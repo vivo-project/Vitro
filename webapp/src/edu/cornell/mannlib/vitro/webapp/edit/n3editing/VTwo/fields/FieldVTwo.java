@@ -138,4 +138,26 @@ public class FieldVTwo {
     public String toString(){
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
+    
+    //Check that two fields are the same
+    //Not sure how to compare EditElement and FieldOptions 
+    public boolean isEqualTo(FieldVTwo inputField) {
+    	//Name required
+    	boolean nameEqual = this.name.equals(inputField.getName());
+    	//Validators initialized so can check
+    	boolean validatorsEqual = this.validators.equals(inputField.getValidators());
+    	//other fields optional and may be null
+    	boolean rangeDatatypeEqual = ((this.rangeDatatypeUri == null && inputField.getRangeDatatypeUri() == null) ||
+    								(this.rangeDatatypeUri != null && inputField.getRangeDatatypeUri() != null 
+    								&& this.rangeDatatypeUri.equals(inputField.getRangeDatatypeUri())));
+    	boolean rangeLangEqual = ((this.rangeLang == null && inputField.getRangeLang() == null) ||
+				(this.rangeLang != null && inputField.getRangeLang() != null 
+				&& this.rangeLang.equals(inputField.getRangeLang())));
+    	
+    	return (nameEqual &&
+    			validatorsEqual &&
+    			rangeDatatypeEqual &&
+    			rangeLangEqual);
+    	
+    }
 }

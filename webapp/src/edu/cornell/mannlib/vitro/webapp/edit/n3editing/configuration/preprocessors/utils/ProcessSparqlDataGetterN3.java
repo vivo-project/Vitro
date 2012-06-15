@@ -19,6 +19,7 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 
@@ -112,7 +113,7 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
    
    public void populateExistingValues(String dataGetterURI, int counter, OntModel queryModel) {
 	   //First, put dataGetterURI within scope as well
-	   existingUriValues.put(this.getDataGetterVar(counter), new ArrayList<String>(Arrays.asList(dataGetterURI)));
+	   this.populateExistingDataGetterURI(dataGetterURI, counter);
 	   //Sparql queries for values to be executed
 	   //And then placed in the correct place/literal or uri
 	   String querystr = getExistingValuesSparqlQuery(dataGetterURI);
@@ -124,10 +125,18 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
            while( results.hasNext()){
         	   QuerySolution qs = results.nextSolution();
         	   Literal saveToVarLiteral = qs.getLiteral("saveToVar");
-        	   Literal htmlValueLiteral = qs.getLiteral("htmlValue");
-        	   //Put both literals in existing literals
+        	   Literal queryLiteral = qs.getLiteral("query");
+        	   Resource queryModelResource = qs.getResource("queryModel");
         	   existingLiteralValues.put(this.getVarName("saveToVar", counter),
-        			   new ArrayList<Literal>(Arrays.asList(saveToVarLiteral, htmlValueLiteral)));
+        			   new ArrayList<Literal>(Arrays.asList(saveToVarLiteral)));
+       
+        	   existingLiteralValues.put(this.getVarName("query", counter),
+        			   new ArrayList<Literal>(Arrays.asList(queryLiteral)));
+        	   
+        	   existingUriValues.put(this.getVarName("queryModel", counter), 
+        			   new ArrayList<String>(Arrays.asList(queryModelResource.getURI())));
+
+        	   
            }
        } catch(Exception ex) {
     	   log.error("Exception occurred in retrieving existing values with query " + querystr, ex);
@@ -136,12 +145,15 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
 	   
    }
   
+	
    
-   //?dataGetter a FixedHTMLDataGetter ; display:saveToVar ?saveToVar; display:htmlValue ?htmlValue .
+   //?dataGetter a SparqlDataGetter ; display:saveToVar ?saveToVar; display:queryModel ?queryModel;
+	//display:query ?query ..
    protected String getExistingValuesSparqlQuery(String dataGetterURI) {
-	   String query = this.getSparqlPrefix() + "SELECT ?saveToVar ?htmlValue WHERE {" + 
-			   "<" + dataGetterURI + "> display:saveToVar ?saveToVar . \n" + 
-			   "<" + dataGetterURI + "> display:htmlValue ?htmlValue . \n" + 
+	   String query = this.getSparqlPrefix() + "SELECT ?saveToVar ?query ?queryModel WHERE {" + 
+			   "<" + dataGetterURI + "> display:query ?query . \n" + 
+			   "OPTIONAL {<" + dataGetterURI + "> display:saveToVar ?saveToVar .} \n" + 
+			   "OPTIONAL {<" + dataGetterURI + "> display:queryModel ?queryModel . }\n" + 
 			   "}";
 	   return query;
    }
@@ -149,8 +161,33 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
 
    
    public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel) {
-	   JSONObject jo = new JSONObject();
-	   return jo;
+	   JSONObject jObject = new JSONObject();
+	   jObject.element("dataGetterClass", classType);
+	   String querystr = getExistingValuesSparqlQuery(dataGetterURI);
+	   QueryExecution qe = null;
+       try{
+           Query query = QueryFactory.create(querystr);
+           qe = QueryExecutionFactory.create(query, queryModel);
+           ResultSet results = qe.execSelect();
+           while( results.hasNext()){
+        	   QuerySolution qs = results.nextSolution();
+        	   Literal saveToVarLiteral = qs.getLiteral("saveToVar");
+        	   Literal queryLiteral = qs.getLiteral("query");
+        	   Resource queryModelResource = qs.getResource("queryModel");
+        	   jObject.element("saveToVar", saveToVarLiteral.getString());
+        	   jObject.element("query", queryLiteral.getString());
+        	   if(queryModelResource != null) {
+        	   jObject.element("queryModel", queryModelResource.getURI());
+        	   } else {
+            	   jObject.element("queryModel", "");
+
+        	   }
+           }
+       } catch(Exception ex) {
+    	   log.error("Exception occurred in retrieving existing values with query " + querystr, ex);
+       }
+	   
+	   return jObject;
    }
 
 }

@@ -88,8 +88,8 @@ public  class ProcessFixedHTMLN3 extends ProcessDataGetterAbstract {
    //Execute populate before retrieval
    public void populateExistingValues(String dataGetterURI, int counter, OntModel queryModel) {
 	   //First, put dataGetterURI within scope as well
-	   existingUriValues.put(this.getDataGetterVar(counter), new ArrayList<String>(Arrays.asList(dataGetterURI)));
-	   //Sparql queries for values to be executed
+	   this.populateExistingDataGetterURI(dataGetterURI, counter);
+	//Sparql queries for values to be executed
 	   //And then placed in the correct place/literal or uri
 	   String querystr = getExistingValuesSparqlQuery(dataGetterURI);
 	   QueryExecution qe = null;

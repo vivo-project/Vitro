@@ -19,6 +19,24 @@ var processIndividualsForClassesDataGetterContent = {
 		});
 		var returnObject = {classGroup:classGroup, classesSelectedInClassGroup:classesSelected, dataGetterClass:this.dataGetterClass};
 		return returnObject;
-	}	
+	},
+	//For an existing set of content where form is already set, fill in the values 
+	populatePageContentSection:function(existingContentObject, pageContentSection) {
+		var classGroupValue = existingContentObject["classGroup"];
+		var classesSelected = existingContenetObject["classesSelectedInClassGroup"];
+		var numberSelected = classesSelected.length;
+		var i;
+		for(i = 0; i < numberSelected; i++) {
+			var classSelected = classesSelected[i];
+			pageContentSection.find("input[name='classInClassGroup'][value='" + classSelected + "']").attr("checked", "checked");
+		}
+		pageContentSection.find("select[name='selectClassGroup']").val(classGroupValue);
+	},
+	//For the label of the content section for editing, need to add additional value
+	retrieveAdditionalLabelText:function(existingContentObject) {
+		//Right now return empty but can hook this into a hashmap with labels and uris
+		//set up in browse class group
+		return "";
+	}
 		
 }

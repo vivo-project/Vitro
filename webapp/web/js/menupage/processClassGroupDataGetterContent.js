@@ -15,7 +15,19 @@ var processClassGroupDataGetterContent = {
 		//query model should also be an input, ensure class group URI is saved as URI and not string
 		var returnObject = {classGroup:classGroup, dataGetterClass:this.dataGetterClass};
 		return returnObject;
+	},
+	//For an existing set of content where form is already set, fill in the values 
+	populatePageContentSection:function(existingContentObject, pageContentSection) {
+		var classGroupValue = existingContentObject["classGroup"];
+		pageContentSection.find("select[name='selectClassGroup']").val(classGroupValue);
+	},
+	//For the label of the content section for editing, need to add additional value
+	retrieveAdditionalLabelText:function(existingContentObject) {
+		//Right now return empty but can hook this into a hashmap with labels and uris
+		//set up in browse class group
+		return "";
 	}
+		
 		
 		
 } 

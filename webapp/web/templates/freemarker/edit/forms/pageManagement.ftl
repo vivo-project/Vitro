@@ -16,7 +16,7 @@
 <#--Existing Values For Editing condition-->
 <#assign literalValues = editConfiguration.existingLiteralValues />
 <#assign uriValues = editConfiguration.existingUriValues />
-<#if menuAction == "Edit"> 
+<#if menuAction = "Edit"> 
 	<#assign pageName = lvf.getFormFieldValue(editSubmission, editConfiguration, "pageName")/>
 	<#assign prettyUrl = lvf.getFormFieldValue(editSubmission, editConfiguration, "prettyUrl")/>
 	<#assign menuItem =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuItem")/>
@@ -76,10 +76,10 @@
             <input type="text" name="prettyUrl" value="${prettyUrl!''}" role="input" />
             <p class="note">Must begin with a leading forward slash: / (e.g., /people)</p>
             <p style="margin-top:8px;margin-bottom:2px">Template<span class="requiredHint"> *</span></p>
-            <input type="radio" class="default-template" name="selectedTemplate" value="default" <#if selectedTemplateType = "default">checked</#if> role="radio" />
+            <input type="radio" class="default-template" name="selectedTemplate" value="default" <#if selectedTemplateType = "default">checked="checked"</#if> role="radio" />
             <label class="inline" for="default"> Default</label>
             <br />
-            <input type="radio" name="selectedTemplate" class="custom-template" value="custom" <#if selectedTemplateType = "custom">checked</#if> role="input" />
+            <input type="radio" name="selectedTemplate" class="custom-template" value="custom" <#if selectedTemplateType = "custom">checked="checked"</#if> role="input" />
             <label class="inline" for="custom"> Custom template</label>
             <section id="custom-template" <#if selectedTemplateType != 'custom'>class="hidden" </#if>role="region">
                 <input type="text" name="customTemplate" value="${customTemplate!''}" size="40" role="input" /><span class="requiredHint"> *</span>
@@ -87,6 +87,7 @@
             <p style="margin-top:10px;margin-bottom:0px"><input id="menuCheckbox" type="checkbox" name="menuCheckbox"> This is a menu page</p>
             <section id="menu" role="region" style="margin-top:10px">
                 <label for="default">Menu Item Name</label>
+                <input type="hidden" id="menuItem" name="menuItem" value="${menuItem!''}" />
                 <input type="text" id="menuLinkText" name="menuLinkText" value="${menuLinkText!''}" size="28" role="input" />
                 <input type="text" id="menuPosition" name="menuPosition" value="${menuPosition!''}" />
                 <p class="note">If left blank, the page title will be used.</p>

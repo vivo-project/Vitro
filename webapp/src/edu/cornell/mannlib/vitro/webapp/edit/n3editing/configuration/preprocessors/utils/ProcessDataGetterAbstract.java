@@ -14,6 +14,15 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Literal;
+
 //Returns the appropriate n3 based on data getter
 public abstract class ProcessDataGetterAbstract implements ProcessDataGetterN3 {
 	
@@ -58,12 +67,20 @@ public abstract class ProcessDataGetterAbstract implements ProcessDataGetterN3 {
    protected  Map<String, List<Literal>> existingLiteralValues = new HashMap<String, List<Literal>>();
    protected Map<String, List<String>> existingUriValues = new HashMap<String, List<String>>();
    public Map<String, List<Literal>> retrieveExistingLiteralValues() {
-		  return existingLiteralValues;
-	   }
-	   public Map<String, List<String>> retrieveExistingUriValues() {
-		  return existingUriValues;
-	   }
+	  return existingLiteralValues;
+   }
+   public Map<String, List<String>> retrieveExistingUriValues() {
+	  return existingUriValues;
+   }
+	   
+	//Data getter var needs to be included in uris in scope
+   public void populateExistingDataGetterURI(String dataGetterURI, int counter) {
+	   existingUriValues.put(this.getVarName("dataGetter", counter), new ArrayList<String>(Arrays.asList(dataGetterURI)));
 
+   }
+   
+
+ 
 }
 
 

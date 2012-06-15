@@ -19,6 +19,7 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
@@ -28,7 +29,7 @@ import net.sf.json.JSONSerializer;
 //Returns the appropriate n3 based on data getter
 public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
 	private static String classType = "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData";
-	private static  String classGroupVarBase = "classGroup";
+	public static  String classGroupVarBase = "classGroup";
 	private Log log = LogFactory.getLog(ProcessClassGroupDataGetterN3.class);
 
 	public ProcessClassGroupDataGetterN3(){
@@ -106,10 +107,10 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
    //TODO: Update
    public void populateExistingValues(String dataGetterURI, int counter, OntModel queryModel) {
 	   //First, put dataGetterURI within scope as well
-	   existingUriValues.put(this.getDataGetterVar(counter), new ArrayList<String>(Arrays.asList(dataGetterURI)));
+	   this.populateExistingDataGetterURI(dataGetterURI, counter);
 	   //Sparql queries for values to be executed
 	   //And then placed in the correct place/literal or uri
-	   String querystr = getExistingValuesSparqlQuery(dataGetterURI);
+	   String querystr = getExistingValuesClassGroup(dataGetterURI);
 	   QueryExecution qe = null;
        try{
            Query query = QueryFactory.create(querystr);
@@ -117,11 +118,10 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
            ResultSet results = qe.execSelect();
            while( results.hasNext()){
         	   QuerySolution qs = results.nextSolution();
-        	   Literal saveToVarLiteral = qs.getLiteral("saveToVar");
-        	   Literal htmlValueLiteral = qs.getLiteral("htmlValue");
+        	   Resource classGroupResource = qs.getResource("classGroup");
         	   //Put both literals in existing literals
-        	   existingLiteralValues.put(this.getVarName("saveToVar", counter),
-        			   new ArrayList<Literal>(Arrays.asList(saveToVarLiteral, htmlValueLiteral)));
+        	   existingUriValues.put(this.getVarName(classGroupVarBase, counter),
+        			   new ArrayList<String>(Arrays.asList(classGroupResource.getURI())));
            }
        } catch(Exception ex) {
     	   log.error("Exception occurred in retrieving existing values with query " + querystr, ex);
@@ -132,17 +132,32 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
   
    
    //?dataGetter a FixedHTMLDataGetter ; display:saveToVar ?saveToVar; display:htmlValue ?htmlValue .
-   protected String getExistingValuesSparqlQuery(String dataGetterURI) {
-	   String query = this.getSparqlPrefix() + "SELECT ?saveToVar ?htmlValue WHERE {" + 
-			   "<" + dataGetterURI + "> display:saveToVar ?saveToVar . \n" + 
-			   "<" + dataGetterURI + "> display:htmlValue ?htmlValue . \n" + 
+   protected String getExistingValuesClassGroup(String dataGetterURI) {
+	   String query = this.getSparqlPrefix() + "SELECT ?classGroup  WHERE {" + 
+			   "<" + dataGetterURI + "> <" + DisplayVocabulary.FOR_CLASSGROUP + "> ?classGroup  . \n" +
 			   "}";
 	   return query;
    }
    
    public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel) {
-	   JSONObject jo = new JSONObject();
-	   return jo;
+	   JSONObject jObject = new JSONObject();
+	   jObject.element("dataGetterClass", classType);
+	   String querystr = getExistingValuesClassGroup(dataGetterURI);
+	   QueryExecution qe = null;
+       try{
+           Query query = QueryFactory.create(querystr);
+           qe = QueryExecutionFactory.create(query, queryModel);
+           ResultSet results = qe.execSelect();
+           while( results.hasNext()){
+        	   QuerySolution qs = results.nextSolution();
+        	   Resource classGroupResource = qs.getResource("classGroup");
+        	   //Put both literals in existing literals
+        	   jObject.element(classGroupVarBase, classGroupResource.getURI());
+           }
+       } catch(Exception ex) {
+    	   log.error("Exception occurred in retrieving existing values with query " + querystr, ex);
+       }
+	   return jObject;
    }
 }
 

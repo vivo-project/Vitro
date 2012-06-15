@@ -4,19 +4,19 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocess
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.vocabulary.RDFS;
-import com.hp.hpl.jena.vocabulary.XSD;
 
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.BaseEditSubmissionPreprocessorVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
@@ -26,11 +26,6 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigu
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3Utils;
-import net.sf.json.JSON;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
-import net.sf.json.util.JSONUtils;
 public class ManagePagePreprocessor extends
 		BaseEditSubmissionPreprocessorVTwo {
 
@@ -103,6 +98,7 @@ public class ManagePagePreprocessor extends
 			
 			//if submission already has value for this, then leave be
 			//otherwise replace with blank value sentinel
+			boolean haslv = submission.hasLiteralValue(literalName);
 			if(!submission.hasLiteralValue(literalName)) {
 				submission.addLiteralToForm(editConfiguration, 
 						 editConfiguration.getField(literalName), 
@@ -114,9 +110,9 @@ public class ManagePagePreprocessor extends
 		for(String uriName: uriKeys) {
 			//these values should never be overwritten or deleted
 			if(uriName != "page" && uriName != "menuItem" && !uriName.startsWith("dataGetter")) {
+				boolean hasuv = submission.hasUriValue(uriName);
 				if(!submission.hasUriValue(uriName)) {
-					submission.addLiteralToForm(editConfiguration, 
-							 editConfiguration.getField(uriName), 
+					submission.addUriToForm(editConfiguration, 
 							 uriName, 
 							 (new String[] {EditConfigurationConstants.BLANK_SENTINEL}));
 				}	
@@ -133,8 +129,11 @@ public class ManagePagePreprocessor extends
 		for(JSONObject jsonObject:pageContentUnitsJSON) {
 			String dataGetterClass = getDataGetterClass(jsonObject);
 			ProcessDataGetterN3 pn = ProcessDataGetterN3Utils.getDataGetterProcessorN3(dataGetterClass, jsonObject);
+			//Removing n3 required b/c retracts in edit case depend on both n3 required and n3 optional
+			//To not muddle up logic, we will just add ALL required and optional statements
+			//from data getters directly to N3 optional
 			//Add n3 required
-			addN3Required(pn, counter);
+			//addN3Required(pn, counter);
 			//Add N3 Optional as well
 			addN3Optional(pn, counter);
 			// Add URIs on Form and Add Literals On Form
@@ -273,7 +272,22 @@ public class ManagePagePreprocessor extends
 
 	private void addFields(ProcessDataGetterN3 pn, int counter) {
 		List<FieldVTwo> fields = pn.retrieveFields(counter);
-		editConfiguration.addFields(fields);
+		//Check if fields don't already exist in case of editing
+		Map<String, FieldVTwo> existingFields = editConfiguration.getFields();
+		for(FieldVTwo newField: fields) {
+			String newFieldName = newField.getName();
+			//if not already in list and about the same
+			if(existingFields.containsKey(newFieldName)) {
+				FieldVTwo existingField = existingFields.get(newFieldName);
+				if(existingField.isEqualTo(newField)) {
+					log.debug("This field already exists and so will not be added:" + newFieldName);
+				} else {
+					log.error("The field with the same name is different and will not be added as a different field exists which is different:" + newFieldName);
+				}
+			} else {
+				editConfiguration.addField(newField);
+			}
+		}
 	}
 	
 	
@@ -291,7 +305,9 @@ public class ManagePagePreprocessor extends
 	/*
 	 * ?subject ?predicate ?conceptNode .
 	 */
+	//NOT Using this right now
 	//This will overwrite the original with the set of new n3 required
+	/*
 	private void addN3Required(ProcessDataGetterN3 pn, int counter) {
 		//Use the process utils to figure out what class required to retrieve the N3 required
 		List<String> requiredList = pn.retrieveN3Required(counter);
@@ -300,7 +316,7 @@ public class ManagePagePreprocessor extends
 		if(requiredList != null) {
 			editConfiguration.addN3Required(requiredList);
 		}
-	}
+	}*/
 	private List<String> getPageToDataGetterN3(
 			ProcessDataGetterN3 pn, int counter) {
 		String dataGetterVar = pn.getDataGetterVar(counter);
@@ -313,31 +329,25 @@ public class ManagePagePreprocessor extends
 	//Add n3 optional
 	
 	private void addN3Optional(ProcessDataGetterN3 pn, int counter) {
+		List<String> addList = new ArrayList<String>();
+		//Get required list
+		List<String> requiredList = pn.retrieveN3Required(counter);
+		//Add connection between data getter and page
+		requiredList.addAll(getPageToDataGetterN3(pn, counter));
+		//get optional n3
 		List<String> optionalList = pn.retrieveN3Optional(counter);
+		if(requiredList != null) {
+			addList.addAll(requiredList);
+		}
+		
 		if(optionalList != null) {
-			editConfiguration.addN3Optional(optionalList);
+			addList.addAll(optionalList);
 		}
-	}
-
-	private String[] convertDelimitedStringToArray(String inputString) {
-		String[] inputArray = new String[1];
-		if (inputString.indexOf(",") != -1) {
-			inputArray = inputString.split(",");
-		} else {
-			inputArray[0] = inputString;
-		}
-		return inputArray;
+		
+		editConfiguration.addN3Optional(addList);
 
 	}
 	
-	
-	
-	
-	private Object getFirstElement(List inputList) {
-		if(inputList == null || inputList.size() == 0)
-			return null;
-		return inputList.get(0);
-	}
 	
 	//Each JSON Object will indicate the type of the data getter within it
 	private String getDataGetterClass(JSONObject jsonObject) {
