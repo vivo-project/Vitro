@@ -40,6 +40,7 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -488,37 +489,35 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
      */
     private Iterator<OntClass> smarterListHierarchyRootClasses(OntModel ontModel, String ontologyURI) {
         List<OntClass> rootClassList = new ArrayList<OntClass>();
-        ClosableIterator<Individual> ci = ontModel.listIndividuals(OWL.Class);
+        ResIterator ci = ontModel.listResourcesWithProperty(RDF.type, OWL.Class);
         try {
-            for (ClosableIterator<Individual> i = ci ; i.hasNext(); ) {
+            for (ResIterator i = ci ; i.hasNext(); ) {
                 try {
-                    Individual classInd = i.next();
-                    //	    		    if (!classInd.canAs(OntClass.class)) {
-                    //	    		        continue;
-                    //	    		    }
-                    OntClass ontClass = (OntClass) classInd.as(OntClass.class);
+                    Resource ontClass = i.nextResource();
                     boolean isRoot = true;
-                    for (Iterator<RDFNode> j = ontClass.listPropertyValues(RDFS.subClassOf); j.hasNext(); ) {
-                        Resource res = (Resource) j.next();
-                        if (res.canAs(OntClass.class)) {
-                            OntClass superClass = (OntClass) res.as(OntClass.class);
-                            if (!superClass.isAnon() && 
-                                    ((ontologyURI==null) || (ontologyURI.equals(superClass.getNameSpace()))) &&
-                                    !OWL.Thing.equals(superClass) && 
-                                    !superClass.equals(ontClass) && 
-                                    !( ontModel.contains(ontClass,OWL.equivalentClass,superClass) || 
-                                            ontModel.contains(superClass,OWL.equivalentClass,ontClass) ) )  {	
-                                if ( (superClass.getNameSpace() != null) 
-                                        && (!(NONUSER_NAMESPACES.contains(
-                                                superClass.getNameSpace()))) ) {
-                                    isRoot=false;
-                                    break;
-                                }
+                    for (StmtIterator j = ontClass.listProperties(RDFS.subClassOf); j.hasNext(); ) {
+                        Statement stmt = j.nextStatement();
+                        if (!stmt.getObject().isResource()) {
+                            continue;
+                        }
+                        Resource superClass = (Resource) stmt.getObject();
+                        if (!superClass.isAnon() && 
+                                ((ontologyURI==null) || (ontologyURI.equals(superClass.getNameSpace()))) &&
+                                !OWL.Thing.equals(superClass) && 
+                                !superClass.equals(ontClass) && 
+                                !( ontModel.contains(ontClass,OWL.equivalentClass,superClass) || 
+                                        ontModel.contains(superClass,OWL.equivalentClass,ontClass) ) )  {	
+                            if ( (superClass.getNameSpace() != null) 
+                                    && (!(NONUSER_NAMESPACES.contains(
+                                            superClass.getNameSpace()))) ) {
+                                isRoot=false;
+                                break;
                             }
                         }
+                        
                     }
-                    if (isRoot) {
-                        rootClassList.add(ontClass);
+                    if (isRoot && ontClass.canAs(OntClass.class)) {
+                        rootClassList.add(ontClass.as(OntClass.class));
                     }
                 } catch (ClassCastException cce) {
                     log.error(cce, cce);
