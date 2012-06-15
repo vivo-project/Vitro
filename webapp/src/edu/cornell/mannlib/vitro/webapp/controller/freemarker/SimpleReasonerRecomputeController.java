@@ -41,10 +41,10 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
             } else {
                 SimpleReasoner simpleReasoner = (SimpleReasoner) sr;
                 if (simpleReasoner.isABoxReasoningAsynchronous()) {
-                    messageStr = "SimpleReasoner is currently in asynchronous mode so a recompute cannot be started. Please try again later.";
+                    messageStr = "Reasoning is currently in asynchronous mode so a recompute cannot be started. Please try again later.";
                 } else if (simpleReasoner.isRecomputing()) {
                         messageStr = 
-                            "The SimpleReasoner is currently in the process of " +
+                            "The system is currently in the process of " +
                             "recomputing inferences.";
                 } else {
                     String submit = (String)vreq.getParameter("submit");

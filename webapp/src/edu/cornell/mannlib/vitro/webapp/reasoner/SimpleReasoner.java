@@ -1560,7 +1560,7 @@ public class SimpleReasoner extends StatementListener {
 	/*
 	 * reconcile a set of inferences into the application inference model
 	 */
-	protected synchronized boolean updateInferenceModel(Model inferenceRebuildModel) {
+	protected boolean updateInferenceModel(Model inferenceRebuildModel) {
 					
     log.info("Updating ABox inference model");
 	StmtIterator iter = null;
@@ -1684,7 +1684,7 @@ public class SimpleReasoner extends StatementListener {
 	/*
 	 * Asynchronous reasoning mode (DeltaComputer) is used in the case of batch removals. 
 	 */
-	public synchronized boolean isABoxReasoningAsynchronous() {
+	public boolean isABoxReasoningAsynchronous() {
          if (batchMode1 || batchMode2) {
         	 return true;
          } else {
@@ -1696,7 +1696,14 @@ public class SimpleReasoner extends StatementListener {
 	private int eventCount = 0;
     
 	@Override
-	public synchronized void notifyEvent(Model model, Object event) {
+	public void notifyEvent(Model model, Object event) {
+	    
+	    if (event instanceof BulkUpdateEvent) {	
+	    	handleBulkUpdateEvent(event);
+	    }
+	}
+		
+	public synchronized void handleBulkUpdateEvent(Object event) {
 	    
 	    if (event instanceof BulkUpdateEvent) {	
 	    	if (((BulkUpdateEvent) event).getBegin()) {	
@@ -1732,7 +1739,7 @@ public class SimpleReasoner extends StatementListener {
 	    	}
 	    }
 	}
-		
+	
 	private synchronized boolean switchBatchModes() {
 
 		if (batchMode1) { 
