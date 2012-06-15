@@ -25,7 +25,6 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -37,7 +36,6 @@ import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.sql.SDBConnection;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
@@ -443,24 +441,9 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
         // nothing
     }
     
-    private class ModelListener extends StatementListener {
-        
-        private String graphURI;
-        private RDFServiceImpl s;
-        
-        public ModelListener(String graphURI, RDFServiceImpl s) {
-            this.graphURI = graphURI;
-            this.s = s;
-        }
-        
-        public void addedStatement(Statement stmt) {
-            s.notifyListeners(stmt.asTriple(), ModelChange.Operation.ADD, graphURI);
-        }
-        
-        public void removedStatement(Statement stmt) {
-            s.notifyListeners(stmt.asTriple(), ModelChange.Operation.REMOVE, graphURI);
-        }
-        
+    @Override
+    public void notifyListeners(Triple triple, ModelChange.Operation operation, String graphURI) {    			
+        super.notifyListeners(triple, operation, graphURI);
     }
-
+    
 }

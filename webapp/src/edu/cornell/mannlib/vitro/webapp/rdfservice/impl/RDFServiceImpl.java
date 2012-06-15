@@ -3,8 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,7 +33,7 @@ public abstract class RDFServiceImpl implements RDFService {
 	
 	private static final Log log = LogFactory.getLog(RDFServiceImpl.class);
 	protected String defaultWriteGraphURI;
-	protected ArrayList<ChangeListener> registeredListeners = new ArrayList<ChangeListener>();
+	protected List<ChangeListener> registeredListeners = new CopyOnWriteArrayList<ChangeListener>();
     	
 	/**
 	 * If the given individual already exists in the default graph, throws an 
@@ -131,8 +132,7 @@ public abstract class RDFServiceImpl implements RDFService {
 		return new ChangeSetImpl();
 	}    
 
-    public synchronized void notifyListeners(Triple triple, ModelChange.Operation operation, String graphURI) {
-    	    			
+    protected void notifyListeners(Triple triple, ModelChange.Operation operation, String graphURI) {    			
         Iterator<ChangeListener> iter = registeredListeners.iterator();
 
         while (iter.hasNext()) {
@@ -145,7 +145,7 @@ public abstract class RDFServiceImpl implements RDFService {
         }
     }
     
-    public synchronized void notifyListenersOfEvent(Object event) {
+    protected void notifyListenersOfEvent(Object event) {
         
         Iterator<ChangeListener> iter = registeredListeners.iterator();
 

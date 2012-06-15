@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,7 +59,6 @@ public class SimpleReasoner extends StatementListener {
 
 	private static final Log log = LogFactory.getLog(SimpleReasoner.class);
 	
-	private RDFService rdfService;
 	private OntModel tboxModel;             // asserted and inferred TBox axioms
 	private OntModel aboxModel;             // ABox assertions
 	private Model inferenceModel;           // ABox inferences
@@ -75,19 +75,18 @@ public class SimpleReasoner extends StatementListener {
 	private volatile boolean batchMode2 = false;
 	private boolean stopRequested = false;
 	
-	//TODO check this for thread safety
-	private List<ReasonerPlugin> pluginList = new ArrayList<ReasonerPlugin>();
+	private List<ReasonerPlugin> pluginList = new CopyOnWriteArrayList<ReasonerPlugin>();
 
 	/**
 	 * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
 	 * @param aboxModel - input.  This model contains asserted ABox statements
 	 * @param inferenceModel - output. This is the model in which inferred (materialized) ABox statements are maintained (added or retracted).
-	 * @param inferenceRebuildModel - output. This the model temporarily used when the whole ABox inference model is rebuilt
-	 * @param inferenceScratchpadModel - output. This the model temporarily used when the whole ABox inference model is rebuilt
+	 * @param inferenceRebuildModel - output. This the model is temporarily used when the whole ABox inference model is rebuilt
+	 * @param inferenceScratchpadModel - output. This the model is temporarily used when the whole ABox inference model is rebuilt
  	 */
 	public SimpleReasoner(OntModel tboxModel, RDFService rdfService, Model inferenceModel,
 			              Model inferenceRebuildModel, Model scratchpadModel) {
-	    this.rdfService = rdfService;
+
 		this.tboxModel = tboxModel;
         this.aboxModel = ModelFactory.createOntologyModel(
                 OntModelSpec.OWL_MEM, ModelFactory.createModelForGraph(
@@ -986,9 +985,6 @@ public class SimpleReasoner extends StatementListener {
 		return false;
 	}
 	
-	
-	
-	
 	/*
 	 * Returns a list of properties that are inverses of the property
 	 * in the given statement. 
@@ -1569,10 +1565,10 @@ public class SimpleReasoner extends StatementListener {
 	// in the recomputed inference model	
     int num = 0;
 	scratchpadModel.enterCriticalSection(Lock.WRITE);
+	scratchpadModel.removeAll();
 	try {
 		inferenceModel.enterCriticalSection(Lock.READ);
 		try {
-			scratchpadModel.removeAll();
 			iter = inferenceModel.listStatements();
 			
 			while (iter.hasNext()) {				
