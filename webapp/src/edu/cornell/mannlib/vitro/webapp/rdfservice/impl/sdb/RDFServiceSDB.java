@@ -113,7 +113,9 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
                 modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
                 dataset.getLock().enterCriticalSection(Lock.WRITE);
                 try {
-                    Model model = dataset.getNamedModel(modelChange.getGraphURI());
+                    Model model = (modelChange.getGraphURI() == null)
+                            ? dataset.getDefaultModel() 
+                            : dataset.getNamedModel(modelChange.getGraphURI());
                     operateOnModel(model, modelChange, dataset);
                 } finally {
                     dataset.getLock().leaveCriticalSection();
@@ -158,9 +160,10 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
                 model.read(modelChange.getSerializedModel(), null,
                         getSerializationFormatString(modelChange.getSerializationFormat()));  
             } else if (modelChange.getOperation() == ModelChange.Operation.REMOVE) {
-                model.remove(parseModel(modelChange));
+                Model removal = parseModel(modelChange);
+                model.remove(removal);
                 if (dataset != null) {
-                    removeBlankNodesWithSparqlUpdate(dataset, model, modelChange.getGraphURI());
+                    removeBlankNodesWithSparqlUpdate(dataset, removal, modelChange.getGraphURI());
                 }
             } else {
                 log.error("unrecognized operation type");
@@ -171,15 +174,25 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
     }
     
     private void removeBlankNodesWithSparqlUpdate(Dataset dataset, Model model, String graphURI) {
-        
-        Model blankNodeModel = ModelFactory.createDefaultModel();
+               
+        List<Statement> blankNodeStatements = new ArrayList<Statement>();
         StmtIterator stmtIt = model.listStatements();
         while (stmtIt.hasNext()) {
             Statement stmt = stmtIt.nextStatement();
             if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
-                blankNodeModel.add(stmt);
+                blankNodeStatements.add(stmt);
             }
         }
+        
+        if(blankNodeStatements.size() == 0) {
+            return;
+        }
+        
+        Model blankNodeModel = ModelFactory.createDefaultModel();
+        blankNodeModel.add(blankNodeStatements);
+        
+        log.debug("removal model size " + model.size());
+        log.debug("blank node model size " + blankNodeModel.size());
                 
         String rootFinder = "SELECT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s } FILTER (!bound(?ss)) }";
         Query rootFinderQuery = QueryFactory.create(rootFinder);
@@ -214,7 +227,11 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
                         }
                         m2.add(stmt);
                         DataSource ds = DatasetFactory.create();
-                        ds.addNamedModel(graphURI, dataset.getNamedModel(graphURI));
+                        if (graphURI == null) {
+                            ds.setDefaultModel(dataset.getDefaultModel());
+                        } else {
+                            ds.addNamedModel(graphURI, dataset.getNamedModel(graphURI));    
+                        }      
                         removeUsingSparqlUpdate(ds, m2, graphURI);
                     }                   
                 } finally {
@@ -276,8 +293,11 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
         // make a plain dataset to force the query to be run in a way that
         // won't overwhelm MySQL with too many joins
         DataSource ds = DatasetFactory.create();
-        ds.addNamedModel(graphURI, (graphURI != null) 
-                ? dataset.getNamedModel(graphURI) : dataset.getDefaultModel());
+        if (graphURI == null) {
+            ds.setDefaultModel(dataset.getDefaultModel());
+        } else {
+            ds.addNamedModel(graphURI, dataset.getNamedModel(graphURI));            
+        }
         QueryExecution qe = QueryExecutionFactory.create(construct, ds);
         try {
             Model m = qe.execConstruct();
