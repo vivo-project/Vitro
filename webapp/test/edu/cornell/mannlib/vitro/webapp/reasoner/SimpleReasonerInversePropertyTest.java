@@ -28,6 +28,7 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
         //Turn off log messages to console
 		setLoggerLevel(SimpleReasoner.class, Level.OFF);
 		setLoggerLevel(SimpleReasonerTBoxListener.class, Level.OFF);
+		setLoggerLevel(ABoxRecomputer.class, Level.OFF);
 	}
 	
 	/*
@@ -447,6 +448,12 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	    aBox.add(a,P,b);
         aBox.add(c,X,d);
 	    
+		Assert.assertTrue(inf.contains(b,Q,a));
+		Assert.assertTrue(inf.contains(d,Y,c));				
+                
+        inf.remove(b,Q,a);
+        inf.remove(d,Y,c);
+        
         //recompute whole abox
 	    simpleReasoner.recompute();
 	    

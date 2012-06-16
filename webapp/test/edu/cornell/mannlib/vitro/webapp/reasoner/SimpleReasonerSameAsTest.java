@@ -35,6 +35,7 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
         //Turn off log messages to console
 		setLoggerLevel(SimpleReasoner.class, Level.OFF);
 		setLoggerLevel(SimpleReasonerTBoxListener.class, Level.OFF);
+		setLoggerLevel(ABoxRecomputer.class, Level.OFF);
 	}
 	
 	/*
@@ -674,7 +675,19 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 		aBox.add(b,Q,d);
 		aBox.add(b,T,literal2);
 		aBox.add(a,OWL.sameAs,b);
-                
+           
+		Assert.assertTrue(inf.contains(b,OWL.sameAs,a));
+		Assert.assertTrue(inf.contains(b,P,c));
+		Assert.assertTrue(inf.contains(b,S,literal1));
+		Assert.assertTrue(inf.contains(a,Q,d));
+		Assert.assertTrue(inf.contains(a,T,literal2));
+		
+		inf.remove(b,OWL.sameAs,a);
+		inf.remove(b,P,c);
+		inf.remove(b,S,literal1);
+		inf.remove(a,Q,d);
+		inf.remove(a,T,literal2);
+		
 	    simpleReasoner.recompute();
 	    
 	    while (simpleReasoner.isRecomputing()) {

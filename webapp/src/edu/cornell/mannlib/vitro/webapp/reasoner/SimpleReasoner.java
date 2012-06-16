@@ -16,13 +16,6 @@ import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntProperty;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -33,7 +26,6 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
@@ -62,17 +54,18 @@ public class SimpleReasoner extends StatementListener {
 	private OntModel tboxModel;             // asserted and inferred TBox axioms
 	private OntModel aboxModel;             // ABox assertions
 	private Model inferenceModel;           // ABox inferences
-	private Model inferenceRebuildModel;    // work area for re-computing all ABox inferences
-	private Model scratchpadModel;          // work area for re-computing all ABox inferences
 	
 	private static final String mostSpecificTypePropertyURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType";	
 	private static final AnnotationProperty mostSpecificType = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createAnnotationProperty(mostSpecificTypePropertyURI);
 	
-	//TODO check this for thread safety
+	// DeltaComputer
 	private CumulativeDeltaModeler aBoxDeltaModeler1 = null;
 	private CumulativeDeltaModeler aBoxDeltaModeler2 = null;
-	private volatile boolean batchMode1 = false;
-	private volatile boolean batchMode2 = false;
+	private int batchMode = 0;  // values: 0, 1 and 2
+
+	// Recomputer
+	private ABoxRecomputer recomputer = null;
+	
 	private boolean stopRequested = false;
 	
 	private List<ReasonerPlugin> pluginList = new CopyOnWriteArrayList<ReasonerPlugin>();
@@ -84,20 +77,24 @@ public class SimpleReasoner extends StatementListener {
 	 * @param inferenceRebuildModel - output. This the model is temporarily used when the whole ABox inference model is rebuilt
 	 * @param inferenceScratchpadModel - output. This the model is temporarily used when the whole ABox inference model is rebuilt
  	 */
-	public SimpleReasoner(OntModel tboxModel, RDFService rdfService, Model inferenceModel,
-			              Model inferenceRebuildModel, Model scratchpadModel) {
+	public SimpleReasoner(OntModel tboxModel, 
+			              RDFService rdfService, 
+			              Model inferenceModel,
+			              Model inferenceRebuildModel, 
+			              Model scratchpadModel) {
 
 		this.tboxModel = tboxModel;
+		
         this.aboxModel = ModelFactory.createOntologyModel(
-                OntModelSpec.OWL_MEM, ModelFactory.createModelForGraph(
-                        new DifferenceGraph(new RDFServiceGraph(rdfService), inferenceModel.getGraph()))); 
+                  OntModelSpec.OWL_MEM, ModelFactory.createModelForGraph(
+                        new DifferenceGraph(new DifferenceGraph(new RDFServiceGraph(rdfService),inferenceModel.getGraph()),
+                        		tboxModel.getGraph())));
+                        
 		this.inferenceModel = inferenceModel;
-		this.inferenceRebuildModel = inferenceRebuildModel;
-		this.scratchpadModel = scratchpadModel;	
-		this.batchMode1 = false;
-		this.batchMode2 = false;
+		this.batchMode = 0;
 		aBoxDeltaModeler1 = new CumulativeDeltaModeler();
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
+		recomputer = new ABoxRecomputer(tboxModel,this.aboxModel,inferenceModel,inferenceRebuildModel,scratchpadModel,this);
 		stopRequested = false;
 		
 		if (rdfService == null) {
@@ -122,13 +119,11 @@ public class SimpleReasoner extends StatementListener {
 		this.tboxModel = tboxModel;
 		this.aboxModel = aboxModel; 
 		this.inferenceModel = inferenceModel;
-		this.inferenceRebuildModel = ModelFactory.createDefaultModel();
-		this.scratchpadModel = ModelFactory.createDefaultModel();
 		aBoxDeltaModeler1 = new CumulativeDeltaModeler();
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
-		this.batchMode1 = false;
-		this.batchMode2 = false;
+		this.batchMode = 0;
 		stopRequested = false;
+		recomputer = new ABoxRecomputer(tboxModel,this.aboxModel,inferenceModel,ModelFactory.createDefaultModel(),ModelFactory.createDefaultModel(),this);
 	}
 	
 	public void setPluginList(List<ReasonerPlugin> pluginList) {
@@ -160,8 +155,7 @@ public class SimpleReasoner extends StatementListener {
 
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
-			log.error("Exception while computing inferences: " + e.getMessage());
-			e.printStackTrace(); //TODO remove this for release
+			log.error("Exception while computing inferences: ",e);
 		}
 	}
 	
@@ -174,9 +168,6 @@ public class SimpleReasoner extends StatementListener {
 	public void removedStatement(Statement stmt) {
 	
 		try {
-           // if (!isInterestedInRemovedStatement(stmt)) { return; }
-		   // interested in all of them now that we are doing inverse
-		   // property reasoning
             handleRemovedStatement(stmt);
             
 		} catch (Exception e) {
@@ -191,11 +182,11 @@ public class SimpleReasoner extends StatementListener {
 	 * with DeltaComputer.
 	 */
 	protected synchronized void handleRemovedStatement(Statement stmt) {    
-		if (batchMode1) {
+		if (batchMode == 1) {
 			 aBoxDeltaModeler1.removedStatement(stmt);
-		} else if (batchMode2) {
+		} else if (batchMode == 2) {
 			 aBoxDeltaModeler2.removedStatement(stmt);
-		} else {
+		} else {  // batchMode == 0
 			if (stmt.getPredicate().equals(RDF.type)) {
 				removedABoxTypeAssertion(stmt, inferenceModel);
 				setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
@@ -346,27 +337,6 @@ public class SimpleReasoner extends StatementListener {
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
 			log.error("Exception while removing inference(s): " + e.getMessage());
-		}
-	}
-
-    /*
-     * This signature used when recomputing the whole ABox
-     */
-	protected void addedABoxTypeAssertion(Resource individual, Model inferenceModel, HashSet<String> unknownTypes) {
-
-		StmtIterator iter = null;
-		
-		aboxModel.enterCriticalSection(Lock.READ);
-		try {		
-			iter = aboxModel.listStatements(individual, RDF.type, (RDFNode) null);
-			
-			while (iter.hasNext()) {	
-				Statement stmt = iter.next();
-				addedABoxTypeAssertion(stmt, inferenceModel, unknownTypes);
-			}
-		} finally {
-			iter.close();
-			aboxModel.leaveCriticalSection();
 		}
 	}
 	
@@ -942,8 +912,7 @@ public class SimpleReasoner extends StatementListener {
 	// Returns true if the triple is entailed by inverse property
 	// reasoning or sameAs reasoning; otherwise returns false.
 	protected boolean entailedStatement(Statement stmt) {	
-		
-		//TODO think about checking class subsumption here
+		//TODO think about checking class subsumption here (for convenience)
 		
 		// Inverse properties
 		List<OntProperty> inverses = getInverseProperties(stmt);
@@ -1324,345 +1293,29 @@ public class SimpleReasoner extends StatementListener {
 	 * Returns true if the reasoner is in the process of recomputing all
 	 * inferences.
 	 */
-	private boolean recomputing = false;
 	
 	public boolean isRecomputing() {
-	    return recomputing;
-	}
-	
-	/**
-	 * Recompute all inferences.
-	 */
-	public synchronized void recompute() {
-	    recomputing = true;
-	    try {
-	        recomputeABox();
-	    } finally {
-	        recomputing = false;
-	    }
-	}
-
-	/*
-	 * Recompute the entire ABox inference graph. The new 
-	 * inference graph is built in a separate model and
-	 * then reconciled with the inference graph in active
-	 * use. The model reconciliation must be done
-	 * without reading the whole inference models into 
-	 * memory in order to support very large ABox 
-	 * inference models.	  
-	 */
-	protected synchronized void recomputeABox() {
-			
-		// recompute class subsumption inferences 
-		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);			
-		try {
-			HashSet<String> unknownTypes = new HashSet<String>();
-			inferenceRebuildModel.removeAll();
-			
-			log.info("Computing class subsumption ABox inferences.");
-			int numStmts = 0;
-			ArrayList<String> individuals = this.getAllIndividualURIs();
-			
-			for (String individualURI : individuals) {			
-				Resource individual = ResourceFactory.createResource(individualURI);
-				
-				try {
-					addedABoxTypeAssertion(individual, inferenceRebuildModel, unknownTypes);
-					setMostSpecificTypes(individual, inferenceRebuildModel, unknownTypes);
-					StmtIterator sit = aboxModel.listStatements(individual, null, (RDFNode) null);
-					while (sit.hasNext()) {
-						Statement s = sit.nextStatement();
-						for (ReasonerPlugin plugin : getPluginList()) {
-							plugin.addedABoxStatement(s, aboxModel, inferenceRebuildModel, tboxModel);
-						}
-					}
-				} catch (NullPointerException npe) {
-	            	log.error("a NullPointerException was received while recomputing the ABox inferences. Halting inference computation.");
-	                return;
-				} catch (JenaException je) {
-					 if (je.getMessage().equals("Statement models must no be null")) {
-						 log.error("Exception while recomputing ABox inference model. Halting inference computation.", je);
-		                 return; 
-					 } 
-					 log.error("Exception while recomputing ABox inference model: ", je);
-				} catch (Exception e) {
-					 log.error("Exception while recomputing ABox inference model: ", e);
-				}
-				
-				numStmts++;
-	            if ((numStmts % 10000) == 0) {
-	                log.info("Still computing class subsumption ABox inferences...");
-	            }
-	            
-	            if (stopRequested) {
-	            	log.info("a stopRequested signal was received during recomputeABox. Halting Processing.");
-	            	return;
-	            }
-			}
-			
-			log.info("Finished computing class subsumption ABox inferences");
-			log.info("Computing inverse property ABox inferences");
-			
-			Iterator<Statement> invStatements = null;
-			tboxModel.enterCriticalSection(Lock.READ);
-			try {
-			    invStatements = tboxModel.listStatements((Resource) null, OWL.inverseOf, (Resource) null);
-			} finally {
-			    tboxModel.leaveCriticalSection();	
-			}
-			
-			numStmts = 0;
-			while (invStatements.hasNext()) {				
-				Statement stmt = invStatements.next();
-												
-				try {
-					OntProperty prop1 = tboxModel.getOntProperty((stmt.getSubject()).getURI());
-					if (prop1 == null) {
-						//TODO make sure not to print out a million of these for the same property
-						log.debug("didn't find subject property in the tbox: " + (stmt.getSubject()).getURI());
-						continue;
-					}
-					
-					OntProperty prop2 = tboxModel.getOntProperty(((Resource)stmt.getObject()).getURI()); 
-					if (prop2 == null) {
-						//TODO make sure not to print out a million of these for the same property
-						log.debug("didn't find object property in the tbox: " + ((Resource)stmt.getObject()).getURI());
-						continue;
-					}
-					
-					addedInverseProperty(prop1, prop2, inferenceRebuildModel);
-				} catch (NullPointerException npe) {
-	            	log.error("a NullPointerException was received while recomputing the ABox inferences. Halting inference computation.");
-	                return;
-				} catch (JenaException je) {
-					 if (je.getMessage().equals("Statement models must no be null")) {
-						 log.error("Exception while recomputing ABox inference model. Halting inference computation.", je);
-		                 return; 
-					 } 
-					 log.error("Exception while recomputing ABox inference model: ", je);
-				} catch (Exception e) {
-					 log.error("Exception while recomputing ABox inference model: ", e);
-				}
-				
-				numStmts++;
-	            if ((numStmts % 10000) == 0) {
-	                log.info("Still computing inverse property ABox inferences...");
-	            }
-	            
-	            if (stopRequested) {
-	            	log.info("a stopRequested signal was received during recomputeABox. Halting Processing.");
-	            	return;
-	            }
-			}
-			
-			log.info("Finished computing inverse property ABox inferences");
-			log.info("Computing sameAs ABox inferences");
-			
-			Iterator<Statement> sameAsStatements = null;
-			aboxModel.enterCriticalSection(Lock.READ);
-			try {
-			    sameAsStatements = aboxModel.listStatements((Resource) null, OWL.sameAs, (Resource) null);
-			} finally {
-			    aboxModel.leaveCriticalSection();	
-			}
-			
-			numStmts = 0;
-			while (sameAsStatements.hasNext()) {				
-				Statement stmt = sameAsStatements.next();
-												
-				try {
-					addedABoxSameAsAssertion(stmt, inferenceRebuildModel); 
-				} catch (NullPointerException npe) {
-	            	log.error("a NullPointerException was received while recomputing the ABox inferences. Halting inference computation.");
-	                return;
-				} catch (JenaException je) {
-					 if (je.getMessage().equals("Statement models must no be null")) {
-						 log.error("Exception while recomputing ABox inference model. Halting inference computation.", je);
-		                 return; 
-					 } 
-					 log.error("Exception while recomputing ABox inference model: ", je);
-				} catch (Exception e) {
-					 log.error("Exception while recomputing ABox inference model: ", e);
-				}
-				
-				numStmts++;
-	            if ((numStmts % 10000) == 0) {
-	                log.info("Still computing sameAs ABox inferences...");
-	            }
-	            
-	            if (stopRequested) {
-	            	log.info("a stopRequested signal was received during recomputeABox. Halting Processing.");
-	            	return;
-	            }
-			}
-			log.info("Finished computing sameAs ABox inferences");	
-			
-			try {
-				if (updateInferenceModel(inferenceRebuildModel)) {
-		        	log.info("a stopRequested signal was received during updateInferenceModel. Halting Processing.");
-		        	return;
-				}
-			} catch (Exception e) {
-				log.error("Exception while reconciling the current and recomputed ABox inference model for class subsumption inferences. Halting processing." , e);
-			}			
-		} catch (Exception e) {
-			log.error("Exception while recomputing ABox inferences. Halting processing.", e);
-		} finally {
-			inferenceRebuildModel.removeAll();
-			inferenceRebuildModel.leaveCriticalSection();
-		}		
-	}
-	
-	/*
-	 * Get the URIs for all individuals in the system
-	 */
-	protected ArrayList<String> getAllIndividualURIs() {
-	    
-		String queryString = "select distinct ?subject where {?subject <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type}";
-	    return getIndividualURIs(queryString);
-	}
-
-	protected ArrayList<String> getIndividualURIs(String queryString) {
-	    
-		ArrayList<String> individuals = new ArrayList<String>();
-		aboxModel.enterCriticalSection(Lock.READ);	
-		
-		try {
-			try {			
-				Query query = QueryFactory.create(queryString, Syntax.syntaxARQ);
-				QueryExecution qe = QueryExecutionFactory.create(query, aboxModel);
-				
-				ResultSet results = qe.execSelect();
-	            
-				while (results.hasNext()) {
-					QuerySolution solution = results.next();
-					Resource resource = solution.getResource("subject");
-					
-					if ((resource != null) && !resource.isAnon()) {
-						individuals.add(resource.getURI());
-					}					
-				}
-				
-		   	} catch (Exception e) {
-				log.error("exception while retrieving list of individuals ",e);
-			}	
-		} finally {
-			aboxModel.leaveCriticalSection();
+		if (recomputer == null) {
+			return false;
 		}
 		
-		return individuals;
-	}
-
-	/*
-	 * reconcile a set of inferences into the application inference model
-	 */
-	protected boolean updateInferenceModel(Model inferenceRebuildModel) {
-					
-    log.info("Updating ABox inference model");
-	StmtIterator iter = null;
- 
-	// Remove everything from the current inference model that is not
-	// in the recomputed inference model	
-    int num = 0;
-	scratchpadModel.enterCriticalSection(Lock.WRITE);
-	scratchpadModel.removeAll();
-	try {
-		inferenceModel.enterCriticalSection(Lock.READ);
-		try {
-			iter = inferenceModel.listStatements();
-			
-			while (iter.hasNext()) {				
-				Statement stmt = iter.next();
-				if (!inferenceRebuildModel.contains(stmt)) {
-				   scratchpadModel.add(stmt);  
-				}
-				
-				num++;
-                if ((num % 10000) == 0) {
-                    log.info("Still updating ABox inference model (removing outdated inferences)...");
-                }
-                
-                if (stopRequested) {
-                	return true;
-                }
-			}
-		} finally {
-			iter.close();
-            inferenceModel.leaveCriticalSection();
-		}
-		
-		try {
-			iter = scratchpadModel.listStatements();
-			while (iter.hasNext()) {
-				Statement stmt = iter.next();
-				
-				inferenceModel.enterCriticalSection(Lock.WRITE);
-				try {
-					inferenceModel.remove(stmt);
-				} finally {
-					inferenceModel.leaveCriticalSection();
-				}
-			}
-		} finally {
-			iter.close();
-		}
-					
-		// Add everything from the recomputed inference model that is not already
-		// in the current inference model to the current inference model.	
-		try {
-			scratchpadModel.removeAll();
-			iter = inferenceRebuildModel.listStatements();
-			
-			while (iter.hasNext()) {				
-				Statement stmt = iter.next();
-				
-				inferenceModel.enterCriticalSection(Lock.READ);
-				try {
-					if (!inferenceModel.contains(stmt)) {
-						 scratchpadModel.add(stmt);
-					}
-				} finally {
-				     inferenceModel.leaveCriticalSection();	
-				}
-									
-				num++;
-                if ((num % 10000) == 0) {
-                    log.info("Still updating ABox inference model (adding new inferences)...");
-                }
-                
-                if (stopRequested) {
-                	return true;
-                }
-			}
-		} finally {
-			iter.close();	
-		}
-					
-		iter = scratchpadModel.listStatements();
-		while (iter.hasNext()) {
-			Statement stmt = iter.next();
-			
-			inferenceModel.enterCriticalSection(Lock.WRITE);
-			try {
-				inferenceModel.add(stmt);
-			} finally {
-				inferenceModel.leaveCriticalSection();
-			}
-		}
-	} finally {
-		iter.close();
-		scratchpadModel.removeAll();
-		scratchpadModel.leaveCriticalSection();			
+	    return recomputer.isRecomputing();
 	}
 	
-	log.info("ABox inference model updated");
-	return false;
+	public void recompute() {
+		if (recomputer != null) {
+		    recomputer.recompute();
+		}
 	}
 	
 	/**
 	 * This is called when the application shuts down.
 	 */
 	public void setStopRequested() {
+	    if (recomputer != null) {
+	    	recomputer.setStopRequested();
+	    }
+
 	    this.stopRequested = true;
 	}
 	
@@ -1681,7 +1334,7 @@ public class SimpleReasoner extends StatementListener {
 	 * Asynchronous reasoning mode (DeltaComputer) is used in the case of batch removals. 
 	 */
 	public boolean isABoxReasoningAsynchronous() {
-         if (batchMode1 || batchMode2) {
+         if (batchMode > 0) {
         	 return true;
          } else {
         	 return false;
@@ -1710,9 +1363,7 @@ public class SimpleReasoner extends StatementListener {
 	    			log.info("received a bulk update begin event while processing in asynchronous mode. Event count = " + eventCount);
 	    			return;  
 	    		} else {
-	    			batchMode1 = true;
-	    			batchMode2 = false;
-	    			
+	    			batchMode = 1;
 	    	    	if (aBoxDeltaModeler1.getRetractions().size() > 0) {
 	    	     	   log.warn("Unexpected condition: the aBoxDeltaModeler1 retractions model was not empty when entering batch mode.");
 	    	     	}
@@ -1738,34 +1389,32 @@ public class SimpleReasoner extends StatementListener {
 	
 	private synchronized boolean switchBatchModes() {
 
-		if (batchMode1) { 
+		if (batchMode == 1) { 
     	   aBoxDeltaModeler2.getRetractions().removeAll();
     	   
-    	   if (aBoxDeltaModeler1.getRetractions().size() > 0) { 
-    	       batchMode2 = true;
-    	   	   batchMode1 = false;  
-			   log.info("entering batch mode 2");
+    	   if (aBoxDeltaModeler1.getRetractions().size() > 0) {
+    		   batchMode = 2;
+			   log.info("entering batch mode " + batchMode);
     	   } else {
     		   deltaComputerProcessing = false;
     		   if (eventCount == 0) {
-    			   batchMode1 = false;
+    			   batchMode = 0;
     		   }
     	   }
-	   } else if (batchMode2) {
+	   } else if (batchMode == 2) {
 			aBoxDeltaModeler1.getRetractions().removeAll();
 
-    	    if (aBoxDeltaModeler2.getRetractions().size() > 0) { 
-    	       batchMode1 = true;
-    	   	   batchMode2 = false;  
-			   log.info("entering batch mode 1");
+    	    if (aBoxDeltaModeler2.getRetractions().size() > 0) {
+    	    	batchMode = 1; 
+			   log.info("entering batch mode " + batchMode);
     	    } else {
     		   deltaComputerProcessing = false;
     		   if (eventCount == 0) {
-    			   batchMode2 = false;
+    			   batchMode = 0;
     		   }
     	    }
 	   } else { 
-		    log.warn("unexpected condition, invoked when batchMode1 and batchMode2 are both false");
+		    log.warn("unexpected condition, invoked when batchMode is neither 1 nor 2. batchMode = " + batchMode);
             deltaComputerProcessing = false;
 	   }
        
@@ -1786,10 +1435,10 @@ public class SimpleReasoner extends StatementListener {
         	while (deltaComputerProcessing && !stopRequested) {
         		
         		if (switchBatchModes()) {
-        			if (batchMode1) {
+        			if (batchMode == 1) {
         				qualifier = "2";
         				retractions = aBoxDeltaModeler2.getRetractions();
-        			} else if (batchMode2) {
+        			} else if (batchMode == 2) {
         				qualifier = "1";
         				retractions = aBoxDeltaModeler1.getRetractions();        				
         			} 
@@ -1853,7 +1502,7 @@ public class SimpleReasoner extends StatementListener {
                 log.debug("\t--> processed " + num + " statements");
         	}
         	
-        	log.info("ending DeltaComputer.run. batchMode1 = " + batchMode1 + ", batchMode2 = " + batchMode2);
+        	log.info("ending DeltaComputer.run. batchMode = " + batchMode);
         }        
     }   
 }
