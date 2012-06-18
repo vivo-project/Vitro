@@ -359,7 +359,8 @@ var pageManagementUtils = {
         $newRemoveButton = $innerDiv.find('input#remove' + counter);
         // this will have to disable submitted fields as well as hide them.
         $newRemoveButton.click(function() {
-            $innerDiv.parent("div").css("display","none");
+            //$innerDiv.parent("div").css("display","none");
+        	$innerDiv.parent("div").remove();
             pageManagementUtils.adjustSaveButtonHeight();
         });
     },
@@ -387,41 +388,47 @@ var pageManagementUtils = {
         url += encodeURIComponent(vclassUri);
         //Make ajax call to retrieve vclasses
         $.getJSON(url, function(results) {
-  
-          if ( results.classes.length == 0 ) {
-     
-          } else {
-              //update existing content type with correct class group name and hide class group select again
-          //   pageManagementUtils.hideClassGroups();
-      
-              pageManagementUtils.selectedGroupForPage.html(results.classGroupName);
-              //update content type in message to "display x within my institution"
-              pageManagementUtils.updateInternalClassMessage(results.classGroupName);
-              //retrieve classes for class group and display with all selected
-              var selectedClassesList = pageManagementUtils.classesForClassGroup.children('ul#selectedClasses');
-              
-              selectedClassesList.empty();
-              selectedClassesList.append('<li class="ui-state-default"> <input type="checkbox" name="allSelected" id="allSelected" value="all" checked="checked" /> <label class="inline" for="All"> All</label> </li>');
-              
-              $.each(results.classes, function(i, item) {
-                  var thisClass = results.classes[i];
-                  var thisClassName = thisClass.name;
-                  //When first selecting new content type, all classes should be selected
-                  appendHtml = ' <li class="ui-state-default">' + 
-                          '<input type="checkbox" checked="checked" name="classInClassGroup" value="' + thisClass.URI + '" />' +  
-                         '<label class="inline" for="' + thisClassName + '"> ' + thisClassName + '</label>' + 
-                          '</li>';
-                  selectedClassesList.append(appendHtml);
-              });
-              pageManagementUtils.toggleClassSelection();
-              
-              
-              //From NEW code
-              if (pageManagementUtils.selectClassGroupDropdown.val() == "" ) {
-            	  pageManagementUtils.classesForClassGroup.addClass('hidden');
-  	            $("div#leftSide").css("height","");
-  	            pageManagementUtils.moreContentButton.hide();
-  	            
+        	//Moved the function to processClassGroupDataGetterContent
+        	//Should probably remove this entire method and copy there
+        	processClassGroupDataGetterContent.displayClassesForClassGroup(results);
+        });
+    },
+    displayClassesForClassGroup:function(results) {
+        if ( results.classes.length == 0 ) {
+            
+        } else {
+            //update existing content type with correct class group name and hide class group select again
+        //   pageManagementUtils.hideClassGroups();
+    
+            pageManagementUtils.selectedGroupForPage.html(results.classGroupName);
+            //update content type in message to "display x within my institution"
+            //SPECIFIC TO VIVO: So include in internal CLASS section instead
+            pageManagementUtils.updateInternalClassMessage(results.classGroupName);
+            //retrieve classes for class group and display with all selected
+            var selectedClassesList =  pageManagementUtils.classesForClassGroup.children('ul#selectedClasses');
+            
+            selectedClassesList.empty();
+            selectedClassesList.append('<li class="ui-state-default"> <input type="checkbox" name="allSelected" id="allSelected" value="all" checked="checked" /> <label class="inline" for="All"> All</label> </li>');
+            
+            $.each(results.classes, function(i, item) {
+                var thisClass = results.classes[i];
+                var thisClassName = thisClass.name;
+                //For the class group, ALL classes should be selected
+                appendHtml = ' <li class="ui-state-default">' + 
+                        '<input type="checkbox" checked="checked" name="classInClassGroup" value="' + thisClass.URI + '" />' +  
+                       '<label class="inline" for="' + thisClassName + '"> ' + thisClassName + '</label>' + 
+                        '</li>';
+                selectedClassesList.append(appendHtml);
+            });
+            pageManagementUtils.toggleClassSelection();
+            
+            
+            //From NEW code
+            if (pageManagementUtils.selectClassGroupDropdown.val() == "" ) {
+          	  pageManagementUtils.classesForClassGroup.addClass('hidden');
+	            $("div#leftSide").css("height","");
+	            pageManagementUtils.moreContentButton.hide();
+	            
 	  	        }
 	  	     else {
 	  	    	 	pageManagementUtils.classesForClassGroup.removeClass('hidden');
@@ -430,11 +437,7 @@ var pageManagementUtils = {
 	  	                $("div#leftSide").css("height",$("div#rightSide").height() + "px");
 	  	            }          
 	  	     }
-              
-              
-          }
- 
-        });
+        }
     },
     toggleClassSelection: function() {
         // Check/unckeck all classes for selection
@@ -544,6 +547,7 @@ var pageManagementUtils = {
     	var originalObjectPath = 'section#' + contentType;
     	var $newContentObj = $(originalObjectPath).clone();
  	    $newContentObj.addClass("pageContent"); 
+ 	    $newContentObj.attr("contentNumber", counter);
  	    //Save content type
 	    $newContentObj.attr("contentType", contentType);
 	    //Set id for object

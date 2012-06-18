@@ -4,7 +4,6 @@
 <#--Requires Menu action be defined in parent template-->
 <#assign classGroup = pageData.classGroup />
 <#assign classGroups = pageData.classGroups />
-<#assign isClassGroupPage = false/>
 <#assign includeAllClasses = false/>
 <#-- some additional processing here which shows or hides the class group selection and classes based on initial action-->
 <#assign existingClassGroupStyle = " " />
@@ -41,20 +40,12 @@
                     <ul id="selectedClasses" name="selectedClasses" role="menu">
                         <#--Adding a default class for "ALL" in case all classes selected-->
                         <li class="ui-state-default" role="menuitem">
-                            <input type="checkbox" name="allSelected" id="allSelected" value="all" <#if !isIndividualsForClassesPage?has_content>checked</#if> />
+                            <input type="checkbox" name="allSelected" id="allSelected" value="all" checked="checked" />
                             <label class="inline" for="All"> All</label>
                         </li>
                         <#list classGroup as classInClassGroup>
                         <li class="ui-state-default" role="menuitem">
-                            <input type="checkbox" id="classInClassGroup" name="classInClassGroup" value="${classInClassGroup.URI}" 
-                            <#if includeAllClasses = true>checked</#if> 
-                            <#if isIndividualsForClassesPage?has_content>
-                                <#list includeClasses as includeClass>
-                                    <#if includeClass = classInClassGroup.URI>
-                                        checked
-                                    </#if>
-                                </#list>
-                            </#if> />
+                            <input type="checkbox" id="classInClassGroup" name="classInClassGroup" value="${classInClassGroup.URI}" checked="checked" />
                             <label class="inline" for="${classInClassGroup.name}"> ${classInClassGroup.name}</label>
                             <span class="ui-icon-sortable"></span> 
                         </li>

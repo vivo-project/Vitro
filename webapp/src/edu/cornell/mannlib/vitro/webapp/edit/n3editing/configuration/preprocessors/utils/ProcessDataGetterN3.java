@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.json.JSONObject;
+import javax.servlet.ServletContext;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -33,6 +34,6 @@ public interface ProcessDataGetterN3 {
     public Map<String, List<Literal>> retrieveExistingLiteralValues();
     public Map<String, List<String>> retrieveExistingUriValues();
     public void populateExistingValues(String dataGetterURI, int counter, OntModel queryModel);
-    public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel);
+    public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context);
 
 }

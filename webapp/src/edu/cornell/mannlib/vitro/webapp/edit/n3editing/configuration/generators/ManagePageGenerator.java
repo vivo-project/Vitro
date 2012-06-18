@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
 import net.sf.json.JSONArray;
@@ -79,17 +80,20 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
      	setUrisAndLiteralsOnForm(conf, vreq);
         //Set the fields
         setFields(conf);
-       
         //Adding additional data, specifically edit mode
         addFormSpecificData(conf, vreq);
         //Add preprocessor
         conf.addEditSubmissionPreprocessor(new ManagePagePreprocessor(conf));
-        //Prepare
+        //Prepare: add literals/uris in scope based on sparql queries
         prepare(vreq, conf);
+        //This method specifically retrieves information for edit
+        populateExistingDataGetter(vreq, conf, session.getServletContext());
         
         return conf	;
     }
 	
+	
+
 	private void setUrisAndLiteralsOnForm(EditConfigurationVTwo conf,
 			VitroRequest vreq) {
 		conf.setUrisOnForm(new String[]{"page", "menuItem"}); //new resources: should this be on form for new - should be for existing
@@ -198,15 +202,11 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	@Override
 	  void prepare(VitroRequest vreq, EditConfigurationVTwo editConfig) {
 	        //setup the model selectors for query, write and display models on editConfig
-			//Double-check if this will even work with over-written model in the case of display  model?
 	        setupModelSelectorsFromVitroRequest(vreq, editConfig);         
 	        OntModel queryModel = (OntModel)vreq.getAttribute("jenaOntModel");
 	        if (editConfig.isParamUpdate()) { 
-	            //editConfig.prepareForObjPropUpdate(queryModel);
-	        	//Set up edit configuration with all the values required
-	        	//Retrieve existing values for page and menu item level
 	        	editConfig.prepareForParamUpdate(queryModel);
-	        	retrieveExistingDataGetterInfo(editConfig, queryModel);
+	        	
 	        }
 	         else{
 	            //if no subject uri, this is creating a new page
@@ -214,17 +214,33 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	        }
 	    }     
 	  
+	private void populateExistingDataGetter(VitroRequest vreq,
+			EditConfigurationVTwo editConfig,
+			ServletContext context) {
+        if (editConfig.isParamUpdate()) { 
+        	 //setup the model selectors for query, write and display models on editConfig
+	        setupModelSelectorsFromVitroRequest(vreq, editConfig);         
+	        OntModel queryModel = (OntModel)vreq.getAttribute("jenaOntModel");
+        	retrieveExistingDataGetterInfo(context, editConfig, queryModel);
+        }
+		
+	}
     
 	//This method will get the data getters related to this page
 	//And retrieve the current information for each of those data getters
-    private void retrieveExistingDataGetterInfo(EditConfigurationVTwo editConfig, OntModel queryModel) {
+    private void retrieveExistingDataGetterInfo(ServletContext context, 
+    		EditConfigurationVTwo editConfig, 
+    		OntModel queryModel) {
 		String pageUri = editConfig.getSubjectUri();
-		executeExistingDataGettersInfo(editConfig, pageUri, queryModel);
+		executeExistingDataGettersInfo(context, editConfig, pageUri, queryModel);
 		 
 		
 	}
     
-    private void executeExistingDataGettersInfo(EditConfigurationVTwo editConfig, String pageUri, OntModel queryModel) {
+    private void executeExistingDataGettersInfo(ServletContext servletContext,
+    		EditConfigurationVTwo editConfig, 
+    		String pageUri, 
+    		OntModel queryModel) {
     	//Create json array to be set within form specific data
     	JSONArray jsonArray = new JSONArray();
     	String querystr = getExistingDataGettersQuery();
@@ -246,7 +262,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
             	//json representation to be returned to template saved in json array
             	processExistingDataGetter(counter, 
             			dg.getURI(), 
-            			dgClassName, editConfig, queryModel, jsonArray);
+            			dgClassName, editConfig, queryModel, jsonArray, servletContext);
             
             	counter++;
             }
@@ -266,7 +282,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	}
 
 	private void processExistingDataGetter(int counter, String dataGetterURI, String dgClassName,
-			EditConfigurationVTwo editConfig, OntModel queryModel, JSONArray jsonArray) {
+			EditConfigurationVTwo editConfig, OntModel queryModel, JSONArray jsonArray, ServletContext context) {
     	ProcessDataGetterN3 pn = ProcessDataGetterN3Utils.getDataGetterProcessorN3(dgClassName, null);
     	
 		//Add N3 Optional as well
@@ -279,14 +295,18 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 		addExistingDataGetterNewResources(editConfig, pn, counter);
 		//Add values in scope
     	addValuesInScope(editConfig, pn, counter, dataGetterURI, queryModel);
-    	//create JSON object and return in form specific dadta
-    	addJSONObjectToArray(dataGetterURI, pn, queryModel, jsonArray);
+    	//Get data getter-specific form specific data should it exist
+    	addDataGetterSpecificFormData(dataGetterURI, pn, queryModel, jsonArray, context);
+    	
 		
 	}
 
-    //Takes data getter information, packs within JSON object to send back to the form
-	private void addJSONObjectToArray(String dataGetterURI, ProcessDataGetterN3 pn, OntModel queryModel, JSONArray jsonArray) {
-		JSONObject jo = pn.getExistingValuesJSON(dataGetterURI, queryModel);
+	//Any data that needs to be placed within form specific data
+	//including: (i) The JSON object representing the existing information to be returned to template
+	
+	//Takes data getter information, packs within JSON object to send back to the form
+	private void addDataGetterSpecificFormData(String dataGetterURI, ProcessDataGetterN3 pn, OntModel queryModel, JSONArray jsonArray, ServletContext context) {
+		JSONObject jo = pn.getExistingValuesJSON(dataGetterURI, queryModel, context);
 		jsonArray.add(jo);
 	}
 

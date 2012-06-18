@@ -21,6 +21,7 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Resource;
+import javax.servlet.ServletContext;
 
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
@@ -196,9 +197,17 @@ public  class ProcessIndividualsForClassesDataGetterN3 extends ProcessClassGroup
    }
 
    
-   public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel) {
+   public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context) {
 	   JSONObject jObject = new JSONObject();
 	   jObject.element("dataGetterClass", classType);
+	   //Get selected class group and which classes were selected
+	   getExistingClassGroupAndIndividuals(dataGetterURI, jObject, queryModel);
+	   //Get all classes within the class group
+	   super.getExistingClassesInClassGroup(context, dataGetterURI, jObject);
+	   return jObject;
+   }
+   
+   private void getExistingClassGroupAndIndividuals(String dataGetterURI, JSONObject jObject, OntModel queryModel) {
 	   String querystr = getExistingValuesIndividualsForClasses(dataGetterURI);
 	   QueryExecution qe = null;
        try{
@@ -225,7 +234,6 @@ public  class ProcessIndividualsForClassesDataGetterN3 extends ProcessClassGroup
        } catch(Exception ex) {
     	   log.error("Exception occurred in retrieving existing values with query " + querystr, ex);
        }
-	   return jObject;
    }
 
 }

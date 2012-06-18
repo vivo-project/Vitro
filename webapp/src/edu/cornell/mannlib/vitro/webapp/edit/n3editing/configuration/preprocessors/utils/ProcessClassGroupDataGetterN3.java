@@ -21,9 +21,15 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Resource;
 
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
+import javax.servlet.ServletContext;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 //Returns the appropriate n3 based on data getter
@@ -139,9 +145,17 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
 	   return query;
    }
    
-   public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel) {
+   public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context) {
 	   JSONObject jObject = new JSONObject();
 	   jObject.element("dataGetterClass", classType);
+	   //Get class group
+	   getExistingClassGroup(dataGetterURI, jObject, queryModel);
+	   //Get classes within class group
+	   getExistingClassesInClassGroup(context, dataGetterURI, jObject);
+	   return jObject;
+   }
+   
+   private void getExistingClassGroup(String dataGetterURI, JSONObject jObject, OntModel queryModel) {
 	   String querystr = getExistingValuesClassGroup(dataGetterURI);
 	   QueryExecution qe = null;
        try{
@@ -157,7 +171,41 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
        } catch(Exception ex) {
     	   log.error("Exception occurred in retrieving existing values with query " + querystr, ex);
        }
-	   return jObject;
+       
+  
+   }
+   
+   //Assumes JSON Object received will have the class group resource URI within it
+   //TODO: Refactor to take advantage of existing code that uses OTHER JSON library
+   protected void getExistingClassesInClassGroup(ServletContext context, String dataGetterURI, JSONObject jObject) {
+	   //Check for class group resource within json object
+	   if(jObject.containsKey(classGroupVarBase)) {
+		   String classGroupURI = jObject.getString(classGroupVarBase);
+		   //Get classes for classGroupURI and include in 
+		   VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+		   VClassGroup group = vcgc.getGroup(classGroupURI);
+		   populateClassesInClassGroupJSON(jObject, group);
+	   } else {
+		   log.error("JSONObject does not have class group URI included. ");
+	   }
+   }
+   
+   //JSONObject will include results JSON object that will include classes JSON Arrya as well as
+   //class group information
+   protected void populateClassesInClassGroupJSON(JSONObject jObject, VClassGroup group) {
+	   JSONArray classes = new JSONArray();
+       for( VClass vc : group){
+           JSONObject vcObj = new JSONObject();
+           vcObj.element("name", vc.getName());
+           vcObj.element("URI", vc.getURI());
+           classes.add(vcObj);
+       }
+       JSONObject results = new JSONObject();
+      
+       results.element("classes", classes);                
+       results.element("classGroupName", group.getPublicName());
+       results.element("classGroupUri", group.getURI());
+       jObject.element("results", results);
    }
 }
 
