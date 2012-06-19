@@ -95,8 +95,9 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
 		for(String fieldName: editConfig.getFields().keySet()){
 		    FieldVTwo field = editConfig.getField(fieldName);
-		    if( field.getFieldOptions() == null ){
-		        continue;
+		    if( field.getFieldOptions() == null ){ 
+		    	//putting empty map in here because FM can't deal
+		        pageData.put(fieldName, Collections.EMPTY_MAP);
 		    }
 		    Map<String, String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, fieldName, wdf);		    
 		    optionsMap = SelectListGeneratorVTwo.getSortedMap(optionsMap);
