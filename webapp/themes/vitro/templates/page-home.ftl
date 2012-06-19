@@ -30,7 +30,7 @@
             
             <@widget name="login" />
             
-            <@allClassGroups vClassGroups />
+            <@allClassGroups vClassGroups! />
         
         <#include "footer.ftl">
     </body>
