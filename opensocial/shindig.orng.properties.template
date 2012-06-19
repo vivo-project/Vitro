@@ -157,7 +157,7 @@ shindig.json-rpc.result-field=result
 shindig.accelerate.remapInternalServerError=true
 shindig.proxy.remapInternalServerError=true
 
-shindig.signing.key-file=/shindig/openssl/oauthkey.pem
+shindig.signing.key-file=@TOKEN_KEY_FILE@
 shindig.signing.key-name=
 
 ####################################################################################
@@ -172,10 +172,10 @@ orng.system = VIVO
 
 # orng.dbDriver is likely com.microsoft.sqlserver.jdbc.SQLServerDriver for Profiles and com.mysql.jdbc.Driver for VIVO
 #orng.dbDriver = com.microsoft.sqlserver.jdbc.SQLServerDriver
-orng.dbDriver = com.mysql.jdbc.Driver
-orng.dbURL = jdbc:mysql://localhost/vitrodb
-orng.dbUser = vitrodb
-orng.dbPassword = vitrodb
+orng.dbDriver = @DATA_SOURCE_DRIVER@
+orng.dbURL = @DATA_SOURCE_URL@
+orng.dbUser = @DATA_SOURCE_USERNAME@
+orng.dbPassword = @DATA_SOURCE_PASSWORD@
 orng.tokenservice.port = 8777
 # orng.RDFConverter = elda | babel 
 orng.RDFConverter = elda

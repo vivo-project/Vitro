@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
+<!-- ====================================================================== 
+     Build script for the ORNG Shindig webapp. 
+     
+     This can be used on its own, or invoked from the "orng" target of the main build file.
+     ====================================================================== -->
+
+<project name="ORNG-shindig" default="describe">
+
+	<!-- ================================= 
+          target: describe              
+         ================================= -->
+	<target name="describe" description="--> Describe the targets (this is the default).">
+		<echo>
+all      - Runs "clean", then "deploy".
+clean    - Delete all artifacts so the next build will be from scratch.
+deploy   - Configure the application and deploy directly into the Tomcat webapps directory.
+	    </echo>
+	</target>
+
+	<!-- ================================= 
+          target: all              
+         ================================= -->
+	<target name="all" depends="clean, deploy" description="--> Run 'clean', then 'deploy'" />
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: properties                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="properties">
+		<property name="deploy.properties.file" location="../webapp/config/deploy.properties" />
+
+		<fail message="You must create a &quot;${deploy.properties.file}&quot; file.">
+			<condition>
+				<not>
+					<available file="${deploy.properties.file}" />
+				</not>
+			</condition>
+		</fail>
+
+		<property file="${deploy.properties.file}" />
+
+		<fail unless="tomcat.home" message="${deploy.properties.file} must contain a value for tomcat.home" />
+		<fail unless="vitro.home.directory" message="${deploy.properties.file} must contain a value for vitro.home.directory" />
+		<fail unless="VitroConnection.DataSource.url" message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.url" />
+		<fail unless="VitroConnection.DataSource.username" message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.username" />
+		<fail unless="VitroConnection.DataSource.password" message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.password" />
+		<fail unless="VitroConnection.DataSource.driver" message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.driver" />
+		<fail unless="OpenSocial.shindigURL" message="${deploy.properties.file} must contain a value for OpenSocial.shindigURL" />
+		<fail unless="OpenSocial.tokenService" message="${deploy.properties.file} must contain a value for OpenSocial.tokenService" />
+		<fail unless="OpenSocial.tokenKeyFile" message="${deploy.properties.file} must contain a value for OpenSocial.tokenKeyFile" />
+
+		<fail message="The vitro.home.directory &quot;${vitro.home.directory}&quot; does not exist.">
+			<condition>
+				<not>
+					<available file="${vitro.home.directory}" />
+				</not>
+			</condition>
+		</fail>
+
+		<fail message="The vitro.home.directory &quot;${vitro.home.directory}&quot; is not writable.">
+			<condition>
+				<not>
+					<isfileselected file="${vitro.home.directory}">
+						<writable />
+					</isfileselected>
+				</not>
+			</condition>
+		</fail>
+
+		<fail message="The Shindig token key file  &quot;${OpenSocial.tokenKeyFile}&quot; does not exist.">
+			<condition>
+				<not>
+					<available file="${OpenSocial.tokenKeyFile}" />
+				</not>
+			</condition>
+		</fail>
+
+		<!-- build directories -->
+		<property name="build.dir" location="./build" />
+		<property name="build.shindig.dir" location="${build.dir}/shindig" />
+
+		<!-- deploy directories -->
+		<property name="shindig.home.dir" location="${vitro.home.directory}/shindig" />
+		<property name="shindig.config.dir" location="${shindig.home.dir}/conf" />
+		<property name="tomcat.webapps.dir" location="${tomcat.home}/webapps" />
+
+		<!-- the Shindig WAR -->
+		<property name="shindig.war.original.file" location="./shindigorng.war" />
+		<property name="shindig.war.unpacked.dir" location="${build.shindig.dir}/war" />
+		<property name="shindig.war.modified.file" location="${build.shindig.dir}/shindigorng.war" />
+		<property name="shindig.war.deployed.file" location="${tomcat.webapps.dir}/shindigorng.war" />
+
+		<!-- the Shindig-ORNG connector JAR -->
+		<property name="shindig.connector.prefix" value="/WEB-INF/lib" />
+		<property name="shindig.connector.original.file" location="${shindig.war.unpacked.dir}/${shindig.connector.prefix}/shindig-orng-connector-2.0.2.jar" />
+		<property name="shindig.connector.unpacked.dir" location="${build.shindig.dir}/connector" />
+		<property name="shindig.connector.modified.file" location="${build.shindig.dir}/shindig-orng-connector-2.0.2.jar" />
+
+		<!-- the Shindig-ORNG connector configuration file -->
+		<property name="shindig.js.original.file" location="${shindig.connector.unpacked.dir}/orng-container.js" />
+		<property name="shindig.js.modified.file" location="${build.shindig.dir}/orng-container.js" />
+		<property name="shindig.js.deployed.file" location="${shindig.config.dir}/orng-container.js" />
+
+		<!-- Shindig properties file -->
+		<property name="shindig.properties.template.file" location="${basedir}/shindig.orng.properties.template" />
+		<property name="shindig.properties.modified.file" location="${build.shindig.dir}/shindig.orng.properties" />
+		<property name="shindig.properties.deployed.file" location="${shindig.config.dir}/shindig.orng.properties" />
+
+	</target>
+
+	<!-- ================================= 
+          target: clean              
+         ================================= -->
+	<target name="clean" depends="properties" description="--> Delete all artifacts">
+		<delete includeemptydirs="true">
+			<fileset dir="${build.shindig.dir}" />
+		</delete>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: prepare                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="prepare" depends="properties">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${build.shindig.dir}" />
+
+		<mkdir dir="${shindig.war.unpacked.dir}" />
+		<mkdir dir="${shindig.connector.unpacked.dir}" />
+
+		<mkdir dir="${shindig.home.dir}" />
+		<mkdir dir="${shindig.config.dir}" />
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: removeConnectorConfigFromWar                      
+          
+		  Unpack the war. 
+		  Unpack the JAR. 
+		  Create a new JAR that doesn't include the config file
+		  Create a new WAR that includes the modified JAR.
+         - - - - - - - - - - - - - - - - - -->
+	<target name="removeConnectorConfigFromWar" depends="properties, prepare">
+		<unwar src="${shindig.war.original.file}" dest="${shindig.war.unpacked.dir}" />
+		<unwar src="${shindig.connector.original.file}" dest="${shindig.connector.unpacked.dir}" />
+		<zip destfile="${shindig.connector.modified.file}">
+			<zipfileset src="${shindig.connector.original.file}" excludes="orng-container.js" />
+		</zip>
+		<zip destfile="${shindig.war.modified.file}">
+			<fileset dir="${shindig.war.unpacked.dir}" excludes="**/shindig-orng-connector-2.0.2.jar" />
+			<zipfileset fullpath="WEB-INF/lib/shindig-orng-connector-2.0.2.jar" dir="${build.shindig.dir}" includes="shindig-orng-connector-2.0.2.jar" />
+		</zip>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: modifyConnectorConfig                      
+		
+		  Get the config file from the unpacked connector WAR and JAR, and make a modified copy.
+         - - - - - - - - - - - - - - - - - -->
+	<target name="modifyConnectorConfig" depends="removeConnectorConfigFromWar">
+		<copy file="${shindig.js.original.file}" tofile="${shindig.js.modified.file}">
+			<filterchain>
+				<tokenfilter>
+					<replacestring from="/shindig/openssl/securitytokenkey.txt" to="${OpenSocial.tokenKeyFile}" />
+				</tokenfilter>
+			</filterchain>
+		</copy>
+	</target>
+
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: modifyPropertiesFile                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="modifyPropertiesFile" depends="properties, prepare">
+		<copy file="${shindig.properties.template.file}" toFile="${shindig.properties.modified.file}">
+			<filterset>
+				<filter token="TOKEN_KEY_FILE" value="${OpenSocial.tokenKeyFile}" />
+				<filter token="DATA_SOURCE_URL" value="${VitroConnection.DataSource.url}" />
+				<filter token="DATA_SOURCE_USERNAME" value="${VitroConnection.DataSource.username}" />
+				<filter token="DATA_SOURCE_PASSWORD" value="${VitroConnection.DataSource.password}" />
+				<filter token="DATA_SOURCE_DRIVER" value="${VitroConnection.DataSource.driver}" />
+			</filterset>
+		</copy>
+	</target>
+
+	<!-- ================================= 
+          target: deploy              
+         ================================= -->
+	<target name="deploy" depends="modifyPropertiesFile, removeConnectorConfigFromWar, modifyConnectorConfig" description="--> Deploy the application directly into the Tomcat webapps directory.">
+		<copy file="${shindig.js.modified.file}" tofile="${shindig.js.deployed.file}" />
+		<copy file="${shindig.properties.modified.file}" tofile="${shindig.properties.deployed.file}" />
+		<copy file="${shindig.war.modified.file}" tofile="${shindig.war.deployed.file}" />
+	</target>
+
+
+</project>

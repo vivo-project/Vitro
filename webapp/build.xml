@@ -74,6 +74,7 @@
 all      - Runs "clean", then "deploy".
 clean    - Delete all artifacts so the next build will be from scratch.
 compile  - Compile the Java source files.
+orng     - Configure and deploy the ORNG Shindig application.
 test     - Compile and run the JUnit tests.
 war      - Create a WAR file to be deployed in a servlet container.
 deploy   - Deploy the application directly into the Tomcat webapps directory.
@@ -115,15 +116,15 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 				</not>
 			</condition>
 		</fail>
-		
+
 		<fail message="The vitro.home.directory &quot;${vitro.home.directory}&quot; is not writable.">
-		    <condition>
-		        <not>
-		            <isfileselected file="${vitro.home.directory}" >
-		                <writable/>
-		            </isfileselected>
-		        </not>
-		    </condition>
+			<condition>
+				<not>
+					<isfileselected file="${vitro.home.directory}">
+						<writable />
+					</isfileselected>
+				</not>
+			</condition>
 		</fail>
 
 		<property name="solr.home.dir" location="${vitro.home.directory}/solr" />
@@ -354,6 +355,13 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 			<arg value="${appbase.dir}/lib" />
 			<arg value="${appbase.dir}/config/jarlist/known_dependencies.txt" />
 		</java>
+	</target>
+
+	<!-- ================================= 
+          target: orng              
+         ================================= -->
+	<target name="orng" description="Configure and deploy the ORNG Shindig application">
+		<ant dir="${corebase.dir}/../opensocial" antfile="build_orng.xml" target="all" />
 	</target>
 
 
