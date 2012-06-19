@@ -48,9 +48,28 @@
         </#list>
     </ul>
     
+
+    <#-- Paging controls -->
+    <#if (pagingLinks?size > 0)>
+        <div class="searchpages">
+            Pages: 
+            <#if prevPage??><a class="prev" href="${prevPage}" title="previous">Previous</a></#if>
+            <#list pagingLinks as link>
+                <#if link.url??>
+                    <a href="${link.url}" title="page link">${link.text}</a>
+                <#else>
+                    <span>${link.text}</span> <#-- no link if current page -->
+                </#if>
+            </#list>
+            <#if nextPage??><a class="next" href="${nextPage}" title="next">Next</a></#if>
+        </div>
+    </#if>
+    <br />
+
     <#-- VIVO OpenSocial Extension by UCSF -->
     <#if openSocial??>
         <#if openSocial.visible>
+        <h3>OpenSocial</h3>
             <script type="text/javascript" language="javascript">
                 // find the 'Search' gadget(s).
                 var searchGadgets = my.findGadgetsAttachingTo("gadgets-search");
@@ -68,24 +87,8 @@
                 }
             </script>
 
-            <div id="gadgets-search" class="gadgets-gadget-parent"></div>
+            <div id="gadgets-search" class="gadgets-gadget-parent" style="display:inline-block"></div>
         </#if>
-    </#if>
-
-    <#-- Paging controls -->
-    <#if (pagingLinks?size > 0)>
-        <div class="searchpages">
-            Pages: 
-            <#if prevPage??><a class="prev" href="${prevPage}" title="previous">Previous</a></#if>
-            <#list pagingLinks as link>
-                <#if link.url??>
-                    <a href="${link.url}" title="page link">${link.text}</a>
-                <#else>
-                    <span>${link.text}</span> <#-- no link if current page -->
-                </#if>
-            </#list>
-            <#if nextPage??><a class="next" href="${nextPage}" title="next">Next</a></#if>
-        </div>
     </#if>
 
 </div> <!-- end contentsBrowseGroup -->

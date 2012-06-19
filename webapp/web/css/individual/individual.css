@@ -281,4 +281,7 @@ a.close {
 a#managePropLink {
     display:none;
 }
-
+/* <---- OpenSocial -----*/
+div#openSocial {
+    display:inline-block;
+}
