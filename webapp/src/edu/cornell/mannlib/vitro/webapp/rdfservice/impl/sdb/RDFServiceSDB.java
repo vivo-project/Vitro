@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -108,6 +109,10 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
             Iterator<ModelChange> csIt = changeSet.getModelChanges().iterator();
             while (csIt.hasNext()) {
                 ModelChange modelChange = csIt.next();
+                if (!modelChange.getSerializedModel().markSupported()) {
+                    byte[] bytes = IOUtils.toByteArray(modelChange.getSerializedModel());
+                    modelChange.setSerializedModel(new ByteArrayInputStream(bytes));
+                }
                 modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
                 dataset.getLock().enterCriticalSection(Lock.WRITE);
                 try {

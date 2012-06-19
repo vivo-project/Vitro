@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -28,6 +30,10 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 
@@ -49,7 +55,7 @@ public class KnowledgeBaseUpdater {
 		this.record = new SimpleChangeRecord(settings.getAddedDataFile(), settings.getRemovedDataFile());
 	}
 	
-	public void update() throws IOException {	
+	public void update(ServletContext servletContext) throws IOException {	
 					
 		if (this.logger == null) {
 			this.logger = new SimpleChangeLogger(settings.getLogFile(),	settings.getErrorLogFile());
@@ -68,9 +74,8 @@ public class KnowledgeBaseUpdater {
 		}
 
 		if (!logger.errorsWritten()) {
-			// add assertions to the knowledge base showing that the 
-			// update was successful, so we don't need to run it again.
-			assertSuccess();
+			assertSuccess(servletContext);
+	    	logger.logWithDate("Finished knowledge base migration");
 		}
 		
 		record.writeChanges();
@@ -86,22 +91,9 @@ public class KnowledgeBaseUpdater {
 	
 	private void performUpdate() throws IOException {
 		
-		log.info("\tperforming SPARQL construct additions (abox)");
-		performSparqlConstructAdditions(settings.getSparqlConstructAdditionsDir(), settings.getUnionOntModelSelector().getABoxModel() , settings.getAssertionOntModelSelector().getABoxModel());
-		log.info("\tperforming SPARQL construct deletions (abox)");
-		performSparqlConstructRetractions(settings.getSparqlConstructDeletionsDir(), settings.getUnionOntModelSelector().getABoxModel() , settings.getAssertionOntModelSelector().getABoxModel());
-		
-		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
-		
-		AtomicOntologyChangeLists changes = new AtomicOntologyChangeLists(rawChanges,settings.getNewTBoxModel(),settings.getOldTBoxModel());
-		
-        //process the TBox before the ABox
-		
+		// only annotations for 1.5
 		log.info("\tupdating tbox annotations");
 	    updateTBoxAnnotations();
-		
-		log.info("\tupdating the abox");
-    	updateABox(changes);
 	}
 	
 	private void performSparqlConstructAdditions(String sparqlConstructDir, OntModel readModel, OntModel writeModel) throws IOException {
@@ -254,7 +246,7 @@ public class KnowledgeBaseUpdater {
 	 * Executes a SPARQL ASK query to determine whether the knowledge base
 	 * needs to be updated to conform to a new ontology version
 	 */
-	public boolean updateRequired() throws IOException {
+	public boolean updateRequired(ServletContext servletContext) throws IOException {
 		
 		boolean required = false;
 		
@@ -262,27 +254,28 @@ public class KnowledgeBaseUpdater {
 		if (sparqlQueryStr == null) {
 			return required;
 		}
-				
-		Model abox = settings.getAssertionOntModelSelector().getABoxModel();
-		Query query = QueryFactory.create(sparqlQueryStr);
-		QueryExecution isUpdated = QueryExecutionFactory.create(query, abox);
 		
+		RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(servletContext).getRDFService();
+
 		// if the ASK query DOES have a solution (i.e. the assertions exist
 		// showing that the update has already been performed), then the update
 		// is NOT required.
-		
-		if (isUpdated.execAsk()) {
-			required = false;
-		} else {
-			required = true;
-			if (JenaDataSourceSetupBase.isFirstStartup()) {
-				assertSuccess();  
-				log.info("The application is starting with an empty database. " +
-				         "An indication will be added to the database that a " +
-				         "knowledge base migration to the current version is " +
-				         "not required.");
-			    required = false;	
-			}
+		try {
+			if (rdfService.sparqlAskQuery(sparqlQueryStr)) {
+				required = false;
+			} else {
+				required = true;
+				if (JenaDataSourceSetupBase.isFirstStartup()) {
+					assertSuccess(servletContext);  
+					log.info("The application is starting with an empty database. " +
+					         "An indication will be added to the database that a " +
+					         "knowledge base migration to the current version is " +
+					         "not required.");
+				    required = false;	
+				}
+			}		   
+		} catch (RDFServiceException e) {
+			log.error("error trying to execute query to find out if knowledge base update is required",e); 
 		}
 		
 		return required; 
@@ -308,27 +301,19 @@ public class KnowledgeBaseUpdater {
 		return fileContents.toString();				
 	}
 	
-	private void assertSuccess() throws FileNotFoundException, IOException {
-		try {
+	private void assertSuccess(ServletContext servletContext) throws FileNotFoundException, IOException {
+		try {				
+			RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(servletContext).getRDFService();
+			ChangeSet changeSet = rdfService.manufactureChangeSet();
 			
-		    //Model m = settings.getAssertionOntModelSelector().getApplicationMetadataModel();
-		    Model m = settings.getAssertionOntModelSelector().getABoxModel();
 		    File successAssertionsFile = new File(settings.getSuccessAssertionsFile()); 
 		    InputStream inStream = new FileInputStream(successAssertionsFile);
-		    m.enterCriticalSection(Lock.WRITE);
-		    try {
-		    	m.read(inStream, null, settings.getSuccessRDFFormat());
-		    	if (logger != null) {
-		    		logger.logWithDate("Finished knowledge base migration");
-		    	} 
-		    } finally {
-		    	m.leaveCriticalSection();
-		    }
+		    
+		    changeSet.addAddition(inStream, RDFService.ModelSerializationFormat.N3, JenaDataSourceSetupBase.JENA_DB_MODEL);
+			rdfService.changeSetUpdate(changeSet);	
 		} catch (Exception e) {
-			if (logger != null) {
-			    logger.logError(" unable to make RDF assertions about successful " +
-					" update to new ontology version: " + e.getMessage());
-			}
+			log.error("unable to make RDF assertions about successful " +
+					" update to new ontology version: ", e);
 		}
 	}
 	

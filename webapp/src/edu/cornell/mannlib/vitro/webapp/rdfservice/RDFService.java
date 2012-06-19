@@ -102,7 +102,6 @@ public interface RDFService {
 	 * 
 	 * @return  boolean - the result of the SPARQL query 
 	 */
-	
 	public boolean sparqlAskQuery(String query) throws RDFServiceException;
 	
 	/**

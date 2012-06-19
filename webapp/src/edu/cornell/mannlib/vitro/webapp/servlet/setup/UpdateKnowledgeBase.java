@@ -49,7 +49,6 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private static final String ADDED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + "addedData.n3";
 	private static final String SPARQL_CONSTRUCT_ADDITIONS_DIR = DATA_DIR + "sparqlConstructs/additions/";
 	private static final String SPARQL_CONSTRUCT_DELETIONS_DIR = DATA_DIR + "sparqlConstructs/deletions/";
-	//private static final String MISC_REPLACEMENTS_FILE = DATA_DIR + "miscReplacements.rdf";
 	private static final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
 	private static final String NEW_TBOX_MODEL_DIR = "/WEB-INF/filegraph/tbox/";
 	private static final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
@@ -99,8 +98,9 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			   KnowledgeBaseUpdater ontologyUpdater = new KnowledgeBaseUpdater(settings);
 			  
 			   try {
-				  if (ontologyUpdater.updateRequired()) {
+				  if (ontologyUpdater.updateRequired(ctx)) {
 					  ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
+					  ontologyUpdater.update(ctx);
 				  }
 			   } catch (IOException ioe) {
 					String errMsg = "IOException updating knowledge base " +

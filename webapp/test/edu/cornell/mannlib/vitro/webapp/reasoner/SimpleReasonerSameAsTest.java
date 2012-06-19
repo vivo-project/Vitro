@@ -446,6 +446,14 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 		
 		//create aBox and tBox, and SimpleReasoner to listen to them
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		// set up TBox	
+		OntClass classA = tBox.createClass("http://test.vivo/A");
+	    classA.setLabel("class A", "en-US");
+		OntClass classB = tBox.createClass("http://test.vivo/B");
+	    classB.setLabel("class B", "en-US");
+		OntClass classC = tBox.createClass("http://test.vivo/C");
+	    classC.setLabel("class C", "en-US");
+	    
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
@@ -454,14 +462,6 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
 		tBox.register(simpleReasonerTBoxListener);
 
-		// set up TBox	
-		OntClass classA = tBox.createClass("http://test.vivo/A");
-	    classA.setLabel("class A", "en-US");
-		OntClass classB = tBox.createClass("http://test.vivo/B");
-	    classB.setLabel("class B", "en-US");
-		OntClass classC = tBox.createClass("http://test.vivo/C");
-	    classC.setLabel("class C", "en-US");
-	    	   
 	    // set up ABox
 		Resource a = aBox.createResource("http://test.vivo/a");
 		Resource b = aBox.createResource("http://test.vivo/b");
