@@ -64,7 +64,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 	protected boolean doAutoComplete = false;
 	protected boolean tooManyRangeIndividuals = false;
 	
-	protected long maxNonACRangeIndividualCount = 1000;
+	protected long maxNonACRangeIndividualCount = 300;
 	
 	private static HashMap<String,String> defaultsForXSDtypes ;
 	  static {
