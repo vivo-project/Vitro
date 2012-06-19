@@ -115,7 +115,7 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
           target: clean              
          ================================= -->
 	<target name="clean" depends="properties" description="--> Delete all artifacts">
-		<delete includeemptydirs="true">
+		<delete includeemptydirs="true" failonerror="false">
 			<fileset dir="${build.shindig.dir}" />
 		</delete>
 	</target>
