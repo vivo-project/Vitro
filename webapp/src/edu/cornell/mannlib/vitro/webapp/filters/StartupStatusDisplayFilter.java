@@ -78,13 +78,20 @@ public class StartupStatusDisplayFilter implements Filter {
 			bodyMap.put("contextPath", getContextPath());
 			bodyMap.put("applicationName", getApplicationName());			
 						
-	        HttpServletRequest httpreq = (HttpServletRequest) req;        
+	        HttpServletRequest httpreq = (HttpServletRequest) req;
+	        String url = "";
+	        
 	        String path = httpreq.getRequestURI();
+	        if( path != null ){
+	        	url = path;
+	        }
+	        
 	        String query = httpreq.getQueryString();
 	        if( !StringUtils.isEmpty( query )){
-	        	query = "?" + query;
-	        }	        
-			bodyMap.put("url", path+query );
+	        	url = url + "?" + query;
+	        }	
+	        
+			bodyMap.put("url", url );
 			
 			hResp.setStatus(SC_INTERNAL_SERVER_ERROR);
 			Template tpl = loadFreemarkerTemplate();
