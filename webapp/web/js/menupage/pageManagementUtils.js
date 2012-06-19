@@ -18,10 +18,22 @@ var pageManagementUtils = {
 	    this.bindEventListeners();
 	    this.initDisplay();
 	    //if edit, then generate existing content
-	    if(this.menuAction != null && this.menuAction == "Edit") {
+	    if(this.isEdit()) {
 	    	this.initExistingContent();
 	    }
 	}, 
+	isEdit:function() {
+		if(pageManagementUtils.menuAction != null && pageManagementUtils.menuAction == "Edit") {
+			return true;
+		}
+		return false;
+	},
+	isAdd:function() {
+		if(pageManagementUtils.menuAction != null && pageManagementUtils.menuAction == "Add") {
+			return true;
+		}
+		return false;
+	},
 	initExistingContent:function() {
 		this.generateExistingContentSections();
 		//display more content button - will need to review how to hit save etc. 
@@ -120,9 +132,12 @@ var pageManagementUtils = {
 	    this.classesForClassGroup.addClass('hidden');
 	    this.moreContentButton.hide();
 	    //left side components
-	    this.defaultTemplateRadio.attr('checked',true);
-	    this.isMenuCheckbox.attr('checked',false);
-	    this.menuSection.hide();
+	    //These depend on whether or not this is an existing item or not
+	    if(this.isAdd()) {
+	    	this.defaultTemplateRadio.attr('checked',true);
+	    	this.isMenuCheckbox.attr('checked',false);
+	    	this.menuSection.hide();
+	    }
 	
 	},
 	bindEventListeners:function(){
@@ -131,7 +146,6 @@ var pageManagementUtils = {
 	            pageManagementUtils.customTemplate.addClass('hidden');
 	            //Also clear custom template value so as not to submit it
 	            pageManagementUtils.clearInputs(pageManagementUtils.customTemplate);
-	            
 	    });
 
 	    this.customTemplateRadio.click( function() {
@@ -231,13 +245,6 @@ var pageManagementUtils = {
 	        pageManagementUtils.adjustSaveButtonHeight();
 	    });
 	    
-	    /*
-	    // Listeners for vClass switching
-        this.changeContentType.click(function() {
-           pageManagementUtils.showClassGroups();
-         
-           return false;
-        });*/
 	    
 	    //Submission: validate as well as create appropriate hidden json inputs
 	    $("form").submit(function (event) { 
