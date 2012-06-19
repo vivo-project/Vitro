@@ -147,7 +147,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	@Override
 	public void close() {
 	    super.close();
-	    this.rdfService.close();
+	    //this.rdfService.close();
 	}
 	
 	private class ReconnectingDatasetFactory implements DatasetWrapperFactory {

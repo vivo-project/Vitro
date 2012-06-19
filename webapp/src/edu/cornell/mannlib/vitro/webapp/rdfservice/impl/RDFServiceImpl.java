@@ -132,7 +132,11 @@ public abstract class RDFServiceImpl implements RDFService {
 		return new ChangeSetImpl();
 	}    
 
-    protected void notifyListeners(Triple triple, ModelChange.Operation operation, String graphURI) {    			
+	// I switched the following two methods back to public so they could be 
+	// used by the ListeningGraph, which is common to both implementations.
+	// This could probably be improved later.  BJL
+	
+    public void notifyListeners(Triple triple, ModelChange.Operation operation, String graphURI) {    			
         Iterator<ChangeListener> iter = registeredListeners.iterator();
 
         while (iter.hasNext()) {
@@ -145,8 +149,7 @@ public abstract class RDFServiceImpl implements RDFService {
         }
     }
     
-    protected void notifyListenersOfEvent(Object event) {
-        
+    public void notifyListenersOfEvent(Object event) {       
         Iterator<ChangeListener> iter = registeredListeners.iterator();
 
         while (iter.hasNext()) {
@@ -181,7 +184,7 @@ public abstract class RDFServiceImpl implements RDFService {
             case RDFXML: 
                 return "RDF/XML";
             case N3: 
-                return "N3";
+                return "TTL";
             default: 
                 log.error("unexpected format in getFormatString");
                 return null;

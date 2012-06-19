@@ -197,6 +197,11 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
         log.debug("removal model size " + model.size());
         log.debug("blank node model size " + blankNodeModel.size());
                 
+        if (blankNodeModel.size() == 1) {
+            log.warn("Deleting single triple with blank node: " + blankNodeModel);
+            log.warn("This likely indicates a problem; excessive data may be deleted.");
+        }
+        
         String rootFinder = "SELECT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s } FILTER (!bound(?ss)) }";
         Query rootFinderQuery = QueryFactory.create(rootFinder);
         QueryExecution qe = QueryExecutionFactory.create(rootFinderQuery, blankNodeModel);
@@ -210,33 +215,37 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
                 QueryExecution qee = QueryExecutionFactory.create(treeFinderQuery, blankNodeModel);
                 try {
                     Model tree = qee.execDescribe();
-                    StmtIterator sit = tree.listStatements(s, null, (RDFNode) null);
-                    while (sit.hasNext()) {
-                        Statement stmt = sit.nextStatement();
-                        RDFNode n = stmt.getObject();
-                        Model m2 = ModelFactory.createDefaultModel();
-                        if (n.isResource()) {
-                            Resource s2 = (Resource) n;
-                            // now run yet another describe query
-                            String smallerTree = makeDescribe(s2);
-                            Query smallerTreeQuery = QueryFactory.create(smallerTree);
-                            QueryExecution qe3 = QueryExecutionFactory.create(
-                                    smallerTreeQuery, tree);
-                            try {
-                                qe3.execDescribe(m2);
-                            } finally {
-                                qe3.close();
-                            }    
-                        }
-                        m2.add(stmt);
-                        DataSource ds = DatasetFactory.create();
-                        if (graphURI == null) {
-                            ds.setDefaultModel(dataset.getDefaultModel());
-                        } else {
-                            ds.addNamedModel(graphURI, dataset.getNamedModel(graphURI));    
-                        }      
-                        removeUsingSparqlUpdate(ds, m2, graphURI);
-                    }                   
+                    DataSource ds = DatasetFactory.create();
+                    if (graphURI == null) {
+                        ds.setDefaultModel(dataset.getDefaultModel());
+                    } else {
+                        ds.addNamedModel(graphURI, dataset.getNamedModel(graphURI));    
+                    }  
+                    if (s.isAnon()) {
+                        removeUsingSparqlUpdate(ds, tree, graphURI);
+                    } else {
+                        StmtIterator sit = tree.listStatements(s, null, (RDFNode) null);
+                        while (sit.hasNext()) {
+                            Statement stmt = sit.nextStatement();
+                            RDFNode n = stmt.getObject();
+                            Model m2 = ModelFactory.createDefaultModel();
+                            if (n.isResource()) {
+                                Resource s2 = (Resource) n;
+                                // now run yet another describe query
+                                String smallerTree = makeDescribe(s2);
+                                Query smallerTreeQuery = QueryFactory.create(smallerTree);
+                                QueryExecution qe3 = QueryExecutionFactory.create(
+                                        smallerTreeQuery, tree);
+                                try {
+                                    qe3.execDescribe(m2);
+                                } finally {
+                                    qe3.close();
+                                }    
+                            }
+                            m2.add(stmt);    
+                            removeUsingSparqlUpdate(ds, m2, graphURI);
+                        }  
+                    }
                 } finally {
                     qee.close();
                 }
@@ -279,12 +288,13 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
         
         StringBuffer queryBuff = new StringBuffer();
         queryBuff.append("CONSTRUCT { \n");
-        queryBuff.append(patternBuff);
+        addStatementPatterns(stmtIt, queryBuff, !WHERE_CLAUSE);
         queryBuff.append("} WHERE { \n");
         if (graphURI != null) {
             queryBuff.append("    GRAPH <" + graphURI + "> { \n");
         }
-        queryBuff.append(patternBuff);
+        stmtIt = model.listStatements();
+        addStatementPatterns(stmtIt, queryBuff, !WHERE_CLAUSE);
         if (graphURI != null) {
             queryBuff.append("    } \n");
         }
@@ -312,6 +322,28 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
         } finally {
             qe.close();
         }       
+    }
+    
+    private static final boolean WHERE_CLAUSE = true;
+    
+    private void addStatementPatterns(StmtIterator stmtIt, StringBuffer patternBuff, boolean whereClause) {
+        while(stmtIt.hasNext()) {
+            Triple t = stmtIt.next().asTriple();
+            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getSubject(), null));
+            patternBuff.append(" ");
+            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getPredicate(), null));
+            patternBuff.append(" ");
+            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getObject(), null));
+            patternBuff.append(" .\n");
+            if (whereClause) {
+                if (t.getSubject().isBlank()) {
+                    patternBuff.append("    FILTER(isBlank(" + SparqlGraph.sparqlNodeDelete(t.getSubject(), null)).append(")) \n");
+                }
+                if (t.getObject().isBlank()) {
+                    patternBuff.append("    FILTER(isBlank(" + SparqlGraph.sparqlNodeDelete(t.getObject(), null)).append(")) \n");
+                }
+            }
+        }
     }
     
     private Model parseModel(ModelChange modelChange) {

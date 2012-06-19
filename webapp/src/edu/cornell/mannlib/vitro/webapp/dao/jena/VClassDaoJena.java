@@ -38,6 +38,7 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
@@ -1026,15 +1027,23 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         try {
             OntResource subclass = getOntClass(ontModel,c2c.getSubclassURI());
             OntResource superclass = getOntClass(ontModel,c2c.getSuperclassURI());
+            Model removal = ModelFactory.createDefaultModel();
+            Model additions = ModelFactory.createDefaultModel(); // to repair any rdf:Lists
             if ((subclass != null) && (superclass != null)) {
-                ontModel.removeAll(subclass, RDFS.subClassOf, superclass);
+                removal.add(ontModel.listStatements(subclass, RDFS.subClassOf, superclass));
             }
             if (subclass.isAnon()) {
-                smartRemove(subclass, getOntModel());
+                Model[] changeSet = getSmartRemoval(subclass, getOntModel());
+                removal.add(changeSet[0]);
+                additions.add(changeSet[1]);
             }
             if (superclass.isAnon()) {
-                smartRemove(superclass, getOntModel());
+                Model[] changeSet = getSmartRemoval(superclass, getOntModel());
+                removal.add(changeSet[0]);
+                additions.add(changeSet[1]);
             }
+            ontModel.remove(removal);
+            ontModel.add(additions);
         } finally {
             ontModel.getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),false));
             ontModel.leaveCriticalSection();

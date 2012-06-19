@@ -1028,17 +1028,36 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     	return directSubjectList;
     }
     
+    /**
+     * Returns additions and retractions to perform
+     * @param ontRes
+     * @param ontModel
+     * @return Model[] where [0] is retractions and [1] is additions
+     */
+    protected Model[] getSmartRemoval(OntResource ontRes, OntModel ontModel) {
+        Model[] changeSet = removeFromLists(ontRes, ontModel);
+        List<Statement> stmtForDependentRes = DependentResourceDeleteJena.getDependentResourceDeleteList(ontRes,ontModel);
+        changeSet[0].add(removeUsingDescribe(ontRes, ontModel));
+        changeSet[0].add(stmtForDependentRes);
+        return changeSet;
+    }
+    
     protected void smartRemove(OntResource ontRes, OntModel ontModel) {
-    	removeFromLists(ontRes, ontModel);
-    	List<Statement> stmtForDependentRes = DependentResourceDeleteJena.getDependentResourceDeleteList(ontRes,ontModel);
-    	removeUsingDescribe(ontRes, ontModel);
-    	ontModel.remove(stmtForDependentRes);
+        Model[] changes = getSmartRemoval(ontRes, ontModel);
+    	ontModel.remove(changes[0]);
+    	ontModel.add(changes[1]);
+    	
     }
  
     /**
      * Removes a resource from any rdf:Lists in which it is a member
      */
-    private void removeFromLists(OntResource res, OntModel ontModel) {
+    private Model[] removeFromLists(OntResource res, OntModel ontModel) {
+        Model[] changeSet = new Model[2];
+        Model retractions = ModelFactory.createDefaultModel();
+        Model additions = ModelFactory.createDefaultModel();
+        changeSet[0] = retractions;
+        changeSet[1] = additions;
     	// Iterate through all of the list nodes this resource is attached to
     	Iterator<Resource> listNodeIt = ontModel.listSubjectsWithProperty(RDF.first, res);
     	while (listNodeIt.hasNext()) {
@@ -1056,16 +1075,17 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     					// if current node is list head
     					if (!nextNode.equals(RDF.nil)) {
     						// only repair the list if there is more than one node
-    						ontModel.add(stmt.getSubject(), RDF.rest, nextNode);
+    						additions.add(stmt.getSubject(), RDF.rest, nextNode);
     					}
     				} else {
-    					ontModel.add(stmt.getSubject(), RDF.rest, nextNode);
+    					additions.add(stmt.getSubject(), RDF.rest, nextNode);
     				}
     			}
     		}
     		//Remove any statements about this node
-    		ontModel.remove(listNode, (Property) null, (RDFNode) null);
+    		retractions.add(listNode, (Property) null, (RDFNode) null);
     	}
+    	return changeSet;
     }
     
     public void removeRulesMentioningResource(Resource res, OntModel ontModel) {
@@ -1093,10 +1113,10 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     
     // removes a resource and its bnode closure using ARQ's DESCRIBE semantics 
     // plus any incoming properties
-    private void removeUsingDescribe(OntResource ontRes, OntModel ontModel) {
+    private Model removeUsingDescribe(OntResource ontRes, OntModel ontModel) {
     	Model temp = describeResource(ontRes, ontModel);
 		temp.add(ontModel.listStatements((Resource) null, (Property) null, ontRes));
-		ontModel.remove(temp);
+		return temp;
     }
     
     private Model describeResource(Resource res, OntModel ontModel) {    	

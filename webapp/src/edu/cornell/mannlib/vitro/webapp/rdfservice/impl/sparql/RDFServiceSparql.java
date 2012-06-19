@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sparql;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -27,13 +28,16 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
@@ -41,6 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.ChangeSetImpl;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sdb.ListeningGraph;
 
 /*
  * API to write, read, and update Vitro's RDF store, with support 
@@ -98,33 +103,62 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	 * 
 	 * @return boolean - indicates whether the precondition was satisfied            
 	 */
-	@Override
-	public boolean changeSetUpdate(ChangeSet changeSet) throws RDFServiceException {
-				
-	    if (changeSet.getPreconditionQuery() != null 
+    @Override
+    public boolean changeSetUpdate(ChangeSet changeSet)
+            throws RDFServiceException {
+             
+        if (changeSet.getPreconditionQuery() != null 
                 && !isPreconditionSatisfied(
                         changeSet.getPreconditionQuery(), 
                                 changeSet.getPreconditionQueryType())) {
             return false;
         }
-		
-		Iterator<ModelChange> csIt = changeSet.getModelChanges().iterator();
-		
-		while (csIt.hasNext()) {
-			
-		    ModelChange modelChange = csIt.next();
-		    
-		    if (modelChange.getOperation() == ModelChange.Operation.ADD) {
-		          performAdd(modelChange);	
-		    } else if (modelChange.getOperation() == ModelChange.Operation.REMOVE) {
-		    	  performRemove(modelChange);
-		    } else {
-		    	  log.error("unrecognized operation type");
-		    }
-		}
-		
-		return true;
-	}
+        
+        try {                    
+            for (Object o : changeSet.getPreChangeEvents()) {
+                this.notifyListenersOfEvent(o);
+            }
+
+            Iterator<ModelChange> csIt = changeSet.getModelChanges().iterator();
+            while (csIt.hasNext()) {
+                ModelChange modelChange = csIt.next();
+                modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
+                performChange(modelChange);
+            }
+            
+            // notify listeners of triple changes
+            csIt = changeSet.getModelChanges().iterator();
+            while (csIt.hasNext()) {
+                ModelChange modelChange = csIt.next();
+                modelChange.getSerializedModel().reset();
+                Model model = ModelFactory.createModelForGraph(
+                        new ListeningGraph(modelChange.getGraphURI(), this));
+                if (modelChange.getOperation() == ModelChange.Operation.ADD) {
+                    model.read(modelChange.getSerializedModel(), null, 
+                            getSerializationFormatString(
+                                    modelChange.getSerializationFormat()));
+                } else if (modelChange.getOperation() == ModelChange.Operation.REMOVE){
+                    Model temp = ModelFactory.createDefaultModel();
+                    temp.read(modelChange.getSerializedModel(), null, 
+                            getSerializationFormatString(
+                                    modelChange.getSerializationFormat()));
+                    model.remove(temp);
+                } else {
+                    log.error("Unsupported model change type " + 
+                            modelChange.getOperation().getClass().getName());
+                }
+            }
+            
+            for (Object o : changeSet.getPostChangeEvents()) {
+                this.notifyListenersOfEvent(o);
+            }
+            
+        } catch (Exception e) {
+            log.error(e, e);
+            throw new RDFServiceException(e);
+        }        
+        return true;
+    }
 			
 	/**
 	 * Performs a SPARQL construct query against the knowledge base. The query may have
@@ -368,6 +402,43 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         }
     }
        
+    public void addModel(Model model, String graphURI) {
+        verbModel(model, graphURI, "INSERT");
+    }
+    
+    public void deleteModel(Model model, String graphURI) {
+        verbModel(model, graphURI, "DELETE");
+    }
+    
+    private void verbModel(Model model, String graphURI, String verb) {
+        Model m = ModelFactory.createDefaultModel();
+        int testLimit = 1000;
+        StmtIterator stmtIt = model.listStatements();
+        int count = 0;
+        try {
+            while (stmtIt.hasNext()) {
+                count++;
+                m.add(stmtIt.nextStatement());
+                if (count % testLimit == 0 || !stmtIt.hasNext()) {
+                    StringWriter sw = new StringWriter();
+                    m.write(sw, "N-TRIPLE");
+                    StringBuffer updateStringBuff = new StringBuffer();
+                    updateStringBuff.append(verb + " DATA { " + ((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" ));
+                    updateStringBuff.append(sw);
+                    updateStringBuff.append(((graphURI != null) ? " } " : "") + " }");
+                    
+                    String updateString = updateStringBuff.toString();
+                    
+                    executeUpdate(updateString);
+
+                    m.removeAll();
+                }
+            }
+        } finally {
+            stmtIt.close();
+        }
+    }
+    
     protected void addTriple(Triple t, String graphURI) {
                 
         StringBuffer updateString = new StringBuffer();
@@ -438,32 +509,165 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         }
 	}
 	
-	protected void performAdd(ModelChange modelChange) throws RDFServiceException {
-	
-		Model model = ModelFactory.createDefaultModel();
-		model.read(modelChange.getSerializedModel(),getSerializationFormatString(modelChange.getSerializationFormat()));
-		
-		StmtIterator stmtIt = model.listStatements();
-		
-		while (stmtIt.hasNext()) {
-		   Statement stmt = stmtIt.next();
-		   Triple triple = new Triple(stmt.getSubject().asNode(), stmt.getPredicate().asNode(), stmt.getObject().asNode());
-	       addTriple(triple, modelChange.getGraphURI());
-		}	
-	}
-	
-	protected void performRemove(ModelChange modelChange) throws RDFServiceException {
-		
-		Model model = ModelFactory.createDefaultModel();
-		model.read(modelChange.getSerializedModel(),getSerializationFormatString(modelChange.getSerializationFormat()));
-		
-		StmtIterator stmtIt = model.listStatements();
-		
-		while (stmtIt.hasNext()) {
-		   Statement stmt = stmtIt.next();
-		   Triple triple = new Triple(stmt.getSubject().asNode(), stmt.getPredicate().asNode(), stmt.getObject().asNode());
-	       removeTriple(triple, modelChange.getGraphURI());
-		}	
-	}
+    private void performChange(ModelChange modelChange) {
+        Model model = parseModel(modelChange);
+        if (modelChange.getOperation() == ModelChange.Operation.ADD) {
+            addModel(model, modelChange.getGraphURI());  
+        } else if (modelChange.getOperation() == ModelChange.Operation.REMOVE) {
+            deleteModel(model, modelChange.getGraphURI());
+            removeBlankNodesWithSparqlUpdate(model, modelChange.getGraphURI());
+        } else {
+            log.error("unrecognized operation type");
+        }         
+    }
+    
+    private void removeBlankNodesWithSparqlUpdate(Model model, String graphURI) {
+        List<Statement> blankNodeStatements = new ArrayList<Statement>();
+        StmtIterator stmtIt = model.listStatements();
+        while (stmtIt.hasNext()) {
+            Statement stmt = stmtIt.nextStatement();
+            if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
+                blankNodeStatements.add(stmt);
+            }
+        }
+        
+        if(blankNodeStatements.size() == 0) {
+            return;
+        }
+        
+        Model blankNodeModel = ModelFactory.createDefaultModel();
+        blankNodeModel.add(blankNodeStatements);
+        
+        log.debug("removal model size " + model.size());       
+        log.debug("blank node model size " + blankNodeModel.size());
+        
+        if (blankNodeModel.size() == 1) {
+            log.warn("Deleting single triple with blank node: " + blankNodeModel);
+            log.warn("This likely indicates a problem; excessive data may be deleted.");
+        }
+                
+        String rootFinder = "SELECT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s } FILTER (!bound(?ss)) }";
+        Query rootFinderQuery = QueryFactory.create(rootFinder);
+        QueryExecution qe = QueryExecutionFactory.create(rootFinderQuery, blankNodeModel);
+        try {
+            ResultSet rs = qe.execSelect();
+            while (rs.hasNext()) {
+                QuerySolution qs = rs.next();
+                com.hp.hpl.jena.rdf.model.Resource s = qs.getResource("s");
+                String treeFinder = makeDescribe(s);
+                Query treeFinderQuery = QueryFactory.create(treeFinder);
+                QueryExecution qee = QueryExecutionFactory.create(treeFinderQuery, blankNodeModel);
+                try {
+                    Model tree = qee.execDescribe();
+                    if (s.isAnon()) {
+                        removeUsingSparqlUpdate(tree, graphURI);
+                    } else {
+                        StmtIterator sit = tree.listStatements(s, null, (RDFNode) null);
+                        while (sit.hasNext()) {
+                            Statement stmt = sit.nextStatement();
+                            RDFNode n = stmt.getObject();
+                            Model m2 = ModelFactory.createDefaultModel();
+                            if (n.isResource()) {
+                                com.hp.hpl.jena.rdf.model.Resource s2 = 
+                                        (com.hp.hpl.jena.rdf.model.Resource) n;
+                                // now run yet another describe query
+                                String smallerTree = makeDescribe(s2);
+                                Query smallerTreeQuery = QueryFactory.create(smallerTree);
+                                QueryExecution qe3 = QueryExecutionFactory.create(
+                                        smallerTreeQuery, tree);
+                                try {
+                                    qe3.execDescribe(m2);
+                                } finally {
+                                    qe3.close();
+                                }    
+                            }
+                            m2.add(stmt);   
+                            removeUsingSparqlUpdate(m2, graphURI);
+                        }     
+                    }
+                } finally {
+                    qee.close();
+                }
+            }
+        } finally {
+            qe.close();
+        }        
+    }
+    
+    private void removeUsingSparqlUpdate(Model model, String graphURI) {
+        
+        
+        StmtIterator stmtIt = model.listStatements();
+        
+        if (!stmtIt.hasNext()) {
+            stmtIt.close();
+            return;
+        }
+            
+        StringBuffer queryBuff = new StringBuffer();
+        queryBuff.append("DELETE { \n");
+        if (graphURI != null) {
+            queryBuff.append("    GRAPH <" + graphURI + "> { \n");
+        }
+        addStatementPatterns(stmtIt, queryBuff, !WHERE_CLAUSE);
+        if (graphURI != null) {
+            queryBuff.append("    } \n");
+        }
+        queryBuff.append("} WHERE { \n");
+        if (graphURI != null) {
+            queryBuff.append("    GRAPH <" + graphURI + "> { \n");
+        }
+        stmtIt = model.listStatements();
+        addStatementPatterns(stmtIt, queryBuff, WHERE_CLAUSE);
+        if (graphURI != null) {
+            queryBuff.append("    } \n");
+        }
+        queryBuff.append("} \n");
+        
+        if(log.isDebugEnabled()) {
+            log.debug(queryBuff.toString());
+        }
+        executeUpdate(queryBuff.toString());
+    }
+    
+    private static final boolean WHERE_CLAUSE = true;
+    
+    private void addStatementPatterns(StmtIterator stmtIt, StringBuffer patternBuff, boolean whereClause) {
+        while(stmtIt.hasNext()) {
+            Triple t = stmtIt.next().asTriple();
+            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getSubject(), null));
+            patternBuff.append(" ");
+            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getPredicate(), null));
+            patternBuff.append(" ");
+            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getObject(), null));
+            patternBuff.append(" .\n");
+            if (whereClause) {
+                if (t.getSubject().isBlank()) {
+                    patternBuff.append("    FILTER(isBlank(" + SparqlGraph.sparqlNodeDelete(t.getSubject(), null)).append(")) \n");
+                }
+                if (t.getObject().isBlank()) {
+                    patternBuff.append("    FILTER(isBlank(" + SparqlGraph.sparqlNodeDelete(t.getObject(), null)).append(")) \n");
+                }
+            }
+        }
+    }
+    
+    private String makeDescribe(com.hp.hpl.jena.rdf.model.Resource s) {
+        StringBuffer query = new StringBuffer("DESCRIBE <") ;
+        if (s.isAnon()) {
+            query.append("_:" + s.getId().toString());
+        } else {
+            query.append(s.getURI());
+        }
+        query.append(">");
+        return query.toString();
+    }
+    
+    private Model parseModel(ModelChange modelChange) {
+        Model model = ModelFactory.createDefaultModel();
+        model.read(modelChange.getSerializedModel(), null,
+                getSerializationFormatString(modelChange.getSerializationFormat()));
+        return model;
+    }
 
 }

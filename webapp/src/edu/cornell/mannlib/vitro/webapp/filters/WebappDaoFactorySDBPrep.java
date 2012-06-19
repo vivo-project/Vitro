@@ -119,7 +119,7 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		vreq.setAssertionsWebappDaoFactory(assertions);
 		vreq.setFullWebappDaoFactory(wadf);
 		vreq.setDataset(dataset);
-		vreq.setOntModelSelector(oms);
+		vreq.setOntModelSelector(baseOms);
 		
 		vreq.setJenaOntModel(ModelFactory.createOntologyModel(
 				OntModelSpec.OWL_MEM, dataset.getDefaultModel()));

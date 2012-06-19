@@ -32,12 +32,13 @@ import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.EmptyReifier;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
 
 public class ListeningGraph implements GraphWithPerform {
     
     private static final Log log = LogFactory.getLog(ListeningGraph.class);
     
-    private RDFServiceSDB rdfServiceSDB;
+    private RDFServiceImpl rdfServiceImpl;
     private String graphURI;
     
     private BulkUpdateHandler bulkUpdateHandler;
@@ -46,9 +47,9 @@ public class ListeningGraph implements GraphWithPerform {
     private Reifier reifier = new EmptyReifier(this);
     private QueryHandler queryHandler;
     
-    public ListeningGraph(String graphURI, RDFServiceSDB rdfServiceSDB) {
+    public ListeningGraph(String graphURI, RDFServiceImpl rdfServiceImpl) {
         this.graphURI = graphURI;
-        this.rdfServiceSDB = rdfServiceSDB;
+        this.rdfServiceImpl = rdfServiceImpl;
     }
     
     @Override
@@ -58,7 +59,10 @@ public class ListeningGraph implements GraphWithPerform {
 
     @Override
     public void performAdd(Triple triple) throws AddDeniedException {
-        this.rdfServiceSDB.notifyListeners(triple, ModelChange.Operation.ADD, graphURI);
+        if (log.isDebugEnabled()) {
+            log.debug("adding " + triple + " to " + graphURI);
+        }
+        this.rdfServiceImpl.notifyListeners(triple, ModelChange.Operation.ADD, graphURI);
     }
 
     @Override
@@ -68,7 +72,10 @@ public class ListeningGraph implements GraphWithPerform {
     
     @Override 
     public void performDelete(Triple triple) throws DeleteDeniedException {
-        this.rdfServiceSDB.notifyListeners(triple, ModelChange.Operation.REMOVE, graphURI);
+        if (log.isDebugEnabled()) {
+            log.debug("deleting " + triple + " from " + graphURI);
+        }
+        this.rdfServiceImpl.notifyListeners(triple, ModelChange.Operation.REMOVE, graphURI);
     }    
       
     @Override

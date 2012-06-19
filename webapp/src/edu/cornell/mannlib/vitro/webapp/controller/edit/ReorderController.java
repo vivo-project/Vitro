@@ -106,7 +106,7 @@ public class ReorderController extends VitroAjaxController {
     
     private void reorderIndividuals(String[] individualUris, VitroRequest vreq, String rankPredicate) {
     	//Testing new mechanism
-    	OntModel writeModel = vreq.getJenaOntModel();
+    	OntModel writeModel = vreq.getOntModelSelector().getABoxModel();
     	Model additions = ModelFactory.createDefaultModel();
         Model retractions = ModelFactory.createDefaultModel();
     	Property rankPredicateProperty = ResourceFactory.createProperty(rankPredicate);

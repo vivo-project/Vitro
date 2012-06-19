@@ -49,7 +49,6 @@ public class VclassRetryController extends BaseEditController {
     	
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
-        epo.setDataAccessObject(request.getFullWebappDaoFactory().getVClassDao());
 
         /*for testing*/
         VClass testMask = new VClass();
@@ -65,7 +64,7 @@ public class VclassRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        VClassDao vcwDao = request.getFullWebappDaoFactory().getVClassDao();
+        VClassDao vcwDao = request.getAssertionsWebappDaoFactory().getVClassDao();
         epo.setDataAccessObject(vcwDao);
         VClassGroupDao cgDao = request.getFullWebappDaoFactory().getVClassGroupDao();
         OntologyDao oDao = request.getFullWebappDaoFactory().getOntologyDao();

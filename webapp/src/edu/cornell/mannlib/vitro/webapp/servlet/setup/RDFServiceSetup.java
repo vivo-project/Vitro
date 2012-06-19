@@ -22,6 +22,7 @@ import com.hp.hpl.jena.sdb.util.StoreUtils;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.SameAsFilteringRDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sdb.RDFServiceSDB;
@@ -49,6 +50,11 @@ implements javax.servlet.ServletContextListener {
             } else {
                 useSDB(ctx, ss);
             }
+            
+            //experimental
+            //RDFServiceFactory factory = RDFServiceUtils.getRDFServiceFactory(ctx);
+            //RDFServiceUtils.setRDFServiceFactory(ctx, new SameAsFilteringRDFServiceFactory(factory));
+            
         } catch (SQLException e) {
             ss.fatal(this, "Exception in RDFServiceSetup", e);
         }        
@@ -57,7 +63,8 @@ implements javax.servlet.ServletContextListener {
     private void useEndpoint(String endpointURI, ServletContext ctx) {
         RDFService rdfService = new RDFServiceSparql(endpointURI);
         RDFServiceFactory rdfServiceFactory = new RDFServiceFactorySingle(rdfService);
-        RDFServiceUtils.setRDFServiceFactory(ctx, rdfServiceFactory);   
+        RDFServiceUtils.setRDFServiceFactory(ctx, rdfServiceFactory);
+        log.info("Using endpoint at " + endpointURI);
     }
 
     private void useSDB(ServletContext ctx, StartupStatus ss) throws SQLException {
