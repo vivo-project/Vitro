@@ -189,10 +189,10 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
                     new ModelSynchronizer(applicationMetadataModelDB));
             
             if (applicationMetadataModel.size()== 0 /* isFirstStartup() */) {
+                JenaDataSourceSetupBase.thisIsFirstStartup();
                 applicationMetadataModel.add(
                         InitialJenaModelUtils.loadInitialModel(
                                 ctx, getDefaultNamespace(ctx)));
-                
             }
             
             baseOms.setApplicationMetadataModel(applicationMetadataModel);
