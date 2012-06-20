@@ -202,11 +202,14 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
             log.warn("This likely indicates a problem; excessive data may be deleted.");
         }
         
-        String rootFinder = "SELECT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s } FILTER (!bound(?ss)) }";
+        String rootFinder = "SELECT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s FILTER(!isBlank(?ss)) } FILTER (!bound(?ss)) }";
         Query rootFinderQuery = QueryFactory.create(rootFinder);
         QueryExecution qe = QueryExecutionFactory.create(rootFinderQuery, blankNodeModel);
         try {
             ResultSet rs = qe.execSelect();
+            if (!rs.hasNext()) {
+                log.warn("No rooted blank node trees; deletion is not possible.");
+            }
             while (rs.hasNext()) {
                 QuerySolution qs = rs.next();
                 Resource s = qs.getResource("s");
@@ -268,22 +271,11 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
     
     private void removeUsingSparqlUpdate(Dataset dataset, Model model, String graphURI) {
         
-        StringBuffer patternBuff = new StringBuffer();
         StmtIterator stmtIt = model.listStatements();
         
         if (!stmtIt.hasNext()) {
             stmtIt.close();
             return;
-        }
-        
-        while(stmtIt.hasNext()) {
-            Triple t = stmtIt.next().asTriple();
-            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getSubject(), null));
-            patternBuff.append(" ");
-            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getPredicate(), null));
-            patternBuff.append(" ");
-            patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getObject(), null));
-            patternBuff.append(" .\n");
         }
         
         StringBuffer queryBuff = new StringBuffer();
@@ -294,13 +286,13 @@ public class RDFServiceSDB extends RDFServiceImpl implements RDFService {
             queryBuff.append("    GRAPH <" + graphURI + "> { \n");
         }
         stmtIt = model.listStatements();
-        addStatementPatterns(stmtIt, queryBuff, !WHERE_CLAUSE);
+        addStatementPatterns(stmtIt, queryBuff, WHERE_CLAUSE);
         if (graphURI != null) {
             queryBuff.append("    } \n");
         }
         queryBuff.append("} \n");
         
-        //log.debug(queryBuff.toString());
+        log.debug(queryBuff.toString());
         
         Query construct = QueryFactory.create(queryBuff.toString());
         // make a plain dataset to force the query to be run in a way that

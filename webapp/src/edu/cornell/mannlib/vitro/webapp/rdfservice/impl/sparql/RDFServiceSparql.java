@@ -568,7 +568,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
             log.warn("This likely indicates a problem; excessive data may be deleted.");
         }
                 
-        String rootFinder = "SELECT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s } FILTER (!bound(?ss)) }";
+        String rootFinder = "SELECT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s FILTER(!isBlank(?ss)) } FILTER (!bound(?ss)) }";
         Query rootFinderQuery = QueryFactory.create(rootFinder);
         QueryExecution qe = QueryExecutionFactory.create(rootFinderQuery, blankNodeModel);
         try {
@@ -617,7 +617,6 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
     }
     
     private void removeUsingSparqlUpdate(Model model, String graphURI) {
-        
         
         StmtIterator stmtIt = model.listStatements();
         
