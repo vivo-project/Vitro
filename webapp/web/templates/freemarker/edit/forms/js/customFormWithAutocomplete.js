@@ -136,7 +136,6 @@ var customForm = {
 //        if ((!this.supportEdit) && (this.editMode == 'edit' || this.editMode == 'repair')) {
         if (this.editMode == 'edit' || this.editMode == 'repair') {
             this.initFormWithValidationErrors();
-            this.initFormFullView();
         }
         else if (this.findValidationErrors()) {
             this.initFormWithValidationErrors();
@@ -546,6 +545,10 @@ var customForm = {
         if (selectedType.val().length) {
             this.acTypes[acTypeKey] = selectedType.val();
             this.typeName = selectedType.html();
+            if ( this.editMode == 'edit' ) {
+                var $acSelect = this.acSelections[acTypeKey];
+                $acSelect.find('label').html('Selected ' + this.typeName + ':');
+            }
         } 
         // reset to empty values; may not need
         else {

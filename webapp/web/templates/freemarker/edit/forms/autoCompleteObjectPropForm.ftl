@@ -50,10 +50,6 @@
 <#--In order to fill out the subject-->
 <#assign acFilterForIndividuals =  "['" + editConfiguration.subjectUri + "']" />
 
-range options ${rangeOptions?keys?size!"FUCK"}
-<#if rangeOptionsExist >FUXINGEXIST!<#else>NOEXIST!</#if>
-
-
 <h2>${formTitle}</h2>
 
 <#if editConfiguration.propertySelectFromExisting = true>
