@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openrdf.model.Resource;
@@ -140,6 +141,10 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
             Iterator<ModelChange> csIt = changeSet.getModelChanges().iterator();
             while (csIt.hasNext()) {
                 ModelChange modelChange = csIt.next();
+                if (!modelChange.getSerializedModel().markSupported()) {
+                    byte[] bytes = IOUtils.toByteArray(modelChange.getSerializedModel());
+                    modelChange.setSerializedModel(new ByteArrayInputStream(bytes));
+                }
                 modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
                 performChange(modelChange);
             }
