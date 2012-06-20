@@ -22,7 +22,6 @@ import com.hp.hpl.jena.sdb.util.StoreUtils;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.SameAsFilteringRDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sdb.RDFServiceSDB;
@@ -45,8 +44,10 @@ implements javax.servlet.ServletContextListener {
         try {
             String endpointURI = ConfigurationProperties.getBean(sce).getProperty(
                     "VitroConnection.DataSource.endpointURI");
+            String updateEndpointURI = ConfigurationProperties.getBean(sce).getProperty(
+                    "VitroConnection.DataSource.updateEndpointURI");
             if (endpointURI != null) {
-                useEndpoint(endpointURI, ctx);
+                useEndpoint(endpointURI, updateEndpointURI, ctx);
             } else {
                 useSDB(ctx, ss);
             }
@@ -60,11 +61,24 @@ implements javax.servlet.ServletContextListener {
         }        
     }
     
-    private void useEndpoint(String endpointURI, ServletContext ctx) {
-        RDFService rdfService = new RDFServiceSparql(endpointURI);
+    private void useEndpoint(String endpointURI, String updateEndpointURI, ServletContext ctx) {
+    	
+    	RDFService rdfService = null;
+    	if (updateEndpointURI == null)  {
+    		rdfService = new RDFServiceSparql(endpointURI);
+    	} else {
+    		rdfService = new RDFServiceSparql(endpointURI, updateEndpointURI);
+    	}
+    	
         RDFServiceFactory rdfServiceFactory = new RDFServiceFactorySingle(rdfService);
         RDFServiceUtils.setRDFServiceFactory(ctx, rdfServiceFactory);
-        log.info("Using endpoint at " + endpointURI);
+        
+        if (updateEndpointURI != null) {
+            log.info("Using read endpoint at " + endpointURI);
+            log.info("Using update endpoint at " + updateEndpointURI);
+        } else {
+            log.info("Using endpoint at " + endpointURI);
+        }
     }
 
     private void useSDB(ServletContext ctx, StartupStatus ss) throws SQLException {

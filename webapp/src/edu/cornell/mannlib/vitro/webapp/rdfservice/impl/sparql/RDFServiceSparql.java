@@ -50,17 +50,20 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sdb.ListeningGraph;
 /*
  * API to write, read, and update Vitro's RDF store, with support 
  * to allow listening, logging and auditing.
+ * 
  */
-
 public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	
 	private static final Log log = LogFactory.getLog(RDFServiceImpl.class);
-	private String endpointURI;
-	private Repository repository;
+	private String readEndpointURI;	
+	private String updateEndpointURI;
+	private Repository readRepository;
+	private Repository updateRepository;
 	
     /**
      * Returns an RDFService for a remote repository 
-     * @param String - URI of the SPARQL endpoint for the knowledge base
+     * @param String - URI of the read SPARQL endpoint for the knowledge base
+     * @param String - URI of the update SPARQL endpoint for the knowledge base
      * @param String - URI of the default write graph within the knowledge base.
      *                   this is the graph that will be written to when a graph
      *                   is not explicitly specified.
@@ -68,25 +71,40 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
      * The default read graph is the union of all graphs in the
      * knowledge base
      */
-    public RDFServiceSparql(String endpointURI, String defaultWriteGraphURI) {
-        this.endpointURI = endpointURI;
-        this.repository = new HTTPRepository(endpointURI);
+    public RDFServiceSparql(String readEndpointURI, String updateEndpointURI, String defaultWriteGraphURI) {
+        this.readEndpointURI = readEndpointURI;
+        this.updateEndpointURI = updateEndpointURI;
+        this.readRepository = new HTTPRepository(readEndpointURI);
+        this.updateRepository = new HTTPRepository(updateEndpointURI);
+    }
+ 
+    /**
+     * Returns an RDFService for a remote repository 
+     * @param String - URI of the read SPARQL endpoint for the knowledge base
+     * @param String - URI of the update SPARQL endpoint for the knowledge base
+     * 
+     * The default read graph is the union of all graphs in the
+     * knowledge base
+     */
+    public RDFServiceSparql(String readEndpointURI, String updateEndpointURI) {
+        this(readEndpointURI, updateEndpointURI, null);
     }
     
     /**
      * Returns an RDFService for a remote repository 
-     * @param String - URI of the SPARQL endpoint for the knowledge base
+     * @param String - URI of the read and update SPARQL endpoint for the knowledge base
      * 
      * The default read graph is the union of all graphs in the
      * knowledge base
      */
     public RDFServiceSparql(String endpointURI) {
-        this(endpointURI, null);
+        this(endpointURI, endpointURI, null);
     }
     	
     public void close() {
         try {
-            this.repository.shutDown();
+            this.readRepository.shutDown();
+            this.updateRepository.shutDown();
         } catch (RepositoryException re) {
             log.error(re, re);
         }
@@ -175,7 +193,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		
 		Model model = ModelFactory.createDefaultModel();
 		Query query = QueryFactory.create(queryStr);
-		QueryExecution qe = QueryExecutionFactory.sparqlService(endpointURI, query);
+		QueryExecution qe = QueryExecutionFactory.sparqlService(readEndpointURI, query);
 		
 		try {
 			qe.execConstruct(model);
@@ -205,7 +223,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		
 		Model model = ModelFactory.createDefaultModel();
 		Query query = QueryFactory.create(queryStr);
-		QueryExecution qe = QueryExecutionFactory.sparqlService(endpointURI, query);
+		QueryExecution qe = QueryExecutionFactory.sparqlService(readEndpointURI, query);
 		
 		try {
 			qe.execDescribe(model);
@@ -233,7 +251,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	public InputStream sparqlSelectQuery(String queryStr, RDFService.ResultFormat resultFormat) throws RDFServiceException {
 		
         Query query = QueryFactory.create(queryStr);
-        QueryExecution qe = QueryExecutionFactory.sparqlService(endpointURI, query);
+        QueryExecution qe = QueryExecutionFactory.sparqlService(readEndpointURI, query);
         
         try {
         	ResultSet resultSet = qe.execSelect();
@@ -275,7 +293,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	public boolean sparqlAskQuery(String queryStr) throws RDFServiceException {
 		
 	    Query query = QueryFactory.create(queryStr);
-	    QueryExecution qe = QueryExecutionFactory.sparqlService(endpointURI, query);
+	    QueryExecution qe = QueryExecutionFactory.sparqlService(readEndpointURI, query);
 	    
 	    try {
 	         return qe.execAsk();
@@ -298,7 +316,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         List<String> graphNodeList = new ArrayList<String>();
         
         try {
-            RepositoryConnection conn = getConnection();
+            RepositoryConnection conn = getWriteConnection();
             try {
                 RepositoryResult<Resource> conResult = conn.getContextIDs();
                 while (conResult.hasNext()) {
@@ -370,21 +388,25 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// Non-override methods below
 	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    protected String getEndpointURI() {
-        return endpointURI;
+    protected String getReadEndpointURI() {
+        return readEndpointURI;
     }
     
-    protected RepositoryConnection getConnection() {
+    protected String getUpdateEndpointURI() {
+        return updateEndpointURI;
+    }
+    
+    protected RepositoryConnection getWriteConnection() {
         try {
-            return this.repository.getConnection();
+            return this.updateRepository.getConnection();
         } catch (RepositoryException e) {
             throw new RuntimeException(e);
         }
     }
-	
+    
     protected void executeUpdate(String updateString) {    
         try {
-            RepositoryConnection conn = getConnection();
+            RepositoryConnection conn = getWriteConnection();
             try {
                 Update u = conn.prepareUpdate(QueryLanguage.SPARQL, updateString);
                 u.execute();
@@ -499,7 +521,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	protected boolean sparqlSelectQueryHasResults(String queryStr) throws RDFServiceException {
 		
         Query query = QueryFactory.create(queryStr);
-        QueryExecution qe = QueryExecutionFactory.sparqlService(endpointURI, query);
+        QueryExecution qe = QueryExecutionFactory.sparqlService(readEndpointURI, query);
         
         try {
         	ResultSet resultSet = qe.execSelect();
@@ -669,5 +691,4 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
                 getSerializationFormatString(modelChange.getSerializationFormat()));
         return model;
     }
-
 }
