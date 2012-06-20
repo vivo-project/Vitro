@@ -278,7 +278,7 @@ a.close {
     padding-top: 0.8em;
 }
 /* <---- Manage Prop Link, individual-properties.ftl -----*/
-a#managePropLink {
+a.manageLinks {
     display:none;
 }
 /* <---- OpenSocial -----*/

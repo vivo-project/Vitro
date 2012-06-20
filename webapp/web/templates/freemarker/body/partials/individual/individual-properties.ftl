@@ -30,13 +30,13 @@
                 <#-- Property display name -->
                 <#if property.localName == "authorInAuthorship" && editable>
                     <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
-                        <a id="managePropLink" href="${urls.base}/managePublications?subjectUri=${subjectUri[1]!}" title="manage publications" <#if verbose>style="padding-top:10px"</#if> >
+                        <a id="managePropLink" class="manageLinks" href="${urls.base}/managePublications?subjectUri=${subjectUri[1]!}" title="manage publications" <#if verbose>style="padding-top:10px"</#if> >
                             manage publications
                         </a>
                     </h3>
                 <#elseif property.localName == "hasResearcherRole" && editable>
                 <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
-                    <a id="managePropLink" href="${urls.base}/manageGrants?subjectUri=${subjectUri[1]!}" title="manage grants & projects" <#if verbose>style="padding-top:10px"</#if> >
+                    <a id="manageGrantLink" class="manageLinks" href="${urls.base}/manageGrants?subjectUri=${subjectUri[1]!}" title="manage grants & projects" <#if verbose>style="padding-top:10px"</#if> >
                         manage grants & projects
                     </a>
                 </h3>
@@ -44,7 +44,7 @@
                     <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> </h3>
                 </#if>
                 <#-- List the statements for each property -->
-                <ul class="property-list" role="list">
+                <ul class="property-list" role="list" id="${property.localName}List">
                     <#-- data property -->
                     <#if property.type == "data">
                         <@p.dataPropertyList property editable />
