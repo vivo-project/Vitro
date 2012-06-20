@@ -305,6 +305,8 @@ var pageManagementUtils = {
         if(varOrClass == null || varOrClass==undefined) {
         	varOrClass = "";
         }
+        //Attach event handlers if they exist
+        pageManagementUtils.bindClonedContentEventHandlers($newContentObj);
         pageManagementUtils.createClonedContentContainer($newContentObj, counter, contentTypeLabel, varOrClass);
         //previously increased by 10, just increasing by 1 here
         pageManagementUtils.counter++;  
@@ -320,6 +322,13 @@ var pageManagementUtils = {
            pageManagementUtils.counter++;  
            return $newContentObj;
     }, 
+    //For binding content type specific event handlers should they exist
+    bindClonedContentEventHandlers:function($newContentObj) {
+    	var dataGetterProcessorObj = pageManagementUtils.getDataGetterProcessorObject($newContentObj);
+    	if($.isFunction(dataGetterProcessorObj.bindEventHandlers)) {
+    		dataGetterProcessorObj.bindEventHandlers($newContentObj);
+    	}
+    },
     createClonedContentContainer:function($newContentObj, counter, contentTypeLabel, varOrClass) {
         //Create the container for the new content
         $newDivContainer = $("<div></div>", {
@@ -397,7 +406,7 @@ var pageManagementUtils = {
         $.getJSON(url, function(results) {
         	//Moved the function to processClassGroupDataGetterContent
         	//Should probably remove this entire method and copy there
-        	processClassGroupDataGetterContent.displayClassesForClassGroup(results);
+        	pageManagementUtils.displayClassesForClassGroup(results);
         });
     },
     displayClassesForClassGroup:function(results) {
@@ -463,7 +472,7 @@ var pageManagementUtils = {
         });
 
         $('input:checkbox[name=classInClassGroup]').click(function(){
-            $(this).closest(ul).find('input:checkbox[name=allSelected]').removeAttr('checked');
+            $(this).closest("ul").find('input:checkbox[name=allSelected]').removeAttr('checked');
         });
     }, //This is SPECIFIC to VIVO so should be moved there
     updateInternalClassMessage:function(classGroupName) { //User has changed content type 
@@ -617,6 +626,15 @@ var pageManagementUtils = {
     		}
     		
     	}
+    },
+    //Get the data getter processor
+    getDataGetterProcessorObject:function(pageContentSection) {
+    	var dataGetterType = pageManagementUtils.processDataGetterUtils.selectDataGetterType(pageContentSection);
+		var dataGetterProcessor = null;
+    	if(pageManagementUtils.dataGetterProcessorMap != null) {
+			dataGetterProcessor = pageManagementUtils.dataGetterProcessorMap[dataGetterType];
+		}
+    	return dataGetterProcessor;
     }
     
 };

@@ -97,13 +97,14 @@ public class ManagePagePreprocessor extends
 		for(String literalName: literalKeys) {
 			
 			//if submission already has value for this, then leave be
-			//otherwise replace with blank value sentinel
+			//otherwise replace with null which will not be valid N3
+			//TODO: Replace with better solution for forcing literal deletion
 			boolean haslv = submission.hasLiteralValue(literalName);
 			if(!submission.hasLiteralValue(literalName)) {
 				submission.addLiteralToForm(editConfiguration, 
 						 editConfiguration.getField(literalName), 
 						 literalName, 
-						 (new String[] {EditConfigurationConstants.BLANK_SENTINEL}));
+						 (new String[] {null}));
 			}
 		}
 		

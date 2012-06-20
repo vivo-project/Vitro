@@ -87,46 +87,46 @@ var processClassGroupDataGetterContent = {
 	//Toggle class selection already deals with names but want to attach that event
 	//handler to THIS new section
 	 toggleClassSelection: function(pageContentSection) {
-	        // Check/unckeck all classes for selection
-	        pageContentSection.find('input:checkbox[name=allSelected]').click(function(){
-	             if ( this.checked ) {
-	             // if checked, select all the checkboxes for this particular section
-	            $(this).closest("ul").find('input:checkbox[name=classInClassGroup]').attr('checked','checked');
-	             //$('input:checkbox[name=classInClassGroup]').attr('checked','checked');
+        // Check/unckeck all classes for selection
+        pageContentSection.find('input:checkbox[name=allSelected]').click(function(){
+             if ( this.checked ) {
+             // if checked, select all the checkboxes for this particular section
+            $(this).closest("ul").find('input:checkbox[name=classInClassGroup]').attr('checked','checked');
+             //$('input:checkbox[name=classInClassGroup]').attr('checked','checked');
 
-	             } else {
-	             // if not checked, deselect all the checkboxes
-	                 $(this).closest("ul").find('input:checkbox[name=classInClassGroup]').removeAttr('checked');
+             } else {
+             // if not checked, deselect all the checkboxes
+                 $(this).closest("ul").find('input:checkbox[name=classInClassGroup]').removeAttr('checked');
 
-	              // $('input:checkbox[name=classInClassGroup]').removeAttr('checked');
-	             }
-	        });
+              // $('input:checkbox[name=classInClassGroup]').removeAttr('checked');
+             }
+        });
 
-	        pageContentSection.find('input:checkbox[name=classInClassGroup]').click(function(){
-	            $(this).closest(ul).find('input:checkbox[name=allSelected]').removeAttr('checked');
-	        });
-	    },
-	    bindEventHandlers:function(pageContentSection) {
-            processClassGroupDataGetterContent.toggleClassSelection(pageContentSection);
+        pageContentSection.find('input:checkbox[name=classInClassGroup]').click(function(){
+            $(this).closest("ul").find('input:checkbox[name=allSelected]').removeAttr('checked');
+        });
+    },
+    bindEventHandlers:function(pageContentSection) {
+        processClassGroupDataGetterContent.toggleClassSelection(pageContentSection);
 
-	    	var selectClassGroupDropdown =  pageContentSection.find("select[name='selectClassGroup']");
-	    	selectClassGroupDropdown.change(function(e, el) {
-	             processClassGroupDataGetterContent.chooseClassGroup(pageContentSection);
-	         });
-	    },
-	    chooseClassGroup: function(pageContentSection) {        
-	    	var selectClassGroupDropdown =  pageContentSection.find("select[name='selectClassGroup']");
-	        var url = "dataservice?getVClassesForVClassGroup=1&classgroupUri=";
-	        var vclassUri = selectClassGroupDropdown.val();
-	        url += encodeURIComponent(vclassUri);
-	        //Get the page content section
-	        //Make ajax call to retrieve vclasses
-	        $.getJSON(url, function(results) {
-	        	//Moved the function to processClassGroupDataGetterContent
-	        	//Should probably remove this entire method and copy there
-	        	processClassGroupDataGetterContent.displayClassesForClassGroup(results, pageContentSection);
-	        });
-	    }
+    	var selectClassGroupDropdown =  pageContentSection.find("select[name='selectClassGroup']");
+    	selectClassGroupDropdown.change(function(e, el) {
+             processClassGroupDataGetterContent.chooseClassGroup(pageContentSection);
+         });
+    },
+    chooseClassGroup: function(pageContentSection) {        
+    	var selectClassGroupDropdown =  pageContentSection.find("select[name='selectClassGroup']");
+        var url = "dataservice?getVClassesForVClassGroup=1&classgroupUri=";
+        var vclassUri = selectClassGroupDropdown.val();
+        url += encodeURIComponent(vclassUri);
+        //Get the page content section
+        //Make ajax call to retrieve vclasses
+        $.getJSON(url, function(results) {
+        	//Moved the function to processClassGroupDataGetterContent
+        	//Should probably remove this entire method and copy there
+        	processClassGroupDataGetterContent.displayClassesForClassGroup(results, pageContentSection);
+        });
+    }
 	   
 		
 		

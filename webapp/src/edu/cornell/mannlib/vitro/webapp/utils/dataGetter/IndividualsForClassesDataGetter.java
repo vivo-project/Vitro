@@ -350,7 +350,7 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
     
     //Get data servuice
     public String getDataServiceUrl() {
-    	return UrlBuilder.getUrl("/dataservice?getSolrIndividualsByVClasses=1&vclassId=");
+    	return UrlBuilder.getUrl("/dataservice?getRenderedSolrIndividualsByVClass=1&vclassId=");
     }
     /**
      * For processig of JSONObject

@@ -316,8 +316,16 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 		if(pn.retrieveN3Optional(counter) != null) {
 			n3.addAll(pn.retrieveN3Optional(counter));
 		}
+		//Add n3 connecting page to this data getter
+		n3.add(getPageToDataGetterN3(pn, counter));
 		editConfig.addN3Optional(n3);
 		
+	}
+	
+	private String getPageToDataGetterN3(ProcessDataGetterN3 pn, int counter) {
+		String dataGetterVar = pn.getDataGetterVar(counter);
+		//Put this method in the generator but can be put elsewhere
+		return getDataGetterN3(dataGetterVar);
 	}
 
 	private void addExistingLiteralsAndUrisOnForm(EditConfigurationVTwo editConfig, ProcessDataGetterN3 pn,

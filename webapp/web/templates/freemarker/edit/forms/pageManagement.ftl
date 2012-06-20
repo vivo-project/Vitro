@@ -84,8 +84,17 @@
             <section id="custom-template" <#if selectedTemplateType != 'custom'>class="hidden" </#if>role="region">
                 <input type="text" name="customTemplate" value="${customTemplate!''}" size="40" role="input" /><span class="requiredHint"> *</span>
             </section>
-            <p style="margin-top:10px;margin-bottom:0px"><input id="menuCheckbox" type="checkbox" name="menuCheckbox"> This is a menu page</p>
-            <section id="menu" role="region" style="margin-top:10px">
+            <p style="margin-top:10px;margin-bottom:0px"><input id="menuCheckbox" type="checkbox" name="menuCheckbox"
+            <#if menuAction="Edit" && menuItem?has_content>checked="checked"</#if>
+            > This is a menu page</p>
+            <section id="menu" role="region" 
+            <#--Do not display menu section unless editing an existing menu item-->
+            <#if menuAction = "Add" || (menuAction="Edit" && (!menuItem?has_content || menuItem = "")) >
+            style="margin-top:10px;display:none"
+            <#else>
+            style="margin-top:10px"
+            </#if>
+            >
                 <label for="default">Menu Item Name</label>
                 <input type="hidden" id="menuItem" name="menuItem" value="${menuItem!''}" />
                 <input type="text" id="menuLinkText" name="menuLinkText" value="${menuLinkText!''}" size="28" role="input" />
