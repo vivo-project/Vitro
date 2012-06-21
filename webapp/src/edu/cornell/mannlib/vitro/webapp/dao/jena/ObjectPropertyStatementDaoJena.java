@@ -264,29 +264,24 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
      * DataPropertyStatementDaoJena returns a List<DataPropertyStatement>. We need to accomodate
      * custom queries that could request any data in addition to just the object of the statement.
      * However, we do need to get the object of the statement so that we have it to create editing links.
-     */
-    
-    @Override 
-    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
-            String subjectUri, 
-            String propertyUri, 
-            String objectKey, String queryString) {
-        
-        return getObjectPropertyStatementsForIndividualByProperty(
-                subjectUri, propertyUri, objectKey, objectKey, null);
-        
-    }
+     */             
     
     @Override
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
             String subjectUri, 
-            String propertyUri, 
+            String propertyUri,             
             String objectKey, 
-            String queryString, Set<String> constructQueryStrings ) {  
-        
+            String queryString, 
+            Set<String> constructQueryStrings,
+            String sortDirection) {    	        
+    	
         Model constructedModel = constructModelForSelectQueries(
                 subjectUri, propertyUri, constructQueryStrings);
-        
+                    
+    	if("desc".equalsIgnoreCase( sortDirection ) ){
+    		queryString = queryString.replaceAll(" ASC\\(", " DESC(");
+    	}
+    	
         log.debug("Query string for object property " + propertyUri + ": " + queryString);
         
         Query query = null;
@@ -301,7 +296,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         QuerySolutionMap initialBindings = new QuerySolutionMap();
         initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
         initialBindings.add("property", ResourceFactory.createResource(propertyUri));
-
+        
         // Run the SPARQL query to get the properties
         List<Map<String, String>> list = new ArrayList<Map<String, String>>();
         DatasetWrapper w = dwf.getDatasetWrapper();
@@ -341,7 +336,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     }
     
     private Model constructModelForSelectQueries(String subjectUri,
-                                                 String propertyUri,
+                                                 String propertyUri,                                                 
                                                  Set<String> constructQueries) {
         
         if (constructQueries == null) {
@@ -357,7 +352,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             
             queryString = queryString.replace("?subject", "<" + subjectUri + ">");
             queryString = queryString.replace("?property", "<" + propertyUri + ">");
-            
+                       
             // we no longer need this query object, but we might want to do this
             // query parse step to improve debugging, depending on the error returned
             // through the RDF API

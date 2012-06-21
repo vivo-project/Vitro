@@ -79,6 +79,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     
     private PropertyListConfig config;
     private String objectKey;    
+    private String sortDirection;
     
     ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, 
             boolean editing)
@@ -86,6 +87,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
         super(op, subject, vreq); 
         setName(op.getDomainPublic());
+        
+        sortDirection = op.getDomainEntitySortDirection();
         
         // Get the config for this object property
         try {
@@ -144,7 +147,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     
     protected List<Map<String, String>> getStatementData() {
         ObjectPropertyStatementDao opDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
-        return opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, getSelectQuery(), getConstructQueries());
+        
+        return opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, getSelectQuery(), getConstructQueries(), sortDirection);
     }
     
     protected abstract boolean isEmpty();

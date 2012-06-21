@@ -32,7 +32,7 @@
             FILTER ( afn:namespace(?subclass) != "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" )   
             </collated>       
         
-        } ORDER BY <collated> ?subclass </collated> ?label ?label ?localName  
+        } ORDER BY <collated> ?subclass </collated> ASC( ?label ) ASC( ?label ) ASC( ?localName )
     </query-select>
 
     <query-construct>

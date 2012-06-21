@@ -82,20 +82,16 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
     @Override
 	public int insertNewObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt) {
         return innerObjectPropertyStatementDao.insertNewObjectPropertyStatement(objPropertyStmt);
-    }
-
+    }    	
+	
     @Override
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
-            String subjectUri, String propertyUri, String objectKey, String query) {
-        return getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, query, null);
-    }
-    
-    @Override
-    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
-            String subjectUri, String propertyUri, String objectKey, String query, Set<String> queryStrings) {
+            String subjectUri, String propertyUri, String objectKey, String query, 
+            Set<String> queryStrings, String sortDirection) {
         
-        List<Map<String, String>> data = innerObjectPropertyStatementDao.
-                                            getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, query, queryStrings);
+        List<Map<String, String>> data = 
+        	innerObjectPropertyStatementDao.getObjectPropertyStatementsForIndividualByProperty(
+        			subjectUri, propertyUri, objectKey, query, queryStrings,sortDirection);
         
         /* Filter the data
          * 
@@ -135,6 +131,8 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
     public Map<String, String> getMostSpecificTypesInClassgroupsForIndividual(String subjectUri) {
         return innerObjectPropertyStatementDao.getMostSpecificTypesInClassgroupsForIndividual(subjectUri);
     }
+
+
     
 
 }
