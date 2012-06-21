@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.services.shortview;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +30,10 @@ public class ShortViewServiceImpl implements ShortViewService {
 	private static final Log log = LogFactory
 			.getLog(ShortViewServiceImpl.class);
 
-	private static final Map<String, Object> EMPTY_MAP = Collections.emptyMap();
-
+	/*
+	 * TODO this should use a real connection to the ApplicationOntology to find
+	 * the short view to use for each individiual in a given context.
+	 */
 	private final FakeApplicationOntologyService faker;
 
 	public ShortViewServiceImpl(FakeApplicationOntologyService faker) {
@@ -64,6 +65,7 @@ public class ShortViewServiceImpl implements ShortViewService {
 
 			return fps.renderTemplate(templateName, fullModelMap, vreq);
 		} catch (TemplateParsingException e) {
+			log.error(e, e);
 			return "<p>Can't parse the short view template '" + templateName
 					+ "' for " + individual.getName() + "</p>";
 		} catch (Exception e) {
@@ -78,7 +80,7 @@ public class ShortViewServiceImpl implements ShortViewService {
 			ShortViewContext svContext, VitroRequest vreq) {
 		TemplateAndDataGetters tdg = fetchTemplateAndDataGetters(individual,
 				svContext, vreq);
-		Map<String, Object> gotData = runDataGetters(tdg.getDataGetters());
+		Map<String, Object> gotData = runDataGetters(tdg.getDataGetters(), individual);
 		return new TemplateAndSupplementalDataImpl(tdg.getTemplateName(),
 				gotData);
 	}
@@ -113,10 +115,12 @@ public class ShortViewServiceImpl implements ShortViewService {
 	}
 
 	/** Build a data map from the combined results of all data getters. */
-	private Map<String, Object> runDataGetters(Set<DataGetter> dataGetters) {
+	private Map<String, Object> runDataGetters(Set<DataGetter> dataGetters, Individual individual) {
+		Map<String, Object> valueMap = new HashMap<String, Object>();
+		valueMap.put("individualUri", individual.getURI());
 		Map<String, Object> gotData = new HashMap<String, Object>();
 		for (DataGetter dg : dataGetters) {
-			gotData.putAll(dg.getData(EMPTY_MAP));
+			gotData.putAll(dg.getData(valueMap));
 		}
 		return gotData;
 	}

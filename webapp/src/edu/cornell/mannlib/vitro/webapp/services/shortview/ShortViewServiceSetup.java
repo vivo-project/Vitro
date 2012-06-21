@@ -6,6 +6,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import edu.cornell.mannlib.vitro.webapp.services.shortview.FakeApplicationOntologyService.ShortViewConfigException;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -20,8 +21,16 @@ public class ShortViewServiceSetup implements ServletContextListener {
 		ServletContext ctx = sce.getServletContext();
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
-		ShortViewServiceImpl svs = new ShortViewServiceImpl(
-				new FakeApplicationOntologyService());
+		FakeApplicationOntologyService faker;
+		try {
+			faker = new FakeApplicationOntologyService(ctx);
+		} catch (ShortViewConfigException e) {
+			ss.warning(this, "Failed to load the shortview_config.n3 file -- "
+					+ e.getMessage(), e);
+			faker = new FakeApplicationOntologyService();
+		}
+
+		ShortViewServiceImpl svs = new ShortViewServiceImpl(faker);
 		ctx.setAttribute(ATTRIBUTE_NAME, svs);
 
 		ss.info(this,
