@@ -173,7 +173,6 @@ public class SimpleReasoner extends StatementListener {
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
 			log.error("Exception while retracting inferences: ", e);
-			e.printStackTrace();
 		}
 	}
 	
@@ -265,7 +264,7 @@ public class SimpleReasoner extends StatementListener {
 			}
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
-			log.error("Exception while adding inference(s): " + e.getMessage());
+			log.error("Exception while adding inference(s)",e);
 		}
 	}
 
@@ -336,7 +335,7 @@ public class SimpleReasoner extends StatementListener {
 			}
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
-			log.error("Exception while removing inference(s): " + e.getMessage());
+			log.error("Exception while removing inference(s)",e);
 		}
 	}
 	

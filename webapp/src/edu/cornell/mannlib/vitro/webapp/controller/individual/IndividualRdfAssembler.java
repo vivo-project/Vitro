@@ -109,11 +109,14 @@ public class IndividualRdfAssembler {
 	    	
 	    	for (ObjectPropertyStatement os: ostates) {
 	    		Property prop = newModel.getProperty(os.getPropertyURI());
+	    		System.out.println("\nsjm: the object property is: " + os.getPropertyURI());
 	    		Resource obj = newModel.getResource(os.getObjectURI());
 	    		newModel.add(newModel.createStatement(subj, prop, obj));
 	    		if ( includeInLinkedData(obj, contextModel)) {
+	    			System.out.println("\tsjm: includeInLinkdedData is true");
 	    			newModel.add(getRDF(os.getObject(), contextModel, newModel, recurseDepth + 1, includes));
 	    	    } else {
+	    			System.out.println("\tsjm: includeInLinkdedData is false");
 	    	    	contextModel.enterCriticalSection(Lock.READ);
 	    			try {
 	    				newModel.add(contextModel.listStatements(obj, RDFS.label, (RDFNode)null));
