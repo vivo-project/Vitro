@@ -85,41 +85,44 @@ public class ManagePagePreprocessor extends
 	
 	private void processExistingValues() {
 		//For all literals that were originally in scope that don't have values on the form
-		//anymore, replace with blank sentinel value
+		//anymore, replace with null value
 		//For those literals, those values will be replaced with form values where overwritten
 		//And will be deleted where not overwritten which is the behavior we desire
-		Map<String, List<Literal>> literalsInScope = this.editConfiguration.getLiteralsInScope();
-		Map<String, List<String>> urisInScope = this.editConfiguration.getUrisInScope();
-		List<String> literalKeys = new ArrayList<String>(literalsInScope.keySet());
-
-		
-		List<String> uriKeys = new ArrayList<String>(urisInScope.keySet());
-		for(String literalName: literalKeys) {
+		if(this.editConfiguration.isParamUpdate()) {
+			Map<String, List<Literal>> literalsInScope = this.editConfiguration.getLiteralsInScope();
+			Map<String, List<String>> urisInScope = this.editConfiguration.getUrisInScope();
+			List<String> literalKeys = new ArrayList<String>(literalsInScope.keySet());
+	
 			
-			//if submission already has value for this, then leave be
-			//otherwise replace with null which will not be valid N3
-			//TODO: Replace with better solution for forcing literal deletion
-			boolean haslv = submission.hasLiteralValue(literalName);
-			if(!submission.hasLiteralValue(literalName)) {
-				submission.addLiteralToForm(editConfiguration, 
-						 editConfiguration.getField(literalName), 
-						 literalName, 
-						 (new String[] {null}));
+			List<String> uriKeys = new ArrayList<String>(urisInScope.keySet());
+			for(String literalName: literalKeys) {
+				
+				//if submission already has value for this, then leave be
+				//otherwise replace with null which will not be valid N3
+				//TODO: Replace with better solution for forcing literal deletion
+				boolean haslv = submission.hasLiteralValue(literalName);
+				if(!submission.hasLiteralValue(literalName)) {
+					submission.addLiteralToForm(editConfiguration, 
+							 editConfiguration.getField(literalName), 
+							 literalName, 
+							 (new String[] {null}));
+				}
+			}
+			
+			
+			for(String uriName: uriKeys) {
+				//these values should never be overwritten or deleted
+				//if(uriName != "page" && uriName != "menuItem" && !uriName.startsWith("dataGetter")) {
+				if(uriName != "page") {
+					boolean hasuv = submission.hasUriValue(uriName);
+					if(!submission.hasUriValue(uriName)) {
+						submission.addUriToForm(editConfiguration, 
+								 uriName, 
+								 (new String[] {EditConfigurationConstants.BLANK_SENTINEL}));
+					}	
+				}
 			}
 		}
-		
-		for(String uriName: uriKeys) {
-			//these values should never be overwritten or deleted
-			if(uriName != "page" && uriName != "menuItem" && !uriName.startsWith("dataGetter")) {
-				boolean hasuv = submission.hasUriValue(uriName);
-				if(!submission.hasUriValue(uriName)) {
-					submission.addUriToForm(editConfiguration, 
-							 uriName, 
-							 (new String[] {EditConfigurationConstants.BLANK_SENTINEL}));
-				}	
-			}
-		}
-		//Other than data getter itself, also get rid of any of the old URIs if any
 		
 	}
 	
@@ -236,35 +239,15 @@ public class ManagePagePreprocessor extends
 			 submission.addUriToForm(editConfiguration, submissionUriName, uriValuesSubmission);
 			 
 		 }
-		 //this needs to be different
-		 //Get the literals directly from the processor - which you can get based on counter
-		 //Problem then is we know what the connection is - some way to put that logic within the processor itself?
-		 //It already knows the json object
-		 
-		 //--> Get field for this base label, with counter value - that you get from configuration
-/*
-		 while(jsonObject.keys().hasNext())
-		 {
-			 //Other than class, all other variables considered a submission value corresponding to field
-			 String key = (String) jsonObject.keys().next();
-			 if(key != "dataGetterClass") {
-				 //not expecting multiple values, so will need to either make this array or 
-				 //think about this some more
-				 //TODO: Consider multiple values here
-				 Map<String, String[]> submissionValues = new HashMap<String, String[]>();
-				 submissionValues.put(key, new String[]{jsonObject.getString(key)} );
-				
-				 if(literalLabels.contains(key)) {
-					 submission.addLiteralToForm(editConfiguration.getField(key), field, var, valuesArray)
-				 }
+		
+		 //To get data getter uris, check if editing an existing set and include those as form inputs
+		 if(editConfiguration.isParamUpdate()) {
+			 String URIValue = jsonObject.getString("URI");
+			 if(URIValue != null) {
+				 String dataGetterURISubmissionName = pn.getDataGetterVarName(counter);
+				 submission.addUriToForm(editConfiguration, dataGetterURISubmissionName, new String[]{URIValue});
 			 }
-			 
 		 }
-		 List<String> uris = pn.retrieveUrissOnForm(counter);
-		 for(String l:literals) {
-			 //json object should have 
-			 submissionValues.put(l, new String[]{jsonObject.getString(l)} );
-		 }*/
 		
 	}
 

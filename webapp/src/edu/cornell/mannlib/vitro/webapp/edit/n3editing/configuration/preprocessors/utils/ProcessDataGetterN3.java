@@ -28,6 +28,7 @@ public interface ProcessDataGetterN3 {
     public List<String> getUriVarNamesBase();
     public String getVarName(String base, int counter);
     public String getDataGetterVar(int counter);
+    public String getDataGetterVarName(int counter);
     public List<String> getNewResources(int counter);
     
     //Get Existing values to put in scope

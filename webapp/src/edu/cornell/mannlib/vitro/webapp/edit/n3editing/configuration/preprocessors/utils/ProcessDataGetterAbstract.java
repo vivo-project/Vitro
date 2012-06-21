@@ -32,7 +32,12 @@ public abstract class ProcessDataGetterAbstract implements ProcessDataGetterN3 {
 	
     //placeholder so need "?" in front of the variable
     public String getDataGetterVar(int counter) {
-    	return "?dataGetter" + counter;
+    	return "?" + getDataGetterVarName(counter);
+    }
+    
+    //Just the var name, no "?"
+    public String getDataGetterVarName(int counter) {
+    	return "dataGetter" + counter;
     }
     
     public String getPrefixes() {

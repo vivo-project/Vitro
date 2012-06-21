@@ -547,6 +547,11 @@ var pageManagementUtils = {
 				var dataGetterProcessor = pageManagementUtils.dataGetterProcessorMap[dataGetterType];
 				//the content type specific processor will create the json object to be returned
 				var jsonObject = dataGetterProcessor.processPageContentSection(pageContentSection);
+				//if data getter uri included, include that as well
+				if(pageContentSection.find("input[name='URI']").length > 0) {
+					var uriValue = pageContentSection.find("input[name='URI']").val();
+					jsonObject["URI"] = uriValue;
+				}
 				return jsonObject;
 			} else {
 				//ERROR handling
@@ -618,6 +623,8 @@ var pageManagementUtils = {
 	    				var $newContentObj = pageManagementUtils.cloneContentAreaForEdit(contentType, contentTypeLabel, additionalLabelText);
 	    				//Populate the section with the values
 	    				dataGetterProcessorObject.populatePageContentSection(JSONContentObject, $newContentObj);
+	    				//Also include a hidden input with data getter URI
+	    				pageManagementUtils.includeDataGetterURI(JSONContentObject, $newContentObj);
 	    			} else {
 	    				//error condition
 	    			}
@@ -625,6 +632,12 @@ var pageManagementUtils = {
     			
     		}
     		
+    	}
+    },
+    includeDataGetterURI:function(JSONContentObject, $newContentObj) {
+    	var uri = JSONContentObject["URI"];
+    	if(uri != null) {
+    		$("<input type='hidden' name='URI' value='" + uri + "'>").appendTo($newContentObj);
     	}
     },
     //Get the data getter processor

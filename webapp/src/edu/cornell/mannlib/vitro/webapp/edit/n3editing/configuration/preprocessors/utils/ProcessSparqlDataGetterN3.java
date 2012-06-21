@@ -36,7 +36,6 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
 	}
 	//Pass in variable that represents the counter 
 
-	//TODO: ensure correct model returned
 	//We shouldn't use the ACTUAL values here but generate the n3 required
     public List<String> retrieveN3Required(int counter) {
     	String dataGetterVar = getDataGetterVar(counter);
@@ -54,14 +53,6 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
     }
   
     
-    //Need to add method sfor returning the fields, literals on form, and all that
-    /*
-     * addLiteralsAndUrisOnForm(pn, counter);
-			// Add fields
-			addFields(pn, counter);
-			//Add input values to submission
-			addInputsToSubmission(pn, counter);
-     */
     public List<String> retrieveLiteralsOnForm(int counter) {
     	List<String> literalsOnForm = new ArrayList<String>();
     	literalsOnForm.add(getVarName("saveToVar",counter));
@@ -81,16 +72,7 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
     
    public List<FieldVTwo> retrieveFields(int counter) {
 	   List<FieldVTwo> fields = new ArrayList<FieldVTwo>();
-	   
-	   //An alternative way of doing this 
-	   /*
-	   List<String> allFieldsBase = new ArrayList<String>();
-	   allFieldsBase.addAll(getLiteralVarNamesBase());
-	   allFieldsBase.addAll(getUriVarNamesBase());
-	   
-	   for(String varName: allFieldsBase) {
-		   fields.add(new FieldVTwo().setName(getVarName(varName, counter)));
-	   } */
+	  
 	   //For existing data getters
 	   //fields.add(new FieldVTwo().setName(getVarName("dataGetter", counter)));
 	   fields.add(new FieldVTwo().setName(getVarName("queryModel", counter)));

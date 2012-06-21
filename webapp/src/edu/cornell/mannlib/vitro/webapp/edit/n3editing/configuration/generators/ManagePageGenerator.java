@@ -307,6 +307,8 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	//Takes data getter information, packs within JSON object to send back to the form
 	private void addDataGetterSpecificFormData(String dataGetterURI, ProcessDataGetterN3 pn, OntModel queryModel, JSONArray jsonArray, ServletContext context) {
 		JSONObject jo = pn.getExistingValuesJSON(dataGetterURI, queryModel, context);
+		//Add dataGetterURI to jsonObject
+		jo.element("URI", dataGetterURI);
 		jsonArray.add(jo);
 	}
 

@@ -49,7 +49,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 
 public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
-
+	//For random number generation, creating it everytime the method is called lead to nextInt being about the same
+	//if calls were made close together in time
+	private Random random = new Random(System.currentTimeMillis());
     public IndividualDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
     }
@@ -634,6 +636,9 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 			//we always want local names like n23423 for the default namespace
 			namespace = DEFAULT_NAMESPACE;
 			uri = null;			
+			log.debug("Setting namespace to default namespace " + DEFAULT_NAMESPACE + " and uri is null");
+			log.debug("Individual : " + individual + " - URI: " + individual.getURI() + " - namespace -" + 
+			individual.getNamespace() + "- ");
 		}else if( individual.getURI() != null ){
 			errMsg = getWebappDaoFactory().checkURI(individual.getURI());
 			if( errMsg == null){
@@ -642,14 +647,16 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 			}else{
 				throw new InsertException(errMsg);
 			}
+			log.debug("Individual URI not null " + individual.getURI() + " and uriIsGood is true and uri set to individual uri");
 		}else{
 			namespace = individual.getNamespace();
 			if( namespace == null || namespace.length() == 0 )
 				namespace = DEFAULT_NAMESPACE;
 			String localName = individual.getName();
-			
+			log.debug("Namespace " + namespace + " -localname=" + localName);
 			/* try to use the specified namespace and local name */
-			if (localName != null) {							
+			if (localName != null) {
+				log.debug("Local name not equal to null so replacing characters, etc.");
 				localName = localName.replaceAll("\\W", "");
 				localName = localName.replaceAll(":", "");
 				if (localName.length() > 2) {
@@ -661,29 +668,31 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 					if( errMsg == null)
 						uriIsGood = true;
 					else
-						throw new InsertException(errMsg);					
+						throw new InsertException(errMsg);		
+					log.debug("uriIsGood is true and uri is " + uri);
 				}
 			}
 			/* else try namespace + n2343 */ 			
 		}
 		
-		Random random = new Random(System.currentTimeMillis());
 		int attempts = 0;
 		
-		while( uriIsGood == false && attempts < 30 ){			
+		while( uriIsGood == false && attempts < 30 ){	
+			log.debug("While loop: Uri is good false, attempt=" + attempts);
 			String localName = "n" + random.nextInt( Math.min(Integer.MAX_VALUE,(int)Math.pow(2,attempts + 13)) );
-			uri = namespace + localName;			
+			uri = namespace + localName;
+			log.debug("Trying URI " + uri);
 			errMsg = getWebappDaoFactory().checkURI(uri);
 			if(  errMsg != null)
 				uri = null;
 			else
-				uriIsGood = true;				
+				uriIsGood = true;		
 			attempts++;
 		}
 		
 		if( uri == null )
 			throw new InsertException("Could not create URI for individual: " + errMsg);
-								
+		log.debug("Using URI" + uri);						
 		return uri;
 	}
 
