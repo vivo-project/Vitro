@@ -51,8 +51,14 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
     }        
     
     @Override
-    public Map<String, Object> getData(Map<String, Object> pageData) {                        
-        return doQuery( vreq.getParameterMap(), getModel(context, vreq, modelURI));
+    public Map<String, Object> getData(Map<String, Object> pageData) { 
+    	// Merge the pageData with the request parameters. PageData overrides
+    	Map<String, String[]> merged = new HashMap<String, String[]>();
+    	merged.putAll(vreq.getParameterMap());
+    	for (String key: pageData.keySet()) {
+    		merged.put(key, new String[] {String.valueOf(pageData.get(key))});
+    	}
+        return doQuery( merged, getModel(context, vreq, modelURI));
     }
 
     /**
