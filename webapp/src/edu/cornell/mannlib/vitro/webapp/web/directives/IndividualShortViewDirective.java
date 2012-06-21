@@ -82,6 +82,11 @@ public class IndividualShortViewDirective extends BaseTemplateDirectiveModel {
 		VitroRequest vreq = new VitroRequest(
 				(HttpServletRequest) env.getCustomAttribute("request"));
 		ShortViewService svs = ShortViewServiceSetup.getService(ctx);
+		if (svs == null) {
+			log.warn("ShortViewService was not initialized properly.");
+			return;
+		}
+		
 		TemplateAndSupplementalData svInfo = svs.getShortViewInfo(individual,
 				svContext, vreq);
 
