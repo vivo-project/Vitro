@@ -114,7 +114,13 @@ name will be used as the label. -->
 </#macro>
 
 <#macro showAddLink propertyLocalName label url>
-    <a class="add-${propertyLocalName}" href="${url}" title="Add new ${label?lower_case} entry"><img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="add" /></a>
+    <#if propertyLocalName == "informationResourceInAuthorship" || propertyLocalName == "webpage" || propertyLocalName == "hasResearchArea">
+        <a class="add-${propertyLocalName}" href="${url}" title="Manage list of ${label?lower_case}">
+        <img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="manage" /></a>
+    <#else>
+        <a class="add-${propertyLocalName}" href="${url}" title="Add new ${label?lower_case} entry">
+        <img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="add" /></a>
+    </#if>
 </#macro>
 
 <#macro propertyLabel property label="${property.name?capitalize}">
@@ -130,7 +136,7 @@ name will be used as the label. -->
 </#macro>
 
 <#macro editingLinks propertyLocalName statement editable>
-    <#if editable>
+    <#if editable && (propertyLocalName != "informationResourceInAuthorship" && propertyLocalName != "webpage" && propertyLocalName != "hasResearchArea")>
         <@editLink propertyLocalName statement />
         <@deleteLink propertyLocalName statement />
      
