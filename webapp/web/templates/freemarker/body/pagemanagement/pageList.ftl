@@ -4,7 +4,6 @@
     <div class="tab">
         <h2>Page Management</h2>
     </div>
-<div>
 
 
 <#if pages?has_content >  
@@ -15,8 +14,9 @@
         <th scope="col">Title</th>
         <!--th scope="col">Type</th-->
         <th scope="col">URL</th>
-        <th scope="col">Template</th>
-        <th scope="col">Menu Page</th>
+        <th scope="col">Custom Template</th>
+        <th id="isMenuPage" scope="col" >Menu Page</th>
+        <th id="iconColumns" scope="col">&nbsp;</th>
       </tr>
     </thead>
     
@@ -25,9 +25,11 @@
     	 <tr>                
             <td> 
             	<#if pagex.listedPageUri?has_content> 
-                	<a href="${urls.base}/individual?uri=${pagex.listedPageUri?url}&switchToDisplayModel=1">${(pagex.listedPageTitle)!'-untitled-'}</a>
-            		&nbsp;
-            		<a href="${urls.base}/editRequestDispatch?subjectUri=${pagex.listedPageUri?url}&switchToDisplayModel=1&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator">Edit</a>
+            	    <#if pagex.listedPageTitle == "Home" >
+            	        ${pagex.listedPageTitle!}
+            	    <#else>
+            		<a href="${urls.base}/editRequestDispatch?subjectUri=${pagex.listedPageUri?url}&switchToDisplayModel=1&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator">${(pagex.listedPageTitle)!'-untitled-'}</a>
+            		</#if>
             		
             	<#else>
             		No URI defined for page. 
@@ -40,6 +42,11 @@
             <#if pagex.listedPageMenuItem?has_content>
             	<div class="menuFlag"></div>
             </#if>
+            </td>
+            <td>
+                <a href="${urls.base}/individual?uri=${pagex.listedPageUri?url}&switchToDisplayModel=1"><img src="${urls.images!}/profile-page-icon.png" title="view the profile properties for this page" alt="profile page"></a>
+                &nbsp;&nbsp;
+                <a href="#"><img src="${urls.images!}/individual/deleteIcon.gif" title="delete this page" alt="delete"></a>
             </td>
         </tr>    
     

@@ -31,6 +31,12 @@ table#pageList th {
 table#pageList th {
     text-align: left;
 } /*Fix for IE8 and 9, force text in a cell to be aligned to the left*/
+th#isMenuPage {
+    width: 86px;
+}
+th#iconColumns {
+    width: 56px;
+}
 table#pageList td {
     vertical-align: top;
     padding: .5em;
