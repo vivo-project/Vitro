@@ -19,17 +19,12 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.sdb.StoreDesc;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -38,15 +33,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlDataset;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlDatasetGraph;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraphMultilingual;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringRDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class WebappDaoFactorySDBPrep implements Filter {
 	
@@ -111,6 +103,13 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		
 		RDFServiceFactory factory = RDFServiceUtils.getRDFServiceFactory(_ctx);
 		RDFService rdfService = factory.getRDFService();
+		
+		if (!"false".equals(
+		        ConfigurationProperties.getBean(vreq).getProperty(
+		                "RDFService.languageFilter", "true"))) {
+		    rdfService = new LanguageFilteringRDFService(rdfService, langs);
+		}
+		
 		Dataset dataset = new RDFServiceDataset(rdfService);
 		wadf = new WebappDaoFactorySDB(rdfService, oms, config);
 	    WebappDaoFactory assertions = new WebappDaoFactorySDB(

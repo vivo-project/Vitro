@@ -49,13 +49,15 @@ public class IndividualDaoSDB extends IndividualDaoJena {
 
 	private DatasetWrapperFactory dwf;
     private SDBDatasetMode datasetMode;
+    private WebappDaoFactorySDB wadf;
 	
     public IndividualDaoSDB(DatasetWrapperFactory dwf, 
                             SDBDatasetMode datasetMode, 
-                            WebappDaoFactoryJena wadf) {
+                            WebappDaoFactorySDB wadf) {
         super(wadf);
         this.dwf = dwf;
         this.datasetMode = datasetMode;
+        this.wadf = wadf;
     }
     
     protected DatasetWrapper getDatasetWrapper() {
@@ -67,7 +69,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
             return new IndividualSDB(individualURI, 
             	                     this.dwf,
             	                     datasetMode, 
-            	                     getWebappDaoFactory());
+            	                     wadf);
         } catch (IndividualNotFoundException e) {
             // If the individual does not exist, return null.
             return null;
@@ -255,7 +257,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     
     private Individual makeIndividual(String uri, String label) throws IndividualNotFoundException {
         Individual ent = new IndividualSDB(uri, 
-                this.dwf, datasetMode, getWebappDaoFactory(), 
+                this.dwf, datasetMode, wadf, 
                 SKIP_INITIALIZATION);
         ent.setName(label);
         return ent;

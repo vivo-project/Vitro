@@ -40,15 +40,17 @@ public class ObjectPropertyStatementDaoSDB extends
     
 	private DatasetWrapperFactory dwf;
 	private SDBDatasetMode datasetMode;
+	private WebappDaoFactorySDB wadf;
 	
 	public ObjectPropertyStatementDaoSDB(
 	            RDFService rdfService,
 	            DatasetWrapperFactory dwf, 
 	            SDBDatasetMode datasetMode,
-	            WebappDaoFactoryJena wadf) {
+	            WebappDaoFactorySDB wadf) {
 		super (rdfService, dwf, wadf);
 		this.dwf = dwf;
 		this.datasetMode = datasetMode;
+		this.wadf = wadf;
 	}
 	
 	@Override
@@ -129,7 +131,7 @@ public class ObjectPropertyStatementDaoSDB extends
                                         objPropertyStmt.getObjectURI(), 
                                         this.dwf, 
                                         datasetMode,
-                                        getWebappDaoFactory());
+                                        wadf);
                                     objPropertyStmt.setObject(objInd);	                                
 	                            }
 	                            

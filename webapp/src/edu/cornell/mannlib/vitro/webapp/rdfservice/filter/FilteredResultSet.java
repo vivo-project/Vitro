@@ -12,9 +12,9 @@ import com.hp.hpl.jena.sparql.engine.binding.Binding;
 
 public class FilteredResultSet implements ResultSet {
 
-    private Iterator<QuerySolution> solutIt;
-    private ResultSet originalResultSet;
-    private int rowNum = -1;
+    protected Iterator<QuerySolution> solutIt;
+    protected ResultSet originalResultSet;
+    protected int rowNum = -1;
     
     public FilteredResultSet (List<QuerySolution> solutions, ResultSet originalResultSet) {
         this.solutIt = solutions.iterator();

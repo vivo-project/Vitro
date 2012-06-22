@@ -53,13 +53,16 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 public class IndividualSDB extends IndividualImpl implements Individual {
 
     private static final Log log = LogFactory.getLog(
                 IndividualSDB.class.getName());
     private OntResource ind = null;
-    private WebappDaoFactoryJena webappDaoFactory = null;
+    private WebappDaoFactorySDB webappDaoFactory = null;
     private Float _searchBoostJena = null;
     private boolean retreivedNullRdfsLabel = false;
     private DatasetWrapperFactory dwf = null;
@@ -72,7 +75,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     public IndividualSDB(String individualURI, 
                          DatasetWrapperFactory datasetWrapperFactory,
                          SDBDatasetMode datasetMode,
-                         WebappDaoFactoryJena wadf,
+                         WebappDaoFactorySDB wadf,
                          Model initModel) {
     	this.individualURI = individualURI;
     	this.dwf = datasetWrapperFactory;
@@ -107,7 +110,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     public IndividualSDB(String individualURI, 
             DatasetWrapperFactory datasetWrapperFactory, 
             SDBDatasetMode datasetMode,
-            WebappDaoFactoryJena wadf,
+            WebappDaoFactorySDB wadf, 
             boolean skipInitialization) throws IndividualNotFoundException {
     	this.individualURI = individualURI;
     	this.datasetMode = datasetMode;
@@ -181,7 +184,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     public IndividualSDB(String individualURI, 
             DatasetWrapperFactory datasetWrapperFactory,
             SDBDatasetMode datasetMode,
-            WebappDaoFactoryJena wadf) throws IndividualNotFoundException {
+            WebappDaoFactorySDB wadf) throws IndividualNotFoundException {
         this(individualURI, 
              datasetWrapperFactory, 
              datasetMode, 
@@ -758,16 +761,15 @@ public class IndividualSDB extends IndividualImpl implements Individual {
    		        				? WebappDaoFactorySDB.SDBDatasetMode
    		        						.ASSERTIONS_ONLY 
    		        			    : datasetMode)) 
-        		+ "} \n";        	
-        	DatasetWrapper w = getDatasetWrapper();
-        	Dataset dataset = w.getDataset();
-        	dataset.getLock().enterCriticalSection(Lock.READ);
+        		+ "} \n";
+    		RDFService service = webappDaoFactory.getRDFService();	
         	try {
-        	    tempModel = QueryExecutionFactory.create(
-        	            QueryFactory.create(getTypes), dataset).execConstruct();
-        	} finally {
-        	    dataset.getLock().leaveCriticalSection();
-        	    w.close();
+        	    tempModel = RDFServiceUtils.parseModel(
+        	            service.sparqlConstructQuery(
+        	                    getTypes, RDFService.ModelSerializationFormat.N3),
+        	                            RDFService.ModelSerializationFormat.N3);
+        	} catch (RDFServiceException e) {
+        	    throw new RuntimeException(e);
         	}
 		}
     	StmtIterator stmtItr = tempModel.listStatements(

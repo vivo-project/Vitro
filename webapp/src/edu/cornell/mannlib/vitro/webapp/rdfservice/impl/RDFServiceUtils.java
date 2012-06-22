@@ -22,6 +22,8 @@ public class RDFServiceUtils {
 
     private static final String RDFSERVICEFACTORY_ATTR = 
             RDFServiceUtils.class.getName() + ".RDFServiceFactory";
+    private static final String RDFSERVICEFACTORY_FILTERING_ATTR = 
+            RDFServiceUtils.class.getName() + ".RDFServiceFactory.Filtering";
     
     public static RDFServiceFactory getRDFServiceFactory(ServletContext context) {
         Object o = context.getAttribute(RDFSERVICEFACTORY_ATTR);

@@ -56,6 +56,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
         this.config = base.config;
         this.userURI = userURI;
         this.dwf = base.dwf;
+        this.rdfService = base.rdfService;
     }
 	
 	@Override
@@ -96,6 +97,10 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	public WebappDaoFactory getUserAwareDaoFactory(String userURI) {
         return new WebappDaoFactorySDB(this, userURI);
     }
+	
+	public RDFService getRDFService() {
+	    return this.rdfService;
+	}
 	
 	public enum SDBDatasetMode {
 	    ASSERTIONS_ONLY, INFERENCES_ONLY, ASSERTIONS_AND_INFERENCES
