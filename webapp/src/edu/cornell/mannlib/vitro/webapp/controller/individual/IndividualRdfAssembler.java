@@ -125,7 +125,8 @@ public class IndividualRdfAssembler {
     	}
     	
     	newModel = getLabelAndTypes(entity, contextModel, newModel );
-    		   
+        newModel = getStatementsWithUntypedProperties(subj, contextModel, vreq.getAssertionsOntModel(), newModel);
+    	
     	//bdc34: The following code adds all triples where entity is the Subject. 
 //    	contextModel.enterCriticalSection(Lock.READ);
 //		try {
@@ -202,5 +203,32 @@ public class IndividualRdfAssembler {
 		
     	return newModel;
     }
-
+    
+    /* This method adds in statements in which the property does not 
+     * have an rdf type in the asserted model. 
+     * This was added for release 1.5 to handle cases such as the 
+     * reasoning-plugin inferred dcterms:creator assertion
+     */
+    private Model getStatementsWithUntypedProperties(Resource subject, OntModel contextModel, OntModel assertionsModel, Model newModel) {
+    	contextModel.enterCriticalSection(Lock.READ);
+		try { 	    	
+			StmtIterator iter = contextModel.listStatements(subject, (Property) null, (RDFNode) null);
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+				Property property = stmt.getPredicate();
+		    	assertionsModel.enterCriticalSection(Lock.READ);
+				try {
+				    if (!assertionsModel.contains(property, RDF.type) && !newModel.contains(stmt)) {	
+					   newModel.add(stmt);
+				    }
+				} finally {
+					assertionsModel.leaveCriticalSection();
+				} 
+			}  
+		} finally {
+			contextModel.leaveCriticalSection();
+		} 
+	
+    	return newModel;
+    }
 }
