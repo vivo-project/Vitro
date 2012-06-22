@@ -115,7 +115,10 @@ owl:versionInfo
     a owl:DatatypeProperty. 
     
 <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#htmlValue>
-    a owl:DatatypeProperty.                  
+    a owl:DatatypeProperty.  
+    
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#cannotDeletePage>
+    a owl:DatatypeProperty.                   
       
 ######### Object Properties#########
 ###Basic

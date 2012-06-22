@@ -116,7 +116,9 @@ var pageManagementUtils = {
         this.menuSection = $("section#menu");
         this.submitButton = $("input#submit");
         this.leftSideDiv = $("div#leftSide");
-        this.rightSideDiv = $("div#rightSide")
+        this.rightSideDiv = $("div#rightSide");
+        //contentDivs container where content added/existing placed
+        this.savedContentDivs = $("section#contentDivs");
 	},
 	initDisplay: function(){
 		//right side components
@@ -191,7 +193,12 @@ var pageManagementUtils = {
 	       pageManagementUtils.resetClassGroupSection();
 	       //Clear all inputs values
 	       pageManagementUtils.clearSourceTemplateValues();
+	     //If adding browse classgroup, need to remove the classgroup option from the dropdown
+	       if(selectedType == "browseClassGroup") {
+	    	   pageManagementUtils.handleAddBrowseClassGroupPageContent();
+	       }
 	       pageManagementUtils.contentTypeSelect.focus();
+
 	    });
 	
 	    //replacing with menu management edit version which is extended with some of the logic below
@@ -200,49 +207,7 @@ var pageManagementUtils = {
         });
 	    
 	    this.contentTypeSelect.change( function() {
-	    	_this = pageManagementUtils;
-	    	pageManagementUtils.clearSourceTemplateValues();
-	        if ( _this.contentTypeSelect.val() == "browseClassGroup" ) {
-	            pageManagementUtils.classGroupSection.show();
-	            pageManagementUtils.fixedHTMLSection.hide();
-	            pageManagementUtils.sparqlQuerySection.hide();
-	            pageManagementUtils.moreContentButton.hide();
-	            pageManagementUtils.headerBar.text("Browse Class Group - ");
-	            pageManagementUtils.headerBar.show();
-	        }
-	        if ( _this.contentTypeSelect.val() == "fixedHtml" || _this.contentTypeSelect.val() == "sparqlQuery" ) {
-	        	 pageManagementUtils.classGroupSection.hide();
-	        	 //if fixed html show that, otherwise show sparq
-	            if ( _this.contentTypeSelect.val() == "fixedHtml" ) {
-	                pageManagementUtils.headerBar.text("Fixed HTML - ");
-	                pageManagementUtils.fixedHTMLSection.show();
-	            	pageManagementUtils.sparqlQuerySection.hide();
-	            }
-	            else {
-	                pageManagementUtils.headerBar.text("SPARQL Query Results - ");
-	                pageManagementUtils.sparqlQuerySection.show();
-	            	pageManagementUtils.fixedHTMLSection.hide();
-	            }
-	           
-	            pageManagementUtils.headerBar.show();
-	            //$('select#selectClassGroup option').eq(0).attr('selected', 'selected');
-	            pageManagementUtils.classesForClassGroup.addClass('hidden');
-	            pageManagementUtils.moreContentButton.show();
-	        }
-	        if ( _this.contentTypeSelect.val() == "" ) {
-	        	pageManagementUtils.classGroupSection.hide();
-	        	pageManagementUtils.fixedHTMLSection.hide();
-	        	pageManagementUtils.sparqlQuerySection.hide();
-	           
-	            pageManagementUtils.moreContentButton.hide();
-	            
-	            //$('select#selectClassGroup option').eq(0).attr('selected', 'selected');
-	            
-	            pageManagementUtils.classesForClassGroup.addClass('hidden');
-	            pageManagementUtils.headerBar.hide();
-	            pageManagementUtils.headerBar.text("");
-	        }
-	        pageManagementUtils.adjustSaveButtonHeight();
+	    	pageManagementUtils.handleContentTypeSelect();
 	    });
 	    
 	    
@@ -252,20 +217,68 @@ var pageManagementUtils = {
             if (validationError == "") {
             		//Create the appropriate json objects
             		pageManagementUtils.createPageContentForSubmission();
-            		//return true;
-            		//For testing, not submitting anything
-            		//event.preventDefault();
             		return true;
                } else{
             	   
                    $('#error-alert').removeClass('hidden');
                    $('#error-alert p').html(validationError);
-                   //TODO: Check why scrolling appears to be a problem
                    $.scrollTo({ top:0, left:0}, 500)
                    return false;
                } 
          });
     
+	},
+	//Select content type
+	handleContentTypeSelect:function() {
+		_this = pageManagementUtils;
+    	pageManagementUtils.clearSourceTemplateValues();
+        if ( _this.contentTypeSelect.val() == "browseClassGroup" ) {
+            pageManagementUtils.classGroupSection.show();
+            pageManagementUtils.fixedHTMLSection.hide();
+            pageManagementUtils.sparqlQuerySection.hide();
+            pageManagementUtils.moreContentButton.hide();
+            pageManagementUtils.headerBar.text("Browse Class Group - ");
+            pageManagementUtils.headerBar.show();
+        }
+        if ( _this.contentTypeSelect.val() == "fixedHtml" || _this.contentTypeSelect.val() == "sparqlQuery" ) {
+        	 pageManagementUtils.classGroupSection.hide();
+        	 //if fixed html show that, otherwise show sparql results
+            if ( _this.contentTypeSelect.val() == "fixedHtml" ) {
+                pageManagementUtils.headerBar.text("Fixed HTML - ");
+                pageManagementUtils.fixedHTMLSection.show();
+            	pageManagementUtils.sparqlQuerySection.hide();
+            }
+            else {
+                pageManagementUtils.headerBar.text("SPARQL Query Results - ");
+                pageManagementUtils.sparqlQuerySection.show();
+            	pageManagementUtils.fixedHTMLSection.hide();
+            }
+           
+            pageManagementUtils.headerBar.show();
+            pageManagementUtils.classesForClassGroup.addClass('hidden');
+            pageManagementUtils.moreContentButton.show();
+        }
+        if ( _this.contentTypeSelect.val() == "" ) {
+        	pageManagementUtils.classGroupSection.hide();
+        	pageManagementUtils.fixedHTMLSection.hide();
+        	pageManagementUtils.sparqlQuerySection.hide();
+            pageManagementUtils.moreContentButton.hide();            
+            pageManagementUtils.classesForClassGroup.addClass('hidden');
+            pageManagementUtils.headerBar.hide();
+            pageManagementUtils.headerBar.text("");
+        }
+        //Collapse any divs for existing content if it exists
+        pageManagementUtils.collapseAllExistingContent();
+        //adjust save button height
+        pageManagementUtils.adjustSaveButtonHeight();	
+	},
+	collapseAllExistingContent:function() {
+		 var $clickableSpan = $newDivContainer.children('span#clickable' + counter);
+         var $innerDiv = $newDivContainer.children('div#innerContainer' + counter);
+		var spanArrows = pageManagementUtils.savedContentDivs.find("span.pageContentExpand div.arrow");
+		spanArrows.removeClass("collapseArrow");
+		spanArrows.addClass("expandArrow");
+		pageManagementUtils.savedContentDivs.find("div.pageContentContainer div.pageContentWrapper").slideUp(222);
 	},
 	//Clear values in content areas that are cloned to create the page content type specific sections
 	//i.e. reset sparql query/class group areas
@@ -373,9 +386,15 @@ var pageManagementUtils = {
         });
         //remove button
         $newRemoveButton = $innerDiv.find('input#remove' + counter);
-        // this will have to disable submitted fields as well as hide them.
+        //remove the content entirely
         $newRemoveButton.click(function() {
-            //$innerDiv.parent("div").css("display","none");
+        	//if content type of what is being deleted is browse class group, then
+        	//add browse classgroup back to set of options
+        	var contentType = $innerDiv.find("section.pageContent").attr("contentType");
+        	if(pageManagementUtils.processDataGetterUtils.isRelatedToBrowseClassGroup(contentType)) {
+        		pageManagementUtils.handleRemoveBrowseClassGroupPageContent();
+        	}
+        	//remove the section
         	$innerDiv.parent("div").remove();
             pageManagementUtils.adjustSaveButtonHeight();
         });
@@ -625,6 +644,10 @@ var pageManagementUtils = {
 	    				dataGetterProcessorObject.populatePageContentSection(JSONContentObject, $newContentObj);
 	    				//Also include a hidden input with data getter URI
 	    				pageManagementUtils.includeDataGetterURI(JSONContentObject, $newContentObj);
+	    				//If content type is browseClassGroup or other 'related types' that are derived from it
+	    				if(pageManagementUtils.processDataGetterUtils.isRelatedToBrowseClassGroup(contentType)) {
+	    					pageManagementUtils.handleAddBrowseClassGroupPageContent();
+	    				}
 	    			} else {
 	    				//error condition
 	    			}
@@ -648,6 +671,19 @@ var pageManagementUtils = {
 			dataGetterProcessor = pageManagementUtils.dataGetterProcessorMap[dataGetterType];
 		}
     	return dataGetterProcessor;
+    },
+    handleAddBrowseClassGroupPageContent:function() {
+    	//if browse class group content has been added, then remove browse classgroup option from dropdown
+    	if(pageManagementUtils.contentTypeSelect.find("option[value='browseClassGroup']").length > 0) {
+    		pageManagementUtils.contentTypeSelect.find("option[value='browseClassGroup']").remove();
+    	}
+    },
+    handleRemoveBrowseClassGroupPageContent:function() {
+    	if(pageManagementUtils.contentTypeSelect.find("option[value='browseClassGroup']").length == 0) {
+	    	//if removed, add browse class group back
+	    	var classGroupOption = '<option value="browseClassGroup">Browse Class Group</option>';           
+	    	pageManagementUtils.contentTypeSelect.find('option:eq(0)').after(classGroupGroupOption);
+    	}
     }
     
 };

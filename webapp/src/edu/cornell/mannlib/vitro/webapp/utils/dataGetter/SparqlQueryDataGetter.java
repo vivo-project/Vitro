@@ -142,6 +142,8 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
         
         //put results in page data, what key to use for results?
         Map<String, Object> rmap = new HashMap<String,Object>();
+        //also store the variable name within which results will be returned
+        rmap.put("variableName", this.saveToVar);
         rmap.put(this.saveToVar, results);  
         //This will be overridden at page level in display model if template specified there
         rmap.put("bodyTemplate", defaultTemplate);

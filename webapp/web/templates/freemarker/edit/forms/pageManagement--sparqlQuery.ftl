@@ -4,7 +4,8 @@
     <label id="variableLabel" for="variable">Variable Name<span class="requiredHint"> *</span></label>
     <input type="text" name="saveToVar" size="20" value="" id="saveToVar" role="input" />
     <label id="queryModelLabel" for="queryModel">Query Model</label>
-    <input type="text" name="queryModel" size="20" value="" id="queryModel" role="input" />
+    <#--Hiding query model for now-->
+    <input type="text" name="queryModel" size="20" value="" id="queryModel" role="input" style="display:none"/>
     <label id="queryLabel" for="queryLabel"><span id="querySpan">Enter SPARQL query here</span><span class="requiredHint"> *</span></label>
     <textarea id="query" name="query" cols="70" rows="15" style="margin-bottom:7px"></textarea>
 </section>

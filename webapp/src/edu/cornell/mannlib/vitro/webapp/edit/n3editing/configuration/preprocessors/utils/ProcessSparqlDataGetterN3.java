@@ -40,7 +40,6 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
     public List<String> retrieveN3Required(int counter) {
     	String dataGetterVar = getDataGetterVar(counter);
     	String n3 = dataGetterVar + " a <" + classType + ">; \n" + 
-    	"display:queryModel " + getN3VarName("queryModel", counter) + "; \n" + 
     	"display:saveToVar " + getN3VarName("saveToVar", counter) + "; \n" + 
     	"display:query " + getN3VarName("query", counter) + " .";
     	List<String> requiredList = new ArrayList<String>();
@@ -48,8 +47,13 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
     	return requiredList;
     	
     }
+    //Query model is optional
     public List<String> retrieveN3Optional(int counter) {
-    	return null;
+    	String dataGetterVar = getDataGetterVar(counter);
+    	String n3 = dataGetterVar + " display:queryModel " + getN3VarName("queryModel", counter) + ". "; 
+    	List<String> optionalList = new ArrayList<String>();
+    	optionalList.add(getPrefixes() + n3);
+    	return optionalList;
     }
   
     

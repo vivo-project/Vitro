@@ -2,8 +2,12 @@
 
 <#--Save to variable is sparqlResults -->
 <#assign resultsExist = false/>
-<#if sparqlResults?has_content>
+<#if variableName?has_content>
 	<#assign resultsExist = true/>
+	<#--This will retrieve the results stored in the variable name being returned from the sparql query.
+	For example, if "results" was specified as the variable storing the sparql results, the value
+	of "results" will not be assigned to "sparqlResults" below. -->
+	<#assign sparqlResults = .globals[variableName]/>
 </#if>
 
 <h3>Sparql Query Results</h3>

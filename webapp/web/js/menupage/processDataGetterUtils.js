@@ -25,5 +25,8 @@ var processDataGetterUtils = {
 			} 
 			
 			return contentType;
+	    },
+	    isRelatedToBrowseClassGroup:function(contentType) {
+	    	return (contentType == "browseClassGroup" || contentType == "individualsForClasses");
 	    }
 };
