@@ -38,7 +38,7 @@
             <td>${(pagex.listedPageTemplate)!''}</td>
             <td style="text-align:center">
             <#if pagex.listedPageMenuItem?has_content>
-            	<span class="menuFlag"></span>
+            	<div class="menuFlag"></div>
             </#if>
             </td>
         </tr>    
