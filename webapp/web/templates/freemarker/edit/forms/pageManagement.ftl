@@ -44,38 +44,37 @@
 			<input type="hidden" id="menuItem" name="menuItem" value="${menuItem}"/>
     <h2>Add Page</h2>
     <!--Drop down for the types of content possible-->
-    <section id="floatRight" style="margin-top:0px;float:right;background-color:#fff;width:580px;margin-right:-4px">
+    <section id="floatRight">
         <div id="rightSide">
-            <section id="addPageOne" role="region">
+            <section id="addPageOne" role="region" >
                 <label for="last-name">Content Type<span class="requiredHint"> *</span></label> 
-                <select id="typeSelect"  name="typeSelect">
+                <select id="typeSelect"  name="typeSelect" >
                     <option value="" selected="selected">Select one</option>
                     <option value="browseClassGroup">Browse Class Group</option>           
                     <option value="fixedHtml">Fixed HTML</option>           
                     <option value="sparqlQuery">SPARQL Query Results</option>           
                  </select>
-                 <input  type="button" id="defineType" name="defineType" value="Define" class="delete" role="input" style="display:none"/>
             </section>
             <section id="contentDivs"></section>
-            <section id="headerBar" style="background-color:#f5f5f5;border-color:#ccc;border-width:1px;border-style:solid;border-bottom-width:0px;padding-left:6px">
+            <section id="headerBar" >
             </section>
             
             <#--This include file contains links to the templates that will be cloned and used for the different content types-->
 			 <!--This content will be copied/shown for these particular content types, so any fields for n3 editing need to be included
             here that correspond to a specific content type.  These are related to specific "data getters" on the server side.  -->
 			<#include "pageManagement--contentTemplates.ftl">          
-            <input  type="button" id="moreContent" name="moreContent" value="Add More Content" class="delete" style="margin-top:8px" />          
+            <input  type="button" id="moreContent" name="moreContent" value="Add More Content" class="delete" />          
         </div>
     </section>
     <!--Information for page or menu item level-->
     <div id="leftSide">
-        <section id="addPageOne" role="region" style="background-color:#fff;">
+        <section id="pageDetails" role="region" >
             <label for="page-name">Title<span class="requiredHint"> *</span></label>
             <input type="text" name="pageName" value="${pageName!''}" role="input" />
             <label for="pretty-url">Pretty URL<span class="requiredHint"> *</span></label> 
             <input type="text" name="prettyUrl" value="${prettyUrl!''}" role="input" />
-            <p class="note">Must begin with a leading forward slash: / (e.g., /people)</p>
-            <p style="margin-top:8px;margin-bottom:2px">Template<span class="requiredHint"> *</span></p>
+            <p class="note">Must begin with a leading forward slash: / <br />(e.g., /people)</p>
+            <p id="templatePTag">Template<span class="requiredHint"> *</span></p>
             <input type="radio" class="default-template" name="selectedTemplate" value="default" <#if selectedTemplateType = "default">checked="checked"</#if> role="radio" />
             <label class="inline" for="default"> Default</label>
             <br />
@@ -84,15 +83,15 @@
             <section id="custom-template" <#if selectedTemplateType != 'custom'>class="hidden" </#if>role="region">
                 <input type="text" name="customTemplate" value="${customTemplate!''}" size="40" role="input" /><span class="requiredHint"> *</span>
             </section>
-            <p style="margin-top:10px;margin-bottom:0px"><input id="menuCheckbox" type="checkbox" name="menuCheckbox"
+            <p id="checkboxPTag"><input id="menuCheckbox" type="checkbox" name="menuCheckbox"
             <#if menuAction="Edit" && menuItem?has_content>checked="checked"</#if>
             > This is a menu page</p>
             <section id="menu" role="region" 
             <#--Do not display menu section unless editing an existing menu item-->
             <#if menuAction = "Add" || (menuAction="Edit" && (!menuItem?has_content || menuItem = "")) >
-            style="margin-top:10px;display:none"
+            class="hideMenuSection"
             <#else>
-            style="margin-top:10px"
+            class="showMenuSection"
             </#if>
             >
                 <label for="default">Menu Item Name</label>
@@ -106,7 +105,7 @@
     </div>
     <section >
         <span id="saveButton" ><input  id="pageSave" type="submit" name="submit-Add" value="Save changes" class="submit" role="input" /> or </span> 
-        <a class="cancel" href="#"  id="cancelPage" style="color:#f70">Cancel</a>
+        <a class="cancel" href="#"  id="cancelPage" >Cancel</a>
         <br />
         <p class="requiredHint">* required fields</p>
     </section>
