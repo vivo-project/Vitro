@@ -91,11 +91,18 @@ public class KnowledgeBaseUpdater {
 	
 	private void performUpdate() throws IOException {
 		
-		// only annotations for 1.5
+		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
+		
+		AtomicOntologyChangeLists changes = new AtomicOntologyChangeLists(rawChanges,settings.getNewTBoxModel(),settings.getOldTBoxModel());
+		
+        //process the TBox before the ABox
 		log.info("\tupdating tbox annotations");
 	    updateTBoxAnnotations();
+		
+		log.info("\tupdating the abox");
+    	updateABox(changes);
 	}
-	
+		
 	private void performSparqlConstructAdditions(String sparqlConstructDir, OntModel readModel, OntModel writeModel) throws IOException {
 		
 		Model anonModel = performSparqlConstructs(sparqlConstructDir, readModel, true);
