@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.config;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -25,6 +27,7 @@ public class ConfigurationPropertiesSmokeTests implements ServletContextListener
 	private static final String PROPERTY_DB_USERNAME = "VitroConnection.DataSource.username";
 	private static final String PROPERTY_DB_PASSWORD = "VitroConnection.DataSource.password";
 	private static final String PROPERTY_DB_DRIVER_CLASS_NAME = "VitroConnection.DataSource.driver";
+	private static final String PROPERTY_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
 
 	private static final String DEFAULT_DB_DRIVER_CLASS = "com.mysql.jdbc.Driver";
 
@@ -36,6 +39,7 @@ public class ConfigurationPropertiesSmokeTests implements ServletContextListener
 
 		checkHomeDirectory(ctx, props, ss);
 		checkDatabaseConnection(ctx, props, ss);
+		checkDefaultNamespace(ctx, props, ss);
 	}
 
 	/**
@@ -134,7 +138,27 @@ public class ConfigurationPropertiesSmokeTests implements ServletContextListener
 					+ username + "'", e);
 		}
 	}
-
+	
+	/**
+     * Confirm that the default namespace is specified and a syntactically valid URI.
+     */
+    private void checkDefaultNamespace(ServletContext ctx,
+            ConfigurationProperties props, StartupStatus ss) {
+        String ns = props.getProperty(PROPERTY_DEFAULT_NAMESPACE);
+        if (ns == null || ns.isEmpty()) {
+            ss.fatal(this, "deploy.properties does not contain a value for '"
+                    + PROPERTY_DEFAULT_NAMESPACE + "'");
+        } else {
+            try {
+                URI uri = new URI(ns);
+            } catch (URISyntaxException e) {
+                ss.fatal(this, PROPERTY_DEFAULT_NAMESPACE + " '" + ns + 
+                        "' is not a valid URI. " + 
+                                (e.getMessage() != null ? e.getMessage() : ""));
+            }
+        }
+    }    
+        
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		// nothing to do at shutdown
