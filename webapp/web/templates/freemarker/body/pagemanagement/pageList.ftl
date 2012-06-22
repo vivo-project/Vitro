@@ -46,8 +46,11 @@
             <td>
                 <a href="${urls.base}/individual?uri=${pagex.listedPageUri?url}&switchToDisplayModel=1"><img src="${urls.images!}/profile-page-icon.png" title="view the profile properties for this page" alt="profile page"></a>
                 &nbsp;&nbsp;
-                <a href="#"><img src="${urls.images!}/individual/deleteIcon.gif" title="delete this page" alt="delete"></a>
-            </td>
+<#--                <#if pagex.listedPageCannotDeletePage?? >
+                <#else>
+                    <a href="#"><img src="${urls.images!}/individual/deleteIcon.gif" title="delete this page" alt="delete"></a>
+                </#if>
+-->            </td>
         </tr>    
     
  
