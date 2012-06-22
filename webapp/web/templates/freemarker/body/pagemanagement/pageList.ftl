@@ -24,20 +24,20 @@
     <#list pages as pagex>      
     	 <tr>                
             <td> 
-            	<#if pagex.pageUri?has_content> 
-                	<a href="${urls.base}/individual?uri=${pagex.pageUri?url}&switchToDisplayModel=1">${(pagex.title)!'-untitled-'}</a>
+            	<#if pagex.listedPageUri?has_content> 
+                	<a href="${urls.base}/individual?uri=${pagex.listedPageUri?url}&switchToDisplayModel=1">${(pagex.listedPageTitle)!'-untitled-'}</a>
             		&nbsp;
-            		<a href="${urls.base}/editRequestDispatch?subjectUri=${pagex.pageUri?url}&switchToDisplayModel=1&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator">Edit</a>
+            		<a href="${urls.base}/editRequestDispatch?subjectUri=${pagex.listedPageUri?url}&switchToDisplayModel=1&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator">Edit</a>
             		
             	<#else>
             		No URI defined for page. 
             	</#if>
             </td>                  
             <!--td> {pagex.dataGetterLabel}</td-->
-            <td>${pagex.urlMapping}</td>
-            <td>${(pagex.template)!''}</td>
+            <td>${pagex.listedPageUrlMapping}</td>
+            <td>${(pagex.listedPageTemplate)!''}</td>
             <td style="text-align:center">
-            <#if pagex.menuItem?has_content>
+            <#if pagex.listedPageMenuItem?has_content>
             	<div class="menuFlag"></div>
             </#if>
             </td>

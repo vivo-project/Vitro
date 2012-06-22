@@ -203,5 +203,3 @@ rdf:type
 <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#restrictResultsByClass>
       a       owl:ObjectProperty .    
       
-
-        
