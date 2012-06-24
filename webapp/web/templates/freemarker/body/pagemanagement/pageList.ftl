@@ -44,7 +44,7 @@
             </#if>
             </td>
             <td>
-                <a href="${urls.base}/individual?uri=${pagex.listedPageUri?url}&switchToDisplayModel=1"><img src="${urls.images!}/profile-page-icon.png" title="view the profile properties for this page" alt="profile page"></a>
+                <a href="${urls.base}/individual?uri=${pagex.listedPageUri?url}&switchToDisplayModel=1"><img src="${urls.images!}/profile-page-icon.png" title="view the individual profile for this page" alt="profile page"></a>
                 &nbsp;&nbsp;
                 <#if !pagex.listedPageCannotDeletePage?has_content >
                     <a cmd="deletePage" pageTitle=" ${pagex.listedPageTitle!}"  href="${urls.base}/deletePageController?pageURI=${pagex.listedPageUri?url}"><img src="${urls.images!}/individual/deleteIcon.gif" title="delete this page" alt="delete"></a>

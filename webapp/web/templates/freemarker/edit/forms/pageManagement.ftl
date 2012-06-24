@@ -54,7 +54,7 @@
                     <option value="browseClassGroup">Browse Class Group</option>           
                     <option value="fixedHtml">Fixed HTML</option>           
                     <option value="sparqlQuery">SPARQL Query Results</option>           
-                 </select>
+                 </select>&nbsp;<span class="note">Add one or more content types</span>
             </section>
             <section id="contentDivs"></section>
             <section id="headerBar" >
@@ -63,8 +63,7 @@
             <#--This include file contains links to the templates that will be cloned and used for the different content types-->
 			 <!--This content will be copied/shown for these particular content types, so any fields for n3 editing need to be included
             here that correspond to a specific content type.  These are related to specific "data getters" on the server side.  -->
-			<#include "pageManagement--contentTemplates.ftl">          
-            <input  type="button" id="moreContent" name="moreContent" value="Add More Content" class="delete" />          
+			<#include "pageManagement--contentTemplates.ftl">                    
         </div>
     </section>
     <!--Information for page or menu item level-->

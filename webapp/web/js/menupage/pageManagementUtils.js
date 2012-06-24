@@ -111,7 +111,7 @@ var pageManagementUtils = {
         this.displayInternalMessage = $('#internal-class label em');
         this.pageContentSubmissionInputs = $("#pageContentSubmissionInputs");
         this.headerBar = $("section#headerBar");
-        this.moreContentButton =  $("input#moreContent");
+        this.doneButton =  $("input#doneWithContent");
         this.isMenuCheckbox = $("input#menuCheckbox");
         this.menuSection = $("section#menu");
         this.submitButton = $("input#submit");
@@ -132,7 +132,7 @@ var pageManagementUtils = {
 	    this.sparqlQuerySection.hide();
 	    this.fixedHTMLSection.hide();
 	    this.classesForClassGroup.addClass('hidden');
-	    this.moreContentButton.hide();
+// tlw72	    this.moreContentButton.hide();
 	    //left side components
 	    //These depend on whether or not this is an existing item or not
 	    if(this.isAdd()) {
@@ -169,7 +169,7 @@ var pageManagementUtils = {
 	
 	    //Collapses the current content and creates a new section of content
 	    //Resets the content to be cloned to default settings
-	    this.moreContentButton.click( function() {
+	    this.doneButton.click( function() {
 	        var selectedType = pageManagementUtils.contentTypeSelect.val();
 	        var selectedTypeText = $("#typeSelect option:selected").text();
 	        
@@ -179,7 +179,6 @@ var pageManagementUtils = {
 	        pageManagementUtils.sparqlQuerySection.hide();
 	        //Reset main content type drop-down
 	        pageManagementUtils.contentTypeSelectOptions.eq(0).attr('selected', 'selected');
-	        pageManagementUtils.moreContentButton.hide();
 	        if ( pageManagementUtils.leftSideDiv.css("height") != undefined ) {
 	            pageManagementUtils.leftSideDiv.css("height","");
 	            if ( pageManagementUtils.leftSideDiv.height() < pageManagementUtils.rightSideDiv.height() ) {
@@ -238,7 +237,7 @@ var pageManagementUtils = {
             pageManagementUtils.classGroupSection.show();
             pageManagementUtils.fixedHTMLSection.hide();
             pageManagementUtils.sparqlQuerySection.hide();
-            pageManagementUtils.moreContentButton.hide();
+// tlw72            pageManagementUtils.moreContentButton.hide();
             pageManagementUtils.headerBar.text("Browse Class Group - ");
             pageManagementUtils.headerBar.show();
         }
@@ -258,13 +257,13 @@ var pageManagementUtils = {
            
             pageManagementUtils.headerBar.show();
             pageManagementUtils.classesForClassGroup.addClass('hidden');
-            pageManagementUtils.moreContentButton.show();
+// tlw72            pageManagementUtils.moreContentButton.show();
         }
         if ( _this.contentTypeSelect.val() == "" ) {
         	pageManagementUtils.classGroupSection.hide();
         	pageManagementUtils.fixedHTMLSection.hide();
         	pageManagementUtils.sparqlQuerySection.hide();
-            pageManagementUtils.moreContentButton.hide();            
+// tlw72            pageManagementUtils.moreContentButton.hide();            
             pageManagementUtils.classesForClassGroup.addClass('hidden');
             pageManagementUtils.headerBar.hide();
             pageManagementUtils.headerBar.text("");
@@ -291,8 +290,13 @@ var pageManagementUtils = {
 
 	},
 	clearInputs:function($el) {
-		//jquery selector :input selects all input text area select and button elements
-		$el.find("input").val("");
+		// jquery selector :input selects all input text area select and button elements
+	    // $el.find("input").val("");  cannot delete the value of the done button  -- tlw72
+	    $el.find("input").each( function() {
+	        if ( $(this).attr('id') != "doneWithContent" ) {
+	            $(this).val("");
+	        }
+        });
 		$el.find("textarea").val("");
 		//resetting class group section as well so selection is reset if type changes
 		$el.find("select option:eq(0)").attr("selected", "selected");
@@ -350,8 +354,8 @@ var pageManagementUtils = {
             html: "<span class='pageContentTypeLabel'>" + contentTypeLabel + " - " + varOrClass 
                         + "</span><span id='clickable" + counter 
                         + "' class='pageContentExpand'><div class='arrow expandArrow'></div></span><div id='innerContainer" + counter 
-                        + "' class='pageContentWrapper'><input id='remove" + counter 
-                        + "' type='button' class='delete' value='Delete' class='deleteButton' /></div>"
+                        + "' class='pageContentWrapper'><span class='deleteLinkContainer'>&nbsp;or&nbsp;<a id='remove" + counter   // changed button to a link
+                        + "' href='' >delete</a></span></div>"
         });
         //Hide inner div
         var $innerDiv = $newDivContainer.children('div#innerContainer' + counter);
@@ -360,12 +364,13 @@ var pageManagementUtils = {
         pageManagementUtils.bindClonedContentContainerEvents($newDivContainer, counter);
         //Append the new container to the section storing these containers
         $newDivContainer.appendTo($('section#contentDivs'));
-        //place new content object
+        //place new content object        
         $newContentObj.prependTo($innerDiv);
     },
     bindClonedContentContainerEvents:function($newDivContainer, counter) {
     	 var $clickableSpan = $newDivContainer.children('span#clickable' + counter);
          var $innerDiv = $newDivContainer.children('div#innerContainer' + counter);
+                  
     	 //Expand/collapse toggle
         $clickableSpan.click(function() {
             if ( $innerDiv.is(':visible') ) {
@@ -385,9 +390,9 @@ var pageManagementUtils = {
             window.setTimeout('pageManagementUtils.adjustSaveButtonHeight()', 223);             
         });
         //remove button
-        $newRemoveButton = $innerDiv.find('input#remove' + counter);
+        $newRemoveLink = $innerDiv.find('a#remove' + counter); // tlw72 changed button to link
         //remove the content entirely
-        $newRemoveButton.click(function() {
+        $newRemoveLink.click(function() {
         	//if content type of what is being deleted is browse class group, then
         	//add browse classgroup back to set of options
         	var contentType = $innerDiv.find("section.pageContent").attr("contentType");
@@ -462,12 +467,10 @@ var pageManagementUtils = {
             if (pageManagementUtils.selectClassGroupDropdown.val() == "" ) {
           	  pageManagementUtils.classesForClassGroup.addClass('hidden');
 	            $("div#leftSide").css("height","");
-	            pageManagementUtils.moreContentButton.hide();
 	            
 	  	        }
 	  	     else {
 	  	    	 	pageManagementUtils.classesForClassGroup.removeClass('hidden');
-	  	            pageManagementUtils.moreContentButton.show();
 	  	            if ( $("div#leftSide").height() < $("div#rightSide").height() ) {
 	  	                $("div#leftSide").css("height",$("div#rightSide").height() + "px");
 	  	            }          
@@ -586,6 +589,7 @@ var pageManagementUtils = {
     createCloneObject:function(contentType, counter) {
     	var originalObjectPath = 'section#' + contentType;
     	var $newContentObj = $(originalObjectPath).clone();
+ 	    $newContentObj.removeClass("sparqlHtmlContent"); 
  	    $newContentObj.addClass("pageContent"); 
  	    $newContentObj.attr("contentNumber", counter);
  	    //Save content type
@@ -715,9 +719,9 @@ var pageManagementUtils = {
     	});
     	return validationErrorMsg;
     }
-    
-};
 
+}
+    
 $(document).ready(function() {
    pageManagementUtils.onLoad();
 });

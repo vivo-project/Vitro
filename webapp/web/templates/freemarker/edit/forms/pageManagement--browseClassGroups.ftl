@@ -50,7 +50,8 @@
                             <span class="ui-icon-sortable"></span> 
                         </li>
                         </#list>
-                    </ul>
+                    </ul><br />
+                    <input  type="button" id="doneWithContent" class="doneWithContent" name="moreContent" value="Done" />
                 </section>
             </section>
  <#--Include JavaScript specific to the types of data getters related to this content-->           
