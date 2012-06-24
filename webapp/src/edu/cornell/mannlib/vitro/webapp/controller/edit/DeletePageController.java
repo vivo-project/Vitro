@@ -47,7 +47,7 @@ public class DeletePageController extends VitroHttpServlet {
 		resp.sendRedirect(rawRequest.getContextPath() + REDIRECT_URL);
     }
 
-    protected void doGet(HttpServletRequest rawRequest, HttpServletResponse resp) {
+    protected void doGet(HttpServletRequest rawRequest, HttpServletResponse resp)  throws ServletException, IOException {
     	doPost(rawRequest, resp);
     }
     
