@@ -1,6 +1,7 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 /*
     ORNG Shindig Helper functions for gadget-to-container commands
-
  */
  
  // dummy function so google analytics does not break for institutions who do not use it
