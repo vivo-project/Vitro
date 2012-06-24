@@ -27,7 +27,21 @@ var processFixedHTMLDataGetterContent = {
 	retrieveAdditionalLabelText:function(existingContentObject) {
 		var saveToVarValue = existingContentObject["saveToVar"];
 		return saveToVarValue;
-	}
+	},
+    //Validation on form submit: Check to see that class group has been selected 
+    validateFormSubmission: function(pageContentSection, pageContentSectionLabel) {
+    	var validationError = "";
+    	//Check that query and saveToVar have been input
+    	var variableValue = pageContentSection.find("input[name='saveToVar']").val();
+    	if(variableValue == "") {
+    		validationError += pageContentSectionLabel + ": You must supply a variable to save HTML content. <br />"
+    	}
+		var htmlValue = pageContentSection.find("textarea[name='htmlValue']").val();
+		if(htmlValue == "") {
+			validationError += pageContentSectionLabel + ": You must supply some HTML or text. <br />";
+		}
+    	return validationError;
+    }
 		
 		
 }

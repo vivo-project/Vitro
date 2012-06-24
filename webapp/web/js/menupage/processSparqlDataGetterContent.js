@@ -32,7 +32,21 @@ var processSparqlDataGetterContent = {
 	retrieveAdditionalLabelText:function(existingContentObject) {
 		var saveToVarValue = existingContentObject["saveToVar"];
 		return saveToVarValue;
-	}
+	},
+    //Validation on form submit: Check to see that class group has been selected 
+    validateFormSubmission: function(pageContentSection, pageContentSectionLabel) {
+    	var validationError = "";
+    	//Check that query and saveToVar have been input
+    	var variableValue = pageContentSection.find("input[name='saveToVar']").val();
+    	if(variableValue == "") {
+    		validationError += pageContentSectionLabel + ": You must supply a variable to save query results. <br />"
+    	}
+		var queryValue = pageContentSection.find("textarea[name='query']").val();
+		if(queryValue == "") {
+			validationError += pageContentSectionLabel + ": You must supply a Sparql query. <br />";
+		}
+    	return validationError;
+    }
 		
 		
 };

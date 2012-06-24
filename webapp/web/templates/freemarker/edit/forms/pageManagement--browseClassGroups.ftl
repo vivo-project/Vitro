@@ -2,9 +2,9 @@
 <#--Browse Class Groups Section-->
 <#-----------Variable assignment-------------->
 <#--Requires Menu action be defined in parent template-->
+
 <#assign classGroup = pageData.classGroup />
 <#assign classGroups = pageData.classGroups />
-<#assign includeAllClasses = false/>
 <#-- some additional processing here which shows or hides the class group selection and classes based on initial action-->
 <#assign existingClassGroupStyle = " " />
 <#assign selectClassGroupStyle = 'class="hidden"' />
@@ -25,7 +25,7 @@
                     <select name="selectClassGroup" id="selectClassGroup" role="combobox">
                         <option value="-1" role="option">Select one</option>
                         <#list classGroups as aClassGroup>
-                            <option value="${aClassGroup.URI}" <#if aClassGroup.URI = associatedPageURI>selected</#if> role="option">${aClassGroup.publicName}</option>
+                            <option value="${aClassGroup.URI}"  role="option">${aClassGroup.publicName}</option>
                         </#list>
                     </select>
                 </section>

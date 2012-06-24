@@ -28,6 +28,7 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -88,7 +89,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
         prepare(vreq, conf);
         //This method specifically retrieves information for edit
         populateExistingDataGetter(vreq, conf, session.getServletContext());
-        
+      
         return conf	;
     }
 	
@@ -145,7 +146,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 		FieldVTwo menuItemLinkTextField = new FieldVTwo().setName("menuLinkText");
 		conf.addField(menuItemLinkTextField);
 		
-		FieldVTwo menuItemPositionField = new FieldVTwo().setName("menuPosition");
+		FieldVTwo menuItemPositionField = new FieldVTwo().setName("menuPosition").setRangeDatatypeUri(XSD.integer.getURI());
 		conf.addField(menuItemPositionField);
 		
 		//The actual page content information is stored in this field, and then
@@ -175,18 +176,16 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	        
 	        String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
 	        String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);                           
-	        
+        	editConfiguration.setUrlToReturnTo(UrlBuilder.getUrl("/pageList"));
 	      //For the case of a new page
 	        if(subjectUri == null) {
 	        	//Once added, return to pageList
-	        	editConfiguration.setUrlToReturnTo(UrlBuilder.getUrl("/pageList"));
 		    	editConfiguration.setEntityToReturnTo("?page");
 		    	editConfiguration.setPredicateUri(predicateUri);
 		        
 	        } else {
 	        	//For the case of an existing page
 	        	//Page title pageName or page hasDataGetter dataGetter
-		        editConfiguration.setUrlPatternToReturnTo("/individual"); 
 		        editConfiguration.setEntityToReturnTo(subjectUri);
 		        //Set update version here
 			    //if subject uri = page uri != null or empty, editing existing page
@@ -486,22 +485,15 @@ private String getExistingCustomTemplateQuery() {
 			addNewPageData(vreq, formSpecificData);
 		}		
 
-		
+		  //for menu position, return either existing menu position or get the highest available menu position
+        retrieveMenuPosition(editConfiguration, vreq, formSpecificData);
 		editConfiguration.setFormSpecificData(formSpecificData);
-	}
-	
-	private String getTemplate(EditConfigurationVTwo editConfiguration) {
-		String returnTemplate = "default";
-		if(editConfiguration.getSubjectUri() != null) {
-			//Then template is EXISTING template
-			//TODO: Get existing template value for page
-		}
-		return returnTemplate;
-		
 	}
 	
 	private void addRequiredPageData(VitroRequest vreq, Map<String, Object> data) {
      	MenuManagementDataUtils.includeRequiredSystemData(vreq.getSession().getServletContext(), data);
+    	data.put("classGroup", new ArrayList<String>());
+    	data.put("classGroups", DataGetterUtils.getClassGroups(vreq.getSession().getServletContext()));
 	}
 	
 	private void addExistingPageData(VitroRequest vreq, Map<String, Object> data) {
@@ -514,18 +506,7 @@ private String getExistingCustomTemplateQuery() {
 	
 	private void addNewPageData(VitroRequest vreq, Map<String, Object> data) {
     	data.put("title", "Add Menu Item");
-		data.put("menuAction", "Add");
-    	//Generate empty values for fields
-    	data.put("menuItem", "");
-    	data.put("pageName", "");
-    	data.put("prettyUrl", "");
-    	data.put("associatedPage", "");
-    	data.put("associatedPageURI", "");
-    	data.put("classGroup", new ArrayList<String>());
-    	//not a page already assigned a class group
-    	data.put("isClassGroupPage", false);
-    	data.put("includeAllClasses", false);
-    	data.put("classGroups", DataGetterUtils.getClassGroups(vreq.getSession().getServletContext()));
+		data.put("menuAction", "Add");    
     	data.put("selectedTemplateType", "default");
     	//defaults to regular class group page
 	}
@@ -563,5 +544,57 @@ private String getExistingCustomTemplateQuery() {
 		return prefixes + "?page display:hasDataGetter " + dataGetterVar + ".";
 	}
 	
+	public void retrieveMenuPosition(EditConfigurationVTwo editConfig, VitroRequest vreq, Map<String, Object> formSpecificData) {
+		boolean returnHighestMenuPosition = false;
+		//if adding a new page or if editing an existing page which does not have an associated
+		//menu position
+		int availableMenuPosition = this.getAvailableMenuPosition(editConfig, vreq);
+		formSpecificData.put("highestMenuPosition", "" + availableMenuPosition);
+	}
+	
+	//Get the highest menu position and return that + 1 for the menu position that can be associated
+	//for a new menu item 
+	public int getAvailableMenuPosition(EditConfigurationVTwo editConfig, VitroRequest vreq) {
+		//Execute sparql query to get highest menu position
+		int maxMenuPosition = getMaxMenuPosition(editConfig, vreq);
+		return maxMenuPosition + 1;
+	}
 
+
+
+	private int getMaxMenuPosition(EditConfigurationVTwo editConfig, VitroRequest vreq) {
+		int maxMenuPosition = 0;
+		Literal menuPosition = null;
+		setupModelSelectorsFromVitroRequest(vreq, editConfig);         
+	    OntModel queryModel = (OntModel)vreq.getAttribute("jenaOntModel");
+		String maxMenuPositionQuery = getMaxMenuPositionQueryString();
+    	QueryExecution qe = null;
+        try{
+            Query query = QueryFactory.create(maxMenuPositionQuery);
+            qe = QueryExecutionFactory.create(query, queryModel);
+            ResultSet results = qe.execSelect();
+            while( results.hasNext()){
+            	QuerySolution qs = results.nextSolution();
+            	menuPosition = qs.getLiteral("menuPosition");
+            }
+
+        } catch(Exception ex) {
+        	log.error("Error occurred in executing query " + maxMenuPositionQuery, ex);
+        }
+        
+        if(menuPosition != null) {
+        	maxMenuPosition = menuPosition.getInt();
+        }
+		return maxMenuPosition;
+	}
+
+
+
+	private String getMaxMenuPositionQueryString() {
+		String query = getSparqlPrefix() + 
+				"SELECT ?menuPosition WHERE {?pageUri display:menuPosition ?menuPosition . } " + 
+				"ORDER BY DESC(?menuPosition) LIMIT 1";
+		return query;
+	}
+	
 }

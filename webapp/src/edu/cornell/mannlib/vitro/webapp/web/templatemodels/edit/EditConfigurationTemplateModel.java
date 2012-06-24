@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditElementVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.ConstantFieldOptions;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.SelectListGeneratorVTwo;
 import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
@@ -95,12 +96,16 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
 		for(String fieldName: editConfig.getFields().keySet()){
 		    FieldVTwo field = editConfig.getField(fieldName);
+		    //TODO: Check if we even need empty options if field options do not exist
 		    if( field.getFieldOptions() == null ){ 
-		    	//putting empty map in here because FM can't deal
-		        pageData.put(fieldName, Collections.EMPTY_MAP);
+		    	//empty options
+		    	field.setOptions(new ConstantFieldOptions());
 		    }
 		    Map<String, String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, fieldName, wdf);		    
 		    optionsMap = SelectListGeneratorVTwo.getSortedMap(optionsMap);
+		    if(pageData.containsKey(fieldName)) {
+		    	log.error("Check the edit configuration setup as pageData already contains " + fieldName + " and this will be overwritten now with empty collection");
+		    }
 		    pageData.put(fieldName, optionsMap);		       
 		}
 	}

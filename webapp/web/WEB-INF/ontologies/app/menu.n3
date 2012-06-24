@@ -60,7 +60,7 @@ display:pageListData
         OPTIONAL {?listedPageUri display:requiresBodyTemplate ?listedPageTemplate .}
         OPTIONAL {?listedPageMenuItem display:toPage ?listedPageUri .}
         OPTIONAL {?listedPageUri display:cannotDeletePage ?listedPageCannotDeletePage .}
-     }  """ .      
+     }  ORDER BY ?listedPageTitle """ .      
 ###Page Management and Data Getters
 #Data getter type labels
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData>  rdfs:label "Class Group Page" .

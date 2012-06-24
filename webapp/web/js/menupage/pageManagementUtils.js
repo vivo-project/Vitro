@@ -214,6 +214,8 @@ var pageManagementUtils = {
 	    //Submission: validate as well as create appropriate hidden json inputs
 	    $("form").submit(function (event) { 
             var validationError = pageManagementUtils.validateMenuItemForm();
+            //Add any errors from page content sections
+            validationError += pageManagementUtils.validatePageContentSections();
             if (validationError == "") {
             		//Create the appropriate json objects
             		pageManagementUtils.createPageContentForSubmission();
@@ -273,8 +275,6 @@ var pageManagementUtils = {
         pageManagementUtils.adjustSaveButtonHeight();	
 	},
 	collapseAllExistingContent:function() {
-		 var $clickableSpan = $newDivContainer.children('span#clickable' + counter);
-         var $innerDiv = $newDivContainer.children('div#innerContainer' + counter);
 		var spanArrows = pageManagementUtils.savedContentDivs.find("span.pageContentExpand div.arrow");
 		spanArrows.removeClass("collapseArrow");
 		spanArrows.addClass("expandArrow");
@@ -682,8 +682,38 @@ var pageManagementUtils = {
     	if(pageManagementUtils.contentTypeSelect.find("option[value='browseClassGroup']").length == 0) {
 	    	//if removed, add browse class group back
 	    	var classGroupOption = '<option value="browseClassGroup">Browse Class Group</option>';           
-	    	pageManagementUtils.contentTypeSelect.find('option:eq(0)').after(classGroupGroupOption);
+	    	pageManagementUtils.contentTypeSelect.find('option:eq(0)').after(classGroupOption);
     	}
+    },
+    //get label of page content section
+    getPageContentSectionLabel:function(pageContentSection) {
+    	var label = pageContentSection.closest("div.pageContentContainer").find("span.pageContentTypeLabel").html();
+    	if(label == null) {
+    		label = "";
+    	}
+    	return label;
+    },
+    //Validation across different content types
+    validatePageContentSections:function() {
+    	//Get all page content sections
+    	var pageContentSections = $("section[class='pageContent']");
+    	var validationErrorMsg = "";
+    	//For each, based on type, validate if a validation function exists
+    	$.each(pageContentSections, function(i) {
+    		if(pageManagementUtils.processDataGetterUtils != null) {
+    			var dataGetterType = pageManagementUtils.processDataGetterUtils.selectDataGetterType($(this));
+    			if(pageManagementUtils.dataGetterProcessorMap != null) {
+    				var dataGetterProcessor = pageManagementUtils.dataGetterProcessorMap[dataGetterType];
+    				//the content type specific processor will create the json object to be returned
+    				if($.isFunction(dataGetterProcessor.validateFormSubmission)) {
+    					//Get label of page content section
+    					var label = pageManagementUtils.getPageContentSectionLabel($(this));
+    					validationErrorMsg += dataGetterProcessor.validateFormSubmission($(this), label);
+    				}
+    			}
+    		}
+    	});
+    	return validationErrorMsg;
     }
     
 };

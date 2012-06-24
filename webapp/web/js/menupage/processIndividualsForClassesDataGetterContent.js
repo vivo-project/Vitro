@@ -37,6 +37,10 @@ var processIndividualsForClassesDataGetterContent = {
 	//For the label of the content section for editing, need to add additional value
 	retrieveAdditionalLabelText:function(existingContentObject) {
 		return processClassGroupDataGetterContent.retrieveAdditionalLabelText(existingContentObject);
-	}
+	},
+	 //Validation on form submit: Check to see that class group has been selected 
+    validateFormSubmission: function(pageContentSection) {
+    	return processClassGroupDataGetterContent.validateFormSubmission(pageContentSection);
+    }
 		
 }

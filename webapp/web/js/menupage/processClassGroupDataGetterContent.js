@@ -126,6 +126,22 @@ var processClassGroupDataGetterContent = {
         	//Should probably remove this entire method and copy there
         	processClassGroupDataGetterContent.displayClassesForClassGroup(results, pageContentSection);
         });
+    },
+    //Validation on form submit: Check to see that class group has been selected 
+    validateFormSubmission: function(pageContentSection, pageContentSectionLabel) {
+    	var validationError = "";
+    	 if (pageContentSection.find('select[name="selectClassGroup"]').val() =='-1') {
+             validationError += pageContentSectionLabel + ": You must supply a class group <br />"; 
+         } else {
+             //class group has been selected, make sure there is at least one class selected
+             var allSelected = pageContentSection.find('input[name="allSelected"]:checked').length;
+             var noClassesSelected = pageContentSection.find('input[name="classInClassGroup"]:checked').length;
+             if (allSelected == 0 && noClassesSelected == 0) {
+                 //at least one class should be selected
+                 validationError +=  pageContentSectionLabel + ":You must select the classes to display<br />";
+             }
+         }
+    	 return validationError;
     }
 	   
 		

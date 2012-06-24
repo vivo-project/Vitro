@@ -46,11 +46,10 @@
             <td>
                 <a href="${urls.base}/individual?uri=${pagex.listedPageUri?url}&switchToDisplayModel=1"><img src="${urls.images!}/profile-page-icon.png" title="view the profile properties for this page" alt="profile page"></a>
                 &nbsp;&nbsp;
-<#--                <#if pagex.listedPageCannotDeletePage?? >
-                <#else>
-                    <a href="#"><img src="${urls.images!}/individual/deleteIcon.gif" title="delete this page" alt="delete"></a>
+                <#if !pagex.listedPageCannotDeletePage?has_content >
+                    <a cmd="deletePage" pageTitle=" ${pagex.listedPageTitle!}"  href="${urls.base}/deletePageController?pageURI=${pagex.listedPageUri?url}"><img src="${urls.images!}/individual/deleteIcon.gif" title="delete this page" alt="delete"></a>
                 </#if>
--->            </td>
+            </td>
         </tr>    
     
  
@@ -73,7 +72,13 @@
 </section>
 
 
-${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/menupage/pageList.css" />',
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />',
+				'<link rel="stylesheet" href="${urls.base}/css/menupage/pageList.css" />',
                   '<link rel="stylesheet" href="${urls.base}/css/menumanagement/menuManagement.css" />')}
+
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>')}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/customFormUtils.js"></script>')}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/browserUtils.js"></script>')}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/pageDeletion.js"></script>')}
 
 

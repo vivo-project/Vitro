@@ -8,11 +8,9 @@
 <#assign pageName = "" />
 <#assign selectedTemplateType = "default" />
 <#assign prettyUrl = ""/>
-<#assign associatedPage = ""/>
-<#assign associatedPageURI = ""/>
 <#assign menuItem = ""/>    	
 <#assign menuLinkText = "" />
-<#assign menuPosition = "" />
+<#assign menuPosition = pageData.highestMenuPosition />
 <#--Existing Values For Editing condition-->
 <#assign literalValues = editConfiguration.existingLiteralValues />
 <#assign uriValues = editConfiguration.existingUriValues />
@@ -21,12 +19,15 @@
 	<#assign prettyUrl = lvf.getFormFieldValue(editSubmission, editConfiguration, "prettyUrl")/>
 	<#assign menuItem =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuItem")/>
 	<#assign menuLinkText =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuLinkText")/>
-	<#assign menuPosition =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuPosition")/>
 	<#assign customTemplate = lvf.getFormFieldValue(editSubmission, editConfiguration, "customTemplate")/>
 	<#if customTemplate?has_content>
 		<#assign selectedTemplateType = "custom" />
 	</#if>
-	
+	<#assign editMenuPosition =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuPosition")/>
+	<#--if menu position exists for a menu item, then use that, otherwise use the highest available menu position number from page data-->
+	<#if editMenuPosition?has_content && editMenuPosition != "">
+		<#assign menuPosition = editMenuPosition/>
+	</#if>	
 </#if>
 
 <#------------HTML Portion------------->
@@ -97,7 +98,7 @@
                 <label for="default">Menu Item Name</label>
                 <input type="hidden" id="menuItem" name="menuItem" value="${menuItem!''}" />
                 <input type="text" id="menuLinkText" name="menuLinkText" value="${menuLinkText!''}" size="28" role="input" />
-                <input type="text" id="menuPosition" name="menuPosition" value="${menuPosition!''}" />
+                <input type="hidden" id="menuPosition" name="menuPosition" value="${menuPosition!''}" />
                 <p class="note">If left blank, the page title will be used.</p>
             </section>
             <br />
