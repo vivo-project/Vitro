@@ -273,10 +273,15 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 	        // VIVO OpenSocial Extension by UCSF
 	        try {
 		        OpenSocialManager openSocialManager = new OpenSocialManager(vreq, "search");
-		        // put list of people found onto pubsub channel
-		        List<String> ids = OpenSocialManager.getOpenSocialId(individuals);
-		        openSocialManager.setPubsubData(OpenSocialManager.JSON_PERSONID_CHANNEL, 
-		        		OpenSocialManager.buildJSONPersonIds(ids, "" + ids.size() + " people found"));
+		        // put list of people found onto pubsub channel 
+	            // only turn this on for a people only search
+	            if ("http://vivoweb.org/ontology#vitroClassGrouppeople".equals(vreq.getParameter(PARAM_CLASSGROUP))) {
+			        List<String> ids = OpenSocialManager.getOpenSocialId(individuals);
+			        openSocialManager.setPubsubData(OpenSocialManager.JSON_PERSONID_CHANNEL, 
+			        		OpenSocialManager.buildJSONPersonIds(ids, "" + ids.size() + " people found"));
+	            }
+				// TODO put this in a better place to guarantee that it gets called at the proper time!
+				openSocialManager.removePubsubGadgetsWithoutData();
 		        body.put("openSocial", openSocialManager);
 		        if (openSocialManager.isVisible()) {
 		        	body.put("bodyOnload", "my.init();");
@@ -285,7 +290,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 	            log.error("IOException in doTemplate()", e);
 	        } catch (SQLException e) {
 	            log.error("SQLException in doTemplate()", e);
-	        }	               
+	        }
 
 	        String template = templateTable.get(format).get(Result.PAGED);
             

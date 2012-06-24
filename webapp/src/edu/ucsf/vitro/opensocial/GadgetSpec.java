@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,33 +12,24 @@ import java.util.Map;
 import org.apache.commons.dbcp.BasicDataSource;
 
 public class GadgetSpec {
-	private String openSocialGadgetURL;
-	private String name;
 	private int appId = 0;
+	private String name;
+	private String openSocialGadgetURL;
 	private List<String> channels = new ArrayList<String>();
-	private boolean unknownGadget = false;
 	private Map<String, GadgetViewRequirements> viewRequirements = new HashMap<String, GadgetViewRequirements>();
+	boolean enabled;
+	private boolean unknownGadget = false;
 
-	// For preloading
 	public GadgetSpec(int appId, String name, String openSocialGadgetURL,
-			List<String> channels) {
+			List<String> channels, BasicDataSource ds, boolean enabled, boolean unknownGadget)
+			throws SQLException {
 		this.appId = appId;
 		this.name = name;
 		this.openSocialGadgetURL = openSocialGadgetURL;
 		this.channels.addAll(channels);
-	}
-	
-	public GadgetSpec(int appId, String name, String openSocialGadgetURL,
-			String channelsStr) {
-		this(appId, name, openSocialGadgetURL, Arrays.asList(channelsStr != null
-				&& channelsStr.length() > 0 ? channelsStr.split(" ") : new String[0]));
-	}
-
-	public GadgetSpec(int appId, String name, String openSocialGadgetURL,
-			List<String> channels, boolean unknownGadget, BasicDataSource ds)
-			throws SQLException {
-		this(appId, name, openSocialGadgetURL, channels);
+		this.enabled = enabled;
 		this.unknownGadget = unknownGadget;
+
 		// Load gadgets from the DB first
 		if (!unknownGadget) {
 			Connection conn = null;
@@ -47,7 +37,7 @@ public class GadgetSpec {
 			ResultSet rset = null;
 
 			try {
-				String sqlCommand = "select page, viewer_req, owner_req, view, closed_width, open_width, start_closed, chromeId, display_order from shindig_app_views where appId = "
+				String sqlCommand = "select page, viewer_req, owner_req, view, closed_width, open_width, start_closed, chromeId, display_order from orng_app_views where appId = "
 						+ appId;
 				conn = ds.getConnection();
 				stmt = conn.createStatement();
@@ -63,25 +53,16 @@ public class GadgetSpec {
 				}
 			} finally {
 				try {
-					if (rset != null) {
-						rset.close();
-					}
+					rset.close();
 				} catch (Exception e) {
-					e.printStackTrace();
 				}
 				try {
-					if (stmt != null) {
-						stmt.close();
-					}
+					stmt.close();
 				} catch (Exception e) {
-					e.printStackTrace();
 				}
 				try {
-					if (conn != null) {
-						conn.close();
-					}
+					conn.close();
 				} catch (Exception e) {
-					e.printStackTrace();
 				}
 			}
 		}
@@ -103,7 +84,7 @@ public class GadgetSpec {
 		return channels;
 	}
 
-	public boolean listensTo(String channel) { // if an unknown gadget just say yes,
+	public boolean listensTo(String channel) { // if an unknownd gadget just say yes,
 												// we don't care about
 												// performance in this situation
 		return unknownGadget || channels.contains(channel);
@@ -129,7 +110,7 @@ public class GadgetSpec {
 		if (viewRequirements.containsKey(page)) {
 			show = true;
 			GadgetViewRequirements req = getGadgetViewRequirements(page);
-			if ('U' == req.getViewerReq() && viewerId != null) {
+			if ('U' == req.getViewerReq() && viewerId == null) {
 				show = false;
 			} else if ('R' == req.getViewerReq()) {
 				show &= isRegisteredTo(viewerId, ds);
@@ -152,7 +133,7 @@ public class GadgetSpec {
 		ResultSet rset = null;
 
 		try {
-			String sqlCommand = "select count(*) from shindig_app_registry where appId = "
+			String sqlCommand = "select count(*) from orng_app_registry where appId = "
 					+ getAppId() + " and personId = '" + personId + "';";
 			conn = ds.getConnection();
 			stmt = conn.createStatement();
@@ -162,25 +143,16 @@ public class GadgetSpec {
 			}
 		} finally {
 			try {
-				if (rset != null) {
-					rset.close();
-				}
+				rset.close();
 			} catch (Exception e) {
-				e.printStackTrace();
 			}
 			try {
-				if (stmt != null) {
-					stmt.close();
-				}
+				stmt.close();
 			} catch (Exception e) {
-				e.printStackTrace();
 			}
 			try {
-				if (conn != null) {
-					conn.close();
-				}
+				conn.close();
 			} catch (Exception e) {
-				e.printStackTrace();
 			}
 		}
 
@@ -191,6 +163,10 @@ public class GadgetSpec {
 		return unknownGadget;
 	}
 
+	public boolean isEnabled() {
+		return enabled;
+	}
+	
 	// who sees it? Return the viewerReq for the ProfileDetails page
 	public char getVisibleScope() {
 		GadgetViewRequirements req = getGadgetViewRequirements("/display");

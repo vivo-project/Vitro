@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +40,9 @@ public class OpenSocialManager {
 
 	private static final String DEFAULT_DRIVER = "com.mysql.jdbc.Driver";
 
+	// for performance
+	private static Map<String, GadgetSpec> gadgetCache;
+	
 	private List<PreparedGadget> gadgets = new ArrayList<PreparedGadget>();
 	private Map<String, String> pubsubdata = new HashMap<String, String>();
 	private String viewerId = null;
@@ -79,14 +83,12 @@ public class OpenSocialManager {
 		}
 		else {
 			UserAccount viewer = LoginStatusBean.getCurrentUser(vreq);
-			this.viewerId = viewer != null ? viewer.getUri() : null;
+			// attempt to use profile URI if present, otherwise user user oriented URI
+			this.viewerId = viewer != null && viewer.getProxiedIndividualUris().size() == 1 ? 
+					viewer.getProxiedIndividualUris().toArray()[0].toString() : (viewer != null ? viewer.getUri() : null);
 		}
 		
-		boolean gadgetSandbox = "gadgetSandbox".equals(pageName);
 		String requestAppId = vreq.getParameter("appId");
-
-		Map<String, GadgetSpec> dbApps = new HashMap<String, GadgetSpec>();
-		Map<String, GadgetSpec> officialApps = new HashMap<String, GadgetSpec>();
 
 		dataSource = new BasicDataSource();
 		dataSource.setDriverClassName(DEFAULT_DRIVER);
@@ -98,122 +100,36 @@ public class OpenSocialManager {
 				.getProperty("VitroConnection.DataSource.url"));
 
 		// Load gadgets from the DB first
-		Connection conn = null;
-		Statement stmt = null;
-		ResultSet rset = null;
-		try {
+		Map<String, GadgetSpec> allDBGadgets = getAllDBGadgets(!noCache);
 
-			String sqlCommand = "select appId, name, url, channels, enabled from shindig_apps";
-			// if a specific app is requested, only grab it
-			if (requestAppId != null) {
-				sqlCommand += " where appId = " + requestAppId;
-			}
-			conn = dataSource.getConnection();
-			stmt = conn.createStatement();
-			rset = stmt.executeQuery(sqlCommand);
-
-			while (rset.next()) {
-				GadgetSpec spec = new GadgetSpec(rset.getInt(1),
-						rset.getString(2), rset.getString(3), rset.getString(4));
-				String gadgetFileName = getGadgetFileNameFromURL(rset
-						.getString(3));
-
-				dbApps.put(gadgetFileName, spec);
-				if (requestAppId != null || rset.getBoolean(5)) {
-					officialApps.put(gadgetFileName, spec);
-				}
-			}
-		} finally {
-			try {
-				if (rset != null) {
-					rset.close();
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		// Add sandbox gadgets if they are present
+		if (vreq.getSession() != null && vreq.getSession().getAttribute(OPENSOCIAL_GADGETS) != null) {		
+			gadgets = getSandboxGadgets(vreq, allDBGadgets, requestAppId);
 		}
-
-		// Add manual gadgets if there are any
-		// Note that this block of code only gets executed after someone fills in the 
-		// gadget/sandbox form!
-		int moduleId = 0;
-		if (vreq.getSession() != null
-				&& vreq.getSession().getAttribute(OPENSOCIAL_GADGETS) != null) {
-			String openSocialGadgetURLS = (String) vreq.getSession()
-					.getAttribute(OPENSOCIAL_GADGETS);
-			String[] urls = openSocialGadgetURLS.split(System.getProperty("line.separator"));
-			for (String openSocialGadgetURL : urls) {
-				if (openSocialGadgetURL.length() == 0)
-					continue;
-				int appId = 0; // if URL matches one in the DB, use DB provided
-								// appId, otherwise generate one
-				String gadgetFileName = getGadgetFileNameFromURL(openSocialGadgetURL);
-				String name = gadgetFileName;
-				List<String> channels = new ArrayList<String>();
-				boolean unknownGadget = true;
-				if (dbApps.containsKey(gadgetFileName)) {
-					appId = dbApps.get(gadgetFileName).getAppId();
-					name = dbApps.get(gadgetFileName).getName();
-					channels = dbApps.get(gadgetFileName).getChannels();
-					unknownGadget = false;
-				} else {
-					appId = openSocialGadgetURL.hashCode();
-				}
-				// if they asked for a specific one, only let it in
-				if (requestAppId != null
-						&& Integer.getInteger(requestAppId) != appId) {
-					continue;
-				}
-				GadgetSpec gadget = new GadgetSpec(appId, name,
-						openSocialGadgetURL, channels, unknownGadget, dataSource);
+		else { 		
+			// if no manual one were added, use the ones from the DB
+			for (GadgetSpec gadgetSpec : allDBGadgets.values()) {
 				// only add ones that are visible in this context!
-				if (unknownGadget
-						|| gadget.show(viewerId, ownerId, pageName, dataSource)) {
-					String securityToken = socketSendReceive(viewerId, ownerId,
-							"" + gadget.getAppId());
-					gadgets.add(new PreparedGadget(gadget, this, moduleId++,
-							securityToken));
-				}
-			}
-		}
-
-		// if no manual one were added, use the ones from the DB
-		if (gadgets.size() == 0) {
-			// Load DB gadgets
-			if (gadgetSandbox) {
-				officialApps = dbApps;
-			}
-			for (GadgetSpec spec : officialApps.values()) {
-				GadgetSpec gadget = new GadgetSpec(spec.getAppId(),
-						spec.getName(), spec.getGadgetURL(),
-						spec.getChannels(), false, dataSource);
-				// only add ones that are visible in this context!
-				if (gadgetSandbox
-						|| gadget.show(viewerId, ownerId, pageName, dataSource)) {
-					String securityToken = socketSendReceive(viewerId, ownerId,
-							"" + gadget.getAppId());
-					gadgets.add(new PreparedGadget(gadget, this, moduleId++,
-							securityToken));
+				int moduleId = 0;
+				if (
+						(
+								(requestAppId == null && gadgetSpec.isEnabled()) || 
+								(requestAppId != null && gadgetSpec.getAppId() ==  Integer.parseInt(requestAppId))
+						) && 
+						gadgetSpec.show(viewerId, ownerId, pageName, dataSource)
+						) {
+					String securityToken = socketSendReceive(viewerId, ownerId, "" + gadgetSpec.getAppId());
+					gadgets.add(new PreparedGadget(gadgetSpec, this, moduleId++, securityToken));
 				}
 			}
 		}
 
 		// sort the gadgets
 		Collections.sort(gadgets);
+	}
+	
+	public static void clearCache() {
+		gadgetCache = null;
 	}
 
 	private String figureOwnerId(VitroRequest vreq) {
@@ -278,17 +194,6 @@ public class OpenSocialManager {
 		personIds.add(ind.getURI());
 		return buildJSONPersonIds(personIds, message);
 	}
-	/****
-	 * public static String BuildJSONPubMedIds(Person person) { List<Int32>
-	 * pubIds = new List<Int32>(); foreach (Publication pub in
-	 * person.PublicationList) { foreach (PublicationSource pubSource in
-	 * pub.PublicationSourceList) { if ("PubMed".Equals(pubSource.Name)) {
-	 * pubIds.Add(Int32.Parse(pubSource.ID)); } } } Dictionary<string, Object>
-	 * foundPubs = new Dictionary<string, object>(); foundPubs.Add("pubIds",
-	 * pubIds); foundPubs.Add("message", "PubMedIDs for " +
-	 * person.Name.FullName); JavaScriptSerializer serializer = new
-	 * JavaScriptSerializer(); return serializer.Serialize(foundPubs); }
-	 ***/
 
 	public void setPubsubData(String key, String value) {
 		if (pubsubdata.containsKey(key)) {
@@ -374,7 +279,7 @@ public class OpenSocialManager {
 			String xtraId1Type, String xtraId1Value) throws SQLException {
 		Connection conn = null;
 		Statement stmt = null;
-		String sqlCommand = "INSERT INTO shindig_activity (userId, activity, xtraId1Type, xtraId1Value) VALUES ('"
+		String sqlCommand = "INSERT INTO orng_activity (userId, activity, xtraId1Type, xtraId1Value) VALUES ('"
 				+ userId +  "','<activity xmlns=\"http://ns.opensocial.org/2008/opensocial\"><postedTime>"
 				+ System.currentTimeMillis() + "</postedTime><title>" + title + "</title>" 
 				+ (body != null ? "<body>" + body + "</body>" : "") + "</activity>','"
@@ -385,18 +290,12 @@ public class OpenSocialManager {
 			stmt.executeUpdate(sqlCommand);
 		} finally {
 			try {
-				if (stmt != null) {
-					stmt.close();
-				}
+				stmt.close();
 			} catch (Exception e) {
-				e.printStackTrace();
 			}
 			try {
-				if (conn != null) {
-					conn.close();
-				}
+				conn.close();
 			} catch (Exception e) {
-				e.printStackTrace();
 			}
 		}
 			
@@ -427,22 +326,20 @@ public class OpenSocialManager {
 		// The following will block until the page is transmitted.
 		while ((bytes = s.getInputStream().read(bytesReceived)) > 0) {
 			page += new String(bytesReceived, 0, bytes);
-		}
+		};
 
 		return page;
 	}
 	
 	public String getContainerJavascriptSrc() {
 		return configuration.getProperty(SHINDIG_URL_PROP)
-				+ "/gadgets/js/core:dynamic-height:osapi:pubsub:rpc:views:shindig-container.js?c=1"
+				+ "/gadgets/js/core:dynamic-height:osapi:pubsub:rpc:views:rdf:shindig-container.js?c=1"
 				+ (isDebug ? "&debug=1" : "");
 	}
 
 	public String getGadgetJavascript() {
 		String lineSeparator = System.getProperty("line.separator");
-		String gadgetScriptText = lineSeparator
-				+ "var my = {};"
-				+ lineSeparator
+		String gadgetScriptText = "var my = {};" + lineSeparator
 				+ "my.gadgetSpec = function(appId, name, url, secureToken, view, closed_width, open_width, start_closed, chrome_id, visible_scope) {"
 				+ lineSeparator + "this.appId = appId;" + lineSeparator
 				+ "this.name = name;" + lineSeparator + "this.url = url;"
@@ -479,5 +376,99 @@ public class OpenSocialManager {
 				+ lineSeparator;
 
 		return gadgetScriptText;
+	}
+	
+	Map<String, GadgetSpec> getAllDBGadgets(boolean useCache) throws SQLException 
+	{
+		// great place to add cache
+        // check cache first
+		Map<String, GadgetSpec> allDBGadgets = useCache ? gadgetCache : null;		
+		if (allDBGadgets == null) {
+			allDBGadgets = new HashMap<String, GadgetSpec>();
+			Connection conn = null;
+			Statement stmt = null;
+			ResultSet rset = null;
+			try {
+	
+				String sqlCommand = "select appId, name, url, channels, enabled from orng_apps";
+	
+				conn = dataSource.getConnection();
+				stmt = conn.createStatement();
+				rset = stmt.executeQuery(sqlCommand);
+	
+				while (rset.next()) {
+					String channelsStr = rset.getString(4);
+					List<String> channels = Arrays.asList(channelsStr != null && channelsStr.length() > 0 ? channelsStr.split(" ") : new String[0]);
+					GadgetSpec spec = new GadgetSpec(rset.getInt(1),
+							rset.getString(2), rset.getString(3), channels, dataSource, rset.getBoolean(5), false);
+					String gadgetFileName = getGadgetFileNameFromURL(rset.getString(3));
+	
+					allDBGadgets.put(gadgetFileName, spec);
+				}
+			} 
+			finally {
+				try {
+					rset.close();
+				} catch (Exception e) {
+				}
+				try {
+					stmt.close();
+				} catch (Exception e) {
+				}
+				try {
+					conn.close();
+				} catch (Exception e) {
+				}
+			}
+			if (useCache) {
+				gadgetCache = allDBGadgets;
+			}
+		}
+
+		return allDBGadgets;
+	}
+	
+	private List<PreparedGadget> getSandboxGadgets(VitroRequest vreq, Map<String, GadgetSpec> allDBGadgets, String requestAppId) throws SQLException, IOException {
+		List<PreparedGadget> sandboxGadgets = new ArrayList<PreparedGadget>();
+		// Note that this block of code only gets executed after someone fills in the 
+		// gadget/sandbox form!
+		String openSocialGadgetURLS = (String) vreq.getSession()
+				.getAttribute(OPENSOCIAL_GADGETS);
+		String[] urls = openSocialGadgetURLS.split(System.getProperty("line.separator"));
+		for (String openSocialGadgetURL : urls) {
+			if (openSocialGadgetURL.length() == 0)
+				continue;
+			int appId = 0; // if URL matches one in the DB, use DB provided
+							// appId, otherwise generate one
+			String gadgetFileName = getGadgetFileNameFromURL(openSocialGadgetURL);
+			String name = gadgetFileName;
+			List<String> channels = new ArrayList<String>();
+			boolean unknownGadget = true;
+			if (allDBGadgets.containsKey(gadgetFileName)) {
+				appId = allDBGadgets.get(gadgetFileName).getAppId();
+				name = allDBGadgets.get(gadgetFileName).getName();
+				channels = allDBGadgets.get(gadgetFileName).getChannels();
+				unknownGadget = false;
+			} else {
+				appId = openSocialGadgetURL.hashCode();
+			}
+			// if they asked for a specific one, only let it in
+			if (requestAppId != null && Integer.parseInt(requestAppId) != appId) {
+				continue;
+			}
+			GadgetSpec gadget = new GadgetSpec(appId, name,
+					openSocialGadgetURL, channels, dataSource, true, unknownGadget);
+			// only add ones that are visible in this context!
+			int moduleId = 0;
+			if (unknownGadget
+					|| gadget.show(viewerId, ownerId, pageName, dataSource)) {
+				String securityToken = socketSendReceive(viewerId, ownerId,
+						"" + gadget.getAppId());
+				sandboxGadgets.add(new PreparedGadget(gadget, this, moduleId++,
+						securityToken));
+			}
+		}
+		return sandboxGadgets;
+		
 	}
 }

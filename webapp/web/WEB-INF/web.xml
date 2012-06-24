@@ -1327,12 +1327,9 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>GadgetController</servlet-name>
-    <url-pattern>/gadget</url-pattern>
+    <url-pattern>/orng/*</url-pattern>
   </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>GadgetController</servlet-name>
-    <url-pattern>/gadget/sandbox</url-pattern>
-  </servlet-mapping>
+
 
   <!-- ==================== tag libraries ============================== -->
   <jsp-config>

@@ -1,7 +1,6 @@
 package edu.ucsf.vitro.opensocial;
 
 public class GadgetViewRequirements {
-	private String page;
 	private char viewerReq; // U for User or null for no requirement
 	private char ownerReq; // R for Registered or null for no requirement
 	private String view;
@@ -11,10 +10,9 @@ public class GadgetViewRequirements {
 	private String chromeId;
 	private int display_order;
 
-	public GadgetViewRequirements(String page, char viewerReq, char ownerReq,
+	public GadgetViewRequirements(char viewerReq, char ownerReq,
 			String view, int closedWidth, int openWidth, boolean startClosed,
 			String chromeId, int display_order) {
-		this.page = page;
 		this.viewerReq = viewerReq;
 		this.ownerReq = ownerReq;
 		this.view = view;
@@ -28,7 +26,7 @@ public class GadgetViewRequirements {
 	public GadgetViewRequirements(String page, String viewerReq,
 			String ownerReq, String view, int closedWidth, int openWidth,
 			boolean startClosed, String chromeId, int display_order) {
-		this(page, viewerReq != null ? viewerReq.charAt(0) : ' ',
+		this(viewerReq != null ? viewerReq.charAt(0) : ' ',
 				ownerReq != null ? ownerReq.charAt(0) : ' ', view, closedWidth,
 				openWidth, startClosed, chromeId, display_order);
 	}

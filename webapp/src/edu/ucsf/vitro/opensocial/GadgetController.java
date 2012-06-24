@@ -23,7 +23,11 @@ public class GadgetController extends FreemarkerHttpServlet {
 	
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
-    	if (vreq.getServletPath().endsWith("/sandbox")) {
+    	if ("/clearcache".equalsIgnoreCase(vreq.getPathInfo())) {
+    		OpenSocialManager.clearCache();
+    		return new RedirectResponseValues("/");
+    	}
+    	else if ("/sandbox".equalsIgnoreCase(vreq.getPathInfo())) {
     		boolean sandbox = "True".equalsIgnoreCase(ConfigurationProperties.getBean(vreq.getSession()
     				.getServletContext()).getProperty("OpenSocial.sandbox"));
     		if (!sandbox) {
@@ -81,7 +85,7 @@ public class GadgetController extends FreemarkerHttpServlet {
         try {
 	        OpenSocialManager openSocialManager = new OpenSocialManager(vreq, "gadgetSandbox");
 	        String gadgetURLS = "";
-	        for (PreparedGadget gadget : openSocialManager.getVisibleGadgets())
+	        for (GadgetSpec gadget : openSocialManager.getAllDBGadgets(false).values())
 	        {
 	            gadgetURLS += gadget.getGadgetURL() + System.getProperty("line.separator");
 	        }

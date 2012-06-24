@@ -44,7 +44,7 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 	private static final String PROPERTY_DB_USERNAME = "VitroConnection.DataSource.username";
 	private static final String PROPERTY_DB_PASSWORD = "VitroConnection.DataSource.password";
 
-	private static final String FILENAME_SHINDIG_PROPERTIES = "shindig.orng.properties";
+	private static final String FILENAME_SHINDIG_PROPERTIES = "shindigorng.properties";
 
 	/*
 	 * If a connection fails in the tester thread, how long do we wait before
@@ -133,7 +133,7 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 
 			conn = dataSource.getConnection();
 			stmt = conn.createStatement();
-			rset = stmt.executeQuery("select * from shindig_apps");
+			rset = stmt.executeQuery("select * from orng_apps");
 		} catch (NoSuchPropertyException e) {
 			warnings.add(new Warning(e.getMessage()));
 		} catch (SQLException e) {
@@ -182,8 +182,7 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 			message += "Has the Tomcat classpath been set to include the "
 					+ "Shindig config directory? "
 					+ "(inside the Vitro home directory) ";
-			message += "Was the openSocial build script run? "
-					+ "('ant -file openSocialBuild.xml')";
+			message += "Was the openSocial build script run? ('ant orng')";
 			warnings.add(new Warning(message));
 		}
 	}
@@ -346,12 +345,14 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 		private static final int SOCKET_TIMEOUT_STATUS = -500;
 
 		private final String shindigBaseUrl;
+		private final String shindigTestUrl;
 		private final HttpClient httpClient = new HttpClient();
 
 		private int statusCode = Integer.MIN_VALUE;
 
 		public ShindigTester(String shindigBaseUrl) {
 			this.shindigBaseUrl = shindigBaseUrl;
+			this.shindigTestUrl = shindigBaseUrl + "/rest/appdata";
 		}
 
 		public void connect() throws ShindigTesterException {
@@ -368,12 +369,12 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 			}
 
 			if (statusCode != HttpStatus.SC_OK) {
-				throw new ShindigTesterException(statusCode);
+				throw new ShindigTesterException(statusCode, shindigBaseUrl,
+						shindigTestUrl);
 			}
 		}
 
 		private void testConnection() throws ShindigTesterException {
-			String shindigTestUrl = shindigBaseUrl + "/rest/activities";
 			GetMethod method = new GetMethod(shindigTestUrl);
 			try {
 				log.debug("Trying to connect to Shindig");
@@ -388,7 +389,8 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 				// Save the status so we know why we failed.
 				statusCode = SOCKET_TIMEOUT_STATUS;
 			} catch (Exception e) {
-				throw new ShindigTesterException(e);
+				throw new ShindigTesterException(e, shindigBaseUrl,
+						shindigTestUrl);
 			} finally {
 				method.releaseConnection();
 			}
@@ -415,14 +417,18 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 	protected static class ShindigTesterException extends Exception {
 		private final int httpStatusCode;
 
-		protected ShindigTesterException(Integer httpStatusCode) {
-			super("Failed to connect to the Shindig service. "
+		protected ShindigTesterException(Integer httpStatusCode,
+				String baseUrl, String testUrl) {
+			super("Failed to connect to the Shindig service at '" + baseUrl
+					+ "' (tried for a response at '" + testUrl + "'). "
 					+ "status code was " + httpStatusCode);
 			this.httpStatusCode = httpStatusCode;
 		}
 
-		protected ShindigTesterException(Throwable cause) {
-			super("Failed to connect to the Shindig service.", cause);
+		protected ShindigTesterException(Throwable cause, String baseUrl,
+				String testUrl) {
+			super("Failed to connect to the Shindig service at '" + baseUrl
+					+ "' (tried for a response at '" + testUrl + "').", cause);
 			this.httpStatusCode = Integer.MIN_VALUE;
 		}
 

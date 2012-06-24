@@ -89,25 +89,13 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 
 		<!-- the Shindig WAR -->
 		<property name="shindig.war.original.file" location="./shindigorng.war" />
-		<property name="shindig.war.unpacked.dir" location="${build.shindig.dir}/war" />
-		<property name="shindig.war.modified.file" location="${build.shindig.dir}/shindigorng.war" />
 		<property name="shindig.war.deployed.file" location="${tomcat.webapps.dir}/shindigorng.war" />
-
-		<!-- the Shindig-ORNG connector JAR -->
-		<property name="shindig.connector.prefix" value="/WEB-INF/lib" />
-		<property name="shindig.connector.original.file" location="${shindig.war.unpacked.dir}/${shindig.connector.prefix}/shindig-orng-connector-2.0.2.jar" />
-		<property name="shindig.connector.unpacked.dir" location="${build.shindig.dir}/connector" />
-		<property name="shindig.connector.modified.file" location="${build.shindig.dir}/shindig-orng-connector-2.0.2.jar" />
-
-		<!-- the Shindig-ORNG connector configuration file -->
-		<property name="shindig.js.original.file" location="${shindig.connector.unpacked.dir}/orng-container.js" />
-		<property name="shindig.js.modified.file" location="${build.shindig.dir}/orng-container.js" />
-		<property name="shindig.js.deployed.file" location="${shindig.config.dir}/orng-container.js" />
+		<property name="shindig.war.deployed.dir" location="${tomcat.webapps.dir}/shindigorng" />
 
 		<!-- Shindig properties file -->
-		<property name="shindig.properties.template.file" location="${basedir}/shindig.orng.properties.template" />
-		<property name="shindig.properties.modified.file" location="${build.shindig.dir}/shindig.orng.properties" />
-		<property name="shindig.properties.deployed.file" location="${shindig.config.dir}/shindig.orng.properties" />
+		<property name="shindig.properties.template.file" location="${basedir}/shindigorng.properties.template" />
+		<property name="shindig.properties.modified.file" location="${build.shindig.dir}/shindigorng.properties" />
+		<property name="shindig.properties.deployed.file" location="${shindig.config.dir}/shindigorng.properties" />
 
 	</target>
 
@@ -118,6 +106,9 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 		<delete includeemptydirs="true" failonerror="false">
 			<fileset dir="${build.shindig.dir}" />
 		</delete>
+		<delete includeemptydirs="true" failonerror="false">
+			<fileset dir="${shindig.war.deployed.dir}" />
+		</delete>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -127,48 +118,9 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${build.shindig.dir}" />
 
-		<mkdir dir="${shindig.war.unpacked.dir}" />
-		<mkdir dir="${shindig.connector.unpacked.dir}" />
-
 		<mkdir dir="${shindig.home.dir}" />
 		<mkdir dir="${shindig.config.dir}" />
 	</target>
-
-	<!-- - - - - - - - - - - - - - - - - - 
-          target: removeConnectorConfigFromWar                      
-          
-		  Unpack the war. 
-		  Unpack the JAR. 
-		  Create a new JAR that doesn't include the config file
-		  Create a new WAR that includes the modified JAR.
-         - - - - - - - - - - - - - - - - - -->
-	<target name="removeConnectorConfigFromWar" depends="properties, prepare">
-		<unwar src="${shindig.war.original.file}" dest="${shindig.war.unpacked.dir}" />
-		<unwar src="${shindig.connector.original.file}" dest="${shindig.connector.unpacked.dir}" />
-		<zip destfile="${shindig.connector.modified.file}">
-			<zipfileset src="${shindig.connector.original.file}" excludes="orng-container.js" />
-		</zip>
-		<zip destfile="${shindig.war.modified.file}">
-			<fileset dir="${shindig.war.unpacked.dir}" excludes="**/shindig-orng-connector-2.0.2.jar" />
-			<zipfileset fullpath="WEB-INF/lib/shindig-orng-connector-2.0.2.jar" dir="${build.shindig.dir}" includes="shindig-orng-connector-2.0.2.jar" />
-		</zip>
-	</target>
-
-	<!-- - - - - - - - - - - - - - - - - - 
-          target: modifyConnectorConfig                      
-		
-		  Get the config file from the unpacked connector WAR and JAR, and make a modified copy.
-         - - - - - - - - - - - - - - - - - -->
-	<target name="modifyConnectorConfig" depends="removeConnectorConfigFromWar">
-		<copy file="${shindig.js.original.file}" tofile="${shindig.js.modified.file}">
-			<filterchain>
-				<tokenfilter>
-					<replacestring from="/shindig/openssl/securitytokenkey.txt" to="${OpenSocial.tokenKeyFile}" />
-				</tokenfilter>
-			</filterchain>
-		</copy>
-	</target>
-
 
 	<!-- - - - - - - - - - - - - - - - - - 
           target: modifyPropertiesFile                      
@@ -188,10 +140,9 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 	<!-- ================================= 
           target: deploy              
          ================================= -->
-	<target name="deploy" depends="modifyPropertiesFile, removeConnectorConfigFromWar, modifyConnectorConfig" description="--> Deploy the application directly into the Tomcat webapps directory.">
-		<copy file="${shindig.js.modified.file}" tofile="${shindig.js.deployed.file}" />
+	<target name="deploy" depends="modifyPropertiesFile" description="--> Deploy the application directly into the Tomcat webapps directory.">
 		<copy file="${shindig.properties.modified.file}" tofile="${shindig.properties.deployed.file}" />
-		<copy file="${shindig.war.modified.file}" tofile="${shindig.war.deployed.file}" />
+		<copy file="${shindig.war.original.file}" tofile="${shindig.war.deployed.file}" overwrite="true" />
 	</target>
 
 

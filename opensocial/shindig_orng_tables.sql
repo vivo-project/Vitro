@@ -1,9 +1,9 @@
 
 --
--- Table structure for table `shindig_activity`
+-- Table structure for table `orng_activity`
 --
 
-CREATE TABLE IF NOT EXISTS `shindig_activity` (
+CREATE TABLE IF NOT EXISTS `orng_activity` (
   `activityId` int(11) NOT NULL AUTO_INCREMENT,
   `userId` varchar(255) default NULL,
   `appId` int(11) default NULL,
@@ -15,10 +15,10 @@ CREATE TABLE IF NOT EXISTS `shindig_activity` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `shindig_appdata`
+-- Table structure for table `orng_appdata`
 --
 
-CREATE TABLE IF NOT EXISTS `shindig_appdata` (
+CREATE TABLE IF NOT EXISTS `orng_appdata` (
   `userId` varchar(255) NOT NULL,
   `appId` int(11) NOT NULL,
   `keyname` varchar(255) NOT NULL,
@@ -31,10 +31,10 @@ CREATE TABLE IF NOT EXISTS `shindig_appdata` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `shindig_apps`
+-- Table structure for table `orng_apps`
 --
 
-CREATE TABLE IF NOT EXISTS `shindig_apps` (
+CREATE TABLE IF NOT EXISTS `orng_apps` (
   `appid` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `url` varchar(255) NOT NULL,
@@ -47,10 +47,10 @@ CREATE TABLE IF NOT EXISTS `shindig_apps` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `shindig_app_registry`
+-- Table structure for table `orng_app_registry`
 --
 
-CREATE TABLE IF NOT EXISTS `shindig_app_registry` (
+CREATE TABLE IF NOT EXISTS `orng_app_registry` (
   `appid` int(11) NOT NULL,
   `personId` varchar(255) NOT NULL,
   `createdDT` datetime NOT NULL,
@@ -60,10 +60,10 @@ CREATE TABLE IF NOT EXISTS `shindig_app_registry` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `shindig_app_views`
+-- Table structure for table `orng_app_views`
 --
 
-CREATE TABLE IF NOT EXISTS `shindig_app_views` (
+CREATE TABLE IF NOT EXISTS `orng_app_views` (
   `appid` int(11) NOT NULL,
   `viewer_req` char(1) default NULL,
   `owner_req` char(1) default NULL,
@@ -79,10 +79,10 @@ CREATE TABLE IF NOT EXISTS `shindig_app_views` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `shindig_messages`
+-- Table structure for table `orng_messages`
 --
 
-CREATE TABLE IF NOT EXISTS `shindig_messages` (
+CREATE TABLE IF NOT EXISTS `orng_messages` (
   `msgId` varchar(255) NOT NULL,
   `senderId` varchar(255) default NULL,
   `recipientId` varchar(255) default NULL,
@@ -97,47 +97,47 @@ CREATE TABLE IF NOT EXISTS `shindig_messages` (
 
 
 DELIMITER // 
-CREATE PROCEDURE shindig_registerAppPerson (uid varchar(255), aid INT, v BOOL)
+CREATE PROCEDURE orng_registerAppPerson (uid varchar(255), aid INT, v BOOL)
 BEGIN
 	IF (v)
 	THEN
-		INSERT INTO shindig_app_registry (appId, personId, createdDT) values (aid, uid, now());
+		INSERT INTO orng_app_registry (appId, personId, createdDT) values (aid, uid, now());
 	ELSE 
-		DELETE FROM shindig_app_registry where appId = aid AND personId = uid;
+		DELETE FROM orng_app_registry where appId = aid AND personId = uid;
 	END IF;	
 END // 
 DELIMITER ; 
 
 DELIMITER // 
-CREATE PROCEDURE shindig_upsertAppData(uid varchar(255), aid INT, kn varchar(255),v varchar(4000))
+CREATE PROCEDURE orng_upsertAppData(uid varchar(255), aid INT, kn varchar(255),v varchar(4000))
 BEGIN
 	DECLARE cnt int;
-	SELECT count(*) FROM shindig_appdata WHERE userId = uid AND appId = aid and keyname = kn INTO cnt; 
+	SELECT count(*) FROM orng_appdata WHERE userId = uid AND appId = aid and keyname = kn INTO cnt; 
 	IF (cnt > 0)
 	THEN
-		UPDATE shindig_appdata set `value` = v, updatedDT = NOW() WHERE userId = uid AND appId = aid and keyname = kn;
+		UPDATE orng_appdata set `value` = v, updatedDT = NOW() WHERE userId = uid AND appId = aid and keyname = kn;
 	ELSE
-		INSERT INTO shindig_appdata (userId, appId, keyname, `value`) values (uid, aid, kn, v);
+		INSERT INTO orng_appdata (userId, appId, keyname, `value`) values (uid, aid, kn, v);
 	END IF;
 		-- if keyname is VISIBLE, do more
 	IF (kn = 'VISIBLE' AND v = 'Y') 
 	THEN
-		CALL shindig_registerAppPerson(uid, aid, 1);
+		CALL orng_registerAppPerson(uid, aid, 1);
 	ELSEIF (kn = 'VISIBLE' )
 	THEN
-		CALL shindig_registerAppPerson(uid, aid, 0);
+		CALL orng_registerAppPerson(uid, aid, 0);
 	END IF;
 END // 
 DELIMITER ;					
 
 DELIMITER // 
-CREATE PROCEDURE shindig_deleteAppData(uid varchar(255),aid INT, kn varchar(255))
+CREATE PROCEDURE orng_deleteAppData(uid varchar(255),aid INT, kn varchar(255))
 BEGIN
-	DELETE FROM shindig_appdata WHERE userId = uid AND appId = aid and keyname = kn;
+	DELETE FROM orng_appdata WHERE userId = uid AND appId = aid and keyname = kn;
 		-- if keyname is VISIBLE, do more
 	IF (kn = 'VISIBLE' ) 
 	THEN
-		CALL shindig_registerAppPerson(uid, aid, 0);
+		CALL orng_registerAppPerson(uid, aid, 0);
 	END IF;
 END // 
 DELIMITER ;
