@@ -11,6 +11,10 @@
 <#assign menuItem = ""/>    	
 <#assign menuLinkText = "" />
 <#assign menuPosition = pageData.highestMenuPosition />
+<#assign addMenuItem = "" />
+<#if pageData.addMenuItem?has_content>
+	<#assign addMenuItem = pageData.addMenuItem />
+</#if>
 <#--Existing Values For Editing condition-->
 <#assign literalValues = editConfiguration.existingLiteralValues />
 <#assign uriValues = editConfiguration.existingUriValues />
@@ -84,11 +88,11 @@
                 <input type="text" name="customTemplate" value="${customTemplate!''}" size="40" role="input" /><span class="requiredHint"> *</span>
             </section>
             <p id="checkboxPTag"><input id="menuCheckbox" type="checkbox" name="menuCheckbox"
-            <#if menuAction="Edit" && menuItem?has_content>checked="checked"</#if>
+            <#if (menuAction="Edit" && menuItem?has_content) || (menuAction="Add" && addMenuItem = "true")>checked="checked"</#if>
             > This is a menu page</p>
             <section id="menu" role="region" 
             <#--Do not display menu section unless editing an existing menu item-->
-            <#if menuAction = "Add" || (menuAction="Edit" && (!menuItem?has_content || menuItem = "")) >
+            <#if (menuAction = "Add" && addMenuItem != "true")  || (menuAction="Edit" && (!menuItem?has_content || menuItem = "")) >
             class="hideMenuSection"
             <#else>
             class="showMenuSection"

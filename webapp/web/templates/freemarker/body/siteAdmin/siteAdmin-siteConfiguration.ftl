@@ -20,7 +20,7 @@
             </#if>        
             
             <#if siteConfig.menuManagement?has_content>
-                <li role="listitem"><a href="${siteConfig.menuManagement}" title="Menu management">Menu management</a></li>
+                <li role="listitem"><a href="${siteConfig.menuManagement}" title="Menu ordering">Menu ordering</a></li>
             </#if>      
             
             <#if siteConfig.restrictLogins?has_content>

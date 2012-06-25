@@ -51,7 +51,7 @@
                         </li>
                         </#list>
                     </ul><br />
-                    <input  type="button" id="doneWithContent" class="doneWithContent" name="moreContent" value="Done" />
+                    <input  type="button" id="doneWithContent" class="doneWithContent" name="doneWithContent" value="Done" />
                 </section>
             </section>
  <#--Include JavaScript specific to the types of data getters related to this content-->           

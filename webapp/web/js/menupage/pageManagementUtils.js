@@ -34,6 +34,12 @@ var pageManagementUtils = {
 		}
 		return false;
 	},
+	isAddMenuItem:function() {
+		if(pageManagementUtils.addMenuItem != null && pageManagementUtils.addMenuItem == "true") {
+			return true;
+		}
+		return false;	
+	},
 	initExistingContent:function() {
 		this.generateExistingContentSections();
 		//display more content button - will need to review how to hit save etc. 
@@ -135,7 +141,7 @@ var pageManagementUtils = {
 // tlw72	    this.moreContentButton.hide();
 	    //left side components
 	    //These depend on whether or not this is an existing item or not
-	    if(this.isAdd()) {
+	    if(this.isAdd() && !this.isAddMenuItem()) {
 	    	this.defaultTemplateRadio.attr('checked',true);
 	    	this.isMenuCheckbox.attr('checked',false);
 	    	this.menuSection.hide();
@@ -345,6 +351,8 @@ var pageManagementUtils = {
     	if($.isFunction(dataGetterProcessorObj.bindEventHandlers)) {
     		dataGetterProcessorObj.bindEventHandlers($newContentObj);
     	}
+    	//Bind done event as the done button is within the cloned content
+    	pageManagementUtils.bindClonedContentDoneEvent($newContentObj);
     },
     createClonedContentContainer:function($newContentObj, counter, contentTypeLabel, varOrClass) {
         //Create the container for the new content
@@ -366,6 +374,17 @@ var pageManagementUtils = {
         $newDivContainer.appendTo($('section#contentDivs'));
         //place new content object        
         $newContentObj.prependTo($innerDiv);
+    },
+    bindClonedContentDoneEvent:function($newContentObj) {
+    	//Done button should just collapse the cloned content
+        $newContentObj.find("input[name='doneWithContent']").click(function() {
+        		var thisInnerDiv = $(this).closest("div.pageContentWrapper");
+                thisInnerDiv.slideUp(222);
+                var thisClickableSpan = $(this).closest("span.pageContentExpand");
+                var thisArrowDiv = thisClickableSpan.find('div.arrow');
+                thisArrowDiv.removeClass("collapseArrow");
+                thisArrowDiv.addClass("expandArrow");
+        });	
     },
     bindClonedContentContainerEvents:function($newDivContainer, counter) {
     	 var $clickableSpan = $newDivContainer.children('span#clickable' + counter);
@@ -389,10 +408,11 @@ var pageManagementUtils = {
             }
             window.setTimeout('pageManagementUtils.adjustSaveButtonHeight()', 223);             
         });
+        
         //remove button
         $newRemoveLink = $innerDiv.find('a#remove' + counter); // tlw72 changed button to link
         //remove the content entirely
-        $newRemoveLink.click(function() {
+        $newRemoveLink.click(function(event) {
         	//if content type of what is being deleted is browse class group, then
         	//add browse classgroup back to set of options
         	var contentType = $innerDiv.find("section.pageContent").attr("contentType");
@@ -402,6 +422,8 @@ var pageManagementUtils = {
         	//remove the section
         	$innerDiv.parent("div").remove();
             pageManagementUtils.adjustSaveButtonHeight();
+            //Because this is now a link, have to prevent default action of navigating to link
+            event.preventDefault();
         });
     },
     resetClassGroupSection:function() {

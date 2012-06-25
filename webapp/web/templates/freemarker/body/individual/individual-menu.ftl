@@ -13,12 +13,12 @@
         var menuItemData = [];
     </script>
     
-    <h3>Menu management</h3>
+    <h3>Menu Ordering</h3>
     
     <#-- List the menu items -->
     <ul class="menuItems">
         <#list hasElement.statements as statement>
-            <li class="menuItem"><#include "${hasElement.template}"> <span class="controls"><@p.editingLinks "hasElement" statement editable /></span></li>
+            <li class="menuItem"><#include "${hasElement.template}"> <span class="controls"><!--p.editingLinks "hasElement" statement editable /--></span></li>
         </#list>
     </ul>
     
@@ -29,6 +29,7 @@
             <input type="hidden" name="typeOfNew" value="http://vitro.mannlib.cornell.edu/ontologies/display/1.1#Page">              
             <input type="hidden" name="switchToDisplayModel" value="1">
             <input type="hidden" name="editForm" value="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator" role="input">
+       		<input type="hidden" name="addMenuItem" value="true" />
        	<input id="submit" value="Add new menu page" role="button" type="submit" >
         
         </form>

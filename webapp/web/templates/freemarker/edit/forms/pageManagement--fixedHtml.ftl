@@ -6,6 +6,6 @@
     <input type="text" name="saveToVar" size="20" value="" id="fixedHTMLSaveToVar" role="input" />
     <label id="fixedHTMLValueLabel" for="fixedHTMLValue">Enter fixed HTML here<span id="fixedHTMLValueSpan"></span><span class="requiredHint"> *</span></label>
     <textarea id="fixedHTMLValue" name="htmlValue" cols="70" rows="15" style="margin-bottom:7px"></textarea><br />
-    <input  type="button" id="doneWithContent" name="moreContent" value="Done" class="doneWithContent" />
+    <input  type="button" id="doneWithContent" name="doneWithContent" value="Done" class="doneWithContent" />
 </section>
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/processFixedHTMLDataGetterContent.js"></script>')}

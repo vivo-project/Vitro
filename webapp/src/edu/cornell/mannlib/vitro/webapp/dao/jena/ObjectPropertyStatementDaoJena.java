@@ -366,9 +366,43 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 //            } 
           
             try {
+            	//If RDFService is null, will do what code used to do before, otherwise employ rdfservice
+            	if(rdfService == null) {
+                    log.debug("RDF Service null, Using CONSTRUCT query string for object property " + 
+                            propertyUri + ": " + queryString);
+                    Query query = null;
+                    try {
+                        query = QueryFactory.create(queryString, Syntax.syntaxARQ);
+                    } catch(Throwable th){
+                        log.error("Could not create CONSTRUCT SPARQL query for query " +
+                                  "string. " + th.getMessage());
+                        log.error(queryString);
+                        return constructedModel;
+                    } 
+                
+                    DatasetWrapper w = dwf.getDatasetWrapper();
+                    Dataset dataset = w.getDataset();
+                    dataset.getLock().enterCriticalSection(Lock.READ);
+                    QueryExecution qe = null;
+                    try {                           
+                        qe = QueryExecutionFactory.create(
+                                query, dataset);
+                        qe.execConstruct(constructedModel);
+                    } catch (Exception e) {
+                        log.error("Error getting constructed model for subject " + subjectUri + " and property " + propertyUri);
+                    } finally {
+                        if (qe != null) {
+                            qe.close();
+                        }
+                        dataset.getLock().leaveCriticalSection();
+                        w.close();
+                    }	
+            	} else {
                 constructedModel.read(
                         rdfService.sparqlConstructQuery(
                                 queryString, RDFService.ModelSerializationFormat.N3), null, "N3");
+            
+            	}
             } catch (Exception e) {
                 log.error("Error getting constructed model for subject " + subjectUri + " and property " + propertyUri);
             } 

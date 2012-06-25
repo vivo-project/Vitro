@@ -41,7 +41,7 @@ public class DeletePageController extends VitroHttpServlet {
     	removeStatements = ModelFactory.createDefaultModel();
     	VitroRequest vreq = new VitroRequest(rawRequest);
     	String pageUri = vreq.getParameter("pageURI");
-    	if(pageUri != null) {
+     	if(pageUri != null) {
     		doDeletePage(pageUri, vreq, resp);
     	}
 		resp.sendRedirect(rawRequest.getContextPath() + REDIRECT_URL);
@@ -130,7 +130,7 @@ public class DeletePageController extends VitroHttpServlet {
 				(RDFNode) null);
 		while(dataGetterIt.hasNext()) {
 			Statement dataGetterStmt = dataGetterIt.nextStatement();
-			Resource dataGetterResource = dataGetterStmt.getSubject();
+			Resource dataGetterResource = dataGetterStmt.getResource();
 			dataGettersModel.add(displayModel.listStatements(dataGetterResource, null, (RDFNode) null));
 		}
 		return dataGettersModel;
@@ -160,11 +160,7 @@ public class DeletePageController extends VitroHttpServlet {
 	//This should be in write mode
     //TODO: find better way of doing this
     private OntModel getDisplayModel(VitroRequest vreq) {
-    	if(vreq.getAttribute(vreq.SPECIAL_WRITE_MODEL) != null) {
-    		return vreq.getWriteModel();
-    	} else {
-    		return (OntModel) getServletContext().getAttribute("http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadata");
-    	}
+    	return vreq.getDisplayModel();    
     }
     
     Log log = LogFactory.getLog(MenuManagementEdit.class);

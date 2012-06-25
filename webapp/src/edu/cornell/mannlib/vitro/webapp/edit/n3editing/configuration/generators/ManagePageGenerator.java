@@ -508,7 +508,12 @@ private String getExistingCustomTemplateQuery() {
     	data.put("title", "Add Menu Item");
 		data.put("menuAction", "Add");    
     	data.put("selectedTemplateType", "default");
-    	//defaults to regular class group page
+    	//Check for parameter specifying that this is a new menu page, in which case
+    	//menu item should be selected
+    	String menuItemParam = vreq.getParameter("addMenuItem");
+    	if(menuItemParam != null) {
+    		data.put("addMenuItem", menuItemParam);
+    	} 
 	}
 	
 	//N3 strings
