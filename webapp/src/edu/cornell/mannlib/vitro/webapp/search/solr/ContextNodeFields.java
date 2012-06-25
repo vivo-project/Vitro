@@ -11,20 +11,16 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.Syntax;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 
 /**
@@ -36,29 +32,21 @@ import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
  *
  */
 public class ContextNodeFields implements DocumentModifier{
-    protected Model model;
     protected List<String> queries = new ArrayList<String>();
-    
     protected boolean shutdown = false;    
-    protected Log log = LogFactory.getLog(ContextNodeFields.class);                      
-             
-   
+    protected Log log = LogFactory.getLog(ContextNodeFields.class);   
+    protected RDFServiceFactory rdfServiceFactory;
+       
     /**
      * Construct this with a model to query when building Solr Documents and
      * a list of the SPARQL queries to run.
      */
-    protected ContextNodeFields(Model model, List<String> queries){
-        this.model = model;        
+    protected ContextNodeFields(List<String> queries, RDFServiceFactory rdfServiceFactory){   
         this.queries = queries;
+        this.rdfServiceFactory = rdfServiceFactory;
     }        
     
-    /**
-     * Implement this method to get values that will be added to ALLTEXT 
-     * field of solr Document for each individual.
-     * 
-     * @param individual
-     * @return StringBuffer with text values to add to ALLTEXT field of solr Document.
-     */
+
     protected StringBuffer getValues( Individual individual ){
         return executeQueryForValues( individual, queries );        
     }                
@@ -68,10 +56,10 @@ public class ContextNodeFields implements DocumentModifier{
         if( individual == null )
             return;
         
-        log.debug( "doing context nodes for: " +  individual.getURI());
+        log.debug( "processing context nodes for: " +  individual.getURI());
         
         /* get text from the context nodes and add the to ALLTEXT */        
-        StringBuffer values = getValues( individual );        
+        StringBuffer values = executeQueryForValues(individual, queries);        
         
         SolrInputField field = doc.getField(VitroSearchTermNames.ALLTEXT);
         if( field == null ){
@@ -81,10 +69,17 @@ public class ContextNodeFields implements DocumentModifier{
         }                                      
     }
     
-    
+    /**
+     * this method gets values that will be added to ALLTEXT 
+     * field of solr Document for each individual.
+     * 
+     * @param individual
+     * @return StringBuffer with text values to add to ALLTEXT field of solr Document.
+     */
     protected StringBuffer executeQueryForValues( Individual individual, Collection<String> queries){
         /* execute all the queries on the list and concat the values to add to all text */
         
+    	RDFService rdfService = rdfServiceFactory.getRDFService();
         StringBuffer allValues = new StringBuffer("");
         
         QuerySolutionMap initialBinding = new QuerySolutionMap();               
@@ -93,35 +88,30 @@ public class ContextNodeFields implements DocumentModifier{
         for(String query : queries ){    
             StringBuffer valuesForQuery = new StringBuffer();
             
-            Query sparqlQuery = QueryFactory.create( query, Syntax.syntaxARQ);
-            model.getLock().enterCriticalSection(Lock.READ);
             try{
-                QueryExecution qExec = 
-                    QueryExecutionFactory.create(sparqlQuery, model, initialBinding);
-                try{                
-                    ResultSet results = qExec.execSelect();                
-                    while(results.hasNext()){                                                                               
-                        valuesForQuery.append( 
-                                getTextForRow( results.nextSolution() ) ) ;
-                    }
-                }catch(Throwable t){
-                    if( ! shutdown )
-                        log.error(t,t);
-                } finally{
-                    qExec.close();
-                } 
-            }finally{
-                model.getLock().leaveCriticalSection();
-            }
+            	ResultSet results = RDFServiceUtils.sparqlSelectQuery(query, rdfService);
+                
+            	while(results.hasNext()){                                                                               
+                    valuesForQuery.append( 
+                            getTextForRow( results.nextSolution() ) ) ; 
+            	}
+            	
+            }catch(Throwable t){
+                if( ! shutdown ) 
+                    log.error(t,t);
+            } 
+            
             if(log.isDebugEnabled()){
                 log.debug("query: '" + query + "'");
                 log.debug("text for query: '" + valuesForQuery.toString() + "'");
             }
             allValues.append(valuesForQuery);
         }
+        
+        rdfService.close();
         return allValues;        
     }       
-
+    
     protected String getTextForRow( QuerySolution row){
         if( row == null )
             return "";
