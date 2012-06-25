@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -77,6 +78,20 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         this.updateEndpointURI = updateEndpointURI;
         this.readRepository = new HTTPRepository(readEndpointURI);
         this.updateRepository = new HTTPRepository(updateEndpointURI);
+        
+        testConnection();
+    }
+    
+    private void testConnection() {
+        try {
+            this.sparqlSelectQuery(
+                    "SELECT ?s WHERE { ?s a " +
+                    "<http://vitro.mannlib.cornell.edu/ns/vitro/nonsense/> }", 
+                            RDFService.ResultFormat.JSON);
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to connect to endpoint at " + 
+                    readEndpointURI, e);
+        }
     }
  
     /**

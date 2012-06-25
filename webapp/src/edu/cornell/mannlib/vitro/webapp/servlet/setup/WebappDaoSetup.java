@@ -133,6 +133,7 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
             baseOms.setTBoxModel(tboxAssertions);
         } catch (Throwable e) {
             log.error("Unable to load tbox assertion cache from DB", e);
+            throw new RuntimeException(e);
         }
         
         // TBox inferences
@@ -155,6 +156,7 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
             inferenceOms.setTBoxModel(tboxInferences);
         } catch (Throwable e) {
             log.error("Unable to load tbox inference cache from DB", e);
+            throw new RuntimeException(e);
         }
                               
         // union ABox
@@ -204,6 +206,7 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
         } catch (Throwable e) {
             log.error("Unable to load application metadata model cache from DB"
                     , e);
+            throw new RuntimeException(e);
         }
         
         checkForNamespaceMismatch( baseOms.getApplicationMetadataModel(), ctx );
