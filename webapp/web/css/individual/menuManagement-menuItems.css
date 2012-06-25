@@ -12,7 +12,7 @@ ul.menuItems li {
 }
 ul.menuItems.dragNdrop li {
     padding-left: 1.4em;
-    background: url("../../edit/forms/images/sortable_icon.png") no-repeat .4em center #f3f3f0;
+    background: url("../../templates/freemarker/edit/forms/images/sortable_icon.png") no-repeat .4em center #f3f3f0;
     cursor: move;
 }
 span.controls {
