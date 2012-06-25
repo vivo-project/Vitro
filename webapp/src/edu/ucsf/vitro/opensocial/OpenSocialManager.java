@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasProfile;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
@@ -76,16 +79,22 @@ public class OpenSocialManager {
 		// Analyze the request to figure out whose page we are viewing.
 		this.ownerId = figureOwnerId(vreq);
 
-		// in editMode we need to set the viewer to be the same as the owner
-		// otherwise, the gadget will not be able to save appData correctly
+		// If we are authorized to edit on behalf of the page owner,
+		// set the viewer ID to be the owner ID, so it looks like we are the page owner.
 		if (editMode) {
 			this.viewerId = ownerId;
 		}
 		else {
+			// If we have a profile page, use that URI. Otherwise, use the URI of the logged-in user account, if any.
 			UserAccount viewer = LoginStatusBean.getCurrentUser(vreq);
-			// attempt to use profile URI if present, otherwise user user oriented URI
-			this.viewerId = viewer != null && viewer.getProxiedIndividualUris().size() == 1 ? 
-					viewer.getProxiedIndividualUris().toArray()[0].toString() : (viewer != null ? viewer.getUri() : null);
+			Collection<String> profileUris = HasProfile.getProfileUris(RequestIdentifiers.getIdBundleForRequest(vreq));
+			if (!profileUris.isEmpty()) {
+				this.viewerId = profileUris.iterator().next();
+			} else if (viewer != null) {
+				this.viewerId = viewer.getUri();
+			} else {
+				this.viewerId = null;
+			}
 		}
 		
 		String requestAppId = vreq.getParameter("appId");
