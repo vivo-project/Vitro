@@ -9,5 +9,6 @@
     <label id="queryLabel" for="queryLabel"><span id="querySpan">Enter SPARQL query here</span><span class="requiredHint"> *</span></label>
     <textarea id="query" name="query" cols="70" rows="15" style="margin-bottom:7px"></textarea><br />
     <input  type="button" id="doneWithContent" class="doneWithContent" name="doneWithContent" value="Done" />
+    <span id="cancelContent"> or <a class="cancel" href="javascript:"  id="cancelContentLink" >Cancel</a></span>
 </section>
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/processSparqlDataGetterContent.js"></script>')}

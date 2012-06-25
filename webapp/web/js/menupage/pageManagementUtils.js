@@ -118,6 +118,7 @@ var pageManagementUtils = {
         this.pageContentSubmissionInputs = $("#pageContentSubmissionInputs");
         this.headerBar = $("section#headerBar");
         this.doneButton =  $("input#doneWithContent");
+        this.cancelLink =  $("a#cancelContentLink");
         this.isMenuCheckbox = $("input#menuCheckbox");
         this.menuLinkText = $("input#menuLinkText");
         this.menuSection = $("section#menu");
@@ -181,6 +182,15 @@ var pageManagementUtils = {
 	       pageManagementUtils.handleClickDone();
 	    });
 	
+	    this.cancelLink.click( function() {
+	        pageManagementUtils.clearSourceTemplateValues();
+	        pageManagementUtils.headerBar.hide();
+            pageManagementUtils.classGroupSection.hide();
+            pageManagementUtils.fixedHTMLSection.hide();
+            pageManagementUtils.sparqlQuerySection.hide();
+            pageManagementUtils.contentTypeSelectOptions.eq(0).attr('selected', 'selected');
+            pageManagementUtils.contentTypeSelect.focus();
+	    });
 	    //replacing with menu management edit version which is extended with some of the logic below
 	    this.selectClassGroupDropdown.change(function() {
             pageManagementUtils.chooseClassGroup();
@@ -266,7 +276,6 @@ var pageManagementUtils = {
             pageManagementUtils.classGroupSection.show();
             pageManagementUtils.fixedHTMLSection.hide();
             pageManagementUtils.sparqlQuerySection.hide();
-// tlw72            pageManagementUtils.moreContentButton.hide();
             pageManagementUtils.headerBar.text("Browse Class Group - ");
             pageManagementUtils.headerBar.show();
         }
@@ -286,13 +295,11 @@ var pageManagementUtils = {
            
             pageManagementUtils.headerBar.show();
             pageManagementUtils.classesForClassGroup.addClass('hidden');
-// tlw72            pageManagementUtils.moreContentButton.show();
         }
         if ( _this.contentTypeSelect.val() == "" ) {
         	pageManagementUtils.classGroupSection.hide();
         	pageManagementUtils.fixedHTMLSection.hide();
         	pageManagementUtils.sparqlQuerySection.hide();
-// tlw72            pageManagementUtils.moreContentButton.hide();            
             pageManagementUtils.classesForClassGroup.addClass('hidden');
             pageManagementUtils.headerBar.hide();
             pageManagementUtils.headerBar.text("");
@@ -351,6 +358,9 @@ var pageManagementUtils = {
         
         //Clone the object, renaming ids and copying text area values as well
         $newContentObj = pageManagementUtils.createCloneObject(contentType, counter);
+
+        // Get rid of the cancel link; it'll be replaced by a delete link
+        $newContentObj.find('span#cancelContent' + counter).html('');
         
         if ( contentType == "sparqlQuery" || contentType == "fixedHtml") {
         	varOrClass = $newContentObj.find('input[name="saveToVar"]').val();
