@@ -29,6 +29,10 @@ var processSparqlDataGetterContent = {
 		pageContentSection.find("input[name='queryModel']").val(queryModelValue);
 	},
 	//For the label of the content section for editing, need to add additional value
+	retrieveContentLabel:function() {
+		return "SPARQL Query Results";
+	},
+	//For the label of the content section for editing, need to add additional value
 	retrieveAdditionalLabelText:function(existingContentObject) {
 		var saveToVarValue = existingContentObject["saveToVar"];
 		return saveToVarValue;

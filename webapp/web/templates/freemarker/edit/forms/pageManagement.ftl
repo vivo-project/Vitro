@@ -33,15 +33,25 @@
 		<#assign menuPosition = editMenuPosition/>
 	</#if>	
 </#if>
+<#--If edit submission exists, then retrieve validation errors if they exist-->
+<#if editSubmission?has_content && editSubmission.submissionExists = true && editSubmission.validationErrors?has_content>
+	<#assign submissionErrors = editSubmission.validationErrors/>
+</#if>
 
 <#------------HTML Portion------------->
-<section id="error-alert" role="alert" class="hidden">
+<section id="error-alert" role="alert" <#if !submissionErrors?has_content>class="hidden"</#if>>
     <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon" />
-    <p></p>
+    <p>
+    <#if submissionErrors?has_content>
+    	<#list submissionErrors?keys as errorFieldName>
+    		${errorFieldName} : ${submissionErrors[errorFieldName]} <br/ >
+        </#list>
+    </#if>
+    </p>
 </section>
 
 <#--class group section has associated page uri, but that depends on editing a current page or if one is selected later-->
-<section id="pageDetails">
+<section id="pageDetailsContainer">
     <#--form method="POST" action="${formUrls}" role="${menuAction} menu item"-->
 	<form id="managePage" method="POST" action="${submitUrl}" role="add page">
 	        <input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="1" role="input" />
@@ -74,7 +84,7 @@
     <div id="leftSide">
         <section id="pageDetails" role="region" >
             <label for="page-name">Title<span class="requiredHint"> *</span></label>
-            <input type="text" name="pageName" value="${pageName!''}" role="input" />
+            <input id="pageName" type="text" name="pageName" value="${pageName!''}" role="input" />
             <label for="pretty-url">Pretty URL<span class="requiredHint"> *</span></label> 
             <input type="text" name="prettyUrl" value="${prettyUrl!''}" role="input" />
             <p class="note">Must begin with a leading forward slash: / <br />(e.g., /people)</p>

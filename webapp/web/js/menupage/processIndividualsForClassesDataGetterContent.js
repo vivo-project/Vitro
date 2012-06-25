@@ -20,11 +20,15 @@ var processIndividualsForClassesDataGetterContent = {
 		var returnObject = {classGroup:classGroup, classesSelectedInClassGroup:classesSelected, dataGetterClass:this.dataGetterClass};
 		return returnObject;
 	},
+	//For the label of the content section for editing, need to add additional value
+	retrieveContentLabel:function() {
+		return processClassGroupDataGetterContent.retrieveContentLabel();
+	},
 	//For an existing set of content where form is already set, fill in the values 
 	populatePageContentSection:function(existingContentObject, pageContentSection) {
 		//select class group in dropdown and append the classes within that class group
 		processClassGroupDataGetterContent.populatePageContentSection(existingContentObject, pageContentSection);
-		var classesSelected = existingContenetObject["classesSelectedInClassGroup"];
+		var classesSelected = existingContentObject["classesSelectedInClassGroup"];
 		var numberSelected = classesSelected.length;
 		var i;
 		//Uncheck all since default is checked
@@ -39,8 +43,8 @@ var processIndividualsForClassesDataGetterContent = {
 		return processClassGroupDataGetterContent.retrieveAdditionalLabelText(existingContentObject);
 	},
 	 //Validation on form submit: Check to see that class group has been selected 
-    validateFormSubmission: function(pageContentSection) {
-    	return processClassGroupDataGetterContent.validateFormSubmission(pageContentSection);
+    validateFormSubmission: function(pageContentSection, pageContentSectionLabel) {
+    	return processClassGroupDataGetterContent.validateFormSubmission(pageContentSection, pageContentSectionLabel);
     }
 		
 }

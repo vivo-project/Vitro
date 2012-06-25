@@ -24,6 +24,10 @@ var processFixedHTMLDataGetterContent = {
 		pageContentSection.find("textarea[name='htmlValue']").val(htmlValue);
 	},
 	//For the label of the content section for editing, need to add additional value
+	retrieveContentLabel:function() {
+		return "Fixed HTML";
+	},
+	//For the label of the content section for editing, need to add additional value
 	retrieveAdditionalLabelText:function(existingContentObject) {
 		var saveToVarValue = existingContentObject["saveToVar"];
 		return saveToVarValue;

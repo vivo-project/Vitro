@@ -119,8 +119,10 @@ var pageManagementUtils = {
         this.headerBar = $("section#headerBar");
         this.doneButton =  $("input#doneWithContent");
         this.isMenuCheckbox = $("input#menuCheckbox");
+        this.menuLinkText = $("input#menuLinkText");
         this.menuSection = $("section#menu");
-        this.submitButton = $("input#submit");
+        this.pageNameInput = $("input#pageName");
+        this.pageSaveButton = $("input#pageSave");
         this.leftSideDiv = $("div#leftSide");
         this.rightSideDiv = $("div#rightSide");
         //contentDivs container where content added/existing placed
@@ -141,10 +143,14 @@ var pageManagementUtils = {
 // tlw72	    this.moreContentButton.hide();
 	    //left side components
 	    //These depend on whether or not this is an existing item or not
-	    if(this.isAdd() && !this.isAddMenuItem()) {
+	    if(this.isAdd()) {
 	    	this.defaultTemplateRadio.attr('checked',true);
-	    	this.isMenuCheckbox.attr('checked',false);
-	    	this.menuSection.hide();
+	    	//disable save button
+	    	this.disablePageSave();
+	    	if(!this.isAddMenuItem()) {
+		    	this.isMenuCheckbox.attr('checked',false);
+		    	this.menuSection.hide();
+	    	}
 	    }
 	
 	},
@@ -169,41 +175,10 @@ var pageManagementUtils = {
 	        }            
 	    });
 	
-	   this.submitButton.click( function() {
-	        $("section#pageDetails").show();
-	    });
-	
 	    //Collapses the current content and creates a new section of content
 	    //Resets the content to be cloned to default settings
 	    this.doneButton.click( function() {
-	        var selectedType = pageManagementUtils.contentTypeSelect.val();
-	        var selectedTypeText = $("#typeSelect option:selected").text();
-	        
-	        //Hide all sections
-	        pageManagementUtils.classGroupSection.hide();
-	        pageManagementUtils.fixedHTMLSection.hide();
-	        pageManagementUtils.sparqlQuerySection.hide();
-	        //Reset main content type drop-down
-	        pageManagementUtils.contentTypeSelectOptions.eq(0).attr('selected', 'selected');
-	        if ( pageManagementUtils.leftSideDiv.css("height") != undefined ) {
-	            pageManagementUtils.leftSideDiv.css("height","");
-	            if ( pageManagementUtils.leftSideDiv.height() < pageManagementUtils.rightSideDiv.height() ) {
-	                pageManagementUtils.leftSideDiv.css("height",pageManagementUtils.rightSideDiv.height() + "px");
-	            }
-	        }
-	       pageManagementUtils.headerBar.hide();
-	       pageManagementUtils.headerBar.text("");
-	       pageManagementUtils.cloneContentArea(selectedType, selectedTypeText);
-	        //Reset class group section AFTER cloning not before
-	       pageManagementUtils.resetClassGroupSection();
-	       //Clear all inputs values
-	       pageManagementUtils.clearSourceTemplateValues();
-	     //If adding browse classgroup, need to remove the classgroup option from the dropdown
-	       if(selectedType == "browseClassGroup") {
-	    	   pageManagementUtils.handleAddBrowseClassGroupPageContent();
-	       }
-	       pageManagementUtils.contentTypeSelect.focus();
-
+	       pageManagementUtils.handleClickDone();
 	    });
 	
 	    //replacing with menu management edit version which is extended with some of the logic below
@@ -218,23 +193,71 @@ var pageManagementUtils = {
 	    
 	    //Submission: validate as well as create appropriate hidden json inputs
 	    $("form").submit(function (event) { 
-            var validationError = pageManagementUtils.validateMenuItemForm();
-            //Add any errors from page content sections
-            validationError += pageManagementUtils.validatePageContentSections();
-            if (validationError == "") {
-            		//Create the appropriate json objects
-            		pageManagementUtils.createPageContentForSubmission();
-            		return true;
-               } else{
-            	   
-                   $('#error-alert').removeClass('hidden');
-                   $('#error-alert p').html(validationError);
-                   $.scrollTo({ top:0, left:0}, 500)
-                   return false;
-               } 
+           pageManagementUtils.handleFormSubmission(event);
          });
     
 	},
+	handleClickDone:function() {
+		var selectedType = pageManagementUtils.contentTypeSelect.val();
+		var selectedTypeText = $("#typeSelect option:selected").text();
+		
+		//Hide all sections
+		pageManagementUtils.classGroupSection.hide();
+		pageManagementUtils.fixedHTMLSection.hide();
+		pageManagementUtils.sparqlQuerySection.hide();
+		//Reset main content type drop-down
+		pageManagementUtils.contentTypeSelectOptions.eq(0).attr('selected', 'selected');
+		if ( pageManagementUtils.leftSideDiv.css("height") != undefined ) {
+			pageManagementUtils.leftSideDiv.css("height","");
+			if ( pageManagementUtils.leftSideDiv.height() < pageManagementUtils.rightSideDiv.height() ) {
+			    pageManagementUtils.leftSideDiv.css("height",pageManagementUtils.rightSideDiv.height() + "px");
+			}
+		}
+	   pageManagementUtils.headerBar.hide();
+	   pageManagementUtils.headerBar.text("");
+	   pageManagementUtils.cloneContentArea(selectedType, selectedTypeText);
+	    //Reset class group section AFTER cloning not before
+	   pageManagementUtils.resetClassGroupSection();
+	   //Clear all inputs values
+	   pageManagementUtils.clearSourceTemplateValues();
+	 //If adding browse classgroup, need to remove the classgroup option from the dropdown
+	   if(selectedType == "browseClassGroup") {
+		   pageManagementUtils.handleAddBrowseClassGroupPageContent();
+	   }
+	   //Enable save button now that some content has been selected
+	   pageManagementUtils.enablePageSave();
+	   pageManagementUtils.contentTypeSelect.focus();
+	
+	},
+	//Form submission
+	handleFormSubmission:function(event) {
+		 var validationError = pageManagementUtils.validateMenuItemForm();
+	     //Add any errors from page content sections
+	     validationError += pageManagementUtils.validatePageContentSections();
+	     if (validationError == "") {
+	    	//Check if menu label needs to be page title
+	    	pageManagementUtils.checkMenuTitleSubmission();
+	 		//Create the appropriate json objects
+     		pageManagementUtils.createPageContentForSubmission();
+     		return true;
+        } else{
+     	   
+            $('#error-alert').removeClass('hidden');
+            $('#error-alert p').html(validationError);
+            event.preventDefault();
+            return false;
+        } 	
+	},
+	checkMenuTitleSubmission:function() {
+		var isMenu = pageManagementUtils.isMenuCheckbox.is(":checked");
+		var linkText = pageManagementUtils.menuLinkText.val();
+		if(isMenu && linkText == "") {
+			//substitute with page title instead
+			var pageName = pageManagementUtils.pageNameInput.val();
+			pageManagementUtils.menuLinkText.val(pageName);
+		}
+	},
+	
 	//Select content type
 	handleContentTypeSelect:function() {
 		_this = pageManagementUtils;
@@ -277,7 +300,17 @@ var pageManagementUtils = {
         //Collapse any divs for existing content if it exists
         pageManagementUtils.collapseAllExistingContent();
         //adjust save button height
-        pageManagementUtils.adjustSaveButtonHeight();	
+        pageManagementUtils.adjustSaveButtonHeight();
+        //Disable save button until the user has clicked done or cancel from the addition
+        pageManagementUtils.disablePageSave();
+	},
+	disablePageSave:function() {
+        pageManagementUtils.pageSaveButton.attr("disabled", "disabled");
+        pageManagementUtils.pageSaveButton.addClass("disabledSubmit");
+	},
+	enablePageSave:function() {
+        pageManagementUtils.pageSaveButton.removeAttr("disabled");
+        pageManagementUtils.pageSaveButton.removeClass("disabledSubmit");
 	},
 	collapseAllExistingContent:function() {
 		var spanArrows = pageManagementUtils.savedContentDivs.find("span.pageContentExpand div.arrow");
@@ -309,6 +342,8 @@ var pageManagementUtils = {
 		
 	},
 	//Clone content area
+	//When adding a new content type, this function will copy the values from the new content form and generate
+	//the content for the new section containing the content
 	cloneContentArea: function(contentType, contentTypeLabel) {
         var ctr = pageManagementUtils.counter;
         var counter = pageManagementUtils.counter;
@@ -334,17 +369,7 @@ var pageManagementUtils = {
         //previously increased by 10, just increasing by 1 here
         pageManagementUtils.counter++;  
     },
-    //For edit, need to have text passed in
-    //Returns new content object itself
-    cloneContentAreaForEdit: function(contentType, contentTypeLabel, labelText) {
-           var counter = pageManagementUtils.counter;           
-           //Clone the object, renaming ids and copying text area values as well
-           $newContentObj = pageManagementUtils.createCloneObject(contentType, counter);               
-           pageManagementUtils.createClonedContentContainer($newContentObj, counter, contentTypeLabel, labelText);
-           //previously increased by 10, just increasing by 1 here
-           pageManagementUtils.counter++;  
-           return $newContentObj;
-    }, 
+    
     //For binding content type specific event handlers should they exist
     bindClonedContentEventHandlers:function($newContentObj) {
     	var dataGetterProcessorObj = pageManagementUtils.getDataGetterProcessorObject($newContentObj);
@@ -426,13 +451,113 @@ var pageManagementUtils = {
             event.preventDefault();
         });
     },
-    resetClassGroupSection:function() {
-    	//doing this in clear inputs instead which will be triggered
-    	//every time content type is changed AS well as on  more content button after
-    	//original content is cloned and stored
-    	//$('select#selectClassGroup option').eq(0).attr('selected', 'selected');
-    	 pageManagementUtils.classesForClassGroup.addClass('hidden');
+    //clones and returns cloned object for content type
+    createCloneObject:function(contentType, counter) {
+    	var originalObjectPath = 'section#' + contentType;
+    	var $newContentObj = $(originalObjectPath).clone();
+ 	    $newContentObj.removeClass("sparqlHtmlContent"); 
+ 	    $newContentObj.addClass("pageContent"); 
+ 	    $newContentObj.attr("contentNumber", counter);
+ 	    //Save content type
+	    $newContentObj.attr("contentType", contentType);
+	    //Set id for object
+	    $newContentObj.attr("id", contentType + counter);
+	    $newContentObj.show();
+	    pageManagementUtils.renameIdsInClone($newContentObj, counter);
+	 //   pageManagementUtils.cloneTextAreaValues(originalObjectPath, $newContentObj);
+	    return $newContentObj;
     },
+    //This is specifically for cloning text area values
+    //May not need this if implementing the jquery fix
+    ///would need a similar function for select as well
+    cloneTextAreaValues:function(originalAncestorPath, $newAncestorObject) {
+    	$(originalAncestorPath + " textarea").each(function(index, el) {
+    		var originalTextAreaValue = $(this).val();
+    		var originalTextAreaName = $(this).attr("name");
+    		$newAncestorObject.find("textarea[name='" + originalTextAreaName + "']").val(originalTextAreaValue);
+    	});
+    }, 
+    //given an object and a counter, rename all the ids
+    renameIdsInClone:function($newContentObj, counter) {
+    	$newContentObj.find("[id]").each(function(index, el) { 
+    		var originalId = $(this).attr("id");
+    		var newId = originalId + counter;
+    		$(this).attr("id", newId);
+    	});
+    },
+    /**Existing Content**/
+  //For edit, need to have text passed in
+    //Returns new content object itself
+    cloneContentAreaForEdit: function(contentType, contentTypeLabel, labelText) {
+           var counter = pageManagementUtils.counter;           
+           //Clone the object, renaming ids and copying text area values as well
+           $newContentObj = pageManagementUtils.createCloneObject(contentType, counter);
+           //Attach done event
+         //Bind done event as the done button is within the cloned content
+       		pageManagementUtils.bindClonedContentDoneEvent($newContentObj);
+       		//create cloned content container
+           pageManagementUtils.createClonedContentContainer($newContentObj, counter, contentTypeLabel, labelText);
+           //previously increased by 10, just increasing by 1 here
+           pageManagementUtils.counter++;  
+           return $newContentObj;
+    }, 
+    //To actually generate the content for existing values
+    generateExistingContentSections:function() {
+    	if(pageManagementUtils.menuAction == "Edit") {
+    		var $existingContent = $("#existingPageContentUnits");
+    		//create json object from string version json2.
+    		if($existingContent.length > 0) {
+    			var jsonObjectString = $existingContent.val();
+    			//this returns an array
+    			var JSONContentObjectArray = JSON.parse(jsonObjectString);
+    			var len = JSONContentObjectArray.length;
+    			var i;
+    			for(i = 0; i < len; i++) {
+    				//Get the type of data getter and create the appropriate section/populate
+    				var JSONContentObject = JSONContentObjectArray[i];
+	    			var dataGetterClass = JSONContentObject["dataGetterClass"];
+	    			if(dataGetterClass != null) {
+	    				//Get the Label for the URI
+	    				var contentType = pageManagementUtils.dataGetterURIToLabel[dataGetterClass];
+	    				var contentTypeForCloning = pageManagementUtils.processDataGetterUtils.getContentTypeForCloning(contentType);
+	    				//Get the processor class for this type 
+	    				var dataGetterProcessorObject = pageManagementUtils.processDataGetterUtils.dataGetterProcessorMap[contentType];
+	    				var contentTypeLabel = dataGetterProcessorObject.retrieveContentLabel();
+	    				var additionalLabelText = dataGetterProcessorObject.retrieveAdditionalLabelText(JSONContentObject);
+	    				//Clone the appropriate section for the label
+	    				var $newContentObj = pageManagementUtils.cloneContentAreaForEdit(contentTypeForCloning, contentTypeLabel, additionalLabelText);
+	    				//Populate the section with the values
+	    				dataGetterProcessorObject.populatePageContentSection(JSONContentObject, $newContentObj);
+	    				//Also include a hidden input with data getter URI
+	    				pageManagementUtils.includeDataGetterURI(JSONContentObject, $newContentObj);
+	    				//If content type is browseClassGroup or other 'related types' that are derived from it
+	    				if(pageManagementUtils.processDataGetterUtils.isRelatedToBrowseClassGroup(contentType)) {
+	    					pageManagementUtils.handleAddBrowseClassGroupPageContent();
+	    				}
+	    			} else {
+	    				//error condition
+	    			}
+    			}
+    			
+    		}
+    		
+    	}
+    },
+    //What's the label of the content type from the drop down
+    getContentTypeLabelFromSelect:function(contentType) {
+    	var text= pageManagementUtils.contentTypeSelect.find("option[value='" + contentType + "']").text();
+    	if(text == null) {
+    		text = "";
+    	}
+    	return text;
+    },
+    includeDataGetterURI:function(JSONContentObject, $newContentObj) {
+    	var uri = JSONContentObject["URI"];
+    	if(uri != null) {
+    		$("<input type='hidden' name='URI' value='" + uri + "'>").appendTo($newContentObj);
+    	}
+    },
+    
     //Adjust save button height
     adjustSaveButtonHeight:function() {
         if ( $("div#leftSide").css("height") != undefined ) {
@@ -442,8 +567,16 @@ var pageManagementUtils = {
              }
         }
     },
-    /************************************/
+    /***Class group selection***/
     //Copied from menu management edit javascript
+  //Class group 
+    resetClassGroupSection:function() {
+    	//doing this in clear inputs instead which will be triggered
+    	//every time content type is changed AS well as on  more content button after
+    	//original content is cloned and stored
+    	//$('select#selectClassGroup option').eq(0).attr('selected', 'selected');
+    	 pageManagementUtils.classesForClassGroup.addClass('hidden');
+    },
     chooseClassGroup: function() {        
         var url = "dataservice?getVClassesForVClassGroup=1&classgroupUri=";
         var vclassUri = this.selectClassGroupDropdown.val();
@@ -523,49 +656,10 @@ var pageManagementUtils = {
         //Set content type within internal class message
         this.displayInternalMessage.filter(":first").html(classGroupName);
     },
-    validateMenuItemForm: function() {
-        var validationError = "";
-        
-        // Check menu name
-        if ($('input[type=text][name=pageName]').val() == "") {
-            validationError += "You must supply a name<br />";
-            }
-        // Check pretty url     
-        if ($('input[type=text][name=prettyUrl]').val() == "") {
-            validationError += "You must supply a pretty URL<br />";
-        }
-        if ($('input[type=text][name=prettyUrl]').val().charAt(0) != "/") {
-            validationError += "The pretty URL must begin with a leading forward slash<br />";
-        }
-        
-        // Check custom template
-        if ($('input:radio[name=selectedTemplate]:checked').val() == "custom") {
-            if ($('input[name=customTemplate]').val() == "") {
-                validationError += "You must supply a template<br />"; 
-            }
-        }
-        
-        //the different types of error will depend on the specific type of data getter/page content
-        /*
-        
-        // if no class group selected, this is an error
-        if ($('#selectClassGroup').val() =='-1') {
-            validationError += "You must supply a content type<br />"; 
-        } else {
-            //class group has been selected, make sure there is at least one class selected
-            var allSelected = $('input[name="allSelected"]:checked').length;
-            var noClassesSelected = $('input[name="classInClassGroup"]:checked').length;
-            if (allSelected == 0 && noClassesSelected == 0) {
-                //at least one class should be selected
-                validationError += "You must select the type of content to display<br />";
-            }
-        }
-      */
-       
-        //check select class group
-       
-        return validationError;
-    },
+    
+    /**On submission**/
+    //On submission, generates the content for the input that will return the serialized JSON objects representing
+    //each of the content types
     createPageContentForSubmission: function() {
     	//Iterate through the page content and create the appropriate json object and save
     	var pageContentSections = $("section[class='pageContent']");
@@ -607,88 +701,7 @@ var pageManagementUtils = {
     	//Error handling here
     	return null;
     },
-    //clones and returns cloned object for content type
-    createCloneObject:function(contentType, counter) {
-    	var originalObjectPath = 'section#' + contentType;
-    	var $newContentObj = $(originalObjectPath).clone();
- 	    $newContentObj.removeClass("sparqlHtmlContent"); 
- 	    $newContentObj.addClass("pageContent"); 
- 	    $newContentObj.attr("contentNumber", counter);
- 	    //Save content type
-	    $newContentObj.attr("contentType", contentType);
-	    //Set id for object
-	    $newContentObj.attr("id", contentType + counter);
-	    $newContentObj.show();
-	    pageManagementUtils.renameIdsInClone($newContentObj, counter);
-	 //   pageManagementUtils.cloneTextAreaValues(originalObjectPath, $newContentObj);
-	    return $newContentObj;
-    },
-    //This is specifically for cloning text area values
-    //May not need this if implementing the jquery fix
-    ///would need a similar function for select as well
-    cloneTextAreaValues:function(originalAncestorPath, $newAncestorObject) {
-    	$(originalAncestorPath + " textarea").each(function(index, el) {
-    		var originalTextAreaValue = $(this).val();
-    		var originalTextAreaName = $(this).attr("name");
-    		$newAncestorObject.find("textarea[name='" + originalTextAreaName + "']").val(originalTextAreaValue);
-    	});
-    }, 
-    //given an object and a counter, rename all the ids
-    renameIdsInClone:function($newContentObj, counter) {
-    	$newContentObj.find("[id]").each(function(index, el) { 
-    		var originalId = $(this).attr("id");
-    		var newId = originalId + counter;
-    		$(this).attr("id", newId);
-    	});
-    },
-    //To actually generate the content for existing values
-    generateExistingContentSections:function() {
-    	if(pageManagementUtils.menuAction == "Edit") {
-    		var $existingContent = $("#existingPageContentUnits");
-    		//create json object from string version json2.
-    		if($existingContent.length > 0) {
-    			var jsonObjectString = $existingContent.val();
-    			//this returns an array
-    			var JSONContentObjectArray = JSON.parse(jsonObjectString);
-    			var len = JSONContentObjectArray.length;
-    			var i;
-    			for(i = 0; i < len; i++) {
-    				//Get the type of data getter and create the appropriate section/populate
-    				var JSONContentObject = JSONContentObjectArray[i];
-	    			var dataGetterClass = JSONContentObject["dataGetterClass"];
-	    			if(dataGetterClass != null) {
-	    				//Get the Label for the URI
-	    				var contentType = pageManagementUtils.dataGetterURIToLabel[dataGetterClass];
-	    				//Get the label for this content t
-	    				var contentTypeLabel = "test label";
-	    				//Get the processor class for this type 
-	    				var dataGetterProcessorObject = pageManagementUtils.processDataGetterUtils.dataGetterProcessorMap[contentType];
-	    				var additionalLabelText = dataGetterProcessorObject.retrieveAdditionalLabelText(JSONContentObject);
-	    				//Clone the appropriate section for the label
-	    				var $newContentObj = pageManagementUtils.cloneContentAreaForEdit(contentType, contentTypeLabel, additionalLabelText);
-	    				//Populate the section with the values
-	    				dataGetterProcessorObject.populatePageContentSection(JSONContentObject, $newContentObj);
-	    				//Also include a hidden input with data getter URI
-	    				pageManagementUtils.includeDataGetterURI(JSONContentObject, $newContentObj);
-	    				//If content type is browseClassGroup or other 'related types' that are derived from it
-	    				if(pageManagementUtils.processDataGetterUtils.isRelatedToBrowseClassGroup(contentType)) {
-	    					pageManagementUtils.handleAddBrowseClassGroupPageContent();
-	    				}
-	    			} else {
-	    				//error condition
-	    			}
-    			}
-    			
-    		}
-    		
-    	}
-    },
-    includeDataGetterURI:function(JSONContentObject, $newContentObj) {
-    	var uri = JSONContentObject["URI"];
-    	if(uri != null) {
-    		$("<input type='hidden' name='URI' value='" + uri + "'>").appendTo($newContentObj);
-    	}
-    },
+  
     //Get the data getter processor
     getDataGetterProcessorObject:function(pageContentSection) {
     	var dataGetterType = pageManagementUtils.processDataGetterUtils.selectDataGetterType(pageContentSection);
@@ -719,26 +732,57 @@ var pageManagementUtils = {
     	}
     	return label;
     },
+    /***Validation***/
+    validateMenuItemForm: function() {
+        var validationError = "";
+        
+        // Check menu name
+        if ($('input[type=text][name=pageName]').val() == "") {
+            validationError += "You must supply a name<br />";
+            }
+        // Check pretty url     
+        if ($('input[type=text][name=prettyUrl]').val() == "") {
+            validationError += "You must supply a pretty URL<br />";
+        }
+        if ($('input[type=text][name=prettyUrl]').val().charAt(0) != "/") {
+            validationError += "The pretty URL must begin with a leading forward slash<br />";
+        }
+        
+        // Check custom template
+        if ($('input:radio[name=selectedTemplate]:checked').val() == "custom") {
+            if ($('input[name=customTemplate]').val() == "") {
+                validationError += "You must supply a template<br />"; 
+            }
+        }
+        
+       
+        return validationError;
+    },
     //Validation across different content types
     validatePageContentSections:function() {
     	//Get all page content sections
     	var pageContentSections = $("section[class='pageContent']");
     	var validationErrorMsg = "";
-    	//For each, based on type, validate if a validation function exists
-    	$.each(pageContentSections, function(i) {
-    		if(pageManagementUtils.processDataGetterUtils != null) {
-    			var dataGetterType = pageManagementUtils.processDataGetterUtils.selectDataGetterType($(this));
-    			if(pageManagementUtils.dataGetterProcessorMap != null) {
-    				var dataGetterProcessor = pageManagementUtils.dataGetterProcessorMap[dataGetterType];
-    				//the content type specific processor will create the json object to be returned
-    				if($.isFunction(dataGetterProcessor.validateFormSubmission)) {
-    					//Get label of page content section
-    					var label = pageManagementUtils.getPageContentSectionLabel($(this));
-    					validationErrorMsg += dataGetterProcessor.validateFormSubmission($(this), label);
-    				}
-    			}
-    		}
-    	});
+    	//If there ARE not contents selected, then error message should indicate user needs to add them
+    	if(pageContentSections.length == 0) {
+    		validationErrorMsg = "You must select content to be included on the page <br /> ";
+    	} else {
+	    	//For each, based on type, validate if a validation function exists
+	    	$.each(pageContentSections, function(i) {
+	    		if(pageManagementUtils.processDataGetterUtils != null) {
+	    			var dataGetterType = pageManagementUtils.processDataGetterUtils.selectDataGetterType($(this));
+	    			if(pageManagementUtils.dataGetterProcessorMap != null) {
+	    				var dataGetterProcessor = pageManagementUtils.dataGetterProcessorMap[dataGetterType];
+	    				//the content type specific processor will create the json object to be returned
+	    				if($.isFunction(dataGetterProcessor.validateFormSubmission)) {
+	    					//Get label of page content section
+	    					var label = pageManagementUtils.getPageContentSectionLabel($(this));
+	    					validationErrorMsg += dataGetterProcessor.validateFormSubmission($(this), label);
+	    				}
+	    			}
+	    		}
+	    	});
+    	}
     	return validationErrorMsg;
     }
 

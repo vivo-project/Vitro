@@ -33,6 +33,9 @@ var processClassGroupDataGetterContent = {
 		}
 	},
 	//For the label of the content section for editing, need to add additional value
+	retrieveContentLabel:function() {
+		return "Browse Class Group";
+	},
 	retrieveAdditionalLabelText:function(existingContentObject) {
 		var label = "";
 		var results = existingContentObject["results"];

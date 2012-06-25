@@ -68,7 +68,7 @@
  	<input id="submit" value="Add Page" role="button" type="submit" >
   </form>
   <br />
- <p style="margin-top:10px">Use <a id="menuMgmtLink" href="#">Menu Management</a> to set the order of menu items.</p>
+ <p style="margin-top:10px">Use <a id="menuMgmtLink" href="${urls.base}/individual?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fontologies%2Fdisplay%2F1.1%23DefaultMenu&switchToDisplayModel=true">Menu Ordering</a> to set the order of menu items.</p>
 </section>
 
 
