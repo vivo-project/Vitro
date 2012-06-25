@@ -43,7 +43,7 @@
 <#--class group section has associated page uri, but that depends on editing a current page or if one is selected later-->
 <section id="pageDetails">
     <#--form method="POST" action="${formUrls}" role="${menuAction} menu item"-->
-	<form method="POST" action="${submitUrl}" role="add page">
+	<form id="managePage" method="POST" action="${submitUrl}" role="add page">
 	        <input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="1" role="input" />
 	        <input type="hidden" id="editKey" name="editKey" value="${editKey}" />
 			<input type="hidden" id="menuItem" name="menuItem" value="${menuItem}"/>
@@ -109,7 +109,7 @@
     </div>
     <section >
         <span id="saveButton" ><input  id="pageSave" type="submit" name="submit-Add" value="Save changes" class="submit" role="input" /> or </span> 
-        <a class="cancel" href="#"  id="cancelPage" >Cancel</a>
+        <a class="cancel" href="${cancelUrl!}"  id="cancelPage" >Cancel</a>
         <br />
         <p class="requiredHint">* required fields</p>
     </section>
@@ -130,8 +130,6 @@
 <#include "pageManagement--customDataScript.ftl">
  
 
-
-${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/menupage/menuManagement.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/menupage/pageManagement.css" />')}
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>')}
