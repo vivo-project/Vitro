@@ -249,7 +249,7 @@ public class CalculateParameters implements DocumentModifier {
         log.debug("Parameter calculation starts..");
         float beta = calculateBeta(individual.getURI());
         doc.addField(VitroSearchTermNames.BETA, beta);
-        doc.setDocumentBoost(beta);   
+        doc.setDocumentBoost(beta + doc.getDocumentBoost() );   
         log.debug("Parameter calculation is done");
 	}
 	

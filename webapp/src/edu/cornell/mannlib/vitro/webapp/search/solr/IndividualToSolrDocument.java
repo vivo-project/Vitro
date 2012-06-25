@@ -3,9 +3,11 @@
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,10 +23,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ClassProhibitedFromSearch;
 
 public class IndividualToSolrDocument {
         
@@ -45,9 +45,7 @@ public class IndividualToSolrDocument {
 
 	@SuppressWarnings("static-access")
     public SolrInputDocument translate(Individual ind) throws IndexingException{
-        try{    	            	      	        	
-        	log.debug("translating " + ind.getURI());
-        	
+        try{    	            	      	        	        	
         	String excludeMsg = checkExcludes( ind );
         	if( excludeMsg != DONT_EXCLUDE){
         	    log.debug(excludeMsg);
@@ -80,7 +78,7 @@ public class IndividualToSolrDocument {
             addAllText( ind, doc, classPublicNames, objectNames );
                
             //boost for entity
-            if(ind.getSearchBoost() != null && ind.getSearchBoost() != 0) {
+            if(ind.getSearchBoost() != null && ind.getSearchBoost() != 0) {            	
                 doc.setDocumentBoost(ind.getSearchBoost());                    
             }    
             
@@ -113,14 +111,39 @@ public class IndividualToSolrDocument {
 	    return DONT_EXCLUDE;
     }
 
+	protected Map<String,Long> docModClassToTime = new HashMap<String,Long>();
+	protected long docModCount =0;
+	
     protected void runAdditionalDocModifers( Individual ind, SolrInputDocument doc, StringBuffer addUri ) 
     throws SkipIndividualException{
         //run the document modifiers
         if( documentModifiers != null && !documentModifiers.isEmpty()){
             for(DocumentModifier modifier: documentModifiers){
+            	
+            	long start = System.currentTimeMillis();
+            	
                 modifier.modifyDocument(ind, doc, addUri);
+                
+                if( log.isDebugEnabled()){
+                	docModCount++;
+	                long delta = System.currentTimeMillis() - start;
+	                synchronized(docModClassToTime){
+	                	Class clz = modifier.getClass();	                	
+	                	if( docModClassToTime.containsKey( clz.getName() )){
+	                		Long time = docModClassToTime.get(clz.getName() );
+	                		docModClassToTime.put(clz.getName(), time + delta);	                		
+	                	}else{
+	                		docModClassToTime.put(clz.getName(), delta);
+	                	}
+	                }
+	                if( docModCount % 100 == 0 ){
+	                	for( Entry<String, Long> entry: docModClassToTime.entrySet()){
+	                		log.debug("average msec to run " + entry.getKey() + ": " + (entry.getValue()/docModCount));                		
+	                	}
+	                }
+                }
             }
-        }
+        }        
     }
     
     protected void addAllText(Individual ind, SolrInputDocument doc, StringBuffer classPublicNames, StringBuffer objectNames) {
@@ -232,7 +255,7 @@ public class IndividualToSolrDocument {
                 //don't add owl:Thing as the type in the index
                 continue;
             } else {                                
-                if( clz.getSearchBoost() != null){
+                if( clz.getSearchBoost() != null){                	
                     doc.setDocumentBoost(doc.getDocumentBoost() + clz.getSearchBoost());
                 }
                 
