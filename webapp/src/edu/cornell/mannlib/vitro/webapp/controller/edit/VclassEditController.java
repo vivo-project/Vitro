@@ -31,7 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 public class VclassEditController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(VclassEditController.class.getName());
-	private static final int NUM_COLS = 12;
+	private static final int NUM_COLS = 10;
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
         if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
@@ -63,9 +63,7 @@ public class VclassEditController extends BaseEditController {
         results.add("display level");        // 7
         results.add("update level");         // 8
         results.add("custom entry form");    // 9
-        results.add("custom display view");  // 10
-        results.add("custom search view");   // 11
-        results.add("URI");                  // 12
+        results.add("URI");                  // 10
         
         String name = vcl.getLocalNameWithPrefix();
         String shortDef = (vcl.getShortDef()==null) ? "" : vcl.getShortDef();
@@ -116,9 +114,7 @@ public class VclassEditController extends BaseEditController {
         results.add(hiddenFromDisplay);      // 7
         results.add(ProhibitedFromUpdate);   // 8
         results.add(customEntryForm);        // 9
-        results.add(customDisplayView);      // 10
-        results.add(customSearchView);       // 11
-        results.add(uri);                    // 12
+        results.add(uri);                    // 10
         request.setAttribute("results", results);
         request.setAttribute("columncount", NUM_COLS);
         request.setAttribute("suppressquery", "true");

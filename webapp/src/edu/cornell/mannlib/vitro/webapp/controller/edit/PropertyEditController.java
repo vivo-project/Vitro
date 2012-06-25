@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -28,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 
 public class PropertyEditController extends BaseEditController {
 
@@ -46,6 +48,7 @@ public class PropertyEditController extends BaseEditController {
         ObjectPropertyDao propDao = vreq.getFullWebappDaoFactory().getObjectPropertyDao();
         VClassDao vcDao = vreq.getFullWebappDaoFactory().getVClassDao();
         PropertyGroupDao pgDao = vreq.getFullWebappDaoFactory().getPropertyGroupDao();
+        DataPropertyDao dpDao = vreq.getFullWebappDaoFactory().getDataPropertyDao();
         ObjectProperty p = (ObjectProperty)propDao.getObjectPropertyByURI(request.getParameter("uri"));
         request.setAttribute("property",p);
 
@@ -57,15 +60,15 @@ public class PropertyEditController extends BaseEditController {
         results.add("display name");   // column 5
         results.add("group");          // column 6
         results.add("display tier");   // column 7
-        results.add("example");        // column 8
-        results.add("description");    // column 9
-        results.add("public description"); // column 10
+        results.add("public description"); // column 8
+        results.add("example");        // column 9
+        results.add("editor description");    // column 10
         results.add("display level"); //column 11
         results.add("update level"); // column 12
         results.add("custom entry form"); // column 13
         results.add("select from existing"); // column 14
         results.add("offer create new option"); // column 15
-        results.add("force stub object deletion"); // column 16
+        results.add("relatedsort direction");  // column 16
         results.add("URI");            // column 17
 
         String displayName = (p.getDomainPublic()==null) ? p.getLocalName() : p.getDomainPublic();
@@ -135,12 +138,12 @@ public class PropertyEditController extends BaseEditController {
             results.add("unspecified"); // column 6
         }
         results.add("domain: "+p.getDomainDisplayTier() + ", range: "+p.getRangeDisplayTier()); // column 7
-        String exampleStr = (p.getExample() == null) ? "" : p.getExample();
-        results.add(exampleStr); // column 8
-        String descriptionStr = (p.getDescription() == null) ? "" : p.getDescription();
-        results.add(descriptionStr); // column 9
         String publicDescriptionStr = (p.getPublicDescription() == null) ? "" : p.getPublicDescription();
-        results.add(publicDescriptionStr); // column 10
+        results.add(publicDescriptionStr); // column 8
+        String exampleStr = (p.getExample() == null) ? "" : p.getExample();
+        results.add(exampleStr); // column 9
+        String descriptionStr = (p.getDescription() == null) ? "" : p.getDescription();
+        results.add(descriptionStr); // column 10
         
         results.add(p.getHiddenFromDisplayBelowRoleLevel() == null ? "unspecified" : p.getHiddenFromDisplayBelowRoleLevel().getLabel()); // column 11
         results.add(p.getProhibitedFromUpdateBelowRoleLevel() == null ? "unspecified" : p.getProhibitedFromUpdateBelowRoleLevel().getLabel()); // column 12
@@ -148,7 +151,26 @@ public class PropertyEditController extends BaseEditController {
         results.add(p.getCustomEntryForm() == null ? "unspecified" : p.getCustomEntryForm()); // column 13
         results.add(p.getSelectFromExisting() ? "true" : "false"); // column 14
         results.add(p.getOfferCreateNewOption() ? "true" : "false"); // column 15
-        results.add(p.getStubObjectRelation() ? "true" : "false"); // column 16
+        //results.add(p.getStubObjectRelation() ? "true" : "false"); // column 16
+        
+        /*
+        String datapropStr = ""; 
+        if (p.getObjectIndividualSortPropertyURI() != null) {
+            DataProperty dProp = dpDao.getDataPropertyByURI(p.getObjectIndividualSortPropertyURI());
+            if (dProp != null && dProp.getURI() != null && dProp.getLocalNameWithPrefix() != null) {
+                try {
+                    datapropStr = "<a href=\"datapropEdit?uri="+URLEncoder.encode(dProp.getURI(),"UTF-8")+"\">"+dProp.getLocalNameWithPrefix()+"</a>";
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+            results.add(datapropStr); // column 16
+        } else {
+            results.add("name (rdfs:label)"); // column 16
+        }
+        */
+        results.add(p.getDomainEntitySortDirection() == null ? "ascending" : p.getDomainEntitySortDirection()); // column 16
+
         results.add(p.getURI()); // column 17
         request.setAttribute("results",results);
         request.setAttribute("columncount",NUM_COLS);

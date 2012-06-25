@@ -396,6 +396,11 @@ ul.ingestMenu {
 tr.editformcell td input[type="text"] {
     width: 30% !important;
 }
+
+tr.editformcell td input.fullWidthInput {
+    width: 90% !important;
+}
+
 tr.editformcell td select {
     font-size: .8em;
 }
