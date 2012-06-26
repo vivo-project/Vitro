@@ -97,6 +97,7 @@ public class FileServingServlet extends VitroHttpServlet {
 		} catch (Exception e) {
 			log.warn("Failed to serve the file at '" + path + "' -- " + e.getMessage());
 			in = openMissingLinkImage(request);
+			mimeType = "image/png";
 		}
 
 		/*
