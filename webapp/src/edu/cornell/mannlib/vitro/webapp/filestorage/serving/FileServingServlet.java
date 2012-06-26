@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.filestorage.serving;
 
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import java.io.FileNotFoundException;
@@ -23,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
@@ -48,6 +47,9 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
  * </p>
  */
 public class FileServingServlet extends VitroHttpServlet {
+	/** If we can't locate the requested image, use this one instead. */
+	private static final String PATH_MISSING_LINK_IMAGE = "/images/missingLink.png";
+
 	private static final Log log = LogFactory.getLog(FileServingServlet.class);
 
 	private FileStorage fileStorage;
@@ -78,46 +80,28 @@ public class FileServingServlet extends VitroHttpServlet {
 		String path = request.getServletPath() + request.getPathInfo();
 		log.debug("Path is '" + path + "'");
 
-		FileInfo fileInfo = FileInfo.instanceFromAliasUrl(
-				request.getFullWebappDaoFactory(), path, getServletContext());
-		log.debug("File info is '" + fileInfo + "'");
-		if (fileInfo == null) {
-			String message = "The request path is not valid for the File servlet: '"
-					+ path + "'";
-			log.error(message);
-			response.sendError(SC_INTERNAL_SERVER_ERROR, message);
-			return;
-		}
-
-		// Validate that the file exists, with the requested URI and filename.
-		String requestedFilename = getFilename(path);
-		String actualFilename = fileInfo.getFilename();
-		if (!actualFilename.equals(requestedFilename)
-				&& !actualFilename.equals(decode(requestedFilename))) {
-			log.warn("The requested filename does not match the "
-					+ "actual filename; request: '" + path + "', actual: '"
-					+ actualFilename + "'");
-			response.sendError(SC_NOT_FOUND, ("File not found: " + path));
-			return;
-		}
-
-		// Get the MIME type.
-		String mimeType = fileInfo.getMimeType();
-
-		// Open the actual byte stream.
+		/*
+		 * Get the mime type and an InputStream from the file. If we can't, use
+		 * the dummy image file instead.
+		 */
 		InputStream in;
+		String mimeType = null;
 		try {
-			in = fileStorage.getInputStream(fileInfo.getBytestreamUri(),
-					actualFilename);
-		} catch (FileNotFoundException e) {
-			log.error("Expected file doesn't exist: " + e);
-			response.sendError(SC_INTERNAL_SERVER_ERROR, e.toString());
-			return;
+			FileInfo fileInfo = figureFileInfo(
+					request.getFullWebappDaoFactory(), path);
+			mimeType = fileInfo.getMimeType();
+
+			String actualFilename = findAndValidateFilename(fileInfo, path);
+
+			in = openImageInputStream(fileInfo, actualFilename);
+		} catch (Exception e) {
+			log.warn("Failed to serve the file at '" + path + "' -- " + e.getMessage());
+			in = openMissingLinkImage(request);
 		}
 
 		/*
-		 * Everything is ready and working. Set the status and the content type,
-		 * and send the image bytes.
+		 * Everything is ready. Set the status and the content type, and send
+		 * the image bytes.
 		 */
 		response.setStatus(SC_OK);
 
@@ -149,10 +133,36 @@ public class FileServingServlet extends VitroHttpServlet {
 		}
 	}
 
-	/**
-	 * The filename is the portion of the path after the last slash.
-	 */
-	private String getFilename(String path) {
+	private FileInfo figureFileInfo(WebappDaoFactory fullWadf, String path)
+			throws FileServingException {
+		FileInfo fileInfo = FileInfo.instanceFromAliasUrl(fullWadf, path,
+				getServletContext());
+		if (fileInfo == null) {
+			throw new FileServingException("The request path is not valid "
+					+ "for the File servlet: '" + path + "'");
+		}
+		log.debug("File info is '" + fileInfo + "'");
+		return fileInfo;
+	}
+
+	/** Validate that the file exists, with the requested URI and filename. */
+	private String findAndValidateFilename(FileInfo fileInfo, String path)
+			throws FileServingException {
+		String requestedFilename = figureFilename(path);
+		String actualFilename = fileInfo.getFilename();
+		if (!actualFilename.equals(requestedFilename)
+				&& !actualFilename.equals(decode(requestedFilename))) {
+			throw new FileServingException(
+					"The requested filename does not match the "
+							+ "actual filename; request: '" + path
+							+ "', actual: '" + actualFilename + "'");
+		}
+		log.debug("Actual filename is '" + actualFilename + "'");
+		return actualFilename;
+	}
+
+	/** The filename is the portion of the path after the last slash. */
+	private String figureFilename(String path) {
 		int slashHere = path.lastIndexOf('/');
 		if (slashHere == -1) {
 			return path;
@@ -161,16 +171,32 @@ public class FileServingServlet extends VitroHttpServlet {
 		}
 	}
 
-	/**
-	 * The filename may have been encoded for URL transfer.
-	 */
+	/** The filename may have been encoded for URL transfer. */
 	private String decode(String filename) {
 		try {
 			return URLDecoder.decode(filename, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			log.error("How did this happen?", e);
+			log.error("No UTF-8 decoder? How did this happen?", e);
 			return filename;
 		}
+	}
+
+	private InputStream openImageInputStream(FileInfo fileInfo,
+			String actualFilename) throws IOException {
+		return fileStorage.getInputStream(fileInfo.getBytestreamUri(),
+				actualFilename);
+	}
+
+	/** Any suprises when opening the image? Use this one instead. */
+	private InputStream openMissingLinkImage(VitroRequest vreq)
+			throws FileNotFoundException {
+		InputStream stream = vreq.getSession().getServletContext()
+				.getResourceAsStream(PATH_MISSING_LINK_IMAGE);
+		if (stream == null) {
+			throw new FileNotFoundException("No image file at '"
+					+ PATH_MISSING_LINK_IMAGE + "'");
+		}
+		return stream;
 	}
 
 	/**
@@ -180,6 +206,19 @@ public class FileServingServlet extends VitroHttpServlet {
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		doGet(request, response);
+	}
+
+	/**
+	 * There was a problem serving the file bytestream.
+	 */
+	private static class FileServingException extends Exception {
+		public FileServingException(String message) {
+			super(message);
+		}
+
+		public FileServingException(String message, Throwable cause) {
+			super(message, cause);
+		}
 	}
 
 }
