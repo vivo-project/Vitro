@@ -174,18 +174,27 @@ orng.RDFConverter = elda
 orng.tokenservice.port = 8777
 orng.securityTokenKeyFile = @TOKEN_KEY_FILE@
 
+#
+# Note that orng.systemDomain can be commented out in a production environment.  
+# It is used to trigger system specific (VIVO or Profiles) means for URI to URL conversion.  
+# This is sometimes necessary when a "fake" domain is being used in a testing/development environment 
+#
+
 # orng.system must be set to Profiles or VIVO
 #orng.system = Profiles
 #orng.dbDriver = com.microsoft.sqlserver.jdbc.SQLServerDriver
 #orng.dbURL = jdbc:sqlserver://dev-sql-ctsi.ucsf.edu;instanceName=default;portNumber=1433;databaseName=profiles_100
 #orng.dbUser = App_Profiles10
 #orng.dbPassword = Password1234
+#orng.systemDomain = http://localhost/profiles
 
 orng.system = VIVO
 orng.dbDriver = @DATA_SOURCE_DRIVER@
 orng.dbURL = @DATA_SOURCE_URL@
 orng.dbUser = @DATA_SOURCE_USERNAME@
 orng.dbPassword = @DATA_SOURCE_PASSWORD@
+orng.systemDomain = NOT_USED
+
 
 
 

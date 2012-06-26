@@ -253,9 +253,6 @@ my.generateGadgets = function(metadata) {
 };
 
 my.init = function() {
-    // overwrite this RPC function.  Do it at this level so that rpc.f (this.f) is accessible for getting module ID
-//    gadgets.rpc.register('requestNavigateTo', doOrngNavigation);
-
     shindig.container.gadgetClass = OrngGadget;
     shindig.container.layoutManager = new OrngLayoutManager();    
     shindig.container.setNoCache(my.noCache);
@@ -286,7 +283,7 @@ OrngGadgetService.inherits(shindig.IfrGadgetService);
 
 OrngGadgetService.prototype.requestNavigateTo = function(view, opt_params) {
     var viewConfig = gadgets.config.get('views')[view];
-    var url = viewConfig.urlTemplate;
+    var url = '/' + location.pathname.split('/')[1] + '/' + viewConfig.urlTemplate;
 
     url += window.location.search.substring(1);
     
