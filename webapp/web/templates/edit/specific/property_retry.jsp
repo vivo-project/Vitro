@@ -3,7 +3,7 @@
 <%@ taglib prefix="form" uri="http://vitro.mannlib.cornell.edu/edit/tags" %>
 <%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
 
-<%-- colspan set to 5 in PropertyRetryController.java --%>
+<%-- colspan set to 6 in PropertyRetryController.java --%>
 <tr class="editformcell">
     <td valign="top" colspan="2">
         <b>Parent property</b><br/>
@@ -18,7 +18,7 @@
 <tr><td colspan="5"><hr class="formDivider"/></td></tr>
 <tr class="editformcell">
 	<td style="vertical-align:top;" valign="top" colspan="1">
-		<b>Ontology</b><br/>
+		<b>Ontology</b><br/><br/>
         <c:choose>
         	<c:when test="${_action eq 'update'}">
 				<select name="Namespace" disabled="disabled"><form:option name="Namespace"/></select><br/>
@@ -30,7 +30,8 @@
 		</c:choose>
 	</td>
 	<td style="vertical-align:top;" valign="top" colspan="2">
-		<b>Internal name*</b> (RDF local name)<br/>
+		<b>Internal name*</b><br/>
+	    (RDF local name)<br/>
         <c:choose>
         	<c:when test="${_action eq 'update'}">
         	    <input type="text" class="fullWidthInput" disabled="disabled" name="LocalName" value="<form:value name='LocalName'/>" /><br/>
@@ -48,7 +49,7 @@
         </c:if>
 	</td>
     <td style="vertical-align:top;" valign="top" colspan="2">
-        <b>Label for public display</b><br/>
+        <b>Label for public display</b><br/><br/>
         <input type="text" class="fullWidthInput" name="DomainPublic" value="<form:value name="DomainPublic"/>" maxlength="80" />
         <c:set var="DomainPublicError"><form:error name="DomainPublic"/></c:set>
         <c:if test="${!empty DomainPublicError}">
@@ -71,7 +72,7 @@
 		</c:choose>
 	</td>
     <td style="vertical-align:top;" valign="top" colspan="2">
-		<b>Inverse property internal name</b><br/>
+		<b>Inverse internal name</b><br/>
         <c:choose>
         	<c:when test="${_action eq 'update'}">
         	    <input type="text" class="fullWidthInput" disabled="disabled" name="LocalNameInverse" value="<form:value name="LocalNameInverse"/>" /><br/>
@@ -89,7 +90,7 @@
         </c:if>
 	</td>
     <td valign="top" style="vertical-align:top;" colspan="2">
-        <b>Inverse property label</b><br/>
+        <b>Inverse label</b><br/>
         <input type="text" class="fullWidthInput" name="RangePublic" value="<form:value name="RangePublic"/>" maxlength="80" /><br/>
         <br/> 
         <c:set var="RangePublicError"><form:error name="RangePublic"/></c:set>
@@ -123,7 +124,7 @@
         </c:choose>
     </td>
     <td valign="top" colspan="1">
-        <br/>
+        <br/><br/>
         <c:choose>
             <c:when test="${symmetric}">
                 <input name="Symmetric" type="checkbox" value="TRUE" checked="checked"/> symmetric
@@ -134,7 +135,7 @@
         </c:choose>
     </td>
     <td valign="top" colspan="1">
-        <br/>
+        <br/><br/>
         <c:choose>
             <c:when test="${functional}">
                 <input name="Functional" type="checkbox" value="TRUE" checked="checked"/> functional
@@ -145,7 +146,7 @@
         </c:choose>
     </td>
     <td valign="top" colspan="1">
-        <br/>
+        <br/><br/>
         <c:choose>
             <c:when test="${inverseFunctional}">
                 <input name="InverseFunctional" type="checkbox" value="TRUE" checked="checked"/> inverse functional

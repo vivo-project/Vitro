@@ -32,7 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 public class VclassEditController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(VclassEditController.class.getName());
-	private static final int NUM_COLS = 13;
+	private static final int NUM_COLS = 12;
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
         if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
@@ -62,12 +62,12 @@ public class VclassEditController extends BaseEditController {
         results.add("short definition");     // 5
         results.add("example");              // 6
         results.add("editor description");   // 7
-        results.add("curator comments");     // 8
-        results.add("display level");        // 9
-        results.add("update level");         // 10
-        results.add("display rank");         // 11
-        results.add("custom entry form");    // 12
-        results.add("URI");                  // 13
+        //results.add("curator comments");   // 
+        results.add("display level");        // 8
+        results.add("update level");         // 9
+        results.add("display rank");         // 10
+        results.add("custom entry form");    // 11
+        results.add("URI");                  // 12
         
         String name = vcl.getLocalNameWithPrefix();
         
@@ -123,12 +123,12 @@ public class VclassEditController extends BaseEditController {
         results.add(shortDef);               // 5
         results.add(example);                // 6
         results.add(description);            // 7
-        results.add(commSb.toString());      // 8
-        results.add(hiddenFromDisplay);      // 9
-        results.add(ProhibitedFromUpdate);   // 10
-        results.add(String.valueOf(vcl.getDisplayRank())); // 11
-        results.add(customEntryForm);        // 12
-        results.add(uri);                    // 13
+        //results.add(commSb.toString());    // 
+        results.add(hiddenFromDisplay);      // 8
+        results.add(ProhibitedFromUpdate);   // 9
+        results.add(String.valueOf(vcl.getDisplayRank())); // 10
+        results.add(customEntryForm);        // 11
+        results.add(uri);                    // 12
         request.setAttribute("results", results);
         request.setAttribute("columncount", NUM_COLS);
         request.setAttribute("suppressquery", "true");

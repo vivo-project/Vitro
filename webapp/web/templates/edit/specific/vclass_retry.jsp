@@ -18,7 +18,7 @@
 		<span class="warning"><form:error name="GroupURI"/></span>
 	</td>
 </tr>
-<tr><td colspan="5"><hr class="formDivider"/></td></tr>
+<tr><td colspan="4"><hr class="formDivider"/></td></tr>
 <tr class="editformcell">
 	<td valign="bottom" colspan="2">
 		<b>Ontology</b><br/>
@@ -51,7 +51,7 @@
 		</c:if>
 	</td>
 </tr>
-<tr><td colspan="5"><hr class="formDivider"/></td></tr>
+<tr><td colspan="4"><hr class="formDivider"/></td></tr>
 <tr class="editformcell">
 	<td valign="top" colspan="4">
 		<b>Short definition</b> to display publicly<br/>
@@ -63,7 +63,7 @@
 	</td>
 </tr>
 <tr class="editformcell">
-	<td valign="top" colspan="3">
+	<td valign="top" colspan="4">
 		<b>Example</b> for ontology editors<br/>
 	    <input type="text" class="fullWidthInput" name="Example" value="${formValue['Example']}" maxlength="120" />
         <c:set var="ExampleError"><form:error name="Example"/></c:set>
@@ -82,7 +82,7 @@
         </c:if>
 	</td>
 </tr>
-<tr><td colspan="5"><hr class="formDivider"/></td></tr>
+<tr><td colspan="4"><hr class="formDivider"/></td></tr>
 <tr class="editformcell">
     <td valign="bottom" colspan="1">
         <b>Display level</b><br/>
@@ -95,7 +95,7 @@
         <i>specify least restrictive level allowed</i><br />
     </td>
 </tr>
-<tr><td colspan="5"><hr class="formDivider"/></td></tr>
+<tr><td colspan="4"><hr class="formDivider"/></td></tr>
 <tr class="editformcell">
 	<!--td valign="top" colspan="1">
 		<b>Display Limit</b><br/>
@@ -122,5 +122,5 @@
 		</c:if>
 	</td>
 </tr>
-<tr><td colspan="5"><hr class="formDivider"/></td></tr>
+<tr><td colspan="4"><hr class="formDivider"/></td></tr>
 </jsp:root>
