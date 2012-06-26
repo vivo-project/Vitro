@@ -23,10 +23,11 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerialization
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
-import edu.cornell.mannlib.vitro.webapp.search.solr.ContextNodeFields;
 
 public class RDFServiceUtils {
 
+	static Log log = LogFactory.getLog(RDFServiceUtils.class);
+	
     private static final String RDFSERVICEFACTORY_ATTR = 
             RDFServiceUtils.class.getName() + ".RDFServiceFactory";
     private static final String RDFSERVICEFACTORY_FILTERING_ATTR = 
@@ -97,8 +98,7 @@ public class RDFServiceUtils {
             InputStream resultStream = rdfService.sparqlSelectQuery(query, RDFService.ResultFormat.JSON);
             resultSet = ResultSetFactory.fromJSON(resultStream);
             return resultSet;
-        } catch (RDFServiceException e) {
-        	Log log = LogFactory.getLog(ContextNodeFields.class); 
+        } catch (RDFServiceException e) {        	
             log.error("error executing sparql select query: " + e.getMessage());
         }
         

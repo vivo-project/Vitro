@@ -1,6 +1,7 @@
+
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.search.solr;
+package edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,10 +61,10 @@ public class IndividualToSolrDocument {
             //vitro id
             doc.addField(term.URI, ind.getURI());
                     
-            //Individual Label
-            addLabel( ind, doc );
-            
-        	//add classes, classgroups get if prohibied becasue of its class
+    		//get label from ind
+    		addLabel(ind, doc);
+    		
+        	//add classes, classgroups get if prohibited because of its class
             StringBuffer classPublicNames = new StringBuffer("");
         	addClasses(ind, doc, classPublicNames);
         	        	        	        	
@@ -72,7 +73,7 @@ public class IndividualToSolrDocument {
         	StringBuffer addUri = new StringBuffer("");           	
         	addObjectPropertyText(ind, doc, objectNames, addUri);        	                 	                                           	     
                         
-            //time of index in millis past epoc
+            //time of index in msec past epoch
             doc.addField(term.INDEXEDTIME, new Long( (new DateTime()).getMillis() ) ); 
                         
             addAllText( ind, doc, classPublicNames, objectNames );
@@ -89,10 +90,10 @@ public class IndividualToSolrDocument {
             //indicates that this individual should not be indexed by returning null
             log.debug(ex);
             return null;
-        }catch(Throwable th){
+        }catch(Exception th){
             //Odd exceptions can get thrown on shutdown
             if( log != null )
-                log.debug(th);
+                log.error(th,th);
             return null;
         }
     }
@@ -190,19 +191,7 @@ public class IndividualToSolrDocument {
         doc.addField(term.ALLTEXT_PHONETIC, alltext);
     }
 
-    protected void addLabel(Individual ind, SolrInputDocument doc) {
-        String value = "";
-        String label = ind.getRdfsLabel();
-        if (label != null) {
-            value = label;
-        } else {
-            value = ind.getLocalName();
-        }            
 
-        doc.addField(term.NAME_RAW, value);
-        // NAME_RAW will be copied by solr into the following fields:
-        // NAME_LOWERCASE, NAME_UNSTEMMED, NAME_STEMMED, NAME_PHONETIC, AC_NAME_UNTOKENIZED, AC_NAME_STEMMED
-    }
 
 
 
@@ -277,6 +266,22 @@ public class IndividualToSolrDocument {
                 }               
             }
         }                                                
+    }
+        
+    protected void addLabel(Individual ind, SolrInputDocument doc) {
+        String value = "";
+        String label = ind.getRdfsLabel();
+        if (label != null) {
+            value = label;
+        } else {
+            value = ind.getLocalName();
+        }            
+
+        doc.addField(term.NAME_RAW, value);
+        doc.addField(term.NAME_LOWERCASE_SINGLE_VALUED,value);
+        
+        // NAME_RAW will be copied by solr into the following fields:
+        // NAME_LOWERCASE, NAME_UNSTEMMED, NAME_STEMMED, NAME_PHONETIC, AC_NAME_UNTOKENIZED, AC_NAME_STEMMED
     }
     
     public Object getIndexId(Object obj) {

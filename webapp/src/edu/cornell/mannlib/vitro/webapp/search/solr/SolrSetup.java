@@ -30,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.search.beans.FileBasedProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
@@ -40,6 +41,17 @@ import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForTypeSta
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.URIsForClassGroupChange;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.DocumentModifier;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.ExcludeBasedOnNamespace;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.ExcludeBasedOnType;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.ExcludeBasedOnTypeNamespace;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.ExcludeNonFlagVitro;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualToSolrDocument;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.NameBoost;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.NameFields;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.SearchIndexExcluder;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.SyncingExcludeBasedOnType;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.ThumbnailImageURL;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 public class SolrSetup implements javax.servlet.ServletContextListener{       
@@ -120,9 +132,9 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             if( modifiers == null )
                 modifiers = new ArrayList<DocumentModifier>();
             
-       
-            modifiers.add(new NameBoost(  1.2f ));
-            modifiers.add(new ThumbnailImageURL(jenaOntModel));                        
+            modifiers.add( new NameFields( RDFServiceUtils.getRDFServiceFactory(context)));
+            modifiers.add( new NameBoost(  1.2f ));
+            modifiers.add( new ThumbnailImageURL(jenaOntModel));                        
             
             /* try to get context attribute SearchIndexExcludes 
              * and use that as the start of the list of exclude 

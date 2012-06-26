@@ -246,9 +246,9 @@
   <copyField source="nameRaw" dest="nameLowercase" />
   <copyField source="nameRaw" dest="NAME_PHONETIC" />
   <copyField source="nameRaw" dest="acNameUntokenized" />
-  <copyField source="nameRaw" dest="acNameStemmed" />
-  <copyField source="nameRaw" dest="nameLowercaseSingleValued" />
+  <copyField source="nameRaw" dest="acNameStemmed" /> 
   <copyField source="nameRaw" dest="nameText" />
+  <!--  nameLowercaseSingleValued is not copied from nameRaw becasue nameRaw might have multiple values -->
      
   <!-- ****************************  End Vitro Fields *************************** -->
    
