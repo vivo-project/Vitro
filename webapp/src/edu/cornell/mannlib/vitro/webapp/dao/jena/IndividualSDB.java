@@ -291,48 +291,22 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         }
     }
 
-    private synchronized void constructProperty(OntResource ind, String propertyURI) {
-        DatasetWrapper w = getDatasetWrapper();
-        Dataset dataset = w.getDataset();
-        dataset.getLock().enterCriticalSection(Lock.READ);
-        try {
-            String[] graphVars = { "?g" };
-            String queryStr = 
-                "CONSTRUCT { <"+ind.getURI()+"> <" + propertyURI + "> ?value } \n" +
-                    "WHERE {  \n" +
-                    "<" + ind.getURI() +"> <" + propertyURI + "> ?value \n" + 
-                    WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) +
-                    "\n} ";
-            Query query = QueryFactory.create(queryStr);
-            QueryExecution qe = QueryExecutionFactory.create(
-                    query, dataset);
-            qe.execConstruct(ind.getModel());
-        } finally {
-            dataset.getLock().leaveCriticalSection();
-            w.close();
-        }
-    }
-
     public Float getSearchBoost(){ 
         if( this._searchBoostJena != null ){
             return this._searchBoostJena;
         }else{
-            String[] graphVars = { "?g" };
             String getPropertyValue = 
             	"SELECT ?value \n" +
-            	"WHERE { GRAPH ?g { \n" +
-            	"<" +individualURI+ "> <" +webappDaoFactory.getJenaBaseDao().SEARCH_BOOST_ANNOT+ "> ?value }\n" + 
-            	WebappDaoFactorySDB.getFilterBlock(graphVars, datasetMode) + "\n" +
+            	"WHERE { \n" +
+            	"<" +individualURI+ "> <" +webappDaoFactory.getJenaBaseDao().SEARCH_BOOST_ANNOT+ "> ?value \n" + 
             	"}";
-            
             DatasetWrapper w = getDatasetWrapper();
             Dataset dataset = w.getDataset();
         	dataset.getLock().enterCriticalSection(Lock.READ);
+        	QueryExecution qe = QueryExecutionFactory.create(
+                    QueryFactory.create(getPropertyValue), dataset);
             try{
-                ResultSet rs = QueryExecutionFactory.create(
-                		QueryFactory.create(getPropertyValue),
-                		dataset).execSelect();
-                
+                ResultSet rs = qe.execSelect();       
                 if(rs.hasNext()){
                 	QuerySolution qs = rs.nextSolution();
                 	if(qs.get("value") !=null){
@@ -340,14 +314,14 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 		searchBoost = Float.parseFloat(value.getLexicalForm());
                 		return searchBoost;
                 	}
-                }
-                else{
-                	    return null;
+                } else{
+                   return null;
                 }
             } catch (Exception e){
             	log.error(e,e); 
                 return null;            	
-            }finally{
+            } finally{
+                qe.close();
             	dataset.getLock().leaveCriticalSection();
             	w.close();
             }
