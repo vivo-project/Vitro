@@ -137,7 +137,7 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
    //?dataGetter a SparqlDataGetter ; display:saveToVar ?saveToVar; display:queryModel ?queryModel;
 	//display:query ?query ..
    protected String getExistingValuesSparqlQuery(String dataGetterURI) {
-	   String query = this.getSparqlPrefix() + "SELECT ?saveToVar ?query ?queryModel WHERE {" + 
+	   String query = this.getSparqlPrefix() + " SELECT ?saveToVar ?query ?queryModel WHERE {" + 
 			   "<" + dataGetterURI + "> display:query ?query . \n" + 
 			   "OPTIONAL {<" + dataGetterURI + "> display:saveToVar ?saveToVar .} \n" + 
 			   "OPTIONAL {<" + dataGetterURI + "> display:queryModel ?queryModel . }\n" + 

@@ -118,7 +118,7 @@ public  class ProcessFixedHTMLN3 extends ProcessDataGetterAbstract {
    
    //?dataGetter a FixedHTMLDataGetter ; display:saveToVar ?saveToVar; display:htmlValue ?htmlValue .
    protected String getExistingValuesSparqlQuery(String dataGetterURI) {
-	   String query = this.getSparqlPrefix() + "SELECT ?saveToVar ?htmlValue WHERE {" + 
+	   String query = this.getSparqlPrefix() + " SELECT ?saveToVar ?htmlValue WHERE {" + 
 			   "<" + dataGetterURI + "> display:saveToVar ?saveToVar . \n" + 
 			   "<" + dataGetterURI + "> display:htmlValue ?htmlValue . \n" + 
 			   "}";

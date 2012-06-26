@@ -184,9 +184,7 @@ rdf:type
 
 ###Adding menu management customform annotation
 <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasElement>
-      a       owl:ObjectProperty;
-      <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#customEntryFormAnnot>
-       "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.MenuEditingFormGenerator"^^xsd:string .
+      a       owl:ObjectProperty .
       
 <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#excludeClass>
       a       owl:ObjectProperty .

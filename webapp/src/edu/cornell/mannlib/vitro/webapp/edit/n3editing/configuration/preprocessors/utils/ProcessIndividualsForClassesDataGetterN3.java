@@ -32,7 +32,6 @@ import net.sf.json.JSONSerializer;
 //Returns the appropriate n3 for selection of classes from within class group
 public  class ProcessIndividualsForClassesDataGetterN3 extends ProcessClassGroupDataGetterN3 {
 	private static String classType = "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter";
-	int classCount = 0;
 	protected static String individualClassVarNameBase = "classesSelectedInClassGroup";
 	private Log log = LogFactory.getLog(ProcessIndividualsForClassesDataGetterN3.class);
 
@@ -54,9 +53,7 @@ public  class ProcessIndividualsForClassesDataGetterN3 extends ProcessClassGroup
     
     protected List<String> addIndividualClassesN3(int counter) {
 		List<String> classN3 = new ArrayList<String>();
-		if(classCount > 0) {
-			classN3.add(generateIndividualClassN3(counter));
-		}
+		classN3.add(generateIndividualClassN3(counter));
 		return classN3;
 	}
     
@@ -96,15 +93,6 @@ public  class ProcessIndividualsForClassesDataGetterN3 extends ProcessClassGroup
     	
     }
     
-   private List<String> getIndividualClassesVarNames(int counter) {
-		List<String> individualClassUris = new ArrayList<String>();
-		int i;
-		for(i = 0; i < classCount; i++) {
-			individualClassUris.add(getVarName(individualClassVarNameBase + counter, classCount));
-		}
-		return individualClassUris;
-		
-	}
    
    public List<FieldVTwo> retrieveFields(int counter) {
 	   List<FieldVTwo> fields = super.retrieveFields(counter);

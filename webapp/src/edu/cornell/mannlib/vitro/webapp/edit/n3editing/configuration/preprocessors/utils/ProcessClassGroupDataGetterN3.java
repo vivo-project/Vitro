@@ -139,7 +139,7 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
    
    //?dataGetter a FixedHTMLDataGetter ; display:saveToVar ?saveToVar; display:htmlValue ?htmlValue .
    protected String getExistingValuesClassGroup(String dataGetterURI) {
-	   String query = this.getSparqlPrefix() + "SELECT ?classGroup  WHERE {" + 
+	   String query = this.getSparqlPrefix() + " SELECT ?classGroup  WHERE {" + 
 			   "<" + dataGetterURI + "> <" + DisplayVocabulary.FOR_CLASSGROUP + "> ?classGroup  . \n" +
 			   "}";
 	   return query;
