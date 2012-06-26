@@ -8,12 +8,9 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -24,21 +21,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.query.DataSource;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.sparql.resultset.ResultSetFormat;
 import com.hp.hpl.jena.vocabulary.XSD;
@@ -47,6 +36,9 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 
 
@@ -133,78 +125,17 @@ public class SparqlQueryServlet extends BaseEditController {
             doHelp(request,response);
             return;
         }
-        
-        Dataset dataset = chooseDatasetForQuery(vreq);
 
-        executeQuery(response, resultFormatParam, rdfResultFormatParam, queryParam, dataset); 
+        executeQuery(response, resultFormatParam, rdfResultFormatParam, 
+                queryParam, vreq.getRDFService()); 
         return;
     }
-    
-	private Dataset chooseDatasetForQuery(VitroRequest vreq) {
-		Map<String, Model> modelMap = getModelsFromRequest(vreq);
-		if (!modelMap.isEmpty()) {
-			return buildDataSetFromNamedModels(modelMap);
-		}
-		
-		String queryParam = vreq.getParameter("query");
-		String[] tokens = queryParam.split("\\s");
-	    for(int i = 0; i < tokens.length; i++){
-	    	if("graph".equalsIgnoreCase(tokens[i])){
-	    		return vreq.getDataset();
-	    	}
-	    }
-		
-		DataSource dataSource = DatasetFactory.create();
-		dataSource.setDefaultModel(vreq.getJenaOntModel());
-		return dataSource;
-	}
-    
-	private Map<String, Model> getModelsFromRequest(HttpServletRequest request) {
-		String modelNames[] = request.getParameterValues("sourceModelName");
-		if ((modelNames == null) || (modelNames.length == 0)) {
-			return Collections.emptyMap();
-		}
-
-		ModelMaker maker = (ModelMaker) getServletContext().getAttribute(
-				"vitroJenaModelMaker");
-
-		Map<String, Model> map = new HashMap<String, Model>();
-		for (String modelName : modelNames) {
-			Model model = maker.getModel(modelName);
-			if (model != null) {
-				map.put(modelName, model);
-			}
-		}
-
-		return map;
-	}
-
-	private Dataset buildDataSetFromNamedModels(Map<String, Model> modelMap) {
-		DataSource dataSource = DatasetFactory.create();
-		for (String name : modelMap.keySet()) {
-			Model model = modelMap.get(name);
-			dataSource.addNamedModel(name, model);
-		}
-
-    	// For now, people expect to query these graphs without using 
-    	// FROM NAMED, so we'll also add to the background
-		OntModel ontModel = ModelFactory
-				.createOntologyModel(OntModelSpec.OWL_MEM);
-		for (String name : modelMap.keySet()) {
-			Model model = modelMap.get(name);
-			ontModel.addSubModel(model);
-		}
-
-		dataSource.setDefaultModel(ontModel);
-		return dataSource;
-	}
-
     
     private void executeQuery(HttpServletResponse response, 
                               String resultFormatParam, 
                               String rdfResultFormatParam, 
                               String queryParam, 
-                              Dataset dataset ) throws IOException {
+                              RDFService rdfService ) throws IOException {
         
     	ResultSetFormat rsf = null;
     	/* BJL23 2008-11-06
@@ -219,13 +150,12 @@ public class SparqlQueryServlet extends BaseEditController {
         }                       
         String mimeType = mimeTypes.get(resultFormatParam);
         
-        QueryExecution qe = null;
         try{
             Query query = SparqlQueryUtils.create(queryParam);
-            qe = QueryExecutionFactory.create(query, dataset);
             if( query.isSelectType() ){
                 ResultSet results = null;
-                results = qe.execSelect();
+                results = ResultSetFactory.fromJSON(rdfService.sparqlSelectQuery(
+                        queryParam, RDFService.ResultFormat.JSON));
                 response.setContentType(mimeType);
                 if (rsf != null) {
                 	OutputStream out = response.getOutputStream();
@@ -237,13 +167,23 @@ public class SparqlQueryServlet extends BaseEditController {
             } else {
                 Model resultModel = null;
                 if( query.isConstructType() ){
-                    resultModel = qe.execConstruct();
+                    resultModel = RDFServiceUtils.parseModel(
+                            rdfService.sparqlConstructQuery(
+                                    queryParam, 
+                                    RDFService.ModelSerializationFormat.N3), 
+                                            RDFService.ModelSerializationFormat.N3);
                 }else if ( query.isDescribeType() ){
-                    resultModel = qe.execDescribe();
+                    resultModel = RDFServiceUtils.parseModel(
+                            rdfService.sparqlDescribeQuery(
+                                    queryParam, 
+                                    RDFService.ModelSerializationFormat.N3), 
+                                            RDFService.ModelSerializationFormat.N3);
                 }else if(query.isAskType()){
                 	// Irrespective of the ResultFormatParam, 
                 	// this always prints a boolean to the default OutputStream.
-                	String result = (qe.execAsk() == true) ? "true" : "false";
+                	String result = (rdfService.sparqlAskQuery(queryParam) == true) 
+                	        ? "true" 
+                	        : "false";
                 	PrintWriter p = response.getWriter();
                 	p.write(result);
                     return;
@@ -252,10 +192,9 @@ public class SparqlQueryServlet extends BaseEditController {
                 OutputStream out = response.getOutputStream();
                 resultModel.write(out, rdfResultFormatParam);
             }
-        }finally{
-            if( qe != null)
-                qe.close();
-        }        
+        } catch (RDFServiceException e) {
+                throw new RuntimeException(e);
+        }
     }
 
     private void doNoModelInContext(HttpServletResponse res){
