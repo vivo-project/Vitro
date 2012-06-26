@@ -155,10 +155,8 @@ public class DeletePageController extends VitroHttpServlet {
 		return menuItemResource;
 	}
 
-	
-
-	//This should be in write mode
-    //TODO: find better way of doing this
+	//This code is called without model switching, so in this case
+	//we just want the regular model
     private OntModel getDisplayModel(VitroRequest vreq) {
     	return vreq.getDisplayModel();    
     }
