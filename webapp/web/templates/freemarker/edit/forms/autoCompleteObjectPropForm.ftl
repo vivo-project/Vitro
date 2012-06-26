@@ -1,7 +1,4 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
-
-<h1>autoCompleteObjectPropForm.ftl</h1>
-
 <#--Assign variables from editConfig-->
 <#assign rangeOptions = editConfiguration.pageData.objectVar />
 <#-- 
@@ -11,7 +8,6 @@
 </#if>
  -->
  
-
 <#assign rangeOptionsExist = true /> 
 
 <#assign objectTypes = editConfiguration.pageData.objectTypes />
