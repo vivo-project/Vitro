@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -41,7 +42,7 @@ public class PropertyEditController extends BaseEditController {
         	return;
         }
 
-        final int NUM_COLS=17;
+        final int NUM_COLS=24;
 
         VitroRequest vreq = new VitroRequest(request);
         
@@ -53,32 +54,33 @@ public class PropertyEditController extends BaseEditController {
         request.setAttribute("property",p);
 
         ArrayList<String> results = new ArrayList<String>();
-        results.add("property");       // column 1
-        results.add("parent property"); // column 2
-        results.add("domain");         // column 3
-        results.add("range");          // column 4
-        results.add("display name");   // column 5
-        results.add("group");          // column 6
-        results.add("display tier");   // column 7
-        results.add("public description"); // column 8
-        results.add("example");        // column 9
-        results.add("editor description");    // column 10
-        results.add("display level"); //column 11
-        results.add("update level"); // column 12
-        results.add("custom entry form"); // column 13
-        results.add("select from existing"); // column 14
-        results.add("offer create new"); // column 15
-        results.add("sort direction");  // column 16
-        results.add("URI");            // column 17
+        results.add("property");              // column 1
+        results.add("parent property");       // column 2
+        results.add("property group");        // column 3
+        results.add("ontology");              // column 4
+        results.add("RDF local name");        // column 5
+        results.add("public display label");  // column 6
+        results.add("domain class");          // column 7
+        results.add("range class");           // column 8
+        results.add("transitive");            // column 9
+        results.add("symmetric");             // column 10
+        results.add("functional");            // column 11
+        results.add("inverse functional");    // column 12
+        results.add("public description");    // column 13
+        results.add("example");               // column 14
+        results.add("editor description");    // column 15
+        results.add("display level");         // column 16
+        results.add("update level");          // column 17
+        results.add("display tier");          // column 18
+        results.add("collate by subclass");   // column 19
+        results.add("custom entry form");     // column 20
+        results.add("select from existing");  // column 21
+        results.add("offer create new");      // column 22
+        results.add("sort direction");        // column 23
+        results.add("URI");                   // column 24
 
-        String displayName = (p.getDomainPublic()==null) ? p.getLocalName() : p.getDomainPublic();
-        try {
-            results.add("<a href=\"propertyEdit?uri="+URLEncoder.encode(p.getURI(),"UTF-8")+"\">"+displayName+"</a> <em>"+p.getLocalNameWithPrefix()+"</em>");// column 1
-        } catch (UnsupportedEncodingException e) {
-            log.error("Could not encode URI for property (domain public: "+p.getDomainPublic()+", local name with prefix: "+p.getLocalNameWithPrefix()+", URI: "+p.getURI()+").");
-            results.add(displayName + "<em>"+p.getLocalNameWithPrefix()+"</em>"); // column 1
-        }
-
+        results.add(p.getLocalNameWithPrefix()); // column 1
+        
         String parentPropertyStr = "";
         if (p.getParentURI() != null) {
         	ObjectProperty parent = propDao.getObjectPropertyByURI(p.getParentURI());
@@ -91,6 +93,30 @@ public class PropertyEditController extends BaseEditController {
         	}
     	} 
         results.add(parentPropertyStr); // column 2
+        
+        if (p.getGroupURI() != null) {
+            PropertyGroup pGroup = pgDao.getGroupByURI(p.getGroupURI());
+            if (pGroup != null){
+                results.add(pGroup.getName()); // column 3
+            } else {
+                results.add("(unnamed group)"); // column 3
+            }
+        } else {
+            results.add("(unspecified)"); // column 3
+        }
+        
+        String ontologyName = null;
+        if (p.getNamespace() != null) {
+            Ontology ont = vreq.getFullWebappDaoFactory().getOntologyDao().getOntologyByURI(p.getNamespace());
+            if ( (ont != null) && (ont.getName() != null) ) {
+                ontologyName = ont.getName();
+            }
+        }
+        results.add(ontologyName==null ? "(not identified)" : ontologyName); // column 4
+        
+        results.add(p.getLocalName());  // column 5
+        
+        results.add(p.getDomainPublic() == null ? "(no public label)" : p.getDomainPublic()); // column 6
         
         String domainStr = ""; 
         if (p.getDomainVClassURI() != null) {
@@ -107,7 +133,7 @@ public class PropertyEditController extends BaseEditController {
         		}
         	}
         }
-        results.add(domainStr); // column 3
+        results.add(domainStr); // column 7
         
         String rangeStr = ""; 
         if (p.getRangeVClassURI() != null) {
@@ -124,34 +150,30 @@ public class PropertyEditController extends BaseEditController {
         		}
         	}
         }
-        results.add(rangeStr); // column 4
+        results.add(rangeStr); // column 8
         
-        results.add(p.getDomainPublic() == null ? "" : p.getDomainPublic()); // column 5
-        if (p.getGroupURI() != null) {
-            PropertyGroup pGroup = pgDao.getGroupByURI(p.getGroupURI());
-            if (pGroup != null){
-                results.add(pGroup.getName()); // column 6
-            } else {
-                results.add("(unnamed group)"); // column 6
-            }
-        } else {
-            results.add("(unspecified)"); // column 6
-        }
-        results.add("domain: "+p.getDomainDisplayTier() + ", range: "+p.getRangeDisplayTier()); // column 7
+        results.add(p.getTransitive() ? "true" : "false");        // column 9
+        results.add(p.getSymmetric() ? "true" : "false");         // column 10
+        results.add(p.getFunctional() ? "true" : "false");        // column 11
+        results.add(p.getInverseFunctional() ? "true" : "false"); // column 12
+        
         String publicDescriptionStr = (p.getPublicDescription() == null) ? "" : p.getPublicDescription();
-        results.add(publicDescriptionStr); // column 8
+        results.add(publicDescriptionStr);     // column 13
         String exampleStr = (p.getExample() == null) ? "" : p.getExample();
-        results.add(exampleStr); // column 9
+        results.add(exampleStr);               // column 14
         String descriptionStr = (p.getDescription() == null) ? "" : p.getDescription();
-        results.add(descriptionStr); // column 10
+        results.add(descriptionStr);           // column 15
         
-        results.add(p.getHiddenFromDisplayBelowRoleLevel() == null ? "(unspecified)" : p.getHiddenFromDisplayBelowRoleLevel().getLabel()); // column 11
-        results.add(p.getProhibitedFromUpdateBelowRoleLevel() == null ? "(unspecified)" : p.getProhibitedFromUpdateBelowRoleLevel().getLabel()); // column 12
+        results.add(p.getHiddenFromDisplayBelowRoleLevel() == null ? "(unspecified)" : p.getHiddenFromDisplayBelowRoleLevel().getLabel()); // column 16
+        results.add(p.getProhibitedFromUpdateBelowRoleLevel() == null ? "(unspecified)" : p.getProhibitedFromUpdateBelowRoleLevel().getLabel()); // column 17
+        
+        results.add("property: "+p.getDomainDisplayTier() + ", inverse: "+p.getRangeDisplayTier()); // column 18
+        
+        results.add(p.getCollateBySubclass() ? "true" : "false"); // column 19
  
-        results.add(p.getCustomEntryForm() == null ? "(unspecified)" : p.getCustomEntryForm()); // column 13
-        results.add(p.getSelectFromExisting() ? "true" : "false"); // column 14
-        results.add(p.getOfferCreateNewOption() ? "true" : "false"); // column 15
-        //results.add(p.getStubObjectRelation() ? "true" : "false"); // column 16
+        results.add(p.getCustomEntryForm() == null ? "(unspecified)" : p.getCustomEntryForm()); // column 20
+        results.add(p.getSelectFromExisting() ? "true" : "false");   // column 21
+        results.add(p.getOfferCreateNewOption() ? "true" : "false"); // column 22
         
         /*
         String datapropStr = ""; 
@@ -169,9 +191,9 @@ public class PropertyEditController extends BaseEditController {
             results.add("name (rdfs:label)"); // column 16
         }
         */
-        results.add(p.getDomainEntitySortDirection() == null ? "ascending" : p.getDomainEntitySortDirection()); // column 16
+        results.add(p.getDomainEntitySortDirection() == null ? "ascending" : p.getDomainEntitySortDirection()); // column 23
 
-        results.add(p.getURI()); // column 17
+        results.add(p.getURI()); // column 24
         request.setAttribute("results",results);
         request.setAttribute("columncount",NUM_COLS);
         request.setAttribute("suppressquery","true");

@@ -400,24 +400,20 @@ ul.ingestMenu {
 tr.editformcell td input[type="text"] {
     width: 30% !important;
 }
-
 tr.editformcell td input.fullWidthInput {
     width: 70% !important;
     margin-top: 0.7em !important;
 }
-
 tr.editformcell td input.shortInput {
     width: 20% !important;
     margin-top: 0.7em !important;
 }
-
 tr.editformcell td textarea.matchingInput {
     width: 95%;
     height:10ex;
     margin-top:0.7em;
     font-style: normal !important;
 }
-
 hr.formDivider {
     background-color: #3196C4;
     border: 0 none;

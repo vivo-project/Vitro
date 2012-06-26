@@ -40,7 +40,7 @@ public class DatapropEditController extends BaseEditController {
 
     	VitroRequest vreq = new VitroRequest(request);
     	
-        final int NUM_COLS=15;
+        final int NUM_COLS=17;
 
         String datapropURI = request.getParameter("uri");
 
@@ -49,25 +49,40 @@ public class DatapropEditController extends BaseEditController {
         PropertyGroupDao pgDao = vreq.getFullWebappDaoFactory().getPropertyGroupDao();
 
         ArrayList results = new ArrayList();
-        results.add("data property");
-        results.add("ontology");
-        results.add("display name");
-        results.add("group");
-        results.add("domain");
-        results.add("range datatype");
-        results.add("public description");
-        results.add("example");
-        results.add("editor description");
-        results.add("display level");
-        results.add("update level");
-        results.add("display tier");
-        results.add("display limit");
-        results.add("custom entry form");
-        results.add("URI");
+        results.add("data property");         // column 1
+        results.add("public display label");  // column 2
+        results.add("property group");        // column 3
+        results.add("ontology");              // column 4
+        results.add("RDF local name");        // column 5
+        results.add("domain class");          // column 6
+        results.add("range datatype");        // column 7
+        results.add("functional");            // column 8
+        results.add("public description");    // column 9
+        results.add("example");               // column 10
+        results.add("editor description");    // column 11
+        results.add("display level");         // column 12
+        results.add("update level");          // column 13
+        results.add("display tier");          // column 14
+        results.add("display limit");         // column 15
+        results.add("custom entry form");     // column 16
+        results.add("URI");                   // column 17
 
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
 
-        results.add(dp.getLocalNameWithPrefix());
+        results.add(dp.getLocalNameWithPrefix()); // column 1
+        results.add(dp.getPublicName() == null ? "(no public label)" : dp.getPublicName()); // column 2
+        
+        if (dp.getGroupURI() != null) {
+            PropertyGroup pGroup = pgDao.getGroupByURI(dp.getGroupURI());
+            if (pGroup != null) {
+                results.add(pGroup.getName()); // column 3
+            } else {
+                results.add(dp.getGroupURI());
+            }
+        } else {
+            results.add("(unspecified)");
+        }
+        
         String ontologyName = null;
         if (dp.getNamespace() != null) {
             Ontology ont = vreq.getFullWebappDaoFactory().getOntologyDao().getOntologyByURI(dp.getNamespace());
@@ -75,19 +90,9 @@ public class DatapropEditController extends BaseEditController {
                 ontologyName = ont.getName();
             }
         }
-        results.add(ontologyName==null ? "(not identified)" : ontologyName);
-        results.add(dp.getPublicName() == null ? "(no public name)" : dp.getPublicName());
+        results.add(ontologyName==null ? "(not identified)" : ontologyName); // column 4
 
-        if (dp.getGroupURI() != null) {
-            PropertyGroup pGroup = pgDao.getGroupByURI(dp.getGroupURI());
-            if (pGroup != null) {
-                results.add(pGroup.getName());
-            } else {
-                results.add(dp.getGroupURI());
-            }
-        } else {
-            results.add("(unspecified)");
-        }
+        results.add(dp.getLocalName()); // column 5
 
         // we support parents now, but not the simple getParent() style method
         //String parentPropertyStr = "<i>(datatype properties are not yet modeled in a property hierarchy)</i>"; // TODO - need multiple inheritance
@@ -100,24 +105,26 @@ public class DatapropEditController extends BaseEditController {
         } catch (UnsupportedEncodingException e) {
             log.error(e, e);
         }
-        results.add(domainStr);
+        results.add(domainStr); // column 6
 
-        String rangeStr = (dp.getRangeDatatypeURI() == null) ? "<i>untyped</i> (rdfs:Literal)" : dp.getRangeDatatypeURI(); // TODO
-        results.add(rangeStr);
+        String rangeStr = (dp.getRangeDatatypeURI() == null) ? "<i>untyped</i> (rdfs:Literal)" : dp.getRangeDatatypeURI();
+        results.add(rangeStr); // column 7
         
-        String publicDescriptionStr = (dp.getPublicDescription() == null) ? "" : dp.getPublicDescription();
+        results.add(dp.getFunctional() ? "true" : "false"); // column 8
+        
+        String publicDescriptionStr = (dp.getPublicDescription() == null) ? "" : dp.getPublicDescription(); // column 9
         results.add(publicDescriptionStr);        
-        String exampleStr = (dp.getExample() == null) ? "" : dp.getExample();
+        String exampleStr = (dp.getExample() == null) ? "" : dp.getExample();  // column 10
         results.add(exampleStr);
-        String descriptionStr = (dp.getDescription() == null) ? "" : dp.getDescription();
+        String descriptionStr = (dp.getDescription() == null) ? "" : dp.getDescription();  // column 11
         results.add(descriptionStr);
         
-        results.add(dp.getHiddenFromDisplayBelowRoleLevel()  == null ? "(unspecified)" : dp.getHiddenFromDisplayBelowRoleLevel().getLabel());
-        results.add(dp.getProhibitedFromUpdateBelowRoleLevel() == null ? "(unspecified)" : dp.getProhibitedFromUpdateBelowRoleLevel().getLabel());
-        results.add(String.valueOf(dp.getDisplayTier()));
-        results.add(String.valueOf(dp.getDisplayLimit()));
-        results.add(dp.getCustomEntryForm() == null ? "(unspecified)" : dp.getCustomEntryForm());
-        results.add(dp.getURI() == null ? "" : dp.getURI());
+        results.add(dp.getHiddenFromDisplayBelowRoleLevel()  == null ? "(unspecified)" : dp.getHiddenFromDisplayBelowRoleLevel().getLabel()); // column 12
+        results.add(dp.getProhibitedFromUpdateBelowRoleLevel() == null ? "(unspecified)" : dp.getProhibitedFromUpdateBelowRoleLevel().getLabel()); // column 13
+        results.add(String.valueOf(dp.getDisplayTier()));  // column 14
+        results.add(String.valueOf(dp.getDisplayLimit()));  // column 15
+        results.add(dp.getCustomEntryForm() == null ? "(unspecified)" : dp.getCustomEntryForm());  // column 16
+        results.add(dp.getURI() == null ? "" : dp.getURI()); // column 17
         request.setAttribute("results",results);
         request.setAttribute("columncount",NUM_COLS);
         request.setAttribute("suppressquery","true");
