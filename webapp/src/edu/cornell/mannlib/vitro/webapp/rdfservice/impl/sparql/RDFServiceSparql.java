@@ -47,7 +47,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.ChangeSetImpl;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sdb.ListeningGraph;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.ListeningGraph;
 
 /*
  * API to write, read, and update Vitro's RDF store, with support 
