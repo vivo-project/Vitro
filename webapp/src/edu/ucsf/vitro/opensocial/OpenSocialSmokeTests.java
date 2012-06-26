@@ -50,7 +50,7 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 	 * If a connection fails in the tester thread, how long do we wait before
 	 * trying again?
 	 */
-	private static final long SLEEP_INTERVAL = 10000; // 10 seconds
+	private static final long SLEEP_INTERVAL = 20000; // 20 seconds
 
 	private ServletContext ctx;
 	private ConfigurationProperties configProps;
