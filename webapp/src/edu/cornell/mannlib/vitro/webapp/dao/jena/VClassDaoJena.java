@@ -745,7 +745,10 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 if (superclass == null) {
                     superclass = (domainSide) ? op.getRange() : op.getDomain();
                     if (superclass == null) {
-                        superclass = getOntModel().getOntResource(OWL.Thing.getURI());
+                    	//this section to prevent all subclasses of owl:Thing
+                        //returned if range is owl:Thing, refer to NIHVIVO-3357 NIHVIVO-3814
+                    	//This is unfortunate case of warping the model for the ease of the display.
+                    	return Collections.emptyList();                        
                     }
                 }
                 if (superclass != null) {
@@ -755,11 +758,15 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                     } else {
                         superVclass = getVClassByURI(superclass.getURI());
                     }
+                    if( OWL.Thing.equals( superclass )){
+                    	//this section to prevent all subclasses of owl:Thing
+                        //returned if range is owl:Thing, refer to NIHVIVO-3357 NIHVIVO-3814
+                    	//This is unfortunate case of warping the model for the ease of the display.
+                    	return Collections.emptyList();
+                    }
                     if (superVclass != null) {
-                        vClasses.add(superVclass);
-                        //Commenting out this section to prevent all subclasses of owl:Thing
-                        //returned if range is owl:Thing, refer to NIHVIVO-3357
-                        /*	String isInferencing = getWebappDaoFactory().getProperties().get("infersTypes");
+                        vClasses.add(superVclass);                                                                       
+                        String isInferencing = getWebappDaoFactory().getProperties().get("infersTypes");
 						// if this model infers types based on the taxonomy, adding the subclasses will only
 						// waste time for no benefit
 						PelletListener pl = getWebappDaoFactory().getPelletListener();
@@ -772,7 +779,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                             	if (vClass != null)
                             	    vClasses.add(vClass);
                         	}
-						} */
+						} 
                     }
                 }
             }

@@ -3,14 +3,18 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 
-import org.junit.Assert;
+import java.util.List;
+
+import static org.junit.Assert.*;
 import org.junit.Test;
 
+import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -94,7 +98,7 @@ public class VClassDaoTest {
 		                                                          // information already in the jena model.
 		
 		
-		Assert.assertEquals(vClass.getName(), class1.getLabel(lang));  //
+		assertEquals(vClass.getName(), class1.getLabel(lang));  //
 		
 		
         vcdj.updateVClass(vClass);                                // we haven't changed any values here, so 
@@ -114,8 +118,8 @@ public class VClassDaoTest {
 		wipeOutModTime(subModel);
 		wipeOutModTime(superModel);
 		
-		Assert.assertTrue(subModel.isIsomorphicWith(origSubModel));	
-	    Assert.assertTrue(superModel.isIsomorphicWith(origSuperModel));	
+		assertTrue(subModel.isIsomorphicWith(origSubModel));	
+	    assertTrue(superModel.isIsomorphicWith(origSuperModel));	
         
 	}
 	
@@ -142,6 +146,57 @@ public class VClassDaoTest {
 
 	void wipeOutModTime(Model model){
 		model.removeAll(null, model.createProperty(VitroVocabulary.MODTIME), null);
+	}
+	
+	
+	@Test
+	public void getVClassesForPropertyTest(){
+		String lang = "en-US";
+		String superClassURI = "http://example.com/SUPER_class";
+		String subClassAURI = "http://example.com/SUB_class_A";
+		String subClassBURI = "http://example.com/SUB_class_B";
+		String propURI = "http://example.com/PROP";
+		
+		String propNoRangeURI = "http://example.com/PROP_NO_RANGE";
+				
+		OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		
+		
+		//Define super class and sub classes 
+		OntClass superClass = model.createClass( superClassURI );
+		superClass.addLabel("SUPER",lang);
+		superClass.setPropertyValue(model.createProperty(VitroVocabulary.IN_CLASSGROUP), model.createResource("http://thisIsTheClassGroupURI"));
+		superClass.addSuperClass( OWL.Thing );
+		
+		OntClass subA = model.createClass(subClassAURI);
+		subA.addLabel("subA",lang);
+		subA.setPropertyValue(model.createProperty(VitroVocabulary.IN_CLASSGROUP), model.createResource("http://thisIsTheClassGroupURI"));
+		superClass.addSubClass(subA);
+				
+		OntClass subB = model.createClass(subClassBURI);
+		subB.addLabel("subB",lang);
+		subB.setPropertyValue(model.createProperty(VitroVocabulary.IN_CLASSGROUP), model.createResource("http://thisIsTheClassGroupURI"));
+		superClass.addSubClass(subB);
+		
+		//Define property using the super class
+		ObjectProperty prop = model.createObjectProperty( propURI );
+		prop.setLabel("PROP", lang);
+		prop.setRange( superClass );
+					
+		ObjectProperty propNoRange = model.createObjectProperty( propNoRangeURI );
+		propNoRange.setLabel("PROP_NO_RANGE", lang);
+		
+		WebappDaoFactoryJena wdfj = new WebappDaoFactoryJena(model);
+		
+		List<VClass> classesForProp = wdfj.getVClassDao().getVClassesForProperty(propURI, true);
+		assertNotNull( classesForProp );
+		assertEquals(3, classesForProp.size());
+		
+		List<VClass> classesForPropNoRange = wdfj.getVClassDao().getVClassesForProperty(propNoRangeURI, true);
+		assertNotNull( classesForPropNoRange );
+		assertEquals(0, classesForPropNoRange.size());
+		
+		
 	}
 	
 }

@@ -437,7 +437,8 @@ public class IndexBuilder extends VitroBackgroundThread {
             work.get( counter % workers ).add( uris.next() );
             counter ++;
         }
-        log.info("Number of individuals to be indexed : " + counter);
+        log.info("Number of individuals to be indexed : " + counter + " by " 
+        		+ workers + " worker theads.");
         return work;        
     }
     

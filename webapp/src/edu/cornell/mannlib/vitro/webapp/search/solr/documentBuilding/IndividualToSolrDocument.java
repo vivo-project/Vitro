@@ -119,14 +119,14 @@ public class IndividualToSolrDocument {
     throws SkipIndividualException{
         //run the document modifiers
         if( documentModifiers != null && !documentModifiers.isEmpty()){
+        	docModCount++;        	
             for(DocumentModifier modifier: documentModifiers){
             	
             	long start = System.currentTimeMillis();
             	
                 modifier.modifyDocument(ind, doc, addUri);
                 
-                if( log.isDebugEnabled()){
-                	docModCount++;
+                if( log.isDebugEnabled()){                	
 	                long delta = System.currentTimeMillis() - start;
 	                synchronized(docModClassToTime){
 	                	Class clz = modifier.getClass();	                	
@@ -137,8 +137,9 @@ public class IndividualToSolrDocument {
 	                		docModClassToTime.put(clz.getName(), delta);
 	                	}
 	                }
-	                if( docModCount % 100 == 0 ){
-	                	for( Entry<String, Long> entry: docModClassToTime.entrySet()){
+	                if( docModCount % 200 == 0 ){
+	                	log.debug("DocumentModifier timings");
+	                	for( Entry<String, Long> entry: docModClassToTime.entrySet()){	                		
 	                		log.debug("average msec to run " + entry.getKey() + ": " + (entry.getValue()/docModCount));                		
 	                	}
 	                }
