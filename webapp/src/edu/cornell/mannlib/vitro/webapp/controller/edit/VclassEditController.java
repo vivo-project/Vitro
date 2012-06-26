@@ -27,11 +27,12 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 
 public class VclassEditController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(VclassEditController.class.getName());
-	private static final int NUM_COLS = 10;
+	private static final int NUM_COLS = 13;
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
         if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
@@ -54,24 +55,31 @@ public class VclassEditController extends BaseEditController {
         request.setAttribute("VClass",vcl);
         
         ArrayList results = new ArrayList();
-        results.add("Class");                // 1
-        results.add("short definition");     // 2
-        results.add("example");              // 3
-        results.add("description");          // 4
-        results.add("editor comments");      // 5
-        results.add("group");                // 6
-        results.add("display level");        // 7
-        results.add("update level");         // 8
-        results.add("custom entry form");    // 9
-        results.add("URI");                  // 10
+        results.add("class");                // 1
+        results.add("ontology");             // 2
+        results.add("display name");         // 3
+        results.add("group");                // 4
+        results.add("short definition");     // 5
+        results.add("example");              // 6
+        results.add("editor description");   // 7
+        results.add("curator comments");     // 8
+        results.add("display level");        // 9
+        results.add("update level");         // 10
+        results.add("display rank");         // 11
+        results.add("custom entry form");    // 12
+        results.add("URI");                  // 13
         
         String name = vcl.getLocalNameWithPrefix();
-        String shortDef = (vcl.getShortDef()==null) ? "" : vcl.getShortDef();
-        String example = (vcl.getExample()==null) ? "" : vcl.getExample();
-        String description = (vcl.getDescription()==null) ? "" : vcl.getDescription();
         
-        WebappDaoFactory wadf = request.getFullWebappDaoFactory();
+        String ontologyName = null;
+        if (vcl.getNamespace() != null) {
+            Ontology ont = request.getFullWebappDaoFactory().getOntologyDao().getOntologyByURI(vcl.getNamespace());
+            if ( (ont != null) && (ont.getName() != null) ) {
+                ontologyName = ont.getName();
+            }
+        }
 
+        WebappDaoFactory wadf = request.getFullWebappDaoFactory();
         String groupURI = vcl.getGroupURI();
         String groupName = "none";
         if(groupURI != null) { 
@@ -82,6 +90,10 @@ public class VclassEditController extends BaseEditController {
             }
         }
 
+        String shortDef = (vcl.getShortDef()==null) ? "" : vcl.getShortDef();
+        String example = (vcl.getExample()==null) ? "" : vcl.getExample();
+        String description = (vcl.getDescription()==null) ? "" : vcl.getDescription();
+        
         boolean foundComment = false;
         StringBuffer commSb = null;
         for (Iterator<String> commIt = request.getFullWebappDaoFactory().getCommentsForResource(vcl.getURI()).iterator(); commIt.hasNext();) { 
@@ -94,27 +106,29 @@ public class VclassEditController extends BaseEditController {
         if (!foundComment) {
             commSb = new StringBuffer("no comments yet");
         }
-                
-        String hiddenFromDisplay  = (vcl.getHiddenFromDisplayBelowRoleLevel()  == null ? "unspecified" : vcl.getHiddenFromDisplayBelowRoleLevel().getLabel());
-        String ProhibitedFromUpdate = (vcl.getProhibitedFromUpdateBelowRoleLevel() == null ? "unspecified" : vcl.getProhibitedFromUpdateBelowRoleLevel().getLabel());
+               
+        String hiddenFromDisplay  = (vcl.getHiddenFromDisplayBelowRoleLevel()  == null ? "(unspecified)" : vcl.getHiddenFromDisplayBelowRoleLevel().getLabel());
+        String ProhibitedFromUpdate = (vcl.getProhibitedFromUpdateBelowRoleLevel() == null ? "(unspecified)" : vcl.getProhibitedFromUpdateBelowRoleLevel().getLabel());
 
-        String customEntryForm = (vcl.getCustomEntryForm() == null ? "" : vcl.getCustomEntryForm());
-        String customDisplayView = (vcl.getCustomDisplayView() == null ? "" : vcl.getCustomDisplayView());
-        String customShortView = (vcl.getCustomShortView() == null ? "" : vcl.getCustomShortView());
-        String customSearchView = (vcl.getCustomSearchView() == null ? "" : vcl.getCustomSearchView());
+        String customEntryForm = (vcl.getCustomEntryForm() == null ? "(unspecified)" : vcl.getCustomEntryForm());
+        
        //String lastModified = "<i>not implemented yet</i>"; // TODO
+        
         String uri = (vcl.getURI() == null) ? "" : vcl.getURI();
         
         results.add(name);                   // 1
-        results.add(shortDef);               // 2
-        results.add(example);                // 3
-        results.add(description);            // 4
-        results.add(commSb.toString());      // 5
-        results.add(groupName);              // 6
-        results.add(hiddenFromDisplay);      // 7
-        results.add(ProhibitedFromUpdate);   // 8
-        results.add(customEntryForm);        // 9
-        results.add(uri);                    // 10
+        results.add(ontologyName==null ? "(not identified)" : ontologyName); //2
+        results.add(vcl.getName() == null ? "(no public name)" : vcl.getName()); //3
+        results.add(groupName);              // 4
+        results.add(shortDef);               // 5
+        results.add(example);                // 6
+        results.add(description);            // 7
+        results.add(commSb.toString());      // 8
+        results.add(hiddenFromDisplay);      // 9
+        results.add(ProhibitedFromUpdate);   // 10
+        results.add(String.valueOf(vcl.getDisplayRank())); // 11
+        results.add(customEntryForm);        // 12
+        results.add(uri);                    // 13
         request.setAttribute("results", results);
         request.setAttribute("columncount", NUM_COLS);
         request.setAttribute("suppressquery", "true");

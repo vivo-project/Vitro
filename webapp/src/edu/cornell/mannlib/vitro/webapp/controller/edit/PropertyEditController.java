@@ -53,7 +53,7 @@ public class PropertyEditController extends BaseEditController {
         request.setAttribute("property",p);
 
         ArrayList<String> results = new ArrayList<String>();
-        results.add("Property");       // column 1
+        results.add("property");       // column 1
         results.add("parent property"); // column 2
         results.add("domain");         // column 3
         results.add("range");          // column 4
@@ -67,8 +67,8 @@ public class PropertyEditController extends BaseEditController {
         results.add("update level"); // column 12
         results.add("custom entry form"); // column 13
         results.add("select from existing"); // column 14
-        results.add("offer create new option"); // column 15
-        results.add("relatedsort direction");  // column 16
+        results.add("offer create new"); // column 15
+        results.add("sort direction");  // column 16
         results.add("URI");            // column 17
 
         String displayName = (p.getDomainPublic()==null) ? p.getLocalName() : p.getDomainPublic();
@@ -132,10 +132,10 @@ public class PropertyEditController extends BaseEditController {
             if (pGroup != null){
                 results.add(pGroup.getName()); // column 6
             } else {
-                results.add("unnamed group"); // column 6
+                results.add("(unnamed group)"); // column 6
             }
         } else {
-            results.add("unspecified"); // column 6
+            results.add("(unspecified)"); // column 6
         }
         results.add("domain: "+p.getDomainDisplayTier() + ", range: "+p.getRangeDisplayTier()); // column 7
         String publicDescriptionStr = (p.getPublicDescription() == null) ? "" : p.getPublicDescription();
@@ -145,10 +145,10 @@ public class PropertyEditController extends BaseEditController {
         String descriptionStr = (p.getDescription() == null) ? "" : p.getDescription();
         results.add(descriptionStr); // column 10
         
-        results.add(p.getHiddenFromDisplayBelowRoleLevel() == null ? "unspecified" : p.getHiddenFromDisplayBelowRoleLevel().getLabel()); // column 11
-        results.add(p.getProhibitedFromUpdateBelowRoleLevel() == null ? "unspecified" : p.getProhibitedFromUpdateBelowRoleLevel().getLabel()); // column 12
+        results.add(p.getHiddenFromDisplayBelowRoleLevel() == null ? "(unspecified)" : p.getHiddenFromDisplayBelowRoleLevel().getLabel()); // column 11
+        results.add(p.getProhibitedFromUpdateBelowRoleLevel() == null ? "(unspecified)" : p.getProhibitedFromUpdateBelowRoleLevel().getLabel()); // column 12
  
-        results.add(p.getCustomEntryForm() == null ? "unspecified" : p.getCustomEntryForm()); // column 13
+        results.add(p.getCustomEntryForm() == null ? "(unspecified)" : p.getCustomEntryForm()); // column 13
         results.add(p.getSelectFromExisting() ? "true" : "false"); // column 14
         results.add(p.getOfferCreateNewOption() ? "true" : "false"); // column 15
         //results.add(p.getStubObjectRelation() ? "true" : "false"); // column 16

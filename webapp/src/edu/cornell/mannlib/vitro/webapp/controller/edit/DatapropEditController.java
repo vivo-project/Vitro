@@ -49,19 +49,19 @@ public class DatapropEditController extends BaseEditController {
         PropertyGroupDao pgDao = vreq.getFullWebappDaoFactory().getPropertyGroupDao();
 
         ArrayList results = new ArrayList();
-        results.add("Data Property");
+        results.add("data property");
         results.add("ontology");
         results.add("display name");
+        results.add("group");
         results.add("domain");
         results.add("range datatype");
-        results.add("group");
-        results.add("display tier");
-        results.add("data entry limit");
-        results.add("example");
-        results.add("description");
         results.add("public description");
+        results.add("example");
+        results.add("editor description");
         results.add("display level");
         results.add("update level");
+        results.add("display tier");
+        results.add("display limit");
         results.add("custom entry form");
         results.add("URI");
 
@@ -78,6 +78,17 @@ public class DatapropEditController extends BaseEditController {
         results.add(ontologyName==null ? "(not identified)" : ontologyName);
         results.add(dp.getPublicName() == null ? "(no public name)" : dp.getPublicName());
 
+        if (dp.getGroupURI() != null) {
+            PropertyGroup pGroup = pgDao.getGroupByURI(dp.getGroupURI());
+            if (pGroup != null) {
+                results.add(pGroup.getName());
+            } else {
+                results.add(dp.getGroupURI());
+            }
+        } else {
+            results.add("(unspecified)");
+        }
+
         // we support parents now, but not the simple getParent() style method
         //String parentPropertyStr = "<i>(datatype properties are not yet modeled in a property hierarchy)</i>"; // TODO - need multiple inheritance
         //results.add(parentPropertyStr);
@@ -90,30 +101,22 @@ public class DatapropEditController extends BaseEditController {
             log.error(e, e);
         }
         results.add(domainStr);
-        
+
         String rangeStr = (dp.getRangeDatatypeURI() == null) ? "<i>untyped</i> (rdfs:Literal)" : dp.getRangeDatatypeURI(); // TODO
         results.add(rangeStr);
-        if (dp.getGroupURI() != null) {
-            PropertyGroup pGroup = pgDao.getGroupByURI(dp.getGroupURI());
-            if (pGroup != null) {
-            	results.add(pGroup.getName());
-            } else {
-            	results.add(dp.getGroupURI());
-            }
-        } else {
-            results.add("unspecified");
-        }
-        results.add(String.valueOf(dp.getDisplayTier()));
-        results.add(String.valueOf(dp.getDisplayLimit()));
+        
+        String publicDescriptionStr = (dp.getPublicDescription() == null) ? "" : dp.getPublicDescription();
+        results.add(publicDescriptionStr);        
         String exampleStr = (dp.getExample() == null) ? "" : dp.getExample();
         results.add(exampleStr);
         String descriptionStr = (dp.getDescription() == null) ? "" : dp.getDescription();
         results.add(descriptionStr);
-        String publicDescriptionStr = (dp.getPublicDescription() == null) ? "" : dp.getPublicDescription();
-        results.add(publicDescriptionStr);        
-        results.add(dp.getHiddenFromDisplayBelowRoleLevel()  == null ? "unspecified" : dp.getHiddenFromDisplayBelowRoleLevel().getLabel());
-        results.add(dp.getProhibitedFromUpdateBelowRoleLevel() == null ? "unspecified" : dp.getProhibitedFromUpdateBelowRoleLevel().getLabel());
-        results.add(dp.getCustomEntryForm() == null ? "unspecified" : dp.getCustomEntryForm());
+        
+        results.add(dp.getHiddenFromDisplayBelowRoleLevel()  == null ? "(unspecified)" : dp.getHiddenFromDisplayBelowRoleLevel().getLabel());
+        results.add(dp.getProhibitedFromUpdateBelowRoleLevel() == null ? "(unspecified)" : dp.getProhibitedFromUpdateBelowRoleLevel().getLabel());
+        results.add(String.valueOf(dp.getDisplayTier()));
+        results.add(String.valueOf(dp.getDisplayLimit()));
+        results.add(dp.getCustomEntryForm() == null ? "(unspecified)" : dp.getCustomEntryForm());
         results.add(dp.getURI() == null ? "" : dp.getURI());
         request.setAttribute("results",results);
         request.setAttribute("columncount",NUM_COLS);
