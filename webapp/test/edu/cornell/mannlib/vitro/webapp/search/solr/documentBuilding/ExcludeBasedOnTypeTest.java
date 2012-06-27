@@ -33,7 +33,7 @@ public class ExcludeBasedOnTypeTest {
 	public void testCheckForExclusion2() {
 		
 		ExcludeBasedOnType ebot = new ExcludeBasedOnType();
-		ebot.addTypeToExclude("http://xmlns.com/foaf/0.1/KillerRobot");
+		ebot.addTypeToExclude("http://example.com/KillerRobot");
 		
 		IndividualImpl ind = new IndividualImpl();
 		ind.setURI("http://example.com/n2343");

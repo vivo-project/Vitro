@@ -34,9 +34,9 @@ public class ExcludeBasedOnType implements SearchIndexExcluder {
     	if( typeURIinExcludeList( ind.getVClass() ))
     		return SKIP_MSG;        	
     	
-        List<VClass> vclasses = ind.getVClasses();
-        if( vclasses == null)
-        	return null;        
+        List<VClass> vclasses = new ArrayList<VClass>();        
+        vclasses.addAll( ind.getVClasses()!=null?ind.getVClasses():Collections.EMPTY_LIST );
+        vclasses.addAll( ind.getVClasses(true)!=null?ind.getVClasses(true):Collections.EMPTY_LIST );
         
         for( VClass vclz : vclasses){
         	if( typeURIinExcludeList( vclz ))
