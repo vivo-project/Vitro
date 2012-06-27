@@ -15,10 +15,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.graph.GraphMaker;
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
@@ -27,11 +23,8 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.sdb.SDBFactory;
-import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
-import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -39,7 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 
 public class RDFServiceModelMaker implements ModelMaker {
 
-    private final static Log log = LogFactory.getLog(VitroJenaSDBModelMaker.class);
+    private final static Log log = LogFactory.getLog(RDFServiceModelMaker.class);
     
     private RDFServiceFactory rdfServiceFactory;
         
@@ -49,10 +42,21 @@ public class RDFServiceModelMaker implements ModelMaker {
     public static final String HAS_NAMED_MODEL_URI = 
             "http://vitro.mannlib.cornell.edu/ns/vitro/sdb/hasNamedModel";
     
-    private Resource sdbResource; // a resource representing the SDB database 
+    private Resource dbResource; // a resource representing the triple store
     
     public RDFServiceModelMaker(RDFServiceFactory rdfServiceFactory) {
         this.rdfServiceFactory = rdfServiceFactory;
+        
+        RDFService rdfService = rdfServiceFactory.getRDFService();
+        if (rdfService != null) {
+	        try {
+	             setUpMetadata(rdfService);            
+	        } catch (RDFServiceException se) {
+	             log.error("unable to set up the cache of graph names");
+	        } finally {
+	        	rdfService.close();
+	        }
+        }
     }  
     
     protected RDFService getRDFService() {
@@ -64,7 +68,7 @@ public class RDFServiceModelMaker implements ModelMaker {
     }
         
     public void close() {
-        // n.a.
+        // getRDFService().close(); ?
     }
 
     public Model createModel(String modelName) {
@@ -72,7 +76,7 @@ public class RDFServiceModelMaker implements ModelMaker {
         Model metadataModel = getMetadataModel();
         try {
             metadataModel.add(
-                    sdbResource,metadataModel.getProperty(
+                    dbResource,metadataModel.getProperty(
                             HAS_NAMED_MODEL_URI), modelName);
         } finally {
             metadataModel.close();
@@ -94,7 +98,7 @@ public class RDFServiceModelMaker implements ModelMaker {
         Model metadataModel = getMetadataModel();
         try {
             StmtIterator stmtIt = metadataModel.listStatements(
-                    sdbResource, metadataModel.getProperty(
+                    dbResource, metadataModel.getProperty(
                             HAS_NAMED_MODEL_URI), arg0);
             try {
                 return stmtIt.hasNext();
@@ -161,7 +165,7 @@ public class RDFServiceModelMaker implements ModelMaker {
         m.removeAll(null,null,null);
         Model metadataModel = getMetadataModel();
         try {
-            metadataModel.remove(sdbResource, metadataModel.getProperty(
+            metadataModel.remove(dbResource, metadataModel.getProperty(
                     HAS_NAMED_MODEL_URI),metadataModel.createLiteral(arg0));
         } finally {
             metadataModel.close();
@@ -241,4 +245,31 @@ public class RDFServiceModelMaker implements ModelMaker {
                         this.getClass().getName());
     }
 
+    private void setUpMetadata(RDFService rdfService) throws RDFServiceException {
+        Model metadataModel = getMetadataModel();
+        
+        if (metadataModel.size() == 0) {
+            // set up the model name metadata to avoid expensive calls to 
+            // listNames()
+            Resource resource = metadataModel.createResource(); 
+            this.dbResource = resource;
+            
+            List<String> graphNames = rdfService.getGraphURIs();
+            Iterator<String> nameIt = graphNames.iterator();
+            while (nameIt.hasNext()) {
+                String name = (String) nameIt.next();
+                metadataModel.add(dbResource,metadataModel.getProperty(
+                        HAS_NAMED_MODEL_URI),name);
+            }
+        } else {
+            StmtIterator stmtIt = metadataModel.listStatements(
+                    (Resource) null, metadataModel.getProperty(
+                            HAS_NAMED_MODEL_URI),(RDFNode) null);
+            if (stmtIt.hasNext()) {
+                Statement stmt = stmtIt.nextStatement();
+                dbResource = stmt.getSubject();
+            }
+            stmtIt.close();
+        }
+    }
 }
