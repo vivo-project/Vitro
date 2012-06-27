@@ -12,6 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.AnnotationProperty;
+import com.hp.hpl.jena.ontology.ConversionException;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
@@ -155,7 +156,7 @@ public class SimpleReasoner extends StatementListener {
 
 		} catch (Exception e) {
 			// don't stop the edit if there's an exception
-			log.error("Exception while computing inferences: ",e);
+			log.error("Exception while computing inferences: " + e.getMessage());
 		}
 	}
 	
@@ -356,8 +357,14 @@ public class SimpleReasoner extends StatementListener {
 				
 			    cls = tboxModel.getOntClass(stmt.getObject().asResource().getURI()); 
 			    if (cls != null) {
-					List<OntClass> parents = (cls.listSuperClasses(false)).toList();		
-					parents.addAll((cls.listEquivalentClasses()).toList());	
+			    	List<OntClass> parents = null;
+			    	try {
+						parents = (cls.listSuperClasses(false)).toList();		
+						parents.addAll((cls.listEquivalentClasses()).toList());	
+			    	} catch (ConversionException ce) {
+			    	    parents = getParents(cls,tboxModel);	
+			    	}
+			    	
 					Iterator<OntClass> parentIt = parents.iterator();
 	
 					if (parentIt.hasNext()) {
@@ -1252,7 +1259,42 @@ public class SimpleReasoner extends StatementListener {
 		
         return;
 	}
+	
+
+	protected List<OntClass> getParents(OntClass cls, OntModel tboxModel) {
 		
+		List<OntClass> parents = new ArrayList<OntClass>();
+			
+	    tboxModel.enterCriticalSection(Lock.READ);
+		try {
+			StmtIterator iter = tboxModel.listStatements(cls, RDFS.subClassOf, (RDFNode) null);
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+				if (!stmt.getObject().isAnon() && stmt.getObject().canAs(OntClass.class)) {
+					if (!parents.contains(stmt.getObject().as(OntClass.class))) {
+						parents.add(stmt.getObject().as(OntClass.class));
+					}
+				}
+			}
+				
+			iter = tboxModel.listStatements(cls, OWL.equivalentClass, (RDFNode) null);
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+				if (!stmt.getObject().isAnon() && stmt.getObject().canAs(OntClass.class)) {
+					if (!parents.contains(stmt.getObject().as(OntClass.class))) {
+						parents.add(stmt.getObject().as(OntClass.class));
+					}
+				}
+			}
+		} catch (Exception e) {
+			log.error("problem computing type inferences for: " + cls.getURI() + e.getMessage());
+		} finally {
+			tboxModel.leaveCriticalSection();
+		}
+		
+		return parents;
+	}
+	
 	// system-configured reasoning modules (plugins)
 	protected boolean isInterestedInRemovedStatement(Statement stmt) {
 		
