@@ -427,9 +427,13 @@ public class SimpleReasoner extends StatementListener {
 						addInference(stmt,inferenceModel,true);
 					} 
 					
-					List<OntClass> parents = null;
-					parents = (cls.listSuperClasses(false)).toList();		
-					parents.addAll((cls.listEquivalentClasses()).toList());
+			    	List<OntClass> parents = null;
+			    	try {
+						parents = (cls.listSuperClasses(false)).toList();		
+						parents.addAll((cls.listEquivalentClasses()).toList());	
+			    	} catch (ConversionException ce) {
+			    	    parents = getParents(cls,tboxModel);	
+			    	}
 					
 					Iterator<OntClass> parentIt = parents.iterator();
 					
@@ -1260,7 +1264,6 @@ public class SimpleReasoner extends StatementListener {
         return;
 	}
 	
-
 	protected List<OntClass> getParents(OntClass cls, OntModel tboxModel) {
 		
 		List<OntClass> parents = new ArrayList<OntClass>();
