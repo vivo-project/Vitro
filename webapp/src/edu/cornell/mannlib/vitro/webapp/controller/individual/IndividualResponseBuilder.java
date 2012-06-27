@@ -88,6 +88,8 @@ class IndividualResponseBuilder {
 		 */
 		// body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
 	    body.put("labelCount", getLabelCount(itm.getUri(), vreq));
+	    body.put("publicationCount", getPublicationCount(itm.getUri(), vreq));
+	    body.put("grantCount", getGrantCount(itm.getUri(), vreq));
 		body.put("individual", wrap(itm, new ReadOnlyBeansWrapper()));
 		
 		body.put("headContent", getRdfLinkTag(itm));	       
@@ -240,36 +242,77 @@ class IndividualResponseBuilder {
     	return map;
     }
 
-    private static String PUBLICATION_QUERY = ""
+    private static String LABEL_COUNT_QUERY = ""
         + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
         + "SELECT ( str(COUNT(?label)) AS ?labelCount ) WHERE { \n"
         + "    ?subject rdfs:label ?label \n"
         + "    FILTER isLiteral(?label) \n"
         + "}" ;
     
+    private static String PUB_COUNT_QUERY = ""
+        + "PREFIX core: <http://vivoweb.org/ontology/core#> \n"
+        + "SELECT ( str(COUNT(?authorship)) AS ?authorshipCount ) WHERE { \n"
+        + "    ?subject core:authorInAuthorship ?authorship \n"
+        + "}" ;
+    
+    private static String GRANT_COUNT_QUERY = ""
+        + "PREFIX core: <http://vivoweb.org/ontology/core#> \n"
+        + "SELECT ( str(COUNT(?role)) AS ?roleCount ) WHERE { \n"
+        + "    { ?subject core:hasInvestigatorRole ?role } UNION \n"
+        + "    { ?subject core:hasPrincipalInvestigatorRole ?role } UNION \n"
+        + "    { ?subject core:hasCo-PrincipalInvestigatorRole ?role } UNION \n"
+        + "    { ?subject core:hasResearcherRole ?role } \n"
+        + "}" ;
        
     private static Integer getLabelCount(String subjectUri, VitroRequest vreq) {
           
-        String queryStr = QueryUtils.subUriForQueryVar(PUBLICATION_QUERY, "subject", subjectUri);
+        String queryStr = QueryUtils.subUriForQueryVar(LABEL_COUNT_QUERY, "subject", subjectUri);
         log.debug("queryStr = " + queryStr);
         int theCount = 0;
-//        String status = "one";
         try {
             ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
             if (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
                 String countStr = soln.get("labelCount").toString();
-                log.debug("countStr = " + countStr);
                 theCount = Integer.parseInt(countStr);
-//                log.debug("theCount = " + theCount);
-//                if ( theCount > 1 ) {
-//                    status = "multiple";
-//                }
             }
         } catch (Exception e) {
             log.error(e, e);
         }    
-    //   log.debug("status = " + status);
+        return theCount;
+    }
+    private static Integer getPublicationCount(String subjectUri, VitroRequest vreq) {
+          
+        String queryStr = QueryUtils.subUriForQueryVar(PUB_COUNT_QUERY, "subject", subjectUri);
+        log.debug("queryStr = " + queryStr);
+        int theCount = 0;
+        try {
+            ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
+            if (results.hasNext()) {
+                QuerySolution soln = results.nextSolution();
+                String countStr = soln.get("authorshipCount").toString();
+                theCount = Integer.parseInt(countStr);
+            }
+        } catch (Exception e) {
+            log.error(e, e);
+        }    
+        return theCount;
+    }
+    private static Integer getGrantCount(String subjectUri, VitroRequest vreq) {
+          
+        String queryStr = QueryUtils.subUriForQueryVar(GRANT_COUNT_QUERY, "subject", subjectUri);
+        log.debug("queryStr = " + queryStr);
+        int theCount = 0;
+        try {
+            ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
+            if (results.hasNext()) {
+                QuerySolution soln = results.nextSolution();
+                String countStr = soln.get("roleCount").toString();
+                theCount = Integer.parseInt(countStr);
+            }
+        } catch (Exception e) {
+            log.error(e, e);
+        }    
         return theCount;
     }
 }
