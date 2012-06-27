@@ -160,8 +160,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         return query.toString();
     }
     
-    private void removeUsingSparqlUpdate(Dataset dataset, Model model, String graphURI) {
-        
+    private void removeUsingSparqlUpdate(Dataset dataset, Model model, String graphURI) {      
         StmtIterator stmtIt = model.listStatements();
         
         if (!stmtIt.hasNext()) {
@@ -234,13 +233,6 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         model.read(modelChange.getSerializedModel(), null,
                 getSerializationFormatString(modelChange.getSerializationFormat()));
         return model;
-    }
-
-    @Override
-    public void newIndividual(String individualURI, String individualTypeURI,
-            String graphURI) throws RDFServiceException {
-        // TODO Auto-generated method stub
-
     }
     
     private InputStream getRDFResultStream(String query, boolean construct, 
@@ -353,7 +345,6 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 
     @Override
     public void getGraphMetadata() throws RDFServiceException {
-        // TODO Auto-generated method stub
     }
     
     @Override

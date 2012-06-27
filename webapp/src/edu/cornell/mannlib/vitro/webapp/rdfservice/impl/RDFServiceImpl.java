@@ -24,25 +24,12 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 
-/*
- * API to write, read, and update Vitro's RDF store, with support 
- * to allow listening, logging and auditing.
- */
-
 public abstract class RDFServiceImpl implements RDFService {
 	
 	private static final Log log = LogFactory.getLog(RDFServiceImpl.class);
 	protected String defaultWriteGraphURI;
 	protected List<ChangeListener> registeredListeners = new CopyOnWriteArrayList<ChangeListener>();
     	
-	/**
-	 * If the given individual already exists in the default graph, throws an 
-	 * RDFServiceException, otherwise adds one type assertion to the default
-	 * graph.
-	 * 
-	 * @param String individualURI - URI of the individual to be added
-	 * @param String individualTypeURI - URI of the type for the individual
-	 */
 	@Override
 	public void newIndividual(String individualURI, 
 			                  String individualTypeURI) throws RDFServiceException {
@@ -50,15 +37,6 @@ public abstract class RDFServiceImpl implements RDFService {
        newIndividual(individualURI, individualTypeURI, defaultWriteGraphURI);
 	}
 		
-	/**
-     * If the given individual already exists in the given graph, throws an 
-     * RDFServiceException, otherwise adds one type assertion to the given
-     * graph.
-     *
-     * @param String individualURI - URI of the individual to be added
-     * @param String individualTypeURI - URI of the type for the individual
-     * @param String graphURI - URI of the graph to which to add the individual
-     */
     @Override
     public void newIndividual(String individualURI, 
                               String individualTypeURI, 
@@ -89,21 +67,11 @@ public abstract class RDFServiceImpl implements RDFService {
        }    
     }
 	
-	/**
-	 * Get the URI of the default write graph
-	 * 
-	 * @return String URI of default write graph
-	 */
 	@Override
 	public String getDefaultWriteGraphURI() throws RDFServiceException {
         return defaultWriteGraphURI;
 	}
 		
-	/**
-	 * Register a listener to listen to changes in any graph in
-	 * the RDF store.
-	 * 
-	 */
 	@Override
 	public synchronized void registerListener(ChangeListener changeListener) throws RDFServiceException {
 		
@@ -112,21 +80,11 @@ public abstract class RDFServiceImpl implements RDFService {
 		}
 	}
 	
-	/**
-	 * Unregister a listener from listening to changes in any graph
-	 * in the RDF store.
-	 * 
-	 */
 	@Override
 	public synchronized void unregisterListener(ChangeListener changeListener) throws RDFServiceException {
 		registeredListeners.remove(changeListener);
 	}
 
-	/**
-	 * Create a ChangeSet object
-	 * 
-	 * @return a ChangeSet object
-	 */
 	@Override
 	public ChangeSet manufactureChangeSet() {
 		return new ChangeSetImpl();

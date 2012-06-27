@@ -5,7 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice;
 import java.io.InputStream;
 import java.util.List;
 
-/*
+/**
  * Input parameter to changeSetUpdate() method in RDFService.
  * Represents a precondition query and an ordered list of model changes. 
  */
@@ -13,36 +13,26 @@ import java.util.List;
 public interface ChangeSet {
 		
 	/**   
-	 * Getter for the precondition query
-	 * 
 	 * @return String - a SPARQL query            
 	 */	
 	public String getPreconditionQuery();
 	
 	/**   
-	 * Setter for the precondition query
-	 * 
 	 * @param preconditionQuery - a SPARQL query            
 	 */	
 	public void setPreconditionQuery(String preconditionQuery);
 	
 	/**   
-	 * Getter for the precondition query type
-	 * 
 	 * @return RDFService.SPARQLQueryType - the precondition query type           
 	 */	
 	public RDFService.SPARQLQueryType getPreconditionQueryType();
 	
 	/**   
-	 * Setter for the precondition query type
-	 * 
 	 * @param queryType - the precondition query type           
 	 */	
 	public void setPreconditionQueryType(RDFService.SPARQLQueryType queryType);
 
 	/**   
-	 * Getter for the list of model changes
-	 * 
 	 * @return List<ModelChange> - list of model changes           
 	 */		
 	public List<ModelChange> getModelChanges();
@@ -71,6 +61,8 @@ public interface ChangeSet {
 
 	/**   
 	 * Creates an instance of the ModelChange class 
+	 * 
+	 * @return ModelChange - an empty instance of the ModelChange class
 	 */		
 	public ModelChange manufactureModelChange();
 	
@@ -80,7 +72,10 @@ public interface ChangeSet {
 	 * @param serializedModel - a serialized RDF model (collection of triples)  
 	 * @param serializationFormat - format of the serialized RDF model
 	 * @param operation - the type of operation to be performed with the serialized RDF model 
-	 * @param graphURI - URI of the graph on which to apply the model change operation        
+	 * @param graphURI - URI of the graph on which to apply the model change operation 
+	 * 
+	 * @return ModelChange - a ModelChange instance initialized with the input
+	 *                       model, model format, operation and graphURI
 	 */		
 	public ModelChange manufactureModelChange(InputStream serializedModel,
                                               RDFService.ModelSerializationFormat serializationFormat,
@@ -88,31 +83,37 @@ public interface ChangeSet {
                                               String graphURI);
 	
 	/**
-	 * Add an event that will be be passed to any change listeners in advance of
-	 * the change set additions and retractions being performed.  The event
+	 * Adds an event that will be be passed to any change listeners in advance of
+	 * the change set additions and retractions being performed. The event
 	 * will only be fired if the precondition (if any) is met.
-	 * @param event
+	 * 
+	 * @param event - event to notify listeners of in advance of making
+	 *                changes to the triple store.
 	 */
 	public void addPreChangeEvent(Object event);
 	    
     /**
-     * Add an event that will be be passed to any change listeners after all of
+     * Adds an event that will be be passed to any change listeners after all of
      * the change set additions and retractions are performed.
-     * @param event
+     * 
+     * @param event - the event to notify listeners of after the changes are 
+     *                performed.
      */
     public void addPostChangeEvent(Object event);
 
     /**
-     * Return a list of events to pass to any change listeners in 
+     * Returns a list of events to pass to any change listeners in 
      * advance of the change set additions and retractions being performed.
-     * @return
+     * 
+     * @return List<Object>
      */
 	public List<Object> getPreChangeEvents();
 	
     /**
-     * Return a list of events to pass to any change listeners after 
+     * Returns a list of events to pass to any change listeners after 
      * the change set additions and retractions are performed.
-     * @return
+     * 
+     * @return List<Object>
      */
     public List<Object> getPostChangeEvents();
     

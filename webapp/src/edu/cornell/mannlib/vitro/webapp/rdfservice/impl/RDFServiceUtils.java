@@ -81,7 +81,7 @@ public class RDFServiceUtils {
             case N3: 
                 return "N3";
             default: 
-                throw new RuntimeException("unexpected format in getFormatString");
+                throw new RuntimeException("unexpected format in getSerializationFormatString");
         }
     }
     

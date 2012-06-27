@@ -32,7 +32,8 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
     public RDFServiceModel(Model model) {
         this.model = model;
     }
-    
+  
+    @Override
     protected DatasetWrapper getDatasetWrapper() {
       DatasetWrapper datasetWrapper = new DatasetWrapper(new DatasetImpl(model));
       return datasetWrapper;

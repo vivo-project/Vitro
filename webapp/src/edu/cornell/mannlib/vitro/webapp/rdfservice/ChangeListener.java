@@ -2,15 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice;
 
-/*
- * 
- * A listener that filters all its listening down to the single-statement level. Users of
- * this class override addedStatement(statement) and removedStatement(statement).
- *  
+/**
+ * An interface for listening to triples that are added to or removed
+ * from the triple store, and other miscellaneous events.   
  */
 
-public interface ChangeListener {
-		
+public interface ChangeListener {		
 	/**
 	 * Override this to listen to all statements added to the RDF store. 
 	 * 
