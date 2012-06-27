@@ -54,6 +54,10 @@ public class VitroRequest extends HttpServletRequestWrapper {
         }
     }
     
+    public void setRDFService(RDFService rdfService) {
+        setAttribute("rdfService", rdfService);
+    }
+    
     public void setWebappDaoFactory( WebappDaoFactory wdf){
         setAttribute("webappDaoFactory",wdf);
     }

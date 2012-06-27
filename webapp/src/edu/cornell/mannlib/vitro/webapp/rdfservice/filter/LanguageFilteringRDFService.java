@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -38,7 +39,28 @@ public class LanguageFilteringRDFService implements RDFService {
     
     public LanguageFilteringRDFService(RDFService service, List<String> langs) {
         this.s = service;
-        this.langs = langs;
+        this.langs = normalizeLangs(langs);
+    }
+    
+    private List<String> normalizeLangs(List<String> langs) {
+        List<String> normalizedLangs = new ArrayList<String>();
+        String currentBaseLang = null;
+        for (String lang : langs) {
+            String normalizedLang = StringUtils.lowerCase(lang);
+            String baseLang = normalizedLang.split("-")[0];
+            if (currentBaseLang == null) {
+                currentBaseLang = baseLang;
+            } else if (!currentBaseLang.equals(baseLang)) {
+                if (!normalizedLangs.contains(currentBaseLang)) {
+                    normalizedLangs.add(currentBaseLang);
+                }
+                currentBaseLang = baseLang;
+            }
+        }
+        if (currentBaseLang != null && !normalizedLangs.contains(currentBaseLang)) {
+            normalizedLangs.add(currentBaseLang);
+        }
+        return normalizedLangs;
     }
 
     @Override
@@ -96,7 +118,7 @@ public class LanguageFilteringRDFService implements RDFService {
                 }
                 Collections.sort(candidatesForRemoval, new StatementSortByLang());
                 Iterator<Statement> candIt = candidatesForRemoval.iterator();
-                String langRegister = "";
+                String langRegister = null;
                 boolean chuckRemaining = false;
                 while(candIt.hasNext()) {
                     Statement s = candIt.next();
@@ -106,10 +128,9 @@ public class LanguageFilteringRDFService implements RDFService {
                         retractions.add(s);
                     } 
                     String lang = s.getObject().asLiteral().getLanguage();
-                    if (langRegister == "") {
+                    if (langRegister == null) {
                         langRegister = lang;
-                    } else if ((langRegister == null && lang != null) 
-                            || (!langRegister.equals(lang)) ) {
+                    } else if (!langRegister.equals(lang)) {
                         chuckRemaining = true;
                         retractions.add(s);
                     }
@@ -158,16 +179,15 @@ public class LanguageFilteringRDFService implements RDFService {
                 }
                 Collections.sort(candidatesForRemoval, new RowIndexedLiteralSortByLang());
                 Iterator<RowIndexedLiteral> candIt = candidatesForRemoval.iterator();
-                String langRegister = "";
+                String langRegister = null;
                 boolean chuckRemaining = false;
                 while(candIt.hasNext()) {
                     RowIndexedLiteral rlit = candIt.next();
                     if (chuckRemaining) {
                         solnList.set(rlit.getIndex(), null);
-                    } else if (langRegister == "") {
+                    } else if (langRegister == null) {
                         langRegister = rlit.getLiteral().getLanguage();
-                    } else if ((langRegister == null && rlit.getLiteral().getLanguage() != null) 
-                            || (!langRegister.equals(rlit.getLiteral().getLanguage())) ) {
+                    } else if (!langRegister.equals(rlit.getLiteral().getLanguage())) {
                         chuckRemaining = true;
                         solnList.set(rlit.getIndex(), null);
                     }
@@ -303,7 +323,41 @@ public class LanguageFilteringRDFService implements RDFService {
         s.close();            
     }
        
-    private class RowIndexedLiteralSortByLang implements Comparator<RowIndexedLiteral> {
+    private class LangSort {
+        
+        protected int compareLangs(String t1lang, String t2lang) {
+            t1lang = StringUtils.lowerCase(t1lang);
+            t2lang = StringUtils.lowerCase(t2lang);
+            if ( t1lang == null && t2lang == null) {
+                return 0;
+            } else if (t1lang == null) { 
+                return 1;
+            } else if (t2lang == null) {
+                return -1;
+            } else {        
+                int t1langPref = langs.indexOf(t1lang);
+                int t2langPref = langs.indexOf(t2lang);
+                if (t1langPref == -1 && t2langPref == -1) {
+                    if ("".equals(t1lang) && "".equals(t2lang)) {
+                        return 0;
+                    } else if ("".equals(t1lang) && !("".equals(t2lang))) {
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                } else if (t1langPref > -1 && t2langPref == -1) {
+                    return -1;
+                } else if (t1langPref == -1 && t2langPref > -1) {
+                    return 1;
+                } else {
+                    return t1langPref - t2langPref;
+                }
+            }
+        }
+        
+    }
+    
+    private class RowIndexedLiteralSortByLang extends LangSort implements Comparator<RowIndexedLiteral> {
         
         public int compare(RowIndexedLiteral rilit1, RowIndexedLiteral rilit2) {
             if (rilit1 == null || rilit2 == null) {
@@ -313,27 +367,11 @@ public class LanguageFilteringRDFService implements RDFService {
             String t1lang = rilit1.getLiteral().getLanguage();
             String t2lang = rilit2.getLiteral().getLanguage();
                     
-            if ( t1lang == null && t2lang == null) {
-                return 0;
-            } else if (t1lang == null) { 
-                return 1;
-            } else if (t2lang == null) {
-                return -1;
-            } else {
-                int t1langPref = langs.indexOf(t1lang);
-                if (t1langPref == -1) {
-                    t1langPref = Integer.MAX_VALUE; 
-                }
-                int t2langPref = langs.indexOf(t2lang);
-                if (t2langPref == -1) {
-                    t2langPref = Integer.MAX_VALUE; 
-                }
-                return t1langPref - t2langPref;
-            }           
+            return compareLangs(t1lang, t2lang);
         }   
     }
     
-    private class StatementSortByLang implements Comparator<Statement> {
+    private class StatementSortByLang extends LangSort implements Comparator<Statement> {
         
         public int compare(Statement s1, Statement s2) {
             if (s1 == null || s2 == null) {
@@ -345,24 +383,8 @@ public class LanguageFilteringRDFService implements RDFService {
             String s1lang = s1.getObject().asLiteral().getLanguage();
             String s2lang = s2.getObject().asLiteral().getLanguage();
                     
-            if (s1lang == null && s2lang == null) {
-                return 0;
-            } else if (s1lang == null) { 
-                return 1;
-            } else if (s2lang == null) {
-                return -1;
-            } else {
-                int t1langPref = langs.indexOf(s1lang);
-                if (t1langPref == -1) {
-                    t1langPref = Integer.MAX_VALUE; 
-                }
-                int t2langPref = langs.indexOf(s2lang);
-                if (t2langPref == -1) {
-                    t2langPref = Integer.MAX_VALUE; 
-                }
-                return t1langPref - t2langPref;
-            }           
-        }   
+            return compareLangs(s1lang, s2lang);
+        }
     }
     
 }

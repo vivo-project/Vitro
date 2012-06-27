@@ -97,6 +97,9 @@ public class WebappDaoFactorySDBPrep implements Filter {
             Locale locale = locs.nextElement();
             langs.add(locale.toString().replace("_", "-"));
         }
+        if (langs.isEmpty()) {
+            langs.add("en");
+        }
         WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
         config.setDefaultNamespace(defaultNamespace);
         config.setPreferredLanguages(langs);
@@ -114,6 +117,7 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		wadf = new WebappDaoFactorySDB(rdfService, oms, config);
 	    WebappDaoFactory assertions = new WebappDaoFactorySDB(
 	            rdfService, baseOms, config, SDBDatasetMode.ASSERTIONS_ONLY);
+	    vreq.setRDFService(rdfService);
 		vreq.setWebappDaoFactory(wadf);
 		vreq.setAssertionsWebappDaoFactory(assertions);
 		vreq.setFullWebappDaoFactory(wadf);
