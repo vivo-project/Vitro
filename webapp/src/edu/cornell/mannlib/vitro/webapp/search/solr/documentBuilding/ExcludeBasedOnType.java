@@ -17,6 +17,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
  */
 public class ExcludeBasedOnType implements SearchIndexExcluder {
 
+	private static final String SKIP_MSG = "skipping due to type.";
+	
+	/** The add, set and remove methods must keep this list sorted. */
     List<String> typeURIs;
     
     public ExcludeBasedOnType(String ... typeURIs) {    
@@ -25,22 +28,41 @@ public class ExcludeBasedOnType implements SearchIndexExcluder {
 
     @Override
     public String checkForExclusion(Individual ind) { 
-        if( ind != null ) {                    
-            List<VClass> vclasses = ind.getVClasses();
-            if( vclasses != null && ! Collections.disjoint(vclasses, typeURIs)  ){
-                return("skipping due to type.");             
-            }        
-        }
+        if( ind == null ) 
+        	return null;
+                  	
+    	if( typeURIinExcludeList( ind.getVClass() ))
+    		return SKIP_MSG;        	
+    	
+        List<VClass> vclasses = ind.getVClasses();
+        if( vclasses == null)
+        	return null;        
+        
+        for( VClass vclz : vclasses){
+        	if( typeURIinExcludeList( vclz ))
+        		return SKIP_MSG;
+        }        
+        
         return null;
     }
         
+    protected boolean typeURIinExcludeList( VClass vclz){    
+    	if( vclz != null && vclz.getURI() != null && !vclz.isAnonymous() ){
+    		int pos = Collections.binarySearch(typeURIs, vclz.getURI());
+    		return pos >= 0;    			        		        	
+        }else{
+        	return false;
+        }    	
+    }
+    
     public void setExcludedTypes(String ... typeURIs){        
         setExcludedTypes(Arrays.asList(typeURIs));         
     }
     
     public void setExcludedTypes(List<String> typeURIs){
         synchronized(this){
-            this.typeURIs = new ArrayList<String>(typeURIs);            
+            this.typeURIs =  new ArrayList<String>(typeURIs) ;
+            Collections.sort( this.typeURIs );
         }
     }
     
@@ -48,13 +70,14 @@ public class ExcludeBasedOnType implements SearchIndexExcluder {
         if( typeURI != null && !typeURI.isEmpty()){
             synchronized(this){
                 typeURIs.add(typeURI);
+                Collections.sort( this.typeURIs );
             }
         }
     }
     
     protected void removeTypeToExclude(String typeURI){        
         synchronized(this){
-            typeURIs.remove(typeURI);
+            typeURIs.remove(typeURI);            
         }
     }
 }

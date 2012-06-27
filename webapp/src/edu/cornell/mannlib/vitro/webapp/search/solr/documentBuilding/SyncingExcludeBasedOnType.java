@@ -41,6 +41,7 @@ public class SyncingExcludeBasedOnType extends ExcludeBasedOnType implements Mod
     
     public SyncingExcludeBasedOnType( Model model){            
         this.setExcludedTypes( buildProhibitedClassesList(searchIndexURI, model) );
+        log.info("types excluded from search: " + typeURIs);
     }       
         
     private List<String> buildProhibitedClassesList( String URI, Model model){
@@ -68,7 +69,7 @@ public class SyncingExcludeBasedOnType extends ExcludeBasedOnType implements Mod
             }catch(Throwable t){
                 log.error(t,t);         
             }finally{ qExec.close(); }
-        }finally{ model.leaveCriticalSection(); }
+        }finally{ model.leaveCriticalSection(); }                                
         
         return newProhibitedClasses;
     }
@@ -83,11 +84,13 @@ public class SyncingExcludeBasedOnType extends ExcludeBasedOnType implements Mod
                 if( s.getObject() != null && s.getObject().canAs(Resource.class)){                
                     String classURI = ((Resource)s.getObject().as(Resource.class)).getURI();     
                     this.addTypeToExclude(classURI);
+                    log.debug("prohibited classes: " + this.typeURIs);
                 }
             }
         }catch(Exception ex){
             log.error("could not add statement",ex);
         }
+        
     }
 
     @Override
@@ -96,7 +99,8 @@ public class SyncingExcludeBasedOnType extends ExcludeBasedOnType implements Mod
             if( isExcludeClassPredicate( s ) && isAboutSearchIndex(s)){             
                 if( s.getObject() != null && s.getObject().canAs(Resource.class)){            
                     String classURI = ((Resource)s.getObject().as(Resource.class)).getURI();                            
-                    this.removeTypeToExclude(classURI);                
+                    this.removeTypeToExclude(classURI);
+                    log.debug("prohibited classes: " + this.typeURIs);
                 }
             }
         }catch(Exception ex){

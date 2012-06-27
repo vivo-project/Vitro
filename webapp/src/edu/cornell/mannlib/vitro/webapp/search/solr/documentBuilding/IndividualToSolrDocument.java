@@ -49,7 +49,7 @@ public class IndividualToSolrDocument {
         try{    	            	      	        	        	
         	String excludeMsg = checkExcludes( ind );
         	if( excludeMsg != DONT_EXCLUDE){
-        	    log.debug(excludeMsg);
+        	    log.debug(ind.getURI() + " " + excludeMsg);
         	    return null;
         	}        	    
         		            
@@ -235,7 +235,7 @@ public class IndividualToSolrDocument {
         
         List<VClass> vclasses = ind.getVClasses(false);
         if( vclasses == null || vclasses.isEmpty() ){
-            throw new SkipIndividualException("Not indexing because individual has no super classes");
+            throw new SkipIndividualException("Not indexing because individual has no classes");
         }        
                 
         for(VClass clz : vclasses){
