@@ -180,6 +180,7 @@ public class JenaIngestController extends BaseEditController {
             processRenameResourceRequest(vreq, response, maker, modelType);
         } else if("mergeResult".equals(actionStr)){
             processMergeResultRequest(vreq, response, maker, modelType);
+            return;
         }
         
         else {

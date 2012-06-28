@@ -10,16 +10,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openrdf.model.Resource;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.Update;
-import org.openrdf.query.UpdateExecutionException;
-import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
 import org.openrdf.repository.RepositoryResult;
@@ -32,6 +31,7 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -48,6 +48,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.ChangeSetImpl;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.ListeningGraph;
+import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
 /*
  * API to write, read, and update Vitro's RDF store, with support 
@@ -59,8 +60,9 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	private static final Log log = LogFactory.getLog(RDFServiceImpl.class);
 	private String readEndpointURI;	
 	private String updateEndpointURI;
-	private Repository readRepository;
-	private Repository updateRepository;
+	private HTTPRepository readRepository;
+	private HTTPRepository updateRepository;
+	private boolean useSesameContextQuery = true;
 	
     /**
      * Returns an RDFService for a remote repository 
@@ -78,7 +80,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         this.updateEndpointURI = updateEndpointURI;
         this.readRepository = new HTTPRepository(readEndpointURI);
         this.updateRepository = new HTTPRepository(updateEndpointURI);
-        
+
         testConnection();
     }
     
@@ -332,25 +334,47 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	// graph update API
 	@Override
 	public List<String> getGraphURIs() throws RDFServiceException {
-		
-        List<String> graphNodeList = new ArrayList<String>();
-        
-        try {
-            RepositoryConnection conn = getWriteConnection();
+        if (!this.useSesameContextQuery) {
+            return getGraphURIsFromSparqlQuery();
+        } else {
             try {
-                RepositoryResult<Resource> conResult = conn.getContextIDs();
-                while (conResult.hasNext()) {
-                    Resource res = conResult.next();
-                    graphNodeList.add(res.stringValue());   
-                }
-            } finally {
-                conn.close();
+                return getGraphURIsFromSesameContexts();
+            } catch (RepositoryException re) {
+                this.useSesameContextQuery = false;
+                return getGraphURIsFromSparqlQuery();
             }
-        } catch (RepositoryException re) {
-            throw new RuntimeException(re);
+        } 
+	}
+	
+	private List<String> getGraphURIsFromSesameContexts() throws RepositoryException {
+	    List<String> graphURIs = new ArrayList<String>();
+	    RepositoryConnection conn = getReadConnection();
+        try {
+            RepositoryResult<Resource> conResult = conn.getContextIDs();
+            while (conResult.hasNext()) {
+                Resource res = conResult.next();
+                graphURIs.add(res.stringValue());   
+            }
+        } finally {
+            conn.close();
         }
-        
-        return graphNodeList;		
+        return graphURIs;
+	}
+	
+	private List<String> getGraphURIsFromSparqlQuery() throws RDFServiceException {
+	    List<String> graphURIs = new ArrayList<String>();
+	    try {
+            String graphURIString = "SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } } ORDER BY ?g";
+            ResultSet rs = ResultSetFactory.fromJSON(
+                    sparqlSelectQuery(graphURIString, RDFService.ResultFormat.JSON));
+            while (rs.hasNext()) {
+                QuerySolution qs = rs.nextSolution();
+                graphURIs.add(qs.getResource("g").getURI());
+            }
+        } catch (Exception e) {
+            throw new RDFServiceException("Unable to list graph URIs", e);
+        }
+	    return graphURIs;
 	}
 
 	/**
@@ -416,6 +440,14 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         return updateEndpointURI;
     }
     
+    protected RepositoryConnection getReadConnection() {
+        try {
+            return this.readRepository.getConnection();
+        } catch (RepositoryException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
     protected RepositoryConnection getWriteConnection() {
         try {
             return this.updateRepository.getConnection();
@@ -424,35 +456,34 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         }
     }
     
-    protected void executeUpdate(String updateString) {    
+    protected void executeUpdate(String updateString) throws RDFServiceException {    
         try {
-            RepositoryConnection conn = getWriteConnection();
-            try {
-                Update u = conn.prepareUpdate(QueryLanguage.SPARQL, updateString);
-                u.execute();
-            } catch (MalformedQueryException e) {
-                throw new RuntimeException(e);
-            } catch (UpdateExecutionException e) {
-                log.error(e,e);
-                log.error("Update command: \n" + updateString);
-                throw new RuntimeException(e);
-            } finally {
-                conn.close();
+            HttpClient httpClient = new HttpClient();
+            PostMethod meth = new PostMethod(updateEndpointURI);
+            meth.addRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            NameValuePair[] body = new NameValuePair[1];
+            body[0] = new NameValuePair("update", updateString);
+            meth.setRequestBody(body);
+            int response = httpClient.executeMethod(meth);
+            if (response > 399) {
+                log.error("response " + response + " to update. \n");
+                log.debug("update string: \n" + updateString);
+                throw new RDFServiceException("Unable to perform SPARQL UPDATE");
             }
-        } catch (RepositoryException re) {
-            throw new RuntimeException(re);
-        }
+        } catch (Exception e) {
+            throw new RDFServiceException("Unable to perform change set update", e);
+        } 
     }
        
-    public void addModel(Model model, String graphURI) {
+    public void addModel(Model model, String graphURI) throws RDFServiceException {
         verbModel(model, graphURI, "INSERT");
     }
     
-    public void deleteModel(Model model, String graphURI) {
+    public void deleteModel(Model model, String graphURI) throws RDFServiceException {
         verbModel(model, graphURI, "DELETE");
     }
     
-    private void verbModel(Model model, String graphURI, String verb) {
+    private void verbModel(Model model, String graphURI, String verb) throws RDFServiceException {
         Model m = ModelFactory.createDefaultModel();
         int testLimit = 1000;
         StmtIterator stmtIt = model.listStatements();
@@ -481,7 +512,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         }
     }
     
-    protected void addTriple(Triple t, String graphURI) {
+    protected void addTriple(Triple t, String graphURI) throws RDFServiceException {
                 
         StringBuffer updateString = new StringBuffer();
         updateString.append("INSERT DATA { ");
@@ -498,7 +529,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         notifyListeners(t, ModelChange.Operation.ADD, graphURI);
     }
     
-    protected void removeTriple(Triple t, String graphURI) {
+    protected void removeTriple(Triple t, String graphURI) throws RDFServiceException {
                 
         StringBuffer updateString = new StringBuffer();
         updateString.append("DELETE DATA { ");
@@ -551,7 +582,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         }
 	}
 	
-    private void performChange(ModelChange modelChange) {
+    private void performChange(ModelChange modelChange) throws RDFServiceException {
         Model model = parseModel(modelChange);
         if (modelChange.getOperation() == ModelChange.Operation.ADD) {
             addModel(model, modelChange.getGraphURI());  
@@ -563,7 +594,8 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         }         
     }
     
-    private void removeBlankNodesWithSparqlUpdate(Model model, String graphURI) {
+    private void removeBlankNodesWithSparqlUpdate(Model model, String graphURI) 
+            throws RDFServiceException {
         List<Statement> blankNodeStatements = new ArrayList<Statement>();
         StmtIterator stmtIt = model.listStatements();
         while (stmtIt.hasNext()) {
@@ -636,7 +668,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         }        
     }
     
-    private void removeUsingSparqlUpdate(Model model, String graphURI) {
+    private void removeUsingSparqlUpdate(Model model, String graphURI) throws RDFServiceException {
         
         StmtIterator stmtIt = model.listStatements();
         
