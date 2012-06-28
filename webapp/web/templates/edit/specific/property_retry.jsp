@@ -59,7 +59,7 @@
 </tr>
 <tr><td colspan="5"><hr class="formDivider"/></td></tr>
 <tr class="editformcell">
-    <td style="vertical-align:top;" valign="top" colspan="1">
+    <td style="vertical-align:top;" valign="top" colspan="2">
         <b>Inverse property ontology</b><br/>
         <c:choose>
         	<c:when test="${_action eq 'update'}">
@@ -71,7 +71,7 @@
 			</c:otherwise>
 		</c:choose>
 	</td>
-    <td style="vertical-align:top;" valign="top" colspan="2">
+    <td style="vertical-align:top;" valign="top" colspan="1">
 		<b>Inverse internal name</b><br/>
         <c:choose>
         	<c:when test="${_action eq 'update'}">
@@ -89,7 +89,7 @@
             <span class="notice"><c:out value="${LocalNameInverseError}"/></span>
         </c:if>
 	</td>
-    <td valign="top" style="vertical-align:top;" colspan="2">
+    <td valign="top" style="vertical-align:top;" colspan="1">
         <b>Inverse label</b><br/>
         <input type="text" class="fullWidthInput" name="RangePublic" value="<form:value name="RangePublic"/>" maxlength="80" /><br/>
         <br/> 
@@ -98,6 +98,7 @@
             <span class="notice"><c:out value="${RangePublicError}"/></span>
         </c:if>
     </td>
+    <td>&nbsp;</td>
 </tr>
 <tr><td colspan="5"><hr class="formDivider"/></td></tr>
 <tr class="editformcell">
@@ -122,19 +123,17 @@
                 <input name="Transitive" type="checkbox" value="TRUE"/>transitive
             </c:otherwise>
         </c:choose>
+        <span style="margin-left:170px">&nbsp;</span>   
+            <c:choose>
+               <c:when test="${symmetric}">
+                   <input name="Symmetric" type="checkbox" value="TRUE" checked="checked"/> symmetric
+               </c:when>
+               <c:otherwise>
+                   <input name="Symmetric" type="checkbox" value="TRUE"/> symmetric
+               </c:otherwise>
+           </c:choose>
     </td>
-    <td valign="top" colspan="1">
-        <br/><br/>
-        <c:choose>
-            <c:when test="${symmetric}">
-                <input name="Symmetric" type="checkbox" value="TRUE" checked="checked"/> symmetric
-            </c:when>
-            <c:otherwise>
-                <input name="Symmetric" type="checkbox" value="TRUE"/> symmetric
-            </c:otherwise>
-        </c:choose>
-    </td>
-    <td valign="top" colspan="1">
+    <td valign="top" colspan="3">
         <br/><br/>
         <c:choose>
             <c:when test="${functional}">
@@ -144,9 +143,7 @@
                 <input name="Functional" type="checkbox" value="TRUE"/> functional
             </c:otherwise>
         </c:choose>
-    </td>
-    <td valign="top" colspan="1">
-        <br/><br/>
+        <span style="margin-left:150px">&nbsp;</span> 
         <c:choose>
             <c:when test="${inverseFunctional}">
                 <input name="InverseFunctional" type="checkbox" value="TRUE" checked="checked"/> inverse functional
@@ -269,8 +266,8 @@
             </c:otherwise>
         </c:choose>
     </td>
-    <td valign="top" colspan="2">
-    	Allow creating new related individuals?<br/><br/>
+    <td valign="top" colspan="1">
+    	Allow creating new related individuals?<br/>
        	<c:choose>
             <c:when test="${offerCreateNewOption}">
     	       	<input name="OfferCreateNewOption" type="checkbox" value="TRUE" checked="checked"/>offer create option
@@ -280,7 +277,7 @@
             </c:otherwise>
         </c:choose>
     </td>
-    <td valign="top" colspan="1">
+    <td valign="top" colspan="2">
         <b>Custom entry form</b><br/>
         <input type="text" class="fullWidthInput" name="CustomEntryForm" value="<form:value name="CustomEntryForm"/>" />
             <c:set var="CustomEntryFormError"><form:error name="CustomEntryForm"/></c:set>
