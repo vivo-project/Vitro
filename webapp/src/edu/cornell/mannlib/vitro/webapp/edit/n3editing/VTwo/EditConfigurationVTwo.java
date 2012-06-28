@@ -162,8 +162,9 @@ public class EditConfigurationVTwo {
     /** 
      * If true, then any dependent resources that are unlinked should be
      * removed using DependentResourceDelete. 
+     *Setting to false for now as we should no longer be utilizing dependent resource deletion.
      */
-    private boolean useDependentResourceDelete = true;   
+    private boolean useDependentResourceDelete = false;   
 
     /** Model id from write model. */
     private String writeModelId;

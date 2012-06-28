@@ -60,7 +60,10 @@ public class DependentResourceDeleteJena {
 		List<Statement> removedStmts = getRemovedStmts( assertions, retractions);
 
 		/* Get ride of any statements that seem to be a change */
-		List<Statement>changedStmts = getChangedStmts( assertions, retractions);
+		HashSet<Statement> changedStatementsSet = new HashSet<Statement>();
+		changedStatementsSet.addAll(getChangedStmts( assertions, retractions));
+		List<Statement>changedStmts = new LinkedList<Statement>();
+		changedStmts.addAll(changedStatementsSet);
 		ListIterator <Statement>removed = removedStmts.listIterator();
 		while( removed.hasNext()){
 			Statement removedStmt = removed.next();
