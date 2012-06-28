@@ -987,7 +987,7 @@ public class SimpleReasoner extends StatementListener {
 				}
 				
 				if (!stmt.getObject().isResource()) {
-					log.warn("The predicate of this statement is an object property, but the object is not a resource.");
+					log.debug("The predicate of this statement is an object property, but the object is not a resource.");
 					return inverses;
 				}
 				
