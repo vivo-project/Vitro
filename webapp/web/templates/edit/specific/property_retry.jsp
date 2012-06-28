@@ -123,7 +123,7 @@
                 <input name="Transitive" type="checkbox" value="TRUE"/>transitive
             </c:otherwise>
         </c:choose>
-        <span class="checkBoxSpacer">&nbsp;</span>   
+        <span class="checkboxSpacer">&nbsp;</span>   
             <c:choose>
                <c:when test="${symmetric}">
                    <input name="Symmetric" type="checkbox" value="TRUE" checked="checked"/> symmetric
@@ -143,7 +143,7 @@
                 <input name="Functional" type="checkbox" value="TRUE"/> functional
             </c:otherwise>
         </c:choose>
-        <span class="checkBoxSpacer">&nbsp;</span> 
+        <span class="checkboxSpacer">&nbsp;</span> 
         <c:choose>
             <c:when test="${inverseFunctional}">
                 <input name="InverseFunctional" type="checkbox" value="TRUE" checked="checked"/> inverse functional
