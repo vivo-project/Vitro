@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.text.Collator;
 import java.util.ArrayList;
@@ -109,6 +111,7 @@ public class JenaIngestController extends BaseEditController {
     private static final String SPARQL_QUERYSTR_PROP = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7/sparql#queryStr";
     private static final String RENAME_RESOURCE = "/jenaIngest/renameResource.jsp";
     private static final String RENAME_RESULT = "/jenaIngest/renameResult.jsp";
+    private static final String CREATED_GRAPH_BASE_URI = "http://vitro.mannlib.cornell.edu/a/graph/";
 
     private static final Map<String, Model> attachedModels = new HashMap<String, Model>();
     
@@ -221,9 +224,22 @@ public class JenaIngestController extends BaseEditController {
     
     private void processCreateModelRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
         String modelName = vreq.getParameter("modelName");
+    	
         if (modelName != null) {
-            doCreateModel(modelName, maker);
-            showModelList(vreq, maker, modelType);
+        	try {
+            	URI graphURI = new URI(modelName);
+            	
+            	if (graphURI.getScheme() == null) {
+            	   String origName = modelName;	
+            	   modelName =CREATED_GRAPH_BASE_URI + modelName;
+                   log.info("The model name has been changed from " + origName + " to " + modelName);
+            	}
+            	           	
+                doCreateModel(modelName, maker);
+                showModelList(vreq, maker, modelType);      
+        	} catch (URISyntaxException e) {
+        		throw new RuntimeException("the model name must be a valid URI");
+        	}
         } else {
             vreq.setAttribute("modelType", modelType);
             vreq.setAttribute("title","Create New Model");
