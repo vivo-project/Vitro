@@ -211,7 +211,7 @@ public class SolrSmokeTest implements ServletContextListener {
 	 * </pre>
 	 */
 	private static class SolrHomePager {
-		private static final long SLEEP_INTERVAL = 10000; // 10 seconds
+		private static final long SLEEP_INTERVAL = 20000; // 20 seconds
 
 		private final URL solrUrl;
 		private final HttpClient httpClient = new HttpClient();
