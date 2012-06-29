@@ -11,10 +11,14 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
@@ -30,6 +34,9 @@ public class JenaExportController extends BaseEditController {
 	private static final Actions REQUIRED_ACTIONS = SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTIONS
 			.or(SimplePermission.EDIT_ONTOLOGY.ACTION);
 
+	
+	private static final Log log = LogFactory.getLog(JenaExportController.class);
+	
 	@Override
 	public void doGet( HttpServletRequest request, HttpServletResponse response ) {
 		if (!isAuthorizedToDisplayPage(request, response, REQUIRED_ACTIONS)) {
@@ -203,10 +210,25 @@ public class JenaExportController extends BaseEditController {
 			// 2010-11-02 workaround for the fact that ARP now always seems to 
 			// try to parse N3 using strict Turtle rules.  Avoiding headaches
 			// by always serializing out as Turtle instead of using N3 sugar.
-			if(!"full".equals(subgraphParam))
-				model.write( outStream, "N3".equals(formatParam) ? "TTL" : formatParam );
-			else
-				ontModel.writeAll(outStream, "N3".equals(formatParam) ? "TTL" : formatParam, null );
+			try {
+				if(!"full".equals(subgraphParam)) {
+					model.write( outStream, "N3".equals(formatParam) ? "TTL" : formatParam );
+				} else {
+					ontModel.writeAll(outStream, "N3".equals(formatParam) ? "TTL" : formatParam, null );
+				}
+			} catch (JenaException je) {
+				response.setContentType("text/plain");
+				response.setHeader("content-disposition", "attachment; filename=" + "export.txt");
+
+				if(!"full".equals(subgraphParam)) {
+					model.write( outStream, "N-TRIPLE", null);
+				} else {
+					ontModel.writeAll(outStream, "N-TRIPLE", null );
+				}
+				
+				log.info("exported model in N-TRIPLE format instead of N3 because there was a problem exporting in N3 format");
+			}
+
 			outStream.flush();
 			outStream.close();
 		} catch (IOException ioe) {
