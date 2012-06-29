@@ -71,18 +71,18 @@ public class IndexBuilder extends VitroBackgroundThread {
     /** Flag so we can tell that the index is being rebuilt. */
     public static final String FLAG_REBUILDING = "rebuilding";
     
-    /** Number of threads to use during indexing. */
-    //protected int numberOfThreads = 10;
-    
     /** List of IndexingEventListeners */
     protected LinkedList<IndexingEventListener> indexingEventListeners = 
         new LinkedList<IndexingEventListener>();
     
     /** number of threads to use during a full index rebuild. */
-    public static final int REINDEX_THREADS= 1;
+    public static final int REINDEX_THREADS= 10;
     
     /** Max threads to use during an update.  Smaller updates will use fewer threads. */
-    public static final int MAX_UPDATE_THREADS= 1;    
+    public static final int MAX_UPDATE_THREADS= 10;    
+    
+    /** Number of individuals to index per update thread. */
+    public static final int URIS_PER_UPDATE_THREAD = 50;
     
     private static final Log log = LogFactory.getLog(IndexBuilder.class);
     
@@ -301,7 +301,7 @@ public class IndexBuilder extends VitroBackgroundThread {
         
         int numberOfThreads = 
         	Math.min( MAX_UPDATE_THREADS, 
-        			  Math.max( uriLists.updatedUris.size() / 100, 1)); 
+        			  Math.max( uriLists.updatedUris.size() / URIS_PER_UPDATE_THREAD, 1)); 
         doBuild( uriLists.updatedUris.iterator(), uriLists.deletedUris , numberOfThreads);
         
         log.debug("Ending updateIndex()");
