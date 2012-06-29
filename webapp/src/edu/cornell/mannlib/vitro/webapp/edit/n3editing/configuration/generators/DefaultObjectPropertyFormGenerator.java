@@ -99,12 +99,31 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	
     	return getDefaultObjectEditConfiguration(vreq, session);
     }
-    
+	
+    protected List<String> getRangeTypes(VitroRequest vreq) {
+		Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
+		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
+		WebappDaoFactory wDaoFact = vreq.getWebappDaoFactory();
+		List<String> types = new ArrayList<String>();
+		List <VClass> vclasses = new ArrayList<VClass>();
+        vclasses = wDaoFact.getVClassDao().getVClassesForProperty(subject.getVClassURI(),predicateUri);
+        for(VClass v: vclasses) {
+        	types.add(v.getURI());
+        }       
+        return types;
+	}	
+	
     private boolean tooManyRangeOptions(VitroRequest vreq, HttpSession session ) throws SolrServerException {
     	List<String> types = getRangeTypes(vreq);
     	SolrServer solrServer = SolrSetup.getSolrServer(session.getServletContext());
     	
-    	long count = 0;
+    	//empty list means the range is not set to anything, force Thing
+    	if(types.size() == 0 ){
+    		types = new ArrayList<String>();
+    		types.add(VitroVocabulary.OWL_THING);
+    	}
+    	
+    	long count = 0;    		   
     	for( String type:types){
     		//solr query for type count.    		
     		SolrQuery query = new SolrQuery();
@@ -122,10 +141,11 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     		if( count > maxNonACRangeIndividualCount )
     			break;
     	}
-    	
+    	    	
     	return  count > maxNonACRangeIndividualCount ;    	    	   
 	}
 
+    
 	private EditConfigurationVTwo getDefaultObjectEditConfiguration(VitroRequest vreq, HttpSession session) throws Exception {
     	EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();    	
     	
@@ -454,18 +474,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	return  rangeIndividualsFound;		
 	}
 
-	protected List<String> getRangeTypes(VitroRequest vreq) {
-		Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
-		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
-		WebappDaoFactory wDaoFact = vreq.getWebappDaoFactory();
-		List<String> types = new ArrayList<String>();
-		List <VClass> vclasses = new ArrayList<VClass>();
-        vclasses = wDaoFact.getVClassDao().getVClassesForProperty(subject.getVClassURI(),predicateUri);
-        for(VClass v: vclasses) {
-        	types.add(v.getURI());
-        }       
-        return types;
-	}	
+
 
 	/** get the auto complete edit mode */
 	public EditMode getEditMode(VitroRequest vreq) {
