@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -15,6 +16,8 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -67,7 +70,7 @@ public class KnowledgeBaseUpdater {
         logger.log("Started knowledge base migration");
 		
 		try {
-		     performUpdate();
+		     performUpdate(servletContext);
 		} catch (Exception e) {
 			 logger.logError(e.getMessage());
 			 e.printStackTrace();
@@ -88,8 +91,7 @@ public class KnowledgeBaseUpdater {
 		return;
 	}
 	
-	
-	private void performUpdate() throws IOException {
+	private void performUpdate(ServletContext servletContext) throws Exception {
 		
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
 		
@@ -98,7 +100,14 @@ public class KnowledgeBaseUpdater {
         //process the TBox before the ABox
 		log.info("\tupdating tbox annotations");
 	    updateTBoxAnnotations();
-		
+
+	    try {
+    	    migrateMigrationMetadata(servletContext);
+		    logger.log("migrated migration metadata");
+	    } catch (Exception e) {
+	    	logger.log("unable to migrate migration metadata " + e.getMessage());
+	    }
+	    
 		log.info("\tupdating the abox");
     	updateABox(changes);
 	}
@@ -239,6 +248,39 @@ public class KnowledgeBaseUpdater {
 		aboxUpdater.processClassChanges(changes.getAtomicClassChanges());
 	}
 	
+	// special for 1.5 - temporary code
+	// migrate past migration indicators to not use blank nodes and move them to app metadata model
+	// changing structure for pre 1.5 ones in the process
+	private void migrateMigrationMetadata(ServletContext servletContext) throws Exception {
+		
+		String baseResourceURI = "http://vitro.mannlib.cornell.edu/ns/vitro/metadata/migration/";
+		String queryFile = "MigrationData.sparql";
+		
+		RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(servletContext).getRDFService();
+
+		String fmQuery = FileUtils.readFileToString(new File(settings.getSparqlConstructDeletionsDir() + "/" + queryFile));
+		Model toRemove = ModelFactory.createDefaultModel();
+		toRemove.read(rdfService.sparqlConstructQuery(fmQuery, RDFService.ModelSerializationFormat.RDFXML), null);
+	
+		String cmQuery = FileUtils.readFileToString(new File(settings.getSparqlConstructAdditionsDir() + "/" + queryFile));
+		Model toAdd = ModelFactory.createDefaultModel();
+		toAdd.read(rdfService.sparqlConstructQuery(cmQuery, RDFService.ModelSerializationFormat.RDFXML), null);
+		
+		ByteArrayOutputStream outAdd = new ByteArrayOutputStream();
+		toAdd.write(outAdd);
+		InputStream inAdd = new ByteArrayInputStream(outAdd.toByteArray());		
+		ChangeSet addChangeSet = rdfService.manufactureChangeSet();		    
+	    addChangeSet.addAddition(inAdd, RDFService.ModelSerializationFormat.RDFXML, JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL);
+		rdfService.changeSetUpdate(addChangeSet);	
+
+		ByteArrayOutputStream outRemove = new ByteArrayOutputStream();
+		toRemove.write(outRemove);
+		InputStream inRemove = new ByteArrayInputStream(outRemove.toByteArray());		
+		ChangeSet removeChangeSet = rdfService.manufactureChangeSet();		    
+	    addChangeSet.addRemoval(inRemove, RDFService.ModelSerializationFormat.RDFXML, JenaDataSourceSetupBase.JENA_DB_MODEL);
+		rdfService.changeSetUpdate(removeChangeSet);	
+	}
+	
 	private void updateTBoxAnnotations() throws IOException {
 		
 		TBoxUpdater tboxUpdater = new TBoxUpdater(settings.getOldTBoxAnnotationsModel(),
@@ -254,7 +296,6 @@ public class KnowledgeBaseUpdater {
 	 * needs to be updated to conform to a new ontology version
 	 */
 	public boolean updateRequired(ServletContext servletContext) throws IOException {
-		
 		boolean required = false;
 		
 		String sparqlQueryStr = loadSparqlQuery(settings.getAskUpdatedQueryFile());
@@ -287,7 +328,7 @@ public class KnowledgeBaseUpdater {
 		
 		return required; 
 	}
-		
+	
 	/**
 	 * loads a SPARQL ASK query from a text file
 	 * @param filePath
@@ -311,19 +352,18 @@ public class KnowledgeBaseUpdater {
 	private void assertSuccess(ServletContext servletContext) throws FileNotFoundException, IOException {
 		try {				
 			RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(servletContext).getRDFService();
-			ChangeSet changeSet = rdfService.manufactureChangeSet();
 			
+			ChangeSet changeSet = rdfService.manufactureChangeSet();
 		    File successAssertionsFile = new File(settings.getSuccessAssertionsFile()); 
-		    InputStream inStream = new FileInputStream(successAssertionsFile);
-		    
-		    changeSet.addAddition(inStream, RDFService.ModelSerializationFormat.N3, JenaDataSourceSetupBase.JENA_DB_MODEL);
+		    InputStream inStream = new FileInputStream(successAssertionsFile);		    
+		    changeSet.addAddition(inStream, RDFService.ModelSerializationFormat.N3, JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL);
 			rdfService.changeSetUpdate(changeSet);	
 		} catch (Exception e) {
 			log.error("unable to make RDF assertions about successful " +
 					" update to new ontology version: ", e);
-		}
+		}		
 	}
-	
+		
 	/**
 	 * A class that allows to access two different ontology change lists,
 	 * one for class changes and the other for property changes.  The 
