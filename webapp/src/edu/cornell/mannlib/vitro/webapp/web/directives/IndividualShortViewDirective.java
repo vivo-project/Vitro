@@ -108,7 +108,7 @@ public class IndividualShortViewDirective extends BaseTemplateDirectiveModel {
 			env.include(template);
 		} catch (IOException e) {
 			log.error("Could not load template '" + svInfo.getTemplateName()
-					+ "'", e);
+					+ "': " + e);
 			renderErrorMessage(individual);
 		} catch (TemplateException e) {
 			log.error("Could not process template '" + svInfo.getTemplateName()

@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.services.shortview;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessingService;
 import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessingService.TemplateParsingException;
+import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessingService.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessingServiceSetup;
 import edu.cornell.mannlib.vitro.webapp.services.shortview.FakeApplicationOntologyService.TemplateAndDataGetters;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
@@ -59,7 +61,7 @@ public class ShortViewServiceImpl implements ShortViewService {
 					.getService(vreq.getSession().getServletContext());
 
 			if (!fps.isTemplateAvailable(templateName, vreq)) {
-				return "<p>Can't locate short view template '" + templateName
+				return "<p>Can't find the short view template '" + templateName
 						+ "' for " + individual.getName() + "</p>";
 			}
 
@@ -68,6 +70,17 @@ public class ShortViewServiceImpl implements ShortViewService {
 			log.error(e, e);
 			return "<p>Can't parse the short view template '" + templateName
 					+ "' for " + individual.getName() + "</p>";
+		} catch (TemplateProcessingException e) {
+			if (e.getCause() instanceof FileNotFoundException) {
+				log.error(e);
+				return "<p>Can't find the short view template '" + templateName
+						+ "' for " + individual.getName() + "</p>";
+			} else {
+				log.error(e, e);
+				return "<p>Can't process the short view template '"
+						+ templateName + "' for " + individual.getName()
+						+ "</p>";
+			}
 		} catch (Exception e) {
 			log.error(e, e);
 			return "<p>Failed to render the short view for "
@@ -80,7 +93,8 @@ public class ShortViewServiceImpl implements ShortViewService {
 			ShortViewContext svContext, VitroRequest vreq) {
 		TemplateAndDataGetters tdg = fetchTemplateAndDataGetters(individual,
 				svContext, vreq);
-		Map<String, Object> gotData = runDataGetters(tdg.getDataGetters(), individual);
+		Map<String, Object> gotData = runDataGetters(tdg.getDataGetters(),
+				individual);
 		return new TemplateAndSupplementalDataImpl(tdg.getTemplateName(),
 				gotData);
 	}
@@ -115,7 +129,8 @@ public class ShortViewServiceImpl implements ShortViewService {
 	}
 
 	/** Build a data map from the combined results of all data getters. */
-	private Map<String, Object> runDataGetters(Set<DataGetter> dataGetters, Individual individual) {
+	private Map<String, Object> runDataGetters(Set<DataGetter> dataGetters,
+			Individual individual) {
 		Map<String, Object> valueMap = new HashMap<String, Object>();
 		valueMap.put("individualUri", individual.getURI());
 		Map<String, Object> gotData = new HashMap<String, Object>();
