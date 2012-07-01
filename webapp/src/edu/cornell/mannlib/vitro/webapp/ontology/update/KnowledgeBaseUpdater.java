@@ -103,9 +103,9 @@ public class KnowledgeBaseUpdater {
 
 	    try {
     	    migrateMigrationMetadata(servletContext);
-		    logger.log("migrated migration metadata");
+		    logger.log("Migrated migration metadata");
 	    } catch (Exception e) {
-	    	logger.log("unable to migrate migration metadata " + e.getMessage());
+	    	log.debug("unable to migrate migration metadata " + e.getMessage());
 	    }
 	    
 		log.info("\tupdating the abox");
@@ -277,7 +277,7 @@ public class KnowledgeBaseUpdater {
 		toRemove.write(outRemove);
 		InputStream inRemove = new ByteArrayInputStream(outRemove.toByteArray());		
 		ChangeSet removeChangeSet = rdfService.manufactureChangeSet();		    
-	    addChangeSet.addRemoval(inRemove, RDFService.ModelSerializationFormat.RDFXML, JenaDataSourceSetupBase.JENA_DB_MODEL);
+	    removeChangeSet.addRemoval(inRemove, RDFService.ModelSerializationFormat.RDFXML, JenaDataSourceSetupBase.JENA_DB_MODEL);
 		rdfService.changeSetUpdate(removeChangeSet);	
 	}
 	
