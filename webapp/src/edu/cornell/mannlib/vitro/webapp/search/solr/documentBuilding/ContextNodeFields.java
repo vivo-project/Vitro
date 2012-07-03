@@ -47,7 +47,7 @@ public class ContextNodeFields implements DocumentModifier{
     }        
     
 
-    protected StringBuffer getValues( Individual individual ){
+    public StringBuffer getValues( Individual individual ){
         return executeQueryForValues( individual, queries );        
     }                
     
@@ -77,20 +77,19 @@ public class ContextNodeFields implements DocumentModifier{
      * @return StringBuffer with text values to add to ALLTEXT field of solr Document.
      */
     protected StringBuffer executeQueryForValues( Individual individual, Collection<String> queries){
-        /* execute all the queries on the list and concat the values to add to all text */
-        
+        /* execute all the queries on the list and concat the values to add to all text */        
     	RDFService rdfService = rdfServiceFactory.getRDFService();
-        StringBuffer allValues = new StringBuffer("");
-        
-        QuerySolutionMap initialBinding = new QuerySolutionMap();               
-        initialBinding.add("uri", ResourceFactory.createResource(individual.getURI()));
+        StringBuffer allValues = new StringBuffer("");                
 
         for(String query : queries ){    
             StringBuffer valuesForQuery = new StringBuffer();
-            
+        	
+            String subInUriQuery = 
+        		query.replaceAll("\\?uri", "<" + individual.getURI() + "> ");
+        	
             try{
-            	ResultSet results = RDFServiceUtils.sparqlSelectQuery(query, rdfService);
-                
+            	
+            	ResultSet results = RDFServiceUtils.sparqlSelectQuery(subInUriQuery, rdfService);               
             	while(results.hasNext()){                                                                               
                     valuesForQuery.append( 
                             getTextForRow( results.nextSolution() ) ) ; 
@@ -102,7 +101,7 @@ public class ContextNodeFields implements DocumentModifier{
             } 
             
             if(log.isDebugEnabled()){
-                log.debug("query: '" + query + "'");
+                log.debug("query: '" + subInUriQuery+ "'");
                 log.debug("text for query: '" + valuesForQuery.toString() + "'");
             }
             allValues.append(valuesForQuery);
