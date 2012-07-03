@@ -5,6 +5,11 @@
         separate controllers for those. Also used to display lists of "all" object and 
         data properties, though there are separate controllers for those, too.
  -->
+ <#if propertyType??>
+     <#assign propType = propertyType>
+<#else>
+    <#assign propType = "group">
+</#if>
 
 
 <section role="region">
@@ -15,16 +20,24 @@
         <#assign displayOption = "hierarchy">
     </#if>
    
-    <form name="classHierarchyForm" id="classHierarchyForm" action="show<#if propertyType == "object">Object<#else>Data</#if>PropertyHierarchy" method="post" role="classHierarchy">
-         <label id="displayOptionLabel" class="inline">Display Options</label>
-        <select id="displayOption" name="displayOption">
-            <option value="hierarchy" <#if displayOption == "asserted">selected</#if> >Property Hierarchy</option>
-            <option value="all" <#if displayOption == "all">selected</#if> >All Properties</option>
-        </select>
-        <input type="submit" class="form-button" id="addProperty" value="Add new <#if propertyType == "object">object<#else>data</#if> property"/>
-    </form>
-
-    <div id="expandLink"><span id="expandAll" ><a href="#" title="expand all">expand all</a></span></div>
+    <#if propType == "group">
+        <form action="editForm" method="get">
+            <input type="submit" class="form-button" id="addProperty" value="Add new property group"/>
+            <input type="hidden" name="controller" value="PropertyGroup"/>
+        </form>
+        <div id="expandLink"><span id="expandAll" ><a href="javascript:" title="hide/show properties">hide properties</a></span></div>
+    <#else>
+        <form name="classHierarchyForm" id="classHierarchyForm" action="show<#if propType == "object">Object<#else>Data</#if>PropertyHierarchy" method="post" role="classHierarchy">
+        <label id="displayOptionLabel" class="inline">Display Options</label>
+            <select id="displayOption" name="displayOption">
+                <option value="hierarchy" <#if displayOption == "asserted">selected</#if> >${propType?capitalize} Property Hierarchy</option>
+                <option value="all" <#if displayOption == "all">selected</#if> >All ${propType?capitalize} Properties</option>
+                <option value="group" <#if displayOption == "group">selected</#if> >Property Groups</option>
+            </select>
+            <input type="submit" class="form-button" id="addProperty" value="Add new <#if propType == "object">object<#else>data</#if> property"/>
+        </form>
+        <div id="expandLink"><span id="expandAll" ><a href="#" title="expand all">expand all</a></span></div>
+    </#if>
 
     <section id="container">
     </section>
@@ -37,7 +50,7 @@
 
 <script language="javascript" type="text/javascript" >
 $(document).ready(function() {
-    objectPropHierarchyUtils.onLoad("${urls.base!}","${displayOption!}","${propertyType}");
+    objectPropHierarchyUtils.onLoad("${urls.base!}","${displayOption!}","${propType}");
 });    
 </script>
 

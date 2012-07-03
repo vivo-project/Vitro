@@ -6,6 +6,7 @@
         this.propType = type;
         this.initObjects();
         this.expandAll.hide();
+//        this.toggleDiv.hide();
         this.checkJsonTree();
 
         if ( noProps ) {
@@ -14,14 +15,20 @@
         else if ( displayOption == "all" ) {
             this.buildAllPropsHtml();
         }
+        else if ( displayOption == "group" ) {
+            this.buildPropertyGroupHtml();
+        }
         else {
             this.buildPropertyHierarchyHtml();
             this.wireExpandLink();
         }
         
-        if ( displayOption == "hierarchy" ) {
+        if ( displayOption == "hierarchy" || displayOption == "group") {
             this.expandAll.show();
         }
+//        else if ( displayOption == "group" ) {
+//            this.toggleDiv.show();
+//        }
         this.bindEventListeners();
     },
 
@@ -34,17 +41,23 @@
         this.form = $('form#classHierarchyForm');
         this.select = $('select#displayOption');
         this.addProperty = $('input#addProperty');
+//        this.toggleDiv = $('div#propsToggleDiv');
+//        this.toggleSpan = $('span#propsToggle');
+//        this.toggleLink = $('span#propsToggle').find('a');
         noProps = new Boolean;
     },
 
     bindEventListeners: function() {
         if ( this.propType == "object" ) {
             this.select.change(function() {
-                if ( objectPropHierarchyUtils.select.val() == "all") {
+                if ( objectPropHierarchyUtils.select.val() == "all" ) {
                     objectPropHierarchyUtils.form.attr("action", "listPropertyWebapps");
                 }
-                else {
+                else if ( objectPropHierarchyUtils.select.val() == "hierarchy") {
                     objectPropHierarchyUtils.form.attr("action", "showObjectPropertyHierarchy");
+                }
+                else {
+                    objectPropHierarchyUtils.form.attr("action", "listPropertyGroups");
                 }
                 objectPropHierarchyUtils.form.submit();
             });
@@ -54,13 +67,16 @@
                 objectPropHierarchyUtils.form.submit();
             });
         }
-        else {
+        else  {
             this.select.change(function() {
-                if ( objectPropHierarchyUtils.select.val() == "all") {
+                if ( objectPropHierarchyUtils.select.val() == "all" ) {
                     objectPropHierarchyUtils.form.attr("action", "listDatatypeProperties");
                 }
-                else {
+                else if ( objectPropHierarchyUtils.select.val() == "hierarchy" ) {
                     objectPropHierarchyUtils.form.attr("action", "showDataPropertyHierarchy");
+                }
+                else {
+                    objectPropHierarchyUtils.form.attr("action", "listPropertyGroups");
                 }
                 objectPropHierarchyUtils.form.submit();
             });
@@ -68,6 +84,19 @@
             this.addProperty.click(function() {
                 objectPropHierarchyUtils.form.attr("action", "editForm?controller=Dataprop");
                 objectPropHierarchyUtils.form.submit();
+            });
+        }
+        if ( this.propType == "group" ) {
+            this.expandAll.click(function() {
+            
+                if ( objectPropHierarchyUtils.expandAll.text() == "hide properties" ) { 
+                    $('td.subclassCell').parent('tr').hide();
+                    objectPropHierarchyUtils.expandAll.text("show properties");
+                }
+                else {
+                    $('td.subclassCell').parent('tr').show();
+                    objectPropHierarchyUtils.expandAll.text("hide properties");
+                }
             });
         }
     },
@@ -289,5 +318,50 @@
             $newClassSection.appendTo($('section#container'));
             objectPropHierarchyUtils.classHtml = "";
         });
+    },
+
+    buildPropertyGroupHtml: function() {
+
+        $.each(json, function() {
+            $newClassSection = jQuery("<section></section>", {
+                id: "classContainer" + objectPropHierarchyUtils.classCounter
+            });
+            var descendants = "";
+
+            if ( this.children.length ) {
+                var ctr = 0;
+                $.each(this.children, function() {
+                    if ( ctr == 0 ) {
+                        descendants += "<tr><td class='classDetail'>Properties:</td>";
+                        ctr = ctr + 1;
+                    }
+                    else {
+                        descendants += "<tr><td></td>" ;
+                    }
+
+                    descendants += "<td class='subclassCell'>" + this.name + "</td></tr>";
+//                    descendants += "<tr><td></td><td><table class='innerDefinition'><tr><td>" + this.data.shortDef + "</td></tr></table></td></tr>";
+
+                });
+                descendants += "</table></td></tr>";
+            }
+
+            objectPropHierarchyUtils.classHtml += "<div>" + this.name + "</div>" + "<table class='classHierarchy' id='classHierarchy" 
+                                               + objectPropHierarchyUtils.classCounter + "'>" ;
+
+            if ( this.data.displayRank.length > 0 ) {
+                objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>Display Rank:</td><td>" + this.data.displayRank + "</td></tr>"
+            }
+            
+            objectPropHierarchyUtils.classHtml += descendants;
+
+            objectPropHierarchyUtils.classHtml += "</table>";
+           // alert(objectPropHierarchyUtils.classHtml);
+            $newClassSection.html(objectPropHierarchyUtils.classHtml);
+            $newClassSection.appendTo($('section#container'));
+            objectPropHierarchyUtils.classHtml = "";
+            objectPropHierarchyUtils.classCounter += 1;
+        });
     }
+    
 }
