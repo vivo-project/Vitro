@@ -4,14 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -20,18 +18,15 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.ResourceUtils;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
@@ -41,13 +36,13 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SpecialBulkUpdateHandlerGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.TripleStoreType;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
 
@@ -160,15 +155,26 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
         }
                               
         // union ABox
+        
+        Model m = ModelFactory.createUnion(
+                baseOms.getABoxModel(), inferenceOms.getABoxModel());
+        m = ModelFactory.createModelForGraph(
+                new SpecialBulkUpdateHandlerGraph(
+                        m.getGraph(), 
+                        baseOms.getABoxModel().getGraph().getBulkUpdateHandler()));
         OntModel unionABoxModel = ModelFactory.createOntologyModel(
-                MEM_ONT_MODEL_SPEC,ModelFactory.createUnion(
-                        baseOms.getABoxModel(), inferenceOms.getABoxModel()));
+                MEM_ONT_MODEL_SPEC, m);
         unionOms.setABoxModel(unionABoxModel);
         
         // union TBox
+        m = ModelFactory.createUnion(
+                baseOms.getTBoxModel(), inferenceOms.getTBoxModel());
+        m = ModelFactory.createModelForGraph(
+                new SpecialBulkUpdateHandlerGraph(
+                        m.getGraph(), 
+                        baseOms.getTBoxModel().getGraph().getBulkUpdateHandler()));
         OntModel unionTBoxModel = ModelFactory.createOntologyModel(
-                MEM_ONT_MODEL_SPEC,ModelFactory.createUnion(
-                        baseOms.getTBoxModel(), inferenceOms.getTBoxModel()));       
+                MEM_ONT_MODEL_SPEC, m);       
         unionOms.setTBoxModel(unionTBoxModel);
                   
         
@@ -218,10 +224,14 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
         log.info("Setting up union models and DAO factories");
         
         // create TBox + ABox union models and set up webapp DAO factories
+        Model baseDynamicUnion = ModelFactory.createUnion(baseOms.getABoxModel(), 
+                baseOms.getTBoxModel());
+        baseDynamicUnion = ModelFactory.createModelForGraph(
+                new SpecialBulkUpdateHandlerGraph(
+                        baseDynamicUnion.getGraph(), 
+                        baseOms.getABoxModel().getGraph().getBulkUpdateHandler()) );
         OntModel baseUnion = ModelFactory.createOntologyModel(
-                OntModelSpec.OWL_MEM,
-                ModelFactory.createUnion(baseOms.getABoxModel(), 
-                        baseOms.getTBoxModel()));
+                OntModelSpec.OWL_MEM, baseDynamicUnion);
         baseOms.setFullModel(baseUnion);
         ModelContext.setBaseOntModel(baseOms.getFullModel(), ctx);
         WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
