@@ -2,12 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
-import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -20,12 +19,20 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 /**
  * Invokes process to test whether the knowledge base needs any updating
@@ -101,6 +108,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 				  if (ontologyUpdater.updateRequired(ctx)) {
 					  ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
 					  ontologyUpdater.update(ctx);
+					  // migrateDisplayModel(ctx);
 				  }
 			   } catch (IOException ioe) {
 					String errMsg = "IOException updating knowledge base " +
@@ -118,15 +126,11 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			t.printStackTrace();
 		}
 	}	
-			
-	private void doMigrateDisplayModel(ServletContext ctx) {
-		Object o = ctx.getAttribute(DISPLAY_ONT_MODEL);
-	    if (!(o instanceof OntModel)) {
-	    	return;
-	    }
-	    OntModel displayModel = (OntModel) o; 
-	}
-			
+	
+  	private void migrateDisplayModel(ServletContext ctx) {
+  	   return;	
+    }
+  					
 	private OntModel loadModelFromDirectory(String directoryPath) {
 		
 		OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
