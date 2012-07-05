@@ -143,6 +143,8 @@ public abstract class RDFServiceImpl implements RDFService {
                 return "RDF/XML";
             case N3: 
                 return "TTL";
+            case NTRIPLE: 
+                return "N-TRIPLE";    
             default: 
                 log.error("unexpected format in getFormatString");
                 return null;
