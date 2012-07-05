@@ -32,9 +32,7 @@ public class BlankNodeFilteringGraph implements Graph {
 
 	@Override
 	public void add(Triple t) throws AddDeniedException {
-		if (!t.getSubject().isBlank() && !t.getObject().isBlank()) {
-			graph.add(t);
-		}   
+		graph.add(t);
 	}
 
 	@Override
@@ -54,9 +52,7 @@ public class BlankNodeFilteringGraph implements Graph {
 
 	@Override
 	public void delete(Triple t) throws DeleteDeniedException {
-		if (!t.getSubject().isBlank() && !t.getObject().isBlank()) {
-			graph.delete(t);
-		}   ;
+		graph.delete(t);
 	}
 
 	@Override
