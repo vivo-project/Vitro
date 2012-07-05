@@ -60,7 +60,6 @@ import com.hp.hpl.jena.sdb.sql.JDBC;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.ResourceUtils;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
@@ -69,13 +68,18 @@ import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.WebappDaoSetup;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
@@ -1163,42 +1167,39 @@ public class JenaIngestController extends BaseEditController {
         String result = null;
         Integer counter = 0;
         Boolean namespacePresent = false;
-        OntModel baseOntModel = (OntModel)
-        getServletContext().getAttribute("baseOntModel");
-        OntModel ontModel = (OntModel)
-        getServletContext().getAttribute("jenaOntModel");
-        OntModel infOntModel = (OntModel)
-        getServletContext().getAttribute(JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
-        List<String> urisToChange = new LinkedList<String>();        
-        ontModel.enterCriticalSection(Lock.READ);
+        RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(
+                getServletContext()).getRDFService();
         try {
-            Iterator<Individual> indIter = ontModel.listIndividuals();
-            while( indIter.hasNext()){
-                Individual ind = indIter.next();
-                String namespace = ind.getNameSpace();
-                if( namespace != null ){
-                    if( oldNamespace.equals(namespace) ){
-                        uri = ind.getURI();    
-                        urisToChange.add(uri);
-                        namespacePresent = true;
+            Model baseOntModel = RDFServiceGraph.createRDFServiceModel
+                    (new RDFServiceGraph(
+                            rdfService, JenaDataSourceSetupBase.JENA_DB_MODEL));
+            OntModel ontModel = (OntModel)
+            getServletContext().getAttribute("jenaOntModel");
+            List<String> urisToChange = new LinkedList<String>();        
+            ontModel.enterCriticalSection(Lock.READ);
+            try {
+                Iterator<Individual> indIter = ontModel.listIndividuals();
+                while( indIter.hasNext()){
+                    Individual ind = indIter.next();
+                    String namespace = ind.getNameSpace();
+                    if( namespace != null ){
+                        if( oldNamespace.equals(namespace) ){
+                            uri = ind.getURI();    
+                            urisToChange.add(uri);
+                            namespacePresent = true;
+                        }
                     }
                 }
+            } finally {
+                ontModel.leaveCriticalSection();
             }
-        } finally {
-            ontModel.leaveCriticalSection();
-        }
-        if(!namespacePresent){
-            result = "no resources renamed";
-            return result;
-        }    
-        for( String oldURIStr : urisToChange){
-            baseOntModel.enterCriticalSection(Lock.WRITE);
-            ontModel.enterCriticalSection(Lock.WRITE);
-            infOntModel.enterCriticalSection(Lock.WRITE);
-            try{
+            if(!namespacePresent){
+                result = "no resources renamed";
+                return result;
+            }    
+            for( String oldURIStr : urisToChange){
                 long time1 = System.currentTimeMillis();
                 Resource res = baseOntModel.getResource(oldURIStr);
-                Resource infRes = infOntModel.getResource(oldURIStr);
                 long time2 = System.currentTimeMillis();
                 String newURIStr=null;
                 Pattern p = Pattern.compile(oldNamespace);
@@ -1209,21 +1210,54 @@ public class JenaIngestController extends BaseEditController {
                 log.debug("time to get new uri: " + 
                         Long.toString(time3 - time2));
                 log.debug("Renaming "+ oldURIStr + " to " + newURIStr);
-                ResourceUtils.renameResource(res,newURIStr);
-                ResourceUtils.renameResource(infRes,newURIStr);
+         
+                String whereClause = "} WHERE { \n" +
+                        "  GRAPH <" + JenaDataSourceSetupBase.JENA_DB_MODEL + "> { \n" +  
+                        "   { <" + oldURIStr + "> ?p <" + oldURIStr + "> } \n " +
+                        "     UNION \n" +  
+                        "   { <" + oldURIStr + "> ?q ?o } \n " +
+                        "     UNION \n" +
+                        "   { ?s ?r <" + oldURIStr + "> } \n" +
+                        "  } \n" +
+                        "}";
+                
+                String removeQuery = "CONSTRUCT { \n" + 
+                                   "   <" + oldURIStr + "> ?p <" + oldURIStr + "> . \n " +
+                                   "   <" + oldURIStr + "> ?q ?o . \n " +
+                                   "   ?s ?r <" + oldURIStr + "> \n" + whereClause;
+
+                String addQuery = "CONSTRUCT { \n" + 
+                        "   <" + newURIStr + "> ?p <" + newURIStr + "> . \n " +
+                        "   <" + newURIStr + "> ?q ?o . \n " +
+                        "   ?s ?r <" + newURIStr + "> \n" + whereClause;                   
+                try {                   
+                    ChangeSet cs = rdfService.manufactureChangeSet();
+                    cs.addAddition(rdfService.sparqlConstructQuery(
+                            addQuery, RDFService.ModelSerializationFormat.N3), 
+                                    RDFService.ModelSerializationFormat.N3, 
+                                            JenaDataSourceSetupBase.JENA_DB_MODEL);
+                    cs.addRemoval(rdfService.sparqlConstructQuery(
+                            removeQuery, RDFService.ModelSerializationFormat.N3), 
+                                    RDFService.ModelSerializationFormat.N3, 
+                                            JenaDataSourceSetupBase.JENA_DB_MODEL); 
+                    rdfService.changeSetUpdate(cs);
+                } catch (RDFServiceException e) {
+                    throw new RuntimeException(e);
+                }
+                 
                 long time4 = System.currentTimeMillis();
                 log.debug(" time to rename : " + Long.toString( time4 - time3));
                 log.debug(" time for one resource: " + 
-                        Long.toString( time4 -time1));
-            } finally {
-                infOntModel.leaveCriticalSection();
-                ontModel.leaveCriticalSection();
-                baseOntModel.leaveCriticalSection();
+                        Long.toString( time4 -time1));          
+                counter++;
+            }        
+            result = counter.toString() + " resources renamed";
+            return result;
+        } finally {
+            if (rdfService != null) {
+                rdfService.close();
             }
-            counter++;
-        }        
-        result = counter.toString() + " resources renamed";
-        return result;
+        }
     }
     
     protected void showModelList(VitroRequest vreq, ModelMaker maker, String modelType) {
