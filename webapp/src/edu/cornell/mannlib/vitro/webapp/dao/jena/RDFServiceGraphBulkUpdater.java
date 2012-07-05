@@ -19,6 +19,7 @@ import com.hp.hpl.jena.graph.GraphUtil;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.impl.SimpleBulkUpdateHandler;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -29,6 +30,7 @@ import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
 
@@ -163,6 +165,111 @@ public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
     }
 
     public static void removeAll(Graph g, Node s, Node p, Node o)
+    {        
+        if (!(g instanceof RDFServiceGraph)) {
+            removeAllTripleByTriple(g, s, p, o);
+            return;
+        }
+        
+        RDFServiceGraph graph = (RDFServiceGraph) g;
+        String graphURI = graph.getGraphURI();
+        
+        StringBuffer findPattern = new StringBuffer()
+        .append(sparqlNode(s, "?s"))
+        .append(" ")
+        .append(sparqlNode(p, "?p"))
+        .append(" ")
+        .append(sparqlNode(o, "?o"));
+        
+        StringBuffer findQuery = new StringBuffer("CONSTRUCT { ")
+        .append(findPattern)
+        .append("} WHERE { \n");
+        if (graphURI != null) {
+            findQuery.append("  GRAPH <" + graphURI + "> { ");
+        }
+        findQuery.append(findPattern);
+        if (graphURI != null) {
+            findQuery.append(" } ");
+        }
+        findQuery.append("\n}");
+        
+        String queryString = findQuery.toString();
+        
+        try {
+            ChangeSet cs = graph.getRDFService().manufactureChangeSet();
+            cs.addRemoval(graph.getRDFService().sparqlConstructQuery(
+                    queryString, RDFService.ModelSerializationFormat.N3), 
+                            RDFService.ModelSerializationFormat.N3, graphURI);
+            graph.getRDFService().changeSetUpdate(cs);
+        } catch (RDFServiceException e) {
+            throw new RuntimeException(e);
+        }
+        
+    }
+    
+    private static String sparqlNode(Node node, String varName) {
+        if (node == null || node.isVariable() || node.isBlank()) {
+            return varName;
+        } else if (node.isURI()) {
+            StringBuffer uriBuff = new StringBuffer();
+            return uriBuff.append("<").append(node.getURI()).append(">").toString();
+        } else if (node.isLiteral()) {
+            StringBuffer literalBuff = new StringBuffer();
+            literalBuff.append("\"");
+            pyString(literalBuff, node.getLiteralLexicalForm());
+            literalBuff.append("\"");
+            if (node.getLiteralDatatypeURI() != null) {
+                literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
+            } else if (node.getLiteralLanguage() != null && node.getLiteralLanguage() != "") {
+                literalBuff.append("@").append(node.getLiteralLanguage());
+            }
+            return literalBuff.toString();
+        } else {
+            return varName;
+        }
+    }
+    
+    /*
+     * 
+     * see http://www.python.org/doc/2.5.2/ref/strings.html
+     * or see jena's n3 grammar jena/src/com/hp/hpl/jena/n3/n3.g
+     */ 
+    protected static void pyString(StringBuffer sbuff, String s)
+    {
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+
+            // Escape escapes and quotes
+            if (c == '\\' || c == '"' )
+            {
+                sbuff.append('\\') ;
+                sbuff.append(c) ;
+                continue ;
+            }            
+
+            // Whitespace                        
+            if (c == '\n'){ sbuff.append("\\n");continue; }
+            if (c == '\t'){ sbuff.append("\\t");continue; }
+            if (c == '\r'){ sbuff.append("\\r");continue; }
+            if (c == '\f'){ sbuff.append("\\f");continue; }                            
+            if (c == '\b'){ sbuff.append("\\b");continue; }
+            if( c == 7 )  { sbuff.append("\\a");continue; }
+            
+            // Output as is (subject to UTF-8 encoding on output that is)
+            sbuff.append(c) ;
+            
+//            // Unicode escapes
+//            // c < 32, c >= 127, not whitespace or other specials
+//            String hexstr = Integer.toHexString(c).toUpperCase();
+//            int pad = 4 - hexstr.length();
+//            sbuff.append("\\u");
+//            for (; pad > 0; pad--)
+//                sbuff.append("0");
+//            sbuff.append(hexstr);
+        }
+    }
+    
+    public static void removeAllTripleByTriple(Graph g, Node s, Node p, Node o)
     {        
         ExtendedIterator<Triple> it = g.find( s, p, o );
         try { 
