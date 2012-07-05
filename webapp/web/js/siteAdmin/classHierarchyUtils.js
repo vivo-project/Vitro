@@ -3,21 +3,21 @@
     var classHierarchyUtils = {
     onLoad: function(urlBase,displayOption) {
         this.imagePath = urlBase + "/images/";
+        this.displayOption = displayOption;
         this.initObjects();
         this.expandAll.hide();
 
-        if ( displayOption == "all" ) {
+        if ( this.displayOption == "all" ) {
             this.buildAllClassesHtml();
         }
-        else if ( displayOption == "group" ) {
+        else if ( this.displayOption == "group" ) {
             this.buildClassGroupHtml();
         }
         else {
             this.buildClassHierarchyHtml();
             this.wireExpandLink();
         }
-        
-        if ( displayOption == "asserted" || displayOption == "inferred" ) {
+        if ( this.displayOption == "asserted" || this.displayOption == "inferred" || this.displayOption == "group") {
             this.expandAll.show();
         }
         this.bindEventListeners();
@@ -54,6 +54,23 @@
             classHierarchyUtils.form.attr("action", "editForm?controller=Classgroup");
             classHierarchyUtils.form.submit();
         });
+
+        if ( this.displayOption == "group" ) {
+            this.expandAll.click(function() {
+            
+                if ( classHierarchyUtils.expandAll.text() == "hide subclasses" ) { 
+                    $('td.subclassCell').parent('tr').hide();
+                    $('table.innerDefinition').hide();
+                    classHierarchyUtils.expandAll.text("show subclasses");
+                }
+                else {
+                    $('td.subclassCell').parent('tr').show();
+                    $('table.innerDefinition').show();
+                    classHierarchyUtils.expandAll.text("hide subclasses");
+                }
+            });
+        }        
+        
     },
      
     buildClassHierarchyHtml: function() {
@@ -97,6 +114,7 @@
             classHierarchyUtils.classHtml = "";
             classHierarchyUtils.classCounter += 1;
         });
+        
     },
 
     getTheChildren: function(node) {
@@ -271,7 +289,6 @@
             classHierarchyUtils.classHtml += descendants;
 
             classHierarchyUtils.classHtml += "</table>";
-       //     alert(classHierarchyUtils.classHtml);
             $newClassSection.html(classHierarchyUtils.classHtml);
             $newClassSection.appendTo($('section#container'));
             classHierarchyUtils.classHtml = "";

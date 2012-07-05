@@ -21,7 +21,11 @@
         </#if>
     </form>
         
-    <div id="expandLink"><span id="expandAll" ><a href="#" title="expand all">expand all</a></span></div>
+    <#if displayOption == "group">
+        <div id="expandLink"><span id="expandAll" ><a href="javascript:" title="hide/show subclasses">hide subclasses</a></span></div>
+    <#else>
+        <div id="expandLink"><span id="expandAll" ><a href="#" title="expand all">expand all</a></span></div>
+    </#if>
     <section id="container">
 
     </section>
