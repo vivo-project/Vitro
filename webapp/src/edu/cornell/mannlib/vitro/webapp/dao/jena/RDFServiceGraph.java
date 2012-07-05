@@ -47,7 +47,7 @@ public class RDFServiceGraph implements GraphWithPerform {
     
     private RDFService rdfService;
     private String graphURI;
-    private static final Log log = LogFactory.getLog(SparqlGraph.class);
+    private static final Log log = LogFactory.getLog(RDFServiceGraph.class);
     
     private BulkUpdateHandler bulkUpdateHandler;
     private PrefixMapping prefixMapping = new PrefixMappingImpl();

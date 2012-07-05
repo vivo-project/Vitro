@@ -13,20 +13,25 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.graph.BulkUpdateHandler;
+import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.GraphMaker;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.ModelReader;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 
@@ -72,12 +77,20 @@ public class RDFServiceModelMaker implements ModelMaker {
     }
 
     public Model createModel(String modelName) {
+    	
         Model model = getModel(modelName);
         Model metadataModel = getMetadataModel();
+        
+        Literal modelNameLiteral = ResourceFactory.createPlainLiteral(modelName);
+        Statement metadataStatment = ResourceFactory.createStatement(dbResource,metadataModel.getProperty(
+                HAS_NAMED_MODEL_URI), modelNameLiteral); 
+       
+        // to get around blank node filtering on BlankNodeFiltering graph
+        List<Statement> stmtList = new ArrayList<Statement>();
+        stmtList.add(metadataStatment);
+        
         try {
-            metadataModel.add(
-                    dbResource,metadataModel.getProperty(
-                            HAS_NAMED_MODEL_URI), modelName);
+            metadataModel.add(stmtList);
         } finally {
             metadataModel.close();
         }
@@ -150,16 +163,51 @@ public class RDFServiceModelMaker implements ModelMaker {
         return WrappedIterator.create(modelNameList.iterator());
     }
 
-    public Model openModel(String arg0, boolean arg1) {
-        RDFService service = getRDFService();
-        try {
-            Dataset dataset = new RDFServiceDataset(service);
-            return dataset.getNamedModel(arg0);
-        } finally {
-            service.close();
-        }
-    }
+    public Model openModel(String graph, boolean arg1) {
+    	
+        RDFService rdfService = getRDFService();
+        
+        String bnodeQuery = "construct { ?s ?p ?o } where {  ";
+        bnodeQuery += (graph != null) ?  "graph <" + graph + "> {"  : ""; 
+        bnodeQuery += "?s ?p ?o filter (isBlank(?s) || isBlank(?o)) }";
+        bnodeQuery +=  (graph != null) ?  "}" : "";
+       
+    	Model bnodeModel = ModelFactory.createDefaultModel();
+    	long start = System.currentTimeMillis();
+    	try {
+        	 bnodeModel.read(rdfService.sparqlConstructQuery(bnodeQuery, ModelSerializationFormat.N3), null, "N3");
+        	 log.debug("constructed a model of blank nodes of size: " + bnodeModel.size() + " for graph " + graph);
+    	} catch (RDFServiceException se) {
+    		 log.error("Error trying to create blank node model.", se);
+    		 return null;
+    	} catch (Exception e) {
+    		 log.error("error trying to create a blank node model: " + e.getMessage());
+    		 return null;
+    	}
 
+    	long timeElapsedMillis = System.currentTimeMillis() - start;
+    	log.debug("msecs to find blank nodes for graph " + graph + " " + timeElapsedMillis);
+
+    	Model model = null;
+        try {
+            Dataset dataset = new RDFServiceDataset(rdfService);
+            model = dataset.getNamedModel(graph);
+        } finally {
+        	rdfService.close();
+        }
+        
+        Graph bnodeFilteringGraph = new BlankNodeFilteringGraph(model.getGraph());
+        Model bnodeFilteringModel = ModelFactory.createModelForGraph(bnodeFilteringGraph);
+      
+        BulkUpdateHandler bulkUpdateHandler = model.getGraph().getBulkUpdateHandler();
+        Model unionModel = ModelFactory.createUnion(bnodeFilteringModel, bnodeModel);
+        Graph specialGraph = new SpecialBulkUpdateHandlerGraph(unionModel.getGraph(), bulkUpdateHandler);
+        Model specialUnionModel = ModelFactory.createModelForGraph(specialGraph);
+        bnodeFilteringModel.register(new BlankNodeStatementListener(bnodeModel));        
+ 
+        return specialUnionModel;
+    }
+    
     public void removeModel(String arg0) {
         Model m = getModel(arg0);
         m.removeAll(null,null,null);
