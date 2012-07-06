@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.jena;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServ
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class RDFUploadController extends JenaIngestController {
@@ -239,7 +241,13 @@ public class RDFUploadController extends JenaIngestController {
         ModelMaker maker = getVitroJenaModelMaker(request);
         
         if (docLoc!=null && modelName != null) {
-            doLoadRDFData(modelName, docLoc, filePath, languageStr, maker);
+            RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(
+                    getServletContext()).getRDFService();
+            try {
+                doLoadRDFData(modelName, docLoc, filePath, languageStr, rdfService);
+            } finally {
+                rdfService.close();
+            }
             String modelType = getModelType(request, maker);
             showModelList(request, maker, modelType);
         } else {
@@ -319,12 +327,12 @@ public class RDFUploadController extends JenaIngestController {
                                String docLoc, 
                                String filePath, 
                                String language, 
-                               ModelMaker modelMaker) {
-        Model m = modelMaker.getModel(modelName);
-        m.enterCriticalSection(Lock.WRITE);
+                               RDFService rdfService) {
         try {
             if ( (docLoc != null) && (docLoc.length()>0) ) {
-                m.read(docLoc, language);
+                URL docLocURL = new URL(docLoc);
+                InputStream in = docLocURL.openStream();
+                readIntoModel(in, language, rdfService, modelName);
             } else if ( (filePath != null) && (filePath.length()>0) ) {
                 File file = new File(filePath);
                 File[] files;
@@ -338,7 +346,8 @@ public class RDFUploadController extends JenaIngestController {
                     File currentFile = files[i];
                     log.debug("Reading file " + currentFile.getName());
                     try {
-                        m.read(fileStream.getInputStream(), null, language);
+                        readIntoModel(fileStream.getInputStream(), language, 
+                                rdfService, modelName);
                         fileStream.delete();
                     } catch (IOException ioe) {
                         String errMsg = "Error loading RDF from " + 
@@ -348,8 +357,20 @@ public class RDFUploadController extends JenaIngestController {
                     }
                 }
             }
-        } finally { 
-            m.leaveCriticalSection();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    private void readIntoModel(InputStream in, String language, 
+            RDFService rdfService, String modelName) {
+        ChangeSet cs = rdfService.manufactureChangeSet();
+        cs.addAddition(in, RDFServiceUtils.getSerializationFormatFromJenaString(
+                        language), modelName);
+        try {
+            rdfService.changeSetUpdate(cs);
+        } catch (RDFServiceException e) {
+            throw new RuntimeException(e);
         }
     }
     

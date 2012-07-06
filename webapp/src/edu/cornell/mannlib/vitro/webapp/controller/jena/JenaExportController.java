@@ -3,7 +3,10 @@
 package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +14,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -28,6 +32,11 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 
 public class JenaExportController extends BaseEditController {
@@ -116,12 +125,10 @@ public class JenaExportController extends BaseEditController {
 						getServletContext()).getABoxModel();
 			}
 			else if("full".equals(assertedOrInferredParam)){
-				model = ModelContext.getUnionOntModelSelector(
-						getServletContext()).getABoxModel();
+			    outputSparqlConstruct(ABOX_FULL_CONSTRUCT, formatParam, response);
 			}
 			else if("asserted".equals(assertedOrInferredParam)){
-				model = ModelContext.getBaseOntModelSelector(
-						getServletContext()).getABoxModel();
+			    outputSparqlConstruct(ABOX_ASSERTED_CONSTRUCT, formatParam, response);
 			}
 		}
 		else if("tbox".equals(subgraphParam)){
@@ -161,47 +168,17 @@ public class JenaExportController extends BaseEditController {
 						getServletContext()).getTBoxModel());
 			}
 			else if("full".equals(assertedOrInferredParam)){
-				ontModel = xutil.extractTBox(dataset, ontologyURI, FULL_GRAPH);
-				ontModel.addSubModel(ModelContext.getUnionOntModelSelector(
-						getServletContext()).getABoxModel());
-				ontModel.addSubModel(ModelContext.getUnionOntModelSelector(
-						getServletContext()).getTBoxModel());
-				ontModel.addSubModel(ModelContext.getUnionOntModelSelector(
-						getServletContext()).getApplicationMetadataModel());
+			    outputSparqlConstruct(FULL_FULL_CONSTRUCT, formatParam, response);
 			}
 			else{
-				ontModel = xutil.extractTBox(
-						dataset, ontologyURI, ASSERTIONS_GRAPH);
-				ontModel.addSubModel(ModelContext.getBaseOntModelSelector(
-						getServletContext()).getABoxModel());
-				ontModel.addSubModel(ModelContext.getBaseOntModelSelector(
-						getServletContext()).getTBoxModel());
-				ontModel.addSubModel(ModelContext.getBaseOntModelSelector(
-						getServletContext()).getApplicationMetadataModel());
+			    outputSparqlConstruct(FULL_ASSERTED_CONSTRUCT, formatParam, response);
 			}
 			
 		}
 		
 		JenaOutputUtils.setNameSpacePrefixes(model,vreq.getWebappDaoFactory());
-		
-		if ( formatParam == null ) {
-			formatParam = "RDF/XML-ABBREV";  // default
-		}
-		String mime = formatToMimetype.get( formatParam );
-		if ( mime == null ) {
-			throw new RuntimeException( "Unsupported RDF format " + formatParam);
-		}
-		
-		response.setContentType( mime );
-		if(mime.equals("application/rdf+xml"))
-			response.setHeader("content-disposition", "attachment; filename=" + "export.rdf");
-		else if(mime.equals("text/n3"))
-			response.setHeader("content-disposition", "attachment; filename=" + "export.n3");
-		else if(mime.equals("text/plain"))
-			response.setHeader("content-disposition", "attachment; filename=" + "export.txt");
-		else if(mime.equals("application/x-turtle"))
-			response.setHeader("content-disposition", "attachment; filename=" + "export.ttl");
-			
+		setHeaders(response, formatParam);
+
 		try {
 			OutputStream outStream = response.getOutputStream();
 			if ( formatParam.startsWith("RDF/XML") ) {
@@ -235,6 +212,50 @@ public class JenaExportController extends BaseEditController {
 			throw new RuntimeException(ioe);
 		}
 		
+	}
+	
+	private void setHeaders(HttpServletResponse response, String formatParam) {
+	       if ( formatParam == null ) {
+	            formatParam = "RDF/XML-ABBREV";  // default
+	        }
+	        String mime = formatToMimetype.get( formatParam );
+	        if ( mime == null ) {
+	            throw new RuntimeException( "Unsupported RDF format " + formatParam);
+	        }
+	        
+	        response.setContentType( mime );
+	        if(mime.equals("application/rdf+xml"))
+	            response.setHeader("content-disposition", "attachment; filename=" + "export.rdf");
+	        else if(mime.equals("text/n3"))
+	            response.setHeader("content-disposition", "attachment; filename=" + "export.n3");
+	        else if(mime.equals("text/plain"))
+	            response.setHeader("content-disposition", "attachment; filename=" + "export.txt");
+	        else if(mime.equals("application/x-turtle"))
+	            response.setHeader("content-disposition", "attachment; filename=" + "export.ttl");
+	}
+	
+	private void outputSparqlConstruct(String queryStr, String formatParam, 
+	        HttpServletResponse response) {
+	    RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(getServletContext()).getRDFService();
+	    try {
+	        setHeaders(response, formatParam);
+	        OutputStream out = response.getOutputStream();
+            if ( formatParam.startsWith("RDF/XML") ) {
+                out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".getBytes());
+            }
+	        InputStream in = rdfService.sparqlConstructQuery(
+	                queryStr, RDFServiceUtils.getSerializationFormatFromJenaString(
+	                        formatParam));
+	        IOUtils.copy(in, out);
+	        out.flush();
+	        out.close();
+	    } catch (RDFServiceException e) {
+	        throw new RuntimeException(e);
+	    } catch (IOException ioe) {
+	        throw new RuntimeException(ioe);
+	    } finally {
+	        rdfService.close();
+	    }	    
 	}
 	
 	private void prepareExportSelectionPage( VitroRequest vreq, HttpServletResponse response ) {
@@ -278,16 +299,35 @@ public class JenaExportController extends BaseEditController {
 		formatToExtension.put("RDF/XML",".rdf");
 		formatToExtension.put("RDF/XML-ABBREV",".rdf");
 		formatToExtension.put("N3",".n3");
-		formatToExtension.put("N-TRIPLES",".nt");
+		formatToExtension.put("N-TRIPLE",".nt");
 		formatToExtension.put("TURTLE",".ttl");
 		
 		formatToMimetype = new HashMap<String,String>();
 		formatToMimetype.put("RDF/XML","application/rdf+xml");
 		formatToMimetype.put("RDF/XML-ABBREV","application/rdf+xml");
 		formatToMimetype.put("N3","text/n3");
-		formatToMimetype.put("N-TRIPLES", "text/plain");
+		formatToMimetype.put("N-TRIPLE", "text/plain");
 		formatToMimetype.put("TURTLE", "application/x-turtle");
 		
 	}
-		
+	
+	private static final String ABOX_FULL_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
+	        "WHERE { GRAPH ?g { ?s ?p ?o } FILTER (!regex(str(?g), \"tbox\")) " +
+            "FILTER (?g != <" + JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL + ">) " +
+            "FILTER (?g != <" + RDFServiceModelMaker.METADATA_MODEL_URI + ">) }";
+	
+	private static final String ABOX_ASSERTED_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
+            "WHERE { GRAPH ?g { ?s ?p ?o } FILTER (!regex(str(?g), \"tbox\")) " + 
+	        "FILTER (?g != <" + JenaDataSourceSetupBase.JENA_INF_MODEL + ">) " +
+	        "FILTER (?g != <" + JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL + ">) " +
+	        "FILTER (?g != <" + RDFServiceModelMaker.METADATA_MODEL_URI + ">) }";
+	
+	private static final String FULL_FULL_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
+            "WHERE { ?s ?p ?o }";
+
+    private static final String FULL_ASSERTED_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
+            "WHERE { GRAPH ?g { ?s ?p ?o } " + 
+            "FILTER (?g != <" + JenaDataSourceSetupBase.JENA_INF_MODEL + ">) " +
+            "FILTER (?g != <" + JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL + ">) }";
+    
 }

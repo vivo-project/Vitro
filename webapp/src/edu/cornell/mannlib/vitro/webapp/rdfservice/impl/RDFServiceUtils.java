@@ -30,8 +30,6 @@ public class RDFServiceUtils {
 	
     private static final String RDFSERVICEFACTORY_ATTR = 
             RDFServiceUtils.class.getName() + ".RDFServiceFactory";
-    private static final String RDFSERVICEFACTORY_FILTERING_ATTR = 
-            RDFServiceUtils.class.getName() + ".RDFServiceFactory.Filtering";
     
        
     public static RDFServiceFactory getRDFServiceFactory(ServletContext context) {
@@ -80,8 +78,24 @@ public class RDFServiceUtils {
                 return "RDF/XML";
             case N3: 
                 return "N3";
+            case NTRIPLE:
+                return "N-TRIPLE";
             default: 
                 throw new RuntimeException("unexpected format in getSerializationFormatString");
+        }
+    }
+    
+    public static ModelSerializationFormat getSerializationFormatFromJenaString(String jenaString) {
+        if ("N3".equals(jenaString) || "TTL".equals(jenaString) 
+                || "TURTLE".equals(jenaString)) {
+            return ModelSerializationFormat.N3;
+        } else if ("N-TRIPLE".equals(jenaString)) {
+            return ModelSerializationFormat.NTRIPLE;
+        } else if ("RDF/XML".equals(jenaString) 
+                || "RDF/XML-ABBREV".equals(jenaString)) {
+            return ModelSerializationFormat.RDFXML;
+        } else {
+            throw new RuntimeException("unrecognized format " + jenaString);
         }
     }
     
