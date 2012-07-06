@@ -5,10 +5,11 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -21,18 +22,20 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 /**
  * Invokes process to test whether the knowledge base needs any updating
@@ -93,8 +96,9 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setAssertionOntModelSelector(ModelContext.getBaseOntModelSelector(ctx));
 			settings.setInferenceOntModelSelector(ModelContext.getInferenceOntModelSelector(ctx));
 			settings.setUnionOntModelSelector(ModelContext.getUnionOntModelSelector(ctx));
-			settings.setDisplayModel(ModelContext.getDisplayModel(ctx));
+			boolean tryMigrateDisplay = true;
 			try {
+				settings.setDisplayModel(ModelContext.getDisplayModel(ctx));
 				OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
 				settings.setOldTBoxModel(oldTBoxModel);
 				OntModel newTBoxModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_MODEL_DIR));
@@ -123,11 +127,9 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 				settings.setLoadedAtStartupDisplayModel(loadedAtStartupFiles);
 				OntModel oldDisplayModelVivoListView = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_VIVOLISTVIEW_PATH));
 				settings.setVivoListViewConfigDisplayModel(oldDisplayModelVivoListView);
-				
-			} catch (ModelDirectoryNotFoundException e) {
-				log.info("Knowledge base update directories not found.  " +
-						 "No update will be performed.");
-				return;
+			} catch (Exception e) {
+				log.info("unable to read display model migration files, display model not migrated. " + e.getMessage());
+				tryMigrateDisplay = false;
 			}
 				
 			try {		
@@ -137,10 +139,17 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 				  if (ontologyUpdater.updateRequired(ctx)) {
 					  ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
 					  ontologyUpdater.update(ctx);
-					  migrateDisplayModel(ontologyUpdater);
+					  if (tryMigrateDisplay) {
+						  try {
+						       migrateDisplayModel(settings);
+						       log.info("Migrated display model");
+						  } catch (Exception e) {
+							   log.info("unable to update display model: " + e.getMessage());
+						  }
+					  }
 				  }
-			   } catch (IOException ioe) {
-					String errMsg = "IOException updating knowledge base " +
+			   } catch (Exception ioe) {
+					String errMsg = "Exception updating knowledge base " +
 						"for ontology changes: ";
 					// Tomcat doesn't always seem to print exceptions thrown from
 					// context listeners
@@ -157,10 +166,143 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	}	
 	
 	//Multiple changes from 1.4 to 1.5 will occur
+	//update migration model
+	public void migrateDisplayModel(UpdateSettings settings) {
 	
-  	private void migrateDisplayModel(KnowledgeBaseUpdater ontologyUpdater) {
-  		ontologyUpdater.migrateDisplayModel();
-    }
+		OntModel displayModel = settings.getDisplayModel();
+		Model addStatements = ModelFactory.createDefaultModel();
+		Model removeStatements = ModelFactory.createDefaultModel();
+		//remove old tbox and display metadata statements and add statements from new versions
+		replaceTboxAndDisplayMetadata(displayModel, addStatements, removeStatements,settings);
+		//Update statements for data getter class types that have changed in 1.5 
+		updateDataGetterClassNames(displayModel, addStatements, removeStatements);
+		//add cannot delete flags to pages that shouldn't allow deletion on page list
+		addCannotDeleteFlagDisplayModel(displayModel, addStatements, removeStatements);
+		//removes requiresTemplate statement for people page
+		updatePeoplePageDisplayModel(displayModel, addStatements, removeStatements);
+		//add page list
+		addPageListDisplayModel(displayModel, addStatements, removeStatements,settings);
+		//update data getter labels
+		updateDataGetterLabels(displayModel, addStatements, removeStatements,settings);
+		
+		displayModel.enterCriticalSection(Lock.WRITE);
+		try {
+			if(log.isDebugEnabled()) {
+				StringWriter sw = new StringWriter();
+				addStatements.write(sw);
+				log.debug("Statements to be added are: ");
+				log.debug(sw.toString());
+				sw.close();
+				sw = new StringWriter();
+				removeStatements.write(sw);
+				log.debug("Statements to be removed are: ");
+				log.debug(sw.toString());
+				sw.close();
+			}
+			displayModel.remove(removeStatements);
+			displayModel.add(addStatements);
+		} catch(Exception ex) {
+			log.error("An error occurred in migrating display model ", ex);
+		} finally {
+			displayModel.leaveCriticalSection();
+		}
+	}
+	
+	//replace 
+	private void replaceTboxAndDisplayMetadata(OntModel displayModel, Model addStatements, Model removeStatements, UpdateSettings settings) {
+		
+		OntModel oldDisplayModelTboxModel = settings.getOldDisplayModelTboxModel();
+		OntModel oldDisplayModelDisplayMetadataModel = settings.getOldDisplayModelDisplayMetadataModel();
+		OntModel newDisplayModelTboxModel = settings.getNewDisplayModelTboxModel();
+		OntModel newDisplayModelDisplayMetadataModel = settings.getNewDisplayModelDisplayMetadataModel();	
+		OntModel loadedAtStartup = settings.getLoadedAtStartupDisplayModel();
+		OntModel oldVivoListView = settings.getVivoListViewConfigDisplayModel();
+		//Remove old display model tbox and display metadata statements from display model
+		removeStatements.add(oldDisplayModelTboxModel);
+		removeStatements.add(oldDisplayModelDisplayMetadataModel);
+		//the old startup folder only contained by oldVivoListView
+		removeStatements.add(oldVivoListView);
+		//Add statements from new tbox and display metadata 
+		addStatements.add(newDisplayModelTboxModel);
+		addStatements.add(newDisplayModelDisplayMetadataModel);
+		//this should include the list view in addition to other files
+		addStatements.add(loadedAtStartup);
+	}
+	
+	//update statements for data getter classes
+	private void updateDataGetterClassNames(OntModel displayModel, Model addStatements, Model removeStatements) {
+		Resource classGroupOldType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.ClassGroupPageData");
+		Resource browseOldType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.BrowseDataGetter");
+		Resource individualsForClassesOldType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.IndividualsForClassesDataGetter");
+		Resource internalClassesOldType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.InternalClassesDataGetter");
+		Resource classGroupNewType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData");
+		Resource browseNewType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.BrowseDataGetter");
+		Resource individualsForClassesNewType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter");
+		Resource internalClassesNewType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.InternalClassesDataGetter");
+		
+		//Find statements where type is ClassGroupData
+		updateAddRemoveDataGetterStatements(displayModel, removeStatements, addStatements, classGroupOldType, classGroupNewType);
+		//Find statements where type is BrowseDataGetter
+		updateAddRemoveDataGetterStatements(displayModel, removeStatements, addStatements, browseOldType, browseNewType);
+		//Find statements where type is individuals for classes
+		updateAddRemoveDataGetterStatements(displayModel, removeStatements, addStatements, individualsForClassesOldType, individualsForClassesNewType);
+		//Find statements where type is internal class
+		updateAddRemoveDataGetterStatements(displayModel, removeStatements, addStatements, internalClassesOldType, internalClassesNewType);
+	}
+	
+	private void updateAddRemoveDataGetterStatements(OntModel displayModel, 
+			Model removeStatements, Model addStatements,
+			Resource oldType, Resource newType) {
+		removeStatements.add(displayModel.listStatements(null, RDF.type, oldType));
+		StmtIterator oldStatements = displayModel.listStatements(null, RDF.type, oldType);
+		while(oldStatements.hasNext()) {
+			Statement stmt = oldStatements.nextStatement();
+			addStatements.add(stmt.getSubject(), RDF.type, newType);
+		}
+	}
+	
+	//add cannotDeleteFlag to display model
+	private void addCannotDeleteFlagDisplayModel(OntModel displayModel, Model addStatements, Model removeStatements) {
+		Resource homePage = displayModel.getResource(DisplayVocabulary.HOME_PAGE_URI);
+		addStatements.add(homePage, 
+				ResourceFactory.createProperty(DisplayVocabulary.DISPLAY_NS + "cannotDeletePage"),
+				ResourceFactory.createPlainLiteral("true"));
+	}
+		
+	//remove requires template
+	private void updatePeoplePageDisplayModel(OntModel displayModel, Model addStatements, Model removeStatements) {
+		Resource peoplePage = displayModel.getResource(DisplayVocabulary.DISPLAY_NS + "People");
+		if(peoplePage != null) {
+			removeStatements.add(peoplePage, DisplayVocabulary.REQUIRES_BODY_TEMPLATE,
+					ResourceFactory.createPlainLiteral("menupage--classgroup-people.ftl"));
+		}
+	}
+	
+	//add page list sparql query
+	private void addPageListDisplayModel(OntModel displayModel, Model addStatements, Model removeStatements, UpdateSettings settings) {
+		OntModel newDisplayModel = settings.getNewDisplayModelFromFile();
+		//Get all statements about pageList and pageListData
+		Resource pageList = newDisplayModel.getResource(DisplayVocabulary.DISPLAY_NS + "pageList");
+		Resource pageListData = newDisplayModel.getResource(DisplayVocabulary.DISPLAY_NS + "pageListData");
+
+		addStatements.add(newDisplayModel.listStatements(pageList, null, (RDFNode) null));
+		addStatements.add(newDisplayModel.listStatements(pageListData, null, (RDFNode) null));
+	}
+	
+	//update any new labels
+	private void updateDataGetterLabels(OntModel displayModel, Model addStatements, Model removeStatements, UpdateSettings settings) {
+		OntModel newDisplayModel = settings.getNewDisplayModelFromFile();
+		List<Resource> resourcesForLabels = new ArrayList<Resource>();
+		resourcesForLabels.add(ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData"));
+		resourcesForLabels.add(ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.BrowseDataGetter"));
+		resourcesForLabels.add(ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter"));
+		resourcesForLabels.add(ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.InternalClassesDataGetter"));
+		resourcesForLabels.add(ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter"));
+		for(Resource r: resourcesForLabels) {
+			addStatements.add(newDisplayModel.listStatements(r, RDFS.label, (RDFNode)null));
+		}
+	}
+	
   					
 	private OntModel loadModelFromDirectory(String directoryPath) {
 		
@@ -189,6 +331,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		readFile(file, om, filePath);
 		return om;
 	}
+	
 	
 	private void readFile(File f, OntModel om, String path) {
 		try {
