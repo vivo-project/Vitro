@@ -93,7 +93,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
             log.warn("This likely indicates a problem; excessive data may be deleted.");
         }
         
-        String rootFinder = "SELECT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s FILTER(!isBlank(?ss)) } FILTER (!bound(?ss)) }";
+        String rootFinder = "SELECT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s } FILTER (!isBlank(?s) || !bound(?ss)) }";
         Query rootFinderQuery = QueryFactory.create(rootFinder);
         QueryExecution qe = QueryExecutionFactory.create(rootFinderQuery, blankNodeModel);
         try {
