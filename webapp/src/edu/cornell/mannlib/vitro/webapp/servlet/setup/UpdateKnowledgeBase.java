@@ -144,7 +144,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 						       migrateDisplayModel(settings);
 						       log.info("Migrated display model");
 						  } catch (Exception e) {
-							   log.info("unable to update display model: " + e.getMessage());
+							   log.warn("unable to successfully update display model: " + e.getMessage());
 						  }
 					  }
 				  }
@@ -167,7 +167,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	
 	//Multiple changes from 1.4 to 1.5 will occur
 	//update migration model
-	public void migrateDisplayModel(UpdateSettings settings) {
+	public void migrateDisplayModel(UpdateSettings settings) throws Exception {
 	
 		OntModel displayModel = settings.getDisplayModel();
 		Model addStatements = ModelFactory.createDefaultModel();
@@ -201,8 +201,6 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			}
 			displayModel.remove(removeStatements);
 			displayModel.add(addStatements);
-		} catch(Exception ex) {
-			log.error("An error occurred in migrating display model ", ex);
 		} finally {
 			displayModel.leaveCriticalSection();
 		}
