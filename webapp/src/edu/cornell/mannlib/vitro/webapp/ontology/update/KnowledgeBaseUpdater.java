@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,10 +30,16 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.vocabulary.RDF;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -364,6 +371,145 @@ public class KnowledgeBaseUpdater {
 		}		
 	}
 		
+	//update migration model
+	public void migrateDisplayModel() {
+	
+		OntModel displayModel = this.settings.getDisplayModel();
+		Model addStatements = ModelFactory.createDefaultModel();
+		Model removeStatements = ModelFactory.createDefaultModel();
+		//remove old tbox and display metadata statements and add statements from new versions
+		replaceTboxAndDisplayMetadata(displayModel, addStatements, removeStatements);
+		//Update statements for data getter class types that have changed in 1.5 
+		updateDataGetterClassNames(displayModel, addStatements, removeStatements);
+		//add cannot delete flags to pages that shouldn't allow deletion on page list
+		addCannotDeleteFlagDisplayModel(displayModel, addStatements, removeStatements);
+		//removes requiresTemplate statement for people page
+		updatePeoplePageDisplayModel(displayModel, addStatements, removeStatements);
+		//add page list
+		addPageListDisplayModel(displayModel, addStatements, removeStatements);
+		//update data getter labels
+		updateDataGetterLabels(displayModel, addStatements, removeStatements);
+		
+		displayModel.enterCriticalSection(Lock.WRITE);
+		try {
+			if(log.isDebugEnabled()) {
+				StringWriter sw = new StringWriter();
+				addStatements.write(sw);
+				log.debug("Statements to be added are: ");
+				log.debug(sw.toString());
+				sw.close();
+				sw = new StringWriter();
+				removeStatements.write(sw);
+				log.debug("Statements to be removed are: ");
+				log.debug(sw.toString());
+				sw.close();
+			}
+			displayModel.remove(removeStatements);
+			displayModel.add(addStatements);
+		} catch(Exception ex) {
+			log.error("An error occurred in migrating display model ", ex);
+		} finally {
+			displayModel.leaveCriticalSection();
+		}
+	}
+	
+	//replace 
+	private void replaceTboxAndDisplayMetadata(OntModel displayModel, Model addStatements, Model removeStatements) {
+		
+		OntModel oldDisplayModelTboxModel = this.settings.getOldDisplayModelTboxModel();
+		OntModel oldDisplayModelDisplayMetadataModel = this.settings.getOldDisplayModelDisplayMetadataModel();
+		OntModel newDisplayModelTboxModel = this.settings.getNewDisplayModelTboxModel();
+		OntModel newDisplayModelDisplayMetadataModel = this.settings.getNewDisplayModelDisplayMetadataModel();	
+		OntModel loadedAtStartup = this.settings.getLoadedAtStartupDisplayModel();
+		OntModel oldVivoListView = this.settings.getVivoListViewConfigDisplayModel();
+		//Remove old display model tbox and display metadata statements from display model
+		removeStatements.add(oldDisplayModelTboxModel);
+		removeStatements.add(oldDisplayModelDisplayMetadataModel);
+		//the old startup folder only contained by oldVivoListView
+		removeStatements.add(oldVivoListView);
+		//Add statements from new tbox and display metadata 
+		addStatements.add(newDisplayModelTboxModel);
+		addStatements.add(newDisplayModelDisplayMetadataModel);
+		//this should include the list view in addition to other files
+		addStatements.add(loadedAtStartup);
+	}
+	
+	//update statements for data getter classes
+	private void updateDataGetterClassNames(OntModel displayModel, Model addStatements, Model removeStatements) {
+		Resource classGroupOldType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.ClassGroupPageData");
+		Resource browseOldType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.BrowseDataGetter");
+		Resource individualsForClassesOldType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.IndividualsForClassesDataGetter");
+		Resource internalClassesOldType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.InternalClassesDataGetter");
+		Resource classGroupNewType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData");
+		Resource browseNewType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.BrowseDataGetter");
+		Resource individualsForClassesNewType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter");
+		Resource internalClassesNewType = ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.InternalClassesDataGetter");
+		
+		//Find statements where type is ClassGroupData
+		updateAddRemoveDataGetterStatements(displayModel, removeStatements, addStatements, classGroupOldType, classGroupNewType);
+		//Find statements where type is BrowseDataGetter
+		updateAddRemoveDataGetterStatements(displayModel, removeStatements, addStatements, browseOldType, browseNewType);
+		//Find statements where type is individuals for classes
+		updateAddRemoveDataGetterStatements(displayModel, removeStatements, addStatements, individualsForClassesOldType, individualsForClassesNewType);
+		//Find statements where type is internal class
+		updateAddRemoveDataGetterStatements(displayModel, removeStatements, addStatements, internalClassesOldType, internalClassesNewType);
+	}
+	
+	private void updateAddRemoveDataGetterStatements(OntModel displayModel, 
+			Model removeStatements, Model addStatements,
+			Resource oldType, Resource newType) {
+		removeStatements.add(displayModel.listStatements(null, RDF.type, oldType));
+		StmtIterator oldStatements = displayModel.listStatements(null, RDF.type, oldType);
+		while(oldStatements.hasNext()) {
+			Statement stmt = oldStatements.nextStatement();
+			addStatements.add(stmt.getSubject(), RDF.type, newType);
+		}
+	}
+	
+	//add cannotDeleteFlag to display model
+	private void addCannotDeleteFlagDisplayModel(OntModel displayModel, Model addStatements, Model removeStatements) {
+		Resource homePage = displayModel.getResource(DisplayVocabulary.HOME_PAGE_URI);
+		addStatements.add(homePage, 
+				ResourceFactory.createProperty(DisplayVocabulary.DISPLAY_NS + "cannotDeletePage"),
+				ResourceFactory.createPlainLiteral("true"));
+	}
+	
+	
+	
+	//remove requires template
+	private void updatePeoplePageDisplayModel(OntModel displayModel, Model addStatements, Model removeStatements) {
+		Resource peoplePage = displayModel.getResource(DisplayVocabulary.DISPLAY_NS + "People");
+		if(peoplePage != null) {
+			removeStatements.add(peoplePage, DisplayVocabulary.REQUIRES_BODY_TEMPLATE,
+					ResourceFactory.createPlainLiteral("menupage--classgroup-people.ftl"));
+		}
+	}
+	
+	//add page list sparql query
+	private void addPageListDisplayModel(OntModel displayModel, Model addStatements, Model removeStatements) {
+		OntModel newDisplayModel = this.settings.getNewDisplayModelFromFile();
+		//Get all statements about pageList and pageListData
+		Resource pageList = newDisplayModel.getResource(DisplayVocabulary.DISPLAY_NS + "pageList");
+		Resource pageListData = newDisplayModel.getResource(DisplayVocabulary.DISPLAY_NS + "pageListData");
+
+		addStatements.add(newDisplayModel.listStatements(pageList, null, (RDFNode) null));
+		addStatements.add(newDisplayModel.listStatements(pageListData, null, (RDFNode) null));
+	}
+	
+	//update any new labels
+	private void updateDataGetterLabels(OntModel displayModel, Model addStatements, Model removeStatements) {
+		OntModel newDisplayModel = this.settings.getNewDisplayModelFromFile();
+		List<Resource> resourcesForLabels = new ArrayList<Resource>();
+		resourcesForLabels.add(ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData"));
+		resourcesForLabels.add(ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.BrowseDataGetter"));
+		resourcesForLabels.add(ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter"));
+		resourcesForLabels.add(ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.InternalClassesDataGetter"));
+		resourcesForLabels.add(ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter"));
+		for(Resource r: resourcesForLabels) {
+			addStatements.add(newDisplayModel.listStatements(r, RDFS.label, (RDFNode)null));
+		}
+	}
+
 	/**
 	 * A class that allows to access two different ontology change lists,
 	 * one for class changes and the other for property changes.  The 
@@ -427,5 +573,7 @@ public class KnowledgeBaseUpdater {
 		public List<AtomicOntologyChange> getAtomicPropertyChanges() {
 			return atomicPropertyChanges;
 		}	
+		
+		
 	}	
 }

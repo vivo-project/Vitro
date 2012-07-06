@@ -60,7 +60,15 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private static final String NEW_TBOX_MODEL_DIR = "/WEB-INF/filegraph/tbox/";
 	private static final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
 	private static final String NEW_TBOX_ANNOTATIONS_DIR = "/WEB-INF/ontologies/user/tbox/";
-	
+	//For display model migration
+	private static final String OLD_DISPLAYMODEL_TBOX_PATH = DATA_DIR + "oldDisplayModel/displayTBOX.n3";
+	private static final String NEW_DISPLAYMODEL_TBOX_PATH = "/WEB-INF/ontologies/app/menuload/displayTBOX.n3";
+	private static final String OLD_DISPLAYMODEL_DISPLAYMETADATA_PATH = DATA_DIR + "oldDisplayModel/displayDisplay.n3";
+	private static final String NEW_DISPLAYMODEL_DISPLAYMETADATA_PATH = "/WEB-INF/ontologies/app/menuload/displayDisplay.n3";
+	private static final String NEW_DISPLAYMODEL_PATH = "/WEB-INF/ontologies/app/menu.n3";
+	private static final String LOADED_STARTUPT_DISPLAYMODEL_DIR = "/WEB-INF/ontologies/app/loadedAtStartup/";
+	private static final String OLD_DISPLAYMODEL_VIVOLISTVIEW_PATH = DATA_DIR + "oldDisplayModel/vivoListViewConfig.rdf";
+
 	public void contextInitialized(ServletContextEvent sce) {
 		try {
 			ServletContext ctx = sce.getServletContext();
@@ -85,7 +93,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setAssertionOntModelSelector(ModelContext.getBaseOntModelSelector(ctx));
 			settings.setInferenceOntModelSelector(ModelContext.getInferenceOntModelSelector(ctx));
 			settings.setUnionOntModelSelector(ModelContext.getUnionOntModelSelector(ctx));
-			
+			settings.setDisplayModel(ModelContext.getDisplayModel(ctx));
 			try {
 				OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
 				settings.setOldTBoxModel(oldTBoxModel);
@@ -95,6 +103,27 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 				settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
 				OntModel newTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_ANNOTATIONS_DIR));
 				settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
+				//Display model tbox and display metadata 
+				//old display model tbox model
+				OntModel oldDisplayModelTboxModel = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_TBOX_PATH));
+				settings.setOldDisplayModelTboxModel(oldDisplayModelTboxModel);
+				//new display model tbox model
+				OntModel newDisplayModelTboxModel = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_TBOX_PATH));
+				settings.setNewDisplayModelTboxModel(newDisplayModelTboxModel);
+				//old display model display model metadata
+				OntModel oldDisplayModelDisplayMetadataModel = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_DISPLAYMETADATA_PATH));
+				settings.setOldDisplayModelDisplayMetadataModel(oldDisplayModelDisplayMetadataModel);
+				//new display model display model metadata
+				OntModel newDisplayModelDisplayMetadataModel = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_DISPLAYMETADATA_PATH));
+				settings.setNewDisplayModelDisplayMetadataModel(newDisplayModelDisplayMetadataModel);
+				//Get new display model
+				OntModel newDisplayModelFromFile = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_PATH));
+				settings.setNewDisplayModelFromFile(newDisplayModelFromFile);
+				OntModel loadedAtStartupFiles = loadModelFromDirectory(ctx.getRealPath(LOADED_STARTUPT_DISPLAYMODEL_DIR));
+				settings.setLoadedAtStartupDisplayModel(loadedAtStartupFiles);
+				OntModel oldDisplayModelVivoListView = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_VIVOLISTVIEW_PATH));
+				settings.setVivoListViewConfigDisplayModel(oldDisplayModelVivoListView);
+				
 			} catch (ModelDirectoryNotFoundException e) {
 				log.info("Knowledge base update directories not found.  " +
 						 "No update will be performed.");
@@ -108,7 +137,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 				  if (ontologyUpdater.updateRequired(ctx)) {
 					  ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
 					  ontologyUpdater.update(ctx);
-					  // migrateDisplayModel(ctx);
+					  migrateDisplayModel(ontologyUpdater);
 				  }
 			   } catch (IOException ioe) {
 					String errMsg = "IOException updating knowledge base " +
@@ -127,8 +156,10 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		}
 	}	
 	
-  	private void migrateDisplayModel(ServletContext ctx) {
-  	   return;	
+	//Multiple changes from 1.4 to 1.5 will occur
+	
+  	private void migrateDisplayModel(KnowledgeBaseUpdater ontologyUpdater) {
+  		ontologyUpdater.migrateDisplayModel();
     }
   					
 	private OntModel loadModelFromDirectory(String directoryPath) {
@@ -141,24 +172,40 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		}
 		File[] rdfFiles = directory.listFiles();
 		for (int i = 0; i < rdfFiles.length; i++) {
-			try {
-				File f = rdfFiles[i];
-				FileInputStream fis = new FileInputStream(f);
-				try {
-					if (f.getName().endsWith(".n3")) {
-						om.read(fis, null, "N3");
-					} else {
-						om.read(fis, null, "RDF/XML");
-					}
-				} catch (Exception e) {
-					log.error("Unable to load RDF from " + f.getName(), e); 
-				}
-			} catch (FileNotFoundException fnfe) {
-				log.error(rdfFiles[i].getName() + " not found. Unable to load" +
-						" RDF from this location: " + directoryPath);
-			}
+			readFile(rdfFiles[i], om, directoryPath);
 		}
 		return om;
+	}
+	
+	//load file from file path
+	private OntModel loadModelFromFile(String filePath) {
+		
+		OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		File file = new File(filePath);
+		if (!file.isFile()) {
+			throw new ModelFileNotFoundException(filePath + " must be a file " +
+					"containing RDF files.");
+		}
+		readFile(file, om, filePath);
+		return om;
+	}
+	
+	private void readFile(File f, OntModel om, String path) {
+		try {
+			FileInputStream fis = new FileInputStream(f);
+			try {	
+				if (f.getName().endsWith(".n3")) {
+					om.read(fis, null, "N3");
+				} else {
+					om.read(fis, null, "RDF/XML");
+				}
+			} catch (Exception e) {
+				log.error("Unable to load RDF from " + f.getName(), e); 
+			}
+		} catch (FileNotFoundException fnfe) {
+			log.error(f.getName() + " not found. Unable to load" +
+					" RDF from this location: " + path);
+		}	
 	}
 	
 	public void contextDestroyed(ServletContextEvent arg0) {
@@ -177,6 +224,12 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	
 	private class ModelDirectoryNotFoundException extends RuntimeException {
 		public ModelDirectoryNotFoundException(String msg) {
+			super(msg);
+		}
+	}
+	
+	private class ModelFileNotFoundException extends RuntimeException {
+		public ModelFileNotFoundException(String msg) {
 			super(msg);
 		}
 	}
