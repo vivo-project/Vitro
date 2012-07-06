@@ -60,14 +60,17 @@ public class IndividualToSolrDocument {
             
             //vitro id
             doc.addField(term.URI, ind.getURI());
-                    
+            log.debug(ind.getURI() + " init boost: " + doc.getDocumentBoost());
+            
     		//get label from ind
     		addLabel(ind, doc);
     		
         	//add classes, classgroups get if prohibited because of its class
             StringBuffer classPublicNames = new StringBuffer("");
         	addClasses(ind, doc, classPublicNames);
-        	        	        	        	
+        	
+        	log.debug(ind.getURI() + " post class boost: " + doc.getDocumentBoost());
+        	
         	// collecting URIs and rdfs:labels of objects of statements         	
         	StringBuffer objectNames = new StringBuffer("");        	
         	StringBuffer addUri = new StringBuffer("");           	
@@ -83,7 +86,11 @@ public class IndividualToSolrDocument {
                 doc.setDocumentBoost(ind.getSearchBoost());                    
             }    
             
+            log.debug(ind.getURI() + " pre mod boost: " + doc.getDocumentBoost());
+            
             runAdditionalDocModifers(ind,doc,addUri);            
+            
+            log.debug(ind.getURI() + " post mod boost: " + doc.getDocumentBoost());
             
             return doc;
         }catch(SkipIndividualException ex){
