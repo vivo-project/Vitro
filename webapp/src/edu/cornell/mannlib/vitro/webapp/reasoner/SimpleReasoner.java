@@ -211,18 +211,11 @@ public class SimpleReasoner extends StatementListener {
 				return;
 			}
 
-		    //log.debug("added TBox assertion = " + stmt.toString());
-			
-			if ( stmt.getObject().isResource() && (stmt.getObject().asResource()).getURI() == null ) {
-				log.warn("The object of this assertion has a null URI: " + stmtString(stmt));
+			if (!stmt.getObject().isResource()) {
+				log.warn("The object of this assertion is not a resource: " + stmtString(stmt));
 				return;
 			}
-
-			if ( stmt.getSubject().getURI() == null ) {
-				log.warn("The subject of this assertion has a null URI: " + stmtString(stmt));
-				return;
-			}
-			
+						
 			if (stmt.getPredicate().equals(RDFS.subClassOf) || stmt.getPredicate().equals(OWL.equivalentClass)) {
 				// ignore anonymous classes
 				if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
@@ -248,7 +241,17 @@ public class SimpleReasoner extends StatementListener {
 					 addedSubClass(subject,object,inferenceModel);
 					 addedSubClass(object,subject,inferenceModel);
 				} 
-			} else {
+			} else {	
+				if ( stmt.getObject().asResource().getURI() == null ) {
+					log.warn("The object of this assertion has a null URI: " + stmtString(stmt));
+					return;
+				}
+
+				if ( stmt.getSubject().getURI() == null ) {
+					log.warn("The subject of this assertion has a null URI: " + stmtString(stmt));
+					return;
+				}
+				
 				OntProperty prop1 = tboxModel.getOntProperty((stmt.getSubject()).getURI());
 				if (prop1 == null) {
 					log.debug("didn't find subject property in the tbox: " + (stmt.getSubject()).getURI());
@@ -281,18 +284,11 @@ public class SimpleReasoner extends StatementListener {
 				return;
 			}
 			
-			//log.debug("removed TBox assertion = " + stmt.toString());
-						
-			if ( stmt.getObject().isResource() && (stmt.getObject().asResource()).getURI() == null ) {
-				log.warn("The object of this assertion has a null URI: " + stmtString(stmt));
+			if (!stmt.getObject().isResource()) {
+				log.warn("The object of this assertion is not a resource: " + stmtString(stmt));
 				return;
 			}
-
-			if ( stmt.getSubject().getURI() == null ) {
-				log.warn("The subject of this assertion has a null URI: " + stmtString(stmt));
-				return;
-			}
-						
+									
 			if ( stmt.getPredicate().equals(RDFS.subClassOf) || stmt.getPredicate().equals(OWL.equivalentClass) ) {
 				
 				// ignore anonymous classes
@@ -320,6 +316,16 @@ public class SimpleReasoner extends StatementListener {
 				   removedSubClass(object,subject,inferenceModel);
 				}
 			} else {
+				if ( stmt.getObject().asResource().getURI() == null ) {
+					log.warn("The object of this assertion has a null URI: " + stmtString(stmt));
+					return;
+				}
+
+				if ( stmt.getSubject().getURI() == null ) {
+					log.warn("The subject of this assertion has a null URI: " + stmtString(stmt));
+					return;
+				}
+				
 				OntProperty prop1 = tboxModel.getOntProperty((stmt.getSubject()).getURI());
 				if (prop1 == null) {
 					log.debug("didn't find subject property in the tbox: " + (stmt.getSubject()).getURI());
@@ -391,7 +397,7 @@ public class SimpleReasoner extends StatementListener {
 					}
 				}
 			} else {
-				log.warn("The object of this rdf:type assertion has a null URI: " + stmtString(stmt));
+				log.debug("The object of this rdf:type assertion has a null URI, no reasoning will be done based on this assertion: " + stmtString(stmt));
 				return;
 			}
 		} finally {
