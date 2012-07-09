@@ -92,7 +92,8 @@ public class StartupStatusDisplayFilter implements Filter {
 	        }	
 	        
 			bodyMap.put("url", url );
-			
+
+			hResp.setContentType("text/html;charset=UTF-8");
 			hResp.setStatus(SC_INTERNAL_SERVER_ERROR);
 			Template tpl = loadFreemarkerTemplate();
 			tpl.process(bodyMap, hResp.getWriter());
