@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class RDFUploadController extends JenaIngestController {
@@ -307,7 +310,18 @@ public class RDFUploadController extends JenaIngestController {
             mainModel.getBaseModel().notifyEvent(startEvent);
             try {                                                 
                 if (remove) {
-                    mainModel.remove(changesModel);
+                    RDFService rdfService = new RDFServiceModel(mainModel);
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    changesModel.write(out, "N-TRIPLE");
+                    ChangeSet cs = rdfService.manufactureChangeSet();
+                    ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+                    cs.addRemoval(in, RDFService.ModelSerializationFormat.NTRIPLE, null);
+                    try {
+                        rdfService.changeSetUpdate(cs);
+                    } catch (RDFServiceException e) {
+                        throw new RuntimeException(e);
+                    }
+                    //mainModel.remove(changesModel);
                 } else {
                     mainModel.add(changesModel);
                     if (classgroupModel != null) {
