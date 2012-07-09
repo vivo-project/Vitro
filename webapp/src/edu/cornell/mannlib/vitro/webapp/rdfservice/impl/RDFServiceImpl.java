@@ -10,11 +10,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sparql.resultset.XMLInput;
 import com.hp.hpl.jena.vocabulary.RDF;
 
@@ -228,5 +231,30 @@ public abstract class RDFServiceImpl implements RDFService {
             // Output as is (subject to UTF-8 encoding on output that is)
             sbuff.append(c) ;
         }
+    }
+    
+    /**
+     * Returns a pair of models.  The first contains any statement containing at 
+     * least one blank node.  The second contains all remaining statements.
+     * @param g
+     * @return
+     */
+    
+    protected Model[] separateStatementsWithBlankNodes(Model gm) {
+        Model blankNodeModel = ModelFactory.createDefaultModel();
+        Model nonBlankNodeModel = ModelFactory.createDefaultModel();
+        StmtIterator sit = gm.listStatements();
+        while (sit.hasNext()) {
+            Statement stmt = sit.nextStatement();
+            if (!stmt.getSubject().isAnon() && !stmt.getObject().isAnon()) {
+                nonBlankNodeModel.add(stmt);
+            } else {
+                blankNodeModel.add(stmt);
+            }
+        }
+        Model[] result = new Model[2];
+        result[0] = blankNodeModel;
+        result[1] = nonBlankNodeModel;
+        return result;
     }
 }
