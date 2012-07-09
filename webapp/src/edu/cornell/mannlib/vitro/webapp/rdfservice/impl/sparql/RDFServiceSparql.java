@@ -620,8 +620,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
             log.warn("This likely indicates a problem; excessive data may be deleted.");
         }
                 
-        String rootFinder = "SELECT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s FILTER(!isBlank(?ss)) } FILTER (!bound(?ss)) }";
-        Query rootFinderQuery = QueryFactory.create(rootFinder);
+        Query rootFinderQuery = QueryFactory.create(BNODE_ROOT_QUERY);
         QueryExecution qe = QueryExecutionFactory.create(rootFinderQuery, blankNodeModel);
         try {
             ResultSet rs = qe.execSelect();
