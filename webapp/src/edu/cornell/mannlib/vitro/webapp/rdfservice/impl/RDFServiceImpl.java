@@ -27,6 +27,9 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 public abstract class RDFServiceImpl implements RDFService {
 	
 	private static final Log log = LogFactory.getLog(RDFServiceImpl.class);
+	protected static final String BNODE_ROOT_QUERY = 
+	        "SELECT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s } FILTER (!isBlank(?s) || !bound(?ss)) }";
+	
 	protected String defaultWriteGraphURI;
 	protected List<ChangeListener> registeredListeners = new CopyOnWriteArrayList<ChangeListener>();
     	
