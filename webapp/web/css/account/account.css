@@ -172,7 +172,7 @@ padding-right: 5px;
 }
 #associated {
     float:right; 
-    display:none;
+     display:none;
 }
 #associated label {
     margin-bottom: 10px;
@@ -224,10 +224,10 @@ padding-right: 5px;
 }
 #associateProfileBackgroundThree {
     background-color:#f1f2ee;
-    padding:7px 94px 26px 12px;
+    padding:7px 94px 26px 12px; 
     margin-top:-129px; 
     margin-left:-12px;
-    margin-right:-8px;
+    margin-right:-8px; 
     z-index:-100;
     border:1px solid #ccc;
     border-left:none;
@@ -238,11 +238,11 @@ padding-right: 5px;
 }
 #associateProfileBackgroundFour {
     background-color:#f1f2ee;
-    padding:0 94px 26px 12px;
-    margin-top:-8px;
+    padding:0 94px 26px 13px;
+    margin-top:-3px;
     margin-left:-12px;
     margin-right:-8px;
-    z-index:-100;
+    z-index:-100; 
     border:1px solid #ccc;
     border-top:none;
     border-bottom-left-radius: 5px;
