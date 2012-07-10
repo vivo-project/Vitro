@@ -738,6 +738,8 @@ public class JenaIngestController extends BaseEditController {
         if (modelType == null) {
             if (maker instanceof RDFServiceModelMaker) {
                 modelType = "sdb";
+            } else if (maker instanceof VitroJenaSDBModelMaker) {
+                modelType = "sdb";
             } else {
                 modelType = "rdb";
             }
@@ -1264,9 +1266,15 @@ public class JenaIngestController extends BaseEditController {
         if(modelType.equals("rdb")){
             vreq.setAttribute("modelType", "rdb");
             vreq.setAttribute("infoLine", "RDB models");
-        } else{
+        } else if (maker instanceof VitroJenaSDBModelMaker || 
+                          (maker instanceof VitroJenaSpecialModelMaker && 
+                                  ((VitroJenaSpecialModelMaker) maker).getInnerModelMaker() 
+                                          instanceof VitroJenaSDBModelMaker)) {
             vreq.setAttribute("modelType", "sdb");
             vreq.setAttribute("infoLine", "SDB models");
+        } else {
+            vreq.setAttribute("modelType", "sdb");
+            vreq.setAttribute("infoLine", "main store models");            
         }
         vreq.setAttribute("modelNames", maker.listModels().toList());
         vreq.setAttribute("bodyAttr", "onLoad=\"init()\"");
