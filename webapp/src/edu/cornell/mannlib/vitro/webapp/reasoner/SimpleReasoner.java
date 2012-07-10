@@ -358,24 +358,18 @@ public class SimpleReasoner extends StatementListener {
 				
 	    tboxModel.enterCriticalSection(Lock.READ);
 		try {
-			OntClass cls = null;
+			Resource cls = null;
 			if ( (stmt.getObject().asResource()).getURI() != null ) {
 				
-			    cls = tboxModel.getOntClass(stmt.getObject().asResource().getURI()); 
+			    cls = tboxModel.getResource(stmt.getObject().asResource().getURI()); 
 			    if (cls != null) {
-			    	List<OntClass> parents = null;
-			    	try {
-						parents = (cls.listSuperClasses(false)).toList();		
-						parents.addAll((cls.listEquivalentClasses()).toList());	
-			    	} catch (ConversionException ce) {
-			    	    parents = getParents(cls,tboxModel);	
-			    	}
+			    	List<Resource> parents = getParents(cls,tboxModel);
 			    	
-					Iterator<OntClass> parentIt = parents.iterator();
+					Iterator<Resource> parentIt = parents.iterator();
 	
 					if (parentIt.hasNext()) {
 						while (parentIt.hasNext()) {
-							OntClass parentClass = parentIt.next();
+							Resource parentClass = parentIt.next();
 							
 							// VIVO doesn't materialize statements that assert anonymous types
 							// for individuals. Also, sharing an identical anonymous node is
@@ -423,29 +417,23 @@ public class SimpleReasoner extends StatementListener {
 	protected void removedABoxTypeAssertion(Statement stmt, Model inferenceModel) {
 		tboxModel.enterCriticalSection(Lock.READ);
 		try {		
-			OntClass cls = null;
+			Resource cls = null;
 			
 			if ( (stmt.getObject().asResource()).getURI() != null ) {
-			    cls = tboxModel.getOntClass(stmt.getObject().asResource().getURI()); 
+			    cls = tboxModel.getResource(stmt.getObject().asResource().getURI()); 
 			    
 				if (cls != null) {
 					if (entailedType(stmt.getSubject(),cls)) {
 						addInference(stmt,inferenceModel,true);
 					} 
 					
-			    	List<OntClass> parents = null;
-			    	try {
-						parents = (cls.listSuperClasses(false)).toList();		
-						parents.addAll((cls.listEquivalentClasses()).toList());	
-			    	} catch (ConversionException ce) {
-			    	    parents = getParents(cls,tboxModel);	
-			    	}
+			    	List<Resource> parents = getParents(cls,tboxModel);
 					
-					Iterator<OntClass> parentIt = parents.iterator();
+					Iterator<Resource> parentIt = parents.iterator();
 					
 					while (parentIt.hasNext()) {
 					    
-						OntClass parentClass = parentIt.next();
+						Resource parentClass = parentIt.next();
 						
 						// VIVO doesn't materialize statements that assert anonymous types
 						// for individuals. Also, sharing an identical anonymous node is
@@ -892,39 +880,92 @@ public class SimpleReasoner extends StatementListener {
 
 	// Returns true if it is entailed by class subsumption that
 	// subject is of type cls; otherwise returns false.
-	protected boolean entailedType(Resource subject, OntClass cls) {
+	protected boolean entailedType(Resource subject, Resource cls) {
 
 		List<Resource> sameIndividuals = getSameIndividuals(subject,inferenceModel);
 		sameIndividuals.add(subject);
 				
-		tboxModel.enterCriticalSection(Lock.READ);
-		try {
-			aboxModel.enterCriticalSection(Lock.READ);
-			try {			
-				List<OntClass> subclasses = null;
-				subclasses = (cls.listSubClasses(false)).toList();		
-				subclasses.addAll((cls.listEquivalentClasses()).toList());
-				Iterator<OntClass> iter = subclasses.iterator();
-				while (iter.hasNext()) {		
-					OntClass childClass = iter.next();
-					if (childClass.equals(cls)) continue;  // TODO - determine whether this is needed
-					Iterator<Resource> sameIter = sameIndividuals.iterator();
-					while (sameIter.hasNext()) {
-						Statement stmt = ResourceFactory.createStatement(sameIter.next(), RDF.type, childClass);
-						if (aboxModel.contains(stmt)) {
-						   return true;					
-						}
+		List<Resource> subClasses = getSubClasses(cls);
+		aboxModel.enterCriticalSection(Lock.READ);
+		try {			
+			Iterator<Resource> iter = subClasses.iterator();
+			while (iter.hasNext()) {		
+				Resource childClass = iter.next();
+				if (childClass.equals(cls)) continue;  
+				Iterator<Resource> sameIter = sameIndividuals.iterator();
+				while (sameIter.hasNext()) {
+					Statement stmt = ResourceFactory.createStatement(sameIter.next(), RDF.type, childClass);
+					if (aboxModel.contains(stmt)) {
+					   return true;					
 					}
 				}
-				return false;
-			} finally { 
-				aboxModel.leaveCriticalSection();
-			}	
-		} finally {
-			tboxModel.leaveCriticalSection();			
-		}
+			}
+			return false;
+		} finally { 
+			aboxModel.leaveCriticalSection();
+		}	
 	}
-		
+	
+	protected List<Resource> getSubClasses(Resource cls) {
+		List<Resource> subClasses = new ArrayList<Resource>();
+		tboxModel.enterCriticalSection(Lock.READ);
+		try {
+			Iterator<Statement> iter = tboxModel.listStatements((Resource) null, RDFS.subClassOf, cls);
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+				if (stmt.getSubject() == null || stmt.getSubject().asResource().getURI() == null) continue;
+				if (!subClasses.contains(stmt.getSubject())) {
+					subClasses.add(stmt.getSubject());
+				}
+			}
+
+			iter = tboxModel.listStatements((Resource) null, OWL.equivalentClass, cls);
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+				if (stmt.getSubject() == null || stmt.getSubject().getURI() == null) continue;
+				if (!subClasses.contains(stmt.getSubject())) {
+					subClasses.add(stmt.getSubject());
+				}
+			}
+
+			return subClasses;
+		} finally {
+			tboxModel.leaveCriticalSection();
+		}	
+	}
+	
+	protected List<Resource> getSuperClasses(Resource cls) {
+		List<Resource> superClasses = new ArrayList<Resource>();
+		tboxModel.enterCriticalSection(Lock.READ);
+		try {
+			Iterator<Statement> iter = tboxModel.listStatements(cls, RDFS.subClassOf, (RDFNode) null);
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+				
+				if (stmt.getObject() != null && stmt.getObject().isResource()) {
+					Resource superCls = stmt.getObject().asResource();
+					
+					if (superCls.isAnon() || superClasses.contains(superCls)) {
+						continue;
+					}
+					superClasses.add(superCls);
+				}				
+			}
+
+			iter = tboxModel.listStatements((Resource) null, OWL.equivalentClass, cls);
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+				if (stmt.getSubject() == null || stmt.getSubject().asResource().getURI() == null) continue;
+				if (!superClasses.contains(stmt.getSubject())) {
+					superClasses.add(stmt.getSubject());
+				}
+			}
+			return superClasses;
+		} finally {
+			tboxModel.leaveCriticalSection();
+		}	
+	}
+	
 	// Returns true if the triple is entailed by inverse property
 	// reasoning or sameAs reasoning; otherwise returns false.
 	protected boolean entailedStatement(Statement stmt) {	
@@ -1165,7 +1206,7 @@ public class SimpleReasoner extends StatementListener {
 				if ( (stmt.getObject().asResource()).getURI() != null ) {
 				    ontClass = tboxModel.getOntClass(stmt.getObject().asResource().getURI()); 
 				} else {
-					log.warn("The object of this rdf:type assertion has a null URI: " + stmtString(stmt));
+					log.debug("The object of this rdf:type assertion has a null URI: " + stmtString(stmt));
 					continue;
 				}
 				 
@@ -1173,7 +1214,7 @@ public class SimpleReasoner extends StatementListener {
 					if ( !(stmt.getObject().asResource().getNameSpace()).equals(OWL.NS)) {
 						if (!unknownTypes.contains(stmt.getObject().asResource().getURI())) {
 						   unknownTypes.add(stmt.getObject().asResource().getURI());
-					       log.warn("Didn't find the target class (the object of an asserted or inferred rdf:type statement) in the TBox: " +
+					       log.debug("Didn't find the target class (the object of an asserted or inferred rdf:type statement) in the TBox: " +
 						          	(stmt.getObject().asResource()).getURI() + ". No mostSpecificType computation will be done based on " + (stmt.getObject().asResource()).getURI() + " type statements.");
 						}
 					}
@@ -1211,10 +1252,22 @@ public class SimpleReasoner extends StatementListener {
 			    if (add) {
 			    	typeURIs.add(type.getURI());
 			    	
-		            Iterator<OntClass> eIter = type.listEquivalentClasses();
+			    	ArrayList<Resource> equivalentClasses = new ArrayList<Resource>();
+			    	
+			    	Iterator<Statement> iter = tboxModel.listStatements((Resource) null, OWL.equivalentClass, type);
+			    	while (iter.hasNext()) {
+			    		Statement stmt = iter.next();
+			    		Resource res = stmt.getSubject();
+			    		if ((res == null) || res.isAnon() || equivalentClasses.contains(res)  ) {
+			    			continue;
+			    		}
+			    		equivalentClasses.add(res);
+			    	}
+			    	
+		            Iterator<Resource> eIter = equivalentClasses.iterator();
 		                
 		            while (eIter.hasNext()) {
-		                OntClass equivClass = eIter.next();
+		                Resource equivClass = eIter.next();
 		                if (equivClass.isAnon()) continue;
 		                typeURIs.add(equivClass.getURI());
 		            }    
@@ -1270,29 +1323,31 @@ public class SimpleReasoner extends StatementListener {
         return;
 	}
 	
-	protected List<OntClass> getParents(OntClass cls, OntModel tboxModel) {
+	protected List<Resource> getParents(Resource cls, OntModel tboxModel) {
 		
-		List<OntClass> parents = new ArrayList<OntClass>();
+		List<Resource> parents = new ArrayList<Resource>();
 			
 	    tboxModel.enterCriticalSection(Lock.READ);
 		try {
 			StmtIterator iter = tboxModel.listStatements(cls, RDFS.subClassOf, (RDFNode) null);
 			while (iter.hasNext()) {
 				Statement stmt = iter.next();
-				if (!stmt.getObject().isAnon() && stmt.getObject().canAs(OntClass.class)) {
-					if (!parents.contains(stmt.getObject().as(OntClass.class))) {
-						parents.add(stmt.getObject().as(OntClass.class));
-					}
+				if (stmt.getObject() == null || !stmt.getObject().isResource() || stmt.getObject().asResource().isAnon()) {
+					continue;
+				}
+				if (!parents.contains(stmt.getObject().asResource())) {
+					parents.add(stmt.getObject().asResource());
 				}
 			}
 				
 			iter = tboxModel.listStatements(cls, OWL.equivalentClass, (RDFNode) null);
 			while (iter.hasNext()) {
 				Statement stmt = iter.next();
-				if (!stmt.getObject().isAnon() && stmt.getObject().canAs(OntClass.class)) {
-					if (!parents.contains(stmt.getObject().as(OntClass.class))) {
-						parents.add(stmt.getObject().as(OntClass.class));
-					}
+				if (stmt.getObject() == null || !stmt.getObject().isResource() || stmt.getObject().asResource().isAnon()) {
+					continue;
+				}
+				if (!parents.contains(stmt.getObject().asResource())) {
+					parents.add(stmt.getObject().asResource());
 				}
 			}
 		} catch (Exception e) {
