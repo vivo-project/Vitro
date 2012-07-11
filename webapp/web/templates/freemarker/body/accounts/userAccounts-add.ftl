@@ -1,8 +1,11 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <#-- Template for adding a user account -->
+<#import "lib-vivo-form.ftl" as lvf>
 
 <h3><a class="account-menu" href="accountsAdmin" title="add new account">User accounts</a> > Add new account</h3>
+
+<@lvf.unsupportedBrowser urls.base /> 
 
     <#if errorEmailIsEmpty??>
         <#assign errorMessage = "You must supply an email address." />

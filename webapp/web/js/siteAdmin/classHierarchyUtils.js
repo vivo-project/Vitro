@@ -81,9 +81,11 @@
             });
             var descendants = "";
             var headerSpan = "";
+            var closingTable = "</table>";
             
             if ( this.children.length ) {
                 descendants = classHierarchyUtils.getTheChildren(this);
+                closingTable = "";
                 headerSpan = "<span class='headerSpanPlus' id='headerSpan" + classHierarchyUtils.classCounter 
                               + "' view='less'>&nbsp;</span>";
             }
@@ -102,10 +104,14 @@
             classHierarchyUtils.classHtml += "<tr><td class='classDetail'>Ontology:</td><td>" + this.data.ontology + "</td></tr>";
 
  
+            if ( descendants.length > 1 ) {
+                descendants = descendants.substring(0, descendants.length - 10);
+            }
+            
             classHierarchyUtils.classHtml += descendants;
 
-            classHierarchyUtils.classHtml += "</table>";
-       //     alert(classHierarchyUtils.classHtml);
+            classHierarchyUtils.classHtml += closingTable;
+//            alert(classHierarchyUtils.classHtml);
             $newClassSection.html(classHierarchyUtils.classHtml);
             $newClassSection.appendTo($('section#container'));
             classHierarchyUtils.makeHeaderSpansClickable(classHierarchyUtils.classCounter);
