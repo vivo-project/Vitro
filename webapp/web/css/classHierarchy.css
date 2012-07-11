@@ -20,6 +20,11 @@ table.classHierarchy .classDetail {
     color:#064D68;
     white-space: nowrap;
 }
+td.classDetail {
+    width:90px;
+    color:#064D68;
+    white-space: nowrap;
+}
 table.subclassTable {
     margin-left:15px;
     margin-bottom:4px;
@@ -47,18 +52,22 @@ section#container div span {
 span.headerSpanPlus {
     width: 12px;
     background: url(../images/vitro_plus_sign.gif) left center no-repeat;
+    cursor:default;
 }
 span.headerSpanMinus {
     width: 12px;
     background: url(../images/vitro_minus_sign.gif) left center no-repeat;
+    cursor:default;
 }
 span.subclassExpandPlus {
     padding-right: 14px;
     background: url(../images/vitro_plus_sign.gif) left center no-repeat;
+    cursor:default;
 }
 span.subclassExpandMinus {
     padding-right: 14px;
     background: url(../images/vitro_minus_sign.gif) left center no-repeat;
+    cursor:default;
 }
 span#expandAll {
     margin-right: 10px;

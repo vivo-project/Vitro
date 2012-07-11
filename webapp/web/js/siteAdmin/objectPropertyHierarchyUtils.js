@@ -126,9 +126,11 @@
             });
             var descendants = "";
             var headerSpan = "";
+            var closingTable = "</table>";
             
             if ( this.children.length ) {
                 descendants = objectPropHierarchyUtils.getTheChildren(this);
+                closingTable = "";
                 headerSpan = "<span class='headerSpanPlus' id='headerSpan" + objectPropHierarchyUtils.classCounter 
                               + "' view='less'>&nbsp;</span>";
             }
@@ -148,10 +150,13 @@
             objectPropHierarchyUtils.classHtml += "<span class='rangeClass'>Range Class:</span>" 
                                                + (this.data.rangeVClass.length > 0 ? this.data.rangeVClass : "none" ) + "</td></tr>";
 
+            if ( descendants.length > 1 ) {
+               descendants = descendants.substring(0, descendants.length - 10);
+            }
  
             objectPropHierarchyUtils.classHtml += descendants;
 
-            objectPropHierarchyUtils.classHtml += "</table>";
+            objectPropHierarchyUtils.classHtml += closingTable;
        //     alert(objectPropHierarchyUtils.classHtml);
             $newClassSection.html(objectPropHierarchyUtils.classHtml);
             $newClassSection.appendTo($('section#container'));
