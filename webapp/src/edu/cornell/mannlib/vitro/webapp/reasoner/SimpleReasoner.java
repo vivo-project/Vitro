@@ -55,6 +55,8 @@ public class SimpleReasoner extends StatementListener {
 	private OntModel tboxModel;             // asserted and inferred TBox axioms
 	private OntModel aboxModel;             // ABox assertions
 	private Model inferenceModel;           // ABox inferences
+	private OntModel fullModel;             // contains at least the 
+	                                        // asserted and inferred ABox
 	
 	private static final String mostSpecificTypePropertyURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType";	
 	private static final AnnotationProperty mostSpecificType = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createAnnotationProperty(mostSpecificTypePropertyURI);
@@ -85,6 +87,10 @@ public class SimpleReasoner extends StatementListener {
 			              Model scratchpadModel) {
 
 		this.tboxModel = tboxModel;
+		
+		this.fullModel = ModelFactory.createOntologyModel(
+                OntModelSpec.OWL_MEM, ModelFactory.createModelForGraph(
+                        new RDFServiceGraph(rdfService)));
 		
         this.aboxModel = ModelFactory.createOntologyModel(
                   OntModelSpec.OWL_MEM, ModelFactory.createModelForGraph(
@@ -120,6 +126,9 @@ public class SimpleReasoner extends StatementListener {
 		this.tboxModel = tboxModel;
 		this.aboxModel = aboxModel; 
 		this.inferenceModel = inferenceModel;
+		this.fullModel = ModelFactory.createOntologyModel(
+		        OntModelSpec.OWL_MEM, ModelFactory.createUnion(
+		                aboxModel, inferenceModel));
 		aBoxDeltaModeler1 = new CumulativeDeltaModeler();
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
 		this.batchMode = 0;
@@ -578,14 +587,17 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	protected void addedABoxAssertion(Statement stmt, Model inferenceModel) {
 		
-		List<OntProperty> inverseProperties = getInverseProperties(stmt);	
-        Iterator<OntProperty> inverseIter = inverseProperties.iterator();
-		        
-	    while (inverseIter.hasNext()) {
-	       Property inverseProp = inverseIter.next();
-	       Statement infStmt = ResourceFactory.createStatement(stmt.getObject().asResource(), inverseProp, stmt.getSubject());
-	       addInference(infStmt,inferenceModel,true);
-	    }	
+	    if (!stmt.getObject().isLiteral()) {
+    		List<OntProperty> inverseProperties = getInverseProperties(stmt);	
+            Iterator<OntProperty> inverseIter = inverseProperties.iterator();
+    		        
+    	    while (inverseIter.hasNext()) {
+    	       Property inverseProp = inverseIter.next();
+    	       Statement infStmt = ResourceFactory.createStatement(
+    	               stmt.getObject().asResource(), inverseProp, stmt.getSubject());
+    	       addInference(infStmt,inferenceModel,true);
+    	    }	
+	    }
 	    
         List<Resource> sameIndividuals = getSameIndividuals(stmt.getSubject().asResource(), inferenceModel);
 		Iterator<Resource> sameIter = sameIndividuals.iterator();
@@ -617,14 +629,17 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	protected void removedABoxAssertion(Statement stmt, Model inferenceModel) {
 		
-		List<OntProperty> inverseProperties = getInverseProperties(stmt);	
-	    Iterator<OntProperty> inverseIter = inverseProperties.iterator();
-		
-	    while (inverseIter.hasNext()) {
-	        OntProperty inverseProp = inverseIter.next();
-	        Statement infStmt = ResourceFactory.createStatement(stmt.getObject().asResource(), inverseProp, stmt.getSubject());
-	        removeInference(infStmt,inferenceModel);
-	    }	   
+	    if (!stmt.getObject().isLiteral()) {
+    		List<OntProperty> inverseProperties = getInverseProperties(stmt);	
+    	    Iterator<OntProperty> inverseIter = inverseProperties.iterator();
+    		
+    	    while (inverseIter.hasNext()) {
+    	        OntProperty inverseProp = inverseIter.next();
+    	        Statement infStmt = ResourceFactory.createStatement(
+    	                stmt.getObject().asResource(), inverseProp, stmt.getSubject());
+    	        removeInference(infStmt,inferenceModel);
+    	    }	   
+	    }
 	
 	    List<Resource> sameIndividuals = getSameIndividuals(stmt.getSubject().asResource(), inferenceModel);
 		Iterator<Resource> sameIter = sameIndividuals.iterator();	 
@@ -786,30 +801,18 @@ public class SimpleReasoner extends StatementListener {
 	 * Get a list of individuals the same as the given individual
 	 */
 	protected List<Resource> getSameIndividuals(Resource ind, Model inferenceModel) {	
-				
-		OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-		unionModel.addSubModel(aboxModel);
-		unionModel.addSubModel(inferenceModel);
-	
 		ArrayList<Resource> sameIndividuals = new ArrayList<Resource>();
-		aboxModel.enterCriticalSection(Lock.READ);
+		fullModel.enterCriticalSection(Lock.READ);
 		try {
-			inferenceModel.enterCriticalSection(Lock.READ);
-			try {
-				Iterator<Statement> iter = unionModel.listStatements(ind, OWL.sameAs, (RDFNode) null);
-				
-				while (iter.hasNext()) {
-					Statement stmt = iter.next();
-					if (stmt.getObject() == null || !stmt.getObject().isResource() || stmt.getObject().asResource().getURI() == null) continue;
-					sameIndividuals.add(stmt.getObject().asResource());
-				}
-			} finally {
-				inferenceModel.leaveCriticalSection();
-			}			
+			Iterator<Statement> iter = fullModel.listStatements(ind, OWL.sameAs, (RDFNode) null);	
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+				if (stmt.getObject() == null || !stmt.getObject().isResource() || stmt.getObject().asResource().getURI() == null) continue;
+				sameIndividuals.add(stmt.getObject().asResource());
+			}
 		} finally {
-			aboxModel.leaveCriticalSection();
-		}
-		
+			fullModel.leaveCriticalSection();
+		}		
 		return sameIndividuals;
 	}
 
