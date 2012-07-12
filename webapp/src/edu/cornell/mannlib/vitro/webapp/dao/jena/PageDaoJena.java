@@ -37,7 +37,8 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
     
     static protected Query pageQuery;
     static protected Query pageTypeQuery;
-    static protected Query pageDataGettersQuery;
+    static protected Query pageDataGetterTypeQuery;
+    static protected Query dataGetterURIsQuery;
     static protected Query pageMappingsQuery;
     static protected Query homePageUriQuery;
     static protected Query classGroupPageQuery;
@@ -46,7 +47,7 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
     static protected Query individualsForClassesRestrictedQuery;
     static protected Query institutionalInternalClassQuery;
     static protected Query individualsForClassesInternalQuery;
-    static protected Query dataGetterClassQuery;
+    static protected Query dataGetterClassQuery;    
 
     static final String prefixes = 
         "PREFIX rdf:   <" + VitroVocabulary.RDF +"> \n" +
@@ -70,13 +71,21 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         "    ?pageUri rdf:type ?type .\n"+                              
         "} \n" ;
     
-    //Get data getters
-    static final protected String pageDataGettersQueryString = 
+    //Get data getter types
+    static final protected String pageDataGetterTypesQueryString = 
         prefixes + "\n" +
-        "SELECT ?dataGetter WHERE {\n" +
+        "SELECT ?dataGetterType WHERE {\n" +
         "    ?pageUri display:hasDataGetter ?dg .\n"+    
-        " 	 ?dg rdf:type ?dataGetter . \n" +
+        " 	 ?dg rdf:type ?dataGetterType . \n" +
         "} \n" ;
+    
+    //Get data getter URIs
+    static final protected String dataGetterURIsQueryString = 
+        prefixes + "\n" +
+        "SELECT ?dg WHERE {\n" +
+        "    ?pageUri display:hasDataGetter ?dg .\n"+            
+        "}" ;
+    
     static final protected String pageMappingsQueryString = 
         prefixes + "\n" +
         "SELECT ?pageUri ?urlMapping WHERE {\n" +
@@ -155,11 +164,17 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
             log.error(pageTypeQueryString);
         }
         try{
-            pageDataGettersQuery = QueryFactory.create(pageDataGettersQueryString);
+            pageDataGetterTypeQuery = QueryFactory.create(pageDataGetterTypesQueryString);
         }catch(Throwable th){
             log.error("could not create SPARQL query for pageTypeQuery " + th.getMessage());
-            log.error(pageDataGettersQueryString);
+            log.error(pageDataGetterTypesQueryString);
         }
+        try{
+            dataGetterURIsQuery = QueryFactory.create(dataGetterURIsQueryString);
+        }catch(Throwable th){
+            log.error("could not create SPARQL query for dataGetterURIsQuery " + th.getMessage());
+            log.error(dataGetterURIsQueryString);
+        }                
         try{    
             pageMappingsQuery=QueryFactory.create(pageMappingsQueryString);
         }catch(Throwable th){
@@ -279,30 +294,36 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
           log.debug("multiple results found for " + pageUri + " using only the first.");
       Map<String,Object> pageData = list.get(0);
       
-      //now get the rdf:types for the page
-      //Changing to get the data getters for the page (already know that it's a page type)
-      List<String> dataGetters = new ArrayList<String>();
+      //now get the rdf:types for the data getters for the page
+      List<String> dataGetterTypes = new ArrayList<String>();
       displayModel.enterCriticalSection(false);
       try{
-          QueryExecution qexec = QueryExecutionFactory.create(pageDataGettersQuery, displayModel, initialBindings);
+          QueryExecution qexec = QueryExecutionFactory.create(pageDataGetterTypeQuery, displayModel, initialBindings);
           try{
               ResultSet rs = qexec.execSelect();
               while(rs.hasNext()){
                   QuerySolution soln = rs.next();
-                  dataGetters.add( nodeToString( soln.get("dataGetter" ) ));
+                  dataGetterTypes.add( nodeToString( soln.get("dataGetterType" ) ));
               }
-          }finally{
-              qexec.close();
-          }
-      }finally{
-          displayModel.leaveCriticalSection();
-      }
+          }finally{ qexec.close(); }
+      }finally{ displayModel.leaveCriticalSection(); }            
+      pageData.put("dataGetterTypes", dataGetterTypes);
       
-      if( list == null )
-          log.error("could not get data getters for page " + pageUri);
-      else
-          pageData.put("dataGetters", dataGetters);
+      //now get URIs of DataGetters for page.
+      List<String> dataGetterURIs = new ArrayList<String>();
+      displayModel.enterCriticalSection(false);
+      try{
+          QueryExecution qexec = QueryExecutionFactory.create(dataGetterURIsQuery, displayModel, initialBindings);
+          try{
+              ResultSet rs = qexec.execSelect();
+              while(rs.hasNext()){
+                  QuerySolution soln = rs.next();
+                  dataGetterURIs.add( nodeToString( soln.get("dg" ) ));
+              }
+          }finally{ qexec.close(); }
+      }finally{ displayModel.leaveCriticalSection(); }
       
+      pageData.put("dataGetterURIs", dataGetterURIs);
       return pageData;
     }
     

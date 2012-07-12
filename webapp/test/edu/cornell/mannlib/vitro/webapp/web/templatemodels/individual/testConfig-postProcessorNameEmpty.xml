@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
+<!--
+	Has a postprocessor tag with no contents. Should use the default.  
+-->
+
+<list-view-config>
+    <query-select>
+        SELECT <collated> ?subclass </collated>
+               ?object
+        WHERE {
+            ?subject ?property ?object
+            <collated>
+            ?object a ?subclass.
+            </collated>
+        }  
+    </query-select>
+
+    <query-construct>
+        CONSTRUCT {
+            ?subject ?property ?object .
+        } WHERE {
+            ?subject ?property ?object 
+        }
+    </query-construct>
+    
+    <template>propStatement-default.ftl</template>
+    
+    <postprocessor></postprocessor>
+</list-view-config>

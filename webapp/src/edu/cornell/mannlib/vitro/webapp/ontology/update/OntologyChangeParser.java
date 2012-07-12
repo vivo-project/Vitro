@@ -92,7 +92,7 @@ public class OntologyChangeParser {
 		}
 		
 		if (changeObjects.size() == 0) {
-			logger.log("did not find any changes in PromptDiff output file.");
+			logger.log("No ABox updates are required.");
 		}
 		return changeObjects;
 	}

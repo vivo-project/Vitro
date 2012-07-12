@@ -117,7 +117,7 @@ public class FriendController extends HttpServlet {
 	}
 
 	private void writeWarningToTheLog(HttpServletRequest req) {
-		log.warn("LOGGING IN VIA SESAME FROM ADDR=" + req.getRemoteAddr()
+		log.warn("LOGGING IN VIA FRIEND FROM ADDR=" + req.getRemoteAddr()
 				+ ", PORT=" + req.getRemotePort() + ", HOST="
 				+ req.getRemoteHost() + ", USER=" + req.getRemoteUser());
 	}

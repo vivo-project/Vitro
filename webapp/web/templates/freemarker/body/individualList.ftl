@@ -43,7 +43,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseIndex.css
             <ul>
                 <#list individuals as individual>
                     <li>       
-                        <#include "listedIndividual.ftl">
+                        <@shortView uri=individual.uri viewContext="index" />
                     </li>
                 </#list>
             </ul>

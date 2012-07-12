@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
+<!--
+	Config file with no subclass selector. Should throw an error on a collated property
+-->
+
+<list-view-config>
+    <query-select>S_E_L_E_C_T ?subclass ORDER BY ?subclass</query-select>
+    <query-construct> Construct </query-construct>
+    <template>propStatement-default.ftl</template>
+</list-view-config>

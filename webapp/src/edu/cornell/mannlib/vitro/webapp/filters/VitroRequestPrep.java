@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.filters;
 
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroRequest.SPECIAL_WRITE_MODEL;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.CONTEXT_DISPLAY_TBOX;
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_DISPLAY_MODEL_PARAM;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_MODEL_PARAM;
@@ -34,10 +35,9 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.AccessSpecialDataModels;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageMenus;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
@@ -48,8 +48,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.FilterFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HideFromDisplayByPolicyFilter;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 /**
@@ -144,8 +146,9 @@ public class VitroRequestPrep implements Filter {
     		log.debug("Found a WebappDaoFactory in the session and using it for this request");
     	}
     	
-    	//replace the WebappDaoFactory with a different version if menu management parameter is found
-    	wdf = checkForSpecialWDF(vreq, wdf);
+    	//Do model switching and replace the WebappDaoFactory with 
+    	//a different version if requested by parameters
+    	wdf = checkForModelSwitching(vreq, wdf);
     	
     	//get any filters from the ContextFitlerFactory
         VitroFilters filters = getFiltersFromContextFilterFactory(req, wdf);
@@ -170,10 +173,11 @@ public class VitroRequestPrep implements Filter {
         	vreq.setDataset(dataset);
         }
         
+        ServletContext ctx = vreq.getSession().getServletContext();
         vreq.setUnfilteredWebappDaoFactory(new WebappDaoFactorySDB(
+                RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService(),
                 ModelContext.getUnionOntModelSelector(
-                        vreq.getSession().getServletContext()),
-                        vreq.getDataset()));
+                        ctx)));
         
         req.setAttribute("VitroRequestPrep.setup", new Integer(1));
         chain.doFilter(req, response);
@@ -196,9 +200,9 @@ public class VitroRequestPrep implements Filter {
     
 	private boolean authorizedForSpecialModel(HttpServletRequest req) {
 		if (isParameterPresent(req, SWITCH_TO_DISPLAY_MODEL)) {
-			return PolicyHelper.isAuthorizedForActions(req, new ManageMenus());
+			return PolicyHelper.isAuthorizedForActions(req, SimplePermission.MANAGE_MENUS.ACTIONS);
 		} else if (anyOtherSpecialProperties(req)){
-			return PolicyHelper.isAuthorizedForActions(req, new AccessSpecialDataModels());
+			return PolicyHelper.isAuthorizedForActions(req, SimplePermission.ACCESS_SPECIAL_DATA_MODELS.ACTIONS);
 		} else {
 			return true;
 		}
@@ -214,7 +218,7 @@ public class VitroRequestPrep implements Filter {
 	 * model for menu management. Also enables the use of a completely different
 	 * model and tbox if uris are passed.
 	 */
-    private WebappDaoFactory checkForSpecialWDF(VitroRequest vreq, WebappDaoFactory inputWadf) {
+    private WebappDaoFactory checkForModelSwitching(VitroRequest vreq, WebappDaoFactory inputWadf) {
         //TODO: Does the dataset in the vreq get set when using a special WDF? Does it need to?
         //TODO: Does the unfiltered WDF get set when using a special WDF? Does it need to?
         
@@ -230,9 +234,15 @@ public class VitroRequestPrep implements Filter {
     	
     	// If they asked for the display model, give it to them.
 		if (isParameterPresent(vreq, SWITCH_TO_DISPLAY_MODEL)) {
-			OntModel mainOntModel = (OntModel)_context.getAttribute("displayOntModel");
-			OntModel tboxOntModel = (OntModel) _context.getAttribute(CONTEXT_DISPLAY_TBOX);
+			OntModel mainOntModel = (OntModel)_context.getAttribute( DISPLAY_ONT_MODEL);
+			OntModel tboxOntModel = (OntModel) _context.getAttribute(CONTEXT_DISPLAY_TBOX);			
 	   		setSpecialWriteModel(vreq, mainOntModel);
+	   		
+	   		vreq.setAttribute(VitroRequest.ID_FOR_ABOX_MODEL, VitroModelSource.ModelName.DISPLAY.toString());
+	   		vreq.setAttribute(VitroRequest.ID_FOR_TBOX_MODEL, VitroModelSource.ModelName.DISPLAY_TBOX.toString());
+	   		vreq.setAttribute(VitroRequest.ID_FOR_DISPLAY_MODEL, VitroModelSource.ModelName.DISPLAY_DISPLAY.toString());
+	   		vreq.setAttribute(VitroRequest.ID_FOR_WRITE_MODEL, VitroModelSource.ModelName.DISPLAY.toString());
+	   		
 			return createNewWebappDaoFactory(wadf, mainOntModel, tboxOntModel, null);
 		}
     	
@@ -242,9 +252,15 @@ public class VitroRequestPrep implements Filter {
 			String dbType = ConfigurationProperties.getBean(_context)
 					.getProperty("VitroConnection.DataSource.dbtype", "MySQL");
 
-	    	OntModel mainOntModel = createSpecialModel(vreq, USE_MODEL_PARAM, bds, dbType);
+	    	OntModel mainOntModel = createSpecialModel(vreq, USE_MODEL_PARAM, bds, dbType);	    	
 	    	OntModel tboxOntModel = createSpecialModel(vreq, USE_TBOX_MODEL_PARAM, bds, dbType);
 	    	OntModel displayOntModel = createSpecialModel(vreq, USE_DISPLAY_MODEL_PARAM, bds, dbType);
+	    	
+	    	vreq.setAttribute(VitroRequest.ID_FOR_ABOX_MODEL, vreq.getParameter(USE_MODEL_PARAM));
+	    	vreq.setAttribute(VitroRequest.ID_FOR_WRITE_MODEL, vreq.getParameter(USE_MODEL_PARAM));
+            vreq.setAttribute(VitroRequest.ID_FOR_TBOX_MODEL, vreq.getParameter(USE_TBOX_MODEL_PARAM));
+            vreq.setAttribute(VitroRequest.ID_FOR_DISPLAY_MODEL, vreq.getParameter(USE_DISPLAY_MODEL_PARAM));            
+            
 	   		setSpecialWriteModel(vreq, mainOntModel);
 	    	return createNewWebappDaoFactory(wadf, mainOntModel, tboxOntModel, displayOntModel);
 		}
@@ -294,8 +310,9 @@ public class VitroRequestPrep implements Filter {
 		}
 	}
 	
-	private void setSpecialWriteModel(VitroRequest vreq, OntModel mainOntModel) {
-		if (mainOntModel != null) {
+	private void setSpecialWriteModel(VitroRequest vreq, OntModel mainOntModel) {	    
+		if (mainOntModel != null) {    
+	        vreq.setAttribute("jenaOntModel", mainOntModel);
 			vreq.setAttribute(SPECIAL_WRITE_MODEL, mainOntModel);
 		}
 	}

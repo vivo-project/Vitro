@@ -29,12 +29,22 @@ public interface ObjectPropertyStatementDao {
     
     Individual fillExistingObjectPropertyStatements( Individual entity );
 
-    int insertNewObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt );
-    
-    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(String subjectUri, String propertyUri, String objectKey, String query);
-    
-    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(String subjectUri, String propertyUri, String objectKey, String query, Set<String> constructQueries);
+    int insertNewObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt );        
 
+//    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
+//			String subjectUri, 
+//			String propertyUri, 
+//			String objectKey, 
+//			String queryString,
+//			Set<String> constructQueryStrings);
+    
     public Map<String, String> getMostSpecificTypesInClassgroupsForIndividual(String subjectUri);
+
+	List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
+			String subjectUri, String propertyUri, String objectKey,
+			String queryString, Set<String> constructQueryStrings,
+			String sortDirection);
+
+	
   
 }

@@ -3,6 +3,7 @@
 package stubs.javax.servlet;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -17,18 +18,29 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * A simple stand-in for the {@link ServletContext}, for use in unit tests.
  */
-@SuppressWarnings("deprecation")
 public class ServletContextStub implements ServletContext {
+	private static final Log log = LogFactory.getLog(ServletContextStub.class);
 
 	// ----------------------------------------------------------------------
 	// Stub infrastructure
 	// ----------------------------------------------------------------------
 
+	private String contextPath = ""; // root context returns ""
 	private final Map<String, Object> attributes = new HashMap<String, Object>();
 	private final Map<String, String> mockResources = new HashMap<String, String>();
+	private final Map<String, String> realPaths = new HashMap<String, String>();
+
+	public void setContextPath(String contextPath) {
+		if (contextPath == null) {
+			throw new NullPointerException("contextPath may not be null.");
+		}
+	}
 
 	public void setMockResource(String path, String contents) {
 		if (path == null) {
@@ -41,9 +53,39 @@ public class ServletContextStub implements ServletContext {
 		}
 	}
 
+	public void setRealPath(String path, String filepath) {
+		if (path == null) {
+			throw new NullPointerException("path may not be null.");
+		}
+		if (filepath == null) {
+			log.debug("removing real path for '" + path + "'");
+			realPaths.remove(path);
+		} else {
+			log.debug("adding real path for '" + path + "' = '" + filepath
+					+ "'");
+			realPaths.put(path, filepath);
+		}
+	}
+
+	/**
+	 * Call setRealPath for each of the files in this directory (non-recursive).
+	 * The prefix is the "pretend" location that we're mapping these files to,
+	 * e.g. "/config/". Use the prefix and the filename as the path.
+	 */
+	public void setRealPaths(String pathPrefix, File dir) {
+		for (File file : dir.listFiles()) {
+			setRealPath(pathPrefix + file.getName(), file.getPath());
+		}
+	}
+
 	// ----------------------------------------------------------------------
 	// Stub methods
 	// ----------------------------------------------------------------------
+
+	@Override
+	public String getContextPath() {
+		return contextPath;
+	}
 
 	@Override
 	public Object getAttribute(String name) {
@@ -78,6 +120,13 @@ public class ServletContextStub implements ServletContext {
 		}
 	}
 
+	@Override
+	public String getRealPath(String path) {
+		String real = realPaths.get(path);
+		log.debug("Real path for '" + path + "' is '" + real + "'");
+		return real;
+	}
+
 	// ----------------------------------------------------------------------
 	// Un-implemented methods
 	// ----------------------------------------------------------------------
@@ -86,12 +135,6 @@ public class ServletContextStub implements ServletContext {
 	public ServletContext getContext(String arg0) {
 		throw new RuntimeException(
 				"ServletContextStub.getContext() not implemented.");
-	}
-
-	@Override
-	public String getContextPath() {
-		throw new RuntimeException(
-				"ServletContextStub.getContextPath() not implemented.");
 	}
 
 	@Override
@@ -129,12 +172,6 @@ public class ServletContextStub implements ServletContext {
 	public RequestDispatcher getNamedDispatcher(String arg0) {
 		throw new RuntimeException(
 				"ServletContextStub.getNamedDispatcher() not implemented.");
-	}
-
-	@Override
-	public String getRealPath(String arg0) {
-		throw new RuntimeException(
-				"ServletContextStub.getRealPath() not implemented.");
 	}
 
 	@Override

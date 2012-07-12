@@ -34,9 +34,9 @@
     </#if>
 </#macro>
 
-<#macro dataPropertyList property editable>
+<#macro dataPropertyList property editable template=property.template>
     <#list property.statements as statement>
-        <@propertyListItem property statement editable >${statement.value}</@propertyListItem>
+        <@propertyListItem property statement editable ><#include "${template}"></@propertyListItem>
     </#list> 
 </#macro>
 
@@ -89,8 +89,8 @@ Assumes property is non-null. -->
 <#-- Some properties usually display without a label. But if there's an add link, 
 we need to also show the property label. If no label is specified, the property
 name will be used as the label. -->
-<#macro addLinkWithLabel property editable label="${property.name?capitalize}" extraParams="">
-    <#local addLink><@addLink property editable label extraParams /></#local>
+<#macro addLinkWithLabel property editable label="${property.name?capitalize}">
+    <#local addLink><@addLink property editable label /></#local>
     <#local verboseDisplay><@verboseDisplay property /></#local>
     <#-- Changed to display the label when user is in edit mode, even if there's no add link (due to 
     displayLimitAnnot, for example). Otherwise the display looks odd, since neighboring 
@@ -104,26 +104,23 @@ name will be used as the label. -->
     </#if>
 </#macro>
 
-<#macro addLink property editable label="${property.name}" extraParams="">
+<#macro addLink property editable label="${property.name}">
     <#if editable>
         <#local url = property.addUrl>
         <#if url?has_content>
-            <@showAddLink property.localName label addParamsToEditUrl(url, extraParams) />
+            <@showAddLink property.localName label url />
         </#if>
     </#if>
 </#macro>
 
-<#function addParamsToEditUrl url extraParams="">
-    <#if extraParams?is_hash_ex>
-        <#list extraParams?keys as key>
-            <#local url = "${url}&${key}=${extraParams[key]?url}">
-        </#list>
-    </#if>
-    <#return url>
-</#function>
-
 <#macro showAddLink propertyLocalName label url>
-    <a class="add-${propertyLocalName}" href="${url}" title="Add new ${label?lower_case} entry"><img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="add" /></a>
+    <#if propertyLocalName == "informationResourceInAuthorship" || propertyLocalName == "webpage" || propertyLocalName == "hasResearchArea">
+        <a class="add-${propertyLocalName}" href="${url}" title="Manage list of ${label?lower_case}">
+        <img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="manage" /></a>
+    <#else>
+        <a class="add-${propertyLocalName}" href="${url}" title="Add new ${label?lower_case} entry">
+        <img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="add" /></a>
+    </#if>
 </#macro>
 
 <#macro propertyLabel property label="${property.name?capitalize}">
@@ -133,22 +130,23 @@ name will be used as the label. -->
 
 <#macro propertyListItem property statement editable >
     <li role="listitem">    
-        <#nested>        
+        <#nested>       
         <@editingLinks "${property.localName}" statement editable/>
     </li>
 </#macro>
 
-<#macro editingLinks propertyLocalName statement editable extraParams="">
-    <#if editable>
-        <@editLink propertyLocalName statement extraParams />
-        <@deleteLink propertyLocalName statement extraParams />
+<#macro editingLinks propertyLocalName statement editable>
+    <#if editable && (propertyLocalName != "informationResourceInAuthorship" && propertyLocalName != "webpage" && propertyLocalName != "hasResearchArea")>
+        <@editLink propertyLocalName statement />
+        <@deleteLink propertyLocalName statement />
+     
     </#if>
 </#macro>
 
-<#macro editLink propertyLocalName statement extraParams="">
+<#macro editLink propertyLocalName statement>
     <#local url = statement.editUrl>
     <#if url?has_content>
-        <@showEditLink propertyLocalName addParamsToEditUrl(url, extraParams) />
+        <@showEditLink propertyLocalName url />
     </#if>
 </#macro>
 
@@ -156,10 +154,10 @@ name will be used as the label. -->
     <a class="edit-${propertyLocalName}" href="${url}" title="edit this entry"><img class="edit-individual" src="${urls.images}/individual/editIcon.gif" alt="edit" /></a>
 </#macro>
 
-<#macro deleteLink propertyLocalName statement extraParams=""> 
+<#macro deleteLink propertyLocalName statement> 
     <#local url = statement.deleteUrl>
     <#if url?has_content>
-        <@showDeleteLink propertyLocalName addParamsToEditUrl(url, extraParams) />
+        <@showDeleteLink propertyLocalName url />
     </#if>
 </#macro>
 
@@ -190,34 +188,38 @@ name will be used as the label. -->
      
      Note that this macro has a side-effect in the call to propertyGroups.pullProperty().
 -->
-<#macro image individual propertyGroups namespaces editable showPlaceholder="never" placeholder="">
+<#macro image individual propertyGroups namespaces editable showPlaceholder="never">
     <#local mainImage = propertyGroups.pullProperty("${namespaces.vitroPublic}mainImage")!>
-    <#local extraParams = "">
-    <#if placeholder?has_content>
-        <#local extraParams = { "placeholder" : placeholder } >
-    </#if>
     <#local thumbUrl = individual.thumbUrl!>
     <#-- Don't assume that if the mainImage property is populated, there is a thumbnail image (though that is the general case).
          If there's a mainImage statement but no thumbnail image, treat it as if there is no image. -->
     <#if (mainImage.statements)?has_content && thumbUrl?has_content>
-        <a href="${individual.imageUrl}" title="individual photo"><img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" /></a>
-        <@editingLinks "${mainImage.localName}" mainImage.first() editable extraParams />
+        <a href="${individual.imageUrl}" title="individual photo">
+        	<img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" />
+        </a>
+        <@editingLinks "${mainImage.localName}" mainImage.first() editable />
     <#else>
-        <#local imageLabel><@addLinkWithLabel mainImage editable "Photo" extraParams /></#local>
+        <#local imageLabel><@addLinkWithLabel mainImage editable "Photo" /></#local>
         ${imageLabel}
-        <#if placeholder?has_content>
-            <#if showPlaceholder == "always" || (showPlaceholder="with_add_link" && imageLabel?has_content)>
-                <img class="individual-photo" src="${placeholder}" title = "no image" alt="placeholder image" width="160" />
-            </#if>
+        <#if showPlaceholder == "always" || (showPlaceholder="with_add_link" && imageLabel?has_content)>
+            <img class="individual-photo" src="${placeholderImageUrl(individual.uri)}" title = "no image" alt="placeholder image" width="160" />
         </#if>
     </#if>
 </#macro>
 
 <#-- Label -->
-<#macro label individual editable>
+<#macro label individual editable labelCount>
     <#local label = individual.nameStatement>
     ${label.value}
-    <@editingLinks "label" label editable />
+    <#if (labelCount > 1)  && editable >
+        <span class="inline">
+            <a id="manageLabels" href="${urls.base}/manageLabels?subjectUri=${individual.uri!}" style="margin-left:20px;font-size:0.7em">
+                manage labels
+            </a>
+        </span>
+    <#else>
+        <@editingLinks "label" label editable />
+    </#if>
 </#macro>
 
 <#-- Most specific types -->
@@ -227,4 +229,8 @@ name will be used as the label. -->
     </#list>
 </#macro>
 
+<#--Property group names may have spaces in them, replace spaces with underscores for html id/hash-->
+<#function createPropertyGroupHtmlId propertyGroupName>
+	<#return propertyGroupName?replace(" ", "_")>
+</#function>
 

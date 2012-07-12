@@ -13,8 +13,10 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.vocabulary.RDFS;
+
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoFrontEndEditing;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -23,7 +25,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServ
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.DirectRedirectResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -33,10 +34,9 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.EditConfigurationGenerator;
-import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
-import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.EditConfigurationTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.MultiValueEditSubmissionTemplateModel;
+
 /**
  * This servlet is intended to handle all requests to create a form for use
  * by the N3 editing system.  It will examine the request parameters, determine
@@ -59,7 +59,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 
     @Override
 	protected Actions requiredActions(VitroRequest vreq) {
-    	return new Actions(new DoFrontEndEditing());
+    	return SimplePermission.DO_FRONT_END_EDITING.ACTIONS;
 	}
 
 	@Override
@@ -133,15 +133,19 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 
 	private boolean isMenuMode(VitroRequest vreq) {
 		//Check if special model, in which case forward
-    	return(vreq.getParameter("switchToDisplayModel") != null); 
+	    //bdc34: the EditRequestDispatchController cannot hijack 
+	    // all edits to the display model and force them into /editDisplayModel .
+	    // Consider changing URLs used on special menu form to point to /editMenu or something.
+    	//return(vreq.getParameter("switchToDisplayModel") != null);
+	    return false;
 	}
 
 	private ResponseValues redirectToMenuEdit(VitroRequest vreq) {
-		String queryString = vreq.getQueryString();
-		String redirectPage = vreq.getContextPath() + "/editDisplayModel?" + queryString;
-        return new DirectRedirectResponseValues(redirectPage, HttpServletResponse.SC_SEE_OTHER);
-
+	    throw new RuntimeException("The EditRequestDispatchController cannot hijack"+ 
+        "all edits to the display model and force them into /editDisplayModel ."+
+        " Consider changing URLs used on special menu form to point to /editDisplayModel");        
 	}
+	
     private MultiValueEditSubmission getMultiValueSubmission(VitroRequest vreq, EditConfigurationVTwo editConfig) {
 		return EditSubmissionUtils.getEditSubmissionFromSession(vreq.getSession(), editConfig);
 	}
@@ -149,7 +153,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 	//TODO: should more of what happens in this method
     //happen in the generators?
 	private EditConfigurationVTwo setupEditConfiguration(String editConfGeneratorName,
-			VitroRequest vreq) {	    	    	    
+			VitroRequest vreq) throws Exception {	    	    	    
     	HttpSession session = vreq.getSession();
     	EditConfigurationVTwo editConfig = 
     	    makeEditConfigurationVTwo( editConfGeneratorName, vreq, session);
@@ -172,56 +176,72 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 		
 	}
 
-	//Additional forwards.. should they be processed here to see which form should be forwarded to
-	//e.g. default add individual form etc. and additional scenarios
-	//TODO: Check if additional scenarios should be checked here
+	/**
+	 * Determine the java class name to use for the EditConfigurationGenerator.
+	 * 
+	 * Forwarding should NOT be done here.  If an EditConfiguration needs to 
+	 * forward to a URL use editConfig.getSkipToUrl(). Also consider using a skip predicate annotation.
+	 */
 	private String processEditConfGeneratorName(VitroRequest vreq) {
-    	//use default object property form if nothing else works
-        String editConfGeneratorName = DEFAULT_OBJ_FORM;
-
-        //Handle deletion before any of the other cases        
-        if(isDeleteForm(vreq)) {
-        	return DEFAULT_DELETE_FORM;
-        }        
-                        
-        // *** handle the case where the form is specified as a request parameter ***
+	    String editConfGeneratorName = null;
+	    
+	    String predicateUri =  getPredicateUri(vreq);
+	    
+        // *** handle the case where the form is specified as a request parameter ***	    
         String formParam = getFormParam(vreq);
         if(  formParam != null && !formParam.isEmpty() ){
+            // please, always do this case first.
             //form parameter must be a fully qualified java class name of a EditConfigurationVTwoGenerator implementation.
-            return formParam;              
+            editConfGeneratorName = formParam;
+            
+        //  *** do magic cmd=delete 
+        }else if(isDeleteForm(vreq)) {
+            //TODO: cmd=delete would be better if it was moved to the the EditConfigurationGenerator that uses it.
+        	return DEFAULT_DELETE_FORM;
+
+      	// *** check for a predicate URI in the request        	
+        }else if( predicateUri != null && !predicateUri.isEmpty() ){                      
+            Property prop = getProperty( predicateUri, vreq);
+            if( prop != null && prop.getCustomEntryForm() != null ){
+                //there is a custom form, great! let's use it.
+                editConfGeneratorName = prop.getCustomEntryForm();
+                
+            }else if( RDFS.label.getURI().equals( predicateUri ) ) {
+                // set RDFS_LABLE_FORM after a custom entry form on the property
+                // so that there is a chance that rdfs:label could have a configurable 
+                // custom form it the future
+                editConfGeneratorName = RDFS_LABEL_FORM;
+                
+            }else if( isDataProperty(prop) ){                   
+                editConfGeneratorName = DEFAULT_DATA_FORM;
+            }else{
+                editConfGeneratorName = DEFAULT_OBJ_FORM;
+            }
+            
+        // *** default to the object property form when there is nothing
+        }else{       
+            editConfGeneratorName = DEFAULT_OBJ_FORM;
         }
-        
-        String predicateUri =  getPredicateUri(vreq);        
-        if( isVitroLabel(predicateUri) ) { //in case of data property
-        	return RDFS_LABEL_FORM;
-        } 
-        
-        WebappDaoFactory wdf = vreq.getWebappDaoFactory();        
-        Property prop = getPropertyByUri(predicateUri, wdf);
-        
-        if(isDataProperty( prop , wdf )){
-            editConfGeneratorName = DEFAULT_DATA_FORM;
-        } else{
-        	String customForm = prop.getCustomEntryForm();
-        	if(customForm != null && !customForm.trim().isEmpty()) {
-        		editConfGeneratorName = customForm;
-        	}
-        }
+                
+        if( editConfGeneratorName == null )
+            log.error("problem: editConfGeneratorName is null but " +
+            		"processEditConfGeneratorName() should never return null.");
         
         log.debug("generator name is " + editConfGeneratorName);
         return editConfGeneratorName;
 	}
 
-    private String getCustomForm(String predicateUri, WebappDaoFactory wdf) {
-		Property prop = getPropertyByUri(predicateUri, wdf);
-		return prop.getCustomEntryForm();
-	}
-
-	private Property getPropertyByUri(String predicateUri, WebappDaoFactory wdf) {
+	private Property getProperty(String predicateUri, VitroRequest vreq) {	    
 		Property p = null;
-		p = wdf.getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
-		if(p == null) {
-			p = wdf.getDataPropertyDao().getDataPropertyByURI(predicateUri);
+		try{
+    		p = vreq.getWebappDaoFactory().getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
+    		if(p == null) {
+    			p = vreq.getWebappDaoFactory().getDataPropertyDao().getDataPropertyByURI(predicateUri);
+    		}
+		}catch( Throwable th){
+  		    //ignore problems
+		    log.debug("Not really a problem if we cannot get a property because we "+
+		            "might be editing arbritrary RDF", th);
 		}
 		return p;
 	}
@@ -230,16 +250,8 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 		return predicateUri.equals(VitroVocabulary.LABEL);
 	}
 
-    private boolean isDataProperty(Property prop, WebappDaoFactory wdf) {
-        if( prop != null && prop instanceof DataProperty ){
-            return true;
-        }else{
-            DataProperty dataProp = wdf.getDataPropertyDao().getDataPropertyByURI(prop.getURI());
-            if( dataProp != null )
-                return true;
-            else
-                return false;
-        }
+    private boolean isDataProperty( Property prop ) {
+        return ( prop != null && prop instanceof DataProperty );        
     }
 
 
@@ -346,14 +358,11 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
        	 	return true;
         }
         return false;
-
     }
     
-    
-    //
-    
+       
     private EditConfigurationVTwo makeEditConfigurationVTwo(
-            String editConfGeneratorName, VitroRequest vreq, HttpSession session) {
+            String editConfGeneratorName, VitroRequest vreq, HttpSession session) throws Exception {
     	
     	EditConfigurationGenerator EditConfigurationVTwoGenerator = null;
     	

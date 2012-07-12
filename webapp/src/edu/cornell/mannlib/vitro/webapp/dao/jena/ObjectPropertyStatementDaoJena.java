@@ -42,16 +42,20 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 
 public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements ObjectPropertyStatementDao {
 
     private static final Log log = LogFactory.getLog(ObjectPropertyStatementDaoJena.class);
     
     private DatasetWrapperFactory dwf;
+    private RDFService rdfService;
     
-    public ObjectPropertyStatementDaoJena(DatasetWrapperFactory dwf,
+    public ObjectPropertyStatementDaoJena(RDFService rdfService,
+                                          DatasetWrapperFactory dwf,
                                           WebappDaoFactoryJena wadf) {
         super(wadf);
+        this.rdfService = rdfService;
         this.dwf = dwf;
     }
 
@@ -260,29 +264,24 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
      * DataPropertyStatementDaoJena returns a List<DataPropertyStatement>. We need to accomodate
      * custom queries that could request any data in addition to just the object of the statement.
      * However, we do need to get the object of the statement so that we have it to create editing links.
-     */
-    
-    @Override 
-    public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
-            String subjectUri, 
-            String propertyUri, 
-            String objectKey, String queryString) {
-        
-        return getObjectPropertyStatementsForIndividualByProperty(
-                subjectUri, propertyUri, objectKey, objectKey, null);
-        
-    }
+     */             
     
     @Override
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
             String subjectUri, 
-            String propertyUri, 
+            String propertyUri,             
             String objectKey, 
-            String queryString, Set<String> constructQueryStrings ) {  
-        
+            String queryString, 
+            Set<String> constructQueryStrings,
+            String sortDirection) {    	        
+    	
         Model constructedModel = constructModelForSelectQueries(
                 subjectUri, propertyUri, constructQueryStrings);
-        
+                    
+    	if("desc".equalsIgnoreCase( sortDirection ) ){
+    		queryString = queryString.replaceAll(" ASC\\(", " DESC(");
+    	}
+    	
         log.debug("Query string for object property " + propertyUri + ": " + queryString);
         
         Query query = null;
@@ -297,7 +296,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         QuerySolutionMap initialBindings = new QuerySolutionMap();
         initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
         initialBindings.add("property", ResourceFactory.createResource(propertyUri));
-
+        
         // Run the SPARQL query to get the properties
         List<Map<String, String>> list = new ArrayList<Map<String, String>>();
         DatasetWrapper w = dwf.getDatasetWrapper();
@@ -335,9 +334,9 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         }
        
     }
- 
+    
     private Model constructModelForSelectQueries(String subjectUri,
-                                                 String propertyUri,
+                                                 String propertyUri,                                                 
                                                  Set<String> constructQueries) {
         
         if (constructQueries == null) {
@@ -351,39 +350,62 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             log.debug("CONSTRUCT query string for object property " + 
                     propertyUri + ": " + queryString);
             
-            Query query = null;
+            queryString = queryString.replace("?subject", "<" + subjectUri + ">");
+            queryString = queryString.replace("?property", "<" + propertyUri + ">");
+                       
+            // we no longer need this query object, but we might want to do this
+            // query parse step to improve debugging, depending on the error returned
+            // through the RDF API
+//            try {
+//                QueryFactory.create(queryString, Syntax.syntaxARQ);
+//            } catch(Throwable th){
+//                log.error("Could not create CONSTRUCT SPARQL query for query " +
+//                          "string. " + th.getMessage());
+//                log.error(queryString);
+//                return constructedModel;
+//            } 
+          
             try {
-                query = QueryFactory.create(queryString, Syntax.syntaxARQ);
-            } catch(Throwable th){
-                log.error("Could not create CONSTRUCT SPARQL query for query " +
-                          "string. " + th.getMessage());
-                log.error(queryString);
-                return constructedModel;
-            } 
-        
-            QuerySolutionMap initialBindings = new QuerySolutionMap();
-            initialBindings.add(
-                    "subject", ResourceFactory.createResource(subjectUri));
-            initialBindings.add(
-                    "property", ResourceFactory.createResource(propertyUri));
-        
-            DatasetWrapper w = dwf.getDatasetWrapper();
-            Dataset dataset = w.getDataset();
-            dataset.getLock().enterCriticalSection(Lock.READ);
-            QueryExecution qe = null;
-            try {                           
-                qe = QueryExecutionFactory.create(
-                        query, dataset, initialBindings);
-                qe.execConstruct(constructedModel);
+            	//If RDFService is null, will do what code used to do before, otherwise employ rdfservice
+            	if(rdfService == null) {
+                    log.debug("RDF Service null, Using CONSTRUCT query string for object property " + 
+                            propertyUri + ": " + queryString);
+                    Query query = null;
+                    try {
+                        query = QueryFactory.create(queryString, Syntax.syntaxARQ);
+                    } catch(Throwable th){
+                        log.error("Could not create CONSTRUCT SPARQL query for query " +
+                                  "string. " + th.getMessage());
+                        log.error(queryString);
+                        return constructedModel;
+                    } 
+                
+                    DatasetWrapper w = dwf.getDatasetWrapper();
+                    Dataset dataset = w.getDataset();
+                    dataset.getLock().enterCriticalSection(Lock.READ);
+                    QueryExecution qe = null;
+                    try {                           
+                        qe = QueryExecutionFactory.create(
+                                query, dataset);
+                        qe.execConstruct(constructedModel);
+                    } catch (Exception e) {
+                        log.error("Error getting constructed model for subject " + subjectUri + " and property " + propertyUri);
+                    } finally {
+                        if (qe != null) {
+                            qe.close();
+                        }
+                        dataset.getLock().leaveCriticalSection();
+                        w.close();
+                    }	
+            	} else {
+                constructedModel.read(
+                        rdfService.sparqlConstructQuery(
+                                queryString, RDFService.ModelSerializationFormat.N3), null, "N3");
+            
+            	}
             } catch (Exception e) {
                 log.error("Error getting constructed model for subject " + subjectUri + " and property " + propertyUri);
-            } finally {
-                if (qe != null) {
-                    qe.close();
-                }
-                dataset.getLock().leaveCriticalSection();
-                w.close();
-            }
+            } 
         }
         
         return constructedModel;
@@ -403,7 +425,18 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     @Override
     /** 
      * Finds all mostSpecificTypes of an individual that are members of a classgroup.
-     * Returns a list of type labels.
+     * Returns a list of type labels. 
+     * 
+     * Note that the Map returned is a LinkedHashMap, which means that an iterator 
+     * will return the entries in the order in which the keys were inserted in the map.
+     * Since the SPARQL query included an "ORDER BY ?label" clause, and since an 
+     * iterator through that ResultSet was used to add entries to the map, an iterator
+     * on the map will return entries that are sorted by label (value, not key).
+     * 
+     * While this sorting order is not specified as a requirement (maybe it should be?),
+     * it is certainly useful that the types are returned in some order that is
+     * replicable, so an individual with multiple mostSpecificTypes, will always see
+     * the same list in the same order. (See https://issues.library.cornell.edu/browse/NIHVIVO-568)
      * **/
     public Map<String, String> getMostSpecificTypesInClassgroupsForIndividual(String subjectUri) {
         

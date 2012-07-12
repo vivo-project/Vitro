@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.dao;
 
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 
@@ -66,6 +67,10 @@ public interface VClassDao {
     List <VClass> getVClassesForProperty(String vclassURI, String propertyURI);
 
     void addVClassesToGroup(VClassGroup group);
+    
+    void insertNewClasses2Classes(Classes2Classes c2c);
+    
+    void deleteClasses2Classes(Classes2Classes c2c);
 
     @SuppressWarnings("unchecked")
     void addVClassesToGroup(VClassGroup group, boolean includeUninstantiatedClasses);/* (non-Javadoc)

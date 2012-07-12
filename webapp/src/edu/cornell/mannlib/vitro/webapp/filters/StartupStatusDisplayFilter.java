@@ -15,7 +15,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringUtils;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -60,11 +63,11 @@ public class StartupStatusDisplayFilter implements Filter {
 			return;
 		}
 
-		displayStartupStatus(resp);
+		displayStartupStatus(req, resp);
 		statusAlreadyDisplayed = true;
 	}
 
-	private void displayStartupStatus(ServletResponse resp) throws IOException,
+	private void displayStartupStatus(ServletRequest req, ServletResponse resp) throws IOException,
 			ServletException {
 		HttpServletResponse hResp = (HttpServletResponse) resp;
 
@@ -73,8 +76,24 @@ public class StartupStatusDisplayFilter implements Filter {
 			bodyMap.put("status", ss);
 			bodyMap.put("showLink", !isFatal());
 			bodyMap.put("contextPath", getContextPath());
-			bodyMap.put("applicationName", getApplicationName());
+			bodyMap.put("applicationName", getApplicationName());			
+						
+	        HttpServletRequest httpreq = (HttpServletRequest) req;
+	        String url = "";
+	        
+	        String path = httpreq.getRequestURI();
+	        if( path != null ){
+	        	url = path;
+	        }
+	        
+	        String query = httpreq.getQueryString();
+	        if( !StringUtils.isEmpty( query )){
+	        	url = url + "?" + query;
+	        }	
+	        
+			bodyMap.put("url", url );
 
+			hResp.setContentType("text/html;charset=UTF-8");
 			hResp.setStatus(SC_INTERNAL_SERVER_ERROR);
 			Template tpl = loadFreemarkerTemplate();
 			tpl.process(bodyMap, hResp.getWriter());

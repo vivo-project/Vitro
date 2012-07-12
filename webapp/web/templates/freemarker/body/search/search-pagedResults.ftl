@@ -3,9 +3,11 @@
 <#-- Template for displaying paged search results -->
 
 <h2>
+<#escape x as x?html>
     Search results for '${querytext}'
     <#if classGroupName?has_content>limited to type '${classGroupName}'</#if>
     <#if typeName?has_content>limited to type '${typeName}'</#if>
+</#escape>
 </h2>
 
 <div class="contentsBrowseGroup">
@@ -41,11 +43,12 @@
     <ul class="searchhits">
         <#list individuals as individual>
             <li>                        
-                <#include "${individual.searchView}">
+            	<@shortView uri=individual.uri viewContext="search" />
             </li>
         </#list>
     </ul>
     
+
     <#-- Paging controls -->
     <#if (pagingLinks?size > 0)>
         <div class="searchpages">
@@ -60,6 +63,32 @@
             </#list>
             <#if nextPage??><a class="next" href="${nextPage}" title="next">Next</a></#if>
         </div>
+    </#if>
+    <br />
+
+    <#-- VIVO OpenSocial Extension by UCSF -->
+    <#if openSocial??>
+        <#if openSocial.visible>
+        <h3>OpenSocial</h3>
+            <script type="text/javascript" language="javascript">
+                // find the 'Search' gadget(s).
+                var searchGadgets = my.findGadgetsAttachingTo("gadgets-search");
+                var keyword = '${querytext}';
+                // add params to these gadgets
+                if (keyword) {
+                    for (var i = 0; i < searchGadgets.length; i++) {
+                        var searchGadget = searchGadgets[i];
+                        searchGadget.additionalParams = searchGadget.additionalParams || {};
+                        searchGadget.additionalParams["keyword"] = keyword;
+                    }
+                }
+                else {  // remove these gadgets
+                    my.removeGadgets(searchGadgets);
+                }
+            </script>
+
+            <div id="gadgets-search" class="gadgets-gadget-parent" style="display:inline-block"></div>
+        </#if>
     </#if>
 
 </div> <!-- end contentsBrowseGroup -->

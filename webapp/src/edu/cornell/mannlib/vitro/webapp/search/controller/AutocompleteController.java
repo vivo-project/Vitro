@@ -24,8 +24,8 @@ import org.apache.solr.common.SolrDocumentList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
@@ -55,7 +55,7 @@ public class AutocompleteController extends VitroAjaxController {
     
     @Override
     protected Actions requiredActions(VitroRequest vreq) {
-    	return new Actions(new UseBasicAjaxControllers());
+    	return SimplePermission.USE_BASIC_AJAX_CONTROLLERS.ACTIONS;
     }
     
     @Override

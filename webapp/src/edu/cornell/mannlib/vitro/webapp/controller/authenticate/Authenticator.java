@@ -8,11 +8,14 @@ import java.util.List;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.codec.binary.Hex;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 
 /**
@@ -22,28 +25,51 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
  * This needs to be based on a HttpSession, because things like the UserDAO are
  * tied to the session. It seemed easier to base it on a HttpServletRequest,
  * which we can use to get the session.
+ * 
+ * TODO: Wouldn't it be cool if we could remove the LoginNotPermitted exception?
+ * Perhaps we could have a sub-object called an Authenticator.ForUser, and you
+ * call a getAuthenticatorForUser() method which returns null if your login has
+ * been disabled. Then, that object would provide these methods:
+ * accountRequiresEditing(), getAssociatedIndividualUris(), isCurrentPassword(),
+ * recordLoginAgainstUserAccount(), recordNewPassword(). If you didn't have such
+ * an object, you couldn't even call these methods.
  */
 public abstract class Authenticator {
 	// ----------------------------------------------------------------------
 	// The factory
 	//
-	// Unit tests can replace the factory to get a stub class instead.
-	// Note: this can only work because the factory value is not final.
+	// Each Authenticator instance is used for a single request, so we store
+	// a factory in the context that can create these instances.
 	// ----------------------------------------------------------------------
 
-	public static interface AuthenticatorFactory {
-		Authenticator newInstance(HttpServletRequest request);
+	private static final String FACTORY_ATTRIBUTE_NAME = AuthenticatorFactory.class
+			.getName();
+
+	public interface AuthenticatorFactory {
+		Authenticator getInstance(HttpServletRequest request);
 	}
 
-	private static AuthenticatorFactory factory = new AuthenticatorFactory() {
-		@Override
-		public Authenticator newInstance(HttpServletRequest request) {
-			return new BasicAuthenticator(request);
-		}
-	};
-
+	/**
+	 * Ask the currently configured AuthenticatorFactory to give us an
+	 * Authenticator for this request.
+	 * 
+	 * If there is no factory, configure a Basic one.
+	 */
 	public static Authenticator getInstance(HttpServletRequest request) {
-		return factory.newInstance(request);
+		ServletContext ctx = request.getSession().getServletContext();
+		Object attribute = ctx.getAttribute(FACTORY_ATTRIBUTE_NAME);
+		if (!(attribute instanceof AuthenticatorFactory)) {
+			setAuthenticatorFactory(new BasicAuthenticator.Factory(), ctx);
+			attribute = ctx.getAttribute(FACTORY_ATTRIBUTE_NAME);
+		}
+		AuthenticatorFactory factory = (AuthenticatorFactory) attribute;
+
+		return factory.getInstance(request);
+	}
+
+	public static void setAuthenticatorFactory(AuthenticatorFactory factory,
+			ServletContext ctx) {
+		ctx.setAttribute(FACTORY_ATTRIBUTE_NAME, factory);
 	}
 
 	// ----------------------------------------------------------------------
@@ -65,6 +91,19 @@ public abstract class Authenticator {
 	 * Get the UserAccount for this email address, or null if there is none.
 	 */
 	public abstract UserAccount getAccountForInternalAuth(String emailAddress);
+
+	/**
+	 * Is this user permitted to login? Some Authenticators might disable logins
+	 * for certain users.
+	 * 
+	 * Behavior when userAccount is null depends on the particular
+	 * Authenticator. An answer of "true" presumably means that the user will be
+	 * permitted to login and create an account on the fly.
+	 * 
+	 * Note that this method may rely on the HttpServletRequest object that was
+	 * provided to the factory when this instance was created.
+	 */
+	public abstract boolean isUserPermittedToLogin(UserAccount userAccount);
 
 	/**
 	 * Internal: does this UserAccount have this password? False if the
@@ -102,9 +141,14 @@ public abstract class Authenticator {
 	 * - record the user in the session map
 	 * - notify other users of the model
 	 * </pre>
+	 * 
+	 * @throws LoginNotPermitted
+	 *             if the Authenticator denies this user the ability to login.
+	 *             This should be thrown if and only if isUserPermittedToLogin()
+	 *             returns false.
 	 */
 	public abstract void recordLoginAgainstUserAccount(UserAccount userAccount,
-			AuthenticationSource authSource);
+			AuthenticationSource authSource) throws LoginNotPermitted;
 
 	/**
 	 * <pre>
@@ -161,5 +205,23 @@ public abstract class Authenticator {
 		} catch (AddressException e) {
 			return false;
 		}
+	}
+
+	/**
+	 * Get the IDs that would be created for this userAccount, if this user were
+	 * to log in.
+	 */
+	public static IdentifierBundle getIdsForUserAccount(HttpServletRequest req,
+			UserAccount userAccount) {
+		return ActiveIdentifierBundleFactories.getUserIdentifierBundle(req,
+				userAccount);
+	}
+
+	// ----------------------------------------------------------------------
+	// Exceptions
+	// ----------------------------------------------------------------------
+
+	public static class LoginNotPermitted extends Exception {
+		// no other information
 	}
 }

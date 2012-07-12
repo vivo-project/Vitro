@@ -19,7 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.BasicValidation;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.BasicValidationVTwo;
 
 public class IndividualDataPropertyStatementProcessor implements ChangeListener {
 	
@@ -82,7 +82,7 @@ public class IndividualDataPropertyStatementProcessor implements ChangeListener 
 	            		String rangeDatatypeURI = dataPropertyDao.getRequiredDatatypeURI(individual, dp);
 	            		if (rangeDatatypeURI != null) {
 	            			dataPropertyStmt.setDatatypeURI(rangeDatatypeURI);
-	            			String validationMsg = BasicValidation.validateAgainstDatatype(dataPropertyStmt.getData(), rangeDatatypeURI);
+	            			String validationMsg = BasicValidationVTwo.validateAgainstDatatype(dataPropertyStmt.getData(), rangeDatatypeURI);
 	            			// Since this backend editing system is de facto deprecated,
 	            			// not worrying about implementing per-field validation
 	            			if (validationMsg != null) {

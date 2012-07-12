@@ -639,18 +639,6 @@ public class IndividualFilteringByStatementTest extends AbstractTestClass {
 		// ----------------------------------------------------------------------
 
 		@Override
-		public boolean isSubjectOriented() {
-			throw new RuntimeException(
-					"ObjectPropertyStatement.isSubjectOriented() not implemented.");
-		}
-
-		@Override
-		public void setSubjectOriented(boolean subjectOriented) {
-			throw new RuntimeException(
-					"ObjectPropertyStatement.setSubjectOriented() not implemented.");
-		}
-
-		@Override
 		public void setSubjectURI(String subjectURI) {
 			throw new RuntimeException(
 					"ObjectPropertyStatement.setSubjectURI() not implemented.");

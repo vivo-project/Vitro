@@ -28,7 +28,15 @@ public class UpdateSettings {
 	private OntModel newTBoxModel;
 	private OntModel oldTBoxAnnotationsModel;
 	private OntModel newTBoxAnnotationsModel;
-	
+	//display model tbox and display model display metadata
+	private OntModel oldDisplayModelTboxModel;
+	private OntModel oldDisplayModelDisplayMetadataModel;
+	private OntModel newDisplayModelTboxModel;
+	private OntModel newDisplayModelDisplayMetadataModel;
+	private OntModel displayModel;
+	private OntModel newDisplayModelFromFile;
+	private OntModel loadedAtStartupDisplayModel;
+	private OntModel oldDisplayModelVivoListViewConfig;
 	public String getDataDir() {
 		return dataDir;
 	}
@@ -149,4 +157,72 @@ public class UpdateSettings {
 	public void setNewTBoxAnnotationsModel(OntModel newTBoxAnnotationsModel) {
 		this.newTBoxAnnotationsModel = newTBoxAnnotationsModel;
 	}
+	
+	//Old and new display model methods
+	public void setOldDisplayModelTboxModel(OntModel oldDisplayModelTboxModel) {
+		this.oldDisplayModelTboxModel = oldDisplayModelTboxModel;
+	}
+	
+	public void setNewDisplayModelTboxModel(OntModel newDisplayModelTboxModel) {
+		this.newDisplayModelTboxModel = newDisplayModelTboxModel;
+	}
+	
+	public void setOldDisplayModelDisplayMetadataModel(OntModel oldDisplayModelDisplayMetadataModel) {
+		this.oldDisplayModelDisplayMetadataModel = oldDisplayModelDisplayMetadataModel;
+	}
+	
+	public void setNewDisplayModelDisplayMetadataModel(OntModel newDisplayModelDisplayMetadataModel) {
+		this.newDisplayModelDisplayMetadataModel = newDisplayModelDisplayMetadataModel;
+	}
+	
+	public void setDisplayModel(OntModel displayModel) {
+		this.displayModel = displayModel;
+	}
+	
+	public OntModel getOldDisplayModelTboxModel() {
+		return this.oldDisplayModelTboxModel;
+	}
+	
+	public OntModel getNewDisplayModelTboxModel() {
+		return this.newDisplayModelTboxModel;
+	}
+
+	public OntModel getOldDisplayModelDisplayMetadataModel() {
+		return this.oldDisplayModelDisplayMetadataModel;
+	}
+	
+	public OntModel getNewDisplayModelDisplayMetadataModel() {
+		return this.newDisplayModelDisplayMetadataModel;
+	}
+	
+	public OntModel getDisplayModel() {
+		return this.displayModel;
+	}
+	
+	public void setNewDisplayModelFromFile(OntModel newDisplayModel) {
+		this.newDisplayModelFromFile = newDisplayModel;
+	}
+	
+	public OntModel getNewDisplayModelFromFile() {
+		return this.newDisplayModelFromFile;
+	}
+	
+	public void setLoadedAtStartupDisplayModel(OntModel loadedModel) {
+		this.loadedAtStartupDisplayModel = loadedModel;
+	}
+	
+	public OntModel getLoadedAtStartupDisplayModel() {
+		return this.loadedAtStartupDisplayModel;
+	}
+	
+	public void setVivoListViewConfigDisplayModel(OntModel loadedModel) {
+		this.oldDisplayModelVivoListViewConfig = loadedModel;
+	}
+	
+	public OntModel getVivoListViewConfigDisplayModel() {
+		return this.oldDisplayModelVivoListViewConfig;
+	}
+	
+	
+	
 }

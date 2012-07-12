@@ -13,11 +13,9 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
 public class Classes2ClassesOperationController extends BaseEditController {
@@ -25,7 +23,7 @@ public class Classes2ClassesOperationController extends BaseEditController {
     private static final Log log = LogFactory.getLog(Classes2ClassesOperationController.class.getName());
 
     public void doGet(HttpServletRequest req, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(req, response, new Actions(new EditOntology()))) {
+        if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
         	return;
         }
 
@@ -59,8 +57,7 @@ public class Classes2ClassesOperationController extends BaseEditController {
             return;
         }
 
-        Classes2ClassesDao dao = request.getFullWebappDaoFactory().getClasses2ClassesDao();
-        VClassDao vcDao = request.getFullWebappDaoFactory().getVClassDao();
+        VClassDao vcDao = request.getAssertionsWebappDaoFactory().getVClassDao();
         
         String modeStr = request.getParameter("opMode");
         modeStr = (modeStr == null) ? "" : modeStr;
@@ -82,7 +79,7 @@ public class Classes2ClassesOperationController extends BaseEditController {
 		                            Classes2Classes c2c = new Classes2Classes();
 		                            c2c.setSubclassURI(subclassURIstrs[i]);
 		                            c2c.setSuperclassURI(superclassURIstr);
-		                            dao.deleteClasses2Classes(c2c);
+		                            vcDao.deleteClasses2Classes(c2c);
 	                        	}
 	                        }
 	                    }
@@ -99,7 +96,7 @@ public class Classes2ClassesOperationController extends BaseEditController {
 		                            Classes2Classes c2c = new Classes2Classes();
 		                            c2c.setSuperclassURI(superclassURIstrs[i]);
 		                            c2c.setSubclassURI(subclassURIstr);
-		                            dao.deleteClasses2Classes(c2c);
+		                            vcDao.deleteClasses2Classes(c2c);
 	                        	}
 	                        }
 	                    }
@@ -113,7 +110,7 @@ public class Classes2ClassesOperationController extends BaseEditController {
 		            	Classes2Classes c2c = new Classes2Classes();
 		                c2c.setSuperclassURI(request.getParameter("SuperclassURI"));
 		                c2c.setSubclassURI(request.getParameter("SubclassURI"));
-		                dao.insertNewClasses2Classes(c2c);
+		                vcDao.insertNewClasses2Classes(c2c);
 	            	}
 	            }
 	        } catch (Exception e) {

@@ -2,18 +2,14 @@
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.EditConfigurationGenerator;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RDFSLabelGenerator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ModelChangePreprocessor;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
 
@@ -45,9 +41,7 @@ public class N3EditUtils {
     public static String processEntityToReturnTo(
             EditConfigurationVTwo configuration, 
             MultiValueEditSubmission submission, 
-            VitroRequest vreq) {
-        //TODO: move this method to utils or contorller?
-        
+            VitroRequest vreq) {      
         String returnTo = null;
         
         //usually the submission should have a returnTo that is
@@ -67,13 +61,15 @@ public class N3EditUtils {
             n3Subber.subInMultiUris(submission.getUrisFromForm(), entityToReturnTo);
             n3Subber.subInMultiLiterals(submission.getLiteralsFromForm(), entityToReturnTo);
         
-            //TODO: this won't work, must the same new resources as in ProcessRdfForm.process
+            //TODO: this won't work to get new resoruce URIs,
+            //must the same new resources as in ProcessRdfForm.process
             //setVarToNewResource(configuration, vreq);
-            //entityToReturnTo = n3Subber.subInMultiUris(varToNewResource, entityToReturnTo);        
+            //entityToReturnTo = n3Subber.subInMultiUris(varToNewResource, entityToReturnTo);
+            
             returnTo = entityToReturnTo.get(0);
         }
 
-        //TODO: what is this about?
+        //remove brackets from sub in of URIs 
         if(returnTo != null) {            
             returnTo = returnTo.trim().replaceAll("<","").replaceAll(">","");       
         }
@@ -90,7 +86,7 @@ public class N3EditUtils {
             EditConfigurationVTwo editConfig,
             MultiValueEditSubmission submission, 
             VitroRequest vreq, 
-            OntModel writeModel) {
+            Model writeModel) {
         
         //now setup an EditConfiguration so a single back button submissions can be handled
         //Do this if data property

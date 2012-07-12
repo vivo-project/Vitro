@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
 import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualToSolrDocument;
 
 
 public class SolrIndexer implements IndexerIface {
@@ -76,6 +77,11 @@ public class SolrIndexer implements IndexerIface {
                 solrDoc = individualToSolrDoc.translate(ind);
 
                 if( solrDoc != null){
+                	if( log.isDebugEnabled()){
+                		log.info("boost for " + ind.getName() + " is " + solrDoc.getDocumentBoost());
+                		log.debug( solrDoc.toString() );
+                	}                	                	                	
+                	
                     UpdateResponse res = server.add( solrDoc );
                     log.debug("response after adding docs to server: "+ res);                
                 }else{

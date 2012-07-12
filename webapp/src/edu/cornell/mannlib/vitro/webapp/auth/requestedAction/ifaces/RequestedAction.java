@@ -8,7 +8,7 @@ public abstract class RequestedAction {
 	 * In its most basic form, a RequestAction needs to have an identifier.
 	 * Sometimes this will be enough.
 	 */
-	public final String getURI() {
+	public String getURI() {
         return RequestActionConstants.actionNamespace + this.getClass().getName();
     }
 

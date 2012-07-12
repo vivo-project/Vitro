@@ -19,7 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 
 
 public class ProhibitedFromSearchTest {
-	String SEARCH_CONFIG_URI = "http://example.com/TestSearchConfig";
+	String SEARCH_CONFIG_URI = DisplayVocabulary.SEARCH_INDEX_URI;
 	String TEST_CLASS = "http://vivoweb.org/ontology/test/bogus#Class5";
 	
 	String n3 = 

@@ -9,9 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.logging.Log;
@@ -21,9 +19,8 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.Lock;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseBasicAjaxControllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
@@ -35,10 +32,10 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;
 
-    //Using the same setsup as primitive delete
+    //Using the same setup as primitive delete
     @Override
     protected Actions requiredActions(VitroRequest vreq) {
-    	return new Actions(new UseBasicAjaxControllers());
+    	return SimplePermission.USE_BASIC_AJAX_CONTROLLERS.ACTIONS;
     }
     
     @Override
@@ -101,7 +98,7 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
     }
     
 	/** Package access to allow for unit testing. */
-	void processChanges(String editorUri, OntModel writeModel,
+	void processChanges(String editorUri, Model writeModel,
 			Model toBeAdded, Model toBeRetracted) throws Exception {
 		Lock lock = null;
 		log.debug("Model to be retracted is");
@@ -111,13 +108,17 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
 		try {
 			lock = writeModel.getLock();
 			lock.enterCriticalSection(Lock.WRITE);
-			writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri, true));
+			if( writeModel instanceof OntModel){
+			    ((OntModel)writeModel).getBaseModel().notifyEvent(new EditEvent(editorUri, true));
+			}
 			writeModel.add(toBeAdded);
 			writeModel.remove(toBeRetracted);
 		} catch (Throwable t) {
 			throw new Exception("Error while modifying model \n" + t.getMessage());
 		} finally {
-			writeModel.getBaseModel().notifyEvent(new EditEvent(editorUri, false));
+		    if( writeModel instanceof OntModel){
+		        ((OntModel)writeModel).getBaseModel().notifyEvent(new EditEvent(editorUri, false));
+		    }
 			lock.leaveCriticalSection();
 		}
 	}
@@ -146,7 +147,7 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
         return models;
     }
 
-    private OntModel getWriteModel(VitroRequest vreq){
+    private Model getWriteModel(VitroRequest vreq){
     	return StandardModelSelector.selector.getModel(vreq,getServletContext());  
     }
 

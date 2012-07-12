@@ -48,6 +48,15 @@ var browseByVClass = {
             return false;
         });
         
+        // save the selected vclass in location hash so we can reset the selection
+        // if the user navigates with the back button
+        this.browseVClasses.children('li').each( function() {
+           $(this).find('a').click(function () {
+                // the extra space is needed to prevent odd scrolling behavior
+                location.hash = $(this).attr('data-uri') + ' ';
+           }); 
+        });
+
         // Call the pagination listener
         this.paginationListener();
     },
@@ -66,7 +75,14 @@ var browseByVClass = {
     // Load individuals for default class as specified by menupage template
     defaultVClass: function() {
         if ( this.defaultBrowseVClassURI != "false" ) {
-            this.getIndividuals(this.defaultBrowseVClassUri, "all", 1, false);
+            if ( location.hash ) {
+                // remove the trailing white space
+                location.hash = location.hash.replace(/\s+/g, '');                
+                this.getIndividuals(location.hash.substring(1,location.hash.length), "all", 1, false);
+            }
+            else {
+                this.getIndividuals(this.defaultBrowseVClassUri, "all", 1, false);
+            }
         }
     },
     
@@ -105,36 +121,8 @@ var browseByVClass = {
             } else {
                 var vclassName = results.vclass.name;
                 $.each(results.individuals, function(i, item) {
-                    var individual, 
-                        label, 
-                        mostSpecificTypes, 
-                        uri, 
-                        profileUrl, 
-                        image, 
-                        listItem;
-                        
-                    individual = results.individuals[i];
-                    label = individual.label;
-                    mostSpecificTypes = individual.mostSpecificTypes;
-                    moreInfo = browseByVClass.getMoreInfo(mostSpecificTypes, vclassName);
-                    uri = individual.URI;
-                    profileUrl = individual.profileUrl;
-                    if ( individual.thumbUrl ) {
-                        image = browseByVClass.baseUrl + individual.thumbUrl;
-                    }
-                    // Build the content of each list item, piecing together each component
-                    listItem = '<li class="individual" role="listitem" role="navigation">';
-                    if ( typeof individual.thumbUrl !== "undefined" ) {
-                        listItem += '<img src="'+ image +'" width="90" alt="'+ label +'" /><h1 class="thumb">';
-                    } else {
-                        listItem += '<h1>';
-                    }
-                    listItem += '<a href="'+ profileUrl +'" title="View the profile page for '+ label +'">'+ label +'</a></h1>';
-                    if ( moreInfo != '' ) {
-                        listItem += '<span class="title">'+ moreInfo +'</span>';
-                    }
-                    listItem += '</li>';
-                    individualList += listItem;
+                    var individual = results.individuals[i];
+                    individualList += individual.shortViewHtml;
                 })
                 
                 // Remove existing content
@@ -156,32 +144,6 @@ var browseByVClass = {
             browseByVClass.selectedVClass(results.vclass.URI);
             browseByVClass.selectedAlpha(alpha);
         });
-    },
-    
-    // Handle mostSpecificType as array
-    // * remove requested class for redundancy
-    // * allow override by another property (passed as argument)
-    getMoreInfo: function(mostSpecificTypes, requestedClass, override) {
-        var requestedClassIndex = $.inArray(requestedClass, mostSpecificTypes);
-        if ( requestedClassIndex > -1 ) {
-            mostSpecificTypes.splice(requestedClassIndex, 1);
-        }
-        var mostSpecificTypeCount = mostSpecificTypes.length;
-        
-        if ( typeof override !== "undefined" ) {
-            return override;
-        } else {
-            if ( mostSpecificTypeCount > 1 ) {
-                var assembledList = '<ul class="mostSpecificTypes">';
-                $.each(mostSpecificTypes, function(i, item) {
-                    assembledList += '<li>'+ item +'</li>';
-                })
-                assembledList += '</ul>';
-                return assembledList;
-            } else {
-                return mostSpecificTypes;
-            }
-        }
     },
     
     // getPageScroll() by quirksmode.org

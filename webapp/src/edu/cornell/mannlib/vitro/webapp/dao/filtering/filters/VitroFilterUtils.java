@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.dao.filtering.filters;
 import java.text.Collator;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -14,8 +13,6 @@ import net.sf.jga.fn.UnaryFunctor;
 import net.sf.jga.fn.adaptor.ChainUnary;
 import net.sf.jga.fn.property.GetProperty;
 import net.sf.jga.fn.string.Match;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.DisplayRestrictedDataByRoleLevelPolicy;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 /**
  * Static methods to help create commonly used filters.
@@ -26,9 +23,7 @@ public class VitroFilterUtils {
 	 * public view.
 	 */
 	public static VitroFilters getPublicFilter(ServletContext ctx) {
-		return new HideFromDisplayByPolicyFilter(
-				new ArrayIdentifierBundle(),
-				new DisplayRestrictedDataByRoleLevelPolicy(ctx));
+		return new FilterByRoleLevelPermission(ctx);
 	}
 
     /** Gets a VitroFilters that permits all objects */

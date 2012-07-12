@@ -23,6 +23,8 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.SkipIndividualException;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.ThumbnailImageURL;
 
 /**
  * @author bdc34
@@ -49,7 +51,7 @@ public class ThumbnailImageURLTest extends AbstractTestClass{
     }
 
     /**
-     * Test method for {@link edu.cornell.mannlib.vitro.webapp.search.solr.ThumbnailImageURL#modifyDocument(edu.cornell.mannlib.vitro.webapp.beans.Individual, org.apache.solr.common.SolrInputDocument, java.lang.StringBuffer)}.
+     * Test method for {@link edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.ThumbnailImageURL#modifyDocument(edu.cornell.mannlib.vitro.webapp.beans.Individual, org.apache.solr.common.SolrInputDocument, java.lang.StringBuffer)}.
      */
     @Test
     public void testModifyDocument() {

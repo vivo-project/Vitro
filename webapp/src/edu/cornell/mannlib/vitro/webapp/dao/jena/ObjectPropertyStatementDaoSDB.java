@@ -23,16 +23,15 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
-import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualSDB.IndividualNotFoundException;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 
 public class ObjectPropertyStatementDaoSDB extends
 		ObjectPropertyStatementDaoJena implements ObjectPropertyStatementDao {
@@ -41,14 +40,17 @@ public class ObjectPropertyStatementDaoSDB extends
     
 	private DatasetWrapperFactory dwf;
 	private SDBDatasetMode datasetMode;
+	private WebappDaoFactorySDB wadf;
 	
 	public ObjectPropertyStatementDaoSDB(
+	            RDFService rdfService,
 	            DatasetWrapperFactory dwf, 
 	            SDBDatasetMode datasetMode,
-	            WebappDaoFactoryJena wadf) {
-		super (dwf, wadf);
+	            WebappDaoFactorySDB wadf) {
+		super (rdfService, dwf, wadf);
 		this.dwf = dwf;
 		this.datasetMode = datasetMode;
+		this.wadf = wadf;
 	}
 	
 	@Override
@@ -129,7 +131,7 @@ public class ObjectPropertyStatementDaoSDB extends
                                         objPropertyStmt.getObjectURI(), 
                                         this.dwf, 
                                         datasetMode,
-                                        getWebappDaoFactory());
+                                        wadf);
                                     objPropertyStmt.setObject(objInd);	                                
 	                            }
 	                            

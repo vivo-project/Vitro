@@ -4,10 +4,19 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import javax.servlet.ServletContext;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+
 public class ModelContext {
+    
+    private static final Log log = LogFactory.getLog(ModelContext.class);
 	
 	private static final String ONT_MODEL_SELECTOR = "ontModelSelector";
 	private static final String UNION_ONT_MODEL_SELECTOR = "unionOntModelSelector";
@@ -94,16 +103,20 @@ public class ModelContext {
 	 *   Changes to application model
 	 */
 	public static void registerListenerForChanges(ServletContext ctx, ModelChangedListener ml){
-	    ModelContext.getJenaOntModel(ctx).register(ml);
-        ModelContext.getBaseOntModel(ctx).register(ml);
-        ModelContext.getInferenceOntModel(ctx).register(ml);
-        ModelContext.getUnionOntModelSelector(ctx).getABoxModel().register(ml);
-        ModelContext.getBaseOntModelSelector(ctx).getABoxModel().register(ml);
-        ModelContext.getBaseOntModelSelector(ctx).getApplicationMetadataModel().register(ml);
-        ModelContext.getInferenceOntModelSelector(ctx).getABoxModel().register(ml);
-        
-        ModelContext.getBaseOntModelSelector(ctx).getTBoxModel().register(ml);
+	    
+        try {
+            RDFServiceUtils.getRDFServiceFactory(ctx).registerListener(
+                    new JenaChangeListener(ml));
+        } catch (RDFServiceException e) {
+            log.error(e,e);
+        }
         
 	}
 	
+	public static OntModel getDisplayModel(ServletContext ctx){
+	    return(OntModel) ctx.getAttribute( DisplayVocabulary.DISPLAY_ONT_MODEL );	    
+	}
+	public static void setDisplayModel(OntModel ontModel, ServletContext ctx){
+	    ctx.setAttribute(DisplayVocabulary.DISPLAY_ONT_MODEL,ontModel);	    
+	}
 }

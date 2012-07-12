@@ -16,20 +16,17 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.vocabulary.XSD;
 
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.EditConfigurationTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
 import freemarker.template.Configuration;
 
 public class EditConfigurationUtils {
@@ -113,7 +110,12 @@ public class EditConfigurationUtils {
     	//DataProperty dataProp = wdf.getDataPropertyDao().getDataPropertyByURI(predicateUri);
     	 WebappDaoFactory unfilteredWdf = vreq.getUnfilteredWebappDaoFactory();
     	 DataProperty dataProp = unfilteredWdf.getDataPropertyDao().getDataPropertyByURI( predicateUri );
-      	return dataProp;
+    	 if( dataProp != null )
+    	     return dataProp;
+    	 else{
+    	     //when editing the display model, unfitlering wdf doesn't seem to have the needed properties.
+    	     return wdf.getDataPropertyDao().getDataPropertyByURI(predicateUri);
+    	 }
     }
     
     //get url without context - used for edit configuration object
@@ -173,6 +175,7 @@ public class EditConfigurationUtils {
     	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     	ObjectProperty op = wdf.getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
     	DataProperty dp = wdf.getDataPropertyDao().getDataPropertyByURI(predicateUri);
+    	log.debug("For " + predicateUri + ", object property from dao null? " + (op == null) + " and data property  null?" + (dp == null));
     	return (op != null && dp == null);
     }
     
@@ -251,7 +254,7 @@ public class EditConfigurationUtils {
 	//Generate HTML for a specific field name given 
 	public static String generateHTMLForElement(VitroRequest vreq, String fieldName, EditConfigurationVTwo editConfig) {
 		String html = "";
-        Configuration fmConfig = FreemarkerConfigurationLoader.getConfig(vreq, vreq.getSession().getServletContext());
+        Configuration fmConfig = FreemarkerConfigurationLoader.getConfig(vreq);
 
         FieldVTwo field = editConfig == null ? null : editConfig.getField(fieldName);
         MultiValueEditSubmission editSub = EditSubmissionUtils.getEditSubmissionFromSession(vreq.getSession(), editConfig);

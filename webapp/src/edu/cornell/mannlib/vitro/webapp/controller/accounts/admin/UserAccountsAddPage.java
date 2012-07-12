@@ -2,13 +2,17 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.admin;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
@@ -55,7 +59,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 	private boolean externalAuthOnly;
 	private String firstName = "";
 	private String lastName = "";
-	private String selectedRoleUri = "";
+	private Collection<String> selectedRoleUris = Collections.emptyList();
 	private String associatedProfileUri = "";
 	private String newProfileClassUri = "";
 
@@ -88,7 +92,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		externalAuthOnly = isFlagOnRequest(PARAMETER_EXTERNAL_AUTH_ONLY);
 		firstName = getStringParameter(PARAMETER_FIRST_NAME, "");
 		lastName = getStringParameter(PARAMETER_LAST_NAME, "");
-		selectedRoleUri = getStringParameter(PARAMETER_ROLE, "");
+		selectedRoleUris = getStringParameters(PARAMETER_ROLE);
 		associatedProfileUri = getStringParameter(
 				PARAMETER_ASSOCIATED_PROFILE_URI, "");
 		newProfileClassUri = getStringParameter(
@@ -114,7 +118,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 			errorCode = ERROR_NO_FIRST_NAME;
 		} else if (lastName.isEmpty()) {
 			errorCode = ERROR_NO_LAST_NAME;
-		} else if (selectedRoleUri.isEmpty()) {
+		} else if (selectedRoleUris.isEmpty()) {
 			errorCode = ERROR_NO_ROLE;
 		} else {
 			errorCode = strategy.additionalValidations();
@@ -155,7 +159,7 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		u.setLoginCount(0);
 		u.setLastLoginTime(0L);
 		u.setStatus(Status.INACTIVE);
-		u.setPermissionSetUris(Collections.singleton(selectedRoleUri));
+		u.setPermissionSetUris(selectedRoleUris);
 
 		strategy.setAdditionalProperties(u);
 
@@ -189,20 +193,29 @@ public class UserAccountsAddPage extends UserAccountsPage {
 	public final ResponseValues showPage() {
 		Map<String, Object> body = new HashMap<String, Object>();
 
-		body.put(PARAMETER_EMAIL_ADDRESS, emailAddress);
-		body.put(PARAMETER_EXTERNAL_AUTH_ID, externalAuthId);
-		body.put(PARAMETER_FIRST_NAME, firstName);
-		body.put(PARAMETER_LAST_NAME, lastName);
-		body.put("selectedRole", selectedRoleUri);
-		body.put("roles", buildRolesList());
+		if (isSubmit()) {
+			body.put(PARAMETER_EMAIL_ADDRESS, emailAddress);
+			body.put(PARAMETER_EXTERNAL_AUTH_ID, externalAuthId);
+			body.put(PARAMETER_FIRST_NAME, firstName);
+			body.put(PARAMETER_LAST_NAME, lastName);
+			body.put("selectedRoles", selectedRoleUris);
+		} else {
+			body.put(PARAMETER_EMAIL_ADDRESS, "");
+			body.put(PARAMETER_EXTERNAL_AUTH_ID, "");
+			body.put(PARAMETER_FIRST_NAME, "");
+			body.put(PARAMETER_LAST_NAME, "");
+			body.put("selectedRoles", getDefaultRolesForNewUsers());
+		}
+		
+		body.put("roles", buildListOfSelectableRoles());
 		body.put("profileTypes", buildProfileTypesList());
 		body.put(PARAMETER_NEW_PROFILE_CLASS_URI, newProfileClassUri);
 		body.put("formUrls", buildUrlsMap());
-
+		
 		if (externalAuthOnly) {
 			body.put(PARAMETER_EXTERNAL_AUTH_ONLY, Boolean.TRUE);
 		}
-
+		
 		if (!associatedProfileUri.isEmpty()) {
 			body.put("associatedProfileInfo",
 					buildProfileInfo(associatedProfileUri));
@@ -219,6 +232,16 @@ public class UserAccountsAddPage extends UserAccountsPage {
 		strategy.addMoreBodyValues(body);
 
 		return new TemplateResponseValues(TEMPLATE_NAME, body);
+	}
+
+	private Collection<String> getDefaultRolesForNewUsers() {
+		List<String> list = new ArrayList<String>();
+		for (PermissionSet ps : userAccountsDao.getAllPermissionSets()) {
+			if (ps.isForNewUsers()) {
+				list.add(ps.getUri());
+			}
+		}
+		return list;
 	}
 
 	public UserAccount getAddedAccount() {

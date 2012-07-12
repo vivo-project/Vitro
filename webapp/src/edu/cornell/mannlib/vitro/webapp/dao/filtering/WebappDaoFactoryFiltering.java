@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
@@ -76,10 +75,6 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
 
     /* ******************* filtering *********************** */
 
-	public Map<String,String> getProperties() {
-		return innerWebappDaoFactory.getProperties();
-	}
-
     public String checkURI(String uriStr) {
     	return innerWebappDaoFactory.checkURI(uriStr);
     }
@@ -101,7 +96,7 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
     	return innerWebappDaoFactory.getNonuserNamespaces();
     }
     
-    public String[] getPreferredLanguages() {
+    public List<String> getPreferredLanguages() {
     	return innerWebappDaoFactory.getPreferredLanguages();
     }
     
@@ -167,10 +162,6 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
 
 
     /* ******************* non-filtering DAOs *************************** */
-
-    public Classes2ClassesDao getClasses2ClassesDao() {
-        return innerWebappDaoFactory.getClasses2ClassesDao();
-    }
 
     public DatatypeDao getDatatypeDao() {
         return innerWebappDaoFactory.getDatatypeDao();

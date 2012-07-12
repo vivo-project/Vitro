@@ -80,7 +80,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 
     protected String DEFAULT_NAMESPACE;
     protected Set<String> NONUSER_NAMESPACES;
-    protected String[] PREFERRED_LANGUAGES;
+    protected List<String> PREFERRED_LANGUAGES;
 
     /* ******************* constructor ************************* */
     
@@ -501,7 +501,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                 }
             }
         } catch (Exception e) {
-            log.error("Error in updatePropertyDateValue");
+            log.error("Error in updatePropertyDateValue", e);
         }
     }
     
@@ -552,8 +552,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                 }
             }
         } catch (Exception e) {
-            log.error("Error in updatePropertyDateTimeValue");
-            log.error(e, e);
+            log.error("Error in updatePropertyDateTimeValue", e);
         }
     }
 
@@ -767,7 +766,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     		if (label.isLiteral()) {
     			Literal labelLit = ((Literal)label);
     			String labelLanguage = labelLit.getLanguage();
-    			if ( (labelLanguage==null) && (lang==null) ) {
+    			if ( (labelLanguage == null) && (lang == null || lang.isEmpty()) ) {
     				return labelLit;
     			}
     			if ( (lang != null) && (lang.equals(labelLanguage)) ) {
@@ -856,6 +855,10 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     private Literal tryPropertyForPreferredLanguages( OntResource r, Property p, boolean alsoTryNoLang ) {
     	Literal label = null;
 	    List<RDFNode> labels = r.listPropertyValues(p).toList();
+	    
+	    if (labels.size() == 0) {
+	        return null;
+	    }
 
 	    // Sort by lexical value to guarantee consistent results
 	    Collections.sort(labels, new Comparator<RDFNode>() {
@@ -871,8 +874,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 	        }
 	    });
 	    
-	    for (int i=0; i<PREFERRED_LANGUAGES.length; i++) {
-	    	String lang = PREFERRED_LANGUAGES[i];
+	    for (String lang : PREFERRED_LANGUAGES) {
 	    	label = getLabel(lang,labels);
 	    	if (label != null) {
 	    		break;
@@ -880,12 +882,21 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 	    }
         if ( label == null && alsoTryNoLang ) {
         	label = getLabel("", labels);
+        	// accept any label as a last resort
+        	if (label == null) {
+        	    for (RDFNode labelNode : labels) {
+        	      if (labelNode instanceof Literal) {
+        	          label = ((Literal) labelNode);
+        	          break;
+        	      }
+        	    }
+        	}
         }
 	    return label;
     }
 
     protected String getDefaultLanguage() {
-        return PREFERRED_LANGUAGES[0];
+        return PREFERRED_LANGUAGES.get(0);
     }
     
     /**
@@ -1017,17 +1028,36 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     	return directSubjectList;
     }
     
+    /**
+     * Returns additions and retractions to perform
+     * @param ontRes
+     * @param ontModel
+     * @return Model[] where [0] is retractions and [1] is additions
+     */
+    protected Model[] getSmartRemoval(OntResource ontRes, OntModel ontModel) {
+        Model[] changeSet = removeFromLists(ontRes, ontModel);
+        List<Statement> stmtForDependentRes = DependentResourceDeleteJena.getDependentResourceDeleteList(ontRes,ontModel);
+        changeSet[0].add(removeUsingDescribe(ontRes, ontModel));
+        changeSet[0].add(stmtForDependentRes);
+        return changeSet;
+    }
+    
     protected void smartRemove(OntResource ontRes, OntModel ontModel) {
-    	removeFromLists(ontRes, ontModel);
-    	List<Statement> stmtForDependentRes = DependentResourceDeleteJena.getDependentResourceDeleteList(ontRes,ontModel);
-    	removeUsingDescribe(ontRes, ontModel);
-    	ontModel.remove(stmtForDependentRes);
+        Model[] changes = getSmartRemoval(ontRes, ontModel);
+    	ontModel.remove(changes[0]);
+    	ontModel.add(changes[1]);
+    	
     }
  
     /**
      * Removes a resource from any rdf:Lists in which it is a member
      */
-    private void removeFromLists(OntResource res, OntModel ontModel) {
+    private Model[] removeFromLists(OntResource res, OntModel ontModel) {
+        Model[] changeSet = new Model[2];
+        Model retractions = ModelFactory.createDefaultModel();
+        Model additions = ModelFactory.createDefaultModel();
+        changeSet[0] = retractions;
+        changeSet[1] = additions;
     	// Iterate through all of the list nodes this resource is attached to
     	Iterator<Resource> listNodeIt = ontModel.listSubjectsWithProperty(RDF.first, res);
     	while (listNodeIt.hasNext()) {
@@ -1045,16 +1075,17 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     					// if current node is list head
     					if (!nextNode.equals(RDF.nil)) {
     						// only repair the list if there is more than one node
-    						ontModel.add(stmt.getSubject(), RDF.rest, nextNode);
+    						additions.add(stmt.getSubject(), RDF.rest, nextNode);
     					}
     				} else {
-    					ontModel.add(stmt.getSubject(), RDF.rest, nextNode);
+    					additions.add(stmt.getSubject(), RDF.rest, nextNode);
     				}
     			}
     		}
     		//Remove any statements about this node
-    		ontModel.remove(listNode, (Property) null, (RDFNode) null);
+    		retractions.add(listNode, (Property) null, (RDFNode) null);
     	}
+    	return changeSet;
     }
     
     public void removeRulesMentioningResource(Resource res, OntModel ontModel) {
@@ -1082,10 +1113,10 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     
     // removes a resource and its bnode closure using ARQ's DESCRIBE semantics 
     // plus any incoming properties
-    private void removeUsingDescribe(OntResource ontRes, OntModel ontModel) {
+    private Model removeUsingDescribe(OntResource ontRes, OntModel ontModel) {
     	Model temp = describeResource(ontRes, ontModel);
 		temp.add(ontModel.listStatements((Resource) null, (Property) null, ontRes));
-		ontModel.remove(temp);
+		return temp;
     }
     
     private Model describeResource(Resource res, OntModel ontModel) {    	

@@ -26,18 +26,32 @@ public class ObjectPropertyDaoStub implements ObjectPropertyDao {
 	// ----------------------------------------------------------------------
 
 	private final Map<String, ObjectProperty> opMap = new HashMap<String, ObjectProperty>();
+	private final Map<String, String> configFilesMap = new HashMap<String, String>();
 
-	public void addObjectProperty(ObjectProperty predicate) {
-		if (predicate == null) {
+	public void addObjectProperty(ObjectProperty property) {
+		if (property == null) {
 			throw new NullPointerException("predicate may not be null.");
 		}
 
-		String uri = predicate.getURI();
+		String uri = property.getURI();
 		if (uri == null) {
 			throw new NullPointerException("uri may not be null.");
 		}
 
-		opMap.put(uri, predicate);
+		opMap.put(uri, property);
+	}
+	
+	public void setCustomListViewConfigFileName(ObjectProperty property, String filename) {
+		if (property == null) {
+			throw new NullPointerException("property may not be null.");
+		}
+		
+		String uri = property.getURI();
+		if (uri == null) {
+			throw new NullPointerException("uri may not be null.");
+		}
+		
+		configFilesMap.put(uri, filename);
 	}
 
 	// ----------------------------------------------------------------------
@@ -46,7 +60,22 @@ public class ObjectPropertyDaoStub implements ObjectPropertyDao {
 
 	@Override
 	public ObjectProperty getObjectPropertyByURI(String objectPropertyURI) {
+		if (objectPropertyURI == null) {
+			return null;
+		}
 		return opMap.get(objectPropertyURI);
+	}
+
+	@Override
+	public String getCustomListViewConfigFileName(ObjectProperty objectProperty) {
+		if (objectProperty == null) {
+			return null;
+		}
+		String uri = objectProperty.getURI();
+		if (uri == null) {
+			return null;
+		}
+		return configFilesMap.get(uri);
 	}
 
 	// ----------------------------------------------------------------------
@@ -239,12 +268,6 @@ public class ObjectPropertyDaoStub implements ObjectPropertyDao {
 	public List<ObjectProperty> getObjectPropertyList(String subjectUri) {
 		throw new RuntimeException(
 				"ObjectPropertyDaoStub.getObjectPropertyList() not implemented.");
-	}
-
-	@Override
-	public String getCustomListViewConfigFileName(ObjectProperty objectProperty) {
-		throw new RuntimeException(
-				"ObjectPropertyDaoStub.getCustomListViewConfigFileName() not implemented.");
 	}
 
 }

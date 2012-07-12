@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -14,44 +13,72 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 /**
- * Execute a SPARQL query.
+ * Execute SPARQL queries against a model.
  * 
- * Take the model and a parser in the constructor. Then execute as many queries
- * as desired, with the query contained in a String.
- * 
- * If there is an exception while parsing the query, executing the query, or
- * parsing the results, log the exception and return the parser's default value.
- * The query enbvironment is closed properly in any case.
+ * Take the model in the constructor. Then execute as many queries as desired,
+ * with the query contained in a String. Exceptions are handled in a tidy
+ * manner, and the query environment is closed properly in any case.
  */
-public class SparqlQueryRunner<T> {
+public class SparqlQueryRunner {
 	private static final Log log = LogFactory.getLog(SparqlQueryRunner.class);
 
 	private static final Syntax SYNTAX = Syntax.syntaxARQ;
 
-	private final OntModel model;
-	private final QueryParser<T> parser;
+	private final Model model;
 
-	public SparqlQueryRunner(OntModel model, QueryParser<T> parser) {
+	public SparqlQueryRunner(Model model) {
+		if (model == null) {
+			throw new NullPointerException("model may not be null.");
+		}
 		this.model = model;
-		this.parser = parser;
 	}
 
 	/**
-	 * Execute the query and parse the results, closing and cleaning up
+	 * Execute the SELECT query and parse the results, closing and cleaning up
 	 * afterward. If an exception occurs, return the parser's default value.
 	 */
-	public T executeQuery(String queryStr) {
-		log.debug("query is: '" + queryStr + "'");
+	public <T> T executeSelect(QueryParser<T> parser, String queryStr) {
+		if (parser == null) {
+			throw new NullPointerException("parser may not be null.");
+		}
+		if (queryStr == null) {
+			throw new NullPointerException("queryStr may not be null.");
+		}
+
+		log.debug("select query is: '" + queryStr + "'");
 		QueryExecution qe = null;
 		try {
 			Query query = QueryFactory.create(queryStr, SYNTAX);
 			qe = QueryExecutionFactory.create(query, model);
 			return parser.parseResults(queryStr, qe.execSelect());
 		} catch (Exception e) {
-			log.error("Failed to execute the query: " + queryStr, e);
+			log.error("Failed to execute the Select query: " + queryStr, e);
 			return parser.defaultValue();
+		} finally {
+			if (qe != null) {
+				qe.close();
+			}
+		}
+	}
+
+	/**
+	 * Execute the CONSTRUCT query and return the resulting model. If an
+	 * exception occurs, return an empty model.
+	 */
+	public Model executeConstruct(String queryStr) {
+		log.debug("construct query is: '" + queryStr + "'");
+		QueryExecution qe = null;
+		try {
+			Query query = QueryFactory.create(queryStr, SYNTAX);
+			qe = QueryExecutionFactory.create(query, model);
+			return qe.execConstruct();
+		} catch (Exception e) {
+			log.error("Failed to execute the Construct query: " + queryStr, e);
+			return ModelFactory.createDefaultModel();
 		} finally {
 			if (qe != null) {
 				qe.close();

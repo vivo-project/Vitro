@@ -6,26 +6,34 @@
 
 <#assign hasElement = propertyGroups.pullProperty("${namespaces.display}hasElement")!>
 
+<#assign addNewMenuItemUrl = "${urls.base}/menuManagementController?cmd=add" >
+
 <#if hasElement?has_content>
     <script type="text/javascript">
         var menuItemData = [];
     </script>
     
-    <h3>Menu management</h3>
+    <h3>Menu Ordering</h3>
     
     <#-- List the menu items -->
     <ul class="menuItems">
         <#list hasElement.statements as statement>
-            <li class="menuItem"><#include "${hasElement.template}"> <span class="controls"><@p.editingLinks "hasElement" statement editable /></span></li>
+            <li class="menuItem"><#include "${hasElement.template}"> <span class="controls"><!--p.editingLinks "hasElement" statement editable /--></span></li>
         </#list>
     </ul>
     
     <#-- Link to add a new menu item -->
     <#if editable>
-        <#assign addUrl = hasElement.addUrl>
-        <#if addUrl?has_content>
-            <p><a class="add-hasElement green button" href="${addUrl}" title="Add new menu item">Add menu item</a></p>
-            
+        <#if addNewMenuItemUrl?has_content>
+        <form id="pageListForm" action="${urls.base}/editRequestDispatch" method="get">
+            <input type="hidden" name="typeOfNew" value="http://vitro.mannlib.cornell.edu/ontologies/display/1.1#Page">              
+            <input type="hidden" name="switchToDisplayModel" value="1">
+            <input type="hidden" name="editForm" value="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator" role="input">
+       		<input type="hidden" name="addMenuItem" value="true" />
+       	<input id="submit" value="Add new menu page" role="button" type="submit" >
+        
+        </form>
+            <br />
             <p class="note">Refresh page after reordering menu items</p>
         </#if>
     </#if>

@@ -1,0 +1,13 @@
+# $This file is distributed under the terms of the license in /doc/license.txt$ 
+
+#
+# Short View configuration
+#
+# This file allows a Vitro administrator to configure short view templates and data getters
+# for individuals of particular classes in particular contexts. This is a transitional
+# implementation, and should be replaced when the work on the Application and Display
+# Ontology is complete.
+#
+# Find out how to use this file at 
+# https://sourceforge.net/apps/mediawiki/vivo/index.php?title=Using_Short_Views_in_Release_1.5
+#

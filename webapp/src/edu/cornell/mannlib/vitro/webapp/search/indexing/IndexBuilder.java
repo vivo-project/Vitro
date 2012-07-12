@@ -71,16 +71,18 @@ public class IndexBuilder extends VitroBackgroundThread {
     /** Flag so we can tell that the index is being rebuilt. */
     public static final String FLAG_REBUILDING = "rebuilding";
     
-    /** Number of threads to use during indexing. */
-    protected int numberOfThreads = 10;
-    
     /** List of IndexingEventListeners */
     protected LinkedList<IndexingEventListener> indexingEventListeners = 
         new LinkedList<IndexingEventListener>();
     
-    public static final int MAX_REINDEX_THREADS= 10;
+    /** number of threads to use during a full index rebuild. */
+    public static final int REINDEX_THREADS= 10;
+    
+    /** Max threads to use during an update.  Smaller updates will use fewer threads. */
     public static final int MAX_UPDATE_THREADS= 10;    
-    public static final int MAX_THREADS = Math.max( MAX_UPDATE_THREADS, MAX_REINDEX_THREADS);
+    
+    /** Number of individuals to index per update thread. */
+    public static final int URIS_PER_UPDATE_THREAD = 50;
     
     private static final Log log = LogFactory.getLog(IndexBuilder.class);
     
@@ -285,9 +287,8 @@ public class IndexBuilder extends VitroBackgroundThread {
         
         log.debug("Getting all URIs in the model");
         Iterator<String> uris = wdf.getIndividualDao().getAllOfThisTypeIterator();
-         
-        this.numberOfThreads = MAX_REINDEX_THREADS;
-        doBuild(uris, Collections.<String>emptyList() );
+                 
+        doBuild(uris, Collections.<String>emptyList(), REINDEX_THREADS );
         
         if( log != null )  //log might be null if system is shutting down.
             log.info("Rebuild of search index is complete.");
@@ -298,8 +299,10 @@ public class IndexBuilder extends VitroBackgroundThread {
                      
         UriLists uriLists = makeAddAndDeleteLists( changedStatementsToUris() );
         
-        this.numberOfThreads = Math.max( MAX_UPDATE_THREADS, uriLists.updatedUris.size() / 20); 
-        doBuild( uriLists.updatedUris.iterator(), uriLists.deletedUris );
+        int numberOfThreads = 
+        	Math.min( MAX_UPDATE_THREADS, 
+        			  Math.max( uriLists.updatedUris.size() / URIS_PER_UPDATE_THREAD, 1)); 
+        doBuild( uriLists.updatedUris.iterator(), uriLists.deletedUris , numberOfThreads);
         
         log.debug("Ending updateIndex()");
     }
@@ -318,7 +321,7 @@ public class IndexBuilder extends VitroBackgroundThread {
      * to false, and a check is made before adding, it will work fine; but
      * checking if an object is on the index is slow.
      */
-    private void doBuild(Iterator<String> updates, Collection<String> deletes ){               
+    private void doBuild(Iterator<String> updates, Collection<String> deletes, int numberOfThreads ){               
         boolean updateRequested = ! reindexRequested;
         
         try {
@@ -341,7 +344,7 @@ public class IndexBuilder extends VitroBackgroundThread {
                 }
             }
             
-            indexUriList(updates);
+            indexUriList(updates, numberOfThreads);
             
         } catch (Exception e) {
             if( log != null) log.debug("Exception during indexing",e);            
@@ -354,12 +357,7 @@ public class IndexBuilder extends VitroBackgroundThread {
      * Use the back end indexer to index each object that the Iterator returns.
      * @throws AbortIndexing 
      */
-    private void indexUriList(Iterator<String> updateUris ) {
-        //make a copy of numberOfThreads so the local copy is safe during this method.
-        int numberOfThreads = this.numberOfThreads;
-        if( numberOfThreads > MAX_THREADS )
-            numberOfThreads = MAX_THREADS;            
-            
+    private void indexUriList(Iterator<String> updateUris , int numberOfThreads) {          
         //make lists of work URIs for workers
         List<List<String>> workLists = makeWorkerUriLists(updateUris, numberOfThreads);                                     
 
@@ -439,7 +437,8 @@ public class IndexBuilder extends VitroBackgroundThread {
             work.get( counter % workers ).add( uris.next() );
             counter ++;
         }
-        log.info("Number of individuals to be indexed : " + counter);
+        log.info("Number of individuals to be indexed : " + counter + " by " 
+        		+ workers + " worker theads.");
         return work;        
     }
     

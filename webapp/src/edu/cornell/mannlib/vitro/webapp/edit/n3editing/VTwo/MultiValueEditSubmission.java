@@ -4,13 +4,11 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
-
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringUtils;
@@ -18,11 +16,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.joda.time.DateTime;
-import org.joda.time.IllegalFieldValueException;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.json.JSONObject;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -31,11 +26,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditElementVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.BasicValidation;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.N3Validator;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
 
 public class MultiValueEditSubmission {
@@ -303,5 +294,15 @@ public class MultiValueEditSubmission {
          }  else {
              log.debug("No value found for query parameter " + var);              
          }
+    }
+    
+    //Check if a certain key has a value associated that is not null 
+    
+    public boolean hasLiteralValue(String key) {
+    	return (this.literalsFromForm.containsKey(key) && this.literalsFromForm.get(key) != null);
+    }
+    
+    public boolean hasUriValue(String key) {
+    	return (this.urisFromForm.containsKey(key) && this.urisFromForm.get(key) != null);
     }
 }

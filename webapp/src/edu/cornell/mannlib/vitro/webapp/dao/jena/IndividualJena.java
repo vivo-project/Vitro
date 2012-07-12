@@ -28,7 +28,6 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -41,7 +40,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 public class IndividualJena extends IndividualImpl implements Individual {
 
@@ -507,30 +505,6 @@ public class IndividualJena extends IndividualImpl implements Individual {
 			}
 		}
 		return false;
-	}
-	
-	@Override
-	public boolean isMemberOfClassProhibitedFromSearch(ProhibitedFromSearch pfs) {
-		ind.getModel().enterCriticalSection(Lock.READ);
-		try {
-			StmtIterator stmtIt = ind.listProperties(RDF.type);
-			try {
-				while(stmtIt.hasNext()) {
-					Statement stmt = stmtIt.nextStatement();
-					if (stmt.getObject().isURIResource()) {
-						String typeURI = ((Resource)stmt.getObject()).getURI();
-						if (pfs.isClassProhibitedFromSearch(typeURI)) {
-							return true;
-						}
-					}
-				}
-			} finally {
-				stmtIt.close();
-			}
-			return false;
-		} finally {
-			ind.getModel().leaveCriticalSection();
-		}
 	}
 
     /**

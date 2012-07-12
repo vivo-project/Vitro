@@ -13,7 +13,6 @@ import com.hp.hpl.jena.ontology.AnnotationProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -28,7 +27,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 public class SimpleReasonerTest extends AbstractTestClass {
 	
-	private Resource objectProperty = ResourceFactory.createResource("http://www.w3.org/2002/07/owl#ObjectProperty");
 	private static final String mostSpecificTypePropertyURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType";
 	long delay = 50;
   
@@ -591,8 +589,12 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	 * inference graph. 
 	 * 
 	 */
-	//@Test  - enable this in 1.5 - will need to add in PelletListener infrastructure
-	public void removeTBoxSubClassAssertion2() throws InterruptedException {
+	//@Test  - this test would need PelletListener infrastructure, which we're not
+	// testing in this suite. The reason it doesn't work as it is because
+	// the SimpleReasonerTBoxListener is not listening to the tBox inference
+	// model as Pellet is updating it. I could simulate it by adding to the
+	// tBox assertions what we can count on Pellet to infer.
+	public void bcdTest() throws InterruptedException {
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
 		// Pellet will compute TBox inferences
@@ -621,6 +623,9 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	    LivingThing.addSubClass(Flora);
 	    Flora.addSubClass(Brassica);
 	    
+	    tBox.rebind();
+	    tBox.prepare();
+	    
 	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
 	    	Thread.sleep(delay);
 	    }
@@ -631,7 +636,9 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	    
 		// Remove the statement that Brassica is a subclass of Flora from the TBox
 		Flora.removeSubClass(Brassica);
-		
+
+	    tBox.rebind();
+	    tBox.prepare();
 	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
 	    	Thread.sleep(delay);
 	    }
@@ -647,411 +654,6 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		simpleReasonerTBoxListener.setStopRequested();
 	}
 	
-	/*
-	 * tests rdfs:subPropertyOf materialization for object properties.
-	 */
-	// @Test  uncomment when sub/equiv property inferencing is enabled. sjm222 5/13/2011
-	public void addABoxAssertion1() throws InterruptedException {
-				
-		// Create TBox, ABox and Inference models and register
-		// the ABox reasoner listeners with the ABox and TBox
-		// Pellet will compute TBox inferences
-		
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-        Model inf = ModelFactory.createDefaultModel();
-		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
-		aBox.register(simpleReasoner);
-		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
-		tBox.register(simpleReasonerTBoxListener);
-
-		// Add object properties propA and propB to the TBox.
-	    // propB is a sub-property of propA.
-		
-		OntProperty propA = tBox.createOntProperty("http://test.vivo/propA");
-        tBox.add(propA, RDF.type, objectProperty);
-		propA.setLabel("propA", "en-US");
-	    
-		OntProperty propB = tBox.createOntProperty("http://test.vivo/propB");
-        tBox.add(propB, RDF.type, objectProperty);
-		propB.setLabel("propB", "en-US");
-	    	   
-	    propA.addSubProperty(propB);
-	    
-        // Add the assertion that x propB y to the ABox
-		Resource ind_x = aBox.createResource("http://test.vivo/x");
-		Resource ind_y = aBox.createResource("http://test.vivo/y");
-		aBox.add(ind_x, propB, ind_y);		
-	    		
-		// Verify that x propA y was inferred
-		Statement xay = ResourceFactory.createStatement(ind_x, propA, ind_y);	
-		Assert.assertTrue(inf.contains(xay));		
-	}
-	
-	/*
-	* Test that when a statement is asserted, that it not
-	* added to the inference graph.
-	*/
-	// @Test  uncomment when sub/equiv property inferencing is enabled. sjm222 5/13/2011
-	public void addABoxAssertion2(){
-			
-		// Create TBox, ABox and Inference models and register
-		// the ABox reasoner listeners with the ABox and TBox
-		// Pellet will compute TBox inferences
-		
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-        Model inf = ModelFactory.createDefaultModel();
-		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
-		aBox.register(simpleReasoner);
-		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
-		tBox.register(simpleReasonerTBoxListener);
-		
-		// Add object properties propA and propB to the TBox.
-	    // propB is a sub-property of propA.
-		
-		OntProperty propA = tBox.createOntProperty("http://test.vivo/propA");
-        tBox.add(propA, RDF.type, objectProperty);
-		propA.setLabel("propA", "en-US");
-	    
-		OntProperty propB = tBox.createOntProperty("http://test.vivo/propB");
-        tBox.add(propB, RDF.type, objectProperty);
-		propB.setLabel("propB", "en-US");
-	    	   
-	    propA.addSubProperty(propB);
-	    
-        // Add the assertion that x propB y to the ABox
-		Resource ind_x = aBox.createResource("http://test.vivo/x");
-		Resource ind_y = aBox.createResource("http://test.vivo/y");
-		aBox.add(ind_x, propB, ind_y);		
-	    		
-		// Verify that x propA y was inferred
-		Statement xby = ResourceFactory.createStatement(ind_x, propB, ind_y);	
-		Assert.assertFalse(inf.contains(xby));		
-	}
-		
-	/*
-	* Test inference based on property equivalence
-	*/ 
-	// @Test  uncomment when sub/equiv property inferencing is enabled. sjm222 5/13/2011
-	public void addABoxAssertion4(){
-				
-		// Create TBox, ABox and Inference models and register
-		// the ABox reasoner listeners with the ABox and TBox
-		// Pellet will compute TBox inferences
-		
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-        Model inf = ModelFactory.createDefaultModel();
-		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
-		aBox.register(simpleReasoner);
-		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
-		tBox.register(simpleReasonerTBoxListener);
-		
-		// Add properties A, B and C to the TBox
-	    // A is equivalent to B
-		// C is a subclass of A
-		
-		OntProperty propA = tBox.createOntProperty("http://test.vivo/A");
-        tBox.add(propA, RDF.type, objectProperty);
-	    propA.setLabel("property A", "en-US");
-
-	    OntProperty propB = tBox.createOntProperty("http://test.vivo/B");
-        tBox.add(propB, RDF.type, objectProperty);
-	    propB.setLabel("property B", "en-US");
-
-	    OntProperty propC = tBox.createOntProperty("http://test.vivo/C");
-        tBox.add(propC, RDF.type, objectProperty);
-	    propC.setLabel("property C", "en-US");
-
-	    propA.addEquivalentProperty(propB);
-	    propA.addSubProperty(propC);
-	    
-        // Add a statement that individual x is of type C to the ABox
-		Resource ind_x = aBox.createResource("http://test.vivo/x");
-		Resource ind_y = aBox.createResource("http://test.vivo/y");
-		
-		aBox.add(ind_x, propC, ind_y);		
-	    
-		// Verify that "x A y" was inferred
-		Statement xAy = ResourceFactory.createStatement(ind_x, propA, ind_y);	
-		Assert.assertTrue(inf.contains(xAy));		
-		
-		// Verify that "x B y" was inferred
-		Statement xBy = ResourceFactory.createStatement(ind_x, propB, ind_y);	
-		Assert.assertTrue(inf.contains(xBy));		
-	}
-	
-	/*
-	 * The sub-property is not of the same type as the super
-	 * property so no inference should be materialized.
-	 */
-
-	// @Test  uncomment when sub/equiv property inferencing is enabled. sjm222 5/13/2011
-	public void addABoxAssertion5(){
-				
-		// Create TBox, ABox and Inference models and register
-		// the ABox reasoner listeners with the ABox and TBox
-		// Pellet will compute TBox inferences
-		
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-        Model inf = ModelFactory.createDefaultModel();
-		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
-		aBox.register(simpleReasoner);
-		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
-		tBox.register(simpleReasonerTBoxListener);
-
-		// Add object properties propA and propB to the TBox.
-	    // propB is a sub-property of propA.
-		
-		OntProperty propA = tBox.createOntProperty("http://test.vivo/propA");
-        tBox.add(propA, RDF.type, objectProperty);
-		propA.setLabel("propA", "en-US");
-	    
-		OntProperty propB = tBox.createOntProperty("http://test.vivo/propB");
-		Resource datatypeProperty = ResourceFactory.createResource("http://www.w3.org/2002/07/owl#DatatypeProperty");
-        tBox.add(propB, RDF.type, datatypeProperty);
-		propB.setLabel("propB", "en-US");
-	    	   
-	    propA.addSubProperty(propB);
-	    
-        // Add the assertion that x propB y to the ABox
-		Resource ind_x = aBox.createResource("http://test.vivo/x");
-		Resource ind_y = aBox.createResource("http://test.vivo/y");
-		aBox.add(ind_x, propB, ind_y);		
-	    		
-		// Verify that x propA y was not inferred
-		Statement xay = ResourceFactory.createStatement(ind_x, propA, ind_y);	
-		Assert.assertFalse(inf.contains(xay));		
-	}
-	
-	/*
-	 * Test inference based on property equivalence
-	 */
-	// @Test  uncomment when sub/equiv property inferencing is enabled. sjm222 5/13/2011
-	public void addABoxAssertion6() {
-				
-		// Create TBox, ABox and Inference models and register
-		// the ABox reasoner listeners with the ABox and TBox
-		// Pellet will compute TBox inferences
-		
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-        Model inf = ModelFactory.createDefaultModel();
-		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
-		aBox.register(simpleReasoner);
-		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
-		tBox.register(simpleReasonerTBoxListener);
-		
-		// Add properties A and B to the TBox
-	    // A is equivalent to B
-		
-		OntProperty propA = tBox.createOntProperty("http://test.vivo/A");
-        tBox.add(propA, RDF.type, objectProperty);
-	    propA.setLabel("property A", "en-US");
-
-	    OntProperty propB = tBox.createOntProperty("http://test.vivo/B");
-        tBox.add(propB, RDF.type, objectProperty);
-	    propB.setLabel("property B", "en-US");
-
-	    propA.addEquivalentProperty(propB);
-	    
-        // Add the statement x B y to the ABox
-		Resource ind_x = aBox.createResource("http://test.vivo/x");
-		Resource ind_y = aBox.createResource("http://test.vivo/y");
-		aBox.add(ind_x, propB, ind_y);		
-	    
-		// Verify that "x A y" was inferred
-		Statement xAy = ResourceFactory.createStatement(ind_x, propA, ind_y);	
-		Assert.assertTrue(inf.contains(xAy));	
-		
-		// Remove the statement that x B y from the ABox
-		aBox.remove(ind_x, propB, ind_y);
-		
-		// Verify that "x is of type A" was removed from the inference graph
-		Assert.assertFalse(inf.contains(xAy));	
-	}
-
-	
-	/*
-	 * Test the addition of a subPropertyOf statement to 
-	 * the TBox. The instance data that is the basis
-	 * for the inference is in the ABox. 
-	 * 
-	 * Since the addition of an owl:equivalentProperty
-	 * statement is implemented as two calls to the
-	 * method that handles the addition of an
-	 * rdfs:subPropetyOf statement, this test serves
-	 * as a test of equivalentProperty assertions also.
-	 */
-	// @Test  uncomment when sub/equiv property inferencing is enabled. sjm222 5/13/2011
-	public void addTBoxSubPropertyAssertion1(){
-				
-		// Create TBox, ABox and Inference models and register
-		// the ABox reasoner listeners with the ABox and TBox
-		// Pellet will compute TBox inferences
-		
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-        Model inf = ModelFactory.createDefaultModel();
-		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
-		aBox.register(simpleReasoner);
-		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
-		tBox.register(simpleReasonerTBoxListener);
-		
-		// Add properties A, B, C and D to the TBox	  
-		OntProperty propA = tBox.createOntProperty("http://test.vivo/A");
-        tBox.add(propA, RDF.type, objectProperty);
-	    propA.setLabel("property A", "en-US");
-
-	    OntProperty propB = tBox.createOntProperty("http://test.vivo/B");
-        tBox.add(propB, RDF.type, objectProperty);
-	    propB.setLabel("property B", "en-US");
-	    
-	    OntProperty propC = tBox.createOntProperty("http://test.vivo/C");
-        tBox.add(propC, RDF.type, objectProperty);
-	    propB.setLabel("property C", "en-US");
-	    
-	    OntProperty propD = tBox.createOntProperty("http://test.vivo/D");
-        tBox.add(propD, RDF.type, objectProperty);
-	    propB.setLabel("property D", "en-US");
-
-	    // Add the statement "x C y" to the ABox
-		Resource ind_x = aBox.createResource("http://test.vivo/x");
-		Resource ind_y = aBox.createResource("http://test.vivo/y");
-		aBox.add(ind_x, propC, ind_y);		
-	    
-        // Add a statement that C is a sub-property of A to the TBox	
-	    
-	    propA.addSubProperty(propC);
-		
-		// Verify that "x A y" was inferred
-		Statement xAy = ResourceFactory.createStatement(ind_x, propA, ind_y);	
-		Assert.assertTrue(inf.contains(xAy));
-
-		// Verify that "x B y" was not inferred
-		Statement xBy = ResourceFactory.createStatement(ind_x, propB, ind_y);	
-		Assert.assertFalse(inf.contains(xBy));	
-
-		// Verify that "x D y" was not inferred
-		Statement xDy = ResourceFactory.createStatement(ind_x, propD, ind_y);	
-		Assert.assertFalse(inf.contains(xDy));	
-		
-	}
-	
-	/*
-	 * Test the removal of a subPropertyOf statement from 
-	 * the TBox. The instance data that is the basis
-	 * for the inference is in the ABox graph and the
-	 * inference graph. 
-	 * 
-	 * Since the addition of an owl:equivalentProperty
-	 * statement is implemented as two calls to the
-	 * method that handles the addition of an
-	 * rdfs:subPropertyOf statement, this test serves
-	 * as a test of equivalentProperty assertions also.
-	 * 
-	 */
-	// @Test  uncomment when sub/equiv property inferencing is enabled. sjm222 5/13/2011
-	public void removeTBoxSubPropertyAssertion1(){
-		// Create TBox, ABox and Inference models and register
-		// the ABox reasoner listeners with the ABox and TBox
-		// Pellet will compute TBox inferences
-		
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-        Model inf = ModelFactory.createDefaultModel();
-		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
-		aBox.register(simpleReasoner);
-		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
-		tBox.register(simpleReasonerTBoxListener);
-		
-		// Add properties A, B, C, D, E, F, G and H to the TBox.
-		// B, C and D are subproperties of A.
-		// E is a subproperty of B.
-		// F and G are subproperties of C.
-		// H is a subproperty of D.
-	
-		OntProperty propA = tBox.createOntProperty("http://test.vivo/A");
-        tBox.add(propA, RDF.type, objectProperty);
-	    propA.setLabel("property A", "en-US");
-
-	    OntProperty propB = tBox.createOntProperty("http://test.vivo/B");
-        tBox.add(propB, RDF.type, objectProperty);
-	    propB.setLabel("property B", "en-US");
-	    
-	    OntProperty propC = tBox.createOntProperty("http://test.vivo/C");
-        tBox.add(propC, RDF.type, objectProperty);
-	    propB.setLabel("property C", "en-US");
-	    
-	    OntProperty propD = tBox.createOntProperty("http://test.vivo/D");
-        tBox.add(propD, RDF.type, objectProperty);
-	    propB.setLabel("property D", "en-US");
-
-	    OntProperty propE = tBox.createOntProperty("http://test.vivo/E");
-        tBox.add(propE, RDF.type, objectProperty);
-	    propB.setLabel("property E", "en-US");
-
-	    OntProperty propF = tBox.createOntProperty("http://test.vivo/F");
-        tBox.add(propF, RDF.type, objectProperty);
-	    propB.setLabel("property F", "en-US");
-
-	    OntProperty propG = tBox.createOntProperty("http://test.vivo/G");
-        tBox.add(propG, RDF.type, objectProperty);
-	    propB.setLabel("property G", "en-US");
-
-	    OntProperty propH = tBox.createOntProperty("http://test.vivo/H");
-        tBox.add(propH, RDF.type, objectProperty);
-	    propB.setLabel("property H", "en-US");
-
-	    propA.addSubProperty(propB);
-	    propA.addSubProperty(propC);
-	    propA.addSubProperty(propD);
-	    propB.addSubProperty(propE);
-	    propC.addSubProperty(propF);
-	    propC.addSubProperty(propG);
-	    propD.addSubProperty(propH);
-	    
-        // Add the statement "x E y" to the ABox
-		Resource ind_x = aBox.createResource("http://test.vivo/x");
-		Resource ind_y = aBox.createResource("http://test.vivo/y");
-		aBox.add(ind_x, propE, ind_y);		
-	    
-		// Remove the statement that B is a subproperty of A from the TBox
-		propA.removeSubProperty(propB);
-		
-		// Verify that "x A y" is not in the inference graph
-		Statement xAy = ResourceFactory.createStatement(ind_x, propA, ind_y);	
-		Assert.assertFalse(inf.contains(xAy));
-		
-		// Verify that "x B y" is in the inference graph
-		Statement xBy = ResourceFactory.createStatement(ind_x, propB, ind_y);	
-		Assert.assertTrue(inf.contains(xBy));	
-
-        // Add statements "w F z" and "w H z" to the ABox
-		Resource ind_z = aBox.createResource("http://test.vivo/z");
-		Resource ind_w = aBox.createResource("http://test.vivo/w");
-		aBox.add(ind_w, propF, ind_z);	
-		aBox.add(ind_w, propH, ind_z);
-		
-		// Remove the statement that C is a subproperty of A from the TBox
-		propA.removeSubProperty(propC);
-
-		// Verify that "w A z" is in the inference graph
-		Statement wAz = ResourceFactory.createStatement(ind_w, propA, ind_z);	
-		Assert.assertTrue(inf.contains(wAz));
-	}
-	
-	
-
 	/*
      * Test computation of mostSpecificType annotations in response
      * to an added/removed ABox type assertion.

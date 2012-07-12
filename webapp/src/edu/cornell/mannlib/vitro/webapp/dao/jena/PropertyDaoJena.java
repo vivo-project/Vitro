@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -35,6 +34,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
+import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
@@ -596,6 +596,31 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         }
     }
     
+    private List<OntClass> listSuperClasses(OntClass ontClass) {
+        return relatedClasses(ontClass, RDFS.subClassOf);
+    }
+    
+    private List<OntClass> listEquivalentClasses(OntClass ontClass) {
+        return relatedClasses(ontClass, OWL.equivalentClass);
+    }
+     
+    private List<OntClass> relatedClasses(OntClass ontClass,
+            com.hp.hpl.jena.rdf.model.Property property) {
+        List<OntClass> classes = new ArrayList<OntClass>();
+        StmtIterator closeIt = ontClass.listProperties(property);
+        try {
+            while (closeIt.hasNext()) {
+                Statement stmt = closeIt.nextStatement();
+                if (stmt.getObject().canAs(OntClass.class)) {
+                    classes.add(stmt.getObject().as(OntClass.class));
+                }
+            }
+        } finally {
+            closeIt.close();
+        }
+        return classes;
+    }
+    
     public List<PropertyInstance> getAllPropInstByVClasses(List<VClass> vclasses) {
         
         List<PropertyInstance> propInsts = new ArrayList<PropertyInstance>();
@@ -628,11 +653,11 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 		        	OntClass ontClass = getOntClass(ontModel,VClassURI);
 		        	if (ontClass != null) {
 		        	    List<OntClass> relatedClasses = new ArrayList<OntClass>();
-		        	    relatedClasses.addAll(ontClass.listEquivalentClasses().toList());
-		        	    relatedClasses.addAll(ontClass.listSuperClasses().toList());
+		        	    relatedClasses.addAll(listEquivalentClasses(ontClass));		        	    
+		        	    relatedClasses.addAll(listSuperClasses(ontClass));
 		        	    for (OntClass relatedClass : relatedClasses) {
     		        	    // find properties in restrictions
-    		        		if (relatedClass.isRestriction()) {
+    		        		if (relatedClass.isRestriction() && relatedClass.canAs(Restriction.class)) {
     		        			// TODO: check if restriction is something like
     		        			// maxCardinality 0 or allValuesFrom owl:Nothing,
     		        			// in which case the property is NOT applicable!

@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator.LoginNotPermitted;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginInProcessFlag;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
@@ -327,6 +328,11 @@ public class Authenticate extends VitroHttpServlet {
 			return;
 		}
 
+		if (!getAuthenticator(request).isUserPermittedToLogin(user)) {
+			bean.setMessage(Message.LOGIN_DISABLED);
+			return;
+		}
+
 		if (!getAuthenticator(request).isCurrentPassword(user, password)) {
 			bean.setMessage(Message.INCORRECT_PASSWORD);
 			return;
@@ -336,7 +342,13 @@ public class Authenticate extends VitroHttpServlet {
 		if (user.isPasswordChangeRequired()) {
 			transitionToForcedPasswordChange(request);
 		} else {
-			transitionToLoggedIn(request, user);
+			try {
+				transitionToLoggedIn(request, user);
+			} catch (LoginNotPermitted e) {
+				// This should have been caught by isUserPermittedToLogin()
+				bean.setMessage(Message.LOGIN_DISABLED);
+				return;
+			}
 		}
 	}
 
@@ -392,7 +404,13 @@ public class Authenticate extends VitroHttpServlet {
 		}
 
 		// New password is acceptable. Store it and go on.
-		transitionToLoggedIn(request, user, newPassword);
+		try {
+			transitionToLoggedIn(request, user, newPassword);
+		} catch (LoginNotPermitted e) {
+			// This should have been caught by isUserPermittedToLogin()
+			bean.setMessage(Message.LOGIN_DISABLED);
+			return;
+		}
 	}
 
 	/**
@@ -424,7 +442,7 @@ public class Authenticate extends VitroHttpServlet {
 	 * State change: all requirements are satisfied. Log them in.
 	 */
 	private void transitionToLoggedIn(HttpServletRequest request,
-			UserAccount user) {
+			UserAccount user) throws LoginNotPermitted {
 		log.debug("Completed login: " + user.getEmailAddress());
 		getAuthenticator(request).recordLoginAgainstUserAccount(user,
 				AuthenticationSource.INTERNAL);
@@ -435,7 +453,7 @@ public class Authenticate extends VitroHttpServlet {
 	 * log them in.
 	 */
 	private void transitionToLoggedIn(HttpServletRequest request,
-			UserAccount user, String newPassword) {
+			UserAccount user, String newPassword) throws LoginNotPermitted {
 		log.debug("Completed login: " + user.getEmailAddress()
 				+ ", password changed.");
 		getAuthenticator(request).recordNewPassword(user, newPassword);
@@ -477,9 +495,10 @@ public class Authenticate extends VitroHttpServlet {
 		response.sendRedirect(loginProcessPage);
 		return;
 	}
-	
+
 	/**
-	 * Exit: user has completed the login. Redirect appropriately and clear the bean.
+	 * Exit: user has completed the login. Redirect appropriately and clear the
+	 * bean.
 	 */
 	private void showLoginComplete(HttpServletResponse response,
 			VitroRequest vreq) throws IOException {
@@ -497,11 +516,10 @@ public class Authenticate extends VitroHttpServlet {
 	}
 
 	private LoginRedirector getLoginRedirector(VitroRequest vreq) {
-		String afterLoginUrl = LoginProcessBean.getBean(vreq).getAfterLoginUrl();
+		String afterLoginUrl = LoginProcessBean.getBean(vreq)
+				.getAfterLoginUrl();
 		return new LoginRedirector(vreq, afterLoginUrl);
 	}
-
-
 
 	/** Get a reference to the Authenticator. */
 	private Authenticator getAuthenticator(HttpServletRequest request) {

@@ -21,7 +21,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
  * Mock the basic functions of Individual for unit tests.
@@ -32,8 +31,12 @@ public class IndividualStub implements Individual {
 	// ----------------------------------------------------------------------
 
 	private final String uri;
+
 	private final Set<DataPropertyStatement> dpsSet = new HashSet<DataPropertyStatement>();
 	private final Set<ObjectPropertyStatement> opsSet = new HashSet<ObjectPropertyStatement>();
+	private final Set<VClass> vClasses = new HashSet<VClass>();
+
+	private String name = "NoName";
 
 	public IndividualStub(String uri) {
 		this.uri = uri;
@@ -44,9 +47,22 @@ public class IndividualStub implements Individual {
 	}
 
 	public void addObjectPropertyStatement(String predicateUri, String objectUri) {
-		opsSet.add(new ObjectPropertyStatementImpl(this.uri, predicateUri, objectUri));
+		opsSet.add(new ObjectPropertyStatementImpl(this.uri, predicateUri,
+				objectUri));
 	}
-	
+
+	public void addPopulatedObjectPropertyStatement(String predicateUri,
+			String objectUri, Individual object) {
+		ObjectPropertyStatementImpl stmt = new ObjectPropertyStatementImpl(
+				this.uri, predicateUri, objectUri);
+		stmt.setObject(object);
+		opsSet.add(stmt);
+	}
+
+	public void addVclass(String namespace, String localname, String vClassName) {
+		vClasses.add(new VClass(namespace, localname, vClassName));
+	}
+
 	// ----------------------------------------------------------------------
 	// Stub methods
 	// ----------------------------------------------------------------------
@@ -54,6 +70,16 @@ public class IndividualStub implements Individual {
 	@Override
 	public String getURI() {
 		return uri;
+	}
+
+	@Override
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 
 	@Override
@@ -65,12 +91,22 @@ public class IndividualStub implements Individual {
 	public List<DataPropertyStatement> getDataPropertyStatements(
 			String propertyUri) {
 		List<DataPropertyStatement> list = new ArrayList<DataPropertyStatement>();
-		for (DataPropertyStatement dps: dpsSet) {
+		for (DataPropertyStatement dps : dpsSet) {
 			if (dps.getDatapropURI().equals(propertyUri)) {
 				list.add(dps);
 			}
 		}
 		return list;
+	}
+
+	@Override
+	public String getDataValue(String propertyUri) {
+		for (DataPropertyStatement dps : dpsSet) {
+			if (dps.getDatapropURI().equals(propertyUri)) {
+				return dps.getData();
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -82,12 +118,70 @@ public class IndividualStub implements Individual {
 	public List<ObjectPropertyStatement> getObjectPropertyStatements(
 			String propertyUri) {
 		List<ObjectPropertyStatement> list = new ArrayList<ObjectPropertyStatement>();
-		for (ObjectPropertyStatement ops: opsSet) {
+		for (ObjectPropertyStatement ops : opsSet) {
 			if (ops.getPropertyURI().equals(propertyUri)) {
 				list.add(ops);
 			}
 		}
 		return list;
+	}
+
+	@Override
+	public Individual getRelatedIndividual(String propertyUri) {
+		for (ObjectPropertyStatement ops : opsSet) {
+			if (ops.getPropertyURI().equals(propertyUri)) {
+				return ops.getObject();
+			}
+		}
+		return null;
+	}
+
+
+	@Override
+	public boolean isVClass(String vclassUri) {
+		for (VClass vc : vClasses) {
+			if (vc.getURI().equals(vclassUri)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public List<VClass> getVClasses(boolean direct) {
+		return new ArrayList<VClass>(vClasses);
+	}
+
+	@Override
+	public void sortForDisplay() {
+		// does nothing.
+	}
+
+	@Override
+	public String getLocalName() {
+		// Useless for now.
+		return "BOGUS Local Name";
+	}
+
+	@Override
+	public VClass getVClass() {
+		for (VClass vc : vClasses) {
+			return vc;
+		}
+		return null;
+	}
+
+	@Override
+	public String getVClassURI() {
+		for (VClass vc : vClasses) {
+			return vc.getURI();
+		}
+		return null;
+	}
+
+	@Override
+	public List<VClass> getVClasses() {
+		return new ArrayList<VClass>(vClasses);
 	}
 
 	// ----------------------------------------------------------------------
@@ -115,12 +209,6 @@ public class IndividualStub implements Individual {
 	public void setNamespace(String namespace) {
 		throw new RuntimeException(
 				"ResourceBean.setNamespace() not implemented.");
-	}
-
-	@Override
-	public String getLocalName() {
-		throw new RuntimeException(
-				"ResourceBean.getLocalName() not implemented.");
 	}
 
 	@Override
@@ -172,23 +260,8 @@ public class IndividualStub implements Individual {
 	}
 
 	@Override
-	public String getName() {
-		throw new RuntimeException("Individual.getName() not implemented.");
-	}
-
-	@Override
-	public void setName(String in) {
-		throw new RuntimeException("Individual.setName() not implemented.");
-	}
-
-	@Override
 	public String getRdfsLabel() {
 		throw new RuntimeException("Individual.getRdfsLabel() not implemented.");
-	}
-
-	@Override
-	public String getVClassURI() {
-		throw new RuntimeException("Individual.getVClassURI() not implemented.");
 	}
 
 	@Override
@@ -297,44 +370,13 @@ public class IndividualStub implements Individual {
 	}
 
 	@Override
-	public String getDataValue(String propertyUri) {
-		throw new RuntimeException("Individual.getDataValue() not implemented.");
-	}
-
-	@Override
-	public VClass getVClass() {
-		throw new RuntimeException("Individual.getVClass() not implemented.");
-	}
-
-	@Override
 	public void setVClass(VClass class1) {
 		throw new RuntimeException("Individual.setVClass() not implemented.");
 	}
 
 	@Override
-	public List<VClass> getVClasses() {
-		throw new RuntimeException("Individual.getVClasses() not implemented.");
-	}
-
-	@Override
-	public List<VClass> getVClasses(boolean direct) {
-		throw new RuntimeException("Individual.getVClasses() not implemented.");
-	}
-
-	@Override
 	public void setVClasses(List<VClass> vClassList, boolean direct) {
 		throw new RuntimeException("Individual.setVClasses() not implemented.");
-	}
-
-	@Override
-	public boolean isVClass(String uri) {
-		throw new RuntimeException("Individual.isVClass() not implemented.");
-	}
-
-	@Override
-	public boolean isMemberOfClassProhibitedFromSearch(ProhibitedFromSearch pfs) {
-		throw new RuntimeException(
-				"Individual.isMemberOfClassProhibitedFromSearch() not implemented.");
 	}
 
 	@Override
@@ -347,12 +389,6 @@ public class IndividualStub implements Individual {
 	public List<Individual> getRelatedIndividuals(String propertyUri) {
 		throw new RuntimeException(
 				"Individual.getRelatedIndividuals() not implemented.");
-	}
-
-	@Override
-	public Individual getRelatedIndividual(String propertyUri) {
-		throw new RuntimeException(
-				"Individual.getRelatedIndividual() not implemented.");
 	}
 
 	@Override
@@ -395,12 +431,6 @@ public class IndividualStub implements Individual {
 	}
 
 	@Override
-	public void sortForDisplay() {
-		throw new RuntimeException(
-				"Individual.sortForDisplay() not implemented.");
-	}
-
-	@Override
 	public JSONObject toJSON() throws JSONException {
 		throw new RuntimeException("Individual.toJSON() not implemented.");
 	}
@@ -419,11 +449,13 @@ public class IndividualStub implements Individual {
 
 	@Override
 	public String getSearchSnippet() {
-		throw new RuntimeException("Individual.getSearchSnippet() not implemented.");
+		throw new RuntimeException(
+				"Individual.getSearchSnippet() not implemented.");
 	}
 
 	@Override
 	public void setSearchSnippet(String snippet) {
-		throw new RuntimeException("Individual.setSearchSnippet() not implemented.");
+		throw new RuntimeException(
+				"Individual.setSearchSnippet() not implemented.");
 	}
 }

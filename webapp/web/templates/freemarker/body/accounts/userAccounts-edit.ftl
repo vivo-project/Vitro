@@ -4,6 +4,7 @@
 
 <h3><a class="account-menu" href="accountsAdmin" title="edit account">User accounts</a> > Edit account</h3>
 
+
     <#if errorEmailIsEmpty??>
         <#assign errorMessage = "You must supply an email address." />
     </#if>
@@ -62,13 +63,16 @@
         <label for="last-name">Last name<span class="requiredHint"> *</span></label> 
         <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
 
-        <#include "userAccounts-associateProfilePanel.ftl">
+		<#if externalAuthPermitted??>
+            <#include "userAccounts-associateProfilePanel.ftl">
 
-        <p><input id="externalAuthChkBox" type="checkbox" name="externalAuthOnly"  <#if externalAuthOnly?? >checked</#if>  />Externally Authenticated Only</p>
+            <p><input id="externalAuthChkBox" type="checkbox" name="externalAuthOnly"  <#if externalAuthOnly?? >checked</#if>  />Externally Authenticated Only</p>
+        </#if>
+
         <#if roles?has_content>
             <p>Roles<span class="requiredHint"> *</span></p>
             <#list roles as role>
-                <input type="radio" name="role" value="${role.uri}" role="radio" <#if selectedRole = role.uri>checked</#if> />
+                <input type="radio" name="role" value="${role.uri}" role="radio" ${selectedRoles?seq_contains(role.uri)?string("checked", "")} />
                 <label class="inline" for="${role.label}"> ${role.label}</label>
                 <br />
             </#list>

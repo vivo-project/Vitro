@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.ConversionException;
+import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.OntResource;
@@ -78,6 +79,9 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 
     protected ObjectProperty propertyFromOntProperty(OntProperty op) {
         if (op==null) {
+            return null;
+        }
+        if( op instanceof DatatypeProperty){
             return null;
         }
         ObjectProperty p = new ObjectProperty();
@@ -275,7 +279,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            OntProperty op = getOntModel().getOntProperty(propertyURI);
+            OntProperty op = getOntModel().getObjectProperty(propertyURI);
             return propertyFromOntProperty(op);
         } finally {
             getOntModel().leaveCriticalSection();
@@ -781,12 +785,12 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     static {
         List<String> namespaceFilters = new ArrayList<String>();
         for (String namespace : EXCLUDED_NAMESPACES) {
-            namespaceFilters.add("( afn:namespace(?property) != \"" + namespace + "\" )");
+            namespaceFilters.add("( !regex(str(?property), \"^" + namespace + "\" ))");
         }
         // A hack to include the vitro:primaryLink and vitro:additionalLink properties in the list
         namespaceFilters.add("( ?property = vitro:primaryLink ||" +
                                "?property = vitro:additionalLink ||" +
-                               "afn:namespace(?property) != \"http://vitro.mannlib.cornell.edu/ns/vitro/0.7#\" )");
+                               "!regex(str(?property), \"^http://vitro.mannlib.cornell.edu/ns/vitro/0.7#\" ))");
         PROPERTY_FILTERS = StringUtils.join(namespaceFilters, " && ");
     }
     

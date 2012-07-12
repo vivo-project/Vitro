@@ -9,8 +9,6 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
-
 public class FreemarkerSetup implements ServletContextListener {
     
     private static final Log log = LogFactory.getLog(FreemarkerSetup.class);
@@ -18,7 +16,6 @@ public class FreemarkerSetup implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent event) {	
 		ServletContext sc = event.getServletContext();	
-        BaseTemplateModel.setServletContext(sc);
         FreemarkerComponentGenerator.setServletContext(sc);
 		UrlBuilder.contextPath = sc.getContextPath();
 		

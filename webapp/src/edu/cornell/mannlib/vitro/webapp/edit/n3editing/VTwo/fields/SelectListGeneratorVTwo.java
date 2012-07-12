@@ -1,0 +1,101 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields;
+
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
+
+public class SelectListGeneratorVTwo {
+    
+    static Log log = LogFactory.getLog(SelectListGeneratorVTwo.class);
+    
+    public static Map<String,String> getOptions(
+            EditConfigurationVTwo editConfig, 
+            String fieldName, 
+            WebappDaoFactory wDaoFact){
+
+        
+        if( editConfig == null ){
+            log.error( "fieldToSelectItemList() must be called with a non-null EditConfigurationVTwo ");
+            return Collections.emptyMap();
+        }
+        if( fieldName == null ){
+            log.error( "fieldToSelectItemList() must be called with a non-null fieldName");
+            return Collections.emptyMap();
+        }                            
+        
+        FieldVTwo field = editConfig.getField(fieldName);
+        if (field==null) {
+            log.error("no field \""+fieldName+"\" found from editConfig.");
+            return Collections.emptyMap();
+        }
+        
+        if( field.getFieldOptions() == null ){
+            return Collections.emptyMap();
+        }
+        
+        try {
+            return field.getFieldOptions().getOptions(editConfig,fieldName,wDaoFact);
+        } catch (Exception e) {
+            log.error("Error runing getFieldOptionis()",e);
+            return Collections.emptyMap();
+        }
+    }
+   
+      
+    //Methods to sort the options map 
+    // from http://forum.java.sun.com/thread.jspa?threadID=639077&messageID=4250708
+    public static Map<String,String> getSortedMap(Map<String,String> hmap){
+        // first make temporary list of String arrays holding both the key and its corresponding value, so that the list can be sorted with a decent comparator
+        List<String[]> objectsToSort = new ArrayList<String[]>(hmap.size());
+        for (String key:hmap.keySet()) {
+            String[] x = new String[2];
+            x[0] = key;
+            x[1] = hmap.get(key);
+            objectsToSort.add(x);
+        }
+        Collections.sort(objectsToSort, new MapPairsComparator());
+
+        HashMap<String,String> map = new LinkedHashMap<String,String>(objectsToSort.size());
+        for (String[] pair:objectsToSort) {
+            map.put(pair[0],pair[1]);
+        }
+        return map;
+    }
+
+    private static class MapPairsComparator implements Comparator<String[]> {
+        public int compare (String[] s1, String[] s2) {
+            Collator collator = Collator.getInstance();
+            if (s2 == null) {
+                return 1;
+            } else if (s1 == null) {
+                return -1;
+            } else {
+            	if ("".equals(s1[0])) {
+            		return -1;
+            	} else if ("".equals(s2[0])) {
+            		return 1;
+            	}
+                if (s2[1]==null) {
+                    return 1;
+                } else if (s1[1] == null){
+                    return -1;
+                } else {
+                    return collator.compare(s1[1],s2[1]);
+                }
+            }
+        }
+    }    
+}

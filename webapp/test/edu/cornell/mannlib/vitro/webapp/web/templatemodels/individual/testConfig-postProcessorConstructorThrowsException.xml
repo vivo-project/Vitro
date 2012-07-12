@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
+<!--
+	postprocessor tag refers to a class that does not implement the required interface.  
+-->
+
+<list-view-config>
+    <query-select>
+        SELECT <collated> ?subclass </collated>
+               ?object
+        WHERE {
+            ?subject ?property ?object
+            <collated>
+            ?object a ?subclass.
+            </collated>
+        }  
+    </query-select>
+
+    <query-construct>
+        CONSTRUCT {
+            ?subject ?property ?object .
+        } WHERE {
+            ?subject ?property ?object 
+        }
+    </query-construct>
+    
+    <template>propStatement-default.ftl</template>
+    
+    <postprocessor>edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyTemplateModel_PropertyListConfigTest$PostProcessorThrowsException</postprocessor>
+</list-view-config>

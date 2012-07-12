@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.accounts;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,9 +35,6 @@ public abstract class UserAccountsPage extends AbstractPageHandler {
 
 	private static final String PERSON_CLASS_URI = "http://xmlns.com/foaf/0.1/Person";
 
-	private static final String DEFAULT_IMAGE_URL = UrlBuilder
-			.getUrl("/images/placeholders/person.thumbnail.jpg");
-
 	/**
 	 * After the account is created, or the password is reset, the user has this
 	 * many days to repond to the email.
@@ -54,11 +50,16 @@ public abstract class UserAccountsPage extends AbstractPageHandler {
 	}
 
 	/**
-	 * Create a list of all known PermissionSets.
+	 * Create a list of all known non-public PermissionSets.
 	 */
-	protected List<PermissionSet> buildRolesList() {
+	protected List<PermissionSet> buildListOfSelectableRoles() {
 		List<PermissionSet> list = new ArrayList<PermissionSet>();
-		list.addAll(userAccountsDao.getAllPermissionSets());
+		for (PermissionSet ps: userAccountsDao.getAllPermissionSets()) {
+			if (!ps.isForPublic()) {
+				list.add(ps);
+			}
+		}
+
 		Collections.sort(list, new Comparator<PermissionSet>() {
 			@Override
 			public int compare(PermissionSet ps1, PermissionSet ps2) {
@@ -105,7 +106,6 @@ public abstract class UserAccountsPage extends AbstractPageHandler {
 				UrlBuilder.getUrl("/accounts/firstTimeExternal"));
 		map.put("accountsAjax", UrlBuilder.getUrl("/accountsAjax"));
 		map.put("proxyAjax", UrlBuilder.getUrl("/proxiesAjax"));
-		map.put("defaultImageUrl", DEFAULT_IMAGE_URL);
 
 		return map;
 	}

@@ -10,9 +10,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyStatementAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 
 /**
@@ -23,19 +23,20 @@ public class RestrictHomeMenuItemEditingPolicy implements PolicyIface {
 	@Override
 	public PolicyDecision isAuthorized(IdentifierBundle whoToAuth,
 			RequestedAction whatToAuth) {
-		if (whatToAuth instanceof EditObjPropStmt) {
-			return isAuthorized((EditObjPropStmt) whatToAuth);
-		} else if (whatToAuth instanceof DropObjectPropStmt) {
-			return isAuthorized((DropObjectPropStmt) whatToAuth);
+		if (whatToAuth instanceof EditObjectPropertyStatement) {
+			return isAuthorized((EditObjectPropertyStatement) whatToAuth);
+		} else if (whatToAuth instanceof DropObjectPropertyStatement) {
+			return isAuthorized((DropObjectPropertyStatement) whatToAuth);
 		} else {
 			return notHandled();
 		}
 	}
 
-	private PolicyDecision isAuthorized(AbstractObjectPropertyAction whatToAuth) {
-		if (whatToAuth.getUriOfPredicate()
+	private PolicyDecision isAuthorized(
+			AbstractObjectPropertyStatementAction whatToAuth) {
+		if (whatToAuth.getPredicateUri()
 				.equals(DisplayVocabulary.HAS_ELEMENT)
-				&& whatToAuth.getUriOfObject().equals(
+				&& whatToAuth.getObjectUri().equals(
 						DisplayVocabulary.HOME_MENU_ITEM)) {
 			return notAuthorized();
 		} else {

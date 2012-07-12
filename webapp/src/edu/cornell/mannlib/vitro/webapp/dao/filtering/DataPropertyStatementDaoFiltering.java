@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 
@@ -18,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 
 class DataPropertyStatementDaoFiltering extends BaseFiltering implements DataPropertyStatementDao{
+    
     final DataPropertyStatementDao innerDataPropertyStatementDao;    
     final VitroFilters filters;
 
@@ -141,4 +143,48 @@ class DataPropertyStatementDaoFiltering extends BaseFiltering implements DataPro
         
     }
     
+    @Override
+    public List<Literal> getDataPropertyValuesForIndividualByProperty(Individual subject, DataProperty property, String queryString, Set<String> constructQueryStrings) {
+        return getDataPropertyValuesForIndividualByProperty(subject.getURI(), property.getURI(), queryString, constructQueryStrings);
+    }
+
+    @Override
+    public List<Literal> getDataPropertyValuesForIndividualByProperty(String subjectUri, String propertyUri, String queryString, Set<String> constructQueryStrings) {        
+        List<Literal> literals = innerDataPropertyStatementDao.getDataPropertyValuesForIndividualByProperty(subjectUri, propertyUri,   queryString, constructQueryStrings);
+        /* Filter the data
+         * 
+         * Filtering is applied to a list of DataPropertyStatement. Create these statements, mapped
+         * to the literal that they are built from, apply filtering to the statements, then get
+         * the associated literals out of the original list. Use a LinkedHashMap to preserve the ordering.
+         */
+        Map<DataPropertyStatement, Literal> stmtsToLiterals = 
+            new LinkedHashMap<DataPropertyStatement, Literal>(literals.size());
+
+        for (Literal literal : literals) {
+            String value = literal.getLexicalForm();
+            DataPropertyStatement statement = new DataPropertyStatementImpl(subjectUri, propertyUri, value);
+            statement.setDatatypeURI(literal.getDatatypeURI());
+            statement.setLanguage(literal.getLanguage());
+            stmtsToLiterals.put(statement, literal);
+        }
+        
+        List<DataPropertyStatement> stmtList = new ArrayList<DataPropertyStatement>(stmtsToLiterals.keySet());
+        
+        // Apply the filters to the list of statements
+        List<DataPropertyStatement> filteredStatements = filter(stmtList, filters.getDataPropertyStatementFilter());
+        
+        // Get the literals associated with the filtered statements out of the original list
+        List<Literal> filteredLiterals = new ArrayList<Literal>(filteredStatements.size());
+        for (DataPropertyStatement dps : filteredStatements) {
+            if (dps instanceof DataPropertyStatementFiltering) {
+                dps = ((DataPropertyStatementFiltering)dps).innerStmt;
+            }
+            filteredLiterals.add(stmtsToLiterals.get(dps));
+        }       
+        
+        // Return the filtered list of literals
+        return filteredLiterals;
+        
+    }
+
 }

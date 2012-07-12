@@ -7,12 +7,13 @@ import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSour
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator.LoginNotPermitted;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
@@ -37,7 +38,7 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 		String action = vreq.getPathInfo();
 
 		if (ACTION_MY_ACCOUNT.equals(action)) {
-			return new Actions(new EditOwnAccount());
+			return SimplePermission.EDIT_OWN_ACCOUNT.ACTIONS;
 		} else {
 			return Actions.AUTHORIZED;
 		}
@@ -108,10 +109,15 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 		if (page.isBogus()) {
 			return showHomePage(vreq, page.getBogusMessage());
 		} else if (page.isSubmit() && page.isValid()) {
-			UserAccount userAccount = page.createAccount();
-			Authenticator auth = Authenticator.getInstance(vreq);
-			auth.recordLoginAgainstUserAccount(userAccount, EXTERNAL);
-			return showLoginRedirection(vreq, page.getAfterLoginUrl());
+			try {
+				UserAccount userAccount = page.createAccount();
+				Authenticator auth = Authenticator.getInstance(vreq);
+				auth.recordLoginAgainstUserAccount(userAccount, EXTERNAL);
+				return showLoginRedirection(vreq, page.getAfterLoginUrl());
+			} catch (LoginNotPermitted e) {
+				// This should have been anticipated by the page.
+				return showHomePage(vreq, BOGUS_STANDARD_MESSAGE);
+			}
 		} else {
 			return page.showPage();
 		}

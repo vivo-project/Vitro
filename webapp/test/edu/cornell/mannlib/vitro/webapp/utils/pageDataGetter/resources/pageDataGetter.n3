@@ -1,0 +1,30 @@
+# $This file is distributed under the terms of the license in /doc/license.txt$
+
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix core: <http://vivoweb.org/ontology/core#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+### This file is for the test PageDataGetterUtilsTest.java
+
+display:SPARQLPage
+    a display:Page ;            
+    display:title "TestQuery" ;
+    display:urlMapping "/query1" ;
+    display:hasDataGetter display:query1data .
+    
+display:query1data 
+    a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>;
+    display:query "SELECT * WHERE { ?uri a <http://xmlns.com/foaf/0.1/Person> } " ;
+    display:saveToVar "people" .      
+            
+display:pageX
+    a display:Page ;
+    display:title "A PageDataGetter, not a DataGetter" ;
+    display:urlMapping "/query2" ;
+    display:hasDataGetter display:pageDataGetterX .
+    
+display:pageDataGetterX
+  a <java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.ClassGroupPageData> .
+      

@@ -49,13 +49,15 @@ public class IndividualDaoSDB extends IndividualDaoJena {
 
 	private DatasetWrapperFactory dwf;
     private SDBDatasetMode datasetMode;
+    private WebappDaoFactorySDB wadf;
 	
     public IndividualDaoSDB(DatasetWrapperFactory dwf, 
                             SDBDatasetMode datasetMode, 
-                            WebappDaoFactoryJena wadf) {
+                            WebappDaoFactorySDB wadf) {
         super(wadf);
         this.dwf = dwf;
         this.datasetMode = datasetMode;
+        this.wadf = wadf;
     }
     
     protected DatasetWrapper getDatasetWrapper() {
@@ -67,7 +69,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
             return new IndividualSDB(individualURI, 
             	                     this.dwf,
             	                     datasetMode, 
-            	                     getWebappDaoFactory());
+            	                     wadf);
         } catch (IndividualNotFoundException e) {
             // If the individual does not exist, return null.
             return null;
@@ -187,9 +189,10 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     		        continue;
     		    }
     		    if (uri != null && !uri.equals(currRes.getURI())) {
-    		        Individual ent = makeIndividual(uri, label);
-    		        if (ent != null) {
-    		            ents.add(ent);
+    		        try {
+    		            ents.add(makeIndividual(uri, label));
+    		        } catch (IndividualNotFoundException e) {
+    		            // don't add
     		        }
     	            uri = currRes.getURI();
     	            label = null;
@@ -201,9 +204,10 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                     label = labelLit.getLexicalForm();
                 }
                 if (!rs.hasNext()) {
-                    Individual ent = makeIndividual(uri, label);
-                    if (ent != null) {
-                        ents.add(ent);
+                    try {
+                        ents.add(makeIndividual(uri, label));
+                    } catch (IndividualNotFoundException e) {
+                        // don't add   
                     }
                 }
     		}
@@ -237,8 +241,12 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     		    if (currRes.isAnon()) {
     		        continue;
     		    }
-    		    filteredIndividualList.add(
-    		    		makeIndividual(currRes.getURI(), null));
+    		    try {
+    		        filteredIndividualList.add(
+    		    	    	makeIndividual(currRes.getURI(), null));
+    		    } catch (IndividualNotFoundException e) {
+    		        // don't add
+    		    }
     		}
        	} finally {
     		dataset.getLock().leaveCriticalSection();
@@ -247,9 +255,9 @@ public class IndividualDaoSDB extends IndividualDaoJena {
        	return filteredIndividualList;
     }
     
-    private Individual makeIndividual(String uri, String label) {
+    private Individual makeIndividual(String uri, String label) throws IndividualNotFoundException {
         Individual ent = new IndividualSDB(uri, 
-                this.dwf, datasetMode, getWebappDaoFactory(), 
+                this.dwf, datasetMode, wadf, 
                 SKIP_INITIALIZATION);
         ent.setName(label);
         return ent;

@@ -16,8 +16,8 @@
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.Map.Entry" %>
 
-<%@ page import="edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages" %>
-<% request.setAttribute("requestedActions", new UseAdvancedDataToolsPages()); %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
+<% request.setAttribute("requestedActions", SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION); %>
 <vitro:confirmAuthorization />
 
 <script type="text/javascript" src="js/jquery.js"></script>

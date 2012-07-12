@@ -11,7 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
-import edu.cornell.mannlib.vitro.webapp.search.solr.IndividualToSolrDocument;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualToSolrDocument;
 
 class IndexWorkerThread extends Thread{
 	
@@ -83,8 +83,8 @@ class IndexWorkerThread extends Thread{
 				} 
 		    }catch(Throwable th){
 		        //on tomcat shutdown odd exceptions get thrown and log can be null
-		        if( log != null )
-		            log.debug("Exception during index building",th);		            
+		        if( log != null && ! stopRequested )
+		            log.error("Exception during index building",th);		            
 		    }
 		}
 	}

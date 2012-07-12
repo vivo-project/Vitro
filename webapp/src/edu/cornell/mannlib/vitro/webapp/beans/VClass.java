@@ -133,8 +133,14 @@ public class VClass extends BaseResourceBean implements Comparable<VClass>
      * Sorts alphabetically by name
      */
     public int compareTo (VClass o1) {
-        Collator collator = Collator.getInstance();
-        return collator.compare(this.getName(),o1.getName());
+        if (this.getName() == null) {
+            return 1;
+        } else if (o1.getName() == null) {
+            return -1;
+        } else {
+            Collator collator = Collator.getInstance();
+            return collator.compare(this.getName(),o1.getName());
+        }
     }
 
     /**

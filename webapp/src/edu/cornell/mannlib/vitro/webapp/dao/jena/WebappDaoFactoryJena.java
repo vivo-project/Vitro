@@ -30,7 +30,6 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
-import edu.cornell.mannlib.vitro.webapp.dao.Classes2ClassesDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
@@ -49,6 +48,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class WebappDaoFactoryJena implements WebappDaoFactory {
@@ -73,6 +73,8 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 	private Map<String,String> properties = new HashMap<String,String>();
 	
 	protected DatasetWrapperFactory dwf;
+	
+	protected RDFService rdfService;
 	
     /* **************** constructors **************** */
 
@@ -233,7 +235,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         return config.getDefaultNamespace();
     }
     
-    public String[] getPreferredLanguages() {
+    public List<String> getPreferredLanguages() {
     	return config.getPreferredLanguages();
     }
     
@@ -311,13 +313,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     	else
     		return userAccountsDao = new UserAccountsDaoJena(this);
     }
-    
-    Classes2ClassesDao classes2ClassesDao = null;
-    public Classes2ClassesDao getClasses2ClassesDao() {
-        if(classes2ClassesDao == null )
-            classes2ClassesDao = new Classes2ClassesDaoJena(this);
-        return classes2ClassesDao;
-    }
 
     DataPropertyStatementDao dataPropertyStatementDao = null;
     public DataPropertyStatementDao getDataPropertyStatementDao() {
@@ -351,8 +346,10 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     ObjectPropertyStatementDao objectPropertyStatementDao = null;
     public ObjectPropertyStatementDao getObjectPropertyStatementDao() {
         if( objectPropertyStatementDao == null )
+            // TODO supply a valid RDFService as the first argument if we keep this
+            // implementation
             objectPropertyStatementDao = new ObjectPropertyStatementDaoJena(
-                    dwf, this);
+                    null, dwf, this);
         return objectPropertyStatementDao;
     }
 

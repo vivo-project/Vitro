@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 import static edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginExternalAuthSetup.ATTRIBUTE_REFERRER;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -14,10 +15,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
+import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.user.UserAccountsFirstTimeExternalPage;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator.LoginNotPermitted;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
+import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.Message;
 
 /**
  * Handle the return from the external authorization login server. If we are
@@ -50,10 +54,22 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		if (log.isDebugEnabled()) {
+			@SuppressWarnings("unchecked")
+			Enumeration<String> names = req.getHeaderNames();
+
+			log.debug("------------request:" + req.getRequestURL());
+			while (names.hasMoreElements()) {
+				String name = names.nextElement();
+				log.debug(name + "=" + req.getHeader(name));
+			}
+		}
+
 		String externalAuthId = ExternalAuthHelper.getHelper(req)
 				.getExternalAuthId(req);
+		log.debug("externalAuthID='" + externalAuthId + "'");
+
 		if (externalAuthId == null) {
-			log.debug("No externalAuthId.");
 			complainAndReturnToReferrer(req, resp, ATTRIBUTE_REFERRER,
 					MESSAGE_LOGIN_FAILED);
 			return;
@@ -64,6 +80,14 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 
 		UserAccount userAccount = getAuthenticator(req)
 				.getAccountForExternalAuth(externalAuthId);
+
+		if (!getAuthenticator(req).isUserPermittedToLogin(userAccount)) {
+			log.debug("Logins disabled for " + userAccount);
+			complainAndReturnToReferrer(req, resp, ATTRIBUTE_REFERRER,
+					MESSAGE_LOGIN_DISABLED);
+			return;
+		}
+
 		if (userAccount == null) {
 			log.debug("Creating new account for " + externalAuthId
 					+ ", return to '" + afterLoginUrl + "'");
@@ -71,13 +95,30 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 					externalAuthId, afterLoginUrl);
 			resp.sendRedirect(UrlBuilder.getUrl("/accounts/firstTimeExternal"));
 			return;
-		} else {
+		}
+
+		try {
 			log.debug("Logging in as " + userAccount.getUri());
 			getAuthenticator(req).recordLoginAgainstUserAccount(userAccount,
 					AuthenticationSource.EXTERNAL);
 			new LoginRedirector(req, afterLoginUrl).redirectLoggedInUser(resp);
 			return;
+		} catch (LoginNotPermitted e) {
+			// should have been caught by isUserPermittedToLogin()
+			log.debug("Logins disabled for " + userAccount);
+			complainAndReturnToReferrer(req, resp, ATTRIBUTE_REFERRER,
+					MESSAGE_LOGIN_DISABLED);
+			return;
 		}
+	}
+
+	@Override
+	protected void complainAndReturnToReferrer(HttpServletRequest req,
+			HttpServletResponse resp, String sessionAttributeForReferrer,
+			Message message, Object... args) throws IOException {
+		DisplayMessage.setMessage(req, message.formatMessage(args));
+		super.complainAndReturnToReferrer(req, resp,
+				sessionAttributeForReferrer, message, args);
 	}
 
 	private void removeLoginProcessArtifacts(HttpServletRequest req) {

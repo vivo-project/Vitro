@@ -13,12 +13,11 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
-
 /**
  * Route notification of changes to TBox to the incremental ABox reasoner.
- * The incremental ABox reasoner handles only subclass, superclass
- * and equivalent class axioms.
- *  
+ * The incremental ABox reasoner handles only subClass and
+ * equivalentClass class axioms. Reasoning dones as a result of TBox
+ * changes is always done in a separate thread.
  */
 
 public class SimpleReasonerTBoxListener extends StatementListener {
@@ -50,19 +49,21 @@ public class SimpleReasonerTBoxListener extends StatementListener {
 	
 	@Override
 	public void addedStatement(Statement statement) {
+		
 		ModelUpdate mu = new ModelUpdate(statement, ModelUpdate.Operation.ADD, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);
 		processUpdate(mu);
 	}
 
 	@Override
 	public void removedStatement(Statement statement) {
+		
 		ModelUpdate mu = new ModelUpdate(statement, ModelUpdate.Operation.RETRACT, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);	
 		processUpdate(mu);
 	}
 	
 	private synchronized void processUpdate(ModelUpdate mu) {
 		if (!processingUpdates && (modelUpdates.peek() != null)) {
-			log.error("TBoxProcessor thread was not running and work queue is not empty. size = " + modelUpdates.size());
+			log.warn("TBoxProcessor thread was not running and work queue is not empty. size = " + modelUpdates.size() + " The work will be processed now.");
 		}
 		
 		modelUpdates.add(mu);

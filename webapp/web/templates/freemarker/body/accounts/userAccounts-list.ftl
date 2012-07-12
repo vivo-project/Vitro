@@ -50,7 +50,7 @@
         <select name="roleFilterUri" id="roleFilterUri">
             <option value="" <#if roleFilterUri = "">selected</#if> >Filter by roles</option>
             <#list roles as role>
-            <option value="${formUrls.list}?roleFilterUri=${role.uri}" <#if roleFilterUri = role.uri>selected</#if> >${role.label}</option>
+            <option value="${formUrls.list}?roleFilterUri=${role.uri?url}" <#if roleFilterUri = role.uri>selected</#if> >${role.label}</option>
             </#list>
             <!--
             When roleFilterUri or searchTerm changes,
@@ -148,7 +148,7 @@
                 <tr>
                     <td>
                         <#if account.deletable>
-                            <input type="checkbox" name="deleteAccount" value="${account.uri}" />
+                            <input type="checkbox" name="deleteAccount" value="${account.uri}" title="select this account to delete it"/>
                             <#assign disableDeleteAccount = '' />
                             <!-- ignored unless submit action is formUrls.delete -->
                         <#else>
@@ -156,7 +156,7 @@
                         </#if>
     
                         <#if account.editUrl != "">
-                            <a ${disableDeleteAccount} href="${account.editUrl}"  title="disable account">${account.emailAddress}</a>
+                            <a ${disableDeleteAccount} href="${account.editUrl}"  title="click to view account details">${account.emailAddress}</a>
                             <!-- when this link is clicked, editAccount is noticed and all other fields are ignored. -->
                         <#else>
                             ${account.emailAddress}

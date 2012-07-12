@@ -25,8 +25,6 @@ public class VitroSearchTermNames {
     public static String ALLTEXTUNSTEMMED = "ALLTEXTUNSTEMMED";
     /** Does the individual have a thumbnail image? 1=yes 0=no */
     public static final String THUMBNAIL = "THUMBNAIL";        
-    /** Should individual be included in full text search results? 1=yes 0=no */
-    public static final String PROHIBITED_FROM_TEXT_RESULTS = "PROHIBITED_FROM_TEXT_RESULTS";
     /** class names in human readable form of an individual*/
     public static final String CLASSLOCALNAMELOWERCASE = "classLocalNameLowerCase";
     /** class names in human readable form of an individual*/

@@ -6,7 +6,7 @@
      is also used to generate the property statement during a deletion.  
  -->
 
-${statement.linkText}
+${statement.linkText} 
 
 <script type="text/javascript">
     menuItemData.push({

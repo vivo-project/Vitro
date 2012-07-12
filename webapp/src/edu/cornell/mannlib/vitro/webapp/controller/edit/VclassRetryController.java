@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,8 +25,7 @@ import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vedit.validator.impl.XMLNameValidator;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOntology;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -43,7 +41,7 @@ public class VclassRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(VclassRetryController.class.getName());
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(req, response, new Actions(new EditOntology()))) {
+        if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
         	return;
         }
 
@@ -51,7 +49,6 @@ public class VclassRetryController extends BaseEditController {
     	
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
-        epo.setDataAccessObject(request.getFullWebappDaoFactory().getVClassDao());
 
         /*for testing*/
         VClass testMask = new VClass();
@@ -67,7 +64,7 @@ public class VclassRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        VClassDao vcwDao = request.getFullWebappDaoFactory().getVClassDao();
+        VClassDao vcwDao = request.getAssertionsWebappDaoFactory().getVClassDao();
         epo.setDataAccessObject(vcwDao);
         VClassGroupDao cgDao = request.getFullWebappDaoFactory().getVClassGroupDao();
         OntologyDao oDao = request.getFullWebappDaoFactory().getOntologyDao();
@@ -199,7 +196,7 @@ public class VclassRetryController extends BaseEditController {
             Classes2Classes c2c = new Classes2Classes();
             c2c.setSubclassURI(((VClass)newObj).getURI());
             c2c.setSuperclassURI(superclassURI);
-            daoFactory.getClasses2ClassesDao().insertNewClasses2Classes(c2c);            
+            daoFactory.getVClassDao().insertNewClasses2Classes(c2c);            
         }
         public void doUpdated(Object oldObj, Object newObj, EditProcessObject epo) {
             // nothing to do

@@ -6,11 +6,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.ServletContext;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual;
@@ -19,9 +21,10 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -42,14 +45,23 @@ public class ShowAuthController extends FreemarkerHttpServlet {
 
 		Map<String, Object> body = new HashMap<String, Object>();
 
-		body.put("identifiers", RequestIdentifiers.getIdBundleForRequest(vreq));
+		body.put("identifiers", getSortedIdentifiers(vreq));
 		body.put("currentUser", LoginStatusBean.getCurrentUser(vreq));
 		body.put("associatedIndividuals", getAssociatedIndividuals(vreq));
 		body.put("factories", getIdentifierFactoryNames(vreq));
 		body.put("policies", ServletPolicyList.getPolicies(vreq));
 		body.put("matchingProperty", getMatchingProperty(vreq));
+		body.put("authenticator", Authenticator.getInstance(vreq));
 
 		return new TemplateResponseValues("admin-showAuth.ftl", body);
+	}
+
+	private List<Identifier> getSortedIdentifiers(VitroRequest vreq) {
+		Map<String, Identifier> idMap = new TreeMap<String, Identifier>();
+		for (Identifier id : RequestIdentifiers.getIdBundleForRequest(vreq)) {
+			idMap.put(id.toString(), id);
+		}
+		return new ArrayList<Identifier>(idMap.values());
 	}
 
 	private List<String> getIdentifierFactoryNames(VitroRequest vreq) {
@@ -77,7 +89,8 @@ public class ShowAuthController extends FreemarkerHttpServlet {
 	 * this individual?
 	 */
 	private boolean mayEditIndividual(VitroRequest vreq, String individualUri) {
-		RequestedAction action = new EditObjPropStmt(individualUri,
+		RequestedAction action = new EditObjectPropertyStatement(
+				vreq.getJenaOntModel(), individualUri,
 				RequestActionConstants.SOME_URI,
 				RequestActionConstants.SOME_URI);
 		return PolicyHelper.isAuthorizedForActions(vreq, action);

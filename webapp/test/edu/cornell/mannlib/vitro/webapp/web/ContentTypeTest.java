@@ -8,7 +8,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualController;
+import edu.cornell.mannlib.vitro.webapp.controller.individual.IndividualController;
 
 
 public class ContentTypeTest {
@@ -41,7 +41,7 @@ public class ContentTypeTest {
         Map<String,Float> clientAccepts = ContentType.getTypesAndQ(
         "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8,application/rdf+xml;q=0.93,text/rdf+n3;q=0.5");
         
-        Map<String,Float> serverTypes = IndividualController.getAcceptedContentTypes();
+        Map<String,Float> serverTypes = IndividualController.ACCEPTED_CONTENT_TYPES;
         
         Assert.assertEquals("application/rdf+xml", ContentType.getBestContentType(clientAccepts, serverTypes)); 
     }
@@ -52,7 +52,7 @@ public class ContentTypeTest {
         Map<String,Float> clientAccepts = ContentType.getTypesAndQ(
         "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
         
-        Map<String,Float> serverTypes = IndividualController.getAcceptedContentTypes();
+        Map<String,Float> serverTypes = IndividualController.ACCEPTED_CONTENT_TYPES;
         
         Assert.assertEquals("application/xhtml+xml", ContentType.getBestContentType(clientAccepts, serverTypes)); 
     }

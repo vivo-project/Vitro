@@ -115,7 +115,7 @@ public class UserAccountsListPage extends UserAccountsPage {
 		body.put("page", buildPageMap(selection));
 
 		body.put("formUrls", buildUrlsMap());
-		body.put("roles", buildRolesList());
+		body.put("roles", buildListOfSelectableRoles());
 
 		body.put("messages", buildMessagesMap());
 

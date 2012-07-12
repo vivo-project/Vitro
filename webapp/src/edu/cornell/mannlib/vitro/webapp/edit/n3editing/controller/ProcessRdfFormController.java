@@ -18,8 +18,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoFrontEndEditing;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -49,10 +49,12 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHas
 public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	
     private Log log = LogFactory.getLog(ProcessRdfFormController.class);
+
+
     	
     @Override
 	protected Actions requiredActions(VitroRequest vreq) {
-    	return new Actions(new DoFrontEndEditing());
+    	return SimplePermission.DO_FRONT_END_EDITING.ACTIONS;
 	}
 
 	@Override 
@@ -72,8 +74,8 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		    return errorResponse;
 
         // get the models to work with in case the write model and query model are not the defaults 
-		OntModel queryModel = configuration.getQueryModelSelector().getModel(vreq, getServletContext());		
-	    OntModel writeModel = configuration.getWriteModelSelector().getModel(vreq,getServletContext());  
+		Model queryModel = configuration.getQueryModelSelector().getModel(vreq, getServletContext());		
+	    Model writeModel = configuration.getWriteModelSelector().getModel(vreq,getServletContext());  
 	    
 	    //If data property check for back button confusion
 	    boolean isBackButton = checkForBackButtonConfusion(configuration, vreq, queryModel);

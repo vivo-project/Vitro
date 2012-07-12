@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Calendar;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,10 +20,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.EditOwnAccount;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseMiscellaneousAdminPages;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
@@ -43,7 +41,6 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
 import freemarker.ext.beans.BeansWrapper;
-import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
@@ -101,9 +98,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             if (!isAuthorizedToDisplayPage(request, response, requiredActions(vreq))) {
                 return;
             }
-            
-            FreemarkerConfiguration config = getConfig(vreq);
-            vreq.setAttribute("freemarkerConfig", config);            
             
 			responseValues = processRequest(vreq);			
 	        doResponse(vreq, response, responseValues);	 
@@ -167,7 +161,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
             boolean sentEmail = false;
             
             // If the user is authorized, display the error data on the page
-            if (PolicyHelper.isAuthorizedForActions(vreq, new UseMiscellaneousAdminPages())) {                              
+            if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTIONS)) {                              
                 templateMap.put("adminErrorData", adminErrorData);   
                 
             // Else send the data to the site administrator
@@ -198,10 +192,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         doGet(request, response);
     }
    
-    protected FreemarkerConfiguration getConfig(VitroRequest vreq) {               
-        return FreemarkerConfigurationLoader.getConfig(vreq, getServletContext());
-    }
-
     /**
      * By default, a page requires authorization for no actions.
      * Subclasses that require authorization to process their page will override 
@@ -217,7 +207,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     }
     
     // Subclasses will override
-    protected ResponseValues processRequest(VitroRequest vreq) {
+    protected ResponseValues processRequest(VitroRequest vreq) throws Exception {
         return null;
     }
        
@@ -251,8 +241,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     protected void doTemplate(VitroRequest vreq, HttpServletResponse response, 
             ResponseValues values) throws TemplateProcessingException {
      
-        Configuration config = getConfig(vreq);
-        
         Map<String, Object> templateDataModel = new HashMap<String, Object>();        
         templateDataModel.putAll(getPageTemplateValues(vreq));
 
@@ -267,7 +255,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         if (bodyTemplate != null) {
             // Tell the template and any directives it uses that we're processing a body template.
             templateDataModel.put("templateType", BODY_TEMPLATE_TYPE);
-            bodyString = processTemplateToString(bodyTemplate, templateDataModel, config, vreq); 
+            bodyString = processTemplateToString(bodyTemplate, templateDataModel, vreq); 
         } else {
             // The subcontroller has not defined a body template. All markup for the page 
             // is specified in the main page template.
@@ -278,7 +266,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // Tell the template and any directives it uses that we're processing a page template.
         templateDataModel.put("templateType", PAGE_TEMPLATE_TYPE);  
         
-        writePage(templateDataModel, config, vreq, response, values.getStatusCode(), values);       
+        writePage(templateDataModel, vreq, response, values.getStatusCode(), values);       
     }
     
     protected void doRedirect(HttpServletRequest request, HttpServletResponse response, ResponseValues values) 
@@ -340,42 +328,38 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return appBean.getThemeDir().replaceAll("/$", "");
     }
 
-    /** 
-     * Define the request-specific URLs that are accessible to the templates. 
-     * @param VitroRequest vreq
-     */
-    private void setRequestUrls(VitroRequest vreq) {
-        
-        FreemarkerConfiguration config = (FreemarkerConfiguration)vreq.getAttribute("freemarkerConfig");
+	/**
+	 * Define the request-specific URLs that are accessible to the templates.
+	 * Merge it with the context-specific URLs from the configuration, because
+	 * this map will mask that one.
+	 */
+    private Map<String, Object> buildRequestUrls(VitroRequest vreq) {
+        Map<String, Object> requestUrls = new HashMap<String, Object>();
+    	
+        FreemarkerConfiguration config = FreemarkerConfigurationLoader.getConfig(vreq);
         TemplateModel urlModel = config.getSharedVariable("urls");
         
         try {
             @SuppressWarnings("unchecked")
-            Map<String, Object> urls = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(urlModel);
+			Map<String, Object> configUrls = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(urlModel);
+			requestUrls.putAll(configUrls);
             
             // This is request-specific because email can be configured
             // and de-configured in the application interface. 
             if (FreemarkerEmailFactory.isConfigured(vreq)) {
-                urls.put("contact", UrlBuilder.getUrl(Route.CONTACT));
-            } else {
-                urls.remove("contact"); // clear value from a previous request
+                requestUrls.put("contact", UrlBuilder.getUrl(Route.CONTACT));
             }      
             
-            urls.put("currentPage", getCurrentPageUrl(vreq));
-            urls.put("referringPage", getReferringPageUrl(vreq));
+            requestUrls.put("currentPage", getCurrentPageUrl(vreq));
+            requestUrls.put("referringPage", getReferringPageUrl(vreq));
             
-            if (PolicyHelper.isAuthorizedForActions(vreq, new EditOwnAccount())) {
-                urls.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));
-            } else {
-                urls.remove("myAccount"); // clear value from a previous request
+            if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.EDIT_OWN_ACCOUNT.ACTIONS)) {
+            	requestUrls.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));
             }
-            
-            config.setSharedVariable("urls", urls);
-
         } catch (TemplateModelException e) {
             log.error(e, e);
         }
-
+        return requestUrls;
     }
     
     private String getCurrentPageUrl(HttpServletRequest request) {
@@ -426,7 +410,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // This may be overridden by the body data model received from the subcontroller.
         map.put("title", getTitle(vreq.getAppBean().getApplicationName(), vreq));
         
-        setRequestUrls(vreq);
+        map.put("urls", buildRequestUrls(vreq));
 
         map.put("menu", getDisplayModelMenu(vreq));
         
@@ -445,6 +429,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
         map.put("widget", new edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective());
+        map.putAll( FreemarkerConfiguration.getDirectives() );
         
         // Add these accumulator objects. They will collect tags so the template can write them 
         // at the appropriate location.
@@ -490,29 +475,19 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         return siteName;
     }
 
-    protected StringWriter processTemplate(String templateName, Map<String, Object> map, Configuration config, 
+    protected StringWriter processTemplate(String templateName, Map<String, Object> map, 
             HttpServletRequest request) throws TemplateProcessingException {    
-        TemplateProcessingHelper helper = new TemplateProcessingHelper(config, request, getServletContext());
+        TemplateProcessingHelper helper = new TemplateProcessingHelper(request, getServletContext());
         return helper.processTemplate(templateName, map);
     }
     
-    protected StringWriter processTemplate(ResponseValues values, Configuration config, 
-            HttpServletRequest request) throws TemplateProcessingException {
-        return processTemplate(values.getTemplateName(), values.getMap(), config, request);
-    }
-    
     // In fact, we can put StringWriter objects directly into the data model, so perhaps we should eliminate the processTemplateToString() methods.
-    protected String processTemplateToString(String templateName, Map<String, Object> map, Configuration config, 
+    protected String processTemplateToString(String templateName, Map<String, Object> map, 
             HttpServletRequest request) throws TemplateProcessingException {
-        return processTemplate(templateName, map, config, request).toString();
+        return processTemplate(templateName, map, request).toString();
     }
   
-    protected String processTemplateToString(ResponseValues values, Configuration config, 
-            HttpServletRequest request) throws TemplateProcessingException {
-        return processTemplate(values, config, request).toString();
-    }
-    
-    protected void writePage(Map<String, Object> root, Configuration config, HttpServletRequest request,
+    protected void writePage(Map<String, Object> root, HttpServletRequest request,
             HttpServletResponse response, int statusCode, ResponseValues rv) throws TemplateProcessingException {
         
         // For an error page, use the standard page template rather than a special one, in case that is the source
@@ -520,17 +495,17 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // less likely.
         String pageTemplateName = 
             rv instanceof ExceptionResponseValues ? Template.PAGE_DEFAULT.toString() : getPageTemplateName();
-        writeTemplate(pageTemplateName, root, config, request, response, statusCode);                   
+        writeTemplate(pageTemplateName, root, request, response, statusCode);                   
     }
     
-    protected void writeTemplate(String templateName, Map<String, Object> map, Configuration config, 
+    protected void writeTemplate(String templateName, Map<String, Object> map, 
             HttpServletRequest request, HttpServletResponse response) throws TemplateProcessingException { 
-        writeTemplate(templateName, map, config, request, response, 0);
+        writeTemplate(templateName, map, request, response, 0);
     }
 
-    protected void writeTemplate(String templateName, Map<String, Object> map, Configuration config, 
+    protected void writeTemplate(String templateName, Map<String, Object> map,
             HttpServletRequest request, HttpServletResponse response, int statusCode) throws TemplateProcessingException {       
-        StringWriter sw = processTemplate(templateName, map, config, request);     
+        StringWriter sw = processTemplate(templateName, map, request);     
         write(sw, response, statusCode);
     }
     

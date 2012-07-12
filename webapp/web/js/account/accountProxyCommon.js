@@ -44,7 +44,7 @@ function itemElement(template, uri, label, classLabel, imageUrl, removeInfo) {
 	this.uri = uri;
 	this.label = label;
 	this.classLabel = classLabel;
-	this.imageUrl = (imageUrl) ? imageUrl : imageUrl="../images/placeholders/person.thumbnail.jpg";
+	this.imageUrl = imageUrl;
 	this.removeInfo = removeInfo;
 	
 	this.toString = function() {

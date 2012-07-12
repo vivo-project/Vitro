@@ -2,7 +2,15 @@
 
 package edu.cornell.mannlib.vitro.webapp.email;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.ConnectException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Properties;
+import java.util.Scanner;
 
 import javax.mail.Session;
 import javax.mail.internet.AddressException;
@@ -17,6 +25,8 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfiguration;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -49,13 +59,10 @@ public class FreemarkerEmailFactory {
 		}
 
 		FreemarkerEmailFactory factory = getFactory(vreq);
-		return new FreemarkerEmailMessage(vreq, factory.getEmailSession(),
+		FreemarkerConfiguration fConfig = FreemarkerConfigurationLoader
+				.getConfig(vreq);
+		return new FreemarkerEmailMessage(fConfig, factory.getEmailSession(),
 				factory.getReplyToAddress());
-	}
-
-	public static boolean isConfigured(HttpServletRequest req) {
-		FreemarkerEmailFactory factory = getFactory(req);
-		return (factory != null) && (factory.isConfigured());
 	}
 
 	/**
@@ -67,6 +74,10 @@ public class FreemarkerEmailFactory {
 			throw new IllegalStateException("Email factory is not configured.");
 		}
 		return getFactory(req).getEmailSession();
+	}
+
+	public static boolean isConfigured(HttpServletRequest req) {
+		return (getFactory(req) != null);
 	}
 
 	private static FreemarkerEmailFactory getFactory(HttpServletRequest req) {
@@ -84,12 +95,14 @@ public class FreemarkerEmailFactory {
 
 	public FreemarkerEmailFactory(ServletContext ctx) {
 		this.smtpHost = getSmtpHostFromConfig(ctx);
+		new SmtpHostTester().test(this.smtpHost);
+
 		this.replyToAddress = getReplyToAddressFromConfig(ctx);
-		this.emailSession = createEmailSession(this.smtpHost);
+		this.emailSession = createEmailSession(smtpHost);
 	}
 
-	boolean isConfigured() {
-		return (!smtpHost.isEmpty()) && (replyToAddress != null);
+	String getSmtpHost() {
+		return smtpHost;
 	}
 
 	InternetAddress getReplyToAddress() {
@@ -104,8 +117,7 @@ public class FreemarkerEmailFactory {
 		ConfigurationProperties config = ConfigurationProperties.getBean(ctx);
 		String hostName = config.getProperty(SMTP_HOST_PROPERTY, "");
 		if (hostName.isEmpty()) {
-			log.info("Configuration property for '" + SMTP_HOST_PROPERTY
-					+ "' is empty: email is disabled.");
+			throw new NotConfiguredException(SMTP_HOST_PROPERTY);
 		}
 		return hostName;
 	}
@@ -114,22 +126,18 @@ public class FreemarkerEmailFactory {
 		ConfigurationProperties config = ConfigurationProperties.getBean(ctx);
 		String rawAddress = config.getProperty(REPLY_TO_PROPERTY, "");
 		if (rawAddress.isEmpty()) {
-			log.info("Configuration property for '" + REPLY_TO_PROPERTY
-					+ "' is empty: email is disabled.");
-			return null;
+			throw new NotConfiguredException(REPLY_TO_PROPERTY);
 		}
 
 		try {
 			InternetAddress[] addresses = InternetAddress.parse(rawAddress,
 					false);
 			if (addresses.length == 0) {
-				throw new IllegalStateException(
-						"No Reply-To address configured in '"
-								+ REPLY_TO_PROPERTY + "'");
+				throw new BadPropertyValueException("No Reply-To address",
+						REPLY_TO_PROPERTY);
 			} else if (addresses.length > 1) {
-				throw new IllegalStateException(
-						"More than one Reply-To address configured in '"
-								+ REPLY_TO_PROPERTY + "'");
+				throw new BadPropertyValueException(
+						"More than one Reply-To address", REPLY_TO_PROPERTY);
 			} else {
 				return addresses[0];
 			}
@@ -147,9 +155,93 @@ public class FreemarkerEmailFactory {
 	}
 
 	// ----------------------------------------------------------------------
-	// Setup class
+	// Helper classes
 	// ----------------------------------------------------------------------
 
+	public static class NotConfiguredException extends RuntimeException {
+		public NotConfiguredException(String property) {
+			super("Configuration property for '" + property
+					+ "' is empty - Email functions are disabled.");
+		}
+	}
+
+	public static class BadPropertyValueException extends RuntimeException {
+		public BadPropertyValueException(String problem, String property) {
+			super(problem + " configured in '" + property
+					+ "' - Email functions are disabled.");
+		}
+	}
+
+	public static class InvalidSmtpHost extends RuntimeException {
+		public InvalidSmtpHost(String smtpHost, String reason) {
+			super("Invalid SMTP host: '" + smtpHost + "': " + reason
+					+ " - Email functions are disabled.");
+		}
+	}
+
+	/**
+	 * Checks to see whether the SMTP host will talk to us.
+	 */
+	public static class SmtpHostTester {
+		private static final int SMTP_PORT = 25;
+		private static final int SMTP_SUCCESS_CODE = 220;
+
+		/**
+		 * Try to open a connection to the SMTP host and conduct an "empty"
+		 * conversation using SMTP.
+		 * 
+		 * @throws InvalidSmtpHost
+		 *             If anything goes wrong.
+		 */
+		public void test(String smtpHost) throws InvalidSmtpHost {
+			Socket socket = null;
+			PrintStream out = null;
+			Scanner in = null;
+			try {
+				InetAddress hostAddr = InetAddress.getByName(smtpHost);
+				socket = new Socket(hostAddr, SMTP_PORT);
+
+				out = new PrintStream(socket.getOutputStream());
+				in = new Scanner(new InputStreamReader(socket.getInputStream()));
+
+				int smtpCode = in.nextInt();
+				if (smtpCode != SMTP_SUCCESS_CODE) {
+					throw new InvalidSmtpHost(smtpHost,
+							"host will not converse: "
+									+ "SMTP initialization code is " + smtpCode);
+				}
+
+				out.println("QUIT");
+			} catch (UnknownHostException e) {
+				throw new InvalidSmtpHost(smtpHost,
+						"host name is not recognized");
+			} catch (ConnectException e) {
+				throw new InvalidSmtpHost(smtpHost,
+						"refused connection on port " + SMTP_PORT);
+			} catch (IOException e) {
+				throw new RuntimeException("unrecognized problem: ", e);
+			} finally {
+				if (in != null) {
+					in.close();
+				}
+				if (out != null) {
+					out.close();
+				}
+				if ((socket != null) && (!socket.isClosed())) {
+					try {
+						socket.close();
+					} catch (IOException e) {
+						log.error("failed to close socket", e);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Tries to create a FreemarkerEmailFactory bean and store it in the servlet
+	 * context.
+	 */
 	public static class Setup implements ServletContextListener {
 		@Override
 		public void contextInitialized(ServletContextEvent sce) {
@@ -159,14 +251,16 @@ public class FreemarkerEmailFactory {
 			try {
 				FreemarkerEmailFactory factory = new FreemarkerEmailFactory(ctx);
 				ctx.setAttribute(ATTRIBUTE_NAME, factory);
-
-				if (factory.isConfigured()) {
-					ss.info(this, "The system is configured to "
-							+ "send mail to users.");
-				} else {
-					ss.info(this, "Configuration parameters are missing: "
-							+ "the system will not send mail to users.");
-				}
+				ss.info(this,
+						"The system will send email from '"
+								+ factory.getReplyToAddress() + "' through '"
+								+ factory.getSmtpHost() + "'.");
+			} catch (NotConfiguredException e) {
+				ss.info(this, e.getMessage());
+			} catch (BadPropertyValueException e) {
+				ss.warning(this, e.getMessage());
+			} catch (InvalidSmtpHost e) {
+				ss.warning(this, e.getMessage());
 			} catch (Exception e) {
 				ss.warning(this,
 						"Failed to initialize FreemarkerEmailFactory. "

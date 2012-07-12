@@ -39,7 +39,7 @@
     <option value="RDF/XML">RDF/XML</option>
     <option value="RDF/XML-ABBREV">RDF/XML abbrev.</option>
     <option value="N3">N3</option>
-    <option value="N-TRIPLES">N-Triples</option>
+    <option value="N-TRIPLE">N-Triples</option>
     <option value="TURTLE">Turtle</option>
 </select>
 

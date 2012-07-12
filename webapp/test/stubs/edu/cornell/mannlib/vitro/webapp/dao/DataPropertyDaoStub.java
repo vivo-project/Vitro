@@ -26,6 +26,7 @@ public class DataPropertyDaoStub implements DataPropertyDao {
 	// ----------------------------------------------------------------------
 	
 	private final Map<String, DataProperty> dpMap = new HashMap<String, DataProperty>();
+	private final Map<String, String> configFilesMap = new HashMap<String, String>();
 	
 	public void addDataProperty(DataProperty dataProperty) {
 		if (dataProperty == null) {
@@ -40,6 +41,18 @@ public class DataPropertyDaoStub implements DataPropertyDao {
 		dpMap.put(uri, dataProperty);
 	}
 
+	public void setCustomListViewConfigFileName(DataProperty property, String filename) {
+		if (property == null) {
+			throw new NullPointerException("property may not be null.");
+		}
+		
+		String uri = property.getURI();
+		if (uri == null) {
+			throw new NullPointerException("uri may not be null.");
+		}
+		
+		configFilesMap.put(uri, filename);
+	}
 	// ----------------------------------------------------------------------
 	// Stub methods
 	// ----------------------------------------------------------------------
@@ -49,6 +62,17 @@ public class DataPropertyDaoStub implements DataPropertyDao {
 		return dpMap.get(dataPropertyURI);
 	}
 
+	@Override
+	public String getCustomListViewConfigFileName(DataProperty dataProperty) {
+		if (dataProperty == null) {
+			return null;
+		}
+		String uri = dataProperty.getURI();
+		if (uri == null) {
+			return null;
+		}
+		return configFilesMap.get(uri);
+	}
 	// ----------------------------------------------------------------------
 	// Un-implemented methods
 	// ----------------------------------------------------------------------

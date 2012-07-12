@@ -24,6 +24,11 @@ public class BaseLoginServlet extends HttpServlet {
 	protected static final Message MESSAGE_LOGIN_FAILED = new LoginProcessBean.Message(
 			"External login failed.", LoginProcessBean.MLevel.ERROR);
 
+	/** Tell the user that it's nothing personal, they just aren't allowed in. */
+	protected static final Message MESSAGE_LOGIN_DISABLED = new LoginProcessBean.Message(
+			"User logins are temporarily disabled while the system is being maintained.",
+			LoginProcessBean.MLevel.ERROR);
+
 	protected Authenticator getAuthenticator(HttpServletRequest req) {
 		return Authenticator.getInstance(req);
 	}

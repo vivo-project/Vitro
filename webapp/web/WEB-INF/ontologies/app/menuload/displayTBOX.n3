@@ -49,7 +49,9 @@ owl:ObjectProperty
       
 <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#DataGetter>
       a       owl:Class .  
-      
+
+<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>
+    a owl:Class .      
       
       
 ########Data Properties#########
@@ -62,6 +64,7 @@ rdfs:comment
 rdfs:label
       a       owl:DatatypeProperty .
 
+      
 owl:versionInfo
       a       owl:DatatypeProperty .
       
@@ -101,7 +104,21 @@ owl:versionInfo
       
   <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#usesDataGetterClass>
       a       owl:DatatypeProperty .      
-      
+
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#query>
+    a owl:DatatypeProperty .
+    
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#saveToVar>
+    a owl:DatatypeProperty.
+    
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#queryModel>
+    a owl:DatatypeProperty. 
+    
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#htmlValue>
+    a owl:DatatypeProperty.  
+    
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#cannotDeletePage>
+    a owl:DatatypeProperty.                   
       
 ######### Object Properties#########
 ###Basic
@@ -135,6 +152,18 @@ owl:topObjectProperty
       <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#stubObjectPropertyAnnot>
               "true"^^xsd:boolean .      
 
+rdf:type 
+      a owl:ObjectProperty ;
+      rdfs:label "RDF Type"@en-US ;
+      rdfs:range owl:Class ;                   
+      <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#customEntryFormAnnot>
+         "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RdfTypeGenerator"^^xsd:string ;                             
+      <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#offerCreateNewOptionAnnot>
+              "true"^^xsd:boolean ;
+      <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#selectFromExistingAnnot>
+              "true"^^xsd:boolean .       
+
+
 <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#additionalLink>
       a       owl:ObjectProperty ;
       rdfs:label "Additional Link"@en-US ;
@@ -152,6 +181,8 @@ owl:topObjectProperty
               "true"^^xsd:boolean .
               
 ###Display model    
+
+###Adding menu management customform annotation
 <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasElement>
       a       owl:ObjectProperty .
       
@@ -173,4 +204,3 @@ owl:topObjectProperty
 <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#restrictResultsByClass>
       a       owl:ObjectProperty .    
       
-        

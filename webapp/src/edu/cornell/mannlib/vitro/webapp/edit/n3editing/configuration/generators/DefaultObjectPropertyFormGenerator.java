@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,64 +12,141 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocumentList;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 
-import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.IndividualsViaObjectPropetyOptions;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
+import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
+import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
+import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils.EditMode;
 
 /**
  * Generates the edit configuration for a default property form.
- *
+ * This handles the default object property auto complete.
+ * 
+ * If a default property form is request and the number of indivdiuals
+ * found in the range is too large, the the auto complete setup and
+ * template will be used instead.
  */
 public class DefaultObjectPropertyFormGenerator implements EditConfigurationGenerator {
 
-    //TODO: bdc34 why does the DefaultObjectPropertyForm have all this data property stuff?
-	private Log log = LogFactory.getLog(DefaultObjectPropertyFormGenerator.class);
-	private boolean isObjectPropForm = false;
+	private Log log = LogFactory.getLog(DefaultObjectPropertyFormGenerator.class);	
 	private String subjectUri = null;
 	private String predicateUri = null;
-	private String objectUri = null;
-	private String datapropKeyStr= null;
-	private int dataHash = 0;
-	
-	private String dataLiteral = null;
+	private String objectUri = null;	
+		
 	private String objectPropertyTemplate = "defaultPropertyForm.ftl";
-	private String dataPropertyTemplate = "defaultDataPropertyForm.ftl";
+	private String acObjectPropertyTemplate = "autoCompleteObjectPropForm.ftl";		
+	
+	protected boolean doAutoComplete = false;
+	protected boolean tooManyRangeIndividuals = false;
+	
+	protected long maxNonACRangeIndividualCount = 300;
+	
 	private static HashMap<String,String> defaultsForXSDtypes ;
 	  static {
 		defaultsForXSDtypes = new HashMap<String,String>();
 		//defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","2001-01-01T12:00:00");
 		defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","#Unparseable datetime defaults to now");
 	  }
+	  
+	  
     @Override
     public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq,
-            HttpSession session) {
+            HttpSession session) throws Exception {
+    	if(!EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)) {    	    	
+    	    throw new Exception("DefaultObjectPropertyFormGenerator does not handle data properties.");
+    	}
     	
+     	if( tooManyRangeOptions( vreq, session ) ){
+    		tooManyRangeIndividuals = true;
+    		doAutoComplete = true;
+    	}
+     	
     	//Check if create new and return specific edit configuration from that generator.
     	if(DefaultAddMissingIndividualFormGenerator.isCreateNewIndividual(vreq, session)) {
     		DefaultAddMissingIndividualFormGenerator generator = new DefaultAddMissingIndividualFormGenerator();
     		return generator.getEditConfiguration(vreq, session);
     	}
+    	    	    	
     	//TODO: Add a generator for delete: based on command being delete - propDelete.jsp
-        //Generate a edit conf for the default object property form and return it.	
+        //Generate a edit configuration for the default object property form and return it.
+    	//if(DefaultDeleteGenerator.isDelete( vreq,session)){
+    	//  return (new DefaultDeleteGenerator()).getEditConfiguration(vreq,session);
+    	
     	return getDefaultObjectEditConfiguration(vreq, session);
     }
+	
+    protected List<String> getRangeTypes(VitroRequest vreq) {
+		Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
+		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
+		WebappDaoFactory wDaoFact = vreq.getWebappDaoFactory();
+		List<String> types = new ArrayList<String>();
+		List <VClass> vclasses = new ArrayList<VClass>();
+        vclasses = wDaoFact.getVClassDao().getVClassesForProperty(subject.getVClassURI(),predicateUri);
+        for(VClass v: vclasses) {
+        	types.add(v.getURI());
+        }       
+        return types;
+	}	
+	
+    private boolean tooManyRangeOptions(VitroRequest vreq, HttpSession session ) throws SolrServerException {
+    	List<String> types = getRangeTypes(vreq);
+    	SolrServer solrServer = SolrSetup.getSolrServer(session.getServletContext());
+    	
+    	//empty list means the range is not set to anything, force Thing
+    	if(types.size() == 0 ){
+    		types = new ArrayList<String>();
+    		types.add(VitroVocabulary.OWL_THING);
+    	}
+    	
+    	long count = 0;    		   
+    	for( String type:types){
+    		//solr query for type count.    		
+    		SolrQuery query = new SolrQuery();
+    		if( VitroVocabulary.OWL_THING.equals( type )){
+    			query.setQuery( "*:*" );    			
+    		}else{
+    			query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type);
+    		}
+    		query.setRows(0);
+    		
+    		QueryResponse rsp = solrServer.query(query);
+    		SolrDocumentList docs = rsp.getResults();
+    		long found = docs.getNumFound();    
+    		count = count + found;
+    		if( count > maxNonACRangeIndividualCount )
+    			break;
+    	}
+    	    	
+    	return  count > maxNonACRangeIndividualCount ;    	    	   
+	}
+
     
-    private EditConfigurationVTwo getDefaultObjectEditConfiguration(VitroRequest vreq, HttpSession session) {
+	private EditConfigurationVTwo getDefaultObjectEditConfiguration(VitroRequest vreq, HttpSession session) throws Exception {
     	EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();    	
     	
     	//process subject, predicate, object parameters
@@ -105,19 +184,21 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	//After the main processing is done, check if select from existing process
     	processProhibitedFromSearch(vreq, session, editConfiguration);
     	
-    	//Form title and submit label now moved to edit configuration template
-    	//TODO: check if edit configuration template correct place to set those or whether
-    	//additional methods here should be used and reference instead, e.g. edit configuration template could call
-    	//default obj property form.populateTemplate or some such method
-    	//Select from existing also set within template itself
+    	//Form title and submit label moved to template
     	setTemplate(editConfiguration, vreq);
     	
     	editConfiguration.addValidator(new AntiXssValidation());
     	
     	//Set edit key
     	setEditKey(editConfiguration, vreq);
+    	    	       	    	
     	//Adding additional data, specifically edit mode
-        addFormSpecificData(editConfiguration, vreq);
+    	if( doAutoComplete ){
+    		addFormSpecificDataForAC(editConfiguration, vreq, session);
+    	}else{	    
+	        addFormSpecificData(editConfiguration, vreq);
+    	}      
+    	
     	return editConfiguration;
     }
     
@@ -128,12 +209,10 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     
 	private void setTemplate(EditConfigurationVTwo editConfiguration,
 			VitroRequest vreq) {
-		String template = objectPropertyTemplate;
-		
-		if(EditConfigurationUtils.isDataProperty(editConfiguration.getPredicateUri(), vreq)){
-    		template = dataPropertyTemplate;
-    	} 
-    	editConfiguration.setTemplate(template);
+		if( doAutoComplete )
+			editConfiguration.setTemplate(acObjectPropertyTemplate);
+		else
+			editConfiguration.setTemplate(objectPropertyTemplate);
 		
 	}
 
@@ -159,13 +238,12 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	//pretends this is a data property editing statement and throws an error
     	//"object"       : [ "objectVar" ,  "${objectUriJson}" , "URI"],
     	if(EditConfigurationUtils.isObjectProperty(predicateUri, vreq)) {
-    		//not concerned about remainder, can move into default obj prop form if required
-    		this.isObjectPropForm = true;
+    		log.debug("This is an object property: " + predicateUri);
     		this.initObjectParameters(vreq);
     		this.processObjectPropForm(vreq, editConfiguration);
     	} else {
-    		this.isObjectPropForm = false;
-    	   this.processDataPropForm(vreq, editConfiguration);
+    		log.debug("This is a data property: " + predicateUri);
+    		return;
     	}
     }    
 
@@ -182,38 +260,21 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	//pretends this is a data property editing statement and throws an error
     	//TODO: Check if null in case no object uri exists but this is still an object property
     }
-    
-    private void processDataPropForm(VitroRequest vreq, EditConfigurationVTwo editConfiguration) {
-        //bdc34
-        throw new Error("DefaultObjectPropertyForm should not be doing data property editng");    	
-    }
-    
+       
     //Get N3 required 
     //Handles both object and data property    
     private List<String> generateN3Required(VitroRequest vreq) {
     	List<String> n3ForEdit = new ArrayList<String>();
-    	String editString = "?subject ?predicate ";
-    	if(this.isObjectPropForm) {
-    		editString += "?objectVar";
-    	} else {
-    		 DataProperty prop = EditConfigurationUtils.getDataProperty(vreq);
-    		 String localName = prop.getLocalName();
-    		 String dataLiteral = localName + "Edited";
-    		 editString += "?"+dataLiteral;
-    	}
+    	String editString = "?subject ?predicate ";    	
+    	editString += "?objectVar";    	
     	editString += " .";
     	n3ForEdit.add(editString);
     	return n3ForEdit;
     }
     
     private List<String> generateN3Optional() {
-    	List<String> n3Inverse = new ArrayList<String>();
-    	//Note that for proper substitution, spaces expected between variables, i.e. string
-    	//of n3 format
-    	//Set only if object property form
-    	if(this.isObjectPropForm) {
-    		n3Inverse.add("?objectVar ?inverseProp ?subject .");
-    	}
+    	List<String> n3Inverse = new ArrayList<String>();    	
+    	n3Inverse.add("?objectVar ?inverseProp ?subject .");    	
     	return n3Inverse;
     	
     }
@@ -249,22 +310,14 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     private void setUrisAndLiteralsOnForm(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
     	List<String> urisOnForm = new ArrayList<String>();
     	List<String> literalsOnForm = new ArrayList<String>();
-    	if(EditConfigurationUtils.isDataProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)) {
-    		//if data property set to data literal
-    		literalsOnForm.add(dataLiteral);
-    	} else {
-    		//uris on form should be empty if data property
-    		urisOnForm.add("objectVar");
-    	}
+    	
+    	//uris on form should be empty if data property
+    	urisOnForm.add("objectVar");
+    	
     	editConfiguration.setUrisOnform(urisOnForm);
     	editConfiguration.setLiteralsOnForm(literalsOnForm);
     }
-    
-    private String getDataLiteral(VitroRequest vreq) {
-    	DataProperty prop = EditConfigurationUtils.getDataProperty(vreq);
-    	return prop.getLocalName() + "Edited";
-    }
-    
+        
     //This is for various items
     private void setSparqlQueries(EditConfigurationVTwo editConfiguration) {
     	//Sparql queries defining retrieval of literals etc.
@@ -289,140 +342,29 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	HashMap<String, String> map = new HashMap<String, String>();
     	return map;
     }
-
     
-    private void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) {
-    	Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
-    	if(EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)) {
-    		fields = getObjectPropertyField(editConfiguration, vreq);
-    	} else {
-    		fields = getDataPropertyField(editConfiguration, vreq);
-    	}
-    	
-    	editConfiguration.setFields(fields);
-    }
-    
-    private Map<String, FieldVTwo> getDataPropertyField(
-			EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
-		Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
-		FieldVTwo field = new FieldVTwo();
-    	field.setName(dataLiteral);
-    	//queryForExisting is not being used anywhere in Field
-    	String rangeDatatypeUri = getRangeDatatypeUri(editConfiguration, vreq);
-    	String rangeLang = getRangeLang(editConfiguration, vreq);
-    	
-    	List<String> validators = new ArrayList<String>();
-    	validators.add("datatype:" + rangeDatatypeUri);
-    	field.setValidators(validators);
-    	
-    	//subjectUri and subjectClassUri are not being used in Field
-    	
-    	field.setOptionsType("LITERALS");
-    	//why isn't predicate uri set for data properties?
-    	field.setPredicateUri(null);
-    	field.setObjectClassUri(null);
-    	field.setRangeDatatypeUri(rangeDatatypeUri);
-    	//have either range datatype uri or range lang
-    	if(rangeDatatypeUri == null) {
-    		field.setRangeLang(rangeLang);
-    	}
-    	field.setLiteralOptions(getLiteralOptions(editConfiguration, vreq));
-    	
-    	fields.put(field.getName(), field);    	
-    	return fields;
-	}
-
-	private List<List<String>> getLiteralOptions(
-			EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
-		   DataPropertyStatement dps =EditConfigurationUtils.getDataPropertyStatement(vreq, vreq.getSession(), dataHash, predicateUri);
-		   List<List<String>> literalOptions = new ArrayList<List<String>>();
-		 if(dps == null) {
-		        log.debug("No incoming dataproperty statement attribute for property ; adding a new statement");                
-		        String rangeDatatypeUri = getRangeDatatypeUri(editConfiguration, vreq);
-		        if(rangeDatatypeUri != null && rangeDatatypeUri.length() > 0) {                        
-		            String defaultVal =  defaultsForXSDtypes.get(rangeDatatypeUri);
-		            List<String> defaultArray = new ArrayList<String>();
-		            defaultArray.add(defaultVal);
-		            literalOptions.add(defaultArray);
-		        }
-		    }   
-		return literalOptions;
-	}
-
-	private String getRangeLang(EditConfigurationVTwo editConfiguration,
-			VitroRequest vreq) {
-		String rangeLang = null;
-		
-	   DataPropertyStatement dps =EditConfigurationUtils.getDataPropertyStatement(vreq, vreq.getSession(), dataHash, predicateUri);
-	   if(dps != null) {
-		   rangeLang = dps.getLanguage();
-		   if( rangeLang == null ) {
-	           log.debug("no language attribute on data property statement in DefaultDataPropertyFormGenerator");
-	       }else{
-	           log.debug("language attribute of ["+rangeLang+"] on data property statement in DefaultDataPropertyFormGenerator");
-	       }
-	   }
-	   if( rangeLang != null && rangeLang.trim().length() == 0)
-           rangeLang = null;
-	    return rangeLang;
-	}
-
-	private String getRangeDatatypeUri(EditConfigurationVTwo editConfiguration,
-			VitroRequest vreq) {
-		Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
-		DataProperty prop = EditConfigurationUtils.getDataProperty(vreq);
-		
-		//rangeDefaultJson goes into literalk options
-		//validations include dataype:rangedatatypeurijson
-		//rangeDatatypeUri is rangeDAttypeUriJson
-		//rangeLang = rangeLanJson
-	   DataPropertyStatement dps =EditConfigurationUtils.getDataPropertyStatement(vreq, vreq.getSession(), dataHash, predicateUri);
-	   String rangeDatatypeUri = vreq.getWebappDaoFactory().getDataPropertyDao().getRequiredDatatypeURI(subject, prop);
-  
-	    if( dps != null ){
-	      rangeDatatypeUri = dps.getDatatypeURI();
-	        if( rangeDatatypeUri == null ){
-	            log.debug("no range datatype uri set on data property statement when property's range datatype is "+prop.getRangeDatatypeURI()+" in DefaultDataPropertyFormGenerator");
-	        } else {
-	            log.debug("range datatype uri of ["+rangeDatatypeUri+"] on data property statement in DefaultDataPropertyFormGenerator");
-	        }
-	    } else {
-	        log.debug("No incoming dataproperty statement attribute for property "+prop.getPublicName()+"; adding a new statement");                
-	    }      
-	    if( rangeDatatypeUri != null && rangeDatatypeUri.trim().length() == 0)
-            rangeDatatypeUri = null;
-	    
-	    return rangeDatatypeUri;
-	}
-
-	private Map<String, FieldVTwo> getObjectPropertyField(
-			EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
-		Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
+    private void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) throws Exception {    	
 		FieldVTwo field = new FieldVTwo();
     	field.setName("objectVar");    	
-    	//queryForExisting is not being used anywhere in Field
     	
     	List<String> validators = new ArrayList<String>();
     	validators.add("nonempty");
     	field.setValidators(validators);
-    	
-    	//subjectUri and subjectClassUri are not being used in Field
-    	
-    	field.setOptionsType("INDIVIDUALS_VIA_OBJECT_PROPERTY");
-    	field.setPredicateUri(predicateUri);
-    	
-    	field.setObjectClassUri(null);
-    	field.setRangeDatatypeUri(null);
-    	
-    	field.setRangeLang(null);
-    	field.setLiteralOptions(new ArrayList<List<String>>());
     	    	
-    	fields.put(field.getName(), field);
+    	if( ! doAutoComplete ){
+    		field.setOptions( new IndividualsViaObjectPropetyOptions(
+    	        subjectUri, 
+    	        predicateUri, 
+    	        objectUri));
+    	}else{
+    		field.setOptions(null);
+    	}
     	
-    	return fields;
-    	
-    	
-	}
+    	Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
+    	fields.put(field.getName(), field);    	
+    	    	    	
+    	editConfiguration.setFields(fields);
+    }       
 
 	private void prepareForUpdate(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
     	//Here, retrieve model from 
@@ -460,7 +402,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     		//TODO: Check how model is retrieved
             OntModel displayOntModel = 
                (OntModel) session.getServletContext()
-                    .getAttribute("displayOntModel");
+                    .getAttribute(DISPLAY_ONT_MODEL);
             if (displayOntModel != null) {
                 ProhibitedFromSearch pfs = new ProhibitedFromSearch(
                     DisplayVocabulary.SEARCH_INDEX_URI, displayOntModel);
@@ -481,7 +423,79 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 		formSpecificData.put("objectSelect", objectSelect);
 		editConfiguration.setFormSpecificData(formSpecificData);
 	}
+        			
+	public void addFormSpecificDataForAC(EditConfigurationVTwo editConfiguration, VitroRequest vreq, HttpSession session) throws SolrServerException {
+		HashMap<String, Object> formSpecificData = new HashMap<String, Object>();
+		//Get the edit mode
+		formSpecificData.put("editMode", getEditMode(vreq).toString().toLowerCase());
+		
+		//We also need the type of the object itself
+		List<String> types = getRangeTypes(vreq);
+        //if types array contains only owl:Thing, the search will not return any results
+        //In this case, set an empty array
+        if(types.size() == 1 && types.get(0).equals(VitroVocabulary.OWL_THING) ){
+        	types = new ArrayList<String>();
+        }
+		
+		formSpecificData.put("objectTypes", StringUtils.join(types, ","));
+		
+		//Get label for individual if it exists
+		if(EditConfigurationUtils.getObjectIndividual(vreq) != null) {
+			String objectLabel = EditConfigurationUtils.getObjectIndividual(vreq).getName();
+			formSpecificData.put("objectLabel", objectLabel);
+		}
+		
+		//TODO: find out if there are any individuals in the classes of objectTypes
+		formSpecificData.put("rangeIndividualsExist", rangeIndividualsExist(session,types) );
+		
+		formSpecificData.put("sparqlForAcFilter", getSparqlForAcFilter(vreq));
+		editConfiguration.setTemplate(acObjectPropertyTemplate);
+		editConfiguration.setFormSpecificData(formSpecificData);
+	}
+	
+	private Object rangeIndividualsExist(HttpSession session, List<String> types) throws SolrServerException {		
+    	SolrServer solrServer = SolrSetup.getSolrServer(session.getServletContext());
+    	
+    	boolean rangeIndividualsFound = false;
+    	for( String type:types){
+    		//solr for type count.
+    		SolrQuery query = new SolrQuery();    
+    		query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type);
+    		query.setRows(0);
+    		
+    		QueryResponse rsp = solrServer.query(query);
+    		SolrDocumentList docs = rsp.getResults();
+    		if( docs.getNumFound() > 0 ){
+    			rangeIndividualsFound = true;
+    			break;
+    		}    		
+    	}
+    	
+    	return  rangeIndividualsFound;		
+	}
+
+
+
+	/** get the auto complete edit mode */
+	public EditMode getEditMode(VitroRequest vreq) {
+		//In this case, the original jsp didn't rely on FrontEndEditingUtils
+		//but instead relied on whether or not the object Uri existed
+		String objectUri = EditConfigurationUtils.getObjectUri(vreq);
+		EditMode editMode = FrontEndEditingUtils.EditMode.ADD;
+		if(objectUri != null && !objectUri.isEmpty()) {
+			editMode = FrontEndEditingUtils.EditMode.EDIT;
+			
+		}
+		return editMode;
+	}
     
-    
+	public String getSparqlForAcFilter(VitroRequest vreq) {
+		String subject = EditConfigurationUtils.getSubjectUri(vreq);			
+		String predicate = EditConfigurationUtils.getPredicateUri(vreq);
+		//Get all objects for existing predicate, filters out results from addition and edit
+		String query =  "SELECT ?objectVar WHERE { " + 
+			"<" + subject + "> <" + predicate + "> ?objectVar .} ";
+		return query;
+	}
 
 }

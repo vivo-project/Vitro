@@ -368,11 +368,6 @@ public class IndividualFiltering implements Individual {
 	public boolean isVClass(String uri) {
     	return _innerIndividual.isVClass(uri);
 	}
-
-    @Override
-    public boolean isMemberOfClassProhibitedFromSearch(ProhibitedFromSearch pfs) {
-    	return _innerIndividual.isMemberOfClassProhibitedFromSearch(pfs);
-    }
     
     @Override
 	public void setDataPropertyMap(Map<String, DataProperty> propertyMap) {

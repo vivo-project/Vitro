@@ -125,6 +125,10 @@ public class LoginProcessBean {
 		public static final Message UNKNOWN_USERNAME = new Message(
 				"The email or password you entered is incorrect.", MLevel.ERROR);
 
+		public static final Message LOGIN_DISABLED = new Message(
+				"User logins are temporarily disabled while the system is being maintained.",
+				MLevel.ERROR);
+
 		public static final Message INCORRECT_PASSWORD = new Message(
 				"The email or password you entered is incorrect.", MLevel.ERROR);
 

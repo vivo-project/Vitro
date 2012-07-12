@@ -708,7 +708,8 @@
       -->
      <lst name="defaults">
        <str name="defType">edismax</str>
-       <str name="qf">ALLTEXT ALLTEXTUNSTEMMED nameUnstemmed nameStemmed nameLowercase</str>
+       <!-- nameText added for NIHVIVO-3701 -->
+       <str name="qf">ALLTEXT ALLTEXTUNSTEMMED nameText^2.0 nameUnstemmed^2.0 nameStemmed^2.0 nameLowercase</str>
        <str name="echoParams">explicit</str>
        <str name="qs">2</str>
        <int name="rows">10</int>

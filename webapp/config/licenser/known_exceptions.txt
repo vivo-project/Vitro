@@ -38,6 +38,7 @@ webapp/web/js/tiny_mce/**/*
 webapp/web/js/jquery.js
 webapp/web/js/jquery-ui/*
 webapp/web/js/jquery_plugins/*
+webapp/web/js/jquery.fix.clone.js
 
 # See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/dojo.js
@@ -133,6 +134,9 @@ webapp/web/WEB-INF/tlds/taglibs-string.tld
 webapp/web/themes/enhanced/css/blueprint/grid.css
 webapp/web/themes/enhanced/css/blueprint/ie.css
 
+# See /doc/3rd-party-licenses.txt for LICENSE file
+webapp/web/css/jquery_plugins/jquery.realperson.css
+
 # PROBLEM: Can't find any info on licensing.
 webapp/web/themes/enhanced/css/blueprint/liquid.css
 
@@ -170,3 +174,14 @@ webapp/src/edu/cornell/mannlib/vitro/webapp/web/antisamy-vitro-1.4.4.xml
 
 # A kluge class derived from JarJar code. See /doc/3rd-party-licenses.txt for LICENSE file
 utilities/buildutils/src/com/tonicsystems/jarjar/KlugedDepFind.java
+
+#Public Domain
+webapp/web/js/json2.js
+
+# Part of the OpenSocial integration - What license should apply here?
+webapp/src/edu/ucsf/vitro/opensocial/GadgetController.java
+webapp/src/edu/ucsf/vitro/opensocial/GadgetSpec.java
+webapp/src/edu/ucsf/vitro/opensocial/GadgetViewRequirements.java
+webapp/src/edu/ucsf/vitro/opensocial/OpenSocialManager.java
+webapp/src/edu/ucsf/vitro/opensocial/PreparedGadget.java
+webapp/web/js/openSocial/shindig.js

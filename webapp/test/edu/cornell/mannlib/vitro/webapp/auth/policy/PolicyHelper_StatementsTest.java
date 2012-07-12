@@ -12,7 +12,8 @@ import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
 import stubs.javax.servlet.http.HttpSessionStub;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -24,8 +25,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractDataPropertyAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractDataPropertyStatementAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyStatementAction;
 
 /**
  * Test the function of PolicyHelper in authorizing statements and models.
@@ -39,6 +40,7 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 	private ServletContextStub ctx;
 	private HttpSessionStub session;
 	private HttpServletRequestStub req;
+	private OntModel ontModel;
 
 	@Before
 	public void setup() {
@@ -50,18 +52,20 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 		req = new HttpServletRequestStub();
 		req.setSession(session);
 
+		ontModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+
 		setLoggerLevel(ServletPolicyList.class, Level.WARN);
 		ServletPolicyList.addPolicy(ctx, new MySimplePolicy());
 	}
 
 	// ----------------------------------------------------------------------
-	// Statement-level tests.
+	// The tests.
 	// ----------------------------------------------------------------------
 
 	@Test
 	public void addNullStatement() {
 		assertEquals("null statement", false,
-				PolicyHelper.isAuthorizedToAdd(req, (Statement) null));
+				PolicyHelper.isAuthorizedToAdd(req, null, ontModel));
 	}
 
 	@Test
@@ -69,29 +73,53 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 		Statement stmt = dataStatement(APPROVED_SUBJECT_URI,
 				APPROVED_PREDICATE_URI);
 		assertEquals("null request", false,
-				PolicyHelper.isAuthorizedToAdd(null, stmt));
+				PolicyHelper.isAuthorizedToAdd(null, stmt, ontModel));
 	}
 
 	@Test
-	public void addAuthorizedStatement() {
+	public void addStatementToNullModel() {
+		Statement stmt = dataStatement(APPROVED_SUBJECT_URI,
+				APPROVED_PREDICATE_URI);
+		assertEquals("authorized", false,
+				PolicyHelper.isAuthorizedToAdd(req, stmt, null));
+	}
+
+	@Test
+	public void addAuthorizedDataStatement() {
 		Statement stmt = dataStatement(APPROVED_SUBJECT_URI,
 				APPROVED_PREDICATE_URI);
 		assertEquals("authorized", true,
-				PolicyHelper.isAuthorizedToAdd(req, stmt));
+				PolicyHelper.isAuthorizedToAdd(req, stmt, ontModel));
 	}
 
 	@Test
-	public void addUnauthorizedStatement() {
+	public void addAuthorizedObjectStatement() {
+		Statement stmt = objectStatement(APPROVED_SUBJECT_URI,
+				APPROVED_PREDICATE_URI, APPROVED_OBJECT_URI);
+		assertEquals("authorized", true,
+				PolicyHelper.isAuthorizedToAdd(req, stmt, ontModel));
+	}
+
+	@Test
+	public void addUnauthorizedDataStatement() {
 		Statement stmt = dataStatement(APPROVED_SUBJECT_URI,
 				UNAPPROVED_PREDICATE_URI);
 		assertEquals("not authorized", false,
-				PolicyHelper.isAuthorizedToAdd(req, stmt));
+				PolicyHelper.isAuthorizedToAdd(req, stmt, ontModel));
+	}
+
+	@Test
+	public void addUnauthorizedObjectStatement() {
+		Statement stmt = objectStatement(APPROVED_SUBJECT_URI,
+				UNAPPROVED_PREDICATE_URI, APPROVED_OBJECT_URI);
+		assertEquals("not authorized", false,
+				PolicyHelper.isAuthorizedToAdd(req, stmt, ontModel));
 	}
 
 	@Test
 	public void dropNullStatement() {
-		assertEquals("null statement", false,
-				PolicyHelper.isAuthorizedToDrop(req, (Statement) null));
+		assertEquals("null statement", false, PolicyHelper.isAuthorizedToDrop(
+				req, (Statement) null, ontModel));
 	}
 
 	@Test
@@ -99,103 +127,47 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 		Statement stmt = dataStatement(APPROVED_SUBJECT_URI,
 				APPROVED_PREDICATE_URI);
 		assertEquals("null request", false,
-				PolicyHelper.isAuthorizedToDrop(null, stmt));
+				PolicyHelper.isAuthorizedToDrop(null, stmt, ontModel));
 	}
 
 	@Test
-	public void dropAuthorizedStatement() {
+	public void dropStatementFromNullModel() {
+		Statement stmt = dataStatement(APPROVED_SUBJECT_URI,
+				APPROVED_PREDICATE_URI);
+		assertEquals("authorized", false,
+				PolicyHelper.isAuthorizedToDrop(req, stmt, null));
+	}
+
+	@Test
+	public void dropAuthorizedDataStatement() {
 		Statement stmt = dataStatement(APPROVED_SUBJECT_URI,
 				APPROVED_PREDICATE_URI);
 		assertEquals("authorized", true,
-				PolicyHelper.isAuthorizedToDrop(req, stmt));
+				PolicyHelper.isAuthorizedToDrop(req, stmt, ontModel));
 	}
 
 	@Test
-	public void dropUnauthorizedStatement() {
+	public void dropAuthorizedObjectStatement() {
+		Statement stmt = objectStatement(APPROVED_SUBJECT_URI,
+				APPROVED_PREDICATE_URI, APPROVED_OBJECT_URI);
+		assertEquals("authorized", true,
+				PolicyHelper.isAuthorizedToDrop(req, stmt, ontModel));
+	}
+
+	@Test
+	public void dropUnauthorizedDataStatement() {
 		Statement stmt = dataStatement(APPROVED_SUBJECT_URI,
 				UNAPPROVED_PREDICATE_URI);
 		assertEquals("not authorized", false,
-				PolicyHelper.isAuthorizedToDrop(req, stmt));
-	}
-
-	// ----------------------------------------------------------------------
-	// Model-level tests
-	// ----------------------------------------------------------------------
-
-	@Test
-	public void addNullModel() {
-		assertEquals("null statement", false,
-				PolicyHelper.isAuthorizedToAdd(req, (Model) null));
+				PolicyHelper.isAuthorizedToDrop(req, stmt, ontModel));
 	}
 
 	@Test
-	public void addModelWithNullRequest() {
-		assertEquals("empty model", false,
-				PolicyHelper.isAuthorizedToAdd(null, model()));
-	}
-
-	@Test
-	public void addEmptyModel() {
-		assertEquals("empty model", true,
-				PolicyHelper.isAuthorizedToAdd(req, model()));
-	}
-
-	@Test
-	public void addAuthorizedModel() {
-		Model model = model(
-				dataStatement(APPROVED_SUBJECT_URI, APPROVED_PREDICATE_URI),
-				objectStatement(APPROVED_SUBJECT_URI, APPROVED_PREDICATE_URI,
-						APPROVED_OBJECT_URI));
-		assertEquals("authorized model", true,
-				PolicyHelper.isAuthorizedToAdd(req, model));
-	}
-
-	@Test
-	public void addUnauthorizedModel() {
-		Model model = model(
-				dataStatement(APPROVED_SUBJECT_URI, APPROVED_PREDICATE_URI),
-				objectStatement(APPROVED_SUBJECT_URI, UNAPPROVED_PREDICATE_URI,
-						APPROVED_OBJECT_URI));
-		assertEquals("unauthorized model", false,
-				PolicyHelper.isAuthorizedToAdd(req, model));
-	}
-
-	@Test
-	public void dropNullModel() {
-		assertEquals("null statement", false,
-				PolicyHelper.isAuthorizedToDrop(req, (Model) null));
-	}
-
-	@Test
-	public void dropModelWithNullRequest() {
-		assertEquals("empty model", false,
-				PolicyHelper.isAuthorizedToDrop(null, model()));
-	}
-
-	@Test
-	public void dropEmptyModel() {
-		assertEquals("empty model", true,
-				PolicyHelper.isAuthorizedToDrop(req, model()));
-	}
-
-	@Test
-	public void dropAuthorizedModel() {
-		Model model = model(
-				dataStatement(APPROVED_SUBJECT_URI, APPROVED_PREDICATE_URI),
-				objectStatement(APPROVED_SUBJECT_URI, APPROVED_PREDICATE_URI,
-						APPROVED_OBJECT_URI));
-		assertEquals("authorized model", true,
-				PolicyHelper.isAuthorizedToDrop(req, model));
-	}
-
-	@Test
-	public void dropUnauthorizedModel() {
-		Model model = model(
-				dataStatement(APPROVED_SUBJECT_URI, UNAPPROVED_PREDICATE_URI),
-				objectStatement(APPROVED_SUBJECT_URI, APPROVED_PREDICATE_URI,
-						APPROVED_OBJECT_URI));
-		assertEquals("unauthorized model", false,
-				PolicyHelper.isAuthorizedToDrop(req, model));
+	public void dropUnauthorizedObjectStatement() {
+		Statement stmt = objectStatement(APPROVED_SUBJECT_URI,
+				UNAPPROVED_PREDICATE_URI, APPROVED_OBJECT_URI);
+		assertEquals("not authorized", false,
+				PolicyHelper.isAuthorizedToDrop(req, stmt, ontModel));
 	}
 
 	// ----------------------------------------------------------------------
@@ -204,27 +176,18 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 
 	/** Build a data statement. */
 	private Statement dataStatement(String subjectUri, String predicateUri) {
-		Model model = ModelFactory.createDefaultModel();
-		Resource subject = model.createResource(subjectUri);
-		Property predicate = model.createProperty(predicateUri);
-		return model.createStatement(subject, predicate, "whoCares?");
+		Resource subject = ontModel.createResource(subjectUri);
+		Property predicate = ontModel.createProperty(predicateUri);
+		return ontModel.createStatement(subject, predicate, "whoCares?");
 	}
 
 	/** Build a object statement. */
 	private Statement objectStatement(String subjectUri, String predicateUri,
 			String objectUri) {
-		Model model = ModelFactory.createDefaultModel();
-		Resource subject = model.createResource(subjectUri);
-		Resource object = model.createResource(objectUri);
-		Property predicate = model.createProperty(predicateUri);
-		return model.createStatement(subject, predicate, object);
-	}
-
-	/** Build a model. */
-	private Model model(Statement... stmts) {
-		Model model = ModelFactory.createDefaultModel();
-		model.add(stmts);
-		return model;
+		Resource subject = ontModel.createResource(subjectUri);
+		Resource object = ontModel.createResource(objectUri);
+		Property predicate = ontModel.createProperty(predicateUri);
+		return ontModel.createStatement(subject, predicate, object);
 	}
 
 	// ----------------------------------------------------------------------
@@ -235,17 +198,17 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 		@Override
 		public PolicyDecision isAuthorized(IdentifierBundle whoToAuth,
 				RequestedAction whatToAuth) {
-			if (whatToAuth instanceof AbstractDataPropertyAction) {
-				return isAuthorized((AbstractDataPropertyAction) whatToAuth);
-			} else if (whatToAuth instanceof AbstractObjectPropertyAction) {
-				return isAuthorized((AbstractObjectPropertyAction) whatToAuth);
+			if (whatToAuth instanceof AbstractDataPropertyStatementAction) {
+				return isAuthorized((AbstractDataPropertyStatementAction) whatToAuth);
+			} else if (whatToAuth instanceof AbstractObjectPropertyStatementAction) {
+				return isAuthorized((AbstractObjectPropertyStatementAction) whatToAuth);
 			} else {
 				return inconclusive();
 			}
 		}
 
 		private PolicyDecision isAuthorized(
-				AbstractDataPropertyAction whatToAuth) {
+				AbstractDataPropertyStatementAction whatToAuth) {
 			if ((APPROVED_SUBJECT_URI.equals(whatToAuth.getSubjectUri()))
 					&& (APPROVED_PREDICATE_URI.equals(whatToAuth
 							.getPredicateUri()))) {
@@ -256,11 +219,11 @@ public class PolicyHelper_StatementsTest extends AbstractTestClass {
 		}
 
 		private PolicyDecision isAuthorized(
-				AbstractObjectPropertyAction whatToAuth) {
-			if ((APPROVED_SUBJECT_URI.equals(whatToAuth.uriOfSubject))
-					&& (APPROVED_PREDICATE_URI
-							.equals(whatToAuth.uriOfPredicate))
-					&& (APPROVED_OBJECT_URI.equals(whatToAuth.uriOfObject))) {
+				AbstractObjectPropertyStatementAction whatToAuth) {
+			if ((APPROVED_SUBJECT_URI.equals(whatToAuth.getSubjectUri()))
+					&& (APPROVED_PREDICATE_URI.equals(whatToAuth
+							.getPredicateUri()))
+					&& (APPROVED_OBJECT_URI.equals(whatToAuth.getObjectUri()))) {
 				return authorized();
 			} else {
 				return inconclusive();

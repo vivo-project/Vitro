@@ -1,0 +1,38 @@
+/* http://keith-wood.name/realPerson.html
+   Real Person Form Submission for jQuery v1.0.1.
+   Written by Keith Wood (kwood{at}iinet.com.au) June 2009.
+   Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt) and 
+   MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses. 
+   Please attribute the author if you use it. */
+   
+/* Real Person jQuery plugin styles v1.0.1. */
+.realperson-challenge {
+	display: inline-block;
+	background-color: #ddd;
+	width: 150px;
+	padding-top: 10px;
+	padding-left: 12px;
+}
+.realperson-text {
+	font-family: "Courier New",monospace;
+	font-size: 6px;
+	font-weight: bold;
+	letter-spacing: -1px;
+	line-height: 3px;
+	color: #000;
+}
+.realperson-regen {
+	padding-top: 4px;
+	padding-right: 6px;
+	font-size: 12px;
+	text-align: center;
+	cursor: pointer;
+}
+.realpersonLabel { 
+    display: block; 
+}
+#defaultReal {
+    margin-left: 20px;
+    vertical-align: top;
+    margin-top: 3px;
+}

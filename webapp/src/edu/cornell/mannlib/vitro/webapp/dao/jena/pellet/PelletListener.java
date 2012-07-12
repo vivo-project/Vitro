@@ -163,7 +163,9 @@ public class PelletListener implements ModelChangedListener {
 		this.deletedDataProperties = ModelFactory.createDefaultModel();
 		this.mainModel.enterCriticalSection(Lock.READ);
     	try {
-        	addedStatements(mainModel);
+    	    for (ObjectPropertyStatementPattern pat : this.inferenceDrivingPatternAllowSet) {
+    	        addedStatements(mainModel.listStatements((Resource) null, pat.getPredicate(), (RDFNode) null));    
+    	    }
         	if (!skipReasoningUponInitialization) {
         		this.foreground = foreground;
         		notifyEvent(null,new EditEvent(null,false));

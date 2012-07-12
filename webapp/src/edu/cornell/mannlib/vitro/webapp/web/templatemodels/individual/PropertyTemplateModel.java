@@ -8,8 +8,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeVerbosePropertyInformation;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -36,7 +36,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     private String name;
 
-    PropertyTemplateModel(Property property, Individual subject, EditingPolicyHelper policyHelper, VitroRequest vreq) {
+    PropertyTemplateModel(Property property, Individual subject, VitroRequest vreq) {
         this.vreq = vreq;
         subjectUri = subject.getURI(); 
         propertyUri = property.getURI();
@@ -65,7 +65,8 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
             return;
         }
         
-        if (!PolicyHelper.isAuthorizedForActions(vreq, new SeeVerbosePropertyInformation())) {
+		if (!PolicyHelper.isAuthorizedForActions(vreq,
+				SimplePermission.SEE_VERBOSE_PROPERTY_INFORMATION.ACTIONS)) {
             return;
         }
         
@@ -93,9 +94,6 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         this.name = name;
     }
     
-    protected abstract void setAddUrl(EditingPolicyHelper policyHelper, Property property);
-    
-    
     /* Template properties */
     
     public abstract String getType();
@@ -113,7 +111,8 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     }
     
     public String getAddUrl() {
-        return addUrl;
+        //log.info("addUrl=" + addUrl);
+        return (addUrl != null) ? addUrl : "";
     }
     
     public Map<String, Object> getVerboseDisplay() {

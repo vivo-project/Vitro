@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -25,6 +26,8 @@ import com.hp.hpl.jena.ontology.ProfileException;
 import com.hp.hpl.jena.ontology.Restriction;
 import com.hp.hpl.jena.ontology.SomeValuesFromRestriction;
 import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
@@ -671,7 +674,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     static {
         List<String> namespaceFilters = new ArrayList<String>();
         for (String namespace : EXCLUDED_NAMESPACES) {
-            namespaceFilters.add("( afn:namespace(?property) != \"" + namespace + "\" )");
+            namespaceFilters.add("( !regex(str(?property), \"^" + namespace + "\" ))");
         }
         PROPERTY_FILTERS = StringUtils.join(namespaceFilters, " && ");
     } 
@@ -683,11 +686,11 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         "   ?property a owl:DatatypeProperty . \n" +
         "   FILTER ( \n" +
         "       isLiteral(?object) && \n" +
-        "       ( afn:namespace(?property) != \"" + VitroVocabulary.PUBLIC + "\" ) && \n" +
-        "       ( afn:namespace(?property) != \"" + VitroVocabulary.OWL + "\" ) && \n" + 
+        "       ( !regex(str(?property), \"^" + VitroVocabulary.PUBLIC + "\" )) && \n" +
+        "       ( !regex(str(?property), \"^" + VitroVocabulary.OWL + "\" )) && \n" + 
         // NIHVIVO-2790 vitro:moniker has been deprecated, but display existing values for editorial management (deletion is encouraged).
         // This property will be hidden from public display by default.
-        "       ( ?property = <" + VitroVocabulary.MONIKER + "> || afn:namespace(?property) != \"" + VitroVocabulary.vitroURI + "\" ) \n" +           
+        "       ( ?property = <" + VitroVocabulary.MONIKER + "> || !regex(str(?property), \"^" + VitroVocabulary.vitroURI + "\" )) \n" +           
         "   ) \n" +
         "}";
     
@@ -728,6 +731,53 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             }
         }
         return properties; 
+    }
+    protected static final String LIST_VIEW_CONFIG_FILE_QUERY_STRING =
+        "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>" +
+        "SELECT ?property ?filename WHERE { \n" +
+        "    ?property display:listViewConfigFile ?filename . \n" +
+        "}";
+    
+    protected static Query listViewConfigFileQuery = null;
+    static {
+        try {
+            listViewConfigFileQuery = QueryFactory.create(LIST_VIEW_CONFIG_FILE_QUERY_STRING);
+        } catch(Throwable th){
+            log.error("could not create SPARQL query for LIST_VIEW_CONFIG_FILE_QUERY_STRING " + th.getMessage());
+            log.error(LIST_VIEW_CONFIG_FILE_QUERY_STRING);
+        }           
+    }
+    
+    Map<DataProperty, String> customListViewConfigFileMap = null;
+    
+    @Override
+    public String getCustomListViewConfigFileName(DataProperty dp) {
+        if (customListViewConfigFileMap == null) {
+            customListViewConfigFileMap = new HashMap<DataProperty, String>();
+            OntModel displayModel = getOntModelSelector().getDisplayModel();
+            //Get all property to list view config file mappings in the system
+            QueryExecution qexec = QueryExecutionFactory.create(listViewConfigFileQuery, displayModel); 
+            ResultSet results = qexec.execSelect();  
+            //Iterate through mappings looking for the current property and setting up a hashmap for subsequent retrieval
+            while (results.hasNext()) {
+                QuerySolution soln = results.next();
+                String propertyUri = soln.getResource("property").getURI();
+                DataProperty prop = getDataPropertyByURI(propertyUri);
+                if (prop == null) {
+                	//This is a warning only if this property is the one for which we're searching
+                	if(dp.getURI().equals(propertyUri)){
+                		log.warn("Can't find property for uri " + propertyUri);
+                	} else {
+                		log.debug("Can't find property for uri " + propertyUri);
+                	}
+                } else {
+                    String filename = soln.getLiteral("filename").getLexicalForm();
+                    customListViewConfigFileMap.put(prop, filename);     
+                }
+            }       
+            qexec.close();
+        }        
+        return customListViewConfigFileMap.get(dp);
     }
     
 }

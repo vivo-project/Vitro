@@ -277,3 +277,11 @@ a.close {
     display: block;
     padding-top: 0.8em;
 }
+/* <---- Manage Prop Link, individual-properties.ftl -----*/
+a.manageLinks {
+    display:none;
+}
+/* <---- OpenSocial -----*/
+div#openSocial {
+    display:inline-block;
+}

@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.text.Collator;
 import java.util.ArrayList;
@@ -42,9 +44,7 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecException;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QueryParseException;
-import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -60,24 +60,27 @@ import com.hp.hpl.jena.sdb.sql.JDBC;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.ResourceUtils;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.UseAdvancedDataToolsPages;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
-import edu.cornell.mannlib.vitro.webapp.controller.SparqlQueryServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetup;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.WebappDaoSetup;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils.MergeResult;
@@ -112,14 +115,15 @@ public class JenaIngestController extends BaseEditController {
     private static final String SPARQL_QUERYSTR_PROP = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7/sparql#queryStr";
     private static final String RENAME_RESOURCE = "/jenaIngest/renameResource.jsp";
     private static final String RENAME_RESULT = "/jenaIngest/renameResult.jsp";
+    private static final String CREATED_GRAPH_BASE_URI = "http://vitro.mannlib.cornell.edu/a/graph/";
 
     private static final Map<String, Model> attachedModels = new HashMap<String, Model>();
     
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        if (!isAuthorizedToDisplayPage(request, response, new Actions(
-                new UseAdvancedDataToolsPages()))) {
+		if (!isAuthorizedToDisplayPage(request, response,
+				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTIONS)) {
             return;
         }
         
@@ -183,6 +187,7 @@ public class JenaIngestController extends BaseEditController {
             processRenameResourceRequest(vreq, response, maker, modelType);
         } else if("mergeResult".equals(actionStr)){
             processMergeResultRequest(vreq, response, maker, modelType);
+            return;
         }
         
         else {
@@ -210,22 +215,35 @@ public class JenaIngestController extends BaseEditController {
     }
     
     private void processRDBModelsRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
-        VitroJenaModelMaker vjmm = (VitroJenaModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
+        ModelMaker vjmm = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
         vreq.getSession().setAttribute("vitroJenaModelMaker", vjmm);
         showModelList(vreq, vjmm, "rdb");
     }
     
     private void processSDBModelsRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
-        VitroJenaSDBModelMaker vsmm = (VitroJenaSDBModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
+        ModelMaker vsmm = (ModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
         vreq.getSession().setAttribute("vitroJenaModelMaker", vsmm);
         showModelList(vreq, vsmm, "sdb");
     }
     
     private void processCreateModelRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
         String modelName = vreq.getParameter("modelName");
+    	
         if (modelName != null) {
-            doCreateModel(modelName, maker);
-            showModelList(vreq, maker, modelType);
+        	try {
+            	URI graphURI = new URI(modelName);
+            	
+            	if (graphURI.getScheme() == null) {
+            	   String origName = modelName;	
+            	   modelName =CREATED_GRAPH_BASE_URI + modelName;
+                   log.info("The model name has been changed from " + origName + " to " + modelName);
+            	}
+            	           	
+                doCreateModel(modelName, maker);
+                showModelList(vreq, maker, modelType);      
+        	} catch (URISyntaxException e) {
+        		throw new RuntimeException("the model name must be a valid URI");
+        	}
         } else {
             vreq.setAttribute("modelType", modelType);
             vreq.setAttribute("title","Create New Model");
@@ -700,38 +718,17 @@ public class JenaIngestController extends BaseEditController {
         }
     }
     
-    protected ModelMaker getVitroJenaModelMaker(HttpServletRequest request) {
-        ModelMaker myVjmm = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-        myVjmm = (myVjmm == null) ? (ModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker") : myVjmm;
-        return new VitroJenaSpecialModelMaker(myVjmm, request);
+    protected ModelMaker getVitroJenaModelMaker(HttpServletRequest request){
+        return JenaIngestController.getVitroJenaModelMaker(request,getServletContext());
     }
     
-    protected Model getModel(String name, HttpServletRequest request) {
-        if ("vitro:jenaOntModel".equals(name)) {
-            Object sessionOntModel = request.getSession().getAttribute("jenaOntModel");
-            if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-                return (OntModel) sessionOntModel;
-            } else {
-                return (OntModel) getServletContext().getAttribute("jenaOntModel");
-            }
-        } else if ("vitro:baseOntModel".equals(name)) {
-            Object sessionOntModel = request.getSession().getAttribute("baseOntModel");
-            if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-                return (OntModel) sessionOntModel;
-            } else {
-                return (OntModel) getServletContext().getAttribute("baseOntModel");
-            }
-        } else if ("vitro:inferenceOntModel".equals(name)) {
-            Object sessionOntModel = request.getSession().getAttribute("inferenceOntModel");
-            if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-                return (OntModel) sessionOntModel;
-            } else {
-                return (OntModel) getServletContext().getAttribute("inferenceOntModel");
-            }
-        } else {
-            return getVitroJenaModelMaker(request).getModel(name);
-        }
+
+    
+    protected Model getModel( String name, HttpServletRequest request ){
+        return JenaIngestController.getModel(name, request, getServletContext());
     }
+    
+    
     
     protected String getModelType(VitroRequest vreq, ModelMaker maker) {
         String modelType = vreq.getParameter("modelType");
@@ -739,7 +736,9 @@ public class JenaIngestController extends BaseEditController {
                 ? ((VitroJenaSpecialModelMaker) maker).getInnerModelMaker()
                 : maker;
         if (modelType == null) {
-            if (maker instanceof VitroJenaSDBModelMaker) {
+            if (maker instanceof RDFServiceModelMaker) {
+                modelType = "sdb";
+            } else if (maker instanceof VitroJenaSDBModelMaker) {
                 modelType = "sdb";
             } else {
                 modelType = "rdb";
@@ -967,7 +966,7 @@ public class JenaIngestController extends BaseEditController {
         log.debug("Connecting to DB at "+jdbcUrl);
         StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash,dbTypeObj) ; 
         ServletContext ctx = vreq.getSession().getServletContext();
-        BasicDataSource bds = JenaDataSourceSetup.makeBasicDataSource(
+        BasicDataSource bds = WebappDaoSetup.makeBasicDataSource(
                 driver, jdbcUrl, username, password, ctx);
         try {
             VitroJenaSDBModelMaker vsmm = new VitroJenaSDBModelMaker(storeDesc, bds);
@@ -1170,42 +1169,39 @@ public class JenaIngestController extends BaseEditController {
         String result = null;
         Integer counter = 0;
         Boolean namespacePresent = false;
-        OntModel baseOntModel = (OntModel)
-        getServletContext().getAttribute("baseOntModel");
-        OntModel ontModel = (OntModel)
-        getServletContext().getAttribute("jenaOntModel");
-        OntModel infOntModel = (OntModel)
-        getServletContext().getAttribute(JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME);
-        List<String> urisToChange = new LinkedList<String>();        
-        ontModel.enterCriticalSection(Lock.READ);
+        RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(
+                getServletContext()).getRDFService();
         try {
-            Iterator<Individual> indIter = ontModel.listIndividuals();
-            while( indIter.hasNext()){
-                Individual ind = indIter.next();
-                String namespace = ind.getNameSpace();
-                if( namespace != null ){
-                    if( oldNamespace.equals(namespace) ){
-                        uri = ind.getURI();    
-                        urisToChange.add(uri);
-                        namespacePresent = true;
+            Model baseOntModel = RDFServiceGraph.createRDFServiceModel
+                    (new RDFServiceGraph(
+                            rdfService, JenaDataSourceSetupBase.JENA_DB_MODEL));
+            OntModel ontModel = (OntModel)
+            getServletContext().getAttribute("jenaOntModel");
+            List<String> urisToChange = new LinkedList<String>();        
+            ontModel.enterCriticalSection(Lock.READ);
+            try {
+                Iterator<Individual> indIter = ontModel.listIndividuals();
+                while( indIter.hasNext()){
+                    Individual ind = indIter.next();
+                    String namespace = ind.getNameSpace();
+                    if( namespace != null ){
+                        if( oldNamespace.equals(namespace) ){
+                            uri = ind.getURI();    
+                            urisToChange.add(uri);
+                            namespacePresent = true;
+                        }
                     }
                 }
+            } finally {
+                ontModel.leaveCriticalSection();
             }
-        } finally {
-            ontModel.leaveCriticalSection();
-        }
-        if(!namespacePresent){
-            result = "no resources renamed";
-            return result;
-        }    
-        for( String oldURIStr : urisToChange){
-            baseOntModel.enterCriticalSection(Lock.WRITE);
-            ontModel.enterCriticalSection(Lock.WRITE);
-            infOntModel.enterCriticalSection(Lock.WRITE);
-            try{
+            if(!namespacePresent){
+                result = "no resources renamed";
+                return result;
+            }    
+            for( String oldURIStr : urisToChange){
                 long time1 = System.currentTimeMillis();
                 Resource res = baseOntModel.getResource(oldURIStr);
-                Resource infRes = infOntModel.getResource(oldURIStr);
                 long time2 = System.currentTimeMillis();
                 String newURIStr=null;
                 Pattern p = Pattern.compile(oldNamespace);
@@ -1216,30 +1212,69 @@ public class JenaIngestController extends BaseEditController {
                 log.debug("time to get new uri: " + 
                         Long.toString(time3 - time2));
                 log.debug("Renaming "+ oldURIStr + " to " + newURIStr);
-                ResourceUtils.renameResource(res,newURIStr);
-                ResourceUtils.renameResource(infRes,newURIStr);
+         
+                String whereClause = "} WHERE { \n" +
+                        "  GRAPH <" + JenaDataSourceSetupBase.JENA_DB_MODEL + "> { \n" +  
+                        "   { <" + oldURIStr + "> ?p <" + oldURIStr + "> } \n " +
+                        "     UNION \n" +  
+                        "   { <" + oldURIStr + "> ?q ?o } \n " +
+                        "     UNION \n" +
+                        "   { ?s ?r <" + oldURIStr + "> } \n" +
+                        "  } \n" +
+                        "}";
+                
+                String removeQuery = "CONSTRUCT { \n" + 
+                                   "   <" + oldURIStr + "> ?p <" + oldURIStr + "> . \n " +
+                                   "   <" + oldURIStr + "> ?q ?o . \n " +
+                                   "   ?s ?r <" + oldURIStr + "> \n" + whereClause;
+
+                String addQuery = "CONSTRUCT { \n" + 
+                        "   <" + newURIStr + "> ?p <" + newURIStr + "> . \n " +
+                        "   <" + newURIStr + "> ?q ?o . \n " +
+                        "   ?s ?r <" + newURIStr + "> \n" + whereClause;                   
+                try {                   
+                    ChangeSet cs = rdfService.manufactureChangeSet();
+                    cs.addAddition(rdfService.sparqlConstructQuery(
+                            addQuery, RDFService.ModelSerializationFormat.N3), 
+                                    RDFService.ModelSerializationFormat.N3, 
+                                            JenaDataSourceSetupBase.JENA_DB_MODEL);
+                    cs.addRemoval(rdfService.sparqlConstructQuery(
+                            removeQuery, RDFService.ModelSerializationFormat.N3), 
+                                    RDFService.ModelSerializationFormat.N3, 
+                                            JenaDataSourceSetupBase.JENA_DB_MODEL); 
+                    rdfService.changeSetUpdate(cs);
+                } catch (RDFServiceException e) {
+                    throw new RuntimeException(e);
+                }
+                 
                 long time4 = System.currentTimeMillis();
                 log.debug(" time to rename : " + Long.toString( time4 - time3));
                 log.debug(" time for one resource: " + 
-                        Long.toString( time4 -time1));
-            } finally {
-                infOntModel.leaveCriticalSection();
-                ontModel.leaveCriticalSection();
-                baseOntModel.leaveCriticalSection();
+                        Long.toString( time4 -time1));          
+                counter++;
+            }        
+            result = counter.toString() + " resources renamed";
+            return result;
+        } finally {
+            if (rdfService != null) {
+                rdfService.close();
             }
-            counter++;
-        }        
-        result = counter.toString() + " resources renamed";
-        return result;
+        }
     }
     
     protected void showModelList(VitroRequest vreq, ModelMaker maker, String modelType) {
         if(modelType.equals("rdb")){
             vreq.setAttribute("modelType", "rdb");
             vreq.setAttribute("infoLine", "RDB models");
-        } else{
+        } else if (maker instanceof VitroJenaSDBModelMaker || 
+                          (maker instanceof VitroJenaSpecialModelMaker && 
+                                  ((VitroJenaSpecialModelMaker) maker).getInnerModelMaker() 
+                                          instanceof VitroJenaSDBModelMaker)) {
             vreq.setAttribute("modelType", "sdb");
             vreq.setAttribute("infoLine", "SDB models");
+        } else {
+            vreq.setAttribute("modelType", "sdb");
+            vreq.setAttribute("infoLine", "main store models");            
         }
         vreq.setAttribute("modelNames", maker.listModels().toList());
         vreq.setAttribute("bodyAttr", "onLoad=\"init()\"");
@@ -1256,5 +1291,37 @@ public class JenaIngestController extends BaseEditController {
         }
         
     }
+
+    public static Model getModel(String name, HttpServletRequest request, ServletContext context) {
+        if ("vitro:jenaOntModel".equals(name)) {
+            Object sessionOntModel = request.getSession().getAttribute("jenaOntModel");
+            if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
+                return (OntModel) sessionOntModel;
+            } else {
+                return (OntModel) context.getAttribute("jenaOntModel");
+            }
+        } else if ("vitro:baseOntModel".equals(name)) {
+            Object sessionOntModel = request.getSession().getAttribute("baseOntModel");
+            if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
+                return (OntModel) sessionOntModel;
+            } else {
+                return (OntModel) context.getAttribute("baseOntModel");
+            }
+        } else if ("vitro:inferenceOntModel".equals(name)) {
+            Object sessionOntModel = request.getSession().getAttribute("inferenceOntModel");
+            if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
+                return (OntModel) sessionOntModel;
+            } else {
+                return (OntModel) context.getAttribute("inferenceOntModel");
+            }
+        } else {
+            return getVitroJenaModelMaker(request,context).getModel(name);
+        }
+    }
     
+    protected static ModelMaker getVitroJenaModelMaker(HttpServletRequest request, ServletContext context) {
+        ModelMaker myVjmm = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
+        myVjmm = (myVjmm == null) ? (ModelMaker) context.getAttribute("vitroJenaSDBModelMaker") : myVjmm;
+        return new VitroJenaSpecialModelMaker(myVjmm, request);
+    }
 }

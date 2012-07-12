@@ -16,11 +16,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasRoleLevel;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsRootUser;
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -71,20 +68,22 @@ public class LoginRedirector {
 		if (isSelfEditorWithIndividual()) {
 			log.debug("Going to Individual home page.");
 			return getAssociatedIndividualHomePage();
-		} else if (isMerelySelfEditor()) {
+		}
+
+		if (!canSeeSiteAdminPage()) {
 			log.debug("User not recognized. Going to application home.");
 			return getApplicationHomePageUrl();
+		}
+
+		if (isLoginPage(afterLoginPage)) {
+			log.debug("Coming from /login. Going to site admin page.");
+			return getSiteAdminPageUrl();
+		} else if (null != afterLoginPage) {
+			log.debug("Returning to requested page: " + afterLoginPage);
+			return afterLoginPage;
 		} else {
-			if (isLoginPage(afterLoginPage)) {
-				log.debug("Coming from /login. Going to site admin page.");
-				return getSiteAdminPageUrl();
-			} else if (null != afterLoginPage) {
-				log.debug("Returning to requested page: " + afterLoginPage);
-				return afterLoginPage;
-			} else {
-				log.debug("Don't know what to do. Go home.");
-				return getApplicationHomePageUrl();
-			}
+			log.debug("Don't know what to do. Go home.");
+			return getApplicationHomePageUrl();
 		}
 	}
 
@@ -113,7 +112,7 @@ public class LoginRedirector {
 	}
 
 	public String assembleWelcomeMessage() {
-		if (isMerelySelfEditor() && !isSelfEditorWithIndividual()) {
+		if (!canSeeSiteAdminPage() && !isSelfEditorWithIndividual()) {
 			// A special message for unrecognized self-editors:
 			return "You have logged in, "
 					+ "but the system contains no profile for you.";
@@ -147,14 +146,9 @@ public class LoginRedirector {
 		}
 	}
 
-	private boolean isMerelySelfEditor() {
-		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(request);
-		if (IsRootUser.isRootUser(ids)) {
-			return false;
-		}
-		
-		RoleLevel role = HasRoleLevel.getUsersRoleLevel(ids);
-		return role == RoleLevel.PUBLIC || role == RoleLevel.SELF;
+	private boolean canSeeSiteAdminPage() {
+		return PolicyHelper.isAuthorizedForActions(request,
+				SimplePermission.SEE_SITE_ADMIN_PAGE.ACTIONS);
 	}
 
 	private boolean isLoginPage(String page) {

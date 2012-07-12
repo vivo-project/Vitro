@@ -18,8 +18,7 @@ import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.DoBackEndEditing;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
@@ -35,9 +34,10 @@ public class DataPropertyStatementRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(DataPropertyStatementRetryController.class.getName());
 	
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(request, response, new Actions(new DoBackEndEditing()))) {
-        	return;
-        }
+		if (!isAuthorizedToDisplayPage(request, response,
+				SimplePermission.DO_BACK_END_EDITING.ACTIONS)) {
+			return;
+		}
 
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);

@@ -26,7 +26,7 @@
     </#list>
     </select>
     
-    <input type="submit" id="submit" value="Add a new item of this type" role="button" />  
+    <input type="submit" id="offerCreate" class="submit"  value="Add a new item of this type" role="button" />  
     <#if rangeOptionsExist  = false >
         <span class="or"> or </span>
         <a title="Cancel" class="cancel" href="${cancelUrl}">Cancel</a>

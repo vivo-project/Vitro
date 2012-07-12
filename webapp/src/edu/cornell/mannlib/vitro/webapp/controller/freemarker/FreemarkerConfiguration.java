@@ -17,8 +17,12 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
+import edu.cornell.mannlib.vitro.webapp.web.directives.IndividualShortViewDirective;
+import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualLocalNameMethod;
+import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualPlaceholderImageUrlMethod;
+import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualProfileUrlMethod;
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -36,14 +40,12 @@ public class FreemarkerConfiguration extends Configuration {
     private final String themeDir;
     private final ServletContext context;
     private final ApplicationBean appBean;
-    private final String appName;
     
-    FreemarkerConfiguration(String themeDir, VitroRequest vreq, ServletContext context) {
+    FreemarkerConfiguration(String themeDir, ApplicationBean appBean, ServletContext context) {
         
         this.themeDir = themeDir;
         this.context = context;
-        this.appBean = vreq.getAppBean();
-        this.appName = appBean.getApplicationName();
+        this.appBean = appBean;
         
         String buildEnv = ConfigurationProperties.getBean(context).getProperty("Environment.build");
         log.debug("Current build environment: " + buildEnv);
@@ -84,7 +86,7 @@ public class FreemarkerConfiguration extends Configuration {
         
         setTemplateLoader(createTemplateLoader());   
 
-        setSharedVariables(vreq);
+        setSharedVariables();
 
     }
 
@@ -92,13 +94,12 @@ public class FreemarkerConfiguration extends Configuration {
      * These are values that are accessible to all
      * templates loaded by the Configuration's TemplateLoader. They
      * should be application- rather than request-specific.
-     * @param VitroRequest vreq
      */
-    private void setSharedVariables(VitroRequest vreq) {
+    private void setSharedVariables() {
 
         Map<String, Object> sharedVariables = new HashMap<String, Object>();
         
-        sharedVariables.put("siteName", appName);        
+        sharedVariables.put("siteName", appBean.getApplicationName());        
         sharedVariables.put("version", getRevisionInfo());
         sharedVariables.put("urls", getSiteUrls());
         sharedVariables.put("themeDir", themeDir);
@@ -107,6 +108,9 @@ public class FreemarkerConfiguration extends Configuration {
         sharedVariables.putAll(getDirectives());
         sharedVariables.putAll(getMethods());
         sharedVariables.put("siteTagline", appBean.getShortHand()); 
+        
+        //Put in edit configuration constants - useful for freemarker templates/editing
+        sharedVariables.put("editConfigurationConstants", EditConfigurationConstants.exportConstants());
         
         for ( Map.Entry<String, Object> variable : sharedVariables.entrySet() ) {
             try {
@@ -151,13 +155,15 @@ public class FreemarkerConfiguration extends Configuration {
         map.put("dump", new freemarker.ext.dump.DumpDirective());
         map.put("dumpAll", new freemarker.ext.dump.DumpAllDirective());  
         map.put("help", new freemarker.ext.dump.HelpDirective());    
+        map.put("shortView", new IndividualShortViewDirective());
         return map;
     }
     
     public static Map<String, Object> getMethods() {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("profileUrl", new edu.cornell.mannlib.vitro.webapp.web.methods.IndividualProfileUrlMethod());
-        map.put("localName", new edu.cornell.mannlib.vitro.webapp.web.methods.IndividualLocalNameMethod());
+        map.put("profileUrl", new IndividualProfileUrlMethod());
+        map.put("localName", new IndividualLocalNameMethod());
+        map.put("placeholderImageUrl", new IndividualPlaceholderImageUrlMethod());
         return map;
     }
     

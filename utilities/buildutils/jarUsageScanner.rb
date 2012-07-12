@@ -33,7 +33,7 @@ pass the root directory of the combined vitro/vivo distro
 	
 --------------------------------------------------------------------------------
 
-Search all of the *.java, *.jsp, *.js, *.xml files for mention of these package names
+Search all of the *.java, *.jsp, *.js, *.tld, *.xml files for mention of these package names
 	For each hit, print the file path, line number, the package name and the JAR name.
 	
 To search files:
@@ -146,7 +146,7 @@ end
 #
 def show_package_in_source_files(package_name)
 	puts "#{package_name}"
-	include_parms = build_include_parms(["*.java", "*.jsp", "*.xml", "*.js" ])
+	include_parms = build_include_parms(["*.java", "*.jsp", "*.xml", "*.tld", "*.js" ])
 	package_name_pattern = package_name.sub(/\./, "\\.")
 	system "grep -H -n -r #{include_parms} #{package_name_pattern} '#{@scan_base_directory}'"
 	puts

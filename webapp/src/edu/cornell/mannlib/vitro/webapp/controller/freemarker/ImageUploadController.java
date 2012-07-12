@@ -19,9 +19,9 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropStmt;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjPropStmt;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -36,6 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
+import edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil;
 
 /**
  * Handle adding, replacing or deleting the main image on an Individual.
@@ -62,12 +63,6 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 
 	/** The form field of the uploaded file; use as a key to the FileItem map. */
 	public static final String PARAMETER_UPLOADED_FILE = "datafile";
-
-	/**
-	 * The image to use as a placeholder when the individual has no image.
-	 * Determined by the template.
-	 */
-	public static final String PARAMETER_PLACEHOLDER_URL = "placeholder";
 
 	/** Here is the main image file. Hold on to it. */
 	public static final String ACTION_UPLOAD = "upload";
@@ -141,15 +136,18 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			String imageUri = entity.getMainImageUri();
 
 			RequestedAction ra;
-			if (ACTION_DELETE.equals(action) || ACTION_DELETE_EDIT.equals(action)) {
-				ra = new DropObjectPropStmt(entity.getURI(),
-						VitroVocabulary.IND_MAIN_IMAGE, imageUri);
+			if (ACTION_DELETE.equals(action)
+					|| ACTION_DELETE_EDIT.equals(action)) {
+				ra = new DropObjectPropertyStatement(vreq.getJenaOntModel(),
+						entity.getURI(), VitroVocabulary.IND_MAIN_IMAGE,
+						imageUri);
 			} else if (imageUri != null) {
-				ra = new EditObjPropStmt(entity.getURI(),
-						VitroVocabulary.IND_MAIN_IMAGE, imageUri);
+				ra = new EditObjectPropertyStatement(vreq.getJenaOntModel(),
+						entity.getURI(), VitroVocabulary.IND_MAIN_IMAGE,
+						imageUri);
 			} else {
-				ra = new AddObjectPropStmt(entity.getURI(),
-						VitroVocabulary.IND_MAIN_IMAGE,
+				ra = new AddObjectPropertyStatement(vreq.getJenaOntModel(),
+						entity.getURI(), VitroVocabulary.IND_MAIN_IMAGE,
 						RequestActionConstants.SOME_URI);
 			}
 			return new Actions(ra);
@@ -157,7 +155,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			return Actions.UNAUTHORIZED;
 		}
 	}
-	
+
 	/**
 	 * <p>
 	 * Parse the multi-part request, process the request, and produce the
@@ -405,12 +403,13 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	private TemplateResponseValues showAddImagePage(VitroRequest vreq,
 			Individual entity) {
 
-		String placeholderUrl = vreq.getParameter(PARAMETER_PLACEHOLDER_URL);
-
 		String formAction = (entity == null) ? "" : formAction(entity.getURI(),
-				ACTION_UPLOAD, placeholderUrl);
+				ACTION_UPLOAD);
 		String cancelUrl = (entity == null) ? "" : exitPageUrl(vreq,
 				entity.getURI());
+		String placeholderUrl = (entity == null) ? "" : UrlBuilder
+				.getUrl(PlaceholderUtil.getPlaceholderImagePathForIndividual(
+						vreq, entity.getURI()));
 
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_NEW);
 
@@ -437,12 +436,11 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private TemplateResponseValues showReplaceImagePage(VitroRequest vreq,
 			Individual entity, ImageInfo imageInfo) {
-		String placeholderUrl = vreq.getParameter(PARAMETER_PLACEHOLDER_URL);
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_REPLACE);
 		rv.put(BODY_THUMBNAIL_URL, UrlBuilder.getUrl(imageInfo.getThumbnail()
 				.getBytestreamAliasUrl()));
-		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE_EDIT, placeholderUrl));
-		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD, placeholderUrl));
+		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE_EDIT));
+		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD));
 		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
 		rv.put(BODY_TITLE, "Replace image" + forName(entity));
 		rv.put(BODY_MAX_FILE_SIZE, MAXIMUM_FILE_SIZE / (1024 * 1024));
@@ -468,12 +466,11 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private TemplateResponseValues showCropImagePage(VitroRequest vreq,
 			Individual entity, String imageUrl, Dimensions dimensions) {
-		String placeholderUrl = vreq.getParameter(PARAMETER_PLACEHOLDER_URL);
 		TemplateResponseValues rv = new TemplateResponseValues(TEMPLATE_CROP);
 		rv.put(BODY_MAIN_IMAGE_URL, UrlBuilder.getUrl(imageUrl));
 		rv.put(BODY_MAIN_IMAGE_HEIGHT, dimensions.height);
 		rv.put(BODY_MAIN_IMAGE_WIDTH, dimensions.width);
-		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_SAVE, placeholderUrl));
+		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_SAVE));
 		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
 		rv.put(BODY_TITLE, "Crop Photo" + forName(entity));
 		return rv;
@@ -518,11 +515,9 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * back to this controller, along with the desired action and the Entity
 	 * URI.
 	 */
-	private String formAction(String entityUri, String action,
-			String placeholderUrl) {
-		ParamMap params = new ParamMap(
-				PARAMETER_ENTITY_URI, entityUri, PARAMETER_ACTION, action,
-				PARAMETER_PLACEHOLDER_URL, placeholderUrl);
+	private String formAction(String entityUri, String action) {
+		ParamMap params = new ParamMap(PARAMETER_ENTITY_URI, entityUri,
+				PARAMETER_ACTION, action);
 		return UrlBuilder.getPath(URL_HERE, params);
 	}
 

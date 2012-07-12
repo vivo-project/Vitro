@@ -105,12 +105,9 @@ public class TBoxUpdater {
          //  the site hasn't overidden the previous default in their knowledge base.
     		    
 		  StmtIterator iter = oldTboxAnnotationsModel.listStatements();
-		  		  
-		  int stmtCount = 0;
-		  
+		  		  		  
 		  while (iter.hasNext()) {
 			  
-			 stmtCount++;
 			 Statement stmt = iter.next();
 			 Resource subject = stmt.getSubject();
 			 Property predicate = stmt.getPredicate();
@@ -160,10 +157,12 @@ public class TBoxUpdater {
              } 
 			 
 			 if (i > 1) {
+				 /*
 				 logger.log("WARNING: found " + i +
 						 " statements with subject = " + subject.getURI() + 
 						 " and property = " + predicate.getURI() +
 						 " in the new version of the annotations ontology (maximum of one is expected)");
+				 */		 
 				 continue; 
 			 }
 			 

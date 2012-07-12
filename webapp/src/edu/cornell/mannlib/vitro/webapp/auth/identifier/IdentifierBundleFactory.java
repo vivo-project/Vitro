@@ -2,22 +2,16 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.identifier;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
 
 /**
- * Creates an IdentifierBundle for a ServletRequest/HttpSession.  Useful
- * for getting the identifiers that should be associated with a request to
- * a servlet or a JSP.
- *
- * We have this method signature because these are the object that are accessible
- * from JSP TagSupport.pageContext.
- *
- * @author bdc34
- *
+ * Creates an IdentifierBundle for a ServletRequest/HttpSession. Useful for
+ * getting the identifiers that should be associated with a request.
  */
 public interface IdentifierBundleFactory {
-    public IdentifierBundle getIdentifierBundle(ServletRequest request, HttpSession session, ServletContext context);
-
+	/**
+	 * Return the IdentifierBundle from this factory. May return an empty
+	 * bundle, but never returns null.
+	 */
+	public IdentifierBundle getIdentifierBundle(HttpServletRequest request);
 }

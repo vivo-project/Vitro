@@ -97,6 +97,24 @@ public abstract class AbstractTestClass {
 		Logger.getLogger(category).setLevel(level);
 	}
 
+	/**
+	 * Capture the log for this class to this Writer. Choose whether or not to
+	 * suppress it from the console.
+	 */
+	protected void captureLogOutput(Class<?> clazz, Writer writer,
+			boolean suppress) {
+		PatternLayout layout = new PatternLayout("%p %m%n");
+
+		ConsoleAppender appender = new ConsoleAppender();
+		appender.setWriter(writer);
+		appender.setLayout(layout);
+
+		Logger logger = Logger.getLogger(clazz);
+		logger.removeAllAppenders();
+		logger.setAdditivity(!suppress);
+		logger.addAppender(appender);
+	}
+
 	// ----------------------------------------------------------------------
 	// Control standard output or error output.
 	// ----------------------------------------------------------------------

@@ -132,7 +132,7 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
             try {
                 com.hp.hpl.jena.ontology.Ontology o = ontModel.createOntology(adjustOntologyURI(ontology.getURI()));
                 if (ontology.getName() != null && ontology.getName().length()>0) {
-                    o.setLabel(ontology.getName(), PREFERRED_LANGUAGES[0]);
+                    o.setLabel(ontology.getName(), getDefaultLanguage());
                 }
                 if (ontology.getPrefix() != null && ontology.getPrefix().length()>0) {
                     addPropertyStringValue(o,ONTOLOGY_PREFIX_ANNOT,ontology.getPrefix(),ontModel);

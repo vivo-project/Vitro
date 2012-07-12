@@ -8,8 +8,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfiguration;
-
 public class EditSubmissionUtils {
 
     protected static final String MULTI_VALUED_EDIT_SUBMISSION = "MultiValueEditSubmission";

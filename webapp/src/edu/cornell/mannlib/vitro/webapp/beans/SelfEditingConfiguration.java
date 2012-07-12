@@ -5,9 +5,9 @@ package edu.cornell.mannlib.vitro.webapp.beans;
 import java.util.Collections;
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,38 +38,47 @@ public class SelfEditingConfiguration {
 	// ----------------------------------------------------------------------
 
 	/**
-	 * If there is no session, create a bean on the fly. If there is a session,
-	 * get the existing bean, or create one and store it for re-use.
+	 * Get the bean from the context. If there no bean, create one on the fly
+	 * and store it in the context.
 	 * 
 	 * Never returns null.
 	 */
 	public static SelfEditingConfiguration getBean(ServletRequest request) {
+		if (request == null) {
+			log.error("Request is null");
+			return new SelfEditingConfiguration(null);
+		}
+
 		if (!(request instanceof HttpServletRequest)) {
-			log.error("Not an HttpServletRequest: " + request);
+			log.error("Not an HttpServletRequest: " + request.getClass());
 			return new SelfEditingConfiguration(null);
 		}
+		HttpServletRequest hreq = (HttpServletRequest) request;
 
-		HttpSession session = ((HttpServletRequest) request).getSession(false);
-		if (session == null) {
-			log.trace("No session; no need to create one.");
-			return new SelfEditingConfiguration(null);
-		}
+		return getBean(hreq.getSession().getServletContext());
+	}
 
-		Object attr = session.getAttribute(BEAN_ATTRIBUTE);
+	/**
+	 * Get the bean from the context. If there no bean, create one on the fly
+	 * and store it in the context.
+	 * 
+	 * Never returns null.
+	 */
+	public static SelfEditingConfiguration getBean(ServletContext ctx) {
+		Object attr = ctx.getAttribute(BEAN_ATTRIBUTE);
 		if (attr instanceof SelfEditingConfiguration) {
-			log.trace("Found a bean: " + attr);
+			log.debug("Found a bean: " + attr);
 			return (SelfEditingConfiguration) attr;
 		}
 
-		SelfEditingConfiguration bean = buildBean(session);
+		SelfEditingConfiguration bean = buildBean(ctx);
 		log.debug("Created a bean: " + bean);
-		session.setAttribute(BEAN_ATTRIBUTE, bean);
+		ctx.setAttribute(BEAN_ATTRIBUTE, bean);
 		return bean;
 	}
 
-	private static SelfEditingConfiguration buildBean(HttpSession session) {
-		ConfigurationProperties config = ConfigurationProperties
-				.getBean(session);
+	private static SelfEditingConfiguration buildBean(ServletContext ctx) {
+		ConfigurationProperties config = ConfigurationProperties.getBean(ctx);
 		String selfEditingIdMatchingProperty = config
 				.getProperty(PROPERTY_SELF_EDITING_ID_MATCHING_PROPERTY);
 		return new SelfEditingConfiguration(selfEditingIdMatchingProperty);

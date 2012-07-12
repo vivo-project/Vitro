@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -25,12 +26,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
-import freemarker.template.Configuration;
 
 public class ContactMailController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
@@ -38,7 +39,6 @@ public class ContactMailController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
 	
     private final static String SPAM_MESSAGE        = "Your message was flagged as spam.";
-    private final static String EMAIL_BACKUP_FILE_PATH = "/WEB-INF/LatestMessage.html";
     
     private final static String WEB_USERNAME_PARAM  = "webusername";
     private final static String WEB_USEREMAIL_PARAM = "webuseremail";
@@ -48,6 +48,11 @@ public class ContactMailController extends FreemarkerHttpServlet {
     private final static String TEMPLATE_EMAIL = "contactForm-email.ftl";
     private final static String TEMPLATE_BACKUP = "contactForm-backup.ftl";
     private final static String TEMPLATE_ERROR = "contactForm-error.ftl";
+    private final static String TEMPLATE_FORM = "contactForm-form.ftl";
+    
+	private static final String PROPERTY_VITRO_HOME_DIR = "vitro.home.directory";
+	private static final String EMAIL_JOURNAL_FILE_DIR = "emailJournal";
+	private static final String EMAIL_JOURNAL_FILE_NAME = "contactFormEmails.html";
     
 	@Override
     protected String getTitle(String siteName, VitroRequest vreq) {
@@ -70,9 +75,13 @@ public class ContactMailController extends FreemarkerHttpServlet {
 		String webuseremail = nonNullAndTrim(vreq, WEB_USEREMAIL_PARAM);
 		String comments = nonNullAndTrim(vreq, COMMENTS_PARAM);
 	    String formType = nonNullAndTrim(vreq, "DeliveryType");
+	    String captchaInput = nonNullAndTrim(vreq, "defaultReal");
+	    String captchaDisplay = nonNullAndTrim(vreq, "defaultRealHash");
 
-		if (validateInput(webusername, webuseremail, comments) != null) {
-			return errorParametersNotValid();
+	    String errorMsg = validateInput(webusername, webuseremail, comments, captchaInput, captchaDisplay);
+
+		if ( errorMsg != null) {
+			return errorParametersNotValid(errorMsg, webusername, webuseremail, comments);
 		}
 		
 		String spamReason = checkForSpam(comments, formType);
@@ -102,19 +111,18 @@ public class ContactMailController extends FreemarkerHttpServlet {
 
 	    String originalReferer = getOriginalRefererFromSession(vreq);
 
-	    Configuration config = (Configuration) vreq.getAttribute("freemarkerConfig");
 	    String msgText = composeEmail(webusername, webuseremail, comments, 
-	    		deliveryfrom, originalReferer, vreq.getRemoteAddr(), config, vreq);
+	    		deliveryfrom, originalReferer, vreq.getRemoteAddr(), vreq);
 	    
 	    try {
-	    	// Write the email to a backup file
-	        FileWriter fw = new FileWriter(getServletContext().getRealPath(EMAIL_BACKUP_FILE_PATH),true);
+	    	// Write the message to the journal file
+	    	FileWriter fw = new FileWriter(locateTheJournalFile(vreq),true);
 	        PrintWriter outFile = new PrintWriter(fw); 
-	        writeBackupCopy(outFile, msgText, config, vreq);
+	        writeBackupCopy(outFile, msgText, vreq);
   
-	        Session s = FreemarkerEmailFactory.getEmailSession(vreq);
-
 	        try {
+	        	// Send the message
+	        	Session s = FreemarkerEmailFactory.getEmailSession(vreq);
 	        	sendMessage(s, webuseremail, webusername, recipients, deliveryfrom, msgText);
 	        } catch (AddressException e) {
 	            statusMsg = "Please supply a valid email address.";
@@ -147,6 +155,40 @@ public class ContactMailController extends FreemarkerHttpServlet {
 	    }   
 	}
 
+	/**
+	 * The journal file belongs in a sub-directory of the Vitro home directory.
+	 * If the sub-directory doesn't exist, create it.
+	 */
+	private File locateTheJournalFile(VitroRequest vreq) {
+		String homeDirPath = ConfigurationProperties.getBean(vreq).getProperty(
+				PROPERTY_VITRO_HOME_DIR);
+		if (homeDirPath == null) {
+			throw new IllegalArgumentException(
+					"Configuration properties must contain a value for '"
+							+ PROPERTY_VITRO_HOME_DIR + "'");
+		}
+
+		File homeDir = new File(homeDirPath);
+		if (!homeDir.exists()) {
+			throw new IllegalStateException("Vitro home directory '"
+					+ homeDir.getAbsolutePath() + "' does not exist.");
+		}
+
+		File journalDir = new File(homeDir, EMAIL_JOURNAL_FILE_DIR);
+		if (!journalDir.exists()) {
+			boolean created = journalDir.mkdir();
+			if (!created) {
+				throw new IllegalStateException(
+						"Unable to create email journal directory at '"
+								+ journalDir + "'");
+			}
+		}
+
+		File journalFile = new File(journalDir, EMAIL_JOURNAL_FILE_NAME);
+		return journalFile;
+	}
+
+
 	private String getOriginalRefererFromSession(VitroRequest vreq) {
 		String originalReferer = (String) vreq.getSession().getAttribute("contactFormReferer");        		
 	    if (originalReferer != null) {
@@ -178,7 +220,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
     
     private String composeEmail(String webusername, String webuseremail,
     							String comments, String deliveryfrom,
-    							String originalReferer, String ipAddr, Configuration config,
+    							String originalReferer, String ipAddr,
     							HttpServletRequest request) {
  
         Map<String, Object> email = new HashMap<String, Object>();
@@ -194,7 +236,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
         }
     	
         try {
-            return processTemplateToString(template, email, config, request);
+            return processTemplateToString(template, email, request);
         } catch (TemplateProcessingException e) {
             log.error("Error processing email text through template: " + e.getMessage(), e);
             return null;            
@@ -202,7 +244,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
     }
     
     private void writeBackupCopy(PrintWriter outFile, String msgText, 
-    		Configuration config, HttpServletRequest request) {
+    		HttpServletRequest request) {
 
         Map<String, Object> backup = new HashMap<String, Object>();
         String template = TEMPLATE_BACKUP; 
@@ -212,7 +254,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
         backup.put("msgText", msgText);
         
         try {
-            String backupText = processTemplateToString(template, backup, config, request);
+            String backupText = processTemplateToString(template, backup, request);
             outFile.print(backupText);
             outFile.flush();
             //outFile.close(); 
@@ -263,20 +305,28 @@ public class ContactMailController extends FreemarkerHttpServlet {
 	}
 
     private String validateInput(String webusername, String webuseremail,
-    							 String comments) {
+    							 String comments, String captchaInput, String captchaDisplay) {
     	
         if( webusername.isEmpty() ){
-            return "A proper webusername field was not found in the form submitted.";
+            return "Please enter a value in the Full name field.";
         } 
 
         if( webuseremail.isEmpty() ){
-            return "A proper webuser email field was not found in the form submitted.";
+            return "Please enter a valid email address.";
         } 
 
         if (comments.isEmpty()) { 
-            return "The proper comments field was not found in the form submitted.";
+            return "Please enter your comments or questions in the space provided.";
         } 
         
+        if (captchaInput.isEmpty()) { 
+            return "Please enter the contents of the gray box in the security field provided.";
+        } 
+        
+		if ( !captchaHash(captchaInput).equals(captchaDisplay) ) {
+			return "The value you entered in the security field did not match the letters displayed in the gray box.";
+		}
+
         return null;
     }
     
@@ -308,6 +358,15 @@ public class ContactMailController extends FreemarkerHttpServlet {
         
     }
     
+	private String captchaHash(String value) {
+		int hash = 5381;
+		value = value.toUpperCase();
+		for(int i = 0; i < value.length(); i++) {
+			hash = ((hash << 5) + hash) + value.charAt(i);
+		}
+		return String.valueOf(hash);
+	}
+
 	private ResponseValues errorNoSmtpServer() {
         Map<String, Object> body = new HashMap<String, Object>();
         body.put("errorMessage", 
@@ -324,11 +383,14 @@ public class ContactMailController extends FreemarkerHttpServlet {
 		return new TemplateResponseValues(TEMPLATE_ERROR, body);
 	}
 	
-	private ResponseValues errorParametersNotValid() {
-		// rjy7 We should reload the form, not go to the error page!
+	private ResponseValues errorParametersNotValid(String errorMsg, String webusername, String webuseremail, String comments) {
         Map<String, Object> body = new HashMap<String, Object>();
-		body.put("errorMessage", "Invalid submission");
-		return new TemplateResponseValues(TEMPLATE_ERROR, body);
+		body.put("errorMessage", errorMsg);
+		body.put("formAction", "submitFeedback");
+		body.put("webusername", webusername);
+		body.put("webuseremail", webuseremail);
+		body.put("comments", comments);
+		return new TemplateResponseValues(TEMPLATE_FORM, body);
 	}
 	
 	private ResponseValues errorSpam() {

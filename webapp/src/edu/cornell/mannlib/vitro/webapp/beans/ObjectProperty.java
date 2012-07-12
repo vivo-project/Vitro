@@ -52,14 +52,12 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     private String namespaceInverse = null;
     private String localNameInverse = null;
 
-    private String domainEntitySortField = null;
     private String domainEntitySortDirection = null;
     private Integer domainDisplayTier = null;
     private Integer domainDisplayLimit = 5;
 
     private String objectIndividualSortPropertyURI = null;
     
-    private String rangeEntitySortField = null;
     private String rangeEntitySortDirection = null;
     private Integer rangeDisplayTier = null;
     private Integer rangeDisplayLimit = 5;

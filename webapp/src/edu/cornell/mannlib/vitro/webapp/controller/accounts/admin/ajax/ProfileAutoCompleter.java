@@ -50,10 +50,10 @@ import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrResponseFilter;
 
 /**
- * Get a list of Profiles that satisfy the search term, and that have no
- * matching property, unless it matches the current externalAuthId. (So a
- * Profile that is currently associated with the user is not excluded from the
- * list.)
+ * Get a list of Profiles with last names that begin with this search term, and
+ * that have no matching property, unless it matches the current externalAuthId.
+ * (So a Profile that is currently associated with the user is not excluded from
+ * the list.)
  * 
  * For each such Profile, return the label, the URL and the URI.
  * 

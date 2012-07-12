@@ -16,7 +16,6 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mindswap.pellet.PelletOptions;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.OWL;
@@ -27,6 +26,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.ReasonerConfiguration;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.reasoner.ReasonerPlugin;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasonerTBoxListener;
@@ -45,6 +46,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+        
         try {    
             // set up Pellet reasoning for the TBox    
             
@@ -60,12 +62,12 @@ public class SimpleReasonerSetup implements ServletContextListener {
             }
             
             // Set various Pellet options for incremental consistency checking, etc.
-            PelletOptions.DL_SAFE_RULES = true;
-            PelletOptions.USE_COMPLETION_QUEUE = true;
-            PelletOptions.USE_TRACING = true;
-            PelletOptions.TRACK_BRANCH_EFFECTS = true;
-            PelletOptions.USE_INCREMENTAL_CONSISTENCY = true;
-            PelletOptions.USE_INCREMENTAL_DELETION = true;
+            //PelletOptions.DL_SAFE_RULES = true;
+            //PelletOptions.USE_COMPLETION_QUEUE = true;
+            //PelletOptions.USE_TRACING = true;
+            //PelletOptions.TRACK_BRANCH_EFFECTS = true;
+            //PelletOptions.USE_INCREMENTAL_CONSISTENCY = true;
+            //PelletOptions.USE_INCREMENTAL_DELETION = true;
              
             PelletListener pelletListener = new PelletListener(unionOms.getTBoxModel(),assertionsOms.getTBoxModel(),inferencesOms.getTBoxModel(),ReasonerConfiguration.DEFAULT);
             sce.getServletContext().setAttribute("pelletListener",pelletListener);
@@ -101,7 +103,9 @@ public class SimpleReasonerSetup implements ServletContextListener {
             
             
             // the simple reasoner will register itself as a listener to the ABox assertions
-            SimpleReasoner simpleReasoner = new SimpleReasoner(unionOms.getTBoxModel(), assertionsOms.getABoxModel(), inferencesOms.getABoxModel(), rebuildModel, scratchModel);
+            RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService();
+            SimpleReasoner simpleReasoner = new SimpleReasoner(
+                    unionOms.getTBoxModel(), rdfService, inferencesOms.getABoxModel(), rebuildModel, scratchModel);
             sce.getServletContext().setAttribute(SimpleReasoner.class.getName(),simpleReasoner);
             
             StartupStatus ss = StartupStatus.getBean(ctx);
@@ -111,6 +115,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
                 try {
                     ReasonerPlugin plugin = (ReasonerPlugin) Class.forName(
                             classname).getConstructors()[0].newInstance();
+                    plugin.setSimpleReasoner(simpleReasoner);
                     pluginList.add(plugin);
                 } catch(Throwable t) {              
                     ss.info(this, "Could not instantiate reasoner plugin " + classname);
@@ -129,11 +134,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
                     new Thread(new ABoxRecomputer(simpleReasoner),"ABoxRecomputer").start();
                 }
                 
-            } else if ( isMSTComputeRequired(sce.getServletContext()) ) {
-                log.info("mostSpecificType computation required. It will be done in a separate thread.");
-                waitForTBoxReasoning(pelletListener);
-                new Thread(new MostSpecificTypeRecomputer(simpleReasoner),"MostSpecificTypeComputer").start();
-            }
+            } 
 
             SimpleReasonerTBoxListener simpleReasonerTBoxListener = new SimpleReasonerTBoxListener(simpleReasoner);
             sce.getServletContext().setAttribute(SimpleReasonerTBoxListener.class.getName(),simpleReasonerTBoxListener);
@@ -231,20 +232,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
             simpleReasoner.recompute();
         }
     }
-    
-    private class MostSpecificTypeRecomputer implements Runnable {
         
-        private SimpleReasoner simpleReasoner;
-        
-        public MostSpecificTypeRecomputer(SimpleReasoner simpleReasoner) {
-            this.simpleReasoner = simpleReasoner;
-        }
-        
-        public void run() {
-            simpleReasoner.computeMostSpecificType();              
-        }
-    }
-    
     /**
      * Read the names of the plugin classes classes.
      * 

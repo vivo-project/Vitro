@@ -18,9 +18,7 @@ public class ObjectPropertyStatementImpl implements ObjectPropertyStatement
 
     private String propertyURI = null;
     private ObjectProperty property = null;
-    private String qualifier = null;
-    private boolean subjectOriented = true; //is the range the item of interest?
-    private String description = null;  //generated desc based on subjectOriented during sql query.  
+    private boolean subjectOriented = true; //is the range the item of interest?  
     
    public ObjectPropertyStatementImpl() { }
 
@@ -37,23 +35,7 @@ public class ObjectPropertyStatementImpl implements ObjectPropertyStatement
            String prop = (getProperty()!=null)?getProperty().getDomainPublic():"by propURI"+getPropertyURI();
            String ran = (getObject()!= null)?getObject().getName():"objectURI:"+getObjectURI();
            String dom = (getSubject()!= null)?getSubject().getName():"subjectURI:"+getSubjectURI();
-           String orent = (isSubjectOriented() )?"subject oriented":"object oriented";
-           return "Object Property Statements: "+dom+" "+prop+" to "+ran+" "+orent;
-    }
-
-    /* (non-Javadoc)
-     * @see edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement#isSubjectOriented()
-     */
-    public boolean isSubjectOriented() {
-        return subjectOriented;
-    }
-
-
-    /* (non-Javadoc)
-     * @see edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement#setSubjectOriented(boolean)
-     */
-    public void setSubjectOriented(boolean subjectOriented) {
-        this.subjectOriented = subjectOriented;
+           return "Object Property Statements: "+dom+" "+prop+" to "+ran+" ";
     }
 
     /* (non-Javadoc)
@@ -100,6 +82,11 @@ public class ObjectPropertyStatementImpl implements ObjectPropertyStatement
      */
     public void setSubject(Individual subject) {
         this.subject = subject;
+        if (subject == null || subject.isAnonymous()) {
+            setSubjectURI(null);    
+        } else {
+            setSubjectURI(subject.getURI());
+        }
     }
 
 
@@ -136,6 +123,11 @@ public class ObjectPropertyStatementImpl implements ObjectPropertyStatement
      */
     public void setObject(Individual object) {
         this.object = object;
+        if (object == null || object.isAnonymous()) {
+            setObjectURI(null);    
+        } else {
+            setObjectURI(object.getURI());
+        }
     }
 
 

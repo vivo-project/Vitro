@@ -2,8 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,29 +14,17 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
-
-
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 
-import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.Field;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditN3GeneratorVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.SelectListGeneratorVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.FieldVTwo;
-import edu.cornell.mannlib.vitro.webapp.web.MiscWebUtils;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.DefaultAddMissingIndividualFormModelPreprocessor;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
 
@@ -319,18 +307,23 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     private void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) {
     	Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
     	if(EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)) {
-    		fields = getObjectPropertyField(editConfiguration, vreq);
+    		    			      
+    	    //make name field
+    	    FieldVTwo field = new FieldVTwo();
+	        field.setName("name");      	        
+	        
+	        List<String> validators = new ArrayList<String>();
+	        validators.add("nonempty");
+	        field.setValidators(validators);   
+	                            
+	        fields.put(field.getName(), field);
+    	        
     	} else {
     		log.error("Is not object property so fields not set");
     	}
     	
     	editConfiguration.setFields(fields);
     }
-    
-   
-
-	
-	
 
 	private String getRangeClassUri(VitroRequest vreq) {
 		Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
@@ -353,36 +346,6 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 	    	if( rangeClass == null ) throw new Error ("Cannot find class for range for property.  Looking for " + prop.getRangeVClassURI() );    
 	    }
 		return rangeClass.getURI();
-	}
-
-	private Map<String, FieldVTwo> getObjectPropertyField(
-			EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
-		Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
-		FieldVTwo field = new FieldVTwo();
-    	field.setName("name");    	
-    	//queryForExisting is not being used anywhere in Field
-    	
-    	List<String> validators = new ArrayList<String>();
-    	validators.add("nonempty");
-    	field.setValidators(validators);
-    	
-    	//subjectUri and subjectClassUri are not being used in Field
-    	
-    	field.setOptionsType("UNDEFINED");
-    	//TODO:check why predicate uri is empty on original jsp
-    	field.setPredicateUri("");
-    	
-    	field.setObjectClassUri("");
-    	field.setRangeDatatypeUri(null);
-    	
-    	field.setRangeLang(null);
-    	field.setLiteralOptions(new ArrayList<List<String>>());
-      	
-    	fields.put(field.getName(), field);
-    	
-    	return fields;
-    	
-    	
 	}
 
 	private void prepareForUpdate(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {

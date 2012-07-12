@@ -13,11 +13,19 @@
             
             <#if siteConfig.manageProxies?has_content>
                 <li role="listitem"><a href="${siteConfig.manageProxies}" title="Manage profile editing">Manage profile editing</a></li>
-            </#if>     
+            </#if>  
+            
+            <#if siteConfig.pageManagement?has_content>
+                <li role="listitem"><a href="${siteConfig.pageManagement}" title="Page management">Page management</a></li>
+            </#if>        
             
             <#if siteConfig.menuManagement?has_content>
-                <li role="listitem"><a href="${siteConfig.menuManagement}" title="Menu management">Menu management</a></li>
+                <li role="listitem"><a href="${siteConfig.menuManagement}" title="Menu ordering">Menu ordering</a></li>
             </#if>      
+            
+            <#if siteConfig.restrictLogins?has_content>
+                <li role="listitem"><a href="${siteConfig.restrictLogins}" title="Restrict Logins">Restrict Logins</a></li>
+            </#if>
             
             <#if siteConfig.siteInfo?has_content>
                 <li role="listitem"><a href="${siteConfig.siteInfo}" title="Site information">Site information</a></li>

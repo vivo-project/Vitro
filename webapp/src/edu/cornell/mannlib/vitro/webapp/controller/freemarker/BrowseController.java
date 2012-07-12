@@ -10,9 +10,9 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin.RebuildVClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -36,7 +36,7 @@ public class BrowseController extends FreemarkerHttpServlet {
     @Override
     protected Actions requiredActions(VitroRequest vreq) {
         if ( vreq.getParameter("clearcache") != null )
-            return new Actions(new RebuildVClassGroupCache() );
+            return SimplePermission.REBUILD_VCLASS_GROUP_CACHE.ACTIONS;
         else
             return Actions.AUTHORIZED;
     }
@@ -51,7 +51,7 @@ public class BrowseController extends FreemarkerHttpServlet {
                        
         if ( vreq.getParameter("clearcache") != null ) {
             //mainly for debugging
-            if( PolicyHelper.isAuthorizedForActions(vreq, new RebuildVClassGroupCache()) ){
+            if( PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.REBUILD_VCLASS_GROUP_CACHE.ACTIONS) ){
                 clearGroupCache();
             }
         }

@@ -67,6 +67,7 @@ public class ReasonerConfiguration {
         defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.unionOf,null));
         defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.intersectionOf,null));
         defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.complementOf,null));
+        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.oneOf,null));
         defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.onProperty,null));
         defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.someValuesFrom,null));
         defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.allValuesFrom,null));

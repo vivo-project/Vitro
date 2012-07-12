@@ -5,8 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.controller.admin;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.SeeStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
@@ -21,7 +21,7 @@ public class StartupStatusController extends FreemarkerHttpServlet {
 
 	@Override
 	protected Actions requiredActions(VitroRequest vreq) {
-		return new Actions(new SeeStartupStatus());
+		return SimplePermission.SEE_STARTUP_STATUS.ACTIONS;
 	}
 
 	@Override

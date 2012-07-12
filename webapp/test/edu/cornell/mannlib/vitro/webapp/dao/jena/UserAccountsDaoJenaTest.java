@@ -358,8 +358,15 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		PermissionSet ps2 = new PermissionSet();
 		ps2.setUri(URI_ROLE2);
 		ps2.setLabel("Role 2");
+		ps2.setForNewUsers(true);
 		expected.add(ps2);
 
+		PermissionSet ps3 = new PermissionSet();
+		ps3.setUri(URI_ROLE3);
+		ps3.setLabel("Role 3");
+		ps3.setForPublic(true);
+		expected.add(ps3);
+		
 		assertCorrectPermissionSets(expected, dao.getAllPermissionSets());
 	}
 
@@ -450,23 +457,25 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 			Collection<PermissionSet> actual) {
 		Set<Map<String, Object>> expectedMaps = new HashSet<Map<String, Object>>();
 		for (PermissionSet ps : expected) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("uri", ps.getUri());
-			map.put("label", ps.getLabel());
-			map.put("permissions", ps.getPermissionUris());
-			expectedMaps.add(map);
+			expectedMaps.add(buildMapFromPermissionSet(ps));
 		}
 
 		Set<Map<String, Object>> actualMaps = new HashSet<Map<String, Object>>();
 		for (PermissionSet ps : actual) {
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("uri", ps.getUri());
-			map.put("label", ps.getLabel());
-			map.put("permissions", ps.getPermissionUris());
-			actualMaps.add(map);
+			actualMaps.add(buildMapFromPermissionSet(ps));
 		}
 
 		assertEquals("all permission sets", expectedMaps, actualMaps);
+	}
+
+	private Map<String, Object> buildMapFromPermissionSet(PermissionSet ps) {
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("uri", ps.getUri());
+		map.put("label", ps.getLabel());
+		map.put("permissions", ps.getPermissionUris());
+		map.put("forNewUsers", ps.isForNewUsers());
+		map.put("forPublic", ps.isForPublic());
+		return map;
 	}
 
 	private void assertExpectedAccountUris(String label,
