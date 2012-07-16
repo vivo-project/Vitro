@@ -5,6 +5,9 @@ package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
@@ -17,9 +20,11 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
- * This allows J. Random User to pretend that he's passed external authentication.
+ * This allows J. Random User to pretend that he's passed external
+ * authentication.
  * 
  * This should not be included in web.xml in a production deployment!!!
  */
@@ -38,10 +43,16 @@ public class FakeExternalAuthController extends FreemarkerHttpServlet {
 	@Override
 	public void init() throws ServletException {
 		log.debug("storing the bean.");
+		
 		ExternalAuthHelper.setBean(getServletContext(),
 				new FakeExternalAuthHelper(null));
+		
+		new SecurityWarning().warn(getServletContext(),
+				"The FakeExternalAuthController is enabled. "
+						+ "If that's not what you wanted, "
+						+ "go into web.xml and comment it out.");
 	}
-	
+
 	@Override
 	protected String getTitle(String siteName, VitroRequest vreq) {
 		return "Fake external login " + siteName;
@@ -125,6 +136,28 @@ public class FakeExternalAuthController extends FreemarkerHttpServlet {
 		@Override
 		public String toString() {
 			return "FakeExternalAuthHelper[username='" + username + "']";
+		}
+
+	}
+
+	/**
+	 * StartupStatus requires a ServletContextListener as the root for a warning
+	 * message. This isn't used as one, but it will satisfy that requirement.
+	 */
+	private static class SecurityWarning implements ServletContextListener {
+
+		void warn(ServletContext ctx, String message) {
+			StartupStatus.getBean(ctx).warning(this, message);
+		}
+
+		@Override
+		public void contextInitialized(ServletContextEvent arg0) {
+			// Nothing to do
+		}
+
+		@Override
+		public void contextDestroyed(ServletContextEvent arg0) {
+			// Nothing to do
 		}
 
 	}
