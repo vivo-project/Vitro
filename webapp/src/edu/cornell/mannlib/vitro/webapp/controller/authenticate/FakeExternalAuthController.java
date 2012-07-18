@@ -41,7 +41,7 @@ public class FakeExternalAuthController extends FreemarkerHttpServlet {
 	private static final String PARAMETER_CANCEL = "cancel";
 
 	@Override
-	public void init() throws ServletException {
+	public void init() throws ServletExceptionXX {
 		log.debug("storing the bean.");
 		
 		ExternalAuthHelper.setBean(getServletContext(),
