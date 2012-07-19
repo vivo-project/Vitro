@@ -12,6 +12,7 @@
 <#assign menuLinkText = "" />
 <#assign menuPosition = pageData.highestMenuPosition />
 <#assign addMenuItem = "" />
+<#assign pageHeading = "Add Page" />
 <#if pageData.addMenuItem?has_content>
 	<#assign addMenuItem = pageData.addMenuItem />
 </#if>
@@ -24,6 +25,7 @@
 	<#assign menuItem =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuItem")/>
 	<#assign menuLinkText =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuLinkText")/>
 	<#assign customTemplate = lvf.getFormFieldValue(editSubmission, editConfiguration, "customTemplate")/>
+	<#assign pageHeading = "Edit Page" />
 	<#if customTemplate?has_content>
 		<#assign selectedTemplateType = "custom" />
 	</#if>
@@ -57,7 +59,7 @@
 	        <input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="1" role="input" />
 	        <input type="hidden" id="editKey" name="editKey" value="${editKey}" />
 			<input type="hidden" id="menuItem" name="menuItem" value="${menuItem}"/>
-    <h2>Add Page</h2>
+    <h2>${pageHeading}</h2>
     <!--Drop down for the types of content possible-->
     <section id="floatRight">
         <div id="rightSide">
@@ -95,7 +97,7 @@
             <input type="radio" name="selectedTemplate" class="custom-template" value="custom" <#if selectedTemplateType = "custom">checked="checked"</#if> role="input" />
             <label class="inline" for="custom"> Custom template</label>
             <section id="custom-template" <#if selectedTemplateType != 'custom'>class="hidden" </#if>role="region">
-                <input type="text" name="customTemplate" value="${customTemplate!''}" size="40" role="input" /><span class="requiredHint"> *</span>
+                <input type="text" name="customTemplate" value="${customTemplate!''}" size="33" role="input" /><span class="requiredHint"> *</span>
             </section>
             <p id="checkboxPTag"><input id="menuCheckbox" type="checkbox" name="menuCheckbox"
             <#if (menuAction="Edit" && menuItem?has_content) || (menuAction="Add" && addMenuItem = "true")>checked="checked"</#if>

@@ -52,6 +52,9 @@
                         </#list>
                     </ul><br />
                     <input  type="button" id="doneWithContent" class="doneWithContent" name="doneWithContent" value="Done" />
+                    <#if menuAction == "Add">
+                        <span id="cancelContent"> or <a class="cancel" href="javascript:"  id="cancelContentLink" >Cancel</a></span>
+                    </#if>
                 </section>
             </section>
  <#--Include JavaScript specific to the types of data getters related to this content-->           
