@@ -181,7 +181,34 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		//removes requiresTemplate statement for people page
 		updatePeoplePageDisplayModel(displayModel, addStatements, removeStatements);
 		//add page list
-		addPageListDisplayModel(displayModel, addStatements, removeStatements,settings);	
+		addPageListDisplayModel(displayModel, addStatements, removeStatements,settings);
+		
+		/***Additional debugging***/
+		//Additional debugging here to see if that statement still exists
+		log.debug("Checking: BEFORE UPDATE DATA GETTER LABELS AND AFTER ADDPAGELIST, what do we have for pageList page");
+		Resource testResource = ResourceFactory.createResource(DisplayVocabulary.DISPLAY_NS + "pageListPage");
+		StmtIterator testIt = addStatements.listStatements(testResource, null, (RDFNode) null);
+		if(!testIt.hasNext()) {
+			log.debug("Add statements does not have the page list page resource " + testResource.getURI());
+		}
+		
+		while(testIt.hasNext()) {
+			log.debug("Statement for page list resource: " + testIt.nextStatement().toString());
+		}
+		
+		log.debug("AFTER PAGE LIST resource method HAS RETURNED, Add statements now includes ");
+		StringWriter aw = new StringWriter();
+		try {
+			addStatements.write(aw, "N3");
+			log.debug(aw.toString());
+			aw.close();
+		}catch(Exception ex) 
+		{
+			log.error("Error occurred when outputting model before executing updateDataGetterLabels ", ex);
+		}
+	
+		/***Additional debugging***/
+		
 		//update data getter labels
 		updateDataGetterLabels(displayModel, addStatements, removeStatements,settings);
 		
