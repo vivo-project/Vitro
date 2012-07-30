@@ -17,7 +17,7 @@
 
 
 <#--HTML Portion-->
- <section id="browseClassGroup" style="background-color:#f9f9f9;padding-left:6px;padding-top:2px;border-width:1px;border-style:solid;border-color:#ccc;">
+ <section id="browseClassGroup" class="contentSectionContainer">
                        
                 <section id="selectContentType" name="selectContentType" ${selectClassGroupStyle} role="region">     
                     

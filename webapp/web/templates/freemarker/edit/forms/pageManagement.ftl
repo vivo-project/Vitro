@@ -25,9 +25,14 @@
 	<#assign menuItem =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuItem")/>
 	<#assign menuLinkText =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuLinkText")/>
 	<#assign customTemplate = lvf.getFormFieldValue(editSubmission, editConfiguration, "customTemplate")/>
+	<#assign selfContainedTemplate = lvf.getFormFieldValue(editSubmission, editConfiguration, "selfContainedTemplate")/>
 	<#assign pageHeading = "Edit Page" />
 	<#if customTemplate?has_content>
-		<#assign selectedTemplateType = "custom" />
+	    <#if selfContainedTemplate?has_content>
+		    <#assign selectedTemplateType = "selfContained" />
+    	<#else>
+            <#assign selectedTemplateType = "custom" />
+        </#if>
 	</#if>
 	<#assign editMenuPosition =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuPosition")/>
 	<#--if menu position exists for a menu item, then use that, otherwise use the highest available menu position number from page data-->
@@ -64,13 +69,13 @@
     <section id="floatRight">
         <div id="rightSide">
             <section id="addPageOne" role="region" >
-                <label for="last-name">Content Type<span class="requiredHint"> *</span></label> 
-                <select id="typeSelect"  name="typeSelect" >
-                    <option value="" selected="selected">Select one</option>
-                    <option value="browseClassGroup">Browse Class Group</option>           
-                    <option value="fixedHtml">Fixed HTML</option>           
-                    <option value="sparqlQuery">SPARQL Query Results</option>           
-                 </select>&nbsp;<span class="note">Add one or more content types</span>
+            <label for="contentType">Content Type<span class="requiredHint"> *</span></label> 
+            <select id="typeSelect"  name="typeSelect" >
+                <option value="" selected="selected">Select a type</option>
+                <option value="browseClassGroup">Browse Class Group</option>           
+                <option value="fixedHtml">Fixed HTML</option>           
+                <option value="sparqlQuery">SPARQL Query Results</option>           
+             </select>&nbsp;<span class="note">Add one or more types</span>
             </section>
             <section id="contentDivs"></section>
             <section id="headerBar" >
@@ -95,11 +100,15 @@
             <label class="inline" for="default"> Default</label>
             <br />
             <input type="radio" name="selectedTemplate" class="custom-template" value="custom" <#if selectedTemplateType = "custom">checked="checked"</#if> role="input" />
-            <label class="inline" for="custom"> Custom template</label>
+            <label class="inline" for="custom"> Custom template requiring content</label>
+            <br /><div id="selfContainedDiv">
+            <input type="radio" name="selectedTemplate" class="selfContained-template" value="selfContained" <#if selectedTemplateType = "selfContained">checked="checked"</#if> role="input" />
+            <label class="inline" for="selfContained"> Custom template containing all content</label></div>
             <section id="custom-template" <#if selectedTemplateType != 'custom'>class="hidden" </#if>role="region">
                 <input type="text" name="customTemplate" value="${customTemplate!''}" size="33" role="input" /><span class="requiredHint"> *</span>
+                <input type="hidden" name="selfContainedTemplate" value="${selfContainedTemplate!''}"/>
             </section>
-            <p id="checkboxPTag"><input id="menuCheckbox" type="checkbox" name="menuCheckbox"
+            <p id="menuCheckboxPTag"><input id="menuCheckbox" type="checkbox" name="menuCheckbox"
             <#if (menuAction="Edit" && menuItem?has_content) || (menuAction="Add" && addMenuItem = "true")>checked="checked"</#if>
             > This is a menu page</p>
             <section id="menu" role="region" 
