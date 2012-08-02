@@ -87,13 +87,9 @@ class IndividualResponseBuilder {
 		 * into the data model: no real data can be modified. 
 		 */
 		// body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
-		if ( itm.person() ) {
-    	    body.put("publicationCount", getPublicationCount(itm.getUri(), vreq));
-    	    body.put("grantCount", getGrantCount(itm.getUri(), vreq));
-		}
-		if ( itm.organization() ) {
-    	    body.put("peopleCount", getPeopleCount(itm.getUri(), vreq));
-		}
+	    body.put("publicationCount", getPublicationCount(itm.getUri(), vreq));
+	    body.put("grantCount", getGrantCount(itm.getUri(), vreq));
+	    body.put("peopleCount", getPeopleCount(itm.getUri(), vreq));
 	    body.put("labelCount", getLabelCount(itm.getUri(), vreq));
 		body.put("individual", wrap(itm, new ReadOnlyBeansWrapper()));
 		
