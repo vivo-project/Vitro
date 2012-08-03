@@ -142,13 +142,22 @@ public  class ProcessFixedHTMLN3 extends ProcessDataGetterAbstract {
         	   QuerySolution qs = results.nextSolution();
         	   Literal saveToVarLiteral = qs.getLiteral("saveToVar");
         	   Literal htmlValueLiteral = qs.getLiteral("htmlValue");
+        	   String htmlValueString = htmlValueLiteral.getString();
+        	   htmlValueString = this.replaceQuotes(htmlValueString);
         	   jObject.element("saveToVar", saveToVarLiteral.getString());
-        	   jObject.element("htmlValue", htmlValueLiteral.getString());
+        	   //TODO: Handle single and double quotes within string and escape properlyu
+        	   jObject.element("htmlValue", htmlValueString);
            }
        } catch(Exception ex) {
     	   log.error("Exception occurred in retrieving existing values with query " + querystr, ex);
        }
        return jObject;
+	   
+   }
+   
+   //Escape single and double quotes for html string to be returned to form
+   public String replaceQuotes(String inputStr) {
+	   return inputStr.replaceAll("\'", "&#39;").replaceAll("\"", "&quot;");
 	   
    }
 

@@ -256,7 +256,7 @@ var pageManagementUtils = {
 		 var validationError = pageManagementUtils.validateMenuItemForm();
 	     //Add any errors from page content sections if necessary
 	     // Only validate the content sections if the self contained template section is NOT selected tlw72
-	     if ( !pageManagementUtils.selfContainedTemplate.is(':checked') ) {
+	     if ( !pageManagementUtils.isSelfContainedTemplateChecked() ) {
 	          validationError += pageManagementUtils.validatePageContentSections();
 	     }
 	     if (validationError == "") {
@@ -264,7 +264,8 @@ var pageManagementUtils = {
 	    	pageManagementUtils.checkMenuTitleSubmission();
 	 		//Create the appropriate json objects if necessary
      		pageManagementUtils.createPageContentForSubmission();
-     		pageManagementUtils.mapCustomTemplateName();
+     		//pageManagementUtils.mapCustomTemplateName();
+     		pageManagementUtils.setUsesSelfContainedTemplateInput();
      		return true;
         } else{
             $('#error-alert').removeClass('hidden');
@@ -698,10 +699,22 @@ var pageManagementUtils = {
     		//Create a new hidden input with a specific name and assign value per page content
         	pageManagementUtils.createPageContentInputForSubmission(jsonObjectString);
     	});
-    	
+    	//For the case where the template only selection is picked, there will be
+    	//no page contents, but the hidden input still needs to be created as it is expected
+    	//to exist by the edit configuration, this creates the hidden input with an empty value
+	     if (pageManagementUtils.isSelfContainedTemplateChecked() ) {
+	    	 	//An empty string as no content selected
+	        	pageManagementUtils.createPageContentInputForSubmission("");
+	     }
     },
     createPageContentInputForSubmission: function(inputValue) {
-    	$("<input type='hidden' name='pageContentUnit' value='" + inputValue + "'>").appendTo(pageManagementUtils.pageContentSubmissionInputs);
+    	//Previously, this code created the hidden input and included the value inline
+    	//but this was converting html encoding for quotes/single quotes into actual quotes
+    	//which prevented correct processing as the html thought the string had ended
+    	//Creating the input and then using the val() method preserved the encoding
+    	var pageContentUnit = $("<input type='hidden' name='pageContentUnit'>");
+    	pageContentUnit.val(inputValue);
+    	pageContentUnit.appendTo(pageManagementUtils.pageContentSubmissionInputs);
     },
     //returns a json object with the data getter information required
     processPageContentSection:function(pageContentSection) {
@@ -776,8 +789,9 @@ var pageManagementUtils = {
             validationError += "The pretty URL must begin with a leading forward slash<br />";
         }
         
-        // Check custom template
-        if ($('input:radio[name=selectedTemplate]:checked').val() == "custom") {
+        // Check custom template and self contained template
+        var selectedTemplateValue = $('input:radio[name=selectedTemplate]:checked').val();
+        if (selectedTemplateValue == "custom" || selectedTemplateValue == "selfContained") {
             if ($('input[name=customTemplate]').val() == "") {
                 validationError += "You must supply a template<br />"; 
             }
@@ -817,8 +831,15 @@ var pageManagementUtils = {
     //If the selfContained-template radio is checked, copy the custom template name to the hidden
     //selfContainedTemplate input element. We need that for edit mode to select the correct radio button.
     mapCustomTemplateName:function() {
-        if ( this.selfContainedTemplateRadio.is(':checked') ) {
+        if ( pageManagementUtils.selfContainedTemplateRadio.is(':checked') ) {
             $("input[name='selfContainedTemplate']").val($("input[name='customTemplate']").val());
+        }
+    },
+    
+    setUsesSelfContainedTemplateInput:function() {
+    	//On form submission attach hidden input to form if the custom template selection is picked
+        if ( pageManagementUtils.isSelfContainedTemplateChecked() ) {
+        	$("<input name='isSelfContainedTemplate' value='true'>").appendTo($("form"));
         }
     },
     
@@ -828,6 +849,9 @@ var pageManagementUtils = {
             $('div#selfContainedDiv').show();
         }
         
+    },
+    isSelfContainedTemplateChecked:function() {
+    	return pageManagementUtils.selfContainedTemplateRadio.is(':checked');
     }
 
 }

@@ -172,11 +172,14 @@ public class ManagePagePreprocessor extends
 	private void convertToJson() {
 		//Iterate through list of inputs
 		pageContentUnitsJSON = new ArrayList<JSONObject>();
-		for(String pageContentUnit: pageContentUnits) {
-			JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON( pageContentUnit );
-			pageContentUnitsJSON.add(jsonObject);
+		//page content units might return null in case self-contained template is selected
+		//otherwise there should be page content units returned from the form
+		if(pageContentUnits != null) {
+			for(String pageContentUnit: pageContentUnits) {
+				JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON( pageContentUnit );
+				pageContentUnitsJSON.add(jsonObject);
+			}
 		}
-		
 	}
 
 	//This is where the actual values will be submitted as if they were separate input fields
