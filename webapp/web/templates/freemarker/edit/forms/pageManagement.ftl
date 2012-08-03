@@ -25,7 +25,7 @@
 	<#assign menuItem =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuItem")/>
 	<#assign menuLinkText =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuLinkText")/>
 	<#assign customTemplate = lvf.getFormFieldValue(editSubmission, editConfiguration, "customTemplate")/>
-	<#assign selfContainedTemplate = lvf.getFormFieldValue(editSubmission, editConfiguration, "selfContainedTemplate")/>
+	<#assign selfContainedTemplate = lvf.getFormFieldValue(editSubmission, editConfiguration, "isSelfContainedTemplate")/>
 	<#assign pageHeading = "Edit Page" />
 	<#if customTemplate?has_content>
 	    <#if selfContainedTemplate?has_content>
@@ -67,7 +67,7 @@
     <h2>${pageHeading}</h2>
     <!--Drop down for the types of content possible-->
     <section id="floatRight">
-        <div id="rightSide">
+        <div id="rightSide" <#if selectedTemplateType="selfContained">style="display:none;"</#if>>
             <section id="addPageOne" role="region" >
             <label for="contentType">Content Type<span class="requiredHint"> *</span></label> 
             <select id="typeSelect"  name="typeSelect" >
@@ -104,7 +104,7 @@
             <br /><div id="selfContainedDiv">
             <input type="radio" name="selectedTemplate" class="selfContained-template" value="selfContained" <#if selectedTemplateType = "selfContained">checked="checked"</#if> role="input" />
             <label class="inline" for="selfContained"> Custom template containing all content</label></div>
-            <section id="custom-template" <#if selectedTemplateType != 'custom'>class="hidden" </#if>role="region">
+            <section id="custom-template" <#if selectedTemplateType ="default">class="hidden" </#if>role="region">
                 <input type="text" name="customTemplate" value="${customTemplate!''}" size="33" role="input" /><span class="requiredHint"> *</span>
                 <input type="hidden" name="selfContainedTemplate" value="${selfContainedTemplate!''}"/>
             </section>
@@ -140,7 +140,9 @@
     <!--For existing content, will have div to save existing content-->
     <div id="existingPageContent" style="display:none">
     <#if pageData.existingPageContentUnits?has_content>
-    	<input type='hidden' id='existingPageContentUnits' value='${pageData.existingPageContentUnits}'/>
+    	<!--Using the ?html ensures that single and double quotes are html encoded - double quotes
+    	if left unencoded will break the html and lead to errors-->
+    	<input type='hidden' id='existingPageContentUnits' value='${pageData.existingPageContentUnits?html}'/>
     </#if>
     </div>
     </form>
