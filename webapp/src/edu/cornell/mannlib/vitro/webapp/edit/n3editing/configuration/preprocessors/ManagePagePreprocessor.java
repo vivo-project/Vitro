@@ -250,10 +250,15 @@ public class ManagePagePreprocessor extends
 		
 		 //To get data getter uris, check if editing an existing set and include those as form inputs
 		 if(editConfiguration.isParamUpdate()) {
-			 String URIValue = jsonObject.getString("URI");
-			 if(URIValue != null) {
-				 String dataGetterURISubmissionName = pn.getDataGetterVarName(counter);
-				 submission.addUriToForm(editConfiguration, dataGetterURISubmissionName, new String[]{URIValue});
+			 //Although this is editing an existing page, new content might have been added which would not include
+			 //existing data getter URIs, so important to check whether the key exists within the json object in the first place
+			 if(jsonObject.containsKey("URI")) {
+				 String URIValue = jsonObject.getString("URI");
+				 if(URIValue != null) {
+					 log.debug("Existing URI for data getter found: " + URIValue);
+					 String dataGetterURISubmissionName = pn.getDataGetterVarName(counter);
+					 submission.addUriToForm(editConfiguration, dataGetterURISubmissionName, new String[]{URIValue});
+				 }
 			 }
 		 }
 		
