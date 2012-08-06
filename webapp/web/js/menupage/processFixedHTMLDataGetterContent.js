@@ -14,7 +14,7 @@ var processFixedHTMLDataGetterContent = {
 	    //JSON parsing on the server side does not handle single quotes, as it appears it thinks the string has 
 	    //ended.  Different data getter types may handle apostrophes/single quotes differently
 		//In this case, this is HTML so it simply html Encodes any apostrophes
-		htmlValue = processFixedHTMLDataGetterContent.replaceSingleQuote(htmlValue);
+		htmlValue = processFixedHTMLDataGetterContent.encodeQuotes(htmlValue);
 		var returnObject = {saveToVar:saveToVarValue, htmlValue:htmlValue, dataGetterClass:this.dataGetterClass};
 		return returnObject;
 	},
@@ -22,6 +22,8 @@ var processFixedHTMLDataGetterContent = {
 	populatePageContentSection:function(existingContentObject, pageContentSection) {
 		var saveToVarValue = existingContentObject["saveToVar"];
 		var htmlValue = existingContentObject["htmlValue"];
+		//In displaying the html value for the edit field, replace the encoded quotes with regular quotes
+		htmlValue = processFixedHTMLDataGetterContent.replaceEncodedWithEscapedQuotes(htmlValue);
 		//Now find and set value
 		pageContentSection.find("input[name='saveToVar']").val(saveToVarValue);
 		pageContentSection.find("textarea[name='htmlValue']").val(htmlValue);
@@ -55,7 +57,7 @@ var processFixedHTMLDataGetterContent = {
 		}
     	return validationError;
     },
-    replaceSingleQuote:function(inputStr) {
+    encodeQuotes:function(inputStr) {
     	return inputStr.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
     },
     //For the variable name, no single quote should be allowed
@@ -65,6 +67,9 @@ var processFixedHTMLDataGetterContent = {
     },
     stringHasDoubleQuote:function(inputStr) {
     	return(inputStr.indexOf("\"") != -1);
+    },
+    replaceEncodedWithEscapedQuotes: function(inputStr) {
+    	return inputStr.replace(/&#39;/g, "\'").replace(/&quot;/g, "\"");
     }
 		
 		
