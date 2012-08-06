@@ -36,5 +36,6 @@ public interface ProcessDataGetterN3 {
     public Map<String, List<String>> retrieveExistingUriValues();
     public void populateExistingValues(String dataGetterURI, int counter, OntModel queryModel);
     public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context);
+    public String replaceEncodedQuotesWithEscapedQuotes(String inputStr);
 
 }

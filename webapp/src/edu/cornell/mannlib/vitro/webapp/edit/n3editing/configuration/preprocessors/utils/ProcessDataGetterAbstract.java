@@ -54,6 +54,13 @@ public abstract class ProcessDataGetterAbstract implements ProcessDataGetterN3 {
 	   return "?" + getVarName(base, counter);
    }
    
+   //For handling encoded single and double quotes
+   //For fixed html and sparql data getters, replaces encoded quotes with escaped quotes
+   //Can be overridden in other processors if need be
+   public String replaceEncodedQuotesWithEscapedQuotes(String inputStr) {
+	   return inputStr.replaceAll("&#39;", "\'").replaceAll("&quot;", "\"");
+   }
+   
    //Return name of new resources
    public List<String> getNewResources(int counter) {
 	   //Each data getter requires a new resource

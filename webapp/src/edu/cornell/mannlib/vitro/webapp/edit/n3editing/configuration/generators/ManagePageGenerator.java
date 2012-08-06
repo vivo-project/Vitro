@@ -282,6 +282,8 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
     private void addJSONArrayToFormSpecificData(JSONArray jsonArray, EditConfigurationVTwo editConfig) {
     	HashMap<String, Object> data = editConfig.getFormSpecificData();		
 		data.put("existingPageContentUnits", jsonArray.toString());
+		//Experimenting with putting actual array in
+		data.put("existingPageContentUnitsJSONArray", jsonArray);
 		
 	}
 

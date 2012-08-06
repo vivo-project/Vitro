@@ -199,10 +199,14 @@ public class ManagePagePreprocessor extends
 			 if(jsonValue instanceof String) {
 				 //TODO: Deal with multiple submission values
 				 //This retrieves the value for this particular json object
-				 literalValues.add(jsonObject.getString(literalLabel));
+				 String jsonString = jsonObject.getString(literalLabel);
+				 jsonString = pn.replaceEncodedQuotesWithEscapedQuotes(jsonString);
+				 literalValues.add(jsonString);
 			 } else if(jsonValue instanceof JSONArray) {
 				 JSONArray values = jsonObject.getJSONArray(literalLabel);
 				 literalValues = (List<String>) JSONSerializer.toJava(values);
+				 //Replacing encoded quotes here as well
+				 this.replaceEncodedQuotesInList(pn, literalValues);
 			 } else if(jsonValue instanceof Boolean) {
 				 Boolean booleanValue = jsonObject.getBoolean(literalLabel);
 				 //Adds string version
@@ -232,6 +236,7 @@ public class ManagePagePreprocessor extends
 				 //multiple values
 				 JSONArray values = jsonObject.getJSONArray(uriLabel);
 				 uriValues = (List<String>) JSONSerializer.toJava(values);
+				
 			 } else {
 				 //This may include JSON Objects but no way to deal with these right now
 			 }
@@ -254,7 +259,17 @@ public class ManagePagePreprocessor extends
 		
 	}
 
-	  
+	private void replaceEncodedQuotesInList(ProcessDataGetterN3 pn, List<String> values) {
+		int i;
+		int len = values.size();
+		for(i = 0; i < len; i++) {
+			String value = values.get(i);
+			if(value.contains("&quot;") || value.contains("&#39;")) {
+				value = pn.replaceEncodedQuotesWithEscapedQuotes(value);
+				values.set(i,value);
+			}
+		}
+	}
 
 
 	private void addFields(ProcessDataGetterN3 pn, int counter) {
