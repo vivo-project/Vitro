@@ -160,9 +160,16 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
         	   QuerySolution qs = results.nextSolution();
         	   Literal saveToVarLiteral = qs.getLiteral("saveToVar");
         	   Literal queryLiteral = qs.getLiteral("query");
+        	   String queryString = queryLiteral.getString();
+        	   //we are saving the actual quotes in the n3 as escaped
+        	   //so for the json object we need to convert them into encoded
+        	   //quotes that will be reconverted on the client side for display
+        	   //Not converting them will either result in an incorrect json object
+        	   //or incorrect html
+        	   queryString = replaceQuotes(queryString);
         	   Resource queryModelResource = qs.getResource("queryModel");
         	   jObject.element("saveToVar", saveToVarLiteral.getString());
-        	   jObject.element("query", queryLiteral.getString());
+        	   jObject.element("query",queryString);
         	   if(queryModelResource != null) {
         	   jObject.element("queryModel", queryModelResource.getURI());
         	   } else {
@@ -175,6 +182,12 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
        }
 	   
 	   return jObject;
+   }
+   
+   //Escape single and double quotes for html string to be returned to form
+   public String replaceQuotes(String inputStr) {
+	   return inputStr.replaceAll("\'", "&#39;").replaceAll("\"", "&quot;");
+	   
    }
 
 }
