@@ -87,9 +87,6 @@ class IndividualResponseBuilder {
 		 * into the data model: no real data can be modified. 
 		 */
 		// body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
-        body.put("publicationCount", getPublicationCount(itm.getUri(), vreq));
-	    body.put("grantCount", getGrantCount(itm.getUri(), vreq));
-        body.put("peopleCount", getPeopleCount(itm.getUri(), vreq));
 	    body.put("labelCount", getLabelCount(itm.getUri(), vreq));
 		body.put("individual", wrap(itm, new ReadOnlyBeansWrapper()));
 		
@@ -249,28 +246,7 @@ class IndividualResponseBuilder {
         + "    ?subject rdfs:label ?label \n"
         + "    FILTER isLiteral(?label) \n"
         + "}" ;
-    
-    private static String PUB_COUNT_QUERY = ""
-        + "PREFIX core: <http://vivoweb.org/ontology/core#> \n"
-        + "SELECT ( str(COUNT(?authorship)) AS ?authorshipCount ) WHERE { \n"
-        + "    ?subject core:authorInAuthorship ?authorship \n"
-        + "}" ;
-    
-    private static String GRANT_COUNT_QUERY = ""
-        + "PREFIX core: <http://vivoweb.org/ontology/core#> \n"
-        + "SELECT ( str(COUNT(?role)) AS ?roleCount ) WHERE { \n"
-        + "    { ?subject core:hasInvestigatorRole ?role } UNION \n"
-        + "    { ?subject core:hasPrincipalInvestigatorRole ?role } UNION \n"
-        + "    { ?subject core:hasCo-PrincipalInvestigatorRole ?role } UNION \n"
-        + "    { ?subject core:hasResearcherRole ?role } \n"
-        + "}" ;
-       
-    private static String PEOPLE_COUNT_QUERY = ""
-        + "PREFIX core: <http://vivoweb.org/ontology/core#> \n"
-        + "SELECT ( str(COUNT(?position)) AS ?positionCount ) WHERE { \n"
-        + "    ?subject core:organizationForPosition ?position  \n"
-        + "}" ;
-       
+           
     private static Integer getLabelCount(String subjectUri, VitroRequest vreq) {
           
         String queryStr = QueryUtils.subUriForQueryVar(LABEL_COUNT_QUERY, "subject", subjectUri);
@@ -281,58 +257,6 @@ class IndividualResponseBuilder {
             if (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
                 String countStr = soln.get("labelCount").toString();
-                theCount = Integer.parseInt(countStr);
-            }
-        } catch (Exception e) {
-            log.error(e, e);
-        }    
-        return theCount;
-    }
-    private static Integer getPublicationCount(String subjectUri, VitroRequest vreq) {
-          
-        String queryStr = QueryUtils.subUriForQueryVar(PUB_COUNT_QUERY, "subject", subjectUri);
-        log.debug("queryStr = " + queryStr);
-        int theCount = 0;
-        try {
-            ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
-            if (results.hasNext()) {
-                QuerySolution soln = results.nextSolution();
-                String countStr = soln.get("authorshipCount").toString();
-                theCount = Integer.parseInt(countStr);
-            }
-        } catch (Exception e) {
-            log.error(e, e);
-        }    
-        return theCount;
-    }
-    private static Integer getGrantCount(String subjectUri, VitroRequest vreq) {
-          
-        String queryStr = QueryUtils.subUriForQueryVar(GRANT_COUNT_QUERY, "subject", subjectUri);
-        log.debug("queryStr = " + queryStr);
-        int theCount = 0;
-        try {
-            ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
-            if (results.hasNext()) {
-                QuerySolution soln = results.nextSolution();
-                String countStr = soln.get("roleCount").toString();
-                theCount = Integer.parseInt(countStr);
-            }
-        } catch (Exception e) {
-            log.error(e, e);
-        }    
-        return theCount;
-    }
-
-    private static Integer getPeopleCount(String subjectUri, VitroRequest vreq) {
-          
-        String queryStr = QueryUtils.subUriForQueryVar(PEOPLE_COUNT_QUERY, "subject", subjectUri);
-        log.debug("queryStr = " + queryStr);
-        int theCount = 0;
-        try {
-            ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
-            if (results.hasNext()) {
-                QuerySolution soln = results.nextSolution();
-                String countStr = soln.get("positionCount").toString();
                 theCount = Integer.parseInt(countStr);
             }
         } catch (Exception e) {
