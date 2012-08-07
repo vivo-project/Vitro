@@ -25,18 +25,6 @@
         </#if>
         
         <#-- List the properties in the group -->
-        <#assign pubCount = 0 >
-        <#assign researchCount = 0 >
-        <#assign peepsCount = 0 >
-        <#if publicationCount?? >
-            <#assign pubCount = publicationCount >
-        </#if>
-        <#if grantCount?? >
-            <#assign researchCount = grantCount >
-        </#if>
-        <#if peopleCount?? >
-            <#assign peepsCount = peopleCount >
-        </#if>
         <#list group.properties as property>
             <article class="property" role="article">
                 <#-- Property display name -->
