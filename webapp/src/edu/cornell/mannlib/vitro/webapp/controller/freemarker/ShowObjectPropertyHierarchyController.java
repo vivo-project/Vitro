@@ -207,11 +207,15 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
             else if ( position < previous_posn ) {
                 tempString += "}, { \"name\": ";
             }
+            
+            String nameStr = getDisplayLabel(op)==null ? "(no name)" : getDisplayLabel(op);
+            nameStr = nameStr.replace("\"","\\\"");
+            nameStr = nameStr.replace("\'","\\\'");
 
             try {
-            	tempString +=  "\"<a href='propertyEdit?uri="+URLEncoder.encode(op.getURI(),"UTF-8") + "'>" + getDisplayLabel(op)+"</a>\", ";
+            	tempString +=  "\"<a href='propertyEdit?uri="+URLEncoder.encode(op.getURI(),"UTF-8") + "'>" + nameStr +"</a>\", ";
             } catch (UnsupportedEncodingException uee) {
-                tempString +=  "\"" + getDisplayLabel(op) + "\"";
+                tempString +=  "\"" + nameStr + "\"";
             	log.error("Unsupported: URLEncoder.encode() with UTF-8");
             }
             
