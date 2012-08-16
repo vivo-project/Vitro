@@ -57,7 +57,10 @@ public class ContextNodeFields implements DocumentModifier{
             return;
         
         log.debug( "processing context nodes for: " +  individual.getURI());
-        
+        log.debug( "queries are ");
+        for(String q:queries) {
+        	log.debug("Query: " + q);
+        }
         /* get text from the context nodes and add the to ALLTEXT */        
         StringBuffer values = executeQueryForValues(individual, queries);        
         
@@ -86,7 +89,7 @@ public class ContextNodeFields implements DocumentModifier{
         	
             String subInUriQuery = 
         		query.replaceAll("\\?uri", "<" + individual.getURI() + "> ");
-        	
+        	log.debug("Subbed in URI query: " + subInUriQuery);
             try{
             	
             	ResultSet results = RDFServiceUtils.sparqlSelectQuery(subInUriQuery, rdfService);               

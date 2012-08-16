@@ -251,6 +251,10 @@
   <!--  nameLowercaseSingleValued is not copied from nameRaw becasue nameRaw might have multiple values -->
      
   <!-- ****************************  End Vitro Fields *************************** -->
+  <!-- ****************************  Dynamic Fields *************************** -->
+  <dynamicField name="*_string" type="string" indexed="true" stored="true" />
+   <!-- ****************************  End Dynamic Fields *************************** -->
+  
    
    <field name="timestamp" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>     
  </fields>

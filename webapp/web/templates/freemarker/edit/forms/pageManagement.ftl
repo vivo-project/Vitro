@@ -63,7 +63,6 @@
 	<form id="managePage" method="POST" action="${submitUrl}" role="add page">
 	        <input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="1" role="input" />
 	        <input type="hidden" id="editKey" name="editKey" value="${editKey}" />
-			<input type="hidden" id="menuItem" name="menuItem" value="${menuItem}"/>
     <h2>${pageHeading}</h2>
     <!--Drop down for the types of content possible-->
     <section id="floatRight">

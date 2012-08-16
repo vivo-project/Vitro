@@ -37,6 +37,18 @@ var processIndividualsForClassesDataGetterContent = {
 			var classSelected = classesSelected[i];
 			pageContentSection.find("input[name='classInClassGroup'][value='" + classSelected + "']").attr("checked", "checked");
 		}
+		//If number of classes selected is not equal to total number of classes, uncheck all
+		
+		var results =existingContentObject["results"];
+		if(results != null && results.classGroupName != null) {
+	    	var resultsClasses = results["classes"];
+	    	if(resultsClasses != null) {
+	    		var numberClasses = resultsClasses.length;
+	    		if(numberClasses != numberSelected) {
+	    			pageContentSection.find("input[name='allSelected']").removeAttr("checked");
+	    		}
+	    	}
+		}
 	},
 	//For the label of the content section for editing, need to add additional value
 	retrieveAdditionalLabelText:function(existingContentObject) {
