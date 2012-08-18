@@ -1,5 +1,5 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
-<#import "lib-vivo-form.ftl" as lvf>
+<#import "lib-vitro-form.ftl" as lvf>
 
 <#--------Set up variables-------->
 <#assign pageData = editConfiguration.pageData />
