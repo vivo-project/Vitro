@@ -208,7 +208,10 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
                  tempString += "\" " + ((vcw.getLocalNameWithPrefix() == null) ? "" : vcw.getLocalNameWithPrefix()) + "\", ";
             }
 
-            tempString += "\"data\": { \"shortDef\": \"" + ((vcw.getShortDef() == null) ? "" : vcw.getShortDef()) + "\", ";
+            String shortDef = ((vcw.getShortDef() == null) ? "" : vcw.getShortDef()) ;
+            shortDef = shortDef.replace("\"","\\\"");
+            shortDef = shortDef.replace("\'","\\\'");
+            tempString += "\"data\": { \"shortDef\": \"" + shortDef + "\", ";
 
             // Get group name if it exists
             VClassGroupDao groupDao= wadf.getVClassGroupDao();

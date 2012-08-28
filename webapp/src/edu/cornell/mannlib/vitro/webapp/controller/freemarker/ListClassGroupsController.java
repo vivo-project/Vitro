@@ -64,6 +64,8 @@ public class ListClassGroupsController extends FreemarkerHttpServlet {
                     if ( StringUtils.isBlank(publicName) ) {
                         publicName = "(unnamed group)";
                     }           
+                    publicName = publicName.replace("\"","\\\"");
+                    publicName = publicName.replace("\'","\\\'");
                     try {
                         json += "{ \"name\": \"<a href='./editForm?uri="+URLEncoder.encode(vcg.getURI(),"UTF-8")+"&amp;controller=Classgroup'>"+publicName+"</a>\", ";
                     } catch (Exception e) {
@@ -90,6 +92,8 @@ public class ListClassGroupsController extends FreemarkerHttpServlet {
                             }
 
                             String shortDefStr = (vcw.getShortDef() == null) ? "" : vcw.getShortDef();
+                            shortDefStr = shortDefStr.replace("\"","\\\"");
+                            shortDefStr = shortDefStr.replace("\'","\\\'");
                             json += "\"data\": { \"shortDef\": \"" + shortDefStr + "\"}, \"children\": [] ";
                             if (classIt.hasNext())
                                 json += "} , ";
