@@ -132,7 +132,7 @@ public class VclassRetryController extends BaseEditController {
         try {
             VClassGroupDao vcgDao = request.getFullWebappDaoFactory().getVClassGroupDao();
             List classGroupOptionList = FormUtils.makeOptionListFromBeans(vcgDao.getPublicGroupsWithVClasses(),"URI","PublicName",vclassForEditing.getGroupURI(),null,(vclassForEditing.getGroupURI()!=null && !(vclassForEditing.getGroupURI().equals(""))));
-            classGroupOptionList.add(new Option("", "none", ("update".equals(action) && (vclassForEditing.getGroupURI()==null || vclassForEditing.getGroupURI().equals("")))));
+            classGroupOptionList.add(0,new Option("", "none", ("update".equals(action) && (vclassForEditing.getGroupURI()==null || vclassForEditing.getGroupURI().equals("")))));
             optionMap.put("GroupURI", classGroupOptionList);
 
         } catch (Exception e) {
