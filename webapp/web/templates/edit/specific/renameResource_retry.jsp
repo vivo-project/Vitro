@@ -9,9 +9,24 @@
 </tr>
 
 <tr class="editformcell">
-<td>
-<b>New URI</b><br/><span class="warning"><strong>${epo.attributeMap['errorMsg']}</strong></span>
-<input type="text" size="95%" name="newURI" value='<%=request.getParameter("oldURI")%>'/>
-</td>
+    <td>
+        <br/>
+        <b>New URI</b>&nbsp;<span class="note"> (must begin with http:// or htts://)</span>
+        <br/>
+        <span class="warning"><strong>${epo.attributeMap['errorMsg']}</strong></span>
+        <input type="text" size="95%" name="newURI" value='<%=request.getParameter("oldURI")%>'/>
+    </td>
 </tr>
-
+<script  type="text/javascript">
+    $('form#editForm').submit(function() {
+        var str = $('input[name=newURI]').val();
+        if ( str.indexOf('http://') >= 0 || str.indexOf('https://') >= 0 ) {
+            return true;
+        }
+        else {
+            alert('The New URI must begin with either http:// \n\n or https://');
+            $('input[name=newURI]').focus();
+            return false;
+        }
+    });
+</script>
