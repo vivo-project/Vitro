@@ -21,7 +21,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -92,7 +91,7 @@ public class WebappDaoFactorySparqlPrep implements Filter {
             }
         }
 		
-        BasicDataSource bds = JenaDataSourceSetupBase.getApplicationDataSource(_ctx);
+        javax.sql.DataSource ds = JenaDataSourceSetupBase.getApplicationDataSource(_ctx);
         StoreDesc storeDesc = (StoreDesc) _ctx.getAttribute("storeDesc");
         OntModelSelector oms = (OntModelSelector) _ctx.getAttribute("unionOntModelSelector");
         String defaultNamespace = (String) _ctx.getAttribute("defaultNamespace");
@@ -103,12 +102,12 @@ public class WebappDaoFactorySparqlPrep implements Filter {
 		WebappDaoFactory wadf = null;
 		
 		try {		
-		    if (bds == null || storeDesc == null || oms == null) {
+		    if (ds == null || storeDesc == null || oms == null) {
 		        throw new RuntimeException("SDB store not property set up");
 		    }
 		    
 			try {
-			    sqlConn = bds.getConnection();
+			    sqlConn = ds.getConnection();
 				conn = new SDBConnection(sqlConn) ;
 			} catch (SQLException sqe) {
 				throw new RuntimeException("Unable to connect to database", sqe);

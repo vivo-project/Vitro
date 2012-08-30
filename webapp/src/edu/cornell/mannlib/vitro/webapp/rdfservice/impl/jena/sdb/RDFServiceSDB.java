@@ -6,6 +6,8 @@ import java.io.ByteArrayInputStream;
 import java.sql.SQLException;
 import java.util.Iterator;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -32,18 +34,18 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
 
     private final static Log log = LogFactory.getLog(RDFServiceSDB.class);
     
-    private BasicDataSource bds;
+    private DataSource ds;
     private StoreDesc storeDesc;
     
-    public RDFServiceSDB(BasicDataSource dataSource, StoreDesc storeDesc) {
-        this.bds = dataSource;
+    public RDFServiceSDB(DataSource dataSource, StoreDesc storeDesc) {
+        this.ds = dataSource;
         this.storeDesc = storeDesc;
     }
     
     @Override
     protected DatasetWrapper getDatasetWrapper() {
         try {
-            SDBConnection conn = new SDBConnection(bds.getConnection());
+            SDBConnection conn = new SDBConnection(ds.getConnection());
             return new DatasetWrapper(getDataset(conn), conn);
         } catch (SQLException sqle) {
             log.error(sqle, sqle);
@@ -64,7 +66,7 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
             
         SDBConnection conn = null;
         try {
-            conn = new SDBConnection(bds.getConnection());
+            conn = new SDBConnection(ds.getConnection());
         } catch (SQLException sqle) {
             log.error(sqle, sqle);
             throw new RDFServiceException(sqle);

@@ -23,8 +23,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -248,7 +248,7 @@ public class VitroRequestPrep implements Filter {
     	
 		// If they asked for other models by URI, set them.
 		if (anyOtherSpecialProperties(vreq)) {
-			BasicDataSource bds = JenaDataSourceSetupBase.getApplicationDataSource(_context);
+			DataSource bds = JenaDataSourceSetupBase.getApplicationDataSource(_context);
 			String dbType = ConfigurationProperties.getBean(_context)
 					.getProperty("VitroConnection.DataSource.dbtype", "MySQL");
 
@@ -286,7 +286,7 @@ public class VitroRequestPrep implements Filter {
 	 *             if it's not found.
 	 */
 	private OntModel createSpecialModel(VitroRequest vreq, String key,
-			BasicDataSource bds, String dbType) {
+			DataSource bds, String dbType) {
 		if (!isParameterPresent(vreq, key)) {
 			return null;
 		}

@@ -29,8 +29,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -966,7 +966,7 @@ public class JenaIngestController extends BaseEditController {
         log.debug("Connecting to DB at "+jdbcUrl);
         StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash,dbTypeObj) ; 
         ServletContext ctx = vreq.getSession().getServletContext();
-        BasicDataSource bds = WebappDaoSetup.makeBasicDataSource(
+        DataSource bds = WebappDaoSetup.makeBasicDataSource(
                 driver, jdbcUrl, username, password, ctx);
         try {
             VitroJenaSDBModelMaker vsmm = new VitroJenaSDBModelMaker(storeDesc, bds);

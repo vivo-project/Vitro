@@ -5,17 +5,13 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntDocumentManager;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /** 
@@ -35,7 +31,7 @@ public class JenaPersistentDataSourceSetup extends JenaDataSourceSetupBase
         // we do not want to fetch imports when we wrap Models in OntModels
         OntDocumentManager.getInstance().setProcessImports(false);
         
-        BasicDataSource bds = makeDataSourceFromConfigurationProperties(ctx);
+        DataSource bds = makeDataSourceFromConfigurationProperties(ctx);
         setApplicationDataSource(bds, ctx);		                          	
 	}
 	
