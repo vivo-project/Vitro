@@ -63,8 +63,12 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
     }
     
     public String getN3ForTypePartial(int counter) {
+    	//UPDATE: including class type as 
     	String dataGetterVar = getDataGetterVar(counter);
-    	String n3 = dataGetterVar + " a <" + getClassType() + ">";
+    	String classTypeVar = getN3VarName(classTypeVarBase, counter);
+    	//String n3 = dataGetterVar + " a <" + getClassType() + ">";
+    	String n3 = dataGetterVar + " a " + classTypeVar;
+
     	return n3;
     }
     
@@ -83,6 +87,8 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
     	List<String> urisOnForm = new ArrayList<String>();
     	//Class group is a URI
     	urisOnForm.add(getVarName("classGroup", counter));
+    	//UPDATE: adding class type as uri on form
+    	urisOnForm.add(getVarName(classTypeVarBase, counter));
     	return urisOnForm;
     	
     }
@@ -90,6 +96,9 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
    public List<FieldVTwo> retrieveFields(int counter) {
 	   List<FieldVTwo> fields = new ArrayList<FieldVTwo>();
 	   fields.add(new FieldVTwo().setName(getVarName("classGroup", counter)));
+	   //UPDATE: adding class type to the uris on the form
+	   fields.add(new FieldVTwo().setName(getVarName(classTypeVarBase, counter)));
+
 	   return fields;
    }
    
@@ -101,7 +110,8 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
 
    //these are for the fields ON the form
    public List<String> getUriVarNamesBase() {
-	   return Arrays.asList("classGroup");   
+	   //UPDATE: adding class type as uri
+	   return Arrays.asList("classGroup", classTypeVarBase);   
    }
 
    //This class can be extended so returning type here
@@ -114,6 +124,8 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
    public void populateExistingValues(String dataGetterURI, int counter, OntModel queryModel) {
 	   //First, put dataGetterURI within scope as well
 	   this.populateExistingDataGetterURI(dataGetterURI, counter);
+	   //Put in type
+	   this.populateExistingClassType(this.getClassType(), counter);
 	   //Sparql queries for values to be executed
 	   //And then placed in the correct place/literal or uri
 	   String querystr = getExistingValuesClassGroup(dataGetterURI);
@@ -148,6 +160,7 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
    public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context) {
 	   JSONObject jObject = new JSONObject();
 	   jObject.element("dataGetterClass", classType);
+	   jObject.element(classTypeVarBase, classType);
 	   //Get class group
 	   getExistingClassGroup(dataGetterURI, jObject, queryModel);
 	   //Get classes within class group

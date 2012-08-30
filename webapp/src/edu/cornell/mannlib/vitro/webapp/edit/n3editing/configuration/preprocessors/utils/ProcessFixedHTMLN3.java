@@ -37,7 +37,9 @@ public  class ProcessFixedHTMLN3 extends ProcessDataGetterAbstract {
 	//?dataGetter a FixedHTMLDataGetter ; display:saveToVar ?saveToVar; display:htmlValue ?htmlValue .
     public List<String> retrieveN3Required(int counter) {
     	String dataGetterVar = getDataGetterVar(counter);
-    	String n3 = dataGetterVar + " a <" + classType + ">; \n" + 
+    	//UPDATE: Using variable for class type
+    	String classTypeVar = getN3VarName(classTypeVarBase, counter);
+    	String n3 = dataGetterVar + " a " + classTypeVar + "; \n" + 
     	"display:saveToVar " + getN3VarName("saveToVar", counter) + "; \n" + 
     	"display:htmlValue " + getN3VarName("htmlValue", counter) + " .";
     	List<String> requiredList = new ArrayList<String>();
@@ -61,6 +63,8 @@ public  class ProcessFixedHTMLN3 extends ProcessDataGetterAbstract {
      
     public List<String> retrieveUrisOnForm(int counter) {
     	List<String> urisOnForm = new ArrayList<String>();
+    	//UPDATE: adding class type as uri on form
+    	urisOnForm.add(getVarName(classTypeVarBase, counter));
     	return urisOnForm;
     	
     }
@@ -71,7 +75,8 @@ public  class ProcessFixedHTMLN3 extends ProcessDataGetterAbstract {
 	   //fields.add(new FieldVTwo().setName(getVarName("dataGetter", counter)));
 	   fields.add(new FieldVTwo().setName(getVarName("saveToVar", counter)));
 	   fields.add(new FieldVTwo().setName(getVarName("htmlValue", counter)));
-
+	   //UPDATE: adding class type to the uris on the form
+	   fields.add(new FieldVTwo().setName(getVarName(classTypeVarBase, counter)));
 	   return fields;
    }
    
@@ -81,7 +86,7 @@ public  class ProcessFixedHTMLN3 extends ProcessDataGetterAbstract {
 
    //these are for the fields ON the form
    public List<String> getUriVarNamesBase() {
-	   return Arrays.asList();   
+	   return Arrays.asList(classTypeVarBase);   
    }
 
    //For Existing Values in case of editing
@@ -90,6 +95,8 @@ public  class ProcessFixedHTMLN3 extends ProcessDataGetterAbstract {
    public void populateExistingValues(String dataGetterURI, int counter, OntModel queryModel) {
 	   //First, put dataGetterURI within scope as well
 	   this.populateExistingDataGetterURI(dataGetterURI, counter);
+	 //Put in type
+	   this.populateExistingClassType(this.getClassType(), counter);
 	//Sparql queries for values to be executed
 	   //And then placed in the correct place/literal or uri
 	   String querystr = getExistingValuesSparqlQuery(dataGetterURI);
@@ -132,6 +139,7 @@ public  class ProcessFixedHTMLN3 extends ProcessDataGetterAbstract {
    public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context) {
 	   JSONObject jObject = new JSONObject();
 	   jObject.element("dataGetterClass", classType);
+	   jObject.element(classTypeVarBase, classType);
 	   String querystr = getExistingValuesSparqlQuery(dataGetterURI);
 	   QueryExecution qe = null;
        try{
@@ -142,8 +150,11 @@ public  class ProcessFixedHTMLN3 extends ProcessDataGetterAbstract {
         	   QuerySolution qs = results.nextSolution();
         	   Literal saveToVarLiteral = qs.getLiteral("saveToVar");
         	   Literal htmlValueLiteral = qs.getLiteral("htmlValue");
+        	   String htmlValueString = htmlValueLiteral.getString();
+        	   htmlValueString = this.replaceQuotes(htmlValueString);
         	   jObject.element("saveToVar", saveToVarLiteral.getString());
-        	   jObject.element("htmlValue", htmlValueLiteral.getString());
+        	   //TODO: Handle single and double quotes within string and escape properlyu
+        	   jObject.element("htmlValue", htmlValueString);
            }
        } catch(Exception ex) {
     	   log.error("Exception occurred in retrieving existing values with query " + querystr, ex);
@@ -151,7 +162,17 @@ public  class ProcessFixedHTMLN3 extends ProcessDataGetterAbstract {
        return jObject;
 	   
    }
+   
+   //Escape single and double quotes for html string to be returned to form
+   public String replaceQuotes(String inputStr) {
+	   return inputStr.replaceAll("\'", "&#39;").replaceAll("\"", "&quot;");
+	   
+   }
 
+   //This class can be extended so returning type here
+   public String getClassType() {
+	   return classType;
+   }
 }
 
 
