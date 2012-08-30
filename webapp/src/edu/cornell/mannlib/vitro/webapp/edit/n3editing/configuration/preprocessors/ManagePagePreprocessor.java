@@ -133,6 +133,9 @@ public class ManagePagePreprocessor extends
 		for(JSONObject jsonObject:pageContentUnitsJSON) {
 			String dataGetterClass = getDataGetterClass(jsonObject);
 			ProcessDataGetterN3 pn = ProcessDataGetterN3Utils.getDataGetterProcessorN3(dataGetterClass, jsonObject);
+			//UPDATE: using class type to indicate class type/ could also get it from 
+			//processor but already have it here
+			jsonObject.put("classType", pn.getClassType());
 			//Removing n3 required b/c retracts in edit case depend on both n3 required and n3 optional
 			//To not muddle up logic, we will just add ALL required and optional statements
 			//from data getters directly to N3 optional

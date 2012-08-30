@@ -25,7 +25,7 @@ import com.hp.hpl.jena.rdf.model.Literal;
 
 //Returns the appropriate n3 based on data getter
 public abstract class ProcessDataGetterAbstract implements ProcessDataGetterN3 {
-	
+	public static String classTypeVarBase = "classType";
 	public ProcessDataGetterAbstract(){
 		
 	}
@@ -91,7 +91,11 @@ public abstract class ProcessDataGetterAbstract implements ProcessDataGetterN3 {
 
    }
    
+   public void populateExistingClassType(String classType, int counter) {
+	   existingUriValues.put(this.getVarName(classTypeVarBase, counter), new ArrayList<String>(Arrays.asList(classType)));
 
+   }
+   
  
 }
 
