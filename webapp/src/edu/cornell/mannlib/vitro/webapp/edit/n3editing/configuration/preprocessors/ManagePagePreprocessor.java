@@ -255,13 +255,18 @@ public class ManagePagePreprocessor extends
 		 if(editConfiguration.isParamUpdate()) {
 			 //Although this is editing an existing page, new content might have been added which would not include
 			 //existing data getter URIs, so important to check whether the key exists within the json object in the first place
+			 String dataGetterURISubmissionName = pn.getDataGetterVarName(counter);
 			 if(jsonObject.containsKey("URI")) {
 				 String URIValue = jsonObject.getString("URI");
 				 if(URIValue != null) {
 					 log.debug("Existing URI for data getter found: " + URIValue);
-					 String dataGetterURISubmissionName = pn.getDataGetterVarName(counter);
 					 submission.addUriToForm(editConfiguration, dataGetterURISubmissionName, new String[]{URIValue});
 				 }
+			 } else {
+				 //if the URI is not included in the json object, this is a NEW data getter
+				 //and as such as we must ensure the URI is created
+				 submission.addUriToForm(editConfiguration, dataGetterURISubmissionName, new String[]{EditConfigurationConstants.NEW_URI_SENTINEL});
+
 			 }
 		 }
 		
