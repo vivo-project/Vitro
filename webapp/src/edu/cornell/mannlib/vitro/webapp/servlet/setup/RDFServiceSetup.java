@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
+import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
@@ -82,8 +83,8 @@ implements javax.servlet.ServletContextListener {
     }
 
     private void useSDB(ServletContext ctx, StartupStatus ss) throws SQLException {
-        BasicDataSource bds = getApplicationDataSource(ctx);
-        if( bds == null ){
+        DataSource ds = getApplicationDataSource(ctx);
+        if( ds == null ){
             ss.fatal(this, "A DataSource must be setup before SDBSetup "+
                     "is run. Make sure that JenaPersistentDataSourceSetup runs before "+
                     "SDBSetup.");
@@ -96,7 +97,7 @@ implements javax.servlet.ServletContextListener {
         StoreDesc storeDesc = makeStoreDesc(ctx);
         setApplicationStoreDesc(storeDesc, ctx);     
         
-        Store store = connectStore(bds, storeDesc);
+        Store store = connectStore(ds, storeDesc);
         setApplicationStore(store, ctx);
         
         if (!isSetUp(store)) {            
@@ -104,7 +105,7 @@ implements javax.servlet.ServletContextListener {
             setupSDB(ctx, store);
         }
         
-        RDFService rdfService = new RDFServiceSDB(bds, storeDesc);
+        RDFService rdfService = new RDFServiceSDB(ds, storeDesc);
         RDFServiceFactory rdfServiceFactory = new RDFServiceFactorySingle(rdfService);
         RDFServiceUtils.setRDFServiceFactory(ctx, rdfServiceFactory);
         
@@ -145,7 +146,7 @@ implements javax.servlet.ServletContextListener {
                 DatabaseType.fetch(dbtypeStr) );
     }
 
-    public static Store connectStore(BasicDataSource bds, StoreDesc storeDesc)
+    public static Store connectStore(DataSource bds, StoreDesc storeDesc)
             throws SQLException {
         SDBConnection conn = new SDBConnection(bds.getConnection());
         return SDBFactory.connectStore(conn, storeDesc);

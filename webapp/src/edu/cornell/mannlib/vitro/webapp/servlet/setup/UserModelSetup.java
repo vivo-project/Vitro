@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
@@ -33,7 +34,7 @@ public class UserModelSetup extends JenaDataSourceSetupBase
         ServletContext ctx = sce.getServletContext();
         StartupStatus ss = StartupStatus.getBean(ctx);                
     
-        BasicDataSource bds = getApplicationDataSource(ctx);
+        DataSource bds = getApplicationDataSource(ctx);
         if( bds == null ){
             ss.fatal(this, "A DataSource must be setup before ModelSetup "+
                     "is run. Make sure that JenaPersistentDataSourceSetup runs before "+
@@ -49,7 +50,7 @@ public class UserModelSetup extends JenaDataSourceSetupBase
         // Does nothing.        
     }
 
-    private void setupUserAccountModel (BasicDataSource bds, ServletContext ctx ,StartupStatus ss){             
+    private void setupUserAccountModel (DataSource bds, ServletContext ctx ,StartupStatus ss){             
         try {
             Model userAccountsDbModel = makeDBModel(bds,
                     JENA_USER_ACCOUNTS_MODEL, DB_ONT_MODEL_SPEC, ctx);

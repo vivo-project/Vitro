@@ -2,7 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import org.apache.commons.dbcp.BasicDataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -10,8 +14,6 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 public class SDBGraphGenerator implements SQLGraphGenerator {
 
@@ -22,7 +24,7 @@ public class SDBGraphGenerator implements SQLGraphGenerator {
     private StoreDesc storeDesc;
     private String graphID;
     
-    public SDBGraphGenerator(BasicDataSource dataSource, StoreDesc storeDesc,
+    public SDBGraphGenerator(DataSource dataSource, StoreDesc storeDesc,
     							String graphID) {
     	this.connGen = new SDBGraphConnectionGenerator(dataSource);
     	this.storeDesc = storeDesc;

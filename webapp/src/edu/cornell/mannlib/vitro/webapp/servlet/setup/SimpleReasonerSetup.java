@@ -12,8 +12,8 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -82,7 +82,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
            // set up simple reasoning for the ABox
                     
             ServletContext ctx = sce.getServletContext();
-            BasicDataSource bds = JenaDataSourceSetupBase
+            DataSource bds = JenaDataSourceSetupBase
                                     .getApplicationDataSource(ctx);
             String dbType = ConfigurationProperties.getBean(ctx).getProperty( // database type
                     "VitroConnection.DataSource.dbtype","MySQL");
