@@ -42,15 +42,15 @@ public class RDBGraphGenerator implements SQLGraphGenerator {
     }
     
     public Graph generateGraph() {
-    	log.info("Regenerate the graph.");
         try {
 //        	if (log.isDebugEnabled()) {
 //        		log.debug(ds.getNumActive() + " active SQL connections");
 //        		log.debug(ds.getNumIdle() + " idle SQL connections");
 //        	}
-        	if ( ( this.connection == null ) || ( this.connection.isClosed() ) ) {
-        		this.connection = ds.getConnection();
+        	if ( ( this.connection != null ) && ( !this.connection.isClosed() ) ) {
+        		this.connection.close();
         	}
+        	this.connection = ds.getConnection();
             IDBConnection idbConn = new DBConnection(this.connection, dbTypeStr);
             Graph requestedProperties = null;
             boolean modelExists = idbConn.containsModel(graphID);
