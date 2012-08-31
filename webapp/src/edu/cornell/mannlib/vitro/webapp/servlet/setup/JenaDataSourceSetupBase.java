@@ -244,6 +244,9 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        cpds.setMaxIdleTimeExcessConnections(300);
        cpds.setAcquireIncrement(5);
        cpds.setNumHelperThreads(6);
+       cpds.setTestConnectionOnCheckout(DEFAULT_TESTONBORROW);
+       cpds.setTestConnectionOnCheckin(DEFAULT_TESTONRETURN);
+       cpds.setPreferredTestQuery(getValidationQuery(ctx));
        return cpds;
    }
 
