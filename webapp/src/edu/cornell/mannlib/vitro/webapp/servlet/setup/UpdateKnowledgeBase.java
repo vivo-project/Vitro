@@ -76,6 +76,14 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		try {
 			ServletContext ctx = sce.getServletContext();
 			
+			// If the DATA_DIR directory doesn't exist no migration check will be done.
+			// This is a normal situation for Vitro.
+			File updateDirectory = new File(ctx.getRealPath(DATA_DIR));
+			if (!updateDirectory.exists()) {
+				log.debug("Directory " + ctx.getRealPath(DATA_DIR) + " does not exist, no migration check will be attempted.");
+				return;
+			}
+
 			String logFileName =  DATA_DIR + LOG_DIR + timestampedFileName("knowledgeBaseUpdate", "log");
 			String errorLogFileName = DATA_DIR + LOG_DIR + 	timestampedFileName("knowledgeBaseUpdate.error", "log");
 						
