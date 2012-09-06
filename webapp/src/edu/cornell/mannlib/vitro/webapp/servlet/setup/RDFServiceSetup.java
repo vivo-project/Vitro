@@ -7,7 +7,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,7 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.sdb.RDFServiceSDB;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.sdb.RDFServiceFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sparql.RDFServiceSparql;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
@@ -105,8 +104,10 @@ implements javax.servlet.ServletContextListener {
             setupSDB(ctx, store);
         }
         
-        RDFService rdfService = new RDFServiceSDB(ds, storeDesc);
-        RDFServiceFactory rdfServiceFactory = new RDFServiceFactorySingle(rdfService);
+        //RDFService rdfService = new RDFServiceSDB(ds, storeDesc);
+        //RDFServiceFactory rdfServiceFactory = new RDFServiceFactorySingle(rdfService);
+        
+        RDFServiceFactory rdfServiceFactory = new RDFServiceFactorySDB(ds, storeDesc);
         RDFServiceUtils.setRDFServiceFactory(ctx, rdfServiceFactory);
         
         log.info("SDB store ready for use");

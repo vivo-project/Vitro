@@ -91,6 +91,10 @@ public abstract class RDFServiceImpl implements RDFService {
 		registeredListeners.remove(changeListener);
 	}
 
+	public synchronized List<ChangeListener> getRegisteredListeners() {
+	    return this.registeredListeners;
+	}
+	
 	@Override
 	public ChangeSet manufactureChangeSet() {
 		return new ChangeSetImpl();

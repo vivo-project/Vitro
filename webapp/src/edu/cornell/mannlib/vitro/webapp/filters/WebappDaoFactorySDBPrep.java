@@ -105,12 +105,17 @@ public class WebappDaoFactorySDBPrep implements Filter {
         config.setPreferredLanguages(langs);
 		
 		RDFServiceFactory factory = RDFServiceUtils.getRDFServiceFactory(_ctx);
-		RDFService rdfService = factory.getRDFService();
+		
+		//RDFService rdfService = factory.getRDFService();
+		RDFService unfilteredRDFService = factory.getShortTermRDFService();
+		RDFService rdfService = null;
 		
 		if (!"false".equals(
 		        ConfigurationProperties.getBean(vreq).getProperty(
 		                "RDFService.languageFilter", "true"))) {
-		    rdfService = new LanguageFilteringRDFService(rdfService, langs);
+		    rdfService = new LanguageFilteringRDFService(unfilteredRDFService, langs);
+		} else {
+		    rdfService = unfilteredRDFService;
 		}
 		
 		Dataset dataset = new RDFServiceDataset(rdfService);
@@ -118,9 +123,12 @@ public class WebappDaoFactorySDBPrep implements Filter {
 	    WebappDaoFactory assertions = new WebappDaoFactorySDB(
 	            rdfService, baseOms, config, SDBDatasetMode.ASSERTIONS_ONLY);
 	    vreq.setRDFService(rdfService);
+	    vreq.setUnfilteredRDFService(unfilteredRDFService);
 		vreq.setWebappDaoFactory(wadf);
 		vreq.setAssertionsWebappDaoFactory(assertions);
 		vreq.setFullWebappDaoFactory(wadf);
+        vreq.setUnfilteredWebappDaoFactory(new WebappDaoFactorySDB(
+                rdfService, ModelContext.getUnionOntModelSelector(_ctx)));
 		vreq.setDataset(dataset);
 		vreq.setOntModelSelector(baseOms);
 		

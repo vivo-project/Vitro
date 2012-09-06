@@ -174,10 +174,13 @@ public class VitroRequestPrep implements Filter {
         }
         
         ServletContext ctx = vreq.getSession().getServletContext();
-        vreq.setUnfilteredWebappDaoFactory(new WebappDaoFactorySDB(
-                RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService(),
-                ModelContext.getUnionOntModelSelector(
-                        ctx)));
+        
+        if (vreq.getUnfilteredWebappDaoFactory() == null) {
+            vreq.setUnfilteredWebappDaoFactory(new WebappDaoFactorySDB(
+                    RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService(),
+                    ModelContext.getUnionOntModelSelector(
+                            ctx)));
+        }
         
         req.setAttribute("VitroRequestPrep.setup", new Integer(1));
         chain.doFilter(req, response);

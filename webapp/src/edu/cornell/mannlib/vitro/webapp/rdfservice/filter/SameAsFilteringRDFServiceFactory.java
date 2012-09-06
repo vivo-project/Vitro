@@ -60,6 +60,11 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
     }
     
     @Override
+    public RDFService getShortTermRDFService() {
+        return new SameAsFilteringRDFService(f.getShortTermRDFService());
+    }
+    
+    @Override
     public void registerListener(ChangeListener changeListener) throws RDFServiceException {
         f.registerListener(changeListener);
     }
