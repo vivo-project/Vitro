@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -20,9 +21,11 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
+import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -239,8 +242,8 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         DatasetWrapper dw = getDatasetWrapper();
         try {
             Dataset d = dw.getDataset();
-            Query q = QueryFactory.create(query);
-            QueryExecution qe = QueryExecutionFactory.create(q, d);
+            Query q = createQuery(query);
+            QueryExecution qe = createQueryExecution(query, q, d);
             ByteArrayOutputStream serializedModel = new ByteArrayOutputStream();
             try {
                 // TODO pipe this
@@ -278,8 +281,8 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         DatasetWrapper dw = getDatasetWrapper();
         try {
             Dataset d = dw.getDataset();
-            Query q = QueryFactory.create(query);
-            QueryExecution qe = QueryExecutionFactory.create(q, d);
+            Query q = createQuery(query);
+            QueryExecution qe = createQueryExecution(query, q, d);
             try {
                 ResultSet resultSet = qe.execSelect();
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
@@ -314,8 +317,8 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         DatasetWrapper dw = getDatasetWrapper();
         try {
             Dataset d = dw.getDataset();
-            Query q = QueryFactory.create(query);
-            QueryExecution qe = QueryExecutionFactory.create(q, d);
+            Query q = createQuery(query);
+            QueryExecution qe = createQueryExecution(query, q, d);
             try {
                 return qe.execAsk();
             } finally {
@@ -354,6 +357,29 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     @Override
     public void notifyListeners(Triple triple, ModelChange.Operation operation, String graphURI) {    			
         super.notifyListeners(triple, operation, graphURI);
+    }
+    
+    protected Query createQuery(String queryString) {
+        List<Syntax> syntaxes = Arrays.asList(
+                Syntax.defaultQuerySyntax, Syntax.syntaxSPARQL_11, 
+                Syntax.syntaxSPARQL_10, Syntax.syntaxSPARQL, Syntax.syntaxARQ);
+        Query q = null;
+        Iterator<Syntax> syntaxIt = syntaxes.iterator(); 
+        while (q == null) {
+            Syntax syntax = syntaxIt.next();
+            try {
+               q = QueryFactory.create(queryString, syntax);  
+            } catch (QueryParseException e) {
+               if (!syntaxIt.hasNext()) {
+                   throw(e);
+               }
+            }
+        }
+        return q;
+    }
+    
+    protected QueryExecution createQueryExecution(String queryString, Query q, Dataset d) {
+        return QueryExecutionFactory.create(q, d);
     }
     
 }

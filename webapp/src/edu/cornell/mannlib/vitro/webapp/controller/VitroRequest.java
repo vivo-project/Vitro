@@ -54,8 +54,23 @@ public class VitroRequest extends HttpServletRequestWrapper {
         }
     }
     
+    public RDFService getUnfilteredRDFService() {
+        Object o = getAttribute("unfilteredRDFService");
+        if (o instanceof RDFService) {
+            return (RDFService) o;
+        } else {
+            RDFService rdfService = RDFServiceUtils.getRDFService(this);
+            setAttribute("unfilteredRDFService", rdfService);
+            return rdfService;
+        }
+    }
+    
     public void setRDFService(RDFService rdfService) {
         setAttribute("rdfService", rdfService);
+    }
+    
+    public void setUnfilteredRDFService(RDFService rdfService) {
+        setAttribute("unfilteredRDFService", rdfService);
     }
     
     public void setWebappDaoFactory( WebappDaoFactory wdf){

@@ -127,7 +127,7 @@ public class SparqlQueryServlet extends BaseEditController {
         }
 
         executeQuery(response, resultFormatParam, rdfResultFormatParam, 
-                queryParam, vreq.getRDFService()); 
+                queryParam, vreq.getUnfilteredRDFService()); 
         return;
     }
     

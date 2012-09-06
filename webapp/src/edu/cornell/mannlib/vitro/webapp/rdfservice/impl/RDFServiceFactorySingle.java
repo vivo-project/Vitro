@@ -29,6 +29,11 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
         return this.rdfService;
     }
     
+    @Override 
+    public RDFService getShortTermRDFService() {
+        return this.rdfService;
+    }
+    
     @Override
     public void registerListener(ChangeListener listener) throws RDFServiceException {
         this.rdfService.registerListener(listener);
