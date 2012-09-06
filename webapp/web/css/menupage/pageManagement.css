@@ -66,6 +66,7 @@ section#floatRight {
 }
 select#typeSelect {
     margin-top:0px;
+    margin-bottom:20px;
 }
 section#headerBar {
     background-color:#f5f5f5;
@@ -130,7 +131,7 @@ input#contentCheckbox {
 }
 span.deleteLinkContainer {
     float:left;
-    margin-left:100px;
+    margin-left:170px;
     margin-top:-36px;
 }
 form#managePage textarea {

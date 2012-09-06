@@ -282,6 +282,11 @@ var pageManagementUtils = {
 			var pageName = pageManagementUtils.pageNameInput.val();
 			pageManagementUtils.menuLinkText.val(pageName);
 		}
+		if(!isMenu && linkText.length > 0) {
+			// if the isMenuCheckbox is unchecked, we need to clear the
+			// menuLinkText field; otherwise, the page remains a menu
+			pageManagementUtils.menuLinkText.val("");
+		}
 	},
 	
 	//Select content type
@@ -414,7 +419,7 @@ var pageManagementUtils = {
             "class": "pageContentContainer",
             html: "<span class='pageContentTypeLabel'>" + contentTypeLabel + " - " + varOrClass 
                         + "</span><span id='clickable" + counter 
-                        + "' class='pageContentExpand'><div class='arrow expandArrow'></div></span><div id='innerContainer" + counter 
+                        + "' class='pageContentExpand'><div id='woof' class='arrow expandArrow'></div></span><div id='innerContainer" + counter 
                         + "' class='pageContentWrapper'><span class='deleteLinkContainer'>&nbsp;or&nbsp;<a id='remove" + counter   // changed button to a link
                         + "' href='' >delete</a></span></div>"
         });
@@ -432,17 +437,18 @@ var pageManagementUtils = {
     	//Done button should just collapse the cloned content
         $newContentObj.find("input[name='doneWithContent']").click(function() {
         		var thisInnerDiv = $(this).closest("div.pageContentWrapper");
-                thisInnerDiv.slideUp(222);
-                var thisClickableSpan = $(this).closest("span.pageContentExpand");
+                var thisClickableSpan = thisInnerDiv.prev("span.pageContentExpand");
                 var thisArrowDiv = thisClickableSpan.find('div.arrow');
+                thisInnerDiv.slideUp(222);
                 thisArrowDiv.removeClass("collapseArrow");
                 thisArrowDiv.addClass("expandArrow");
+                window.setTimeout('pageManagementUtils.adjustSaveButtonHeight()', 223);
+         
         });	
     },
     bindClonedContentContainerEvents:function($newDivContainer, counter) {
     	 var $clickableSpan = $newDivContainer.children('span#clickable' + counter);
          var $innerDiv = $newDivContainer.children('div#innerContainer' + counter);
-                  
     	 //Expand/collapse toggle
         $clickableSpan.click(function() {
             if ( $innerDiv.is(':visible') ) {

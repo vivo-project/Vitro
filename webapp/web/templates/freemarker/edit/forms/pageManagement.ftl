@@ -12,7 +12,8 @@
 <#assign menuLinkText = "" />
 <#assign menuPosition = pageData.highestMenuPosition />
 <#assign addMenuItem = "" />
-<#assign pageHeading = "Add Page" />
+<#assign pageHeading = "Add New Page" />
+<#assign saveBtnText = "Save new page" />
 <#if pageData.addMenuItem?has_content>
 	<#assign addMenuItem = pageData.addMenuItem />
 </#if>
@@ -26,7 +27,8 @@
 	<#assign menuLinkText =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuLinkText")/>
 	<#assign customTemplate = lvf.getFormFieldValue(editSubmission, editConfiguration, "customTemplate")/>
 	<#assign selfContainedTemplate = lvf.getFormFieldValue(editSubmission, editConfiguration, "isSelfContainedTemplate")/>
-	<#assign pageHeading = "Edit Page" />
+	<#assign pageHeading = "Edit ${pageName} Page" />
+    <#assign saveBtnText = "Save changes" />
 	<#if customTemplate?has_content>
 	    <#if selfContainedTemplate?has_content>
 		    <#assign selectedTemplateType = "selfContained" />
@@ -128,7 +130,7 @@
         </section>
     </div>
     <section >
-        <span id="saveButton" ><input  id="pageSave" type="submit" name="submit-Add" value="Save changes" class="submit" role="input" /> or </span> 
+        <span id="saveButton" ><input  id="pageSave" type="submit" name="submit-Add" value="${saveBtnText}" class="submit" role="input" /> or </span> 
         <a class="cancel" href="${cancelUrl!}"  id="cancelPage" >Cancel</a>
         <br />
         <p class="requiredHint">* required fields</p>
