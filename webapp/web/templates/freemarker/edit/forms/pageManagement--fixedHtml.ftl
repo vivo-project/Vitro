@@ -6,7 +6,7 @@
     <input type="text" name="saveToVar" size="20" value="" id="fixedHTMLSaveToVar" role="input" />
     <label id="fixedHTMLValueLabel" for="fixedHTMLValue">Enter fixed HTML here<span id="fixedHTMLValueSpan"></span><span class="requiredHint"> *</span></label>
     <textarea id="fixedHTMLValue" name="htmlValue" cols="70" rows="15" style="margin-bottom:7px"></textarea><br />
-    <input  type="button" id="doneWithContent" name="doneWithContent" value="Done" class="doneWithContent" />
+    <input  type="button" id="doneWithContent" name="doneWithContent" value="Save this content" class="doneWithContent" />
     <#if menuAction == "Add">
         <span id="cancelContent"> or <a class="cancel" href="javascript:"  id="cancelContentLink" >Cancel</a></span>
     </#if>

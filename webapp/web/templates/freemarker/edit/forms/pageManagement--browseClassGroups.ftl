@@ -51,7 +51,7 @@
                         </li>
                         </#list>
                     </ul><br />
-                    <input  type="button" id="doneWithContent" class="doneWithContent" name="doneWithContent" value="Done" />
+                    <input  type="button" id="doneWithContent" class="doneWithContent" name="doneWithContent" value="Save this content" />
                     <#if menuAction == "Add">
                         <span id="cancelContent"> or <a class="cancel" href="javascript:"  id="cancelContentLink" >Cancel</a></span>
                     </#if>
