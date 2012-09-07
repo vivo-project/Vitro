@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `orng_app_registry` (
   `appid` int(11) NOT NULL,
   `personId` varchar(255) NOT NULL,
   `createdDT` datetime NOT NULL,
-  PRIMARY KEY  (`appid`)
+  PRIMARY KEY  (`appid`, `personId` )
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------

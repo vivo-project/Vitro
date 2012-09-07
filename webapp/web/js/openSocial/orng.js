@@ -72,8 +72,10 @@ gadgets.pubsubrouter.init(function(id) {
       else if (channel == 'added' && my.gadgets[moduleId].view == 'home') {
           if (message == 'Y') {
             _gaq.push(['_trackEvent', my.gadgets[moduleId].name, 'SHOW', 'profile_edit_view']);    
+            // find out whose page we are on, if any
+        	var userId = gadgets.util.getUrlParameters()['uri'] || document.URL.replace('/display/', '/individual/');
             osapi.activities.create(
-		    { 	'userId': gadgets.util.getUrlParameters()['Person'],
+		    { 	'userId': userId,
 			    'appId': my.gadgets[moduleId].appId,
 			    'activity': {'postedTime': new Date().getTime(), 'title': 'added a gadget', 'body': 'added the ' + my.gadgets[moduleId].name + ' gadget to their profile' }
 		    }).execute(function(response){});
@@ -389,8 +391,10 @@ OrngGadget.prototype.handleToggle = function() {
         _gaq.push(['_trackEvent', my.gadgets[this.id].name, 'OPEN_IN_EDIT', 'profile_edit_view']);  
       }
       else {
+          // find out whose page we are on, if any
+      	var userId = gadgets.util.getUrlParameters()['uri'] || document.URL.replace('/display/', '/individual/');
         osapi.activities.create(
-		  { 	'userId': gadgets.util.getUrlParameters()['Person'],
+		  { 	'userId': userId,
 			    'appId': my.gadgets[this.id].appId,
 			    'activity': {'postedTime': new Date().getTime(), 'title': 'gadget viewed', 'body': my.gadgets[this.id].name + ' gadget was viewed' }
 		  }).execute(function(response){});
