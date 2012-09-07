@@ -38,15 +38,24 @@
 		</td>
 	</tr>
 <script  type="text/javascript">
+$(document).ready(function() {   
+      var source = "";
+    $('input#primaryAction').click(function() {
+        source = "submit";
+    });
     $('form#editForm').submit(function() {
-        var str = $('input[name=URI]').val();
-        if ( str.indexOf('http://') >= 0 || str.indexOf('https://') >= 0 ) {
-            return true;
-        }
-        else {
-            alert('The Namespace URI must begin with either http:// \n\n or https://');
-            $('input[name=URI]').focus();
-            return false;
+        if (source == "submit") {
+            var str = $('input[name=URI]').val();
+            if ( str.indexOf('http://') >= 0 || str.indexOf('https://') >= 0 ) {
+                return true;
+            }
+            else {
+                alert('The Namespace URI must begin with either http:// \n\n or https://');
+                $('input[name=URI]').focus();
+                source = "";
+                return false;
+            }
         }
     });
+});
 </script>
