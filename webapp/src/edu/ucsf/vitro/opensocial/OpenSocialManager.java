@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,6 +44,8 @@ public class OpenSocialManager {
 	public static final String TAG_NAME = "openSocial";
 
 	private static final String DEFAULT_DRIVER = "com.mysql.jdbc.Driver";
+	
+    private static final Log log = LogFactory.getLog(OpenSocialManager.class);	
 
 	// for performance
 	private static Map<String, GadgetSpec> gadgetCache;
@@ -445,6 +449,7 @@ public class OpenSocialManager {
 				.getAttribute(OPENSOCIAL_GADGETS);
 		String[] urls = openSocialGadgetURLS.split(System.getProperty("line.separator"));
 		for (String openSocialGadgetURL : urls) {
+			openSocialGadgetURL = openSocialGadgetURL.trim();
 			if (openSocialGadgetURL.length() == 0)
 				continue;
 			int appId = 0; // if URL matches one in the DB, use DB provided
@@ -459,7 +464,8 @@ public class OpenSocialManager {
 				channels = allDBGadgets.get(gadgetFileName).getChannels();
 				unknownGadget = false;
 			} else {
-				appId = openSocialGadgetURL.hashCode();
+				log.warn("Could not find " + gadgetFileName + " in " + allDBGadgets.keySet());
+				appId = Math.abs(openSocialGadgetURL.hashCode());
 			}
 			// if they asked for a specific one, only let it in
 			if (requestAppId != null && Integer.parseInt(requestAppId) != appId) {
