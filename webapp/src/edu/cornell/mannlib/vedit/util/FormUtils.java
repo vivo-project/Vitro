@@ -244,20 +244,20 @@ public class FormUtils {
         			&& (selectedVClassURI.equals(vclass.getURI())) ) {
         		option.setSelected(true);
         	}
-        	String ontologyName = null;
+        	String ontologyPrefix = null;
         	if (vclass.getNamespace() != null) {
         		Ontology ont = wadf.getOntologyDao().getOntologyByURI(
         				vclass.getNamespace());
-        		if ( (ont != null) && (ont.getName() != null) ) {
-        			ontologyName = ont.getName();
+        		if ( (ont != null) && (ont.getPrefix() != null) ) {
+        			ontologyPrefix = ont.getPrefix();
         		}
         	}
         	StringBuffer classNameBuffer = new StringBuffer();
+        	if (ontologyPrefix != null) {
+        		classNameBuffer.append(ontologyPrefix).append(":");
+        	}
         	if (vclass.getName() != null) {
         		classNameBuffer.append(vclass.getName());
-        	}
-        	if (ontologyName != null) {
-        		classNameBuffer.append(" (").append(ontologyName).append(")");
         	}
         	option.setBody(classNameBuffer.toString());
         	vclassOptionList.add(option);

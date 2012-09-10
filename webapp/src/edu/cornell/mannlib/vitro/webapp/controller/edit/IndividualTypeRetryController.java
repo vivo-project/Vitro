@@ -9,6 +9,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -71,6 +72,7 @@ public class IndividualTypeRetryController extends BaseEditController {
 			classNameMap.put(vc.getURI(),vc.getLocalNameWithPrefix());
 			allClassURISet.add(vc.getURI());
 		}
+
 		allVClasses = null;
 			
 		for (Iterator<VClass> indClassIt = ind.getVClasses(false).iterator(); indClassIt.hasNext(); ) {
@@ -91,7 +93,6 @@ public class IndividualTypeRetryController extends BaseEditController {
 		foo.setOptionLists(optionMap);
 
 		List<Option> typeOptionList = new ArrayList<Option>(); 
-		
 		for (Iterator<String> classURIIt = classURIList.iterator(); classURIIt.hasNext();) {
 			String classURI = classURIIt.next();
 			Option opt = new Option(classURI,classNameMap.get(classURI));
@@ -127,7 +128,7 @@ public class IndividualTypeRetryController extends BaseEditController {
 	private class OptionCollator implements Comparator {
 	    public int compare (Object o1, Object o2) {
 	        Collator collator = Collator.getInstance();
-	        return collator.compare( ((Option)o1).getBody() , ((Option)o2).getBody() );
+	        return collator.compare( ((Option)o1).getBody().toString().substring(((Option)o1).getBody().toString().indexOf(":")) , ((Option)o2).getBody().toString().substring(((Option)o2).getBody().toString().indexOf(":")) );
 	    }
 	}
 	
