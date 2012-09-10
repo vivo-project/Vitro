@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -25,6 +26,7 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -43,6 +45,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualSDB.IndividualNotFoundException;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class IndividualDaoSDB extends IndividualDaoJena {
@@ -177,9 +181,16 @@ public class IndividualDaoSDB extends IndividualDaoJena {
 	    		 	"    ?ind  <" + RDFS.label.getURI() + "> ?label \n" +
 	    		 	"} \n" +
 	    		 "} ORDER BY ?ind ?label";
-    		ResultSet rs =QueryExecutionFactory.create(
-    		        QueryFactory.create(query), dataset)
-    		        .execSelect();
+            RDFService rdfService = wadf.getRDFService();
+            InputStream in = null;
+            try {
+                in = rdfService.sparqlSelectQuery(
+                        query, RDFService.ResultFormat.JSON);
+            } catch (RDFServiceException e) {
+                log.debug(e,e);
+                throw new RuntimeException(e);
+            }
+            ResultSet rs = ResultSetFactory.fromJSON(in);
     		String uri = null;
     		String label = null;
     		while (rs.hasNext()) {
@@ -232,9 +243,16 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                 	"{   ?ind a <" + theClass.getURI() + "> } \n" +
                 "  } \n" + filterStr +
                 "} ORDER BY ?ind";
-    		ResultSet rs =QueryExecutionFactory.create(
-    		        QueryFactory.create(query), dataset)
-    		        .execSelect();
+    		RDFService rdfService = wadf.getRDFService();
+    		InputStream in = null;
+    		try {
+    		    in = rdfService.sparqlSelectQuery(
+    		            query, RDFService.ResultFormat.JSON);
+    		} catch (RDFServiceException e) {
+    		    log.debug(e,e);
+    		    throw new RuntimeException(e);
+    		}
+    		ResultSet rs = ResultSetFactory.fromJSON(in);
     		while (rs.hasNext()) {
     		    QuerySolution sol = rs.nextSolution();
     		    Resource currRes = sol.getResource("ind");
