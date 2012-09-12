@@ -102,11 +102,7 @@ public class ShortViewServiceImpl implements ShortViewService {
 	/** Get most specific classes from Individual, sorted by alpha. */
 	private SortedSet<String> figureMostSpecificClassUris(Individual individual) {
 		SortedSet<String> classUris = new TreeSet<String>();
-		List<ObjectPropertyStatement> stmts = individual
-				.getObjectPropertyStatements(VitroVocabulary.MOST_SPECIFIC_TYPE);
-		for (ObjectPropertyStatement stmt : stmts) {
-			classUris.add(stmt.getObjectURI());
-		}
+		classUris.addAll(individual.getMostSpecificTypeURIs());
 		return classUris;
 	}
 

@@ -66,7 +66,9 @@ public interface Individual extends ResourceBean, Comparable<Individual> {
     void setVClasses(List<VClass> vClassList, boolean direct);
     
     /** Does the individual belong to this class? */
-    boolean isVClass(String uri);   
+    boolean isVClass(String uri);
+    
+    List<String> getMostSpecificTypeURIs();
 
     void setObjectPropertyStatements(List<ObjectPropertyStatement> list);
     List<ObjectPropertyStatement> getObjectPropertyStatements();
