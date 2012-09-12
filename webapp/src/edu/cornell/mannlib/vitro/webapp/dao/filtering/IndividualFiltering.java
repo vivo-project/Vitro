@@ -370,6 +370,11 @@ public class IndividualFiltering implements Individual {
 	}
     
     @Override
+    public List<String> getMostSpecificTypeURIs() {
+        return _innerIndividual.getMostSpecificTypeURIs();
+    }
+    
+    @Override
 	public void setDataPropertyMap(Map<String, DataProperty> propertyMap) {
         _innerIndividual.setDataPropertyMap(propertyMap);
     }

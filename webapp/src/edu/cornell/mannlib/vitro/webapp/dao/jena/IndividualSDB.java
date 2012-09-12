@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.io.InputStream;
 import java.sql.Timestamp;
 import java.text.Collator;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -43,6 +45,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -268,6 +271,32 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         	List<VClass> clist = getVClasses(true);
             return (clist.size() > 0) ? clist.get(0) : null ; 
         } 
+    }
+    
+    @Override
+    public List<String> getMostSpecificTypeURIs() {
+        List<String> typeURIs = new ArrayList<String>();
+        if (this.getURI() == null) {
+            return typeURIs;
+        } else {
+            String queryStr = "SELECT ?type WHERE { <" + this.getURI() + "> <" + 
+                    VitroVocabulary.MOST_SPECIFIC_TYPE + "> ?type }";
+            try {
+                InputStream json = webappDaoFactory.getRDFService().sparqlSelectQuery(
+                        queryStr, RDFService.ResultFormat.JSON);
+                ResultSet rs = ResultSetFactory.fromJSON(json);
+                while (rs.hasNext()) {
+                    QuerySolution qsoln = rs.nextSolution();
+                    RDFNode node = qsoln.get("type");
+                    if (node.isURIResource()) {
+                        typeURIs.add(node.asResource().getURI());
+                    }
+                }
+                return typeURIs;
+            } catch (RDFServiceException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public Timestamp getModTime() {
@@ -676,7 +705,98 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     		return map;    		
     	}
     }
+    
+    @Override 
+    public List<DataPropertyStatement> getDataPropertyStatements(String propertyUri) {
+        List<DataPropertyStatement> stmts = this.dataPropertyStatements;
+        if (stmts == null) {
+            return sparqlForDataPropertyStatements(propertyUri);
+        } else {
+            List<DataPropertyStatement> stmtsForProp = new ArrayList<DataPropertyStatement>();
+            for (DataPropertyStatement stmt : stmts) {
+                if (stmt.getDatapropURI().equals(propertyUri)) {
+                    stmtsForProp.add(stmt);
+                }
+            }
+            return stmtsForProp;
+        }
+    }
+    
+    @Override
+    public String getDataValue(String propertyUri) {
+        if (propertyUri == null) {
+            log.error("Cannot retrieve value for null property");
+            return null;
+        } else if (this.getURI() == null) {
+            log.error("Cannot retrieve value of property " + propertyUri + 
+                    " for anonymous individual");
+            return null;
+        } else {
+            List<DataPropertyStatement> stmts = sparqlForDataPropertyStatements(
+                    propertyUri);
+            if (stmts != null && stmts.size() > 0) {
+                return stmts.get(0).getData();
+            }
+        }
+        return null; // not found
+    }
+    
+    @Override 
+    public List<String> getDataValues(String propertyUri) {
+        List<String> values = new ArrayList<String>();
+        if (propertyUri == null) {
+            log.error("Cannot retrieve value for null property");
+            return null;
+        } else if (this.getURI() == null) {
+            log.error("Cannot retrieve value of property " + propertyUri + 
+                    " for anonymous individual");
+            return null;
+        } else {
+            List<DataPropertyStatement> stmts = sparqlForDataPropertyStatements(
+                    propertyUri);
+            if (stmts != null) {
+                for (DataPropertyStatement stmt : stmts) {
+                    values.add(stmt.getData());
+                }
+            }
+            return values;
+        }
+    }
 
+    private List<DataPropertyStatement> sparqlForDataPropertyStatements(String propertyUri) {
+        List<DataPropertyStatement> stmts = new ArrayList<DataPropertyStatement>();
+        String queryStr = "SELECT (str(?value) as ?valueString) WHERE { <" 
+                + this.getURI() + "> <" + propertyUri + "> ?value }"; 
+        try {
+            InputStream json = webappDaoFactory.getRDFService().sparqlSelectQuery(
+                    queryStr, RDFService.ResultFormat.JSON);
+            ResultSet rs = ResultSetFactory.fromJSON(json);    
+            while (rs.hasNext()) {
+                QuerySolution qsoln = rs.nextSolution();
+                RDFNode node = qsoln.get("valueString");
+                if (!node.isLiteral()) { 
+                    log.debug("Ignoring non-literal value for " + node + 
+                            " for property " + propertyUri);
+                } else {
+                    Literal lit = node.asLiteral();
+                    DataPropertyStatement stmt = new DataPropertyStatementImpl();
+                    
+                    stmt.setData(lit.getLexicalForm());
+                    stmt.setDatatypeURI(lit.getDatatypeURI());
+                    stmt.setLanguage(lit.getLanguage());
+                    stmt.setDatapropURI(propertyUri);
+                    stmt.setIndividualURI(this.getURI());
+                    stmt.setIndividual(this);
+                    stmts.add(stmt);
+                }
+            }
+        } catch (RDFServiceException e) {
+            log.error(e,e);
+            throw new RuntimeException(e);
+        }
+        return stmts;
+    }
+    
     public List<DataPropertyStatement> getExternalIds() { 
         if (this.externalIds != null) {
             return this.externalIds;
@@ -830,25 +950,16 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 	 * any of the super classes of the direct classes will satisfy this request.
 	 */
 	@Override
-	public boolean isVClass(String uri) { 
-    	if (uri == null) {
+	public boolean isVClass(String uri) {
+    	if (uri == null || this.getURI() == null) {
     		return false;
     	}
-
-		if (super.isVClass(uri)) {
-			return true;
-		}
-
-		VClassDao vclassDao = webappDaoFactory.getVClassDao();
-		for (VClass vClass : getVClasses(true)) {
-			for (String superClassUri: vclassDao.getAllSuperClassURIs(
-			        vClass.getURI())) {
-				if (uri.equals(superClassUri)) {
-					return true;
-				}
-			}
-		}
-		return false;
+        String queryString = "ASK { <" + this.getURI() + "> a <" + uri + "> }";
+        try {
+            return webappDaoFactory.getRDFService().sparqlAskQuery(queryString);
+        } catch (RDFServiceException e) {
+            throw new RuntimeException(e);
+        }
 	}
 	
     /**
