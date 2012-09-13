@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 
 public class BaseEditController extends VitroHttpServlet {
@@ -171,6 +172,20 @@ public class BaseEditController extends VitroHttpServlet {
     	
     	return ontModel;
     	
+    }
+    
+    protected WebappDaoFactory getWebappDaoFactory(VitroRequest vreq) {
+        WebappDaoFactory wadf = (WebappDaoFactory) getServletContext().getAttribute(
+                "assertionsWebappDaoFactory");
+        if (wadf == null) {
+            log.info("Using vreq.getFullWebappDaoFactory()");
+            wadf = vreq.getFullWebappDaoFactory();
+        } 
+        return wadf;
+    }
+    
+    protected WebappDaoFactory getWebappDaoFactory(VitroRequest vreq, String userURI) {
+        return getWebappDaoFactory(vreq).getUserAwareDaoFactory(userURI);
     }
     
     public String getDefaultLandingPage(HttpServletRequest request) {
