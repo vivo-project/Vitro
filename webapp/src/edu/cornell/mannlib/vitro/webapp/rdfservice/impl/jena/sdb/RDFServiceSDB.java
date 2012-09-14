@@ -147,7 +147,7 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
             }
             throw new RDFServiceException(e);
         } finally {
-            conn.close();
+            close(conn);
         }
         
         return true;
@@ -155,6 +155,12 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
     
     protected Connection getConnection() throws SQLException {
         return (conn != null) ? conn : ds.getConnection();
+    }
+
+    protected void close(SDBConnection sdbConn) {
+        if (!sdbConn.getSqlConnection().equals(conn)) {
+            sdbConn.close();
+        }
     }
     
     protected Dataset getDataset(SDBConnection conn) {
