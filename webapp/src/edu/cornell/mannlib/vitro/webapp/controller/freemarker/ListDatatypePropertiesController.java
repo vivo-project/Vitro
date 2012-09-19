@@ -112,6 +112,8 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
                         }
                         
                         String nameStr = prop.getPublicName()==null ? prop.getName()==null ? prop.getURI()==null ? "(no name)" : prop.getURI() : prop.getName() : prop.getPublicName();
+                        nameStr = nameStr.replace("\"","\\\"");
+                        nameStr = nameStr.replace("\'","\\\'");
                         try {
                             json += "{ \"name\": \"<a href='datapropEdit?uri="+URLEncoder.encode(prop.getURI(),"UTF-8")+"'>" + nameStr + "</a>\", "; 
                         } catch (Exception e) {
