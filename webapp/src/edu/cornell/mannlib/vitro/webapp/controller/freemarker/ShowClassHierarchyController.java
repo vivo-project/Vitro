@@ -201,9 +201,8 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
             else if ( position < previous_posn ) {
                 tempString += "}, { \"name\": ";
             }
-
             try {
-                tempString +=  "\"<a href='vclassEdit?uri="+URLEncoder.encode(vcw.getURI(),"UTF-8")+"'>"+vcw.getLocalNameWithPrefix()+"</a>\", ";
+                tempString +=  "\"<a href='vclassEdit?uri="+URLEncoder.encode(vcw.getURI(),"UTF-8")+"'>"+ vcw.getLocalNameWithPrefix() +"</a>\", ";
             } catch (Exception e) {
                  tempString += "\" " + ((vcw.getLocalNameWithPrefix() == null) ? "" : vcw.getLocalNameWithPrefix()) + "\", ";
             }
