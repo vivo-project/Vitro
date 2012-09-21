@@ -1441,7 +1441,7 @@ public class SimpleReasoner extends StatementListener {
 				}
 			} catch (Exception e) {
 				log.error("Exception while processing " + (op == ModelUpdate.Operation.ADD ? "an added" : "a removed") + 
-						" statement in SimpleReasoner plugin:" + plugin.getClass().getName() + " -- " + e.getMessage());
+						" statement in SimpleReasoner plugin:" + plugin.getClass().getName() + " -- ", e);
 			}
 		}
 	}
