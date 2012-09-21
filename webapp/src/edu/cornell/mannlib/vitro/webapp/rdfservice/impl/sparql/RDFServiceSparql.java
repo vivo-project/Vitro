@@ -59,8 +59,8 @@ import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	
 	private static final Log log = LogFactory.getLog(RDFServiceImpl.class);
-	private String readEndpointURI;	
-	private String updateEndpointURI;
+	protected String readEndpointURI;	
+	protected String updateEndpointURI;
 	private HTTPRepository readRepository;
 	private HTTPRepository updateRepository;
     private HttpClient httpClient;
