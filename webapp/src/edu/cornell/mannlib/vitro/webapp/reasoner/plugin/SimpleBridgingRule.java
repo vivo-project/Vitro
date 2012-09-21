@@ -2,12 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.reasoner.plugin;
 
-import java.util.List;
+import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -15,16 +14,13 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.sparql.util.graph.GraphFactory;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.DifferenceGraph;
 import edu.cornell.mannlib.vitro.webapp.reasoner.ReasonerPlugin;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 
@@ -174,10 +170,10 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
         } else if (stmt.getPredicate().equals(assertedProp2)) {
             z = stmt.getObject();
         }
-        StmtIterator sit = aboxInferencesModel.listStatements(x, this.inferredProp, z);
+        Iterator<Statement> sit = aboxInferencesModel.listStatements(x, this.inferredProp, z).toList().iterator();
         
         while(sit.hasNext()) {
-        	Statement s = sit.nextStatement();
+        	Statement s = sit.next();
         	Query ask = createQuery(this.retractionTestString, stmt, s);
         	QueryExecution qe = QueryExecutionFactory.create(ask, aboxAssertionsModel);
         	try {
