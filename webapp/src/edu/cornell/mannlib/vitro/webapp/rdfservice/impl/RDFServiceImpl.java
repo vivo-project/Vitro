@@ -201,7 +201,7 @@ public abstract class RDFServiceImpl implements RDFService {
             literalBuff.append("\"");
             if (node.getLiteralDatatypeURI() != null) {
                 literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
-            } else if (node.getLiteralLanguage() != null && node.getLiteralLanguage() != "") {
+            } else if (node.getLiteralLanguage() != null && node.getLiteralLanguage().length() > 0) {
                 literalBuff.append("@").append(node.getLiteralLanguage());
             }
             return literalBuff.toString();
