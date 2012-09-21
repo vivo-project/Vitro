@@ -9,6 +9,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelChangedListener;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -23,10 +24,15 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 public class SearchReindexingListener implements ModelChangedListener {						
 	private IndexBuilder indexBuilder;    
 	
+	/** Model just for creating statements */
+	private Model statementCreator;
+	
 	public SearchReindexingListener(IndexBuilder indexBuilder ) {
 		if(indexBuilder == null )
 			throw new IllegalArgumentException("Constructor parameter indexBuilder must not be null");		
-		this.indexBuilder = indexBuilder;			
+		this.indexBuilder = indexBuilder;
+		this.statementCreator = ModelFactory.createDefaultModel();
+		log.debug("new SearchReindexingListener");
 	}	
 
 	private synchronized void addChange(Statement stmt){	    
@@ -50,12 +56,22 @@ public class SearchReindexingListener implements ModelChangedListener {
 	        log.debug("changed statement: sub='" + sub + "' pred='" + pred +"' obj='" + obj + "'");
         }
 				
-		indexBuilder.addToChanged(stmt);		
+		indexBuilder.addToChanged( copyStmt(stmt) );		
 	}
 
 	private void requestAsyncIndexUpdate(){
+		log.debug("requestAsyncIndexUpdate()");
 		indexBuilder.doUpdateIndex();
 	}	
+	
+	/**
+	 * Create a copy of the statement to make sure that
+	 * it is not associated with any Models.  This is 
+	 * to avoid the Models being held back from GC.
+	 */
+	private Statement copyStmt( Statement in){
+		return statementCreator.createStatement(in.getSubject(),in.getPredicate(),in.getObject());
+	}
 	
 	@Override
 	public void notifyEvent(Model arg0, Object arg1) {
