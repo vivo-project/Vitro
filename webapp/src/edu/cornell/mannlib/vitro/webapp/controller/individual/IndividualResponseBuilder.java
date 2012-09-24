@@ -31,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ExecuteDataRetrieval;
 import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
@@ -59,6 +60,7 @@ class IndividualResponseBuilder {
 	private final WebappDaoFactory wadf;
 	private final IndividualDao iDao;
 	private final ObjectPropertyDao opDao;
+	private final ExecuteDataRetrieval eDataRetrieval;
 
 	private final Individual individual;
 	
@@ -69,6 +71,8 @@ class IndividualResponseBuilder {
 		this.opDao = wadf.getObjectPropertyDao();
 
 		this.individual = individual;
+		//initializing execute data retrieval 
+		this.eDataRetrieval = new ExecuteDataRetrieval(this.vreq, this.vreq.getDisplayModel(), this.individual);
 	}
 
 	ResponseValues assembleResponse() throws TemplateModelException {
@@ -80,6 +84,14 @@ class IndividualResponseBuilder {
 		body.put("temporalVisualizationEnabled", getTemporalVisualizationFlag());
 		body.put("verbosePropertySwitch", getVerbosePropertyValues());
 		
+		//Execute data getters that might apply to this individual, e.g. because of the class of the individual
+		try{
+			this.eDataRetrieval.executeDataGetters(body);
+		} catch(Exception ex) {
+			log.error("Data retrieval for individual lead to error", ex);
+		}
+		
+		//Individual template model
 		IndividualTemplateModel itm = getIndividualTemplateModel(individual);
 		/* We need to expose non-getters in displaying the individual's property list, 
 		 * since it requires calls to methods with parameters.
@@ -248,7 +260,6 @@ class IndividualResponseBuilder {
         + "}" ;
            
     private static Integer getLabelCount(String subjectUri, VitroRequest vreq) {
-          
         String queryStr = QueryUtils.subUriForQueryVar(LABEL_COUNT_QUERY, "subject", subjectUri);
         log.debug("queryStr = " + queryStr);
         int theCount = 0;
