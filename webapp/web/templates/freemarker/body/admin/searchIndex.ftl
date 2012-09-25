@@ -17,6 +17,9 @@
             Reset the search index and re-populate it.
         </p>
     </form>
+<#elseif totalToDo == 0>
+    <h3>Preparing to rebuild the search index. </h3>
+    <p>since ${since?string("hh:mm:ss a, MMMM dd, yyyy")}, elapsed time ${elapsed}</p>
 <#else>
     <h3>The search index is currently being ${currentTask}.</h3>
     <p>since ${since?string("hh:mm:ss a, MMMM dd, yyyy")}, elapsed time ${elapsed}, estimated total time ${expected}</p>
