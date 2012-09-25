@@ -74,7 +74,7 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
             Model aboxAssertionsModel, 
             Model aboxInferencesModel, 
             OntModel TBoxInferencesModel) {
-		if (ignore(stmt)) {
+		if (!isInterestedInAddedStatement(stmt) || ignore(stmt)) {
 			return;
 		}
         Model inf = constructInferences(this.queryStr, stmt, aboxAssertionsModel);
@@ -151,7 +151,7 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
             Model aboxInferencesModel, 
             OntModel TBoxInferencesModel) {
 
-		if (ignore(stmt)) {
+		if (!isInterestedInRemovedStatement(stmt) || ignore(stmt)) {
 			return;
 		}
         

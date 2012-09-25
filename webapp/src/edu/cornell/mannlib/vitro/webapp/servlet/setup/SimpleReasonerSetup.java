@@ -17,12 +17,14 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.ReasonerConfiguration;
@@ -87,23 +89,13 @@ public class SimpleReasonerSetup implements ServletContextListener {
             String dbType = ConfigurationProperties.getBean(ctx).getProperty( // database type
                     "VitroConnection.DataSource.dbtype","MySQL");
             
-                        
-            Model rebuildModel = JenaDataSourceSetupBase.makeDBModel(
-                    bds, 
-                    JENA_INF_MODEL_REBUILD, 
-                    JenaDataSourceSetupBase.DB_ONT_MODEL_SPEC, 
-                    TripleStoreType.SDB, 
-                    dbType, ctx);            
-            Model scratchModel = JenaDataSourceSetupBase.makeDBModel(
-                    bds, 
-                    JENA_INF_MODEL_SCRATCHPAD, 
-                    JenaDataSourceSetupBase.DB_ONT_MODEL_SPEC, 
-                    TripleStoreType.SDB, 
-                    dbType, ctx); 
+            RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService();            
+            Dataset dataset = new RDFServiceDataset(rdfService);
             
-            
+            Model rebuildModel = dataset.getNamedModel(JENA_INF_MODEL_REBUILD); 
+            Model scratchModel = dataset.getNamedModel(JENA_INF_MODEL_SCRATCHPAD); 
+
             // the simple reasoner will register itself as a listener to the ABox assertions
-            RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService();
             SimpleReasoner simpleReasoner = new SimpleReasoner(
                     unionOms.getTBoxModel(), rdfService, inferencesOms.getABoxModel(), rebuildModel, scratchModel);
             sce.getServletContext().setAttribute(SimpleReasoner.class.getName(),simpleReasoner);
