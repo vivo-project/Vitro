@@ -41,6 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 
 /**
  * Allows for real-time incremental materialization or retraction of RDFS-
@@ -102,7 +103,7 @@ public class SimpleReasoner extends StatementListener {
 		this.batchMode = 0;
 		aBoxDeltaModeler1 = new CumulativeDeltaModeler();
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
-		recomputer = new ABoxRecomputer(tboxModel,this.aboxModel,inferenceModel,inferenceRebuildModel,scratchpadModel,this);
+		recomputer = new ABoxRecomputer(tboxModel,this.aboxModel,inferenceModel,inferenceRebuildModel,scratchpadModel,rdfService,this);
 		stopRequested = false;
 		
 		if (rdfService == null) {
@@ -134,7 +135,7 @@ public class SimpleReasoner extends StatementListener {
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
 		this.batchMode = 0;
 		stopRequested = false;
-		recomputer = new ABoxRecomputer(tboxModel,this.aboxModel,inferenceModel,ModelFactory.createDefaultModel(),ModelFactory.createDefaultModel(),this);
+		recomputer = new ABoxRecomputer(tboxModel,this.aboxModel,inferenceModel,ModelFactory.createDefaultModel(), ModelFactory.createDefaultModel(), new RDFServiceModel(aboxModel), this);
 	}
 	
 	public void setPluginList(List<ReasonerPlugin> pluginList) {

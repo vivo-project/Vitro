@@ -2,22 +2,20 @@
 
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
-import java.util.ArrayList;
+import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.Syntax;
+import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -29,6 +27,9 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+
 public class ABoxRecomputer {
 
 	private static final Log log = LogFactory.getLog(ABoxRecomputer.class);
@@ -38,6 +39,7 @@ public class ABoxRecomputer {
 	private Model inferenceModel;           // ABox inferences
 	private Model inferenceRebuildModel;    // work area for recomputing all ABox inferences
 	private Model scratchpadModel;          // work area for recomputing all ABox inferences
+	private RDFService rdfService;
 	private SimpleReasoner simpleReasoner;
 	private Object lock1 = new Object();
 	
@@ -56,12 +58,14 @@ public class ABoxRecomputer {
 			              Model inferenceModel,
 			              Model inferenceRebuildModel,
 			              Model scratchpadModel,
+			              RDFService rdfService,
 			              SimpleReasoner simpleReasoner) {
 		this.tboxModel = tboxModel;
         this.aboxModel = aboxModel; 
 		this.inferenceModel = inferenceModel;
 		this.inferenceRebuildModel = inferenceRebuildModel;
 		this.scratchpadModel = scratchpadModel;	
+		this.rdfService = rdfService;
 		this.simpleReasoner = simpleReasoner;
 		recomputing = false;
 		stopRequested = false;		
@@ -116,7 +120,9 @@ public class ABoxRecomputer {
 			
 			log.info("Computing class subsumption ABox inferences.");
 			int numStmts = 0;
-			ArrayList<String> individuals = this.getAllIndividualURIs();
+			Collection<String> individuals = this.getAllIndividualURIs();
+			
+			log.info("Recomputing inferences for " + individuals.size() + " individuals");
 			
 			for (String individualURI : individuals) {			
 				Resource individual = ResourceFactory.createResource(individualURI);
@@ -143,6 +149,8 @@ public class ABoxRecomputer {
 					 log.error("Exception while recomputing ABox inference model: ", je);
 				} catch (Exception e) {
 					 log.error("Exception while recomputing ABox inference model: ", e);
+				} catch (OutOfMemoryError e) {
+				    log.error(individualURI + " out of memory", e);
 				}
 				
 				numStmts++;
@@ -274,40 +282,54 @@ public class ABoxRecomputer {
 	/*
 	 * Get the URIs for all individuals in the system
 	 */
-	protected ArrayList<String> getAllIndividualURIs() {
+	protected Collection<String> getAllIndividualURIs() {
 	    
-		String queryString = "select distinct ?subject where {?subject <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type}";
+		String queryString = "select ?s where {?s a ?type}";
 	    return getIndividualURIs(queryString);
 	}
 
-	protected ArrayList<String> getIndividualURIs(String queryString) {
+	protected Collection<String> getIndividualURIs(String queryString) {
 	    
-		ArrayList<String> individuals = new ArrayList<String>();
-		aboxModel.enterCriticalSection(Lock.READ);	
+		Set<String> individuals = new HashSet<String>();
+
+		int batchSize = 50000;
+		int offset = 0;
+		boolean done = false;
 		
-		try {
-			try {			
-				Query query = QueryFactory.create(queryString, Syntax.syntaxARQ);
-				QueryExecution qe = QueryExecutionFactory.create(query, aboxModel);
-				
-				ResultSet results = qe.execSelect();
-	            
-				while (results.hasNext()) {
-					QuerySolution solution = results.next();
-					Resource resource = solution.getResource("subject");
-					
-					if ((resource != null) && !resource.isAnon()) {
-						individuals.add(resource.getURI());
-					}					
-				}
-				
-		   	} catch (Exception e) {
-				log.error("exception while retrieving list of individuals ",e);
-			}	
-		} finally {
-			aboxModel.leaveCriticalSection();
+		while (!done) {
+		    String queryStr = queryString + " LIMIT " + batchSize + " OFFSET " + offset;
+		    if(log.isDebugEnabled()) {
+		        log.debug(queryStr);
+		    }
+		    
+		    ResultSet results = null;
+		    
+		    try {
+		        InputStream in = rdfService.sparqlSelectQuery(queryStr, RDFService.ResultFormat.JSON);
+		        results = ResultSetFactory.fromJSON(in);
+		    } catch (RDFServiceException e) {
+		        throw new RuntimeException(e);
+		    }
+            
+    		if (!results.hasNext()) {
+    		    done = true;
+    		}
+    		
+    		while (results.hasNext()) {
+    			QuerySolution solution = results.next();
+    			Resource resource = solution.getResource("s");
+    			
+    			if ((resource != null) && !resource.isAnon()) {
+    				individuals.add(resource.getURI());
+    			}					
+    		}
+    		
+    		if(log.isDebugEnabled()) {
+    		    log.info(individuals.size() + " in set");
+    		}
+    		offset += batchSize;
 		}
-		
+				
 		return individuals;
 	}
 
