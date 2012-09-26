@@ -38,6 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
@@ -102,6 +103,11 @@ public class RDFUploadController extends JenaIngestController {
             ? getABoxModel(request.getSession(), getServletContext())
             : ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
         
+        log.info(uploadModel.getNsPrefixMap().size());
+        for (String key : uploadModel.getNsPrefixMap().keySet()) {
+            log.info(key + " => " + uploadModel.getNsPrefixMap().get(key));
+        }
+            
         /* ********************* GET RDF by URL ********************** */
         String RDFUrlStr =  request.getParameter("rdfUrl");
         if (RDFUrlStr != null && RDFUrlStr.length() > 0) {
@@ -412,16 +418,10 @@ public class RDFUploadController extends JenaIngestController {
      }
      
      private OntModel getABoxModel(HttpSession session, ServletContext ctx) {   
-         if (session != null 
-                 && session.getAttribute("baseOntModelSelector")
-                         instanceof OntModelSelector) {
-             return ((OntModelSelector) 
-                     session.getAttribute("baseOntModelSelector"))
-                     .getABoxModel();   
-         } else {
-             return ((OntModelSelector) 
-                     ctx.getAttribute("baseOntModelSelector")).getABoxModel();
-         }
+         RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService();
+         Model abox = RDFServiceGraph.createRDFServiceModel(
+                 new RDFServiceGraph(rdfService, JenaDataSourceSetupBase.JENA_DB_MODEL));
+         return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, abox);
      }    
 
      private OntModel getTBoxModel(HttpSession session, ServletContext ctx) {   
