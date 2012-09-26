@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.solr.client.solrj.SolrServer;
+import org.apache.solr.client.solrj.SolrServerException;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
@@ -26,6 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Red
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
+import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.WorkLevel;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.WorkLevelStamp;
 
@@ -151,7 +154,18 @@ public class IndexController extends FreemarkerHttpServlet {
 		body.put("elapsed", formatElapsedTime(since, new Date()));
 		body.put("expected", formatElapsedTime(since, expectedCompletion));
 		body.put("hasPreviousBuild", since.getTime() > 0L);
+		body.put("indexIsConnected", testIndexConnection());
 		return new TemplateResponseValues(TEMPLATE_NAME, body);
+	}
+
+	private Boolean testIndexConnection() {
+		try {
+			SolrSetup.getSolrServer(getServletContext()).ping();
+			return Boolean.TRUE;
+		} catch (Exception e) {
+			log.error("Can't connect to the Solr server.", e);
+			return Boolean.FALSE;
+		}
 	}
 
 	private Date figureExpectedCompletion(Date startTime, long totalToDo,
@@ -183,11 +197,11 @@ public class IndexController extends FreemarkerHttpServlet {
 
 	private String figureCurrentTask(Collection<String> flags) {
 		if (flags.contains(IndexBuilder.FLAG_REBUILDING)) {
-			return "rebuilt";
+			return "Rebuilding";
 		} else if (flags.contains(IndexBuilder.FLAG_UPDATING)) {
-			return "updated";
+			return "Updating";
 		} else {
-			return "";
+			return "Not working on";
 		}
 	}
 
