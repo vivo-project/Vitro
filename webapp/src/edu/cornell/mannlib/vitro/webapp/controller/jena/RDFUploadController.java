@@ -102,11 +102,6 @@ public class RDFUploadController extends JenaIngestController {
         OntModel uploadModel = (directRead) 
             ? getABoxModel(request.getSession(), getServletContext())
             : ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-        
-        log.info(uploadModel.getNsPrefixMap().size());
-        for (String key : uploadModel.getNsPrefixMap().keySet()) {
-            log.info(key + " => " + uploadModel.getNsPrefixMap().get(key));
-        }
             
         /* ********************* GET RDF by URL ********************** */
         String RDFUrlStr =  request.getParameter("rdfUrl");
