@@ -28,6 +28,10 @@ public class JenaOutputUtils {
 		
 		Map<String,String> prefixes = new HashMap<String,String>();
 		List<Ontology> ontologies = wadf.getOntologyDao().getAllOntologies();
+		// apparently this is null if empty
+		if (ontologies == null) {
+		    return;
+		}
 		Iterator<Ontology> iter = ontologies.iterator();
 		String namespace = null;
 		String prefix = null;

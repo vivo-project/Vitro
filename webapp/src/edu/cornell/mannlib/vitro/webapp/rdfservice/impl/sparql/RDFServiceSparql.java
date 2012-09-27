@@ -13,9 +13,7 @@ import java.util.List;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.ByteArrayRequestEntity;
 import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,7 +47,6 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.ChangeSetImpl;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.ListeningGraph;
-import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
 /*
  * API to write, read, and update Vitro's RDF store, with support 
@@ -223,7 +220,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 			                                RDFServiceImpl.ModelSerializationFormat resultFormat) throws RDFServiceException {
 		
 		Model model = ModelFactory.createDefaultModel();
-		Query query = QueryFactory.create(queryStr);
+		Query query = createQuery(queryStr);
 		QueryExecution qe = QueryExecutionFactory.sparqlService(readEndpointURI, query);
 		
 		try {
@@ -253,7 +250,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 			                               RDFServiceImpl.ModelSerializationFormat resultFormat) throws RDFServiceException {
 		
 		Model model = ModelFactory.createDefaultModel();
-		Query query = QueryFactory.create(queryStr);
+		Query query = createQuery(queryStr);
 		QueryExecution qe = QueryExecutionFactory.sparqlService(readEndpointURI, query);
 		
 		try {
@@ -281,7 +278,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	@Override
 	public InputStream sparqlSelectQuery(String queryStr, RDFService.ResultFormat resultFormat) throws RDFServiceException {
 		
-        Query query = QueryFactory.create(queryStr);
+        Query query = createQuery(queryStr);
         QueryExecution qe = QueryExecutionFactory.sparqlService(readEndpointURI, query);
         
         try {
@@ -323,7 +320,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	@Override
 	public boolean sparqlAskQuery(String queryStr) throws RDFServiceException {
 		
-	    Query query = QueryFactory.create(queryStr);
+	    Query query = createQuery(queryStr);
 	    QueryExecution qe = QueryExecutionFactory.sparqlService(readEndpointURI, query);
 	    
 	    try {
@@ -465,7 +462,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         }
     }
     
-    protected void executeUpdate(String updateString) throws RDFServiceException {    
+    protected void executeUpdate(String updateString) throws RDFServiceException {  
         try {
             PostMethod meth = new PostMethod(updateEndpointURI);
             try {
@@ -582,7 +579,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	@Override
 	protected boolean sparqlSelectQueryHasResults(String queryStr) throws RDFServiceException {
 		
-        Query query = QueryFactory.create(queryStr);
+        Query query = createQuery(queryStr);
         QueryExecution qe = QueryExecutionFactory.sparqlService(readEndpointURI, query);
         
         try {
@@ -637,6 +634,8 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         
         Model blankNodeModel = ModelFactory.createDefaultModel();
         blankNodeModel.add(blankNodeStatements);
+        
+        
         
         log.debug("update model size " + model.size());       
         log.debug("blank node model size " + blankNodeModel.size());

@@ -20,7 +20,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntDocumentManager;
-import com.hp.hpl.jena.ontology.OntDocumentManager;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
@@ -29,7 +28,8 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 // This ContextListener must run after the JenaDataSourceSetup ContextListener
 
@@ -50,9 +50,11 @@ public class FileGraphSetup implements ServletContextListener {
 
         try {
 
+            ServletContext ctx = sce.getServletContext();
             OntDocumentManager.getInstance().setProcessImports(true);
             baseOms = ModelContext.getBaseOntModelSelector(sce.getServletContext());
             Dataset dataset = JenaDataSourceSetupBase.getStartupDataset(sce.getServletContext());
+            RDFServiceModelMaker maker = new RDFServiceModelMaker(RDFServiceUtils.getRDFServiceFactory(ctx));
 
             // ABox files
             Set<String> pathSet = sce.getServletContext().getResourcePaths(PATH_ROOT + ABOX);
@@ -61,7 +63,7 @@ public class FileGraphSetup implements ServletContextListener {
 
             if (pathSet != null) {
                 OntModel aboxBaseModel = baseOms.getABoxModel();
-                aboxChanged = readGraphs(sce, pathSet, dataset, ABOX, aboxBaseModel);		
+                aboxChanged = readGraphs(sce, pathSet, maker, ABOX, aboxBaseModel);		
             }
 
             // TBox files
@@ -71,7 +73,7 @@ public class FileGraphSetup implements ServletContextListener {
 
             if (pathSet != null) {
                 OntModel tboxBaseModel = baseOms.getTBoxModel();
-                tboxChanged = readGraphs(sce, pathSet, dataset, TBOX, tboxBaseModel);
+                tboxChanged = readGraphs(sce, pathSet, maker, TBOX, tboxBaseModel);
             }
         } catch (ClassCastException cce) {
             String errMsg = "Unable to cast servlet context attribute to the appropriate type " + cce.getLocalizedMessage();
@@ -105,7 +107,7 @@ public class FileGraphSetup implements ServletContextListener {
      * Note: no connection needs to be maintained between the in-memory copy of the
      * graph and the DB copy.
      */
-    public boolean readGraphs(ServletContextEvent sce, Set<String> pathSet, Dataset dataset, String type, OntModel baseModel) {
+    public boolean readGraphs(ServletContextEvent sce, Set<String> pathSet, RDFServiceModelMaker dataset, String type, OntModel baseModel) {
 
         int count = 0;
 
@@ -169,10 +171,9 @@ public class FileGraphSetup implements ServletContextListener {
      * Otherwise, if a graph with the given name is in the DB and is isomorphic with
      * the graph that was read from the files system, then do nothing. 
      */
-    public boolean updateGraphInDB(Dataset dataset, Model fileModel, String type, String path) {
-
+    public boolean updateGraphInDB(RDFServiceModelMaker dataset, Model fileModel, String type, String path) {
         String graphURI = pathToURI(path,type);
-        Model dbModel = dataset.getNamedModel(graphURI);
+        Model dbModel = dataset.getModel(graphURI);
         boolean modelChanged = false;
         
         boolean isIsomorphic = dbModel.isIsomorphicWith(fileModel);
