@@ -359,25 +359,6 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         super.notifyListeners(triple, operation, graphURI);
     }
     
-    protected Query createQuery(String queryString) {
-        List<Syntax> syntaxes = Arrays.asList(
-                Syntax.defaultQuerySyntax, Syntax.syntaxSPARQL_11, 
-                Syntax.syntaxSPARQL_10, Syntax.syntaxSPARQL, Syntax.syntaxARQ);
-        Query q = null;
-        Iterator<Syntax> syntaxIt = syntaxes.iterator(); 
-        while (q == null) {
-            Syntax syntax = syntaxIt.next();
-            try {
-               q = QueryFactory.create(queryString, syntax);  
-            } catch (QueryParseException e) {
-               if (!syntaxIt.hasNext()) {
-                   throw(e);
-               }
-            }
-        }
-        return q;
-    }
-    
     protected QueryExecution createQueryExecution(String queryString, Query q, Dataset d) {
         return QueryExecutionFactory.create(q, d);
     }
