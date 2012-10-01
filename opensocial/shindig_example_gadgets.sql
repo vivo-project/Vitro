@@ -9,21 +9,23 @@ INSERT INTO `orng_apps` (`appid`, `name`, `url`, `PersonFilterID`, `enabled`, `c
 (102, 'Faculty Mentor', 'http://dev-profiles.ucsf.edu/orng/Mentor.xml', NULL, 0, NULL),
 (103, 'Websites', 'http://dev-profiles.ucsf.edu/orng/Links.xml', NULL, 1, NULL),
 (104, 'Profile List', 'http://dev-profiles.ucsf.edu/orng/ProfileListTool.xml', NULL, 1, 'JSONPersonIds'),
-(106, 'RDF Test Gadget', 'http://dev-profiles.ucsf.edu/orng/RDFTest.xml', NULL, 1, NULL);
+(106, 'RDF Test Gadget', 'http://dev-profiles.ucsf.edu/orng/RDFTest.xml', NULL, 1, NULL),
+(112, 'Twitter', 'http://dev-profiles.ucsf.edu/ORNG/Twitter.xml', NULL, 1, NULL);
 
 DELETE FROM `orng_app_views`;
 
-INSERT INTO `orng_app_views` (`appid`, `viewer_req`, `owner_req`, `page`, `view`, `closed_width`, `open_width`, `start_closed`, `chromeId`, `display_order`) VALUES
-(100, NULL, NULL, 'search', NULL, 600, 600, 1, 'gadgets-search', NULL),
-(101, NULL, 'R', 'individual', 'profile', 290, 600, 1, 'gadgets-view', 3),
-(101, NULL, NULL, 'individual-EDIT-MODE', 'home', 700, 700, 1, 'gadgets-edit', NULL),
-(102, NULL, 'R', 'individual', 'profile', 290, 600, 1, 'gadgets-view', 2),
-(102, NULL, NULL, 'individual-EDIT-MODE', 'home', 700, 700, 1, 'gadgets-edit', NULL),
-(103, NULL, NULL, 'individual-EDIT-MODE', 'home', 700, 700, 1, 'gadgets-edit', NULL),
-(103, NULL, 'R', 'individual', 'profile', 290, 600, 0, 'gadgets-view', 1),
-(104, 'U', NULL, 'search', 'small', 160, 160, 0, 'gadgets-tools', NULL),
-(104, 'U', NULL, 'gadgetDetails', 'canvas', 700, 700, 0, 'gadgets-detail', NULL),
-(104, 'U', NULL, 'SimilarPeople.aspx', 'small', 160, 160, 0, 'gadgets-tools', NULL),
-(104, 'U', NULL, 'individual', 'small', 290, 290, 0, 'gadgets-view', NULL),
-(104, 'U', NULL, 'CoAuthors.aspx', 'small', 160, 160, 0, 'gadgets-tools', NULL),
-(106, NULL, NULL, 'individual-EDIT-MODE', 'home', 700, 700, 1, 'gadgets-edit', NULL);
+INSERT INTO `orng_app_views` (`appid`, `viewer_req`, `owner_req`, `page`, `view`, `chromeId`, `opt_params`, `display_order`) VALUES
+(100, NULL, NULL, 'search', NULL, 'gadgets-search', NULL, NULL),
+(101, NULL, 'R', 'individual', 'profile', 'gadgets-view', '{''gadget_class'':''ORNGToggleGadget'', ''start_closed'':1, ''closed_width'':290}', 4),
+(101, NULL, NULL, 'individual-EDIT-MODE', 'home', 'gadgets-edit', '{''gadget_class'':''ORNGToggleGadget'', ''start_closed'':1, ''closed_width'':700}', 4),
+(102, NULL, 'R', 'individual', 'profile', 'gadgets-view', '{''gadget_class'':''ORNGToggleGadget'', ''start_closed'':1, ''closed_width'':290}', 3),
+(102, NULL, NULL, 'individual-EDIT-MODE', 'home', 'gadgets-edit', '{''gadget_class'':''ORNGToggleGadget'', ''start_closed'':1, ''closed_width'':700}', 3),
+(103, NULL, NULL, 'individual-EDIT-MODE', 'home', 'gadgets-edit', '{''gadget_class'':''ORNGToggleGadget'', ''start_closed'':1, ''closed_width'':700}', NULL),
+(103, NULL, 'R', 'individual', 'profile', 'gadgets-view', '{''gadget_class'':''ORNGToggleGadget'', ''start_closed'':0, ''closed_width'':290}', 1),
+(104, 'U', NULL, 'search', 'small', 'gadgets-tools', NULL, NULL),
+(104, 'U', NULL, 'gadgetDetails', 'canvas', 'gadgets-detail', NULL, NULL),
+(104, 'U', NULL, 'individual', 'small', 'gadgets-view', NULL, NULL),
+(106, NULL, NULL, 'individual-EDIT-MODE', 'home', 'gadgets-edit', '{''gadget_class'':''ORNGToggleGadget'', ''start_closed'':1, ''closed_width'':700}', NULL),
+(112, NULL, 'R', 'individual', 'profile', 'gadgets-view', '{''gadget_class'':''ORNGToggleGadget'', ''start_closed'':0, ''closed_width'':290}', 2),
+(112, NULL, NULL, 'individual-EDIT-MODE', 'home', 'gadgets-edit', '{''gadget_class'':''ORNGToggleGadget'', ''start_closed'':1, ''closed_width'':700}', 2);
+
