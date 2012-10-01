@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -115,6 +116,8 @@ public class ABoxRecomputer {
 		// recompute class subsumption inferences 
 		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);			
 		try {
+		    
+		    log.info("Clearing inference rebuild model.");
 			HashSet<String> unknownTypes = new HashSet<String>();
 			inferenceRebuildModel.removeAll();
 			
@@ -130,12 +133,15 @@ public class ABoxRecomputer {
 				try {
 					addedABoxTypeAssertion(individual, inferenceRebuildModel, unknownTypes);
 					simpleReasoner.setMostSpecificTypes(individual, inferenceRebuildModel, unknownTypes);
-					StmtIterator sit = aboxModel.listStatements(individual, null, (RDFNode) null);
-					while (sit.hasNext()) {
-						Statement s = sit.nextStatement();
-						for (ReasonerPlugin plugin : simpleReasoner.getPluginList()) {
-							plugin.addedABoxStatement(s, aboxModel, inferenceRebuildModel, tboxModel);
-						}
+					List<ReasonerPlugin> pluginList = simpleReasoner.getPluginList();
+					if (pluginList.size() > 0) {
+    					StmtIterator sit = aboxModel.listStatements(individual, null, (RDFNode) null);
+    					while (sit.hasNext()) {
+    						Statement s = sit.nextStatement();
+    						for (ReasonerPlugin plugin : pluginList) {
+    							plugin.addedABoxStatement(s, aboxModel, inferenceRebuildModel, tboxModel);
+    						}
+    					}
 					}
 				} catch (NullPointerException npe) {
 	            	log.error("a NullPointerException was received while recomputing the ABox inferences. Halting inference computation.");
@@ -346,7 +352,9 @@ public class ABoxRecomputer {
 				simpleReasoner.addedABoxTypeAssertion(stmt, inferenceModel, unknownTypes);
 			}
 		} finally {
-			iter.close();
+		    if (iter != null) {
+			    iter.close();
+		    }
 			aboxModel.leaveCriticalSection();
 		}
 	}
@@ -384,7 +392,9 @@ public class ABoxRecomputer {
                 }
 			}
 		} finally {
-			iter.close();
+		    if (iter != null) {
+			    iter.close();
+		    }
             inferenceModel.leaveCriticalSection();
 		}
 		
@@ -401,7 +411,9 @@ public class ABoxRecomputer {
 				}
 			}
 		} finally {
-			iter.close();
+		    if (iter != null) {
+		        iter.close();    
+		    }
 		}
 					
 		// Add everything from the recomputed inference model that is not already
@@ -432,22 +444,29 @@ public class ABoxRecomputer {
                 }
 			}
 		} finally {
-			iter.close();	
+		    if (iter != null) {
+			    iter.close();	
+		    }
 		}
 					
 		iter = scratchpadModel.listStatements();
-		while (iter.hasNext()) {
-			Statement stmt = iter.next();
-			
-			inferenceModel.enterCriticalSection(Lock.WRITE);
-			try {
-				inferenceModel.add(stmt);
-			} finally {
-				inferenceModel.leaveCriticalSection();
-			}
+		try {
+    		while (iter.hasNext()) {
+    			Statement stmt = iter.next();
+    			
+    			inferenceModel.enterCriticalSection(Lock.WRITE);
+    			try {
+    				inferenceModel.add(stmt);
+    			} finally {
+    				inferenceModel.leaveCriticalSection();
+    			}
+    		}
+		} finally {
+		    if (iter != null) {
+		        iter.close();
+		    }
 		}
 	} finally {
-		iter.close();
 		scratchpadModel.removeAll();
 		scratchpadModel.leaveCriticalSection();			
 	}
