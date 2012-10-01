@@ -353,15 +353,13 @@ public class OpenSocialManager {
 	public String getGadgetJavascript() {
 		String lineSeparator = System.getProperty("line.separator");
 		String gadgetScriptText = "var my = {};" + lineSeparator
-				+ "my.gadgetSpec = function(appId, name, url, secureToken, view, closed_width, open_width, start_closed, chrome_id, visible_scope) {"
+				+ "my.gadgetSpec = function(appId, name, url, secureToken, view, chrome_id, opt_params, visible_scope) {"
 				+ lineSeparator + "this.appId = appId;" + lineSeparator
 				+ "this.name = name;" + lineSeparator + "this.url = url;"
 				+ lineSeparator + "this.secureToken = secureToken;"
 				+ lineSeparator + "this.view = view || 'default';"
-				+ lineSeparator + "this.closed_width = closed_width;"
-				+ lineSeparator + "this.open_width = open_width;"
-				+ lineSeparator + "this.start_closed = start_closed;"
-				+ lineSeparator + "this.chrome_id = chrome_id;" + lineSeparator
+				+ lineSeparator + "this.chrome_id = chrome_id;" 
+				+ lineSeparator + "this.opt_params = opt_params;" + lineSeparator
 				+ "this.visible_scope = visible_scope;" + lineSeparator + "};"
 				+ lineSeparator + "my.pubsubData = {};" + lineSeparator;
 		for (String key : getPubsubData().keySet()) {
@@ -377,10 +375,7 @@ public class OpenSocialManager {
 			gadgetScriptText += "new my.gadgetSpec(" + gadget.getAppId() + ",'"
 					+ gadget.getName() + "','" + gadget.getGadgetURL() + "','"
 					+ gadget.getSecurityToken() + "','" + gadget.getView()
-					+ "'," + gadget.getClosedWidth() + ","
-					+ gadget.getOpenWidth() + ","
-					+ (gadget.getStartClosed() ? "1" : "0") + ",'"
-					+ gadget.getChromeId() + "','"
+					+ "','" + gadget.getChromeId() + "'," + gadget.getOptParams() + ",'"
 					+ gadget.getGadgetSpec().getVisibleScope() + "'), ";
 		}
 		gadgetScriptText = gadgetScriptText.substring(0,

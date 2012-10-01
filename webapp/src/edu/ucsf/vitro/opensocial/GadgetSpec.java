@@ -37,7 +37,7 @@ public class GadgetSpec {
 			ResultSet rset = null;
 
 			try {
-				String sqlCommand = "select page, viewer_req, owner_req, view, closed_width, open_width, start_closed, chromeId, display_order from orng_app_views where appId = "
+				String sqlCommand = "select page, viewer_req, owner_req, view, chromeId, opt_params, display_order from orng_app_views where appId = "
 						+ appId;
 				conn = ds.getConnection();
 				stmt = conn.createStatement();
@@ -47,9 +47,8 @@ public class GadgetSpec {
 							rset.getString(1),
 							new GadgetViewRequirements(rset.getString(1), rset
 									.getString(2), rset.getString(3), rset
-									.getString(4), rset.getInt(5), rset
-									.getInt(6), rset.getBoolean(7), rset
-									.getString(8), rset.getInt(9)));
+									.getString(4), rset.getString(5), rset
+									.getString(6), rset.getInt(7)));
 				}
 			} finally {
 				try {
