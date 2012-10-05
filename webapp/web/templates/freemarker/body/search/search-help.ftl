@@ -11,7 +11,6 @@
 <ul class="searchTips">
     <li>Keep it simple! Use short, single terms unless your searches are returning too many results.</li>
     <li>Use quotes to search for an entire phrase -- e.g., "<i>protein folding</i>".</li>
-    <li>Except for Boolean operators, searches are not case-sensitive, so <i>Geneva</i> and <i>geneva</i> are equivalent.</li>
     <li>Except for boolean operators, searches are <strong>not</strong> case-sensitive, so "Geneva" and "geneva" are equivalent</li>
     <li>If you are unsure of the correct spelling, put ~ at the end of your search term -- e.g., <i>cabage~</i> finds <i>cabbage</i>, <i>steven~</i> finds <i>Stephen</i> and <i>Stefan</i> (as well as other similar names).</li>
 </ul>
