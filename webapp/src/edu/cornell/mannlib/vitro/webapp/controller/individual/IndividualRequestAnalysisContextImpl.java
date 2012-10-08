@@ -6,6 +6,9 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -21,6 +24,10 @@ import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
  */
 public class IndividualRequestAnalysisContextImpl implements
 		IndividualRequestAnalysisContext {
+	private static final Log log = LogFactory
+			.getLog(IndividualRequestAnalysisContextImpl.class);
+	
+	
 	private final VitroRequest vreq;
 	private final ServletContext ctx;
 	private final WebappDaoFactory wadf;
@@ -46,6 +53,12 @@ public class IndividualRequestAnalysisContextImpl implements
 
 		NamespaceMapper namespaceMapper = NamespaceMapperFactory
 				.getNamespaceMapper(ctx);
+		if (namespaceMapper == null) {
+			log.warn("No NamespaceMapper in ServletContext. Request URL was '"
+					+ vreq.getRequestURL() + "'");
+			return "";
+		}
+
 		String ns = namespaceMapper.getNamespaceForPrefix(prefix);
 
 		return (ns == null) ? "" : ns;
