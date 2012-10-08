@@ -2,6 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -26,8 +30,10 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 /**
  * If the user has an IsRootUser identifier, they can do anything!
  * 
- * On setup, check to see that there is a root user. If not, create one. If we
- * can't create one, abort.
+ * On setup, check to see that the specified root user exists. If not, create
+ * it. If we can't create it, abort.
+ * 
+ * If any other root users exist, warn about them.
  */
 public class RootUserPolicy implements PolicyIface {
 	private static final Log log = LogFactory.getLog(RootUserPolicy.class);
@@ -62,8 +68,10 @@ public class RootUserPolicy implements PolicyIface {
 	public static class Setup implements ServletContextListener {
 		private ServletContext ctx;
 		private StartupStatus ss;
-		private String configRootEmail;
 		private UserAccountsDao uaDao;
+		private String configuredRootUser;
+		private boolean configuredRootUserExists;
+		private TreeSet<String> otherRootUsers;
 
 		@Override
 		public void contextInitialized(ServletContextEvent sce) {
@@ -72,14 +80,23 @@ public class RootUserPolicy implements PolicyIface {
 
 			try {
 				uaDao = getUserAccountsDao();
-				configRootEmail = getRootEmailFromConfig();
+				configuredRootUser = getRootEmailFromConfig();
 
-				checkForWrongRootUser();
+				otherRootUsers = getEmailsOfAllRootUsers();
+				configuredRootUserExists = otherRootUsers
+						.remove(configuredRootUser);
 
-				if (rootUserExists()) {
-					ss.info(this, "root user is " + configRootEmail);
+				if (configuredRootUserExists) {
+					if (otherRootUsers.isEmpty()) {
+						informThatRootUserExists();
+					} else {
+						complainAboutMultipleRootUsers();
+					}
 				} else {
 					createRootUser();
+					if (!otherRootUsers.isEmpty()) {
+						complainAboutWrongRootUsers();
+					}
 				}
 
 				ServletPolicyList.addPolicy(ctx, new RootUserPolicy());
@@ -110,37 +127,14 @@ public class RootUserPolicy implements PolicyIface {
 			}
 		}
 
-		private void checkForWrongRootUser() {
-			UserAccount root = getRootUser();
-			if (root == null) {
-				return;
-			}
-
-			String actualRootEmail = root.getEmailAddress();
-			if (actualRootEmail.equals(configRootEmail)) {
-				return;
-			}
-
-			ss.warning(
-					this,
-					"The deploy.properties file specifies a root user of '"
-							+ configRootEmail
-							+ "', but the system already contains a root user named '"
-							+ actualRootEmail + "'. The user '"
-							+ configRootEmail + "' will not be created.");
-		}
-
-		private boolean rootUserExists() {
-			return (getRootUser() != null);
-		}
-
-		private UserAccount getRootUser() {
+		private TreeSet<String> getEmailsOfAllRootUsers() {
+			TreeSet<String> rootUsers = new TreeSet<String>();
 			for (UserAccount ua : uaDao.getAllUserAccounts()) {
 				if (ua.isRootUser()) {
-					return ua;
+					rootUsers.add(ua.getEmailAddress());
 				}
 			}
-			return null;
+			return rootUsers;
 		}
 
 		/**
@@ -148,29 +142,21 @@ public class RootUserPolicy implements PolicyIface {
 		 * be forced to edit them. However, that's not in place yet.
 		 */
 		private void createRootUser() {
-			String emailAddress = ConfigurationProperties.getBean(ctx)
-					.getProperty(PROPERTY_ROOT_USER_EMAIL);
-			if (emailAddress == null) {
-				throw new IllegalStateException(
-						"deploy.properties must contain a value for '"
-								+ PROPERTY_ROOT_USER_EMAIL + "'");
-			}
-
-			if (!Authenticator.isValidEmailAddress(emailAddress)) {
+			if (!Authenticator.isValidEmailAddress(configuredRootUser)) {
 				throw new IllegalStateException("Value for '"
 						+ PROPERTY_ROOT_USER_EMAIL
-						+ "' is not a valid email address: '" + emailAddress
-						+ "'");
+						+ "' is not a valid email address: '"
+						+ configuredRootUser + "'");
 			}
 
-			if (null != uaDao.getUserAccountByEmail(emailAddress)) {
+			if (null != uaDao.getUserAccountByEmail(configuredRootUser)) {
 				throw new IllegalStateException("Can't create root user - "
 						+ "an account already exists with email address '"
-						+ emailAddress + "'");
+						+ configuredRootUser + "'");
 			}
 
 			UserAccount ua = new UserAccount();
-			ua.setEmailAddress(emailAddress);
+			ua.setEmailAddress(configuredRootUser);
 			ua.setFirstName("root");
 			ua.setLastName("user");
 			ua.setMd5Password(Authenticator
@@ -182,7 +168,36 @@ public class RootUserPolicy implements PolicyIface {
 			uaDao.insertUserAccount(ua);
 
 			StartupStatus.getBean(ctx).info(this,
-					"Created root user as '" + emailAddress + "'");
+					"Created root user '" + configuredRootUser + "'");
+		}
+
+		private void informThatRootUserExists() {
+			ss.info(this, "Root user is " + configuredRootUser);
+		}
+
+		private void complainAboutMultipleRootUsers() {
+			for (String other : otherRootUsers) {
+				ss.warning(this, "deploy.properties specifies '"
+						+ configuredRootUser + "' as the value for '"
+						+ PROPERTY_ROOT_USER_EMAIL
+						+ "', but the system also contains this root user: "
+						+ other);
+			}
+			ss.warning(this, "For security, "
+					+ "it is best to delete unneeded root user accounts.");
+		}
+
+		private void complainAboutWrongRootUsers() {
+			for (String other : otherRootUsers) {
+				ss.warning(this, "deploy.properties specifies '"
+						+ configuredRootUser + "' as the value for '"
+						+ PROPERTY_ROOT_USER_EMAIL
+						+ "', but the system contains this root user instead: "
+						+ other);
+			}
+			ss.warning(this, "Creating root user '" + configuredRootUser + "'");
+			ss.warning(this, "For security, "
+					+ "it is best to delete unneeded root user accounts.");
 		}
 
 		@Override
