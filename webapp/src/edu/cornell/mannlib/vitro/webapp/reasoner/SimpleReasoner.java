@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
+import static edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.WorkLevel.WORKING;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -42,6 +44,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
+import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 /**
  * Allows for real-time incremental materialization or retraction of RDFS-
@@ -1536,7 +1539,10 @@ public class SimpleReasoner extends StatementListener {
 	    		log.info("received a bulk update end event");
 	    		if (!deltaComputerProcessing) {
 	    		    deltaComputerProcessing = true;
-	    		    new Thread(new DeltaComputer(),"DeltaComputer").start();
+					VitroBackgroundThread thread = new VitroBackgroundThread(new DeltaComputer(), 
+							"SimpleReasoner.DeltaComputer");
+	    		    thread.setWorkLevel(WORKING);
+					thread.start();
 	    		} else {
 	    			eventCount--;
 	    			log.info("received a bulk update end event while currently processing in aynchronous mode. Event count = " + eventCount);

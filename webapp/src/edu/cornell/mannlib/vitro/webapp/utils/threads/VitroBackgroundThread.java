@@ -66,7 +66,7 @@ public class VitroBackgroundThread extends Thread {
 		allThreads.add(new WeakReference<VitroBackgroundThread>(this));
 	}
 
-	protected void setWorkLevel(WorkLevel level, String... flags) {
+	public void setWorkLevel(WorkLevel level, String... flags) {
 		log.debug("Set work level on '" + this.getName() + "' to " + level
 				+ ", flags=" + flags);
 		stamp = new WorkLevelStamp(level, flags);
