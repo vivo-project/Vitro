@@ -114,7 +114,7 @@ public  class ProcessIndividualsForClassesDataGetterN3 extends ProcessClassGroup
 
    //these are for the fields ON the form
    public List<String> getUriVarNamesBase() {
-	   return Arrays.asList("classGroup", individualClassVarNameBase);   
+	   return Arrays.asList("classGroup", individualClassVarNameBase,  classTypeVarBase);   
    }
    
    @Override
@@ -128,6 +128,8 @@ public  class ProcessIndividualsForClassesDataGetterN3 extends ProcessClassGroup
    public void populateExistingValues(String dataGetterURI, int counter, OntModel queryModel) {
 	   //First, put dataGetterURI within scope as well
 	   this.populateExistingDataGetterURI(dataGetterURI, counter);
+	   //UPDATE: Put in type
+	   this.populateExistingClassType(this.getClassType(), counter);
 	   //Sparql queries for values to be executed
 	   //And then placed in the correct place/literal or uri
 	   String querystr = getExistingValuesIndividualsForClasses(dataGetterURI);
@@ -175,6 +177,8 @@ public  class ProcessIndividualsForClassesDataGetterN3 extends ProcessClassGroup
    public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context) {
 	   JSONObject jObject = new JSONObject();
 	   jObject.element("dataGetterClass", classType);
+	   //Update to include class type as variable
+	   jObject.element(classTypeVarBase, classType);
 	   //Get selected class group and which classes were selected
 	   getExistingClassGroupAndIndividuals(dataGetterURI, jObject, queryModel);
 	   //Get all classes within the class group

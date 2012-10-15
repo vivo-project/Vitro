@@ -25,7 +25,7 @@ import com.hp.hpl.jena.rdf.model.Literal;
 
 //Returns the appropriate n3 based on data getter
 public abstract class ProcessDataGetterAbstract implements ProcessDataGetterN3 {
-	
+	public static String classTypeVarBase = "classType";
 	public ProcessDataGetterAbstract(){
 		
 	}
@@ -52,6 +52,13 @@ public abstract class ProcessDataGetterAbstract implements ProcessDataGetterN3 {
    //For use within n3 strings, need a "?"
    public String getN3VarName(String base, int counter) {
 	   return "?" + getVarName(base, counter);
+   }
+   
+   //For handling encoded single and double quotes
+   //For fixed html and sparql data getters, replaces encoded quotes with escaped quotes
+   //Can be overridden in other processors if need be
+   public String replaceEncodedQuotesWithEscapedQuotes(String inputStr) {
+	   return inputStr.replaceAll("&#39;", "\'").replaceAll("&quot;", "\"");
    }
    
    //Return name of new resources
@@ -84,7 +91,11 @@ public abstract class ProcessDataGetterAbstract implements ProcessDataGetterN3 {
 
    }
    
+   public void populateExistingClassType(String classType, int counter) {
+	   existingUriValues.put(this.getVarName(classTypeVarBase, counter), new ArrayList<String>(Arrays.asList(classType)));
 
+   }
+   
  
 }
 

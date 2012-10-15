@@ -5,8 +5,8 @@ import java.sql.SQLException;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
+import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -24,7 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.sdb.RDFServiceSDB;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.sdb.RDFServiceFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sparql.RDFServiceSparql;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
@@ -82,8 +82,8 @@ implements javax.servlet.ServletContextListener {
     }
 
     private void useSDB(ServletContext ctx, StartupStatus ss) throws SQLException {
-        BasicDataSource bds = getApplicationDataSource(ctx);
-        if( bds == null ){
+        DataSource ds = getApplicationDataSource(ctx);
+        if( ds == null ){
             ss.fatal(this, "A DataSource must be setup before SDBSetup "+
                     "is run. Make sure that JenaPersistentDataSourceSetup runs before "+
                     "SDBSetup.");
@@ -96,7 +96,7 @@ implements javax.servlet.ServletContextListener {
         StoreDesc storeDesc = makeStoreDesc(ctx);
         setApplicationStoreDesc(storeDesc, ctx);     
         
-        Store store = connectStore(bds, storeDesc);
+        Store store = connectStore(ds, storeDesc);
         setApplicationStore(store, ctx);
         
         if (!isSetUp(store)) {            
@@ -104,8 +104,10 @@ implements javax.servlet.ServletContextListener {
             setupSDB(ctx, store);
         }
         
-        RDFService rdfService = new RDFServiceSDB(bds, storeDesc);
-        RDFServiceFactory rdfServiceFactory = new RDFServiceFactorySingle(rdfService);
+        //RDFService rdfService = new RDFServiceSDB(ds, storeDesc);
+        //RDFServiceFactory rdfServiceFactory = new RDFServiceFactorySingle(rdfService);
+        
+        RDFServiceFactory rdfServiceFactory = new RDFServiceFactorySDB(ds, storeDesc);
         RDFServiceUtils.setRDFServiceFactory(ctx, rdfServiceFactory);
         
         log.info("SDB store ready for use");
@@ -145,7 +147,7 @@ implements javax.servlet.ServletContextListener {
                 DatabaseType.fetch(dbtypeStr) );
     }
 
-    public static Store connectStore(BasicDataSource bds, StoreDesc storeDesc)
+    public static Store connectStore(DataSource bds, StoreDesc storeDesc)
             throws SQLException {
         SDBConnection conn = new SDBConnection(bds.getConnection());
         return SDBFactory.connectStore(conn, storeDesc);

@@ -11,6 +11,7 @@ var processSparqlDataGetterContent = {
 		
 		var variableValue = pageContentSection.find("input[name='saveToVar']").val();
 		var queryValue = pageContentSection.find("textarea[name='query']").val();
+		queryValue = processSparqlDataGetterContent.encodeQuotes(queryValue);
 		var queryModel = pageContentSection.find("input[name='queryModel']").val();
 
 		//query model should also be an input
@@ -22,7 +23,11 @@ var processSparqlDataGetterContent = {
 	populatePageContentSection:function(existingContentObject, pageContentSection) {
 		var saveToVarValue = existingContentObject["saveToVar"];
 		var queryValue = existingContentObject["query"];
+		//replace any encoded quotes with escaped quotes that will show up as quotes in the textarea
+		queryValue = processSparqlDataGetterContent.replaceEncodedWithEscapedQuotes(queryValue);
 		var queryModelValue = existingContentObject["queryModel"];
+		
+		
 		//Now find and set value
 		pageContentSection.find("input[name='saveToVar']").val(saveToVarValue);
 		pageContentSection.find("textarea[name='query']").val(queryValue);
@@ -45,11 +50,45 @@ var processSparqlDataGetterContent = {
     	if(variableValue == "") {
     		validationError += pageContentSectionLabel + ": You must supply a variable to save query results. <br />"
     	}
+    	if(processSparqlDataGetterContent.stringHasSingleQuote(variableValue)) {
+    		validationError += pageContentSectionLabel + ": The variable name should not have an apostrophe . <br />";
+    	}
+    	if(processSparqlDataGetterContent.stringHasDoubleQuote(variableValue)) {
+    		validationError += pageContentSectionLabel + ": The variable name should not have a double quote . <br />";
+    	}
+    	//Check that query  model does not have single or double quotes within it
+    	//Uncomment this/adapt this when we actually allow display the query model input
+    	/*
+    	var queryModelValue = pageContentSection.find("input[name='queryModel']").val();
+    	if(processSparqlDataGetterContent.stringHasSingleQuote(queryModelValue)) {
+    		validationError += pageContentSectionLabel + ": The query model should not have an apostrophe . <br />";
+
+    	}
+    	if(processSparqlDataGetterContent.stringHasDoubleQuote(queryModelValue)) {
+    		validationError += pageContentSectionLabel + ": The query model should not have a double quote . <br />";
+	
+    	}*/
+    	
 		var queryValue = pageContentSection.find("textarea[name='query']").val();
 		if(queryValue == "") {
 			validationError += pageContentSectionLabel + ": You must supply a Sparql query. <br />";
 		}
     	return validationError;
+    },
+    encodeQuotes:function(inputStr) {
+    	return inputStr.replace(/'/g, '&#39;').replace(/"/g, '&quot;');
+    },
+    //For the variable name, no single quote should be allowed
+    //This can be extended for other special characters
+    stringHasSingleQuote:function(inputStr) {
+    	return(inputStr.indexOf("'") != -1);
+    },
+    stringHasDoubleQuote:function(inputStr) {
+    	return(inputStr.indexOf("\"") != -1);
+    },
+    replaceEncodedWithEscapedQuotes: function(inputStr) {
+
+    	return inputStr.replace(/&#39;/g, "\'").replace(/&quot;/g, "\"");
     }
 		
 		

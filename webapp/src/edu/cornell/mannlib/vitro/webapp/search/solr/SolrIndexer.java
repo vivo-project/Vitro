@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -52,7 +53,8 @@ public class SolrIndexer implements IndexerIface {
     
     public SolrIndexer( SolrServer server, IndividualToSolrDocument indToDoc){
         this.server = server; 
-        this.individualToSolrDoc = indToDoc;        
+        this.individualToSolrDoc = indToDoc;  
+        urisIndexed = new HashSet<String>();
     }
     
     @Override
@@ -61,11 +63,13 @@ public class SolrIndexer implements IndexerIface {
             throw new IndexingException("SolrIndexer: must call " +
                     "startIndexing() before index().");        
         
-        if( ind == null )
-            log.debug("Individual to index was null, ignoring.");
+        if( ind == null ){
+            log.debug("in index(), Individual to index was null, ignoring.");
+            return;
+        }
         
         try{
-            if( urisIndexed.contains(ind.getURI()) ){
+            if( urisIndexed != null && urisIndexed.contains(ind.getURI()) ){
                 log.debug("already indexed " + ind.getURI() );
                 return;
             }else{

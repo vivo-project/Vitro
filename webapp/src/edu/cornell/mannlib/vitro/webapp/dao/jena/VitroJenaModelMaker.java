@@ -8,8 +8,8 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,7 +47,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 	private String username;
 	private String password;
 	private String dbTypeStr;
-	private BasicDataSource dataSource;
+	private DataSource dataSource;
 	private HashMap<String,Model> modelCache;
 	private HttpServletRequest request = null;
 	

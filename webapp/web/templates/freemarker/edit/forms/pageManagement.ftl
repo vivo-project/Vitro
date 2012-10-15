@@ -1,5 +1,5 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
-<#import "lib-vivo-form.ftl" as lvf>
+<#import "lib-vitro-form.ftl" as lvf>
 
 <#--------Set up variables-------->
 <#assign pageData = editConfiguration.pageData />
@@ -12,6 +12,8 @@
 <#assign menuLinkText = "" />
 <#assign menuPosition = pageData.highestMenuPosition />
 <#assign addMenuItem = "" />
+<#assign pageHeading = "Add New Page" />
+<#assign saveBtnText = "Save new page" />
 <#if pageData.addMenuItem?has_content>
 	<#assign addMenuItem = pageData.addMenuItem />
 </#if>
@@ -24,8 +26,15 @@
 	<#assign menuItem =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuItem")/>
 	<#assign menuLinkText =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuLinkText")/>
 	<#assign customTemplate = lvf.getFormFieldValue(editSubmission, editConfiguration, "customTemplate")/>
+	<#assign selfContainedTemplate = lvf.getFormFieldValue(editSubmission, editConfiguration, "isSelfContainedTemplate")/>
+	<#assign pageHeading = "Edit ${pageName} Page" />
+    <#assign saveBtnText = "Save changes" />
 	<#if customTemplate?has_content>
-		<#assign selectedTemplateType = "custom" />
+	    <#if selfContainedTemplate?has_content>
+		    <#assign selectedTemplateType = "selfContained" />
+    	<#else>
+            <#assign selectedTemplateType = "custom" />
+        </#if>
 	</#if>
 	<#assign editMenuPosition =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuPosition")/>
 	<#--if menu position exists for a menu item, then use that, otherwise use the highest available menu position number from page data-->
@@ -56,19 +65,18 @@
 	<form id="managePage" method="POST" action="${submitUrl}" role="add page">
 	        <input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="1" role="input" />
 	        <input type="hidden" id="editKey" name="editKey" value="${editKey}" />
-			<input type="hidden" id="menuItem" name="menuItem" value="${menuItem}"/>
-    <h2>Add Page</h2>
+    <h2>${pageHeading}</h2>
     <!--Drop down for the types of content possible-->
     <section id="floatRight">
-        <div id="rightSide">
+        <div id="rightSide" <#if selectedTemplateType="selfContained">style="display:none;"</#if>>
             <section id="addPageOne" role="region" >
-                <label for="last-name">Content Type<span class="requiredHint"> *</span></label> 
-                <select id="typeSelect"  name="typeSelect" >
-                    <option value="" selected="selected">Select one</option>
-                    <option value="browseClassGroup">Browse Class Group</option>           
-                    <option value="fixedHtml">Fixed HTML</option>           
-                    <option value="sparqlQuery">SPARQL Query Results</option>           
-                 </select>&nbsp;<span class="note">Add one or more content types</span>
+            <label for="contentType">Content Type<span class="requiredHint"> *</span></label> 
+            <select id="typeSelect"  name="typeSelect" >
+                <option value="" selected="selected">Select a type</option>
+                <option value="browseClassGroup">Browse Class Group</option>           
+                <option value="fixedHtml">Fixed HTML</option>           
+                <option value="sparqlQuery">SPARQL Query Results</option>           
+             </select>&nbsp;<span class="note">Add one or more types</span>
             </section>
             <section id="contentDivs"></section>
             <section id="headerBar" >
@@ -93,11 +101,15 @@
             <label class="inline" for="default"> Default</label>
             <br />
             <input type="radio" name="selectedTemplate" class="custom-template" value="custom" <#if selectedTemplateType = "custom">checked="checked"</#if> role="input" />
-            <label class="inline" for="custom"> Custom template</label>
-            <section id="custom-template" <#if selectedTemplateType != 'custom'>class="hidden" </#if>role="region">
-                <input type="text" name="customTemplate" value="${customTemplate!''}" size="40" role="input" /><span class="requiredHint"> *</span>
+            <label class="inline" for="custom"> Custom template requiring content</label>
+            <br /><div id="selfContainedDiv">
+            <input type="radio" name="selectedTemplate" class="selfContained-template" value="selfContained" <#if selectedTemplateType = "selfContained">checked="checked"</#if> role="input" />
+            <label class="inline" for="selfContained"> Custom template containing all content</label></div>
+            <section id="custom-template" <#if selectedTemplateType ="default">class="hidden" </#if>role="region">
+                <input type="text" name="customTemplate" value="${customTemplate!''}" size="33" role="input" /><span class="requiredHint"> *</span>
+                <input type="hidden" name="selfContainedTemplate" value="${selfContainedTemplate!''}"/>
             </section>
-            <p id="checkboxPTag"><input id="menuCheckbox" type="checkbox" name="menuCheckbox"
+            <p id="menuCheckboxPTag"><input id="menuCheckbox" type="checkbox" name="menuCheckbox"
             <#if (menuAction="Edit" && menuItem?has_content) || (menuAction="Add" && addMenuItem = "true")>checked="checked"</#if>
             > This is a menu page</p>
             <section id="menu" role="region" 
@@ -118,7 +130,7 @@
         </section>
     </div>
     <section >
-        <span id="saveButton" ><input  id="pageSave" type="submit" name="submit-Add" value="Save changes" class="submit" role="input" /> or </span> 
+        <span id="saveButton" ><input  id="pageSave" type="submit" name="submit-Add" value="${saveBtnText}" class="submit" role="input" /> or </span> 
         <a class="cancel" href="${cancelUrl!}"  id="cancelPage" >Cancel</a>
         <br />
         <p class="requiredHint">* required fields</p>
@@ -129,7 +141,9 @@
     <!--For existing content, will have div to save existing content-->
     <div id="existingPageContent" style="display:none">
     <#if pageData.existingPageContentUnits?has_content>
-    	<input type='hidden' id='existingPageContentUnits' value='${pageData.existingPageContentUnits}'/>
+    	<!--Using the ?html ensures that single and double quotes are html encoded - double quotes
+    	if left unencoded will break the html and lead to errors-->
+    	<input type='hidden' id='existingPageContentUnits' value='${pageData.existingPageContentUnits?html}'/>
     </#if>
     </div>
     </form>

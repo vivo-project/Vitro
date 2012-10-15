@@ -133,6 +133,9 @@ public class ManagePagePreprocessor extends
 		for(JSONObject jsonObject:pageContentUnitsJSON) {
 			String dataGetterClass = getDataGetterClass(jsonObject);
 			ProcessDataGetterN3 pn = ProcessDataGetterN3Utils.getDataGetterProcessorN3(dataGetterClass, jsonObject);
+			//UPDATE: using class type to indicate class type/ could also get it from 
+			//processor but already have it here
+			jsonObject.put("classType", pn.getClassType());
 			//Removing n3 required b/c retracts in edit case depend on both n3 required and n3 optional
 			//To not muddle up logic, we will just add ALL required and optional statements
 			//from data getters directly to N3 optional
@@ -172,11 +175,14 @@ public class ManagePagePreprocessor extends
 	private void convertToJson() {
 		//Iterate through list of inputs
 		pageContentUnitsJSON = new ArrayList<JSONObject>();
-		for(String pageContentUnit: pageContentUnits) {
-			JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON( pageContentUnit );
-			pageContentUnitsJSON.add(jsonObject);
+		//page content units might return null in case self-contained template is selected
+		//otherwise there should be page content units returned from the form
+		if(pageContentUnits != null) {
+			for(String pageContentUnit: pageContentUnits) {
+				JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON( pageContentUnit );
+				pageContentUnitsJSON.add(jsonObject);
+			}
 		}
-		
 	}
 
 	//This is where the actual values will be submitted as if they were separate input fields
@@ -196,10 +202,14 @@ public class ManagePagePreprocessor extends
 			 if(jsonValue instanceof String) {
 				 //TODO: Deal with multiple submission values
 				 //This retrieves the value for this particular json object
-				 literalValues.add(jsonObject.getString(literalLabel));
+				 String jsonString = jsonObject.getString(literalLabel);
+				 jsonString = pn.replaceEncodedQuotesWithEscapedQuotes(jsonString);
+				 literalValues.add(jsonString);
 			 } else if(jsonValue instanceof JSONArray) {
 				 JSONArray values = jsonObject.getJSONArray(literalLabel);
 				 literalValues = (List<String>) JSONSerializer.toJava(values);
+				 //Replacing encoded quotes here as well
+				 this.replaceEncodedQuotesInList(pn, literalValues);
 			 } else if(jsonValue instanceof Boolean) {
 				 Boolean booleanValue = jsonObject.getBoolean(literalLabel);
 				 //Adds string version
@@ -229,6 +239,7 @@ public class ManagePagePreprocessor extends
 				 //multiple values
 				 JSONArray values = jsonObject.getJSONArray(uriLabel);
 				 uriValues = (List<String>) JSONSerializer.toJava(values);
+				
 			 } else {
 				 //This may include JSON Objects but no way to deal with these right now
 			 }
@@ -242,16 +253,36 @@ public class ManagePagePreprocessor extends
 		
 		 //To get data getter uris, check if editing an existing set and include those as form inputs
 		 if(editConfiguration.isParamUpdate()) {
-			 String URIValue = jsonObject.getString("URI");
-			 if(URIValue != null) {
-				 String dataGetterURISubmissionName = pn.getDataGetterVarName(counter);
-				 submission.addUriToForm(editConfiguration, dataGetterURISubmissionName, new String[]{URIValue});
+			 //Although this is editing an existing page, new content might have been added which would not include
+			 //existing data getter URIs, so important to check whether the key exists within the json object in the first place
+			 String dataGetterURISubmissionName = pn.getDataGetterVarName(counter);
+			 if(jsonObject.containsKey("URI")) {
+				 String URIValue = jsonObject.getString("URI");
+				 if(URIValue != null) {
+					 log.debug("Existing URI for data getter found: " + URIValue);
+					 submission.addUriToForm(editConfiguration, dataGetterURISubmissionName, new String[]{URIValue});
+				 }
+			 } else {
+				 //if the URI is not included in the json object, this is a NEW data getter
+				 //and as such as we must ensure the URI is created
+				 submission.addUriToForm(editConfiguration, dataGetterURISubmissionName, new String[]{EditConfigurationConstants.NEW_URI_SENTINEL});
+
 			 }
 		 }
 		
 	}
 
-	  
+	private void replaceEncodedQuotesInList(ProcessDataGetterN3 pn, List<String> values) {
+		int i;
+		int len = values.size();
+		for(i = 0; i < len; i++) {
+			String value = values.get(i);
+			if(value.contains("&quot;") || value.contains("&#39;")) {
+				value = pn.replaceEncodedQuotesWithEscapedQuotes(value);
+				values.set(i,value);
+			}
+		}
+	}
 
 
 	private void addFields(ProcessDataGetterN3 pn, int counter) {

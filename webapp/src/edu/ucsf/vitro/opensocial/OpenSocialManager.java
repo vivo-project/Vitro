@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,6 +44,8 @@ public class OpenSocialManager {
 	public static final String TAG_NAME = "openSocial";
 
 	private static final String DEFAULT_DRIVER = "com.mysql.jdbc.Driver";
+	
+    private static final Log log = LogFactory.getLog(OpenSocialManager.class);	
 
 	// for performance
 	private static Map<String, GadgetSpec> gadgetCache;
@@ -349,15 +353,13 @@ public class OpenSocialManager {
 	public String getGadgetJavascript() {
 		String lineSeparator = System.getProperty("line.separator");
 		String gadgetScriptText = "var my = {};" + lineSeparator
-				+ "my.gadgetSpec = function(appId, name, url, secureToken, view, closed_width, open_width, start_closed, chrome_id, visible_scope) {"
+				+ "my.gadgetSpec = function(appId, name, url, secureToken, view, chrome_id, opt_params, visible_scope) {"
 				+ lineSeparator + "this.appId = appId;" + lineSeparator
 				+ "this.name = name;" + lineSeparator + "this.url = url;"
 				+ lineSeparator + "this.secureToken = secureToken;"
 				+ lineSeparator + "this.view = view || 'default';"
-				+ lineSeparator + "this.closed_width = closed_width;"
-				+ lineSeparator + "this.open_width = open_width;"
-				+ lineSeparator + "this.start_closed = start_closed;"
-				+ lineSeparator + "this.chrome_id = chrome_id;" + lineSeparator
+				+ lineSeparator + "this.chrome_id = chrome_id;" 
+				+ lineSeparator + "this.opt_params = opt_params;" + lineSeparator
 				+ "this.visible_scope = visible_scope;" + lineSeparator + "};"
 				+ lineSeparator + "my.pubsubData = {};" + lineSeparator;
 		for (String key : getPubsubData().keySet()) {
@@ -373,10 +375,7 @@ public class OpenSocialManager {
 			gadgetScriptText += "new my.gadgetSpec(" + gadget.getAppId() + ",'"
 					+ gadget.getName() + "','" + gadget.getGadgetURL() + "','"
 					+ gadget.getSecurityToken() + "','" + gadget.getView()
-					+ "'," + gadget.getClosedWidth() + ","
-					+ gadget.getOpenWidth() + ","
-					+ (gadget.getStartClosed() ? "1" : "0") + ",'"
-					+ gadget.getChromeId() + "','"
+					+ "','" + gadget.getChromeId() + "'," + gadget.getOptParams() + ",'"
 					+ gadget.getGadgetSpec().getVisibleScope() + "'), ";
 		}
 		gadgetScriptText = gadgetScriptText.substring(0,
@@ -445,6 +444,7 @@ public class OpenSocialManager {
 				.getAttribute(OPENSOCIAL_GADGETS);
 		String[] urls = openSocialGadgetURLS.split(System.getProperty("line.separator"));
 		for (String openSocialGadgetURL : urls) {
+			openSocialGadgetURL = openSocialGadgetURL.trim();
 			if (openSocialGadgetURL.length() == 0)
 				continue;
 			int appId = 0; // if URL matches one in the DB, use DB provided
@@ -459,7 +459,8 @@ public class OpenSocialManager {
 				channels = allDBGadgets.get(gadgetFileName).getChannels();
 				unknownGadget = false;
 			} else {
-				appId = openSocialGadgetURL.hashCode();
+				log.warn("Could not find " + gadgetFileName + " in " + allDBGadgets.keySet());
+				appId = Math.abs(openSocialGadgetURL.hashCode());
 			}
 			// if they asked for a specific one, only let it in
 			if (requestAppId != null && Integer.parseInt(requestAppId) != appId) {

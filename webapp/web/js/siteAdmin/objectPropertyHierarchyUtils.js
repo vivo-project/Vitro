@@ -182,10 +182,10 @@
             }
 
             if ( this.children.length == 1 ) {
-                subclassString += "<span style='font-size:0.8em'> (1 subclass)</span>"; 
+                subclassString += "<span style='font-size:0.8em'> (1 subproperty)</span>"; 
             }
             else if ( this.children.length > 1 ) {
-                subclassString += "<span style='font-size:0.8em'> (" + this.children.length + " subclasses)</span>";
+                subclassString += "<span style='font-size:0.8em'> (" + this.children.length + " subproperties)</span>";
             }
 
             childDetails += "<td class='subclassCell' colspan='2'><span class='subclassExpandPlus' id='subclassExpand" 

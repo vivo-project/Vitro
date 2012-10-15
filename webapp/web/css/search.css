@@ -57,6 +57,14 @@ a:visited span.SearchTerm {
 div.searchTips li {
     line-height: 2em;
 }
+ul.searchTips {
+    list-style: url("../images/arrowIcon.gif");
+}
+ul.searchTips li {
+    line-height:1.375em;
+    padding:0 0 8px 0;
+    margin-left:20px;
+}
 /* Search results */
 .display-title {
     font-size: .825em;
@@ -68,4 +76,10 @@ div.searchTips li {
 }
 .display-title:first-child {
     margin-left: .5em;
+}
+span#searchHelp {
+    float:right;
+    margin-top:-45px;
+    font-size:.825em;
+    padding-right:32px
 }

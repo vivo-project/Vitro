@@ -152,6 +152,8 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
                         ObjectProperty prop = (ObjectProperty) propsIt.next();
                     
                         String propNameStr = ShowObjectPropertyHierarchyController.getDisplayLabel(prop);
+                        propNameStr = propNameStr.replace("\"","\\\"");
+                        propNameStr = propNameStr.replace("\'","\\\'");
                         try {
                             json += "{ \"name\": \"<a href='./propertyEdit?uri="+URLEncoder.encode(prop.getURI(),"UTF-8")+"'>" 
                                  + propNameStr + "</a>\", "; 

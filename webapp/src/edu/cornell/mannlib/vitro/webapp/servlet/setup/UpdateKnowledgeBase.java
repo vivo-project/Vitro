@@ -76,6 +76,14 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		try {
 			ServletContext ctx = sce.getServletContext();
 			
+			// If the DATA_DIR directory doesn't exist no migration check will be done.
+			// This is a normal situation for Vitro.
+			File updateDirectory = new File(ctx.getRealPath(DATA_DIR));
+			if (!updateDirectory.exists()) {
+				log.debug("Directory " + ctx.getRealPath(DATA_DIR) + " does not exist, no migration check will be attempted.");
+				return;
+			}
+
 			String logFileName =  DATA_DIR + LOG_DIR + timestampedFileName("knowledgeBaseUpdate", "log");
 			String errorLogFileName = DATA_DIR + LOG_DIR + 	timestampedFileName("knowledgeBaseUpdate.error", "log");
 						
@@ -168,7 +176,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	//Multiple changes from 1.4 to 1.5 will occur
 	//update migration model
 	public void migrateDisplayModel(UpdateSettings settings) throws Exception {
-	
+		log.debug("Beginning migration of display model");
 		OntModel displayModel = settings.getDisplayModel();
 		Model addStatements = ModelFactory.createDefaultModel();
 		Model removeStatements = ModelFactory.createDefaultModel();
@@ -189,12 +197,12 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		try {
 			if(log.isDebugEnabled()) {
 				StringWriter sw = new StringWriter();
-				addStatements.write(sw);
+				addStatements.write(sw,"N3");
 				log.debug("Statements to be added are: ");
 				log.debug(sw.toString());
 				sw.close();
 				sw = new StringWriter();
-				removeStatements.write(sw);
+				removeStatements.write(sw, "N3");
 				log.debug("Statements to be removed are: ");
 				log.debug(sw.toString());
 				sw.close();
@@ -220,11 +228,32 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		removeStatements.add(oldDisplayModelDisplayMetadataModel);
 		//the old startup folder only contained by oldVivoListView
 		removeStatements.add(oldVivoListView);
+		StringWriter sw = new StringWriter();
+
+		try {
+			log.debug("Adding old display tbox model, display metadata model, and oldVivoListView to remove statements.  Remove statements now include:");
+			removeStatements.write(sw, "N3");
+			log.debug(sw.toString());
+			sw.close(); 
+		}
+		catch(Exception ex) {
+			log.error("Exception occurred", ex);
+		}
 		//Add statements from new tbox and display metadata 
 		addStatements.add(newDisplayModelTboxModel);
 		addStatements.add(newDisplayModelDisplayMetadataModel);
 		//this should include the list view in addition to other files
 		addStatements.add(loadedAtStartup);
+		try {
+			sw = new StringWriter();
+			log.debug("Adding new display tbox model, display metadata model, and loaded at startup to add statements.  Add statements now include:");
+			addStatements.write(sw, "N3");
+			log.debug(sw.toString());
+			sw.close(); 	
+		} catch(Exception ex) {
+			log.error("Exception occurred in adding new display model tbox/metadata info to add statements ", ex);
+		}
+		log.debug("Adding new display tbox model, display metadata model, and all models loaded at startup");
 	}
 	
 	//update statements for data getter classes
@@ -251,11 +280,27 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private void updateAddRemoveDataGetterStatements(OntModel displayModel, 
 			Model removeStatements, Model addStatements,
 			Resource oldType, Resource newType) {
+		log.debug("Old type: " + oldType.getURI() + " - newType: " + newType.getURI());
 		removeStatements.add(displayModel.listStatements(null, RDF.type, oldType));
 		StmtIterator oldStatements = displayModel.listStatements(null, RDF.type, oldType);
 		while(oldStatements.hasNext()) {
 			Statement stmt = oldStatements.nextStatement();
 			addStatements.add(stmt.getSubject(), RDF.type, newType);
+		}
+		//Print out remove and add statements here
+		StringWriter sw = new StringWriter();
+		try {
+			log.debug("Adding statements with old data getter types to remove statements, remove statements is now");
+			removeStatements.write(sw,"N3");
+			log.debug(sw.toString());
+			sw.close();
+			sw = new StringWriter();
+			log.debug("Adding statements with new data getter types to add statements, add statements is now");
+			addStatements.write(sw, "N3");
+			log.debug(sw.toString());
+			sw.close();
+		} catch(Exception ex) {
+			log.error("Error occurred in writing out remove and statements for data getter types", ex);
 		}
 	}
 	
@@ -274,21 +319,75 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			removeStatements.add(peoplePage, DisplayVocabulary.REQUIRES_BODY_TEMPLATE,
 					ResourceFactory.createPlainLiteral("menupage--classgroup-people.ftl"));
 		}
+		log.debug("Will remove body template from people page so added that to remove statements ");
 	}
 	
 	//add page list sparql query
 	private void addPageListDisplayModel(OntModel displayModel, Model addStatements, Model removeStatements, UpdateSettings settings) {
 		OntModel newDisplayModel = settings.getNewDisplayModelFromFile();
-		//Get all statements about pageList and pageListData
-		Resource pageList = newDisplayModel.getResource(DisplayVocabulary.DISPLAY_NS + "pageList");
+		//Get all statements about pageListPage and pageListData
+		Resource pageList = newDisplayModel.getResource(DisplayVocabulary.DISPLAY_NS + "pageListPage");
 		Resource pageListData = newDisplayModel.getResource(DisplayVocabulary.DISPLAY_NS + "pageListData");
 
 		addStatements.add(newDisplayModel.listStatements(pageList, null, (RDFNode) null));
 		addStatements.add(newDisplayModel.listStatements(pageListData, null, (RDFNode) null));
+		StringWriter sw = new StringWriter();
+		try {
+			if(pageList != null) {
+				log.debug("Page list uri is " + pageList.getURI());
+			} else {
+				log.debug("Page list uri is null for some reason");
+			}
+			log.debug("New Display model from file is ");
+			newDisplayModel.write(sw, "N3");
+			log.debug(sw.toString());
+			sw.close();
+			sw = new StringWriter();
+			log.debug("Added statements now include ");
+			addStatements.write(sw, "N3");
+			log.debug(sw.toString());
+			sw.close();
+		}catch(Exception ex) {
+			log.error("Exception occurred in writing out new display model", ex);
+		}
+		
+		log.debug("Checking: AFTER adding pageList resource, what do we have for pageList page");
+		Resource testResource = ResourceFactory.createResource(DisplayVocabulary.DISPLAY_NS + "pageListPage");
+		StmtIterator testIt = addStatements.listStatements(testResource, null, (RDFNode) null);
+		if(!testIt.hasNext()) {
+			log.debug("Add statements does not have the page list page resource " + testResource.getURI());
+		}
+		
+		while(testIt.hasNext()) {
+			log.debug("Statement for page list resource: " + testIt.nextStatement().toString());
+		}
 	}
 	
 	//update any new labels
 	private void updateDataGetterLabels(OntModel displayModel, Model addStatements, Model removeStatements, UpdateSettings settings) {
+		log.debug("Checking: BEFORE adding any statements, what do we have for pageList page");
+		Resource testResource = ResourceFactory.createResource(DisplayVocabulary.DISPLAY_NS + "pageListPage");
+		StmtIterator testIt = addStatements.listStatements(testResource, null, (RDFNode) null);
+		if(!testIt.hasNext()) {
+			log.debug("Add statements does not have the page list page resource " + testResource.getURI());
+		}
+		
+		while(testIt.hasNext()) {
+			log.debug("Statement for page list resource: " + testIt.nextStatement().toString());
+		}
+		
+		log.debug("Triple checking -- before this method, the add statements model contains");
+		StringWriter sw = new StringWriter();
+		try {
+			addStatements.write(sw, "N3");
+			log.debug(sw.toString());
+			sw.close();
+		}catch(Exception ex) 
+		{
+			log.error("Error occurred in adding resource labels ", ex);
+		}
+		
+		
 		OntModel newDisplayModel = settings.getNewDisplayModelFromFile();
 		List<Resource> resourcesForLabels = new ArrayList<Resource>();
 		resourcesForLabels.add(ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData"));
@@ -297,13 +396,38 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		resourcesForLabels.add(ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.InternalClassesDataGetter"));
 		resourcesForLabels.add(ResourceFactory.createResource("java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter"));
 		for(Resource r: resourcesForLabels) {
+			log.debug("Adding the following for " + r.getURI());
+			log.debug(newDisplayModel.listStatements(r, RDFS.label, (RDFNode)null).toList().toString());
 			addStatements.add(newDisplayModel.listStatements(r, RDFS.label, (RDFNode)null));
+			log.debug("After adding statements, we now have the following in addStatements:::");
+			sw = new StringWriter();
+			try {
+				addStatements.write(sw, "N3");
+				log.debug(sw.toString());
+				sw.close();
+			}catch(Exception ex) 
+			{
+				log.error("Error occurred in adding resource labels ", ex);
+			}
+			
 		}
+		//Add statements now includes
+		log.debug("AFTER all resources added, Add statements now includes ");
+		sw = new StringWriter();
+		try {
+			addStatements.write(sw, "N3");
+			log.debug(sw.toString());
+			sw.close();
+		}catch(Exception ex) 
+		{
+			log.error("Error occurred in adding resource labels ", ex);
+		}
+		
 	}
 	
   					
 	private OntModel loadModelFromDirectory(String directoryPath) {
-		
+		log.debug("Loading model from directory " + directoryPath);
 		OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		File directory = new File(directoryPath);
 		if (!directory.isDirectory()) {
@@ -319,7 +443,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	
 	//load file from file path
 	private OntModel loadModelFromFile(String filePath) {
-		
+		log.debug("Load model from file " + filePath);
 		OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		File file = new File(filePath);
 		if (!file.isFile()) {

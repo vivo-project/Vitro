@@ -2,16 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import java.util.HashSet;
-
 import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class ABoxJenaChangeListener extends JenaChangeListener {
 
-    private HashSet<String> ignoredGraphs = new HashSet<String>();
-    
     public ABoxJenaChangeListener(ModelChangedListener listener) {
         super(listener);
         ignoredGraphs.add(JenaDataSourceSetupBase.JENA_INF_MODEL);

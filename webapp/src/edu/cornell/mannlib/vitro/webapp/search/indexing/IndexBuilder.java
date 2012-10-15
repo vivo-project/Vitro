@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +48,8 @@ public class IndexBuilder extends VitroBackgroundThread {
      * and other similar objects will use methods on IndexBuilder to add statements
      * to this queue.   
      */
-    private final ConcurrentLinkedQueue<Statement> changedStmtQueue = new ConcurrentLinkedQueue<Statement>();
+    //private final ConcurrentLinkedQueue<Statement> changedStmtQueue = new ConcurrentLinkedQueue<Statement>();
+	private final HashSet<Statement> changedStmts = new HashSet<Statement>();
     
     /** This is a list of objects that will compute what URIs need to be
      * updated in the search index when a statement changes.  */     
@@ -128,7 +130,10 @@ public class IndexBuilder extends VitroBackgroundThread {
      * your changes with a call to doUpdateIndex().
      */
 	public void addToChanged(Statement stmt) {
-		changedStmtQueue.add(stmt);
+		log.debug("call to addToChanged()");
+		synchronized(changedStmts){
+			changedStmts.add(stmt);
+		}
 	}
     
     /**
@@ -136,6 +141,7 @@ public class IndexBuilder extends VitroBackgroundThread {
      * the index.
      */
     public synchronized void doIndexRebuild() {
+    	log.debug("call to doIndexRebuild()");
         //set flag for full index rebuild
         this.reindexRequested = true;   
         //wake up                           
@@ -145,7 +151,8 @@ public class IndexBuilder extends VitroBackgroundThread {
     /** 
      * This will re-index Individuals were added with addToChanged(). 
      */
-    public synchronized void doUpdateIndex() {        	    
+    public synchronized void doUpdateIndex() {
+    	log.debug("callto doUpdateIndex()");
     	//wake up thread and it will attempt to index anything in changedUris
         this.notifyAll();    	    	   
     }
@@ -180,20 +187,26 @@ public class IndexBuilder extends VitroBackgroundThread {
                     notifyListeners( IndexingEventListener.EventTypes.FINISH_FULL_REBUILD );
                     
                     setWorkLevel(WorkLevel.IDLE);
-                }else if( !changedStmtQueue.isEmpty() ){                       
-                	setWorkLevel(WorkLevel.WORKING, FLAG_UPDATING);                	
-                	
-                	//wait a bit to let a bit more work to come into the queue
-                    Thread.sleep(WAIT_AFTER_NEW_WORK_INTERVAL);                     
-                    log.debug("work found for IndexBuilder, starting update");
-                    
-                    notifyListeners( IndexingEventListener.EventTypes.START_UPDATE );
-                    updatedIndex();
-                    notifyListeners( IndexingEventListener.EventTypes.FINISHED_UPDATE );
-                    setWorkLevel(WorkLevel.IDLE);
-                } else {
-                    log.debug("there is no indexing working to do, waiting for work");              
-                    synchronized (this) { this.wait(MAX_IDLE_INTERVAL); }                         
+                }else{
+                	boolean workToDo = false;
+                	synchronized (changedStmts ){
+                		 workToDo = !changedStmts.isEmpty(); 
+                	}
+                	if(  workToDo ){                                       
+	                	setWorkLevel(WorkLevel.WORKING, FLAG_UPDATING);                	
+	                	
+	                	//wait a bit to let a bit more work to come into the queue
+	                    Thread.sleep(WAIT_AFTER_NEW_WORK_INTERVAL);                     
+	                    log.debug("work found for IndexBuilder, starting update");
+	                    
+	                    notifyListeners( IndexingEventListener.EventTypes.START_UPDATE );
+	                    updatedIndex();
+	                    notifyListeners( IndexingEventListener.EventTypes.FINISHED_UPDATE );
+	                    setWorkLevel(WorkLevel.IDLE);
+                	} else {
+                		log.debug("there is no indexing working to do, waiting for work");              
+                		synchronized (this) { this.wait(MAX_IDLE_INTERVAL); }
+                	}
                 }
             } catch (InterruptedException e) {
                 log.debug("woken up",e);
@@ -231,11 +244,9 @@ public class IndexBuilder extends VitroBackgroundThread {
         for( StatementToURIsToUpdate stu : stmtToURIsToIndexFunctions ) {
             stu.startIndexing();        
         }
-                
-        Collection<String> urisToUpdate = new HashSet<String>();
-        
-        Statement stmt ;
-        while (null != (stmt = changedStmtQueue.poll())) {
+                    
+        Collection<String> urisToUpdate = new HashSet<String>();                
+        for( Statement stmt : getAndClearChangedStmts() ){
         	for( StatementToURIsToUpdate stu : stmtToURIsToIndexFunctions ){
         		urisToUpdate.addAll( stu.findAdditionalURIsToIndex(stmt) );
         	}
@@ -247,6 +258,17 @@ public class IndexBuilder extends VitroBackgroundThread {
         }
         
         return urisToUpdate;        
+    }
+    
+    private Statement[] getAndClearChangedStmts(){
+        //get the statements that changed 
+        Statement[] stmts = null; 
+        synchronized( changedStmts ){
+        	stmts = new Statement[changedStmts.size()];
+        	stmts = changedStmts.toArray( stmts );
+        	changedStmts.clear();
+        }	
+        return stmts;
     }
     
 	/**
@@ -283,7 +305,7 @@ public class IndexBuilder extends VitroBackgroundThread {
         log.info("Rebuild of search index is starting.");
 
         // clear out changed URIs since we are doing a full index rebuild
-		changedStmtQueue.clear();
+		changedStmts.clear();
         
         log.debug("Getting all URIs in the model");
         Iterator<String> uris = wdf.getIndividualDao().getAllOfThisTypeIterator();
@@ -297,11 +319,11 @@ public class IndexBuilder extends VitroBackgroundThread {
     protected void updatedIndex() {
         log.debug("Starting updateIndex()");       
                      
-        UriLists uriLists = makeAddAndDeleteLists( changedStatementsToUris() );
-        
+        UriLists uriLists = makeAddAndDeleteLists( changedStatementsToUris() );       
         int numberOfThreads = 
         	Math.min( MAX_UPDATE_THREADS, 
-        			  Math.max( uriLists.updatedUris.size() / URIS_PER_UPDATE_THREAD, 1)); 
+        			  Math.max( uriLists.updatedUris.size() / URIS_PER_UPDATE_THREAD, 1));
+        
         doBuild( uriLists.updatedUris.iterator(), uriLists.deletedUris , numberOfThreads);
         
         log.debug("Ending updateIndex()");

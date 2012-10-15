@@ -207,6 +207,8 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
             }
 
             String nameStr = dp.getPublicName()==null ? dp.getName()==null ? dp.getURI()==null ? "(no name)" : dp.getURI() : dp.getName() : dp.getPublicName();
+            nameStr = nameStr.replace("\"","\\\"");
+            nameStr = nameStr.replace("\'","\\\'");
             try {
                 tempString += "\"<a href='datapropEdit?uri="+URLEncoder.encode(dp.getURI(),"UTF-8")+"'>" + nameStr + "</a>\", ";                 
             } catch (Exception e) {

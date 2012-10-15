@@ -73,23 +73,6 @@ public class PreparedGadget implements Comparable<PreparedGadget> {
 		}
 	}
 
-	public int getOpenWidth() {
-		GadgetViewRequirements reqs = getGadgetViewRequirements();
-		return reqs != null ? reqs.getOpenWidth() : 0;
-	}
-
-	public int getClosedWidth() {
-		GadgetViewRequirements reqs = getGadgetViewRequirements();
-		return reqs != null ? reqs.getClosedWidth() : 0;
-	}
-
-	public boolean getStartClosed() {
-		GadgetViewRequirements reqs = getGadgetViewRequirements();
-		// if the page specific reqs are present, honor those. Otherwise defaut
-		// to true for regular gadgets, false for sandbox gadgets
-		return reqs != null ? reqs.getStartClosed() : !gadgetSpec.fromSandbox();
-	}
-
 	public String getChromeId() {
 		GadgetViewRequirements reqs = getGadgetViewRequirements();
 		if (reqs != null) {
@@ -110,6 +93,11 @@ public class PreparedGadget implements Comparable<PreparedGadget> {
 		} else {
 			return null;
 		}
+	}
+
+	public String getOptParams() {
+		GadgetViewRequirements reqs = getGadgetViewRequirements();
+		return reqs != null ? reqs.getOptParams() : "{}";
 	}
 
 	public String getCanvasURL() throws UnsupportedEncodingException {

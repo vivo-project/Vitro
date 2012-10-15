@@ -2,10 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import java.sql.SQLException;
 import java.sql.Connection;
+import java.sql.SQLException;
 
-import org.apache.commons.dbcp.BasicDataSource;
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -21,13 +22,13 @@ public class RDBGraphGenerator implements SQLGraphGenerator {
 
 	private static final Log log = LogFactory.getLog(RDBGraphGenerator.class.getName());
 	
-    private BasicDataSource ds = null;
+    private DataSource ds = null;
     private Connection connection = null;
     private String dbTypeStr = null;
     private String graphID = null;
 
-    public RDBGraphGenerator(BasicDataSource bds, String dbTypeStr, String graphID) {
-        this.ds = bds;
+    public RDBGraphGenerator(DataSource ds, String dbTypeStr, String graphID) {
+        this.ds = ds;
         this.dbTypeStr = dbTypeStr;
         this.graphID = graphID;
     }
@@ -41,15 +42,15 @@ public class RDBGraphGenerator implements SQLGraphGenerator {
     }
     
     public Graph generateGraph() {
-    	log.info("Regenerate the graph.");
         try {
-        	if (log.isDebugEnabled()) {
-        		log.debug(ds.getNumActive() + " active SQL connections");
-        		log.debug(ds.getNumIdle() + " idle SQL connections");
+//        	if (log.isDebugEnabled()) {
+//        		log.debug(ds.getNumActive() + " active SQL connections");
+//        		log.debug(ds.getNumIdle() + " idle SQL connections");
+//        	}
+        	if ( ( this.connection != null ) && ( !this.connection.isClosed() ) ) {
+        		this.connection.close();
         	}
-        	if ( ( this.connection == null ) || ( this.connection.isClosed() ) ) {
-        		this.connection = ds.getConnection();
-        	}
+        	this.connection = ds.getConnection();
             IDBConnection idbConn = new DBConnection(this.connection, dbTypeStr);
             Graph requestedProperties = null;
             boolean modelExists = idbConn.containsModel(graphID);

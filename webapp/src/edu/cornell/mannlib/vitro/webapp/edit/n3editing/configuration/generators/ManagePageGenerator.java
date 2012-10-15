@@ -98,7 +98,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	private void setUrisAndLiteralsOnForm(EditConfigurationVTwo conf,
 			VitroRequest vreq) {
 		conf.setUrisOnForm(new String[]{"page", "menuItem"}); //new resources: should this be on form for new - should be for existing
-		conf.setLiteralsOnForm(new String[]{"pageName", "prettyUrl", "menuPosition", "menuLinkText", "customTemplate", "pageContentUnit"}); //page content unit = data getter JSON object
+		conf.setLiteralsOnForm(new String[]{"pageName", "prettyUrl", "menuPosition", "menuLinkText", "customTemplate", "isSelfContainedTemplate", "pageContentUnit"}); //page content unit = data getter JSON object
 		
 	}
 
@@ -116,7 +116,8 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	private void setN3Optional(EditConfigurationVTwo conf) {
 		//body template is not required, and a given page may or may not be a menu item, but should linked to menu if menu item
 	      conf.setN3Optional(new ArrayList<String>(Arrays.asList(prefixes + pageBodyTemplateN3, 
-	    		  							prefixes + menuItemN3 + menuN3)));
+	    		  							prefixes + menuItemN3 + menuN3,
+	    		  							prefixes + isSelfContainedTemplateN3)));
 	}
 
 	private void setN3Required(EditConfigurationVTwo conf) {
@@ -148,6 +149,10 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 		
 		FieldVTwo menuItemPositionField = new FieldVTwo().setName("menuPosition").setRangeDatatypeUri(XSD.integer.getURI());
 		conf.addField(menuItemPositionField);
+		
+		//If this is a self contained template, the appropriate flag will be set
+		FieldVTwo isSelfContainedTemplateField = new FieldVTwo().setName("isSelfContainedTemplate");
+		conf.addField(isSelfContainedTemplateField);
 		
 		//The actual page content information is stored in this field, and then
 		//interpreted using the preprocessor
@@ -277,6 +282,8 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
     private void addJSONArrayToFormSpecificData(JSONArray jsonArray, EditConfigurationVTwo editConfig) {
     	HashMap<String, Object> data = editConfig.getFormSpecificData();		
 		data.put("existingPageContentUnits", jsonArray.toString());
+		//Experimenting with putting actual array in
+		data.put("existingPageContentUnitsJSONArray", jsonArray);
 		
 	}
 
@@ -423,6 +430,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
     	map.put("menuPosition", getExistingMenuPositionQuery());
     	map.put("menuLinkText", getExistingMenuLinkTextQuery());
     	map.put("customTemplate", getExistingCustomTemplateQuery());
+    	map.put("isSelfContainedTemplate", getExistingIsSelfContainedTemplateQuery());
     	return map;
     }
     
@@ -459,6 +467,12 @@ private String getExistingMenuLinkTextQuery() {
 
 private String getExistingCustomTemplateQuery() {
 	String query = getSparqlPrefix() + "SELECT ?customTemplate WHERE {?page display:requiresBodyTemplate ?customTemplate .}";
+	return query;
+}
+
+private String getExistingIsSelfContainedTemplateQuery() {
+	String query = getSparqlPrefix() + "SELECT ?isSelfContainedTemplate WHERE {?page display:isSelfContainedTemplate ?isSelfContainedTemplate .}";
+
 	return query;
 }
 
@@ -532,6 +546,10 @@ private String getExistingCustomTemplateQuery() {
 	//That would be optional
 	
 	final static String pageBodyTemplateN3 = "?page display:requiresBodyTemplate ?customTemplate .";
+	
+	//If self contained template, n3 will denote this using a flag
+	final static String isSelfContainedTemplateN3 = "?page display:isSelfContainedTemplate ?isSelfContainedTemplate .";
+
 	
 	//Menu position is added dynamically at end by default and can be changed on reordering page
 	final static String menuItemN3 = "?menuItem a display:NavigationElement ; \n" + 

@@ -3,15 +3,22 @@
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.sdb;
 
 import java.io.ByteArrayInputStream;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.apache.commons.dbcp.BasicDataSource;
+import javax.sql.DataSource;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.sdb.SDBFactory;
@@ -21,6 +28,7 @@ import com.hp.hpl.jena.sdb.sql.SDBConnection;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.StaticDatasetFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -32,18 +40,30 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
 
     private final static Log log = LogFactory.getLog(RDFServiceSDB.class);
     
-    private BasicDataSource bds;
+    private DataSource ds;
     private StoreDesc storeDesc;
+    private Connection conn;
+    private StaticDatasetFactory staticDatasetFactory;
     
-    public RDFServiceSDB(BasicDataSource dataSource, StoreDesc storeDesc) {
-        this.bds = dataSource;
+    public RDFServiceSDB(DataSource dataSource, StoreDesc storeDesc) {
+        this.ds = dataSource;
         this.storeDesc = storeDesc;
+    }
+    
+    public RDFServiceSDB(Connection conn, StoreDesc storeDesc) {
+        this.conn = conn;
+        this.storeDesc = storeDesc;
+        this.staticDatasetFactory = new StaticDatasetFactory(getDataset(
+                new SDBConnection(conn)));
     }
     
     @Override
     protected DatasetWrapper getDatasetWrapper() {
         try {
-            SDBConnection conn = new SDBConnection(bds.getConnection());
+            if (staticDatasetFactory != null) {
+                return staticDatasetFactory.getDatasetWrapper();
+            }
+            SDBConnection conn = new SDBConnection(ds.getConnection());
             return new DatasetWrapper(getDataset(conn), conn);
         } catch (SQLException sqle) {
             log.error(sqle, sqle);
@@ -64,7 +84,7 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
             
         SDBConnection conn = null;
         try {
-            conn = new SDBConnection(bds.getConnection());
+            conn = new SDBConnection(getConnection());
         } catch (SQLException sqle) {
             log.error(sqle, sqle);
             throw new RDFServiceException(sqle);
@@ -127,15 +147,57 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
             }
             throw new RDFServiceException(e);
         } finally {
-            conn.close();
+            close(conn);
         }
         
         return true;
     }  
+    
+    protected Connection getConnection() throws SQLException {
+        return (conn != null) ? conn : ds.getConnection();
+    }
+
+    protected void close(SDBConnection sdbConn) {
+        if (!sdbConn.getSqlConnection().equals(conn)) {
+            sdbConn.close();
+        }
+    }
     
     protected Dataset getDataset(SDBConnection conn) {
         Store store = SDBFactory.connectStore(conn, storeDesc);
         store.getLoader().setUseThreading(false);
         return SDBFactory.connectDataset(store);
     }
+    
+    private static final Pattern OPTIONAL_PATTERN = Pattern.compile("optional", Pattern.CASE_INSENSITIVE);
+    
+    private static final Pattern GRAPH_PATTERN = Pattern.compile("graph", Pattern.CASE_INSENSITIVE);
+    
+    @Override
+    protected QueryExecution createQueryExecution(String queryString, Query q, Dataset d) {
+        // query performance with OPTIONAL can be dramatically improved on SDB by 
+        // using the default model (union model) instead of the dataset, so long as 
+        // we're not querying particular named graphs
+                
+        Matcher optional = OPTIONAL_PATTERN.matcher(queryString);
+        Matcher graph = GRAPH_PATTERN.matcher(queryString);
+        
+        if (optional.find() && !graph.find()) { 
+            return QueryExecutionFactory.create(q, d.getDefaultModel());
+        } else {
+            return QueryExecutionFactory.create(q, d); 
+        }       
+    }
+    
+    @Override 
+    public void close() {
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException e) {
+                log.error(e,e);
+            }
+        }
+    }
+    
 }

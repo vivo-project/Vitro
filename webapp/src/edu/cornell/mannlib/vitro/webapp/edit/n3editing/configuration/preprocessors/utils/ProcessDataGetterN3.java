@@ -17,6 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 //Returns the appropriate n3 based on data getter
 
 public interface ProcessDataGetterN3 {
+	public String getClassType();
 	public List<String> retrieveN3Required(int counter);
     public List<String> retrieveN3Optional(int counter);
     public List<String >retrieveLiteralsOnForm(int counter);
@@ -36,5 +37,6 @@ public interface ProcessDataGetterN3 {
     public Map<String, List<String>> retrieveExistingUriValues();
     public void populateExistingValues(String dataGetterURI, int counter, OntModel queryModel);
     public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context);
+    public String replaceEncodedQuotesWithEscapedQuotes(String inputStr);
 
 }

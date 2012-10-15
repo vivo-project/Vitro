@@ -18,6 +18,7 @@ import java.util.TreeSet;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
@@ -207,6 +208,20 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     	} else {
     		this.allVClasses = vClassList;
     	}
+    }
+    
+    @Override
+    public List<String> getMostSpecificTypeURIs() {
+        List<String> typeURIs = new ArrayList<String>();
+        List<ObjectPropertyStatement> stmts = getObjectPropertyStatements(
+                VitroVocabulary.MOST_SPECIFIC_TYPE);
+        for (ObjectPropertyStatement stmt : stmts) {
+            String objURI = stmt.getObjectURI();
+            if (objURI != null) {
+                typeURIs.add(objURI);
+            }
+        }
+        return typeURIs;
     }
 
     public void setObjectPropertyStatements(List<ObjectPropertyStatement> list) {

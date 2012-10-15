@@ -17,7 +17,7 @@
 
 
 <#--HTML Portion-->
- <section id="browseClassGroup" style="background-color:#f9f9f9;padding-left:6px;padding-top:2px;border-width:1px;border-style:solid;border-color:#ccc;">
+ <section id="browseClassGroup" class="contentSectionContainer">
                        
                 <section id="selectContentType" name="selectContentType" ${selectClassGroupStyle} role="region">     
                     
@@ -51,7 +51,10 @@
                         </li>
                         </#list>
                     </ul><br />
-                    <input  type="button" id="doneWithContent" class="doneWithContent" name="doneWithContent" value="Done" />
+                    <input  type="button" id="doneWithContent" class="doneWithContent" name="doneWithContent" value="Save this content" />
+                    <#if menuAction == "Add">
+                        <span id="cancelContent"> or <a class="cancel" href="javascript:"  id="cancelContentLink" >Cancel</a></span>
+                    </#if>
                 </section>
             </section>
  <#--Include JavaScript specific to the types of data getters related to this content-->           

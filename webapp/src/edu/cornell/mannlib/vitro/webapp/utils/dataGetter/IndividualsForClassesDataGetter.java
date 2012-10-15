@@ -80,7 +80,7 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
 
     protected Map<String, Object> getClassIntersectionsMap(Model displayModel) {
     	  QuerySolutionMap initBindings = new QuerySolutionMap();
-          initBindings.add("dataGetterURI", ResourceFactory.createResource(this.dataGetterURI));
+          initBindings.add("dataGetterUri", ResourceFactory.createResource(this.dataGetterURI));
           try {
 	         QueryExecution qexec = QueryExecutionFactory.create( dataGetterQuery, displayModel , initBindings);
 	     	 Map<String, Object> classesAndRestrictions = new HashMap<String, Object>();

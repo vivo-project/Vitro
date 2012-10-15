@@ -1,14 +1,13 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
-import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
-
 import java.io.File;
 import java.io.FileOutputStream;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
@@ -16,7 +15,6 @@ import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 
-import com.hp.hpl.jena.ontology.OntDocumentManager;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -53,7 +51,7 @@ implements ServletContextListener {
      * Also, at each start of tomcat, load The display TBox and the
      * display/display model.
      */
-    private void setupDisplayModel(BasicDataSource bds, ServletContext ctx,
+    private void setupDisplayModel(DataSource bds, ServletContext ctx,
             StartupStatus ss) {
 
         // display, editing and navigation Model 
@@ -242,7 +240,7 @@ implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {       
         ServletContext ctx = sce.getServletContext();
         StartupStatus ss = StartupStatus.getBean(ctx);        
-        BasicDataSource bds = getApplicationDataSource(ctx);        
+        DataSource bds = getApplicationDataSource(ctx);        
         
         setupDisplayModel(bds, ctx, ss);                        
     }

@@ -31,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ExecuteDataRetrieval;
 import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
@@ -59,6 +60,7 @@ class IndividualResponseBuilder {
 	private final WebappDaoFactory wadf;
 	private final IndividualDao iDao;
 	private final ObjectPropertyDao opDao;
+	private final ExecuteDataRetrieval eDataRetrieval;
 
 	private final Individual individual;
 	
@@ -69,6 +71,8 @@ class IndividualResponseBuilder {
 		this.opDao = wadf.getObjectPropertyDao();
 
 		this.individual = individual;
+		//initializing execute data retrieval 
+		this.eDataRetrieval = new ExecuteDataRetrieval(this.vreq, this.vreq.getDisplayModel(), this.individual);
 	}
 
 	ResponseValues assembleResponse() throws TemplateModelException {
@@ -80,6 +84,14 @@ class IndividualResponseBuilder {
 		body.put("temporalVisualizationEnabled", getTemporalVisualizationFlag());
 		body.put("verbosePropertySwitch", getVerbosePropertyValues());
 		
+		//Execute data getters that might apply to this individual, e.g. because of the class of the individual
+		try{
+			this.eDataRetrieval.executeDataGetters(body);
+		} catch(Exception ex) {
+			log.error("Data retrieval for individual lead to error", ex);
+		}
+		
+		//Individual template model
 		IndividualTemplateModel itm = getIndividualTemplateModel(individual);
 		/* We need to expose non-getters in displaying the individual's property list, 
 		 * since it requires calls to methods with parameters.
@@ -88,8 +100,6 @@ class IndividualResponseBuilder {
 		 */
 		// body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
 	    body.put("labelCount", getLabelCount(itm.getUri(), vreq));
-	    body.put("publicationCount", getPublicationCount(itm.getUri(), vreq));
-	    body.put("grantCount", getGrantCount(itm.getUri(), vreq));
 		body.put("individual", wrap(itm, new ReadOnlyBeansWrapper()));
 		
 		body.put("headContent", getRdfLinkTag(itm));	       
@@ -248,24 +258,8 @@ class IndividualResponseBuilder {
         + "    ?subject rdfs:label ?label \n"
         + "    FILTER isLiteral(?label) \n"
         + "}" ;
-    
-    private static String PUB_COUNT_QUERY = ""
-        + "PREFIX core: <http://vivoweb.org/ontology/core#> \n"
-        + "SELECT ( str(COUNT(?authorship)) AS ?authorshipCount ) WHERE { \n"
-        + "    ?subject core:authorInAuthorship ?authorship \n"
-        + "}" ;
-    
-    private static String GRANT_COUNT_QUERY = ""
-        + "PREFIX core: <http://vivoweb.org/ontology/core#> \n"
-        + "SELECT ( str(COUNT(?role)) AS ?roleCount ) WHERE { \n"
-        + "    { ?subject core:hasInvestigatorRole ?role } UNION \n"
-        + "    { ?subject core:hasPrincipalInvestigatorRole ?role } UNION \n"
-        + "    { ?subject core:hasCo-PrincipalInvestigatorRole ?role } UNION \n"
-        + "    { ?subject core:hasResearcherRole ?role } \n"
-        + "}" ;
-       
+           
     private static Integer getLabelCount(String subjectUri, VitroRequest vreq) {
-          
         String queryStr = QueryUtils.subUriForQueryVar(LABEL_COUNT_QUERY, "subject", subjectUri);
         log.debug("queryStr = " + queryStr);
         int theCount = 0;
@@ -274,40 +268,6 @@ class IndividualResponseBuilder {
             if (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
                 String countStr = soln.get("labelCount").toString();
-                theCount = Integer.parseInt(countStr);
-            }
-        } catch (Exception e) {
-            log.error(e, e);
-        }    
-        return theCount;
-    }
-    private static Integer getPublicationCount(String subjectUri, VitroRequest vreq) {
-          
-        String queryStr = QueryUtils.subUriForQueryVar(PUB_COUNT_QUERY, "subject", subjectUri);
-        log.debug("queryStr = " + queryStr);
-        int theCount = 0;
-        try {
-            ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
-            if (results.hasNext()) {
-                QuerySolution soln = results.nextSolution();
-                String countStr = soln.get("authorshipCount").toString();
-                theCount = Integer.parseInt(countStr);
-            }
-        } catch (Exception e) {
-            log.error(e, e);
-        }    
-        return theCount;
-    }
-    private static Integer getGrantCount(String subjectUri, VitroRequest vreq) {
-          
-        String queryStr = QueryUtils.subUriForQueryVar(GRANT_COUNT_QUERY, "subject", subjectUri);
-        log.debug("queryStr = " + queryStr);
-        int theCount = 0;
-        try {
-            ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
-            if (results.hasNext()) {
-                QuerySolution soln = results.nextSolution();
-                String countStr = soln.get("roleCount").toString();
                 theCount = Integer.parseInt(countStr);
             }
         } catch (Exception e) {

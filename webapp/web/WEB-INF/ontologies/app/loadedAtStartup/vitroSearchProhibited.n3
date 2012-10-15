@@ -5,7 +5,8 @@
 # vitroDisplay:SearchIndex and the URI of the class 
 # that you would like to exclude.
 
-# All .n3 or .rdf files in this directory will be used to configure 
+# All .n3 or .rdf files in this directory will be added to the display model
+# and the display model will be queried and used to configure 
 # the search exclusions.  Each file must be a valid file in the format
 # specified by its extension. Each file will be loaded individually and
 # must be a complete stand alone example of its format.  Each file must contain all

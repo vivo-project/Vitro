@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl;
 
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -13,7 +14,11 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -31,7 +36,7 @@ public abstract class RDFServiceImpl implements RDFService {
 	
 	private static final Log log = LogFactory.getLog(RDFServiceImpl.class);
 	protected static final String BNODE_ROOT_QUERY = 
-	        "SELECT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s } FILTER (!isBlank(?s) || !bound(?ss)) }";
+	        "SELECT DISTINCT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s } FILTER (!isBlank(?s) || !bound(?ss)) }";
 	
 	protected String defaultWriteGraphURI;
 	protected List<ChangeListener> registeredListeners = new CopyOnWriteArrayList<ChangeListener>();
@@ -91,6 +96,10 @@ public abstract class RDFServiceImpl implements RDFService {
 		registeredListeners.remove(changeListener);
 	}
 
+	public synchronized List<ChangeListener> getRegisteredListeners() {
+	    return this.registeredListeners;
+	}
+	
 	@Override
 	public ChangeSet manufactureChangeSet() {
 		return new ChangeSetImpl();
@@ -197,7 +206,7 @@ public abstract class RDFServiceImpl implements RDFService {
             literalBuff.append("\"");
             if (node.getLiteralDatatypeURI() != null) {
                 literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
-            } else if (node.getLiteralLanguage() != null && node.getLiteralLanguage() != "") {
+            } else if (node.getLiteralLanguage() != null && node.getLiteralLanguage().length() > 0) {
                 literalBuff.append("@").append(node.getLiteralLanguage());
             }
             return literalBuff.toString();
@@ -257,4 +266,24 @@ public abstract class RDFServiceImpl implements RDFService {
         result[1] = nonBlankNodeModel;
         return result;
     }
+    
+    protected Query createQuery(String queryString) {
+        List<Syntax> syntaxes = Arrays.asList(
+                Syntax.defaultQuerySyntax, Syntax.syntaxSPARQL_11, 
+                Syntax.syntaxSPARQL_10, Syntax.syntaxSPARQL, Syntax.syntaxARQ);
+        Query q = null;
+        Iterator<Syntax> syntaxIt = syntaxes.iterator(); 
+        while (q == null) {
+            Syntax syntax = syntaxIt.next();
+            try {
+               q = QueryFactory.create(queryString, syntax);  
+            } catch (QueryParseException e) {
+               if (!syntaxIt.hasNext()) {
+                   throw(e);
+               }
+            }
+        }
+        return q;
+    }
+    
 }

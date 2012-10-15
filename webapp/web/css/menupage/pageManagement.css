@@ -31,7 +31,7 @@
     float:right;
     padding-right:5px;
 }
-.sparqlHtmlContent {
+.contentSectionContainer {
     background-color:#f9f9f9;
     padding-left:6px;
     padding-top:2px;
@@ -66,6 +66,7 @@ section#floatRight {
 }
 select#typeSelect {
     margin-top:0px;
+    margin-bottom:20px;
 }
 section#headerBar {
     background-color:#f5f5f5;
@@ -86,9 +87,9 @@ p#templatePTag {
     margin-top:8px;
     margin-bottom:2px;
 }
-p#checkboxPTag {
-    margin-top:10px;
-    margin-bottom:0px;
+p#menuCheckboxPTag {
+    margin-top:15px;
+    margin-bottom:3px;
 }
 section.hideMenuSection {
     margin-top:10px;
@@ -96,6 +97,10 @@ section.hideMenuSection {
 }
 section.showMenuSection {
     margin-top:10px;
+}
+section#addPageOne  {
+    margin-bottom:-12px;
+    margin-top:8px;
 }
 input.doneWithContent {
     display: inline;
@@ -118,9 +123,15 @@ input.doneWithContent {
     margin-bottom:8px;
     margin-top:0px;
 }
+input#contentCheckbox {
+    margin-left:30px;
+    margin-top:5px;
+    vertical-align:top;
+    padding: 0;
+}
 span.deleteLinkContainer {
     float:left;
-    margin-left:100px;
+    margin-left:170px;
     margin-top:-36px;
 }
 form#managePage textarea {

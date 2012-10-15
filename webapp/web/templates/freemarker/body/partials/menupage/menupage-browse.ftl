@@ -11,7 +11,7 @@
 <section id="browse-by" role="region">
     <nav role="navigation">
         <ul id="browse-classes">
-            <#list vClassGroup as vClass>
+            <#list vClassGroup?sort_by("displayRank") as vClass>
                 <#------------------------------------------------------------
                 Need to replace vClassCamel with full URL that allows function
                 to degrade gracefully in absence of JavaScript. Something

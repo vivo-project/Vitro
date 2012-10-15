@@ -11,7 +11,7 @@
 	</tr>
 	<tr class="editformcell">
 		<td valign="bottom" colspan="3">
-            <b>Namespace URI*</b><br/>
+            <b>Namespace URI*</b>&nbsp;<span class="note"> (must begin with http:// or https://)</span><br/>
              <c:choose>
                <c:when test="${_action eq 'update'}">
                     <i>Change via the "change URI" button on previous screen</i><br/>
@@ -37,4 +37,25 @@
             </c:if>
 		</td>
 	</tr>
-
+<script  type="text/javascript">
+$(document).ready(function() {   
+      var source = "";
+    $('input#primaryAction').click(function() {
+        source = "submit";
+    });
+    $('form#editForm').submit(function() {
+        if (source == "submit") {
+            var str = $('input[name=URI]').val();
+            if ( str.indexOf('http://') >= 0 || str.indexOf('https://') >= 0 ) {
+                return true;
+            }
+            else {
+                alert('The Namespace URI must begin with either http:// \n\n or https://');
+                $('input[name=URI]').focus();
+                source = "";
+                return false;
+            }
+        }
+    });
+});
+</script>

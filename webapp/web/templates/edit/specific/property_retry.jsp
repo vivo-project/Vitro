@@ -234,13 +234,7 @@
 <tr><td colspan="5"><hr class="formDivider"/></td></tr>
 <tr class="editformcell">
     <td valign="top" colspan="2">
-        <b>Number</b> of individuals to display<br/>
-        <input type="text" class="shortInput" name="DomainDisplayLimit" value="<form:value name="DomainDisplayLimit"/>" /><br/>
-            <i>before showing a &quot;more ...&quot; button</i><br/>
-            <c:set var="DomainDisplayLimitError"><form:error name="DomainDisplayLimit"/></c:set>
-            <c:if test="${!empty DomainDisplayLimitError}">
-                <span class="notice"><c:out value="${DomainDisplayLimitError}"/></span>
-            </c:if>
+        <%-- Removed "Number of individuals to display" control per NIHVIVO-3921 --%>
     </td>    
     <td valign="top" colspan="3">
         <b>Sort direction</b> for related individuals, alphabetically by their name (rdfs:label)<br/>

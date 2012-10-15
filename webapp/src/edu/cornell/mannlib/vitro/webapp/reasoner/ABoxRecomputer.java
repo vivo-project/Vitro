@@ -2,23 +2,23 @@
 
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
-import java.util.ArrayList;
+import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.Syntax;
+import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -29,6 +29,12 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.SimpleReasonerSetup;
+
 public class ABoxRecomputer {
 
 	private static final Log log = LogFactory.getLog(ABoxRecomputer.class);
@@ -38,6 +44,7 @@ public class ABoxRecomputer {
 	private Model inferenceModel;           // ABox inferences
 	private Model inferenceRebuildModel;    // work area for recomputing all ABox inferences
 	private Model scratchpadModel;          // work area for recomputing all ABox inferences
+	private RDFService rdfService;
 	private SimpleReasoner simpleReasoner;
 	private Object lock1 = new Object();
 	
@@ -56,12 +63,14 @@ public class ABoxRecomputer {
 			              Model inferenceModel,
 			              Model inferenceRebuildModel,
 			              Model scratchpadModel,
+			              RDFService rdfService,
 			              SimpleReasoner simpleReasoner) {
 		this.tboxModel = tboxModel;
         this.aboxModel = aboxModel; 
 		this.inferenceModel = inferenceModel;
 		this.inferenceRebuildModel = inferenceRebuildModel;
 		this.scratchpadModel = scratchpadModel;	
+		this.rdfService = rdfService;
 		this.simpleReasoner = simpleReasoner;
 		recomputing = false;
 		stopRequested = false;		
@@ -111,12 +120,16 @@ public class ABoxRecomputer {
 		// recompute class subsumption inferences 
 		inferenceRebuildModel.enterCriticalSection(Lock.WRITE);			
 		try {
+		    
+		    log.info("Clearing inference rebuild model.");
 			HashSet<String> unknownTypes = new HashSet<String>();
 			inferenceRebuildModel.removeAll();
 			
 			log.info("Computing class subsumption ABox inferences.");
 			int numStmts = 0;
-			ArrayList<String> individuals = this.getAllIndividualURIs();
+			Collection<String> individuals = this.getAllIndividualURIs();
+			
+			log.info("Recomputing inferences for " + individuals.size() + " individuals");
 			
 			for (String individualURI : individuals) {			
 				Resource individual = ResourceFactory.createResource(individualURI);
@@ -124,12 +137,15 @@ public class ABoxRecomputer {
 				try {
 					addedABoxTypeAssertion(individual, inferenceRebuildModel, unknownTypes);
 					simpleReasoner.setMostSpecificTypes(individual, inferenceRebuildModel, unknownTypes);
-					StmtIterator sit = aboxModel.listStatements(individual, null, (RDFNode) null);
-					while (sit.hasNext()) {
-						Statement s = sit.nextStatement();
-						for (ReasonerPlugin plugin : simpleReasoner.getPluginList()) {
-							plugin.addedABoxStatement(s, aboxModel, inferenceRebuildModel, tboxModel);
-						}
+					List<ReasonerPlugin> pluginList = simpleReasoner.getPluginList();
+					if (pluginList.size() > 0) {
+    					StmtIterator sit = aboxModel.listStatements(individual, null, (RDFNode) null);
+    					while (sit.hasNext()) {
+    						Statement s = sit.nextStatement();
+    						for (ReasonerPlugin plugin : pluginList) {
+    							plugin.addedABoxStatement(s, aboxModel, inferenceRebuildModel, tboxModel);
+    						}
+    					}
 					}
 				} catch (NullPointerException npe) {
 	            	log.error("a NullPointerException was received while recomputing the ABox inferences. Halting inference computation.");
@@ -143,6 +159,8 @@ public class ABoxRecomputer {
 					 log.error("Exception while recomputing ABox inference model: ", je);
 				} catch (Exception e) {
 					 log.error("Exception while recomputing ABox inference model: ", e);
+				} catch (OutOfMemoryError e) {
+				    log.error(individualURI + " out of memory", e);
 				}
 				
 				numStmts++;
@@ -264,6 +282,7 @@ public class ABoxRecomputer {
 				log.error("Exception while reconciling the current and recomputed ABox inference model for class subsumption inferences. Halting processing." , e);
 			}			
 		} catch (Exception e) {
+		    e.printStackTrace();
 			log.error("Exception while recomputing ABox inferences. Halting processing.", e);
 		} finally {
 			inferenceRebuildModel.removeAll();
@@ -274,40 +293,54 @@ public class ABoxRecomputer {
 	/*
 	 * Get the URIs for all individuals in the system
 	 */
-	protected ArrayList<String> getAllIndividualURIs() {
+	protected Collection<String> getAllIndividualURIs() {
 	    
-		String queryString = "select distinct ?subject where {?subject <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type}";
+		String queryString = "select ?s where {?s a ?type}";
 	    return getIndividualURIs(queryString);
 	}
 
-	protected ArrayList<String> getIndividualURIs(String queryString) {
+	protected Collection<String> getIndividualURIs(String queryString) {
 	    
-		ArrayList<String> individuals = new ArrayList<String>();
-		aboxModel.enterCriticalSection(Lock.READ);	
+		Set<String> individuals = new HashSet<String>();
+
+		int batchSize = 50000;
+		int offset = 0;
+		boolean done = false;
 		
-		try {
-			try {			
-				Query query = QueryFactory.create(queryString, Syntax.syntaxARQ);
-				QueryExecution qe = QueryExecutionFactory.create(query, aboxModel);
-				
-				ResultSet results = qe.execSelect();
-	            
-				while (results.hasNext()) {
-					QuerySolution solution = results.next();
-					Resource resource = solution.getResource("subject");
-					
-					if ((resource != null) && !resource.isAnon()) {
-						individuals.add(resource.getURI());
-					}					
-				}
-				
-		   	} catch (Exception e) {
-				log.error("exception while retrieving list of individuals ",e);
-			}	
-		} finally {
-			aboxModel.leaveCriticalSection();
+		while (!done) {
+		    String queryStr = queryString + " LIMIT " + batchSize + " OFFSET " + offset;
+		    if(log.isDebugEnabled()) {
+		        log.debug(queryStr);
+		    }
+		    
+		    ResultSet results = null;
+		    
+		    try {
+		        InputStream in = rdfService.sparqlSelectQuery(queryStr, RDFService.ResultFormat.JSON);
+		        results = ResultSetFactory.fromJSON(in);
+		    } catch (RDFServiceException e) {
+		        throw new RuntimeException(e);
+		    }
+            
+    		if (!results.hasNext()) {
+    		    done = true;
+    		}
+    		
+    		while (results.hasNext()) {
+    			QuerySolution solution = results.next();
+    			Resource resource = solution.getResource("s");
+    			
+    			if ((resource != null) && !resource.isAnon()) {
+    				individuals.add(resource.getURI());
+    			}					
+    		}
+    		
+    		if(log.isDebugEnabled()) {
+    		    log.info(individuals.size() + " in set");
+    		}
+    		offset += batchSize;
 		}
-		
+				
 		return individuals;
 	}
 
@@ -324,7 +357,9 @@ public class ABoxRecomputer {
 				simpleReasoner.addedABoxTypeAssertion(stmt, inferenceModel, unknownTypes);
 			}
 		} finally {
-			iter.close();
+		    if (iter != null) {
+			    iter.close();
+		    }
 			aboxModel.leaveCriticalSection();
 		}
 	}
@@ -332,20 +367,21 @@ public class ABoxRecomputer {
 	 * reconcile a set of inferences into the application inference model
 	 */
 	protected boolean updateInferenceModel(Model inferenceRebuildModel) {
-					
+	    
     log.info("Updating ABox inference model");
-	StmtIterator iter = null;
+	Iterator<Statement> iter = null;
  
 	// Remove everything from the current inference model that is not
 	// in the recomputed inference model	
     int num = 0;
 	scratchpadModel.enterCriticalSection(Lock.WRITE);
 	scratchpadModel.removeAll();
+	log.info("Updating ABox inference model (checking for outdated inferences)");
 	try {
 		inferenceModel.enterCriticalSection(Lock.READ);
+	
 		try {
-			iter = inferenceModel.listStatements();
-			
+			iter = listModelStatements(inferenceModel, JenaDataSourceSetupBase.JENA_INF_MODEL);
 			while (iter.hasNext()) {				
 				Statement stmt = iter.next();
 				if (!inferenceRebuildModel.contains(stmt)) {
@@ -354,7 +390,7 @@ public class ABoxRecomputer {
 				
 				num++;
                 if ((num % 10000) == 0) {
-                    log.info("Still updating ABox inference model (removing outdated inferences)...");
+                    log.info("Still updating ABox inference model (checking for outdated inferences)...");
                 }
                 
                 if (stopRequested) {
@@ -362,12 +398,14 @@ public class ABoxRecomputer {
                 }
 			}
 		} finally {
-			iter.close();
+//		    if (iter != null) {
+//			    iter.close();
+//		    }
             inferenceModel.leaveCriticalSection();
 		}
 		
 		try {
-			iter = scratchpadModel.listStatements();
+			iter = listModelStatements(scratchpadModel, SimpleReasonerSetup.JENA_INF_MODEL_SCRATCHPAD);
 			while (iter.hasNext()) {
 				Statement stmt = iter.next();
 				
@@ -379,14 +417,17 @@ public class ABoxRecomputer {
 				}
 			}
 		} finally {
-			iter.close();
+//		    if (iter != null) {
+//		        iter.close();    
+//		    }
 		}
 					
 		// Add everything from the recomputed inference model that is not already
 		// in the current inference model to the current inference model.	
 		try {
 			scratchpadModel.removeAll();
-			iter = inferenceRebuildModel.listStatements();
+			log.info("Updating ABox inference model (adding any new inferences)");
+			iter = listModelStatements(inferenceRebuildModel, SimpleReasonerSetup.JENA_INF_MODEL_REBUILD); 
 			
 			while (iter.hasNext()) {				
 				Statement stmt = iter.next();
@@ -402,7 +443,7 @@ public class ABoxRecomputer {
 									
 				num++;
                 if ((num % 10000) == 0) {
-                    log.info("Still updating ABox inference model (adding new inferences)...");
+                    log.info("Still updating ABox inference model (adding any new inferences)...");
                 }
                 
                 if (stopRequested) {
@@ -410,22 +451,29 @@ public class ABoxRecomputer {
                 }
 			}
 		} finally {
-			iter.close();	
+//		    if (iter != null) {
+//			    iter.close();	
+//		    }
 		}
 					
-		iter = scratchpadModel.listStatements();
-		while (iter.hasNext()) {
-			Statement stmt = iter.next();
-			
-			inferenceModel.enterCriticalSection(Lock.WRITE);
-			try {
-				inferenceModel.add(stmt);
-			} finally {
-				inferenceModel.leaveCriticalSection();
-			}
+		iter = listModelStatements(scratchpadModel, SimpleReasonerSetup.JENA_INF_MODEL_SCRATCHPAD);
+		try {
+    		while (iter.hasNext()) {
+    			Statement stmt = iter.next();
+    			
+    			inferenceModel.enterCriticalSection(Lock.WRITE);
+    			try {
+    				inferenceModel.add(stmt);
+    			} finally {
+    				inferenceModel.leaveCriticalSection();
+    			}
+    		}
+		} finally {
+//		    if (iter != null) {
+//		        iter.close();
+//		    }
 		}
 	} finally {
-		iter.close();
 		scratchpadModel.removeAll();
 		scratchpadModel.leaveCriticalSection();			
 	}
@@ -433,6 +481,80 @@ public class ABoxRecomputer {
 	log.info("ABox inference model updated");
 	return false;
 	}
+	
+	private Iterator<Statement> listModelStatements(Model model, String graphURI) {
+	    // the RDFServices supplied by the unit tests won't have the right
+	    // named graphs.  So if the graphURI-based chunked iterator is empty, 
+	    // we'll try listStatements() on the model instead.
+	    Iterator<Statement> it = new ChunkedStatementIterator(graphURI);
+	    if (it.hasNext()) {
+	        return it;
+	    } else {
+	        return model.listStatements();
+	    }
+	}
+	
+	// avoids OutOfMemory errors by retrieving triples in batches
+	private class ChunkedStatementIterator implements Iterator<Statement> {
+	    
+	    final int CHUNK_SIZE = 50000;
+	    private int offset = 0;
+	    
+	    private String queryString;
+	    
+	    private Model temp = ModelFactory.createDefaultModel();
+	    private StmtIterator tempIt;
+	    
+	    public ChunkedStatementIterator(String graphURI) {
+	        this.queryString = "CONSTRUCT { ?s ?p ?o } WHERE { GRAPH <" + 
+	                graphURI + "> { ?s ?p ?o } }";
+	    }
+	    
+	    public Statement next() {
+	        if (tempIt.hasNext()) {
+	            return tempIt.nextStatement();
+	        } else {
+	            return null;
+	        }
+	    }
+	    
+	    public void remove() {
+	        throw new UnsupportedOperationException(this.getClass().getName() + 
+	                " does not support .remove()");
+	    }
+	    
+	    public boolean hasNext() {
+	        if (tempIt != null && tempIt.hasNext()) {
+	            return true;
+	        } else {
+	            getNextChunk();
+	            if (temp.size() > 0) {
+	                tempIt = temp.listStatements();
+	                return true;
+	            } else {
+	                return false;
+	            }
+	        }
+	    }
+	    
+	    private void getNextChunk() {
+	        
+            String chunkQueryString = queryString + " LIMIT " + CHUNK_SIZE + " OFFSET " + offset;
+            offset += CHUNK_SIZE;
+            
+            try {
+                InputStream in = rdfService.sparqlConstructQuery(
+                        chunkQueryString, RDFService.ModelSerializationFormat.NTRIPLE);
+                temp.removeAll();
+                temp.add(RDFServiceUtils.parseModel(
+                        in, RDFService.ModelSerializationFormat.NTRIPLE));
+            } catch (RDFServiceException e) {
+                throw new RuntimeException(e);
+            }
+	    }
+        
+	}
+	
 	
 	/**
 	 * This is called when the application shuts down.

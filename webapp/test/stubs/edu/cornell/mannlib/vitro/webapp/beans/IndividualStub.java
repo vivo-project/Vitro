@@ -260,6 +260,11 @@ public class IndividualStub implements Individual {
 	}
 
 	@Override
+	public List<String> getMostSpecificTypeURIs() {
+	    throw new RuntimeException("Individual.getMostSpecificTypeURIs() not implemented.");
+	}
+	
+	@Override
 	public String getRdfsLabel() {
 		throw new RuntimeException("Individual.getRdfsLabel() not implemented.");
 	}

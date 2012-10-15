@@ -117,6 +117,7 @@ public class ReorderController extends VitroAjaxController {
         	Resource individualResource = ResourceFactory.createResource(individualUri);
         	//Deletions are all old statements with rank predicate
         	retractions.add(writeModel.listStatements(individualResource, rankPredicateProperty, (RDFNode) null));
+        	log.debug("retractions = " + retractions);
         	//New statement is new literal with the data property from
         	Literal dataLiteral = null;
         	if(datapropURI != null && datapropURI.length() > 0) {
@@ -126,6 +127,7 @@ public class ReorderController extends VitroAjaxController {
 
         	}
         	additions.add(individualResource, rankPredicateProperty, dataLiteral);
+        	log.debug("additions = " + additions);
         	counter++;
         }
         
@@ -134,8 +136,8 @@ public class ReorderController extends VitroAjaxController {
             lock =  writeModel.getLock();
             lock.enterCriticalSection(Lock.WRITE);
             writeModel.getBaseModel().notifyEvent(new EditEvent(null,true));   
-            writeModel.add( additions );
             writeModel.remove( retractions );
+            writeModel.add( additions );
         }catch(Throwable t){
             log.error("error adding edit change n3required model to in memory model \n"+ t.getMessage() );
         }finally{

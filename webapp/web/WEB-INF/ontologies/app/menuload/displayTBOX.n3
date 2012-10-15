@@ -91,6 +91,9 @@ owl:versionInfo
 <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#requiresBodyTemplate>
       a       owl:DatatypeProperty .
       
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#isSelfContainedTemplate>
+      a       owl:DatatypeProperty .
+      
 <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#menuPosition>
       a       owl:DatatypeProperty ;
       <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#displayLimitAnnot>

@@ -5,7 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.apache.commons.dbcp.BasicDataSource;
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -14,10 +15,10 @@ public class SDBGraphConnectionGenerator {
 	private final static Log log = LogFactory.getLog(
 			SDBGraphConnectionGenerator.class);
 	
-	private BasicDataSource ds = null;
+	private DataSource ds = null;
 	private Connection connection = null;
 	
-	public SDBGraphConnectionGenerator(BasicDataSource dataSource) {
+	public SDBGraphConnectionGenerator(DataSource dataSource) {
 		this.ds = dataSource;
 	}
 	

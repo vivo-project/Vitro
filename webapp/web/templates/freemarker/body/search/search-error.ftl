@@ -9,3 +9,4 @@
 <p>
 ${message?html}
 </p>
+<#include "search-help.ftl" >

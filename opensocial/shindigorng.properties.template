@@ -159,9 +159,6 @@ shindig.json-rpc.result-field=result
 shindig.accelerate.remapInternalServerError=true
 shindig.proxy.remapInternalServerError=true
 
-shindig.signing.key-file=@TOKEN_KEY_FILE@
-shindig.signing.key-name=mykey
-
 #####################################################################################
 #
 #	Open Research Networking Gadgets Items 

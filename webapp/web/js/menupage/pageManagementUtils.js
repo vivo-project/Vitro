@@ -105,10 +105,11 @@ var pageManagementUtils = {
 		//From original menu management edit
 		this.defaultTemplateRadio = $('input.default-template');
         this.customTemplateRadio = $('input.custom-template');
+        this.selfContainedTemplateRadio = $('input.selfContained-template');
         this.customTemplate = $('#custom-template');
         //In this version, these don't exist but we can consider this later
        // this.changeContentType = $('#changeContentType');
-        this.selectContentType = $('#selectContentType');
+       // this.selectContentType = $('#selectContentType');
        // this.existingContentType = $('#existingContentType');
         this.selectClassGroupDropdown = $('select#selectClassGroup');
         this.classesForClassGroup = $('section#classesInSelectedGroup');
@@ -141,7 +142,6 @@ var pageManagementUtils = {
 	    this.sparqlQuerySection.hide();
 	    this.fixedHTMLSection.hide();
 	    this.classesForClassGroup.addClass('hidden');
-// tlw72	    this.moreContentButton.hide();
 	    //left side components
 	    //These depend on whether or not this is an existing item or not
 	    if(this.isAdd()) {
@@ -161,12 +161,22 @@ var pageManagementUtils = {
 	            pageManagementUtils.customTemplate.addClass('hidden');
 	            //Also clear custom template value so as not to submit it
 	            pageManagementUtils.clearInputs(pageManagementUtils.customTemplate);
+	            pageManagementUtils.rightSideDiv.show(); 
+	            pageManagementUtils.disablePageSave();           
 	    });
 
 	    this.customTemplateRadio.click( function() {
 	            pageManagementUtils.customTemplate.removeClass('hidden');            
+	            pageManagementUtils.rightSideDiv.show();
+	            pageManagementUtils.disablePageSave();            
 	    });
 	
+	    this.selfContainedTemplateRadio.click( function() {
+	            pageManagementUtils.customTemplate.removeClass('hidden');
+	            pageManagementUtils.rightSideDiv.hide(); 
+	            pageManagementUtils.enablePageSave();           
+	    });
+
 	    this.isMenuCheckbox.click( function() {
 	        if ( pageManagementUtils.menuSection.is(':hidden') ) {
 	            pageManagementUtils.menuSection.show();
@@ -190,6 +200,8 @@ var pageManagementUtils = {
             pageManagementUtils.sparqlQuerySection.hide();
             pageManagementUtils.contentTypeSelectOptions.eq(0).attr('selected', 'selected');
             pageManagementUtils.contentTypeSelect.focus();
+            pageManagementUtils.adjustSaveButtonHeight();
+            pageManagementUtils.checkSelfContainedRadio();
 	    });
 	    //replacing with menu management edit version which is extended with some of the logic below
 	    this.selectClassGroupDropdown.change(function() {
@@ -242,16 +254,20 @@ var pageManagementUtils = {
 	//Form submission
 	handleFormSubmission:function(event) {
 		 var validationError = pageManagementUtils.validateMenuItemForm();
-	     //Add any errors from page content sections
-	     validationError += pageManagementUtils.validatePageContentSections();
+	     //Add any errors from page content sections if necessary
+	     // Only validate the content sections if the self contained template section is NOT selected tlw72
+	     if ( !pageManagementUtils.isSelfContainedTemplateChecked() ) {
+	          validationError += pageManagementUtils.validatePageContentSections();
+	     }
 	     if (validationError == "") {
 	    	//Check if menu label needs to be page title
 	    	pageManagementUtils.checkMenuTitleSubmission();
-	 		//Create the appropriate json objects
+	 		//Create the appropriate json objects if necessary
      		pageManagementUtils.createPageContentForSubmission();
+     		//pageManagementUtils.mapCustomTemplateName();
+     		pageManagementUtils.setUsesSelfContainedTemplateInput();
      		return true;
         } else{
-     	   
             $('#error-alert').removeClass('hidden');
             $('#error-alert p').html(validationError);
             event.preventDefault();
@@ -266,6 +282,11 @@ var pageManagementUtils = {
 			var pageName = pageManagementUtils.pageNameInput.val();
 			pageManagementUtils.menuLinkText.val(pageName);
 		}
+		if(!isMenu && linkText.length > 0) {
+			// if the isMenuCheckbox is unchecked, we need to clear the
+			// menuLinkText field; otherwise, the page remains a menu
+			pageManagementUtils.menuLinkText.val("");
+		}
 	},
 	
 	//Select content type
@@ -278,6 +299,7 @@ var pageManagementUtils = {
             pageManagementUtils.sparqlQuerySection.hide();
             pageManagementUtils.headerBar.text("Browse Class Group - ");
             pageManagementUtils.headerBar.show();
+            $('div#selfContainedDiv').hide();
         }
         if ( _this.contentTypeSelect.val() == "fixedHtml" || _this.contentTypeSelect.val() == "sparqlQuery" ) {
         	 pageManagementUtils.classGroupSection.hide();
@@ -295,6 +317,7 @@ var pageManagementUtils = {
            
             pageManagementUtils.headerBar.show();
             pageManagementUtils.classesForClassGroup.addClass('hidden');
+            $('div#selfContainedDiv').hide();
         }
         if ( _this.contentTypeSelect.val() == "" ) {
         	pageManagementUtils.classGroupSection.hide();
@@ -303,6 +326,7 @@ var pageManagementUtils = {
             pageManagementUtils.classesForClassGroup.addClass('hidden');
             pageManagementUtils.headerBar.hide();
             pageManagementUtils.headerBar.text("");
+            pageManagementUtils.checkSelfContainedRadio();
         }
         //Collapse any divs for existing content if it exists
         pageManagementUtils.collapseAllExistingContent();
@@ -337,7 +361,6 @@ var pageManagementUtils = {
 	},
 	clearInputs:function($el) {
 		// jquery selector :input selects all input text area select and button elements
-	    // $el.find("input").val("");  cannot delete the value of the done button  -- tlw72
 	    $el.find("input").each( function() {
 	        if ( $(this).attr('id') != "doneWithContent" ) {
 	            $(this).val("");
@@ -396,7 +419,7 @@ var pageManagementUtils = {
             "class": "pageContentContainer",
             html: "<span class='pageContentTypeLabel'>" + contentTypeLabel + " - " + varOrClass 
                         + "</span><span id='clickable" + counter 
-                        + "' class='pageContentExpand'><div class='arrow expandArrow'></div></span><div id='innerContainer" + counter 
+                        + "' class='pageContentExpand'><div id='woof' class='arrow expandArrow'></div></span><div id='innerContainer" + counter 
                         + "' class='pageContentWrapper'><span class='deleteLinkContainer'>&nbsp;or&nbsp;<a id='remove" + counter   // changed button to a link
                         + "' href='' >delete</a></span></div>"
         });
@@ -414,17 +437,18 @@ var pageManagementUtils = {
     	//Done button should just collapse the cloned content
         $newContentObj.find("input[name='doneWithContent']").click(function() {
         		var thisInnerDiv = $(this).closest("div.pageContentWrapper");
-                thisInnerDiv.slideUp(222);
-                var thisClickableSpan = $(this).closest("span.pageContentExpand");
+                var thisClickableSpan = thisInnerDiv.prev("span.pageContentExpand");
                 var thisArrowDiv = thisClickableSpan.find('div.arrow');
+                thisInnerDiv.slideUp(222);
                 thisArrowDiv.removeClass("collapseArrow");
                 thisArrowDiv.addClass("expandArrow");
+                window.setTimeout('pageManagementUtils.adjustSaveButtonHeight()', 223);
+         
         });	
     },
     bindClonedContentContainerEvents:function($newDivContainer, counter) {
     	 var $clickableSpan = $newDivContainer.children('span#clickable' + counter);
          var $innerDiv = $newDivContainer.children('div#innerContainer' + counter);
-                  
     	 //Expand/collapse toggle
         $clickableSpan.click(function() {
             if ( $innerDiv.is(':visible') ) {
@@ -445,7 +469,7 @@ var pageManagementUtils = {
         });
         
         //remove button
-        $newRemoveLink = $innerDiv.find('a#remove' + counter); // tlw72 changed button to link
+        $newRemoveLink = $innerDiv.find('a#remove' + counter); 
         //remove the content entirely
         $newRemoveLink.click(function(event) {
         	//if content type of what is being deleted is browse class group, then
@@ -457,6 +481,7 @@ var pageManagementUtils = {
         	//remove the section
         	$innerDiv.parent("div").remove();
             pageManagementUtils.adjustSaveButtonHeight();
+            pageManagementUtils.checkSelfContainedRadio();
             //Because this is now a link, have to prevent default action of navigating to link
             event.preventDefault();
         });
@@ -465,7 +490,7 @@ var pageManagementUtils = {
     createCloneObject:function(contentType, counter) {
     	var originalObjectPath = 'section#' + contentType;
     	var $newContentObj = $(originalObjectPath).clone();
- 	    $newContentObj.removeClass("sparqlHtmlContent"); 
+ 	    $newContentObj.removeClass("contentSectionContainer"); 
  	    $newContentObj.addClass("pageContent"); 
  	    $newContentObj.attr("contentNumber", counter);
  	    //Save content type
@@ -680,10 +705,22 @@ var pageManagementUtils = {
     		//Create a new hidden input with a specific name and assign value per page content
         	pageManagementUtils.createPageContentInputForSubmission(jsonObjectString);
     	});
-    	
+    	//For the case where the template only selection is picked, there will be
+    	//no page contents, but the hidden input still needs to be created as it is expected
+    	//to exist by the edit configuration, this creates the hidden input with an empty value
+	     if (pageManagementUtils.isSelfContainedTemplateChecked() ) {
+	    	 	//An empty string as no content selected
+	        	pageManagementUtils.createPageContentInputForSubmission("");
+	     }
     },
     createPageContentInputForSubmission: function(inputValue) {
-    	$("<input type='hidden' name='pageContentUnit' value='" + inputValue + "'>").appendTo(pageManagementUtils.pageContentSubmissionInputs);
+    	//Previously, this code created the hidden input and included the value inline
+    	//but this was converting html encoding for quotes/single quotes into actual quotes
+    	//which prevented correct processing as the html thought the string had ended
+    	//Creating the input and then using the val() method preserved the encoding
+    	var pageContentUnit = $("<input type='hidden' name='pageContentUnit'>");
+    	pageContentUnit.val(inputValue);
+    	pageContentUnit.appendTo(pageManagementUtils.pageContentSubmissionInputs);
     },
     //returns a json object with the data getter information required
     processPageContentSection:function(pageContentSection) {
@@ -758,8 +795,9 @@ var pageManagementUtils = {
             validationError += "The pretty URL must begin with a leading forward slash<br />";
         }
         
-        // Check custom template
-        if ($('input:radio[name=selectedTemplate]:checked').val() == "custom") {
+        // Check custom template and self contained template
+        var selectedTemplateValue = $('input:radio[name=selectedTemplate]:checked').val();
+        if (selectedTemplateValue == "custom" || selectedTemplateValue == "selfContained") {
             if ($('input[name=customTemplate]').val() == "") {
                 validationError += "You must supply a template<br />"; 
             }
@@ -794,6 +832,32 @@ var pageManagementUtils = {
 	    	});
     	}
     	return validationErrorMsg;
+    },
+
+    //If the selfContained-template radio is checked, copy the custom template name to the hidden
+    //selfContainedTemplate input element. We need that for edit mode to select the correct radio button.
+    mapCustomTemplateName:function() {
+        if ( pageManagementUtils.selfContainedTemplateRadio.is(':checked') ) {
+            $("input[name='selfContainedTemplate']").val($("input[name='customTemplate']").val());
+        }
+    },
+    
+    setUsesSelfContainedTemplateInput:function() {
+    	//On form submission attach hidden input to form if the custom template selection is picked
+        if ( pageManagementUtils.isSelfContainedTemplateChecked() ) {
+        	$("<input name='isSelfContainedTemplate' value='true'>").appendTo($("form"));
+        }
+    },
+    
+    //If any content is defined, keep the selContained radio button hidden
+    checkSelfContainedRadio:function() {
+        if ( pageManagementUtils.savedContentDivs.html().length == 0 ) {
+            $('div#selfContainedDiv').show();
+        }
+        
+    },
+    isSelfContainedTemplateChecked:function() {
+    	return pageManagementUtils.selfContainedTemplateRadio.is(':checked');
     }
 
 }

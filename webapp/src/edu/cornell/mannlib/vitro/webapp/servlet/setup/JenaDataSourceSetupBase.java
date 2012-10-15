@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import java.beans.PropertyVetoException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -9,6 +10,7 @@ import java.sql.SQLException;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
+import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
@@ -31,6 +33,7 @@ import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.sdb.store.LayoutType;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
@@ -174,9 +177,10 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
                 "VitroConnection.DataSource.username");
         String password = ConfigurationProperties.getBean(ctx).getProperty(
                 "VitroConnection.DataSource.password");
-        BasicDataSource ds = makeBasicDataSource(
+        DataSource ds = makeC3poDataSource(
                 getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
-
+//        DataSource ds = makeBasicDataSource(
+//                getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
        jenaDbOntModelSpec = (jenaDbOntModelSpec != null) 
                ? jenaDbOntModelSpec 
                : DB_ONT_MODEL_SPEC;
@@ -186,10 +190,10 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
    }
    
     /**
-    * Sets up a BasicDataSource using values from
+    * Sets up a DataSource using values from
     * a properties file.
     */
-    public final BasicDataSource makeDataSourceFromConfigurationProperties(
+    public final DataSource makeDataSourceFromConfigurationProperties(
             ServletContext ctx) {
         String dbDriverClassname = ConfigurationProperties.getBean(ctx)
                 .getProperty("VitroConnection.DataSource.driver",
@@ -199,35 +203,54 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
                 "VitroConnection.DataSource.username");
         String password = ConfigurationProperties.getBean(ctx).getProperty(
                 "VitroConnection.DataSource.password");
-        return makeBasicDataSource(
+        return makeC3poDataSource(
                 dbDriverClassname, jdbcUrl, username, password, ctx);
+//        makeBasicDataSource(
+//                dbDriverClassname, jdbcUrl, username, password, ctx);
     }
    
-   public void setApplicationDataSource(BasicDataSource bds, 
+   public void setApplicationDataSource(DataSource ds, 
                                         ServletContext ctx) {
-       ctx.setAttribute(getDataSourceAttributeName(), bds);
+       ctx.setAttribute(getDataSourceAttributeName(), ds);
    }
    
-   public static BasicDataSource getApplicationDataSource(ServletContext ctx) {
-       return (BasicDataSource) ctx.getAttribute(getDataSourceAttributeName());
+   public static DataSource getApplicationDataSource(ServletContext ctx) {
+       return (DataSource) ctx.getAttribute(getDataSourceAttributeName());
    }
    
    private static String getDataSourceAttributeName() {
        return JenaDataSourceSetupBase.class.getName() + ".dataSource";
    }
-
-   public static BasicDataSource makeBasicDataSource(String dbDriverClassname,
+   
+   public static DataSource makeC3poDataSource(String dbDriverClassname,
                                                      String jdbcUrl,
                                                      String username, 
                                                      String password, 
                                                      ServletContext ctx) {
-       log.debug("makeBasicDataSource('" + dbDriverClassname + "', '"
-            + jdbcUrl + "', '" + username + "', '" + password + "')");
-       BasicDataSource ds = new BasicDataSource();
-       ds.setDriverClassName(dbDriverClassname);
-       ds.setUrl(jdbcUrl);
-       ds.setUsername(username);
-       ds.setPassword(password);
+       
+       ComboPooledDataSource cpds = new ComboPooledDataSource();
+       try {
+           cpds.setDriverClass(dbDriverClassname);
+       } catch (PropertyVetoException pve) {
+           throw new RuntimeException(pve);
+       }
+       cpds.setJdbcUrl(jdbcUrl);
+       cpds.setUser(username);
+       cpds.setPassword(password);
+       int[] maxActiveAndIdle = getMaxActiveAndIdle(ctx);
+       cpds.setMaxPoolSize(maxActiveAndIdle[0]);
+       cpds.setMinPoolSize(maxActiveAndIdle[1]);
+       cpds.setMaxIdleTime(3600); // ms
+       cpds.setMaxIdleTimeExcessConnections(300);
+       cpds.setAcquireIncrement(5);
+       cpds.setNumHelperThreads(6);
+       cpds.setTestConnectionOnCheckout(DEFAULT_TESTONBORROW);
+       cpds.setTestConnectionOnCheckin(DEFAULT_TESTONRETURN);
+       cpds.setPreferredTestQuery(getValidationQuery(ctx));
+       return cpds;
+   }
+
+   private static int[] getMaxActiveAndIdle(ServletContext ctx) {
        int maxActiveInt = DEFAULT_MAXACTIVE;
        String maxActiveStr = ConfigurationProperties.getBean(ctx).getProperty(
                 MAX_ACTIVE_PROPERTY);
@@ -247,11 +270,11 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
                        + maxActiveStr + " as an integer");
            }
        }
+       String maxIdleStr = ConfigurationProperties.getBean(ctx).getProperty(
+               MAX_IDLE_PROPERTY);
        int maxIdleInt = (maxActiveInt > DEFAULT_MAXACTIVE) 
                ? maxActiveInt / 4
                : DEFAULT_MAXIDLE;
-        String maxIdleStr = ConfigurationProperties.getBean(ctx).getProperty(
-                MAX_IDLE_PROPERTY);
        if (!StringUtils.isEmpty(maxIdleStr)) {
            try {
                maxIdleInt = Integer.parseInt(maxIdleStr);    
@@ -259,15 +282,34 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
                log.error("Unable to parse connection pool maxIdle setting " 
                        + maxIdleStr + " as an integer");
            }
-       }
-       ds.setMaxActive(maxActiveInt);
-       ds.setMaxIdle(maxIdleInt);
+       }       
+       int[] result = new int[2];
+       result[0] = maxActiveInt;
+       result[1] = maxIdleInt;
+       return result;
+   }
+   
+   public static DataSource makeBasicDataSource(String dbDriverClassname,
+                                                     String jdbcUrl,
+                                                     String username, 
+                                                     String password, 
+                                                     ServletContext ctx) {
+       log.debug("makeBasicDataSource('" + dbDriverClassname + "', '"
+            + jdbcUrl + "', '" + username + "', '" + password + "')");
+       BasicDataSource ds = new BasicDataSource();
+       ds.setDriverClassName(dbDriverClassname);
+       ds.setUrl(jdbcUrl);
+       ds.setUsername(username);
+       ds.setPassword(password);
+       int[] maxActiveAndIdle = getMaxActiveAndIdle(ctx);
+       ds.setMaxActive(maxActiveAndIdle[0]);
+       ds.setMaxIdle(maxActiveAndIdle[1]);
        ds.setMaxWait(DEFAULT_MAXWAIT);
        ds.setValidationQuery(getValidationQuery(ctx));
        ds.setTestOnBorrow(DEFAULT_TESTONBORROW);
        ds.setTestOnReturn(DEFAULT_TESTONRETURN);
        ds.setMinEvictableIdleTimeMillis(DEFAULT_MINEVICTIONIDLETIME);
-       ds.setNumTestsPerEvictionRun(maxActiveInt);
+       ds.setNumTestsPerEvictionRun(maxActiveAndIdle[0]);
        ds.setTimeBetweenEvictionRunsMillis(DEFAULT_TIMEBETWEENEVICTIONS);
        ds.setInitialSize(ds.getMaxActive() / 10);
 
@@ -292,7 +334,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        firstStartup = true;
    }
    
-   protected Model makeDBModel(BasicDataSource ds, 
+   protected Model makeDBModel(DataSource ds, 
                                String jenaDbModelname, 
                                OntModelSpec jenaDbOntModelSpec, 
                                ServletContext ctx) {
@@ -300,7 +342,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
                ds, jenaDbModelname, jenaDbOntModelSpec, TripleStoreType.RDB, ctx);
    }
    
-   protected Model makeDBModel(BasicDataSource ds, 
+   protected Model makeDBModel(DataSource ds, 
            String jenaDbModelName, 
            OntModelSpec jenaDbOntModelSpec, 
            TripleStoreType storeType, ServletContext ctx) {
@@ -308,7 +350,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
                getDbType(ctx), ctx);
    }
    
-   public static Model makeDBModel(BasicDataSource ds, 
+   public static Model makeDBModel(DataSource ds, 
                                String jenaDbModelName, 
                                OntModelSpec jenaDbOntModelSpec, 
                                TripleStoreType storeType, String dbType, 
@@ -343,7 +385,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
                         "Unsupported store type " + storeType); 
             }
             dbModel = ModelFactory.createModelForGraph(g);
-            log.debug("Using database at "+ds.getUrl());
+            //log.debug("Using database at " + ds.getUrl());
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -429,11 +471,13 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         } else if (TripleStoreType.SDB.equals(type)) {
             StoreDesc storeDesc = new StoreDesc(
                     LayoutType.LayoutTripleNodesHash, DatabaseType.fetch(dbtypeStr));
-            BasicDataSource bds = WebappDaoSetup.makeBasicDataSource(
+            DataSource bds = WebappDaoSetup.makeC3poDataSource(
                     getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
-            bds.setMaxActive(4); // for now, the SDB model makers should not use more
-                                 // than a small handful of connections
-            bds.setMaxIdle(2);
+//            DataSource bds = WebappDaoSetup.makeBasicDataSource(
+//                    getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
+//            bds.setMaxActive(4); // for now, the SDB model makers should not use more
+//                                 // than a small handful of connections
+//            bds.setMaxIdle(2);
             try {
                 vsmm = new VitroJenaSDBModelMaker(storeDesc, bds);
             } catch (SQLException sqle) {

@@ -4,8 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.dwr;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -42,15 +42,11 @@ public class VClassDWR {
         VitroRequest vreq = new VitroRequest(req);
         
         vclasses = vreq.getWebappDaoFactory().getVClassDao().getVClassesForProperty(vclassURI, propertyURI);
-//        if( vclasses != null && filterOutUninstanciated ){
-//            ListIterator<VClass> it = vclasses.listIterator();
-//            while(it.hasNext()){
-//                VClass clazz = it.next();
-//                if( clazz.getEntityCount() == 0 )
-//                    it.remove();
-//            }
-//        }
+        
+        //it seems that filterOutUninstanciated was removed in the RDFService conversion.
+                
+        Collections.sort(vclasses); //sort vClasses NIHVIVO-3963        
         return vclasses;
     }
-
+    
 }

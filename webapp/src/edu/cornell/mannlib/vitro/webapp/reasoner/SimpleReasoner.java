@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.AnnotationProperty;
-import com.hp.hpl.jena.ontology.ConversionException;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
@@ -23,6 +23,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -40,6 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 
 /**
  * Allows for real-time incremental materialization or retraction of RDFS-
@@ -101,7 +103,7 @@ public class SimpleReasoner extends StatementListener {
 		this.batchMode = 0;
 		aBoxDeltaModeler1 = new CumulativeDeltaModeler();
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
-		recomputer = new ABoxRecomputer(tboxModel,this.aboxModel,inferenceModel,inferenceRebuildModel,scratchpadModel,this);
+		recomputer = new ABoxRecomputer(tboxModel,this.aboxModel,inferenceModel,inferenceRebuildModel,scratchpadModel,rdfService,this);
 		stopRequested = false;
 		
 		if (rdfService == null) {
@@ -133,7 +135,7 @@ public class SimpleReasoner extends StatementListener {
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
 		this.batchMode = 0;
 		stopRequested = false;
-		recomputer = new ABoxRecomputer(tboxModel,this.aboxModel,inferenceModel,ModelFactory.createDefaultModel(),ModelFactory.createDefaultModel(),this);
+		recomputer = new ABoxRecomputer(tboxModel,this.aboxModel,inferenceModel,ModelFactory.createDefaultModel(), ModelFactory.createDefaultModel(), new RDFServiceModel(aboxModel), this);
 	}
 	
 	public void setPluginList(List<ReasonerPlugin> pluginList) {
@@ -418,12 +420,26 @@ public class SimpleReasoner extends StatementListener {
 	}
 
 	/*
+     * If it is removed that B is of type A, then for each superclass of A remove
+     * the inferred statement that B is of that type UNLESS it is otherwise entailed
+     * that B is of that type.
+     * 
+     */
+	protected void removedABoxTypeAssertion(Statement stmt, Model inferenceModel) {
+	    removedABoxTypeAssertion(stmt, inferenceModel, null);
+	}
+	
+	/*
 	 * If it is removed that B is of type A, then for each superclass of A remove
 	 * the inferred statement that B is of that type UNLESS it is otherwise entailed
 	 * that B is of that type.
 	 * 
+	 * remainingTypeURIs is an optional list of asserted type URIs for the subject of 
+	 * stmt, and may be null.  Supplying a precompiled list can yield performance 
+     * improvement when this method is called repeatedly for the same subject.  
+	 * 
 	 */
-	protected void removedABoxTypeAssertion(Statement stmt, Model inferenceModel) {
+	protected void removedABoxTypeAssertion(Statement stmt, Model inferenceModel, List<String> remainingTypeURIs) {
 		tboxModel.enterCriticalSection(Lock.READ);
 		try {		
 			Resource cls = null;
@@ -450,7 +466,8 @@ public class SimpleReasoner extends StatementListener {
 						// of classes not individuals.
 						if (parentClass.isAnon()) continue;  
 						
-						if (entailedType(stmt.getSubject(),parentClass)) {
+						List<String> typeURIs = (remainingTypeURIs == null) ? getRemainingAssertedTypeURIs(stmt.getSubject()) : remainingTypeURIs;
+						if (entailedType(stmt.getSubject(),parentClass, typeURIs)) {
 						    continue;    // if a type is still entailed without the
 						}
 						                                                              // removed statement, then don't remove it
@@ -882,31 +899,64 @@ public class SimpleReasoner extends StatementListener {
 	}
 
 	// Returns true if it is entailed by class subsumption that
-	// subject is of type cls; otherwise returns false.
+    // subject is of type cls; otherwise returns false.
 	protected boolean entailedType(Resource subject, Resource cls) {
-
-		List<Resource> sameIndividuals = getSameIndividuals(subject,inferenceModel);
-		sameIndividuals.add(subject);
+	    return entailedType(subject, cls, null);
+	}
+	
+	// Returns true if it is entailed by class subsumption that
+	// subject is of type cls; otherwise returns false.
+	// remainingTypeURIs is an optional list of asserted type URIs for the subject 
+	// resource, and may be null.  Supplying a precompiled list can yield performance 
+	// improvement when this method is called repeatedly for the same subject. 
+	protected boolean entailedType(Resource subject, Resource cls, List<String> remainingTypeURIs) {
 				
 		List<Resource> subClasses = getSubClasses(cls);
-		aboxModel.enterCriticalSection(Lock.READ);
-		try {			
-			Iterator<Resource> iter = subClasses.iterator();
-			while (iter.hasNext()) {		
-				Resource childClass = iter.next();
-				if (childClass.equals(cls)) continue;  
-				Iterator<Resource> sameIter = sameIndividuals.iterator();
-				while (sameIter.hasNext()) {
-					Statement stmt = ResourceFactory.createStatement(sameIter.next(), RDF.type, childClass);
-					if (aboxModel.contains(stmt)) {
-					   return true;					
-					}
-				}
-			}
-			return false;
-		} finally { 
-			aboxModel.leaveCriticalSection();
-		}	
+		Set<String> subClassURIs = new HashSet<String>();
+	    for (Resource subClass : subClasses) {
+	        if (!subClass.isAnon()) {
+	            subClassURIs.add(subClass.getURI());
+	        }
+	    }
+	    
+	    List<String> typeURIs = (remainingTypeURIs == null) ? getRemainingAssertedTypeURIs(subject) : remainingTypeURIs;
+	    
+	    for (String typeURI : typeURIs) {
+            if (!typeURI.equals(cls.getURI()) && subClassURIs.contains(typeURI)) {
+                return true;
+            }
+	    }
+	    
+        return false;
+		
+	}
+	
+	protected List<String> getRemainingAssertedTypeURIs(Resource resource) {
+	    
+	    List<String> typeURIs = new ArrayList<String>();
+
+	    List<Resource> sameIndividuals = getSameIndividuals(resource,inferenceModel);
+	    sameIndividuals.add(resource);
+
+	    aboxModel.enterCriticalSection(Lock.READ);
+	    try {           
+	        Iterator<Resource> sameIter = sameIndividuals.iterator();
+	        while (sameIter.hasNext()) {
+	            Resource res = sameIter.next();
+	            StmtIterator typeIt = aboxModel.listStatements(res, RDF.type, (RDFNode) null);
+	            while (typeIt.hasNext()) {
+	                Statement stmt = typeIt.nextStatement();
+	                if (stmt.getObject().isURIResource()) {
+	                    String typeURI = stmt.getObject().asResource().getURI();
+	                    typeURIs.add(typeURI);
+	                }
+	            }
+	        }
+	    } finally { 
+	        aboxModel.leaveCriticalSection();
+	    }   
+	    
+	    return typeURIs;
 	}
 	
 	protected List<Resource> getSubClasses(Resource cls) {
@@ -1392,7 +1442,7 @@ public class SimpleReasoner extends StatementListener {
 				}
 			} catch (Exception e) {
 				log.error("Exception while processing " + (op == ModelUpdate.Operation.ADD ? "an added" : "a removed") + 
-						" statement in SimpleReasoner plugin:" + plugin.getClass().getName() + " -- " + e.getMessage());
+						" statement in SimpleReasoner plugin:" + plugin.getClass().getName() + " -- ", e);
 			}
 		}
 	}
@@ -1555,41 +1605,56 @@ public class SimpleReasoner extends StatementListener {
         		}
         	
     			retractions.enterCriticalSection(Lock.READ);	
-    			StmtIterator iter = null;
     			int num = 0;
     			
     			try {
     	   	       	log.info("started computing inferences for batch " + qualifier + " updates");
-    				iter = retractions.listStatements();
-    			   		
-    				while (iter.hasNext() && !stopRequested) {				
-    					Statement stmt = iter.next();
-    				    num++;
-     				    
-    					try {
-    						if (stmt.getPredicate().equals(RDF.type)) {
-    							removedABoxTypeAssertion(stmt, inferenceModel);
-    						}
-    				        setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
-    				        doPlugins(ModelUpdate.Operation.RETRACT,stmt);
-    					} catch (NullPointerException npe) {
-    						 abort = true;
-    						 break;
-    					} catch (Exception e) {
-    						 log.error("exception in batch mode ",e);
-    					}
-    					
-		                if ((num % 6000) == 0) {
-		                    log.info("still computing inferences for batch " + qualifier + " update...");
-		                }	
-		                
-		                if (stopRequested) {
-		                	log.info("a stopRequested signal was received during DeltaComputer.run. Halting Processing.");
-		                	return;
-		                }
-    				}
+    				
+    			   	
+    				ResIterator subIt = retractions.listSubjects();
+    				while (subIt.hasNext()) {	
+    				    Resource subj = subIt.nextResource();
+    				    StmtIterator iter = retractions.listStatements(
+    				            subj, null, (RDFNode) null);
+    				    boolean typesModified = false;
+    				    try {
+    				        List<String> typeURIs = null;
+        				    while (iter.hasNext() && !stopRequested) {              
+                                Statement stmt = iter.next();
+                                num++;                         
+                                try {
+                                    if (stmt.getPredicate().equals(RDF.type)) {
+                                        typesModified = true;
+                                        if (typeURIs == null) {
+                                            typeURIs = getRemainingAssertedTypeURIs(stmt.getSubject());
+                                        }
+                                        removedABoxTypeAssertion(stmt, inferenceModel, typeURIs);
+                                    }
+                                    doPlugins(ModelUpdate.Operation.RETRACT,stmt);
+                                } catch (NullPointerException npe) {
+                                     abort = true;
+                                     break;
+                                } catch (Exception e) {
+                                     log.error("exception in batch mode ",e);
+                                }
+                                
+                                if ((num % 6000) == 0) {
+                                    log.info("still computing inferences for batch " + qualifier + " update...");
+                                }   
+                                
+                                if (stopRequested) {
+                                    log.info("a stopRequested signal was received during DeltaComputer.run. Halting Processing.");
+                                    return;
+                                }
+                            }
+    				    } finally {
+    				        iter.close();
+                            if (typesModified) {
+                                setMostSpecificTypes(subj, inferenceModel, new HashSet<String>());
+                            }
+    				    }
+    				}				
     			} finally {
-    				iter.close();
     	    		retractions.removeAll();	
     	   			retractions.leaveCriticalSection();
     			}			
