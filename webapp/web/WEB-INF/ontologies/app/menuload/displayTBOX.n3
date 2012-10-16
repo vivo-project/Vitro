@@ -52,6 +52,11 @@ owl:ObjectProperty
 
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>
     a owl:Class .      
+    
+##Adding a data getter type that is Solr Class search, i.e. get individuals for VClass
+<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SolrIndividualsDataGetter>
+    a owl:Class .      
+    
       
 ########Data Properties#########
 
@@ -130,6 +135,11 @@ rdfs:domain
       a       owl:ObjectProperty .
 owl:topObjectProperty
 	a owl:ObjectProperty .
+
+##Adding object property defining class for solr data getter	
+<http://vitro.mannlib.cornell.edu/ontologies/display/1.1#hasVClassId>
+    a owl:ObjectProperty.                   
+	
            
 ###Vitro properties without which individual templates throw errors as are required
 

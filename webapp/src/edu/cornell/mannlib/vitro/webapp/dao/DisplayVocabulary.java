@@ -138,6 +138,11 @@ public class DisplayVocabulary {
     /* URI of property for Fixed HTML Generator */
     public static final String FIXED_HTML_VALUE = DISPLAY_NS + "htmlValue";
     
+    
+    /* URI of property for Solr Query Generator */
+    public static final String VCLASSID = DISPLAY_NS + "hasVClassId";
+
+    
     //public static final Individual EVENTS = m_model.createIndividual( NS + "Events", PAGE );
     
     //public static final Individual EVENTS_MENU_ITEM = m_model.createIndividual( NS + "EventsMenuItem", NAVIGATION_ELEMENT );
