@@ -17,10 +17,11 @@ import javax.servlet.ServletContextListener;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
- * Test that gets run at servlet context startup to check for the existence and 
- * validity of properties in the configuration. 
+ * Test that gets run at servlet context startup to check for the existence and
+ * validity of properties in the configuration.
  */
-public class ConfigurationPropertiesSmokeTests implements ServletContextListener {
+public class ConfigurationPropertiesSmokeTests implements
+		ServletContextListener {
 
 	private static final String PROPERTY_HOME_DIRECTORY = "vitro.home.directory";
 	private static final String PROPERTY_DB_URL = "VitroConnection.DataSource.url";
@@ -138,27 +139,39 @@ public class ConfigurationPropertiesSmokeTests implements ServletContextListener
 					+ username + "'", e);
 		}
 	}
-	
+
 	/**
-     * Confirm that the default namespace is specified and a syntactically valid URI.
-     */
-    private void checkDefaultNamespace(ServletContext ctx,
-            ConfigurationProperties props, StartupStatus ss) {
-        String ns = props.getProperty(PROPERTY_DEFAULT_NAMESPACE);
-        if (ns == null || ns.isEmpty()) {
-            ss.fatal(this, "deploy.properties does not contain a value for '"
-                    + PROPERTY_DEFAULT_NAMESPACE + "'");
-        } else {
-            try {
-                URI uri = new URI(ns);
-            } catch (URISyntaxException e) {
-                ss.fatal(this, PROPERTY_DEFAULT_NAMESPACE + " '" + ns + 
-                        "' is not a valid URI. " + 
-                                (e.getMessage() != null ? e.getMessage() : ""));
-            }
-        }
-    }    
-        
+	 * Confirm that the default namespace is specified and a syntactically valid
+	 * URI. It should also end with "/individual/".
+	 */
+	private void checkDefaultNamespace(ServletContext ctx,
+			ConfigurationProperties props, StartupStatus ss) {
+		String ns = props.getProperty(PROPERTY_DEFAULT_NAMESPACE);
+		if (ns == null || ns.isEmpty()) {
+			ss.fatal(this, "deploy.properties does not contain a value for '"
+					+ PROPERTY_DEFAULT_NAMESPACE + "'");
+			return;
+		}
+
+		try {
+			new URI(ns);
+		} catch (URISyntaxException e) {
+			ss.fatal(this,
+					PROPERTY_DEFAULT_NAMESPACE + " '" + ns
+							+ "' is not a valid URI. "
+							+ (e.getMessage() != null ? e.getMessage() : ""));
+			return;
+		}
+
+		String suffix = "/individual/";
+		if (!ns.endsWith(suffix)) {
+			ss.warning(this,
+					"Default namespace does not match the expected form "
+							+ "(does not end with '" + suffix + "'): '" + ns
+							+ "'");
+		}
+	}
+
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		// nothing to do at shutdown
