@@ -3,16 +3,23 @@
 package edu.cornell.mannlib.vitro.webapp.config;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
@@ -22,6 +29,8 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
  */
 public class ConfigurationPropertiesSmokeTests implements
 		ServletContextListener {
+	private static final Log log = LogFactory
+			.getLog(ConfigurationPropertiesSmokeTests.class);
 
 	private static final String PROPERTY_HOME_DIRECTORY = "vitro.home.directory";
 	private static final String PROPERTY_DB_URL = "VitroConnection.DataSource.url";
@@ -104,10 +113,6 @@ public class ConfigurationPropertiesSmokeTests implements
 			return;
 		}
 
-		Properties connectionProps = new Properties();
-		connectionProps.put("user", username);
-		connectionProps.put("password", password);
-
 		String driverClassName = props
 				.getProperty(PROPERTY_DB_DRIVER_CLASS_NAME);
 		if (driverClassName == null) {
@@ -117,6 +122,7 @@ public class ConfigurationPropertiesSmokeTests implements
 				ss.fatal(this, "The default Database Driver failed to load. "
 						+ "The driver class is '" + DEFAULT_DB_DRIVER_CLASS
 						+ "'", e);
+				return;
 			}
 		} else {
 			try {
@@ -126,17 +132,112 @@ public class ConfigurationPropertiesSmokeTests implements
 						+ "The driver class was set by "
 						+ PROPERTY_DB_DRIVER_CLASS_NAME + " to be '"
 						+ driverClassName + "'", e);
+				return;
 			}
 		}
+
+		Properties connectionProps = new Properties();
+		connectionProps.put("user", username);
+		connectionProps.put("password", password);
 
 		Connection conn = null;
 		try {
 			conn = DriverManager.getConnection(url, connectionProps);
-			conn.close();
+			closeConnection(conn);
 		} catch (SQLException e) {
 			ss.fatal(this, "Can't connect to the database: " + PROPERTY_DB_URL
 					+ "='" + url + "', " + PROPERTY_DB_USERNAME + "='"
 					+ username + "'", e);
+			return;
+		}
+
+		checkForPropertHandlingOfUnicodeCharacters(url, connectionProps, ss);
+	}
+
+	private void checkForPropertHandlingOfUnicodeCharacters(String url,
+			Properties connectionProps, StartupStatus ss) {
+		String testString = "ABC\u00CE\u0123";
+
+		Connection conn = null;
+		Statement stmt = null;
+		PreparedStatement pstmt = null;
+		try {
+			// Get the connection.
+			conn = DriverManager.getConnection(url, connectionProps);
+
+			// Create the temporary table.
+			stmt = conn.createStatement();
+			stmt.executeUpdate("CREATE TEMPORARY TABLE smoke_test (contents varchar(100))");
+
+			// Write the test string, encoding in UTF-8 on the way in.
+			try {
+				pstmt = conn
+						.prepareStatement("INSERT INTO smoke_test values ( ? )");
+				pstmt.setBytes(1, testString.getBytes("UTF-8"));
+			} catch (UnsupportedEncodingException e1) {
+				e1.printStackTrace();
+			}
+			pstmt.executeUpdate();
+
+			// Read it back as a String. Does the database decode it properly?
+			ResultSet rs = stmt.executeQuery("SELECT * FROM smoke_test");
+			if (!rs.next()) {
+				throw new SQLException(
+						"Query of temporary table returned 0 rows.");
+			}
+			String storedValue = rs.getString(1);
+			if (!testString.equals(storedValue)) {
+				ss.fatal(this, "The database does not store Unicode "
+						+ "characters correctly. The test inserted \""
+						+ showUnicode(testString)
+						+ "\", but the query returned \""
+						+ showUnicode(storedValue)
+						+ "\". Is the character encoding correctly "
+						+ "set on the database?");
+			}
+		} catch (SQLException e) {
+			ss.fatal(this, "Failed to check handling of Unicode characters", e);
+		} finally {
+			closeStatement(pstmt);
+			closeStatement(stmt);
+			closeConnection(conn);
+		}
+	}
+
+	/**
+	 * Display the hex codes for a String.
+	 */
+	private String showUnicode(String testString) {
+		StringBuilder u = new StringBuilder();
+		for (char c : testString.toCharArray()) {
+			u.append(String.format("\\u%04x", c & 0x0000FFFF));
+		}
+		return u.toString();
+	}
+
+	/**
+	 * Close the statement, catching any exception.
+	 */
+	private void closeStatement(Statement stmt) {
+		if (stmt != null) {
+			try {
+				stmt.close();
+			} catch (SQLException e) {
+				log.error("Failed to close SQL statement", e);
+			}
+		}
+	}
+
+	/**
+	 * Close the connection, catching any exception.
+	 */
+	private void closeConnection(Connection conn) {
+		if (conn != null) {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				log.error("Failed to close database connection", e);
+			}
 		}
 	}
 
