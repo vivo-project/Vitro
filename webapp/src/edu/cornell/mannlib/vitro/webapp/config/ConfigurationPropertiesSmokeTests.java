@@ -37,6 +37,7 @@ public class ConfigurationPropertiesSmokeTests implements
 	private static final String PROPERTY_DB_USERNAME = "VitroConnection.DataSource.username";
 	private static final String PROPERTY_DB_PASSWORD = "VitroConnection.DataSource.password";
 	private static final String PROPERTY_DB_DRIVER_CLASS_NAME = "VitroConnection.DataSource.driver";
+	private static final String PROPERTY_DB_TYPE = "VitroConnection.DataSource.dbtype";
 	private static final String PROPERTY_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
 
 	private static final String DEFAULT_DB_DRIVER_CLASS = "com.mysql.jdbc.Driver";
@@ -151,11 +152,13 @@ public class ConfigurationPropertiesSmokeTests implements
 			return;
 		}
 
-		checkForPropertHandlingOfUnicodeCharacters(url, connectionProps, ss);
+		String dbType = props.getProperty(PROPERTY_DB_TYPE, "MySQL");
+		checkForPropertHandlingOfUnicodeCharacters(url, connectionProps, ss,
+				dbType);
 	}
 
 	private void checkForPropertHandlingOfUnicodeCharacters(String url,
-			Properties connectionProps, StartupStatus ss) {
+			Properties connectionProps, StartupStatus ss, String dbType) {
 		String testString = "ABC\u00CE\u0123";
 
 		Connection conn = null;
@@ -187,13 +190,20 @@ public class ConfigurationPropertiesSmokeTests implements
 			}
 			String storedValue = rs.getString(1);
 			if (!testString.equals(storedValue)) {
-				ss.fatal(this, "The database does not store Unicode "
+				String message = "The database does not store Unicode "
 						+ "characters correctly. The test inserted \""
 						+ showUnicode(testString)
 						+ "\", but the query returned \""
 						+ showUnicode(storedValue)
 						+ "\". Is the character encoding correctly "
-						+ "set on the database?");
+						+ "set on the database?";
+				if ("MySQL".equals(dbType)) {
+					// For MySQL, we know that this is a configuration problem.
+					ss.fatal(this, message);
+				} else {
+					// For other databases, it might not be.
+					ss.warning(this, message);
+				}
 			}
 		} catch (SQLException e) {
 			ss.fatal(this, "Failed to check handling of Unicode characters", e);
