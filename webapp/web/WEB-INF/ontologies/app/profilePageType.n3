@@ -1,0 +1,25 @@
+# $This file is distributed under the terms of the license in /doc/license.txt$ 
+
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
+@base <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
+
+display:ProfilePageType rdf:type owl:Class ;
+                 
+                 owl:equivalentClass [ rdf:type owl:Class ;
+                                       owl:oneOf ( display:standard
+                                                   display:quickView
+                                                 )
+                                     ] .
+
+display:quickView rdf:type display:ProfilePageType , 
+                                owl:NamedIndividual .
+
+display:standard rdf:type display:ProfilePageType ,
+                          owl:NamedIndividual .
+
+display:hasDefaultProfilePageType rdf:type owl:ObjectProperty .                                                                                    
+display:hasDefaultProfilePageType rdfs:range display:ProfilePageType .
