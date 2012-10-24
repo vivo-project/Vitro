@@ -1,6 +1,7 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -79,5 +80,9 @@ public class ChildVClassesOptions implements FieldOptions {
 
     public String getClassUri(){
         return vclassUri;    
+    }
+    
+    public Comparator<String[]> getCustomComparator() {
+    	return null;
     }
 }

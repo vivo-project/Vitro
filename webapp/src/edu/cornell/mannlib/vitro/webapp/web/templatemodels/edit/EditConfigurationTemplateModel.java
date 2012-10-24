@@ -101,8 +101,8 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		    	//empty options
 		    	field.setOptions(new ConstantFieldOptions());
 		    }
-		    Map<String, String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, fieldName, wdf);		    
-		    optionsMap = SelectListGeneratorVTwo.getSortedMap(optionsMap);
+		    Map<String, String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, fieldName, wdf);	
+		    optionsMap = SelectListGeneratorVTwo.getSortedMap(optionsMap, field.getFieldOptions().getCustomComparator());
 		    if(pageData.containsKey(fieldName)) {
 		    	log.error("Check the edit configuration setup as pageData already contains " + fieldName + " and this will be overwritten now with empty collection");
 		    }

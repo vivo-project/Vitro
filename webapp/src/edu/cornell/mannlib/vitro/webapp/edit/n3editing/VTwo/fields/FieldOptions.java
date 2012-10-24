@@ -1,6 +1,7 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields;
 
+import java.util.Comparator;
 import java.util.Map;
 
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -28,6 +29,13 @@ public interface FieldOptions {
             EditConfigurationVTwo editConfig, 
             String fieldName, 
             WebappDaoFactory wDaoFact) throws Exception;
+    
+    /*
+     * Certain field options may have custom sorting requirements. If no sorting requirements exist,
+     * then the method will return null.
+     */
+    
+    public Comparator<String[]> getCustomComparator();
 }
 
 /*

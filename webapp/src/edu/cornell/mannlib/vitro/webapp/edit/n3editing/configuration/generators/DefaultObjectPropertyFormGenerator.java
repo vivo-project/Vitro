@@ -343,7 +343,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	return map;
     }
     
-    private void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) throws Exception {    	
+    protected void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) throws Exception {    	
 		FieldVTwo field = new FieldVTwo();
     	field.setName("objectVar");    	
     	
@@ -474,7 +474,18 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	return  rangeIndividualsFound;		
 	}
 
-
+	public String getSubjectUri() {
+		return subjectUri;
+	}
+	
+	public String getPredicateUri() {
+		return predicateUri;
+	}
+	
+	public String getObjectUri() {
+		return objectUri;
+	}
+	
 
 	/** get the auto complete edit mode */
 	public EditMode getEditMode(VitroRequest vreq) {
@@ -497,5 +508,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 			"<" + subject + "> <" + predicate + "> ?objectVar .} ";
 		return query;
 	}
+	
+	
 
 }
