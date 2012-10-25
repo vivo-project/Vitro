@@ -281,6 +281,10 @@ a.close {
 a.manageLinks {
     display:none;
 }
+a#manageLabels { 
+    margin-left:20px;
+    font-size:0.7em;
+}
 /* <---- OpenSocial -----*/
 div#openSocial {
     display:inline-block;
