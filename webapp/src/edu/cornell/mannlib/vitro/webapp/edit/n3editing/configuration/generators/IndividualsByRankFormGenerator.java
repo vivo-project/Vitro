@@ -48,7 +48,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils.EditMode;
  * Generates the edit configuration for a default property form.
  * This handles the default object property auto complete.
  * 
- * If a default property form is request and the number of indivdiuals
+ * If a default property form is request and the number of individuals
  * found in the range is too large, the the auto complete setup and
  * template will be used instead.
  */
@@ -76,7 +76,8 @@ public class IndividualsByRankFormGenerator extends DefaultObjectPropertyFormGen
     	        super.getSubjectUri(),
     	        super.getPredicateUri(), 
     	        super.getObjectUri(),
-    	        vreq.getWebappDaoFactory()));
+    	        vreq.getWebappDaoFactory(), 
+    	        vreq.getJenaOntModel()));
     	}else{
     		field.setOptions(null);
     	}
