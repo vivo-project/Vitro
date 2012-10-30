@@ -30,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.search.beans.FileBasedProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
@@ -116,7 +117,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             server.setMaxTotalConnections(100);         
             server.setMaxRetries(1);
             
-            context.setAttribute(SOLR_SERVER, server);
+            context.setAttribute(SOLR_SERVER, server);                        
             
             /* set up the individual to solr doc translation */            
             OntModel jenaOntModel = ModelContext.getJenaOntModel(context);            
@@ -127,34 +128,23 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
              * objects.  This allows other ContextListeners to add to 
              * the basic set of DocumentModifiers. */
             @SuppressWarnings("unchecked")
-            List<DocumentModifier> modifiers = 
-                (List<DocumentModifier>)context.getAttribute("DocumentModifiers");            
-            if( modifiers == null )
-                modifiers = new ArrayList<DocumentModifier>();
-            
-            modifiers.add( new NameFields( RDFServiceUtils.getRDFServiceFactory(context)));
-            modifiers.add( new NameBoost(  1.2f ));
-            modifiers.add( new ThumbnailImageURL(jenaOntModel));                        
+            List<DocumentModifier> modifiersFromContext = 
+                (List<DocumentModifier>)context.getAttribute("DocumentModifiers");
             
             /* try to get context attribute SearchIndexExcludes 
              * and use that as the start of the list of exclude 
              * objects.  This allows other ContextListeners to add to 
              * the basic set of SearchIndexExcludes . */
             @SuppressWarnings("unchecked")
-            List<SearchIndexExcluder> excludes = 
-                (List<SearchIndexExcluder>)context.getAttribute("SearchIndexExcludes");            
-            if( excludes == null )
-                excludes = new ArrayList<SearchIndexExcluder>();
+            List<SearchIndexExcluder> searchIndexExcludesFromContext = 
+                (List<SearchIndexExcluder>)context.getAttribute("SearchIndexExcludes");
             
-            excludes.add(new ExcludeBasedOnNamespace( INDIVIDUAL_NS_EXCLUDES ));
-            excludes.add(new ExcludeBasedOnTypeNamespace( TYPE_NS_EXCLUDES ) );
-            excludes.add(new ExcludeBasedOnType( OWL_TYPES_EXCLUDES) );
-            excludes.add(new ExcludeNonFlagVitro() );                        
-            excludes.add( new SyncingExcludeBasedOnType( displayModel ) );                        
-            
-            IndividualToSolrDocument indToSolrDoc =
-                new IndividualToSolrDocument(excludes, modifiers);                        
-            
+            IndividualToSolrDocument indToSolrDoc = 
+            	setupTransltion(jenaOntModel, displayModel, 
+            		RDFServiceUtils.getRDFServiceFactory(context), 
+            		modifiersFromContext, 
+            		searchIndexExcludesFromContext);
+                                                
             /* setup solr indexer */            
             SolrIndexer solrIndexer = new SolrIndexer(server, indToSolrDoc);                  
             
@@ -213,4 +203,44 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
         return (SolrServer) ctx.getAttribute(SOLR_SERVER);
     }
     
+    
+    public static IndividualToSolrDocument setupTransltion(
+    		OntModel jenaOntModel,
+    		Model displayModel,
+    		RDFServiceFactory rdfServiceFactory,
+    		List<DocumentModifier> modifiersFromContext,
+    		List<SearchIndexExcluder> searchIndexExcludesFromContext
+    		) {        
+        
+        /* try to get context attribute DocumentModifiers 
+         * and use that as the start of the list of DocumentModifier 
+         * objects.  This allows other ContextListeners to add to 
+         * the basic set of DocumentModifiers. */        
+        List<DocumentModifier> modifiers = new ArrayList<DocumentModifier>();
+        if( modifiersFromContext != null ){
+        	modifiers.addAll( modifiersFromContext);
+        }
+        
+        modifiers.add( new NameFields( rdfServiceFactory ));
+        modifiers.add( new NameBoost(  1.2f ));
+        modifiers.add( new ThumbnailImageURL(jenaOntModel));                        
+        
+        /* try to get context attribute SearchIndexExcludes 
+         * and use that as the start of the list of exclude 
+         * objects.  This allows other ContextListeners to add to 
+         * the basic set of SearchIndexExcludes . */
+        List<SearchIndexExcluder> excludes = 
+        	new ArrayList<SearchIndexExcluder>();
+        if( searchIndexExcludesFromContext != null ){
+        	excludes.addAll(searchIndexExcludesFromContext);
+        }
+        
+        excludes.add(new ExcludeBasedOnNamespace( INDIVIDUAL_NS_EXCLUDES ));
+        excludes.add(new ExcludeBasedOnTypeNamespace( TYPE_NS_EXCLUDES ) );
+        excludes.add(new ExcludeBasedOnType( OWL_TYPES_EXCLUDES) );
+        excludes.add(new ExcludeNonFlagVitro() );                        
+        excludes.add( new SyncingExcludeBasedOnType( displayModel ) );                        
+        
+        return new IndividualToSolrDocument(excludes, modifiers);    
+    }
 }

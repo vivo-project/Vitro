@@ -7,23 +7,18 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrInputField;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.Syntax;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 
 public class ThumbnailImageURL implements DocumentModifier {
@@ -44,15 +39,15 @@ public class ThumbnailImageURL implements DocumentModifier {
     " ?a <http://vitro.mannlib.cornell.edu/ns/vitro/public#downloadLocation> ?downloadLocation . } " ;
     //" ?b <http://vitro.mannlib.cornell.edu/ns/vitro/public#directDownloadUrl> ?thumbnailLocationURL . } ";
     
-    private Model model;
+    private RDFServiceFactory rsf;
     private Log log = LogFactory.getLog(ThumbnailImageURL.class);
     
 	static VitroSearchTermNames term = new VitroSearchTermNames();
 	String fieldForThumbnailURL = term.THUMBNAIL_URL;
 	
 	
-	public ThumbnailImageURL(Model model){
-		this.model = model;
+	public ThumbnailImageURL( RDFServiceFactory rsf ){
+		this.rsf = rsf;
 	}
 	
 	@Override
@@ -84,35 +79,28 @@ public class ThumbnailImageURL implements DocumentModifier {
 		QuerySolutionMap initialBinding = new QuerySolutionMap();
 		Resource uriResource = ResourceFactory.createResource(individual.getURI());
 		initialBinding.add("uri", uriResource);
-		
-		Query sparqlQuery = QueryFactory.create(query, Syntax.syntaxARQ);
-        model.getLock().enterCriticalSection(Lock.READ);
-        try{
-            QueryExecution qExec = QueryExecutionFactory.create(sparqlQuery, model, initialBinding);
-            try{                
-                ResultSet results = qExec.execSelect();                
-                while(results.hasNext()){                    
-                    QuerySolution soln = results.nextSolution();                                   
-                    Iterator<String> iter =  soln.varNames() ;
-                    while( iter.hasNext()){
-                        String name = iter.next();
-                        RDFNode node = soln.get( name );
-                        if( node != null ){
-                            result.append("" + node.toString());
-                        }else{
-                            log.info(name + " is null");
-                        }                        
-                    }
-                }
-            }catch(Throwable t){                
-                log.error(t,t);
-            } finally{
-                qExec.close();
-            } 
-        }finally{
-            model.getLock().leaveCriticalSection();
-        }
-		
+
+		RDFService rdf = rsf.getRDFService();
+		try{
+			ResultSet results = RDFServiceUtils.sparqlSelectQuery(query, rdf);
+			while(results.hasNext()){
+				QuerySolution soln = results.nextSolution();
+				Iterator<String> iter =  soln.varNames() ;
+				while( iter.hasNext()){
+					String name = iter.next();
+					RDFNode node = soln.get( name );
+					if( node != null ){
+						result.append("" + node.toString());
+					}else{
+						log.info(name + " is null");
+					}                        
+				}
+			}
+		}catch(Throwable t){                
+			log.error(t,t);
+		} finally{
+			rdf.close();
+		}				
 		return result.toString();
 	}
 
