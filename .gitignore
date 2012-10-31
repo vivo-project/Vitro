@@ -1,0 +1,5 @@
+/.project
+/.classpath
+/bin/
+debug.log4j.properties
+deploy.properties
