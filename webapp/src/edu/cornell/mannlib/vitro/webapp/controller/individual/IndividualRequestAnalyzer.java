@@ -35,9 +35,9 @@ public class IndividualRequestAnalyzer {
 	 * individual will allow filtering in robots.txt.
 	 * Change this to /individual/ to get the 1.5.1 and earlier behavior.
 	 */
-	static String rdfURL = DEFAULT_RDF_URL;		
+	protected static String rdfURL = DEFAULT_RDF_URL;
 	
-	private static Pattern RDF_REQUEST = Pattern.compile("^" + rdfURL +"([^/]+)/\\1\\.(rdf|n3|ttl)$");
+	private static Pattern RDF_REQUEST = Pattern.compile("^" + getRdfURL() +"([^/]+)/\\1\\.(rdf|n3|ttl)$");
 	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individual/([^/]+)$");
 	
     private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]+)$");			
@@ -124,11 +124,11 @@ public class IndividualRequestAnalyzer {
 		if (c != null) {
 			String mediaType = c.getMediaType();
 			if (RDFXML_MIMETYPE.equals(mediaType)) {
-				return rdfURL + m.group(1) + "/" + m.group(1) + ".rdf";
+				return getRdfURL() + m.group(1) + "/" + m.group(1) + ".rdf";
 			} else if (N3_MIMETYPE.equals(mediaType)) {
-				return rdfURL + m.group(1) + "/" + m.group(1) + ".n3";
+				return getRdfURL() + m.group(1) + "/" + m.group(1) + ".n3";
 			} else if (TTL_MIMETYPE.equals(mediaType)) {
-				return rdfURL + m.group(1) + "/" + m.group(1) + ".ttl";
+				return getRdfURL() + m.group(1) + "/" + m.group(1) + ".ttl";
 			}
 		}
 		// or redirect to the canonical URL for HTML representation.
@@ -318,6 +318,14 @@ public class IndividualRequestAnalyzer {
 
 	private Individual getIndividualByNetId(String netId) {
 		return analysisContext.getIndividualByNetId(netId);
+	}
+
+	public static void setRdfURL(String rdfURL) {
+		IndividualRequestAnalyzer.rdfURL = rdfURL;
+	}
+
+	public static String getRdfURL() {
+		return rdfURL;
 	}
 }
 

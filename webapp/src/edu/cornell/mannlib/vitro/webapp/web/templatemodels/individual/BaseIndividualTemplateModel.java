@@ -90,14 +90,12 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         return thumbUrl == null ? null : getUrl(thumbUrl);
     } 
 
-    // Used to create a link to generate the individual's rdf.
-    public String getRdfUrl() {
-        
-        String individualUri = getUri();
-        String profileUrl = getProfileUrl();
-        boolean isUriInDefaultNamespace = UrlBuilder.isUriInDefaultNamespace(individualUri, vreq);
-        return isUriInDefaultNamespace ? profileUrl + "/" + getLocalName() + ".rdf" 
-                                       : UrlBuilder.addParams(profileUrl, "format", "rdfxml");
+    // Used to create a link to generate the individual's RDF.
+    public String getRdfUrl() {        
+    	return UrlBuilder.getIndividualRdfUrl(
+    			individual, 
+    			vreq.getWebappDaoFactory().getDefaultNamespace(), 
+    			vreq);    	
     }
 
     public GroupedPropertyList getPropertyList() {

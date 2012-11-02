@@ -249,7 +249,7 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 
 	@Test
 	public void getRdfByUriAndFormatParameters() {
-		analyzer.rdfURL = analyzer.DEFAULT_RDF_URL;
+		analyzer.setRdfURL(analyzer.DEFAULT_RDF_URL);
 		req.setRequestUrl(url(URL_INDIVIDUAL_PAGE));
 		req.addParameter("uri", URI_INDIVIDUAL_TEST);
 		req.addParameter("format", "rdfxml");
@@ -267,7 +267,7 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 
 	@Test
 	public void getN3ByUriAndFormatParameters() {
-		analyzer.rdfURL = analyzer.DEFAULT_RDF_URL;
+		analyzer.setRdfURL(analyzer.DEFAULT_RDF_URL);
 		req.setRequestUrl(url(URL_INDIVIDUAL_PAGE));
 		req.addParameter("uri", URI_INDIVIDUAL_TEST);
 		req.addParameter("format", "n3");
@@ -286,7 +286,7 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 
 	@Test
 	public void getTurtleByUriAndFormatParameters() {
-		analyzer.rdfURL = analyzer.DEFAULT_RDF_URL;
+		analyzer.setRdfURL(analyzer.DEFAULT_RDF_URL);
 		req.setRequestUrl(url(URL_INDIVIDUAL_PAGE));
 		req.addParameter("uri", URI_INDIVIDUAL_TEST);
 		req.addParameter("format", "ttl");
@@ -304,7 +304,7 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 
 	@Test
 	public void unrecognizedFormatParameter() {
-		analyzer.rdfURL = analyzer.DEFAULT_RDF_URL;
+		analyzer.setRdfURL(analyzer.DEFAULT_RDF_URL);
 		req.setRequestUrl(url(URL_INDIVIDUAL_PAGE));
 		req.addParameter("uri", URI_INDIVIDUAL_TEST);
 		req.addParameter("format", "bogus");
@@ -323,7 +323,7 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 	/** http://vivo.cornell.edu/individual/n23/n23.rdf */
 	@Test
 	public void getRdfByStreamRequest() {
-		analyzer.rdfURL = analyzer.DEFAULT_RDF_URL;
+		analyzer.setRdfURL(analyzer.DEFAULT_RDF_URL);
 		req.setRequestUrl(absoluteUrlForRdfStream(ID_INDIVIDUAL_TEST, ".rdf"));
 		analyzeIt();
 		assertLinkedDataRequestInfo("RDF by stream request",
@@ -338,7 +338,7 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 	/** http://vivo.cornell.edu/individual/n23/n23.n3 */
 	@Test
 	public void getN3ByStreamRequest() {
-		analyzer.rdfURL = analyzer.DEFAULT_RDF_URL;
+		analyzer.setRdfURL(analyzer.DEFAULT_RDF_URL);
 		req.setRequestUrl(absoluteUrlForRdfStream(ID_INDIVIDUAL_TEST, ".n3"));
 		analyzeIt();
 		assertLinkedDataRequestInfo("N3 by stream request",
@@ -353,7 +353,7 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 	/** http://vivo.cornell.edu/individual/n23/n23.rdf */
 	@Test
 	public void getTurtleByStreamRequest() {
-		analyzer.rdfURL = analyzer.DEFAULT_RDF_URL;
+		analyzer.setRdfURL(analyzer.DEFAULT_RDF_URL);
 		req.setRequestUrl(absoluteUrlForRdfStream(ID_INDIVIDUAL_TEST, ".ttl"));
 		analyzeIt();
 		assertLinkedDataRequestInfo("Turtle by stream request",
@@ -368,7 +368,7 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 	/** http://vivo.cornell.edu/individual/n23/n23.bogus is an error */
 	@Test
 	public void unrecognizedFormatForRdfStreamRequest() {
-		analyzer.rdfURL = analyzer.DEFAULT_RDF_URL;
+		analyzer.setRdfURL(analyzer.DEFAULT_RDF_URL);
 		req.setRequestUrl(absoluteUrlForRdfStream(ID_INDIVIDUAL_TEST, ".bogus"));
 		analyzeIt();
 		assertNoIndividualRequestInfo("Unrecognized RDF stream request");
@@ -384,12 +384,12 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 
 	/** /individual/n23/n23.rdf, or the like */
 	private String redirectUrlForRdfStream(String id, String extension) {
-		return  analyzer.rdfURL + id + "/" + id + extension;
+		return  analyzer.getRdfURL() + id + "/" + id + extension;
 	}
 
 	/** http://vivo.mydomain.edu/individual/n23/n23.rdf, or the like */
 	private URL absoluteUrlForRdfStream(String id, String extension) {
-		return url(  URL_HOME_PAGE + this.analyzer.rdfURL + id + "/" + id + extension);		
+		return url(  URL_HOME_PAGE + this.analyzer.getRdfURL() + id + "/" + id + extension);		
 	}
 
 	private void analyzeIt() {
@@ -401,7 +401,7 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 	private void analyzeIt(String rdfURL) {
 		vreq = new VitroRequest(req);
 		analyzer = new IndividualRequestAnalyzer(vreq, analysisContext);
-		analyzer.rdfURL = rdfURL;
+		analyzer.setRdfURL(rdfURL);
 		requestInfo = analyzer.analyze();
 	}
 	

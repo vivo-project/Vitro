@@ -17,6 +17,7 @@ import org.openrdf.model.impl.URIImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.individual.IndividualRequestAnalyzer;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -289,11 +290,14 @@ public class UrlBuilder {
         return isUriInDefaultNamespace(individualUri, vreq.getWebappDaoFactory());
     }
     
-    public static boolean isUriInDefaultNamespace(String individualUri, WebappDaoFactory wadf) {       
-        try {
+    public static boolean isUriInDefaultNamespace(String individualUri, WebappDaoFactory wadf) {               
+    	return isUriInDefaultNamespace(individualUri,  wadf.getDefaultNamespace());            
+    }
+    
+    protected static boolean isUriInDefaultNamespace( String individualUri, String defaultNamespace){
+    	try {
             URI uri = new URIImpl(individualUri); // throws exception if individualUri is invalid
-            String namespace = uri.getNamespace();
-            String defaultNamespace = wadf.getDefaultNamespace();  
+            String namespace = uri.getNamespace();             
             return defaultNamespace.equals(namespace);
         } catch (Exception e) {
             log.warn(e);
@@ -349,6 +353,24 @@ public class UrlBuilder {
 	    	}
     	}
     	return specialParams;
+    }
+    
+    /**
+     * Gets the URL for the RDF of the individual.
+     */
+    public static String getIndividualRdfUrl(Individual ind, String defaultNameSpace, VitroRequest vreq){
+    	if( ind == null || ind.getURI() == null)
+    		return "";    	
+    	
+    	String profileUrl = UrlBuilder.getIndividualProfileUrl(ind, vreq);
+    	String individualUri = ind.getURI();    	
+    	
+    	if(isUriInDefaultNamespace(individualUri, defaultNameSpace) ){
+    		return getUrl( IndividualRequestAnalyzer.getRdfURL() ) 
+    			+ ind.getLocalName() + "/" + ind.getLocalName() + ".rdf";	
+    	}else{
+    		return UrlBuilder.addParams(profileUrl, "format", "rdfxml");
+    	}
     }
 
 }
