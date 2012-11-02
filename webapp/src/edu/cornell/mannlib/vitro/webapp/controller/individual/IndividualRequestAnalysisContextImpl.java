@@ -46,9 +46,12 @@ public class IndividualRequestAnalysisContextImpl implements
 
 		NamespaceMapper namespaceMapper = NamespaceMapperFactory
 				.getNamespaceMapper(ctx);
-		String ns = namespaceMapper.getNamespaceForPrefix(prefix);
-
-		return (ns == null) ? "" : ns;
+		if( namespaceMapper != null ){
+			String ns = namespaceMapper.getNamespaceForPrefix(prefix);
+			return (ns == null) ? "" : ns;
+		}else{
+			return "";
+		}
 	}
 
 	@Override
