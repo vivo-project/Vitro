@@ -1199,7 +1199,11 @@
   <servlet-mapping>
     <servlet-name>individual</servlet-name>
     <url-pattern>/display/*</url-pattern>
-  </servlet-mapping>  
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>individual</servlet-name>
+    <url-pattern>/rdf/*</url-pattern>
+  </servlet-mapping>    
   
   <servlet-mapping>
     <servlet-name>ontology</servlet-name>
