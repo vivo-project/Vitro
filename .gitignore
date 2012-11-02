@@ -1,5 +1,8 @@
-/.project
+/webapp/.build/
 /.classpath
+/.project
+/.settings
 /bin/
-debug.log4j.properties
-deploy.properties
+/webapp/config/deploy.properties
+/webapp/config/debug.log4j.properties
+
