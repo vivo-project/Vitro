@@ -26,10 +26,21 @@ public class IndividualRequestAnalyzer {
 	private static final Log log = LogFactory
 			.getLog(IndividualRequestAnalyzer.class);
 	
+	static final String PRE_1_5_1_RDF_URL = "/individual/";
+	static final String DEFAULT_RDF_URL = "/rdf/";
 	
-	private static Pattern RDF_REQUEST = Pattern.compile("^/individual/([^/]+)/\\1\\.(rdf|n3|ttl)$");
-    private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]+)$");
-	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individual/([^/]+)$");		
+	/**
+	 * Base of URL to serve RDF from. Requests with Accept headers will
+	 * be redirected to URLs with this prefix. Using a prefix other than
+	 * individual will allow filtering in robots.txt.
+	 * Change this to /individual/ to get the 1.5.1 and earlier behavior.
+	 */
+	static String rdfURL = DEFAULT_RDF_URL;		
+	
+	private static Pattern RDF_REQUEST = Pattern.compile("^" + rdfURL +"([^/]+)/\\1\\.(rdf|n3|ttl)$");
+	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individual/([^/]+)$");
+	
+    private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]+)$");			
 	private static Pattern NS_PREFIX_URL = Pattern.compile("^/individual/([^/]*)/([^/]+)$");
 	
 	private final VitroRequest vreq;
@@ -113,11 +124,11 @@ public class IndividualRequestAnalyzer {
 		if (c != null) {
 			String mediaType = c.getMediaType();
 			if (RDFXML_MIMETYPE.equals(mediaType)) {
-				return "/individual/" + m.group(1) + "/" + m.group(1) + ".rdf";
+				return rdfURL + m.group(1) + "/" + m.group(1) + ".rdf";
 			} else if (N3_MIMETYPE.equals(mediaType)) {
-				return "/individual/" + m.group(1) + "/" + m.group(1) + ".n3";
+				return rdfURL + m.group(1) + "/" + m.group(1) + ".n3";
 			} else if (TTL_MIMETYPE.equals(mediaType)) {
-				return "/individual/" + m.group(1) + "/" + m.group(1) + ".ttl";
+				return rdfURL + m.group(1) + "/" + m.group(1) + ".ttl";
 			}
 		}
 		// or redirect to the canonical URL for HTML representation.

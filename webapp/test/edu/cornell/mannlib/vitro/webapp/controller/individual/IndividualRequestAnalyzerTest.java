@@ -32,7 +32,9 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 	private static final String URL_INDIVIDUAL_PAGE = URL_HOME_PAGE
 			+ "/individual";
 	private static final String DEFAULT_NAMESPACE = URL_INDIVIDUAL_PAGE + "/";
-
+	
+	
+	
 	/**
 	 * Info about the individual that we're testing (mostly).
 	 */
@@ -247,19 +249,36 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 
 	@Test
 	public void getRdfByUriAndFormatParameters() {
+		analyzer.rdfURL = analyzer.DEFAULT_RDF_URL;
 		req.setRequestUrl(url(URL_INDIVIDUAL_PAGE));
 		req.addParameter("uri", URI_INDIVIDUAL_TEST);
 		req.addParameter("format", "rdfxml");
 		analyzeIt();
 		assertLinkedDataRequestInfo("RDF by uri and format parameters",
 				URI_INDIVIDUAL_TEST, ContentType.RDFXML);
+				
+		req.setRequestUrl(url(URL_INDIVIDUAL_PAGE));
+		req.addParameter("uri", URI_INDIVIDUAL_TEST);
+		req.addParameter("format", "rdfxml");
+		analyzeIt(analyzer.PRE_1_5_1_RDF_URL);
+		assertLinkedDataRequestInfo("RDF by uri and format parameters",
+				URI_INDIVIDUAL_TEST, ContentType.RDFXML);
 	}
 
 	@Test
 	public void getN3ByUriAndFormatParameters() {
+		analyzer.rdfURL = analyzer.DEFAULT_RDF_URL;
 		req.setRequestUrl(url(URL_INDIVIDUAL_PAGE));
 		req.addParameter("uri", URI_INDIVIDUAL_TEST);
 		req.addParameter("format", "n3");
+		analyzeIt();
+		assertLinkedDataRequestInfo("N3 by uri and format parameters",
+				URI_INDIVIDUAL_TEST, ContentType.N3);
+				
+		req.setRequestUrl(url(URL_INDIVIDUAL_PAGE));
+		req.addParameter("uri", URI_INDIVIDUAL_TEST);
+		req.addParameter("format", "n3");
+		analyzeIt(analyzer.PRE_1_5_1_RDF_URL);
 		analyzeIt();
 		assertLinkedDataRequestInfo("N3 by uri and format parameters",
 				URI_INDIVIDUAL_TEST, ContentType.N3);
@@ -267,20 +286,36 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 
 	@Test
 	public void getTurtleByUriAndFormatParameters() {
+		analyzer.rdfURL = analyzer.DEFAULT_RDF_URL;
 		req.setRequestUrl(url(URL_INDIVIDUAL_PAGE));
 		req.addParameter("uri", URI_INDIVIDUAL_TEST);
 		req.addParameter("format", "ttl");
 		analyzeIt();
 		assertLinkedDataRequestInfo("Turtle by uri and format parameters",
 				URI_INDIVIDUAL_TEST, ContentType.TURTLE);
+		
+		req.setRequestUrl(url(URL_INDIVIDUAL_PAGE));
+		req.addParameter("uri", URI_INDIVIDUAL_TEST);
+		req.addParameter("format", "ttl");	
+		analyzeIt(analyzer.PRE_1_5_1_RDF_URL);
+		assertLinkedDataRequestInfo("Turtle by uri and format parameters",
+				URI_INDIVIDUAL_TEST, ContentType.TURTLE);
 	}
 
 	@Test
 	public void unrecognizedFormatParameter() {
+		analyzer.rdfURL = analyzer.DEFAULT_RDF_URL;
 		req.setRequestUrl(url(URL_INDIVIDUAL_PAGE));
 		req.addParameter("uri", URI_INDIVIDUAL_TEST);
 		req.addParameter("format", "bogus");
 		analyzeIt();
+		assertDefaultRequestInfo("unrecognized format means HTML response",
+				URI_INDIVIDUAL_TEST);
+		
+		req.setRequestUrl(url(URL_INDIVIDUAL_PAGE));
+		req.addParameter("uri", URI_INDIVIDUAL_TEST);
+		req.addParameter("format", "bogus");
+		analyzeIt(analyzer.PRE_1_5_1_RDF_URL);
 		assertDefaultRequestInfo("unrecognized format means HTML response",
 				URI_INDIVIDUAL_TEST);
 	}
@@ -288,8 +323,14 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 	/** http://vivo.cornell.edu/individual/n23/n23.rdf */
 	@Test
 	public void getRdfByStreamRequest() {
+		analyzer.rdfURL = analyzer.DEFAULT_RDF_URL;
 		req.setRequestUrl(absoluteUrlForRdfStream(ID_INDIVIDUAL_TEST, ".rdf"));
 		analyzeIt();
+		assertLinkedDataRequestInfo("RDF by stream request",
+				URI_INDIVIDUAL_TEST, ContentType.RDFXML);
+				
+		req.setRequestUrl(absoluteUrlForRdfStream(ID_INDIVIDUAL_TEST, ".rdf"));
+		analyzeIt(analyzer.PRE_1_5_1_RDF_URL);		
 		assertLinkedDataRequestInfo("RDF by stream request",
 				URI_INDIVIDUAL_TEST, ContentType.RDFXML);
 	}
@@ -297,8 +338,14 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 	/** http://vivo.cornell.edu/individual/n23/n23.n3 */
 	@Test
 	public void getN3ByStreamRequest() {
+		analyzer.rdfURL = analyzer.DEFAULT_RDF_URL;
 		req.setRequestUrl(absoluteUrlForRdfStream(ID_INDIVIDUAL_TEST, ".n3"));
 		analyzeIt();
+		assertLinkedDataRequestInfo("N3 by stream request",
+				URI_INDIVIDUAL_TEST, ContentType.N3);
+		
+		req.setRequestUrl(absoluteUrlForRdfStream(ID_INDIVIDUAL_TEST, ".n3"));
+		analyzeIt(analyzer.PRE_1_5_1_RDF_URL);
 		assertLinkedDataRequestInfo("N3 by stream request",
 				URI_INDIVIDUAL_TEST, ContentType.N3);
 	}
@@ -306,8 +353,14 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 	/** http://vivo.cornell.edu/individual/n23/n23.rdf */
 	@Test
 	public void getTurtleByStreamRequest() {
+		analyzer.rdfURL = analyzer.DEFAULT_RDF_URL;
 		req.setRequestUrl(absoluteUrlForRdfStream(ID_INDIVIDUAL_TEST, ".ttl"));
 		analyzeIt();
+		assertLinkedDataRequestInfo("Turtle by stream request",
+				URI_INDIVIDUAL_TEST, ContentType.TURTLE);
+		
+		req.setRequestUrl(absoluteUrlForRdfStream(ID_INDIVIDUAL_TEST, ".ttl"));
+		analyzeIt(analyzer.PRE_1_5_1_RDF_URL);
 		assertLinkedDataRequestInfo("Turtle by stream request",
 				URI_INDIVIDUAL_TEST, ContentType.TURTLE);
 	}
@@ -315,8 +368,13 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 	/** http://vivo.cornell.edu/individual/n23/n23.bogus is an error */
 	@Test
 	public void unrecognizedFormatForRdfStreamRequest() {
+		analyzer.rdfURL = analyzer.DEFAULT_RDF_URL;
 		req.setRequestUrl(absoluteUrlForRdfStream(ID_INDIVIDUAL_TEST, ".bogus"));
 		analyzeIt();
+		assertNoIndividualRequestInfo("Unrecognized RDF stream request");
+				
+		req.setRequestUrl(absoluteUrlForRdfStream(ID_INDIVIDUAL_TEST, ".bogus"));
+		analyzeIt(analyzer.PRE_1_5_1_RDF_URL);
 		assertNoIndividualRequestInfo("Unrecognized RDF stream request");
 	}
 
@@ -326,12 +384,12 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 
 	/** /individual/n23/n23.rdf, or the like */
 	private String redirectUrlForRdfStream(String id, String extension) {
-		return "/individual/" + id + "/" + id + extension;
+		return  analyzer.rdfURL + id + "/" + id + extension;
 	}
 
 	/** http://vivo.mydomain.edu/individual/n23/n23.rdf, or the like */
 	private URL absoluteUrlForRdfStream(String id, String extension) {
-		return url(DEFAULT_NAMESPACE + id + "/" + id + extension);
+		return url(  URL_HOME_PAGE + this.analyzer.rdfURL + id + "/" + id + extension);		
 	}
 
 	private void analyzeIt() {
@@ -339,7 +397,14 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 		analyzer = new IndividualRequestAnalyzer(vreq, analysisContext);
 		requestInfo = analyzer.analyze();
 	}
-
+	
+	private void analyzeIt(String rdfURL) {
+		vreq = new VitroRequest(req);
+		analyzer = new IndividualRequestAnalyzer(vreq, analysisContext);
+		analyzer.rdfURL = rdfURL;
+		requestInfo = analyzer.analyze();
+	}
+	
 	/** We should have a DEFAULT request with the expected Individual. */
 	private void assertDefaultRequestInfo(String message, String individualUri) {
 		assertEquals(message + ": expecting DEFAULT request type",
