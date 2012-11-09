@@ -5,4 +5,4 @@
 /bin/
 /webapp/config/deploy.properties
 /webapp/config/debug.log4j.properties
-
+.build

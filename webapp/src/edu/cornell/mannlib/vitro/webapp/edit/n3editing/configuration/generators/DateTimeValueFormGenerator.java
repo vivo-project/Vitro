@@ -94,6 +94,14 @@ public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
         "?subject <" + toDateTimeValue + "> ?existingNode . \n" +
         "?existingNode a <" + valueType + "> }";
 
+	
+	public static String getNodeVar() {
+		return "valueNode";
+	}
+	
+	public static String getNodeN3Var() {
+		return "?" + getNodeVar();
+	}
 
 //Adding form specific data such as edit mode
 	public void addFormSpecificData(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
