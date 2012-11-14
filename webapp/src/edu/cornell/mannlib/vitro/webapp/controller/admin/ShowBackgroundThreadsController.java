@@ -28,7 +28,7 @@ public class ShowBackgroundThreadsController extends FreemarkerHttpServlet {
 
 	
 	@Override
-	protected ResponseValues processRequest(VitroRequest vreq) throws Exception {
+	protected ResponseValues processRequest(VitroRequest vreq) throws ExceptionXX {
 
 		SortedMap<String, ThreadInfo> threadMap = new TreeMap<String, ThreadInfo>();
 
