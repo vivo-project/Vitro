@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import freemarker.cache.WebappTemplateLoader;
 import freemarker.template.Configuration;
@@ -68,31 +69,31 @@ public class StartupStatusDisplayFilter implements Filter {
 		statusAlreadyDisplayed = true;
 	}
 
-	private void displayStartupStatus(ServletRequest req, ServletResponse resp) throws IOException,
-			ServletException {
+	private void displayStartupStatus(ServletRequest req, ServletResponse resp)
+			throws IOException, ServletException {
 		HttpServletResponse hresp = (HttpServletResponse) resp;
-        HttpServletRequest hreq = (HttpServletRequest) req;
+		HttpServletRequest hreq = (HttpServletRequest) req;
 
 		try {
 			Map<String, Object> bodyMap = new HashMap<String, Object>();
 			bodyMap.put("status", ss);
 			bodyMap.put("showLink", !isFatal());
 			bodyMap.put("contextPath", getContextPath());
-			bodyMap.put("applicationName", getApplicationName(hreq));			
-						
-	        String url = "";
-	        
-	        String path = hreq.getRequestURI();
-	        if( path != null ){
-	        	url = path;
-	        }
-	        
-	        String query = hreq.getQueryString();
-	        if( !StringUtils.isEmpty( query )){
-	        	url = url + "?" + query;
-	        }	
-	        
-			bodyMap.put("url", url );
+			bodyMap.put("applicationName", getApplicationName());
+
+			String url = "";
+
+			String path = hreq.getRequestURI();
+			if (path != null) {
+				url = path;
+			}
+
+			String query = hreq.getQueryString();
+			if (!StringUtils.isEmpty(query)) {
+				url = url + "?" + query;
+			}
+
+			bodyMap.put("url", url);
 
 			hresp.setContentType("text/html;charset=UTF-8");
 			hresp.setStatus(SC_INTERNAL_SERVER_ERROR);
@@ -112,10 +113,12 @@ public class StartupStatusDisplayFilter implements Filter {
 		}
 	}
 
-	private Object getApplicationName(HttpServletRequest hreq) {
+	private Object getApplicationName() {
 		String name = "";
 		try {
-			ApplicationBean app = new VitroRequest(hreq).getAppBean();
+			WebappDaoFactory wadf = (WebappDaoFactory) ctx
+					.getAttribute("webappDaoFactory");
+			ApplicationBean app = wadf.getApplicationDao().getApplicationBean();
 			name = app.getApplicationName();
 		} catch (Exception e) {
 			// deal with problems below
