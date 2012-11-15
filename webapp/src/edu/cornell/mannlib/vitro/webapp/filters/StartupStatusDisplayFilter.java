@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import freemarker.cache.WebappTemplateLoader;
 import freemarker.template.Configuration;
@@ -69,34 +70,34 @@ public class StartupStatusDisplayFilter implements Filter {
 
 	private void displayStartupStatus(ServletRequest req, ServletResponse resp) throws IOException,
 			ServletException {
-		HttpServletResponse hResp = (HttpServletResponse) resp;
+		HttpServletResponse hresp = (HttpServletResponse) resp;
+        HttpServletRequest hreq = (HttpServletRequest) req;
 
 		try {
 			Map<String, Object> bodyMap = new HashMap<String, Object>();
 			bodyMap.put("status", ss);
 			bodyMap.put("showLink", !isFatal());
 			bodyMap.put("contextPath", getContextPath());
-			bodyMap.put("applicationName", getApplicationName());			
+			bodyMap.put("applicationName", getApplicationName(hreq));			
 						
-	        HttpServletRequest httpreq = (HttpServletRequest) req;
 	        String url = "";
 	        
-	        String path = httpreq.getRequestURI();
+	        String path = hreq.getRequestURI();
 	        if( path != null ){
 	        	url = path;
 	        }
 	        
-	        String query = httpreq.getQueryString();
+	        String query = hreq.getQueryString();
 	        if( !StringUtils.isEmpty( query )){
 	        	url = url + "?" + query;
 	        }	
 	        
 			bodyMap.put("url", url );
 
-			hResp.setContentType("text/html;charset=UTF-8");
-			hResp.setStatus(SC_INTERNAL_SERVER_ERROR);
+			hresp.setContentType("text/html;charset=UTF-8");
+			hresp.setStatus(SC_INTERNAL_SERVER_ERROR);
 			Template tpl = loadFreemarkerTemplate();
-			tpl.process(bodyMap, hResp.getWriter());
+			tpl.process(bodyMap, hresp.getWriter());
 		} catch (TemplateException e) {
 			throw new ServletException("Problem with Freemarker Template", e);
 		}
@@ -111,10 +112,10 @@ public class StartupStatusDisplayFilter implements Filter {
 		}
 	}
 
-	private Object getApplicationName() {
+	private Object getApplicationName(HttpServletRequest hreq) {
 		String name = "";
 		try {
-			ApplicationBean app = ApplicationBean.getAppBean(ctx);
+			ApplicationBean app = new VitroRequest(hreq).getAppBean();
 			name = app.getApplicationName();
 		} catch (Exception e) {
 			// deal with problems below

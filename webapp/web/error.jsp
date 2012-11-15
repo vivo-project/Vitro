@@ -13,7 +13,6 @@
             request.setAttribute("bodyJsp", "/errorbody.jsp");
             request.setAttribute("title", "Error");
             request.setAttribute("css", "");
-            request.setAttribute("appBean", appBean);
             request.setAttribute("themeDir", themeDir);
             %>
 
