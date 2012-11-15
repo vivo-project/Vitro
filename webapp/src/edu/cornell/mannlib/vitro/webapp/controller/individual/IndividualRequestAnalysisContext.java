@@ -16,12 +16,6 @@ public interface IndividualRequestAnalysisContext {
 	String getDefaultNamespace();
 
 	/**
-	 * Is there a namespace for this prefix? If not, return an empty string, but
-	 * never null.
-	 */
-	String getNamespaceForPrefix(String prefix);
-
-	/**
 	 * Use the IndividualDao to get this individual.
 	 * 
 	 * If the URI is null, or if no such Individual exists, return null.
