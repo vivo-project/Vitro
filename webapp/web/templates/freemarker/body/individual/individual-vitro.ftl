@@ -49,10 +49,18 @@
 <#assign nameForOtherGroup = "other"> <#-- used by both individual-propertyGroupMenu.ftl and individual-properties.ftl -->
 
 <#-- Property group menu -->
-<#include "individual-propertyGroupMenu.ftl">
+<#-- With release 1.6 the property group is no longer used. The include statement
+     remains in the event a particular VIVO site still wants to use it with the new
+     collapsible groups.
+     
+     <#include "individual-propertyGroupMenu.ftl">
+-->
 
 <#-- Ontology properties -->
 <#include "individual-properties.ftl">
+<script>
+    var individualLocalName = "${individual.localName}";
+</script>
 
 <#assign rdfUrl = individual.rdfUrl>
 
