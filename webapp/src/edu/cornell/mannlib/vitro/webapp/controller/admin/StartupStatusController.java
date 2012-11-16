@@ -7,7 +7,6 @@ import java.util.Map;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -31,7 +30,7 @@ public class StartupStatusController extends FreemarkerHttpServlet {
 		body.put("title", "Startup Status");
 		body.put("status", StartupStatus.getBean(getServletContext()));
 		body.put("contextPath", getContextPath());
-		body.put("applicationName", getApplicationName());
+		body.put("applicationName", getApplicationName(vreq));
 
 		return new TemplateResponseValues("startupStatus-display.ftl", body);
 	}
@@ -45,11 +44,10 @@ public class StartupStatusController extends FreemarkerHttpServlet {
 		}
 	}
 
-	private Object getApplicationName() {
+	private Object getApplicationName(VitroRequest vreq) {
 		String name = "";
 		try {
-			ApplicationBean app = ApplicationBean.getAppBean(getServletContext());
-			name = app.getApplicationName();
+			name = vreq.getAppBean().getApplicationName();
 		} catch (Exception e) {
 			// deal with problems below
 		}

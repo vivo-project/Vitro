@@ -49,15 +49,6 @@ public class ApplicationBean {
     private String    copyrightAnchor;
     private String    themeDir;
        
-    public static ApplicationBean getAppBean(ServletContext sc){
-        if( sc != null ){
-            Object obj = sc.getAttribute("applicationBean");
-            if( obj != null )
-                return (ApplicationBean)obj;
-        }
-        return new ApplicationBean();
-    }
-
     public String toString() {
         String output = "Application Bean Contents:\n";
         output += "  initialized from DB:    [" + initialized             + "]\n";

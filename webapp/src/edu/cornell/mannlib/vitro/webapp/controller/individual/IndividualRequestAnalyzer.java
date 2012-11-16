@@ -30,7 +30,6 @@ public class IndividualRequestAnalyzer {
 	private static Pattern RDF_REQUEST = Pattern.compile("^/individual/([^/]+)/\\1\\.(rdf|n3|ttl)$");
     private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]+)$");
 	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individual/([^/]+)$");		
-	private static Pattern NS_PREFIX_URL = Pattern.compile("^/individual/([^/]*)/([^/]+)$");
 	
 	private final VitroRequest vreq;
 	private final IndividualRequestAnalysisContext analysisContext;
@@ -164,7 +163,6 @@ public class IndividualRequestAnalyzer {
 	 *     /individual/localname/localname.rdf
 	 *     /individual/localname/localname.n3
 	 *     /individual/localname/localname.ttl
-	 *     /individual/nsprefix/localname
 	 * </pre>
 	 * 
 	 * @return null on failure.
@@ -200,14 +198,6 @@ public class IndividualRequestAnalyzer {
 			Matcher rdfMatch = RDF_REQUEST.matcher(url);
 			if (rdfMatch.matches() && rdfMatch.groupCount() == 2) {
 				return getIndividualByLocalname(rdfMatch.group(1));
-			}
-	
-			// Does the URL look like a namespace prefix followed by a local
-			// name?
-			Matcher prefix_match = NS_PREFIX_URL.matcher(url);
-			if (prefix_match.matches() && prefix_match.groupCount() == 2) {
-				return getIndividualByPrefixAndLocalname(prefix_match.group(1),
-						prefix_match.group(2));
 			}
 	
 			// Couldn't match it to anything.
@@ -297,12 +287,6 @@ public class IndividualRequestAnalyzer {
 		String defaultNamespace = analysisContext.getDefaultNamespace();
 		String uri = defaultNamespace + localname;
 		return getIndividualByUri(uri);
-	}
-
-	private Individual getIndividualByPrefixAndLocalname(String prefix,
-			String localName) {
-		String ns = analysisContext.getNamespaceForPrefix(prefix);
-		return getIndividualByUri(ns + localName);
 	}
 
 	private Individual getIndividualByNetId(String netId) {
