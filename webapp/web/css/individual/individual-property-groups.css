@@ -1,0 +1,32 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+span#toggleContainer {
+    float:right;
+    padding:10px 8px 0 0;
+    font-size: 0.85em;
+}
+section.property-group h2 { 
+    padding: 8px 10px 4px 12px; 
+}
+.scroll-up {
+   position: absolute; 
+   width: 21px;
+   height: 30px;
+   top: 8px; /* changed for redesign, was 0 */
+   right: 12px; /* changed for redesign, was -21px;*/
+}
+section.property-group div {
+    margin-top:15px;
+    display:none;
+}
+section.property-group h2 {
+    font-size: 1.15em !important; 
+    color: #5e6363 !important; 
+    font-weight: normal !important;
+    background: #fafaf9 !important; 
+}
+/* this class is referenced in java script; the important is needed to override the color in the previous selector */
+section.property-group h2.expandedPropGroupH2 {
+    background:#e4ecf3 !important;
+    color:#2485ae !important;  
+}
