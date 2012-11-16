@@ -165,6 +165,9 @@ webapp/web/js/raphael/*
 # See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/sparql/prototype.js
 
+# See /doc/3rd-party-licenses.txt for LICENSE file
+webapp/web/js/amplify/amplify.store.min.js
+
 # Apache Solr search platform. See /doc/3rd-party-licenses.txt for LICENSE file
 solr/**/*
 solr/*
