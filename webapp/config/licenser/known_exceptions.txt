@@ -156,6 +156,9 @@ webapp/web/js/html5.js
 # See /doc/3rd-party-licenses.txt for LICENSE file
 webapp/web/js/selectivizr.js
 
+# See /doc/3rd-party-licenses.txt for LICENSE file
+webapp/web/js/amplify/amplify.store.min.js
+
 # PROBLEM: Can't find any info on licensing.
 webapp/web/js/jquery_plugins/supersleight.js
 
