@@ -283,11 +283,7 @@ public class VitroRequest extends HttpServletRequestWrapper {
     }
     
     public ApplicationBean getAppBean(){
-        //return (ApplicationBean) getAttribute("appBean");
     	return getWebappDaoFactory().getApplicationDao().getApplicationBean();
-    }
-    public void setAppBean(ApplicationBean ab){
-        setAttribute("appBean",ab);
     }
 
     @SuppressWarnings("unchecked")
