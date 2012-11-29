@@ -7,6 +7,7 @@ import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -101,15 +102,23 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     }
 	
     protected List<String> getRangeTypes(VitroRequest vreq) {
-		Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
-		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
+    	Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
+   		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
 		WebappDaoFactory wDaoFact = vreq.getWebappDaoFactory();
 		List<String> types = new ArrayList<String>();
-		List <VClass> vclasses = new ArrayList<VClass>();
-        vclasses = wDaoFact.getVClassDao().getVClassesForProperty(subject.getVClassURI(),predicateUri);
-        for(VClass v: vclasses) {
-        	types.add(v.getURI());
-        }       
+		//Get all vclasses applicable to subject
+		List<VClass> vClasses = subject.getVClasses();
+		HashSet<String> typesHash = new HashSet<String>();
+		for(VClass vclass: vClasses) {
+			 List<VClass> rangeVclasses = wDaoFact.getVClassDao().getVClassesForProperty(vclass.getURI(),predicateUri);
+			 if(rangeVclasses !=  null) {
+				 for(VClass range: rangeVclasses) {
+					 //a hash will keep a unique list of types and so prevent duplicates
+					 typesHash.add(range.getURI());
+				 }
+			 }
+		}
+		types.addAll(typesHash);
         return types;
 	}	
 	

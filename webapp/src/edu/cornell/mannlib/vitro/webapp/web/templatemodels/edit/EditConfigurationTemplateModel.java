@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -504,6 +505,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
    
 
 	//TODO:Check where this logic should actually go, copied from input element formatting tag
+    //Updating to enable multiple vclasses applicable to subject to be analyzed to understand possible range of types
     public Map<String, String> getOfferTypesCreateNew() {
 		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     	ObjectProperty op = 
@@ -513,9 +515,34 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     		wdf.getIndividualDao().getIndividualByURI(editConfig.getSubjectUri());
     	
     	List<VClass> vclasses = null;
-    	vclasses = wdf.getVClassDao().getVClassesForProperty(sub.getVClassURI(), op.getURI());    	
-    	if( vclasses == null )
+    	List<VClass> subjectVClasses = sub.getVClasses();
+    	if( subjectVClasses == null ) {
     		vclasses = wdf.getVClassDao().getAllVclasses();
+    	}
+    	else {
+    		//this hash is used to make sure there are no duplicates in the vclasses
+    		//a more elegant method may look at overriding equals/hashcode to enable a single hashset of VClass objects
+	    	HashSet<String> vclassesURIs = new HashSet<String>();
+	    	vclasses = new ArrayList<VClass>();
+	        //Get the range vclasses applicable for the property and each vclass for the subject
+	        for(VClass subjectVClass: subjectVClasses) {
+	        	List<VClass> rangeVclasses = wdf.getVClassDao().getVClassesForProperty(subjectVClass.getURI(), op.getURI());
+	        	//add range vclass to hash
+	        	if(rangeVclasses != null) {
+	        		for(VClass v: rangeVclasses) {
+	        			if(!vclassesURIs.contains(v.getURI())) {
+	        				vclassesURIs.add(v.getURI());
+	        				vclasses.add(v);
+	        			}
+	        		}
+	        	}
+	        }
+    	}
+    	//if each subject vclass resulted in null being returned for range vclasses, then size of vclasses would be zero
+    	if(vclasses.size() == 0) {
+    		vclasses = wdf.getVClassDao().getAllVclasses();
+    	}
+    	
     	
     	HashMap<String,String> types = new HashMap<String, String>();
     	for( VClass vclass : vclasses ){
