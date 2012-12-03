@@ -155,12 +155,25 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 	private EditConfigurationVTwo setupEditConfiguration(String editConfGeneratorName,
 			VitroRequest vreq) throws Exception {	    	    	    
     	HttpSession session = vreq.getSession();
-    	EditConfigurationVTwo editConfig = 
-    	    makeEditConfigurationVTwo( editConfGeneratorName, vreq, session);
-
-        //edit key is set here, NOT in the generator class
-    	String editKey = EditConfigurationUtils.getEditKey(vreq);  
-        editConfig.setEditKey(editKey);        
+    	//Originally, this code called makeEditConfiguration before checking for/setting the edit key
+    	//which meant that in the case of page reload on an error, you would recreate an edit configuration
+    	//using the generator
+    	//Given recent updates enabling modification of edit configuration dynamically through AJAX,
+    	//we will first check whether the edit key exists and if there is already an edit configuration
+    	//in the session - and then will utilize the edit configuration that already exists
+    	//edit key is set here, NOT in the generator class
+    	EditConfigurationVTwo editConfig = null;
+    	EditConfigurationVTwo existingConfig = EditConfigurationVTwo.getConfigFromSession(session, vreq);
+    	if(existingConfig != null) {
+    		editConfig = existingConfig;
+    	} else {
+    		editConfig = 
+    	    	    makeEditConfigurationVTwo( editConfGeneratorName, vreq, session);
+    	}
+    	 
+    	String editKey = EditConfigurationUtils.getEditKey(vreq); 
+    	editConfig.setEditKey(editKey);        
+        
 
         //put edit configuration in session so it can be accessed on form submit.
         EditConfigurationVTwo.putConfigInSession(editConfig, session);
