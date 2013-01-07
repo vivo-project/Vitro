@@ -128,10 +128,11 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
        
         	   existingLiteralValues.put(this.getVarName("query", counter),
         			   new ArrayList<Literal>(Arrays.asList(queryLiteral)));
-        	   
-        	   existingUriValues.put(this.getVarName("queryModel", counter), 
+        	   //Query model is optional
+        	   if(queryModelResource != null && queryModelResource.getURI() != null) {
+        		   existingUriValues.put(this.getVarName("queryModel", counter), 
         			   new ArrayList<String>(Arrays.asList(queryModelResource.getURI())));
-
+        	   }
         	   
            }
        } catch(Exception ex) {
