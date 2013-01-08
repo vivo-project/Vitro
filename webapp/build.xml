@@ -257,7 +257,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<property name="solr.distrib.dir" location="${corebase.dir}/../solr" />
 		<property name="solr.home.template.dir" location="${solr.distrib.dir}/homeDirectoryTemplate" />
 		<property name="solr.context.template.file" location="${solr.distrib.dir}/template.context.xml" />
-		<property name="solr.distrib.war" location="${solr.distrib.dir}/apache-solr-3.1.0.war" />
+		<property name="solr.distrib.war" location="${solr.distrib.dir}/apache-solr-3.6.2.war" />
 
 		<property name="solr.context.file" location="${solr.build.dir}/context.xml" />
 		<property name="solr.context.temp.file" location="${solr.build.dir}/context.temp.xml" />
