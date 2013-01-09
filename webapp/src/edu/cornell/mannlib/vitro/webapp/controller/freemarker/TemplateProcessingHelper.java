@@ -51,6 +51,10 @@ public class TemplateProcessingHelper {
             env.setCustomAttribute("request", request);
             env.setCustomAttribute("context", context);
             
+            // Set the Locale from the request into the environment, so date builtins will be
+            // Locale-dependent
+            env.setLocale(request.getLocale());
+            
             // Define a setup template to be included by every page template
             String templateType = (String) map.get("templateType");
             if (FreemarkerHttpServlet.PAGE_TEMPLATE_TYPE.equals(templateType)) {

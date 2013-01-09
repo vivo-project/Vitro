@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
+import edu.cornell.mannlib.vitro.webapp.i18n.freemarker.I18nMethodModel;
 import edu.cornell.mannlib.vitro.webapp.web.directives.IndividualShortViewDirective;
 import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualLocalNameMethod;
 import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualPlaceholderImageUrlMethod;
@@ -166,6 +167,7 @@ public class FreemarkerConfiguration extends Configuration {
         map.put("profileUrl", new IndividualProfileUrlMethod());
         map.put("localName", new IndividualLocalNameMethod());
         map.put("placeholderImageUrl", new IndividualPlaceholderImageUrlMethod());
+        map.put("i18n", new I18nMethodModel());
         return map;
     }
     
