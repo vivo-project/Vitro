@@ -37,7 +37,9 @@ public class FreemarkerConfiguration extends Configuration {
 
     private static final Log log = LogFactory.getLog(FreemarkerConfiguration.class);
 
-    private final String themeDir;
+	private static final String PROPERTY_DEVELOPER_DEFEAT_CACHE = "developer.defeatFreemarkerCache";
+
+	private final String themeDir;
     private final ServletContext context;
     private final ApplicationBean appBean;
     
@@ -47,10 +49,10 @@ public class FreemarkerConfiguration extends Configuration {
         this.context = context;
         this.appBean = appBean;
         
-        String buildEnv = ConfigurationProperties.getBean(context).getProperty("Environment.build");
-        log.debug("Current build environment: " + buildEnv);
-        if ("development".equals(buildEnv)) { // Set Environment.build = development in deploy.properties
-            log.debug("Disabling Freemarker template caching in development build.");
+		String flag = ConfigurationProperties.getBean(context).getProperty(
+				PROPERTY_DEVELOPER_DEFEAT_CACHE, "false");
+		if (Boolean.valueOf(flag.trim())) {
+			log.debug("Disabling Freemarker template caching in development build.");
             setTemplateUpdateDelay(0); // no template caching in development 
         } else {
             int delay = 60;
