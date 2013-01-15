@@ -61,6 +61,10 @@ public class TemplateProcessingHelper {
                 env.include(getTemplate("pageSetup.ftl"));
             }
             
+            // Apply any data-getters that are associated with this template.
+            FreemarkerConfiguration.retrieveAndRunDataGetters(env, template.getName());
+            
+            // Now process it.
             env.process();
         } catch (TemplateException e) {
             throw new TemplateProcessingException("TemplateException creating processing environment", e);
