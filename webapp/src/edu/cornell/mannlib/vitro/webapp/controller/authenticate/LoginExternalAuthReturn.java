@@ -37,7 +37,7 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 	 * the header will contain the name of the user who just logged in.
 	 * 
 	 * Deal with these possibilities: 
-	 * - The header name was not configured in deploy.properties. Complain.
+	 * - The header name was not configured in runtime.properties. Complain.
 	 * - No username: the login failed. Complain 
 	 * - User corresponds to a User acocunt. Record the login. 
 	 * - User corresponds to an Individual (self-editor). 

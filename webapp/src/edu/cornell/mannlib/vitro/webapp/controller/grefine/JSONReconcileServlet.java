@@ -201,7 +201,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			viewJson.put("url", urlBuf.toString() + "/individual?uri={{id}}");
 			json.put("view", viewJson);
 
-			// parse defaultTypeList from deploy.properties
+			// parse defaultTypeList from runtime.properties
 			if (defaultTypeList != null) {
 				String[] splitList = defaultTypeList.split(";");
 				String[][] idNameArray = new String[splitList.length][splitList.length];

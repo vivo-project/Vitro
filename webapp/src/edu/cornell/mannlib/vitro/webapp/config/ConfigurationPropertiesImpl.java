@@ -9,13 +9,16 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
  * The basic implementation of ConfigurationProperties. It loads the
- * configuration properties from a properties file and stores them in a map.
+ * configuration properties from a properties file and stores them in a map. It
+ * also permits the caller to supply a map of "preemptive" properties that will
+ * be included and will override any matching properties from the file.
  * 
  * Leading and trailing white space are trimmed from the property values.
  * 
@@ -27,23 +30,25 @@ public class ConfigurationPropertiesImpl extends ConfigurationProperties {
 
 	private final Map<String, String> propertyMap;
 
-	public ConfigurationPropertiesImpl(InputStream stream) {
+	public ConfigurationPropertiesImpl(InputStream stream,
+			Map<String, String> preemptiveProperties) throws IOException {
 		Properties props = loadFromPropertiesFile(stream);
 		Map<String, String> map = copyPropertiesToMap(props);
-		trimWhiteSpaceFromValues(map);
-		this.propertyMap = Collections.unmodifiableMap(map);
 
+		if (preemptiveProperties != null) {
+			map.putAll(preemptiveProperties);
+		}
+
+		trimWhiteSpaceFromValues(map);
+
+		this.propertyMap = Collections.unmodifiableMap(map);
 		log.debug("Configuration properties are: " + map);
 	}
 
-	private Properties loadFromPropertiesFile(InputStream stream) {
+	private Properties loadFromPropertiesFile(InputStream stream)
+			throws IOException {
 		Properties props = new Properties();
-		try {
-			props.load(stream);
-		} catch (IOException e) {
-			throw new IllegalStateException(
-					"Failed to parse the configuration properties file.", e);
-		}
+		props.load(stream);
 		return props;
 	}
 
@@ -84,7 +89,8 @@ public class ConfigurationPropertiesImpl extends ConfigurationProperties {
 
 	@Override
 	public String toString() {
-		return "ConfigurationPropertiesImpl[propertyMap=" + propertyMap + "]";
+		return "ConfigurationPropertiesImpl[propertyMap="
+				+ new TreeMap<String, String>(propertyMap) + "]";
 	}
 
 }

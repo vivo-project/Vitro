@@ -89,7 +89,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
         /* setup the http connection with the solr server */
         String solrServerUrlString = ConfigurationProperties.getBean(sce).getProperty("vitro.local.solr.url");
         if( solrServerUrlString == null ){
-            ss.fatal(this, "Could not find vitro.local.solr.url in deploy.properties.  "+
+            ss.fatal(this, "Could not find vitro.local.solr.url in runtime.properties.  "+
                     "Vitro application needs a URL of a solr server that it can use to index its data. " +
                     "It should be something like http://localhost:${port}" + context.getContextPath() + "solr" 
                     );
@@ -101,7 +101,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
         	solrServerUrl = new URL(solrServerUrlString);
         } catch (MalformedURLException e) {
             ss.fatal(this, "Can't connect with the solr server. " +
-            		"The value for vitro.local.solr.url in deploy.properties is not a valid URL: " + solrServerUrlString);
+            		"The value for vitro.local.solr.url in runtime.properties is not a valid URL: " + solrServerUrlString);
             return;
         }
         
