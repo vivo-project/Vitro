@@ -70,7 +70,7 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 		configProps = ConfigurationProperties.getBean(ctx);
 
 		/*
-		 * If OpenSocial is not configured in deploy.properties, skip the tests.
+		 * If OpenSocial is not configured in runtime.properties, skip the tests.
 		 */
 		if (!configurationPresent()) {
 			ss.info(this, "The OpenSocial connection is not configured.");
@@ -188,7 +188,7 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 	}
 
 	/**
-	 * Check that the Token Key file has been specified in deploy.properties,
+	 * Check that the Token Key file has been specified in runtime.properties,
 	 * and that it actually does exist.
 	 */
 	private void checkTokenKeyFile() {
@@ -210,14 +210,14 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 	}
 
 	/**
-	 * Get the Token Service info from deploy.properties. It must be in the form
+	 * Get the Token Service info from runtime.properties. It must be in the form
 	 * of host:port, and may not refer to localhost.
 	 */
 	private void checkTokenServiceInfo() {
 		String tsInfo = configProps.getProperty(PROPERTY_SHINDIG_TOKEN_SERVICE);
 		if (StringUtils.isEmpty(tsInfo)) {
 			warnings.add(new Warning("There is no value for '"
-					+ PROPERTY_SHINDIG_TOKEN_SERVICE + "' in deploy.properties"));
+					+ PROPERTY_SHINDIG_TOKEN_SERVICE + "' in runtime.properties"));
 			return;
 		}
 
@@ -278,7 +278,7 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 
 	private static class NoSuchPropertyException extends Exception {
 		NoSuchPropertyException(String key) {
-			super("There is no value for '" + key + "' in deploy.properties");
+			super("There is no value for '" + key + "' in build.properties");
 		}
 	}
 

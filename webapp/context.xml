@@ -1,20 +1,5 @@
 <Context>
-
   <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
-
-    <!--
-        Vitro will interpret this as either a file path or a resource path. So,
-        if a simple resource path is used, such as "deploy.properties", Vitro 
-        will find the file at: 
-            ${Tomcat}/webapps/vitro/WEB-INF/classes/deploy.properties
-        For an external file, specify a full file path, like
-            "/usr/local/vitro/deploy.properties".   
-    -->
-    <Environment type="java.lang.String" override="false" 
-        name="path.configuration" 
-        value="deploy.properties"
-        />
-        
     <!--
         Disable the attempt to persist sessions when Tomcat shuts down. 
     -->

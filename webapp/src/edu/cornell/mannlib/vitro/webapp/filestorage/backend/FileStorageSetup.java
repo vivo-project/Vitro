@@ -35,7 +35,7 @@ public class FileStorageSetup implements ServletContextListener {
 	 * {@link ConfigurationProperties} for the vivo home directory. The file
 	 * storage base directory is in a subdirectory below this one.
 	 */
-	public static final String PROPERTY_VITRO_HOME_DIR = "vitro.home.directory";
+	public static final String PROPERTY_VITRO_HOME_DIR = "vitro.home";
 	public static final String FILE_STORAGE_SUBDIRECTORY = "uploads";
 
 	/**
