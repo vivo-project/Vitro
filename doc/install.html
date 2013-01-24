@@ -651,10 +651,80 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            An absolute file path, pointing to the root directory of the Harvester utility.
-                            You must include the final slash.
+                          Force VIVO to use a specific language or Locale instead of those 
+                          specified by the browser. 
+                          This affects RDF data retrieved from the model, if RDFService.languageFilter is true.  
+                          This also affects the text of pages that have been modified to support multiple languages. 
                         </td>
                     </tr>
+                    <tr class="odd_row">
+                        <td>
+                          languages.forceLocale
+                        </td>
+                        <td>
+                          en_US
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2">
+                          A list of supported languages or Locales that the user may choose to
+                          use instead of the one specified by the browser. Selection images must
+                          be available in the i18n/images directory of the theme.
+                          This affects RDF data retrieved from the model, if RDFService.languageFilter is true.  
+                          This also affects the text of pages that have been modified to support multiple languages. 
+                        </td>
+                    </tr>
+                    <tr class="odd_row">
+                        <td>
+                          languages.selectableLocales
+                        </td>
+                        <td>
+                           en, es, fr_FR
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2">
+                          <b>For developers only.</b>
+                          Defeat the Freemarker template cache, so each template
+                          is read from disk on each request. This permits developers to immediately
+                          see the effect of changes to the template. The default is <code>false</code>, which
+                          means that a cached copy of each template will be used for 60 seconds 
+                          before the disk is checked for a new version.
+                          <br/><b>Setting this option to "true" slows down VIVO performance.</b>
+                        </td>
+                    </tr>
+                    <tr class="odd_row">
+                        <td>
+                          developer.defeatFreemarkerCache
+                        </td>
+                        <td>
+                          false
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2">
+                          <b>For developers only.</b>
+                          Defeat the cache of language-specific text strings,
+                          so the language file is read from disk on each request.
+                          This permits developers to immediately
+                          see the effect of changes to the text strings. 
+                          The default is <code>false</code>, which means that the language file is 
+                          read when VIVO starts up, or when a new theme is selected.
+                          <br/><b>Setting this option to "true" slows down VIVO performance.</b>
+                        </td>
+                    </tr>
+                    <tr class="odd_row">
+                        <td>
+                          developer.defeatI18nCache = true
+                        </td>
+                        <td>
+                          false
+                        </td>
+                    </tr>
+                    
                 </tbody>
             </table>
             <h3 id="deploy">VI. Compile and deploy</h3>

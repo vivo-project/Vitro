@@ -200,7 +200,7 @@ public class I18n {
 			log.debug("Paths are '" + themeI18nPath + "' and '" + appI18nPath
 					+ "'");
 
-			return VivoResourceBundle.getBundle(bundleName, ctx, appI18nPath,
+			return VitroResourceBundle.getBundle(bundleName, ctx, appI18nPath,
 					themeI18nPath, this);
 		}
 

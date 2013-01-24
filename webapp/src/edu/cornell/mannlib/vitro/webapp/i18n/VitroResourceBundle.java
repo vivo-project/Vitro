@@ -41,8 +41,8 @@ import org.apache.commons.logging.LogFactory;
  * 
  * In all_es.properties: account_email_html = @@file accountEmail_es.html
  */
-public class VivoResourceBundle extends ResourceBundle {
-	private static final Log log = LogFactory.getLog(VivoResourceBundle.class);
+public class VitroResourceBundle extends ResourceBundle {
+	private static final Log log = LogFactory.getLog(VitroResourceBundle.class);
 
 	private static final String FILE_FLAG = "@@file ";
 	private static final String MESSAGE_FILE_NOT_FOUND = "File {1} not found for property {0}.";
@@ -51,11 +51,11 @@ public class VivoResourceBundle extends ResourceBundle {
 	// Factory method
 	// ----------------------------------------------------------------------
 
-	public static VivoResourceBundle getBundle(String bundleName,
+	public static VitroResourceBundle getBundle(String bundleName,
 			ServletContext ctx, String appI18nPath, String themeI18nPath,
 			Control control) {
 		try {
-			return new VivoResourceBundle(bundleName, ctx, appI18nPath,
+			return new VitroResourceBundle(bundleName, ctx, appI18nPath,
 					themeI18nPath, control);
 		} catch (FileNotFoundException e) {
 			log.debug(e);
@@ -78,7 +78,7 @@ public class VivoResourceBundle extends ResourceBundle {
 	private final Properties defaults;
 	private final Properties properties;
 
-	private VivoResourceBundle(String bundleName, ServletContext ctx,
+	private VitroResourceBundle(String bundleName, ServletContext ctx,
 			String appI18nPath, String themeI18nPath, Control control)
 			throws IOException {
 		this.bundleName = bundleName;
