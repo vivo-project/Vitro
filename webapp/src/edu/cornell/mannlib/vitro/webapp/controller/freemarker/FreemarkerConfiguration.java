@@ -50,19 +50,21 @@ public class FreemarkerConfiguration extends Configuration {
     private static final Log log = LogFactory.getLog(FreemarkerConfiguration.class);
 
 	private static final String PROPERTY_DEVELOPER_DEFEAT_CACHE = "developer.defeatFreemarkerCache";
+	private static final String PROPERTY_DEVELOPER_INSERT_DELIMITERS = "developer.insertFreemarkerDelimiters";
 
 	private final String themeDir;
     private final ServletContext context;
     private final ApplicationBean appBean;
+	private final ConfigurationProperties props;
     
     FreemarkerConfiguration(String themeDir, ApplicationBean appBean, ServletContext context) {
         
         this.themeDir = themeDir;
         this.context = context;
         this.appBean = appBean;
-        
-		String flag = ConfigurationProperties.getBean(context).getProperty(
-				PROPERTY_DEVELOPER_DEFEAT_CACHE, "false");
+		this.props = ConfigurationProperties.getBean(context);
+
+		String flag = props.getProperty(PROPERTY_DEVELOPER_DEFEAT_CACHE, "false");
 		if (Boolean.valueOf(flag.trim())) {
 			log.debug("Disabling Freemarker template caching in development build.");
             setTemplateUpdateDelay(0); // no template caching in development 
@@ -211,7 +213,13 @@ public class FreemarkerConfiguration extends Configuration {
             log.error("Error creating template loaders");
         }
         
-        return mtl;        
+		// Add the ability to add delimiters to the templates, based on
+		// settings.
+		if (Boolean.valueOf(props.getProperty(PROPERTY_DEVELOPER_INSERT_DELIMITERS))) {
+			return new DelimitingTemplateLoader(mtl);
+		} else {
+			return mtl;
+		}
     }
 
 	/**
