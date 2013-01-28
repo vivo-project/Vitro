@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -111,20 +113,22 @@ public class VitroResourceBundle extends ResourceBundle {
 			log.debug("Loading bundle '" + bundleName + "' defaults from '"
 					+ defaultsPath + "'");
 			FileInputStream stream = new FileInputStream(defaultsFile);
+			Reader reader = new InputStreamReader(stream, "UTF-8");
 			try {
-				this.defaults.load(stream);
+				this.defaults.load(reader);
 			} finally {
-				stream.close();
+				reader.close();
 			}
 		}
 		if (propertiesFile != null) {
 			log.debug("Loading bundle '" + bundleName + "' overrides from '"
 					+ propertiesPath + "'");
 			FileInputStream stream = new FileInputStream(propertiesFile);
+			Reader reader = new InputStreamReader(stream, "UTF-8");
 			try {
-				this.properties.load(stream);
+				this.properties.load(reader);
 			} finally {
-				stream.close();
+				reader.close();
 			}
 		}
 	}
