@@ -74,7 +74,7 @@
 Assumes property is non-null. -->
 <#macro objectPropertyListing property editable template=property.template>
     <#local localName = property.localName>
-    <h2 id="${localName}">${property.name?capitalize} <@addLink property editable /> <@verboseDisplay property /></h2>    
+    <h2 id="${localName}" class="mainPropGroup">${property.name?capitalize} <@addLink property editable /> <@verboseDisplay property /></h2>    
     <ul id="individual-${localName}" role="list">
         <@objectProperty property editable />
     </ul>
@@ -188,21 +188,21 @@ name will be used as the label. -->
      
      Note that this macro has a side-effect in the call to propertyGroups.pullProperty().
 -->
-<#macro image individual propertyGroups namespaces editable showPlaceholder="never">
+<#macro image individual propertyGroups namespaces editable showPlaceholder="never" imageWidth=160 >
     <#local mainImage = propertyGroups.pullProperty("${namespaces.vitroPublic}mainImage")!>
     <#local thumbUrl = individual.thumbUrl!>
     <#-- Don't assume that if the mainImage property is populated, there is a thumbnail image (though that is the general case).
          If there's a mainImage statement but no thumbnail image, treat it as if there is no image. -->
     <#if (mainImage.statements)?has_content && thumbUrl?has_content>
         <a href="${individual.imageUrl}" title="individual photo">
-        	<img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" />
+        	<img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="${imageWidth!}" />
         </a>
         <@editingLinks "${mainImage.localName}" mainImage.first() editable />
     <#else>
         <#local imageLabel><@addLinkWithLabel mainImage editable "Photo" /></#local>
         ${imageLabel}
         <#if showPlaceholder == "always" || (showPlaceholder="with_add_link" && imageLabel?has_content)>
-            <img class="individual-photo" src="${placeholderImageUrl(individual.uri)}" title = "no image" alt="placeholder image" width="160" />
+            <img class="individual-photo" src="${placeholderImageUrl(individual.uri)}" title = "no image" alt="placeholder image" width="${imageWidth!}" />
         </#if>
     </#if>
 </#macro>
@@ -213,7 +213,7 @@ name will be used as the label. -->
     ${label.value}
     <#if (labelCount > 1)  && editable >
         <span class="inline">
-            <a id="manageLabels" href="${urls.base}/manageLabels?subjectUri=${individual.uri!}" style="margin-left:20px;font-size:0.7em">
+            <a id="manageLabels" href="${urls.base}/manageLabels?subjectUri=${individual.uri!}">
                 manage labels
             </a>
         </span>
@@ -223,9 +223,15 @@ name will be used as the label. -->
 </#macro>
 
 <#-- Most specific types -->
-<#macro mostSpecificTypes individual>
+<#macro mostSpecificTypes individual >
     <#list individual.mostSpecificTypes as type>
         <span class="display-title">${type}</span>
+    </#list>
+</#macro>
+
+<#macro mostSpecificTypesPerson individual editable>
+    <#list individual.mostSpecificTypes as type>
+        <div id="titleContainer"><span class="<#if editable>display-title-editable<#else>display-title-not-editable</#if>">${type}</span></div>
     </#list>
 </#macro>
 
