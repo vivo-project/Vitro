@@ -42,8 +42,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.sun.net.httpserver.HttpServer;
-
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 
 /**
@@ -242,7 +240,10 @@ public class WebXmlTest extends AbstractTestClass {
 			}
 		} catch (ClassNotFoundException e) {
 			return "The class does not exist.";
-		} catch (InstantiationException | IllegalAccessException e) {
+		} catch (InstantiationException e) {
+			return "The class does not have a public constructor "
+					+ "that takes zero arguments.";
+		} catch (IllegalAccessException e) {
 			return "The class does not have a public constructor "
 					+ "that takes zero arguments.";
 		}
