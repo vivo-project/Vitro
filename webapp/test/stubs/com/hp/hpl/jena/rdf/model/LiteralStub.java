@@ -1,3 +1,5 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
 package stubs.com.hp.hpl.jena.rdf.model;
 
 import com.hp.hpl.jena.datatypes.RDFDatatype;

@@ -84,7 +84,8 @@ public class I18n {
 
 	/**
 	 * Get an I18nBundle by this name. The request provides the preferred
-	 * Locale, the theme directory and the development mode flag.
+	 * Locale, the application directory, the theme directory and the
+	 * development mode flag.
 	 * 
 	 * If the request indicates that the system is in development mode, then the
 	 * cache is cleared on each request.
@@ -155,7 +156,8 @@ public class I18n {
 	// ----------------------------------------------------------------------
 
 	/**
-	 * Instead of looking in the classpath, look in the theme directory.
+	 * Instead of looking in the classpath, look in the theme i18n directory and
+	 * the application i18n directory.
 	 */
 	private static class ThemeBasedControl extends ResourceBundle.Control {
 		private static final String BUNDLE_DIRECTORY = "i18n/";
@@ -177,7 +179,8 @@ public class I18n {
 
 		/**
 		 * Don't look in the class path, look in the current servlet context, in
-		 * the bundle directory under the theme directory.
+		 * the bundle directory under the theme directory and in the bundle
+		 * directory under the application directory.
 		 */
 		@Override
 		public ResourceBundle newBundle(String baseName, Locale locale,
@@ -193,7 +196,7 @@ public class I18n {
 			if (bundleName == null) {
 				throw new NullPointerException("bundleName may not be null.");
 			}
-			
+
 			String themeI18nPath = "/" + themeDirectory + BUNDLE_DIRECTORY;
 			String appI18nPath = "/" + BUNDLE_DIRECTORY;
 
