@@ -35,7 +35,8 @@
                     <@p.label individual editable labelCount />
 
                     <#--  Most-specific types -->
-                    <@p.mostSpecificTypes individual /><img id="uriIcon" title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon"/>
+                    <@p.mostSpecificTypes individual />
+                    <span id="iconControlsVitro"><img id="uriIcon" title="${individual.uri}" class="middle" src="${urls.images}/individual/uriIcon.gif" alt="uri icon"/></span>
                 </h1>
             </#if>
         </header>
