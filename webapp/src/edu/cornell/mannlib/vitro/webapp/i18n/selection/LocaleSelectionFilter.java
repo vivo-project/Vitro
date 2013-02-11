@@ -72,9 +72,9 @@ public class LocaleSelectionFilter implements Filter {
 	 */
 	private static class LocaleSelectionRequestWrapper extends
 			HttpServletRequestWrapper {
-		private final HttpServletRequest request;
-		private final Locale selectedLocale;
+		private final List<Locale> locales;
 
+		@SuppressWarnings("unchecked")
 		public LocaleSelectionRequestWrapper(HttpServletRequest request,
 				Locale selectedLocale) {
 			super(request);
@@ -82,31 +82,32 @@ public class LocaleSelectionFilter implements Filter {
 			if (request == null) {
 				throw new NullPointerException("request may not be null.");
 			}
-			this.request = request;
-
 			if (selectedLocale == null) {
 				throw new NullPointerException(
 						"selectedLocale may not be null.");
 			}
-			this.selectedLocale = selectedLocale;
+			
+			Locale selectedLanguage = new Locale(selectedLocale.getLanguage());
+
+			locales = EnumerationUtils.toList(request.getLocales());
+			locales.remove(selectedLanguage);
+			locales.add(0, selectedLanguage);
+			locales.remove(selectedLocale);
+			locales.add(0, selectedLocale);
 		}
 
 		@Override
 		public Locale getLocale() {
-			return selectedLocale;
+			return locales.get(0);
 		}
 
 		/**
-		 * Put the selected Locale on the front of the list of acceptable
-		 * Locales.
+		 * Get the modified list of locales.
 		 */
-		@SuppressWarnings({ "unchecked", "rawtypes" })
+		@SuppressWarnings("rawtypes")
 		@Override
 		public Enumeration getLocales() {
-			List list = EnumerationUtils.toList(request.getLocales());
-			list.remove(selectedLocale);
-			list.add(0, selectedLocale);
-			return Collections.enumeration(list);
+			return Collections.enumeration(locales);
 		}
 	}
 

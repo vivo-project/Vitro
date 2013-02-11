@@ -5,7 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.HashMap;
+//import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -129,7 +130,7 @@ public class UrlBuilder {
         return getUrl(Route.LOGOUT);
     }
     
-    public static class ParamMap extends HashMap<String, String> { 
+    public static class ParamMap extends LinkedHashMap<String, String> { 
         private static final long serialVersionUID = 1L;
         
         public ParamMap() { }
@@ -276,7 +277,7 @@ public class UrlBuilder {
         }        
 
     	if (profileUrl != null) {
-    		HashMap<String, String> specialParams = getModelParams(vreq);
+    		LinkedHashMap<String, String> specialParams = getModelParams(vreq);
     		if(specialParams.size() != 0) {
     			profileUrl = addParams(profileUrl, new ParamMap(specialParams));
     		}
@@ -325,9 +326,9 @@ public class UrlBuilder {
     
     //To be used in different property templates so placing method for reuse here
     //Check if special params included, specifically for menu management and other models
-    public static HashMap<String,String> getModelParams(VitroRequest vreq) {
+    public static LinkedHashMap<String,String> getModelParams(VitroRequest vreq) {
     	
-    	HashMap<String,String> specialParams = new HashMap<String, String>();
+    	LinkedHashMap<String,String> specialParams = new LinkedHashMap<String, String>();
     	if(vreq != null) {
     		//this parameter is sufficient to switch to menu model
     		String useMenuModelParam = vreq.getParameter(DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL);
