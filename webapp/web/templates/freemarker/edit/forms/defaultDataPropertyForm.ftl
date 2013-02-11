@@ -49,3 +49,8 @@
 
 <#include "defaultFormScripts.ftl">     
 
+<script type="text/javascript">
+$(document).ready(function(){
+    defaultDataPropertyUtils.onLoad();
+});
+</script> 
