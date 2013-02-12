@@ -58,6 +58,9 @@
 </section> <!-- end property-group -->
 <#assign sectionCount = 2 >
 </#list>
+<script>
+    var individualLocalName = "${individual.localName}";
+</script>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/individual-property-groups.css" />')}
 ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/amplify/amplify.store.min.js"></script>')}

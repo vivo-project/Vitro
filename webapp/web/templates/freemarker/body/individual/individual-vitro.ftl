@@ -62,10 +62,6 @@
 
 <#include "individual-property-group-tabs.ftl">
 
-<script>
-    var individualLocalName = "${individual.localName}";
-</script>
-
 <#assign rdfUrl = individual.rdfUrl>
 
 <#if rdfUrl??>
