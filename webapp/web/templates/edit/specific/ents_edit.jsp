@@ -37,9 +37,12 @@
                         SELECT   ?pred  ?predLabel ?obj ?objLabel ?graph
                         WHERE 
                         {
+                         { <${entity.URI}> ?pred ?obj 
+                           MINUS { GRAPH ?g { <${entity.URI}> ?pred ?obj } } } 
+                         UNION 
                          { GRAPH ?graph { <${entity.URI}> ?pred ?obj} } 
-                         OPTIONAL { GRAPH ?h { ?obj rdfs:label ?objLabel } }
-                         OPTIONAL { GRAPH ?i { ?pred rdfs:label ?predLabel } }
+                         OPTIONAL { ?obj rdfs:label ?objLabel }
+                         OPTIONAL { ?pred rdfs:label ?predLabel }
                         } ORDER BY ?graph ?pred
                         limit 10000"/>
           <form action="admin/sparqlquery" method="get">
@@ -54,9 +57,12 @@
                         SELECT ?sub ?subL  ?pred  ?predLabel ?graph
                         WHERE 
                         {
+                         { ?sub ?pred <${entity.URI}>  
+                           MINUS { GRAPH ?g { ?sub ?pred <${entity.URI}> } } } 
+                         UNION
                          { GRAPH ?graph { ?sub ?pred <${entity.URI}> } }
-                         OPTIONAL { GRAPH ?h { ?sub rdfs:label ?subL } }
-                         OPTIONAL { GRAPH ?i { ?pred rdfs:label ?predLabel } }
+                         OPTIONAL { ?sub rdfs:label ?subL }
+                         OPTIONAL { ?pred rdfs:label ?predLabel }
                         } ORDER BY ?graph ?pred
                         limit 10000"/>
           <form action="admin/sparqlquery" method="get">
