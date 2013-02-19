@@ -438,13 +438,17 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         final List<String> list = 
             new LinkedList<String>();
         
-        // get all labeled resources from any non-tbox and non-metadata graphs.
+        // get all labeled resources from any non-tbox and non-metadata graphs,
+        // as well as the unnamed graph (first pattern below)
         String query = "SELECT DISTINCT ?ind WHERE { \n" +
+                       " { ?ind <" + RDFS.label.getURI() + "> ?label } " +
+                       " UNION { " + 
                        "  GRAPH ?g { ?ind <" + RDFS.label.getURI() +
                                           "> ?label } \n" +
                        "  FILTER (?g != <" + JenaDataSourceSetupBase
                                .JENA_APPLICATION_METADATA_MODEL + "> " +
                        "          && !regex(str(?g),\"tbox\")) \n " +
+                       " } " +
                        "}";
               
 	    Query q = QueryFactory.create(query);

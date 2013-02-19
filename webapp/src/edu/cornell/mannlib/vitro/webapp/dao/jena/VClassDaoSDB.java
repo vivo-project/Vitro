@@ -139,10 +139,8 @@ public class VClassDaoSDB extends VClassDaoJena {
         try {
             String queryText =              
                 "SELECT COUNT( DISTINCT ?instance ) WHERE { \n" +
-                "  GRAPH <urn:x-arq:UnionGraph> { \n" + 
                 "      ?class <"+VitroVocabulary.IN_CLASSGROUP+"> <"+vcg.getURI() +"> .\n" +                
                 "      ?instance a ?class .  \n" +
-                "  } \n" +
                 "} \n" ;
             
             Query countQuery = QueryFactory.create(queryText, Syntax.syntaxARQ);
