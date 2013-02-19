@@ -44,8 +44,7 @@
                 fix_nesting : true,
                 cleanup_on_startup : true,
                 gecko_spellcheck : true,
-                forced_root_block: false,
-                 forced_root_block : 'p'
+                forced_root_block: false
                 // plugins: "paste",
                 // theme_advanced_buttons1_add : "pastetext,pasteword,selectall",
                 // paste_create_paragraphs: false,
