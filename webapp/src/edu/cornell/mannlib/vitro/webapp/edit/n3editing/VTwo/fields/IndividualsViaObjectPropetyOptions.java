@@ -66,16 +66,29 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
         
         Individual subject = wDaoFact.getIndividualDao().getIndividualByURI(subjectUri);                    
         ObjectProperty objProp = wDaoFact.getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
-        List<VClass> vclasses = wDaoFact.getVClassDao().getVClassesForProperty(subject.getVClassURI(), predicateUri);
+        //get all vclasses applicable to the individual subject
+        List<VClass> subjectVClasses = subject.getVClasses();
+        //using hashset to prevent duplicates
+        HashSet<String> vclassesURIs = new HashSet<String>();
+        //Get the range vclasses applicable for the property and each vclass for the subject
+        for(VClass subjectVClass: subjectVClasses) {
+        	List<VClass> vclasses = wDaoFact.getVClassDao().getVClassesForProperty(subjectVClass.getURI(), predicateUri);
+        	//add range vclass to hash
+        	if(vclasses != null) {
+        		for(VClass v: vclasses) {
+        			vclassesURIs.add(v.getURI());
+        		}
+        	}
+        }
                 
-        if (vclasses == null || vclasses.size() == 0) {           
+        if (vclassesURIs.size() == 0) {           
             return optionsMap;
         }
         
         List<Individual> individuals = new ArrayList<Individual>();
         HashSet<String> uriSet = new HashSet<String>();        
-        for (VClass vclass : vclasses) {
-            List<Individual> inds = wDaoFact.getIndividualDao().getIndividualsByVClassURI(vclass.getURI(), -1, -1);
+        for (String vclassURI: vclassesURIs) {
+            List<Individual> inds = wDaoFact.getIndividualDao().getIndividualsByVClassURI(vclassURI, -1, -1);
             for (Individual ind : inds) {
                 if (!uriSet.contains(ind.getURI())) {
                     uriSet.add(ind.getURI());
@@ -88,7 +101,7 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
 
         individuals = removeIndividualsAlreadyInRange(
                 individuals, stmts, predicateUri, objectUri);
-        // Collections.sort(individuals,new compareIndividualsByName());
+        // Collections.sort(individuals,new compareIndividualsByName());a
 
         for (Individual ind : individuals) {
             String uri = ind.getURI();

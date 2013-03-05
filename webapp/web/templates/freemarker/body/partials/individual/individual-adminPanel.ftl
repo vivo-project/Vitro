@@ -6,7 +6,7 @@
 
 <#if individual.showAdminPanel>
     <section id="admin">
-        <h3>Admin Panel</h3><a class="edit-individual" href="${individual.controlPanelUrl()}" title="edit this individual">Edit this individual</a>
+        <h3 id="adminPanel">Admin Panel</h3><a class="edit-individual" href="${individual.controlPanelUrl()}" title="edit this individual">Edit this individual</a>
         
         <section id = "verbose-mode">
         <#if verbosePropertySwitch?has_content>

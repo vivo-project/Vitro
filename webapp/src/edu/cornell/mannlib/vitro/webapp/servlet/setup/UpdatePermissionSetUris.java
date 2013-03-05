@@ -182,10 +182,10 @@ public class UpdatePermissionSetUris implements ServletContextListener {
 
 		Journal(ServletContext ctx) throws IOException {
 			String homeDirectoryPath = ConfigurationProperties.getBean(ctx)
-					.getProperty("vitro.home.directory");
+					.getProperty("vitro.home");
 			if (homeDirectoryPath == null) {
 				throw new IllegalStateException(
-						"No value found for vitro.home.directory");
+						"No value found for vitro.home");
 			}
 			File homeDirectory = new File(homeDirectoryPath);
 			confirmIsDirectory(homeDirectory);

@@ -253,7 +253,7 @@
      
   <!-- ****************************  End Vitro Fields *************************** -->
   <!-- ****************************  Dynamic Fields *************************** -->
-  <dynamicField name="*_string" type="string" indexed="true" stored="true" />
+  <dynamicField name="*_string" type="string" indexed="true" stored="true" multiValued="true"/>
    <!-- ****************************  End Dynamic Fields *************************** -->
   
    

@@ -80,7 +80,7 @@ public class ContextNodeFields implements DocumentModifier{
      * @return StringBuffer with text values to add to ALLTEXT field of solr Document.
      */
     protected StringBuffer executeQueryForValues( Individual individual, Collection<String> queries){
-        /* execute all the queries on the list and concat the values to add to all text */        
+    	  /* execute all the queries on the list and concat the values to add to all text */        
     	RDFService rdfService = rdfServiceFactory.getRDFService();
         StringBuffer allValues = new StringBuffer("");                
 
@@ -95,7 +95,7 @@ public class ContextNodeFields implements DocumentModifier{
             	ResultSet results = RDFServiceUtils.sparqlSelectQuery(subInUriQuery, rdfService);               
             	while(results.hasNext()){                                                                               
                     valuesForQuery.append( 
-                            getTextForRow( results.nextSolution() ) ) ; 
+                            getTextForRow( results.nextSolution(), true ) ) ; 
             	}
             	
             }catch(Throwable t){
@@ -111,10 +111,10 @@ public class ContextNodeFields implements DocumentModifier{
         }
         
         rdfService.close();
-        return allValues;        
+        return allValues;    
     }       
     
-    protected String getTextForRow( QuerySolution row){
+    protected String getTextForRow( QuerySolution row, boolean addSpace){
         if( row == null )
             return "";
 
@@ -124,14 +124,17 @@ public class ContextNodeFields implements DocumentModifier{
             String name = iter.next();
             RDFNode node = row.get( name );
             if( node != null ){
-                text.append(" ").append( node.toString() );
+            	if(addSpace) {
+            		text.append(" ").append( node.toString() );
+            	} else {
+            		text.append(node.toString());
+            	}
             }else{
                 log.debug(name + " is null");
             }                        
         }        
         return text.toString();
     }
-    
     
     public void shutdown(){
         shutdown=true;  

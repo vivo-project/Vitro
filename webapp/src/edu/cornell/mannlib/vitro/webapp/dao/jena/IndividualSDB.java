@@ -848,14 +848,19 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     		String getTypes = 
         		"CONSTRUCT{ <" + this.individualURI + "> <" + RDF.type +
         		        "> ?types }\n" +
-        		"WHERE{ GRAPH ?g"   
+        		"WHERE{ { GRAPH ?g"   
         		+ " { <" + this.individualURI +"> <" +RDF.type+ "> ?types } \n" 
    		        + WebappDaoFactorySDB.getFilterBlock(
    		        		graphVars, (direct 
    		        				? WebappDaoFactorySDB.SDBDatasetMode
    		        						.ASSERTIONS_ONLY 
    		        			    : datasetMode)) 
-        		+ "} \n";
+        		+ "} \n" 
+        		// GRAPH-less pattern to support retrieving inferred types
+        		// from the unnamed base graph, as in Sesame and OWLIM
+    		    + ((datasetMode.equals(WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY)) 
+    		      ? "" : "UNION { <" + this.individualURI +"> <" +RDF.type+ "> ?types }" ) 
+    		    + "} \n";
     		RDFService service = webappDaoFactory.getRDFService();	
         	try {
         	    tempModel = RDFServiceUtils.parseModel(

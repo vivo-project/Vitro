@@ -8,6 +8,7 @@
 
     <nav role="navigation">
         <ul id="header-nav" role="list">
+            <#include "languageSelector.ftl">
             <#if user.loggedIn>
                 <li role="listitem">${user.loginName}</li>
                 <li role="listitem"><a href="${urls.logout}" title="End your session">Log out</a></li>

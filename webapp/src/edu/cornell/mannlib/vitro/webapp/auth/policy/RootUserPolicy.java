@@ -120,7 +120,7 @@ public class RootUserPolicy implements PolicyIface {
 					PROPERTY_ROOT_USER_EMAIL);
 			if (email == null) {
 				throw new IllegalStateException(
-						"deploy.properties must contain a value for '"
+						"runtime.properties must contain a value for '"
 								+ PROPERTY_ROOT_USER_EMAIL + "'");
 			} else {
 				return email;
@@ -177,7 +177,7 @@ public class RootUserPolicy implements PolicyIface {
 
 		private void complainAboutMultipleRootUsers() {
 			for (String other : otherRootUsers) {
-				ss.warning(this, "deploy.properties specifies '"
+				ss.warning(this, "runtime.properties specifies '"
 						+ configuredRootUser + "' as the value for '"
 						+ PROPERTY_ROOT_USER_EMAIL
 						+ "', but the system also contains this root user: "
@@ -189,7 +189,7 @@ public class RootUserPolicy implements PolicyIface {
 
 		private void complainAboutWrongRootUsers() {
 			for (String other : otherRootUsers) {
-				ss.warning(this, "deploy.properties specifies '"
+				ss.warning(this, "runtime.properties specifies '"
 						+ configuredRootUser + "' as the value for '"
 						+ PROPERTY_ROOT_USER_EMAIL
 						+ "', but the system contains this root user instead: "

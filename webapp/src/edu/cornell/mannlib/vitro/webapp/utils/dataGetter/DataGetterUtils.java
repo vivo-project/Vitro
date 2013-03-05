@@ -59,39 +59,58 @@ public class DataGetterUtils {
      * This should not return PageDataGetters and should not throw an 
      * exception if a page has PageDataGetters.  
      */
-    public static List<DataGetter> getDataGettersForPage( VitroRequest vreq, Model displayModel, String pageURI) 
-    throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException{
-        //get data getter uris for pageURI
-        List<String> dgUris = getDataGetterURIsForPageURI( displayModel, pageURI);
-        
-        List<DataGetter> dgList = new ArrayList<DataGetter>();
-        for( String dgURI: dgUris){
-            DataGetter dg =dataGetterForURI(vreq, displayModel, dgURI) ;
-            if( dg != null )
-                dgList.add(dg); 
-        }
-        log.debug("getDataGettersForPage: " + dgList);
-        return dgList;
-    }
+	public static List<DataGetter> getDataGettersForPage(VitroRequest vreq, Model displayModel, String pageURI) 
+			throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
+		List<String> dgUris = getDataGetterURIsForAssociatedURI(displayModel, pageURI);
+		List<DataGetter> dgList = dataGettersForURIs(vreq, displayModel, dgUris);
+		log.debug("getDataGettersForPage: " + dgList);
+		return dgList;
+	}
     
     /**
-     * Get a list of DataGetter objects that are associated with a JAVA class.
+     * Get a list of DataGetter objects that are associated with a Vitro VClass.
      * This allows the individual profile for an individual of a specific class to be returned .  
      */
     public static List<DataGetter> getDataGettersForClass( VitroRequest vreq, Model displayModel, String classURI) 
-    	    throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException{
-    	        //get data getter uris for pageURI
-    	        List<String> dgUris = getDataGetterURIsForClassURI( displayModel, classURI);
-    	        
-    	        List<DataGetter> dgList = new ArrayList<DataGetter>();
-    	        for( String dgURI: dgUris){
-    	            DataGetter dg =dataGetterForURI(vreq, displayModel, dgURI) ;
-    	            if( dg != null )
-    	                dgList.add(dg); 
-    	        }
-    	        log.debug("getDataGettersForClass: " + dgList);
-    	        return dgList;
-    	    }
+            throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException{
+        List<String> dgUris = getDataGetterURIsForAssociatedURI( displayModel, classURI);
+        List<DataGetter> dgList = dataGettersForURIs(vreq, displayModel, dgUris);
+        log.debug("getDataGettersForClass: " + dgList);
+        return dgList;
+    }
+
+    /**
+     * Get a list of DataGetter objects that are associated with a Freemarker template.
+     * @param templateName a filename like "index.ftl", which will be used as a URI like "freemarker:index.ftl".
+     */
+    public static List<DataGetter> getDataGettersForTemplate( VitroRequest vreq, Model displayModel, String templateName) 
+    		throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException{
+    	String templateUri = "freemarker:" + templateName;
+    	List<String> dgUris = getDataGetterURIsForAssociatedURI( displayModel, templateUri);
+    	List<DataGetter> dgList = dataGettersForURIs(vreq, displayModel, dgUris);
+    	log.debug("getDataGettersForTemplate '" + templateName + "': " + dgList);
+    	return dgList;
+    }
+    
+	/**
+	 * Return a list of DataGetters from the list of URIs. Each DataGetter will be configured from information
+	 * in the displayModel.
+	 * 
+	 * Problems instantiating and configuring a particular DataGetter may result in an exception,
+	 * or may just mean that there will be no entry in the result for that URI.
+	 * 
+	 * May return an empty list, but will not return null.
+	 */
+	private static List<DataGetter> dataGettersForURIs(VitroRequest vreq, Model displayModel, List<String> dgUris)
+			throws InstantiationException, IllegalAccessException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException {
+		List<DataGetter> dgList = new ArrayList<DataGetter>();
+		for( String dgURI: dgUris){
+		    DataGetter dg =dataGetterForURI(vreq, displayModel, dgURI) ;
+		    if( dg != null )
+		        dgList.add(dg); 
+		}
+		return dgList;
+	}
 
     /**
      * Returns a DataGetter using information in the 
@@ -103,7 +122,7 @@ public class DataGetterUtils {
      * that does not implement the DataGetter interface.
      */
     public static DataGetter dataGetterForURI(VitroRequest vreq, Model displayModel, String dataGetterURI) 
-    throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, InvocationTargetException, SecurityException, NoSuchMethodException 
+    throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, InvocationTargetException, SecurityException 
     {
         //get java class for dataGetterURI
         String dgClassName = getJClassForDataGetterURI(displayModel, dataGetterURI);
@@ -180,18 +199,18 @@ public class DataGetterUtils {
     }
     
     
-    private static List<String> getDataGetterURIsForPageURI(Model displayModel, String pageURI) {
+    private static List<String> getDataGetterURIsForAssociatedURI(Model displayModel, String associatedURI) {
         String query = prefixes + 
-             "SELECT ?dataGetter WHERE { ?pageURI display:hasDataGetter ?dataGetter. }";
-        Query dgForPageQuery = QueryFactory.create(query);
+             "SELECT ?dataGetter WHERE { ?associatedURI display:hasDataGetter ?dataGetter }";
+        Query dgForUriQuery = QueryFactory.create(query);
         
         QuerySolutionMap initialBindings = new QuerySolutionMap();
-        initialBindings.add("pageURI", ResourceFactory.createResource( pageURI ));
+        initialBindings.add("associatedURI", ResourceFactory.createResource( associatedURI ));
         
         List<String> dgURIs = new ArrayList<String>();
         displayModel.enterCriticalSection(false);
         try{
-            QueryExecution qexec = QueryExecutionFactory.create(dgForPageQuery,displayModel,initialBindings );
+            QueryExecution qexec = QueryExecutionFactory.create(dgForUriQuery,displayModel,initialBindings );
             try{                                                    
                 ResultSet results = qexec.execSelect();                
                 while (results.hasNext()) {
@@ -204,35 +223,7 @@ public class DataGetterUtils {
             }finally{ qexec.close(); }
         }finally{ displayModel.leaveCriticalSection(); }
                 
-        return dgURIs;
-    }
-    
-    //Get data getters for a specific JAVA class - associates data getters with individuals for a specific JAVA class
-    private static List<String> getDataGetterURIsForClassURI(Model displayModel, String classURI) {
-    	//Class URI will be substituted in so this is for a specific class uri
-        String query = prefixes + 
-             "SELECT ?dataGetter WHERE { ?classURI display:hasDataGetter ?dataGetter }";
-        Query dgForPageQuery = QueryFactory.create(query);
-        
-        QuerySolutionMap initialBindings = new QuerySolutionMap();
-        initialBindings.add("classURI", ResourceFactory.createResource( classURI ));
-        
-        List<String> dgURIs = new ArrayList<String>();
-        displayModel.enterCriticalSection(false);
-        try{
-            QueryExecution qexec = QueryExecutionFactory.create(dgForPageQuery,displayModel,initialBindings );
-            try{                                                    
-                ResultSet results = qexec.execSelect();                
-                while (results.hasNext()) {
-                    QuerySolution soln = results.nextSolution();
-                    Resource dg = soln.getResource("dataGetter");
-                    if( dg != null && dg.getURI() != null){
-                        dgURIs.add( dg.getURI());
-                    }
-                }
-            }finally{ qexec.close(); }
-        }finally{ displayModel.leaveCriticalSection(); }
-                
+		log.debug("Found " + dgURIs.size() +" DataGetter URIs for '" + associatedURI + "': " + dgURIs);
         return dgURIs;
     }
     

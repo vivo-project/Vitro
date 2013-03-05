@@ -20,8 +20,8 @@ import org.apache.commons.logging.LogFactory;
  * are attached to the servlet context.
  * 
  * The customary behavior is for ConfigurationPropertiesSetup to create a
- * ConfigurationPropertiesImpl, which will parse the deploy.properties file for
- * these properties.
+ * ConfigurationPropertiesImpl, which will obtain the properties from the
+ * build.properties file and the runtime.properties file.
  */
 public abstract class ConfigurationProperties {
 	private static final Log log = LogFactory

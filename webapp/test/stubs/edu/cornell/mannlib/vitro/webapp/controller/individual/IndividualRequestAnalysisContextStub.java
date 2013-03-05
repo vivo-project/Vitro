@@ -21,7 +21,6 @@ public class IndividualRequestAnalysisContextStub implements
 	private final String defaultNamespace;
 	private final Map<String, Individual> individualsByUri = new HashMap<String, Individual>();
 	private final Map<String, Individual> profilePages = new HashMap<String, Individual>();
-	private final Map<String, String> namespacesByPrefix = new HashMap<String, String>();
 	private final Map<String, String> aliasUrlsByIndividual = new HashMap<String, String>();
 
 	public IndividualRequestAnalysisContextStub(String defaultNamespace) {
@@ -36,10 +35,6 @@ public class IndividualRequestAnalysisContextStub implements
 		profilePages.put(netId, individual);
 	}
 
-	public void setNamespacePrefix(String prefix, String namespace) {
-		namespacesByPrefix.put(prefix, namespace);
-	}
-
 	public void setAliasUrl(String individualUri, String aliasUrl) {
 		aliasUrlsByIndividual.put(individualUri, aliasUrl);
 	}
@@ -51,15 +46,6 @@ public class IndividualRequestAnalysisContextStub implements
 	@Override
 	public String getDefaultNamespace() {
 		return defaultNamespace;
-	}
-
-	@Override
-	public String getNamespaceForPrefix(String prefix) {
-		if (prefix == null) {
-			return "";
-		}
-		String namespace = namespacesByPrefix.get(prefix);
-		return (namespace == null) ? "" : namespace;
 	}
 
 	@Override

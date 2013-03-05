@@ -32,7 +32,7 @@
 /* <------ INDIVIDUAL INTRO FOR ANY CLASS*/
 #individual-intro {
     margin-top: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 0;
     position: relative;
     overflow: hidden;
 }
@@ -63,7 +63,7 @@ img#uriIcon {
     width: 166px;
     float: left;
     padding-right: 1.5em;
-    margin-bottom: 20px;
+    margin-bottom: 0;
 }
 #share-contact h3 {
     margin-top: 15px;
@@ -89,7 +89,7 @@ img.individual-photo {
 h2#mainImage, #share-contact h2 {
     font-size: 1em;
     line-height: 1em;
-    padding-bottom: 0.3em
+    padding-bottom: 0.6em
 }
 #photo-wrapper {
     position: relative;

@@ -33,9 +33,6 @@ import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 public class OntologyController extends VitroHttpServlet{
     private static final Log log = LogFactory.getLog(OntologyController.class.getName());
     
-    private String default_jsp      = Controllers.BASIC_JSP;
-    private ApplicationBean appBean;
-    
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 	throws ServletException,IOException{
 		doGet(request, response);
@@ -242,7 +239,7 @@ public class OntologyController extends VitroHttpServlet{
     throws IOException, ServletException {
         VitroRequest vreq = new VitroRequest(req);
         
-        ApplicationBean appBean = ApplicationBean.getAppBean(getServletContext());
+        ApplicationBean appBean = vreq.getAppBean();
 
         //set title before we do the highlighting so we don't get markup in it.
         req.setAttribute("title","not found");

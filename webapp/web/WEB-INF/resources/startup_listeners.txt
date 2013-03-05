@@ -55,6 +55,9 @@ edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewServiceSetup
 
 edu.ucsf.vitro.opensocial.OpenSocialSmokeTests
 
+# For multiple language support
+edu.cornell.mannlib.vitro.webapp.i18n.selection.LocaleSelectionSetup
+
 # The Solr index uses a "public" permission, so the PropertyRestrictionPolicyHelper 
 #   and the PermissionRegistry must already be set up.
 edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup

@@ -38,7 +38,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -82,19 +81,10 @@ public class VitroRequestPrep implements Filter {
     };
 
     private ServletContext _context;
-    private ApplicationBean _appbean;    
     
     @Override
 	public void init(FilterConfig filterConfig) throws ServletException {
         _context = filterConfig.getServletContext();
-        
-        Object o =  _context.getAttribute("applicationBean");
-        if (o instanceof ApplicationBean) {
-            _appbean = (ApplicationBean) o; 
-        } else {
-            _appbean = new ApplicationBean();
-        }
-        log.debug("VitroRequestPrep: AppBean theme " + _appbean.getThemeDir());
     }    
     
     @Override
@@ -131,9 +121,6 @@ public class VitroRequestPrep implements Filter {
         }
         
         VitroRequest vreq = new VitroRequest(req);
-        
-        //-- setup appBean --//
-        vreq.setAppBean(_appbean);
         
         //-- setup DAO factory --//
         WebappDaoFactory wdf = getWebappDaoFactory(vreq);

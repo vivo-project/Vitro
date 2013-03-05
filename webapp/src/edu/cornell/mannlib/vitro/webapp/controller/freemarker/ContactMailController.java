@@ -50,7 +50,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
     private final static String TEMPLATE_ERROR = "contactForm-error.ftl";
     private final static String TEMPLATE_FORM = "contactForm-form.ftl";
     
-	private static final String PROPERTY_VITRO_HOME_DIR = "vitro.home.directory";
+	private static final String PROPERTY_VITRO_HOME_DIR = "vitro.home";
 	private static final String EMAIL_JOURNAL_FILE_DIR = "emailJournal";
 	private static final String EMAIL_JOURNAL_FILE_NAME = "contactFormEmails.html";
     

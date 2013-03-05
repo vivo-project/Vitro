@@ -6,10 +6,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,8 +21,12 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
+import edu.cornell.mannlib.vitro.webapp.i18n.freemarker.I18nMethodModel;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
 import edu.cornell.mannlib.vitro.webapp.web.directives.IndividualShortViewDirective;
 import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualLocalNameMethod;
 import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualPlaceholderImageUrlMethod;
@@ -27,30 +35,38 @@ import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
+import freemarker.core.Environment;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
+import freemarker.template.ObjectWrapper;
+import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModelException;
+import freemarker.template.utility.DeepUnwrap;
 
 public class FreemarkerConfiguration extends Configuration {
 
     private static final Log log = LogFactory.getLog(FreemarkerConfiguration.class);
 
-    private final String themeDir;
+	private static final String PROPERTY_DEVELOPER_DEFEAT_CACHE = "developer.defeatFreemarkerCache";
+	private static final String PROPERTY_DEVELOPER_INSERT_DELIMITERS = "developer.insertFreemarkerDelimiters";
+
+	private final String themeDir;
     private final ServletContext context;
     private final ApplicationBean appBean;
+	private final ConfigurationProperties props;
     
     FreemarkerConfiguration(String themeDir, ApplicationBean appBean, ServletContext context) {
         
         this.themeDir = themeDir;
         this.context = context;
         this.appBean = appBean;
-        
-        String buildEnv = ConfigurationProperties.getBean(context).getProperty("Environment.build");
-        log.debug("Current build environment: " + buildEnv);
-        if ("development".equals(buildEnv)) { // Set Environment.build = development in deploy.properties
-            log.debug("Disabling Freemarker template caching in development build.");
+		this.props = ConfigurationProperties.getBean(context);
+
+		String flag = props.getProperty(PROPERTY_DEVELOPER_DEFEAT_CACHE, "false");
+		if (Boolean.valueOf(flag.trim())) {
+			log.debug("Disabling Freemarker template caching in development build.");
             setTemplateUpdateDelay(0); // no template caching in development 
         } else {
             int delay = 60;
@@ -164,6 +180,7 @@ public class FreemarkerConfiguration extends Configuration {
         map.put("profileUrl", new IndividualProfileUrlMethod());
         map.put("localName", new IndividualLocalNameMethod());
         map.put("placeholderImageUrl", new IndividualPlaceholderImageUrlMethod());
+        map.put("i18n", new I18nMethodModel());
         return map;
     }
     
@@ -196,7 +213,110 @@ public class FreemarkerConfiguration extends Configuration {
             log.error("Error creating template loaders");
         }
         
-        return mtl;        
+		// Add the ability to add delimiters to the templates, based on
+		// settings.
+		if (Boolean.valueOf(props.getProperty(PROPERTY_DEVELOPER_INSERT_DELIMITERS))) {
+			return new DelimitingTemplateLoader(mtl);
+		} else {
+			return mtl;
+		}
     }
+
+	/**
+	 * Override getTemplate(), so we can apply DataGetters to all included
+	 * templates.
+	 * 
+	 * This won't work for top-level Templates, since the Environment hasn't
+	 * been created yet. When TemplateProcessingHelper creates the Environment,
+	 * it must call retrieveAndRunDataGetters() for the top-level Template.
+	 */
+	@Override
+	public Template getTemplate(String name, Locale locale, String encoding,
+			boolean parse) throws IOException {
+		Template template = super.getTemplate(name, locale, encoding, parse);
+		
+		if (template == null) {
+			log.debug("Template '" + name + "' not found for locale '" + locale + "'.");
+			return template;
+		}
+		
+		Environment env = getEnvironment();
+		if (env == null) {
+			log.debug("Not fetching data getters for template '" + template.getName() + "'. No environment.");
+			return template;
+		}
+		
+		retrieveAndRunDataGetters(env, template.getName());
+		return template;
+	}
+
+
+	/**
+	 * Find the DataGetters for this template, and apply them to the Freemarker
+	 * environment.
+	 */
+	public static void retrieveAndRunDataGetters(Environment env, String templateName) {
+		HttpServletRequest req = (HttpServletRequest) env.getCustomAttribute("request");
+		VitroRequest vreq = new VitroRequest(req);
+		
+		if (dataGettersAlreadyApplied(env, templateName)) {
+			log.debug("DataGetters for '" +	templateName+"' have already been applied");
+			return;
+		}
+
+		try {
+			List<DataGetter> dgList = DataGetterUtils.getDataGettersForTemplate(
+					vreq, vreq.getDisplayModel(), templateName);
+			log.debug("Retrieved " + dgList.size() + " data getters for template '" + templateName + "'");
+
+			@SuppressWarnings("unchecked")
+			Map<String, Object> dataMap = (Map<String, Object>) DeepUnwrap.permissiveUnwrap(env.getDataModel());
+			for (DataGetter dg : dgList) {
+				applyDataGetter(dg, env, dataMap);
+			}
+		} catch (Exception e) {
+			log.warn(e, e);
+		}
+	}
+
+	/**
+	 * Have the DataGetters for this template already been applied to this environment? 
+	 * If not, record that they are being applied now.
+	 */
+	@SuppressWarnings("unchecked")
+	private static boolean dataGettersAlreadyApplied(Environment env, String templateName) {
+		Set<String> names;
+		Object o = env.getCustomAttribute("dataGettersApplied");
+		if (o instanceof Set) {
+			names = (Set<String>) o;
+		} else {
+			names = new HashSet<String>();
+		}
+		
+		boolean added = names.add(templateName);
+		if (added) {
+			env.setCustomAttribute("dataGettersApplied", names);
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	/**
+	 * Get the data from a DataGetter, and store it in global variables in the
+	 * Freemarker environment.
+	 */
+	private static void applyDataGetter(DataGetter dg, Environment env,
+			Map<String, Object> dataMap) throws TemplateModelException {
+		Map<String, Object> moreData = dg.getData(dataMap);
+		ObjectWrapper wrapper = env.getObjectWrapper();
+		if (moreData != null) {
+			for (String key : moreData.keySet()) {
+				Object value = moreData.get(key);
+				env.setGlobalVariable(key, wrapper.wrap(value));
+				log.debug("Stored in environment: '" + key + "' = '" + value + "'");
+			}
+		}
+	}
 
 }

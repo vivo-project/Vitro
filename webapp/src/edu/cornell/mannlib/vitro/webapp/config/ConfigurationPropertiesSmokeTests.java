@@ -32,7 +32,7 @@ public class ConfigurationPropertiesSmokeTests implements
 	private static final Log log = LogFactory
 			.getLog(ConfigurationPropertiesSmokeTests.class);
 
-	private static final String PROPERTY_HOME_DIRECTORY = "vitro.home.directory";
+	private static final String PROPERTY_HOME_DIRECTORY = "vitro.home";
 	private static final String PROPERTY_DB_URL = "VitroConnection.DataSource.url";
 	private static final String PROPERTY_DB_USERNAME = "VitroConnection.DataSource.username";
 	private static final String PROPERTY_DB_PASSWORD = "VitroConnection.DataSource.password";
@@ -61,7 +61,7 @@ public class ConfigurationPropertiesSmokeTests implements
 			ConfigurationProperties props, StartupStatus ss) {
 		String homeDirectoryPath = props.getProperty(PROPERTY_HOME_DIRECTORY);
 		if (homeDirectoryPath == null || homeDirectoryPath.isEmpty()) {
-			ss.fatal(this, "deploy.properties does not contain a value for '"
+			ss.fatal(this, "Can't find a value for the home directory: '"
 					+ PROPERTY_HOME_DIRECTORY + "'");
 			return;
 		}
@@ -97,19 +97,19 @@ public class ConfigurationPropertiesSmokeTests implements
 			ConfigurationProperties props, StartupStatus ss) {
 		String url = props.getProperty(PROPERTY_DB_URL);
 		if (url == null || url.isEmpty()) {
-			ss.fatal(this, "deploy.properties does not contain a value for '"
+			ss.fatal(this, "runtime.properties does not contain a value for '"
 					+ PROPERTY_DB_URL + "'");
 			return;
 		}
 		String username = props.getProperty(PROPERTY_DB_USERNAME);
 		if (username == null || username.isEmpty()) {
-			ss.fatal(this, "deploy.properties does not contain a value for '"
+			ss.fatal(this, "runtime.properties does not contain a value for '"
 					+ PROPERTY_DB_USERNAME + "'");
 			return;
 		}
 		String password = props.getProperty(PROPERTY_DB_PASSWORD);
 		if (password == null || password.isEmpty()) {
-			ss.fatal(this, "deploy.properties does not contain a value for '"
+			ss.fatal(this, "runtime.properties does not contain a value for '"
 					+ PROPERTY_DB_PASSWORD + "'");
 			return;
 		}
@@ -259,7 +259,7 @@ public class ConfigurationPropertiesSmokeTests implements
 			ConfigurationProperties props, StartupStatus ss) {
 		String ns = props.getProperty(PROPERTY_DEFAULT_NAMESPACE);
 		if (ns == null || ns.isEmpty()) {
-			ss.fatal(this, "deploy.properties does not contain a value for '"
+			ss.fatal(this, "runtime.properties does not contain a value for '"
 					+ PROPERTY_DEFAULT_NAMESPACE + "'");
 			return;
 		}

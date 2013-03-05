@@ -82,6 +82,7 @@ class IndividualResponseBuilder {
 		body.put("relatedSubject", getRelatedSubject());
 		body.put("namespaces", namespaces);
 		body.put("temporalVisualizationEnabled", getTemporalVisualizationFlag());
+		body.put("profilePageTypesEnabled", getprofilePageTypesFlag());
 		body.put("verbosePropertySwitch", getVerbosePropertyValues());
 		
 		//Execute data getters that might apply to this individual, e.g. because of the class of the individual
@@ -91,6 +92,13 @@ class IndividualResponseBuilder {
 			log.error("Data retrieval for individual lead to error", ex);
 		}
 		
+		// for quick profile view - users can toggle between the quick and the full views, 
+		// so the "destination" let's us know which view they are targeting. On normal
+		// page request, this string is empty and the default template is loaded.
+        String targetedView = "";
+		targetedView = vreq.getParameter("destination");
+		body.put("targetedView", targetedView);
+
 		//Individual template model
 		IndividualTemplateModel itm = getIndividualTemplateModel(individual);
 		/* We need to expose non-getters in displaying the individual's property list, 
@@ -100,6 +108,7 @@ class IndividualResponseBuilder {
 		 */
 		// body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
 	    body.put("labelCount", getLabelCount(itm.getUri(), vreq));
+	    body.put("profileType", getProfileType(itm.getUri(), vreq));
 		body.put("individual", wrap(itm, new ReadOnlyBeansWrapper()));
 		
 		body.put("headContent", getRdfLinkTag(itm));	       
@@ -166,6 +175,12 @@ class IndividualResponseBuilder {
 	private boolean getTemporalVisualizationFlag() {
 		String property = ConfigurationProperties.getBean(vreq).getProperty(
 				"visualization.temporal");
+		return "enabled".equals(property);
+	}
+
+	private boolean getprofilePageTypesFlag() {
+		String property = ConfigurationProperties.getBean(vreq).getProperty(
+				"MultiViews.profilePageTypes");
 		return "enabled".equals(property);
 	}
 
@@ -274,5 +289,30 @@ class IndividualResponseBuilder {
             log.error(e, e);
         }    
         return theCount;
+    }
+
+    private static String PROFILE_TYPE_QUERY = ""
+        + "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> \n"
+        + "SELECT ?profile WHERE { \n"
+        + "    ?subject display:hasDefaultProfilePageType ?profile \n"
+        + "}" ;
+           
+    private static String getProfileType(String subjectUri, VitroRequest vreq) {
+        String queryStr = QueryUtils.subUriForQueryVar(PROFILE_TYPE_QUERY, "subject", subjectUri);
+        log.debug("queryStr = " + queryStr);
+        String profileType = "none";
+        try {
+            ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
+            if (results.hasNext()) {
+                QuerySolution soln = results.nextSolution();
+                String profileStr = soln.get("profile").toString();
+                if ( profileStr.length() > 0 ) {
+                    profileType = profileStr.substring(profileStr.indexOf("#")+1,profileStr.length());
+                }
+            }
+        } catch (Exception e) {
+            log.error(e, e);
+        }    
+        return profileType;
     }
 }

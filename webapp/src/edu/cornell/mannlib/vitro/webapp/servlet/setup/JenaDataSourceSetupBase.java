@@ -546,7 +546,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         if ((dns != null) && (!dns.isEmpty())) {
             return dns;
         } else {
-            throw new IllegalStateException("deploy.properties does not "
+            throw new IllegalStateException("runtime.properties does not "
                     + "contain a value for '" + VITRO_DEFAULT_NAMESPACE + "'");
         }
     }

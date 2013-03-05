@@ -16,6 +16,10 @@
 </#list>
 
 <script type="text/javascript">
+    var firstBrowseClass = $("ul#browse-classes li:first").find("a").attr("data-uri");
+    if ( !firstBrowseClass || firstBrowseClass.length == 0 ) {
+        firstBrowseClass = '${firstNonEmptyVClass}';
+    }
     var menupageData = {
         baseUrl: '${urls.base}',
         <#if internalClass?has_content>
@@ -23,9 +27,12 @@
         <#else>
             dataServiceUrl: '${dataServiceUrlIndividualsByVClass}',
         </#if>
-        defaultBrowseVClassUri: '${firstNonEmptyVClass}'
+        defaultBrowseVClassUri: firstBrowseClass //'${firstNonEmptyVClass}'
     };
 </script>
+
+
+
 
 <#-- Script to enable browsing individuals within a class -->
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/jquery.scrollTo-min.js"></script>',

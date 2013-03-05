@@ -31,9 +31,6 @@
         if (request.getAttribute("css") == null){
             e+="basicPage.jsp expects that request parameter 'css' be set to css to include in page.\n";            
         }         
-        if( request.getAttribute("appBean") == null){
-            e+="basicPage.jsp expects that request attribute 'appBean' be set.\n";          
-        }
         if( e.length() > 0 ){
             throw new JspException(e);
         }

@@ -30,40 +30,53 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
           target: properties                      
          - - - - - - - - - - - - - - - - - -->
 	<target name="properties">
-		<property name="deploy.properties.file" location="../webapp/config/deploy.properties" />
+		<property name="build.properties.file" location="../webapp/config/build.properties" />
 
-		<fail message="You must create a &quot;${deploy.properties.file}&quot; file.">
+		<fail message="You must create a &quot;${build.properties.file}&quot; file.">
 			<condition>
 				<not>
-					<available file="${deploy.properties.file}" />
+					<available file="${build.properties.file}" />
+				</not>
+			</condition>
+		</fail>
+		
+		<property file="${build.properties.file}" />
+
+		<fail unless="tomcat.home" message="${build.properties.file} must contain a value for tomcat.home" />
+		<fail unless="vitro.home" message="${build.properties.file} must contain a value for vitro.home" />
+
+		<property name="runtime.properties.file" location="${vitro.home}/runtime.properties" />
+
+		<fail message="The runtime properties file &quot;${runtime.properties.file}&quot; does not exist."> 
+			<condition>
+				<not>
+					<available file="${runtime.properties.file}" />
+				</not>
+			</condition>
+		</fail>
+		
+		<property file="${runtime.properties.file}" />
+
+		<fail unless="VitroConnection.DataSource.url" message="${runtime.properties.file} must contain a value for VitroConnection.DataSource.url" />
+		<fail unless="VitroConnection.DataSource.username" message="${runtime.properties.file} must contain a value for VitroConnection.DataSource.username" />
+		<fail unless="VitroConnection.DataSource.password" message="${runtime.properties.file} must contain a value for VitroConnection.DataSource.password" />
+		<fail unless="VitroConnection.DataSource.driver" message="${runtime.properties.file} must contain a value for VitroConnection.DataSource.driver" />
+		<fail unless="OpenSocial.shindigURL" message="${runtime.properties.file} must contain a value for OpenSocial.shindigURL" />
+		<fail unless="OpenSocial.tokenService" message="${runtime.properties.file} must contain a value for OpenSocial.tokenService" />
+		<fail unless="OpenSocial.tokenKeyFile" message="${runtime.properties.file} must contain a value for OpenSocial.tokenKeyFile" />
+
+		<fail message="The Vitro home directory &quot;${vitro.home}&quot; does not exist.">
+			<condition>
+				<not>
+					<available file="${vitro.home}" />
 				</not>
 			</condition>
 		</fail>
 
-		<property file="${deploy.properties.file}" />
-
-		<fail unless="tomcat.home" message="${deploy.properties.file} must contain a value for tomcat.home" />
-		<fail unless="vitro.home.directory" message="${deploy.properties.file} must contain a value for vitro.home.directory" />
-		<fail unless="VitroConnection.DataSource.url" message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.url" />
-		<fail unless="VitroConnection.DataSource.username" message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.username" />
-		<fail unless="VitroConnection.DataSource.password" message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.password" />
-		<fail unless="VitroConnection.DataSource.driver" message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.driver" />
-		<fail unless="OpenSocial.shindigURL" message="${deploy.properties.file} must contain a value for OpenSocial.shindigURL" />
-		<fail unless="OpenSocial.tokenService" message="${deploy.properties.file} must contain a value for OpenSocial.tokenService" />
-		<fail unless="OpenSocial.tokenKeyFile" message="${deploy.properties.file} must contain a value for OpenSocial.tokenKeyFile" />
-
-		<fail message="The vitro.home.directory &quot;${vitro.home.directory}&quot; does not exist.">
+		<fail message="The Vitro home directory &quot;${vitro.home}&quot; is not writable.">
 			<condition>
 				<not>
-					<available file="${vitro.home.directory}" />
-				</not>
-			</condition>
-		</fail>
-
-		<fail message="The vitro.home.directory &quot;${vitro.home.directory}&quot; is not writable.">
-			<condition>
-				<not>
-					<isfileselected file="${vitro.home.directory}">
+					<isfileselected file="${vitro.home}">
 						<writable />
 					</isfileselected>
 				</not>
@@ -83,7 +96,7 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 		<property name="build.shindig.dir" location="${build.dir}/shindig" />
 
 		<!-- deploy directories -->
-		<property name="shindig.home.dir" location="${vitro.home.directory}/shindig" />
+		<property name="shindig.home.dir" location="${vitro.home}/shindig" />
 		<property name="shindig.config.dir" location="${shindig.home.dir}/conf" />
 		<property name="tomcat.webapps.dir" location="${tomcat.home}/webapps" />
 
@@ -144,6 +157,5 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 		<copy file="${shindig.properties.modified.file}" tofile="${shindig.properties.deployed.file}" />
 		<copy file="${shindig.war.original.file}" tofile="${shindig.war.deployed.file}" overwrite="true" />
 	</target>
-
 
 </project>
