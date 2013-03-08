@@ -53,8 +53,8 @@ public class LanguageFilteringRDFServiceTest extends AbstractTestClass {
 
 	@Before
 	public void setup() {
-		setLoggerLevel(this.getClass(), Level.DEBUG);
-		setLoggerLevel(LanguageFilteringRDFService.class, Level.DEBUG);
+//		setLoggerLevel(this.getClass(), Level.DEBUG);
+//		setLoggerLevel(LanguageFilteringRDFService.class, Level.DEBUG);
 	}
 
 	// ----------------------------------------------------------------------
