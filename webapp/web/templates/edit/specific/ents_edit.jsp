@@ -3,10 +3,10 @@
 <% /* For now, not using XML syntax because the output XHTML is not indented */ %>
 <% /* <?xml version="1.0" encoding="UTF-8"?> */ %>
 <% /* <jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" 
-          xmlns:c="http://java.sun.com/jstl/core"
+          xmlns:c="http://java.sun.com/jsp/jstl/core"
           xmlns:form="http://vitro.mannlib.cornell.edu/edit/tags"
           version="2.0"> */ %> 
-<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://vitro.mannlib.cornell.edu/edit/tags" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
