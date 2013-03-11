@@ -116,6 +116,9 @@ public class JenaIngestController extends BaseEditController {
     private static final String RENAME_RESOURCE = "/jenaIngest/renameResource.jsp";
     private static final String RENAME_RESULT = "/jenaIngest/renameResult.jsp";
     private static final String CREATED_GRAPH_BASE_URI = "http://vitro.mannlib.cornell.edu/a/graph/";
+    public static final boolean MAIN_STORE_STATE = true;
+    public static final boolean AUXILIARY_STORE_STATE = false;
+    private static final String INGEST_STORE_ATTR = JenaIngestController.class.getName() + ".isUsingMainStoreForIngest";
 
     private static final Map<String, Model> attachedModels = new HashMap<String, Model>();
     
@@ -214,15 +217,30 @@ public class JenaIngestController extends BaseEditController {
         showModelList(vreq, maker, modelType);
     }
     
+    public static boolean isUsingMainStoreForIngest(VitroRequest vreq) {
+        Boolean storeState = (Boolean) vreq.getSession().getAttribute(INGEST_STORE_ATTR);
+        if (storeState == null) {
+            return MAIN_STORE_STATE;
+        } else {
+            return storeState;
+        }
+    }
+    
+    private void setUsingMainStoreForIngest(VitroRequest vreq, boolean storeState) {
+        vreq.getSession().setAttribute(INGEST_STORE_ATTR, storeState);
+    }
+    
     private void processRDBModelsRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
         ModelMaker vjmm = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
         vreq.getSession().setAttribute("vitroJenaModelMaker", vjmm);
+        setUsingMainStoreForIngest(vreq, AUXILIARY_STORE_STATE);
         showModelList(vreq, vjmm, "rdb");
     }
     
     private void processSDBModelsRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
         ModelMaker vsmm = (ModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
         vreq.getSession().setAttribute("vitroJenaModelMaker", vsmm);
+        setUsingMainStoreForIngest(vreq, MAIN_STORE_STATE);
         showModelList(vreq, vsmm, "sdb");
     }
     
