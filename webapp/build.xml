@@ -84,8 +84,13 @@
 	<target name="compileBuildtools">
 		<path id="utility.compile.classpath">
 			<fileset dir="${buildtools.lib.dir}" includes="*.jar" />
+			<fileset dir="${appbase.dir}/lib">
+				<include name="commons-io-2.0.1.jar" />
+				<include name="commons-lang-2.6.jar" />
+				<include name="servlet-api.jar" />
+			</fileset>
 		</path>
-	
+
 		<mkdir dir="${buildtools.compiled.dir}" />
 		<javac srcdir="${buildtools.source.dir}"
 		       destdir="${buildtools.compiled.dir}"
@@ -110,7 +115,7 @@
 	<target name="prepare">
 		<mkdir dir="${build.dir}" />
 	</target>
-	
+
 	<!-- - - - - - - - - - - - - - - - - - 
           target: prepareWebappDir                      
          - - - - - - - - - - - - - - - - - -->
@@ -160,7 +165,7 @@
 				<filename name="runtime.properties" />
 			</fileset>
 		</copy>
-		
+
 		<!-- copy any xml files from source tree to the war directory -->
 		<copy todir="${main.compiled.dir}">
 			<fileset dir="${appbase.dir}/src" includes="**/*.xml" />
@@ -210,7 +215,7 @@
 			<pathelement location="${main.compiled.dir}" />
 			<path refid="main.compile.classpath" />
 		</path>
-	
+
 		<mkdir dir="${unittests.compiled.dir}" />
 		<javac srcdir="${appbase.dir}/test" 
 		       destdir="${unittests.compiled.dir}" 
@@ -335,7 +340,7 @@
 			</fileset>
 		</copy>
 	</target>
-	
+
 	<!-- ================================= 
       target: deploy              
      ================================= -->
@@ -422,6 +427,21 @@ deploy     - Deploy the application directly into the Tomcat webapps directory.
 		<ant dir="${corebase.dir}/../opensocial" antfile="build_orng.xml" target="all" />
 	</target>
 
+	<!-- ================================= 
+          target: checkContainerNeutrality              
+         ================================= -->
+	<target name="checkContainerNeutrality" depends="compile, compileBuildtools" description="Look for things that Tomcat tolerates but shouldn't">
+		<junit haltonfailure="true">
+			<test name="edu.cornell.mannlib.vitro.utilities.containerneutral.CheckContainerNeutrality" />
+			<sysproperty key="CheckContainerNeutrality.webapp.dir" value="${main.webapp.dir}"/>
+			<classpath>
+				<path refid="utility.run.classpath" />
+				<path refid="main.compile.classpath" />
+				<pathelement location="${main.compiled.dir}" />
+			</classpath>
+			<formatter type="plain" usefile="false"/>
+		</junit>
+	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	     MACROS
@@ -463,4 +483,3 @@ deploy     - Deploy the application directly into the Tomcat webapps directory.
 	</macrodef>
 
 </project>
-		
