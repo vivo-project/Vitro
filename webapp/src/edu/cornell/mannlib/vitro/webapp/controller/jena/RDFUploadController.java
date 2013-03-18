@@ -53,9 +53,7 @@ public class RDFUploadController extends JenaIngestController {
     
     private static int maxFileSizeInBytes = 1024 * 1024 * 2000; //2000mb
     private static FileItem fileStream = null; 
-    private static final String INGEST_MENU_JSP = "/jenaIngest/ingestMenu.jsp";
     private static final String LOAD_RDF_DATA_JSP="/jenaIngest/loadRDFData.jsp";
-    private static final String LIST_MODELS_JSP = "/jenaIngest/listModels.jsp";
     
     public void doPost(HttpServletRequest rawRequest,
             HttpServletResponse response) throws ServletException, IOException {
@@ -244,9 +242,11 @@ public class RDFUploadController extends JenaIngestController {
         String languageStr = request.getParameter("language");
         ModelMaker maker = getVitroJenaModelMaker(request);
         
-        if (docLoc!=null && modelName != null) {
-            RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(
-                    getServletContext()).getRDFService();
+        if (modelName == null) {
+            request.setAttribute("title","Load RDF Data");
+            request.setAttribute("bodyJsp",LOAD_RDF_DATA_JSP);  
+        } else {          
+            RDFService rdfService = getRDFService(request, maker, modelName);
             try {
                 doLoadRDFData(modelName, docLoc, filePath, languageStr, rdfService);
             } finally {
@@ -254,10 +254,7 @@ public class RDFUploadController extends JenaIngestController {
             }
             String modelType = getModelType(request, maker);
             showModelList(request, maker, modelType);
-        } else {
-            request.setAttribute("title","Load RDF Data");
-            request.setAttribute("bodyJsp",LOAD_RDF_DATA_JSP);
-        }
+        } 
         
         RequestDispatcher rd = request.getRequestDispatcher(
                 Controllers.BASIC_JSP);      
@@ -270,6 +267,18 @@ public class RDFUploadController extends JenaIngestController {
             throw new ServletException(errMsg, e);
         }
         
+    }
+    
+    private RDFService getRDFService(VitroRequest vreq, ModelMaker maker, String modelName) {
+        if (JenaIngestController.isUsingMainStoreForIngest(vreq)) {
+            log.debug("Using main RDFService");
+            return RDFServiceUtils.getRDFServiceFactory(
+                    getServletContext()).getRDFService();
+        } else {
+            log.debug("Making RDFService for single model from ModelMaker");
+            Model m = maker.getModel(modelName);
+            return new RDFServiceModel(m);   
+        }
     }
     
     private long operateOnModel(WebappDaoFactory webappDaoFactory, 

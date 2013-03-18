@@ -1,6 +1,6 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isErrorPage="true" %>
 <%@ page import="com.oreilly.servlet.ServletUtils,edu.cornell.mannlib.vitro.webapp.web.*" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>

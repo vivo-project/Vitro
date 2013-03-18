@@ -2,7 +2,7 @@
 
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>

@@ -3,7 +3,7 @@
 <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
-          xmlns:c  ="http://java.sun.com/jstl/core"
+          xmlns:c  ="http://java.sun.com/jsp/jstl/core"
           xmlns:fn ="http://java.sun.com/jsp/jstl/functions">
 
 <div class="editingForm">

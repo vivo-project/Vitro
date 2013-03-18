@@ -5,7 +5,7 @@
 <%@ page import="java.util.Iterator"%>
 <%@ page import="java.net.URLEncoder"%>
 <%@ page import="java.util.List"%>
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
