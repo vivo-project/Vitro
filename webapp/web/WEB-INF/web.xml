@@ -1083,14 +1083,6 @@
     <servlet-name>logout</servlet-name>
     <url-pattern>/logout</url-pattern>
   </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>pubsbyorg</servlet-name>
-    <url-pattern>/pubsbyorg</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>coauthors</servlet-name>
-    <url-pattern>/coauthors</url-pattern>
-  </servlet-mapping>
 
   <!-- ==================== sparql query builder ==================== -->
   
