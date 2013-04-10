@@ -99,7 +99,7 @@
 		       encoding="UTF8"
 		       includeantruntime="false"
 		       optimize="false"
-		       source="1.6">
+		       source="1.7">
 			<classpath refid="utility.compile.classpath" />
 		</javac>
 
@@ -202,7 +202,7 @@
 		       encoding="UTF8" 
 		       includeantruntime="false" 
 		       optimize="true" 
-		       source="1.6">
+		       source="1.7">
 			<classpath refid="main.compile.classpath" />
 		</javac>
 	</target>
@@ -224,7 +224,7 @@
 		       encoding="UTF8" 
 		       includeantruntime="false" 
 		       optimize="false" 
-		       source="1.6">
+		       source="1.7">
 			<classpath refid="test.compile.classpath" />
 		</javac>
 
