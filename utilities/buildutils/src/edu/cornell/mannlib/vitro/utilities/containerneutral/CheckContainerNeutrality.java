@@ -8,8 +8,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.Filter;
 import javax.servlet.ServletContextListener;
@@ -90,6 +92,18 @@ import org.xml.sax.SAXException;
  * Check each <filter-class/> to insure that the class can be loaded and
  * instantiated and assigned to Filter.
  * 
+ * ------
+ * 
+ * A <servlet/> tag for every <servlet-mapping/> tag
+ * 
+ * I can't find a mention of this in the spec, but Tomcat complains and refuses
+ * to load the app if there is a <servlet-mapping/> tag whose <servlet-name/> is
+ * not matched by a <servlet-name/> in a <servlet/> tag.
+ * 
+ * Get sets of all <servlet-name/> tags that are specified in <servlet/> and
+ * <servlet-mapping/> tags. There should not be any names in the
+ * servlet-mappings that are not in the servlets.
+ * 
  * ---------------------------------------------------------------------
  * 
  * Although this class is executed as a JUnit test, it doesn't have the usual
@@ -101,7 +115,7 @@ import org.xml.sax.SAXException;
  * 
  * ---------------------------------------------------------------------
  * 
- * Since this is not executed as part of the standard Vitro unit tests, it also 
+ * Since this is not executed as part of the standard Vitro unit tests, it also
  * cannot use the standard logging mechanism. Log4J has not been initialized.
  * 
  */
@@ -166,6 +180,7 @@ public class CheckContainerNeutrality {
 		checkListenerClasses();
 		checkFilterClasses();
 		checkTaglibLocations();
+		checkServletNames();
 
 		if (!messages.isEmpty()) {
 			fail("Found these problems with '" + webXmlFile.getCanonicalPath()
@@ -231,6 +246,25 @@ public class CheckContainerNeutrality {
 			if (message != null) {
 				messages.add(message);
 			}
+		}
+	}
+
+	private void checkServletNames() {
+		Set<String> servletNames = new HashSet<String>();
+		for (Node n : findNodes("//j2ee:servlet/j2ee:servlet-name")) {
+			servletNames.add(n.getTextContent());
+		}
+
+		Set<String> servletMappingNames = new HashSet<String>();
+		for (Node n : findNodes("//j2ee:servlet-mapping/j2ee:servlet-name")) {
+			servletMappingNames.add(n.getTextContent());
+		}
+
+		servletMappingNames.removeAll(servletNames);
+		for (String name : servletMappingNames) {
+			messages.add("There is a <servlet-mapping> tag for <servlet-name>"
+					+ name + "</servlet-name>, but there is "
+					+ "no matching <servlet> tag.");
 		}
 	}
 
