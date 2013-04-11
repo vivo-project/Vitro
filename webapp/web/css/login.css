@@ -59,11 +59,21 @@ p.request-account {
     font-size: .8em;
 }
 h3.internal-auth {
-    margin-left: 38px;
-    color: #5F6464;
+    margin-left: 20px;
     font-size: 1em;
     margin-bottom: 0;
     padding-bottom: 0;
+    text-decoration: none;
+    cursor: hand; 
+    cursor: pointer; 
+    text-align: center;
+    line-height: 1.4em;
+}
+.vivoAccount {
+    display: none;
+}
+#vivoAccountError {
+    display: block;  
 }
 .formFieldAlert {
     border: 2px solid #900;

@@ -10,5 +10,10 @@ $(document).ready(function(){
     
     // fade in error alerts
     $('section#error-alert').css('display', 'none').fadeIn(1500); 
-
+    
+    // toggle vivo account authentication form
+    $('h3.internal-auth').click(function() {
+        $('.vivoAccount').toggle();
+    });
+    
 });
