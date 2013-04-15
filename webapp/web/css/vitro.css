@@ -247,3 +247,148 @@ p#mngLabelsText {
     margin-left:25px;
     margin-bottom:12px;
 }
+
+/* SEARCH HOME------>  */ 
+#search-home {
+		margin-top: 2em;
+}
+
+#search-home h3 {
+		padding-left: 24px;
+}
+#search-homepage {
+		position: relative;
+		padding-left: 24px;
+}
+#search-home-field {
+		width: 530px;
+		height: 44px;
+}
+#search-home-field input.search {
+	 	text-decoration: none;
+		font-size: 18px;
+		border: none;
+	  padding-left: 13px;
+	  padding-top: 8px;
+	  cursor: pointer;
+}
+span.search-filter-selected {
+		display: none;
+}
+input.search-homepage {
+		float: left;
+		height: 20px;
+		border: 0;
+		font-size: 18px;
+		margin-left: 4px;
+		margin-top: 2px;
+		margin-right: 40px;
+		margin-top: 2px;
+		width: 351px;
+		background-position: right;
+}
+a.filter-search {
+		position: absolute;
+		vertical-align: middle;
+		display: inline-block;
+		width: 39px;
+		height: 43px;
+		z-index: 9999; 
+		top: 0;
+		right: 135px;
+		z-index: 9999; 
+}
+.filter-default {
+
+}
+.filter-active {
+
+}
+#filter-search-nav {
+		position: absolute;
+		width: 184px;
+		top: 0;
+		right: 135px;
+		z-index: 9998; 
+		display: none;
+		list-style-type: none;
+}
+#filter-search-nav li {
+		padding-left: 0;
+		margin-left: 0;
+		list-style-type: none;
+		background-image: none;
+}
+#filter-search-nav {
+		z-index: 9998;
+}
+#filter-search-nav a.active {
+
+}
+#filter-search-nav a {
+		font-size: 17px;
+		display: block;
+		margin-left: 15px;
+		margin-right: 15px;
+		padding-top: 8px;
+		padding-bottom: 8px;
+		text-decoration: none;
+
+}
+
+/* HOME STATS----->  */
+#home-stats {
+		margin-top: 1em;
+		width: 921px;
+		height: 213px;
+		float: left;
+}
+#home-stats h4 {
+		margin-top: 0;
+		width: 64px;
+		height: 34px;
+		font-size: 18px;
+		text-align: center;
+		margin-left: 35px;
+		padding: 0;
+		line-height: 35px;	
+}
+#stats {
+		margin: 0 auto;
+		width: 875px;
+}
+#stats li {
+		float: left;
+		width: 108px;
+		height: 102px;
+		margin-top: 35px;
+		margin-right: 25px;
+}
+#stats p {
+
+}
+#stats li a {
+		text-decoration: none;
+}
+#stats li a:hover {
+
+}
+#stats li:first-child {
+		margin-left: 50px;
+}
+#stats .stats-count {
+		text-align: center;
+		font-size: 42px;
+		margin: 0;
+		padding-top: 30px;
+}
+#stats .stats-count span {
+		font-size: 18px;
+		padding-left: 2px;
+}
+#stats .stats-type {
+		font-size: 13px;
+		text-align: center;
+		margin: 0;
+		margin-top: 13px;
+}
