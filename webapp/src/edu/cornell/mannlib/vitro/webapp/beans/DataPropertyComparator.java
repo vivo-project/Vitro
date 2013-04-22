@@ -44,8 +44,8 @@ public class DataPropertyComparator implements Comparator<Individual> {
             }
             if (datatype == null) {
                 log.warn("Can't compare data property statements: no datatype specified.");
-                // Perhaps we should throw an error here, but for now we need it to return 0
-                return 0;
+                // Perhaps we should throw an error here, but for now we need it to set the datatype
+                datatype = XSD.xint.toString();
             }
             
             if (XSD.xint.toString().equals(datatype)) {
