@@ -43,8 +43,7 @@ public class SessionTimeoutLimitingFilter implements Filter {
 
 	/**
 	 * If this request has a trivial session object -- that is, the user is not
-	 * logged in and not self-editing -- then give it a short expiration
-	 * interval.
+	 * logged in -- then give it a short expiration interval.
 	 */
 	private void limitTrivialSession(ServletRequest servletRequest) {
 		if (!(servletRequest instanceof HttpServletRequest)) {
