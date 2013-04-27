@@ -1,0 +1,8 @@
+{2} {3}
+
+Congratulations!
+
+We have created your new {0} account associated with 
+{4}
+        
+Thanks!

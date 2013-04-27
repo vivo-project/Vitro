@@ -4,20 +4,19 @@
 
 <#import "userAccounts-accountsNav.ftl" as p>
 
+<#assign strings = i18n() />
+
 <form method="POST" action="${formUrls.add}" id="add-account" class="customForm" role="Add account">
-    <h3><span>User accounts | </span><input type="submit" class="submit add-account" value="Add new account" /></h3>
+    <h3><span>${strings.user_accounts_link} | </span><input type="submit" class="submit add-account" value="${strings.add_new_account}" /></h3>
 </form>
 
 <#if newUserAccount?? >
     <section class="account-feedback">
         <p>
-            A new account for 
-            <a href="${newUserAccount.editUrl}" title="new account">${newUserAccount.firstName} ${newUserAccount.lastName}</a>
-            was successfully created. 
-            <#if emailWasSent?? > 
-                A notification email has been sent to ${newUserAccount.emailAddress}
-                with instructions for activating the account and creating a password.
-            </#if>
+            ${strings.new_account_1}
+            <a href="${newUserAccount.editUrl}" title="${strings.new_account_title}">${newUserAccount.firstName} ${newUserAccount.lastName}</a>
+            ${strings.new_account_2}
+            <#if emailWasSent?? >${strings.new_account_notification(newUserAccount.emailAddress)}</#if>
         </p>
     </section>
 </#if>
@@ -25,14 +24,10 @@
 <#if updatedUserAccount?? >
     <section class="account-feedback">
         <p>
-            The account for 
-            <a href="${updatedUserAccount.editUrl}" title="updated account">${updatedUserAccount.firstName} ${updatedUserAccount.lastName}</a>
-            has been updated.
-            <#if emailWasSent?? > 
-                A confirmation email has been sent to ${updatedUserAccount.emailAddress}
-                with instructions for resetting a password. 
-                The password will not be reset until the user follows the link provided in this email.
-            </#if>
+            ${strings.updated_account_1}
+            <a href="${updatedUserAccount.editUrl}" title="${strings.updated_account_title}}">${updatedUserAccount.firstName} ${updatedUserAccount.lastName}</a>
+            ${strings.updated_account_2}
+            <#if emailWasSent?? >${strings.updated_account_notification(updatedUserAccount.emailAddress)}</#if>
         </p>
     </section>
 </#if>
@@ -40,7 +35,7 @@
 <#if deletedAccountCount?? >
     <section class="account-feedback">
         <p>
-            Deleted ${deletedAccountCount} accounts.
+            ${strings.deleted_accounts(deletedAccountCount)}
         </p>
     </section>
 </#if>
@@ -48,7 +43,7 @@
 <section id="filter-roles">
     <form method="POST" action="${formUrls.list}" class="customForm" role="filter by roles">
         <select name="roleFilterUri" id="roleFilterUri">
-            <option value="" <#if roleFilterUri = "">selected</#if> >Filter by roles</option>
+            <option value="" <#if roleFilterUri = "">selected</#if> >${strings.filter_by_roles}</option>
             <#list roles as role>
             <option value="${formUrls.list}?roleFilterUri=${role.uri?url}" <#if roleFilterUri = role.uri>selected</#if> >${role.label}</option>
             </#list>
@@ -60,7 +55,7 @@
         </select>
         
         <#if roleFilterUri?has_content>
-             <span><a href="${formUrls.list}" title="view all acounts"> View all accounts</a></span>
+             <span><a href="${formUrls.list}" title="${strings.view_all_accounts_title}">${strings.view_all_accounts}</a></span>
         </#if>
     </form>
 </section>
@@ -68,7 +63,7 @@
 <section id="search-accounts">
     <form method="POST" action="${formUrls.list}" class="customForm" role="search accounts">
         <input type="text" name="searchTerm" />
-        <input class="submit" type="submit" value="Search accounts"/>
+        <input class="submit" type="submit" value="${strings.search_accounts_button}"/>
         <!--
             When searchTerm changes, 
             set pageIndex to 1
@@ -80,64 +75,64 @@
 </section>
 <#if searchTerm?has_content>
 <section id="search-feedback">
-    <p>Search results for "<strong>${searchTerm}</strong>" | <span><a href="${formUrls.list}" title="view all accounts"> View all accounts</a></span></p>
+    <p>${strings.accounts_search_results} "<strong>${searchTerm}</strong>" | <span><a href="${formUrls.list}" title="${strings.view_all_accounts_title}">${strings.view_all_accounts}</a></span></p>
 </section>
 </#if>
 <form method="POST" action="${formUrls.list}" id="account-display" class="customForm" role="accounts display">
     <@p.accountsNav />
     
     <table id="account">
-        <caption>Account Management</caption>
+        <caption>${strings.account_management}</caption>
 
         <thead>
             <tr>
                <th scope="col"> <input  class="delete-all hidden" type="checkbox" name="delete-all">
-                   Email Address
+                   ${strings.email_address}
                    <nav class="account-alpha-browse">
-                       <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=ASC" title="ascending order"></a> 
-                       <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=DESC" title="descending order"></a>
+                       <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=ASC" title="${strings.ascending_order}"></a> 
+                       <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=email&orderDirection=DESC" title="${strings.descending_order}"></a>
                    </nav>
                 </th>
                 
                 <th scope="col">
-                    First name
+                    ${strings.first_name}
                     <nav class="account-alpha-browse">
-                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=firstName&orderDirection=ASC" title="ascending order"></a> 
-                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=firstName&orderDirection=DESC" title="descending order"></a>
+                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=firstName&orderDirection=ASC" title="${strings.ascending_order}"></a> 
+                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=firstName&orderDirection=DESC" title="${strings.descending_order}"></a>
                     </nav>
                 </th>
                 
                 <th scope="col">
-                    Last name
+                    ${strings.last_name}
                     <nav class="account-alpha-browse">
-                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=lastName&orderDirection=ASC" title="ascending order"></a> 
-                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=lastName&orderDirection=DESC" title="descending order"></a>
+                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=lastName&orderDirection=ASC" title="${strings.ascending_order}"></a> 
+                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=lastName&orderDirection=DESC" title="${strings.descending_order}"></a>
                     </nav>
                 </th>
                 
                 <th scope="col">
-                    Status
+                    ${strings.status}
                     <nav class="account-alpha-browse">
-                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=status&orderDirection=ASC" title="ascending order"></a> 
-                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=status&orderDirection=DESC" title="descending order"></a>
+                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=status&orderDirection=ASC" title="${strings.ascending_order}"></a> 
+                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=status&orderDirection=DESC" title="${strings.descending_order}"></a>
                     </nav>
                 </th>
                 
-                <th scope="col">Roles</th>
+                <th scope="col">${strings.roles}</th>
                 
                 <th scope="col">
-                    Login&nbsp;count
+                    ${strings.login_count}
                     <nav class="account-alpha-browse">
-                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=ASC" title="ascending order"></a> 
-                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=DESC" title="descending order"></a>
+                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=ASC" title="${strings.ascending_order}"></a> 
+                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=count&orderDirection=DESC" title="${strings.descending_order}"></a>
                     </nav>
                 </th>
 
                 <th scope="col">
-                    Last&nbsp;Login
+                    ${strings.last_login}
                     <nav class="account-alpha-browse">
-                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=lastLogin&orderDirection=ASC" title="ascending order"></a> 
-                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=lastLogin&orderDirection=DESC" title="descending order"></a>
+                        <a class="sort-asc" href="?accountsPerPage=${accountsPerPage}&orderField=lastLogin&orderDirection=ASC" title="${strings.ascending_order}"></a> 
+                        <a class="sort-desc" href="?accountsPerPage=${accountsPerPage}&orderField=lastLogin&orderDirection=DESC" title="${strings.descending_order}"></a>
                     </nav>
                 </th>
             </tr>
@@ -148,7 +143,7 @@
                 <tr>
                     <td>
                         <#if account.deletable>
-                            <input type="checkbox" name="deleteAccount" value="${account.uri}" title="select this account to delete it"/>
+                            <input type="checkbox" name="deleteAccount" value="${account.uri}" title="${strings.select_account_to_delete}"/>
                             <#assign disableDeleteAccount = '' />
                             <!-- ignored unless submit action is formUrls.delete -->
                         <#else>
@@ -156,7 +151,7 @@
                         </#if>
     
                         <#if account.editUrl != "">
-                            <a ${disableDeleteAccount} href="${account.editUrl}"  title="click to view account details">${account.emailAddress}</a>
+                            <a ${disableDeleteAccount} href="${account.editUrl}"  title="${strings.click_to_view_account}">${account.emailAddress}</a>
                             <!-- when this link is clicked, editAccount is noticed and all other fields are ignored. -->
                         <#else>
                             ${account.emailAddress}
@@ -184,6 +179,11 @@
     
     <@p.accountsNav />
 </form>
+
+<script type="text/javascript">
+    confirm_delete_account_singular = "${strings.confirm_delete_account_singular}"
+    confirm_delete_account_plural = "${strings.confirm_delete_account_plural}"
+</script>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/account.css" />')}
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/account/accountUtils.js"></script>')}
