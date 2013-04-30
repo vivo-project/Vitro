@@ -10,15 +10,10 @@ $(document).ready(function(){
     // fade in flash-message when user logs out
     jQuery('section#flash-message').css('display', 'none').fadeIn(1500);
     
-    
     /////////////////////////////
      // Home search fiter
      // Toggle filter select list
-
      var $searchFilterList = $('#filter-search-nav');
-     var $selectedFilter;
-     var $queryToSend;
-     var $queryToSendAll = true;
      var $isFilterOpen = false;
 
      console.log("Filter is open = " + $isFilterOpen);
@@ -63,15 +58,14 @@ $(document).ready(function(){
                ev.preventDefault();
 
                if ($(this).text() == 'All') {
-                  $queryToSendAll = true; 
                   //Selected filter feedback
                   $('.search-filter-selected').text('');
+                  $('input[name="classgroup"]').val('');
                   console.log("ALL");
                } else {
 
-                   //Selected filter feedback
                      $('.search-filter-selected').text($(this).text()).fadeIn('slow');
-                     $queryToSendAll = false; 
+                     $('input[name="classgroup"]').val($(this).children("a").attr("title"));
                }
 
                //Hide filter select list
@@ -82,10 +76,7 @@ $(document).ready(function(){
                $('a.filter-search').removeClass('filter-active');
                $('a.filter-search').addClass('filter-default');
 
-
-               $selectedFilter = $(this).text();
                $isFilterOpen = false;
-               console.log("$queryToSend " + $selectedFilter);
            });
 
        });
@@ -118,18 +109,4 @@ $(document).ready(function(){
 
            console.log("HIDE input value ") ;
        });
-
-     $('#search-homepage').submit(function(){
-
-         if ($queryToSendAll) {
-             $filterType = '';
-         }else {
-             $filterType = '&classgroup=http://vivoweb.org/ontology/vitroClassGroup' + $selectedFilter;
-         }
-
-         $queryToSend = 'querytext=' + $('input.search-homepage').val()  + $filterType;
-         console.log("Query to send: " + $queryToSend);
-
-         return false; 
-     });
 });

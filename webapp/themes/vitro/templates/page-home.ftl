@@ -1,7 +1,7 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <@widget name="login" include="assets" />
-<#include "browse-classgroups.ftl">
+<#import "lib-home-page.ftl" as lh>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -36,17 +36,14 @@
                             <div id="search-home-field">
                                 <input type="text" name="querytext" class="search-homepage" value="${querytext!}" autocapitalize="off" />
                                 <input type="submit" value="Search" class="search" />
+                                <input type="hidden" name="classgroup" class="search-homepage" value="" autocapitalize="off" />
                             </div>
                             
                             <a class="filter-search filter-default" href="#" title="Filter search"><span class="displace">filter search</span></a>
                             
                             <ul id="filter-search-nav">
                                 <li><a class="active" href="">All</a></li>
-                                <li><a href="">People</a></li>
-                                <li><a href="">Organizations</a></li>
-                                <li><a href="">Research</a></li>
-                                <li><a href="">Events</a></li>
-                                <li><a href="">Topics</a></li>
+                                <@lh.allClassGroupNames vClassGroups! />
                             </ul>
                         </form>
                     </fieldset>
@@ -57,19 +54,12 @@
             
             
             <@widget name="login" />
-            
-            <#--<@allClassGroups vClassGroups! />-->
-            
-            <section id="home-stats">
-                <h4>Stats</h4>
+                        
+            <section id="home-stats" class="home-sections" >
+                <h4>Statistics</h4>
 
                 <ul id="stats">
-                    <li><a href="#"><p class="stats-count">19<span>k</span></p><p class="stats-type">People</p></a></li>
-                    <li><a href="#"><p class="stats-count">128<span>k</span></p><p class="stats-type">Research</p></a></li>
-                    <li><a href="#"><p class="stats-count">22<span>k</span></p><p class="stats-type">Organizations</p></a></li>
-                    <li><a href="#"><p class="stats-count">29<span>k</span></p><p class="stats-type">Events</p></a></li>
-                    <li><a href="#"><p class="stats-count">1.9<span>k</span></p><p class="stats-type">Topics</p></a></li>
-                    <li><a href="#"><p class="stats-count">6.5<span>k</span></p><p class="stats-type">Activities</p></a></li>
+                    <@lh.allClassGroups vClassGroups! />
                 </ul>
             </section>
         

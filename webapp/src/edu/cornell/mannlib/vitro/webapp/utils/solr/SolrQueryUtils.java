@@ -190,6 +190,26 @@ public class SolrQueryUtils {
         }      
     }    
 
+    public static SolrQuery getRandomQuery(List<String> vclassUris, int page, int pageSize){
+        String queryText = "";
+        
+        try {            
+            queryText = makeMultiClassQuery(vclassUris);
+            log.debug("queryText is " + queryText);
+            SolrQuery query = new SolrQuery(queryText);
+
+            //page count starts at 1, row count starts at 0
+            query.setStart( page ).setRows( pageSize );
+            
+            log.debug("Query is " + query.toString());
+            return query;
+            
+        } catch (Exception ex){
+            log.error("Could not make the Solr query",ex);
+            return new SolrQuery();        
+        }      
+    }    
+
     public static String makeMultiClassQuery( List<String> vclassUris){
         List<String> queryTypes = new ArrayList<String>();  
         try {            
@@ -217,4 +237,16 @@ public class SolrQueryUtils {
 		return results;
 	}
 
+    public static IndividualListQueryResults buildAndExecuteRandomVClassQuery(
+			List<String> vclassURIs, int page, int pageSize,
+			ServletContext context, IndividualDao indDao)
+			throws SolrServerException {
+		 SolrQuery query = SolrQueryUtils.getRandomQuery(vclassURIs, page, pageSize);
+		 IndividualListQueryResults results = IndividualListQueryResults.runQuery(query, indDao, context);
+		 log.debug("Executed solr query for " + vclassURIs);
+		 if (results.getIndividuals().isEmpty()) { 
+			 log.debug("entities list is null for vclass " + vclassURIs);
+		 }
+		return results;
+	}
 }

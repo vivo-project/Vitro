@@ -182,8 +182,19 @@ public class IndividualListController extends FreemarkerHttpServlet {
         }
         return rvMap;
     }
-
 	
+    public static Map<String,Object> getRandomResultsForVClass(String vclassURI, int page, int pageSize, IndividualDao indDao, ServletContext context) {
+   	 	Map<String,Object> rvMap = new HashMap<String,Object>();    
+   	 	try{
+            List<String> classUris = Collections.singletonList(vclassURI);
+			IndividualListQueryResults results = SolrQueryUtils.buildAndExecuteRandomVClassQuery(classUris, page, pageSize, context, indDao);
+	        rvMap = getResultsForVClassQuery(results, page, pageSize, "");
+   	 	} catch(Throwable th) {
+	   		log.error("An error occurred retrieving random results for vclass query", th);
+	    }
+        return rvMap;
+    }
+
 	//TODO: Get rid of this method and utilize SolrQueryUtils - currently appears to be referenced
 	//only within DataGetterUtils
     public static long getIndividualCount(List<String> vclassUris, IndividualDao indDao, ServletContext context) {    	    	       
