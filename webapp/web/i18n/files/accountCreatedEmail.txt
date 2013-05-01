@@ -1,0 +1,17 @@
+{2} {3}
+
+Congratulations!
+
+We have created your new account on {0},
+associated with {4}.
+
+If you did not request this new account you can safely ignore this email. 
+This request will expire if not acted upon for 30 days.
+        
+Paste the link below into your browser's address bar to create your password 
+for your new account using our secure server.
+        
+{5}
+        
+Thanks!
+

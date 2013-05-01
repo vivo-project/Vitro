@@ -23,8 +23,6 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 	private static final Log log = LogFactory
 			.getLog(UserAccountsPasswordBasePage.class);
 
-	public static final String BOGUS_MESSAGE_NO_SUCH_ACCOUNT = "The account you are trying to set a password on is no longer available. Please contact your system administrator if you think this is an error.";
-
 	private static final String PARAMETER_SUBMIT = "submit";
 	private static final String PARAMETER_USER = "user";
 	private static final String PARAMETER_KEY = "key";
@@ -79,7 +77,7 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 		if (userAccount == null) {
 			log.warn("Password request for '" + userEmail
 					+ "' is bogus: no such user");
-			bogusMessage = BOGUS_MESSAGE_NO_SUCH_ACCOUNT;
+			bogusMessage = i18n.text("account_no_longer_exists");
 			return;
 		}
 
@@ -170,9 +168,9 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 
 	public String getSuccessMessage() {
 		if (loggedIn) {
-			return "Your password has been saved.";
+			return i18n.text("password_saved");
 		} else {
-			return "Your password has been saved. Please log in.";
+			return i18n.text("password_saved_please_login");
 		}
 	}
 
