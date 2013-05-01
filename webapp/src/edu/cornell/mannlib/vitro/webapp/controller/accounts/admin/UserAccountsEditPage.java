@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.admin;
 
+import static edu.cornell.mannlib.vitro.webapp.controller.accounts.user.UserAccountsUserController.getBogusStandardMessage;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,7 +22,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsPage;
-import edu.cornell.mannlib.vitro.webapp.controller.accounts.user.UserAccountsUserController;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -116,7 +117,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 		if (userAccount == null) {
 			log.warn("Edit account for '" + userUri
 					+ "' is bogus: no such user");
-			bogusMessage = UserAccountsUserController.BOGUS_STANDARD_MESSAGE;
+			bogusMessage = getBogusStandardMessage(vreq);
 			return;
 		}
 		if (userAccount.isRootUser()) {
@@ -125,7 +126,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 				log.warn("User is attempting to edit the root account, "
 						+ "but is not authorized to do so. Logged in as: "
 						+ LoginStatusBean.getCurrentUser(vreq));
-				bogusMessage = UserAccountsUserController.BOGUS_STANDARD_MESSAGE;
+				bogusMessage = getBogusStandardMessage(vreq);
 				return;
 			}
 		}

@@ -27,8 +27,10 @@ import javax.mail.internet.MimeMultipart;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.web.directives.EmailDirective;
+import freemarker.core.Environment;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
@@ -47,7 +49,8 @@ public class FreemarkerEmailMessage {
 	private static final Log log = LogFactory
 			.getLog(FreemarkerEmailMessage.class);
 
-	private final Session session;
+	private final VitroRequest vreq;
+	private final Session mailSession;
 	private final FreemarkerConfiguration config;
 
 	private final List<Recipient> recipients = new ArrayList<Recipient>();
@@ -63,9 +66,10 @@ public class FreemarkerEmailMessage {
 	/**
 	 * Package access - should only be created by the factory.
 	 */
-	FreemarkerEmailMessage(FreemarkerConfiguration fConfig, Session session,
-			InternetAddress replyToAddress) {
-		this.session = session;
+	FreemarkerEmailMessage(VitroRequest vreq, FreemarkerConfiguration fConfig,
+			Session mailSession, InternetAddress replyToAddress) {
+		this.vreq = vreq;
+		this.mailSession = mailSession;
 		this.replyToAddress = replyToAddress;
 		this.config = fConfig;
 	}
@@ -141,7 +145,13 @@ public class FreemarkerEmailMessage {
 
 		try {
 			Template template = config.getTemplate(templateName);
-			template.process(bodyMap, new StringWriter());
+
+			Environment env = template.createProcessingEnvironment(bodyMap,
+					new StringWriter());
+			env.setCustomAttribute("request", vreq);
+			env.setCustomAttribute("context", vreq.getSession()
+					.getServletContext());
+			env.process();
 		} catch (TemplateException e) {
 			log.error(e, e);
 		} catch (IOException e) {
@@ -151,7 +161,7 @@ public class FreemarkerEmailMessage {
 
 	public boolean send() {
 		try {
-			MimeMessage msg = new MimeMessage(session);
+			MimeMessage msg = new MimeMessage(mailSession);
 			msg.setReplyTo(new Address[] { replyToAddress });
 
 			if (fromAddress == null) {
@@ -199,11 +209,11 @@ public class FreemarkerEmailMessage {
 		bodyPart.setContent(textBody, type);
 		content.addBodyPart(bodyPart);
 	}
-	   
-    public String getReplyToAddress() {
-        return replyToAddress.getAddress();
-    }
-    
+
+	public String getReplyToAddress() {
+		return replyToAddress.getAddress();
+	}
+
 	private <T> T nonNull(T value, T defaultValue) {
 		return (value == null) ? defaultValue : value;
 	}

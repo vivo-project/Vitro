@@ -25,6 +25,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 
 /**
  * A base class with some utility routines for page handler (created by
@@ -39,6 +41,7 @@ public abstract class AbstractPageHandler {
 	private static final Log log = LogFactory.getLog(AbstractPageHandler.class);
 
 	protected final VitroRequest vreq;
+	protected final I18nBundle i18n;
 	protected final ServletContext ctx;
 	protected final OntModel userAccountsModel;
 	protected final OntModel unionModel;
@@ -50,6 +53,7 @@ public abstract class AbstractPageHandler {
 
 	protected AbstractPageHandler(VitroRequest vreq) {
 		this.vreq = vreq;
+		this.i18n = I18n.bundle(vreq);
 		this.ctx = vreq.getSession().getServletContext();
 
 		OntModelSelector oms = ModelContext.getUnionOntModelSelector(ctx);
@@ -154,7 +158,8 @@ public abstract class AbstractPageHandler {
 		private static final String ATTRIBUTE = Message.class.getName();
 
 		public static void setMessage(HttpServletRequest req, Message message) {
-			log.debug("Added message to session: " + message.getMessageInfoMap());
+			log.debug("Added message to session: "
+					+ message.getMessageInfoMap());
 			req.getSession().setAttribute(ATTRIBUTE, message);
 		}
 

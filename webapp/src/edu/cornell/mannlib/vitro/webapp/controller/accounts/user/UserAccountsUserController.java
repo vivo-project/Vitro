@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.controller.accounts.user;
 
 import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource.EXTERNAL;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -18,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 /**
  * Parcel out the different actions required of the UserAccounts GUI.
@@ -25,8 +28,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 public class UserAccountsUserController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(UserAccountsUserController.class);
-
-	public static final String BOGUS_STANDARD_MESSAGE = "Request failed. Please contact your system administrator.";
 
 	private static final String ACTION_CREATE_PASSWORD = "/createPassword";
 	private static final String ACTION_RESET_PASSWORD = "/resetPassword";
@@ -116,7 +117,7 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 				return showLoginRedirection(vreq, page.getAfterLoginUrl());
 			} catch (LoginNotPermitted e) {
 				// This should have been anticipated by the page.
-				return showHomePage(vreq, BOGUS_STANDARD_MESSAGE);
+				return showHomePage(vreq, getBogusStandardMessage(vreq));
 			}
 		} else {
 			return page.showPage();
@@ -124,7 +125,7 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 	}
 
 	private ResponseValues handleInvalidRequest(VitroRequest vreq) {
-		return showHomePage(vreq, BOGUS_STANDARD_MESSAGE);
+		return showHomePage(vreq, getBogusStandardMessage(vreq));
 	}
 
 	private ResponseValues showHomePage(VitroRequest vreq, String message) {
@@ -158,5 +159,9 @@ public class UserAccountsUserController extends FreemarkerHttpServlet {
 			return uri.substring(vreq.getContextPath().length());
 		}
 		return uri;
+	}
+
+	public static String getBogusStandardMessage(HttpServletRequest req) {
+		return I18n.bundle(req).text("request_failed");
 	}
 }

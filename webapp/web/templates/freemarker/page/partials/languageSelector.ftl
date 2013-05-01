@@ -9,14 +9,12 @@
 <#-- This is included by identity.ftl --> 
 <#if selectLocale??>
     <li>
-      <form method="get" action="${selectLocale.selectLocaleUrl}" >
-        <#list selectLocale.locales as locale>
-          <button type="submit" name="selection" value="${locale.code}">
-            <img src="${locale.imageUrl}" height="15" align="middle" alt="${locale.label}"/>
-          </button>
-          <#if locale_has_next>|</#if>
-        </#list>
-      </form>
+      <#list selectLocale.locales as locale>
+        <a href="${selectLocale.selectLocaleUrl}?selection=${locale.code}">
+          <img src="${locale.imageUrl}" height="15" align="middle" alt="${locale.label}"/>
+        </a>
+        <#if locale_has_next>|</#if>
+      </#list>
     </li>
 </#if>
 
