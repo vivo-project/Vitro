@@ -251,6 +251,7 @@ p#mngLabelsText {
 /* SEARCH HOME------>  */ 
 #search-home {
 		margin-top: 2em;
+		width: 570px;
 }
 
 #search-home h3 {

@@ -55,14 +55,17 @@
             
             <@widget name="login" />
                         
-            <section id="home-stats" class="home-sections" >
-                <h4>Statistics</h4>
-
-                <ul id="stats">
-                    <@lh.allClassGroups vClassGroups! />
-                </ul>
-            </section>
+            <!-- Statistical information relating to property groups and their classes; displayed horizontally, not vertically-->
+            <@lh.allClassGroups vClassGroups! />
         
         <#include "footer.ftl">
+        <script>
+            // this will ensure that the hidden classgroup input is cleared if the back button is used
+            // to return to the home page from the search results. Not in vitroUtils.js because that
+            // gets loaded on every page.
+            $(document).ready(function(){
+                $('input[name="classgroup"]').val("");    
+            });
+        </script>
     </body>
 </html>
