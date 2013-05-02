@@ -39,8 +39,9 @@ public class I18nBundle {
 	public I18nBundle(String bundleName, ResourceBundle resources) {
 		this(bundleName, resources, MESSAGE_KEY_NOT_FOUND);
 	}
-	
-	private I18nBundle(String bundleName, ResourceBundle resources, String notFoundMessage) {
+
+	private I18nBundle(String bundleName, ResourceBundle resources,
+			String notFoundMessage) {
 		if (bundleName == null) {
 			throw new IllegalArgumentException("bundleName may not be null");
 		}
@@ -49,20 +50,22 @@ public class I18nBundle {
 		}
 		if (resources == null) {
 			throw new NullPointerException("resources may not be null.");
-		}if (notFoundMessage == null) {
+		}
+		if (notFoundMessage == null) {
 			throw new NullPointerException("notFoundMessage may not be null.");
 		}
 		this.bundleName = bundleName;
 		this.resources = resources;
 		this.notFoundMessage = notFoundMessage;
 	}
-	
+
 	public String text(String key, Object... parameters) {
-		log.debug("Asking for '" + key + "' from bundle '" + bundleName + "'");
 
 		String textString;
 		if (resources.containsKey(key)) {
 			textString = resources.getString(key);
+			log.debug("In '" + bundleName + "', " + key + "='" + textString
+					+ "')");
 			return formatString(textString, parameters);
 		} else {
 			String message = MessageFormat.format(notFoundMessage, bundleName,

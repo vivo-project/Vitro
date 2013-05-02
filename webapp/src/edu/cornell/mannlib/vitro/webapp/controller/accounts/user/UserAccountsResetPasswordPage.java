@@ -46,14 +46,13 @@ public class UserAccountsResetPasswordPage extends UserAccountsPasswordBasePage 
 
 	@Override
 	protected String alreadyLoggedInMessage(String currentUserEmail) {
-		return "You may not reset the password for " + userEmail
-				+ " while you are logged in as " + currentUserEmail
-				+ ". Please log out and try again.";
+		return i18n.text("cant_change_password_while_logged_in", userEmail,
+				currentUserEmail);
 	}
 
 	@Override
 	protected String passwordChangeNotPendingMessage() {
-		return "The password for " + userEmail + " has already been reset.";
+		return i18n.text("password_change_not_pending", userEmail);
 	}
 
 	@Override
@@ -69,7 +68,7 @@ public class UserAccountsResetPasswordPage extends UserAccountsPasswordBasePage 
 		FreemarkerEmailMessage email = FreemarkerEmailFactory
 				.createNewMessage(vreq);
 		email.addRecipient(TO, userAccount.getEmailAddress());
-		email.setSubject("Password changed.");
+		email.setSubject(i18n.text("password_changed_subject"));
 		email.setTemplate(EMAIL_TEMPLATE);
 		email.setBodyMap(body);
 		email.processTemplate();

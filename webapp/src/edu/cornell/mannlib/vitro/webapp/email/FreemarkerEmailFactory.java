@@ -61,8 +61,8 @@ public class FreemarkerEmailFactory {
 		FreemarkerEmailFactory factory = getFactory(vreq);
 		FreemarkerConfiguration fConfig = FreemarkerConfigurationLoader
 				.getConfig(vreq);
-		return new FreemarkerEmailMessage(fConfig, factory.getEmailSession(),
-				factory.getReplyToAddress());
+		return new FreemarkerEmailMessage(vreq, fConfig,
+				factory.getEmailSession(), factory.getReplyToAddress());
 	}
 
 	/**

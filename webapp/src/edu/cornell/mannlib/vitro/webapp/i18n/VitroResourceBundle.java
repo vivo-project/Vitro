@@ -60,7 +60,7 @@ public class VitroResourceBundle extends ResourceBundle {
 			return new VitroResourceBundle(bundleName, ctx, appI18nPath,
 					themeI18nPath, control);
 		} catch (FileNotFoundException e) {
-			log.debug(e);
+			log.info(e.getMessage());
 			return null;
 		} catch (Exception e) {
 			log.warn(e, e);

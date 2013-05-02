@@ -2,60 +2,22 @@
 
 <#-- Confirmation email for user account password reset -->
 
-<#assign subject = "${siteName} reset password request" />
+<#assign strings = i18n() />
 
-<#assign html>
-<html>
-    <head>
-        <title>${subject}</title>
-    </head>
-    <body>
-        <p>
-            Dear ${userAccount.firstName} ${userAccount.lastName}:
-        </p>
-        
-        <p>
-            We have received a request to reset the password for your ${siteName} account (${userAccount.emailAddress}). 
-        </p>
-        
-        <p>
-            Please follow the instructions below to proceed with your password reset.
-        </p>
-        
-        <p>
-            If you did not request this new account you can safely ignore this email. 
-            This request will expire if not acted upon within 30 days.
-        </p>
-        
-        <p>
-            Click on the link below or paste it into your browser's address bar to reset your password 
-            using our secure server.
-        </p>
-        
-        <p>${passwordLink}</p>
-        
-        <p>Thank you!</p>
-    </body>
-</html>
-</#assign>
+<#assign subject = strings.password_reset_pending_subject(siteName) />
 
-<#assign text>
-Dear ${userAccount.firstName} ${userAccount.lastName}:
-        
-We have received a request to reset the password for your ${siteName} account 
-(${userAccount.emailAddress}). 
+<#assign html = strings.password_reset_pending_email_html(siteName, 
+                                                   subject, 
+                                                   userAccount.firstName, 
+                                                   userAccount.lastName, 
+                                                   userAccount.emailAddress, 
+                                                   passwordLink) />
 
-Please follow the instructions below to proceed with your password reset.
-
-If you did not request this new account you can safely ignore this email. 
-This request will expire if not acted upon within 30 days.
-
-Paste the link below into your browser's address bar to reset your password 
-using our secure server.
-
-${passwordLink}
-        
-Thank you!
-</#assign>
+<#assign text = strings.password_reset_pending_email_text(siteName, 
+                                                   subject, 
+                                                   userAccount.firstName, 
+                                                   userAccount.lastName, 
+                                                   userAccount.emailAddress, 
+                                                   passwordLink) />
 
 <@email subject=subject html=html text=text />
