@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import java.util.List;
-
 import com.hp.hpl.jena.ontology.AnnotationProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.query.Dataset;
@@ -11,8 +9,6 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -64,8 +60,8 @@ public class VClassDaoSDB extends VClassDaoJena {
                         while (annotIt.hasNext()) {
                             try {
                                 Statement annot = (Statement) annotIt.next();
-                                Resource cls = (Resource) annot.getSubject();
-                                VClass vcw = (VClass) getVClassByURI(cls.getURI());
+                                Resource cls = annot.getSubject();
+                                VClass vcw = getVClassByURI(cls.getURI());
                                 if (vcw != null) {
                                     boolean classIsInstantiated = false;
                                     if (getIndividualCount) {                                                                            

@@ -95,7 +95,7 @@ public class JenaModelUtils {
                         .getRootClasses();
                 for (Iterator<VClass> rootClassIt = rootClasses.iterator(); 
                         rootClassIt.hasNext(); ) {
-                    VClass rootClass = (VClass) rootClassIt.next();	                    
+                    VClass rootClass = rootClassIt.next();	                    
                     Individual classGroup = modelForClassgroups.createIndividual(
                             wadf.getDefaultNamespace() + "vitroClassGroup" + 
                                     rootClass.getLocalName(), classGroupClass);
@@ -108,7 +108,7 @@ public class JenaModelUtils {
                     for (Iterator<String> childIt = myWebappDaoFactory.getVClassDao()
                             .getAllSubClassURIs(rootClass.getURI()).iterator(); 
                             childIt.hasNext(); ) {
-                        String childURI = (String) childIt.next();
+                        String childURI = childIt.next();
                         Resource childClass = modelForClassgroupAnnotations
                                 .getResource(childURI);
                         if (!modelForClassgroupAnnotations.contains(

@@ -4,14 +4,10 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-
-import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class DatatypeDaoJena extends JenaBaseDao implements DatatypeDao {
 

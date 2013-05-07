@@ -34,7 +34,6 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
@@ -151,7 +150,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         List<String> directSubproperties = getSubPropertyURIs(propertyURI);     
         Iterator<String> it=directSubproperties.iterator();
         while(it.hasNext()){
-            String uri = (String)it.next();
+            String uri = it.next();
             if (!subtree.contains(uri)) {
             	subtree.add(uri);
             	getAllSubPropertyURIs(uri,subtree);
@@ -192,7 +191,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         List<String> directSuperproperties = getSuperPropertyURIs(propertyURI,true);     
         Iterator<String> it=directSuperproperties.iterator();
         while(it.hasNext()){
-            String uri = (String)it.next();
+            String uri = it.next();
             if (!subtree.contains(uri)) {
             	subtree.add(uri);
             	getAllSuperPropertyURIs(uri,subtree);
@@ -342,13 +341,13 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 			   
 			if (targetProp != null) {
 			
-			    StmtIterator stmtIter = ontModel.listStatements((Resource) null, OWL.onProperty, (RDFNode) targetProp);
+			    StmtIterator stmtIter = ontModel.listStatements((Resource) null, OWL.onProperty, targetProp);
 	
 			    while (stmtIter.hasNext()) {
 				   Statement statement = stmtIter.next();
 				   
 				   if ( statement.getSubject().canAs(OntClass.class) ) {
-					   classURISet.addAll(getRelatedClasses((OntClass) statement.getSubject().as(OntClass.class)));
+					   classURISet.addAll(getRelatedClasses(statement.getSubject().as(OntClass.class)));
 				   } else {
 					   log.warn("getClassesWithRestrictionOnProperty: Unexpected use of onProperty: it is not applied to a class");
 				   }
@@ -661,7 +660,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     		        			// TODO: check if restriction is something like
     		        			// maxCardinality 0 or allValuesFrom owl:Nothing,
     		        			// in which case the property is NOT applicable!
-    		        			Restriction rest = (Restriction) relatedClass.as(Restriction.class);
+    		        			Restriction rest = relatedClass.as(Restriction.class);
     		        			OntProperty onProperty = rest.getOnProperty();
     		        			if (onProperty != null) {
     		        			    Resource[] ranges = new Resource[2];
@@ -726,7 +725,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                 		rangeClassURI = PSEUDO_BNODE_NS + rangeRes.getId()
                 		        .toString();
                 	} else {
-                		rangeClassURI = (String) rangeRes.getURI();
+                		rangeClassURI = rangeRes.getURI();
                 	}
                     pi.setRangeClassURI(rangeClassURI);
                 	VClass range = getWebappDaoFactory().getVClassDao()

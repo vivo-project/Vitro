@@ -98,11 +98,11 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                             labelStr += "some values from ";
                         }
                         if (fillerRes.canAs(OntClass.class)) { 
-                            OntClass avf = (OntClass) fillerRes.as(OntClass.class);
+                            OntClass avf = fillerRes.as(OntClass.class);
                             labelStr += getLabelForClass(avf,withPrefix,forPickList);
                         } else {
                             try {
-                                labelStr += getLabelOrId( (OntResource) fillerRes.as(OntResource.class));
+                                labelStr += getLabelOrId(fillerRes.as(OntResource.class));
                             } catch (Exception e) {
                                 labelStr += "???";
                             }
@@ -113,9 +113,9 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                         RDFNode fillerNode = hvRest.getHasValue();
                         try {
                             if (fillerNode.isResource()) {
-                                labelStr += getLabelOrId((OntResource)fillerNode.as(OntResource.class));
+                                labelStr += getLabelOrId(fillerNode.as(OntResource.class));
                             } else {
-                                labelStr += ((Literal) fillerNode.as(Literal.class)).getLexicalForm(); 
+                                labelStr += fillerNode.as(Literal.class).getLexicalForm(); 
                             }
                         } catch (Exception e) {
                             labelStr += "???";
@@ -138,10 +138,10 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                     String labelStr = "(";
                     if (cls.isComplementClass()) {
                         labelStr += "not ";
-                        ComplementClass ccls = (ComplementClass) cls.as(ComplementClass.class);
+                        ComplementClass ccls = cls.as(ComplementClass.class);
                         labelStr += getLabelForClass(ccls.getOperand(),withPrefix,forPickList);		    			
                     } else if (cls.isIntersectionClass()) {
-                        IntersectionClass icls = (IntersectionClass) cls.as(IntersectionClass.class);
+                        IntersectionClass icls = cls.as(IntersectionClass.class);
                         for (Iterator operandIt = icls.listOperands(); operandIt.hasNext();) {
                             OntClass operand = (OntClass) operandIt.next();
                             labelStr += getLabelForClass(operand,withPrefix,forPickList);
@@ -150,7 +150,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                             }
                         }
                     } else if (cls.isUnionClass()) {
-                        UnionClass icls = (UnionClass) cls.as(UnionClass.class);
+                        UnionClass icls = cls.as(UnionClass.class);
                         for (Iterator operandIt = icls.listOperands(); operandIt.hasNext();) {
                             OntClass operand = (OntClass) operandIt.next();
                             labelStr += getLabelForClass(operand,withPrefix,forPickList);
@@ -169,7 +169,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
             } else {
                 if (withPrefix || forPickList) {
                     OntologyDao oDao=getWebappDaoFactory().getOntologyDao();
-                    Ontology o = (Ontology)oDao.getOntologyByURI(cls.getNameSpace());
+                    Ontology o = oDao.getOntologyByURI(cls.getNameSpace());
                     if (o!=null) {
                         if (withPrefix) {                        	
                             return(o.getPrefix()==null?(o.getName()==null?"unspec:"+getLabelOrId(cls):o.getName()+":"+getLabelOrId(cls)):o.getPrefix()+":"+getLabelOrId(cls));
@@ -208,7 +208,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 while(restIt.hasNext()) {
                     Resource restRes = restIt.next();
                     if (restRes.canAs(OntResource.class)) {
-                        OntResource restOntRes = (OntResource) restRes.as(OntResource.class);
+                        OntResource restOntRes = restRes.as(OntResource.class);
                         smartRemove(restOntRes, ontModel);
                     }
                 }
@@ -216,7 +216,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 while(restIt.hasNext()) {
                     Resource restRes = restIt.next();
                     if (restRes.canAs(OntResource.class)) {
-                        OntResource restOntRes = (OntResource) restRes.as(OntResource.class);
+                        OntResource restOntRes = restRes.as(OntResource.class);
                         smartRemove(restOntRes, ontModel);
                     }
                 }
@@ -400,7 +400,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         List<String> directSubclasses = getSubClassURIs(classURI);     
         Iterator<String> it=directSubclasses.iterator();
         while(it.hasNext()){
-            String uri = (String)it.next();
+            String uri = it.next();
             if (!subtree.contains(uri)) {
                 subtree.add(uri);
                 getAllSubClassURIs(uri,subtree);
@@ -423,7 +423,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
             while (superClassIt.hasNext()) {
                 Statement stmt = superClassIt.nextStatement();
                 if (stmt.getObject().canAs(OntResource.class)) {
-                    OntResource superRes = (OntResource) stmt.getObject().as(OntResource.class);
+                    OntResource superRes = stmt.getObject().as(OntResource.class);
                     String test = getClassURIStr(superRes);
                     superclassURIs.add(test);
                 }
@@ -442,7 +442,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         List<String> directSuperclasses = getSuperClassURIs(classURI, true);     
         Iterator<String> it=directSuperclasses.iterator();
         while(it.hasNext()){
-            String uri = (String)it.next();
+            String uri = it.next();
             if (!subtree.contains(uri)) {
                 subtree.add(uri);
                 getAllSuperClassURIs(uri,subtree);
@@ -459,7 +459,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 while (classIt.hasNext()) {
                     try {
                         Individual classInd = classIt.next();
-                        OntClass cls = (OntClass) classInd.as(OntClass.class);
+                        OntClass cls = classInd.as(OntClass.class);
                         if (!cls.isAnon() && !(NONUSER_NAMESPACES.contains(cls.getNameSpace()))) {
                             classes.add(new VClassJena(cls,getWebappDaoFactory()));
                         }
@@ -724,17 +724,17 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                                 Statement axStmt = (Statement) axStmtIt.next();
                                 OntResource subjOntRes = null;
                                 if (axStmt.getSubject().canAs(OntResource.class)) {
-                                    subjOntRes = (OntResource) axStmt.getSubject().as(OntResource.class);
+                                    subjOntRes = axStmt.getSubject().as(OntResource.class);
                                 }
                                 if (
                                         (subjOntRes != null) && (subjSuperclasses.contains(getClassURIStr(subjOntRes))) &&
                                         (axStmt.getPredicate().equals(RDFS.subClassOf) || (axStmt.getPredicate().equals(OWL.equivalentClass)))	
                                         ) {
                                     if (restRes.canAs(AllValuesFromRestriction.class)) {
-                                        AllValuesFromRestriction avfRest = (AllValuesFromRestriction) restRes.as(AllValuesFromRestriction.class);
+                                        AllValuesFromRestriction avfRest = restRes.as(AllValuesFromRestriction.class);
                                         Resource avf = avfRest.getAllValuesFrom();
                                         if (avf.canAs(OntClass.class)) {
-                                            superclass = (OntClass) avfRest.getAllValuesFrom().as(OntClass.class);
+                                            superclass = avfRest.getAllValuesFrom().as(OntClass.class);
                                         }
                                     } 
                                 }
@@ -818,8 +818,8 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                         while (annotIt.hasNext()) {
                             try {
                                 Statement annot = (Statement) annotIt.next();
-                                Resource cls = (Resource) annot.getSubject();
-                                VClass vcw = (VClass) getVClassByURI(cls.getURI());
+                                Resource cls = annot.getSubject();
+                                VClass vcw = getVClassByURI(cls.getURI());
                                 if (vcw != null) {
                                     boolean classIsInstantiated = false;
                                     if (getIndividualCount) {
@@ -926,7 +926,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
             OntClass ontCls = ontModel.createClass(cls.getURI());
             try {
                 if (cls.getName() != null && cls.getName().length() > 0) {
-                    ontCls.setLabel(cls.getName(), (String) getDefaultLanguage());
+                    ontCls.setLabel(cls.getName(), getDefaultLanguage());
                 } else {
                     ontCls.removeAll(RDFS.label);
                 }

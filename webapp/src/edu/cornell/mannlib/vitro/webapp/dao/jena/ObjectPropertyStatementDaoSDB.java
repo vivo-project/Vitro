@@ -102,7 +102,7 @@ public class ObjectPropertyStatementDaoSDB extends
 	            ClosableIterator<Statement> propIt = ind.listProperties();
 	            try {
 	                while (propIt.hasNext()) {
-	                    Statement st = (Statement) propIt.next();
+	                    Statement st = propIt.next();
 	                    if (st.getObject().isResource() && !(NONUSER_NAMESPACES.contains(st.getPredicate().getNameSpace()))) {
 	                        try {
 	                            ObjectPropertyStatement objPropertyStmt = new ObjectPropertyStatementImpl();

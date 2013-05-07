@@ -14,11 +14,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -32,7 +30,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
@@ -82,7 +79,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
             ClosableIterator<Individual> groupIt = getOntModel().listIndividuals(CLASSGROUP);
             try {
                 while (groupIt.hasNext()) {
-                    Individual groupInd = (Individual) groupIt.next();
+                    Individual groupInd = groupIt.next();
                     VClassGroup group = groupFromGroupIndividual(groupInd);
                     if (group!=null) {
                         groups.add(group);
@@ -94,7 +91,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
             Collections.sort(groups);
             Iterator<VClassGroup> groupsIt = groups.iterator();
             while (groupsIt.hasNext()) {
-                VClassGroup group = (VClassGroup) groupsIt.next();
+                VClassGroup group = groupsIt.next();
                 map.put(group.getPublicName(), group);
             }
             return map;
@@ -140,7 +137,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
             ClosableIterator<Individual> groupIt = getOntModel().listIndividuals(CLASSGROUP);
             try {
                 while (groupIt.hasNext()) {
-                    Individual grp = (Individual) groupIt.next();
+                    Individual grp = groupIt.next();
                     VClassGroup vgrp = groupFromGroupIndividual(grp);
                     if (vgrp != null) {
                         groups.add(vgrp);
@@ -247,7 +244,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         int removedGroupsCount = 0;
         ListIterator<VClassGroup> it = groups.listIterator();
         while(it.hasNext()){
-            VClassGroup group = (VClassGroup) it.next();
+            VClassGroup group = it.next();
             List<VClass> classes = group.getVitroClassList();
             if( classes == null || classes.size() < 1 ){
                 removedGroupsCount++;
@@ -283,7 +280,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         try {
             Individual groupInd = ontModel.getIndividual(vcg.getURI());
             try {
-                groupInd.setLabel(vcg.getPublicName(), (String) getDefaultLanguage());
+                groupInd.setLabel(vcg.getPublicName(), getDefaultLanguage());
             } catch (Exception e) {
                 log.error("error updating name for "+groupInd.getURI());
             }

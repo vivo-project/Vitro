@@ -146,7 +146,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         
         
         if (theClass.isAnon() && theClass.canAs(UnionClass.class)) {
-        	UnionClass u = (UnionClass) theClass.as(UnionClass.class);
+        	UnionClass u = theClass.as(UnionClass.class);
         	for (OntClass operand : u.listOperands().toList()) {
         		VClass vc = new VClassJena(operand, getWebappDaoFactory());
         		ents.addAll(getIndividualsByVClass(vc));
@@ -159,8 +159,8 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 	            try {
 	                while (stmtIt.hasNext()) {
 	                    Statement stmt = stmtIt.nextStatement();
-	                    OntResource ind = (OntResource) stmt.getSubject().as(OntResource.class);
-	                    ents.add(new IndividualJena(ind, (WebappDaoFactoryJena) getWebappDaoFactory()));
+	                    OntResource ind = stmt.getSubject().as(OntResource.class);
+	                    ents.add(new IndividualJena(ind, getWebappDaoFactory()));
 	                }
 	            } finally {
 	                stmtIt.close();
@@ -232,7 +232,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 ontModel.getBaseModel().notifyEvent(new IndividualCreationEvent(getWebappDaoFactory().getUserURI(),true,entURI));
                 com.hp.hpl.jena.ontology.Individual ind = ontModel.createIndividual(entURI,cls);
                 if (ent.getName() != null) {
-                    ind.setLabel(ent.getName(), (String) getDefaultLanguage());
+                    ind.setLabel(ent.getName(), getDefaultLanguage());
                 }
                 List<VClass> vclasses = ent.getVClasses(false);
                 if (vclasses != null) {
@@ -388,7 +388,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 return 1;
             }
             if (res.canAs(OntResource.class)) {
-                OntResource ontRes = (OntResource) res.as(OntResource.class);
+                OntResource ontRes = res.as(OntResource.class);
                 smartRemove(ontRes, ontModel);
             } else {
                 ontModel.removeAll(res,null,null);
@@ -420,7 +420,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         	OntResource ontRes = (entityURI.startsWith(VitroVocabulary.PSEUDO_BNODE_NS)) 
         		? (OntResource) ontModel.createResource(new AnonId(entityURI.substring(VitroVocabulary.PSEUDO_BNODE_NS.length()))).as(OntResource.class)
         		: ontModel.getOntResource(entityURI);
-            Individual ent = new IndividualJena(ontRes, (WebappDaoFactoryJena) getWebappDaoFactory());
+            Individual ent = new IndividualJena(ontRes, getWebappDaoFactory());
             return ent;
         } catch (Exception ex) {
             return null;
@@ -494,7 +494,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 String subUri = ((Resource)sub).getURI();
                 if( ! individualsMap.containsKey(subUri)){
                     com.hp.hpl.jena.ontology.Individual ind = getOntModel().getIndividual(subUri);
-                    individualsMap.put(subUri,new IndividualJena(ind, (WebappDaoFactoryJena) getWebappDaoFactory()));
+                    individualsMap.put(subUri,new IndividualJena(ind, getWebappDaoFactory()));
                 }
             }
             
@@ -519,7 +519,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 String subUri = ((Resource)sub).getURI();
                 if( ! individualsMap.containsKey(subUri)){
                     com.hp.hpl.jena.ontology.Individual ind = getOntModel().getIndividual(subUri);
-                    individualsMap.put(subUri,new IndividualJena(ind, (WebappDaoFactoryJena) getWebappDaoFactory()));
+                    individualsMap.put(subUri,new IndividualJena(ind, getWebappDaoFactory()));
                 }                
             }
             
@@ -544,7 +544,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 String subUri = ((Resource)sub).getURI();
                 if( ! individualsMap.containsKey(subUri)){
                     com.hp.hpl.jena.ontology.Individual ind = getOntModel().getIndividual(subUri);
-                    individualsMap.put(subUri,new IndividualJena(ind, (WebappDaoFactoryJena) getWebappDaoFactory()));
+                    individualsMap.put(subUri,new IndividualJena(ind, getWebappDaoFactory()));
                 }                
             }
         } finally {
@@ -594,7 +594,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                     continue;
                 }
                 com.hp.hpl.jena.ontology.Individual ind = getOntModel().getIndividual(st.getURI());
-                inds.add(new IndividualJena(ind, (WebappDaoFactoryJena) getWebappDaoFactory()));
+                inds.add(new IndividualJena(ind, getWebappDaoFactory()));
             }
         } finally {
             if( stmts != null ) stmts.close();

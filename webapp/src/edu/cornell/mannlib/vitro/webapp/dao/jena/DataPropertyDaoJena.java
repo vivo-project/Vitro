@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,6 @@ import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.ontology.ProfileException;
 import com.hp.hpl.jena.ontology.Restriction;
-import com.hp.hpl.jena.ontology.SomeValuesFromRestriction;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -53,7 +51,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
@@ -93,7 +90,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     	try {
 	        com.hp.hpl.jena.ontology.OntResource ind = ontModel.getOntResource(dataPropertyURI);
 	        if( ind != null ){
-	            ontModel.add(ind,(Property)DATAPROPERTY_ISEXTERNALID, "TRUE");
+	            ontModel.add(ind, DATAPROPERTY_ISEXTERNALID, "TRUE");
 	            return true;
 	        }else{
 	            return false;
@@ -114,7 +111,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             	while(restIt.hasNext()) {
             		Resource restRes = restIt.next();
             		if (restRes.canAs(OntResource.class)) {
-            			OntResource restOntRes = (OntResource) restRes.as(OntResource.class);
+            			OntResource restOntRes = restRes.as(OntResource.class);
             			smartRemove(restOntRes, ontModel);
             		}
             	}
@@ -181,7 +178,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             dp.setNamespace(op.getNameSpace());
             dp.setLocalName(op.getLocalName());
             OntologyDao oDao=getWebappDaoFactory().getOntologyDao();
-            Ontology o = (Ontology)oDao.getOntologyByURI(dp.getNamespace());
+            Ontology o = oDao.getOntologyByURI(dp.getNamespace());
             if (o==null) {
                 if (!VitroVocabulary.vitroURI.equals(dp.getNamespace())) {
                     log.debug("datapropFromOntProperty(): no ontology object found for the namespace "+dp.getNamespace());
@@ -206,8 +203,8 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             dp.setExample(getPropertyStringValue(op,EXAMPLE_ANNOT));
             dp.setDescription(getPropertyStringValue(op,DESCRIPTION_ANNOT));
             dp.setPublicDescription(getPropertyStringValue(op,PUBLIC_DESCRIPTION_ANNOT));
-            dp.setDisplayTier(((WebappDaoFactoryJena)getWebappDaoFactory()).getJenaBaseDao().getPropertyNonNegativeIntValue(op, DISPLAY_RANK_ANNOT));
-            dp.setDisplayLimit(((WebappDaoFactoryJena)getWebappDaoFactory()).getJenaBaseDao().getPropertyNonNegativeIntValue(op, DISPLAY_LIMIT));
+            dp.setDisplayTier((getWebappDaoFactory()).getJenaBaseDao().getPropertyNonNegativeIntValue(op, DISPLAY_RANK_ANNOT));
+            dp.setDisplayLimit((getWebappDaoFactory()).getJenaBaseDao().getPropertyNonNegativeIntValue(op, DISPLAY_LIMIT));
             
             //There might be multiple HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT properties, only use the highest
             StmtIterator it = op.listProperties(HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
@@ -216,7 +213,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
                 Statement stmt = it.nextStatement();
                 RDFNode obj;
                 if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                    Resource res = (Resource)obj.as(Resource.class);
+                    Resource res = obj.as(Resource.class);
                     if( res != null && res.getURI() != null ){
                         BaseResourceBean.RoleLevel roleFromModel =  BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
                         if( roleFromModel != null && 
@@ -235,7 +232,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
                 Statement stmt = it.nextStatement();
                 RDFNode obj;
                 if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                    Resource res = (Resource)obj.as(Resource.class);
+                    Resource res = obj.as(Resource.class);
                     if( res != null && res.getURI() != null ){
                         BaseResourceBean.RoleLevel roleFromModel =  BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
                         if( roleFromModel != null && 
@@ -365,7 +362,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             while (restIt.hasNext()) {
                 Resource restRes = restIt.next();
                 if (restRes.canAs(Restriction.class)) {
-                    Restriction rest = (Restriction) restRes.as(Restriction.class);
+                    Restriction rest = restRes.as(Restriction.class);
                     if (rest.isAllValuesFromRestriction()) {
                         AllValuesFromRestriction avfrest = rest.asAllValuesFromRestriction();
                         if (avfrest.getAllValuesFrom() != null) {
@@ -485,7 +482,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         	}
             com.hp.hpl.jena.ontology.DatatypeProperty jDataprop = ontModel.createDatatypeProperty(dtp.getURI());
             if (dtp.getPublicName() != null && dtp.getPublicName().length() > 0) {
-            	jDataprop.setLabel(dtp.getPublicName(), (String) getDefaultLanguage());
+            	jDataprop.setLabel(dtp.getPublicName(), getDefaultLanguage());
             } else {
             	jDataprop.removeAll(RDFS.label);
             }
@@ -609,7 +606,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
                     	while (parentNodeIt.hasNext()) {
                     		RDFNode parentNode = parentNodeIt.next();
                     		if (parentNode.canAs(Property.class)) {
-                    			parentList.add((Property) parentNode.as(Property.class));
+                    			parentList.add(parentNode.as(Property.class));
                     		}
                     	}
                     	if (parentList.size()==0) {
