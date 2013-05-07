@@ -46,6 +46,9 @@ Multiple labels exist for this profile but there should only be one. Select the 
             <input type="button" class="submit" id="submit" value="Save" role="button" role="input" />
             <span class="or"> or </span>
             <a href="${urls.referringPage}" class="cancel" title="cancel" >Cancel</a>
+            <span id="indicator" class="indicator hidden">
+                <img class="indicator" src="${urls.base}/images/indicatorWhite.gif" />&nbsp;Your selection is being processed.
+            </span>
         </p>
     </section>
 
