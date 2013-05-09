@@ -214,32 +214,14 @@ public class VitroRequest extends HttpServletRequestWrapper {
     }
 
     //Get the display and editing configuration model
-    public OntModel getDisplayModel(){     
-        //bdc34: I have no idea what the correct way to get this model is
-        
-        //try from the request
-        if( _req.getAttribute("displayOntModel") != null ){
-            return (OntModel) _req.getAttribute(DISPLAY_ONT_MODEL);
-                
-        //try from the session
-        } else {
-            HttpSession session = _req.getSession(false);
-            if( session != null ){
-                if( session.getAttribute(DISPLAY_ONT_MODEL) != null ){            
-                    return (OntModel) session.getAttribute(DISPLAY_ONT_MODEL);
-                    
-                //try from the context                    
-                }else{
-                    if( session.getServletContext().getAttribute(DISPLAY_ONT_MODEL) != null){
-                        return (OntModel)session.getServletContext().getAttribute(DISPLAY_ONT_MODEL); 
-                    }
-                }
-            }            
-        }
-        
-        //nothing worked, could not find display model
-        log.error("No display model could be found.");
-        return null;                
+    public OntModel getDisplayModel(){
+    	Object value = _req.getAttribute(DISPLAY_ONT_MODEL);
+    	if (value instanceof OntModel) {
+    		return (OntModel) value;
+    	} else {
+    		log.error("No display model on the VitroRequest. Expecting an OntModel but found " + value);
+    		return null;
+    	}
     }
         
     /**
