@@ -2,6 +2,6 @@
 
 <#-- Template for help on individual page -->
 
-<h2>Individual not found:</h2>
+<h2>${i18n().individual_not_found}</h2>
 
-<p>id is the id of the entity to query for. netid also works.</p>
+<p>${i18n().entity_to_query_for}</p>

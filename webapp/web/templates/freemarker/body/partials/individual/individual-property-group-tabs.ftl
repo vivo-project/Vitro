@@ -15,8 +15,8 @@
 		<#--the function replaces spaces in the name with underscores, also called for the property group menu-->
     	<#assign groupNameHtmlId = p.createPropertyGroupHtmlId(groupName) >
     <#else>
-        <#assign groupName = "Properties">
-    	<#assign groupNameHtmlId = "properties" >
+        <#assign groupName = "${i18n().properties_capitalized}">
+    	<#assign groupNameHtmlId = "${i18n().properties}" >
     </#if>
         <#if tabCount = 1 >
             <li class="selectedGroupTab clickable" groupName="${groupNameHtmlId}">${groupName?capitalize}</li>
@@ -28,7 +28,7 @@
         </#if>
 </#list>
 <#if (propertyGroups.all?size > 1) >
-    <li  class="nonSelectedGroupTab clickable" groupName="viewAll">View All</li>
+    <li  class="nonSelectedGroupTab clickable" groupName="viewAll">${i18n().view_all}</li>
     <li  class="groupTabSpacer">&nbsp;</li>
 </#if>
 </ul>
@@ -38,8 +38,8 @@
     <#assign verbose = (verbosePropertySwitch.currentValue)!false>
     <section id="${groupNameHtmlId}" class="property-group" role="region" style="<#if (sectionCount > 1) >display:none<#else>display:block</#if>">
     <nav id="scroller" class="scroll-up hidden" role="navigation">
-        <a href="#branding" title="scroll up" >
-            <img src="${urls.images}/individual/scroll-up.gif" alt="scroll to property group menus" />
+        <a href="#branding" title="${i18n().scroll_to_menus}" >
+            <img src="${urls.images}/individual/scroll-up.gif" alt="${i18n().scroll_to_menus}" />
         </a>
     </nav>
     
@@ -49,7 +49,7 @@
     	<#assign groupNameHtmlId = p.createPropertyGroupHtmlId(groupName) >
         <h2 id="${groupNameHtmlId}" pgroup="tabs" class="hidden">${groupName?capitalize}</h2>
     <#else>
-        <h2 id="properties" pgroup="tabs" class="hidden">Properties</h2>
+        <h2 id="properties" pgroup="tabs" class="hidden">${i18n().properties_capitalized}</h2>
     </#if>
         <div id="${groupNameHtmlId}Group" >
             <#-- List the properties in the group   -->

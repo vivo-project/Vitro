@@ -11,9 +11,7 @@
         </section>
     </#if>
 
-    <p>Thank you for your interest in ${siteName}. 
-        Please submit this form with questions, comments, or feedback about the content of this site.
-    </p>
+    <p>${i18n().interest_thanks(siteName)}</p>
         
     <form name="contact_form" id="contact_form" class="customForm" action="${formAction!}" method="post" onSubmit="return ValidateForm('contact_form');" role="contact form">
         <input type="hidden" name="RequiredFields" value="webusername,webuseremail,s34gfd88p9x1" />
@@ -22,25 +20,25 @@
         <input type="hidden" name="EmailFieldsNames" value="emailaddress" />
         <input type="hidden" name="DeliveryType" value="contact" />
     
-        <label for="webusername">Full name <span class="requiredHint"> *</span></label>
+        <label for="webusername">${i18n().full_name} <span class="requiredHint"> *</span></label>
         <input type="text" name="webusername" value="${webusername!}"/>
         
-        <label for="webuseremail">Email address <span class="requiredHint"> *</span></label>
+        <label for="webuseremail">${i18n().email_address} <span class="requiredHint"> *</span></label>
         <input type="text" name="webuseremail"  value="${webuseremail!}"/>
 
-        <label>Comments, questions, or suggestions <span class="requiredHint"> *</span></label>
+        <label>${i18n().comments_questions} <span class="requiredHint"> *</span></label>
         <textarea name="s34gfd88p9x1" rows="10" cols="90">${comments!}</textarea>
         
        
-    	<p><label class="realpersonLabel">Please enter the letters displayed below into the security field:</label>
+    	<p><label class="realpersonLabel">${i18n().enter_in_security_field}:</label>
 
     		<input type="text" id="defaultReal" name="defaultReal"></p>
         
         <div class="buttons">
-            <br /><input id="submit" type="submit" value="Send Mail" />
+            <br /><input id="submit" type="submit" value="${i18n().send_mail}" />
         </div>
         
-        <p class="requiredHint">* required fields</p>
+        <p class="requiredHint">* ${i18n().required_fields}</p>
     </form>    
 </section>
 
