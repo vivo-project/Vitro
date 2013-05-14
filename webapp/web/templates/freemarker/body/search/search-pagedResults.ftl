@@ -8,8 +8,14 @@
     <#if classGroupName?has_content>limited to type '${classGroupName}'</#if>
     <#if typeName?has_content>limited to type '${typeName}'</#if>
 </#escape>
+<span id="downloadResults">
+	<img src="images/share-uri-icon.png" alt="XML/RDF Results" />
+	
+</span>
 </h2>
+
 <span id="searchHelp"><a href="${urls.base}/searchHelp" title="search help">Not the results you expected?</a></span>
+
 <div class="contentsBrowseGroup">
 
     <#-- Refinement links -->

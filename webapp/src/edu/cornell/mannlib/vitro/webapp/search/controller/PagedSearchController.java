@@ -70,6 +70,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     protected static final int DEFAULT_MAX_HIT_COUNT = 1000;   
 
     private static final String PARAM_XML_REQUEST = "xml";
+    private static final String PARAM_CSV_REQUEST = "csv";
     private static final String PARAM_START_INDEX = "startIndex";
     private static final String PARAM_HITS_PER_PAGE = "hitsPerPage";
     private static final String PARAM_CLASSGROUP = "classgroup";
@@ -79,7 +80,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     protected static final Map<Format,Map<Result,String>> templateTable;
 
     protected enum Format { 
-        HTML, XML; 
+        HTML, XML, CSV; 
     }
     
     protected enum Result {
@@ -101,14 +102,25 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             throws IOException, ServletException {
         VitroRequest vreq = new VitroRequest(request);
         boolean wasXmlRequested = isRequestedFormatXml(vreq);
-        if( ! wasXmlRequested ){
+        boolean wasCSVRequested = isRequestedFormatCSV(vreq);
+        if( !wasXmlRequested && !wasCSVRequested){
             super.doGet(vreq,response);
-        }else{
+        }else if (wasXMLRequested){
             try {                
                 ResponseValues rvalues = processRequest(vreq);
                 
                 response.setCharacterEncoding("UTF-8");
                 response.setContentType("text/xml;charset=UTF-8");
+                writeTemplate(rvalues.getTemplateName(), rvalues.getMap(), request, response);
+            } catch (Exception e) {
+                log.error(e, e);
+            }
+        }else if (wasCSVRequested){
+        	try {                
+                ResponseValues rvalues = processRequest(vreq);
+                
+                response.setCharacterEncoding("UTF-8");
+                response.setContentType("text/csv;charset=UTF-8");
                 writeTemplate(rvalues.getTemplateName(), rvalues.getMap(), request, response);
             } catch (Exception e) {
                 log.error(e, e);
@@ -672,10 +684,25 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             return false;
         }
     }
+    
+    protected boolean isRequestedFormatCSV(VitroRequest req){
+        if( req != null ){
+            String param = req.getParameter(PARAM_CSV_REQUEST);
+            if( param != null && "1".equals(param)){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return false;
+        }
+    }
 
     protected Format getFormat(VitroRequest req){
         if( req != null && req.getParameter("xml") != null && "1".equals(req.getParameter("xml")))
             return Format.XML;
+        else if ( req != null && req.getParameter("csv") != null && "1".equals(req.getParameter("csv")))
+        	return Format.CSV;
         else 
             return Format.HTML;
     }
@@ -705,8 +732,19 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         resultsToTemplates = new HashMap<Result,String>();
         resultsToTemplates.put(Result.PAGED, "search-xmlResults.ftl");
         resultsToTemplates.put(Result.ERROR, "search-xmlError.ftl");
+
         // resultsToTemplates.put(Result.BAD_QUERY, "search-xmlBadQuery.ftl");        
         templateTable.put(Format.XML, Collections.unmodifiableMap(resultsToTemplates));
+        
+        
+        // set up CSV format
+        resultsToTemplates = new HashMap<Result,String>();
+        resultsToTemplates.put(Result.PAGED, "search-csvResults.ftl");
+        resultsToTemplates.put(Result.ERROR, "search-csvError.ftl");
+        
+        // resultsToTemplates.put(Result.BAD_QUERY, "search-xmlBadQuery.ftl");        
+        templateTable.put(Format.CSV, Collections.unmodifiableMap(resultsToTemplates));
+
         
         return Collections.unmodifiableMap(templateTable);
     }
