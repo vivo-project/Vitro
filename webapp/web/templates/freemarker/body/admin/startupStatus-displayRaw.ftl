@@ -1,10 +1,10 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- 
-    Template for the raw page that displays the StartupStatus if there 
+<#--
+    Template for the raw page that displays the StartupStatus if there
     are warnings or errors.
     
-    "raw" because this template works outside of the usual framework, in 
+    "raw" because this template works outside of the usual framework, in
     case the Freemarker context didn't initialize properly.
     
     This file can't even include a reference to an external CSS file, in case
@@ -40,7 +40,7 @@
 
 <html lang="en">
     <head>
-        <title>${i18n().startup_status}</title>
+        <title>Startup Status</title>
         
         <style TYPE="text/css">
            #startup-trace {
@@ -63,7 +63,7 @@
                background-color: #FFDDDD;
            }
            #startup-trace li.warning{
-               background-color: #FFFFDD; 
+               background-color: #FFFFDD;
            }
            #startup-trace li.info {
                background-color: #DDFFDD;
@@ -72,14 +72,14 @@
                background-color: #F3F3F0;
            }
            
-        </style> 
+        </style>
     </head>
 
     <body>
         <#if status.errorItems?has_content>
-            <h2>${i18n().fatal_error}</h2>
+            <h2>Fatal error</h2>
 
-            <p>${i18n().fatal_error_detected(applicationName)}</p>
+            <p>${applicationName} detected a fatal error during startup.</p>
 
             <ul id="startup-trace" cellspacing="0" class="trace" role="navigation">
             <#list status.errorItems as item>
@@ -89,9 +89,9 @@
         </#if>
 
         <#if status.warningItems?has_content>
-            <h2>${i18n().warning}</h2>
+            <h2>Warning</h2>
 
-            <p>${i18n().warning_issued(applicationName)}</p>
+            <p>${applicationName} issued warnings during startup.</p>
 
             <ul id="startup-trace" cellspacing="0" class="trace" role="navigation"><#list status.warningItems as item>
               <@statusItem item=item />
@@ -100,14 +100,14 @@
             
             <#-- If there were no fatal errors, let them go forward from here. -->
             <#if showLink>
-                <p><a href="${url}" title="continue">${i18n().continue}</a></p>
-    	    </#if>
+                <p><a href="${url}" title="continue">Continue</a></p>
+     </#if>
             
         </#if>
 
-        <h2>${i18n().startup_trace}</h2>
+        <h2>Startup trace</h2>
 
-        <p>${i18n().full_list_startup}</p>
+        <p>The full list of startup events and messages.</p>
 
         <ul id="startup-trace" cellspacing="0" class="trace" role="navigation">
               <#list status.statusItems as item>
