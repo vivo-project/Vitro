@@ -35,9 +35,9 @@
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/startupStatus.css" />')}
 
 <#if status.errorItems?has_content>
-    <h2>Fatal error</h2>
+    <h2>${i18n().fatal_error}</h2>
     
-    <p>${applicationName} detected a fatal error during startup.</p>
+    <p>${i18n().fatal_error_detected(applicationName)}</p>
    
     <ul id="startup-trace" cellspacing="0" class="trace" role="navigation">
     <#list status.errorItems as item>
@@ -47,9 +47,9 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/startupStatus.c
 </#if>
 
 <#if status.warningItems?has_content>
-    <h2>Warning</h2>
+    <h2>${i18n().warning}</h2>
     
-    <p>${applicationName} issued warnings during startup.</p>
+    <p>${i18n().warning_issued(applicationName)}</p>
     
     <ul id="startup-trace" cellspacing="0" class="trace" role="navigation"><#list status.warningItems as item>
       <@statusItem item=item />
@@ -57,9 +57,9 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/startupStatus.c
     </ul>
 </#if>
 
-<h2>Startup trace</h2>
+<h2>${i18n().startup_trace}</h2>
 
-<p>The full list of startup events and messages.</p>
+<p>${i18n().full_list_startup}</p>
 
 <ul id="startup-trace" cellspacing="0" class="trace" role="navigation">
       <#list status.statusItems as item>

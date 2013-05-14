@@ -72,7 +72,10 @@ public class JsonServlet extends VitroHttpServlet {
             new GetDataForPage(vreq).process(resp);
         }else if( vreq.getParameter("getRenderedSolrIndividualsByVClass") != null ){
             new GetRenderedSolrIndividualsByVClass(vreq).process(resp);
+        }else if( vreq.getParameter("getRandomSolrIndividualsByVClass") != null ){
+            new GetRandomSolrIndividualsByVClass(vreq).process(resp);
         }
+        
     }
     
 
@@ -135,7 +138,35 @@ public class JsonServlet extends VitroHttpServlet {
             return value;            
     }
     
+    public static JSONObject getRandomSolrIndividualsByVClass(String vclassURI, HttpServletRequest req, ServletContext context) throws Exception {
+        VitroRequest vreq = new VitroRequest(req);        
+        
+        Map<String, Object> map = getRandomSolrVClassResults(vclassURI, vreq, context);
+        //last parameter indicates single vclass instead of multiple vclasses
+        return processVClassResults(map, vreq, context, false);                    
+    }
 
+     //Including version for Random Solr query for Vclass Intersections
+     private static Map<String,Object> getRandomSolrVClassResults(String vclassURI, VitroRequest vreq, ServletContext context){
+         log.debug("Retrieving random Solr intersection results for " + vclassURI);
+
+         int page = IndividualListController.getPageParameter(vreq);
+         int pageSize = Integer.parseInt(vreq.getParameter("pageSize"));
+         log.debug("page and pageSize parameters = " + page + " and " + pageSize);
+         Map<String,Object> map = null;
+         try {
+ 	         map = IndividualListController.getRandomResultsForVClass(
+ 	                 vclassURI, 
+ 	                 page, 
+ 	                 pageSize, 
+ 	                 vreq.getWebappDaoFactory().getIndividualDao(), 
+ 	                 context);  
+         } catch(Exception ex) {
+         	log.error("Error in retrieval of search results for VClass " + vclassURI, ex);
+         }
+
+         return map;
+    }
     
 
 }

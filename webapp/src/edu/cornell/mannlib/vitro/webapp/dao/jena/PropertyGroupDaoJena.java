@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -16,7 +15,6 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -26,7 +24,6 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
@@ -228,7 +225,7 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
 	    try {
 	        Individual groupInd = ontModel.getIndividual(group.getURI());
 	        try {
-	            groupInd.setLabel(group.getName(), (String) getDefaultLanguage());
+	            groupInd.setLabel(group.getName(), getDefaultLanguage());
 	        } catch (Exception e) {
 	            log.error("error updating name for "+groupInd.getURI());
 	        }

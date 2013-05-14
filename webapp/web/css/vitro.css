@@ -251,6 +251,7 @@ p#mngLabelsText {
 /* SEARCH HOME------>  */ 
 #search-home {
 		margin-top: 2em;
+		width: 570px;
 }
 
 #search-home h3 {
@@ -341,17 +342,19 @@ a.filter-search {
 		margin-top: 1em;
 		width: 921px;
 		height: 213px;
-		float: left;
+		clear: both;
 }
-#home-stats h4 {
+.home-sections h4 {
 		margin-top: 0;
-		width: 64px;
 		height: 34px;
 		font-size: 18px;
 		text-align: center;
 		margin-left: 35px;
 		padding: 0;
 		line-height: 35px;	
+}
+#home-stats h4 {
+		width: 102px;
 }
 #stats {
 		margin: 0 auto;

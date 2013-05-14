@@ -94,17 +94,10 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
         setStartupDataset(dataset, ctx);
         
         // ABox assertions
-        Model aboxAssertions = dataset.getNamedModel(
-                JenaDataSourceSetupBase.JENA_DB_MODEL);
-        baseOms.setABoxModel(
-                ModelFactory.createOntologyModel(
-                        OntModelSpec.OWL_MEM, aboxAssertions));
+        baseOms.setABoxModel(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, dataset.getNamedModel(JenaDataSourceSetupBase.JENA_DB_MODEL)));
         
         // ABox inferences
-        Model aboxInferences = dataset.getNamedModel(
-                JenaDataSourceSetupBase.JENA_INF_MODEL);
-        inferenceOms.setABoxModel(ModelFactory.createOntologyModel(
-                OntModelSpec.OWL_MEM, aboxInferences));
+        inferenceOms.setABoxModel(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, dataset.getNamedModel(JenaDataSourceSetupBase.JENA_INF_MODEL)));
         
         // TBox assertions
         try {
@@ -115,15 +108,11 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
             
             if (tboxAssertionsDB != null) {
                 long startTime = System.currentTimeMillis();
-                System.out.println(
-                        "Copying cached tbox assertions into memory");
+                log.info("Copying cached tbox assertions into memory");
                 tboxAssertions.add(tboxAssertionsDB);
-                System.out.println((System.currentTimeMillis() - startTime)
-                        / 1000 + " seconds to load tbox assertions");
+                log.info((System.currentTimeMillis() - startTime)/ 1000 + " seconds to load tbox assertions");
+                tboxAssertions.getBaseModel().register(new ModelSynchronizer(tboxAssertionsDB));
             }
-
-            tboxAssertions.getBaseModel().register(new ModelSynchronizer(
-                    tboxAssertionsDB));
                         
             baseOms.setTBoxModel(tboxAssertions);
         } catch (Throwable e) {
@@ -139,15 +128,15 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
             
             if (tboxInferencesDB != null) {
                 long startTime = System.currentTimeMillis();
-                System.out.println(
+                log.info(
                         "Copying cached tbox inferences into memory");
                 tboxInferences.add(tboxInferencesDB);
                 System.out.println((System.currentTimeMillis() - startTime)
                         / 1000 + " seconds to load tbox inferences");
+                
+                tboxInferences.getBaseModel().register(new ModelSynchronizer(
+                		tboxInferencesDB));
             }
-            
-            tboxInferences.getBaseModel().register(new ModelSynchronizer(
-                    tboxInferencesDB));
             inferenceOms.setTBoxModel(tboxInferences);
         } catch (Throwable e) {
             log.error("Unable to load tbox inference cache from DB", e);
@@ -155,7 +144,6 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
         }
                               
         // union ABox
-        
         Model m = ModelFactory.createUnion(
                 baseOms.getABoxModel(), inferenceOms.getABoxModel());
         m = ModelFactory.createModelForGraph(
@@ -167,8 +155,7 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
         unionOms.setABoxModel(unionABoxModel);
         
         // union TBox
-        m = ModelFactory.createUnion(
-                baseOms.getTBoxModel(), inferenceOms.getTBoxModel());
+        m = ModelFactory.createUnion(baseOms.getTBoxModel(), inferenceOms.getTBoxModel());
         m = ModelFactory.createModelForGraph(
                 new SpecialBulkUpdateHandlerGraph(
                         m.getGraph(), 

@@ -24,6 +24,7 @@ public class GetSolrIndividualsByVClass extends JsonObjectProducer {
 	protected JSONObject process() throws Exception {
         VClass vclass=null;
         
+        String queryType = (String) vreq.getAttribute("queryType");
         String vitroClassIdStr = vreq.getParameter("vclassId");            
         if ( vitroClassIdStr != null && !vitroClassIdStr.isEmpty()){                             
             vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vitroClassIdStr);
@@ -35,8 +36,13 @@ public class GetSolrIndividualsByVClass extends JsonObjectProducer {
             log.debug("parameter vclassId URI parameter expected ");
             throw new Exception("parameter vclassId URI parameter expected ");
         }
+        
         vreq.setAttribute("displayType", vitroClassIdStr);
-        return JsonServlet.getSolrIndividualsByVClass(vclass.getURI(), vreq, ctx);
+        if ( queryType != null && queryType.equals("random")){
+            return JsonServlet.getRandomSolrIndividualsByVClass(vclass.getURI(), vreq, ctx);             
+        } else {
+            return JsonServlet.getSolrIndividualsByVClass(vclass.getURI(), vreq, ctx);
+        }
     }
 
 }

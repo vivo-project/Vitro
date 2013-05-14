@@ -37,6 +37,11 @@ var manageLabels = {
 
         $('input#submit').click( function() {
              manageLabels.processLabel(manageLabels.selectedRadio);
+             $('span.or').hide();
+             $('a.cancel').hide();
+             $('span#indicator').removeClass('hidden');
+             $('input.submit').addClass('disabledSubmit');
+             $('input.submit').attr('disabled', 'disabled');             
         });
 
     },
@@ -70,11 +75,19 @@ var manageLabels = {
             complete: function(request, status) {
                 
                 if (status == 'success') {
+                    $('span.or').show();
+                    $('a.cancel').show();
+                    $('span#indicator').addClass('hidden');
                     window.location = $('a.cancel').attr('href');
                 }
                 else {
                     alert('Error processing request: the unchecked labels could not be deleted.');
                     selectedRadio.removeAttr('checked');
+                    $('span.or').show();
+                    $('a.cancel').show();
+                    $('span#indicator').addClass('hidden');
+                    $('input.submit').removeClass('disabledSubmit');
+                    $('input.submit').attr('disabled', '');
                 }
             }
         });        

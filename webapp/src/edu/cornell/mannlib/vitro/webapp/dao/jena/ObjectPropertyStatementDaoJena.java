@@ -99,7 +99,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 	            ClosableIterator<Statement> propIt = ind.listProperties();
 	            try {
 	                while (propIt.hasNext()) {
-	                    Statement st = (Statement) propIt.next();
+	                    Statement st = propIt.next();
 	                    
 	                    if (st.getObject().isResource() && !(NONUSER_NAMESPACES.contains(st.getPredicate().getNameSpace()))) {
 	                        try {
@@ -173,7 +173,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     		try {
     			int count = 0;
     			while ( (opsIt.hasNext()) && ((endIndex<0) || (count<endIndex)) ) {
-    				Statement stmt = (Statement) opsIt.next();
+    				Statement stmt = opsIt.next();
     				if (stmt.getObject().isResource()) {
 	    				++count;
 	    				if (startIndex<0 || startIndex<=count) {

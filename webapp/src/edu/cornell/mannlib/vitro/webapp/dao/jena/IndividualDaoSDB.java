@@ -106,7 +106,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
             : ResourceFactory.createResource(vclassURI);
     
         if (theClass.isAnon() && theClass.canAs(UnionClass.class)) {
-        	UnionClass u = (UnionClass) theClass.as(UnionClass.class);
+        	UnionClass u = theClass.as(UnionClass.class);
         	for (OntClass operand : u.listOperands().toList()) {
         		VClass vc = new VClassJena(operand, getWebappDaoFactory());
         		ents.addAll(getIndividualsByVClass(vc));
@@ -523,7 +523,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
             try {
 	            ResultSet results = qe.execSelect();
 	            while (results.hasNext()) {
-	                QuerySolution qs = (QuerySolution) results.next();
+	                QuerySolution qs = results.next();
 	                Resource res = (Resource) qs.get("?ent");
 	                if (res.getURI() != null) {
 	                	individualURIs.add(res.getURI());

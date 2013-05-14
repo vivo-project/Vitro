@@ -2,15 +2,21 @@
 
 <#-- Template for setting the account reference field, which can also associate a profile with the user account -->
 
+<#assign strings = i18n() />
+
 <section id="edit-myProxy" name="proxyProxiesPanel" role="region">
-    <h4>Who can edit my profile</h4>
+    <h4>${strings.who_can_edit_profile}</h4>
     
-    <label for="addProfileEditor">Add profile editor</label>
-    <input id="addProfileEditor" type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" /><span><img class="loading-profileMyAccoount hidden" src="${urls.images}/indicatorWhite.gif" /></span>
+    <label for="addProfileEditor">${strings.add_profile_editor}</label>
+    <input id="addProfileEditor" type="text" name="proxySelectorAC" class="acSelector" size="35" 
+            value="${strings.select_existing_last_name}" role="input" />
+    <span><img class="loading-profileMyAccoount hidden" src="${urls.images}/indicatorWhite.gif" /></span>
     
-    <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='type more characters' noMatchText='no match'>&nbsp;</span></p>
+    <p class="search-status">
+        <span name='proxySelectorSearchStatus' moreCharsText='${strings.type_more_characters}' noMatchText='${strings.no_match}'>&nbsp;</span>
+    </p>
     <p name="excludeUri" style="display: none">${myAccountUri}<p>
-    <p class="selected-editors">Selected editors:</p>
+    <p class="selected-editors">${strings.selected_editors}:</p>
     
     <#-- Magic ul that holds all of the proxy data and the template that shows how to display it. -->
     <ul name="proxyData" role="navigation">
@@ -35,7 +41,7 @@
                 
                 <p class="proxy-info">%label% | <span class="class-label">%classLabel%</span>
                     <br />
-                    <a class='remove-proxy' href="." templatePart="remove" title="remove selection">Remove selection</a>
+                    <a class='remove-proxy' href="." templatePart="remove" title="${strings.remove_selection_title}">${strings.remove_selection}</a>
                     
                     <input type="hidden" name="proxyUri" value="%uri%" role="input" />
                 </p>

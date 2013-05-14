@@ -305,7 +305,7 @@ public class RDFServiceModelMaker implements ModelMaker {
             List<String> graphNames = rdfService.getGraphURIs();
             Iterator<String> nameIt = graphNames.iterator();
             while (nameIt.hasNext()) {
-                String name = (String) nameIt.next();
+                String name = nameIt.next();
                 metadataModel.add(dbResource,metadataModel.getProperty(
                         HAS_NAMED_MODEL_URI),name);
             }

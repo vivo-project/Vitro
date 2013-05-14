@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 

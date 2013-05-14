@@ -12,17 +12,17 @@
     <body>
         <h3>${subject}</h3>
         
-        <p><strong>From:</strong> ${name}</p>
+        <p><strong>${i18n().from}:</strong> ${name}</p>
 
-        <p><strong>Email address:</strong> ${emailAddress}</p>
+        <p><strong>${i18n().email_address}:</strong> ${emailAddress}</p>
             
         <p>
-            <strong>IP address:</strong> ${ip}<br />
+            <strong>${i18n().ip_address}:</strong> ${ip}<br />
             <#if referrer??>
-                <em>Likely viewing page: ${referrer}</em>
+                <em>${i18n().viewing_page}: ${referrer}</em>
             </#if>
         </p>  
         
-        <p><strong>Comments:</strong> ${comments}</p>
+        <p><strong>${i18n().comments}:</strong> ${comments}</p>
     </body>
 </html>

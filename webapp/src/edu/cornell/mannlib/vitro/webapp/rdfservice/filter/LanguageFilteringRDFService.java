@@ -8,8 +8,10 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -368,17 +370,20 @@ public class LanguageFilteringRDFService implements RDFService {
 
 			int index = langs.indexOf(lang);
 			if (index >= 0) {
+				log.debug("languageIndex for '" + lang + "' is " + index);
 				return index;
 			}
 
 			if (lang.length() > 2) {
 				index = langs.indexOf(lang.substring(0, 2));
 				if (index >= 0) {
+					log.debug("languageIndex for '" + lang + "' is " + index + inexactMatchPenalty);
 					return index + inexactMatchPenalty;
 				}
 			}
 
 			if (lang.isEmpty()) {
+				log.debug("languageIndex for '" + lang + "' is " + noLanguage);
 				return noLanguage;
 			}
 

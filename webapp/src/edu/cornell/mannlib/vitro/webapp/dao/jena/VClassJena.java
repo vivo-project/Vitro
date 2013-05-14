@@ -324,7 +324,7 @@ public class VClassJena extends VClass {
                     Statement stmt = it.nextStatement();
                     RDFNode obj;
                     if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                        Resource res = (Resource)obj.as(Resource.class);
+                        Resource res = obj.as(Resource.class);
                         if( res != null && res.getURI() != null ){
                             BaseResourceBean.RoleLevel roleFromModel = BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
                             if( roleFromModel != null && 
@@ -358,7 +358,7 @@ public class VClassJena extends VClass {
                     Statement stmt = it.nextStatement();
                     RDFNode obj;
                     if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                        Resource res = (Resource)obj.as(Resource.class);
+                        Resource res = obj.as(Resource.class);
                         if( res != null && res.getURI() != null ){
                             BaseResourceBean.RoleLevel roleFromModel = BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
                             if( roleFromModel != null && 

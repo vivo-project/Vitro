@@ -17,15 +17,15 @@ table.threadInfo th {
 </style>
 
 
-<h2>Background Threads</h2>
+<h2>${i18n().background_threads}</h2>
 
 <section id="show-threads" role="region">
     <#list threads as threadInfo>
         <table class="threadInfo ${threadInfo.workLevel}" summary="Thread ${threadInfo.name}">
-            <tr><th>Name</th><td>${threadInfo.name}</td></tr>
-            <tr><th>WorkLevel</th><td>${threadInfo.workLevel}</td></tr>
-            <tr><th>Since</th><td>${threadInfo.since}</td></tr>
-            <tr><th>Flags</th><td>${threadInfo.flags}</td></tr>
+            <tr><th>${i18n().name}</th><td>${threadInfo.name}</td></tr>
+            <tr><th>${i18n().work_level}</th><td>${threadInfo.workLevel}</td></tr>
+            <tr><th>${i18n().since}</th><td>${threadInfo.since}</td></tr>
+            <tr><th>${i18n().flags}</th><td>${threadInfo.flags}</td></tr>
         </table>
     </#list>
 </section>

@@ -320,9 +320,9 @@ public class PelletListener implements ModelChangedListener {
 						        		try {
 						        			if ( ( ((Resource)stmt.getObject()).equals(RDFS.Resource) ) ) {
 						        				reject = true;
-						        			} else if ( ( ((Resource)stmt.getSubject()).equals(OWL.Nothing) ) )  {
+						        			} else if ( ( stmt.getSubject().equals(OWL.Nothing) ) )  {
 												reject = true; 
-											}  else if ( ( ((Resource)stmt.getObject()).equals(OWL.Nothing) ) )  {
+											}  else if ( ( stmt.getObject().equals(OWL.Nothing) ) )  {
 												reject = true;
 											}
 						        		} catch (Exception e) {}

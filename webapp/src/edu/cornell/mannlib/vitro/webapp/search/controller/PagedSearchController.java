@@ -211,7 +211,8 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             
             Map<String, Object> body = new HashMap<String, Object>();
             
-            String classGroupParam = vreq.getParameter(PARAM_CLASSGROUP);    
+            String classGroupParam = vreq.getParameter(PARAM_CLASSGROUP); 
+            log.debug("Query text is \""+ classGroupParam + "\"");   
             boolean classGroupFilterRequested = false;
             if (!StringUtils.isEmpty(classGroupParam)) {
                 VClassGroup grp = grpDao.getGroupByURI(classGroupParam);

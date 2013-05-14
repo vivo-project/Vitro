@@ -2,6 +2,6 @@
 
 <#-- Template for general system error. -->
 
-<p>There was an error in the system.</p>
+<p>${i18n().we_have_an_error}.</p>
 
-<p>Return to the <a href="${urls.home}" title="home page">home page</a>.</p> 
+<p>${i18n().return_to_the} <a href="${urls.home}" title="${i18n().home_page}">${i18n().home_page}</a></p>

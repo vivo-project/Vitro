@@ -92,7 +92,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             p.setNamespace(op.getNameSpace());
             p.setLocalName(op.getLocalName());
             OntologyDao oDao=getWebappDaoFactory().getOntologyDao();
-            Ontology o = (Ontology)oDao.getOntologyByURI(p.getNamespace());
+            Ontology o = oDao.getOntologyByURI(p.getNamespace());
             if (o==null) {
                 if (!VitroVocabulary.vitroURI.equals(p.getNamespace())) {
                     log.debug("propertyFromOntProperty(): no ontology object found for the namespace "+p.getNamespace());
@@ -180,7 +180,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 Statement stmt = it.nextStatement();
                 RDFNode obj;
                 if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                    Resource res = (Resource)obj.as(Resource.class);
+                    Resource res = obj.as(Resource.class);
                     if( res != null && res.getURI() != null ){
                         BaseResourceBean.RoleLevel roleFromModel =  BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
                         if( roleFromModel != null && 
@@ -199,7 +199,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 Statement stmt = it.nextStatement();
                 RDFNode obj;
                 if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                    Resource res = (Resource)obj.as(Resource.class);
+                    Resource res = obj.as(Resource.class);
                     if( res != null && res.getURI() != null ){
                         BaseResourceBean.RoleLevel roleFromModel =  BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
                         if( roleFromModel != null && 
@@ -259,7 +259,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 	                while (opIt.hasNext()) {
 	                	Resource res = (Resource) opIt.next();
 	                	if ( (res.canAs(OntProperty.class)) && (!NONUSER_NAMESPACES.contains(res.getNameSpace())) ) {
-	                		props.add(propertyFromOntProperty((OntProperty)res.as(OntProperty.class)));
+	                		props.add(propertyFromOntProperty(res.as(OntProperty.class)));
 	                	}
 	                }
 	            } finally {
@@ -298,7 +298,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             while(it.hasNext()){
                 ObjectPropertyStatement objPropertyStmt = (ObjectPropertyStatement)it.next();
                 if (hash.containsKey(objPropertyStmt.getPropertyURI())) {
-                    ObjectProperty p = (ObjectProperty) hash.get(objPropertyStmt.getPropertyURI());
+                    ObjectProperty p = hash.get(objPropertyStmt.getPropertyURI());
                     p.addObjectPropertyStatement(objPropertyStmt);
                 } else {
                     OntProperty op = getOntModel().getOntProperty(objPropertyStmt.getPropertyURI());
@@ -603,7 +603,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             	while(restIt.hasNext()) {
             		Resource restRes = restIt.next();
             		if (restRes.canAs(OntResource.class)) {
-            			OntResource restOntRes = (OntResource) restRes.as(OntResource.class);
+            			OntResource restOntRes = restRes.as(OntResource.class);
             			smartRemove(restOntRes, ontModel);
             		}
             	}            	
@@ -627,7 +627,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 	            	while(restIt.hasNext()) {
 	            		Resource restRes = restIt.next();
 	            		if (restRes.canAs(OntResource.class)) {
-	            			OntResource restOntRes = (OntResource) restRes.as(OntResource.class);
+	            			OntResource restOntRes = restRes.as(OntResource.class);
 	            			smartRemove(restOntRes, ontModel);
 	            		}
 	            	}
@@ -660,7 +660,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 while (propIt.hasNext()) {
                 	Resource res = (Resource) propIt.next();
                 	if (res.canAs(OntProperty.class)) {
-	                    com.hp.hpl.jena.ontology.OntProperty op = (com.hp.hpl.jena.ontology.OntProperty) res.as(OntProperty.class);
+	                    com.hp.hpl.jena.ontology.OntProperty op = res.as(OntProperty.class);
 	                    boolean isRoot = false;
 	                    Iterator parentIt = op.listSuperProperties();
 	                    if (parentIt != null) {

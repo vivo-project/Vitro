@@ -28,7 +28,7 @@
         <header>
             <#if relatedSubject??>
                 <h2>${relatedSubject.relatingPredicateDomainPublic} for ${relatedSubject.name}</h2>
-                <p><a href="${relatedSubject.url}" title="return to subject">&larr; return to ${relatedSubject.name}</a></p>                
+                <p><a href="${relatedSubject.url}" title="${i18n().return_to(relatedSubject.name)}">&larr; ${i18n().return_to(relatedSubject.name)}</a></p>                
             <#else>                
                 <h1 class="fn">
                     <#-- Label -->
@@ -77,3 +77,7 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_pl
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/imageUpload/imageUploadUtils.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/individual/individualUriRdf.js"></script>')}
+
+<script type="text/javascript">
+    i18n_confirmDelete = "${i18n().confirm_delete}"
+</script>

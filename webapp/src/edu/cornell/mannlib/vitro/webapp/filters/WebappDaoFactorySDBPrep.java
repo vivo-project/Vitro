@@ -3,10 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.filters;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -38,6 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetM
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringRDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 public class WebappDaoFactorySDBPrep implements Filter {
@@ -88,18 +87,10 @@ public class WebappDaoFactorySDBPrep implements Filter {
         String defaultNamespace = (String) _ctx.getAttribute("defaultNamespace");
 		WebappDaoFactory wadf = null;
 		VitroRequest vreq = new VitroRequest((HttpServletRequest) request);
-		
-        List<String> langs = new ArrayList<String>();
+
+		log.debug("Accept-Language: " + vreq.getHeader("Accept-Language"));
+		List<String> langs = LanguageFilteringUtils.localesToLanguages(vreq.getLocales());
         
-        log.debug("Accept-Language: " + vreq.getHeader("Accept-Language"));
-        Enumeration<Locale> locs = vreq.getLocales();
-        while (locs.hasMoreElements()) {
-            Locale locale = locs.nextElement();
-            langs.add(locale.toString().replace("_", "-"));
-        }
-        if (langs.isEmpty()) {
-            langs.add("en");
-        }
         WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
         config.setDefaultNamespace(defaultNamespace);
         config.setPreferredLanguages(langs);
@@ -110,12 +101,14 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		RDFService unfilteredRDFService = factory.getShortTermRDFService();
 		RDFService rdfService = null;
 		
-		if (!"false".equals(
-		        ConfigurationProperties.getBean(vreq).getProperty(
-		                "RDFService.languageFilter", "true"))) {
-		    rdfService = new LanguageFilteringRDFService(unfilteredRDFService, langs);
+		if (Boolean.valueOf(ConfigurationProperties.getBean(vreq).getProperty(
+				"RDFService.languageFilter", "true"))) {
+			rdfService = new LanguageFilteringRDFService(unfilteredRDFService, langs);
+			oms = LanguageFilteringUtils.replaceDisplayModelInSelector(oms, 
+					LanguageFilteringUtils.wrapOntModelInALanguageFilter(oms.getDisplayModel(), request));
+			baseOms = LanguageFilteringUtils.replaceDisplayModelInSelector(baseOms, oms.getDisplayModel());
 		} else {
-		    rdfService = unfilteredRDFService;
+			rdfService = unfilteredRDFService;
 		}
 		
 		Dataset dataset = new RDFServiceDataset(rdfService);

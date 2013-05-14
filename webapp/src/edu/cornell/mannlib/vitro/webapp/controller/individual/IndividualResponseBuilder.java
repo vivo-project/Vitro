@@ -180,7 +180,7 @@ class IndividualResponseBuilder {
 
 	private boolean getprofilePageTypesFlag() {
 		String property = ConfigurationProperties.getBean(vreq).getProperty(
-				"MultiViews.profilePageTypes");
+				"multiViews.profilePageTypes");
 		return "enabled".equals(property);
 	}
 

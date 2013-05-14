@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -48,6 +49,7 @@ public class HomePageController extends FreemarkerHttpServlet {
 	        }
         }*/
         body.put("dataServiceUrlVClassesForVClassGroup", UrlBuilder.getUrl("/dataservice?getVClassesForVClassGroup=1&classgroupUri="));
+	    body.put("geoFocusMapsEnabled", getGeoFocusMapsFlag(vreq));
         
         return new TemplateResponseValues(BODY_TEMPLATE, body);
     }
@@ -61,4 +63,11 @@ public class HomePageController extends FreemarkerHttpServlet {
     protected String getPageTemplateName() {
         return PAGE_TEMPLATE;
     }
+
+	private boolean getGeoFocusMapsFlag(VitroRequest vreq) {
+		String property = ConfigurationProperties.getBean(vreq).getProperty(
+				"homePage.geoFocusMaps");
+		return "enabled".equals(property);
+	}
+
 }

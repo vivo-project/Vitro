@@ -2,58 +2,48 @@
 
 <#-- Template for editing a user account -->
 
-<h3>My account</h3>
+<#assign strings = i18n() />
+
+<h3>${strings.myAccount_heading}</h3>
 
     <#if errorEmailIsEmpty??>
-        <#assign errorMessage = "You must supply an email address." />
+        <#assign errorMessage = strings.error_no_email />
+    <#elseif errorEmailInUse??>
+        <#assign errorMessage = strings.error_email_already_exists />
+    <#elseif errorEmailInvalidFormat??>
+        <#assign errorMessage = strings.error_invalid_email(emailAddress) />
+    <#elseif errorFirstNameIsEmpty??>
+        <#assign errorMessage = strings.error_no_first_name />
+    <#elseif errorLastNameIsEmpty??>
+        <#assign errorMessage = strings.error_no_last_name />
+    <#elseif errorNoRoleSelected??>
+        <#assign errorMessage = strings.error_no_role />
+    <#elseif errorPasswordIsEmpty??>
+        <#assign errorMessage = strings.error_no_password />
+    <#elseif errorPasswordIsWrongLength??>
+        <#assign errorMessage = strings.error_password_length(minimumLength, maximumLength) />
+    <#elseif errorPasswordsDontMatch??>
+        <#assign errorMessage = strings.error_password_mismatch />
     </#if>
-    
-    <#if errorEmailInUse??>
-        <#assign errorMessage = "An account with that email address already exists." />
-    </#if>
-    
-    <#if errorEmailInvalidFormat??>
-        <#assign errorMessage = "'${emailAddress}' is not a valid email address." />
-    </#if>
-    
-    <#if errorFirstNameIsEmpty??>
-        <#assign errorMessage = "You must supply a first name." />
-    </#if>
-    
-    <#if errorLastNameIsEmpty??>
-        <#assign errorMessage = "You must supply a last name." />
-    </#if>
-    
-    <#if errorPasswordIsEmpty??>
-        <#assign errorMessage = "No password supplied." />
-    </#if>
-    
-    <#if errorPasswordIsWrongLength??>
-        <#assign errorMessage = "Password must be between ${minimumLength} and ${maximumLength} characters." />
-    </#if>
-    
-    <#if errorPasswordsDontMatch??>
-        <#assign errorMessage = "Passwords do not match." />
-    </#if>
-    
+
     <#if errorMessage?has_content>
         <section id="error-alert" role="alert">
-            <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon"/>
+            <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="${strings.alt_error_alert}" />
             <p>${errorMessage}</p>
         </section>
     </#if>
 
     <#if confirmChange??>
-        <#assign confirmMessage = "Your changes have been saved." />
+        <#assign confirmMessage = strings.myAccount_confirm_changes />
     </#if>
     
     <#if confirmEmailSent??>
-        <#assign confirmMessage = "Your changes have been saved. A confirmation email has been sent to ${emailAddress}." />
+        <#assign confirmMessage = strings.myAccount_confirm_changes_plus_note(emailAddress) />
     </#if>
     
     <#if confirmMessage?has_content>
         <section  class="account-feedback" role="alert">
-            <p><img class="middle" src="${urls.images}/iconConfirmation.png" alert="Confirmation icon"/> ${confirmMessage}</p>
+            <p><img class="middle" src="${urls.images}/iconConfirmation.png" alt="${strings.alt_confirmation}"/> ${confirmMessage}</p>
         </section>
     </#if>
 
@@ -63,30 +53,34 @@
             <#include "userAccounts-myProxiesPanel.ftl">
         </#if>
 
-        <label for="email-address">Email address<span class="requiredHint"> *</span></label>
+        <label for="email-address">${strings.email_address}<span class="requiredHint"> *</span></label>
         <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
 
-        <p class="note">Note: if email changes, a confirmation email will<br />be sent to the new email address entered above.</p>
+        <p class="note">${strings.email_change_will_be_confirmed}</p>
         
-        <label for="first-name">First name<span class="requiredHint"> *</span></label> 
+        <label for="first-name">${strings.first_name}<span class="requiredHint"> *</span></label> 
         <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
 
-        <label for="last-name">Last name<span class="requiredHint"> *</span></label> 
+        <label for="last-name">${strings.last_name}<span class="requiredHint"> *</span></label> 
         <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
 
         <#if !externalAuth??>
-            <label for="new-password">New password</label>
+            <label for="new-password">${strings.new_password}</label>
             <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
 
-            <p class="note">Minimum of ${minimumLength} characters in length.<br />If left blank, the password will not be changed.</p>
+            <p class="note">${strings.minimum_password_length(minimumLength)}<br />${strings.leave_password_unchanged}</p>
 
-            <label for="confirm-password">Confirm new password</label> 
+            <label for="confirm-password">${strings.confirm_password}</label> 
             <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
         </#if>
 
-        <p><input type="submit" id="submitMyAccount" name="submitMyAccount" value="Save changes" class="submit" disabled /> or <a class="cancel" href="${urls.referringPage}" title="cancel">Cancel</a></p>
+        <p>
+            <input type="submit" id="submitMyAccount" name="submitMyAccount" value="${strings.save_changes}" class="submit" disabled /> 
+            ${strings.or} 
+            <a class="cancel" href="${urls.referringPage}" title="${strings.cancel_title}">${strings.cancel_link}</a>
+        </p>
 
-        <p class="requiredHint">* required fields</p>
+        <p class="requiredHint">* ${strings.required_fields}</p>
     </form>
 </section>
 

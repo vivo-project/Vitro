@@ -2,42 +2,20 @@
 
 <#-- Confirmation that a password has been reset. -->
 
-<#assign subject = "Your ${siteName} password changed." />
+<#assign strings = i18n() />
 
-<#assign html>
-<html>
-    <head>
-        <title>${subject}</title>
-    </head>
-    <body>
-        <p>
-            ${userAccount.firstName} ${userAccount.lastName}
-        </p>
-        
-        <p>
-            <strong>Password successfully changed.</strong>
-        </p>
-        
-        <p>
-            Your new password associated with ${userAccount.emailAddress} has been changed.
-        </p>
-        
-        <p>
-            Thank you.
-        </p>
-    </body>
-</html>
-</#assign>
+<#assign subject = strings.password_reset_complete_subject(siteName) />
 
-<#assign text>
-${userAccount.firstName} ${userAccount.lastName}
+<#assign html = strings.password_reset_complete_email_html(siteName, 
+                                                   subject, 
+                                                   userAccount.firstName, 
+                                                   userAccount.lastName, 
+                                                   userAccount.emailAddress) />
 
-Password successfully changed.
-
-Your new password associated with ${userAccount.emailAddress} 
-has been changed.
-
-Thank you.
-</#assign>
+<#assign text = strings.password_reset_complete_email_text(siteName, 
+                                                   subject, 
+                                                   userAccount.firstName, 
+                                                   userAccount.lastName, 
+                                                   userAccount.emailAddress) />
 
 <@email subject=subject html=html text=text />
