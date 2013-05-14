@@ -3,17 +3,17 @@
 <#-- Template for the Fake External Authentication page. -->
 
 <section role="region">
-    <h2>Fake External Authentication</h2>
+    <h2>${i18n().fake_external_auth}</h2>
     
     <p>
-      Enter the userID that you want to sign in as, or click Cancel.
+      ${i18n().enter_id_to_login}
     </p>
 
 		<form action="${controllerUrl}">
-			Username:
+			${i18n().username}:
 			<input type="text" name="username" />
-			<input type="submit" value="submit" /> 
-			<input type="submit" name="cancel" value="cancel" /> 
+			<input type="submit" value="${i18n().submit_button}" /> 
+			<input type="submit" name="cancel" value="${i18n().cancel_link}" /> 
 		</form>
     <br/>
 </section>
