@@ -5,7 +5,7 @@ $(document).ready(function(){
     $.extend(this, individualLocalName);
     adjustFontSize();
     padSectionBottoms();
-    retrieveLocalStorage();
+    checkLocationHash();
     
     // ensures that shorter property group sections don't cause the page to "jump around"
     // when the tabs are clicked
@@ -59,6 +59,43 @@ $(document).ready(function(){
         });        
     }
    
+    // If users click a marker on the home page map, they are taken to the profile
+    // page of the corresponding country. The url contains the word "Research" in
+    // the location hash. Use this to select the Research tab, which displays the
+    // researchers who have this countru as a geographic focus.
+    function checkLocationHash() {
+        if ( location.hash ) {
+            // remove the trailing white space
+            location.hash = location.hash.replace(/\s+/g, '');
+            if ( location.hash.indexOf("map") >= 0 ) {  
+                // get the name of the group that contains the geographicFocusOf property.
+                var tabName = $('h3#geographicFocusOf').parent('article').parent('div').attr("id");
+                tabName = tabName.replace("Group","");
+                tabNameCapped = tabName.charAt(0).toUpperCase() + tabName.slice(1);
+                // if the name of the first tab section = tabName we don't have to do anything;
+                // otherwise, select the correct tab and deselect the first one
+                var $firstTab = $('li.clickable').first();
+                if ( $firstTab.text() != tabNameCapped ) {
+                    // select the correct tab
+                    $('li[groupName="' + tabName + '"]').removeClass("nonSelectedGroupTab clickable");
+                    $('li[groupName="' + tabName + '"]').addClass("selectedGroupTab clickable");
+                    // deselect the first tab
+                    $firstTab.removeClass("selectedGroupTab clickable");
+                    $firstTab.addClass("nonSelectedGroupTab clickable");
+                    $('section.property-group:visible').hide();
+                    // show the selected tab section
+                    $('section#' + tabName).show();                
+                }
+            }
+            else {
+                retrieveLocalStorage();
+            }            
+        }
+        else {
+            retrieveLocalStorage();
+        }
+    }
+
     //  Next two functions --  keep track of which property group tab was selected,
     //  so if we return from a custom form or a related individual, even via the back button,
     //  the same property group will be selected as before.
@@ -96,15 +133,16 @@ $(document).ready(function(){
     }
 
     function retrieveLocalStorage() {
+        
         var localName = this.individualLocalName;
         var selectedTab = amplify.store(individualLocalName);
         
         if ( selectedTab != undefined ) {
             var groupName = selectedTab[0];
             
-            // unlikely, but it's possible a tab that was previously selected and stored won't be displayed
-            // because the object properties would have been deleted (in non-edit mode). So ensure that the tab in local
-            // storage has been rendered on the page.     
+            // unlikely, but it's possible a tab that was previously selected and stored won't be 
+            // displayed because the object properties would have been deleted (in non-edit mode). 
+            // So ensure that the tab in local storage has been rendered on the page.     
             if ( $("ul.propertyTabsList li[groupName='" + groupName + "']").length ) { 
                 // if the selected tab is the default first one, don't do anything
                 if ( $('li.clickable').first().attr("groupName") != groupName ) {   
@@ -129,14 +167,14 @@ $(document).ready(function(){
         }
     }
     // if there are so many tabs that they wrap to a second line, adjust the font size to 
-    //prevent wrapping
+    // prevent wrapping
     function adjustFontSize() {
         var width = 0;
         $('ul.propertyTabsList li').each(function() {
             width += $(this).outerWidth();
         });
         if ( width < 922 ) {
-            var diff = 926-width;
+            var diff = 925-width;
             $('ul.propertyTabsList li:last-child').css('width', diff + 'px');
         }
         else {
@@ -156,11 +194,17 @@ $(document).ready(function(){
             else if ( diff > 130 && diff < 175 ) {
                 $('ul.propertyTabsList li').css('font-size', "0.8em");
             }
-            else if ( diff > 175 && diff < 260 ) {
+            else if ( diff > 175 && diff < 240 ) {
                 $('ul.propertyTabsList li').css('font-size', "0.73em");
             }
-            else {
+            else if ( diff > 240 && diff < 280 ) {
                 $('ul.propertyTabsList li').css('font-size', "0.7em");
+            }
+            else if ( diff > 280 && diff < 310 ) {
+                $('ul.propertyTabsList li').css('font-size', "0.675em");
+            }
+            else {
+                $('ul.propertyTabsList li').css('font-size', "0.65em");
             }
 
             // get the new width
@@ -168,7 +212,7 @@ $(document).ready(function(){
             $('ul.propertyTabsList li').each(function() {
                 newWidth += $(this).outerWidth();
             });
-            var newDiff = 926-newWidth;
+            var newDiff = 925-newWidth;
             $('ul.propertyTabsList li:last-child').css('width', newDiff + 'px');
         }
     }
