@@ -105,12 +105,13 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         boolean wasCSVRequested = isRequestedFormatCSV(vreq);
         if( !wasXmlRequested && !wasCSVRequested){
             super.doGet(vreq,response);
-        }else if (wasXMLRequested){
+        }else if (wasXmlRequested){
             try {                
                 ResponseValues rvalues = processRequest(vreq);
                 
                 response.setCharacterEncoding("UTF-8");
                 response.setContentType("text/xml;charset=UTF-8");
+                response.setHeader("Content-Disposition", "attachment; filename=search.xml");
                 writeTemplate(rvalues.getTemplateName(), rvalues.getMap(), request, response);
             } catch (Exception e) {
                 log.error(e, e);
@@ -121,6 +122,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 
                 response.setCharacterEncoding("UTF-8");
                 response.setContentType("text/csv;charset=UTF-8");
+                response.setHeader("Content-Disposition", "attachment; filename=search.csv");
                 writeTemplate(rvalues.getTemplateName(), rvalues.getMap(), request, response);
             } catch (Exception e) {
                 log.error(e, e);
@@ -134,8 +136,9 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         //There may be other non-html formats in the future
         Format format = getFormat(vreq);            
         boolean wasXmlRequested = Format.XML == format;
+        boolean wasCSVRequested = Format.CSV == format;
         log.debug("Requested format was " + (wasXmlRequested ? "xml" : "html"));
-        boolean wasHtmlRequested = ! wasXmlRequested; 
+        boolean wasHtmlRequested = ! (wasXmlRequested || wasCSVRequested); 
         
         try {
             

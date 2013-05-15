@@ -2,21 +2,27 @@
 
 <#-- Template for displaying paged search results -->
 
-<h2>
+
+
+<h2 style="float:left">
 <#escape x as x?html>
     Search results for '${querytext}'
     <#if classGroupName?has_content>limited to type '${classGroupName}'</#if>
     <#if typeName?has_content>limited to type '${typeName}'</#if>
 </#escape>
-<span id="downloadResults">
-	<img src="images/share-uri-icon.png" alt="XML/RDF Results" />
-	
-</span>
+<script>
+	var queryText = '${querytext}'
+	var urlsBase = '${urls.base}'
+</script>
 </h2>
+
+<span id="downloadResults" title="Download Results">
+	<img id="downloadIcon" src="images/download-icon.png" alt="Download Results"  />
+</span>
 
 <span id="searchHelp"><a href="${urls.base}/searchHelp" title="search help">Not the results you expected?</a></span>
 
-<div class="contentsBrowseGroup">
+<div class="contentsBrowseGroup" style="clear:left">
 
     <#-- Refinement links -->
     <#if classGroupLinks?has_content>
@@ -100,3 +106,8 @@
 </div> <!-- end contentsBrowseGroup -->
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/search.css" />')}
+
+${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>',
+                  '<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>')}
+
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/searchDownload.js"></script>')}
