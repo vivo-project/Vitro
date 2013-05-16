@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
-import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
 import static edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY;
 import static edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode.INFERENCES_ONLY;
 
@@ -28,6 +27,7 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.ResourceUtils;
 import com.hp.hpl.jena.vocabulary.RDF;
 
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
@@ -72,7 +72,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 		}
 
     	OntModel userAccountsModel = ontModelFromContextAttribute(ctx, "userAccountsOntModel");     
-        OntModel displayModel = ontModelFromContextAttribute(ctx,DISPLAY_ONT_MODEL);
+        OntModel displayModel = ModelAccess.on(ctx).getDisplayModel();
         OntModel baseABoxModel = createNamedModelFromDataset(dataset, JENA_DB_MODEL);
         OntModel inferenceABoxModel = createNamedModelFromDataset(dataset, JENA_INF_MODEL);
         OntModel baseTBoxModel = createdMemoryMappedModel(dataset, JENA_TBOX_ASSERTIONS_MODEL, "tbox assertions");

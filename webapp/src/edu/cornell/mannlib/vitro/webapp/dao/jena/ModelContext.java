@@ -113,10 +113,4 @@ public class ModelContext {
         
 	}
 	
-	public static OntModel getDisplayModel(ServletContext ctx){
-	    return(OntModel) ctx.getAttribute( DisplayVocabulary.DISPLAY_ONT_MODEL );	    
-	}
-	public static void setDisplayModel(OntModel ontModel, ServletContext ctx){
-	    ctx.setAttribute(DisplayVocabulary.DISPLAY_ONT_MODEL,ontModel);	    
-	}
 }

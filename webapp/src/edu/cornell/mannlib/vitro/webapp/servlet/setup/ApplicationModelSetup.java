@@ -9,7 +9,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
@@ -23,7 +22,7 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
@@ -63,8 +62,8 @@ implements ServletContextListener {
             }
             OntModel displayModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
             displayModel.add(displayDbModel);           
-            displayModel.getBaseModel().register(new ModelSynchronizer(displayDbModel));            
-            ModelContext.setDisplayModel(displayModel, ctx);
+            displayModel.getBaseModel().register(new ModelSynchronizer(displayDbModel));        
+            ModelAccess.on(ctx).setDisplayModel(displayModel);
             
             //at each startup load all RDF files from directory to sub-models of display model  
             initializeDisplayLoadedAtStartup(ctx, displayModel);                

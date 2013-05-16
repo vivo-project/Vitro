@@ -4,14 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.filters;
 
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroRequest.SPECIAL_WRITE_MODEL;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.CONTEXT_DISPLAY_TBOX;
-import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_DISPLAY_MODEL_PARAM;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_MODEL_PARAM;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_TBOX_MODEL_PARAM;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,20 +40,18 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.FilterFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HideFromDisplayByPolicyFilter;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringRDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 /**
@@ -138,21 +134,14 @@ public class VitroRequestPrep implements Filter {
     		log.debug("Found a WebappDaoFactory in the session and using it for this request");
     	}
     	
-    	// Set up the DisplayModel, with language filtering if appropriate.
-    	OntModel displayModel;
-        Object displayModelObject = req.getSession().getAttribute(DISPLAY_ONT_MODEL);
-        if (displayModelObject instanceof OntModel) {
-        	displayModel = (OntModel) displayModelObject;
-        } else {
-        	displayModel = (OntModel) _context.getAttribute(DISPLAY_ONT_MODEL);
-        }
-        
-		if (Boolean.valueOf(ConfigurationProperties.getBean(vreq).getProperty(
-		                "RDFService.languageFilter", "true"))) {
-			displayModel = LanguageFilteringUtils.wrapOntModelInALanguageFilter(displayModel, req);
+    	// Set up the DisplayModel with language filtering, if appropriate.
+		ConfigurationProperties props = ConfigurationProperties.getBean(req);
+		Boolean languageFilteringEnabled = Boolean.valueOf(props.getProperty("RDFService.languageFilter", "true"));
+		if (languageFilteringEnabled) {
+			OntModel displayModel = ModelAccess.on(req.getSession()).getDisplayModel();
+			OntModel filteredDisplayModel = LanguageFilteringUtils.wrapOntModelInALanguageFilter(displayModel, req);
+			ModelAccess.on(req).setDisplayModel(filteredDisplayModel);
 		}
-		vreq.setAttribute(DISPLAY_ONT_MODEL, displayModel);
-
     	
     	//Do model switching and replace the WebappDaoFactory with 
     	//a different version if requested by parameters
@@ -245,7 +234,7 @@ public class VitroRequestPrep implements Filter {
     	
     	// If they asked for the display model, give it to them.
 		if (isParameterPresent(vreq, SWITCH_TO_DISPLAY_MODEL)) {
-			OntModel mainOntModel = (OntModel)_context.getAttribute( DISPLAY_ONT_MODEL);
+			OntModel mainOntModel = ModelAccess.on(_context).getDisplayModel();
 			OntModel tboxOntModel = (OntModel) _context.getAttribute(CONTEXT_DISPLAY_TBOX);			
 	   		setSpecialWriteModel(vreq, mainOntModel);
 	   		

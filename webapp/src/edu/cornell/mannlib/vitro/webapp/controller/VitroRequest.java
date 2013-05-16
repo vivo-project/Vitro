@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
-import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
 
 import java.util.Map;
 
@@ -17,6 +16,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
@@ -215,13 +215,7 @@ public class VitroRequest extends HttpServletRequestWrapper {
 
     //Get the display and editing configuration model
     public OntModel getDisplayModel(){
-    	Object value = _req.getAttribute(DISPLAY_ONT_MODEL);
-    	if (value instanceof OntModel) {
-    		return (OntModel) value;
-    	} else {
-    		log.error("No display model on the VitroRequest. Expecting an OntModel but found " + value);
-    		return null;
-    	}
+    	return ModelAccess.on(_req).getDisplayModel();
     }
         
     /**

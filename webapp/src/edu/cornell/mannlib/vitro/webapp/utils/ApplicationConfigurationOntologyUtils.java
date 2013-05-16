@@ -5,6 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -21,6 +23,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 
 public class ApplicationConfigurationOntologyUtils {
@@ -28,8 +31,9 @@ public class ApplicationConfigurationOntologyUtils {
     private static final Log log = LogFactory.getLog(ApplicationConfigurationOntologyUtils.class);
     
     public static List<ObjectProperty> getAdditionalFauxSubpropertiesForList(List<ObjectProperty> propList, VitroRequest vreq) {
-        Model displayModel = ModelContext.getDisplayModel(vreq.getSession().getServletContext());
-        Model tboxModel = ModelContext.getUnionOntModelSelector(vreq.getSession().getServletContext()).getTBoxModel();
+        ServletContext ctx = vreq.getSession().getServletContext();
+		Model displayModel = ModelAccess.on(ctx).getDisplayModel();
+        Model tboxModel = ModelContext.getUnionOntModelSelector(ctx).getTBoxModel();
         return getAdditionalFauxSubpropertiesForList(propList, displayModel, tboxModel);
     }
     
