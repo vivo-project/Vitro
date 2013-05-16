@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
+import static edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY;
+import static edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode.INFERENCES_ONLY;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +15,8 @@ import javax.servlet.ServletContextEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.graph.BulkUpdateHandler;
+import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
@@ -20,19 +24,14 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.ResourceUtils;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
@@ -59,202 +58,96 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
         ServletContext ctx = sce.getServletContext();
         StartupStatus ss = StartupStatus.getBean(ctx);
         
-        try {
-            long startTime = System.currentTimeMillis();
-            setUpJenaDataSource(ctx, ss);
-            log.info((System.currentTimeMillis() - startTime) / 1000 + 
-                    " seconds to set up models and DAO factories");  
-        } catch (Throwable t) {
-            log.error("Throwable in " + this.getClass().getName(), t);
-            ss.fatal(this, "Throwable in " + this.getClass().getName(), t);
-        }
-        
+        long begin = System.currentTimeMillis();
+        setUpJenaDataSource(ctx);
+        ss.info(this, secondsSince(begin) + " seconds to set up models and DAO factories");  
     } 
 
-    private void setUpJenaDataSource(ServletContext ctx, StartupStatus ss) {
-        OntModelSelectorImpl baseOms = new OntModelSelectorImpl();     
-        OntModelSelectorImpl inferenceOms = new OntModelSelectorImpl();       
-        OntModelSelectorImpl unionOms = new OntModelSelectorImpl();
-        
-        OntModel userAccountsModel = ontModelFromContextAttribute(
-                ctx, "userAccountsOntModel");     
-        baseOms.setUserAccountsModel(userAccountsModel);
-        inferenceOms.setUserAccountsModel(userAccountsModel);
-        unionOms.setUserAccountsModel(userAccountsModel);       
-        
-        OntModel displayModel = ontModelFromContextAttribute(
-                ctx,DISPLAY_ONT_MODEL);
-        baseOms.setDisplayModel(displayModel);
-        inferenceOms.setDisplayModel(displayModel);
-        unionOms.setDisplayModel(displayModel);
-                
-        RDFServiceFactory rdfServiceFactory = RDFServiceUtils.getRDFServiceFactory(ctx);
-        RDFService rdfService = rdfServiceFactory.getRDFService();
-        Dataset dataset = new RDFServiceDataset(rdfService);
-        setStartupDataset(dataset, ctx);
-        
-        // ABox assertions
-        baseOms.setABoxModel(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, dataset.getNamedModel(JenaDataSourceSetupBase.JENA_DB_MODEL)));
-        
-        // ABox inferences
-        inferenceOms.setABoxModel(ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, dataset.getNamedModel(JenaDataSourceSetupBase.JENA_INF_MODEL)));
-        
-        // TBox assertions
-        try {
-            Model tboxAssertionsDB = dataset.getNamedModel(
-                    JENA_TBOX_ASSERTIONS_MODEL);
-            OntModel tboxAssertions = ModelFactory.createOntologyModel(
-                    MEM_ONT_MODEL_SPEC);
-            
-            if (tboxAssertionsDB != null) {
-                long startTime = System.currentTimeMillis();
-                log.info("Copying cached tbox assertions into memory");
-                tboxAssertions.add(tboxAssertionsDB);
-                log.info((System.currentTimeMillis() - startTime)/ 1000 + " seconds to load tbox assertions");
-                tboxAssertions.getBaseModel().register(new ModelSynchronizer(tboxAssertionsDB));
-            }
-                        
-            baseOms.setTBoxModel(tboxAssertions);
-        } catch (Throwable e) {
-            log.error("Unable to load tbox assertion cache from DB", e);
-            throw new RuntimeException(e);
-        }
-        
-        // TBox inferences
-        try {
-            Model tboxInferencesDB = dataset.getNamedModel(JENA_TBOX_INF_MODEL);
-            OntModel tboxInferences = ModelFactory.createOntologyModel(
-                    MEM_ONT_MODEL_SPEC);
-            
-            if (tboxInferencesDB != null) {
-                long startTime = System.currentTimeMillis();
-                log.info(
-                        "Copying cached tbox inferences into memory");
-                tboxInferences.add(tboxInferencesDB);
-                System.out.println((System.currentTimeMillis() - startTime)
-                        / 1000 + " seconds to load tbox inferences");
-                
-                tboxInferences.getBaseModel().register(new ModelSynchronizer(
-                		tboxInferencesDB));
-            }
-            inferenceOms.setTBoxModel(tboxInferences);
-        } catch (Throwable e) {
-            log.error("Unable to load tbox inference cache from DB", e);
-            throw new RuntimeException(e);
-        }
-                              
-        // union ABox
-        Model m = ModelFactory.createUnion(
-                baseOms.getABoxModel(), inferenceOms.getABoxModel());
-        m = ModelFactory.createModelForGraph(
-                new SpecialBulkUpdateHandlerGraph(
-                        m.getGraph(), 
-                        baseOms.getABoxModel().getGraph().getBulkUpdateHandler()));
-        OntModel unionABoxModel = ModelFactory.createOntologyModel(
-                MEM_ONT_MODEL_SPEC, m);
-        unionOms.setABoxModel(unionABoxModel);
-        
-        // union TBox
-        m = ModelFactory.createUnion(baseOms.getTBoxModel(), inferenceOms.getTBoxModel());
-        m = ModelFactory.createModelForGraph(
-                new SpecialBulkUpdateHandlerGraph(
-                        m.getGraph(), 
-                        baseOms.getTBoxModel().getGraph().getBulkUpdateHandler()));
-        OntModel unionTBoxModel = ModelFactory.createOntologyModel(
-                MEM_ONT_MODEL_SPEC, m);       
-        unionOms.setTBoxModel(unionTBoxModel);
-                  
-        
-        // Application metadata model is cached in memory.
-        try {
-            
-            Model applicationMetadataModelDB = dataset.getNamedModel(
-                    JENA_APPLICATION_METADATA_MODEL);
-            OntModel applicationMetadataModel = 
-                    ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
-            
-            long startTime = System.currentTimeMillis();
-            System.out.println(
-                    "Copying cached application metadata model into memory");
-            applicationMetadataModel.add(applicationMetadataModelDB);
-            System.out.println((System.currentTimeMillis() - startTime) 
-                    / 1000 + " seconds to load application metadata model " +
-                    "assertions of size " + applicationMetadataModel.size());
-            applicationMetadataModel.getBaseModel().register(
-                    new ModelSynchronizer(applicationMetadataModelDB));
-            
-            if (applicationMetadataModel.size()== 0 /* isFirstStartup() */) {
-                JenaDataSourceSetupBase.thisIsFirstStartup();
-                applicationMetadataModel.add(
-                        InitialJenaModelUtils.loadInitialModel(
-                                ctx, getDefaultNamespace(ctx)));
-            }
-            
-            baseOms.setApplicationMetadataModel(applicationMetadataModel);
-            inferenceOms.setApplicationMetadataModel(
-                    baseOms.getApplicationMetadataModel());
-            unionOms.setApplicationMetadataModel(
-                    baseOms.getApplicationMetadataModel());
-            
-        } catch (Throwable e) {
-            log.error("Unable to load application metadata model cache from DB"
-                    , e);
-            throw new RuntimeException(e);
-        }
-        
-        checkForNamespaceMismatch( baseOms.getApplicationMetadataModel(), ctx );
-        
+    private void setUpJenaDataSource(ServletContext ctx) {
+    	RDFServiceFactory rdfServiceFactory = RDFServiceUtils.getRDFServiceFactory(ctx);
+    	RDFService rdfService = rdfServiceFactory.getRDFService();
+    	Dataset dataset = new RDFServiceDataset(rdfService);
+    	setStartupDataset(dataset, ctx);
+    	
+    	OntModel applicationMetadataModel = createdMemoryMappedModel(dataset, JENA_APPLICATION_METADATA_MODEL, "application metadata model");
+		if (applicationMetadataModel.size()== 0) {
+			JenaDataSourceSetupBase.thisIsFirstStartup();
+		}
+
+    	OntModel userAccountsModel = ontModelFromContextAttribute(ctx, "userAccountsOntModel");     
+        OntModel displayModel = ontModelFromContextAttribute(ctx,DISPLAY_ONT_MODEL);
+        OntModel baseABoxModel = createNamedModelFromDataset(dataset, JENA_DB_MODEL);
+        OntModel inferenceABoxModel = createNamedModelFromDataset(dataset, JENA_INF_MODEL);
+        OntModel baseTBoxModel = createdMemoryMappedModel(dataset, JENA_TBOX_ASSERTIONS_MODEL, "tbox assertions");
+        OntModel inferenceTBoxModel = createdMemoryMappedModel(dataset, JENA_TBOX_INF_MODEL, "tbox inferences");
+        OntModel unionABoxModel = createCombinedBulkUpdatingModel(baseABoxModel, inferenceABoxModel);
+        OntModel unionTBoxModel = createCombinedBulkUpdatingModel(baseTBoxModel, inferenceTBoxModel);
+
         if (isFirstStartup()) {
-            loadDataFromFilesystem(baseOms, ctx);
+        	loadInitialApplicationMetadataModel(applicationMetadataModel, ctx);
+        	loadDataFromFilesystem(baseABoxModel, baseTBoxModel, applicationMetadataModel, ctx);
         }
         
-        log.info("Setting up union models and DAO factories");
+        log.info("Setting up union models");
+        OntModel baseFullModel = createCombinedBulkUpdatingModel(baseABoxModel, baseTBoxModel);
+        OntModel inferenceFullModel = createCombinedModel(inferenceABoxModel, inferenceTBoxModel);
+        OntModel unionFullModel = ModelFactory.createOntologyModel(DB_ONT_MODEL_SPEC, dataset.getDefaultModel());
         
-        // create TBox + ABox union models and set up webapp DAO factories
-        Model baseDynamicUnion = ModelFactory.createUnion(baseOms.getABoxModel(), 
-                baseOms.getTBoxModel());
-        baseDynamicUnion = ModelFactory.createModelForGraph(
-                new SpecialBulkUpdateHandlerGraph(
-                        baseDynamicUnion.getGraph(), 
-                        baseOms.getABoxModel().getGraph().getBulkUpdateHandler()) );
-        OntModel baseUnion = ModelFactory.createOntologyModel(
-                OntModelSpec.OWL_MEM, baseDynamicUnion);
-        baseOms.setFullModel(baseUnion);
-        ModelContext.setBaseOntModel(baseOms.getFullModel(), ctx);
+        ModelContext.setBaseOntModel(baseFullModel, ctx);
+        ModelContext.setInferenceOntModel(inferenceFullModel, ctx);
+        
+        checkForNamespaceMismatch( applicationMetadataModel, ctx );
+        
+        OntModelSelectorImpl baseOms = new OntModelSelectorImpl();     
+        baseOms.setApplicationMetadataModel(applicationMetadataModel);
+        baseOms.setUserAccountsModel(userAccountsModel);
+        baseOms.setDisplayModel(displayModel);
+		baseOms.setABoxModel(baseABoxModel);
+		baseOms.setTBoxModel(baseTBoxModel);
+		baseOms.setFullModel(baseFullModel);
+
+		OntModelSelectorImpl inferenceOms = new OntModelSelectorImpl();       
+		inferenceOms.setApplicationMetadataModel(applicationMetadataModel);
+		inferenceOms.setUserAccountsModel(userAccountsModel);
+		inferenceOms.setDisplayModel(displayModel);
+		inferenceOms.setABoxModel(inferenceABoxModel);
+		inferenceOms.setTBoxModel(inferenceTBoxModel);
+		inferenceOms.setFullModel(inferenceFullModel);
+
+		OntModelSelectorImpl unionOms = new OntModelSelectorImpl();
+		unionOms.setApplicationMetadataModel(applicationMetadataModel);
+		unionOms.setUserAccountsModel(userAccountsModel);       
+		unionOms.setDisplayModel(displayModel);
+		unionOms.setABoxModel(unionABoxModel);
+		unionOms.setTBoxModel(unionTBoxModel);
+		unionOms.setFullModel(unionFullModel);
+                  
+		ModelContext.setOntModelSelector(unionOms, ctx);
+		ModelContext.setUnionOntModelSelector(unionOms, ctx); // assertions and inferences
+		ModelContext.setBaseOntModelSelector(baseOms, ctx); // assertions
+		ModelContext.setInferenceOntModelSelector(inferenceOms, ctx); // inferences       
+
+		
+        
+
+		log.info("Setting up DAO factories");
+        
+        
+        ctx.setAttribute("jenaOntModel", unionFullModel);  
+        
         WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
         config.setDefaultNamespace(getDefaultNamespace(ctx));
-        WebappDaoFactory baseWadf = new WebappDaoFactorySDB(
-                rdfService, baseOms, config,
-                WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY);
+        
+        WebappDaoFactory baseWadf = new WebappDaoFactorySDB(rdfService, baseOms, config, ASSERTIONS_ONLY);
         ctx.setAttribute("assertionsWebappDaoFactory",baseWadf);
         
-        OntModel inferenceUnion = ModelFactory.createOntologyModel(
-                OntModelSpec.OWL_MEM,
-                ModelFactory.createUnion(
-                        inferenceOms.getABoxModel(), 
-                        inferenceOms.getTBoxModel()));
-        inferenceOms.setFullModel(inferenceUnion);
-        ModelContext.setInferenceOntModel(inferenceOms.getFullModel(), ctx);
-        WebappDaoFactory infWadf = new WebappDaoFactorySDB(
-                rdfService, inferenceOms, config, 
-                WebappDaoFactorySDB.SDBDatasetMode.INFERENCES_ONLY);
+        WebappDaoFactory infWadf = new WebappDaoFactorySDB(rdfService, inferenceOms, config, INFERENCES_ONLY);
         ctx.setAttribute("deductionsWebappDaoFactory", infWadf);
         
-        OntModel masterUnion = ModelFactory.createOntologyModel(
-                DB_ONT_MODEL_SPEC, dataset.getDefaultModel());
-        unionOms.setFullModel(masterUnion);
-        ctx.setAttribute("jenaOntModel", masterUnion);  
-        WebappDaoFactory wadf = new WebappDaoFactorySDB(
-                rdfService, unionOms, config);
+        WebappDaoFactory wadf = new WebappDaoFactorySDB(rdfService, unionOms, config);
         ctx.setAttribute("webappDaoFactory",wadf);
 
-        ModelContext.setOntModelSelector(unionOms, ctx);
-        ModelContext.setUnionOntModelSelector(unionOms, ctx);          
-                                           // assertions and inferences
-        ModelContext.setBaseOntModelSelector(baseOms, ctx);            
-                                           // assertions
-        ModelContext.setInferenceOntModelSelector(inferenceOms, ctx);  
-                                           // inferences       
+        log.info("Model makers set up");
         
         ctx.setAttribute("defaultNamespace", getDefaultNamespace(ctx));
         
@@ -269,8 +162,53 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
         //I don't know what are the implications of this choice.        
         setVitroModelSource( new VitroModelSource(vsmm,ctx), ctx);
         
-        log.info("Model makers set up");
     }
+
+	private OntModel createNamedModelFromDataset(Dataset dataset, String name) {
+    	return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, dataset.getNamedModel(name));
+    }
+    
+	private OntModel createdMemoryMappedModel(Dataset dataset, String name, String label) {
+		try {
+			Model dbModel = dataset.getNamedModel(name);
+			OntModel memoryModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
+			
+			if (dbModel != null) {
+			    long begin = System.currentTimeMillis();
+				log.info("Copying cached " + label + " into memory");
+			    memoryModel.add(dbModel);
+			    log.info(secondsSince(begin) + " seconds to load " + label);
+			    memoryModel.getBaseModel().register(new ModelSynchronizer(dbModel));
+			}
+			return memoryModel;
+        } catch (Throwable e) {
+            throw new RuntimeException("Unable to load " + label + " from DB", e);
+        }
+	}
+
+	private OntModel createCombinedModel(OntModel oneModel, OntModel otherModel) {
+        return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, 
+        		ModelFactory.createUnion(oneModel, otherModel));
+	}
+
+	private OntModel createCombinedBulkUpdatingModel(OntModel baseModel,
+			OntModel otherModel) {
+		BulkUpdateHandler bulkUpdateHandler = baseModel.getGraph().getBulkUpdateHandler();
+		Graph unionGraph = ModelFactory.createUnion(baseModel, otherModel).getGraph();
+		Model unionModel = ModelFactory.createModelForGraph(
+				new SpecialBulkUpdateHandlerGraph(unionGraph, bulkUpdateHandler));
+		return ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC, unionModel);
+	}
+
+	private void loadInitialApplicationMetadataModel(OntModel applicationMetadataModel,
+			ServletContext ctx) {
+		try {
+			applicationMetadataModel.add(
+					InitialJenaModelUtils.loadInitialModel(ctx, getDefaultNamespace(ctx)));
+		} catch (Throwable e) {
+			throw new RuntimeException("Unable to load application metadata model cache from DB", e);
+		}
+	}
 
 
     /**
@@ -340,6 +278,26 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
         }
     }
     
+    
+    /* ===================================================================== */
+
+	private long secondsSince(long startTime) {
+		return (System.currentTimeMillis() - startTime) / 1000;
+	}
+
+	private void loadDataFromFilesystem(OntModel baseABoxModel, OntModel baseTBoxModel, OntModel applicationMetadataModel, 
+			ServletContext ctx) {
+		Long startTime = System.currentTimeMillis();
+		log.info("Initializing models from RDF files");    
+		
+		readOntologyFilesInPathSet(USER_ABOX_PATH, ctx, baseABoxModel);
+		readOntologyFilesInPathSet(USER_TBOX_PATH, ctx, baseTBoxModel);
+		readOntologyFilesInPathSet(USER_APPMETA_PATH, ctx, applicationMetadataModel);
+		
+		log.debug(((System.currentTimeMillis() - startTime) / 1000)
+				+ " seconds to read RDF files ");
+	}
+	
 
     /* ===================================================================== */
     
@@ -349,35 +307,6 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
         // Nothing to do.
     }    
     
-    private boolean isEmpty(Model model) {
-        ClosableIterator<Statement> closeIt = model.listStatements(
-                null, RDF.type, ResourceFactory.createResource(
-                        VitroVocabulary.PORTAL));
-        try {
-            if (closeIt.hasNext()) {
-                return false;
-            } else {
-                return true;
-            }
-        } finally {
-            closeIt.close();
-        }
-    }
-    
-    private void loadDataFromFilesystem(OntModelSelector baseOms, 
-                                        ServletContext ctx) {
-        Long startTime = System.currentTimeMillis();
-        log.info("Initializing models from RDF files");    
-        
-        readOntologyFilesInPathSet(USER_ABOX_PATH, ctx, baseOms.getABoxModel());
-        readOntologyFilesInPathSet(USER_TBOX_PATH, ctx, baseOms.getTBoxModel());
-        readOntologyFilesInPathSet(
-                USER_APPMETA_PATH, ctx, baseOms.getApplicationMetadataModel());
-        
-        log.debug(((System.currentTimeMillis() - startTime) / 1000)
-                + " seconds to read RDF files ");
-    }
-   
   
 
  
