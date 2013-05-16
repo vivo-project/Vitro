@@ -71,7 +71,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 			JenaDataSourceSetupBase.thisIsFirstStartup();
 		}
 
-    	OntModel userAccountsModel = ontModelFromContextAttribute(ctx, "userAccountsOntModel");     
+    	OntModel userAccountsModel = ModelAccess.on(ctx).getUserAccountsModel(); 
         OntModel displayModel = ModelAccess.on(ctx).getDisplayModel();
         OntModel baseABoxModel = createNamedModelFromDataset(dataset, JENA_DB_MODEL);
         OntModel inferenceABoxModel = createNamedModelFromDataset(dataset, JENA_INF_MODEL);

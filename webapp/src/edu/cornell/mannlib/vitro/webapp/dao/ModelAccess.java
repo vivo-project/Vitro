@@ -82,6 +82,14 @@ public class ModelAccess {
 		this.parent = parent;
 	}
 
+	public void setUserAccountsModel(OntModel m) {
+		setOntModel(ModelID.USER_ACCOUNTS, m);
+	}
+	
+	public OntModel getUserAccountsModel() {
+		return getOntModel(ModelID.USER_ACCOUNTS);
+	}
+	
 	public void setDisplayModel(OntModel m) {
 		setOntModel(ModelID.DISPLAY, m);
 	}
@@ -99,14 +107,6 @@ public class ModelAccess {
 	// public OntModel getAssertionsOntModel() {
 	// throw new RuntimeException(
 	// "ModelAccess.getAssertionsOntModel not implemented.");
-	// }
-	//
-	// public void setUserAccountsModel(OntModel m) {
-	// setOntModel(ModelID.USER_ACCOUNTS, m);
-	// }
-	//
-	// public OntModel getUserAccountsModel() {
-	// return getOntModel(ModelID.USER_ACCOUNTS);
 	// }
 	//
 	// public OntModel getDisplayTboxOntModel() {
