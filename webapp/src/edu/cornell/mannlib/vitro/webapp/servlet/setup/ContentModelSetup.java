@@ -34,10 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SpecialBulkUpdateHandlerGraph;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
@@ -46,12 +43,12 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
 
 /**
- * Primarily sets up webapp DAO factories.
+ * Sets up the content models, OntModelSelectors and webapp DAO factories.
  */
-public class WebappDaoSetup extends JenaDataSourceSetupBase 
+public class ContentModelSetup extends JenaDataSourceSetupBase 
         implements javax.servlet.ServletContextListener {
     
-    private static final Log log = LogFactory.getLog(WebappDaoSetup.class);
+    private static final Log log = LogFactory.getLog(ContentModelSetup.class);
     
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -127,11 +124,7 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
 		ModelContext.setBaseOntModelSelector(baseOms, ctx); // assertions
 		ModelContext.setInferenceOntModelSelector(inferenceOms, ctx); // inferences       
 
-		
-        
-
 		log.info("Setting up DAO factories");
-        
         
         ctx.setAttribute("jenaOntModel", unionFullModel);  
         
@@ -150,18 +143,6 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
         log.info("Model makers set up");
         
         ctx.setAttribute("defaultNamespace", getDefaultNamespace(ctx));
-        
-        makeModelMakerFromConnectionProperties(TripleStoreType.RDB, ctx);
-        VitroJenaModelMaker vjmm = getVitroJenaModelMaker();
-        setVitroJenaModelMaker(vjmm, ctx);
-        makeModelMakerFromConnectionProperties(TripleStoreType.SDB, ctx);
-        RDFServiceModelMaker vsmm = new RDFServiceModelMaker(rdfServiceFactory);
-        setVitroJenaSDBModelMaker(vsmm, ctx);
-                
-        //bdc34: I have no reason for vsmm vs vjmm.  
-        //I don't know what are the implications of this choice.        
-        setVitroModelSource( new VitroModelSource(vsmm,ctx), ctx);
-        
     }
 
 	private OntModel createNamedModelFromDataset(Dataset dataset, String name) {
@@ -210,6 +191,24 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
 		}
 	}
 
+	private void loadDataFromFilesystem(OntModel baseABoxModel, OntModel baseTBoxModel, OntModel applicationMetadataModel, 
+			ServletContext ctx) {
+		Long startTime = System.currentTimeMillis();
+		log.info("Initializing models from RDF files");    
+		
+		readOntologyFilesInPathSet(USER_ABOX_PATH, ctx, baseABoxModel);
+		readOntologyFilesInPathSet(USER_TBOX_PATH, ctx, baseTBoxModel);
+		readOntologyFilesInPathSet(USER_APPMETA_PATH, ctx, applicationMetadataModel);
+		
+		log.debug(((System.currentTimeMillis() - startTime) / 1000)
+				+ " seconds to read RDF files ");
+	}
+	
+	private long secondsSince(long startTime) {
+		return (System.currentTimeMillis() - startTime) / 1000;
+	}
+
+    /* ===================================================================== */
 
     /**
      * If we find a "portal1" portal (and we should), its URI should use the
@@ -258,8 +257,7 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
         return portals;
     }
     
-    private boolean noPortalForNamespace(List<Resource> portals, 
-                                         String expectedNamespace) {
+    private boolean noPortalForNamespace(List<Resource> portals, String expectedNamespace) {
         for (Resource portal : portals) {
             if(expectedNamespace.equals(portal.getNameSpace())) {
                 return false;
@@ -271,44 +269,18 @@ public class WebappDaoSetup extends JenaDataSourceSetupBase
     private void renamePortal(Resource portal, String namespace, Model model) {
         model.enterCriticalSection(Lock.WRITE);
         try {
-            ResourceUtils.renameResource(
-                    portal, namespace + portal.getLocalName());
+            ResourceUtils.renameResource(portal, namespace + portal.getLocalName());
         } finally {
             model.leaveCriticalSection();
         }
     }
     
-    
     /* ===================================================================== */
-
-	private long secondsSince(long startTime) {
-		return (System.currentTimeMillis() - startTime) / 1000;
-	}
-
-	private void loadDataFromFilesystem(OntModel baseABoxModel, OntModel baseTBoxModel, OntModel applicationMetadataModel, 
-			ServletContext ctx) {
-		Long startTime = System.currentTimeMillis();
-		log.info("Initializing models from RDF files");    
-		
-		readOntologyFilesInPathSet(USER_ABOX_PATH, ctx, baseABoxModel);
-		readOntologyFilesInPathSet(USER_TBOX_PATH, ctx, baseTBoxModel);
-		readOntologyFilesInPathSet(USER_APPMETA_PATH, ctx, applicationMetadataModel);
-		
-		log.debug(((System.currentTimeMillis() - startTime) / 1000)
-				+ " seconds to read RDF files ");
-	}
-	
-
-    /* ===================================================================== */
-    
     
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         // Nothing to do.
     }    
-    
-  
-
  
  }
 
