@@ -54,7 +54,6 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 	public static final boolean KEEP_ONLY_IF_TRUE = true; //used for updatePropertyBooleanValue()
     public static final boolean KEEP_ONLY_IF_FALSE = false; //used for updatePropertyBooleanValue()
     
-    public static final String JENA_ONT_MODEL_ATTRIBUTE_NAME = "jenaOntModel";
     public static final String ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME = "baseOntModel";
     public static final String INFERENCE_ONT_MODEL_ATTRIBUTE_NAME = "inferenceOntModel";
     

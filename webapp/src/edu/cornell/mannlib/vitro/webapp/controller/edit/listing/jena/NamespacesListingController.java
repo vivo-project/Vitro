@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class NamespacesListingController extends BaseEditController {
@@ -34,7 +35,7 @@ public class NamespacesListingController extends BaseEditController {
 
         VitroRequest vrequest = new VitroRequest(request);
                
-        OntModel ontModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
+		OntModel ontModel = ModelAccess.on(getServletContext()).getJenaOntModel();
                
         ArrayList results = new ArrayList();
         request.setAttribute("results",results);

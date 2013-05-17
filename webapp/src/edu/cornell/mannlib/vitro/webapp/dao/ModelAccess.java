@@ -98,6 +98,15 @@ public class ModelAccess {
 		return getOntModel(ModelID.DISPLAY);
 	}
 
+	public void setJenaOntModel(OntModel m) {
+		setOntModel(ModelID.UNION_FULL, m);
+	}
+	
+	public OntModel getJenaOntModel() {
+		return getOntModel(ModelID.UNION_FULL);
+	}
+
+
 	// /** Is this the same as Assertions model? */
 	// // public OntModel getBaseOntModel() {
 	// // throw new RuntimeException(
@@ -224,14 +233,6 @@ public class ModelAccess {
 	 * 		ctx.setAttribute(INFERENCE_ONT_MODEL_SELECTOR, oms); 
 	 * 	}
 	 * 	
-	 * 	public static OntModel getJenaOntModel(ServletContext ctx) {
-	 * 		return (OntModel) ctx.getAttribute(JENA_ONT_MODEL);
-	 * 	}
-	 * 	
-	 * 	public static void setJenaOntModel(OntModel ontModel, ServletContext ctx) {
-	 * 		ctx.setAttribute(JENA_ONT_MODEL, ontModel);
-	 * 	}
-	 * 	
 	 * 	public static OntModel getBaseOntModel(ServletContext ctx) {
 	 * 		return (OntModel) ctx.getAttribute(BASE_ONT_MODEL);
 	 * 	}
@@ -255,7 +256,6 @@ public class ModelAccess {
 	 * VitroRequest.getAssertionsWebappDaoFactory()
 	 * VitroRequest.getDeductionsWebappDaoFactory()
 	 * VitroRequest.getFullWebappDaoFactory()
-	 * VitroRequest.getJenaOntModel()
 	 * VitroRequest.getRDFService()
 	 * VitroRequest.getUnfilteredRDFService()
 	 * VitroRequest.getWebappDaoFactory()
@@ -278,7 +278,6 @@ public class ModelAccess {
 	 * VitroModelSource.openModelIfPresent(string)
 	 * ServletContext.getAttribute("assertionsWebappDaoFactory")
 	 * ServletContext.getAttribute("baseOntModelSelector")
-	 * ServletContext.getAttribute("jenaOntModel")
 	 * ServletContext.getAttribute("jenaPersistentOntModel")
 	 * ServletContext.getAttribute("pelletOntModel")
 	 * ServletContext.getAttribute("webappDaoFactory")
@@ -287,8 +286,6 @@ public class ModelAccess {
 	 * JenaDataSourceSetupBase.getApplicationDataSource(ctx)
 	 * JenaDataSourceSetupBase.getStartupDataset()
 	 * HttpSession.getAttribute("jenaAuditModel")
-	 * HttpSession.getAttribute("jenaOntModel")
-	 * ServletRequest.getAttribute("jenaOntModel")
 	 * </pre>
 	 */
 

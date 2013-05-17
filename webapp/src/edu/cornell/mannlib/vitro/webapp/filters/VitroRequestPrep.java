@@ -41,6 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.FilterFactory;
@@ -312,7 +313,7 @@ public class VitroRequestPrep implements Filter {
 	
 	private void setSpecialWriteModel(VitroRequest vreq, OntModel mainOntModel) {	    
 		if (mainOntModel != null) {    
-	        vreq.setAttribute("jenaOntModel", mainOntModel);
+			ModelAccess.on(vreq).setJenaOntModel(mainOntModel);
 			vreq.setAttribute(SPECIAL_WRITE_MODEL, mainOntModel);
 		}
 	}

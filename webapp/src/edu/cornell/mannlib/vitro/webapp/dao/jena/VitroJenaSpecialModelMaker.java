@@ -14,6 +14,8 @@ import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.ModelReader;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+
 /**
  * Wraps a model maker and returns Models from the servlet context when 
  * certain model URIs are requested
@@ -115,14 +117,7 @@ public class VitroJenaSpecialModelMaker implements ModelMaker {
 	private Model getSpecialModel(String modelName) {
 		if (request != null) {
 			if ("vitro:jenaOntModel".equals(modelName)) {
-				Object sessionOntModel = request.getSession().getAttribute("jenaOntModel");
-				if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-					log.debug("Returning jenaOntModel from session");
-					return (OntModel) sessionOntModel;
-				} else {
-					log.debug("Returning jenaOntModel from context");
-					return (OntModel) request.getSession().getServletContext().getAttribute("jenaOntModel");
-				}
+				return ModelAccess.on(request.getSession()).getJenaOntModel();
 			} else if ("vitro:baseOntModel".equals(modelName)) {
 				Object sessionOntModel = request.getSession().getAttribute("baseOntModel");
 				if (sessionOntModel != null && sessionOntModel instanceof OntModel) {

@@ -33,6 +33,7 @@ import com.hp.hpl.jena.vocabulary.XSD;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
@@ -207,7 +208,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	  void prepare(VitroRequest vreq, EditConfigurationVTwo editConfig) {
 	        //setup the model selectors for query, write and display models on editConfig
 	        setupModelSelectorsFromVitroRequest(vreq, editConfig);         
-	        OntModel queryModel = (OntModel)vreq.getAttribute("jenaOntModel");
+			OntModel queryModel = ModelAccess.on(vreq).getJenaOntModel();
 	        if (editConfig.isParamUpdate()) { 
 	        	editConfig.prepareForParamUpdate(queryModel);
 	        	
@@ -224,7 +225,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
         if (editConfig.isParamUpdate()) { 
         	 //setup the model selectors for query, write and display models on editConfig
 	        setupModelSelectorsFromVitroRequest(vreq, editConfig);         
-	        OntModel queryModel = (OntModel)vreq.getAttribute("jenaOntModel");
+			OntModel queryModel = ModelAccess.on(vreq).getJenaOntModel();
         	retrieveExistingDataGetterInfo(context, editConfig, queryModel);
         }
 		
@@ -589,7 +590,8 @@ private String getExistingIsSelfContainedTemplateQuery() {
 		int maxMenuPosition = 0;
 		Literal menuPosition = null;
 		setupModelSelectorsFromVitroRequest(vreq, editConfig);         
-	    OntModel queryModel = (OntModel)vreq.getAttribute("jenaOntModel");
+		OntModel queryModel = ModelAccess.on(vreq).getJenaOntModel();
+
 		String maxMenuPositionQuery = getMaxMenuPositionQueryString();
     	QueryExecution qe = null;
         try{

@@ -27,6 +27,7 @@ import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 /**
@@ -311,14 +312,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 	private Model getSpecialModel(String modelName) {
 		if (request != null) {
 			if ("vitro:jenaOntModel".equals(modelName)) {
-				Object sessionOntModel = request.getSession().getAttribute("jenaOntModel");
-				if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-					log.debug("Returning jenaOntModel from session");
-					return (OntModel) sessionOntModel;
-				} else {
-					log.debug("Returning jenaOntModel from context");
-					return (OntModel) request.getSession().getServletContext().getAttribute("jenaOntModel");
-				}
+	    		return ModelAccess.on(request.getSession()).getJenaOntModel();
 			} else if ("vitro:baseOntModel".equals(modelName)) {
 				Object sessionOntModel = request.getSession().getAttribute("baseOntModel");
 				if (sessionOntModel != null && sessionOntModel instanceof OntModel) {

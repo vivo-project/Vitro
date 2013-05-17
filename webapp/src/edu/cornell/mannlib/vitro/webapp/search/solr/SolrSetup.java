@@ -113,7 +113,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             context.setAttribute(SOLR_SERVER, server);
             
             /* set up the individual to solr doc translation */            
-            OntModel jenaOntModel = ModelContext.getJenaOntModel(context);            
+            OntModel jenaOntModel = ModelAccess.on(context).getJenaOntModel();            
             OntModel displayModel = ModelAccess.on(context).getDisplayModel();
             
             /* try to get context attribute DocumentModifiers 

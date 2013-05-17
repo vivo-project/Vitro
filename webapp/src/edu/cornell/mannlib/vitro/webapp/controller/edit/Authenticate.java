@@ -39,6 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.Message;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginLogoutEvent;
 
 public class Authenticate extends VitroHttpServlet {
@@ -557,16 +558,7 @@ public class Authenticate extends VitroHttpServlet {
 			return;
 		}
 
-		OntModel jenaOntModel = (OntModel) session.getAttribute("jenaOntModel");
-		if (jenaOntModel == null) {
-			jenaOntModel = (OntModel) context.getAttribute("jenaOntModel");
-		}
-		if (jenaOntModel == null) {
-			log.error("Unable to notify audit model of login event "
-					+ "because no model could be found");
-			return;
-		}
-
+		OntModel jenaOntModel = ModelAccess.on(session).getJenaOntModel();
 		jenaOntModel.getBaseModel().notifyEvent(event);
 	}
 

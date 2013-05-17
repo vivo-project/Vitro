@@ -24,6 +24,7 @@ import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class NamespacePrefixOperationController extends BaseEditController {
@@ -68,7 +69,7 @@ public class NamespacePrefixOperationController extends BaseEditController {
         
         if (request.getParameter("_cancel") == null) {
         	
-        	OntModel ontModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
+    		OntModel ontModel = ModelAccess.on(getServletContext()).getJenaOntModel();
         	String namespaceStr = request.getParameter("namespace");
         	String prefixStr = request.getParameter("prefix");
 

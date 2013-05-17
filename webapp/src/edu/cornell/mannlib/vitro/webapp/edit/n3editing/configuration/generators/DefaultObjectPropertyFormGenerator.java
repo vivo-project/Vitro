@@ -378,7 +378,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 
 	private void prepareForUpdate(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
     	//Here, retrieve model from 
-    	Model model = (Model) session.getServletContext().getAttribute("jenaOntModel");
+		OntModel model = ModelAccess.on(session.getServletContext()).getJenaOntModel();
     	//if object property
     	if(EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)){
 	    	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);

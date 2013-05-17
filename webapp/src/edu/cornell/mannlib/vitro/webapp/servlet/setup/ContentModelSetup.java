@@ -28,6 +28,7 @@ import com.hp.hpl.jena.util.ResourceUtils;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
@@ -125,8 +126,8 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 		ModelContext.setInferenceOntModelSelector(inferenceOms, ctx); // inferences       
 
 		log.info("Setting up DAO factories");
-        
-        ctx.setAttribute("jenaOntModel", unionFullModel);  
+		
+		ModelAccess.on(ctx).setJenaOntModel(unionFullModel);
         
         WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
         config.setDefaultNamespace(getDefaultNamespace(ctx));

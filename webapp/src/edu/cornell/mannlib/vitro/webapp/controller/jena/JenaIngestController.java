@@ -67,6 +67,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
@@ -520,7 +521,7 @@ public class JenaIngestController extends BaseEditController {
             vreq.setAttribute("title", "Choose Workflow Step");
             vreq.setAttribute("bodyJsp", WORKFLOW_STEP_JSP);
         } else {
-            OntModel jenaOntModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
+    		OntModel jenaOntModel = ModelAccess.on(getServletContext()).getJenaOntModel();
             jenaOntModel.enterCriticalSection(Lock.READ);
             List<Individual> savedQueryList = new LinkedList<Individual>();
             try {
@@ -537,7 +538,7 @@ public class JenaIngestController extends BaseEditController {
     
     private void processExecuteSparqlRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
         String sparqlQueryStr = vreq.getParameter("sparqlQueryStr");
-        OntModel jenaOntModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
+		OntModel jenaOntModel = ModelAccess.on(getServletContext()).getJenaOntModel();
         jenaOntModel.enterCriticalSection(Lock.READ);
         List<Individual> savedQueryList = new LinkedList<Individual>();
         try {
@@ -910,7 +911,7 @@ public class JenaIngestController extends BaseEditController {
     }
     
     private long doExecuteSparql(VitroRequest vreq) {
-        OntModel jenaOntModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
+		OntModel jenaOntModel = ModelAccess.on(getServletContext()).getJenaOntModel();
         OntModel source = null;
         if ("pellet".equals(vreq.getParameter("reasoning"))) {
             source = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC);
@@ -1193,8 +1194,7 @@ public class JenaIngestController extends BaseEditController {
             Model baseOntModel = RDFServiceGraph.createRDFServiceModel
                     (new RDFServiceGraph(
                             rdfService, JenaDataSourceSetupBase.JENA_DB_MODEL));
-            OntModel ontModel = (OntModel)
-            getServletContext().getAttribute("jenaOntModel");
+    		OntModel ontModel = ModelAccess.on(getServletContext()).getJenaOntModel();
             List<String> urisToChange = new LinkedList<String>();        
             ontModel.enterCriticalSection(Lock.READ);
             try {
@@ -1312,12 +1312,7 @@ public class JenaIngestController extends BaseEditController {
 
     public static Model getModel(String name, HttpServletRequest request, ServletContext context) {
         if ("vitro:jenaOntModel".equals(name)) {
-            Object sessionOntModel = request.getSession().getAttribute("jenaOntModel");
-            if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-                return (OntModel) sessionOntModel;
-            } else {
-                return (OntModel) context.getAttribute("jenaOntModel");
-            }
+            return ModelAccess.on(request.getSession()).getJenaOntModel();
         } else if ("vitro:baseOntModel".equals(name)) {
             Object sessionOntModel = request.getSession().getAttribute("baseOntModel");
             if (sessionOntModel != null && sessionOntModel instanceof OntModel) {

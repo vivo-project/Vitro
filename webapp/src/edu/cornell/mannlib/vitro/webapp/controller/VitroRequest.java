@@ -17,6 +17,7 @@ import com.hp.hpl.jena.query.Dataset;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
@@ -107,7 +108,7 @@ public class VitroRequest extends HttpServletRequestWrapper {
     }
     
     public void setJenaOntModel(OntModel ontModel) {
-    	setAttribute("jenaOntModel", ontModel);
+    	ModelAccess.on(this).setJenaOntModel(ontModel);
     }
     
     public void setOntModelSelector(OntModelSelector oms) {
@@ -176,15 +177,7 @@ public class VitroRequest extends HttpServletRequestWrapper {
     
     
     public OntModel getJenaOntModel() {
-    	Object ontModel = getAttribute("jenaOntModel");
-    	if (ontModel instanceof OntModel) {
-    		return (OntModel) ontModel;
-    	}
-    	OntModel jenaOntModel = (OntModel)_req.getSession().getAttribute( JenaBaseDao.JENA_ONT_MODEL_ATTRIBUTE_NAME );
-    	if ( jenaOntModel == null ) {
-    		jenaOntModel = (OntModel)_req.getSession().getServletContext().getAttribute( JenaBaseDao.JENA_ONT_MODEL_ATTRIBUTE_NAME );
-    	}
-    	return jenaOntModel;
+    	return ModelAccess.on(this).getJenaOntModel();
     }
     
     public OntModelSelector getOntModelSelector() {

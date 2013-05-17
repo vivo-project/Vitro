@@ -13,6 +13,7 @@ import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 
 /**
  * Add this ChangeListener to your EditProcessObject when modifying the
@@ -90,7 +91,7 @@ public class PropertyRestrictionListener implements ChangeListener {
 	}
 
 	private void createAndSetBean() {
-		OntModel model = (OntModel) ctx.getAttribute("jenaOntModel");
+		OntModel model = ModelAccess.on(ctx).getJenaOntModel();
 		PropertyRestrictionPolicyHelper bean = PropertyRestrictionPolicyHelper
 				.createBean(model);
 		PropertyRestrictionPolicyHelper.setBean(ctx, bean);

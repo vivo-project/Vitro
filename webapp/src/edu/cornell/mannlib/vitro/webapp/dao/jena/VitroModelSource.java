@@ -107,7 +107,7 @@ public class VitroModelSource implements ModelSource {
     private Model getNamedModel( ModelName pmn ){
         switch( pmn ){
             case ABOX: 
-                return (Model) context.getAttribute("jenaOntModel");
+            	return ModelAccess.on(context).getJenaOntModel();
             case TBOX:
                 return (Model) context.getAttribute("tboxmodel???");
             case DISPLAY:
