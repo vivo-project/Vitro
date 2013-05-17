@@ -106,18 +106,14 @@ public class ModelAccess {
 		return getOntModel(ModelID.UNION_FULL);
 	}
 
-
-	// /** Is this the same as Assertions model? */
-	// // public OntModel getBaseOntModel() {
-	// // throw new RuntimeException(
-	// // "ModelAccess.getBaseOntModel not implemented.");
-	// // }
-	//
-	// public OntModel getAssertionsOntModel() {
-	// throw new RuntimeException(
-	// "ModelAccess.getAssertionsOntModel not implemented.");
-	// }
-	//
+	public void setBaseOntModel(OntModel m) {
+		setOntModel(ModelID.BASE_FULL, m);
+	}
+	
+	public OntModel getBaseOntModel() {
+		return getOntModel(ModelID.BASE_FULL);
+	}
+	
 	// public OntModel getDisplayTboxOntModel() {
 	// throw new RuntimeException(
 	// "ModelAccess.getDisplayTboxOntModel not implemented.");
@@ -231,14 +227,6 @@ public class ModelAccess {
 	 * 	
 	 * 	public static void setInferenceOntModelSelector(OntModelSelector oms, ServletContext ctx) {
 	 * 		ctx.setAttribute(INFERENCE_ONT_MODEL_SELECTOR, oms); 
-	 * 	}
-	 * 	
-	 * 	public static OntModel getBaseOntModel(ServletContext ctx) {
-	 * 		return (OntModel) ctx.getAttribute(BASE_ONT_MODEL);
-	 * 	}
-	 * 	
-	 * 	public static void setBaseOntModel(OntModel ontModel, ServletContext ctx) {
-	 * 		ctx.setAttribute(BASE_ONT_MODEL, ontModel);
 	 * 	}
 	 * 	
 	 * 	public static OntModel getInferenceOntModel(ServletContext ctx) {

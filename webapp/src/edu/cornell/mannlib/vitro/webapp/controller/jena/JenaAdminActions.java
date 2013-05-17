@@ -94,7 +94,7 @@ public class JenaAdminActions extends BaseEditController {
      * @param response
      */
     private void outputTbox(HttpServletResponse response) {
-        OntModel memoryModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+        OntModel memoryModel = ModelAccess.on(getServletContext()).getBaseOntModel();
         try {
         	OntModel tempOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
         	Property DescriptionProp = ResourceFactory.createProperty(VitroVocabulary.DESCRIPTION_ANNOT);
@@ -306,7 +306,7 @@ public class JenaAdminActions extends BaseEditController {
         if (actionStr.equals("output")) {
             OntModel memoryModel = null;
 	    if (request.getParameter("assertionsOnly") != null) {
-	    	memoryModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+	        memoryModel = ModelAccess.on(getServletContext()).getBaseOntModel();
 	    	System.out.println("baseOntModel");
 	    } else if (request.getParameter("inferences") != null) {
 	    	memoryModel = (OntModel) getServletContext().getAttribute("inferenceOntModel");
@@ -375,7 +375,7 @@ public class JenaAdminActions extends BaseEditController {
             ClosableIterator ooIt = persistentModel.listObjects();
             clean(oIt,persistentModel);
         } else if (actionStr.equals("outputTaxonomy")) {
-        	OntModel ontModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+            OntModel ontModel = ModelAccess.on(getServletContext()).getBaseOntModel();
         	Model taxonomyModel = extractTaxonomy(ontModel);
         	try {
         		taxonomyModel.write(response.getOutputStream());

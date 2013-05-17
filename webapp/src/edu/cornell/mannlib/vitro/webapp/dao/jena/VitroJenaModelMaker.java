@@ -314,12 +314,7 @@ public class VitroJenaModelMaker implements ModelMaker {
 			if ("vitro:jenaOntModel".equals(modelName)) {
 	    		return ModelAccess.on(request.getSession()).getJenaOntModel();
 			} else if ("vitro:baseOntModel".equals(modelName)) {
-				Object sessionOntModel = request.getSession().getAttribute("baseOntModel");
-				if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-					return (OntModel) sessionOntModel;
-				} else {
-					return (OntModel) request.getSession().getServletContext().getAttribute("baseOntModel");
-				}
+		        return ModelAccess.on(request.getSession()).getBaseOntModel();
 			} else if ("vitro:inferenceOntModel".equals(modelName)) {
 				Object sessionOntModel = request.getSession().getAttribute("inferenceOntModel");
 				if (sessionOntModel != null && sessionOntModel instanceof OntModel) {

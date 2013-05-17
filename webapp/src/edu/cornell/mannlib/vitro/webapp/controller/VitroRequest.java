@@ -191,11 +191,7 @@ public class VitroRequest extends HttpServletRequestWrapper {
     
     
     public OntModel getAssertionsOntModel() {
-    	OntModel jenaOntModel = (OntModel)_req.getSession().getAttribute( JenaBaseDao.ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME );
-    	if ( jenaOntModel == null ) {
-    		jenaOntModel = (OntModel)_req.getSession().getServletContext().getAttribute( JenaBaseDao.ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME );
-    	}
-    	return jenaOntModel;    	
+        return ModelAccess.on(getSession()).getBaseOntModel();
     }
     
     public OntModel getInferenceOntModel() {

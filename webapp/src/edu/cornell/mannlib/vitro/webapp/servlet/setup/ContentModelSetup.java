@@ -90,8 +90,20 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         OntModel baseFullModel = createCombinedBulkUpdatingModel(baseABoxModel, baseTBoxModel);
         OntModel inferenceFullModel = createCombinedModel(inferenceABoxModel, inferenceTBoxModel);
         OntModel unionFullModel = ModelFactory.createOntologyModel(DB_ONT_MODEL_SPEC, dataset.getDefaultModel());
+
+        ModelAccess.on(ctx).setOntModel(ModelID.APPLICATION_METADATA, applicationMetadataModel);
+        ModelAccess.on(ctx).setOntModel(ModelID.USER_ACCOUNTS, userAccountsModel);
+        ModelAccess.on(ctx).setOntModel(ModelID.DISPLAY, displayModel);
+        ModelAccess.on(ctx).setOntModel(ModelID.BASE_ABOX, baseABoxModel);
+        ModelAccess.on(ctx).setOntModel(ModelID.BASE_TBOX, baseTBoxModel);
+        ModelAccess.on(ctx).setOntModel(ModelID.BASE_FULL, baseFullModel);
+        ModelAccess.on(ctx).setOntModel(ModelID.INFERRED_ABOX, inferenceABoxModel);
+        ModelAccess.on(ctx).setOntModel(ModelID.INFERRED_TBOX, inferenceTBoxModel);
+        ModelAccess.on(ctx).setOntModel(ModelID.INFERRED_FULL, inferenceFullModel);
+        ModelAccess.on(ctx).setOntModel(ModelID.UNION_ABOX, unionABoxModel);
+        ModelAccess.on(ctx).setOntModel(ModelID.UNION_TBOX, unionTBoxModel);
+        ModelAccess.on(ctx).setOntModel(ModelID.UNION_FULL, unionFullModel);
         
-        ModelContext.setBaseOntModel(baseFullModel, ctx);
         ModelContext.setInferenceOntModel(inferenceFullModel, ctx);
         
         checkForNamespaceMismatch( applicationMetadataModel, ctx );
@@ -127,8 +139,6 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 
 		log.info("Setting up DAO factories");
 		
-		ModelAccess.on(ctx).setJenaOntModel(unionFullModel);
-        
         WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
         config.setDefaultNamespace(getDefaultNamespace(ctx));
         

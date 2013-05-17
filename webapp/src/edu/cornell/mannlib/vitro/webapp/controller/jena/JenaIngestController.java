@@ -661,8 +661,7 @@ public class JenaIngestController extends BaseEditController {
               /*
                * get baseOnt and infOnt models
                */
-              OntModel baseOntModel = ModelContext.getBaseOntModel(
-                      getServletContext());
+              OntModel baseOntModel = ModelAccess.on(getServletContext()).getBaseOntModel();
               OntModel tboxOntModel = ModelContext.getUnionOntModelSelector(
                       getServletContext()).getTBoxModel();
               
@@ -1314,12 +1313,7 @@ public class JenaIngestController extends BaseEditController {
         if ("vitro:jenaOntModel".equals(name)) {
             return ModelAccess.on(request.getSession()).getJenaOntModel();
         } else if ("vitro:baseOntModel".equals(name)) {
-            Object sessionOntModel = request.getSession().getAttribute("baseOntModel");
-            if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-                return (OntModel) sessionOntModel;
-            } else {
-                return (OntModel) context.getAttribute("baseOntModel");
-            }
+            return ModelAccess.on(request.getSession()).getBaseOntModel();
         } else if ("vitro:inferenceOntModel".equals(name)) {
             Object sessionOntModel = request.getSession().getAttribute("inferenceOntModel");
             if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
