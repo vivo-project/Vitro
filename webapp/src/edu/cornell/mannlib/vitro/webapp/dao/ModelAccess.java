@@ -114,6 +114,10 @@ public class ModelAccess {
 		return getOntModel(ModelID.BASE_FULL);
 	}
 	
+	public OntModel getInferenceOntModel() {
+		return getOntModel(ModelID.INFERRED_FULL);
+	}
+	
 	// public OntModel getDisplayTboxOntModel() {
 	// throw new RuntimeException(
 	// "ModelAccess.getDisplayTboxOntModel not implemented.");
@@ -229,14 +233,6 @@ public class ModelAccess {
 	 * 		ctx.setAttribute(INFERENCE_ONT_MODEL_SELECTOR, oms); 
 	 * 	}
 	 * 	
-	 * 	public static OntModel getInferenceOntModel(ServletContext ctx) {
-	 * 		return (OntModel) ctx.getAttribute(INFERENCE_ONT_MODEL);
-	 * 	}
-	 * 	
-	 * 	public static void setInferenceOntModel(OntModel ontModel, ServletContext ctx) {
-	 * 		ctx.setAttribute(INFERENCE_ONT_MODEL, ontModel);
-	 * 	}
-	 * 
 	 * </pre>
 	 */
 	/**
@@ -251,7 +247,6 @@ public class ModelAccess {
 	 * VitroRequest.getJenaOntModel()
 	 * VitroRequest.setJenaOntModel()
 	 * ModelContext.getBaseOntModelSelector()
-	 * ModelContext.getInferenceOntModel()
 	 * ModelContext.getInferenceOntModelSelector()
 	 * ModelContext.getOntModelSelector()
 	 * ModelContext.getUnionOntModelSelector()

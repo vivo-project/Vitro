@@ -7,7 +7,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,9 +16,7 @@ import com.hp.hpl.jena.query.Dataset;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource.ModelName;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -107,10 +104,6 @@ public class VitroRequest extends HttpServletRequestWrapper {
     	setAttribute("dataset", dataset);
     }
     
-    public void setJenaOntModel(OntModel ontModel) {
-    	ModelAccess.on(this).setJenaOntModel(ontModel);
-    }
-    
     public void setOntModelSelector(OntModelSelector oms) {
         setAttribute("ontModelSelector", oms);
     }
@@ -174,12 +167,6 @@ public class VitroRequest extends HttpServletRequestWrapper {
     	}
     }
     
-    
-    
-    public OntModel getJenaOntModel() {
-    	return ModelAccess.on(this).getJenaOntModel();
-    }
-    
     public OntModelSelector getOntModelSelector() {
         Object o = this.getAttribute("ontModelSelector");
         if (o instanceof OntModelSelector) {
@@ -189,22 +176,24 @@ public class VitroRequest extends HttpServletRequestWrapper {
         }
     }
     
+    public void setJenaOntModel(OntModel ontModel) {
+    	ModelAccess.on(this).setJenaOntModel(ontModel);
+    }
+    
+    public OntModel getJenaOntModel() {
+    	return ModelAccess.on(this).getJenaOntModel();
+    }
     
     public OntModel getAssertionsOntModel() {
-        return ModelAccess.on(getSession()).getBaseOntModel();
+        return ModelAccess.on(this).getBaseOntModel();
     }
     
     public OntModel getInferenceOntModel() {
-    	OntModel jenaOntModel = (OntModel)_req.getSession().getAttribute( JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME );
-    	if ( jenaOntModel == null ) {
-    		jenaOntModel = (OntModel)_req.getSession().getServletContext().getAttribute( JenaBaseDao.INFERENCE_ONT_MODEL_ATTRIBUTE_NAME );
-    	}
-    	return jenaOntModel;    	
+    	return ModelAccess.on(this).getInferenceOntModel();
     }
 
-    //Get the display and editing configuration model
     public OntModel getDisplayModel(){
-    	return ModelAccess.on(_req).getDisplayModel();
+    	return ModelAccess.on(this).getDisplayModel();
     }
         
     /**

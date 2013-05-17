@@ -1315,12 +1315,7 @@ public class JenaIngestController extends BaseEditController {
         } else if ("vitro:baseOntModel".equals(name)) {
             return ModelAccess.on(request.getSession()).getBaseOntModel();
         } else if ("vitro:inferenceOntModel".equals(name)) {
-            Object sessionOntModel = request.getSession().getAttribute("inferenceOntModel");
-            if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-                return (OntModel) sessionOntModel;
-            } else {
-                return (OntModel) context.getAttribute("inferenceOntModel");
-            }
+        	return ModelAccess.on(request.getSession()).getInferenceOntModel();
         } else {
             return getVitroJenaModelMaker(request,context).getModel(name);
         }

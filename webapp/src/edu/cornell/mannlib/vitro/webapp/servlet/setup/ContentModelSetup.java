@@ -104,8 +104,6 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         ModelAccess.on(ctx).setOntModel(ModelID.UNION_TBOX, unionTBoxModel);
         ModelAccess.on(ctx).setOntModel(ModelID.UNION_FULL, unionFullModel);
         
-        ModelContext.setInferenceOntModel(inferenceFullModel, ctx);
-        
         checkForNamespaceMismatch( applicationMetadataModel, ctx );
         
         OntModelSelectorImpl baseOms = new OntModelSelectorImpl();     

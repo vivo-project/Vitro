@@ -7,7 +7,6 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -22,8 +21,6 @@ public class ModelContext {
 	private static final String BASE_ONT_MODEL_SELECTOR = "baseOntModelSelector";
 	private static final String INFERENCE_ONT_MODEL_SELECTOR = "inferenceOntModelSelector";
 	
-	private static final String INFERENCE_ONT_MODEL = "inferenceOntModel";
-
 	public ModelContext() {}
 	
 	public static OntModelSelector getOntModelSelector(ServletContext ctx) {
@@ -56,14 +53,6 @@ public class ModelContext {
 	
 	public static void setInferenceOntModelSelector(OntModelSelector oms, ServletContext ctx) {
 		ctx.setAttribute(INFERENCE_ONT_MODEL_SELECTOR, oms); 
-	}
-	
-	public static OntModel getInferenceOntModel(ServletContext ctx) {
-		return (OntModel) ctx.getAttribute(INFERENCE_ONT_MODEL);
-	}
-	
-	public static void setInferenceOntModel(OntModel ontModel, ServletContext ctx) {
-		ctx.setAttribute(INFERENCE_ONT_MODEL, ontModel);
 	}
 	
 	/**

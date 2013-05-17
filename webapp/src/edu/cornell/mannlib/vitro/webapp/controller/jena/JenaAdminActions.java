@@ -309,7 +309,7 @@ public class JenaAdminActions extends BaseEditController {
 	        memoryModel = ModelAccess.on(getServletContext()).getBaseOntModel();
 	    	System.out.println("baseOntModel");
 	    } else if (request.getParameter("inferences") != null) {
-	    	memoryModel = (OntModel) getServletContext().getAttribute("inferenceOntModel");
+	    	memoryModel = ModelAccess.on(getServletContext()).getInferenceOntModel();
 	    	System.out.println("inferenceOntModel");
 	    } else if (request.getParameter("pellet") != null) {
 	    	memoryModel = (OntModel) getServletContext().getAttribute("pelletOntModel");
