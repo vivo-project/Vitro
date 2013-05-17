@@ -10,7 +10,6 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
@@ -23,8 +22,6 @@ public class ModelContext {
 	private static final String BASE_ONT_MODEL_SELECTOR = "baseOntModelSelector";
 	private static final String INFERENCE_ONT_MODEL_SELECTOR = "inferenceOntModelSelector";
 	
-	private static final String JENA_ONT_MODEL = "jenaOntModel";
-	private static final String BASE_ONT_MODEL = "baseOntModel";
 	private static final String INFERENCE_ONT_MODEL = "inferenceOntModel";
 
 	public ModelContext() {}
@@ -59,22 +56,6 @@ public class ModelContext {
 	
 	public static void setInferenceOntModelSelector(OntModelSelector oms, ServletContext ctx) {
 		ctx.setAttribute(INFERENCE_ONT_MODEL_SELECTOR, oms); 
-	}
-	
-	public static OntModel getJenaOntModel(ServletContext ctx) {
-		return (OntModel) ctx.getAttribute(JENA_ONT_MODEL);
-	}
-	
-	public static void setJenaOntModel(OntModel ontModel, ServletContext ctx) {
-		ctx.setAttribute(JENA_ONT_MODEL, ontModel);
-	}
-	
-	public static OntModel getBaseOntModel(ServletContext ctx) {
-		return (OntModel) ctx.getAttribute(BASE_ONT_MODEL);
-	}
-	
-	public static void setBaseOntModel(OntModel ontModel, ServletContext ctx) {
-		ctx.setAttribute(BASE_ONT_MODEL, ontModel);
 	}
 	
 	public static OntModel getInferenceOntModel(ServletContext ctx) {
@@ -113,10 +94,4 @@ public class ModelContext {
         
 	}
 	
-	public static OntModel getDisplayModel(ServletContext ctx){
-	    return(OntModel) ctx.getAttribute( DisplayVocabulary.DISPLAY_ONT_MODEL );	    
-	}
-	public static void setDisplayModel(OntModel ontModel, ServletContext ctx){
-	    ctx.setAttribute(DisplayVocabulary.DISPLAY_ONT_MODEL,ontModel);	    
-	}
 }

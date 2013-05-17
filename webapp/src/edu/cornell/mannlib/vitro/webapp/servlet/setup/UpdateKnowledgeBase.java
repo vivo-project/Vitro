@@ -32,6 +32,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
@@ -106,7 +107,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setUnionOntModelSelector(ModelContext.getUnionOntModelSelector(ctx));
 			boolean tryMigrateDisplay = true;
 			try {
-				settings.setDisplayModel(ModelContext.getDisplayModel(ctx));
+				settings.setDisplayModel(ModelAccess.on(ctx).getDisplayModel());
 				OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
 				settings.setOldTBoxModel(oldTBoxModel);
 				OntModel newTBoxModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_MODEL_DIR));

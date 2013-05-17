@@ -31,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
@@ -377,7 +378,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 
 	private void prepareForUpdate(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
     	//Here, retrieve model from 
-    	Model model = (Model) session.getServletContext().getAttribute("jenaOntModel");
+		OntModel model = ModelAccess.on(session.getServletContext()).getJenaOntModel();
     	//if object property
     	if(EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)){
 	    	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);
@@ -408,16 +409,11 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	if(isSelectFromExisting(vreq)) {
     		// set ProhibitedFromSearch object so picklist doesn't show
             // individuals from classes that should be hidden from list views
-    		//TODO: Check how model is retrieved
-            OntModel displayOntModel = 
-               (OntModel) session.getServletContext()
-                    .getAttribute(DISPLAY_ONT_MODEL);
-            if (displayOntModel != null) {
-                ProhibitedFromSearch pfs = new ProhibitedFromSearch(
-                    DisplayVocabulary.SEARCH_INDEX_URI, displayOntModel);
-                if( editConfig != null )
-                    editConfig.setProhibitedFromSearch(pfs);
-            }
+            OntModel displayOntModel = ModelAccess.on(session).getDisplayModel();
+            ProhibitedFromSearch pfs = new ProhibitedFromSearch(
+                DisplayVocabulary.SEARCH_INDEX_URI, displayOntModel);
+            if( editConfig != null )
+                editConfig.setProhibitedFromSearch(pfs);
     	}
     }
     

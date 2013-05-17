@@ -28,6 +28,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.util.ResourceUtils;
 
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class RunSparqlConstructs implements ServletContextListener {
@@ -46,7 +47,7 @@ public class RunSparqlConstructs implements ServletContextListener {
 			String namespace = (wadf != null && wadf.getDefaultNamespace() != null) 
 				? wadf.getDefaultNamespace() : DEFAULT_DEFAULT_NAMESPACE;
 			
-			OntModel baseOntModel = (OntModel) sce.getServletContext().getAttribute("baseOntModel");
+		    OntModel baseOntModel = ModelAccess.on(sce.getServletContext()).getBaseOntModel();
 			Model anonModel = ModelFactory.createDefaultModel();
 			Model namedModel = ModelFactory.createDefaultModel();
 			

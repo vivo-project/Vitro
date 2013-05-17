@@ -26,6 +26,7 @@ import com.hp.hpl.jena.rdf.model.impl.Util;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
@@ -344,7 +345,7 @@ public class PropertyRestrictionPolicyHelper {
 			StartupStatus ss = StartupStatus.getBean(ctx);
 
 			try {
-				OntModel model = (OntModel) ctx.getAttribute("jenaOntModel");
+				OntModel model = ModelAccess.on(ctx).getJenaOntModel();
 				if (model == null) {
 					throw new NullPointerException(
 							"jenaOntModel has not been initialized.");

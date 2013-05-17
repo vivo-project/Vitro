@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 
@@ -153,14 +154,13 @@ public class BaseEditController extends VitroHttpServlet {
         }
     }
     
-    protected String MODEL_ATTR_NAME = "jenaOntModel";
-    
     protected OntModel getOntModel( HttpServletRequest request, ServletContext ctx ) {
 
+    	// TODO: JB - This method gets the UNION FULL model from the session, if there is one, 
+    	// TODO and the BASE_TBOX model otherwise.
     	OntModel ontModel = null;
-    	
     	try {
-    		ontModel = (OntModel) request.getSession().getAttribute(MODEL_ATTR_NAME);
+    		ontModel = ModelAccess.on(request.getSession()).getJenaOntModel();
     	} catch (Exception e) {
     	    // ignoring any problems here - we're not really expecting
     	    // this attribute to be populated anyway

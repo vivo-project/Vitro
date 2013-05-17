@@ -47,6 +47,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class JenaAdminActions extends BaseEditController {
@@ -93,7 +94,7 @@ public class JenaAdminActions extends BaseEditController {
      * @param response
      */
     private void outputTbox(HttpServletResponse response) {
-        OntModel memoryModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+        OntModel memoryModel = ModelAccess.on(getServletContext()).getBaseOntModel();
         try {
         	OntModel tempOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
         	Property DescriptionProp = ResourceFactory.createProperty(VitroVocabulary.DESCRIPTION_ANNOT);
@@ -171,7 +172,7 @@ public class JenaAdminActions extends BaseEditController {
 	private String testWriteXML() {
 		StringBuffer output = new StringBuffer();
 		output.append("<html><head><title>Test Write XML</title></head><body><pre>\n");
-		Model model = (Model) getServletContext().getAttribute("jenaOntModel");
+		OntModel model = ModelAccess.on(getServletContext()).getJenaOntModel();
 		Model tmp = ModelFactory.createDefaultModel();
 		boolean valid = true;
 		for (Statement stmt : ((List<Statement>)model.listStatements().toList()) ) {
@@ -230,7 +231,7 @@ public class JenaAdminActions extends BaseEditController {
     }
     
     private void removeLongLiterals() {
-    	OntModel memoryModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
+		OntModel memoryModel = ModelAccess.on(getServletContext()).getJenaOntModel();
     	memoryModel.enterCriticalSection(Lock.WRITE);
     	try {
     		List<Statement> statementsToRemove = new LinkedList<Statement>();
@@ -273,7 +274,7 @@ public class JenaAdminActions extends BaseEditController {
 		}
         
         if (actionStr.equals("checkURIs")) { 
-        	OntModel memoryModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
+    		OntModel memoryModel = ModelAccess.on(getServletContext()).getJenaOntModel();
         	ClosableIterator stmtIt = memoryModel.listStatements();
         	try {
 	        	for (Iterator i = stmtIt; i.hasNext(); ) {
@@ -305,7 +306,7 @@ public class JenaAdminActions extends BaseEditController {
         if (actionStr.equals("output")) {
             OntModel memoryModel = null;
 	    if (request.getParameter("assertionsOnly") != null) {
-	    	memoryModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+	        memoryModel = ModelAccess.on(getServletContext()).getBaseOntModel();
 	    	System.out.println("baseOntModel");
 	    } else if (request.getParameter("inferences") != null) {
 	    	memoryModel = (OntModel) getServletContext().getAttribute("inferenceOntModel");
@@ -314,7 +315,7 @@ public class JenaAdminActions extends BaseEditController {
 	    	memoryModel = (OntModel) getServletContext().getAttribute("pelletOntModel");
 	    	System.out.println("pelletOntModel");
 	    } else {
-	    	memoryModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
+			memoryModel = ModelAccess.on(getServletContext()).getJenaOntModel();
 	    	System.out.println("jenaOntModel");
 	    }  
 	    int subModelCount = 0;
@@ -340,7 +341,7 @@ public class JenaAdminActions extends BaseEditController {
         }
         
         if (actionStr.equals("isIsomorphic")) {
-            OntModel memoryModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
+    		OntModel memoryModel = ModelAccess.on(getServletContext()).getJenaOntModel();
             OntModel persistentModel = (OntModel) getServletContext().getAttribute("jenaPersistentOntModel");
             if ((memoryModel != null) && (persistentModel != null)) {
                 long startTime = System.currentTimeMillis();
@@ -363,7 +364,7 @@ public class JenaAdminActions extends BaseEditController {
                 log.trace((System.currentTimeMillis()-startTime)/1000+" seconds to check isomorphism");
             }
         } else if (actionStr.equals("removeUntypedResources")) {
-            OntModel memoryModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
+    		OntModel memoryModel = ModelAccess.on(getServletContext()).getJenaOntModel();
             OntModel persistentModel = (OntModel) getServletContext().getAttribute("jenaPersistentOntModel");
             ClosableIterator rIt = memoryModel.listSubjects();
             clean(rIt,memoryModel);
@@ -374,7 +375,7 @@ public class JenaAdminActions extends BaseEditController {
             ClosableIterator ooIt = persistentModel.listObjects();
             clean(oIt,persistentModel);
         } else if (actionStr.equals("outputTaxonomy")) {
-        	OntModel ontModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+            OntModel ontModel = ModelAccess.on(getServletContext()).getBaseOntModel();
         	Model taxonomyModel = extractTaxonomy(ontModel);
         	try {
         		taxonomyModel.write(response.getOutputStream());

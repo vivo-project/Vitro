@@ -31,6 +31,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -494,7 +495,7 @@ public class VClassGroupCache implements IndexingEventListener {
             } else if(VitroVocabulary.DISPLAY_RANK.equals(stmt.getPredicate().getURI())){
             	requestCacheUpdate();
             } else {
-                OntModel jenaOntModel = ModelContext.getJenaOntModel(context);
+                OntModel jenaOntModel = ModelAccess.on(context).getJenaOntModel();
                 if( isClassNameChange(stmt, jenaOntModel) ) {            
                     requestCacheUpdate();
                 }

@@ -13,15 +13,15 @@ import net.sf.jga.fn.UnaryFunctor;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.EntityPropertyListFilter;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao;
 
 public class PropertyMaskingSetup implements ServletContextListener {
 
 	private final static String ENTITY_PROPERTY_LIST_FILTER_ATTR_NAME = "entityPropertyListFilter";
 
 	public void contextInitialized(ServletContextEvent sce) {
-		OntModel jenaOntModel = (OntModel) sce.getServletContext().getAttribute(JenaBaseDao.JENA_ONT_MODEL_ATTRIBUTE_NAME);		
+		OntModel jenaOntModel = ModelAccess.on(sce.getServletContext()).getJenaOntModel();
         sce.getServletContext().setAttribute(ENTITY_PROPERTY_LIST_FILTER_ATTR_NAME, new EntityPropertyListFilter(jenaOntModel));
 	}
 	

@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -11,19 +10,16 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.impl.XMLResponseParser;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
@@ -31,8 +27,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.search.beans.FileBasedProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForContextNodes;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForDataProperties;
@@ -119,8 +113,8 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             context.setAttribute(SOLR_SERVER, server);
             
             /* set up the individual to solr doc translation */            
-            OntModel jenaOntModel = ModelContext.getJenaOntModel(context);            
-            Model displayModel = ModelContext.getDisplayModel(context);
+            OntModel jenaOntModel = ModelAccess.on(context).getJenaOntModel();            
+            OntModel displayModel = ModelAccess.on(context).getDisplayModel();
             
             /* try to get context attribute DocumentModifiers 
              * and use that as the start of the list of DocumentModifier 

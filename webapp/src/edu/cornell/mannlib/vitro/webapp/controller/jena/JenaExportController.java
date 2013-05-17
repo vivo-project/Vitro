@@ -283,8 +283,6 @@ public class JenaExportController extends BaseEditController {
 		}
 	}
 	
-	static final String FULL_ONT_MODEL_ATTR = "jenaOntModel";
-	static final String ASSERTIONS_ONT_MODEL_ATTR = "baseOntModel";
 	static final String INFERENCES_ONT_MODEL_ATTR = "inferenceOntModel";
 	static final String FULL_GRAPH = "?g";
 	static final String ASSERTIONS_GRAPH = "<http://vitro.mannlib.cornell.edu/default/vitro-kb-2>";
