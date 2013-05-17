@@ -18,7 +18,43 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 
 /**
  * Hierarchical storage for models. TODO
+ * 
+ * Could this be extended? Could it be used to replace or implement these
+ * methods?
+ * 
+ * <pre>
+ * VitroRequest.getAssertionsWebappDaoFactory()
+ * VitroRequest.getDeductionsWebappDaoFactory()
+ * VitroRequest.getFullWebappDaoFactory()
+ * VitroRequest.getRDFService()
+ * VitroRequest.getUnfilteredRDFService()
+ * VitroRequest.getWebappDaoFactory()
+ * VitroRequest.getWriteModel()
+ * VitroRequest.getJenaOntModel()
+ * VitroRequest.setJenaOntModel()
+ * OntModelSelector.getAboxModel
+ * OntModelSelector.getApplicationMetadataModel()
+ * OntModelSelector.getFullModel()
+ * OntModelSelector.getTBoxModel()
+ * OntModelSelector.getTBoxModel(ontologyURI)
+ * OntModelSelector.getUserAccountsModel()
+ * VitroModelSource.getModel(URL)
+ * VitroModelSource.getModel(URL, loadIfAbsent)
+ * VitroModelSource.openModel(name)
+ * VitroModelSource.openModelIfPresent(string)
+ * ServletContext.getAttribute("assertionsWebappDaoFactory")
+ * ServletContext.getAttribute("baseOntModelSelector")
+ * ServletContext.getAttribute("jenaPersistentOntModel")
+ * ServletContext.getAttribute("pelletOntModel")
+ * ServletContext.getAttribute("webappDaoFactory")
+ * VitroJenaModelMaker
+ * VitroJenaSpecialModelMaker
+ * JenaDataSourceSetupBase.getApplicationDataSource(ctx)
+ * JenaDataSourceSetupBase.getStartupDataset()
+ * HttpSession.getAttribute("jenaAuditModel")
+ * </pre>
  */
+
 public class ModelAccess {
 	private static final Log log = LogFactory.getLog(ModelAccess.class);
 
@@ -188,6 +224,12 @@ public class ModelAccess {
 	// Helper classes
 	// ----------------------------------------------------------------------
 
+	/**
+	 * This OntModelSelector doesn't actually hold any OntModels. Instead, it
+	 * links back to the ModelAccess that it was created from. So, if you change
+	 * a model on the ModelAccess, it will change on the OntModelSelector also.
+	 * Even if the OntModelSelector was created first.
+	 */
 	private static class FacadeOntModelSelector implements OntModelSelector {
 		private final ModelAccess parent;
 		private final ModelID aboxID;
@@ -237,50 +279,5 @@ public class ModelAccess {
 			return parent.getOntModel(ModelID.DISPLAY);
 		}
 	}
-
-	// public OntModel getDisplayTboxOntModel() {
-	// throw new RuntimeException(
-	// "ModelAccess.getDisplayTboxOntModel not implemented.");
-	// }
-	//
-	// public OntModel getDisplayModelDisplayOntModel() {
-	// throw new RuntimeException(
-	// "ModelAccess.getDisplayModelDisplayOntModel not implemented.");
-	// }
-	//
-
-	/**
-	 * <pre>
-	 * VitroRequest.getAssertionsWebappDaoFactory()
-	 * VitroRequest.getDeductionsWebappDaoFactory()
-	 * VitroRequest.getFullWebappDaoFactory()
-	 * VitroRequest.getRDFService()
-	 * VitroRequest.getUnfilteredRDFService()
-	 * VitroRequest.getWebappDaoFactory()
-	 * VitroRequest.getWriteModel()
-	 * VitroRequest.getJenaOntModel()
-	 * VitroRequest.setJenaOntModel()
-	 * OntModelSelector.getAboxModel
-	 * OntModelSelector.getApplicationMetadataModel()
-	 * OntModelSelector.getFullModel()
-	 * OntModelSelector.getTBoxModel()
-	 * OntModelSelector.getTBoxModel(ontologyURI)
-	 * OntModelSelector.getUserAccountsModel()
-	 * VitroModelSource.getModel(URL)
-	 * VitroModelSource.getModel(URL, loadIfAbsent)
-	 * VitroModelSource.openModel(name)
-	 * VitroModelSource.openModelIfPresent(string)
-	 * ServletContext.getAttribute("assertionsWebappDaoFactory")
-	 * ServletContext.getAttribute("baseOntModelSelector")
-	 * ServletContext.getAttribute("jenaPersistentOntModel")
-	 * ServletContext.getAttribute("pelletOntModel")
-	 * ServletContext.getAttribute("webappDaoFactory")
-	 * VitroJenaModelMaker
-	 * VitroJenaSpecialModelMaker
-	 * JenaDataSourceSetupBase.getApplicationDataSource(ctx)
-	 * JenaDataSourceSetupBase.getStartupDataset()
-	 * HttpSession.getAttribute("jenaAuditModel")
-	 * </pre>
-	 */
 
 }
