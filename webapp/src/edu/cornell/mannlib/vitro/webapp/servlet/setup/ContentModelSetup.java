@@ -31,9 +31,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SpecialBulkUpdateHandlerGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
@@ -72,8 +71,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 			JenaDataSourceSetupBase.thisIsFirstStartup();
 		}
 
-    	OntModel userAccountsModel = ModelAccess.on(ctx).getUserAccountsModel(); 
-        OntModel displayModel = ModelAccess.on(ctx).getDisplayModel();
+    	ModelAccess models = ModelAccess.on(ctx);
         OntModel baseABoxModel = createNamedModelFromDataset(dataset, JENA_DB_MODEL);
         OntModel inferenceABoxModel = createNamedModelFromDataset(dataset, JENA_INF_MODEL);
         OntModel baseTBoxModel = createdMemoryMappedModel(dataset, JENA_TBOX_ASSERTIONS_MODEL, "tbox assertions");
@@ -91,61 +89,34 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         OntModel inferenceFullModel = createCombinedModel(inferenceABoxModel, inferenceTBoxModel);
         OntModel unionFullModel = ModelFactory.createOntologyModel(DB_ONT_MODEL_SPEC, dataset.getDefaultModel());
 
-        ModelAccess.on(ctx).setOntModel(ModelID.APPLICATION_METADATA, applicationMetadataModel);
-        ModelAccess.on(ctx).setOntModel(ModelID.USER_ACCOUNTS, userAccountsModel);
-        ModelAccess.on(ctx).setOntModel(ModelID.DISPLAY, displayModel);
-        ModelAccess.on(ctx).setOntModel(ModelID.BASE_ABOX, baseABoxModel);
-        ModelAccess.on(ctx).setOntModel(ModelID.BASE_TBOX, baseTBoxModel);
-        ModelAccess.on(ctx).setOntModel(ModelID.BASE_FULL, baseFullModel);
-        ModelAccess.on(ctx).setOntModel(ModelID.INFERRED_ABOX, inferenceABoxModel);
-        ModelAccess.on(ctx).setOntModel(ModelID.INFERRED_TBOX, inferenceTBoxModel);
-        ModelAccess.on(ctx).setOntModel(ModelID.INFERRED_FULL, inferenceFullModel);
-        ModelAccess.on(ctx).setOntModel(ModelID.UNION_ABOX, unionABoxModel);
-        ModelAccess.on(ctx).setOntModel(ModelID.UNION_TBOX, unionTBoxModel);
-        ModelAccess.on(ctx).setOntModel(ModelID.UNION_FULL, unionFullModel);
+        models.setOntModel(ModelID.APPLICATION_METADATA, applicationMetadataModel);
+
+        models.setOntModel(ModelID.BASE_ABOX, baseABoxModel);
+        models.setOntModel(ModelID.BASE_TBOX, baseTBoxModel);
+        models.setOntModel(ModelID.BASE_FULL, baseFullModel);
+        models.setOntModel(ModelID.INFERRED_ABOX, inferenceABoxModel);
+        models.setOntModel(ModelID.INFERRED_TBOX, inferenceTBoxModel);
+        models.setOntModel(ModelID.INFERRED_FULL, inferenceFullModel);
+        models.setOntModel(ModelID.UNION_ABOX, unionABoxModel);
+        models.setOntModel(ModelID.UNION_TBOX, unionTBoxModel);
+        models.setOntModel(ModelID.UNION_FULL, unionFullModel);
         
         checkForNamespaceMismatch( applicationMetadataModel, ctx );
         
-        OntModelSelectorImpl baseOms = new OntModelSelectorImpl();     
-        baseOms.setApplicationMetadataModel(applicationMetadataModel);
-        baseOms.setUserAccountsModel(userAccountsModel);
-        baseOms.setDisplayModel(displayModel);
-		baseOms.setABoxModel(baseABoxModel);
-		baseOms.setTBoxModel(baseTBoxModel);
-		baseOms.setFullModel(baseFullModel);
-
-		OntModelSelectorImpl inferenceOms = new OntModelSelectorImpl();       
-		inferenceOms.setApplicationMetadataModel(applicationMetadataModel);
-		inferenceOms.setUserAccountsModel(userAccountsModel);
-		inferenceOms.setDisplayModel(displayModel);
-		inferenceOms.setABoxModel(inferenceABoxModel);
-		inferenceOms.setTBoxModel(inferenceTBoxModel);
-		inferenceOms.setFullModel(inferenceFullModel);
-
-		OntModelSelectorImpl unionOms = new OntModelSelectorImpl();
-		unionOms.setApplicationMetadataModel(applicationMetadataModel);
-		unionOms.setUserAccountsModel(userAccountsModel);       
-		unionOms.setDisplayModel(displayModel);
-		unionOms.setABoxModel(unionABoxModel);
-		unionOms.setTBoxModel(unionTBoxModel);
-		unionOms.setFullModel(unionFullModel);
-                  
-		ModelContext.setOntModelSelector(unionOms, ctx);
-		ModelContext.setUnionOntModelSelector(unionOms, ctx); // assertions and inferences
-		ModelContext.setBaseOntModelSelector(baseOms, ctx); // assertions
-		ModelContext.setInferenceOntModelSelector(inferenceOms, ctx); // inferences       
-
 		log.info("Setting up DAO factories");
 		
         WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
         config.setDefaultNamespace(getDefaultNamespace(ctx));
         
+        OntModelSelector baseOms = models.getBaseOntModelSelector();
         WebappDaoFactory baseWadf = new WebappDaoFactorySDB(rdfService, baseOms, config, ASSERTIONS_ONLY);
         ctx.setAttribute("assertionsWebappDaoFactory",baseWadf);
         
+        OntModelSelector inferenceOms = models.getInferenceOntModelSelector();
         WebappDaoFactory infWadf = new WebappDaoFactorySDB(rdfService, inferenceOms, config, INFERENCES_ONLY);
         ctx.setAttribute("deductionsWebappDaoFactory", infWadf);
         
+        OntModelSelector unionOms = models.getUnionOntModelSelector();
         WebappDaoFactory wadf = new WebappDaoFactorySDB(rdfService, unionOms, config);
         ctx.setAttribute("webappDaoFactory",wadf);
 

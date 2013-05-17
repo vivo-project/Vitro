@@ -41,13 +41,11 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.FilterFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HideFromDisplayByPolicyFilter;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
@@ -176,8 +174,7 @@ public class VitroRequestPrep implements Filter {
         if (vreq.getUnfilteredWebappDaoFactory() == null) {
             vreq.setUnfilteredWebappDaoFactory(new WebappDaoFactorySDB(
                     RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService(),
-                    ModelContext.getUnionOntModelSelector(
-                            ctx)));
+                    ModelAccess.on(ctx).getUnionOntModelSelector()));
         }
         
         req.setAttribute("VitroRequestPrep.setup", new Integer(1));

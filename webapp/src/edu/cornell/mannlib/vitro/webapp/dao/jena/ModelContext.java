@@ -13,47 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 public class ModelContext {
-    
     private static final Log log = LogFactory.getLog(ModelContext.class);
-	
-	private static final String ONT_MODEL_SELECTOR = "ontModelSelector";
-	private static final String UNION_ONT_MODEL_SELECTOR = "unionOntModelSelector";
-	private static final String BASE_ONT_MODEL_SELECTOR = "baseOntModelSelector";
-	private static final String INFERENCE_ONT_MODEL_SELECTOR = "inferenceOntModelSelector";
-	
-	public ModelContext() {}
-	
-	public static OntModelSelector getOntModelSelector(ServletContext ctx) {
-		return (OntModelSelector) ctx.getAttribute(ONT_MODEL_SELECTOR);
-	}
-	
-	public static void setOntModelSelector(OntModelSelector oms, ServletContext ctx) {
-		ctx.setAttribute(ONT_MODEL_SELECTOR, oms); 
-	}
-	
-	public static OntModelSelector getUnionOntModelSelector(ServletContext ctx) {
-		return (OntModelSelector) ctx.getAttribute(UNION_ONT_MODEL_SELECTOR);
-	}
-	
-	public static void setUnionOntModelSelector(OntModelSelector oms, ServletContext ctx) {
-		ctx.setAttribute(UNION_ONT_MODEL_SELECTOR, oms); 
-	}
- 	
-	public static OntModelSelector getBaseOntModelSelector(ServletContext ctx) {
-		return (OntModelSelector) ctx.getAttribute(BASE_ONT_MODEL_SELECTOR);
-	}
-	
-	public static void setBaseOntModelSelector(OntModelSelector oms, ServletContext ctx) {
-		ctx.setAttribute(BASE_ONT_MODEL_SELECTOR, oms); 
-	}
-	
-	public static OntModelSelector getInferenceOntModelSelector(ServletContext ctx) {
-		return (OntModelSelector) ctx.getAttribute(INFERENCE_ONT_MODEL_SELECTOR);
-	}
-	
-	public static void setInferenceOntModelSelector(OntModelSelector oms, ServletContext ctx) {
-		ctx.setAttribute(INFERENCE_ONT_MODEL_SELECTOR, oms); 
-	}
 	
 	/**
 	 * Register a listener to the models needed to get changes to:

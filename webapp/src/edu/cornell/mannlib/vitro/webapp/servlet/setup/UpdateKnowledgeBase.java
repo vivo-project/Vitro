@@ -34,7 +34,6 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
 
@@ -102,9 +101,9 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setRemovedDataFile(ctx.getRealPath(REMOVED_DATA_FILE));
 			WebappDaoFactory wadf = (WebappDaoFactory) ctx.getAttribute("webappDaoFactory");
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());
-			settings.setAssertionOntModelSelector(ModelContext.getBaseOntModelSelector(ctx));
-			settings.setInferenceOntModelSelector(ModelContext.getInferenceOntModelSelector(ctx));
-			settings.setUnionOntModelSelector(ModelContext.getUnionOntModelSelector(ctx));
+			settings.setAssertionOntModelSelector(ModelAccess.on(ctx).getBaseOntModelSelector());
+			settings.setInferenceOntModelSelector(ModelAccess.on(ctx).getInferenceOntModelSelector());
+			settings.setUnionOntModelSelector(ModelAccess.on(ctx).getUnionOntModelSelector());
 			boolean tryMigrateDisplay = true;
 			try {
 				settings.setDisplayModel(ModelAccess.on(ctx).getDisplayModel());

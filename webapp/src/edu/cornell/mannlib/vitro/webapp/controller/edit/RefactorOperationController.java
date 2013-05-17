@@ -49,7 +49,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.FileGraphSetup;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
@@ -235,10 +235,10 @@ public class RefactorOperationController extends BaseEditController {
     			Model model = null;
     			
     			if (JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL.equals(graphURI)) {
-    				model = ModelContext.getBaseOntModelSelector(getServletContext()).getTBoxModel();
+    				model = ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_TBOX);
     				doNotify = true;
     			} else if (JenaDataSourceSetupBase.JENA_DB_MODEL.equals(graphURI)) {
-					model = ModelContext.getBaseOntModelSelector(getServletContext()).getABoxModel();
+					model = ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_ABOX);
 					doNotify = true;
     			} else {
     			    model = dataset.getNamedModel(graphURI);
@@ -251,8 +251,7 @@ public class RefactorOperationController extends BaseEditController {
     		dataset.getLock().leaveCriticalSection();
     	}
 		
-		renameResourceInModel(ModelContext.getOntModelSelector(
-				getServletContext()).getUserAccountsModel(), 
+		renameResourceInModel(ModelAccess.on(getServletContext()).getUserAccountsModel(), 
 				        userURI, oldURIStr, newURIStr, !NOTIFY);
     	
 		// there are no statements to delete, but we want indexes updated appropriately

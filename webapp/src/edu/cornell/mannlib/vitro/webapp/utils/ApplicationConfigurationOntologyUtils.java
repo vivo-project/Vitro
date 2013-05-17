@@ -24,7 +24,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 
 public class ApplicationConfigurationOntologyUtils {
 
@@ -33,7 +33,7 @@ public class ApplicationConfigurationOntologyUtils {
     public static List<ObjectProperty> getAdditionalFauxSubpropertiesForList(List<ObjectProperty> propList, VitroRequest vreq) {
         ServletContext ctx = vreq.getSession().getServletContext();
 		Model displayModel = ModelAccess.on(ctx).getDisplayModel();
-        Model tboxModel = ModelContext.getUnionOntModelSelector(ctx).getTBoxModel();
+        Model tboxModel = ModelAccess.on(ctx).getOntModel(ModelID.UNION_TBOX);
         return getAdditionalFauxSubpropertiesForList(propList, displayModel, tboxModel);
     }
     
