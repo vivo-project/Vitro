@@ -55,7 +55,7 @@
     }
     String contextId = sesameProperties.getProperty(SESAME_CONTEXT);
     
-    Model fullModel = ModelAccess.on(getServletContext).getJenaOntModel();
+    Model fullModel = ModelAccess.on(getServletContext()).getJenaOntModel();
     // Copy the model to avoid locking the main model during sync.  Assumes enough memory.
     Model copyModel = ModelFactory.createDefaultModel();
     fullModel.enterCriticalSection(Lock.READ);

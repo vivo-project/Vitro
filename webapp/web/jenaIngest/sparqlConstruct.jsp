@@ -47,7 +47,7 @@
 <h3>SPARQL Query <select name="savedQuery">
 	<option value="">select saved query</option>
 	<%
-              OntModel jenaOntModel = ModelAccess.on(getServletContext().getJenaOntModel();
+              OntModel jenaOntModel = ModelAccess.on(getServletContext()).getJenaOntModel();
               jenaOntModel.enterCriticalSection(Lock.READ);
               try {
                   List savedQueries = (List) request.getAttribute("savedQueries");

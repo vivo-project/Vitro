@@ -26,7 +26,7 @@
 		<select name="workflowStepURI">
              
         <%
-              OntModel jenaOntModel = ModelAccess.on(getServletContext().getJenaOntModel();
+              OntModel jenaOntModel = ModelAccess.on(getServletContext()).getJenaOntModel();
               jenaOntModel.enterCriticalSection(Lock.READ);
               try {
                   List workflowSteps  = (List) request.getAttribute("workflowSteps");
