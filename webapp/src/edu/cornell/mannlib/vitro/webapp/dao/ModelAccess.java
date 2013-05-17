@@ -260,10 +260,11 @@ public class ModelAccess {
 	 * VitroRequest.getUnfilteredRDFService()
 	 * VitroRequest.getWebappDaoFactory()
 	 * VitroRequest.getWriteModel()
+	 * VitroRequest.getJenaOntModel()
+	 * VitroRequest.setJenaOntModel()
 	 * ModelContext.getBaseOntModelSelector()
 	 * ModelContext.getInferenceOntModel()
 	 * ModelContext.getInferenceOntModelSelector()
-	 * ModelContext.getJenaOntModel()
 	 * ModelContext.getOntModelSelector()
 	 * ModelContext.getUnionOntModelSelector()
 	 * OntModelSelector.getAboxModel
