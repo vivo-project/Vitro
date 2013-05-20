@@ -21,9 +21,9 @@
                        
                 <section id="selectContentType" name="selectContentType" ${selectClassGroupStyle} role="region">     
                     
-                    <label for="selectClassGroup">Class Group<span class="requiredHint"> *</span></label>
+                    <label for="selectClassGroup">${i18n().class_group_all_caps}<span class="requiredHint"> *</span></label>
                     <select name="selectClassGroup" id="selectClassGroup" role="combobox">
-                        <option value="-1" role="option">Select one</option>
+                        <option value="-1" role="option">${i18n().select_one}</option>
                         <#list classGroups as aClassGroup>
                             <option value="${aClassGroup.URI}"  role="option">${aClassGroup.publicName}</option>
                         </#list>
@@ -33,7 +33,7 @@
                 
                 <section id="classesInSelectedGroup" name="classesInSelectedGroup" ${existingClassGroupStyle}>
                     <#-- Select classes in a class group -->    
-                    <p id="selectClassesMessage" name="selectClassesMessage">Select content to display<span class="requiredHint"> *</span></p>
+                    <p id="selectClassesMessage" name="selectClassesMessage">${i18n().select_content_display}<span class="requiredHint"> *</span></p>
 
                     <#include "pageManagement--classIntersections.ftl">
 
@@ -41,7 +41,7 @@
                         <#--Adding a default class for "ALL" in case all classes selected-->
                         <li class="ui-state-default" role="menuitem">
                             <input type="checkbox" name="allSelected" id="allSelected" value="all" checked="checked" />
-                            <label class="inline" for="All"> All</label>
+                            <label class="inline" for="All"> ${i18n().all_capitalized}</label>
                         </li>
                         <#list classGroup as classInClassGroup>
                         <li class="ui-state-default" role="menuitem">
@@ -51,9 +51,9 @@
                         </li>
                         </#list>
                     </ul><br />
-                    <input  type="button" id="doneWithContent" class="doneWithContent" name="doneWithContent" value="Save this content" />
+                    <input  type="button" id="doneWithContent" class="doneWithContent" name="doneWithContent" value="${i18n().save_this_content}" />
                     <#if menuAction == "Add">
-                        <span id="cancelContent"> or <a class="cancel" href="javascript:"  id="cancelContentLink" >Cancel</a></span>
+                        <span id="cancelContent"> ${i18n().or} <a class="cancel" href="javascript:"  id="cancelContentLink" title="${i18n().cancel_title}">${i18n().cancel_link}</a></span>
                     </#if>
                 </section>
             </section>

@@ -2,36 +2,36 @@
 
 <#-- Template for displaying list of user accounts -->
 
-<h3>Manage profile editing</h3>
+<h3>${i18n().manage_profile_editing}</h3>
 
 <#if message??>
     <section class="account-feedback" role="region">
         <#if message.success?? > 
-            <p>The operation was successful.</p>
+            <p>${i18n().operation_successful}</p>
         </#if>
     
         <#if message.failure?? >
-            <p> The operation was unsuccessful. Full details can be found in the system log.</p>
+            <p>${i18n().operation_unsuccessful}</p>
         </#if>
     </section>
 </#if>
 
 <section id="error-alert" role="alert" class="hidden">
-    <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon" />
+    <img src="${urls.images}/iconAlert.png" width="24" height="24" alt="${i18n().error_alert_icon}" />
     <p></p>
 </section>
 
 <section class="proxy-profile">
-    <h4>Relate profile editors and profiles <img src="${urls.images}/iconInfo.png" alt="info icon" title="The editors you select on the left hand side will have the ability to edit the VIVO profiles you select on the right hand side. You can select multiple editors and multiple profiles, but you must select a minimum of 1 each." /></h4>
+    <h4>${i18n().relate_editors_profiles} <img src="${urls.images}/iconInfo.png" alt="${i18n().info_icon}" title="${i18n().profile_editing_title}" /></h4>
     
     <form id="add-relation" action="${formUrls.create}" method="POST">
         <fieldset class="proxy">
-            <legend>Select editors</legend>
+            <legend>${i18n().select_editors}</legend>
             
             <section name="proxyProxiesPanel" role="section">
-                <label for="selectProfileEditors">Select editors</label>
-                <input id="selectProfileEditors" type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" /><span><img class="loading-relateEditor hidden" src="${urls.images}/indicatorWhite.gif" /></span>
-                <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='type more characters' noMatchText='no match'>&nbsp;</span></p>
+                <label for="selectProfileEditors">${i18n().select_editors}</label>
+                <input id="selectProfileEditors" type="text" name="proxySelectorAC" class="acSelector" size="35" value="${i18n().select_last_name}" role="input" /><span><img class="loading-relateEditor hidden" src="${urls.images}/indicatorWhite.gif" alt="${i18n().processing_indicator}"/></span>
+                <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='${i18n().type_more_chars}' noMatchText='${i18n().no_match}'>&nbsp;</span></p>
     
                 <#-- Magic div that holds all of the proxy data and the template that shows how to display it. -->
                 <ul name="proxyData" role="navigation">
@@ -48,7 +48,7 @@
                             <p class="proxy-info">
                                 %label% | <span class="class-label">%classLabel%</span>
                                 <br />
-                                <a class='remove-proxy' href="." templatePart="remove" title="remove selection">Remove selection</a>
+                                <a class='remove-proxy' href="." templatePart="remove" title="${i18n().remove_selection}">${i18n().remove_selection}</a>
                                 <input type="hidden" name="proxyUri" value="%uri%" >
                             </p>
                         </li>
@@ -58,13 +58,13 @@
         </fieldset>
     
         <fieldset class="profile">
-          <legend>Select profiles</legend>  
+          <legend>${i18n().select_profiles}</legend>  
       
           <section name="proxyProfilesPanel" role="region">
-              <label for="selectProfiles">Select profiles</label>
-              <input id="selectProfiles" type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" /><span><img class="loading-relateProfile hidden" src="${urls.images}/indicatorWhite.gif" /></span>
+              <label for="selectProfiles">${i18n().select_profiles}</label>
+              <input id="selectProfiles" type="text" name="proxySelectorAC" class="acSelector" size="35" value="${i18n().select_last_name}" role="input" /><span><img class="loading-relateProfile hidden" src="${urls.images}/indicatorWhite.gif"  alt="${i18n().processing_indicator}"/></span>
             
-              <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='type more characters' noMatchText='no match'>&nbsp;</span></p>
+              <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='${i18n().type_more_chars}' noMatchText='${i18n().no_match}'>&nbsp;</span></p>
 
                 <#-- Magic div thst holds all of the proxy data and the template that shows how to display it. -->
                 <ul name="proxyData" role="navigation">
@@ -79,7 +79,7 @@
                             <img class="photo-profile" width="60" alt="%label%" src="%imageUrl%">
                             
                             <p class="proxy-info-profile">%label% | <span class="class-label">%classLabel%</span>
-                                <br /><a class='remove-proxy' href="." templatePart="remove" title="remove selection">Remove selection</a>
+                                <br /><a class='remove-proxy' href="." templatePart="remove" title="${i18n().remove_selection}">${i18n().remove_selection}</a>
                             </p>
     
                             <input type="hidden" name="profileUri" templatePart="uriField" value="%uri%" role="input" />
@@ -89,19 +89,19 @@
             </section>
         </fieldset>
 
-        <input class="submit pos-submit" type="submit" name="createRelationship" value="Save"  role="button" />
+        <input class="submit pos-submit" type="submit" name="createRelationship" value="${i18n().save_button}"  role="button" />
     </form>
 </section>
 
 
-<h4 class="profile-editors">Profile editors</h4>
+<h4 class="profile-editors">${i18n().profile_editors}</h4>
 
 <section id="search-proxy" role="region">
     <form action="${formUrls.list}" method="POST">
         <input type="text" name="searchTerm" role="input" />
-        <input class="submit" type="submit" name="searchByProxy" value="Search" role="button" /> 
+        <input class="submit" type="submit" name="searchByProxy" value="${i18n().search_button}" role="button" /> 
             <#if page.previous??>
-               | <a href="${formUrls.list}?pageIndex=${page.previous}&searchTerm=${searchTerm}" title="previous">Previous</a>
+               | <a href="${formUrls.list}?pageIndex=${page.previous}&searchTerm=${searchTerm}" title="${i18n().previous}">${i18n().previous}</a>
             </#if>
             
             <#if page.last != 0>
@@ -109,11 +109,11 @@
             </#if>
             
             <#if page.next??>
-                <a href="${formUrls.list}?pageIndex=${page.next}&searchTerm=${searchTerm}" title="next">Next</a>
+                <a href="${formUrls.list}?pageIndex=${page.next}&searchTerm=${searchTerm}" title="${i18n().next_capitalized}">${i18n().next_capitalized}</a>
             </#if>
 
             <#if searchTerm?has_content>
-                <p>Search results for "<span class="blue">${searchTerm}</span>" | <a href="${formUrls.list}" title="view all profile editors">View all profile editors</a></p>
+                <p>${i18n().search_results_for} '<span class="blue">${searchTerm}</span>' | <a href="${formUrls.list}" title="${i18n().view_profile_editors}">${i18n().view_profile_editors}</a></p>
             </#if>
     </form>
 </section>
@@ -129,22 +129,22 @@
                 <p class="proxyInfoElement proxy-info">
                     ${p.label} | <span class="class-label">${p.classLabel}</span>
                     <br>
-                    <a class="remove-proxyUri" href="${formUrls.edit}?proxyUri=${p.uri}&deleteProxy=Delete proxy" title="delete profile editor">Delete profile editor</a>
+                    <a class="remove-proxyUri" href="${formUrls.edit}?proxyUri=${p.uri}&deleteProxy=Delete proxy" title="${i18n().delete_profile_editor}">${i18n().delete_profile_editor}</a>
                     <input type="hidden" value="${p.uri}" name="proxyUri">
                 </p>
             </div>       
         </fieldset>  
         
         <fieldset class="profile">
-            <legend>Add profile</legend>
+            <legend>${i18n().add_profile}</legend>
             
             <section name="proxyProfilesPanel" role="region">
-                <label for="addProfile">Add profile</label>
-                <input id="addProfile" type="text" name="proxySelectorAC" class="acSelector" size="35" value="Select an existing last name" role="input" /><span><img class="loading-addProfile hidden" src="${urls.images}/indicatorWhite.gif" /></span>
+                <label for="addProfile">${i18n().add_profile}</label>
+                <input id="addProfile" type="text" name="proxySelectorAC" class="acSelector" size="35" value="${i18n().select_last_name}" role="input" /><span><img class="loading-addProfile hidden"  alt="${i18n().processing_indicator}" src="${urls.images}/indicatorWhite.gif" /></span>
                 
-                <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='type more characters' noMatchText='no match'>&nbsp;</span></p>
+                <p class="search-status"><span name='proxySelectorSearchStatus' moreCharsText='${i18n().type_more_chars}' noMatchText='${i18n().no_match}'>&nbsp;</span></p>
                 <p name="excludeUri" style="display: none">${r.proxyInfos[0].profileUri}<p>
-                <p class="selected-editors">Selected profiles:</p>
+                <p class="selected-editors">${i18n().selected_profiles}:</p>
     
                 <#-- Magic div that holds all of the proxy data and the template that shows how to display it. -->
                 <ul name="proxyData" role="navigation">
@@ -168,7 +168,7 @@
                             <img class="photo-profile" width="60" alt="%label%" src="%imageUrl%">
                              
                             <p class="proxy-info-profile">%label% | <span class="class-label">%classLabel%</span>
-                                <br /><a class='remove-proxy' href="." templatePart="remove" title="remove selection">Remove selection</a>
+                                <br /><a class='remove-proxy' href="." templatePart="remove" title="${i18n().remove_selection}">${i18n().remove_selection}</a>
                             </p>
                         </li>
                         
@@ -177,7 +177,7 @@
                 </ul>
             </section>
             
-            <input class="submit" type="submit" name="modifyProfileList" value="Save changes to profiles" role="button" />
+            <input class="submit" type="submit" name="modifyProfileList" value="${i18n().save_profile_changes}" role="button" />
         </fieldset> 
     </form>
 </section>

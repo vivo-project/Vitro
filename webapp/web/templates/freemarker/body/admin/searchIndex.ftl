@@ -9,7 +9,7 @@
 <#if !indexIsConnected>
     <!-- Can't contact the Solr server. Indexing would be impossible. Show an error message. -->
     <section id="error-alert" role="alert">
-        <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon" />
+        <img src="${urls.images}/iconAlert.png" width="24" height="24" alt="Error alert icon" />
         <p>${i18n().search_index_not_connected}</p>
         <p><tt>SolrServer.ping()</tt> ${i18n().failed}.
         <p>${i18n().check_startup_status}</p>

@@ -11,12 +11,12 @@
   
     <thead>
       <tr>
-        <th scope="col">Title</th>
-        <!--th scope="col">Type</th-->
+        <th scope="col">${i18n().title_capitalized}</th>
+        <!--th scope="col">${i18n().type_capitalized}</th-->
         <th scope="col">URL</th>
-        <th scope="col">Custom Template</th>
-        <th id="isMenuPage" scope="col" >Menu Page</th>
-        <th id="iconColumns" scope="col">Controls</th>
+        <th scope="col">${i18n().custom_template}</th>
+        <th id="isMenuPage" scope="col" >${i18n().menu_page}</th>
+        <th id="iconColumns" scope="col">${i18n().controls}</th>
       </tr>
     </thead>
     
@@ -28,11 +28,11 @@
             	    <#if pagex.listedPageTitle == "Home" >
             	        ${pagex.listedPageTitle!}
             	    <#else>
-            		<a href="${urls.base}/editRequestDispatch?subjectUri=${pagex.listedPageUri?url}&switchToDisplayModel=1&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator">${(pagex.listedPageTitle)!'-untitled-'}</a>
+            		<a href="${urls.base}/editRequestDispatch?subjectUri=${pagex.listedPageUri?url}&switchToDisplayModel=1&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator" title="${i18n().listed_page_title}">${(pagex.listedPageTitle)!i18n().untitled}</a>
             		</#if>
             		
             	<#else>
-            		No URI defined for page. 
+            		${i18n().uri_not_defined} 
             	</#if>
             </td>                  
             <!--td> {pagex.dataGetterLabel}</td-->
@@ -44,12 +44,12 @@
             </#if>
             </td>
             <td>
-                <a href="${urls.base}/editRequestDispatch?subjectUri=${pagex.listedPageUri?url}&switchToDisplayModel=1&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator"><img src="${urls.images!}/individual/editIcon.gif" title="edit this page" alt="edit"></a>
+                <a href="${urls.base}/editRequestDispatch?subjectUri=${pagex.listedPageUri?url}&switchToDisplayModel=1&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator" title=""><img src="${urls.images!}/individual/editIcon.gif" alt="${i18n().edit_page}"></a>
                 &nbsp;&nbsp;
-                <a href="${urls.base}/individual?uri=${pagex.listedPageUri?url}&switchToDisplayModel=1"><img src="${urls.images!}/profile-page-icon.png" title="view the individual profile for this page" alt="profile page"></a>
+                <a href="${urls.base}/individual?uri=${pagex.listedPageUri?url}&switchToDisplayModel=1" title="${i18n().view_profile_for_page}"><img src="${urls.images!}/profile-page-icon.png" alt="${i18n().view_profile_for_page}"></a>
                 &nbsp;&nbsp;
                 <#if !pagex.listedPageCannotDeletePage?has_content >
-                    <a cmd="deletePage" pageTitle=" ${pagex.listedPageTitle!}"  href="${urls.base}/deletePageController?pageURI=${pagex.listedPageUri?url}"><img src="${urls.images!}/individual/deleteIcon.gif" title="delete this page" alt="delete"></a>
+                    <a cmd="deletePage" pageTitle=" ${pagex.listedPageTitle!}"  href="${urls.base}/deletePageController?pageURI=${pagex.listedPageUri?url}" title="${i18n().delete_page}"><img src="${urls.images!}/individual/deleteIcon.gif" alt="${i18n().delete_page}"></a>
                 </#if>
             </td>
         </tr>    
@@ -60,17 +60,17 @@
   </table>
   
 <#else>
-    <p>There are no pages defined yet.</p>
+    <p>${i18n().no_pages_defined}</p>
 </#if>
   
   <form id="pageListForm" action="${urls.base}/editRequestDispatch" method="get">
       <input type="hidden" name="typeOfNew" value="http://vitro.mannlib.cornell.edu/ontologies/display/1.1#Page">              
       <input type="hidden" name="switchToDisplayModel" value="1">
       <input type="hidden" name="editForm" value="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator" role="input">
- 	<input id="submit" value="Add Page" role="button" type="submit" >
+ 	<input id="submit" value="${i18n().add_page}" role="button" type="submit" >
   </form>
   <br />
- <p style="margin-top:10px">Use <a id="menuMgmtLink" href="${urls.base}/individual?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fontologies%2Fdisplay%2F1.1%23DefaultMenu&switchToDisplayModel=true">Menu Ordering</a> to set the order of menu items.</p>
+ <p style="margin-top:10px">${i18n().use_capitalized} <a id="menuMgmtLink" href="${urls.base}/individual?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fontologies%2Fdisplay%2F1.1%23DefaultMenu&switchToDisplayModel=true" title="">${i18n().menu_orering}</a> ${i18n().to_order_menu_items}</p>
 </section>
 
 

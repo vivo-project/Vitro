@@ -115,11 +115,11 @@ name will be used as the label. -->
 
 <#macro showAddLink propertyLocalName label url>
     <#if propertyLocalName == "informationResourceInAuthorship" || propertyLocalName == "webpage" || propertyLocalName == "hasResearchArea">
-        <a class="add-${propertyLocalName}" href="${url}" title="Manage list of ${label?lower_case}">
-        <img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="manage" /></a>
+        <a class="add-${propertyLocalName}" href="${url}" title="${i18n().manage_list_of} ${label?lower_case}">
+        <img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="${i18n().manage}" /></a>
     <#else>
-        <a class="add-${propertyLocalName}" href="${url}" title="Add new ${label?lower_case} entry">
-        <img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="add" /></a>
+        <a class="add-${propertyLocalName}" href="${url}" title="${i18n().add_new} ${label?lower_case} ${i18n().entry}">
+        <img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="${i18n().add}" /></a>
     </#if>
 </#macro>
 
@@ -151,7 +151,7 @@ name will be used as the label. -->
 </#macro>
 
 <#macro showEditLink propertyLocalName url>
-    <a class="edit-${propertyLocalName}" href="${url}" title="edit this entry"><img class="edit-individual" src="${urls.images}/individual/editIcon.gif" alt="edit" /></a>
+    <a class="edit-${propertyLocalName}" href="${url}" title="${i18n().edit_entry}"><img class="edit-individual" src="${urls.images}/individual/editIcon.gif" alt="${i18n().edit_entry}" /></a>
 </#macro>
 
 <#macro deleteLink propertyLocalName statement> 
@@ -162,14 +162,14 @@ name will be used as the label. -->
 </#macro>
 
 <#macro showDeleteLink propertyLocalName url>
-    <a class="delete-${propertyLocalName}" href="${url}" title="delete this entry"><img  class="delete-individual" src="${urls.images}/individual/deleteIcon.gif" alt="delete" /></a>
+    <a class="delete-${propertyLocalName}" href="${url}" title="${i18n().delete_entry}"><img  class="delete-individual" src="${urls.images}/individual/deleteIcon.gif" alt="${i18n().delete_entry}" /></a>
 </#macro>
 
 <#macro verboseDisplay property>
     <#local verboseDisplay = property.verboseDisplay!>
     <#if verboseDisplay?has_content>       
         <section class="verbosePropertyListing">
-            <a class="propertyLink" href="${verboseDisplay.propertyEditUrl}" title="name">${verboseDisplay.localName}</a> 
+            <a class="propertyLink" href="${verboseDisplay.propertyEditUrl}" title="${i18n().name}">${verboseDisplay.localName}</a> 
             (<span>${property.type?lower_case}</span> property);
             order in group: <span>${verboseDisplay.displayRank};</span> 
             display level: <span>${verboseDisplay.displayLevel};</span>
@@ -194,15 +194,15 @@ name will be used as the label. -->
     <#-- Don't assume that if the mainImage property is populated, there is a thumbnail image (though that is the general case).
          If there's a mainImage statement but no thumbnail image, treat it as if there is no image. -->
     <#if (mainImage.statements)?has_content && thumbUrl?has_content>
-        <a href="${individual.imageUrl}" title="individual photo">
-        	<img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="${imageWidth!}" />
+        <a href="${individual.imageUrl}" title="${i18n().alt_thumbnail_photo}">
+        	<img class="individual-photo" src="${thumbUrl}" title="${i18n().click_to_view_larger}" alt="${individual.name}" width="${imageWidth!}" />
         </a>
         <@editingLinks "${mainImage.localName}" mainImage.first() editable />
     <#else>
-        <#local imageLabel><@addLinkWithLabel mainImage editable "Photo" /></#local>
+        <#local imageLabel><@addLinkWithLabel mainImage editable "${i18n().photo}" /></#local>
         ${imageLabel}
         <#if showPlaceholder == "always" || (showPlaceholder="with_add_link" && imageLabel?has_content)>
-            <img class="individual-photo" src="${placeholderImageUrl(individual.uri)}" title = "no image" alt="placeholder image" width="${imageWidth!}" />
+            <img class="individual-photo" src="${placeholderImageUrl(individual.uri)}" title = "${i18n().no_image}" alt="${i18n().placeholder_image}" width="${imageWidth!}" />
         </#if>
     </#if>
 </#macro>
@@ -214,7 +214,7 @@ name will be used as the label. -->
     <#if (labelCount > 1)  && editable >
         <span class="inline">
             <a id="manageLabels" href="${urls.base}/manageLabels?subjectUri=${individual.uri!}">
-                manage labels
+                ${i18n().manage_labels}
             </a>
         </span>
     <#else>

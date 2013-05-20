@@ -86,6 +86,9 @@ $(document).ready(function(){
                     // show the selected tab section
                     $('section#' + tabName).show();                
                 }
+                // if there is a more link, "click" more to show all the researchers
+                // we need the timeout delay so that the more link can get rendered                
+                setTimeout(geoFocusExpand,250);
             }
             else {
                 retrieveLocalStorage();
@@ -96,6 +99,21 @@ $(document).ready(function(){
         }
     }
 
+    function geoFocusExpand() {
+        // if the ontology is set to collate by subclass, $list.length will be > 0 
+        // this ensures both possibilities are covered
+        var $list = $('ul#geographicFocusOfList').find('ul');
+        if ( $list.length > 0 )
+        {
+            var $more = $list.find('a.more-less');
+            $more.click();
+        }
+        else {
+            var $more = $('ul#geographicFocusOfList').find('a.more-less');
+            $more.click();
+        }
+    }
+    
     //  Next two functions --  keep track of which property group tab was selected,
     //  so if we return from a custom form or a related individual, even via the back button,
     //  the same property group will be selected as before.
@@ -167,14 +185,14 @@ $(document).ready(function(){
         }
     }
     // if there are so many tabs that they wrap to a second line, adjust the font size to 
-    // prevent wrapping
+    //prevent wrapping
     function adjustFontSize() {
         var width = 0;
         $('ul.propertyTabsList li').each(function() {
             width += $(this).outerWidth();
         });
         if ( width < 922 ) {
-            var diff = 925-width;
+            var diff = 927-width;
             $('ul.propertyTabsList li:last-child').css('width', diff + 'px');
         }
         else {
@@ -194,17 +212,11 @@ $(document).ready(function(){
             else if ( diff > 130 && diff < 175 ) {
                 $('ul.propertyTabsList li').css('font-size', "0.8em");
             }
-            else if ( diff > 175 && diff < 240 ) {
+            else if ( diff > 175 && diff < 260 ) {
                 $('ul.propertyTabsList li').css('font-size', "0.73em");
             }
-            else if ( diff > 240 && diff < 280 ) {
-                $('ul.propertyTabsList li').css('font-size', "0.7em");
-            }
-            else if ( diff > 280 && diff < 310 ) {
-                $('ul.propertyTabsList li').css('font-size', "0.675em");
-            }
             else {
-                $('ul.propertyTabsList li').css('font-size', "0.65em");
+                $('ul.propertyTabsList li').css('font-size', "0.7em");
             }
 
             // get the new width
@@ -212,7 +224,7 @@ $(document).ready(function(){
             $('ul.propertyTabsList li').each(function() {
                 newWidth += $(this).outerWidth();
             });
-            var newDiff = 925-newWidth;
+            var newDiff = 926-newWidth;
             $('ul.propertyTabsList li:last-child').css('width', newDiff + 'px');
         }
     }

@@ -7,12 +7,12 @@
 <#assign htmlForElements = editConfiguration.pageData.htmlForElements />
 
 <#if editMode == "edit">        
-        <#assign titleVerb="Edit">        
-        <#assign submitButtonText="Edit Date/Time Value">
+        <#assign titleVerb="${i18n().edit_capitalized}">        
+        <#assign submitButtonText="${i18n().edit_date_time_value}">
         <#assign disabledVal="disabled">
 <#else>
-        <#assign titleVerb="Create">        
-        <#assign submitButtonText="Create Date/Time Value">
+        <#assign titleVerb="${i18n().create_capitalized}">        
+        <#assign submitButtonText="${i18n().create_date_time_value}">
         <#assign disabledVal=""/>
 </#if>
 <#--If edit submission exists, then retrieve validation errors if they exist-->
@@ -21,25 +21,25 @@
 </#if>
 
 
-<h2>${titleVerb} date time value for ${editConfiguration.subjectName}</h2>
+<h2>${titleVerb} ${i18n().date_time_value_for} ${editConfiguration.subjectName}</h2>
 
 <#--Display error messages if any-->
 <#if submissionErrors?has_content>
     <section id="error-alert" role="alert">
-        <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon" />
+        <img src="${urls.images}/iconAlert.png" width="24" height="24" alt="${i18n().error_alert_icon}" />
         <p>
         <#--below shows examples of both printing out all error messages and checking the error message for a specific field-->
         <#list submissionErrors?keys as errorFieldName>
         	<#if errorFieldName == "startField">
         	    <#if submissionErrors[errorFieldName]?contains("before")>
-        	        The Start interval must be earlier than the End interval.
+        	        ${i18n().start_interval_must_precede_end_earlier}
         	    <#else>
         	        ${submissionErrors[errorFieldName]}
         	    </#if>
         	    <br />
         	<#elseif errorFieldName == "endField">
     	        <#if submissionErrors[errorFieldName]?contains("after")>
-    	            The End interval must be later than the Start interval.
+    	            ${i18n().end_interval_must_follow_start_interval}
     	        <#else>
     	            ${submissionErrors[errorFieldName]}
     	        </#if>
@@ -52,20 +52,20 @@
 <p></p>
 <#--Need to draw edit elements for dates here-->
  <#if htmlForElements?keys?seq_contains("startField")>
-	Start&nbsp; ${htmlForElements["startField"]}
+	${i18n().start_capitalized}&nbsp; ${htmlForElements["startField"]}
  </#if>
  <br /><br />
  <#if htmlForElements?keys?seq_contains("endField")>
-	End&nbsp; ${htmlForElements["endField"]}
+	${i18n().end_capitalized}&nbsp; ${htmlForElements["endField"]}
  </#if>
 
     <p class="submit">
         <input type="hidden" name="editKey" value="${editKey}" />
         <input type="submit" id="submit" value="${submitButtonText}" role="button" />
     
-        <span class="or"> or </span>
+        <span class="or"> ${i18n().or} </span>
     
-        <a class="cancel" href="${editConfiguration.cancelUrl}" title="Cancel">Cancel</a>
+        <a class="cancel" href="${editConfiguration.cancelUrl}" title="${i18n().cancel_title}">${i18n().cancel_link}</a>
     </p>
 </form>
 

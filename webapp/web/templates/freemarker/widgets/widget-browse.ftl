@@ -12,12 +12,12 @@
 
 <#macro allClassGroups>
     <section id="browse" role="region">
-        <h4>Browse</h4>
+        <h4>${i18n().browse_capitalized}</h4>
         
         <ul id="browse-classgroups" role="list">
         <#list vclassGroupList as group>
             <#if (group.individualCount > 0)>
-                <li role="listitem"><a href="${urls.currentPage}?classgroupUri=${group.uri?url}" title="group name">${group.displayName?capitalize} <span class="count-classes">(${group.individualCount})</span></a></li>
+                <li role="listitem"><a href="${urls.currentPage}?classgroupUri=${group.uri?url}" title="${i18n().group_name}">${group.displayName?capitalize} <span class="count-classes">(${group.individualCount})</span></a></li>
             </#if>
         </#list>
         </ul>
@@ -28,14 +28,14 @@
 
 <#macro classGroup>
     <section id="browse" role="region">
-        <h4>Browse</h4>
+        <h4>${i18n().browse_capitalized}</h4>
         
          <section id="browse-classes" role="navigation">
              <nav>
                  <ul id="classes-in-classgroup" role="list">
                      <#list classes as class>
                         <#if (class.individualCount > 0)>
-                            <li role="listitem"><a href="${urls.currentPage}?classgroupUri=${classGroup.uri?url}&vclassUri=${class.uri?url}" title="class name">${class.name} <span class="count-individuals"> (${class.individualCount})</span></a></li>
+                            <li role="listitem"><a href="${urls.currentPage}?classgroupUri=${classGroup.uri?url}&vclassUri=${class.uri?url}" title="${i18n().class_name}">${class.name} <span class="count-individuals"> (${class.individualCount})</span></a></li>
                         </#if>
                      </#list>
                  </ul>
@@ -46,7 +46,7 @@
 
 <#macro vclass>
     <section id="browse" role="region">
-    <h4>Browse</h4>    
+    <h4>${i18n().browse_capitalized}</h4>    
         <div>
             vclass ${class.name} from ${classGroup.displayName}
             This has classGroup, classes, individualsInClass and class.
@@ -54,14 +54,14 @@
          
         <ul>
             <#list individualsInClass as ind>
-                <li><a href="${urls.base}/individual?uri=${ind.uri?url}" title="individual name">${ind.name}</a></li>
+                <li><a href="${urls.base}/individual?uri=${ind.uri?url}" title="${i18n().individual_nam}">${ind.name}</a></li>
             </#list>
         </section>
 </#macro>
 
 <#macro vclassAlpha>
     <section id="browse" role="region">
-    <h4>Browse</h4>     
-        <div>vclassAlpha is not yet implemented.</div> 
+    <h4>${i18n().browse_capitalized}</h4>     
+        <div>${i18n().vclassAlpha_not_implemented}</div> 
     </section>
 </#macro>

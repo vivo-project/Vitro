@@ -4,44 +4,44 @@
 
 <#if siteConfig?has_content>
     <section class="pageBodyGroup" role="region">
-        <h3>Site Configuration</h3>
+        <h3>${i18n().site_config}</h3>
         
         <ul role="navigation">
             <#if siteConfig.internalClass?has_content>
-                <li role="listitem"><a href="${siteConfig.internalClass}" title="Institutional internal class">Institutional internal class</a></li>
+                <li role="listitem"><a href="${siteConfig.internalClass}" title="${i18n().internal_class}">${i18n().internal_class}</a></li>
             </#if>     
             
             <#if siteConfig.manageProxies?has_content>
-                <li role="listitem"><a href="${siteConfig.manageProxies}" title="Manage profile editing">Manage profile editing</a></li>
+                <li role="listitem"><a href="${siteConfig.manageProxies}" title="${i18n().manage_profile_editing}">${i18n().manage_profile_editing}</a></li>
             </#if>  
             
             <#if siteConfig.pageManagement?has_content>
-                <li role="listitem"><a href="${siteConfig.pageManagement}" title="Page management">Page management</a></li>
+                <li role="listitem"><a href="${siteConfig.pageManagement}" title="${i18n().page_management}">${i18n().page_management}</a></li>
             </#if>        
             
             <#if siteConfig.menuManagement?has_content>
-                <li role="listitem"><a href="${siteConfig.menuManagement}" title="Menu ordering">Menu ordering</a></li>
+                <li role="listitem"><a href="${siteConfig.menuManagement}" title="${i18n().menu_ordering}">${i18n().menu_ordering}</a></li>
             </#if>      
             
             <#if siteConfig.restrictLogins?has_content>
-                <li role="listitem"><a href="${siteConfig.restrictLogins}" title="Restrict Logins">Restrict Logins</a></li>
+                <li role="listitem"><a href="${siteConfig.restrictLogins}" title="${i18n().restrict_logins}">${i18n().restrict_logins}</a></li>
             </#if>
             
             <#if siteConfig.siteInfo?has_content>
-                <li role="listitem"><a href="${siteConfig.siteInfo}" title="Site information">Site information</a></li>
+                <li role="listitem"><a href="${siteConfig.siteInfo}" title="${i18n().site_information}">${i18n().site_information}</a></li>
             </#if>
             
             <#if siteConfig.startupStatus?has_content>
                 <li role="listitem">
-                    <a href="${siteConfig.startupStatus}" title="Startup status">Startup status</a>
+                    <a href="${siteConfig.startupStatus}" title="${i18n().startup_status}">${i18n().startup_status}</a>
                     <#if siteConfig.startupStatusAlert>
-                        <img id="alertIcon" src="${urls.images}/iconAlert.png" width="20" height="20" alert="Error alert icon" />
+                        <img id="alertIcon" src="${urls.images}/iconAlert.png" width="20" height="20" alt="${i18n().error_alert_icon}" />
                     </#if>
                 </li>
             </#if>   
             
              <#if siteConfig.userAccounts?has_content>
-                <li role="listitem"><a href="${siteConfig.userAccounts}" title="User accounts">User accounts</a></li>
+                <li role="listitem"><a href="${siteConfig.userAccounts}" title="${i18n().user_accounts}">${i18n().user_accounts}</a></li>
              </#if>        
         </ul>
     </section>

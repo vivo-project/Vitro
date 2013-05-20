@@ -2,7 +2,7 @@
 
 <#--Template for removing menu items -->
 
-<h3>Remove menu item</h3>
+<h3>${i18n().remove_menu_item}</h3>
 
 <section id="remove-menu-item" role="region">
     <form method="POST" action="${formUrls}" class="customForm" role="remove menu item">
@@ -10,9 +10,9 @@
         <input type="hidden" name="cmd" id="cmd" value="Remove" role="input" />
         <input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="true" role="input" />
 
-        <p>Are you sure you want to remove <em>${menuName}</em> menu item?</p>
+        <p>${i18n().confirm_menu_item_delete} <em>${menuName}</em> ${i18n().menu_item}?</p>
 
-        <input type="submit" name="removeMenuItem" value="Remove menu item" class="submit" role="input" /> or <a class="cancel" href="${cancelUrl}" title="cancel">Cancel</a>
+        <input type="submit" name="removeMenuItem" value="${i18n().remove_menu_item}" class="submit" role="input" /> ${i18n().or} <a class="cancel" href="${cancelUrl}" title="${i18n().cancel_title}">${i18n().cancel_link}</a>
     </form>
 </section>
 

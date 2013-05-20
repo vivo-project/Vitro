@@ -4,11 +4,11 @@
  "${editConfiguration.propertyPublicDomainTitle}" entry for ${editConfiguration.subjectName}
 </#assign>
 <#if editConfiguration.objectUri?has_content>
-    <#assign formTitle>Edit ${formTitle} </#assign>
-    <#assign submitLabel>Save changes</#assign>
+    <#assign formTitle>${i18n().edit_capitalized} ${formTitle} </#assign>
+    <#assign submitLabel>${i18n().save_changes}</#assign>
 <#else>
-    <#assign formTitle>Create ${formTitle} </#assign>
-    <#assign submitLabel>Create "${editConfiguration.propertyPublicDomainTitle}" entry</#assign>
+    <#assign formTitle>${i18n().create_capitalized} ${formTitle} </#assign>
+    <#assign submitLabel>${i18n().create_capitalized} "${editConfiguration.propertyPublicDomainTitle}" ${i18n().entry}</#assign>
 </#if>
 
 <h2>${formTitle}</h2>
@@ -20,6 +20,6 @@
     <p class="submit">
         <input type="submit" id="submit" value="${submitLabel}" role="submit" />
         <span class="or"> or </span>
-        <a title="Cancel" href="${editConfiguration.cancelUrl}">Cancel</a>
+        <a title="${i18n().cancel_title}" href="${editConfiguration.cancelUrl}">${i18n().cancel_link}</a>
     </p>     
 </form>
