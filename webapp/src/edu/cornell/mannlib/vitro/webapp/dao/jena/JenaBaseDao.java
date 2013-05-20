@@ -54,8 +54,6 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 	public static final boolean KEEP_ONLY_IF_TRUE = true; //used for updatePropertyBooleanValue()
     public static final boolean KEEP_ONLY_IF_FALSE = false; //used for updatePropertyBooleanValue()
     
-    public static final String INFERENCE_ONT_MODEL_ATTRIBUTE_NAME = "inferenceOntModel";
-    
     protected static final Log log = LogFactory.getLog(JenaBaseDao.class.getName());
     
     /* ******************* static constants ****************** */

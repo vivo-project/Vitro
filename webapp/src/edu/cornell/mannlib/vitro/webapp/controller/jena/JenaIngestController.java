@@ -68,8 +68,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
@@ -80,8 +80,8 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.ContentModelSetup;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils.MergeResult;
@@ -662,8 +662,7 @@ public class JenaIngestController extends BaseEditController {
                * get baseOnt and infOnt models
                */
               OntModel baseOntModel = ModelAccess.on(getServletContext()).getBaseOntModel();
-              OntModel tboxOntModel = ModelContext.getUnionOntModelSelector(
-                      getServletContext()).getTBoxModel();
+              OntModel tboxOntModel = ModelAccess.on(getServletContext()).getOntModel(ModelID.UNION_TBOX);
               
               /*
                * calling method that does the merge operation.
@@ -826,10 +825,10 @@ public class JenaIngestController extends BaseEditController {
             return;
         }
         Model m = modelMaker.getModel(modelName);
-        ModelContext.getBaseOntModelSelector(getServletContext()).getTBoxModel().addSubModel(m);
-        ModelContext.getBaseOntModelSelector(getServletContext()).getABoxModel().addSubModel(m);
-        ModelContext.getUnionOntModelSelector(getServletContext()).getABoxModel().addSubModel(m);
-        ModelContext.getUnionOntModelSelector(getServletContext()).getTBoxModel().addSubModel(m);
+        ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_ABOX).addSubModel(m);
+        ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_TBOX).addSubModel(m);
+        ModelAccess.on(getServletContext()).getOntModel(ModelID.UNION_ABOX).addSubModel(m);
+        ModelAccess.on(getServletContext()).getOntModel(ModelID.UNION_TBOX).addSubModel(m);
         attachedModels.put(modelName, m);
         log.info("Attached " + modelName + " (" + m.hashCode() + ") to webapp");
     }
@@ -839,10 +838,10 @@ public class JenaIngestController extends BaseEditController {
         if (m == null) {
             return;
         }
-        ModelContext.getBaseOntModelSelector(getServletContext()).getTBoxModel().removeSubModel(m);
-        ModelContext.getBaseOntModelSelector(getServletContext()).getABoxModel().removeSubModel(m);
-        ModelContext.getUnionOntModelSelector(getServletContext()).getABoxModel().removeSubModel(m);
-        ModelContext.getUnionOntModelSelector(getServletContext()).getTBoxModel().removeSubModel(m);
+        ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_ABOX).removeSubModel(m);
+        ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_TBOX).removeSubModel(m);
+        ModelAccess.on(getServletContext()).getOntModel(ModelID.UNION_ABOX).removeSubModel(m);
+        ModelAccess.on(getServletContext()).getOntModel(ModelID.UNION_TBOX).removeSubModel(m);
         attachedModels.remove(modelName);
         log.info("Detached " + modelName + " (" + m.hashCode() + ") from webapp");
     }
@@ -1315,12 +1314,7 @@ public class JenaIngestController extends BaseEditController {
         } else if ("vitro:baseOntModel".equals(name)) {
             return ModelAccess.on(request.getSession()).getBaseOntModel();
         } else if ("vitro:inferenceOntModel".equals(name)) {
-            Object sessionOntModel = request.getSession().getAttribute("inferenceOntModel");
-            if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-                return (OntModel) sessionOntModel;
-            } else {
-                return (OntModel) context.getAttribute("inferenceOntModel");
-            }
+        	return ModelAccess.on(request.getSession()).getInferenceOntModel();
         } else {
             return getVitroJenaModelMaker(request,context).getModel(name);
         }

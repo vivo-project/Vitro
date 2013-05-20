@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.filters;
 
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroRequest.SPECIAL_WRITE_MODEL;
-import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.CONTEXT_DISPLAY_TBOX;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_DISPLAY_MODEL_PARAM;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_MODEL_PARAM;
@@ -47,7 +46,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.FilterFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HideFromDisplayByPolicyFilter;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
@@ -176,8 +174,7 @@ public class VitroRequestPrep implements Filter {
         if (vreq.getUnfilteredWebappDaoFactory() == null) {
             vreq.setUnfilteredWebappDaoFactory(new WebappDaoFactorySDB(
                     RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService(),
-                    ModelContext.getUnionOntModelSelector(
-                            ctx)));
+                    ModelAccess.on(ctx).getUnionOntModelSelector()));
         }
         
         req.setAttribute("VitroRequestPrep.setup", new Integer(1));
@@ -236,7 +233,7 @@ public class VitroRequestPrep implements Filter {
     	// If they asked for the display model, give it to them.
 		if (isParameterPresent(vreq, SWITCH_TO_DISPLAY_MODEL)) {
 			OntModel mainOntModel = ModelAccess.on(_context).getDisplayModel();
-			OntModel tboxOntModel = (OntModel) _context.getAttribute(CONTEXT_DISPLAY_TBOX);			
+			OntModel tboxOntModel = ModelAccess.on(_context).getOntModel(ModelID.DISPLAY_TBOX);
 	   		setSpecialWriteModel(vreq, mainOntModel);
 	   		
 	   		vreq.setAttribute(VitroRequest.ID_FOR_ABOX_MODEL, VitroModelSource.ModelName.DISPLAY.toString());

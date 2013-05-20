@@ -26,6 +26,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
@@ -82,8 +83,6 @@ public class WebappDaoFactorySDBPrep implements Filter {
             }
         }
 		
-        OntModelSelector oms = ModelContext.getUnionOntModelSelector(_ctx);
-        OntModelSelector baseOms = ModelContext.getBaseOntModelSelector(_ctx);
         String defaultNamespace = (String) _ctx.getAttribute("defaultNamespace");
 		WebappDaoFactory wadf = null;
 		VitroRequest vreq = new VitroRequest((HttpServletRequest) request);
@@ -104,29 +103,34 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		if (Boolean.valueOf(ConfigurationProperties.getBean(vreq).getProperty(
 				"RDFService.languageFilter", "true"))) {
 			rdfService = new LanguageFilteringRDFService(unfilteredRDFService, langs);
-			oms = LanguageFilteringUtils.replaceDisplayModelInSelector(oms, 
-					LanguageFilteringUtils.wrapOntModelInALanguageFilter(oms.getDisplayModel(), request));
-			baseOms = LanguageFilteringUtils.replaceDisplayModelInSelector(baseOms, oms.getDisplayModel());
+
+			OntModel rawDisplayModel = ModelAccess.on(vreq.getSession()).getDisplayModel();
+			OntModel filteredDisplayModel = LanguageFilteringUtils.wrapOntModelInALanguageFilter(rawDisplayModel, request);
+			ModelAccess.on(vreq).setDisplayModel(filteredDisplayModel);
 		} else {
 			rdfService = unfilteredRDFService;
 		}
 		
 		Dataset dataset = new RDFServiceDataset(rdfService);
+
+		OntModelSelector oms = ModelAccess.on(_ctx).getUnionOntModelSelector();
 		wadf = new WebappDaoFactorySDB(rdfService, oms, config);
-	    WebappDaoFactory assertions = new WebappDaoFactorySDB(
+	    
+		OntModelSelector baseOms = ModelAccess.on(_ctx).getBaseOntModelSelector();
+		WebappDaoFactory assertions = new WebappDaoFactorySDB(
 	            rdfService, baseOms, config, SDBDatasetMode.ASSERTIONS_ONLY);
+		
 	    vreq.setRDFService(rdfService);
 	    vreq.setUnfilteredRDFService(unfilteredRDFService);
 		vreq.setWebappDaoFactory(wadf);
 		vreq.setAssertionsWebappDaoFactory(assertions);
 		vreq.setFullWebappDaoFactory(wadf);
         vreq.setUnfilteredWebappDaoFactory(new WebappDaoFactorySDB(
-                rdfService, ModelContext.getUnionOntModelSelector(_ctx)));
+                rdfService, ModelAccess.on(_ctx).getUnionOntModelSelector()));
 		vreq.setDataset(dataset);
-		vreq.setOntModelSelector(baseOms);
 		
-		vreq.setJenaOntModel(ModelFactory.createOntologyModel(
-				OntModelSpec.OWL_MEM, dataset.getDefaultModel()));
+		ModelAccess.on(vreq).setJenaOntModel(
+				ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, dataset.getDefaultModel()));
 					
 		request.setAttribute("WebappDaoFactorySDBPrep.setup", 1);
 		

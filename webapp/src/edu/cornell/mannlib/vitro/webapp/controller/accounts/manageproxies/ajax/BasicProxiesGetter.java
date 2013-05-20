@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,9 +20,8 @@ import com.hp.hpl.jena.query.QuerySolution;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.AbstractAjaxResponder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil;
@@ -60,9 +58,7 @@ public class BasicProxiesGetter extends AbstractAjaxResponder {
 		super(servlet, vreq, resp);
 		term = getStringParameter(PARAMETER_SEARCH_TERM, "");
 
-		ServletContext ctx = vreq.getSession().getServletContext();
-		OntModelSelector oms = ModelContext.getUnionOntModelSelector(ctx);
-		userAccountsModel = oms.getUserAccountsModel();
+		userAccountsModel = ModelAccess.on(vreq).getUserAccountsModel();
 
 		placeholderImageUrl = UrlBuilder.getUrl(PlaceholderUtil
 				.getPlaceholderImagePathForType(vreq,

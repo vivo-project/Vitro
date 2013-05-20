@@ -22,7 +22,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
@@ -33,7 +33,6 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.reasoner.ReasonerPlugin;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasonerTBoxListener;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.TripleStoreType;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 public class SimpleReasonerSetup implements ServletContextListener {
@@ -48,13 +47,13 @@ public class SimpleReasonerSetup implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+    	ServletContext ctx = sce.getServletContext();
         
         try {    
             // set up Pellet reasoning for the TBox    
-            
-            OntModelSelector assertionsOms = ModelContext.getBaseOntModelSelector(sce.getServletContext());
-            OntModelSelector inferencesOms = ModelContext.getInferenceOntModelSelector(sce.getServletContext());
-            OntModelSelector unionOms = ModelContext.getUnionOntModelSelector(sce.getServletContext());
+            OntModelSelector assertionsOms = ModelAccess.on(ctx).getBaseOntModelSelector();
+            OntModelSelector inferencesOms = ModelAccess.on(ctx).getInferenceOntModelSelector();
+            OntModelSelector unionOms = ModelAccess.on(ctx).getUnionOntModelSelector();
 
             WebappDaoFactoryJena wadf = (WebappDaoFactoryJena) sce.getServletContext().getAttribute("webappDaoFactory");
             
@@ -83,7 +82,6 @@ public class SimpleReasonerSetup implements ServletContextListener {
      
            // set up simple reasoning for the ABox
                     
-            ServletContext ctx = sce.getServletContext();
             DataSource bds = JenaDataSourceSetupBase
                                     .getApplicationDataSource(ctx);
             String dbType = ConfigurationProperties.getBean(ctx).getProperty( // database type

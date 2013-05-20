@@ -8,7 +8,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.graph.GraphMaker;
-import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.ModelReader;
@@ -121,12 +120,7 @@ public class VitroJenaSpecialModelMaker implements ModelMaker {
 			} else if ("vitro:baseOntModel".equals(modelName)) {
 		        return ModelAccess.on(request.getSession()).getBaseOntModel();
 			} else if ("vitro:inferenceOntModel".equals(modelName)) {
-				Object sessionOntModel = request.getSession().getAttribute("inferenceOntModel");
-				if (sessionOntModel != null && sessionOntModel instanceof OntModel) {
-					return (OntModel) sessionOntModel;
-				} else {
-					return (OntModel) request.getSession().getServletContext().getAttribute("inferenceOntModel");
-				}
+				return ModelAccess.on(request.getSession()).getInferenceOntModel();
 			} else {
 				return null;
 			}

@@ -9,12 +9,55 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.ontology.OntModel;
+
+import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 
 /**
  * Hierarchical storage for models. TODO
+ * 
+ * Could this be extended? Could it be used to replace or implement these
+ * methods?
+ * 
+ * <pre>
+ * VitroRequest.getAssertionsWebappDaoFactory()
+ * VitroRequest.getDeductionsWebappDaoFactory()
+ * VitroRequest.getFullWebappDaoFactory()
+ * VitroRequest.getRDFService()
+ * VitroRequest.getUnfilteredRDFService()
+ * VitroRequest.getWebappDaoFactory()
+ * VitroRequest.getWriteModel()
+ * VitroRequest.getJenaOntModel()
+ * VitroRequest.setJenaOntModel()
+ * OntModelSelector.getAboxModel
+ * OntModelSelector.getApplicationMetadataModel()
+ * OntModelSelector.getFullModel()
+ * OntModelSelector.getTBoxModel()
+ * OntModelSelector.getTBoxModel(ontologyURI)
+ * OntModelSelector.getUserAccountsModel()
+ * VitroModelSource.getModel(URL)
+ * VitroModelSource.getModel(URL, loadIfAbsent)
+ * VitroModelSource.openModel(name)
+ * VitroModelSource.openModelIfPresent(string)
+ * ServletContext.getAttribute("assertionsWebappDaoFactory")
+ * ServletContext.getAttribute("baseOntModelSelector")
+ * ServletContext.getAttribute("jenaPersistentOntModel")
+ * ServletContext.getAttribute("pelletOntModel")
+ * ServletContext.getAttribute("webappDaoFactory")
+ * VitroJenaModelMaker
+ * VitroJenaSpecialModelMaker
+ * JenaDataSourceSetupBase.getApplicationDataSource(ctx)
+ * JenaDataSourceSetupBase.getStartupDataset()
+ * HttpSession.getAttribute("jenaAuditModel")
+ * </pre>
  */
+
 public class ModelAccess {
+	private static final Log log = LogFactory.getLog(ModelAccess.class);
+
 	/** These attributes should only be accessed through this class. */
 	private static final String ATTRIBUTE_NAME = ModelAccess.class.getName();
 
@@ -32,6 +75,10 @@ public class ModelAccess {
 		UNION_ABOX, UNION_TBOX, UNION_FULL
 	}
 
+	private enum Scope {
+		CONTEXT, SESSION, REQUEST
+	}
+
 	// ----------------------------------------------------------------------
 	// Factory methods
 	// ----------------------------------------------------------------------
@@ -42,7 +89,7 @@ public class ModelAccess {
 			return (ModelAccess) o;
 		} else {
 			ModelAccess parent = on(req.getSession());
-			ModelAccess ma = new ModelAccess(parent);
+			ModelAccess ma = new ModelAccess(Scope.REQUEST, parent);
 			req.setAttribute(ATTRIBUTE_NAME, ma);
 			return ma;
 		}
@@ -54,7 +101,7 @@ public class ModelAccess {
 			return (ModelAccess) o;
 		} else {
 			ModelAccess parent = on(session.getServletContext());
-			ModelAccess ma = new ModelAccess(parent);
+			ModelAccess ma = new ModelAccess(Scope.SESSION, parent);
 			session.setAttribute(ATTRIBUTE_NAME, ma);
 			return ma;
 		}
@@ -65,31 +112,41 @@ public class ModelAccess {
 		if (o instanceof ModelAccess) {
 			return (ModelAccess) o;
 		} else {
-			ModelAccess ma = new ModelAccess(null);
+			ModelAccess ma = new ModelAccess(Scope.CONTEXT, null);
 			ctx.setAttribute(ATTRIBUTE_NAME, ma);
 			return ma;
 		}
 	}
 
 	// ----------------------------------------------------------------------
-	// Instance methods
+	// The instance
 	// ----------------------------------------------------------------------
 
+	private final Scope scope;
 	private final ModelAccess parent;
 	private final Map<String, OntModel> modelMap = new HashMap<>();
 
-	public ModelAccess(ModelAccess parent) {
+	public ModelAccess(Scope scope, ModelAccess parent) {
+		this.scope = scope;
 		this.parent = parent;
+	}
+
+	// ----------------------------------------------------------------------
+	// Accessing the models
+	// ----------------------------------------------------------------------
+
+	public OntModel getApplicationMetadataModel() {
+		return getOntModel(ModelID.APPLICATION_METADATA);
 	}
 
 	public void setUserAccountsModel(OntModel m) {
 		setOntModel(ModelID.USER_ACCOUNTS, m);
 	}
-	
+
 	public OntModel getUserAccountsModel() {
 		return getOntModel(ModelID.USER_ACCOUNTS);
 	}
-	
+
 	public void setDisplayModel(OntModel m) {
 		setOntModel(ModelID.DISPLAY, m);
 	}
@@ -101,7 +158,7 @@ public class ModelAccess {
 	public void setJenaOntModel(OntModel m) {
 		setOntModel(ModelID.UNION_FULL, m);
 	}
-	
+
 	public OntModel getJenaOntModel() {
 		return getOntModel(ModelID.UNION_FULL);
 	}
@@ -109,174 +166,14 @@ public class ModelAccess {
 	public void setBaseOntModel(OntModel m) {
 		setOntModel(ModelID.BASE_FULL, m);
 	}
-	
+
 	public OntModel getBaseOntModel() {
 		return getOntModel(ModelID.BASE_FULL);
 	}
-	
-	// public OntModel getDisplayTboxOntModel() {
-	// throw new RuntimeException(
-	// "ModelAccess.getDisplayTboxOntModel not implemented.");
-	// }
-	//
-	// public OntModel getDisplayModelDisplayOntModel() {
-	// throw new RuntimeException(
-	// "ModelAccess.getDisplayModelDisplayOntModel not implemented.");
-	// }
-	//
-	// public OntModelSelector getOntModelSelector() {
-	// return getUnionOntModelSelector();
-	// }
-	//
-	// public OntModelSelector getBaseOntModelSelector() {
-	// return new FacadeOntModelSelector(this, ModelID.BASE_ABOX,
-	// ModelID.BASE_TBOX, ModelID.BASE_FULL);
-	// }
-	//
-	// public OntModelSelector getInferenceOntModelSelector() {
-	// return new FacadeOntModelSelector(this, ModelID.INFERRED_ABOX,
-	// ModelID.INFERRED_TBOX, ModelID.INFERRED_FULL);
-	// }
-	//
-	// public OntModelSelector getUnionOntModelSelector() {
-	// return new FacadeOntModelSelector(this, ModelID.UNION_ABOX,
-	// ModelID.UNION_TBOX, ModelID.UNION_FULL);
-	// }
-	//
-	// private static class FacadeOntModelSelector implements OntModelSelector {
-	// private final ModelAccess parent;
-	// private final ModelID aboxID;
-	// private final ModelID tboxID;
-	// private final ModelID fullID;
-	//
-	// public FacadeOntModelSelector(ModelAccess parent, ModelID aboxID,
-	// ModelID tboxID, ModelID fullID) {
-	// this.parent = parent;
-	// this.aboxID = aboxID;
-	// this.tboxID = tboxID;
-	// this.fullID = fullID;
-	// }
-	//
-	// @Override
-	// public OntModel getABoxModel() {
-	// return parent.getOntModel(aboxID);
-	// }
-	//
-	// @Override
-	// public OntModel getTBoxModel() {
-	// return parent.getOntModel(tboxID);
-	// }
-	//
-	// @Override
-	// public OntModel getTBoxModel(String ontologyURI) {
-	// return parent.getOntModel(tboxID);
-	// }
-	//
-	// @Override
-	// public OntModel getFullModel() {
-	// return parent.getOntModel(fullID);
-	// }
-	//
-	// @Override
-	// public OntModel getApplicationMetadataModel() {
-	// return parent.getOntModel(ModelID.APPLICATION_METADATA);
-	// }
-	//
-	// @Override
-	// public OntModel getUserAccountsModel() {
-	// return parent.getOntModel(ModelID.USER_ACCOUNTS);
-	// }
-	//
-	// @Override
-	// public OntModel getDisplayModel() {
-	// return parent.getOntModel(ModelID.DISPLAY);
-	// }
-	// }
 
-	/**
-	 * <pre>
-	 * From ModelContext
-	 * 
-	 * 	public static OntModelSelector getOntModelSelector(ServletContext ctx) {
-	 * 		return (OntModelSelector) ctx.getAttribute(ONT_MODEL_SELECTOR);
-	 * 	}
-	 * 	
-	 * 	public static void setOntModelSelector(OntModelSelector oms, ServletContext ctx) {
-	 * 		ctx.setAttribute(ONT_MODEL_SELECTOR, oms); 
-	 * 	}
-	 * 	
-	 * 	public static OntModelSelector getUnionOntModelSelector(ServletContext ctx) {
-	 * 		return (OntModelSelector) ctx.getAttribute(UNION_ONT_MODEL_SELECTOR);
-	 * 	}
-	 * 	
-	 * 	public static void setUnionOntModelSelector(OntModelSelector oms, ServletContext ctx) {
-	 * 		ctx.setAttribute(UNION_ONT_MODEL_SELECTOR, oms); 
-	 * 	}
-	 *  	
-	 * 	public static OntModelSelector getBaseOntModelSelector(ServletContext ctx) {
-	 * 		return (OntModelSelector) ctx.getAttribute(BASE_ONT_MODEL_SELECTOR);
-	 * 	}
-	 * 	
-	 * 	public static void setBaseOntModelSelector(OntModelSelector oms, ServletContext ctx) {
-	 * 		ctx.setAttribute(BASE_ONT_MODEL_SELECTOR, oms); 
-	 * 	}
-	 * 	
-	 * 	public static OntModelSelector getInferenceOntModelSelector(ServletContext ctx) {
-	 * 		return (OntModelSelector) ctx.getAttribute(INFERENCE_ONT_MODEL_SELECTOR);
-	 * 	}
-	 * 	
-	 * 	public static void setInferenceOntModelSelector(OntModelSelector oms, ServletContext ctx) {
-	 * 		ctx.setAttribute(INFERENCE_ONT_MODEL_SELECTOR, oms); 
-	 * 	}
-	 * 	
-	 * 	public static OntModel getInferenceOntModel(ServletContext ctx) {
-	 * 		return (OntModel) ctx.getAttribute(INFERENCE_ONT_MODEL);
-	 * 	}
-	 * 	
-	 * 	public static void setInferenceOntModel(OntModel ontModel, ServletContext ctx) {
-	 * 		ctx.setAttribute(INFERENCE_ONT_MODEL, ontModel);
-	 * 	}
-	 * 
-	 * </pre>
-	 */
-	/**
-	 * <pre>
-	 * VitroRequest.getAssertionsWebappDaoFactory()
-	 * VitroRequest.getDeductionsWebappDaoFactory()
-	 * VitroRequest.getFullWebappDaoFactory()
-	 * VitroRequest.getRDFService()
-	 * VitroRequest.getUnfilteredRDFService()
-	 * VitroRequest.getWebappDaoFactory()
-	 * VitroRequest.getWriteModel()
-	 * VitroRequest.getJenaOntModel()
-	 * VitroRequest.setJenaOntModel()
-	 * ModelContext.getBaseOntModelSelector()
-	 * ModelContext.getInferenceOntModel()
-	 * ModelContext.getInferenceOntModelSelector()
-	 * ModelContext.getOntModelSelector()
-	 * ModelContext.getUnionOntModelSelector()
-	 * OntModelSelector.getAboxModel
-	 * OntModelSelector.getApplicationMetadataModel()
-	 * OntModelSelector.getFullModel()
-	 * OntModelSelector.getTBoxModel()
-	 * OntModelSelector.getTBoxModel(ontologyURI)
-	 * OntModelSelector.getUserAccountsModel()
-	 * VitroModelSource.getModel(URL)
-	 * VitroModelSource.getModel(URL, loadIfAbsent)
-	 * VitroModelSource.openModel(name)
-	 * VitroModelSource.openModelIfPresent(string)
-	 * ServletContext.getAttribute("assertionsWebappDaoFactory")
-	 * ServletContext.getAttribute("baseOntModelSelector")
-	 * ServletContext.getAttribute("jenaPersistentOntModel")
-	 * ServletContext.getAttribute("pelletOntModel")
-	 * ServletContext.getAttribute("webappDaoFactory")
-	 * VitroJenaModelMaker
-	 * VitroJenaSpecialModelMaker
-	 * JenaDataSourceSetupBase.getApplicationDataSource(ctx)
-	 * JenaDataSourceSetupBase.getStartupDataset()
-	 * HttpSession.getAttribute("jenaAuditModel")
-	 * </pre>
-	 */
+	public OntModel getInferenceOntModel() {
+		return getOntModel(ModelID.INFERRED_FULL);
+	}
 
 	public void setOntModel(ModelID id, OntModel ontModel) {
 		String key = id.toString();
@@ -290,11 +187,96 @@ public class ModelAccess {
 	public OntModel getOntModel(ModelID id) {
 		String key = id.toString();
 		if (modelMap.containsKey(key)) {
+			log.debug("Using " + id + " model from " + scope);
 			return modelMap.get(key);
 		} else if (parent != null) {
 			return parent.getOntModel(id);
 		} else {
+			log.warn("No model found for " + id);
 			return null;
+		}
+	}
+
+	// ----------------------------------------------------------------------
+	// Accessing the OntModelSelectors
+	// ----------------------------------------------------------------------
+
+	public OntModelSelector getOntModelSelector() {
+		return getUnionOntModelSelector();
+	}
+
+	public OntModelSelector getBaseOntModelSelector() {
+		return new FacadeOntModelSelector(this, ModelID.BASE_ABOX,
+				ModelID.BASE_TBOX, ModelID.BASE_FULL);
+	}
+
+	public OntModelSelector getInferenceOntModelSelector() {
+		return new FacadeOntModelSelector(this, ModelID.INFERRED_ABOX,
+				ModelID.INFERRED_TBOX, ModelID.INFERRED_FULL);
+	}
+
+	public OntModelSelector getUnionOntModelSelector() {
+		return new FacadeOntModelSelector(this, ModelID.UNION_ABOX,
+				ModelID.UNION_TBOX, ModelID.UNION_FULL);
+	}
+
+	// ----------------------------------------------------------------------
+	// Helper classes
+	// ----------------------------------------------------------------------
+
+	/**
+	 * This OntModelSelector doesn't actually hold any OntModels. Instead, it
+	 * links back to the ModelAccess that it was created from. So, if you change
+	 * a model on the ModelAccess, it will change on the OntModelSelector also.
+	 * Even if the OntModelSelector was created first.
+	 */
+	private static class FacadeOntModelSelector implements OntModelSelector {
+		private final ModelAccess parent;
+		private final ModelID aboxID;
+		private final ModelID tboxID;
+		private final ModelID fullID;
+
+		public FacadeOntModelSelector(ModelAccess parent, ModelID aboxID,
+				ModelID tboxID, ModelID fullID) {
+			this.parent = parent;
+			this.aboxID = aboxID;
+			this.tboxID = tboxID;
+			this.fullID = fullID;
+		}
+
+		@Override
+		public OntModel getABoxModel() {
+			return parent.getOntModel(aboxID);
+		}
+
+		@Override
+		public OntModel getTBoxModel() {
+			return parent.getOntModel(tboxID);
+		}
+
+		@Override
+		public OntModel getTBoxModel(String ontologyURI) {
+			return parent.getOntModel(tboxID);
+		}
+
+		@Override
+		public OntModel getFullModel() {
+			return parent.getOntModel(fullID);
+		}
+
+		@Override
+		public OntModel getApplicationMetadataModel() {
+			return parent.getOntModel(ModelID.APPLICATION_METADATA);
+		}
+
+		@Override
+		public OntModel getUserAccountsModel() {
+			return parent.getOntModel(ModelID.USER_ACCOUNTS);
+		}
+
+		@Override
+		public OntModel getDisplayModel() {
+			return parent.getOntModel(ModelID.DISPLAY);
 		}
 	}
 

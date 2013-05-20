@@ -27,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 
 public class BaseEditController extends VitroHttpServlet {
@@ -167,7 +168,7 @@ public class BaseEditController extends VitroHttpServlet {
     	}
     	
     	if ( ontModel == null ) {
-            ontModel = (OntModel) ModelContext.getBaseOntModelSelector(ctx).getTBoxModel();
+            ontModel = ModelAccess.on(ctx).getOntModel(ModelID.BASE_TBOX);
     	}
     	
     	return ontModel;
