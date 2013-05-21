@@ -16,7 +16,7 @@
             </#if>
             
             <#if indexCacheRebuild.recomputeInferences?has_content>
-                <li role="listitem"><a href="${indexCacheRebuild.recomputeInferences}" title="${i18n().recompute_inferences}">${i18n().recompute_inferences}</a></li>
+                <li role="listitem"><a href="${indexCacheRebuild.recomputeInferences}" title="${i18n().recompute_inferences}">${i18n().recompute_inferences_mixed_caps}</a></li>
             </#if>
         </ul>
     </section>

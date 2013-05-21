@@ -31,7 +31,7 @@
                     <h3>${i18n().search_vitro} <span class="search-filter-selected">filteredSearch</span></h3>
                     
                     <fieldset>
-                        <legend>Search form</legend>
+                        <legend>${i18n().search_form}</legend>
                         <form id="search-homepage" action="${urls.search}" name="search-home" role="search" method="post" > 
                             <div id="search-home-field">
                                 <input type="text" name="querytext" class="search-homepage" value="${querytext!}" autocapitalize="off" />
