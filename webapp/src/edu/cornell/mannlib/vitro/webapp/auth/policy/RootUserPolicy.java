@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
-import java.util.Collections;
-import java.util.Set;
 import java.util.TreeSet;
 
 import javax.servlet.ServletContext;
@@ -23,8 +21,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -79,7 +77,8 @@ public class RootUserPolicy implements PolicyIface {
 			ss = StartupStatus.getBean(ctx);
 
 			try {
-				uaDao = getUserAccountsDao();
+				uaDao = ModelAccess.on(ctx).getWebappDaoFactory()
+						.getUserAccountsDao();
 				configuredRootUser = getRootEmailFromConfig();
 
 				otherRootUsers = getEmailsOfAllRootUsers();
@@ -103,16 +102,6 @@ public class RootUserPolicy implements PolicyIface {
 			} catch (Exception e) {
 				ss.fatal(this, "Failed to set up the RootUserPolicy", e);
 			}
-		}
-
-		private UserAccountsDao getUserAccountsDao() {
-			WebappDaoFactory wadf = (WebappDaoFactory) ctx
-					.getAttribute("webappDaoFactory");
-			if (wadf == null) {
-				throw new IllegalStateException(
-						"No webappDaoFactory on the servlet context");
-			}
-			return wadf.getUserAccountsDao();
 		}
 
 		private String getRootEmailFromConfig() {

@@ -99,7 +99,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setErrorLogFile(ctx.getRealPath(errorLogFileName));
 			settings.setAddedDataFile(ctx.getRealPath(ADDED_DATA_FILE));
 			settings.setRemovedDataFile(ctx.getRealPath(REMOVED_DATA_FILE));
-			WebappDaoFactory wadf = (WebappDaoFactory) ctx.getAttribute("webappDaoFactory");
+			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());
 			settings.setAssertionOntModelSelector(ModelAccess.on(ctx).getBaseOntModelSelector());
 			settings.setInferenceOntModelSelector(ModelAccess.on(ctx).getInferenceOntModelSelector());

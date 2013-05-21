@@ -123,15 +123,7 @@ public class VitroRequestPrep implements Filter {
         VitroRequest vreq = new VitroRequest(req);
         
         //-- setup DAO factory --//
-        WebappDaoFactory wdf = getWebappDaoFactory(vreq);
-        //TODO: get accept-language from request and set as preferred languages
-        
-        // if there is a WebappDaoFactory in the session, use it
-    	Object o = req.getSession().getAttribute("webappDaoFactory");
-    	if (o instanceof WebappDaoFactory) {
-    		wdf = (WebappDaoFactory) o;
-    		log.debug("Found a WebappDaoFactory in the session and using it for this request");
-    	}
+        WebappDaoFactory wdf = ModelAccess.on(vreq.getSession()).getWebappDaoFactory();
     	
     	// Set up the DisplayModel with language filtering, if appropriate.
 		ConfigurationProperties props = ConfigurationProperties.getBean(req);
@@ -160,7 +152,7 @@ public class VitroRequestPrep implements Filter {
 		HideFromDisplayByPolicyFilter filter = new HideFromDisplayByPolicyFilter(
 				RequestIdentifiers.getIdBundleForRequest(req),
 				ServletPolicyList.getPolicies(_context));
-		vreq.setWebappDaoFactory(new WebappDaoFactoryFiltering(wdf, filter));
+		ModelAccess.on(vreq).setWebappDaoFactory(new WebappDaoFactoryFiltering(wdf, filter));
 		
         // support for Dataset interface if using Jena in-memory model
         if (vreq.getDataset() == null) {
@@ -181,13 +173,7 @@ public class VitroRequestPrep implements Filter {
         chain.doFilter(req, response);
     }
 
-	private WebappDaoFactory getWebappDaoFactory(VitroRequest vreq){
-    	WebappDaoFactory webappDaoFactory = vreq.getWebappDaoFactory();
-        return (webappDaoFactory != null) ? webappDaoFactory :
-        	(WebappDaoFactory) _context.getAttribute("webappDaoFactory");
-    }
-
-    private VitroFilters getFiltersFromContextFilterFactory( HttpServletRequest request, WebappDaoFactory wdf){
+	private VitroFilters getFiltersFromContextFilterFactory( HttpServletRequest request, WebappDaoFactory wdf){
         FilterFactory ff = (FilterFactory)_context.getAttribute("FilterFactory");
         if( ff == null ){ 
             return null;

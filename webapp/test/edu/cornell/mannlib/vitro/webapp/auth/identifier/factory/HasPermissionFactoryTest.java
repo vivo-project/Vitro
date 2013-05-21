@@ -29,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionRegistry;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 
 /**
  * Can we tell whether a user is logged in as root?
@@ -79,7 +80,7 @@ public class HasPermissionFactoryTest extends AbstractTestClass {
 		wdf.setUserAccountsDao(uaDao);
 
 		ctx = new ServletContextStub();
-		ctx.setAttribute("webappDaoFactory", wdf);
+		ModelAccess.on(ctx).setWebappDaoFactory(wdf);
 
 		session = new HttpSessionStub();
 		session.setServletContext(ctx);

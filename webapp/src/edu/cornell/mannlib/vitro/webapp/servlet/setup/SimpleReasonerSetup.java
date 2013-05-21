@@ -23,6 +23,7 @@ import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
@@ -55,7 +56,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
             OntModelSelector inferencesOms = ModelAccess.on(ctx).getInferenceOntModelSelector();
             OntModelSelector unionOms = ModelAccess.on(ctx).getUnionOntModelSelector();
 
-            WebappDaoFactoryJena wadf = (WebappDaoFactoryJena) sce.getServletContext().getAttribute("webappDaoFactory");
+			WebappDaoFactoryJena wadf = (WebappDaoFactoryJena) ModelAccess.on(ctx).getWebappDaoFactory();
             
             if (!assertionsOms.getTBoxModel().getProfile().NAMESPACE().equals(OWL.NAMESPACE.getNameSpace())) {        
                 log.error("Not connecting Pellet reasoner - the TBox assertions model is not an OWL model");

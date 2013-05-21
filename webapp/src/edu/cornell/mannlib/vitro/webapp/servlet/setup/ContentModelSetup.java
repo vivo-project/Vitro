@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import static edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY;
-import static edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode.INFERENCES_ONLY;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +27,7 @@ import com.hp.hpl.jena.util.ResourceUtils;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.FactoryID;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
@@ -110,15 +110,11 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         
         OntModelSelector baseOms = models.getBaseOntModelSelector();
         WebappDaoFactory baseWadf = new WebappDaoFactorySDB(rdfService, baseOms, config, ASSERTIONS_ONLY);
-        ctx.setAttribute("assertionsWebappDaoFactory",baseWadf);
-        
-        OntModelSelector inferenceOms = models.getInferenceOntModelSelector();
-        WebappDaoFactory infWadf = new WebappDaoFactorySDB(rdfService, inferenceOms, config, INFERENCES_ONLY);
-        ctx.setAttribute("deductionsWebappDaoFactory", infWadf);
+        ModelAccess.on(ctx).setBaseWebappDaoFactory(baseWadf);
         
         OntModelSelector unionOms = models.getUnionOntModelSelector();
         WebappDaoFactory wadf = new WebappDaoFactorySDB(rdfService, unionOms, config);
-        ctx.setAttribute("webappDaoFactory",wadf);
+        ModelAccess.on(ctx).setWebappDaoFactory(FactoryID.UNION, wadf);
 
         log.info("Model makers set up");
         

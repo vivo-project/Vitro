@@ -47,6 +47,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.AuthenticatorStub;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 
 /**
  */
@@ -147,7 +148,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		webappDaoFactory.setIndividualDao(individualDao);
 
 		servletContext = new ServletContextStub();
-		servletContext.setAttribute("webappDaoFactory", webappDaoFactory);
+		ModelAccess.on(servletContext).setWebappDaoFactory(webappDaoFactory);
 		servletContext.setAttribute(AuthenticatorStub.FACTORY_ATTRIBUTE_NAME,
 				authenticatorFactory);
 

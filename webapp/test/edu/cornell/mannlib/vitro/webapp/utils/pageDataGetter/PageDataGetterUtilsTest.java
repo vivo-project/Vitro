@@ -18,6 +18,7 @@ import com.hp.hpl.jena.rdf.model.impl.RDFDefaultErrorHandler;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SimpleOntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
@@ -48,7 +49,7 @@ public class PageDataGetterUtilsTest extends AbstractTestClass{
     @Test
     public void testGetPageDataGetterObjects() throws Exception{
         VitroRequest vreq = new VitroRequest( new HttpServletRequestStub() );
-        vreq.setWebappDaoFactory(wdf);
+        ModelAccess.on(vreq).setWebappDaoFactory(wdf);
         
         List<PageDataGetter> pdgList = PageDataGetterUtils.getPageDataGetterObjects(vreq, pageURI);
         Assert.assertNotNull(pdgList);
@@ -58,7 +59,7 @@ public class PageDataGetterUtilsTest extends AbstractTestClass{
     @Test
     public void testGetNonPageDataGetterObjects() throws Exception{
         VitroRequest vreq = new VitroRequest( new HttpServletRequestStub() );
-        vreq.setWebappDaoFactory(wdf);
+        ModelAccess.on(vreq).setWebappDaoFactory(wdf);
         
         List<PageDataGetter> pdgList = PageDataGetterUtils.getPageDataGetterObjects(vreq, pageURI_2);
         Assert.assertNotNull(pdgList);

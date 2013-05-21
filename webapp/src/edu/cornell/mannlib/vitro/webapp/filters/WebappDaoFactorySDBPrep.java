@@ -115,6 +115,7 @@ public class WebappDaoFactorySDBPrep implements Filter {
 
 		OntModelSelector oms = ModelAccess.on(_ctx).getUnionOntModelSelector();
 		wadf = new WebappDaoFactorySDB(rdfService, oms, config);
+		ModelAccess.on(vreq).setWebappDaoFactory(wadf);
 	    
 		OntModelSelector baseOms = ModelAccess.on(_ctx).getBaseOntModelSelector();
 		WebappDaoFactory assertions = new WebappDaoFactorySDB(
@@ -122,9 +123,7 @@ public class WebappDaoFactorySDBPrep implements Filter {
 		
 	    vreq.setRDFService(rdfService);
 	    vreq.setUnfilteredRDFService(unfilteredRDFService);
-		vreq.setWebappDaoFactory(wadf);
-		vreq.setAssertionsWebappDaoFactory(assertions);
-		vreq.setFullWebappDaoFactory(wadf);
+		ModelAccess.on(vreq).setBaseWebappDaoFactory(assertions);
         vreq.setUnfilteredWebappDaoFactory(new WebappDaoFactorySDB(
                 rdfService, ModelAccess.on(_ctx).getUnionOntModelSelector()));
 		vreq.setDataset(dataset);

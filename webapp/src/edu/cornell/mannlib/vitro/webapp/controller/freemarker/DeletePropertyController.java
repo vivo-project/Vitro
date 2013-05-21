@@ -17,6 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
@@ -200,7 +201,7 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
     
     	Individual object = EditConfigurationUtils.getIndividual(vreq, objectUri);
     	if(object == null) {
-    		WebappDaoFactory wadf = (WebappDaoFactory) vreq.getSession().getServletContext().getAttribute("webappDaoFactory");
+			WebappDaoFactory wadf = ModelAccess.on(vreq.getSession().getServletContext()).getWebappDaoFactory();
     		object = wadf.getIndividualDao().getIndividualByURI(objectUri);
     	}
     	

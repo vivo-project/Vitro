@@ -174,12 +174,7 @@ public class VClassGroupCache implements IndexingEventListener {
     }
 
     protected VClassGroupDao getVCGDao() {
-        WebappDaoFactory wdf = (WebappDaoFactory) context.getAttribute("webappDaoFactory");
-        if (wdf == null) {
-            log.error("Cannot get webappDaoFactory from context");
-            return null;
-        } else
-            return wdf.getVClassGroupDao();
+		return ModelAccess.on(context).getWebappDaoFactory().getVClassGroupDao();
     }
     
     public void doSynchronousRebuild(){
@@ -242,12 +237,9 @@ public class VClassGroupCache implements IndexingEventListener {
      */
     protected static void rebuildCacheUsingSolr( VClassGroupCache cache ) throws SolrServerException{                        
         long start = System.currentTimeMillis();
-        WebappDaoFactory wdFactory = (WebappDaoFactory) cache.context.getAttribute("webappDaoFactory");
-        if (wdFactory == null){ 
-            log.error("Unable to rebuild cache: could not get 'webappDaoFactory' from Servletcontext");
-            return;
-        }        
-        SolrServer solrServer = (SolrServer)cache.context.getAttribute(SolrSetup.SOLR_SERVER);
+		WebappDaoFactory wdFactory = ModelAccess.on(cache.context).getWebappDaoFactory();
+
+		SolrServer solrServer = (SolrServer)cache.context.getAttribute(SolrSetup.SOLR_SERVER);
         if( solrServer == null){
             log.error("Unable to rebuild cache: could not get solrServer from ServletContext");
             return;

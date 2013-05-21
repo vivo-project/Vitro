@@ -12,10 +12,11 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import stubs.javax.servlet.ServletContextStub;
+
 /**
  * A simple stand-in for the HttpSession, for use in unit tests.
  */
-@SuppressWarnings("deprecation")
 public class HttpSessionStub implements HttpSession {
 	private static final Log log = LogFactory.getLog(HttpSessionStub.class);
 
@@ -49,7 +50,11 @@ public class HttpSessionStub implements HttpSession {
 
 	@Override
 	public ServletContext getServletContext() {
-		return this.context;
+		if (this.context == null) {
+			return new ServletContextStub();
+		} else {
+			return this.context;
+		}
 	}
 
 	@Override
@@ -149,6 +154,7 @@ public class HttpSessionStub implements HttpSession {
 				"HttpSessionStub.putValue() not implemented.");
 	}
 
+	@Override
 	public void removeValue(String arg0) {
 		throw new RuntimeException(
 				"HttpSessionStub.removeValue() not implemented.");
