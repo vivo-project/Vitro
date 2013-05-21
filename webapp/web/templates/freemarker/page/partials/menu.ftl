@@ -3,7 +3,7 @@
 <nav role="navigation">
     <ul id="main-nav" role="list">
         <#list menu.items as item>
-            <li role="listitem"><a href="${item.url}" <#if item.active> class="selected" </#if> title="menu item">${item.linkText}</a></li>
+            <li role="listitem"><a href="${item.url}" <#if item.active> class="selected" </#if> title="${i18n().menu_item}">${item.linkText}</a></li>
         </#list>
     </ul>
 </nav>

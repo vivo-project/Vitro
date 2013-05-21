@@ -10,14 +10,14 @@
 
 <#macro loggedIn>
     <div class="testWidget">
-        <h4>This is the test widget for logged-in users.</h4>    
-        <p>Login status: ${status}.</p>
+        <h4>${i18n().test_for_logged_in_users}</h4>    
+        <p>${i18n().login_status} ${status}.</p>
     </div>
 </#macro>
 
 <#macro notLoggedIn>
     <div class="testWidget">
-        <h4>This is the test widget for non-logged-in users.</h4>    
-        <p>Login status: ${status}.</p>
+        <h4>${i18n().test_for_nonlogged_in_users}</h4>    
+        <p>${i18n().login_status} ${status}.</p>
     </div>
 </#macro>

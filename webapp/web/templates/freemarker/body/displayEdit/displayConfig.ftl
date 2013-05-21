@@ -5,7 +5,7 @@
     
     <#if errorMessage??>
         <div id="errorAlert">
-            <img src="../images/iconAlert.png" alert="Error alert icon" height="31" width="32">
+            <img src="../images/iconAlert.png" alt="Error alert icon" height="31" width="32">
             <p>${errorMessage}</p>
         </div>
     </#if>

@@ -11,15 +11,15 @@
 </#if>
 
 
-<h2>Create a new ${typeName}</h2>
+<h2>${i18n().create_new} ${typeName}</h2>
 
 <#if submissionErrors?has_content >
     <section id="error-alert" role="alert">
-        <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon" />
+        <img src="${urls.images}/iconAlert.png" width="24" height="24" alt="${i18n().error_alert_icon}" />
         <p>
         <#list submissionErrors?keys as errorFieldName>
         	<#if  errorFieldName == "label">
-        	    Please enter a value in the name field.
+        	    ${i18n().enter_value_name_field}
     	    </#if>
     	    <br />
     	</#list>
@@ -36,17 +36,17 @@
     <form id="newIndividual" class="customForm noIE67" action="${submitUrl}"  role="add new individual">
  
       <p>
-          <label for="name">Name ${requiredHint}</label>
+          <label for="name">${i18n().name} ${requiredHint}</label>
           <input size="30"  type="text" id="label" name="label" value="" />
       </p>
 
       <p class="submit">
           <input type="hidden" name = "editKey" value="${editKey}"/>
-          <input type="submit" id="submit" value="Create ${typeName}"/>
-          <span class="or"> or <a class="cancel" href="${urls.base}/siteAdmin" title="cancel">Cancel</a>
+          <input type="submit" id="submit" value="${i18n().create_capitalized} ${typeName}"/>
+          <span class="or"> or <a class="cancel" href="${urls.base}/siteAdmin" title="${i18n().cancel_title}">${i18n().cancel_link}</a>
       </p>
 
-      <p id="requiredLegend" class="requiredHint">* required fields</p>
+      <p id="requiredLegend" class="requiredHint">* ${i18n().required_fields}</p>
 
     </form>
 

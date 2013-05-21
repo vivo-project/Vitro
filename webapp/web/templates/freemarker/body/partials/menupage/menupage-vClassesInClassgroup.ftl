@@ -13,7 +13,7 @@
             <#else>
                 <#assign classGroupIndividualCount = classGroupIndividualCount + vClass.entityCount />
             </#if>
-            <li role="listitem"><a href="#browse-by" title="Browse all individuals in this class" data-uri="${vClass.URI}">${vClass.name} <span class="count-classes">(${vClass.entityCount})</span></a></li>
+            <li role="listitem"><a href="#browse-by" title="${i18n().browse_all_in_class}" data-uri="${vClass.URI}">${vClass.name} <span class="count-classes">(${vClass.entityCount})</span></a></li>
         </#if>
     </#list>
     </ul>

@@ -18,7 +18,7 @@
     <#assign selected = 'class="selected" ' />
     <#assign classGroupList>
         <section id="home-stats" class="home-sections" >
-            <h4>Statistics</h4>
+            <h4>${i18n().statistics}</h4>
             <ul id="stats">
                 <#assign groupCount = 1>
                 <#list classGroups as group>
@@ -31,6 +31,7 @@
                         <#if !firstPopulatedClassGroup??>
                             <#assign firstPopulatedClassGroup = group />
                         </#if>
+                        <#-- MAY BE NECESSARY FOR A SITE TO UPDATE THIS LINE BASED ON HOW IT CUSTOMIZES CLASS GROUP NAMES -->
                         <#if group.displayName != "equipment" && group.displayName != "courses" >
                             <li>
                                 <a href="#">
@@ -61,14 +62,14 @@
     <#if firstPopulatedClassGroup??>
             ${classGroupList}
     <#else>
-        <h3 id="noContentMsg">There is currently no content in the system, or you need to create class groups and assign your classes to them.</h3>
+        <h3 id="noContentMsg">${i18n().no_content_create_groups_classes}</h3>
         
         <#if user.loggedIn>
             <#if user.hasSiteAdminAccess>
-                <p>You can <a href="${urls.siteAdmin}" title="Manage content">add content and manage this site</a> from the Site Administration page.</p>
+                <p>${i18n().you_can} <a href="${urls.siteAdmin}" title="${i18n().add_content_manage_site}">${i18n().add_content_manage_site}</a>${i18n().from_site_admin_page}</p>
             </#if>
         <#else>
-            <p>Please <a href="${urls.login}" title="log in to manage this site">log in</a> to manage content.</p>
+            <p>${i18n().please} <a href="${urls.login}" title="${i18n().login_to_manage_site}">${i18n().log_in}</a> ${i18n().to_manage_content.}</p>
         </#if>
     </#if>
             

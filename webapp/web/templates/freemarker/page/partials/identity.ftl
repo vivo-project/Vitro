@@ -1,7 +1,7 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <header id="branding" role="banner">
-    <h1 class="vivo-logo"><a href="${urls.home}" title="site name"><span class="displace">${siteName}</span></a></h1>
+    <h1 class="vivo-logo"><a href="${urls.home}" title="${siteName}"><span class="displace">${siteName}</span></a></h1>
     <#if siteTagline?has_content>
         <em>${siteTagline}</em>
     </#if>
@@ -11,31 +11,31 @@
             <#include "languageSelector.ftl">
             <#if user.loggedIn>
                 <li role="listitem">${user.loginName}</li>
-                <li role="listitem"><a href="${urls.logout}" title="End your session">Log out</a></li>
+                <li role="listitem"><a href="${urls.logout}" title="${i18n().end_your_Session}">${i18n().log_out}</a></li>
                 <#if user.hasSiteAdminAccess>
-                    <li role="listitem"><a href="${urls.siteAdmin}" title="Manage this site">Site Admin</a></li>
+                    <li role="listitem"><a href="${urls.siteAdmin}" title="${i18n().manage_site}">${i18n().site_admin}</a></li>
                 </#if>
             <#else>
-                <li role="listitem"><a href="${urls.login}" title="Log in to manage this site" >Log in</a></li>
+                <li role="listitem"><a href="${urls.login}" title="${i18n().login_to_manage_site}" >${i18n().login_button}</a></li>
             </#if>
             <#-- List of links that appear in submenus, like the header and footer. -->
-                <li role="listitem"><a href="${urls.about}" title="More details about this site">About</a></li>
+                <li role="listitem"><a href="${urls.about}" title="${i18n().more_details_about_site}">${i18n().about}</a></li>
             <#if urls.contact??>
-                <li role="listitem"><a href="${urls.contact}" title="Send us your feedback or ask a question">Contact Us</a></li>
+                <li role="listitem"><a href="${urls.contact}" title="${i18n().send_feedback_questions}">${i18n().contact_us}</a></li>
             </#if>
-                <li role="listitem"><a href="http://www.vivoweb.org/support" title="Visit the national project web site" target="blank">Support</a></li>
-                <li role="listitem"><a href="${urls.index}" title="View an outline of the content in this site">Index</a></li>
+                <li role="listitem"><a href="http://www.vivoweb.org/support" title="${i18n().visit_project_website}" target="blank">${i18n().support}</a></li>
+                <li role="listitem"><a href="${urls.index}" title="${i18n().view_content_index}">${i18n().index}</a></li>
         </ul>
     </nav>
     
     <section id="search" role="region">
         <fieldset>
-            <legend>Search form</legend>
+            <legend>${i18n().search_form}</legend>
             
             <form id="search-form" action="${urls.search}" name="search" role="search" accept-charset="UTF-8" method="POST"> 
                 <div id="search-field">
                     <input type="text" name="querytext" class="search-vitro" value="${querytext!}" autocapitalize="off" />
-                    <input type="submit" value="Search" class="submit">
+                    <input type="submit" value="${i18n().search_button}" class="submit">
                 </div>
             </form>
         </fieldset>

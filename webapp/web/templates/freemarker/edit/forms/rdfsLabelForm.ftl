@@ -1,12 +1,12 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#assign actionText = "Add new" />
+<#assign actionText = "${i18n().add_new}" />
 <#if editConfiguration.dataPropertyStatement?has_content>
-    <#assign actionText = "Edit"/>
+    <#assign actionText = "${i18n().edit_capitalized}"/>
 </#if>
-<#assign submitLabel>${actionText} label</#assign>
+<#assign submitLabel>${actionText} ${i18n().label}</#assign>
 
-<h2>${actionText} <em>label</em> for ${editConfiguration.subjectName}</h2>
+<h2>${actionText} <em>${i18n().label}</em> for ${editConfiguration.subjectName}</h2>
 
 <#assign literalValues = "${editConfiguration.dataLiteralValuesAsString}" />
 
@@ -17,7 +17,7 @@
     
     <p class="submit">
         <input type="submit" id="submit" value="${submitLabel}" role="input"/>
-        or <a href="${cancelUrl}" class="cancel" title="cancel">Cancel</a>
+        or <a href="${cancelUrl}" class="cancel" title="${i18n().cancel_title}">${i18n().cancel_link}</a>
     </p>
     
 </form>

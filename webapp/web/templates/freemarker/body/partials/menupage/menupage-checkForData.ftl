@@ -22,19 +22,19 @@
         <#if user.authorizedToRebuildSearchIndex>
             <span class="contentNote">
                 <h4>Expecting content?</h4>
-                <p>Try <a title="Rebuild the search index for this site" href="${urls.base}/SearchIndex">rebuilding the search index</a>.</p>
+                <p><a title="${i18n().try_rebuilding_index}" href="${urls.base}/SearchIndex">${i18n().try_rebuilding_index}</a>.</p>
             </span>
         </#if>
     <#else>
         <span class="contentNote">
-            <p>Please <a href="${urls.login}" title="log in to manage this site">log in</a> to manage content.</p>
+            <p>${i18n().please} <a href="${urls.login}" title="${i18n().login_to_manage_site}">${i18n().log_in}</a> ${i18n().to_manage_content}</p>
         </span>
     </#if>
     
-    <h3>There is currently no ${page.title} content in the system</h3>
+    <h3>${i18n().no_content_in_system(page.title)}</h3>
     <#if user.loggedIn && user.hasSiteAdminAccess>
-        <p>You can <a href="${urls.siteAdmin}" title="Manage content">add content and manage this site</a> from the Site Administration page.</p>
+        <p>${i18n().you_can} <a href="${urls.siteAdmin}" title="Manage content">${i18n().add_content_manage_site}</a> ${i18n().from_site_admin_page}</p>
     </#if>
     
-    <p>You can browse all of the public content currently in the system using the <a href="${urls.index}" title="browse all content">index page</a>.</p>
+    <p>${i18n().browse_all_public_content} <a href="${urls.index}" title="${i18n().browse_all_content}">${i18n().index_page}</a>.</p>
 </#assign>

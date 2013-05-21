@@ -11,11 +11,11 @@
     <#assign selectClassGroupStyle = " " />
 </#if>
 <section id="error-alert" role="alert" class="hidden">
-    <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon" />
+    <img src="${urls.images}/iconAlert.png" width="24" height="24" alt="${i18n().error_alert_icon}" />
     <p></p>
 </section>
 
-<h3>${menuAction} menu item</h3>
+<h3>${menuAction} ${i18n().menu_item}</h3>
 
 <section id="${menuAction?lower_case}-menu-item" role="region">
     <form method="POST" action="${formUrls}" class="customForm" role="${menuAction} menu item">
@@ -23,39 +23,39 @@
         <input type="hidden" name="menuItem" id="menuItem" value="${menuItem}" role="input" />
         <input type="hidden" name="switchToDisplayModel" id="switchToDisplayModel" value="true" role="input" />
          
-        <label for="menu-name">Name<span class="requiredHint"> *</span></label>
+        <label for="menu-name">${i18n().name}<span class="requiredHint"> *</span></label>
         <input type="text" name="menuName" value="${menuName}" role="input" />
 
-        <label for="pretty-url">Pretty URL<span class="requiredHint"> *</span></label> 
+        <label for="pretty-url">${i18n().pretty_url}<span class="requiredHint"> *</span></label> 
         <input type="text" name="prettyUrl" value="${prettyUrl}" role="input" />
-        <p class="note">Must begin with a leading forward slash: / (e.g., /people)</p>
+        <p class="note">${i18n().start_with_leading_slash}</p>
         
-        <p>Template<span class="requiredHint"> *</span></p>
+        <p>${i18n().template_capitalized}<span class="requiredHint"> *</span></p>
         
         <input type="radio" class="default-template" name="selectedTemplate" value="default" <#if selectedTemplateType = "default">checked</#if> role="radio" />
-        <label class="inline" for="default"> Default</label>
+        <label class="inline" for="default"> ${i18n().default}</label>
         <br />
         <input type="radio" name="selectedTemplate" class="custom-template" value="custom" <#if selectedTemplateType = "custom">checked</#if> role="input" />
-        <label class="inline" for="custom"> Custom template</label>
+        <label class="inline" for="custom"> ${i18n().custom_template}</label>
         
         <section id="custom-template" <#if selectedTemplateType != 'custom'>class="hidden" </#if>role="region">
             <input type="text" name="customTemplate" value="${customTemplate!}" size="40" role="input" /><span class="requiredHint"> *</span>
         </section>
         
         <section id="existingContentType" name="existingContentType" ${existingClassGroupStyle} role="region">
-            <p>Selected content type for the associated page</p>
+            <p>${i18n().selected_page_content_type}</p>
             <p>
                 <span id="selectedContentTypeValue" name="selectedContentTypeValue">${associatedPage}</span>
-                <a href="#" id="changeContentType" name="changeContentType" title="change content type">Change content type</a>
+                <a href="#" id="changeContentType" name="changeContentType" title="${i18n().change_content_type}">${i18n().change_content_type}</a>
             </p>
         </section>
         
         <#-- Select class group -->
         <section id="selectContentType" name="selectContentType" ${selectClassGroupStyle} role="region">     
-           <label for="selectClassGroup">Select content type for the associated page<span class="requiredHint"> *</span></label>
+           <label for="selectClassGroup">${i18n().select_page_content_type}<span class="requiredHint"> *</span></label>
            
            <select name="selectClassGroup" id="selectClassGroup" role="combobox">
-               <option value="-1" role="option">Select one</option>
+               <option value="-1" role="option">${i18n().select_one}</option>
                <#list classGroups as aClassGroup>
                     <option value="${aClassGroup.URI}" <#if aClassGroup.URI = associatedPageURI>selected</#if> role="option">${aClassGroup.publicName}</option>
                </#list>
@@ -64,7 +64,7 @@
         
         <section id="classesInSelectedGroup" name="classesInSelectedGroup" ${existingClassGroupStyle}>
             <#-- Select classes in a class group -->    
-            <p id="selectClassesMessage" name="selectClassesMessage">Select content to display<span class="requiredHint"> *</span></p>
+            <p id="selectClassesMessage" name="selectClassesMessage">${i18n().select_content_display}<span class="requiredHint"> *</span></p>
             
             <#include "menuManagement--classIntersections.ftl">
             
@@ -72,7 +72,7 @@
                 <#--Adding a default class for "ALL" in case all classes selected-->
                 <li class="ui-state-default" role="menuitem">
                     <input type="checkbox" name="allSelected" id="allSelected" value="all" <#if !isIndividualsForClassesPage?has_content>checked</#if> />
-                    <label class="inline" for="All"> All</label>
+                    <label class="inline" for="All"> ${i18n().all_capitalized}</label>
                 </li>
                 <#list classGroup as classInClassGroup>
                 <li class="ui-state-default" role="menuitem">
@@ -92,9 +92,9 @@
             </ul>
         </section>
         
-        <input type="submit" name="submit-${menuAction}" value="Save changes" class="submit" role="input" /> or <a class="cancel" href="${cancelUrl}" title="cancel">Cancel</a>
+        <input type="submit" name="submit-${menuAction}" value="${i18n().save_changes}" class="submit" role="input" /> ${i18n().or} <a class="cancel" href="${cancelUrl}" title="${i18n().cancel_title}">${i18n().cancel_link}</a>
 
-        <p class="requiredHint">* required fields</p>
+        <p class="requiredHint">* ${i18n().required_fields}</p>
     </form>
 </section>
 
