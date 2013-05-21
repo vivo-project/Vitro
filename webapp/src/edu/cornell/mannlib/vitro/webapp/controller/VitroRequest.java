@@ -175,12 +175,14 @@ public class VitroRequest extends HttpServletRequestWrapper {
     	return ModelAccess.on(this).getJenaOntModel();
     }
     
+    /** JB - surprising that this comes from session. */
     public OntModel getAssertionsOntModel() {
-        return ModelAccess.on(this).getBaseOntModel();
+        return ModelAccess.on(this.getSession()).getBaseOntModel();
     }
     
+    /** JB - surprising that this comes from session. */
     public OntModel getInferenceOntModel() {
-    	return ModelAccess.on(this).getInferenceOntModel();
+    	return ModelAccess.on(this.getSession()).getInferenceOntModel();
     }
 
     public OntModel getDisplayModel(){

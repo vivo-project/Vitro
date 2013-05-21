@@ -409,7 +409,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	if(isSelectFromExisting(vreq)) {
     		// set ProhibitedFromSearch object so picklist doesn't show
             // individuals from classes that should be hidden from list views
-            OntModel displayOntModel = ModelAccess.on(session).getDisplayModel();
+            OntModel displayOntModel = ModelAccess.on(session.getServletContext()).getDisplayModel();
             ProhibitedFromSearch pfs = new ProhibitedFromSearch(
                 DisplayVocabulary.SEARCH_INDEX_URI, displayOntModel);
             if( editConfig != null )
