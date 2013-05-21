@@ -178,7 +178,7 @@ public abstract class UserAccountsMyAccountPageStrategy extends
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);
 			email.addRecipient(TO, page.getUserAccount().getEmailAddress());
-			email.setSubject(i18n.text("email_changed_subject"));
+			email.setSubject(i18n.text("email_changed_subject", getSiteName()));
 			email.setTemplate(EMAIL_TEMPLATE);
 			email.setBodyMap(body);
 			email.processTemplate();

@@ -36,7 +36,7 @@
         <label class="inline" for="default"> ${i18n().default}</label>
         <br />
         <input type="radio" name="selectedTemplate" class="custom-template" value="custom" <#if selectedTemplateType = "custom">checked</#if> role="input" />
-        <label class="inline" for="custom"> ${i18n().custom_template}</label>
+        <label class="inline" for="custom"> ${i18n().custom_template_mixed_caps}</label>
         
         <section id="custom-template" <#if selectedTemplateType != 'custom'>class="hidden" </#if>role="region">
             <input type="text" name="customTemplate" value="${customTemplate!}" size="40" role="input" /><span class="requiredHint"> *</span>
