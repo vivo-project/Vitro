@@ -55,7 +55,7 @@ public class ApplicationConfigurationOntologyUtils {
         		"}"; 
       
         for (ObjectProperty op : propList) {
-            log.info("Checking " + op.getURI() + " for additional properties");
+            log.debug("Checking " + op.getURI() + " for additional properties");
             String queryStr = propQuery.replaceAll("\\?property", "<" + op.getURI() + ">");
             log.debug(queryStr);
             Query q = QueryFactory.create(queryStr);

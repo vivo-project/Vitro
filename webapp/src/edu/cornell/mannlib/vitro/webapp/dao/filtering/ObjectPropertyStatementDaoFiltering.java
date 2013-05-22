@@ -105,6 +105,10 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
         for (Map<String, String> map : data) {
             String objectUri = map.get(objectKey);
             ObjectPropertyStatement statement = new ObjectPropertyStatementImpl(subjectUri, propertyUri, objectUri);
+            ObjectProperty op = new ObjectProperty();
+            op.setURI(propertyUri);
+            op.setRangeVClassURI(rangeUri);
+            statement.setProperty(op);
             stmtsToData.put(statement, map);
         }
         

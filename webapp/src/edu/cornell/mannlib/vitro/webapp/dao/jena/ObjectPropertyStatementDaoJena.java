@@ -297,7 +297,9 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         QuerySolutionMap initialBindings = new QuerySolutionMap();
         initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
         initialBindings.add("property", ResourceFactory.createResource(propertyUri));
-        initialBindings.add("objectType", ResourceFactory.createResource(rangeUri));
+        if (rangeUri != null) {
+            initialBindings.add("objectType", ResourceFactory.createResource(rangeUri));
+        }
         
         // Run the SPARQL query to get the properties
         List<Map<String, String>> list = new ArrayList<Map<String, String>>();
