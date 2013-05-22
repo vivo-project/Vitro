@@ -175,18 +175,12 @@ public class BaseEditController extends VitroHttpServlet {
     	
     }
     
-    protected WebappDaoFactory getWebappDaoFactory(VitroRequest vreq) {
-        WebappDaoFactory wadf = (WebappDaoFactory) getServletContext().getAttribute(
-                "assertionsWebappDaoFactory");
-        if (wadf == null) {
-            log.info("Using vreq.getFullWebappDaoFactory()");
-            wadf = vreq.getFullWebappDaoFactory();
-        } 
-        return wadf;
+    protected WebappDaoFactory getWebappDaoFactory() {
+    	return ModelAccess.on(getServletContext()).getBaseWebappDaoFactory();
     }
     
-    protected WebappDaoFactory getWebappDaoFactory(VitroRequest vreq, String userURI) {
-        return getWebappDaoFactory(vreq).getUserAwareDaoFactory(userURI);
+    protected WebappDaoFactory getWebappDaoFactory(String userURI) {
+        return getWebappDaoFactory().getUserAwareDaoFactory(userURI);
     }
     
     public String getDefaultLandingPage(HttpServletRequest request) {

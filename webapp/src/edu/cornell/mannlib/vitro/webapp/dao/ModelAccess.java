@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -24,29 +24,26 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
  * 
  * <pre>
  * VitroRequest.getAssertionsWebappDaoFactory()
- * VitroRequest.getDeductionsWebappDaoFactory()
  * VitroRequest.getFullWebappDaoFactory()
  * VitroRequest.getRDFService()
  * VitroRequest.getUnfilteredRDFService()
  * VitroRequest.getWebappDaoFactory()
  * VitroRequest.getWriteModel()
  * VitroRequest.getJenaOntModel()
- * VitroRequest.setJenaOntModel()
- * OntModelSelector.getAboxModel
- * OntModelSelector.getApplicationMetadataModel()
+ * vreq.setUnfilteredWebappDaoFactory(wadf);
+ * 
+ * OntModelSelector.getABoxModel
  * OntModelSelector.getFullModel()
  * OntModelSelector.getTBoxModel()
  * OntModelSelector.getTBoxModel(ontologyURI)
- * OntModelSelector.getUserAccountsModel()
  * VitroModelSource.getModel(URL)
  * VitroModelSource.getModel(URL, loadIfAbsent)
  * VitroModelSource.openModel(name)
  * VitroModelSource.openModelIfPresent(string)
- * ServletContext.getAttribute("assertionsWebappDaoFactory")
+ * ServletContext.getAttribute("deductionsWebappDaoFactory")
  * ServletContext.getAttribute("baseOntModelSelector")
  * ServletContext.getAttribute("jenaPersistentOntModel")
  * ServletContext.getAttribute("pelletOntModel")
- * ServletContext.getAttribute("webappDaoFactory")
  * VitroJenaModelMaker
  * VitroJenaSpecialModelMaker
  * JenaDataSourceSetupBase.getApplicationDataSource(ctx)
@@ -73,6 +70,10 @@ public class ModelAccess {
 		INFERRED_ABOX, INFERRED_TBOX, INFERRED_FULL,
 
 		UNION_ABOX, UNION_TBOX, UNION_FULL
+	}
+
+	public enum FactoryID {
+		BASE, UNION
 	}
 
 	private enum Scope {
@@ -124,7 +125,9 @@ public class ModelAccess {
 
 	private final Scope scope;
 	private final ModelAccess parent;
-	private final Map<String, OntModel> modelMap = new HashMap<>();
+	private final Map<ModelID, OntModel> modelMap = new EnumMap<>(ModelID.class);
+	private final Map<FactoryID, WebappDaoFactory> factoryMap = new EnumMap<>(
+			FactoryID.class);
 
 	public ModelAccess(Scope scope, ModelAccess parent) {
 		this.scope = scope;
@@ -176,23 +179,69 @@ public class ModelAccess {
 	}
 
 	public void setOntModel(ModelID id, OntModel ontModel) {
-		String key = id.toString();
 		if (ontModel == null) {
-			modelMap.remove(key);
+			modelMap.remove(id);
 		} else {
-			modelMap.put(key, ontModel);
+			modelMap.put(id, ontModel);
 		}
 	}
 
+	public void removeOntModel(ModelID id) {
+		setOntModel(id, null);
+	}
+
 	public OntModel getOntModel(ModelID id) {
-		String key = id.toString();
-		if (modelMap.containsKey(key)) {
+		if (modelMap.containsKey(id)) {
 			log.debug("Using " + id + " model from " + scope);
-			return modelMap.get(key);
+			return modelMap.get(id);
 		} else if (parent != null) {
 			return parent.getOntModel(id);
 		} else {
 			log.warn("No model found for " + id);
+			return null;
+		}
+	}
+
+	// ----------------------------------------------------------------------
+	// Accessing the Webapp DAO factories.
+	// ----------------------------------------------------------------------
+
+	public void setWebappDaoFactory(WebappDaoFactory wadf) {
+		setWebappDaoFactory(FactoryID.UNION, wadf);
+	}
+
+	public WebappDaoFactory getWebappDaoFactory() {
+		return getWebappDaoFactory(FactoryID.UNION);
+	}
+
+	public void setBaseWebappDaoFactory(WebappDaoFactory wadf) {
+		setWebappDaoFactory(FactoryID.BASE, wadf);
+	}
+
+	public WebappDaoFactory getBaseWebappDaoFactory() {
+		return getWebappDaoFactory(FactoryID.BASE);
+	}
+
+	public void setWebappDaoFactory(FactoryID id, WebappDaoFactory wadf) {
+		if (wadf == null) {
+			factoryMap.remove(id);
+		} else {
+			factoryMap.put(id, wadf);
+		}
+	}
+
+	public void removeWebappDaoFactory(FactoryID id) {
+		setWebappDaoFactory(id, null);
+	}
+
+	public WebappDaoFactory getWebappDaoFactory(FactoryID id) {
+		if (factoryMap.containsKey(id)) {
+			log.debug("Using " + id + " DAO factory from " + scope);
+			return factoryMap.get(id);
+		} else if (parent != null) {
+			return parent.getWebappDaoFactory(id);
+		} else {
+			log.warn("No DAO factory found for " + id);
 			return null;
 		}
 	}

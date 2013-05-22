@@ -13,8 +13,6 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 
@@ -42,22 +40,6 @@ public class LanguageFilteringUtils {
 		}
 		return langs;
 
-	}
-
-	/**
-	 * Make a new OntModelSelector that containing a new display model and all
-	 * of the other models in the original OntModelSelector.
-	 */
-	public static OntModelSelector replaceDisplayModelInSelector(
-			OntModelSelector oldOms, OntModel newDisplayModel) {
-		OntModelSelectorImpl newOms = new OntModelSelectorImpl();
-		newOms.setABoxModel(oldOms.getABoxModel());
-		newOms.setApplicationMetadataModel(oldOms.getApplicationMetadataModel());
-		newOms.setDisplayModel(newDisplayModel);
-		newOms.setFullModel(oldOms.getFullModel());
-		newOms.setTBoxModel(oldOms.getTBoxModel());
-		newOms.setUserAccountsModel(oldOms.getUserAccountsModel());
-		return newOms;
 	}
 
 	/**

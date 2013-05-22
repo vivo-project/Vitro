@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import freemarker.cache.WebappTemplateLoader;
@@ -116,8 +116,7 @@ public class StartupStatusDisplayFilter implements Filter {
 	private Object getApplicationName() {
 		String name = "";
 		try {
-			WebappDaoFactory wadf = (WebappDaoFactory) ctx
-					.getAttribute("webappDaoFactory");
+			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
 			ApplicationBean app = wadf.getApplicationDao().getApplicationBean();
 			name = app.getApplicationName();
 		} catch (Exception e) {

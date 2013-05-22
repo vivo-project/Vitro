@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
@@ -18,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.openrdf.model.URI;
 import org.openrdf.model.impl.URIImpl;
 
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
@@ -36,7 +36,7 @@ public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/
 	    super(response);
 		this._response = response;
 		this._context = context;
-		this.wadf = (WebappDaoFactory) context.getAttribute("webappDaoFactory");
+		this.wadf =	ModelAccess.on(context).getWebappDaoFactory();
 		this.contextPathDepth = slashPattern.split(request.getContextPath()).length-1;
 	}
 		

@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginEvent;
@@ -302,14 +303,7 @@ public class BasicAuthenticator extends Authenticator {
 		}
 
 		ServletContext servletContext = session.getServletContext();
-		WebappDaoFactory wadf = (WebappDaoFactory) servletContext
-				.getAttribute("webappDaoFactory");
-		if (wadf == null) {
-			log.error("no WebappDaoFactory");
-			return null;
-		}
-
-		return wadf;
+		return ModelAccess.on(servletContext).getWebappDaoFactory();
 	}
 
 	@Override

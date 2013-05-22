@@ -146,25 +146,17 @@ public class WebappDaoFactorySparqlPrep implements Filter {
 				
 				Model m = ModelFactory.createModelForGraph(g);
 				OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
-								
-				dataset = DatasetFactory.create(new SparqlDatasetGraph(endpointURI));
-				
-				//DataSource datasource = DatasetFactory.create();
-				//datasource.addNamedModel("fake:fake", m);
-				//dataset = datasource;			
-				
-				vreq.setAssertionsWebappDaoFactory(wadf);
-
 				ModelAccess.on(vreq).setOntModel(ModelID.UNION_ABOX, om);
 				ModelAccess.on(vreq).setOntModel(ModelID.UNION_TBOX, om);
 				ModelAccess.on(vreq).setOntModel(ModelID.UNION_FULL, om);
+
 				OntModelSelector oms = ModelAccess.on(vreq).getOntModelSelector();
-				
 				wadf = new WebappDaoFactoryJena(oms, config);
-				//wadf = new WebappDaoFactorySDB(oms, dataset, config);
-				vreq.setFullWebappDaoFactory(wadf);
+				ModelAccess.on(vreq).setWebappDaoFactory(wadf);
+				ModelAccess.on(vreq).setBaseWebappDaoFactory(wadf);
 				vreq.setUnfilteredWebappDaoFactory(wadf);
-				vreq.setWebappDaoFactory(wadf);
+
+				dataset = DatasetFactory.create(new SparqlDatasetGraph(endpointURI));
 				vreq.setDataset(dataset);
 			}
 		} catch (Throwable t) {

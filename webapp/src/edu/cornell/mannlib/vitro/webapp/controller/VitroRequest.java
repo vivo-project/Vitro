@@ -71,13 +71,9 @@ public class VitroRequest extends HttpServletRequestWrapper {
         setAttribute("unfilteredRDFService", rdfService);
     }
     
-    public void setWebappDaoFactory( WebappDaoFactory wdf){
-        setAttribute("webappDaoFactory",wdf);
-    }
-    
     /** gets WebappDaoFactory with appropriate filtering for the request */
     public WebappDaoFactory getWebappDaoFactory(){
-    	return (WebappDaoFactory) getAttribute("webappDaoFactory");
+    	return ModelAccess.on(this).getWebappDaoFactory();
     }
     
     public void setUnfilteredWebappDaoFactory(WebappDaoFactory wdf) {
@@ -92,10 +88,6 @@ public class VitroRequest extends HttpServletRequestWrapper {
     	return (WebappDaoFactory) getAttribute("unfilteredWebappDaoFactory");
     }
     
-    public void setFullWebappDaoFactory(WebappDaoFactory wdf) {
-    	setAttribute("fullWebappDaoFactory", wdf);
-    }
-    
     public Dataset getDataset() {
     	return (Dataset) getAttribute("dataset");
     }
@@ -106,53 +98,14 @@ public class VitroRequest extends HttpServletRequestWrapper {
     
     /** gets assertions + inferences WebappDaoFactory with no filtering **/
     public WebappDaoFactory getFullWebappDaoFactory() {
-    	Object webappDaoFactoryAttr = _req.getAttribute("fullWebappDaoFactory");
-    	if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
-    		return (WebappDaoFactory) webappDaoFactoryAttr;
-    	} else {
-	        webappDaoFactoryAttr = _req.getSession().getAttribute("webappDaoFactory");
-	        if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
-	             return (WebappDaoFactory) webappDaoFactoryAttr;
-	        } else {
-	        	return (WebappDaoFactory) _req.getSession().getServletContext().getAttribute("webappDaoFactory");	
-	        }
-    	}
+    	return ModelAccess.on(this).getWebappDaoFactory();
     }
     
     /** gets assertions-only WebappDaoFactory with no filtering */
     public WebappDaoFactory getAssertionsWebappDaoFactory() {
-    	Object webappDaoFactoryAttr = _req.getSession().getAttribute("assertionsWebappDaoFactory");
-        if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
-             log.debug("Returning assertionsWebappDaoFactory from session");
-             return (WebappDaoFactory) webappDaoFactoryAttr;
-        } else {
-            webappDaoFactoryAttr = getAttribute("assertionsWebappDaoFactory");
-            if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
-                log.debug("returning assertionsWebappDaoFactory from request attribute");
-                return (WebappDaoFactory) webappDaoFactoryAttr;     
-            } else {
-                log.debug("Returning assertionsWebappDaoFactory from context");
-                return (WebappDaoFactory) _req.getSession().getServletContext().getAttribute("assertionsWebappDaoFactory");
-            }
-        		
-        }
+    	return ModelAccess.on(this).getBaseWebappDaoFactory();
     }
-    
-    /** gets assertions-only WebappDaoFactory with no filtering */
-    public void setAssertionsWebappDaoFactory(WebappDaoFactory wadf) {
-        setAttribute("assertionsWebappDaoFactory", wadf); 
-    }
-    
-    /** gets inferences-only WebappDaoFactory with no filtering */
-    public WebappDaoFactory getDeductionsWebappDaoFactory() {
-    	Object webappDaoFactoryAttr = _req.getSession().getAttribute("deductionsWebappDaoFactory");
-        if (webappDaoFactoryAttr instanceof WebappDaoFactory) {
-             return (WebappDaoFactory) webappDaoFactoryAttr;
-        } else {
-        	return (WebappDaoFactory) _req.getSession().getServletContext().getAttribute("deductionsWebappDaoFactory");	
-        }
-    }
-    
+        
     //Method that retrieves write model, returns special model in case of write model
     public OntModel getWriteModel() {
     	//if special write model doesn't exist use get ont model 
@@ -167,20 +120,18 @@ public class VitroRequest extends HttpServletRequestWrapper {
     	return ModelAccess.on(this).getOntModelSelector();
     }
     
-    public void setJenaOntModel(OntModel ontModel) {
-    	ModelAccess.on(this).setJenaOntModel(ontModel);
-    }
-    
     public OntModel getJenaOntModel() {
     	return ModelAccess.on(this).getJenaOntModel();
     }
     
+    /** JB - surprising that this comes from session. */
     public OntModel getAssertionsOntModel() {
-        return ModelAccess.on(this).getBaseOntModel();
+        return ModelAccess.on(this.getSession()).getBaseOntModel();
     }
     
+    /** JB - surprising that this comes from session. */
     public OntModel getInferenceOntModel() {
-    	return ModelAccess.on(this).getInferenceOntModel();
+    	return ModelAccess.on(this.getSession()).getInferenceOntModel();
     }
 
     public OntModel getDisplayModel(){

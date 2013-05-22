@@ -273,8 +273,7 @@ public class PermissionSetsLoader implements ServletContextListener {
 			this.ctx = ctx;
 			this.ss = ss;
 
-			WebappDaoFactory wadf = (WebappDaoFactory) ctx
-					.getAttribute("webappDaoFactory");
+			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
 			if (wadf == null) {
 				throw new IllegalStateException(
 						"No webappDaoFactory on the servlet context");
