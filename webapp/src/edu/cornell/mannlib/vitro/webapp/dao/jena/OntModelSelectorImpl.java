@@ -39,11 +39,6 @@ public class OntModelSelectorImpl implements OntModelSelector {
 	}
 
 	@Override
-	public OntModel getTBoxModel(String ontologyURI) {
-		return this.tboxModel;
-	}
-
-	@Override
 	public OntModel getUserAccountsModel() {
 		return this.userAccountsModel;
 	}

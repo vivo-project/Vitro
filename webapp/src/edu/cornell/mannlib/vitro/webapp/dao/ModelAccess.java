@@ -29,19 +29,15 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
  * VitroRequest.getUnfilteredRDFService()
  * VitroRequest.getWebappDaoFactory()
  * VitroRequest.getWriteModel()
- * VitroRequest.getJenaOntModel()
  * vreq.setUnfilteredWebappDaoFactory(wadf);
  * 
  * OntModelSelector.getABoxModel
  * OntModelSelector.getFullModel()
  * OntModelSelector.getTBoxModel()
- * OntModelSelector.getTBoxModel(ontologyURI)
  * VitroModelSource.getModel(URL)
  * VitroModelSource.getModel(URL, loadIfAbsent)
  * VitroModelSource.openModel(name)
  * VitroModelSource.openModelIfPresent(string)
- * ServletContext.getAttribute("deductionsWebappDaoFactory")
- * ServletContext.getAttribute("baseOntModelSelector")
  * ServletContext.getAttribute("jenaPersistentOntModel")
  * ServletContext.getAttribute("pelletOntModel")
  * VitroJenaModelMaker
@@ -300,11 +296,6 @@ public class ModelAccess {
 
 		@Override
 		public OntModel getTBoxModel() {
-			return parent.getOntModel(tboxID);
-		}
-
-		@Override
-		public OntModel getTBoxModel(String ontologyURI) {
 			return parent.getOntModel(tboxID);
 		}
 
