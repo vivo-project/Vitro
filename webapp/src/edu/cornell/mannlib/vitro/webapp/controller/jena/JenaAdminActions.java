@@ -340,41 +340,7 @@ public class JenaAdminActions extends BaseEditController {
         	removeLongLiterals();
         }
         
-        if (actionStr.equals("isIsomorphic")) {
-    		OntModel memoryModel = ModelAccess.on(getServletContext()).getJenaOntModel();
-            OntModel persistentModel = (OntModel) getServletContext().getAttribute("jenaPersistentOntModel");
-            if ((memoryModel != null) && (persistentModel != null)) {
-                long startTime = System.currentTimeMillis();
-                if (memoryModel.isIsomorphicWith(persistentModel)) {
-                    log.trace("In-memory and persistent models are isomorphic");
-                } else {
-                    log.trace("In-memory and persistent models are NOT isomorphic");
-                    log.trace("In-memory model has "+memoryModel.size()+" statements");
-                    log.trace("Persistent model has "+persistentModel.size()+" statements");
-                    Model diff = memoryModel.difference(persistentModel);
-                    ClosableIterator stmtIt = diff.listStatements();
-                    log.trace("Delta = "+diff.size()+" statments");
-                    while (stmtIt.hasNext()) {
-                        Statement s = (Statement) stmtIt.next();
-                        try {
-                            log.trace(s.getSubject().getURI()+" : "+s.getPredicate().getURI()); // + ((Literal)s.getObject()).getString());
-                        } catch (ClassCastException cce) {}
-                    }
-                }
-                log.trace((System.currentTimeMillis()-startTime)/1000+" seconds to check isomorphism");
-            }
-        } else if (actionStr.equals("removeUntypedResources")) {
-    		OntModel memoryModel = ModelAccess.on(getServletContext()).getJenaOntModel();
-            OntModel persistentModel = (OntModel) getServletContext().getAttribute("jenaPersistentOntModel");
-            ClosableIterator rIt = memoryModel.listSubjects();
-            clean(rIt,memoryModel);
-            ClosableIterator oIt = memoryModel.listObjects();
-            clean(oIt,memoryModel);
-            ClosableIterator rrIt = persistentModel.listSubjects();
-            clean(rIt,persistentModel);
-            ClosableIterator ooIt = persistentModel.listObjects();
-            clean(oIt,persistentModel);
-        } else if (actionStr.equals("outputTaxonomy")) {
+        if (actionStr.equals("outputTaxonomy")) {
             OntModel ontModel = ModelAccess.on(getServletContext()).getBaseOntModel();
         	Model taxonomyModel = extractTaxonomy(ontModel);
         	try {
@@ -386,32 +352,8 @@ public class JenaAdminActions extends BaseEditController {
     }
 
 
-    private void clean(ClosableIterator rIt, OntModel model) {
-        try {
-            while (rIt.hasNext()) {
-                try {
-                    OntResource r = (OntResource) rIt.next();
-                    try {
-                        Resource t = r.getRDFType();
-                        if (t == null) {
-                            r.remove();
-                        }
-                    } catch (Exception e) {
-                        r.remove();
-                    }
-                } catch (ClassCastException cce) {
-                    Resource r = (Resource) rIt.next();
-                    model.removeAll(r,null,null);
-                    model.removeAll(null,null,r);
-                }
-            }
-        } finally {
-            rIt.close();
-        }
-    }
-
-
-    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doPost(HttpServletRequest request, HttpServletResponse response) {
         doGet(request ,response);
     }
 
