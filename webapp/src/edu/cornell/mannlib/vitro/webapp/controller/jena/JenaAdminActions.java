@@ -18,12 +18,10 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.iri.IRI;
 import com.hp.hpl.jena.iri.IRIFactory;
-import com.hp.hpl.jena.iri.Violation;
 import com.hp.hpl.jena.ontology.AllValuesFromRestriction;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.ontology.Restriction;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -35,11 +33,9 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -60,7 +56,7 @@ public class JenaAdminActions extends BaseEditController {
         if (iri.hasViolation(false) ) {
         	log.error("Bad URI: "+uri);
         	log.error( "Only well-formed absolute URIrefs can be included in RDF/XML output: "
-                 + ((Violation)iri.violations(false).next()).getShortMessage());
+                 + iri.violations(false).next().getShortMessage());
         	return true;
         } else {
         	return false;
@@ -72,8 +68,7 @@ public class JenaAdminActions extends BaseEditController {
     private static final String AKT_PORTAL = "http://www.aktors.org/ontology/portal#";
     
     private void copyStatements(Model src, Model dest, Resource subj, Property pred, RDFNode obj) {
-    	for (Iterator i = src.listStatements(subj,pred,obj); i.hasNext();) {
-    		Statement stmt = (Statement) i.next();
+    	for (Statement stmt : src.listStatements(subj,pred,obj).toList()) {
     		String subjNs = stmt.getSubject().getNameSpace();
     		if (subjNs == null || (! (subjNs.equals(VITRO) || subjNs.equals(AKT_SUPPORT) || subjNs.equals(AKT_PORTAL) ) ) ) {
     			if (stmt.getObject().isLiteral()) {
@@ -91,14 +86,11 @@ public class JenaAdminActions extends BaseEditController {
     
     /**
      * This doesn't really print just the TBox.  It takes a copy of the model, removes all the individuals, and writes the result.
-     * @param response
      */
     private void outputTbox(HttpServletResponse response) {
         OntModel memoryModel = ModelAccess.on(getServletContext()).getBaseOntModel();
         try {
         	OntModel tempOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
-        	Property DescriptionProp = ResourceFactory.createProperty(VitroVocabulary.DESCRIPTION_ANNOT);
-        	Property ExampleProp = ResourceFactory.createProperty(VitroVocabulary.EXAMPLE_ANNOT);
         	memoryModel.enterCriticalSection(Lock.READ);
         	try {
         		copyStatements(memoryModel,tempOntModel,null,RDF.type,OWL.Class);
@@ -110,8 +102,6 @@ public class JenaAdminActions extends BaseEditController {
         		copyStatements(memoryModel,tempOntModel,null,RDFS.domain,null);
         		copyStatements(memoryModel,tempOntModel,null,RDFS.range,null);
         		copyStatements(memoryModel,tempOntModel,null,OWL.inverseOf,null);
-        		//copyStatements(memoryModel,tempOntModel,null,DescriptionProp,null);
-        		//copyStatements(memoryModel,tempOntModel,null,ExampleProp,null);
         	} finally {
         		memoryModel.leaveCriticalSection();
         	}
@@ -131,28 +121,24 @@ public class JenaAdminActions extends BaseEditController {
     	Model taxonomyModel = ModelFactory.createDefaultModel();
     	try {
     		HashSet<Resource> typeSet = new HashSet<Resource>();
-    		for (Iterator classIt = ontModel.listStatements((Resource)null,RDF.type,(RDFNode)null); classIt.hasNext();) {
-    			Statement stmt = (Statement) classIt.next();
+    		for (Statement stmt : ontModel.listStatements((Resource)null,RDF.type,(RDFNode)null).toList()) {
     			if (stmt.getObject().isResource()) {
-    				Resource ontClass = (Resource) stmt.getObject();
-    				typeSet.add(ontClass);
+    				typeSet.add((Resource) stmt.getObject());
     			}
     		}
-    		for (Iterator classIt = ontModel.listClasses(); classIt.hasNext();) {
-    			Resource classRes = (Resource) classIt.next();
+    		for (Resource classRes : ontModel.listClasses().toList()) {
     			typeSet.add(classRes);
     		}
-    		for (Iterator<Resource> typeIt = typeSet.iterator(); typeIt.hasNext();) {
-    			Resource ontClass = typeIt.next();
-	    			if (!ontClass.isAnon()) { // Only query for named classes
-	    				System.out.println("Describing "+ontClass.getURI());
-	    				// We want a subgraph describing this class, including related BNodes
-	    				String queryStr = "DESCRIBE <"+ontClass.getURI()+">";
-	    				Query describeQuery = QueryFactory.create(queryStr);
-	    				QueryExecution qe = QueryExecutionFactory.create(describeQuery,ontModel);
-	    				qe.execDescribe(taxonomyModel);
-	    			}
+    		for (Resource ontClass : typeSet) {
+    			if (!ontClass.isAnon()) { // Only query for named classes
+    				System.out.println("Describing "+ontClass.getURI());
+    				// We want a subgraph describing this class, including related BNodes
+    				String queryStr = "DESCRIBE <"+ontClass.getURI()+">";
+    				Query describeQuery = QueryFactory.create(queryStr);
+    				QueryExecution qe = QueryExecutionFactory.create(describeQuery,ontModel);
+    				qe.execDescribe(taxonomyModel);
     			}
+			}
     	} finally {
     		ontModel.leaveCriticalSection();
     	}
@@ -175,7 +161,7 @@ public class JenaAdminActions extends BaseEditController {
 		OntModel model = ModelAccess.on(getServletContext()).getJenaOntModel();
 		Model tmp = ModelFactory.createDefaultModel();
 		boolean valid = true;
-		for (Statement stmt : ((List<Statement>)model.listStatements().toList()) ) {
+		for (Statement stmt : model.listStatements().toList() ) {
 			tmp.add(stmt);
 				StringWriter writer = new StringWriter();
 				try {
@@ -202,17 +188,15 @@ public class JenaAdminActions extends BaseEditController {
 
     private void printRestrictions() {
     	OntModel memoryModel = (OntModel) getServletContext().getAttribute("pelletOntModel");
-    	for (Iterator i = memoryModel.listRestrictions(); i.hasNext(); ) {
-    		Restriction rest = (Restriction) i.next();
+    	for (Restriction rest : memoryModel.listRestrictions().toList() ) {
     		//System.out.println();
     		if (rest.isAllValuesFromRestriction()) {
     			log.trace("All values from: ");
     			AllValuesFromRestriction avfr = rest.asAllValuesFromRestriction();
     			Resource res = avfr.getAllValuesFrom();
     			if (res.canAs(OntClass.class)) {
-    				OntClass resClass = (OntClass) res.as(OntClass.class);
-    				for (Iterator resInstIt = resClass.listInstances(); resInstIt.hasNext(); ) {
-    					Resource inst = (Resource) resInstIt.next();
+    				OntClass resClass = res.as(OntClass.class);
+    				for (Resource inst : resClass.listInstances().toList() ) {
     					log.trace("    -"+inst.getURI());
     				}
     			}
@@ -222,8 +206,7 @@ public class JenaAdminActions extends BaseEditController {
     			log.trace("Has value: ");
     		}
     		log.trace("On property "+rest.getOnProperty().getURI());
-    		for (Iterator indIt = rest.listInstances(); indIt.hasNext(); ) {
-    			Resource inst = (Resource) indIt.next();
+    		for (Resource inst : rest.listInstances().toList() ) {
     			log.trace("     "+inst.getURI());
     		}
     		
@@ -235,8 +218,7 @@ public class JenaAdminActions extends BaseEditController {
     	memoryModel.enterCriticalSection(Lock.WRITE);
     	try {
     		List<Statement> statementsToRemove = new LinkedList<Statement>();
-    		for (Iterator i = memoryModel.listStatements(null,null,(Literal)null); i.hasNext(); ) {
-    			Statement stmt = (Statement) i.next();
+    		for (Statement stmt :  memoryModel.listStatements(null,null,(Literal)null).toList() ) {
     			if (stmt.getObject().isLiteral()) {
     				Literal lit = (Literal) stmt.getObject();
     				if ( lit.getString().length() > 24) {
@@ -253,7 +235,8 @@ public class JenaAdminActions extends BaseEditController {
     	}
     }
     
-    public void doGet(HttpServletRequest req, HttpServletResponse response) {
+    @Override
+	public void doGet(HttpServletRequest req, HttpServletResponse response) {
         if (!isAuthorizedToDisplayPage(req, response, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTIONS)) {
         	return;
         }
@@ -275,16 +258,15 @@ public class JenaAdminActions extends BaseEditController {
         
         if (actionStr.equals("checkURIs")) { 
     		OntModel memoryModel = ModelAccess.on(getServletContext()).getJenaOntModel();
-        	ClosableIterator stmtIt = memoryModel.listStatements();
+        	StmtIterator stmtIt = memoryModel.listStatements();
         	try {
-	        	for (Iterator i = stmtIt; i.hasNext(); ) {
+        		for (Statement stmt : stmtIt.toList() ) {
 	        		boolean sFailed = false;
 	        		boolean pFailed = false;
 	        		boolean oFailed = false;
 	        		String sURI = "<bNode>";
 	        		String pURI = "???";
 	        		String oURI = "<bNode>";
-	        		Statement stmt = (Statement) i.next();
 	        		if (stmt.getSubject().getURI() != null) {
 	        			sFailed = checkURI(sURI = stmt.getSubject().getURI());
 	        		}
@@ -318,11 +300,7 @@ public class JenaAdminActions extends BaseEditController {
 			memoryModel = ModelAccess.on(getServletContext()).getJenaOntModel();
 	    	System.out.println("jenaOntModel");
 	    }  
-	    int subModelCount = 0;
-	    for (Iterator subIt = memoryModel.listSubModels(); subIt.hasNext();) {
-	    	subIt.next();
-	    	++subModelCount;
-	    }
+	    int subModelCount = memoryModel.listSubModels().toList().size();
 	    System.out.println("Submodels: "+subModelCount);
 	        try {
 	            //response.setContentType("application/rdf+xml");
