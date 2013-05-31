@@ -95,23 +95,13 @@ class DataPropertyDaoFiltering extends BaseFiltering implements DataPropertyDao{
     
     @Override
     public DataProperty getDataPropertyByURI(String dataPropertyURI) {
-        DataProperty prop = innerDataPropertyDao.getDataPropertyByURI(dataPropertyURI);
-        if( prop != null ){
-            Boolean acceptable = filters.getDataPropertyFilter().fn(prop);
-            if( acceptable == Boolean.TRUE )
-                return prop;
-            else
-                return null;
-        }
-        return null;
+        return innerDataPropertyDao.getDataPropertyByURI(dataPropertyURI);
     }
-
 
     @Override
     public String insertDataProperty(DataProperty dataProperty) throws InsertException {
         return innerDataPropertyDao.insertDataProperty(dataProperty);
     }
-
 
     @Override
     public void updateDataProperty(DataProperty dataProperty) {
