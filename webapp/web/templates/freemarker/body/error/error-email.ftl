@@ -2,7 +2,7 @@
 
 <#-- Template for email message sent to site administrator when an error occurs on the site. -->
 
-<#assign subject = i18n().error_occurred />
+<#assign subject = "${i18n().error_occurred}" />
 
 <#assign datetime = datetime?string("yyyy-MM-dd HH:mm:ss zzz")>
 

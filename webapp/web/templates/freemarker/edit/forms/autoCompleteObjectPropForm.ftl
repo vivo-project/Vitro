@@ -39,7 +39,7 @@
 </#if>
 
 <#if editConfiguration.formTitle?contains("collaborator") >
-    <#assign formTitle = i18n().select_existing_collaborator(editConfiguration.subjectName) />
+    <#assign formTitle = "${i18n().select_existing_collaborator(editConfiguration.subjectName)}" />
 <#else>
     <#assign formTitle = editConfiguration.formTitle />
 </#if>

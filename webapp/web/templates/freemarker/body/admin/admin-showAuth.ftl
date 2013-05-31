@@ -13,11 +13,11 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
             <tr><th>URI:</th><td>${currentUser.uri}</td></tr>
             <tr><th>${i18n().first_name}:</th><td>${currentUser.firstName}</td></tr>
             <tr><th>${i18n().last_name}:</th><td>${currentUser.lastName}</td></tr>
-            <tr><th>${i18n().email_Address}:</th><td>${currentUser.emailAddress}</td></tr>
+            <tr><th>${i18n().email_address}:</th><td>${currentUser.emailAddress}</td></tr>
             <tr><th>${i18n().external_auth_id}:</th><td>${currentUser.externalAuthId}</td></tr>
             <tr><th>${i18n().login_count}:</th><td>${currentUser.loginCount}</td></tr>
             <#list currentUser.permissionSetUris as role>
-                <tr><th>${i18n().role}:</th><td>${role}</td></tr>
+                <tr><th>${i18n().user_role}:</th><td>${role}</td></tr>
             </#list>
     <#else>
         <tr><th>${i18n().not_logged_in}</th></tr>

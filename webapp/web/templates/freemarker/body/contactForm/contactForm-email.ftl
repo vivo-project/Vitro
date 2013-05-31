@@ -12,7 +12,7 @@
     <body>
         <h3>${subject}</h3>
         
-        <p><strong>${i18n().from}:</strong> ${name}</p>
+        <p><strong>${i18n().from_capitalized}:</strong> ${name}</p>
 
         <p><strong>${i18n().email_address}:</strong> ${emailAddress}</p>
             
