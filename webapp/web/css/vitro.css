@@ -133,8 +133,15 @@
     border-bottom: none
 }
 .searchTOC ul a {
-    display: block;
+    display: inline;
     padding-left: 25px;
+}
+
+.searchTOC ul span {
+	float:right;
+	padding-right: 10px;
+	color:grey;
+	font-size:smaller;
 }
 
 /* ------------------------------------------------->  */

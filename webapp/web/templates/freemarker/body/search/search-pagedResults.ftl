@@ -38,7 +38,7 @@
             <h4>Display only</h4>           
             <ul>           
             <#list classGroupLinks as link>
-                <li><a href="${link.url}" title="class group link">${link.text}</a></li>
+                <li><a href="${link.url}" title="class group link">${link.text}</a><span>(${link.count})</span></li>
             </#list>
             </ul>           
         </div>
@@ -53,7 +53,7 @@
             </#if>
             <ul>           
             <#list classLinks as link>
-                <li><a href="${link.url}" title="class link">${link.text}</a></li>
+                <li><a href="${link.url}" title="class link">${link.text}</a><span>(${link.count})</span></li>
             </#list>
             </ul>
         </div>
