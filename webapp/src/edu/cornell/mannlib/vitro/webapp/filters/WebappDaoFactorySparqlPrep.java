@@ -27,7 +27,6 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.query.DataSource;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -39,10 +38,11 @@ import com.hp.hpl.jena.sdb.sql.SDBConnection;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SingleContentOntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlDatasetGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraphMultilingual;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
@@ -93,7 +93,6 @@ public class WebappDaoFactorySparqlPrep implements Filter {
 		
         javax.sql.DataSource ds = JenaDataSourceSetupBase.getApplicationDataSource(_ctx);
         StoreDesc storeDesc = (StoreDesc) _ctx.getAttribute("storeDesc");
-        OntModelSelector oms = (OntModelSelector) _ctx.getAttribute("unionOntModelSelector");
         String defaultNamespace = (String) _ctx.getAttribute("defaultNamespace");
         Connection sqlConn = null;
 		SDBConnection conn = null;
@@ -102,7 +101,7 @@ public class WebappDaoFactorySparqlPrep implements Filter {
 		WebappDaoFactory wadf = null;
 		
 		try {		
-		    if (ds == null || storeDesc == null || oms == null) {
+		    if (ds == null || storeDesc == null) {
 		        throw new RuntimeException("SDB store not property set up");
 		    }
 		    
@@ -147,25 +146,18 @@ public class WebappDaoFactorySparqlPrep implements Filter {
 				
 				Model m = ModelFactory.createModelForGraph(g);
 				OntModel om = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
-				oms = new SingleContentOntModelSelector(om, oms.getDisplayModel(), oms.getUserAccountsModel());
-								
-				dataset = DatasetFactory.create(new SparqlDatasetGraph(endpointURI));
-				
-				//DataSource datasource = DatasetFactory.create();
-				//datasource.addNamedModel("fake:fake", m);
-				//dataset = datasource;			
-				
-				vreq.setAssertionsWebappDaoFactory(wadf);
-				
+				ModelAccess.on(vreq).setOntModel(ModelID.UNION_ABOX, om);
+				ModelAccess.on(vreq).setOntModel(ModelID.UNION_TBOX, om);
+				ModelAccess.on(vreq).setOntModel(ModelID.UNION_FULL, om);
+
+				OntModelSelector oms = ModelAccess.on(vreq).getOntModelSelector();
 				wadf = new WebappDaoFactoryJena(oms, config);
-				//wadf = new WebappDaoFactorySDB(oms, dataset, config);
-				vreq.setWebappDaoFactory(wadf);
-				vreq.setFullWebappDaoFactory(wadf);
+				ModelAccess.on(vreq).setWebappDaoFactory(wadf);
+				ModelAccess.on(vreq).setBaseWebappDaoFactory(wadf);
 				vreq.setUnfilteredWebappDaoFactory(wadf);
-				vreq.setWebappDaoFactory(wadf);
+
+				dataset = DatasetFactory.create(new SparqlDatasetGraph(endpointURI));
 				vreq.setDataset(dataset);
-				vreq.setJenaOntModel(om);
-				vreq.setOntModelSelector(oms);
 			}
 		} catch (Throwable t) {
 			log.error("Unable to filter request to set up SDB connection", t);

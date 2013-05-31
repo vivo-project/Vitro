@@ -19,12 +19,12 @@ import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 
@@ -56,12 +56,10 @@ public abstract class AbstractPageHandler {
 		this.i18n = I18n.bundle(vreq);
 		this.ctx = vreq.getSession().getServletContext();
 
-		OntModelSelector oms = ModelContext.getUnionOntModelSelector(ctx);
-		userAccountsModel = oms.getUserAccountsModel();
-		unionModel = oms.getFullModel();
+		userAccountsModel = ModelAccess.on(ctx).getUserAccountsModel();
+		unionModel = ModelAccess.on(ctx).getOntModel(ModelID.UNION_FULL);
 
-		WebappDaoFactory wdf = (WebappDaoFactory) this.ctx
-				.getAttribute("webappDaoFactory");
+		WebappDaoFactory wdf = ModelAccess.on(ctx).getWebappDaoFactory();
 		userAccountsDao = wdf.getUserAccountsDao();
 		vclassDao = wdf.getVClassDao();
 		indDao = wdf.getIndividualDao();

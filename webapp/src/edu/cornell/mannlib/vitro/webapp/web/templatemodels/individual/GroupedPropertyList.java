@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.ApplicationConfigurationOntologyUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 /*
@@ -72,13 +73,27 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // so we cannot just rely on getting that list.
         List<ObjectProperty> populatedObjectPropertyList = subject
                 .getPopulatedObjectPropertyList();
+        
+        List<ObjectProperty> additions = ApplicationConfigurationOntologyUtils
+                .getAdditionalFauxSubpropertiesForList(
+                        populatedObjectPropertyList, vreq);
+        if (log.isDebugEnabled()) {
+            for (ObjectProperty t : additions) {
+                log.debug(t.getDomainPublic() + " " + t.getGroupURI());
+            }
+            log.debug("Added " + additions.size() + 
+                    " properties due to application configuration ontology");
+        }
+        
+        populatedObjectPropertyList.addAll(additions);        
+                
         propertyList.addAll(populatedObjectPropertyList);
 
         // If editing this page, merge in object properties applicable to the individual that are currently
         // unpopulated, so the properties are displayed to allow statements to be added to these properties.
         // RY In future, we should limit this to properties that the user has permission to add properties to.
         if (editing) {
-            mergeAllPossibleObjectProperties(populatedObjectPropertyList, propertyList);                   
+            mergeAllPossibleObjectProperties(populatedObjectPropertyList, propertyList);
         }
 
         // Now do much the same with data properties: get the list of populated data properties, then add in placeholders for missing ones 
@@ -108,7 +123,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                     subject, editing, populatedDataPropertyList,
                     populatedObjectPropertyList));
         }
-
+        
         if (!editing) {
             pruneEmptyProperties();
         }
@@ -351,7 +366,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
             } else {
                 String groupUriForProperty = p.getGroupURI();
                 boolean assignedToGroup = false;
-
                 if (groupUriForProperty != null) {
                     for (PropertyGroup pg : groupList) {
                         String groupUri = pg.getURI();
@@ -359,7 +373,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                             pg.getPropertyList().add(p);
                             assignedToGroup = true;
                             break;
-                        }
+                        }     
                     }
                 }
 

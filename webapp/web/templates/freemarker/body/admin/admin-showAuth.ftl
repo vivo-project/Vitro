@@ -7,24 +7,24 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
 <h2>Authorization Info</h2>
 
 <section id="show-auth" role="region">
-    <h4>Current user</h4>
+    <h4>${i18n().current_user}</h4>
     <table summary="Information about the current user">
     <#if currentUser?has_content>
             <tr><th>URI:</th><td>${currentUser.uri}</td></tr>
-            <tr><th>First name:</th><td>${currentUser.firstName}</td></tr>
-            <tr><th>Last name:</th><td>${currentUser.lastName}</td></tr>
-            <tr><th>Email:</th><td>${currentUser.emailAddress}</td></tr>
-            <tr><th>External Auth ID:</th><td>${currentUser.externalAuthId}</td></tr>
-            <tr><th>Login count:</th><td>${currentUser.loginCount}</td></tr>
+            <tr><th>${i18n().first_name}:</th><td>${currentUser.firstName}</td></tr>
+            <tr><th>${i18n().last_name}:</th><td>${currentUser.lastName}</td></tr>
+            <tr><th>${i18n().email_address}:</th><td>${currentUser.emailAddress}</td></tr>
+            <tr><th>${i18n().external_auth_id}:</th><td>${currentUser.externalAuthId}</td></tr>
+            <tr><th>${i18n().login_count}:</th><td>${currentUser.loginCount}</td></tr>
             <#list currentUser.permissionSetUris as role>
-                <tr><th>Role:</th><td>${role}</td></tr>
+                <tr><th>${i18n().user_role}:</th><td>${role}</td></tr>
             </#list>
     <#else>
-        <tr><th>Not logged in</th></tr>
+        <tr><th>${i18n().not_logged_in}</th></tr>
     </#if>
     </table>
    
-    <h4>Identifiers:</h4>
+    <h4>${i18n().identifiers}:</h4>
     <table summary="Identifiers">
         <#list identifiers as identifier>
             <tr>
@@ -34,11 +34,11 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
     </table>
 
     <h4>
-        AssociatedIndividuals: 
+        ${i18n().associated_individuals}: 
         <#if matchingProperty??>
-            (match by ${matchingProperty})
+            (${i18n().match_by(matchingProperty)})
         <#else>
-            (matching property is not defined)
+            (${i18n().matching_prop_not_defined})
         </#if>
     </h4>
     <table summary="Associated Individuals">
@@ -47,18 +47,18 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
                 <tr>
                     <td>${associatedIndividual.uri}</td>
                     <#if associatedIndividual.editable>
-                        <td>May edit</td>
+                        <td>${i18n().may_edit}</td>
                     <#else>
-                        <td>May not edit</td>
+                        <td>${i18n().may_not_edit}</td>
                     </#if>
                 </tr>
             </#list>
         <#else>
-            <tr><td>none</td></tr>
+            <tr><td>${i18n().none}</td></tr>
         </#if>
     </table>
 
-    <h4>Identifier factories:</h4>
+    <h4>${i18n().identifier_factories}:</h4>
     <table summary="Active Identifier Factories">
         <#list factories as factory>
             <tr>
@@ -67,7 +67,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
         </#list>
     </table>
 
-    <h4>Policies:</h4>
+    <h4>${i18n().policies}:</h4>
     <table summary="Policies" width="100%">
         <#list policies as policy>
             <tr>
@@ -76,7 +76,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/showAuth.css" /
         </#list>
     </table>
 
-    <h4>Authenticator:</h4>
+    <h4>${i18n().authenticator}:</h4>
     <table summary="Authenticator" width="100%">
         <tr>
             <td>${authenticator}</td>

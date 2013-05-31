@@ -7,9 +7,9 @@
 
 <h2 style="float:left">
 <#escape x as x?html>
-    Search results for '${querytext}'
-    <#if classGroupName?has_content>limited to type '${classGroupName}'</#if>
-    <#if typeName?has_content>limited to type '${typeName}'</#if>
+    ${i18n().search_results_for} '${querytext}'
+    <#if classGroupName?has_content>${i18n().limited_to_type} '${classGroupName}'</#if>
+    <#if typeName?has_content>${i18n().limited_to_type} '${typeName}'</#if>
 </#escape>
 <script type="text/javascript">
 	var url = window.location.toString();	
@@ -23,6 +23,7 @@
 	var urlsBase = '${urls.base}';
 </script>
 </h2>
+<<<<<<< HEAD
 
 <span id="downloadResults" title="Download Results">
 	<img id="downloadIcon" src="images/download-icon.png" alt="Download Results"  />
@@ -32,13 +33,16 @@
 
 <div class="contentsBrowseGroup" style="clear:left">
 
+<span id="searchHelp"><a href="${urls.base}/searchHelp" title="${i18n().search_help}">${i18n().not_expected_results}</a></span>
+<div class="contentsBrowseGroup">
+
     <#-- Refinement links -->
     <#if classGroupLinks?has_content>
         <div class="searchTOC">
-            <h4>Display only</h4>           
+            <h4>${i18n().display_only}</h4>           
             <ul>           
             <#list classGroupLinks as link>
-                <li><a href="${link.url}" title="class group link">${link.text}</a><span>(${link.count})</span></li>
+                <li><a href="${link.url}" title="${i18n().class_group_link}">${link.text}</a><span>(${link.count})</span></li>
             </#list>
             </ul>           
         </div>
@@ -47,13 +51,13 @@
     <#if classLinks?has_content>
         <div class="searchTOC">
             <#if classGroupName?has_content>
-                <h4>Limit ${classGroupName} to</h4>
+                <h4>${i18n().limit} ${classGroupName} to</h4>
             <#else>
-                <h4>Limit to</h4>
+                <h4>${i18n().limit_to}</h4>
             </#if>
             <ul>           
             <#list classLinks as link>
-                <li><a href="${link.url}" title="class link">${link.text}</a><span>(${link.count})</span></li>
+                <li><a href="${link.url}" title="${i18n().class_link}">${link.text}</a><span>(${link.count})</span></li>
             </#list>
             </ul>
         </div>
@@ -73,15 +77,15 @@
     <#if (pagingLinks?size > 0)>
         <div class="searchpages">
             Pages: 
-            <#if prevPage??><a class="prev" href="${prevPage}" title="previous">Previous</a></#if>
+            <#if prevPage??><a class="prev" href="${prevPage}" title="${i18n().previous}">${i18n().previous}</a></#if>
             <#list pagingLinks as link>
                 <#if link.url??>
-                    <a href="${link.url}" title="page link">${link.text}</a>
+                    <a href="${link.url}" title="${i18n().page_link}">${link.text}</a>
                 <#else>
                     <span>${link.text}</span> <#-- no link if current page -->
                 </#if>
             </#list>
-            <#if nextPage??><a class="next" href="${nextPage}" title="next">Next</a></#if>
+            <#if nextPage??><a class="next" href="${nextPage}" title="${i18n().next_capitalized}">${i18n().next_capitalized}</a></#if>
         </div>
     </#if>
     <br />

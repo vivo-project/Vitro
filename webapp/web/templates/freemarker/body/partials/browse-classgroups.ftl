@@ -24,7 +24,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseClassGrou
                 <#elseif classGroup.uri == group.uri>
                     <#assign activeGroup = selected />
                 </#if>
-                <li role="listitem"><a ${activeGroup}href="${urls.currentPage}?classgroupUri=${group.uri?url}#browse" title="Browse ${group.displayName?capitalize}" data-uri="${group.uri}" data-count="${group.individualCount}">${group.displayName?capitalize} <span class="count-classes">(${group.individualCount})</span></a></li>
+                <li role="listitem"><a ${activeGroup}href="${urls.currentPage}?classgroupUri=${group.uri?url}#browse" title="${i18n().browse_capitalized} ${group.displayName?capitalize}" data-uri="${group.uri}" data-count="${group.individualCount}">${group.displayName?capitalize} <span class="count-classes">(${group.individualCount})</span></a></li>
             </#if>
         </#list>
     </#assign>
@@ -32,7 +32,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseClassGrou
     <#-- Display the class group browse only if we have at least one populated class group -->
     <#if firstPopulatedClassGroup??>
         <section id="browse" role="region">
-            <h4>Browse by</h4>
+            <h4>${i18n().browse_by}</h4>
             
             <ul id="browse-classgroups" role="list">
                 ${classGroupList}
@@ -77,14 +77,14 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseClassGrou
     <#else>
         <#-- Would be nice to update classgroups-checkForData.ftl with macro so it could be used here as well -->
         <#-- <#include "classgroups-checkForData.ftl"> -->
-        <h3>There is currently no content in the system, or you need to create class groups and assign your classes to them.</h3>
+        <h3>${i18n().no_content_create_groups_classes}</h3>
         
         <#if user.loggedIn>
             <#if user.hasSiteAdminAccess>
-                <p>You can <a href="${urls.siteAdmin}" title="Manage content">add content and manage this site</a> from the Site Administration page.</p>
+                <p>${i18n().you_can} <a href="${urls.siteAdmin}" title="${i18n().add_content_manage_site}">${i18n().add_content_manage_site}</a> ${i18n().from_site_admin_page}</p>
             </#if>
         <#else>
-            <p>Please <a href="${urls.login}" title="log in to manage this site">log in</a> to manage content.</p>
+            <p>${i18n().please} <a href="${urls.login}" title="${i18n().login_to_manage_site}">${i18n().log_in}</a> ${i18n().to_manage_content}</p>
         </#if>
     </#if>
 </#macro>

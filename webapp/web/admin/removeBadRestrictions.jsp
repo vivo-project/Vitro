@@ -4,12 +4,13 @@
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.dao.ModelAccess"%>
 <% request.setAttribute("requestedActions", SimplePermission.USE_MISCELLANEOUS_CURATOR_PAGES.ACTION); %>
 <vitro:confirmAuthorization />
 
 <%
     if (request.getParameter("execute") != null) {
-    	OntModel ontModel = (OntModel) getServletContext().getAttribute(JenaBaseDao.ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME);
+     	OntModel ontModel = ModelAccess.on(getServletContext()).getBaseOntModel();
     	int results = doRemoval(ontModel);
     	request.setAttribute("removalCount", results);
     }
@@ -66,7 +67,7 @@
             "    FILTER(afn:bnode(?bnode) = \"" + bnodeId + "\")\n" +
             "}";
             
-        OntModel ontModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+    	OntModel ontModel = ModelAccess.on(getServletContext()).getBaseOntModel();
         Model conceptDescription = ModelFactory.createDefaultModel();
         try {
             ontModel.enterCriticalSection(Lock.READ);

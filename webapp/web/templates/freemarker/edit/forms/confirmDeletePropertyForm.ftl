@@ -16,7 +16,7 @@
 <#assign deletionTemplateName = editConfiguration.deleteTemplate/>
 
 <form action="${editConfiguration.deleteProcessingUrl}" method="get">
-    <h2>Are you sure you want to delete the following entry from <em>${editConfiguration.propertyName}</em>?</h2>
+    <h2>${i18n().confirm_entry_deletion_from} <em>${editConfiguration.propertyName}</em>?</h2>
     
     <p class="toBeDeleted ${toBeDeletedClass}">
         <#if editConfiguration.objectProperty = true>
@@ -42,9 +42,9 @@
     <#if editConfiguration.objectProperty = true>
     <p class="submit">
     </#if>
-        <input type="submit" id="submit" value="Delete" role="button"/>
+        <input type="submit" id="submit" value="${i18n().delete_button}" role="button"/>
         or 
-        <a class="cancel" title="Cancel" href="${editConfiguration.cancelUrl}">Cancel</a>
+        <a class="cancel" title="${i18n().cancel_title}" href="${editConfiguration.cancelUrl}">${i18n().cancel_link}</a>
     <#if editConfiguration.objectProperty = true>
     </p>
     </#if>

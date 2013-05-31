@@ -22,21 +22,21 @@
    
     <#if propType == "group">
         <form action="editForm" method="get">
-            <input type="submit" class="form-button" id="addProperty" value="Add new property group"/>
+            <input type="submit" class="form-button" id="addProperty" value="${i18n().add_property_group}"/>
             <input type="hidden" name="controller" value="PropertyGroup"/>
         </form>
-        <div id="expandLink"><span id="expandAll" ><a href="javascript:" title="hide/show properties">hide properties</a></span></div>
+        <div id="expandLink"><span id="expandAll" ><a href="javascript:" title="${i18n().hide_show_properties}">${i18n().hide_properties}</a></span></div>
     <#else>
         <form name="classHierarchyForm" id="classHierarchyForm" action="show<#if propType == "object">Object<#else>Data</#if>PropertyHierarchy" method="post" role="classHierarchy">
-        <label id="displayOptionLabel" class="inline">Display Options</label>
+        <label id="displayOptionLabel" class="inline">${i18n().display_options}</label>
             <select id="displayOption" name="displayOption">
-                <option value="hierarchy" <#if displayOption == "asserted">selected</#if> >${propType?capitalize} Property Hierarchy</option>
-                <option value="all" <#if displayOption == "all">selected</#if> >All ${propType?capitalize} Properties</option>
-                <option value="group" <#if displayOption == "group">selected</#if> >Property Groups</option>
+                <option value="hierarchy" <#if displayOption == "asserted">selected</#if> >${propType?capitalize} ${i18n().property_hierarchy}</option>
+                <option value="all" <#if displayOption == "all">selected</#if> >${i18n().all_x_properties(propType?capitalize)}</option>
+                <option value="group" <#if displayOption == "group">selected</#if> >${i18n().property_groups}</option>
             </select>
-            <input type="submit" class="form-button" id="addProperty" value="Add new <#if propType == "object">object<#else>data</#if> property"/>
+            <input type="submit" class="form-button" id="addProperty" value="${i18n().add_new} <#if propType == "object">${i18n().object}<#else>${i18n().data}</#if> ${i18n().property}"/>
         </form>
-        <div id="expandLink"><span id="expandAll" ><a href="#" title="expand all">expand all</a></span></div>
+        <div id="expandLink"><span id="expandAll" ><a href="#" title="${i18n().expand_all}">${i18n().expand_all}</a></span></div>
     </#if>
 
     <section id="container">

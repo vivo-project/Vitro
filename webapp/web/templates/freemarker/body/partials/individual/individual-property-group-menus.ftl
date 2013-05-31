@@ -19,7 +19,7 @@
                         	<#assign groupnameHtmlId = p.createPropertyGroupHtmlId(groupname) >
                             <#-- capitalize will capitalize each word in the name; cap_first only the first. We may need a custom
                             function to capitalize all except function words. -->
-                            <li role="listitem"><a href="#${groupnameHtmlId}" title="group name">${groupname?capitalize}</a></li>
+                            <li role="listitem"><a href="#${groupnameHtmlId}" title="${i18n().group_name}">${groupname?capitalize}</a></li>
                         </#if>
                     </#list>
                 </ul>
@@ -33,8 +33,8 @@
     
     <section class="property-group" role="region">
         <nav class="scroll-up" role="navigation">
-            <a href="#branding" title="scroll up">
-                <img src="${urls.images}/individual/scroll-up.gif" alt="scroll to property group menus" />
+            <a href="#branding" title="${i18n().scroll_to_menus}">
+                <img src="${urls.images}/individual/scroll-up.gif" alt="${i18n().scroll_to_menus}" />
             </a>
         </nav>
         
@@ -44,7 +44,7 @@
         	<#assign groupNameHtmlId = p.createPropertyGroupHtmlId(groupName) >
             <h2 id="${groupNameHtmlId}">${groupName?capitalize}</h2>
         <#else>
-            <h2 id="properties">Properties</h2>
+            <h2 id="properties">${i18n().properties_capitalized}</h2>
         </#if>
         
         <#-- List the properties in the group -->

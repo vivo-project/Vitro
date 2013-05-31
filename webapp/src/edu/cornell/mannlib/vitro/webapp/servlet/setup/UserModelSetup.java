@@ -6,7 +6,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -14,6 +13,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
@@ -65,7 +65,7 @@ public class UserModelSetup extends JenaDataSourceSetupBase
         	userAccountsModel.add(userAccountsDbModel);
             userAccountsModel.getBaseModel().register(
                     new ModelSynchronizer(userAccountsDbModel));
-            ctx.setAttribute("userAccountsOntModel", userAccountsModel);
+            ModelAccess.on(ctx).setUserAccountsModel(userAccountsModel);
                         
         } catch (Throwable t) {
             log.error("Unable to load user accounts model from DB", t);

@@ -6,9 +6,9 @@
 
 <#if spamReason??>
     <section id="error-alert" role="alert">
-        <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon" />
+        <img src="${urls.images}/iconAlert.png" width="24" height="24" alt="${i18n().error_alert_icon}" />
         
-        <p>REJECTED - SPAM</p>
+        <p>${i18n().rejected_spam}</p>
         <p>${spamReason}</p>
     </section>
 </#if>

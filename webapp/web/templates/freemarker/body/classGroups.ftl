@@ -19,14 +19,14 @@
                             <#list classGroup.classes as class> 
                                 <#-- Only render populated classes -->
                                 <#if (class.individualCount > 0)>
-                                    <li role="listitem"><a href="${class.url}" title="class name">${class.name}</a> (${class.individualCount})</li>
+                                    <li role="listitem"><a href="${class.url}" title="${i18n().class_name}">${class.name}</a> (${class.individualCount})</li>
                                 <#assign classCount = classCount + 1 >
                                 </#if>
                                 <#if (classCount > 34) && !splitGroup >
                                    <#assign splitGroup = true >
                                    </ul></div>
                                    <div class="class-group">
-                                       <h2>${classGroup.displayName} (cont'd)</h2>
+                                       <h2>${classGroup.displayName} (${i18n().continued})</h2>
                                           <ul role="list">
                                 </#if>
                             </#list>

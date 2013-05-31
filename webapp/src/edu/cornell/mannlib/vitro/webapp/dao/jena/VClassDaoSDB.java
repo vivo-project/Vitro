@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+
 import com.hp.hpl.jena.ontology.AnnotationProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.query.Dataset;
@@ -13,9 +14,11 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -53,9 +56,9 @@ public class VClassDaoSDB extends VClassDaoJena {
         try {
             if ((group != null) && (group.getURI() != null)) {                                
                 Resource groupRes = ResourceFactory.createResource(group.getURI());
-                AnnotationProperty inClassGroup = getOntModel().getAnnotationProperty(VitroVocabulary.IN_CLASSGROUP);
+                Property inClassGroup = ResourceFactory.createProperty(VitroVocabulary.IN_CLASSGROUP);
                 if (inClassGroup != null) {
-                    ClosableIterator annotIt = getOntModel().listStatements((OntClass)null,inClassGroup,groupRes);
+                    StmtIterator annotIt = getOntModel().listStatements((Resource)null,inClassGroup, groupRes);
                     try {
                         while (annotIt.hasNext()) {
                             try {
@@ -91,7 +94,7 @@ public class VClassDaoSDB extends VClassDaoJena {
                                     	Model aboxModel = getOntModelSelector().getABoxModel();
                                     	aboxModel.enterCriticalSection(Lock.READ);
                                     	try {
-	                                        ClosableIterator countIt = aboxModel.listStatements(null,RDF.type,cls);
+	                                        StmtIterator countIt = aboxModel.listStatements(null,RDF.type,cls);
 	                                        try {
 	                                            if (countIt.hasNext()) {
 	                                            	classIsInstantiated = true;

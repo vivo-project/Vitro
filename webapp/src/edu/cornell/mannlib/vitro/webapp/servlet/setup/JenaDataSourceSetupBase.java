@@ -471,7 +471,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         } else if (TripleStoreType.SDB.equals(type)) {
             StoreDesc storeDesc = new StoreDesc(
                     LayoutType.LayoutTripleNodesHash, DatabaseType.fetch(dbtypeStr));
-            DataSource bds = WebappDaoSetup.makeC3poDataSource(
+            DataSource bds = ContentModelSetup.makeC3poDataSource(
                     getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
 //            DataSource bds = WebappDaoSetup.makeBasicDataSource(
 //                    getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);

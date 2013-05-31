@@ -41,7 +41,7 @@ public interface ObjectPropertyStatementDao {
     public Map<String, String> getMostSpecificTypesInClassgroupsForIndividual(String subjectUri);
 
 	List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
-			String subjectUri, String propertyUri, String objectKey,
+			String subjectUri, String propertyUri, String objectKey, String rangeUri,
 			String queryString, Set<String> constructQueryStrings,
 			String sortDirection);
 

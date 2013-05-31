@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsRootUser;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 
 /**
  * Can we tell whether a user is logged in as root?
@@ -56,7 +57,7 @@ public class IsRootUserFactoryTest extends AbstractTestClass {
 		wdf.setUserAccountsDao(uaDao);
 
 		ctx = new ServletContextStub();
-		ctx.setAttribute("webappDaoFactory", wdf);
+		ModelAccess.on(ctx).setWebappDaoFactory(wdf);
 
 		session = new HttpSessionStub();
 		session.setServletContext(ctx);

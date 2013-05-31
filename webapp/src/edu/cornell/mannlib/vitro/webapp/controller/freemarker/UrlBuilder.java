@@ -303,7 +303,7 @@ public class UrlBuilder {
     }
     
     public static String urlEncode(String str) {
-        String encoding = "ISO-8859-1";
+        String encoding = "UTF-8";
         String encodedUrl = null;
         try {
             encodedUrl = URLEncoder.encode(str, encoding);
@@ -314,7 +314,7 @@ public class UrlBuilder {
     }
 
     public static String urlDecode(String str) {
-        String encoding = "ISO-8859-1";
+        String encoding = "UTF-8";
         String decodedUrl = null;
         try {
             decodedUrl = URLDecoder.decode(str, encoding);

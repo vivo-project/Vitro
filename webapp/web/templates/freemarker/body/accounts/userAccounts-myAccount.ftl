@@ -28,7 +28,7 @@
 
     <#if errorMessage?has_content>
         <section id="error-alert" role="alert">
-            <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="${strings.alt_error_alert}" />
+            <img src="${urls.images}/iconAlert.png" width="24" height="24" alt="${strings.alt_error_alert}" />
             <p>${errorMessage}</p>
         </section>
     </#if>

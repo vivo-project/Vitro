@@ -32,10 +32,10 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -100,8 +100,7 @@ public class PermissionSetsLoader implements ServletContextListener {
 			this.ctx = ctx;
 			this.ss = ss;
 
-			this.userAccountsModel = ModelContext.getBaseOntModelSelector(ctx)
-					.getUserAccountsModel();
+			this.userAccountsModel = ModelAccess.on(ctx).getUserAccountsModel();
 			this.permissionSetType = this.userAccountsModel
 					.getProperty(VitroVocabulary.PERMISSIONSET);
 
@@ -274,8 +273,7 @@ public class PermissionSetsLoader implements ServletContextListener {
 			this.ctx = ctx;
 			this.ss = ss;
 
-			WebappDaoFactory wadf = (WebappDaoFactory) ctx
-					.getAttribute("webappDaoFactory");
+			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
 			if (wadf == null) {
 				throw new IllegalStateException(
 						"No webappDaoFactory on the servlet context");

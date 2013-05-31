@@ -250,6 +250,11 @@
   <copyField source="nameRaw" dest="acNameStemmed" /> 
   <copyField source="nameRaw" dest="nameText" />
   <!--  nameLowercaseSingleValued is not copied from nameRaw becasue nameRaw might have multiple values -->
+  
+  <!-- field for hash signature, used for comparing to versions from external caches -->
+  <field name="etag" type="string" stored="true" indexed="false" multiValued="false" />
+
+  
      
   <!-- ****************************  End Vitro Fields *************************** -->
   <!-- ****************************  Dynamic Fields *************************** -->

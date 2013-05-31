@@ -22,6 +22,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 
 /**
@@ -42,14 +43,7 @@ public class AssembleModelsSetup implements ServletContextListener {
 	private String SYNTAX = "N3";
 	
 	public void contextInitialized(ServletContextEvent sce) {
-	    
-		OntModel jenaOntModel = null;
-		try {
-			jenaOntModel = (OntModel) sce.getServletContext().getAttribute("baseOntModel");
-		} catch (Exception e) {
-			log.error("No baseOntModel found to which to attach assembled models");
-			return;
-		}
+		OntModel jenaOntModel = ModelAccess.on(sce.getServletContext()).getBaseOntModel();
 		// read assemblers out of assemblers directory
 		Set pathSet = sce.getServletContext().getResourcePaths(ASSEMBLERS_DIR_PATH);
 		for (String path : (Set<String>)pathSet) {

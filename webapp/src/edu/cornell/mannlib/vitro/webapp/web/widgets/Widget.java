@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
@@ -107,6 +108,7 @@ public abstract class Widget {
     
     private String processMacroToString(Environment env, String widgetName, Macro macro, Map<String, Object> map) {   
         StringWriter out = new StringWriter();
+        
         try {
             String templateString = macro.getChildNodes().get(0).toString();
             // NB Using this method of creating a template from a string does not allow the widget template to import
@@ -117,8 +119,16 @@ public abstract class Widget {
             // the same key, e.g., "widgetTemplate", since one putTemplate() call will clobber a previous one.
             // We need to give each widget macro template a unique key in the StringTemplateLoader, and check 
             // if it's already there or else add it. Leave this for later.
-            Template template = new Template("widget", new StringReader(templateString), env.getConfiguration());          
-            template.process(map, out);
+            Template template = new Template("widget", new StringReader(templateString), env.getConfiguration());
+            
+            // JB KLUGE The widget is processed in its own environment, which doesn't include these custom attributes.
+            // JB KLUGE Put them in.
+            Environment widgetEnv = template.createProcessingEnvironment(map, out);
+            ServletRequest request = (ServletRequest) env.getCustomAttribute("request");
+			widgetEnv.setCustomAttribute("request", request);
+            widgetEnv.setCustomAttribute("context", env.getCustomAttribute("context"));
+            widgetEnv.setLocale(request.getLocale());
+            widgetEnv.process();
         } catch (Exception e) {
             log.error("Could not process widget " + widgetName, e);
         }

@@ -115,13 +115,6 @@ public class DisplayVocabulary {
     public static final String USE_TBOX_MODEL_PARAM = "useThisTboxModel";
     public static final String USE_DISPLAY_MODEL_PARAM = "useThisDisplayModel";
     
-    //Attribute values used to store display tbox/display display model in servlet context
-    public static final String CONTEXT_DISPLAY_TBOX = "displayOntModelTBOX";
-    public static final String CONTEXT_DISPLAY_DISPLAY = "displayOntModelDisplayModel";
-    
-    /** Key for display model in request, session or context attributes */
-    public static final String DISPLAY_ONT_MODEL = "displayOntModel";
-    
     //URL for menu management
     public static final String PROCESS_MENU_MANAGEMENT_URL = "/menuManagementEdit";
     public static final String REORDER_MENU_URL = PROCESS_MENU_MANAGEMENT_URL + "?cmd=Reorder&" + SWITCH_TO_DISPLAY_MODEL + "=true";

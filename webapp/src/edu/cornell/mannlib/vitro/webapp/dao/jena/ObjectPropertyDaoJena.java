@@ -27,6 +27,7 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -38,6 +39,7 @@ import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
+import com.hp.hpl.jena.sdb.util.Pair;
 
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -859,12 +861,16 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         }           
     }
     
-    Map<ObjectProperty, String> customListViewConfigFileMap = null;
+    //TODO private void addPropertyClassCombinationsToListViewMap(HashMap)    
+    
+    // Map key is pair of object property and range class URI
+    // If range is unspecified, OWL.Thing.getURI() is used in the key.
+    Map<Pair<ObjectProperty, String>, String> customListViewConfigFileMap = null;
     
     @Override
     public String getCustomListViewConfigFileName(ObjectProperty op) {
         if (customListViewConfigFileMap == null) {
-            customListViewConfigFileMap = new HashMap<ObjectProperty, String>();
+            customListViewConfigFileMap = new HashMap<Pair<ObjectProperty, String>, String>();
             OntModel displayModel = getOntModelSelector().getDisplayModel();
             //Get all property to list view config file mappings in the system
             QueryExecution qexec = QueryExecutionFactory.create(listViewConfigFileQuery, displayModel); 
@@ -883,12 +889,18 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 	}
                 } else {
                     String filename = soln.getLiteral("filename").getLexicalForm();
-                    customListViewConfigFileMap.put(prop, filename);     
+                    customListViewConfigFileMap.put(new Pair<ObjectProperty, String>(prop, OWL.Thing.getURI()), filename);     
                 }
             }       
             qexec.close();
-        }        
-        return customListViewConfigFileMap.get(op);
+        }      
+        
+        String customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<ObjectProperty, String>(op, op.getRangeVClassURI()));
+        if (customListViewConfigFileName == null) {
+            customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<ObjectProperty, String>(op, OWL.Thing.getURI()));
+        }
+        
+        return customListViewConfigFileName;
     }
 
 }

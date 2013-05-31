@@ -28,6 +28,7 @@ import stubs.javax.servlet.http.HttpSessionStub;
 import stubs.org.apache.solr.client.solrj.SolrServerStub;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 
 /**
@@ -106,8 +107,7 @@ public class JsonServletTest extends AbstractTestClass {
 		resp = new HttpServletResponseStub();
 
 		wadf = new WebappDaoFactoryStub();
-		req.setAttribute("webappDaoFactory", wadf);
-		ctx.setAttribute("webappDaoFactory", wadf);
+		ModelAccess.on(ctx).setWebappDaoFactory(wadf);
 
 		vcDao = new VClassDaoStub();
 		wadf.setVClassDao(vcDao);

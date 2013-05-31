@@ -6,18 +6,18 @@
 
 <#if dataInput?has_content>
     <section class="pageBodyGroup" role="region">
-        <h3>Data Input</h3>
+        <h3>${i18n().data_input}</h3>
 
         <form id="addIndividualClass" action="${dataInput.formAction}" method="get">
             <select id="VClassURI" name="typeOfNew" class="form-item long-options" role="select">
                 <@form.optionGroups groups=dataInput.groupedClassOptions />
             </select>
             <input type="hidden" name="editForm" value="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.NewIndividualFormGenerator" role="input" />
-            <input type="submit" id="submit" value="Add individual of this class" role="button" />
+            <input type="submit" id="submit" value="${i18n().add_individual_of_class}" role="button" />
         </form>
         
         <section id="addClassBubble" role="region">
-            <p>Please create a <a title="Create a class gorup" href="${urls.base}/editForm?controller=Classgroup">class group</a> and associate classes with the group created.</p>
+            <p>${i18n().please_create} <a title="${i18n().create_classgroup}" href="${urls.base}/editForm?controller=Classgroup">${i18n().a_classgroup}</a> ${i18n().associate_classes_with_group}</p>
         </section>
     </section>
 </#if>

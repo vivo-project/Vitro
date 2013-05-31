@@ -4,19 +4,19 @@
 
 <#if indexCacheRebuild?has_content>
     <section class="pageBodyGroup indexCacheRebuild" role="region">
-        <h3>Refresh Content</h3>
+        <h3>${i18n().refresh_content}</h3>
         
         <ul role="navigation">                        
             <#if indexCacheRebuild.rebuildSearchIndex?has_content>
-                <li role="listitem"><a href="${indexCacheRebuild.rebuildSearchIndex }" title="Rebuild search index">Rebuild search index</a></li>
+                <li role="listitem"><a href="${indexCacheRebuild.rebuildSearchIndex }" title="${i18n().rebuild_search_index}">${i18n().rebuild_search_index}</a></li>
             </#if>
             
             <#if indexCacheRebuild.rebuildVisCache?has_content>
-                <li role="listitem"><a href="${indexCacheRebuild.rebuildVisCache}" title="Rebuild visualization cache">Rebuild visualization cache</a></li>
+                <li role="listitem"><a href="${indexCacheRebuild.rebuildVisCache}" title="${i18n().rebuild_vis_cache}">${i18n().rebuild_vis_cache}</a></li>
             </#if>
             
             <#if indexCacheRebuild.recomputeInferences?has_content>
-                <li role="listitem"><a href="${indexCacheRebuild.recomputeInferences}" title="Recompute inferences">Recompute inferences</a></li>
+                <li role="listitem"><a href="${indexCacheRebuild.recomputeInferences}" title="${i18n().recompute_inferences}">${i18n().recompute_inferences_mixed_caps}</a></li>
             </#if>
         </ul>
     </section>

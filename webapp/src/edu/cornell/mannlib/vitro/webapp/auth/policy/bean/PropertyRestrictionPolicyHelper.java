@@ -26,6 +26,7 @@ import com.hp.hpl.jena.rdf.model.impl.Util;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
@@ -256,17 +257,23 @@ public class PropertyRestrictionPolicyHelper {
 		log.debug("can modify resource '" + resourceUri + "'");
 		return true;
 	}
+	
+	public boolean canDisplayPredicate(String predicateUri, RoleLevel userRole) {
+	    return canDisplayPredicate(predicateUri, null, userRole);
+	}
 
 	/**
 	 * If display of a predicate is restricted, the user's role must be at least
 	 * as high as the restriction level.
 	 */
-	public boolean canDisplayPredicate(String predicateUri, RoleLevel userRole) {
+	public boolean canDisplayPredicate(String predicateUri, String rangeUri, RoleLevel userRole) {
 		if (predicateUri == null) {
 			log.debug("can't display predicate: predicateUri was null");
 			return false;
 		}
 
+		// TODO insert combo logic here
+		
 		RoleLevel displayThreshold = displayThresholdMap.get(predicateUri);
 		if (isAuthorized(userRole, displayThreshold)) {
 			log.debug("can display predicate: '" + predicateUri
@@ -344,7 +351,7 @@ public class PropertyRestrictionPolicyHelper {
 			StartupStatus ss = StartupStatus.getBean(ctx);
 
 			try {
-				OntModel model = (OntModel) ctx.getAttribute("jenaOntModel");
+				OntModel model = ModelAccess.on(ctx).getJenaOntModel();
 				if (model == null) {
 					throw new NullPointerException(
 							"jenaOntModel has not been initialized.");

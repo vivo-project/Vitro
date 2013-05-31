@@ -27,19 +27,19 @@
 	<#assign propertyNameForDisplay = editConfiguration.objectPropertyNameForDisplay />
 </#if>
 <#if editMode = "edit" >
-	<#assign titleVerb = "Edit" />
+	<#assign titleVerb = "${i18n().edit_capitalized}" />
 	<#assign objectLabel = editConfiguration.pageData.objectLabel />
 	<#assign selectedObjectUri = editConfiguration.objectUri />
-	<#assign submitButtonText = "Save Change" />
+	<#assign submitButtonText = "${i18n().save_button}" />
 <#else>
-	<#assign titleVerb = "Add" >
+	<#assign titleVerb = "${i18n().add_capitalized}" >
 	<#assign objectLabel = "" />
 	<#assign selectedObjectUri = ""/>
-	<#assign submitButtonText = "Create Entry" />
+	<#assign submitButtonText = "${i18n().create_entry}" />
 </#if>
 
 <#if editConfiguration.formTitle?contains("collaborator") >
-    <#assign formTitle = "Select an existing Collaborator for ${editConfiguration.subjectName}" />
+    <#assign formTitle = "${i18n().select_existing_collaborator(editConfiguration.subjectName)}" />
 <#else>
     <#assign formTitle = editConfiguration.formTitle />
 </#if>
@@ -58,16 +58,16 @@
              
             <#---This section should become autocomplete instead--> 
             <p>
-				<label for="object"> ${propertyNameForDisplay?capitalize} Name<span class='requiredHint'> *</span></label>
+				<label for="object"> ${propertyNameForDisplay?capitalize} ${i18n().name_capitalized}<span class='requiredHint'> *</span></label>
 				<input class="acSelector" size="50"  type="text" id="object" name="objectLabel" acGroupName="object" value="${objectLabel}" />
 			</p>
 								
 			<div class="acSelection" acGroupName="object" > 
 				<p class="inline">
-					<label>Selected:</label> 
+					<label>${i18n().selected}:</label> 
 					<span class="acSelectionInfo"></span>
-					<a href="" class="verifyMatch"  title="verify match">(Verify this match</a> or 
-                    <a href="#" class="changeSelection" id="changeSelection">change selection)</a>
+					<a href="" class="verifyMatch"  title="${i18n().verify_this_match}">(${i18n().verify_this_match}</a> ${i18n().or} 
+                    <a href="#" class="changeSelection" id="changeSelection">${i18n().change_selection})</a>
                 </p>
                 <input class="acUriReceiver" type="hidden" id="objectVar" name="objectVar" value="${selectedObjectUri}" />
 			</div>
@@ -78,11 +78,11 @@
                 <input type="submit" id="submit" value="${submitButtonText}" role="button" disabled="disabled"/>
            
                 <span class="or"> or </span>
-                <a title="Cancel" class="cancel" href="${cancelUrl}">Cancel</a>
+                <a title="${i18n().cancel_title}" class="cancel" href="${cancelUrl}">${i18n().cancel_link}</a>
             </p>
         </form>
     <#else>
-        <p> There are no entries in the system from which to select.  </p>  
+        <p> ${i18n().there_are_no_entries_for_selection}  </p>  
     </#if>
 </#if>
 <p>&nbsp;</p>
@@ -92,7 +92,7 @@
 </#if>
 
 <#if editConfiguration.propertySelectFromExisting = false && editConfiguration.propertyOfferCreateNewOption = false>
-<p>This property is currently configured to prohibit editing. </p>
+<p>${i18n().editing_prohibited} </p>
 </#if>
 
 

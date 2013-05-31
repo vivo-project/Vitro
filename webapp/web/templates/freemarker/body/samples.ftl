@@ -9,60 +9,58 @@
 
 <@widget name="test" />
 
-<h3>Dates</h3>
+<h3>${i18n().dates}</h3>
 <ul>
-    <li>Current date & time: ${.now?datetime}</li>
-    <li>Current date: ${.now?date}</li>
-    <li>Current time: ${.now?time}</li>
+    <li>${i18n().current_date_time} ${.now?datetime}</li>
+    <li>${i18n().current_date} ${.now?date}</li>
+    <li>${i18n().current_time} ${.now?time}</li>
 </ul>
-<h3>Dates</h3>
 
-
-<h3>Formatted datetime</h3>
+<h3>${i18n().formatted_date_time}</h3>
 <p><p>${dt.xsdDateTimeToYear(xsddatetime)}</p>
 
-<h3>Apples</h3>
+<h3>${i18n().apples}</h3>
 <ul>
 <#list apples as apple>
     <li>${apple}</li>
 </#list>
 </ul>
 
-<h3>Fruit</h3>
+<h3>${i18n().fruit}</h3>
 <ul>
 <#list fruit as f>
     <li>${f}</li>
 </#list>
 </ul>
 
-<p><strong>Animal:</strong> ${animal}</p>
+<p><strong>${i18n().animal}</strong> ${animal}</p>
 
-<p><strong>Book Title:</strong> ${bookTitle}</p>
+<p><strong>${i18n().book_title}</strong> ${bookTitle}</p>
 
 
-<h3>Zoo 1</h3>
+<h3>${i18n().zoo_one}</h3>
 <ul>
 <#list zoo1.animals as animal>
     <li>${animal}</li>
 </#list>
 </ul>
 
-<h3>Zoo 2</h3>
+<h3>${i18n().zoo_two}</h3>
 <ul>
 <#list zoo2.animals as animal>
     <li>${animal}</li>
 </#list>
 </ul>
 
-<p><strong>Berries: </strong>${berries}</p>
+<p><strong>${i18n().berries} </strong>${berries}</p>
 
 <p>${year?number?c}</p>
 
-<h3>Raw String Literals</h3>
+<h3>${i18n().raw_string_literals}</h3>
 <p>${r"#{title}"}</p>
 <p>${r"${title}"}</p>
 
-<h2>Containers do not pick up changes to the value of their elements</h2>
+<h2>${i18n().containers_do_not_pick_up_changes}</h2>
 <#assign
     fruit = ["apples", "oranges", "bananas"]
     veg = ["beans", "peas", "carrots"]
@@ -79,12 +77,12 @@
     ><br />
 </#noparse>
 
-<h3>List elements of ${r"${fruit}"}</h3>
+<h3>${i18n().list_elements_of} ${r"${fruit}"}</h3>
 <#list fruit as f>
     ${f}<br />
 </#list>
 
-<h3>List elements of ${r"${food}"}: contains no pears</h3>
+<h3>${i18n().list_elements_of} ${r"${food}"}: ${i18n().contains_no_pears}</h3>
 <#list food as item>
     <#list item as i>
         ${i}<br />
@@ -92,7 +90,7 @@
 </#list>
 
 
-<h3>Numbers</h3>
+<h3>${i18n().numbers}</h3>
 
 <#assign
     one = 1
@@ -116,7 +114,7 @@ ${r"${two}"}: ${two}<br />
 ${r"${numbers[1]}"}: ${numbers[1]}<br />
 ${r"${numbers2[1]}"}: ${numbers2[1]}<br />
 
-<h3>Uncamelcasing</h3>
+<h3>${i18n().undo_camelcasing}</h3>
 <#assign s1 = "FreemarkerTest">
 ${s1} => ${str.unCamelCase(s1)}<br />
 <#assign s2 = "Freemarker">

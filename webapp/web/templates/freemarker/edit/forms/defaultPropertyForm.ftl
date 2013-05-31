@@ -25,12 +25,12 @@
             
             <p>
                 <input type="submit" id="submit" value="${editConfiguration.submitLabel}" role="button "/>
-                <span class="or"> or </span>
-                <a title="Cancel" class="cancel" href="${cancelUrl}">Cancel</a>
+                <span class="or"> ${i18n().or} </span>
+                <a title="${i18n().cancel_title}" class="cancel" href="${cancelUrl}">${i18n().cancel_link}</a>
             </p>
         </form>
     <#else>
-        <p> There are no entries in the system from which to select.  </p>  
+        <p> ${i18n().there_are_no_entries_for_selection}  </p>  
     </#if>
 </#if>
 
@@ -40,7 +40,7 @@
 </#if>
 
 <#if editConfiguration.propertySelectFromExisting = false && editConfiguration.propertyOfferCreateNewOption = false>
-<p>This property is currently configured to prohibit editing. </p>
+<p>${i18n().editing_prohibited} </p>
 </#if>
 
 

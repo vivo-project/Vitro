@@ -11,14 +11,14 @@
 <#macro accountsNav accountsCount=counts>
 
   <section class="accounts">
-      <input type="submit" name="delete-account" class="delete-account delete" value="Delete" onClick="changeAction(this.form, '${formUrls.delete}')" />
+      <input type="submit" name="delete-account" class="delete-account delete" value="${i18n().delete_button}" onClick="changeAction(this.form, '${formUrls.delete}')" />
       <!-- 
           When this is clicked, the checkboxes are noticed and all other fields are ignored. 
           submit the form (submit action is formUrls.delete)
       -->
 
       <nav class="display-tools">
-          <span>| ${total} accounts | </span>  
+          <span>| ${total} ${i18n().accounts} | </span>  
 
           <select name="accountsPerPage" class="accounts-per-page">
               <#list accountsCount as count>
@@ -32,14 +32,14 @@
               -->     
           </select>
 
-          accounts per page <input type="submit" name="accounts-per-page" value="Update" /> | 
+          ${i18n().accounts_per_page} <input type="submit" name="accounts-per-page" value="${i18n().update_button}" /> | 
 
           <#if page.previous?has_content>
-              <a href="${formUrls.list}?accountsPerPage=${accountsPerPage}&pageIndex=${page.previous}" title="previous">Previous</a> <!-- only present if current page is not 1.-->
+              <a href="${formUrls.list}?accountsPerPage=${accountsPerPage}&pageIndex=${page.previous}" title="${i18n().previous}">${i18n().previous}</a> <!-- only present if current page is not 1.-->
           </#if>
               ${page.current} of ${page.last} 
           <#if page.next?has_content>
-              <a href="${formUrls.list}?accountsPerPage=${accountsPerPage}&pageIndex=${page.next}" title="next">Next</a><!-- only present if current page is not last page.-->
+              <a href="${formUrls.list}?accountsPerPage=${accountsPerPage}&pageIndex=${page.next}" title="${i18n().next_capitalized}">${i18n().next_capitalized}</a><!-- only present if current page is not last page.-->
           </#if>
       </nav>
   </section>

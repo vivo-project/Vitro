@@ -6,5 +6,5 @@
 <#if urls.contact??>
     <li><a href="${urls.contact}">Contact Us</a></li>
 </#if> 
-<li><a href="http://www.vivoweb.org/support" title="support">Support</a></li>
-<li><a href="${urls.index}" title="index">Index</a></li>
+<li><a href="http://www.vivoweb.org/support" title="${i18n().support}">${i18n().support}</a></li>
+<li><a href="${urls.index}" title="${i18n().index}">${i18n().index}</a></li>

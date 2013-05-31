@@ -34,9 +34,10 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
@@ -170,14 +171,12 @@ public class RDFUploadController extends JenaIngestController {
 
             JenaModelUtils xutil = new JenaModelUtils();
             
-            OntModel tboxModel = getTBoxModel(
-                    request.getSession(), getServletContext());
+            OntModel tboxModel = getTBoxModel(request.getSession());
             OntModel aboxModel = getABoxModel(
                     request.getSession(), getServletContext());
             OntModel tboxChangeModel = null;
             Model aboxChangeModel = null;
-            OntModelSelector ontModelSelector = ModelContext.getOntModelSelector(
-                    getServletContext());
+            OntModelSelector ontModelSelector = ModelAccess.on(getServletContext()).getOntModelSelector();
             
             if (tboxModel != null) {
                 boolean AGGRESSIVE = true;
@@ -428,17 +427,8 @@ public class RDFUploadController extends JenaIngestController {
          return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, abox);
      }    
 
-     private OntModel getTBoxModel(HttpSession session, ServletContext ctx) {   
-         if (session != null 
-                 && session.getAttribute("baseOntModelSelector")
-                         instanceof OntModelSelector) {
-             return ((OntModelSelector) 
-                     session.getAttribute("baseOntModelSelector"))
-                     .getTBoxModel();   
-         } else {
-             return ((OntModelSelector) 
-                     ctx.getAttribute("baseOntModelSelector")).getTBoxModel();
-         }
+     private OntModel getTBoxModel(HttpSession session) { 
+    	 return ModelAccess.on(session).getOntModel(ModelID.BASE_TBOX);
      }    
      
     private static final Log log = LogFactory.getLog(

@@ -3,8 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.filters;
 
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroRequest.SPECIAL_WRITE_MODEL;
-import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.CONTEXT_DISPLAY_TBOX;
-import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.DISPLAY_ONT_MODEL;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_DISPLAY_MODEL_PARAM;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_MODEL_PARAM;
@@ -41,15 +39,17 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.FilterFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HideFromDisplayByPolicyFilter;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
@@ -123,15 +123,16 @@ public class VitroRequestPrep implements Filter {
         VitroRequest vreq = new VitroRequest(req);
         
         //-- setup DAO factory --//
-        WebappDaoFactory wdf = getWebappDaoFactory(vreq);
-        //TODO: get accept-language from request and set as preferred languages
-        
-        // if there is a WebappDaoFactory in the session, use it
-    	Object o = req.getSession().getAttribute("webappDaoFactory");
-    	if (o instanceof WebappDaoFactory) {
-    		wdf = (WebappDaoFactory) o;
-    		log.debug("Found a WebappDaoFactory in the session and using it for this request");
-    	}
+        WebappDaoFactory wdf = ModelAccess.on(vreq.getSession()).getWebappDaoFactory();
+    	
+    	// Set up the DisplayModel with language filtering, if appropriate.
+		ConfigurationProperties props = ConfigurationProperties.getBean(req);
+		Boolean languageFilteringEnabled = Boolean.valueOf(props.getProperty("RDFService.languageFilter", "true"));
+		if (languageFilteringEnabled) {
+			OntModel displayModel = ModelAccess.on(req.getSession()).getDisplayModel();
+			OntModel filteredDisplayModel = LanguageFilteringUtils.wrapOntModelInALanguageFilter(displayModel, req);
+			ModelAccess.on(req).setDisplayModel(filteredDisplayModel);
+		}
     	
     	//Do model switching and replace the WebappDaoFactory with 
     	//a different version if requested by parameters
@@ -151,7 +152,7 @@ public class VitroRequestPrep implements Filter {
 		HideFromDisplayByPolicyFilter filter = new HideFromDisplayByPolicyFilter(
 				RequestIdentifiers.getIdBundleForRequest(req),
 				ServletPolicyList.getPolicies(_context));
-		vreq.setWebappDaoFactory(new WebappDaoFactoryFiltering(wdf, filter));
+		ModelAccess.on(vreq).setWebappDaoFactory(new WebappDaoFactoryFiltering(wdf, filter));
 		
         // support for Dataset interface if using Jena in-memory model
         if (vreq.getDataset() == null) {
@@ -165,21 +166,14 @@ public class VitroRequestPrep implements Filter {
         if (vreq.getUnfilteredWebappDaoFactory() == null) {
             vreq.setUnfilteredWebappDaoFactory(new WebappDaoFactorySDB(
                     RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService(),
-                    ModelContext.getUnionOntModelSelector(
-                            ctx)));
+                    ModelAccess.on(ctx).getUnionOntModelSelector()));
         }
         
         req.setAttribute("VitroRequestPrep.setup", new Integer(1));
         chain.doFilter(req, response);
     }
 
-	private WebappDaoFactory getWebappDaoFactory(VitroRequest vreq){
-    	WebappDaoFactory webappDaoFactory = vreq.getWebappDaoFactory();
-        return (webappDaoFactory != null) ? webappDaoFactory :
-        	(WebappDaoFactory) _context.getAttribute("webappDaoFactory");
-    }
-
-    private VitroFilters getFiltersFromContextFilterFactory( HttpServletRequest request, WebappDaoFactory wdf){
+	private VitroFilters getFiltersFromContextFilterFactory( HttpServletRequest request, WebappDaoFactory wdf){
         FilterFactory ff = (FilterFactory)_context.getAttribute("FilterFactory");
         if( ff == null ){ 
             return null;
@@ -224,8 +218,8 @@ public class VitroRequestPrep implements Filter {
     	
     	// If they asked for the display model, give it to them.
 		if (isParameterPresent(vreq, SWITCH_TO_DISPLAY_MODEL)) {
-			OntModel mainOntModel = (OntModel)_context.getAttribute( DISPLAY_ONT_MODEL);
-			OntModel tboxOntModel = (OntModel) _context.getAttribute(CONTEXT_DISPLAY_TBOX);			
+			OntModel mainOntModel = ModelAccess.on(_context).getDisplayModel();
+			OntModel tboxOntModel = ModelAccess.on(_context).getOntModel(ModelID.DISPLAY_TBOX);
 	   		setSpecialWriteModel(vreq, mainOntModel);
 	   		
 	   		vreq.setAttribute(VitroRequest.ID_FOR_ABOX_MODEL, VitroModelSource.ModelName.DISPLAY.toString());
@@ -302,7 +296,7 @@ public class VitroRequestPrep implements Filter {
 	
 	private void setSpecialWriteModel(VitroRequest vreq, OntModel mainOntModel) {	    
 		if (mainOntModel != null) {    
-	        vreq.setAttribute("jenaOntModel", mainOntModel);
+			ModelAccess.on(vreq).setJenaOntModel(mainOntModel);
 			vreq.setAttribute(SPECIAL_WRITE_MODEL, mainOntModel);
 		}
 	}

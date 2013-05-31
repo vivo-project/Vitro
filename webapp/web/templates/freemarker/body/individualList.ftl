@@ -11,7 +11,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseIndex.css
 <section class="individualList">
     <h2>${title} 
         <#if rdfUrl?has_content>
-            <span class="rdfLink"><a class="icon-rdf" href="${rdfUrl}" title="View the ${title} list in RDF format">RDF</a></span>
+            <span class="rdfLink"><a class="icon-rdf" href="${rdfUrl}" title="${i18n().view_list_in_rdf(title)}">${i18n().rdf}</a></span>
         </#if>
     </h2>
     <#if subtitle?has_content>
@@ -24,7 +24,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseIndex.css
         <#else>
             <#assign pagination>
                 <#if (pages?has_content && pages?size > 1)>
-                    pages:
+                    ${i18n().pages}:
                     <ul class="pagination">
                         <#list pages as page>
                             <#if page.selected>
