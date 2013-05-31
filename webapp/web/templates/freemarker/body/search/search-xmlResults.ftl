@@ -14,12 +14,6 @@
         <doc>
           <str name="uri">${individual.uri?xml}</str>                      
           <str name="name">${individual.name?xml}</str>
-          <#if individual.preferredTitle?has_content>
-          <str name="title">${individual.preferredTitle?xml}</str>
-          </#if>
-          <#if individual.email?has_content>
-          <str name="email">"${individual.email}"</str>
-          </#if>
           <str name="vivo-url">${individual.profileUrl?xml}"</str>
         </doc>
     </#list>

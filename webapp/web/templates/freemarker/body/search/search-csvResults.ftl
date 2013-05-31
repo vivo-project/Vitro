@@ -3,7 +3,7 @@
 <#assign todayDate = today?date>
 Results from ${siteName} for ${querytext} on ${todayDate}
 
-URI, Name, URL
+Name, URI, URL
 <#list individuals as individual>                 
-"${individual.uri}","${individual.name}","${individual.profileUrl}"
+"${individual.name}","${individual.uri}","${individual.profileUrl}"
 </#list>
