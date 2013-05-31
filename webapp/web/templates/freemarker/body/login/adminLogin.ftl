@@ -6,31 +6,31 @@
     <h2>${i18n().internal_login}</h2>
 
     <#if errorNoEmail??>
-        <#assign errorMessage = i18n().no_email_supplied />
+        <#assign errorMessage = "${i18n().no_email_supplied}" />
     </#if>
     
     <#if errorNoPassword??>
-        <#assign errorMessage = i18n().no_password_supplied />
+        <#assign errorMessage = "${i18n().no_password_supplied}" />
     </#if>
     
     <#if errorLoginDisabled??>
-        <#assign errorMessage = i18n().logins_temporarily_disabled />
+        <#assign errorMessage = "${i18n().logins_temporarily_disabled}" />
     </#if>
     
     <#if errorLoginFailed??>
-        <#assign errorMessage = i18n().incorrect_email_password />
+        <#assign errorMessage = "${i18n().incorrect_email_password}" />
     </#if>
     
     <#if errorNewPasswordWrongLength??>
-        <#assign errorMessage = i18n().password_length />
+        <#assign errorMessage = "${i18n().password_length}" />
     </#if>
     
     <#if errorNewPasswordsDontMatch??>
-        <#assign errorMessage = i18n().password_mismatch />
+        <#assign errorMessage = "${i18n().password_mismatch}" />
     </#if>
     
     <#if errorNewPasswordMatchesOld??>
-        <#assign errorMessage = i18n().new_pwd_matches_existing />
+        <#assign errorMessage = "${i18n().new_pwd_matches_existing}" />
     </#if>
     
     <#if errorMessage?has_content>
