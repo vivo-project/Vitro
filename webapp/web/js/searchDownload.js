@@ -2,13 +2,23 @@
 
 $(document).ready(function(){
     // This function creates and styles the "qTip" tooltip that displays the resource uri and the rdf link when the user clicks the uri/rdf icon.
-    $('span#downloadResults').children('img#downloadIcon').each(function()
+	
+	$('span#downloadResults').children('img#downloadIcon').each(function()
     {
         $(this).qtip(
         {
             content: {
                 prerender: true, // We need this for the .click() event listener on 'a.close'
-                text: '<h5>Download the results from this search</h5> <h5 class ="download-url"><a href="' + urlsBase + '/search?querytext=' + queryText +'&amp;xml=1&amp;hitsPerPage=500">download results in XML format</a></h5><h5 class ="download-url"><a href="' + urlsBase + '/search?querytext=' + queryText +'&amp;csv=1&amp;hitsPerPage=500">download results in CSV format</a></h5><br /><a class="close" href="#">close</a>'
+                text:  '<div style="float:right; width:150px">'
+	            	+'<p><label for="amount" style="font-size:14px;">Maximum Records:</label>'
+	            	+'<input disabled type="text" id="amount" style="margin-left:35px; border: 0; color: #f6931f; font-weight: bold; width:45px" /></p>'
+	            	+'<div id="slider-vertical" style="margin-left:60px; margin-top: -20px; height: 100px; background-color:white"></div>'
+	            	+'</div>'
+                	+'<div style="float:left; width:300px"><h5>Download the results from this search</h5> '
+                	+'<h5 class ="download-url"><a id=xmlDownload href="' + urlsBase + '/search?' + queryText +'&amp;xml=1&amp;hitsPerPage=500">download results in XML format</a></h5>'
+                	+'<h5 class ="download-url"><a id=csvDownload href="' + urlsBase + '/search?' + queryText +'&amp;csv=1&amp;hitsPerPage=500">download results in CSV format</a></h5>'
+                	+'<br /><a class="close" href="#">close</a></div>'
+
             },
             position: {
                 corner: {
@@ -28,17 +38,33 @@ $(document).ready(function(){
             },
             style: {
                 padding: '1em',
-                width: 350,
+                width: 500,
                 backgroundColor: '#f1f2ee'
             }
         });
+
     });
 
-    
+    $( "#slider-vertical" ).slider({
+	      orientation: "vertical",
+	      range: "min",
+	      min: 10,
+	      max: 1000,
+	      value: 500,
+	      slide: function( event, ui ) {
+	        $( "#amount" ).val( ui.value );
+	        $('#csvDownload').attr("href", urlsBase + '/search?' + queryText +'&csv=1&hitsPerPage=' + ui.value);
+	        $('#xmlDownload').attr("href", urlsBase + '/search?' + queryText +'&xml=1&hitsPerPage=' + ui.value);
+	      }
+	    });
+	    $( "#amount" ).val( $( "#slider-vertical" ).slider( "value" ) );
+	
 
     // Prevent close link for URI qTip from requesting bogus '#' href
     $('a.close').click(function() {
         $('#downloadIcon').qtip("hide");
         return false;
     });
+    
+
 });

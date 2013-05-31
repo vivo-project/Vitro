@@ -4,15 +4,23 @@
 
 
 
+
 <h2 style="float:left">
 <#escape x as x?html>
     Search results for '${querytext}'
     <#if classGroupName?has_content>limited to type '${classGroupName}'</#if>
     <#if typeName?has_content>limited to type '${typeName}'</#if>
 </#escape>
-<script>
-	var queryText = '${querytext}'
-	var urlsBase = '${urls.base}'
+<script type="text/javascript">
+	var url = window.location.toString();	
+	if (url.indexOf("?") == -1){
+		var queryText = 'querytext=${querytext}';
+	} else {
+		var urlArray = url.split("?");
+		var queryText = urlArray[1];
+	}
+	
+	var urlsBase = '${urls.base}';
 </script>
 </h2>
 
@@ -105,9 +113,12 @@
 
 </div> <!-- end contentsBrowseGroup -->
 
-${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/search.css" />')}
+${stylesheets.add('<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />',
+  				  '<link rel="stylesheet" href="${urls.base}/css/search.css" />')}
 
-${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>',
-                  '<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>')}
+${headScripts.add('<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>',
+				  '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>',
+                  '<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>'
+                  )}
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/searchDownload.js"></script>')}
