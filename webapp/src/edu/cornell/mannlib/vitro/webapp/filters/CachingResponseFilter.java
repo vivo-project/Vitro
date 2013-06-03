@@ -37,6 +37,8 @@ import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrResultsParser;
 /**
  * Assist in cache management for individual profile pages.
  * 
+ * Must be enabled in runtime.properties.
+ * 
  * Only works for users who are not logged in.
  * 
  * The Solr index must be configured to keep an ETAG on each individual's
@@ -72,6 +74,7 @@ public class CachingResponseFilter implements Filter {
 			.getLog(CachingResponseFilter.class);
 
 	private static final String PROPERTY_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
+	private static final String PROPERTY_ENABLE_CACHING = "http.createCacheHeaders";
 	private static final String ETAG_FIELD = "etag";
 
 	private static final FieldMap parserFieldMap = SolrQueryUtils.fieldMap()
@@ -79,12 +82,14 @@ public class CachingResponseFilter implements Filter {
 
 	private ServletContext ctx;
 	private String defaultNamespace;
+	private boolean enabled;
 
 	@Override
 	public void init(FilterConfig fc) throws ServletException {
 		ctx = fc.getServletContext();
-		defaultNamespace = ConfigurationProperties.getBean(ctx).getProperty(
-				PROPERTY_DEFAULT_NAMESPACE);
+		ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
+		defaultNamespace = props.getProperty(PROPERTY_DEFAULT_NAMESPACE);
+		enabled = Boolean.valueOf(props.getProperty(PROPERTY_ENABLE_CACHING));
 	}
 
 	@Override
@@ -102,10 +107,14 @@ public class CachingResponseFilter implements Filter {
 		HttpServletResponse resp = (HttpServletResponse) response;
 
 		/*
-		 * If this request is not for a profile page, or if the individual
-		 * doesn't appear in the search index, create a basic, cache-neutral
-		 * response.
+		 * If caching is disabled, if this request is not for a profile page, or
+		 * if the individual doesn't appear in the search index, create a basic,
+		 * cache-neutral response.
 		 */
+		if (!enabled) {
+			produceBasicResponse(req, resp, chain);
+			return;
+		}
 		String individualUri = figureIndividualUriFromRequest(req);
 		if (individualUri == null) {
 			produceBasicResponse(req, resp, chain);
