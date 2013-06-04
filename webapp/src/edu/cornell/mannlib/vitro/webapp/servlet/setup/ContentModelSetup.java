@@ -84,7 +84,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         	loadDataFromFilesystem(baseABoxModel, baseTBoxModel, applicationMetadataModel, ctx);
         }
         
-        log.info("Setting up union models");
+        log.info("Setting up full models");
         OntModel baseFullModel = createCombinedBulkUpdatingModel(baseABoxModel, baseTBoxModel);
         OntModel inferenceFullModel = createCombinedModel(inferenceABoxModel, inferenceTBoxModel);
         OntModel unionFullModel = ModelFactory.createOntologyModel(DB_ONT_MODEL_SPEC, dataset.getDefaultModel());

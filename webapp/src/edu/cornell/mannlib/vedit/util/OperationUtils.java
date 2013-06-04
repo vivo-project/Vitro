@@ -137,11 +137,9 @@ public class OperationUtils{
                 }
             }
         } catch (InstantiationException ie){
-            log.error("edu.cornell.mannlib.vitro.edit.utils.OperationUtils.cloneBean("+bean.getClass().toString()+") could not instantiate new instance of bean.");
-            log.error(ie.getStackTrace());
+            log.error("edu.cornell.mannlib.vitro.edit.utils.OperationUtils.cloneBean("+bean.getClass().toString()+") could not instantiate new instance of bean.", ie);
         } catch (IllegalAccessException iae){
-            log.error("edu.cornell.mannlib.vitro.edit.utils.OperationUtils.cloneBean("+bean.getClass().toString()+") encountered illegal access exception instantiating new bean.");
-            log.error(iae.getStackTrace());
+            log.error("edu.cornell.mannlib.vitro.edit.utils.OperationUtils.cloneBean("+bean.getClass().toString()+") encountered illegal access exception instantiating new bean.", iae);
         }
         return newBean;
     }
