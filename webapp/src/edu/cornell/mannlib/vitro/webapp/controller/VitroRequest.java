@@ -98,7 +98,7 @@ public class VitroRequest extends HttpServletRequestWrapper {
     
     /** gets assertions + inferences WebappDaoFactory with no filtering **/
     public WebappDaoFactory getFullWebappDaoFactory() {
-    	return ModelAccess.on(this).getWebappDaoFactory();
+    	return getUnfilteredWebappDaoFactory();
     }
     
     /** gets assertions-only WebappDaoFactory with no filtering */
