@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.i18n.selection;
 
 import java.io.FileNotFoundException;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 
@@ -40,13 +41,16 @@ public class LocaleSelectorUtilities {
 		String imageDirPath = "/" + themeDir + "i18n/images/";
 
 		ServletContext ctx = vreq.getSession().getServletContext();
-		for (Object o : ctx.getResourcePaths(imageDirPath)) {
-			String resourcePath = (String) o;
-			if (resourcePath.contains(filename)) {
-				String fullPath = vreq.getContextPath() + resourcePath;
-				log.debug("Found image for " + locale + " at '" + fullPath
-						+ "'");
-				return fullPath;
+		@SuppressWarnings("unchecked")
+		Set<String> resourcePaths = ctx.getResourcePaths(imageDirPath);
+		if (resourcePaths != null) {
+			for (String resourcePath : resourcePaths) {
+				if (resourcePath.contains(filename)) {
+					String fullPath = vreq.getContextPath() + resourcePath;
+					log.debug("Found image for " + locale + " at '" + fullPath
+							+ "'");
+					return fullPath;
+				}
 			}
 		}
 		throw new FileNotFoundException("Can't find an image for " + locale);
