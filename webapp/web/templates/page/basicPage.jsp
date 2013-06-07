@@ -6,7 +6,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page errorPage="/error.jsp"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet" %>
 
 <%  /***********************************************

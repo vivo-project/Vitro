@@ -57,8 +57,6 @@ public class RequestModelsPrep implements Filter {
 	 * The filter will be applied to all incoming urls, this is a list of URI
 	 * patterns to skip. These are matched against the requestURI sans query
 	 * parameters, e.g. "/vitro/index.jsp" "/vitro/themes/enhanced/css/edit.css"
-	 * 
-	 * These patterns are from VitroRequestPrep.java
 	 */
 	private final static Pattern[] skipPatterns = {
 			Pattern.compile(".*\\.(gif|GIF|jpg|jpeg)$"),
@@ -109,7 +107,7 @@ public class RequestModelsPrep implements Filter {
 		for (Pattern skipPattern : skipPatterns) {
 			if (skipPattern.matcher(requestURI).matches()) {
 				log.debug("request matched skipPattern '" + skipPattern
-						+ "', skipping VitroRequestPrep");
+						+ "', skipping RequestModelsPrep");
 				return false;
 			}
 		}
