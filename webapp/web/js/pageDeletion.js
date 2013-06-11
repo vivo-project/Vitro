@@ -1,5 +1,7 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
   
+$.extend(this, i18nStrings);
+
 var pageDeletion = {
 	// on initial page setup
 	onLoad:function(){
@@ -17,7 +19,7 @@ var pageDeletion = {
 		this.deleteLinks.click(function(event) {
 			var href=$(this).attr("href");
 			var pageTitle = $(this).attr("pageTitle");
-			var confirmResult = confirm("Are you sure you wish to delete this page: " + pageTitle + "?");
+			var confirmResult = confirm( i18nStrings.confirmPageDeletion + " " + pageTitle + "?");
 			if(confirmResult) {
 				//Continue with the link
 				return true;

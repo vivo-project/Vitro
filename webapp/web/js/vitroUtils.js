@@ -5,6 +5,8 @@ $(document).ready(function(){
     // Use jQuery() instead of $() alias, because dwr/util.js, loaded on back end editing 
     // pages, overwrites $.
     // fade out welcome-message when user logs in
+    $.extend(this, i18nStrings);
+    
     jQuery('section#welcome-message').css('display', 'block').delay(2000).fadeOut(1500);
     
     // fade in flash-message when user logs out
@@ -23,7 +25,7 @@ $(document).ready(function(){
 
          if (!$isFilterOpen) {
 
-            console.log("Filer is close = " + $isFilterOpen);
+            console.log("Filter is closed = " + $isFilterOpen);
 
              //Change button filter state to selected
              //$(this).css('background','url(../../themes/vivo-cornell/images/filteredSearchActive.gif) no-repeat right top');
@@ -47,7 +49,7 @@ $(document).ready(function(){
 
              $isFilterOpen = false;
 
-             console.log("close");
+             console.log("closed");
          }
     });
 
@@ -57,7 +59,7 @@ $(document).ready(function(){
            $(this).click(function(ev){
                ev.preventDefault();
 
-               if ($(this).text() == 'All') {
+               if ($(this).text() == i18nStrings.allCapitalized) {
                   //Selected filter feedback
                   $('.search-filter-selected').text('');
                   $('input[name="classgroup"]').val('');

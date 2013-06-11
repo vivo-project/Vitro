@@ -29,6 +29,16 @@
         </#if>
         defaultBrowseVClassUri: firstBrowseClass //'${firstNonEmptyVClass}'
     };
+    var i18nStrings = {
+        pageString: '${i18n().page}',
+        viewPageString: '${i18n().view_page}',
+        ofTheResults: '${i18n().of_the_results}',
+        thereAreNo: '${i18n().there_are_no}',
+        indNamesStartWith: '${i18n().individuals_names_starting_with}',
+        tryAnotherLetter: '${i18n().try_another_letter}',
+        indsInSystem: '${i18n().individuals_in_system}',
+        selectAnotherClass: '${i18n().select_another_class}'
+    };
 </script>
 
 

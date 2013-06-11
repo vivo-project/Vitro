@@ -55,6 +55,9 @@ var proxyContextInfo = {
     baseUrl: '${urls.base}',
     ajaxUrl: '${formUrls.proxyAjax}'
 };
+var i18nStrings = {
+    selectEditorAndProfile: '${i18n().select_editor_and_profile}'
+};
 </script>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/autocomplete.css" />',

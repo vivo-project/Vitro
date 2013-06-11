@@ -20,7 +20,7 @@
                 <#elseif property.localName == "organizationForPosition" && editable  >
                     <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
                         <a id="managePeopleLink" class="manageLinks" href="${urls.base}/managePeople?subjectUri=${subjectUri[1]!}" title="${i18n().manage_affiliated_people}" <#if verbose>style="padding-top:10px"</#if> >
-                            ${i18n().manage_affiliated_people}
+                            ${i18n().manage_affiliated_people_link}
                         </a>
                     </h3>
                 <#else>

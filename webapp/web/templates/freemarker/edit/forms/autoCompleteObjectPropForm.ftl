@@ -123,6 +123,11 @@ Also multiple types parameter set to true only if more than one type returned-->
         defaultTypeName: '${propertyNameForDisplay}', // used in repair mode to generate button text
         baseHref: '${urls.base}/individual?uri='
     };
+    var i18nStrings = {
+        selectAnExisting: '${i18n().select_an_existing}',
+        orCreateNewOne: '${i18n().or_create_new_one}',
+        selectedString: '${i18n().selected}'
+    };
     </script>
 <#--
 	 edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.AutocompleteObjectPropertyFormGenerator

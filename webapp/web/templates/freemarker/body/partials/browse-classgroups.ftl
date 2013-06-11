@@ -71,6 +71,11 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseClassGrou
                 defaultBrowseClassGroupUri: '${firstPopulatedClassGroup.uri!}',
                 defaultBrowseClassGroupCount: '${firstPopulatedClassGroup.individualCount!}'
             };
+            var i18nStrings = {
+                browseAllString: '${i18n().browse_all}',
+                contentString: '${i18n().content}'
+            };
+            
         </script>
         ${scripts.add('<script type="text/javascript" src="${urls.base}/js/browseClassGroups.js"></script>')}
 

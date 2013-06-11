@@ -41,6 +41,12 @@
         <p class="requiredHint">* ${i18n().required_fields}</p>
     </form>    
 </section>
+<script type="text/javascript">
+    var i18nStrings = {
+        pleaseFormatEmail: '${i18n().please_format_email}',
+        enterValidAddress: '${i18n().or_enter_valid_address}'
+    };
+</script>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/templates/freemarker/edit/forms/css/customForm.css" />',
                   '<link rel="stylesheet" href="${urls.base}/css/jquery_plugins/jquery.realperson.css" />')}

@@ -32,6 +32,17 @@
 </section>
 <script language="javascript" type="text/javascript" >
     var json = [${jsonTree!}];
+    var i18nStrings = {
+        hideSubclasses: '${i18n().hide_subclasses}',
+        showSubclasses: '${i18n().show_subclasses}',
+        classGroup: '${i18n().class_group_all_caps}',
+        ontologyString: '${i18n().ontology_capitalized}',
+        subclassesString: '${i18n().subclasses_capitalized}',
+        expandAll: '${i18n().expand_all}',
+        collapseAll: '${i18n().collapse_all}',
+        classesString: '${i18n().classes_capitalized}',
+        displayRank: '${i18n().display_rank}'
+    };
 </script>
 
 <script language="javascript" type="text/javascript" >

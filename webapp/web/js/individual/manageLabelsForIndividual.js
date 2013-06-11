@@ -16,6 +16,7 @@ var manageLabels = {
 
         // Get the custom form data from the page
         $.extend(this, customFormData);
+        $.extend(this, i18nStrings);
     },
 
     // Initial page setup. Called only at page load.
@@ -81,7 +82,7 @@ var manageLabels = {
                     window.location = $('a.cancel').attr('href');
                 }
                 else {
-                    alert('Error processing request: the unchecked labels could not be deleted.');
+                    alert(manageLabels.errorProcessingLabels);
                     selectedRadio.removeAttr('checked');
                     $('span.or').show();
                     $('a.cancel').show();

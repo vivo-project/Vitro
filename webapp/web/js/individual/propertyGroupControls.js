@@ -33,7 +33,7 @@ $(document).ready(function(){
                 $propertyGroupLi.removeClass("nonSelectedGroupTab clickable");
                 $propertyGroupLi.addClass("selectedGroupTab clickable");
             }
-            if ( $propertyGroupLi.text() == "View All" ) {
+            if ( $propertyGroupLi.attr("groupname") == "viewAll" ) {
                 processViewAllTab();
             }
             else {

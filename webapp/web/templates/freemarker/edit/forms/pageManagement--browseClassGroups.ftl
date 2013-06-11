@@ -57,5 +57,13 @@
                     </#if>
                 </section>
             </section>
+<script>
+    var i18nStringsBrowseGroups = {
+        browseClassGroup: '${i18n().browse_class_group}',
+        allCapitalized: '${i18n().all_capitalized}',
+        supplyClassGroup: '${i18n().supply_class_group}',
+        selectClasses: '${i18n().select_classes_to_display}'
+    };
+</script>
  <#--Include JavaScript specific to the types of data getters related to this content-->           
- <#include "pageManagement--browseClassGroupsScripts.ftl">           
+ <#include "pageManagement--browseClassGroupsScripts.ftl">

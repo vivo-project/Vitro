@@ -11,4 +11,13 @@
         <span id="cancelContent"> ${i18n().or} <a class="cancel" href="javascript:"  id="cancelContentLink" title="${i18n().cancel_title}">${i18n().cancel_link}</a></span>
     </#if>
 </section>
+<script>
+    var i18nStringsFixedHtml = {
+        fixedHtml: '${i18n().fixed_html}',
+        supplyVariableName: '${i18n().supply_variable_name}',
+        noApostrophes: '${i18n().apostrophe_not_allowed}',
+        noDoubleQuotes: '${i18n().double_quote_note_allowed}',
+        supplyHtml: '${i18n().supply_html}'
+    };
+</script>
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/processFixedHTMLDataGetterContent.js"></script>')}

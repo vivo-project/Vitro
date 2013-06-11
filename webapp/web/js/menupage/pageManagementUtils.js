@@ -93,6 +93,8 @@ var pageManagementUtils = {
         $.extend(this, vitro.customFormUtils);
         // Get the custom form data from the page
         $.extend(this, customFormData);
+        $.extend(this, i18nStrings);
+        
     },
 	initObjects:function(){
 		this.counter = 0;
@@ -297,7 +299,7 @@ var pageManagementUtils = {
             pageManagementUtils.classGroupSection.show();
             pageManagementUtils.fixedHTMLSection.hide();
             pageManagementUtils.sparqlQuerySection.hide();
-            pageManagementUtils.headerBar.text("Browse Class Group - ");
+            pageManagementUtils.headerBar.text(pageManagementUtils.browseClassGroup + " - ");
             pageManagementUtils.headerBar.show();
             $('div#selfContainedDiv').hide();
         }
@@ -305,12 +307,12 @@ var pageManagementUtils = {
         	 pageManagementUtils.classGroupSection.hide();
         	 //if fixed html show that, otherwise show sparql results
             if ( _this.contentTypeSelect.val() == "fixedHtml" ) {
-                pageManagementUtils.headerBar.text("Fixed HTML - ");
+                pageManagementUtils.headerBar.text(pageManagementUtils.fixedHtml + " - ");
                 pageManagementUtils.fixedHTMLSection.show();
             	pageManagementUtils.sparqlQuerySection.hide();
             }
             else {
-                pageManagementUtils.headerBar.text("SPARQL Query Results - ");
+                pageManagementUtils.headerBar.text(pageManagementUtils.sparqlResults + " - ");
                 pageManagementUtils.sparqlQuerySection.show();
             	pageManagementUtils.fixedHTMLSection.hide();
             }
@@ -420,8 +422,8 @@ var pageManagementUtils = {
             html: "<span class='pageContentTypeLabel'>" + contentTypeLabel + " - " + varOrClass 
                         + "</span><span id='clickable" + counter 
                         + "' class='pageContentExpand'><div id='woof' class='arrow expandArrow'></div></span><div id='innerContainer" + counter 
-                        + "' class='pageContentWrapper'><span class='deleteLinkContainer'>&nbsp;or&nbsp;<a id='remove" + counter   // changed button to a link
-                        + "' href='' >delete</a></span></div>"
+                        + "' class='pageContentWrapper'><span class='deleteLinkContainer'>&nbsp;" + pageManagementUtils.orString + "&nbsp;<a id='remove" + counter   // changed button to a link
+                        + "' href='' >" + pageManagementUtils.deleteString + "</a></span></div>"
         });
         //Hide inner div
         var $innerDiv = $newDivContainer.children('div#innerContainer' + counter);
@@ -638,7 +640,7 @@ var pageManagementUtils = {
             var selectedClassesList =  pageManagementUtils.classesForClassGroup.children('ul#selectedClasses');
             
             selectedClassesList.empty();
-            selectedClassesList.append('<li class="ui-state-default"> <input type="checkbox" name="allSelected" id="allSelected" value="all" checked="checked" /> <label class="inline" for="All"> All</label> </li>');
+            selectedClassesList.append('<li class="ui-state-default"> <input type="checkbox" name="allSelected" id="allSelected" value="all" checked="checked" /> <label class="inline" for="All"> ' + pageManagementUtils.allCapitalized + '</label> </li>');
             
             $.each(results.classes, function(i, item) {
                 var thisClass = results.classes[i];
@@ -740,11 +742,11 @@ var pageManagementUtils = {
 				return jsonObject;
 			} else {
 				//ERROR handling
-		    	alert("An error has occurred and the map of processors for this content is missing. Please contact the administrator");
+		    	alert(pageManagementUtils.mapProcessorError);
 				return null;
 			} 
 		}
-    	alert("An error has occurred and the code for processing this content is missing a component. Please contact the administrator.");
+    	alert(pageManagementUtils.codeProcessingError);
     	//Error handling here
     	return null;
     },
@@ -785,21 +787,21 @@ var pageManagementUtils = {
         
         // Check menu name
         if ($('input[type=text][name=pageName]').val() == "") {
-            validationError += "You must supply a name<br />";
+            validationError += pageManagementUtils.supplyName + "<br />";
             }
         // Check pretty url     
         if ($('input[type=text][name=prettyUrl]').val() == "") {
-            validationError += "You must supply a pretty URL<br />";
+            validationError += pageManagementUtils.supplyPrettyUrl + "<br />";
         }
         if ($('input[type=text][name=prettyUrl]').val().charAt(0) != "/") {
-            validationError += "The pretty URL must begin with a leading forward slash<br />";
+            validationError += pageManagementUtils.startUrlWithSlash + "<br />";
         }
         
         // Check custom template and self contained template
         var selectedTemplateValue = $('input:radio[name=selectedTemplate]:checked').val();
         if (selectedTemplateValue == "custom" || selectedTemplateValue == "selfContained") {
             if ($('input[name=customTemplate]').val() == "") {
-                validationError += "You must supply a template<br />"; 
+                validationError += pageManagementUtils.supplyTemplate + "<br />"; 
             }
         }
         
@@ -813,7 +815,7 @@ var pageManagementUtils = {
     	var validationErrorMsg = "";
     	//If there ARE not contents selected, then error message should indicate user needs to add them
     	if(pageContentSections.length == 0) {
-    		validationErrorMsg = "You must select content to be included on the page <br /> ";
+    		validationErrorMsg = pageManagementUtils.selectContentType + " <br /> ";
     	} else {
 	    	//For each, based on type, validate if a validation function exists
 	    	$.each(pageContentSections, function(i) {

@@ -55,6 +55,9 @@ var customFormData = {
     processingUrl: '${urls.base}/edit/primitiveRdfEdit',
     individualUri: '${subjectUri!}'
 };
+var i18nStrings = {
+    errorProcessingLabels: '${i18n().error_processing_labels}'
+};
 </script>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />')}

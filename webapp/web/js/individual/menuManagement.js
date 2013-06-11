@@ -13,6 +13,7 @@ var menuManagement = {
     // Add variables from menupage template
     mergeFromTemplate: function() {
         $.extend(this, menuManagementData);
+        $.extend(this, i18nStrings);
     },
     
     // Create references to frequently used elements for convenience
@@ -30,7 +31,7 @@ var menuManagement = {
         
         this.menuItemsList.addClass('dragNdrop');
         
-        menuItems.attr('title', 'Drag and drop to reorder menu items');
+        menuItems.attr('title', menuManagement.dragDropMenus);
         
         
         
@@ -95,7 +96,7 @@ var menuManagement = {
                         ui.item.appendTo(menuItems);
                     }
                     
-                    alert('Reordering of menu items failed.');
+                    alert(menuManagement.reorderingFailed);
                 }
             }
         });

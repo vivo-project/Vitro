@@ -73,7 +73,11 @@
  <p style="margin-top:10px">${i18n().use_capitalized} <a id="menuMgmtLink" href="${urls.base}/individual?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fontologies%2Fdisplay%2F1.1%23DefaultMenu&switchToDisplayModel=true" title="">${i18n().menu_orering}</a> ${i18n().to_order_menu_items}</p>
 </section>
 
-
+<script>
+    var i18nStrings = {
+        confirmPageDeletion: '${i18n().confirm_page_deletion}'
+    };
+</script>
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />',
 				'<link rel="stylesheet" href="${urls.base}/css/menupage/pageList.css" />')}
 

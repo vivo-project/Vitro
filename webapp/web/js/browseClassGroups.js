@@ -1,5 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
+
 var browseClassGroups = {
     // Initial page setup
     onLoad: function() {
@@ -11,6 +12,7 @@ var browseClassGroups = {
     // Add variables from browse template
     mergeFromTemplate: function() {
         $.extend(this, browseData);
+        $.extend(this, i18nStrings);
     },
     
     // Create references to frequently used elements for convenience
@@ -91,7 +93,8 @@ var browseClassGroups = {
                     
                     // Build the content of each list item, piecing together each component
                     listItem = '<li role="listitem">';
-                    listItem += '<a href="'+ indexUrl +'" title="Browse all '+ name +' content">'+ name +'</a>'; 
+                    listItem += '<a href="'+ indexUrl +'" title="' + browseClassGroups.browseAllString + ' ' 
+                                + name + ' ' + browseClassGroups.contentString + '">'+ name +'</a>'; 
                     listItem += '</li>';
                     
                     // Add the list item to the array of classes
@@ -113,7 +116,9 @@ var browseClassGroups = {
                 classList.splice(potentialSuperClasses, 1);
                 
                 browseAllUrl = browseClassGroups.baseUrl +'/individuallist?vclassId='+ encodeURIComponent(superClassUri);
-                browseAllLink = '<a class="browse-superclass" href="'+ browseAllUrl +'" title="Browse all '+ results.classGroupName +'">Browse all &raquo;</a>';
+                browseAllLink = '<a class="browse-superclass" href="'+ browseAllUrl +'" title="' 
+                                + browseClassGroups.browseAllString + ' ' + results.classGroupName 
+                                + '">' + browseClassGroups.browseAllString + ' &raquo;</a>';
                 browseClassGroups.browseClasses.prepend(browseAllLink);
             }
             
@@ -166,7 +171,7 @@ var graphClassGroups = {
         $('rect').each(function() {
             var index = $('rect').index(this);
             var label = labels[index];
-            var title = 'Browse all '+ label +' content';
+            var title = browseClassGroups.browseAllString + ' ' + label + ' ' + browseClassGroups.contentString;
             
             // Add a title attribute
             $(this).attr('title', title);

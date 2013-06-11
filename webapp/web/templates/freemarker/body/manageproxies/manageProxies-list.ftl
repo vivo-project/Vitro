@@ -188,6 +188,9 @@ var proxyContextInfo = {
     baseUrl: '${urls.base}',
     ajaxUrl: '${formUrls.ajax}'
 };
+var i18nStrings = {
+    selectEditorAndProfile: '${i18n().select_editor_and_profile}'
+};
 </script>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/account.css" />')}

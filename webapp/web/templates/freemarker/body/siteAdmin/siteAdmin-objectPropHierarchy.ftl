@@ -45,6 +45,20 @@
 </section>
 <script language="javascript" type="text/javascript" >
     var json = [${jsonTree!}];
+    var i18nStrings = {
+        hideProperties: '${i18n().hide_properties}',
+        showProperties: '${i18n().show_properties}',
+        localNameString: '${i18n().local_name}',
+        groupString: '${i18n().group_capitalized}',
+        domainClass: '${i18n().domain_class}',
+        rangeClass: '${i18n().range_class}',
+        expandAll: '${i18n().expand_all}',
+        collapseAll: '${i18n().collapse_all}',
+        subProperties: '${i18n().sub_properties}',
+        displayRank: '${i18n().display_rank}',
+        subProperty: '${i18n().subproperty}',
+        propertiesString: '${i18n().properties_capitalized}'
+    };
 </script>
 
 

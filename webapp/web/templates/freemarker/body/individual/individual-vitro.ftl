@@ -69,6 +69,13 @@
         var individualRdfUrl = '${rdfUrl}';
     </script>
 </#if>
+<script>
+    var i18nStringsUriRdf = {
+        shareProfileUri: '${i18n().share_profile_uri}',
+        viewRDFProfile: '${i18n().view_profile_in_rdf}',
+        closeString: '${i18n().close}'
+    };
+</script>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/individual.css" />')}
 

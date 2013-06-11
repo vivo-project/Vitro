@@ -51,6 +51,10 @@
             reorderUrl: '${reorderUrl}',
             positionPredicate: '${positionPredicate}'
         };
+        var i18nStrings = {
+            dragDropMenus: '${i18n().drag_drop_to_reorder_menus}',
+            reorderingFailed: '${i18n().reordering_menus_failed}'
+        };
     </script>
     
     ${scripts.add('<script type="text/javascript" src="${urls.base}/js/individual/menuManagement.js"></script>')}

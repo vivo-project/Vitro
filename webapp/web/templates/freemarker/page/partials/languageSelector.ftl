@@ -10,7 +10,7 @@
 <#if selectLocale??>    
     <#list selectLocale.locales as locale>
         <li>
-            <a href="${selectLocale.selectLocaleUrl}?selection=${locale.code}" title="${i18n().select_locale}">
+            <a href="${selectLocale.selectLocaleUrl}?selection=${locale.code}" title="${i18n().select_locale} -- ${locale.label}">
                 <img src="${locale.imageUrl}" height="15" style="vertical-align:middle" alt="${locale.label}"/>
             </a>
         </li>
