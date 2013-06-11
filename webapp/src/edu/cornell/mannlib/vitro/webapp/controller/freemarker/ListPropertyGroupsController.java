@@ -73,7 +73,7 @@ public class ListPropertyGroupsController extends FreemarkerHttpServlet {
                         publicName = publicName.replace("\"","\\\"");
                         publicName = publicName.replace("\'","\\\'");
                         try {
-                            json += "{ \"name\": \"<a href='./editForm?uri="+URLEncoder.encode(pg.getURI(),"UTF-8")+"&amp;controller=Classgroup'>" + publicName + "</a>\", ";
+                            json += "{ \"name\": \"<a href='./editForm?uri="+URLEncoder.encode(pg.getURI(),"UTF-8")+"&amp;controller=PropertyGroup'>" + publicName + "</a>\", ";
                         } catch (Exception e) {
                             json += "{ \"name\": \"" + publicName + "\", ";
                         }
