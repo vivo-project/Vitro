@@ -197,8 +197,11 @@ ul#alpha-browse-individuals {
 }
 ul#alpha-browse-individuals li {
     float: left;
-    margin-right: 4px;
+    margin-right: 5px;
     padding-top: 0px;
+}
+ul#alpha-browse-individuals li:first-child {
+    padding-left: 1px;
 }
 ul#alpha-browse-individuals li:last-child {
     border-bottom: 0;
@@ -208,7 +211,6 @@ ul#alpha-browse-individuals a {
     height: 35px;
     margin-left: 0;
     padding-left: 8px;
-    width: 10px;
 }
 nav#alpha-browse-container {
     width: 619px;
