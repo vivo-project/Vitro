@@ -70,7 +70,7 @@
  	<input id="submit" value="${i18n().add_page}" role="button" type="submit" >
   </form>
   <br />
- <p style="margin-top:10px">${i18n().use_capitalized} <a id="menuMgmtLink" href="${urls.base}/individual?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fontologies%2Fdisplay%2F1.1%23DefaultMenu&switchToDisplayModel=true" title="">${i18n().menu_orering}</a> ${i18n().to_order_menu_items}</p>
+ <p style="margin-top:10px">${i18n().use_capitalized} <a id="menuMgmtLink" href="${urls.base}/individual?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fontologies%2Fdisplay%2F1.1%23DefaultMenu&switchToDisplayModel=true&previous=pageManagement" title="">${i18n().menu_orering}</a> ${i18n().to_order_menu_items}</p>
 </section>
 
 <script>

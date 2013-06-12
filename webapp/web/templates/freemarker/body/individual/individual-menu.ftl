@@ -31,6 +31,10 @@
             <input type="hidden" name="editForm" value="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator" role="input">
        		<input type="hidden" name="addMenuItem" value="true" />
        	<input id="submit" value="Add new menu page" role="button" type="submit" >
+       	<#if verbosePropertySwitch.url?contains("pageManagement")>
+       	    <span class="or"> ${i18n().or} </span>
+       	    <a  style="margin-left:7px" href="${urls.base}/pageList" title="Return to Profile Page">Return to Page Management</a>
+       	</#if>
         
         </form>
             <br />
