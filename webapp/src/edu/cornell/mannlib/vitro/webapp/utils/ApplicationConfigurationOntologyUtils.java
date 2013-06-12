@@ -44,14 +44,15 @@ public class ApplicationConfigurationOntologyUtils {
         Model union = ModelFactory.createUnion(displayModel, tboxModel);
         String propQuery = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
                 "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
-                "SELECT ?range ?label ?listView ?group WHERE { \n" +
+                "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
+                "SELECT ?range ?label ?group ?customForm WHERE { \n" +
         		"    ?p rdfs:subPropertyOf ?property . \n" +
                 "    ?context config:configContextFor ?p . \n" +
         		"    ?context config:qualifiedBy ?range . \n" +
                 "    ?context config:hasConfiguration ?configuration . \n" +
         		"    OPTIONAL { ?configuration config:propertyGroup ?group } \n" +
                 "    OPTIONAL { ?configuration config:displayName ?label } \n" +
-        		"    OPTIONAL { ?configuration config:hasListView ?lv . ?lv config:listViewConfigFile ?listView } \n" +
+                "    OPTIONAL { ?configuration vitro:customEntryFormAnnot ?customForm } \n" +
         		"}"; 
       
         for (ObjectProperty op : propList) {
@@ -85,11 +86,11 @@ public class ApplicationConfigurationOntologyUtils {
                     } else {
                         newProp.setDomainPublic(op.getDomainPublic());
                     }
-                    Literal listViewLit = qsoln.getLiteral("listView");
-                    if (listViewLit != null) {
-                        // TODO where do we get the list views from?
+                    Literal customFormLit = qsoln.getLiteral("customForm");
+                    if (customFormLit != null) {
+                        newProp.setCustomEntryForm(customFormLit.getLexicalForm());
                     } else {
-                        // newProp.set
+                        newProp.setCustomEntryForm(op.getCustomEntryForm());
                     }
                     additionalProps.add(newProp);
                 }  

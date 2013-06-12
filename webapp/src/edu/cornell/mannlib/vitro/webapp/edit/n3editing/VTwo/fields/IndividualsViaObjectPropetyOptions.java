@@ -1,7 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields;
 
-import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -15,22 +14,25 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 
 public class IndividualsViaObjectPropetyOptions implements FieldOptions {
+    
+    private static final Log log = LogFactory.getLog(IndividualsViaObjectPropetyOptions.class);
+    
     private static final String LEFT_BLANK = "";
     private String subjectUri;
     private String predicateUri;    
+    private String rangeUri;
     private String objectUri;
     
     private String defaultOptionLabel;
     
     public IndividualsViaObjectPropetyOptions(String subjectUri,
-            String predicateUri, String objectUri) throws Exception {
+            String predicateUri, String rangeUri, String objectUri) throws Exception {
         super();
         
         if (subjectUri == null || subjectUri.equals("")) {
@@ -42,7 +44,13 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
 
         this.subjectUri = subjectUri;
         this.predicateUri = predicateUri;
+        this.rangeUri = rangeUri;
         this.objectUri = objectUri;
+    }
+    
+    public IndividualsViaObjectPropetyOptions(String subjectUri,
+            String predicateUri, String objectUri) throws Exception {
+        this (subjectUri, predicateUri, null, objectUri);
     }
 
     public IndividualsViaObjectPropetyOptions setDefaultOptionLabel(String label){
@@ -65,21 +73,9 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
         }
         
         Individual subject = wDaoFact.getIndividualDao().getIndividualByURI(subjectUri);                    
-        ObjectProperty objProp = wDaoFact.getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
+
         //get all vclasses applicable to the individual subject
-        List<VClass> subjectVClasses = subject.getVClasses();
-        //using hashset to prevent duplicates
-        HashSet<String> vclassesURIs = new HashSet<String>();
-        //Get the range vclasses applicable for the property and each vclass for the subject
-        for(VClass subjectVClass: subjectVClasses) {
-        	List<VClass> vclasses = wDaoFact.getVClassDao().getVClassesForProperty(subjectVClass.getURI(), predicateUri);
-        	//add range vclass to hash
-        	if(vclasses != null) {
-        		for(VClass v: vclasses) {
-        			vclassesURIs.add(v.getURI());
-        		}
-        	}
-        }
+        HashSet<String> vclassesURIs = getApplicableVClassURIs(subject, wDaoFact);
                 
         if (vclassesURIs.size() == 0) {           
             return optionsMap;
@@ -114,6 +110,33 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
         return optionsMap;
     }
 
+    private HashSet<String> getApplicableVClassURIs(Individual subject, WebappDaoFactory wDaoFact) {
+        HashSet<String> vclassesURIs = new HashSet<String>();
+        if (rangeUri != null) {
+            log.debug("individualsViaObjectProperty using rangeUri " + rangeUri);
+            vclassesURIs.add(rangeUri);
+            return vclassesURIs;
+        } 
+        
+        log.debug("individualsViaObjectProperty not using any rangeUri");
+        
+        List<VClass> subjectVClasses = subject.getVClasses();
+        
+        //using hashset to prevent duplicates
+        
+        //Get the range vclasses applicable for the property and each vclass for the subject
+        for(VClass subjectVClass: subjectVClasses) {
+            List<VClass> vclasses = wDaoFact.getVClassDao().getVClassesForProperty(subjectVClass.getURI(), predicateUri);
+            //add range vclass to hash
+            if(vclasses != null) {
+                for(VClass v: vclasses) {
+                    vclassesURIs.add(v.getURI());
+                }
+            }
+        }
+        
+        return vclassesURIs;
+    }
     
     // copied from OptionsForPropertyTag.java in the thought that class may be deprecated
     private static List<Individual> removeIndividualsAlreadyInRange(List<Individual> individuals,

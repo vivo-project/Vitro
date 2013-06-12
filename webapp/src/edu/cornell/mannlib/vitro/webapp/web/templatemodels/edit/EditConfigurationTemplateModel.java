@@ -175,6 +175,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     
     //Also used above and can be used in object auto complete form
     public String getObjectPropertyNameForDisplay() {
+        // TODO modify this to get prop/class combo
     	String propertyTitle = null;
     	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);
     	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
@@ -546,7 +547,6 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	
     	HashMap<String,String> types = new HashMap<String, String>();
     	for( VClass vclass : vclasses ){
-    		
     		String name = null;
     		if( vclass.getPickListName() != null && vclass.getPickListName().length() > 0){
     			name = vclass.getPickListName();

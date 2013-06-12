@@ -15,6 +15,8 @@ import java.util.Map;
 
 import net.sf.jga.algorithms.Filter;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,7 +31,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
  * A Individual object that will delegate to an inner Individual
@@ -42,6 +43,8 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 public class IndividualFiltering implements Individual {
     private final Individual _innerIndividual;
     private final VitroFilters _filters;
+    
+    private static final Log log = LogFactory.getLog(IndividualFiltering.class);
 
     public IndividualFiltering(Individual individual, VitroFilters filters) {
         super();
@@ -143,10 +146,18 @@ public class IndividualFiltering implements Individual {
 		// I'd rather filter on the actual ObjectPropertyStatements here, but
 		// Individual.getPopulatedObjectPropertyList doesn't actually populate
 		// the ObjectProperty with statements. - jblake
+        
+        // bjl23:  disabling this filtering because the individual statements are
+        // filtered later, and we need to allow for the possibility that a particular
+        // predicate + range class combination is allowed even if the predicate is
+        // hidden on its own.
+        
+        // Will revisit filtering at this level if it turns out to be truly necessary.
+        
         List<ObjectProperty> outOProps = new ArrayList<ObjectProperty>();
         List<ObjectProperty> oProps = _innerIndividual.getPopulatedObjectPropertyList();
 		for (ObjectProperty op: oProps) {
-			if (_filters.getObjectPropertyStatementFilter().fn(
+			if (true || _filters.getObjectPropertyStatementFilter().fn(
 					new ObjectPropertyStatementImpl(this._innerIndividual.getURI(), op.getURI(), SOME_LITERAL))) {
 				outOProps.add(op);
 			}

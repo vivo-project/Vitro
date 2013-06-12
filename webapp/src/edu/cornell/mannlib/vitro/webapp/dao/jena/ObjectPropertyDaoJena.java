@@ -231,12 +231,6 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         }
         return p;
     }
-    
-    private String stripItalics(String in) {
-    	String out = in.replaceAll("\\<i\\>","");
-    	out = out.replaceAll("\\<\\/i\\>","");
-    	return out;
-    }
 
     public List getAllObjectProperties() {
         getOntModel().enterCriticalSection(Lock.READ);
@@ -800,7 +794,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         PREFIXES + "\n" +
         "SELECT DISTINCT ?property WHERE { \n" +
         "   ?subject ?property ?object . \n" + 
-        "   ?property a owl:ObjectProperty . \n" +
+//        "   ?property a owl:ObjectProperty . \n" +
         "   FILTER ( \n" +
         "       isURI(?object) && \n" +
                 PROPERTY_FILTERS + "\n" +
@@ -846,11 +840,19 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     }
 
     protected static final String LIST_VIEW_CONFIG_FILE_QUERY_STRING =
-        "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>" +
-        "SELECT ?property ?filename WHERE { \n" +
-        "    ?property display:listViewConfigFile ?filename . \n" +
+        "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> \n" +
+        "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
+        "SELECT ?property ?range ?filename WHERE { \n" +
+        "    { ?property display:listViewConfigFile ?filename \n" +
+        "    } UNION { \n" +
+        "        ?lv config:listViewConfigFile ?filename . \n " +
+        "        ?configuration config:hasListView ?lv . " +
+        "        ?context config:hasConfiguration ?configuration . \n" +
+        "        ?context config:configContextFor ?property . \n" +
+        "        ?context config:qualifiedBy ?range . \n" +
+        "    } \n" +
         "}";
-    
+        
     protected static Query listViewConfigFileQuery = null;
     static {
         try {
@@ -879,6 +881,10 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             while (results.hasNext()) {
                 QuerySolution soln = results.next();
                 String propertyUri = soln.getResource("property").getURI();
+                RDFNode rangeNode = soln.get("range");
+                String rangeUri = (rangeNode != null)
+                        ? ((Resource) rangeNode).getURI()
+                        : OWL.Thing.getURI();
                 ObjectProperty prop = getObjectPropertyByURI(propertyUri);
                 if (prop == null) {
                 	//This is a warning only if this property is the one for which we're searching
@@ -889,7 +895,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 	}
                 } else {
                     String filename = soln.getLiteral("filename").getLexicalForm();
-                    customListViewConfigFileMap.put(new Pair<ObjectProperty, String>(prop, OWL.Thing.getURI()), filename);     
+                    customListViewConfigFileMap.put(new Pair<ObjectProperty, String>(prop, rangeUri), filename);     
                 }
             }       
             qexec.close();

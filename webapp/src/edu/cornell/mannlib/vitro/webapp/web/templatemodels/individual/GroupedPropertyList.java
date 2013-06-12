@@ -85,7 +85,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                     " properties due to application configuration ontology");
         }
         
-        populatedObjectPropertyList.addAll(additions);        
+        populatedObjectPropertyList.addAll(additions);
                 
         propertyList.addAll(populatedObjectPropertyList);
 

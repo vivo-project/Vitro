@@ -8,6 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
@@ -92,8 +93,9 @@ public class PropertyRestrictionListener implements ChangeListener {
 
 	private void createAndSetBean() {
 		OntModel model = ModelAccess.on(ctx).getJenaOntModel();
+		Model displayModel = ModelAccess.on(ctx).getDisplayModel();
 		PropertyRestrictionPolicyHelper bean = PropertyRestrictionPolicyHelper
-				.createBean(model);
+				.createBean(model, displayModel);
 		PropertyRestrictionPolicyHelper.setBean(ctx, bean);
 	}
 }

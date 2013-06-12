@@ -100,10 +100,15 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     }
 	
     protected List<String> getRangeTypes(VitroRequest vreq) {
+        WebappDaoFactory wDaoFact = vreq.getWebappDaoFactory();
+        List<String> types = new ArrayList<String>();
     	Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
    		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
-		WebappDaoFactory wDaoFact = vreq.getWebappDaoFactory();
-		List<String> types = new ArrayList<String>();
+   		String rangeUri = EditConfigurationUtils.getRangeUri(vreq);
+   		if (rangeUri != null) {
+	        types.add(rangeUri);
+	        return types;
+   		}
 		//Get all vclasses applicable to subject
 		List<VClass> vClasses = subject.getVClasses();
 		HashSet<String> typesHash = new HashSet<String>();
@@ -180,7 +185,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	this.setSparqlQueries(editConfiguration);
     	
     	//set fields
-    	setFields(editConfiguration, vreq, EditConfigurationUtils.getPredicateUri(vreq));
+    	setFields(editConfiguration, vreq, EditConfigurationUtils.getPredicateUri(vreq), EditConfigurationUtils.getRangeUri(vreq));
     	
     //	No need to put in session here b/c put in session within edit request dispatch controller instead
     	//placing in session depends on having edit key which is handled in edit request dispatch controller
@@ -350,7 +355,11 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	return map;
     }
     
-    protected void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) throws Exception {    	
+    protected void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) throws Exception {
+        setFields(editConfiguration, vreq, predicateUri, null);
+    }
+    
+    protected void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri, String rangeUri) throws Exception {
 		FieldVTwo field = new FieldVTwo();
     	field.setName("objectVar");    	
     	
@@ -361,7 +370,8 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	if( ! doAutoComplete ){
     		field.setOptions( new IndividualsViaObjectPropetyOptions(
     	        subjectUri, 
-    	        predicateUri, 
+    	        predicateUri,
+    	        rangeUri,
     	        objectUri));
     	}else{
     		field.setOptions(null);

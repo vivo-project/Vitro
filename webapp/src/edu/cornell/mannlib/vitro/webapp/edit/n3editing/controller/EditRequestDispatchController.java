@@ -199,6 +199,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 	    String editConfGeneratorName = null;
 	    
 	    String predicateUri =  getPredicateUri(vreq);
+	    String rangeUri = EditConfigurationUtils.getRangeUri(vreq);
 	    
         // *** handle the case where the form is specified as a request parameter ***	    
         String formParam = getFormParam(vreq);
@@ -215,7 +216,9 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
       	// *** check for a predicate URI in the request        	
         }else if( predicateUri != null && !predicateUri.isEmpty() ){                      
             Property prop = getProperty( predicateUri, vreq);
-            if( prop != null && prop.getCustomEntryForm() != null ){
+            if (prop != null && rangeUri != null) {
+                // get the custom form out of the application ontology data  
+            } else if( prop != null && prop.getCustomEntryForm() != null ){
                 //there is a custom form, great! let's use it.
                 editConfGeneratorName = prop.getCustomEntryForm();
                 

@@ -122,12 +122,20 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
             return;
         }
         
+        String rangeUri = (property instanceof ObjectProperty) 
+                ? ((ObjectProperty) property).getRangeVClassURI()
+                : "data";
+         
         if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
             addUrl = getImageUploadUrl(subjectUri, "add");
         } else {
             ParamMap params = new ParamMap(
                     "subjectUri", subjectUri,
-                    "predicateUri", propertyUri);  
+                    "predicateUri", propertyUri);
+            
+            if (rangeUri != null) {
+                params.put("rangeUri", rangeUri);
+            }
             
             params.putAll(UrlBuilder.getModelParams(vreq));
 

@@ -73,7 +73,7 @@ public class PropertyRestrictionPolicyHelperTest extends AbstractTestClass {
 		bean = new PropertyRestrictionPolicyHelper(
 				Arrays.asList(PROHIBITED_NAMESPACES),
 				Arrays.asList(PERMITTED_EXCEPTIONS), displayLevels,
-				modifyLevels);
+				modifyLevels, ModelFactory.createDefaultModel());
 	}
 
 	@Before
