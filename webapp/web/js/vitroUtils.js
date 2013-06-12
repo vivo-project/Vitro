@@ -86,8 +86,9 @@ $(document).ready(function(){
        //When focus, hide filter select list and change filter button state to default
        $('input.search-homepage').focus(function(){
 
+           $('input.search-homepage').attr("value","");
            $('input.search-homepage').css({
-               'background' : 'none',
+               'text-align' : 'left',
                'opacity' : 1
            });
 
