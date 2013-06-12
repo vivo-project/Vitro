@@ -1,8 +1,8 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Template for property group menu on individual profile page -->
+<#-- Template for property group menu on individual profile page nameForOtherGroup! -->
 
-<#assign nameForOtherGroup = nameForOtherGroup!"other">
+<#assign nameForOtherGroup = "${i18n().other}">
 
 <#if (propertyGroups.all)??>
     <#assign groups = propertyGroups.all>

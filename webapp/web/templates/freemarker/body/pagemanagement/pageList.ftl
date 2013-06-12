@@ -2,12 +2,12 @@
 
 <section id="pageList">
     <div class="tab">
-        <h2>Page Management</h2>
+        <h2>${i18n().page_management}</h2>
     </div>
 
 
 <#if pages?has_content >  
-<table id="pageList" style="margin-bottom:2px">  <caption>Page Management</caption>
+<table id="pageList" style="margin-bottom:2px">  <caption>${i18n().page_management}</caption>
   
     <thead>
       <tr>
