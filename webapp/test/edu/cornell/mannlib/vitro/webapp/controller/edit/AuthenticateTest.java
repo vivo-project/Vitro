@@ -26,6 +26,7 @@ import stubs.edu.cornell.mannlib.vitro.webapp.config.ConfigurationPropertiesStub
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.IndividualDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.i18n.I18nStub;
 import stubs.javax.servlet.ServletConfigStub;
 import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
@@ -120,6 +121,11 @@ public class AuthenticateTest extends AbstractTestClass {
 
 	@Before
 	public void setup() throws Exception {
+		// Create an I18n module that has a value for any key, but the value is
+		// the key itself.
+		@SuppressWarnings("unused")
+		I18nStub i18n = new I18nStub();
+
 		authenticatorFactory = new AuthenticatorStub.Factory();
 		authenticator = authenticatorFactory.getInstance(request);
 		authenticator.addUser(createUserFromUserInfo(NEW_DBA));
@@ -314,7 +320,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		doTheRequest();
 
 		assertProcessBean(LOGGING_IN, NO_USER, NO_MSG,
-				"Please enter your email address.", URL_LOGIN, URL_WITH_LINK);
+				"error_no_email_address", URL_LOGIN, URL_WITH_LINK);
 		assertRedirectToLoginProcessPage();
 	}
 
@@ -326,8 +332,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		doTheRequest();
 
 		assertProcessBean(LOGGING_IN, "unknownBozo", NO_MSG,
-				"The email or password you entered is incorrect.", URL_LOGIN,
-				URL_WITH_LINK);
+				"error_incorrect_credentials", URL_LOGIN, URL_WITH_LINK);
 		assertRedirectToLoginProcessPage();
 	}
 
@@ -339,7 +344,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		doTheRequest();
 
 		assertProcessBean(LOGGING_IN, NEW_DBA_NAME, NO_MSG,
-				"Please enter your password.", URL_LOGIN, URL_WITH_LINK);
+				"error_no_password", URL_LOGIN, URL_WITH_LINK);
 		assertRedirectToLoginProcessPage();
 	}
 
@@ -351,8 +356,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		doTheRequest();
 
 		assertProcessBean(LOGGING_IN, NEW_DBA_NAME, NO_MSG,
-				"The email or password you entered is incorrect.", URL_LOGIN,
-				URL_WITH_LINK);
+				"error_incorrect_credentials", URL_LOGIN, URL_WITH_LINK);
 		assertRedirectToLoginProcessPage();
 	}
 
@@ -403,8 +407,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		doTheRequest();
 
 		assertProcessBean(FORCED_PASSWORD_CHANGE, NEW_DBA_NAME, NO_MSG,
-				"Please enter a password between 6 and 12 "
-						+ "characters in length.", URL_LOGIN, URL_WITH_LINK);
+				"error_password_length", URL_LOGIN, URL_WITH_LINK);
 		assertRedirectToLoginProcessPage();
 	}
 
@@ -417,7 +420,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		doTheRequest();
 
 		assertProcessBean(FORCED_PASSWORD_CHANGE, NEW_DBA_NAME, NO_MSG,
-				"The passwords entered do not match.", URL_LOGIN, URL_WITH_LINK);
+				"error_passwords_dont_match", URL_LOGIN, URL_WITH_LINK);
 		assertRedirectToLoginProcessPage();
 	}
 
@@ -430,7 +433,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		doTheRequest();
 
 		assertProcessBean(FORCED_PASSWORD_CHANGE, NEW_DBA_NAME, NO_MSG,
-				"Your new password cannot match the current one.", URL_LOGIN,
+				"error_previous_password", URL_LOGIN,
 				URL_WITH_LINK);
 		assertRedirectToLoginProcessPage();
 	}

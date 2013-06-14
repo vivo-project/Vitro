@@ -22,7 +22,7 @@
     </#if>
     
     <#if errorNewPasswordWrongLength??>
-        <#assign errorMessage = "${i18n().password_length}" />
+        <#assign errorMessage = "${i18n().password_length(minPasswordLength, maxPasswordLength)}" />
     </#if>
     
     <#if errorNewPasswordsDontMatch??>
@@ -51,7 +51,7 @@
             <label for="newPassword">${i18n().new_password}</label>
             <input name="newPassword" id="newPassword" class="text-field" type="password" required autofocus />
             
-            <p class="password-note">${i18n().Minimum of 6 characters in length.</p>
+            <p class="password-note">${i18n().minimum_password_length(minPasswordLength)}</p>
             
             <label for="confirmPassword">${i18n().confirm_password}</label>
             <input id="confirmPassword" name="confirmPassword" class="text-field" type="password" required />

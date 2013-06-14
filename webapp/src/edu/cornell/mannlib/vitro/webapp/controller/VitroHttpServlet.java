@@ -30,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 public class VitroHttpServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -62,15 +63,6 @@ public class VitroHttpServlet extends HttpServlet {
 
 		super.service(req, resp);
 	}
-
-	/**
-	 * Show this to the user if they are logged in, but still not authorized to
-	 * view the page.
-	 */
-	private static final String INSUFFICIENT_AUTHORIZATION_MESSAGE = "We're sorry, "
-			+ "but you are not authorized to view the page you requested. "
-			+ "If you think this is an error, "
-			+ "please contact us and we'll be happy to help.";
 
 	/**
 	 * doGet does nothing.
@@ -148,7 +140,7 @@ public class VitroHttpServlet extends HttpServlet {
 			HttpServletRequest request, HttpServletResponse response) {
 		try {
 			DisplayMessage.setMessage(request,
-					INSUFFICIENT_AUTHORIZATION_MESSAGE);
+					I18n.bundle(request).text("insufficient_authorization"));
 			response.sendRedirect(request.getContextPath());
 		} catch (IOException e) {
 			log.error("Could not redirect to show insufficient authorization.");

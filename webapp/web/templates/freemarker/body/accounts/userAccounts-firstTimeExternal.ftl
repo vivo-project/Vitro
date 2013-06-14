@@ -47,7 +47,7 @@
 
         <p><input type="submit" name="submit" value="${strings.create_account}" class="submit"/>
             ${strings.or} 
-            <a class="cancel" href="${urls.home}" title="${string.cancel_title}">${strings.cancel_link}</a>
+            <a class="cancel" href="${urls.home}" title="${strings.cancel_title}">${strings.cancel_link}</a>
         </p>
 
         <p class="requiredHint">* ${strings.required_fields}</p>

@@ -62,7 +62,7 @@
             <section id="passwordContainer" role="region">
                 <label for="initial-password">${strings.initial_password}<span class="requiredHint"> *</span></label>
                 <input type="password" name="initialPassword" value="${initialPassword}" id="initial-password" role="input" />
-                <p class="note">${strings.minimum_password_length}</p>
+                <p class="note">${strings.minimum_password_length(minimumLength)}</p>
                 
                 <label for="confirm-password">${strings.confirm_initial_password}<span class="requiredHint"> *</span></label> 
                 <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />

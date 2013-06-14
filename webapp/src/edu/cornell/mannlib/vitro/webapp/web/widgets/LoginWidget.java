@@ -12,6 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginInProcessFlag;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -56,7 +57,8 @@ public class LoginWidget extends Widget {
         EXTERNAL_AUTH_NAME("externalAuthName"),
         EXTERNAL_AUTH_URL("externalAuthUrl"),
         CANCEL_URL("cancelUrl"),
-        SITE_NAME("siteName");
+        SITE_NAME("siteName"),
+        MINIMUM_PASSWORD_LENGTH("minimumPasswordLength");
 
         private final String variableName;
         
@@ -172,6 +174,7 @@ public class LoginWidget extends Widget {
                 Macro.FORCE_PASSWORD_CHANGE.toString());
         values.put(TemplateVariable.FORM_ACTION.toString(), getAuthenticateUrl(request));
         values.put(TemplateVariable.CANCEL_URL.toString(), getCancelUrl(request));
+        values.put(TemplateVariable.MINIMUM_PASSWORD_LENGTH.toString(), UserAccount.MIN_PASSWORD_LENGTH);
 
         String errorMessage = bean.getErrorMessageAndClear();
         if (!errorMessage.isEmpty()) {

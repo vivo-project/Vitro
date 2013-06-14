@@ -2,7 +2,7 @@
 
 <#-- Template for restricting (or opening) access to logins. -->
 
-<h2>Restrict Logins</h2>
+<h2>${i18n().restrict_logins}</h2>
     <#if messageAlreadyRestricted??>
         <#assign errorMessage = "${i18n().logins_already_restricted}" />
     </#if>
@@ -35,10 +35,10 @@
 
 <section id="restrict-login" role="region">
     <#if restricted == true>
-        <h4>Logins are restricted</h4>
+        <h4>${i18n().logins_are_restricted}</h4>
         <p><a href="${openUrl}" title="${i18n().remove_restrictions}">${i18n().remove_restrictions}</a></p>
     <#else>
-        <h4>Logins are open to all</h4>
-        <p><a href="${restrictUrl}" title="${i18n().Restrict Logins}">${i18n().Restrict Logins}</a></p>
+        <h4>${i18n().logins_are_open}</h4>
+        <p><a href="${restrictUrl}" title="${i18n().restrict_logins}">${i18n().restrict_logins}</a></p>
     </#if>
 </section>

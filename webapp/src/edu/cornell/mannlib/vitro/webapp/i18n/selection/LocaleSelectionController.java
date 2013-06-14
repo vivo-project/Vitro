@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 /**
  * Call this at /selectLocale&selection=[locale_string]
@@ -75,8 +76,7 @@ public class LocaleSelectionController extends HttpServlet {
 		} catch (IllegalArgumentException e) {
 			log.error("Failed to convert the selection to a Locale", e);
 			DisplayMessage.setMessage(req,
-					"There was a problem in the system. "
-							+ "Your language choice was rejected.");
+					I18n.bundle(req).text("language_selection_failed"));
 			return;
 		}
 
