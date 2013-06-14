@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.ResourceBundle.Control;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.ServletContext;
@@ -33,6 +32,13 @@ public class I18n {
 
 	public static final String DEFAULT_BUNDLE_NAME = "all";
 	private static final String PROPERTY_DEVELOPER_DEFEAT_CACHE = "developer.defeatI18nCache";
+
+	/**
+	 * If this attribute is present on the request, then the cache has already
+	 * been cleared.
+	 */
+	private static final String ATTRIBUTE_CACHE_CLEARED = I18n.class.getName()
+			+ "-cacheCleared";
 
 	/**
 	 * This is where the work gets done. Not declared final, so it can be
@@ -91,8 +97,10 @@ public class I18n {
 	 * cache is cleared on each request.
 	 * 
 	 * If the theme directory has changed, the cache is cleared.
+	 * 
+	 * Declared 'protected' so it can be overridden in unit tests.
 	 */
-	private I18nBundle getBundle(String bundleName, HttpServletRequest req) {
+	protected I18nBundle getBundle(String bundleName, HttpServletRequest req) {
 		log.debug("Getting bundle '" + bundleName + "'");
 
 		try {
@@ -102,7 +110,7 @@ public class I18n {
 			String dir = themeDirectory.get();
 			ServletContext ctx = req.getSession().getServletContext();
 
-			ResourceBundle.Control control = getControl(ctx, dir);
+			ResourceBundle.Control control = new ThemeBasedControl(ctx, dir);
 			ResourceBundle rb = ResourceBundle.getBundle(bundleName,
 					req.getLocale(), control);
 			return new I18nBundle(bundleName, rb);
@@ -125,7 +133,7 @@ public class I18n {
 				.getProperty(PROPERTY_DEVELOPER_DEFEAT_CACHE, "false");
 		if (Boolean.valueOf(flag.trim())) {
 			log.debug("In development mode - clearing the cache.");
-			ResourceBundle.clearCache();
+			clearCacheOnRequest(req);
 		}
 	}
 
@@ -139,16 +147,19 @@ public class I18n {
 		if (!currentDir.equals(previousDir)) {
 			log.debug("Theme directory changed from '" + previousDir + "' to '"
 					+ currentDir + "' - clearing the cache.");
-			ResourceBundle.clearCache();
+			clearCacheOnRequest(req);
 		}
 	}
 
-	/**
-	 * Override this method in the unit tests, to return a more testable Control
-	 * instance.
-	 */
-	protected Control getControl(ServletContext ctx, String dir) {
-		return new ThemeBasedControl(ctx, dir);
+	/** Only clear the cache one time per request. */
+	private void clearCacheOnRequest(HttpServletRequest req) {
+		if (req.getAttribute(ATTRIBUTE_CACHE_CLEARED) != null) {
+			log.debug("Cache was already cleared on this request.");
+		} else {
+			ResourceBundle.clearCache();
+			log.debug("Cache cleared.");
+			req.setAttribute(ATTRIBUTE_CACHE_CLEARED, Boolean.TRUE);
+		}
 	}
 
 	// ----------------------------------------------------------------------
