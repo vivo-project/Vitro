@@ -23,15 +23,10 @@
 	var urlsBase = '${urls.base}';
 </script>
 </h2>
-<<<<<<< HEAD
 
 <span id="downloadResults" title="Download Results">
 	<img id="downloadIcon" src="images/download-icon.png" alt="Download Results"  />
 </span>
-
-<span id="searchHelp"><a href="${urls.base}/searchHelp" title="search help">Not the results you expected?</a></span>
-
-<div class="contentsBrowseGroup" style="clear:left">
 
 <span id="searchHelp"><a href="${urls.base}/searchHelp" title="${i18n().search_help}">${i18n().not_expected_results}</a></span>
 <div class="contentsBrowseGroup">
