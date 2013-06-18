@@ -138,11 +138,8 @@ public class RequestModelsPrep implements Filter {
 		Dataset dataset = new RDFServiceDataset(rdfService);
 		vreq.setDataset(dataset);
 
-		OntModelSelector oms = ModelAccess.on(ctx).getUnionOntModelSelector();
 		WebappDaoFactoryConfig config = createWadfConfig(langs);
-		WebappDaoFactory wadf = new WebappDaoFactorySDB(rdfService, oms, config);
-		vreq.setUnfilteredWebappDaoFactory(wadf);
-
+		
 		WebappDaoFactory assertions = new WebappDaoFactorySDB(rdfService,
 				ModelAccess.on(ctx).getBaseOntModelSelector(), config,
 				SDBDatasetMode.ASSERTIONS_ONLY);
@@ -152,6 +149,11 @@ public class RequestModelsPrep implements Filter {
 				ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
 						dataset.getDefaultModel()));
 
+		OntModelSelector oms = ModelAccess.on(ctx).getUnionOntModelSelector();
+		WebappDaoFactory wadf = new WebappDaoFactorySDB(rdfService, oms, config);
+		vreq.setUnfilteredWebappDaoFactory(wadf);
+		
+		wadf = new WebappDaoFactorySDB(rdfService, ModelAccess.on(vreq).getUnionOntModelSelector(), config);
 		if (isLanguageAwarenessEnabled()) {
 			ModelAccess.on(vreq).setDisplayModel(
 					LanguageFilteringUtils.wrapOntModelInALanguageFilter(
