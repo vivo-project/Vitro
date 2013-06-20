@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -30,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
@@ -126,7 +128,6 @@ public class RequestModelsPrep implements Filter {
 
 	private void setUpTheRequestModels(RDFService rawRdfService,
 			HttpServletRequest req) {
-		HttpSession session = req.getSession();
 		VitroRequest vreq = new VitroRequest(req);
 
 		vreq.setUnfilteredRDFService(rawRdfService);
@@ -153,12 +154,10 @@ public class RequestModelsPrep implements Filter {
 		WebappDaoFactory wadf = new WebappDaoFactorySDB(rdfService, oms, config);
 		vreq.setUnfilteredWebappDaoFactory(wadf);
 		
+		addLanguageAwarenessToRequestModel(req, ModelID.DISPLAY);
+		addLanguageAwarenessToRequestModel(req, ModelID.APPLICATION_METADATA);
+
 		wadf = new WebappDaoFactorySDB(rdfService, ModelAccess.on(vreq).getUnionOntModelSelector(), config);
-		if (isLanguageAwarenessEnabled()) {
-			ModelAccess.on(vreq).setDisplayModel(
-					LanguageFilteringUtils.wrapOntModelInALanguageFilter(
-							ModelAccess.on(session).getDisplayModel(), req));
-		}
 
 		// Do model switching and replace the WebappDaoFactory with
 		// a different version if requested by parameters
@@ -199,6 +198,15 @@ public class RequestModelsPrep implements Filter {
 			return new LanguageFilteringRDFService(rawRDFService, langs);
 		} else {
 			return rawRDFService;
+		}
+	}
+
+	private void addLanguageAwarenessToRequestModel(HttpServletRequest req, ModelID id) {
+		if (isLanguageAwarenessEnabled()) {
+			OntModel unaware = ModelAccess.on(req.getSession()).getOntModel(id);
+			OntModel aware = LanguageFilteringUtils
+					.wrapOntModelInALanguageFilter(unaware, req);
+			ModelAccess.on(req).setOntModel(id, aware);
 		}
 	}
 
