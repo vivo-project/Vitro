@@ -17,6 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 
 public class IndividualsViaObjectPropetyOptions implements FieldOptions {
@@ -76,6 +77,10 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
 
         //get all vclasses applicable to the individual subject
         HashSet<String> vclassesURIs = getApplicableVClassURIs(subject, wDaoFact);
+        
+        if (rangeUri != null) {
+            vclassesURIs = filterToSubclassesOfRange(vclassesURIs, rangeUri, wDaoFact);
+        }
                 
         if (vclassesURIs.size() == 0) {           
             return optionsMap;
@@ -136,6 +141,19 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
         }
         
         return vclassesURIs;
+    }
+    
+    private HashSet<String> filterToSubclassesOfRange(HashSet<String> vclassesURIs, 
+                                              String rangeUri, 
+                                              WebappDaoFactory wDaoFact) {
+        HashSet<String> filteredVClassesURIs = new HashSet<String>();
+        VClassDao vcDao = wDaoFact.getVClassDao();
+        for (String vclass : vclassesURIs) {
+            if (vclass.equals(rangeUri) || vcDao.isSubClassOf(vclass, rangeUri)) {
+                filteredVClassesURIs.add(vclass);
+            }
+        }
+        return filteredVClassesURIs;
     }
     
     // copied from OptionsForPropertyTag.java in the thought that class may be deprecated

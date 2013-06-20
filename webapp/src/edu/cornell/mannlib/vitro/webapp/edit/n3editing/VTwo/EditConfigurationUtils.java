@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
@@ -55,6 +56,10 @@ public class EditConfigurationUtils {
     
     public static String getRangeUri(VitroRequest vreq) {
         return vreq.getParameter("rangeUri");
+    }
+    
+    public static VClass getRangeVClass(VitroRequest vreq) {
+        return vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(getRangeUri(vreq));
     }
     
     //get individual
@@ -93,7 +98,8 @@ public class EditConfigurationUtils {
     public static ObjectProperty getObjectProperty(VitroRequest vreq) {
     	//gets the predicate uri from the request
     	String predicateUri = getPredicateUri(vreq);
-    	return getObjectPropertyForPredicate(vreq, predicateUri);
+    	String rangeUri = getRangeUri(vreq);
+    	return getObjectPropertyForPredicate(vreq, predicateUri, rangeUri);
     }
     
     public static DataProperty getDataProperty(VitroRequest vreq) {
@@ -102,8 +108,16 @@ public class EditConfigurationUtils {
     }
     
     public static ObjectProperty getObjectPropertyForPredicate(VitroRequest vreq, String predicateUri) {
+        return getObjectPropertyForPredicate(vreq, predicateUri, null);
+    }
+    
+    public static ObjectProperty getObjectPropertyForPredicate(VitroRequest vreq, String predicateUri, String rangeUri) {
     	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     	ObjectProperty objectProp = wdf.getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
+    	if (rangeUri != null) {
+    	    objectProp.setRangeVClassURI(rangeUri);
+    	    // TODO implement this in the DAO?
+    	}
     	return objectProp;
     }
     

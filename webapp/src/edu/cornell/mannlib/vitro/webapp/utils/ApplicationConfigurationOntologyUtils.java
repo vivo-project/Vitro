@@ -37,6 +37,8 @@ public class ApplicationConfigurationOntologyUtils {
         return getAdditionalFauxSubpropertiesForList(propList, displayModel, tboxModel);
     }
     
+    
+    
     public static List<ObjectProperty> getAdditionalFauxSubpropertiesForList(List<ObjectProperty> propList, 
                                                                          Model displayModel, 
                                                                          Model tboxModel) {

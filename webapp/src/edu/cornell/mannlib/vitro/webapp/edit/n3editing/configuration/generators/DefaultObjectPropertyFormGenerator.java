@@ -106,7 +106,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
    		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
    		String rangeUri = EditConfigurationUtils.getRangeUri(vreq);
    		if (rangeUri != null) {
-	        types.add(rangeUri);
+   		    types.add(rangeUri);
 	        return types;
    		}
 		//Get all vclasses applicable to subject
@@ -144,11 +144,10 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     		}else{
     			query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type);
     		}
-    		query.setRows(0);
-    		
+    		query.setRows(0);	
     		QueryResponse rsp = solrServer.query(query);
     		SolrDocumentList docs = rsp.getResults();
-    		long found = docs.getNumFound();    
+    		long found = docs.getNumFound();
     		count = count + found;
     		if( count > maxNonACRangeIndividualCount )
     			break;
@@ -471,7 +470,8 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	boolean rangeIndividualsFound = false;
     	for( String type:types){
     		//solr for type count.
-    		SolrQuery query = new SolrQuery();    
+    		SolrQuery query = new SolrQuery();   
+    		
     		query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type);
     		query.setRows(0);
     		

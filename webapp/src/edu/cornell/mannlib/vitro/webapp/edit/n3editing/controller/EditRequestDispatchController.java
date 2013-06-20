@@ -217,7 +217,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
         }else if( predicateUri != null && !predicateUri.isEmpty() ){                      
             Property prop = getProperty( predicateUri, vreq);
             if (prop != null && rangeUri != null) {
-                // get the custom form out of the application ontology data  
+                editConfGeneratorName = getCustomEntryFormForPropertyAndRange(prop, rangeUri);
             } else if( prop != null && prop.getCustomEntryForm() != null ){
                 //there is a custom form, great! let's use it.
                 editConfGeneratorName = prop.getCustomEntryForm();
@@ -247,7 +247,22 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
         return editConfGeneratorName;
 	}
 
-	private Property getProperty(String predicateUri, VitroRequest vreq) {	    
+	private String getCustomEntryFormForPropertyAndRange(Property prop, String rangeUri){
+	    String entryFormName = null;
+	    // = ApplicationConfigurationOntologyUtils.getEntryForm(prop.getURI(), rangeUri);
+	    if (entryFormName == null) {
+	        if (prop.getCustomEntryForm() != null) {
+	            return prop.getCustomEntryForm();
+	        } else {
+	            return DEFAULT_OBJ_FORM;
+	        }
+	    } else {
+	        prop.setCustomEntryForm(entryFormName);
+	        return entryFormName;
+	    }
+	}
+	
+	private Property getProperty(String predicateUri, VitroRequest vreq) {	   
 		Property p = null;
 		try{
     		p = vreq.getWebappDaoFactory().getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
