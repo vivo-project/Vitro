@@ -15,7 +15,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -156,6 +155,10 @@ public class RequestModelsPrep implements Filter {
 		
 		addLanguageAwarenessToRequestModel(req, ModelID.DISPLAY);
 		addLanguageAwarenessToRequestModel(req, ModelID.APPLICATION_METADATA);
+		addLanguageAwarenessToRequestModel(req, ModelID.UNION_TBOX);
+		addLanguageAwarenessToRequestModel(req, ModelID.UNION_FULL);
+		addLanguageAwarenessToRequestModel(req, ModelID.BASE_TBOX);
+		addLanguageAwarenessToRequestModel(req, ModelID.BASE_FULL);
 
 		wadf = new WebappDaoFactorySDB(rdfService, ModelAccess.on(vreq).getUnionOntModelSelector(), config);
 
