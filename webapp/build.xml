@@ -167,7 +167,7 @@
 		</copy>
 
 		<!-- use the production Log4J properties, unless a debug version exists. -->
-		<condition property="log4j.properties.file" value="debug.log4j.properties" else="default.log4j.properties">
+		<condition property="log4j.properties.file" value="debug.log4j.properties" else="log4j.properties">
 			<available file="${appbase.dir}/config/debug.log4j.properties" />
 		</condition>
 		<copy file="${appbase.dir}/config/${log4j.properties.file}" 
