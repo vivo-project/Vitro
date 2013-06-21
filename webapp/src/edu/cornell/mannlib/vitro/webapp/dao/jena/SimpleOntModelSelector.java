@@ -47,6 +47,7 @@ public class SimpleOntModelSelector implements OntModelSelector {
 		this.applicationMetadataModel = ontModel;
 		this.tboxModel = ontModel;
 		this.userAccountsModel = ontModel;
+		this.displayModel = ontModel;
 	}
 	
 	public void setABoxModel(OntModel m) {

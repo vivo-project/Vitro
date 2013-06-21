@@ -183,7 +183,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                 if (pi != null) {
                     if (!alreadyOnObjectPropertyList(
                             populatedObjectPropertyList, pi)) {
-                        addObjectPropertyToPropertyList(pi.getPropertyURI(),
+                        addObjectPropertyToPropertyList(pi.getPropertyURI(), pi.getRangeClassURI(),
                                 propertyList);
                     }
                 } else {
@@ -199,7 +199,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // constitute a special case (i.e., included in piDao.getAllPossiblePropInstForIndividual()).
         for (String propertyUri : VITRO_PROPS_TO_ADD_TO_LIST) {
             if (!alreadyOnPropertyList(propertyList, propertyUri)) {
-                addObjectPropertyToPropertyList(propertyUri, propertyList);
+                addObjectPropertyToPropertyList(propertyUri, null, propertyList);
             }
         }
     }
@@ -217,10 +217,10 @@ public class GroupedPropertyList extends BaseTemplateModel {
         return false;
     }
 
-    private void addObjectPropertyToPropertyList(String propertyUri,
+    private void addObjectPropertyToPropertyList(String propertyUri, String rangeUri,
             List<Property> propertyList) {
         ObjectPropertyDao opDao = wdf.getObjectPropertyDao();
-        ObjectProperty op = opDao.getObjectPropertyByURI(propertyUri);
+        ObjectProperty op = opDao.getObjectPropertyByURIAndRangeURI(propertyUri, rangeUri);
         if (op == null) {
             log.error("ObjectProperty op returned null from opDao.getObjectPropertyByURI(" + propertyUri + ")");
         } else if (op.getURI() == null) {

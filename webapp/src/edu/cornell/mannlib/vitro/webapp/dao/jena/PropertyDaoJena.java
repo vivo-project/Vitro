@@ -30,6 +30,7 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
@@ -706,61 +707,99 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         	
         	// make the PropertyInstance objects
 	        for (String propertyURI : applicableProperties.keySet()) {
-	        	OntProperty op = ontModel
-	        	        .getOntProperty(propertyURI);
-	        	if (op == null) {
-	        	    continue;
-	        	}
-	        	String domainURIStr = getURIStr(op.getDomain());
-	        	Resource[] foundRanges = applicableProperties.get(propertyURI);
-	        	Resource rangeRes = (foundRanges[0] != null) 
-	        	        ? foundRanges[0]
-	        	        : (op.getRange() == null && foundRanges[1] != null)
-	        	                ? foundRanges[1]
-	        	                : op.getRange();
-                PropertyInstance pi = new PropertyInstance();
-                if (rangeRes != null) {
-                	String rangeClassURI;
-                	if (rangeRes.isAnon()) {
-                		rangeClassURI = PSEUDO_BNODE_NS + rangeRes.getId()
-                		        .toString();
-                	} else {
-                		rangeClassURI = rangeRes.getURI();
-                	}
-                    pi.setRangeClassURI(rangeClassURI);
-                	VClass range = getWebappDaoFactory().getVClassDao()
-                	        .getVClassByURI(rangeClassURI);
-                	if (range == null) {
-                		range = new VClass();
-                		range.setURI(rangeClassURI);
-                		range.setName(range.getLocalName());
-                	}
-                	pi.setRangeClassName(range.getName());
-                } else {
-                	pi.setRangeClassURI(OWL.Thing.getURI()); // TODO see above
-                }
-                pi.setDomainClassURI(domainURIStr);
-                VClass domain = getWebappDaoFactory().getVClassDao()
-    	                .getVClassByURI(domainURIStr);
-		    	if (domain == null) {
-		    		domain = new VClass();
-		    		domain.setURI(domainURIStr);
-		    		domain.setName(domain.getLocalName());
-		    	}
-                pi.setDomainClassName(domain.getName());
-                pi.setSubjectSide(true);
-                pi.setPropertyURI(op.getURI());
-                pi.setPropertyName(getLabelOrId(op)); // TODO
-                pi.setRangePublic(getLabelOrId(op));
-                pi.setDomainPublic(getLabelOrId(op));
-                propInsts.add(pi);
-	        }      
+	            OntProperty op = ontModel
+	                    .getOntProperty(propertyURI);
+	            if (op == null) {
+	                continue;
+	            } 
+	            Resource[] foundRanges = applicableProperties.get(propertyURI);
+	            Resource rangeRes = (foundRanges[0] != null) 
+	                    ? foundRanges[0]
+	                            : (op.getRange() == null && foundRanges[1] != null)
+	                            ? foundRanges[1]
+	                                    : op.getRange();
+	                            propInsts.add(getPropInstForPropertyAndRange(op, rangeRes, applicableProperties));	
+	            List<String> additionalFauxSubpropertyRangeURIs = getAdditionalFauxSubpropertyRangeURIsForPropertyURI(propertyURI);
+	            for (String rangeURI : additionalFauxSubpropertyRangeURIs) {
+	                if (getWebappDaoFactory().getVClassDao().isSubClassOf(rangeURI, rangeRes.getURI())) {
+	                    propInsts.add(getPropInstForPropertyAndRange(
+	                            op, ResourceFactory.createResource(rangeURI), applicableProperties));
+	                }
+	            }
+	        }
+	        
         } finally {
         	ontModel.leaveCriticalSection();
         }
            
         return propInsts;
         
+    }
+    
+    private PropertyInstance getPropInstForPropertyAndRange(OntProperty op, Resource rangeRes, 
+                                                              Map<String, Resource[]> applicableProperties) {                   
+        PropertyInstance pi = new PropertyInstance();
+        String domainURIStr = getURIStr(op.getDomain());
+        if (rangeRes != null) {
+            String rangeClassURI;
+            if (rangeRes.isAnon()) {
+                rangeClassURI = PSEUDO_BNODE_NS + rangeRes.getId()
+                        .toString();
+            } else {
+                rangeClassURI = rangeRes.getURI();
+            }
+            pi.setRangeClassURI(rangeClassURI);
+            VClass range = getWebappDaoFactory().getVClassDao()
+                    .getVClassByURI(rangeClassURI);
+            if (range == null) {
+                range = new VClass();
+                range.setURI(rangeClassURI);
+                range.setName(range.getLocalName());
+            }
+            pi.setRangeClassName(range.getName());
+        } else {
+            pi.setRangeClassURI(OWL.Thing.getURI()); // TODO see above
+        }
+        pi.setDomainClassURI(domainURIStr);
+        VClass domain = getWebappDaoFactory().getVClassDao()
+                .getVClassByURI(domainURIStr);
+        if (domain == null) {
+            domain = new VClass();
+            domain.setURI(domainURIStr);
+            domain.setName(domain.getLocalName());
+        }
+        pi.setDomainClassName(domain.getName());
+        pi.setSubjectSide(true);
+        pi.setPropertyURI(op.getURI());
+        pi.setPropertyName(getLabelOrId(op)); // TODO
+        pi.setRangePublic(getLabelOrId(op));
+        pi.setDomainPublic(getLabelOrId(op));
+        return pi;
+    }
+    
+    private List<String> getAdditionalFauxSubpropertyRangeURIsForPropertyURI(String propertyURI) {
+        List<String> rangeURIs = new ArrayList<String>();
+        String propQuery = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
+                "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
+                "SELECT ?range WHERE { \n" +
+                "    ?context config:configContextFor <" + propertyURI + "> . \n" +
+                "    ?context config:qualifiedBy ?range . \n" +
+                "}"; 
+
+        Query q = QueryFactory.create(propQuery);
+        QueryExecution qe = QueryExecutionFactory.create(q, getOntModelSelector().getDisplayModel());
+        try {
+            ResultSet rs = qe.execSelect();
+            while (rs.hasNext()) {
+                QuerySolution qsoln = rs.nextSolution();
+                Resource rangeRes = qsoln.getResource("range");
+                rangeURIs.add(rangeRes.getURI());
+            }  
+        } finally {
+            qe.close();
+        }
+        return rangeURIs;
     }
 
     private String getURIStr(Resource res) {

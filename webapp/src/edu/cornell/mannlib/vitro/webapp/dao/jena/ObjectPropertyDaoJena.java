@@ -28,6 +28,8 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -281,6 +283,65 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             getOntModel().leaveCriticalSection();
         }
     }
+    
+    public ObjectProperty getObjectPropertyByURIAndRangeURI(String propertyURI, String rangeURI) {
+        ObjectProperty op = getObjectPropertyByURI(propertyURI);
+        if (op == null) {
+            return op;
+        }
+        op.setRangeVClassURI(rangeURI);
+        String propQuery = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
+                "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
+                "SELECT ?range ?label ?group ?customForm ?displayLevel ?updateLevel WHERE { \n" +
+                "    ?context config:configContextFor <" + propertyURI + "> . \n" +
+                "    ?context config:qualifiedBy <" + rangeURI + "> . \n" +
+                "    ?context config:hasConfiguration ?configuration . \n" +
+                "    OPTIONAL { ?configuration config:propertyGroup ?group } \n" +
+                "    OPTIONAL { ?configuration config:displayName ?label } \n" +
+                "    OPTIONAL { ?configuration vitro:customEntryFormAnnot ?customForm } \n" +
+                "    OPTIONAL { ?configuration vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayLevel } \n" +
+                "    OPTIONAL { ?configuration vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateLevel } \n" +
+                "}"; 
+      
+        Query q = QueryFactory.create(propQuery);
+        QueryExecution qe = QueryExecutionFactory.create(q, getOntModelSelector().getDisplayModel());
+        try {
+            ResultSet rs = qe.execSelect();
+            if (rs.hasNext()) {
+                QuerySolution qsoln = rs.nextSolution();
+                log.debug(qsoln);
+                Resource groupRes = qsoln.getResource("group");
+                if (groupRes != null) {
+                    op.setGroupURI(groupRes.getURI());
+                } 
+                Resource displayLevelRes = qsoln.getResource("displayLevel");
+                if (displayLevelRes != null) {
+                    op.setHiddenFromDisplayBelowRoleLevel(
+                            BaseResourceBean.RoleLevel.getRoleByUri(
+                                    displayLevelRes.getURI()));
+                }
+                Resource updateLevelRes = qsoln.getResource("updateLevel");
+                if (updateLevelRes != null) {
+                    op.setProhibitedFromUpdateBelowRoleLevel(
+                            BaseResourceBean.RoleLevel.getRoleByUri(
+                                    updateLevelRes.getURI()));
+                }
+                Literal labelLit = qsoln.getLiteral("label");
+                if (labelLit != null) {
+                    op.setDomainPublic(labelLit.getLexicalForm());
+                } 
+                Literal customFormLit = qsoln.getLiteral("customForm");
+                if (customFormLit != null) {
+                    op.setCustomEntryForm(customFormLit.getLexicalForm());
+                } 
+            }  
+        } finally {
+            qe.close();
+        }            
+        return op;
+    }
+    
 
     public List<ObjectProperty> getObjectPropertiesForObjectPropertyStatements(List objPropertyStmts) {
         if( objPropertyStmts == null || objPropertyStmts.size() < 1) return new ArrayList();
