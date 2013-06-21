@@ -18,8 +18,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Literal;
-import  com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -27,6 +25,8 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.XSD;
 
@@ -508,7 +508,7 @@ private String getExistingIsSelfContainedTemplateQuery() {
 	private void addRequiredPageData(VitroRequest vreq, Map<String, Object> data) {
      	MenuManagementDataUtils.includeRequiredSystemData(vreq.getSession().getServletContext(), data);
     	data.put("classGroup", new ArrayList<String>());
-    	data.put("classGroups", DataGetterUtils.getClassGroups(vreq.getSession().getServletContext()));
+    	data.put("classGroups", DataGetterUtils.getClassGroups(vreq));
 	}
 	
 	private void addExistingPageData(VitroRequest vreq, Map<String, Object> data) {

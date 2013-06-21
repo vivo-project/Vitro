@@ -17,6 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 
@@ -46,7 +47,6 @@ public class BrowseController extends FreemarkerHttpServlet {
     protected ResponseValues processRequest(VitroRequest vreq) {
         
         Map<String, Object> body = new HashMap<String, Object>();
-        String message = null;
         String templateName = TEMPLATE_DEFAULT;
                        
         if ( vreq.getParameter("clearcache") != null ) {
@@ -57,25 +57,13 @@ public class BrowseController extends FreemarkerHttpServlet {
         }
         
         List<VClassGroup> groups = null;
-        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(getServletContext());
-        if ( vcgc == null ) {
-            log.error("Could not get VClassGroupCache");
-            message = "The system is not configured correctly. Please check your logs for error messages.";
-        } else {
-            groups =vcgc.getGroups();
-            List<VClassGroupTemplateModel> vcgroups = new ArrayList<VClassGroupTemplateModel>(groups.size());
-            for (VClassGroup group : groups) {
-                vcgroups.add(new VClassGroupTemplateModel(group));
-            }
-            body.put("classGroups", vcgroups);
+        VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
+        groups =vcgc.getGroups();
+        List<VClassGroupTemplateModel> vcgroups = new ArrayList<VClassGroupTemplateModel>(groups.size());
+        for (VClassGroup group : groups) {
+            vcgroups.add(new VClassGroupTemplateModel(group));
         }
-        
-        if (message != null) {
-            body.put("message", message);
-            templateName = Template.TITLED_MESSAGE.toString();
-        }
-        
-
+        body.put("classGroups", vcgroups);
         
         return new TemplateResponseValues(templateName, body);
     }

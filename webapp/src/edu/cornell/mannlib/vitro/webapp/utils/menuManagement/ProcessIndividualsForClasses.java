@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,12 +34,13 @@ public class ProcessIndividualsForClasses implements ProcessDataGetter {
    /**Retrieve and populate**/
     
   //Based on institutional internal page and not general individualsForClasses
-    public void populateTemplate(ServletContext context, Map<String, Object> pageData, Map<String, Object> templateData) {
+    @Override
+	public void populateTemplate(HttpServletRequest req, Map<String, Object> pageData, Map<String, Object> templateData) {
 		initTemplateData(templateData);
 		populateIncludedClasses(pageData, templateData);
 		populateRestrictedClasses(pageData, templateData);
 		//Also save the class group for display
-		DataGetterUtils.getClassGroupForDataGetter(context, pageData, templateData); 
+		DataGetterUtils.getClassGroupForDataGetter(req, pageData, templateData); 
 
 	}
     
@@ -76,6 +77,7 @@ public class ProcessIndividualsForClasses implements ProcessDataGetter {
 	public boolean useProcessor(VitroRequest vreq) {
 		return(!allClassesSelected(vreq));
 	}
+	@Override
 	public  Model processSubmission(VitroRequest vreq, Resource dataGetterResource) {
 		String[] selectedClasses = vreq.getParameterValues("classInClassGroup");
 		String dataGetterTypeUri = DataGetterUtils.generateDataGetterTypeURI(IndividualsForClassesDataGetter.class.getName());

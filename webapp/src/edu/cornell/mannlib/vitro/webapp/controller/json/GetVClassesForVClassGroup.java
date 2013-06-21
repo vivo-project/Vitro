@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 
 /**
@@ -32,7 +33,7 @@ public class GetVClassesForVClassGroup extends JsonObjectProducer {
             throw new Exception("no URI passed for classgroupUri");
         }
         
-        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(ctx);
+        VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
         VClassGroup vcg = vcgc.getGroup(vcgUri);
         if( vcg == null ){
             throw new Exception("Could not find vclassgroup: " + vcgUri);
