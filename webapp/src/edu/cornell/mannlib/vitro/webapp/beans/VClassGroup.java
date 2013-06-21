@@ -62,6 +62,15 @@ public class VClassGroup extends LinkedList <VClass> implements Comparable<VClas
         this.displayRank = rank;
         this.publicName = name;
     }
+    
+    public VClassGroup(VClassGroup vcg) {
+    	this.URI = vcg.URI;
+    	this.namespace = vcg.namespace;
+    	this.localName = vcg.localName;
+    	this.publicName = vcg.publicName;
+    	this.displayRank = vcg.displayRank;
+    	this.individualCount = vcg.individualCount;
+    }
 
     public String getURI() {
         return URI;

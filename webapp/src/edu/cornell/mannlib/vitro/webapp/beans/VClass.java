@@ -130,6 +130,29 @@ public class VClass extends BaseResourceBean implements Comparable<VClass>
     }
     
     /**
+	 * Constructs the VClass as a deep copy of an existing VClass. 
+	 */
+    public VClass( VClass vc) {
+    	this.URI = vc.URI;
+    	this.namespace = vc.namespace;
+    	this.localName = vc.localName;
+    	this.myName = vc.myName;
+    	this.myExample = vc.myExample;
+    	this.myDescription = vc.myDescription;
+    	this.myShortDefinition = vc.myShortDefinition;
+    	this.myEntityCount = vc.myEntityCount;
+    	this.displayLimit = vc.displayLimit;
+    	this.displayRank = vc.displayRank;
+    	this.quickEditJsp = vc.quickEditJsp;
+    	this.groupURI = vc.groupURI;
+    	this.group = (vc.group == null) ? null : new VClassGroup(vc.group);
+    	this.customEntryForm = vc.customEntryForm;
+    	this.customDisplayView = vc.customDisplayView;
+    	this.customShortView = vc.customShortView;
+    	this.customSearchView = vc.customSearchView;
+    }
+    
+    /**
      * Sorts alphabetically by name
      */
     public int compareTo (VClass o1) {

@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
@@ -227,6 +229,14 @@ public class VClassGroupCache implements IndexingEventListener {
         return (VClassGroupCache) sc.getAttribute(ATTRIBUTE_NAME);
     }
 
+	/**
+	 * Use getVClassGroups(HttpServletRequest) to get a language-aware image of
+	 * the cached groups and classes.
+	 */
+    public static VClassGroupsForRequest getVClassGroups(HttpServletRequest req) {
+    	return new VClassGroupsForRequest(req, getVClassGroupCache(req.getSession().getServletContext()));
+    }
+    
     /**
      * Method that rebuilds the cache. This will use a WebappDaoFactory, 
      * a SolrSever and maybe a ProhibitedFromSearch from the cache.context.
