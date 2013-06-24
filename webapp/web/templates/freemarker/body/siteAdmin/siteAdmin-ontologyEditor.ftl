@@ -17,7 +17,7 @@
         
         <ul role="navigation">
             <li role="listitem">
-                <a href="${ontologyEditor.urls.ontologies}" title="${i18n().ontology_list}"></a>${i18n().ontology_list}</h4>
+                <a href="${ontologyEditor.urls.ontologies}" title="${i18n().ontology_list}">${i18n().ontology_list}</a>
             </li>
         </ul>
     
