@@ -376,7 +376,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     protected VClassDao vClassDao = null;
     public VClassDao getVClassDao() {
         if( vClassDao == null )
-            vClassDao = new VClassDaoJena(this);
+            vClassDao = new VClassDaoJena(this, config.isUnderlyingStoreReasoned());
         return vClassDao;
     }
 

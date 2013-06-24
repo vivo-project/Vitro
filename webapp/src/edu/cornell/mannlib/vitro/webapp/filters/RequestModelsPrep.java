@@ -138,7 +138,7 @@ public class RequestModelsPrep implements Filter {
 		Dataset dataset = new RDFServiceDataset(rdfService);
 		vreq.setDataset(dataset);
 
-		WebappDaoFactoryConfig config = createWadfConfig(langs);
+		WebappDaoFactoryConfig config = createWadfConfig(langs, req);
 		
 		WebappDaoFactory assertions = new WebappDaoFactorySDB(rdfService,
 				ModelAccess.on(ctx).getBaseOntModelSelector(), config,
@@ -175,10 +175,11 @@ public class RequestModelsPrep implements Filter {
 		ModelAccess.on(vreq).setWebappDaoFactory(filteredWadf);
 	}
 
-	private WebappDaoFactoryConfig createWadfConfig(List<String> langs) {
+	private WebappDaoFactoryConfig createWadfConfig(List<String> langs, HttpServletRequest req) {
 		WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
 		config.setDefaultNamespace(defaultNamespace);
 		config.setPreferredLanguages(langs);
+		config.setUnderlyingStoreReasoned(isStoreReasoned(req));
 		return config;
 	}
 
@@ -211,6 +212,12 @@ public class RequestModelsPrep implements Filter {
 					.wrapOntModelInALanguageFilter(unaware, req);
 			ModelAccess.on(req).setOntModel(id, aware);
 		}
+	}
+	
+	private boolean isStoreReasoned(ServletRequest req) {
+	    String isStoreReasoned = ConfigurationProperties.getBean(req).getProperty(
+	            "VitroConnection.DataSource.isStoreReasoned", "true");
+	    return ("true".equals(isStoreReasoned));
 	}
 
 	@Override

@@ -503,7 +503,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     	List<VClass> allTypes = ind.getVClasses(false); // include indirect types
         
         Set<String> allSuperclassURIs = new HashSet<String>();
-       
+        
         for (VClass type : allTypes) {
             String classURI = type.getURI();
             if (classURI != null) {
@@ -718,7 +718,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 	                            : (op.getRange() == null && foundRanges[1] != null)
 	                            ? foundRanges[1]
 	                                    : op.getRange();
-	                            propInsts.add(getPropInstForPropertyAndRange(op, rangeRes, applicableProperties));	
+	                            propInsts.add(getPropInstForPropertyAndRange(op, rangeRes, applicableProperties));
 	            List<String> additionalFauxSubpropertyRangeURIs = getAdditionalFauxSubpropertyRangeURIsForPropertyURI(propertyURI);
 	            for (String rangeURI : additionalFauxSubpropertyRangeURIs) {
 	                if (getWebappDaoFactory().getVClassDao().isSubClassOf(rangeURI, rangeRes.getURI())) {

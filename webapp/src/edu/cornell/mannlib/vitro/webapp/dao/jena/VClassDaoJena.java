@@ -66,14 +66,20 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 public class VClassDaoJena extends JenaBaseDao implements VClassDao {
 
     protected static final Log log = LogFactory.getLog(VClassDaoJena.class);
+    private boolean isUnderlyingStoreReasoned = false;
 
-    public VClassDaoJena(WebappDaoFactoryJena wadf) {
+    public VClassDaoJena(WebappDaoFactoryJena wadf, boolean isUnderlyingStoreReasoned) {
         super(wadf);
+        this.isUnderlyingStoreReasoned = isUnderlyingStoreReasoned;
     }
 
     @Override
     protected OntModel getOntModel() {
         return getOntModelSelector().getTBoxModel();
+    }
+    
+    protected boolean isUnderlyingStoreReasoned() {
+        return this.isUnderlyingStoreReasoned;
     }
 
     /* ************************************************** */
@@ -412,14 +418,11 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
 
         List<String> superclassURIs = null;
 
-        //String infersTypes = getWebappDaoFactory().getProperties().get("infersTypes");
-        //if ("true".equalsIgnoreCase(infersTypes)) {
-
-        PelletListener pl = getWebappDaoFactory().getPelletListener();
-        if (pl != null && pl.isConsistent() && !pl.isInErrorState() && !pl.isReasoning()) {	
+        if (isUnderlyingStoreReasoned()) {	
             superclassURIs = new ArrayList<String>();
-            OntClass cls = getOntClass(getOntModel(),classURI);
-            StmtIterator superClassIt = getOntModel().listStatements(cls,RDFS.subClassOf,(RDFNode)null);
+            Resource cls = ResourceFactory.createResource(classURI);
+            StmtIterator superClassIt = getOntModel().listStatements(
+                    cls, RDFS.subClassOf, (RDFNode)null);
             while (superClassIt.hasNext()) {
                 Statement stmt = superClassIt.nextStatement();
                 if (stmt.getObject().canAs(OntResource.class)) {
@@ -766,12 +769,9 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                     }
                     if (superVclass != null) {
                         vClasses.add(superVclass);                                                                       
-                        String isInferencing = getWebappDaoFactory().getProperties().get("infersTypes");
 						// if this model infers types based on the taxonomy, adding the subclasses will only
 						// waste time for no benefit
-						PelletListener pl = getWebappDaoFactory().getPelletListener();
-						if (pl == null || !pl.isConsistent() || pl.isInErrorState() || pl.isReasoning() 
-								|| isInferencing == null || "false".equalsIgnoreCase(isInferencing)) {
+						if (!isUnderlyingStoreReasoned()) {
                         	Iterator classURIs = getAllSubClassURIs(getClassURIStr(superclass)).iterator();
                         	while (classURIs.hasNext()) {
                             	String classURI = (String) classURIs.next();

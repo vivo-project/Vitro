@@ -35,8 +35,8 @@ public class VClassDaoSDB extends VClassDaoJena {
 	
     public VClassDaoSDB(DatasetWrapperFactory datasetWrapperFactory, 
                         SDBDatasetMode datasetMode,
-                        WebappDaoFactoryJena wadf) {
-        super(wadf);
+                        WebappDaoFactoryJena wadf, boolean isUnderlyingStoreReasoned) {
+        super(wadf, isUnderlyingStoreReasoned);
         this.dwf = datasetWrapperFactory;
         this.datasetMode = datasetMode;
     }

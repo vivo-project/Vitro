@@ -86,7 +86,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         }
         
         populatedObjectPropertyList.addAll(additions);
-                
+        
         propertyList.addAll(populatedObjectPropertyList);
 
         // If editing this page, merge in object properties applicable to the individual that are currently
@@ -95,7 +95,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         if (editing) {
             mergeAllPossibleObjectProperties(populatedObjectPropertyList, propertyList);
         }
-
+        
         // Now do much the same with data properties: get the list of populated data properties, then add in placeholders for missing ones 
         // rjy7 Currently we are getting the list of properties in one sparql query, then doing a separate query
         // to get values for each property. This could be optimized by doing a single query to get a map of properties to 
@@ -105,11 +105,11 @@ public class GroupedPropertyList extends BaseTemplateModel {
         List<DataProperty> populatedDataPropertyList = subject
                 .getPopulatedDataPropertyList();
         propertyList.addAll(populatedDataPropertyList);
-
+        
         if (editing) {
             mergeAllPossibleDataProperties(propertyList);
         }
-
+        
         sort(propertyList);
 
         // Put the list into groups

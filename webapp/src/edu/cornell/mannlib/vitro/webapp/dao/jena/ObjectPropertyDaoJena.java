@@ -310,7 +310,6 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             ResultSet rs = qe.execSelect();
             if (rs.hasNext()) {
                 QuerySolution qsoln = rs.nextSolution();
-                log.debug(qsoln);
                 Resource groupRes = qsoln.getResource("group");
                 if (groupRes != null) {
                     op.setGroupURI(groupRes.getURI());
