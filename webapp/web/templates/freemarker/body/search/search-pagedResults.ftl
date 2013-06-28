@@ -2,13 +2,32 @@
 
 <#-- Template for displaying paged search results -->
 
-<h2>
+
+
+
+<h2 style="float:left">
 <#escape x as x?html>
     ${i18n().search_results_for} '${querytext}'
     <#if classGroupName?has_content>${i18n().limited_to_type} '${classGroupName}'</#if>
     <#if typeName?has_content>${i18n().limited_to_type} '${typeName}'</#if>
 </#escape>
+<script type="text/javascript">
+	var url = window.location.toString();	
+	if (url.indexOf("?") == -1){
+		var queryText = 'querytext=${querytext}';
+	} else {
+		var urlArray = url.split("?");
+		var queryText = urlArray[1];
+	}
+	
+	var urlsBase = '${urls.base}';
+</script>
 </h2>
+
+<span id="downloadResults" title="Download Results">
+	<img id="downloadIcon" src="images/download-icon.png" alt="Download Results"  />
+</span>
+
 <span id="searchHelp"><a href="${urls.base}/searchHelp" title="${i18n().search_help}">${i18n().not_expected_results}</a></span>
 <div class="contentsBrowseGroup">
 
@@ -18,7 +37,7 @@
             <h4>${i18n().display_only}</h4>           
             <ul>           
             <#list classGroupLinks as link>
-                <li><a href="${link.url}" title="${i18n().class_group_link}">${link.text}</a></li>
+                <li><a href="${link.url}" title="${i18n().class_group_link}">${link.text}</a><span>(${link.count})</span></li>
             </#list>
             </ul>           
         </div>
@@ -33,7 +52,7 @@
             </#if>
             <ul>           
             <#list classLinks as link>
-                <li><a href="${link.url}" title="${i18n().class_link}">${link.text}</a></li>
+                <li><a href="${link.url}" title="${i18n().class_link}">${link.text}</a><span>(${link.count})</span></li>
             </#list>
             </ul>
         </div>
@@ -93,4 +112,12 @@
 
 </div> <!-- end contentsBrowseGroup -->
 
-${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/search.css" />')}
+${stylesheets.add('<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />',
+  				  '<link rel="stylesheet" href="${urls.base}/css/search.css" />')}
+
+${headScripts.add('<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>',
+				  '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>',
+                  '<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>'
+                  )}
+
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/searchDownload.js"></script>')}

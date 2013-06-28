@@ -79,7 +79,22 @@ ul.searchTips li {
 }
 span#searchHelp {
     float:right;
-    margin-top:-45px;
+    margin-top:10px;
     font-size:.825em;
     padding-right:32px
+}
+
+span#downloadResults {
+    float:left;
+    margin-top:10px;
+    font-size:.825em;
+    padding-left:10px
+}
+
+img#downloadIcon {
+    cursor: pointer;
+}
+
+.download-url {
+	padding: 5px 25px 5px;
 }
