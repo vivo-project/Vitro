@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.datatypes.TypeMapper;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntResource;
@@ -27,7 +30,6 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -40,14 +42,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.controller.edit.ReorderController;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ObjectPropertyStatementDaoJena;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPropertyStatementDao
 {
@@ -114,7 +111,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
                 StmtIterator stmtIt = ind.listProperties();
                 while( stmtIt.hasNext() )
                 {
-                    Statement st = (Statement)stmtIt.next();
+                    Statement st = stmtIt.next();
                     boolean addToList = /*allowAnyNameSpace ? st.getObject().canAs(Literal.class) :*/ st.getObject().isLiteral() && 
                           (
                               (RDF.value.equals(st.getPredicate()) || VitroVocabulary.value.equals(st.getPredicate().getURI())) 
@@ -210,7 +207,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
         // do something annoying if we are dealing with a blank node
     	try {	
 	    	getOntModel().enterCriticalSection(Lock.READ);
-	        OntResource ontRes = (OntResource) getOntModel().createResource(
+	        OntResource ontRes = getOntModel().createResource(
 	        		new AnonId(entity.getLocalName())).as(OntResource.class);
 	        if (ontRes == null) {
 	        	return edList;

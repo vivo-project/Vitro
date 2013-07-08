@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import java.util.ArrayList;
 import java.util.Collections;
 
 import org.apache.commons.collections.iterators.EmptyIterator;

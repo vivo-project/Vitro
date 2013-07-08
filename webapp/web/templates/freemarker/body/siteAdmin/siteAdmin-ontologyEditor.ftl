@@ -4,36 +4,36 @@
 
 <#if ontologyEditor?has_content>
     <section class="pageBodyGroup" role="region">
-        <h3>Ontology Editor</h3>
+        <h3>${i18n().ontology_editor}</h3>
         
         <#if ontologyEditor.pellet?has_content>
             <div class="notice">
                 <p>${ontologyEditor.pellet.error}</p>
                 <#if ontologyEditor.pellet.explanation?has_content>
-                    <p>Cause: ${ontologyEditor.pellet.explanation}</p>
+                    <p>${i18n().cause} ${ontologyEditor.pellet.explanation}</p>
                 </#if>
             </div>
         </#if>
         
         <ul role="navigation">
             <li role="listitem">
-                <a href="${ontologyEditor.urls.ontologies}" title="Ontology list">Ontology list</a></h4>
+                <a href="${ontologyEditor.urls.ontologies}" title="${i18n().ontology_list}">${i18n().ontology_list}</a>
             </li>
         </ul>
     
-        <h4>Class Management</h4>
+        <h4>${i18n().class_management}</h4>
         
         <ul role="navigation">
-            <li role="listitem"><a href="${ontologyEditor.urls.classHierarchy}" title="Class hierarchy">Class hierarchy</a></li>
-            <li role="listitem"><a href="${ontologyEditor.urls.classGroups}" title="Class groups">Class groups</a></li>
+            <li role="listitem"><a href="${ontologyEditor.urls.classHierarchy}" title="${i18n().class_hierarchy}">${i18n().class_hierarchy}</a></li>
+            <li role="listitem"><a href="${ontologyEditor.urls.classGroups}" title="${i18n().class_groups}">${i18n().class_groups}</a></li>
         </ul>
         
-        <h4>Property Management</h4>
+        <h4>${i18n().property_management}</h4>
         
         <ul role="navigation">
-            <li role="listitem"><a href="${ontologyEditor.urls.objectPropertyHierarchy}" title="Object property hierarchy">Object property hierarchy</a></li>
-            <li role="listitem"><a href="${ontologyEditor.urls.dataPropertyHierarchy}" title="Data property hierarchy">Data property hierarchy</a></li>
-            <li role="listitem"><a href="${ontologyEditor.urls.propertyGroups}" title="Property groups">Property groups</a></li>
+            <li role="listitem"><a href="${ontologyEditor.urls.objectPropertyHierarchy}" title="${i18n().object_property_hierarchy}">${i18n().object_property_hierarchy}</a></li>
+            <li role="listitem"><a href="${ontologyEditor.urls.dataPropertyHierarchy}" title="${i18n().data_property_hierarchy}">${i18n().data_property_hierarchy}</a></li>
+            <li role="listitem"><a href="${ontologyEditor.urls.propertyGroups}" title="${i18n().property_groups}">${i18n().property_groups}</a></li>
         </ul>
         
     </section>

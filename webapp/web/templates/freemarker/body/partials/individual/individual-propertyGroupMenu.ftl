@@ -1,8 +1,8 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Template for property group menu on individual profile page -->
+<#-- Template for property group menu on individual profile page nameForOtherGroup! -->
 
-<#assign nameForOtherGroup = nameForOtherGroup!"other">
+<#assign nameForOtherGroup = "${i18n().other}">
 
 <#if (propertyGroups.all)??>
     <#assign groups = propertyGroups.all>
@@ -18,7 +18,7 @@
                         	<#assign groupnameHtmlId = p.createPropertyGroupHtmlId(groupname) >
                             <#-- capitalize will capitalize each word in the name; cap_first only the first. We may need a custom
                             function to capitalize all except function words. -->
-                            <li role="listitem"><a href="#${groupnameHtmlId}" title="group name">${groupname?capitalize}</a></li>
+                            <li role="listitem"><a href="#${groupnameHtmlId}" title="${i18n().group_name}">${groupname?capitalize}</a></li>
                         </#if>
                     </#list>
                 </ul>

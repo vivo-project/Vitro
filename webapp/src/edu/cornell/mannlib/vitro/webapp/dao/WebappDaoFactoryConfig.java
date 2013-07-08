@@ -12,6 +12,7 @@ public class WebappDaoFactoryConfig {
 	private List<String> preferredLanguages;
 	private String defaultNamespace;
 	private Set<String> nonUserNamespaces;
+	private boolean isUnderlyingStoreReasoned = false;
 	
 	public WebappDaoFactoryConfig() {
 	    preferredLanguages = Arrays.asList("en-US", "en", "EN");
@@ -42,6 +43,14 @@ public class WebappDaoFactoryConfig {
 	
 	public void setNonUserNamespaces(Set<String> nonUserNamespaces) {
 		this.nonUserNamespaces = nonUserNamespaces;
+	}
+	
+	public void setUnderlyingStoreReasoned(boolean isReasoned) {
+	    this.isUnderlyingStoreReasoned = isReasoned;
+	}
+	
+	public boolean isUnderlyingStoreReasoned() {
+	    return this.isUnderlyingStoreReasoned;
 	}
 	
 }

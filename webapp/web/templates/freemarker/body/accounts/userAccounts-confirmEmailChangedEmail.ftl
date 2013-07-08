@@ -2,37 +2,20 @@
 
 <#-- Confirmation that the user has changed his email account. -->
 
-<#assign subject = "Your ${siteName} email account has been changed." />
+<#assign strings = i18n() />
 
-<#assign html>
-<html>
-    <head>
-        <title>${subject}</title>
-    </head>
-    <body>
-        <p>
-            Hi, ${userAccount.firstName} ${userAccount.lastName}
-        </p>
-        
-        <p>
-            You recently changed the email address associated with 
-            ${userAccount.firstName} ${userAccount.lastName}
-        </p>
-        
-        <p>
-            Thank you.
-        </p>
-    </body>
-</html>
-</#assign>
+<#assign subject = strings.email_changed_subject(siteName) />
 
-<#assign text>
-Hi, ${userAccount.firstName} ${userAccount.lastName}
+<#assign html = strings.email_changed_html(siteName, 
+                                           subject, 
+                                           userAccount.firstName, 
+                                           userAccount.lastName, 
+                                           userAccount.emailAddress) />
 
-You recently changed the email address associated with 
-${userAccount.firstName} ${userAccount.lastName}
-
-Thank you.
-</#assign>
+<#assign text = strings.email_changed_text(siteName, 
+                                           subject, 
+                                           userAccount.firstName, 
+                                           userAccount.lastName, 
+                                           userAccount.emailAddress) />
 
 <@email subject=subject html=html text=text />

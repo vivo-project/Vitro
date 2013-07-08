@@ -16,6 +16,7 @@ var manageLabels = {
 
         // Get the custom form data from the page
         $.extend(this, customFormData);
+        $.extend(this, i18nStrings);
     },
 
     // Initial page setup. Called only at page load.
@@ -37,6 +38,11 @@ var manageLabels = {
 
         $('input#submit').click( function() {
              manageLabels.processLabel(manageLabels.selectedRadio);
+             $('span.or').hide();
+             $('a.cancel').hide();
+             $('span#indicator').removeClass('hidden');
+             $('input.submit').addClass('disabledSubmit');
+             $('input.submit').attr('disabled', 'disabled');             
         });
 
     },
@@ -70,11 +76,19 @@ var manageLabels = {
             complete: function(request, status) {
                 
                 if (status == 'success') {
+                    $('span.or').show();
+                    $('a.cancel').show();
+                    $('span#indicator').addClass('hidden');
                     window.location = $('a.cancel').attr('href');
                 }
                 else {
-                    alert('Error processing request: the unchecked labels could not be deleted.');
+                    alert(manageLabels.errorProcessingLabels);
                     selectedRadio.removeAttr('checked');
+                    $('span.or').show();
+                    $('a.cancel').show();
+                    $('span#indicator').addClass('hidden');
+                    $('input.submit').removeClass('disabledSubmit');
+                    $('input.submit').attr('disabled', '');
                 }
             }
         });        

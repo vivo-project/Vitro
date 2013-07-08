@@ -65,6 +65,11 @@ public class ObjectPropertyDaoStub implements ObjectPropertyDao {
 		}
 		return opMap.get(objectPropertyURI);
 	}
+	
+    @Override
+    public ObjectProperty getObjectPropertyByURIAndRangeURI(String objectPropertyURI, String rangeURI) {
+        return getObjectPropertyByURI(objectPropertyURI);
+    }
 
 	@Override
 	public String getCustomListViewConfigFileName(ObjectProperty objectProperty) {

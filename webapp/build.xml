@@ -9,6 +9,36 @@
      ====================================================================== -->
 
 <project name="vitroCore" default="describe">
+	<property environment="env" />
+
+	<!-- We must be using a suitable version of Java. -->
+	<fail>
+		<condition>
+			<not>
+				<or>
+					<equals arg1="1.7" arg2="${ant.java.version}" />
+					<equals arg1="1.8" arg2="${ant.java.version}" />
+				</or>
+			</not>
+		</condition>
+		The Vitro build script requires Java 7 or later.
+		Java system property java.version = ${java.version}
+		Java system property java.home = ${java.home}
+		JAVA_HOME environment variable = ${env.JAVA_HOME}
+	</fail>
+
+	<!-- We must be using a suitable version of Ant. -->
+	<fail>
+		<condition>
+			<not>
+				<antversion atleast="1.8" />
+			</not>
+		</condition>
+		The Vitro build script requires Ant 1.8 or later.
+		Ant property ant.version = ${ant.version}
+		Ant property ant.home = ${ant.home}
+		ANT_HOME environment variable = ${env.ANT_HOME}
+	</fail>
 
 	<!-- A product script will override appbase.dir, but not corebase.dir -->
 	<dirname property="corebase.dir" file="${ant.file.vitroCore}" />
@@ -99,7 +129,7 @@
 		       encoding="UTF8"
 		       includeantruntime="false"
 		       optimize="false"
-		       source="1.6">
+		       source="1.7">
 			<classpath refid="utility.compile.classpath" />
 		</javac>
 
@@ -137,7 +167,7 @@
 		</copy>
 
 		<!-- use the production Log4J properties, unless a debug version exists. -->
-		<condition property="log4j.properties.file" value="debug.log4j.properties" else="default.log4j.properties">
+		<condition property="log4j.properties.file" value="debug.log4j.properties" else="log4j.properties">
 			<available file="${appbase.dir}/config/debug.log4j.properties" />
 		</condition>
 		<copy file="${appbase.dir}/config/${log4j.properties.file}" 
@@ -202,7 +232,7 @@
 		       encoding="UTF8" 
 		       includeantruntime="false" 
 		       optimize="true" 
-		       source="1.6">
+		       source="1.7">
 			<classpath refid="main.compile.classpath" />
 		</javac>
 	</target>
@@ -224,7 +254,7 @@
 		       encoding="UTF8" 
 		       includeantruntime="false" 
 		       optimize="false" 
-		       source="1.6">
+		       source="1.7">
 			<classpath refid="test.compile.classpath" />
 		</javac>
 

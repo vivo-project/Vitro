@@ -2,10 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import com.hp.hpl.jena.ontology.OntModel;
@@ -16,7 +14,6 @@ import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
 

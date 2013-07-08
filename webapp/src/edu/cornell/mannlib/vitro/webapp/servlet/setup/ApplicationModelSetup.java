@@ -9,7 +9,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
@@ -23,7 +22,8 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
@@ -63,8 +63,8 @@ implements ServletContextListener {
             }
             OntModel displayModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
             displayModel.add(displayDbModel);           
-            displayModel.getBaseModel().register(new ModelSynchronizer(displayDbModel));            
-            ModelContext.setDisplayModel(displayModel, ctx);
+            displayModel.getBaseModel().register(new ModelSynchronizer(displayDbModel));        
+            ModelAccess.on(ctx).setDisplayModel(displayModel);
             
             //at each startup load all RDF files from directory to sub-models of display model  
             initializeDisplayLoadedAtStartup(ctx, displayModel);                
@@ -84,7 +84,7 @@ implements ServletContextListener {
                     MEM_ONT_MODEL_SPEC);
             appTBOXModel.add(displayTboxModel);
             appTBOXModel.getBaseModel().register(new ModelSynchronizer(displayTboxModel));
-            ctx.setAttribute("displayOntModelTBOX", appTBOXModel);
+            ModelAccess.on(ctx).setOntModel(ModelID.DISPLAY_TBOX, appTBOXModel);
             log.debug("Loaded file " + APPPATH_LOAD + "displayTBOX.n3 into display tbox model");
         } catch (Throwable t) {
             log.error("Unable to load user application configuration model TBOX", t);
@@ -102,7 +102,7 @@ implements ServletContextListener {
                     MEM_ONT_MODEL_SPEC);
             appDisplayDisplayModel.add(displayDisplayModel);
             appDisplayDisplayModel.getBaseModel().register(new ModelSynchronizer(displayDisplayModel));
-            ctx.setAttribute("displayOntModelDisplayModel", appDisplayDisplayModel);
+            ModelAccess.on(ctx).setOntModel(ModelID.DISPLAY_DISPLAY, appDisplayDisplayModel);
             log.debug("Loaded file " + APPPATH_LOAD + "displayDisplay.n3 into display display model");
         } catch (Throwable t) {
             log.error("Unable to load user application configuration model Display Model", t);

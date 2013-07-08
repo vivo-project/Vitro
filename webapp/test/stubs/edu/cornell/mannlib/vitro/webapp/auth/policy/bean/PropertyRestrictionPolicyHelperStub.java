@@ -8,6 +8,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 
@@ -57,7 +60,7 @@ public class PropertyRestrictionPolicyHelperStub extends
 			Map<String, RoleLevel> displayThresholds,
 			Map<String, RoleLevel> modifyThresholds) {
 		super(modifyRestrictedNamespaces, modifyPermittedExceptions,
-				displayThresholds, modifyThresholds);
+				displayThresholds, modifyThresholds, ModelFactory.createDefaultModel());
 	}
 
 }

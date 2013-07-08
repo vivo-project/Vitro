@@ -13,7 +13,7 @@
         var menuItemData = [];
     </script>
     
-    <h3>Menu Ordering</h3>
+    <h3>${i18n().menu_ordering}</h3>
     
     <#-- List the menu items -->
     <ul class="menuItems">
@@ -31,10 +31,14 @@
             <input type="hidden" name="editForm" value="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator" role="input">
        		<input type="hidden" name="addMenuItem" value="true" />
        	<input id="submit" value="Add new menu page" role="button" type="submit" >
+       	<#if verbosePropertySwitch.url?contains("pageManagement")>
+       	    <span class="or"> ${i18n().or} </span>
+       	    <a  style="margin-left:7px" href="${urls.base}/pageList" title="Return to Profile Page">Return to Page Management</a>
+       	</#if>
         
         </form>
             <br />
-            <p class="note">Refresh page after reordering menu items</p>
+            <p class="note">${i18n().refresh_page_after_reordering}</p>
         </#if>
     </#if>
     
@@ -51,9 +55,13 @@
             reorderUrl: '${reorderUrl}',
             positionPredicate: '${positionPredicate}'
         };
+        var i18nStrings = {
+            dragDropMenus: '${i18n().drag_drop_to_reorder_menus}',
+            reorderingFailed: '${i18n().reordering_menus_failed}'
+        };
     </script>
     
     ${scripts.add('<script type="text/javascript" src="${urls.base}/js/individual/menuManagement.js"></script>')}
 <#else>
-    <p id="error-alert">There was an error in the system. The display:hasElement property could not be retrieved.</p>
+    <p id="error-alert">${i18n().display_has_element_error}</p>
 </#if>

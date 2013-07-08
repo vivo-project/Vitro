@@ -53,6 +53,23 @@ public class VitroResourceBundle extends ResourceBundle {
 	// Factory method
 	// ----------------------------------------------------------------------
 
+	/**
+	 * Returns the bundle for the for foo_ba_RR, providing that
+	 * foo_ba_RR.properties exists in the I18n area of either the theme or the
+	 * application.
+	 * 
+	 * If the desired file doesn't exist in either location, return null.
+	 * Usually, this does not indicate a problem but only that we were looking
+	 * for too specific a bundle. For example, if the base name of the bundle is
+	 * "all" and the locale is "en_US", we will likely return null on the search
+	 * for all_en_US.properties, and all_en.properties, but will return a full
+	 * bundle for all.properties.
+	 * 
+	 * Of course, if all.properties doesn't exist either, then we have a
+	 * problem, but that will be reported elsewhere.
+	 * 
+	 * @return the populated bundle or null.
+	 */
 	public static VitroResourceBundle getBundle(String bundleName,
 			ServletContext ctx, String appI18nPath, String themeI18nPath,
 			Control control) {
@@ -60,7 +77,7 @@ public class VitroResourceBundle extends ResourceBundle {
 			return new VitroResourceBundle(bundleName, ctx, appI18nPath,
 					themeI18nPath, control);
 		} catch (FileNotFoundException e) {
-			log.debug(e);
+			log.debug(e.getMessage());
 			return null;
 		} catch (Exception e) {
 			log.warn(e, e);

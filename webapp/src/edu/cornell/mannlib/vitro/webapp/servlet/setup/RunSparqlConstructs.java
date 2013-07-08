@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -28,6 +29,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.util.ResourceUtils;
 
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class RunSparqlConstructs implements ServletContextListener {
@@ -42,18 +44,20 @@ public class RunSparqlConstructs implements ServletContextListener {
 	
 	public void contextInitialized(ServletContextEvent sce) {
 		try {
-			WebappDaoFactory wadf = (WebappDaoFactory) sce.getServletContext().getAttribute("webappDaoFactory");
+			ServletContext ctx = sce.getServletContext();
+			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
+
 			String namespace = (wadf != null && wadf.getDefaultNamespace() != null) 
 				? wadf.getDefaultNamespace() : DEFAULT_DEFAULT_NAMESPACE;
 			
-			OntModel baseOntModel = (OntModel) sce.getServletContext().getAttribute("baseOntModel");
+		    OntModel baseOntModel = ModelAccess.on(ctx).getBaseOntModel();
 			Model anonModel = ModelFactory.createDefaultModel();
 			Model namedModel = ModelFactory.createDefaultModel();
 			
-			Set<String> resourcePaths = sce.getServletContext().getResourcePaths(SPARQL_DIR);
+			Set<String> resourcePaths = ctx.getResourcePaths(SPARQL_DIR);
 			for (String path : resourcePaths) {
 				log.debug("Attempting to execute SPARQL at " + path);
-				File file = new File(sce.getServletContext().getRealPath(path));			
+				File file = new File(ctx.getRealPath(path));			
 				try {
 					BufferedReader reader = new BufferedReader(new FileReader(file));
 					StringBuffer fileContents = new StringBuffer();

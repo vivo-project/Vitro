@@ -3,3 +3,6 @@
 <#-- Main template for the login page -->
 
 <@widget name="login" />
+<script>
+$('div.vivoAccount').show();
+</script>

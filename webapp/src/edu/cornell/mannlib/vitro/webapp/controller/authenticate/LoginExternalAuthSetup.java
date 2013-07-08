@@ -53,7 +53,7 @@ public class LoginExternalAuthSetup extends BaseLoginServlet {
 
 		if (redirectUrl == null) {
 			complainAndReturnToReferrer(req, resp, ATTRIBUTE_REFERRER,
-					MESSAGE_LOGIN_FAILED);
+					messageLoginFailed(req));
 		}
 
 		log.debug("redirecting to '" + redirectUrl + "'");

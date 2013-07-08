@@ -2,42 +2,20 @@
 
 <#-- Confirmation that an password has been created. -->
 
-<#assign subject = "Your ${siteName} password has successfully been created." />
+<#assign strings = i18n() />
 
-<#assign html>
-<html>
-    <head>
-        <title>${subject}</title>
-    </head>
-    <body>
-        <p>
-            ${userAccount.firstName} ${userAccount.lastName}
-        </p>
-        
-        <p>
-            <strong>Password successfully created.</strong>
-        </p>
-        
-        <p>
-            Your new password associated with ${userAccount.emailAddress} has been created.
-        </p>
-        
-        <p>
-            Thank you.
-        </p>
-    </body>
-</html>
-</#assign>
+<#assign subject = strings.password_created_subject(siteName) />
 
-<#assign text>
-${userAccount.firstName} ${userAccount.lastName}
+<#assign html = strings.password_created_email_html(siteName, 
+                                                   subject, 
+                                                   userAccount.firstName, 
+                                                   userAccount.lastName, 
+                                                   userAccount.emailAddress) />
 
-Password successfully created.
-
-Your new password associated with ${userAccount.emailAddress} 
-has been created.
-
-Thank you.
-</#assign>
+<#assign text = strings.password_created_email_text(siteName, 
+                                                   subject, 
+                                                   userAccount.firstName, 
+                                                   userAccount.lastName, 
+                                                   userAccount.emailAddress) />
 
 <@email subject=subject html=html text=text />

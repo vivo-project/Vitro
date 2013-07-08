@@ -47,6 +47,7 @@ public class SimpleOntModelSelector implements OntModelSelector {
 		this.applicationMetadataModel = ontModel;
 		this.tboxModel = ontModel;
 		this.userAccountsModel = ontModel;
+		this.displayModel = ontModel;
 	}
 	
 	public void setABoxModel(OntModel m) {
@@ -89,26 +90,27 @@ public class SimpleOntModelSelector implements OntModelSelector {
 		this.fullModel = m;
 	}
 	
+	@Override
 	public OntModel getABoxModel() {
 		return aboxModel;
 	}
 	
+	@Override
 	public OntModel getApplicationMetadataModel() {
 		return applicationMetadataModel;
 	}
 
+	@Override
 	public OntModel getFullModel() {
 		return fullModel;
 	}
 
+	@Override
 	public OntModel getTBoxModel() {
 		return tboxModel;
 	}
 
-	public OntModel getTBoxModel(String ontologyURI) {
-		return tboxModel;
-	}
-
+	@Override
 	public OntModel getUserAccountsModel() {
 		return userAccountsModel;
 	}
@@ -120,6 +122,7 @@ public class SimpleOntModelSelector implements OntModelSelector {
 	public void setDisplayModel(OntModel displayModel) {
 		this.displayModel = displayModel;		
 	}
+	@Override
 	public OntModel getDisplayModel(){
 		return this.displayModel;
 	}

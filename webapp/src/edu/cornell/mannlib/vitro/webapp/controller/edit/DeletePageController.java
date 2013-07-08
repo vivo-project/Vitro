@@ -23,6 +23,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
@@ -38,6 +39,9 @@ public class DeletePageController extends VitroHttpServlet {
     @Override
     protected void doPost(HttpServletRequest rawRequest, HttpServletResponse resp)
             throws ServletException, IOException {
+    	if (!isAuthorizedToDisplayPage(rawRequest, resp, SimplePermission.MANAGE_MENUS.ACTION)) {
+    		return;
+    	}
     	removeStatements = ModelFactory.createDefaultModel();
     	VitroRequest vreq = new VitroRequest(rawRequest);
     	String pageUri = vreq.getParameter("pageURI");

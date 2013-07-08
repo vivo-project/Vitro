@@ -175,10 +175,12 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     
     //Also used above and can be used in object auto complete form
     public String getObjectPropertyNameForDisplay() {
+        // TODO modify this to get prop/class combo
     	String propertyTitle = null;
     	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);
     	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
     	Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
+    	VClass rangeClass = EditConfigurationUtils.getRangeVClass(vreq);
     	if(objectIndividual != null) {
     		propertyTitle = prop.getDomainPublic();
     	}  else {
@@ -186,8 +188,9 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
             if ( prop.getOfferCreateNewOption() ) {
             	//Try to get the name of the class to select from
            	  	VClass classOfObjectFillers = null;
-        
-    		    if( prop.getRangeVClassURI() == null ) {    	
+           	  	if (rangeClass != null) {
+           	  	    classOfObjectFillers = rangeClass;
+           	  	} else if( prop.getRangeVClassURI() == null ) {    	
     		    	// If property has no explicit range, try to get classes 
     		    	List<VClass> classes = wdf.getVClassDao().getVClassesForProperty(subject.getVClassURI(), prop.getURI());
     		    	if( classes == null || classes.size() == 0 || classes.get(0) == null ){	    	
@@ -514,12 +517,23 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	Individual sub = 
     		wdf.getIndividualDao().getIndividualByURI(editConfig.getSubjectUri());
     	
+    	VClass rangeClass = EditConfigurationUtils.getRangeVClass(vreq);
+    	
     	List<VClass> vclasses = null;
     	List<VClass> subjectVClasses = sub.getVClasses();
     	if( subjectVClasses == null ) {
     		vclasses = wdf.getVClassDao().getAllVclasses();
-    	}
-    	else {
+    	} else if (rangeClass != null) {
+    	    vclasses = new ArrayList<VClass>();
+    	    vclasses.add(rangeClass);
+    	    List<String> subURIs = wdf.getVClassDao().getSubClassURIs(rangeClass.getURI());
+    	    for (String subClassURI : subURIs) {
+    	        VClass subClass = wdf.getVClassDao().getVClassByURI(subClassURI);
+    	        if (subClass != null) {
+    	            vclasses.add(subClass);
+    	        }
+    	   }
+    	} else {
     		//this hash is used to make sure there are no duplicates in the vclasses
     		//a more elegant method may look at overriding equals/hashcode to enable a single hashset of VClass objects
 	    	HashSet<String> vclassesURIs = new HashSet<String>();
@@ -546,7 +560,6 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	
     	HashMap<String,String> types = new HashMap<String, String>();
     	for( VClass vclass : vclasses ){
-    		
     		String name = null;
     		if( vclass.getPickListName() != null && vclass.getPickListName().length() > 0){
     			name = vclass.getPickListName();

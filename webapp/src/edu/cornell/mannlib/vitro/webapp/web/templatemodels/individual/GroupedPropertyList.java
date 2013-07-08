@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.ApplicationConfigurationOntologyUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
 /*
@@ -72,15 +73,29 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // so we cannot just rely on getting that list.
         List<ObjectProperty> populatedObjectPropertyList = subject
                 .getPopulatedObjectPropertyList();
+        
+        List<ObjectProperty> additions = ApplicationConfigurationOntologyUtils
+                .getAdditionalFauxSubpropertiesForList(
+                        populatedObjectPropertyList, vreq);
+        if (log.isDebugEnabled()) {
+            for (ObjectProperty t : additions) {
+                log.debug(t.getDomainPublic() + " " + t.getGroupURI());
+            }
+            log.debug("Added " + additions.size() + 
+                    " properties due to application configuration ontology");
+        }
+        
+        populatedObjectPropertyList.addAll(additions);
+        
         propertyList.addAll(populatedObjectPropertyList);
 
         // If editing this page, merge in object properties applicable to the individual that are currently
         // unpopulated, so the properties are displayed to allow statements to be added to these properties.
         // RY In future, we should limit this to properties that the user has permission to add properties to.
         if (editing) {
-            mergeAllPossibleObjectProperties(populatedObjectPropertyList, propertyList);                   
+            mergeAllPossibleObjectProperties(populatedObjectPropertyList, propertyList);
         }
-
+        
         // Now do much the same with data properties: get the list of populated data properties, then add in placeholders for missing ones 
         // rjy7 Currently we are getting the list of properties in one sparql query, then doing a separate query
         // to get values for each property. This could be optimized by doing a single query to get a map of properties to 
@@ -90,11 +105,11 @@ public class GroupedPropertyList extends BaseTemplateModel {
         List<DataProperty> populatedDataPropertyList = subject
                 .getPopulatedDataPropertyList();
         propertyList.addAll(populatedDataPropertyList);
-
+        
         if (editing) {
             mergeAllPossibleDataProperties(propertyList);
         }
-
+        
         sort(propertyList);
 
         // Put the list into groups
@@ -108,7 +123,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                     subject, editing, populatedDataPropertyList,
                     populatedObjectPropertyList));
         }
-
+        
         if (!editing) {
             pruneEmptyProperties();
         }
@@ -168,7 +183,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                 if (pi != null) {
                     if (!alreadyOnObjectPropertyList(
                             populatedObjectPropertyList, pi)) {
-                        addObjectPropertyToPropertyList(pi.getPropertyURI(),
+                        addObjectPropertyToPropertyList(pi.getPropertyURI(), pi.getRangeClassURI(),
                                 propertyList);
                     }
                 } else {
@@ -184,7 +199,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // constitute a special case (i.e., included in piDao.getAllPossiblePropInstForIndividual()).
         for (String propertyUri : VITRO_PROPS_TO_ADD_TO_LIST) {
             if (!alreadyOnPropertyList(propertyList, propertyUri)) {
-                addObjectPropertyToPropertyList(propertyUri, propertyList);
+                addObjectPropertyToPropertyList(propertyUri, null, propertyList);
             }
         }
     }
@@ -202,10 +217,10 @@ public class GroupedPropertyList extends BaseTemplateModel {
         return false;
     }
 
-    private void addObjectPropertyToPropertyList(String propertyUri,
+    private void addObjectPropertyToPropertyList(String propertyUri, String rangeUri,
             List<Property> propertyList) {
         ObjectPropertyDao opDao = wdf.getObjectPropertyDao();
-        ObjectProperty op = opDao.getObjectPropertyByURI(propertyUri);
+        ObjectProperty op = opDao.getObjectPropertyByURIAndRangeURI(propertyUri, rangeUri);
         if (op == null) {
             log.error("ObjectProperty op returned null from opDao.getObjectPropertyByURI(" + propertyUri + ")");
         } else if (op.getURI() == null) {
@@ -351,7 +366,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
             } else {
                 String groupUriForProperty = p.getGroupURI();
                 boolean assignedToGroup = false;
-
                 if (groupUriForProperty != null) {
                     for (PropertyGroup pg : groupList) {
                         String groupUri = pg.getURI();
@@ -359,7 +373,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                             pg.getPropertyList().add(p);
                             assignedToGroup = true;
                             break;
-                        }
+                        }     
                     }
                 }
 

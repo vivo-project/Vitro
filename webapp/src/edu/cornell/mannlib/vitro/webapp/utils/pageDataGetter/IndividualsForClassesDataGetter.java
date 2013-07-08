@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,22 +16,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-
-import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 
@@ -44,7 +33,8 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateMo
 public class IndividualsForClassesDataGetter implements PageDataGetter{
     private static final Log log = LogFactory.getLog(IndividualsForClassesDataGetter.class);
     protected static String restrictClassesTemplateName = null;
-    public Map<String,Object> getData(ServletContext context, VitroRequest vreq, String pageUri, Map<String, Object> page ){
+    @Override
+	public Map<String,Object> getData(ServletContext context, VitroRequest vreq, String pageUri, Map<String, Object> page ){
         this.setTemplateName();
     	HashMap<String, Object> data = new HashMap<String,Object>();
         //This is the old technique of getting class intersections
@@ -158,7 +148,7 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
     	log.debug("Processing classes that will be displayed");
     	List<VClass> vClasses = new ArrayList<VClass>();
   
-    	VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+    	VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
     	for(String classUri: classes) {
     		//Retrieve vclass from cache to get the count
     		VClass vclass = vcgc.getCachedVClass(classUri);
@@ -193,7 +183,7 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
 	    	List<VClass> restrictVClasses = new ArrayList<VClass>();
 	    	
 	    	List<String> urlEncodedRestrictClasses = new ArrayList<String>();
-	    	VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+	    	VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
 
 	    	if(restrictClasses.size() > 0) {
 	    		//classes for restriction are not displayed so don't need to include their class individual counts
@@ -237,7 +227,7 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
     
     public static VClassGroupTemplateModel getClassGroup(String classGroupUri, ServletContext context, VitroRequest vreq){
         
-        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+        VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
         List<VClassGroup> vcgList = vcgc.getGroups();
         VClassGroup group = null;
         for( VClassGroup vcg : vcgList){
@@ -275,18 +265,21 @@ public class IndividualsForClassesDataGetter implements PageDataGetter{
         return new VClassGroupTemplateModel(group);
     }
     
-    public String getType(){
+    @Override
+	public String getType(){
         return PageDataGetterUtils.generateDataGetterTypeURI(IndividualsForClassesDataGetter.class.getName());
     } 
     
     //Get data servuice
-    public String getDataServiceUrl() {
+    @Override
+	public String getDataServiceUrl() {
     	return UrlBuilder.getUrl("/dataservice?getSolrIndividualsByVClasses=1&vclassId=");
     }
     /**
      * For processig of JSONObject
      */
-    public JSONObject convertToJSON(Map<String, Object> map, VitroRequest vreq) {
+    @Override
+	public JSONObject convertToJSON(Map<String, Object> map, VitroRequest vreq) {
     	JSONObject rObj = PageDataGetterUtils.processVclassResultsJSON(map, vreq, true);
     	return rObj;
     }

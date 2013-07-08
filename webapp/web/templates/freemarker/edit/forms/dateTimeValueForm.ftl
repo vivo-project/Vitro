@@ -7,16 +7,16 @@
 <#assign htmlForElements = editConfiguration.pageData.htmlForElements />
 
 <#if editMode == "edit">        
-        <#assign titleVerb="Edit">        
-        <#assign submitButtonText="Edit Date/Time Value">
+        <#assign titleVerb="${i18n().edit_capitalized}">        
+        <#assign submitButtonText="${i18n().edit_date_time_value}">
         <#assign disabledVal="disabled">
 <#else>
-        <#assign titleVerb="Create">        
-        <#assign submitButtonText="Create Date/Time Value">
+        <#assign titleVerb="${i18n().create_capitalized}">        
+        <#assign submitButtonText="${i18n().create_date_time_value}">
         <#assign disabledVal=""/>
 </#if>
 
-<h2>${titleVerb} date time value for ${editConfiguration.subjectName}</h2>
+<h2>${titleVerb} ${i18n().date_time_value_for} ${editConfiguration.subjectName}</h2>
 
 <form class="customForm" action ="${submitUrl}" class="customForm">
 <#--Need to draw edit elements for dates here-->
@@ -28,9 +28,9 @@
         <input type="hidden" name="editKey" value="${editKey}" />
         <input type="submit" id="submit" value="${submitButtonText}" role="button" />
     
-        <span class="or"> or </span>
+        <span class="or"> ${i18n().or} </span>
     
-        <a class="cancel" href="${editConfiguration.cancelUrl}" title="Cancel">Cancel</a>
+        <a class="cancel" href="${editConfiguration.cancelUrl}" title="${i18n().cancel_title}">${i18n().cancel_link}</a>
     </p>
 </form>
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customForm.css" />',

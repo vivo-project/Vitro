@@ -1,5 +1,7 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
+$.extend(this, i18nStringsSparqlQuery);
+
 //Process sparql data getter and provide a json object with the necessary information
 var processSparqlDataGetterContent = {
 	dataGetterClass:null,
@@ -35,7 +37,7 @@ var processSparqlDataGetterContent = {
 	},
 	//For the label of the content section for editing, need to add additional value
 	retrieveContentLabel:function() {
-		return "SPARQL Query Results";
+		return i18nStringsSparqlQuery.sparqlResults;
 	},
 	//For the label of the content section for editing, need to add additional value
 	retrieveAdditionalLabelText:function(existingContentObject) {
@@ -48,13 +50,13 @@ var processSparqlDataGetterContent = {
     	//Check that query and saveToVar have been input
     	var variableValue = pageContentSection.find("input[name='saveToVar']").val();
     	if(variableValue == "") {
-    		validationError += pageContentSectionLabel + ": You must supply a variable to save query results. <br />"
+    		validationError += pageContentSectionLabel + ": " + i18nStringsSparqlQuery.supplyQueryVariable + " <br />"
     	}
     	if(processSparqlDataGetterContent.stringHasSingleQuote(variableValue)) {
-    		validationError += pageContentSectionLabel + ": The variable name should not have an apostrophe . <br />";
+    		validationError += pageContentSectionLabel + ": " + i18nStringsSparqlQuery.noApostrophes + " <br />";
     	}
     	if(processSparqlDataGetterContent.stringHasDoubleQuote(variableValue)) {
-    		validationError += pageContentSectionLabel + ": The variable name should not have a double quote . <br />";
+    		validationError += pageContentSectionLabel + ": " + i18nStringsSparqlQuery.noDoubleQuotes + " <br />";
     	}
     	//Check that query  model does not have single or double quotes within it
     	//Uncomment this/adapt this when we actually allow display the query model input
@@ -71,7 +73,7 @@ var processSparqlDataGetterContent = {
     	
 		var queryValue = pageContentSection.find("textarea[name='query']").val();
 		if(queryValue == "") {
-			validationError += pageContentSectionLabel + ": You must supply a Sparql query. <br />";
+			validationError += pageContentSectionLabel + ": " + i18nStringsSparqlQuery.supplyQuery + " <br />";
 		}
     	return validationError;
     },

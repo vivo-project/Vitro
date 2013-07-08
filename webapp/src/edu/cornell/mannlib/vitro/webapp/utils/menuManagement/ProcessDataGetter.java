@@ -4,18 +4,15 @@ package edu.cornell.mannlib.vitro.webapp.utils.menuManagement;
 
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-
-import org.json.JSONObject;
+import javax.servlet.http.HttpServletRequest;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+
 public interface ProcessDataGetter{
-    public void populateTemplate(ServletContext context, Map<String, Object> pageData, Map<String, Object> templateData);
+    public void populateTemplate(HttpServletRequest req, Map<String, Object> pageData, Map<String, Object> templateData);
 
     public  Model processSubmission(VitroRequest vreq, Resource dataGetterResource);
     

@@ -59,8 +59,8 @@
                 // theme_advanced_buttons3_add_before : "tablecontrols,separator",
                 // invalid_elements : "li",
                 // theme_advanced_styles : "Header 1=header1;Header 2=header2;Header 3=header3;Table Row=tableRow1", // Theme specific setting CSS classes
-            }
-         };
+        }
+    };
 </script>
 
 <#-- Script to enable browsing individuals within a class -->

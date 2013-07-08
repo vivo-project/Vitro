@@ -34,6 +34,7 @@ var customForm = {
 
         // Get the custom form data from the page
         $.extend(this, customFormData);
+        $.extend(this, i18nStrings);
     },
     
     // On page load, create references for easy access to form elements.
@@ -547,7 +548,7 @@ var customForm = {
             this.typeName = selectedType.html();
             if ( this.editMode == 'edit' ) {
                 var $acSelect = this.acSelections[acTypeKey];
-                $acSelect.find('label').html('Selected ' + this.typeName + ':');
+                $acSelect.find('label').html( customForm.selectedString + ' ' + this.typeName + ':');
             }
         } 
         // reset to empty values; may not need
@@ -590,12 +591,12 @@ var customForm = {
         var typeText;
         // First case applies on page load; second case applies when the type gets changed. With multiple
         // ac fields there are cases where we also have to check if the help text is already there
-        if (!$(selectedObj).val() || $(selectedObj).hasClass(this.acHelpTextClass) || $(selectedObj).val().substring(0, 18) == "Select an existing" ) {
+        if (!$(selectedObj).val() || $(selectedObj).hasClass(this.acHelpTextClass) || $(selectedObj).val().substring(0, 18) == customForm.selectAnExisting ) {
         	typeText = this.getTypeNameForLabels($(selectedObj));            
-        	var helpText = "Select an existing " + typeText + " or create a new one.";
+        	var helpText = customForm.selectAnExisting + " " + typeText + " " + customForm.orCreateNewOne ;
         	//Different for object property autocomplete
         	if ( this.acSelectOnly ) {
-        		helpText = "Select an existing " + typeText;
+        		helpText = customForm.selectAnExisting + " " + typeText;
         	}
     		$(selectedObj).val(helpText)
     	               .addClass(this.acHelpTextClass);     

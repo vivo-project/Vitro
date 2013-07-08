@@ -7,11 +7,9 @@
 <#if subjectName?? >
 <h2>Manage Labels for ${subjectName}</h2>
 <#else>
-<h2>Manage Labels</h2>
+<h2>${i18n().manage_labels}</h2>
 </#if>
-<p id="mngLabelsText">
-Multiple labels exist for this profile but there should only be one. Select the label you want displayed on the profile page, and the others will be deleted. 
-</p>
+<p id="mngLabelsText">${i18n().manage_labels_intro}</p>
 
     <section id="rdfsLabels" role="container">
         <ul>
@@ -43,9 +41,12 @@ Multiple labels exist for this profile but there should only be one. Select the 
 
         <br />   
         <p>       
-            <input type="button" class="submit" id="submit" value="Save" role="button" role="input" />
+            <input type="button" class="submit" id="submit" value="${i18n().save_button}" role="button" role="input" />
             <span class="or"> or </span>
-            <a href="${urls.referringPage}" class="cancel" title="cancel" >Cancel</a>
+            <a href="${urls.referringPage}" class="cancel" title="${i18n().cancel_title}" >${i18n().cancel_link}</a>
+            <span id="indicator" class="indicator hidden">
+                <img class="indicator" src="${urls.base}/images/indicatorWhite.gif" alt="${i18n().processing_icon}"/>&nbsp;${i18n().selection_in_process}
+            </span>
         </p>
     </section>
 
@@ -53,6 +54,9 @@ Multiple labels exist for this profile but there should only be one. Select the 
 var customFormData = {
     processingUrl: '${urls.base}/edit/primitiveRdfEdit',
     individualUri: '${subjectUri!}'
+};
+var i18nStrings = {
+    errorProcessingLabels: '${i18n().error_processing_labels}'
 };
 </script>
 

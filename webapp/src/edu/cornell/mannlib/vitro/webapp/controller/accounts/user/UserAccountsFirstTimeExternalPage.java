@@ -115,18 +115,17 @@ public class UserAccountsFirstTimeExternalPage extends UserAccountsPage {
 
 	private void validateExternalAuthId() {
 		if (externalAuthId.isEmpty()) {
-			bogusMessage = "Login failed - External ID is not found.";
+			bogusMessage = i18n.text("external_id_not_provided");
 			return;
 		}
 		if (null != userAccountsDao
 				.getUserAccountByExternalAuthId(externalAuthId)) {
-			bogusMessage = "User account already exists for '" + externalAuthId
-					+ "'";
+			bogusMessage = i18n.text("external_id_already_in_use",
+					externalAuthId);
 			return;
 		}
 		if (!Authenticator.getInstance(vreq).isUserPermittedToLogin(null)) {
-			bogusMessage = "User logins are temporarily disabled "
-					+ "while the system is being maintained.";
+			bogusMessage = i18n.text("logins_disabled_for_maintenance");
 			return;
 		}
 	}

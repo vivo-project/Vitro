@@ -17,6 +17,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -26,6 +33,7 @@ import com.hp.hpl.jena.rdf.model.impl.Util;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
@@ -96,7 +104,10 @@ public class PropertyRestrictionPolicyHelper {
 	 * Initialize the bean with the standard prohibitions and exceptions, and
 	 * with the thresholds obtained from the model.
 	 */
-	public static PropertyRestrictionPolicyHelper createBean(OntModel model) {
+	public static PropertyRestrictionPolicyHelper createBean(OntModel model, 
+	                                                         Model displayModel) {
+	    
+	    
 		Map<String, RoleLevel> displayThresholdMap = new HashMap<String, RoleLevel>();
 		Map<String, RoleLevel> modifyThresholdMap = new HashMap<String, RoleLevel>();
 
@@ -111,7 +122,7 @@ public class PropertyRestrictionPolicyHelper {
 
 		PropertyRestrictionPolicyHelper bean = new PropertyRestrictionPolicyHelper(
 				PROHIBITED_NAMESPACES, PERMITTED_EXCEPTIONS,
-				displayThresholdMap, modifyThresholdMap);
+				displayThresholdMap, modifyThresholdMap, displayModel);
 
 		return bean;
 	}
@@ -171,6 +182,8 @@ public class PropertyRestrictionPolicyHelper {
 	 * the threshold role.
 	 */
 	private final Map<String, RoleLevel> modifyThresholdMap;
+	
+	private final Model displayModel;
 
 	/**
 	 * Store unmodifiable versions of the inputs.
@@ -182,11 +195,13 @@ public class PropertyRestrictionPolicyHelper {
 			Collection<String> modifyProhibitedNamespaces,
 			Collection<String> modifyExceptionsAllowedUris,
 			Map<String, RoleLevel> displayThresholdMap,
-			Map<String, RoleLevel> modifyThresholdMap) {
+			Map<String, RoleLevel> modifyThresholdMap,
+			Model displayModel) {
 		this.modifyProhibitedNamespaces = unmodifiable(modifyProhibitedNamespaces);
 		this.modifyExceptionsAllowedUris = unmodifiable(modifyExceptionsAllowedUris);
 		this.displayThresholdMap = unmodifiable(displayThresholdMap);
 		this.modifyThresholdMap = unmodifiable(modifyThresholdMap);
+		this.displayModel = displayModel;
 
 		if (log.isDebugEnabled()) {
 			log.debug("prohibited: " + this.modifyProhibitedNamespaces);
@@ -256,18 +271,33 @@ public class PropertyRestrictionPolicyHelper {
 		log.debug("can modify resource '" + resourceUri + "'");
 		return true;
 	}
+	
+	public boolean canDisplayPredicate(String predicateUri, RoleLevel userRole) {
+	    return canDisplayPredicate(predicateUri, null, userRole);
+	}
 
 	/**
 	 * If display of a predicate is restricted, the user's role must be at least
 	 * as high as the restriction level.
 	 */
-	public boolean canDisplayPredicate(String predicateUri, RoleLevel userRole) {
+	public boolean canDisplayPredicate(String predicateUri, String rangeUri, RoleLevel userRole) {
 		if (predicateUri == null) {
 			log.debug("can't display predicate: predicateUri was null");
 			return false;
 		}
-
-		RoleLevel displayThreshold = displayThresholdMap.get(predicateUri);
+		
+		RoleLevel displayThreshold = RoleLevel.NOBODY;
+		if (rangeUri == null) {
+		    displayThreshold = displayThresholdMap.get(predicateUri); 
+		} else {
+		    log.debug("Getting display threshold for " + predicateUri + " " + rangeUri);
+		    displayThreshold = getDisplayThreshold(predicateUri, rangeUri);
+		    if (displayThreshold == null) {
+		        displayThreshold = displayThresholdMap.get(predicateUri);
+		    }
+		    log.debug(displayThreshold);
+		}
+		       	        
 		if (isAuthorized(userRole, displayThreshold)) {
 			log.debug("can display predicate: '" + predicateUri
 					+ "', userRole=" + userRole + ", thresholdRole="
@@ -279,7 +309,45 @@ public class PropertyRestrictionPolicyHelper {
 				+ userRole + ", thresholdRole=" + displayThreshold);
 		return false;
 	}
-
+	
+	/**
+	 * Gets the role level threshold for displaying a predicate with a particular
+	 * object class
+	 * @param predicateUri
+	 * @param rangeUri
+	 * @return RoleLevel threshold
+	 */
+	private RoleLevel getDisplayThreshold(String predicateUri, String rangeUri) {
+	    String query = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
+	            "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
+                "SELECT ?level WHERE { \n" +
+//                "    ?p rdfs:subPropertyOf ?property . \n" +
+                "    ?context config:configContextFor ?p . \n" +
+                "    ?context config:qualifiedBy ?range . \n" +
+                "    ?context config:hasConfiguration ?configuration . \n" +
+                "    ?configuration vitro:hiddenFromDisplayBelowRoleLevelAnnot ?level \n" +
+                "}";
+	    Query q = QueryFactory.create(query);
+	    QueryExecution qe = QueryExecutionFactory.create(q, displayModel);
+	    try {
+	        ResultSet rs = qe.execSelect();
+	        if (!rs.hasNext()) {
+	            return null;
+	        } 
+	        while(rs.hasNext()) {
+	          QuerySolution qsoln = rs.nextSolution();
+	          Resource levelRes = qsoln.getResource("level");
+	          if (levelRes != null) {
+	              return RoleLevel.getRoleByUri(levelRes.getURI());
+	          }
+	        }
+	    } finally {
+	        qe.close();
+	    }
+	    return null;
+	}
+	
 	/**
 	 * A predicate cannot be modified if its namespace is in the prohibited list
 	 * (some exceptions are allowed).
@@ -344,14 +412,19 @@ public class PropertyRestrictionPolicyHelper {
 			StartupStatus ss = StartupStatus.getBean(ctx);
 
 			try {
-				OntModel model = (OntModel) ctx.getAttribute("jenaOntModel");
+				OntModel model = ModelAccess.on(ctx).getJenaOntModel();
 				if (model == null) {
 					throw new NullPointerException(
 							"jenaOntModel has not been initialized.");
 				}
-
+                Model displayModel = ModelAccess.on(ctx).getDisplayModel();
+                if (displayModel == null) {
+                    throw new NullPointerException(
+                            "display model has not been initialized.");
+                }
+				
 				PropertyRestrictionPolicyHelper bean = PropertyRestrictionPolicyHelper
-						.createBean(model);
+						.createBean(model, displayModel);
 				PropertyRestrictionPolicyHelper.setBean(ctx, bean);
 			} catch (Exception e) {
 				ss.fatal(this, "could not set up PropertyRestrictionPolicyHelper", e);

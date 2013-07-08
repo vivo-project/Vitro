@@ -856,18 +856,14 @@
        type header if posted in the body. For example, curl now
        requires: -H 'Content-type:text/xml; charset=utf-8'
     -->
-  <requestHandler name="/update" 
+  <requestHandler name="/update"
                   class="solr.XmlUpdateRequestHandler">
-    <!-- See below for information on defining 
-         updateRequestProcessorChains that can be used by name 
-         on each Update Request
-      -->
-    <!--
+    <!-- Run the etag processor on each update request. -->
        <lst name="defaults">
-         <str name="update.processor">dedupe</str>
+         <str name="update.processor">etag</str>
        </lst>
-       -->
-    </requestHandler>
+  </requestHandler>
+  
   <!-- Binary Update Request Handler
        http://wiki.apache.org/solr/javabin
     -->
@@ -1479,6 +1475,23 @@
        <processor class="solr.RunUpdateProcessorFactory" />
      </updateRequestProcessorChain>
     -->
+
+  <!-- ETag generation
+
+       Creates the "etag" field on the fly based on a hash of all other
+       fields.  
+       
+    -->
+     <updateRequestProcessorChain name="etag">
+       <processor class="solr.processor.SignatureUpdateProcessorFactory">
+         <bool name="enabled">true</bool>
+         <str name="signatureField">etag</str>
+         <bool name="overwriteDupes">false</bool>
+         <str name="signatureClass">solr.processor.Lookup3Signature</str>
+       </processor>
+       <processor class="solr.LogUpdateProcessorFactory" />
+       <processor class="solr.RunUpdateProcessorFactory" />
+     </updateRequestProcessorChain>
 
   <!-- Response Writers
 

@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.admin;
 
+import static edu.cornell.mannlib.vitro.webapp.controller.accounts.user.UserAccountsUserController.getBogusStandardMessage;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,7 +17,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.usepages.ManageRoot
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.UserAccountsPage;
-import edu.cornell.mannlib.vitro.webapp.controller.accounts.user.UserAccountsUserController;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 /**
@@ -51,7 +52,7 @@ public class UserAccountsDeleter extends UserAccountsPage {
 		UserAccount loggedInAccount = LoginStatusBean.getCurrentUser(vreq);
 		if (loggedInAccount == null) {
 			log.warn("Trying to delete accounts while not logged in!");
-			bogusMessage = UserAccountsUserController.BOGUS_STANDARD_MESSAGE;
+			bogusMessage = getBogusStandardMessage(vreq);
 			return;
 		}
 
@@ -61,14 +62,14 @@ public class UserAccountsDeleter extends UserAccountsPage {
 			if (u == null) {
 				log.warn("Delete account for '" + uri
 						+ "' is bogus: no such user");
-				bogusMessage = UserAccountsUserController.BOGUS_STANDARD_MESSAGE;
+				bogusMessage = getBogusStandardMessage(vreq);
 				return;
 			}
 
 			if (u.getUri().equals(loggedInAccount.getUri())) {
 				log.warn("'" + u.getUri()
 						+ "' is trying to delete his own account.");
-				bogusMessage = UserAccountsUserController.BOGUS_STANDARD_MESSAGE;
+				bogusMessage = getBogusStandardMessage(vreq);
 				return;
 			}
 
@@ -78,7 +79,7 @@ public class UserAccountsDeleter extends UserAccountsPage {
 				log.warn("Attempting to delete the root account, "
 						+ "but not authorized. Logged in as "
 						+ LoginStatusBean.getCurrentUser(vreq));
-				bogusMessage = UserAccountsUserController.BOGUS_STANDARD_MESSAGE;
+				bogusMessage = getBogusStandardMessage(vreq);
 				return;
 			}
 		}

@@ -478,8 +478,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     			Individual subj = null;
     			try {
     			    subj = new IndividualSDB(
-    			            ((OntResource) s.getSubject().as(OntResource.class))
-    			                    .getURI(), 
+    			            s.getSubject().as(OntResource.class).getURI(), 
     			                            this.dwf, datasetMode, webappDaoFactory);
     			} catch (IndividualNotFoundException e) {
     			    // leave null subject
@@ -487,8 +486,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     			Individual obj = null;
     			try {
     			    obj = new IndividualSDB(
-    			            ((OntResource) s.getObject().as(OntResource.class))
-    			                    .getURI(), 
+    			            s.getObject().as(OntResource.class).getURI(), 
     			                            this.dwf, datasetMode, webappDaoFactory);
     			} catch (IndividualNotFoundException e) {
     			    // leave null object
@@ -548,8 +546,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         	    	if (value.canAs(OntResource.class)) {
             	    	relatedIndividuals.add(
             	    		new IndividualSDB(
-            	    		        ((OntResource) value.as(OntResource.class))
-            	    		                .getURI(), 
+            	    		        value.as(OntResource.class).getURI(), 
             	    		                this.dwf, 
             	    		                datasetMode, 
             	    		                webappDaoFactory) );  
@@ -588,7 +585,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
             	    if (value != null && value.canAs(OntResource.class)) {
             	        try {
                 	    	return new IndividualSDB(
-                	    	        ((OntResource) value.as(OntResource.class)).getURI(), 
+                	    	        value.as(OntResource.class).getURI(), 
                 	    	                dwf, datasetMode, webappDaoFactory);
             	        } catch (IndividualNotFoundException e) {
             	            return null;
@@ -1045,8 +1042,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                         	rv = collator.compare( ((String)val1) , ((String)val2) );
                             //rv = ((String)val1).compareTo((String)val2);
                         else if( val1 instanceof Date ) {
-                            DateTime dt1 = new DateTime((Date)val1);
-                            DateTime dt2 = new DateTime((Date)val2);
+                            DateTime dt1 = new DateTime(val1);
+                            DateTime dt2 = new DateTime(val2);
                             rv = dt1.compareTo(dt2);
                         }
                         else

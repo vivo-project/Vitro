@@ -30,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
@@ -227,7 +228,7 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
     	log.debug("Processing classes that will be displayed");
     	List<VClass> vClasses = new ArrayList<VClass>();
   
-    	VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+    	VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
     	for(String classUri: classes) {
     		//Retrieve vclass from cache to get the count
     		VClass vclass = vcgc.getCachedVClass(classUri);
@@ -262,7 +263,7 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
 	    	List<VClass> restrictVClasses = new ArrayList<VClass>();
 	    	
 	    	List<String> urlEncodedRestrictClasses = new ArrayList<String>();
-	    	VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+	    	VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
 
 	    	if(restrictClasses.size() > 0) {
 	    		//classes for restriction are not displayed so don't need to include their class individual counts
@@ -306,7 +307,7 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
     
     public static VClassGroupTemplateModel getClassGroup(String classGroupUri, ServletContext context, VitroRequest vreq){
         
-        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+        VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
         List<VClassGroup> vcgList = vcgc.getGroups();
         VClassGroup group = null;
         for( VClassGroup vcg : vcgList){

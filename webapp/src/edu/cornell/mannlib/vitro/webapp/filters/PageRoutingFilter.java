@@ -11,6 +11,7 @@ import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -21,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.PageController;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 /**
@@ -52,7 +54,9 @@ public class PageRoutingFilter implements Filter{
     @Override
     public void doFilter(ServletRequest arg0, ServletResponse arg1, FilterChain chain) 
         throws IOException, ServletException {        
-        PageDao pageDao = getPageDao();        
+        ServletContext ctx = filterConfig.getServletContext();
+        
+		PageDao pageDao = ModelAccess.on(ctx).getWebappDaoFactory().getPageDao();        
         Map<String,String> urlMappings = pageDao.getPageMappings();
         
         // get URL without hostname or servlet context
@@ -81,7 +85,7 @@ public class PageRoutingFilter implements Filter{
                 String controllerName = getControllerToForwardTo(req, pageUri, pageDao);            
                 log.debug(path + " is being forwarded to controller " + controllerName);
                 
-                RequestDispatcher rd = filterConfig.getServletContext().getNamedDispatcher( controllerName );
+                RequestDispatcher rd = ctx.getNamedDispatcher( controllerName );
                 if( rd == null ){
                     log.error(path + " should be forwarded to controller " + controllerName + " but there " +
                     		"is no servlet named that defined for the web application in web.xml");
@@ -91,7 +95,7 @@ public class PageRoutingFilter implements Filter{
                 rd.forward(req, response);
             }else if( "/".equals( path ) || path.isEmpty() ){
                 log.debug("url '" +path + "' is being forward to home controller" );
-                RequestDispatcher rd = filterConfig.getServletContext().getNamedDispatcher( HOME_CONTROLLER_NAME );            
+                RequestDispatcher rd = ctx.getNamedDispatcher( HOME_CONTROLLER_NAME );            
                 rd.forward(req, response);
             }else{
                 doNonDisplayPage(path,arg0,arg1,chain);
@@ -132,12 +136,6 @@ public class PageRoutingFilter implements Filter{
         return false;                
     }
     
-    protected PageDao getPageDao(){
-        WebappDaoFactory wdf = (WebappDaoFactory) 
-            filterConfig.getServletContext().getAttribute("webappDaoFactory");
-        return wdf.getPageDao();
-    }
-        
     @Override
     public void destroy() {
        //nothing to do here        

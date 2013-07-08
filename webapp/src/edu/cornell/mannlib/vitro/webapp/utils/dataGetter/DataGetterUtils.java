@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -45,6 +46,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListCont
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.json.JsonServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
@@ -102,7 +104,7 @@ public class DataGetterUtils {
 	 * May return an empty list, but will not return null.
 	 */
 	private static List<DataGetter> dataGettersForURIs(VitroRequest vreq, Model displayModel, List<String> dgUris)
-			throws InstantiationException, IllegalAccessException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException {
+			throws InstantiationException, IllegalAccessException, ClassNotFoundException, InvocationTargetException {
 		List<DataGetter> dgList = new ArrayList<DataGetter>();
 		for( String dgURI: dgUris){
 		    DataGetter dg =dataGetterForURI(vreq, displayModel, dgURI) ;
@@ -332,7 +334,7 @@ public class DataGetterUtils {
                 @SuppressWarnings("unchecked")
                 Enumeration<String> e = vreq.getParameterNames();
                 while(e.hasMoreElements()){
-                    String name = (String)e.nextElement();
+                    String name = e.nextElement();
                     log.debug("parameter: " + name);
                     for( String value : vreq.getParameterValues(name) ){
                         log.debug("value for " + name + ": '" + value + "'");
@@ -550,9 +552,9 @@ public class DataGetterUtils {
     //Get All VClass Groups information
     //Used within menu management and processing
     //TODO: Check if more appropriate location possible
-    public static List<HashMap<String, String>> getClassGroups(ServletContext context) {
+    public static List<HashMap<String, String>> getClassGroups(HttpServletRequest req) {
     	//Wanted this to be 
-    	VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+    	VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(req);
         List<VClassGroup> vcgList = vcgc.getGroups();
         //For now encoding as hashmap with label and URI as trying to retrieve class group
         //results in errors for some reason
@@ -570,11 +572,11 @@ public class DataGetterUtils {
    //TODO: Check whether this needs to be put here or elsewhere, as this is data getter specific
     //with respect to class groups
   //Need to use VClassGroupCache to retrieve class group information - this is the information returned from "for class group"
-	public static void getClassGroupForDataGetter(ServletContext context, Map<String, Object> pageData, Map<String, Object> templateData) {
+	public static void getClassGroupForDataGetter(HttpServletRequest req, Map<String, Object> pageData, Map<String, Object> templateData) {
     	//Get the class group from VClassGroup, this is the same as the class group for the class group page data getter
 		//and the associated class group (not custom) for individuals datagetter
 		String classGroupUri = (String) pageData.get("classGroupUri");
-		VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+		VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(req);
     	VClassGroup group = vcgc.getGroup(classGroupUri);
 
 		templateData.put("classGroup", group);

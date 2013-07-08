@@ -171,6 +171,9 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 			body.put("password", password);
 			body.put("newPassword", newPassword);
 			body.put("confirmPassword", confirmPassword);
+			
+			body.put("minPasswordLength", MIN_PASSWORD_LENGTH);
+			body.put("maxPasswordLength", MAX_PASSWORD_LENGTH);
 
 			for (String code : codes) {
 				body.put(code, Boolean.TRUE);

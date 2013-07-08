@@ -4,14 +4,13 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,8 +32,9 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
@@ -176,12 +176,7 @@ public class VClassGroupCache implements IndexingEventListener {
     }
 
     protected VClassGroupDao getVCGDao() {
-        WebappDaoFactory wdf = (WebappDaoFactory) context.getAttribute("webappDaoFactory");
-        if (wdf == null) {
-            log.error("Cannot get webappDaoFactory from context");
-            return null;
-        } else
-            return wdf.getVClassGroupDao();
+		return ModelAccess.on(context).getWebappDaoFactory().getVClassGroupDao();
     }
     
     public void doSynchronousRebuild(){
@@ -234,6 +229,14 @@ public class VClassGroupCache implements IndexingEventListener {
         return (VClassGroupCache) sc.getAttribute(ATTRIBUTE_NAME);
     }
 
+	/**
+	 * Use getVClassGroups(HttpServletRequest) to get a language-aware image of
+	 * the cached groups and classes.
+	 */
+    public static VClassGroupsForRequest getVClassGroups(HttpServletRequest req) {
+    	return new VClassGroupsForRequest(req, getVClassGroupCache(req.getSession().getServletContext()));
+    }
+    
     /**
      * Method that rebuilds the cache. This will use a WebappDaoFactory, 
      * a SolrSever and maybe a ProhibitedFromSearch from the cache.context.
@@ -244,12 +247,9 @@ public class VClassGroupCache implements IndexingEventListener {
      */
     protected static void rebuildCacheUsingSolr( VClassGroupCache cache ) throws SolrServerException{                        
         long start = System.currentTimeMillis();
-        WebappDaoFactory wdFactory = (WebappDaoFactory) cache.context.getAttribute("webappDaoFactory");
-        if (wdFactory == null){ 
-            log.error("Unable to rebuild cache: could not get 'webappDaoFactory' from Servletcontext");
-            return;
-        }        
-        SolrServer solrServer = (SolrServer)cache.context.getAttribute(SolrSetup.SOLR_SERVER);
+		WebappDaoFactory wdFactory = ModelAccess.on(cache.context).getWebappDaoFactory();
+
+		SolrServer solrServer = (SolrServer)cache.context.getAttribute(SolrSetup.SOLR_SERVER);
         if( solrServer == null){
             log.error("Unable to rebuild cache: could not get solrServer from ServletContext");
             return;
@@ -497,7 +497,7 @@ public class VClassGroupCache implements IndexingEventListener {
             } else if(VitroVocabulary.DISPLAY_RANK.equals(stmt.getPredicate().getURI())){
             	requestCacheUpdate();
             } else {
-                OntModel jenaOntModel = ModelContext.getJenaOntModel(context);
+                OntModel jenaOntModel = ModelAccess.on(context).getJenaOntModel();
                 if( isClassNameChange(stmt, jenaOntModel) ) {            
                     requestCacheUpdate();
                 }

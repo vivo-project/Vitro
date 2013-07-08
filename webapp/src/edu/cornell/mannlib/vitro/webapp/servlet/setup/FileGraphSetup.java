@@ -26,7 +26,7 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
@@ -48,16 +48,16 @@ public class FileGraphSetup implements ServletContextListener {
         boolean tboxChanged = false; // indicates whether any TBox file graph model has changed
         OntModelSelector baseOms = null;
 
+        ServletContext ctx = sce.getServletContext();
+        
         try {
-
-            ServletContext ctx = sce.getServletContext();
             OntDocumentManager.getInstance().setProcessImports(true);
-            baseOms = ModelContext.getBaseOntModelSelector(sce.getServletContext());
-            Dataset dataset = JenaDataSourceSetupBase.getStartupDataset(sce.getServletContext());
+            baseOms = ModelAccess.on(ctx).getBaseOntModelSelector();
+            Dataset dataset = JenaDataSourceSetupBase.getStartupDataset(ctx);
             RDFServiceModelMaker maker = new RDFServiceModelMaker(RDFServiceUtils.getRDFServiceFactory(ctx));
 
             // ABox files
-            Set<String> pathSet = sce.getServletContext().getResourcePaths(PATH_ROOT + ABOX);
+            Set<String> pathSet = ctx.getResourcePaths(PATH_ROOT + ABOX);
 
             cleanupDB(dataset, pathToURI(pathSet, ABOX), ABOX);
 
@@ -67,7 +67,7 @@ public class FileGraphSetup implements ServletContextListener {
             }
 
             // TBox files
-            pathSet = sce.getServletContext().getResourcePaths(PATH_ROOT + TBOX);
+            pathSet = ctx.getResourcePaths(PATH_ROOT + TBOX);
 
             cleanupDB(dataset, pathToURI(pathSet, TBOX),TBOX);
 

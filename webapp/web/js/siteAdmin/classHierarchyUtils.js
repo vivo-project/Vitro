@@ -2,6 +2,7 @@
   
     var classHierarchyUtils = {
     onLoad: function(urlBase,displayOption) {
+        $.extend(this, i18nStrings);
         this.imagePath = urlBase + "/images/";
         this.displayOption = displayOption;
         this.initObjects();
@@ -58,15 +59,15 @@
         if ( this.displayOption == "group" ) {
             this.expandAll.click(function() {
             
-                if ( classHierarchyUtils.expandAll.text() == "hide subclasses" ) { 
+                if ( classHierarchyUtils.expandAll.text() == i18nStrings.hideSubclasses ) { 
                     $('td.subclassCell').parent('tr').hide();
                     $('table.innerDefinition').hide();
-                    classHierarchyUtils.expandAll.text("show subclasses");
+                    classHierarchyUtils.expandAll.text(i18nStrings.showSubclasses);
                 }
                 else {
                     $('td.subclassCell').parent('tr').show();
                     $('table.innerDefinition').show();
-                    classHierarchyUtils.expandAll.text("hide subclasses");
+                    classHierarchyUtils.expandAll.text(i18nStrings.hideSubclasses);
                 }
             });
         }        
@@ -98,10 +99,10 @@
             }
 
             if ( this.data.classGroup.length > 0 ) {
-                classHierarchyUtils.classHtml += "<tr><td class='classDetail'>Class Group:</td><td class='subclassCell'>" + this.data.classGroup + "</td></tr>";
+                classHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.classGroup + ":</td><td class='subclassCell'>" + this.data.classGroup + "</td></tr>";
             }
 
-            classHierarchyUtils.classHtml += "<tr><td class='classDetail'>Ontology:</td><td class='subclassCell'>" + this.data.ontology + "</td></tr>";
+            classHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.ontologyString + ":</td><td class='subclassCell'>" + this.data.ontology + "</td></tr>";
 
  
             if ( descendants.length > 1 ) {
@@ -129,7 +130,7 @@
         var ctr = 0
         $.each(node.children, function() {
             if ( ctr == 0 ) {
-                childDetails += "<tr><td class='classDetail'>Subclasses:</td>";
+                childDetails += "<tr><td class='classDetail'>" + i18nStrings.subclassesString + ":</td>";
                 ctr = ctr + 1;
             }
             else {
@@ -156,10 +157,10 @@
             }
 
             if ( this.data.classGroup.length > 0 ) {
-                childDetails += "<tr><td class='classDetail'>Class Group:</td><td class='subclassCell'>" + this.data.classGroup + "</td></tr>";
+                childDetails += "<tr><td class='classDetail'>" + i18nStrings.classGroup + ":</td><td class='subclassCell'>" + this.data.classGroup + "</td></tr>";
             }
 
-            childDetails += "<tr><td class='classDetail'>Ontology:</td><td class='subclassCell'>" + this.data.ontology + "</td></tr>";
+            childDetails += "<tr><td class='classDetail'>" + i18nStrings.ontologyString + ":</td><td class='subclassCell'>" + this.data.ontology + "</td></tr>";
 
             if ( this.children ) {
                 var grandChildren = classHierarchyUtils.getTheChildren(this);
@@ -213,15 +214,15 @@
     
     wireExpandLink: function() {
         this.expandAll.click(function() {
-            if ( classHierarchyUtils.expandAll.text() == "expand all" ) {
-                classHierarchyUtils.expandAll.text("collapse all");
+            if ( classHierarchyUtils.expandAll.text() == i18nStrings.expandAll ) {
+                classHierarchyUtils.expandAll.text(i18nStrings.collapseAll);
                 $('span.headerSpanPlus').addClass("headerSpanMinus");
                 $('table.classHierarchy').find('span.subclassExpandPlus').addClass("subclassExpandMinus");
                 $('table.classHierarchy').find('table.subclassTable').show();
                 $('section#container').find('span.headerSpanPlus').attr('view','more');
             }
             else {
-                classHierarchyUtils.expandAll.text("expand all");
+                classHierarchyUtils.expandAll.text(i18nStrings.expandAll);
                 $('span.headerSpanPlus').removeClass("headerSpanMinus");
                 $('table.classHierarchy').find('span.subclassExpandPlus').removeClass("subclassExpandMinus");
                 $('table.classHierarchy').find('table.subclassTable').hide();
@@ -245,10 +246,10 @@
             }
 
             if ( this.data.classGroup.length > 0 ) {
-                classHierarchyUtils.classHtml += "<tr><td class='classDetail'>Class Group:</td><td>" + this.data.classGroup + "</td></tr>";
+                classHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.classGroup + ":</td><td>" + this.data.classGroup + "</td></tr>";
             }
 
-            classHierarchyUtils.classHtml += "<tr><td class='classDetail'>Ontology:</td><td>" + this.data.ontology + "</td></tr>";
+            classHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.ontologyString + ":</td><td>" + this.data.ontology + "</td></tr>";
 
             classHierarchyUtils.classHtml += "</table>";
 
@@ -271,7 +272,7 @@
                 var ctr = 0;
                 $.each(this.children, function() {
                     if ( ctr == 0 ) {
-                        descendants += "<tr><td class='classDetail'>Classes:</td>";
+                        descendants += "<tr><td class='classDetail'>" + i18nStrings.classesString + ":</td>";
                         ctr = ctr + 1;
                     }
                     else {
@@ -289,7 +290,7 @@
                                       + classHierarchyUtils.classCounter + "'>" ;
 
             if ( this.data.displayRank.length > 0 ) {
-                classHierarchyUtils.classHtml += "<tr><td class='classDetail'>Display Rank:</td><td>" + this.data.displayRank + "</td></tr>"
+                classHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.displayRank + ":</td><td>" + this.data.displayRank + "</td></tr>"
             }
  
             classHierarchyUtils.classHtml += descendants;

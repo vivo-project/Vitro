@@ -2,23 +2,42 @@
 
 <#-- Template for displaying paged search results -->
 
-<h2>
+
+
+
+<h2 style="float:left">
 <#escape x as x?html>
-    Search results for '${querytext}'
-    <#if classGroupName?has_content>limited to type '${classGroupName}'</#if>
-    <#if typeName?has_content>limited to type '${typeName}'</#if>
+    ${i18n().search_results_for} '${querytext}'
+    <#if classGroupName?has_content>${i18n().limited_to_type} '${classGroupName}'</#if>
+    <#if typeName?has_content>${i18n().limited_to_type} '${typeName}'</#if>
 </#escape>
+<script type="text/javascript">
+	var url = window.location.toString();	
+	if (url.indexOf("?") == -1){
+		var queryText = 'querytext=${querytext}';
+	} else {
+		var urlArray = url.split("?");
+		var queryText = urlArray[1];
+	}
+	
+	var urlsBase = '${urls.base}';
+</script>
 </h2>
-<span id="searchHelp"><a href="${urls.base}/searchHelp" title="search help">Not the results you expected?</a></span>
+
+<span id="downloadResults" title="Download Results">
+	<img id="downloadIcon" src="images/download-icon.png" alt="Download Results"  />
+</span>
+
+<span id="searchHelp"><a href="${urls.base}/searchHelp" title="${i18n().search_help}">${i18n().not_expected_results}</a></span>
 <div class="contentsBrowseGroup">
 
     <#-- Refinement links -->
     <#if classGroupLinks?has_content>
         <div class="searchTOC">
-            <h4>Display only</h4>           
+            <h4>${i18n().display_only}</h4>           
             <ul>           
             <#list classGroupLinks as link>
-                <li><a href="${link.url}" title="class group link">${link.text}</a></li>
+                <li><a href="${link.url}" title="${i18n().class_group_link}">${link.text}</a><span>(${link.count})</span></li>
             </#list>
             </ul>           
         </div>
@@ -27,13 +46,13 @@
     <#if classLinks?has_content>
         <div class="searchTOC">
             <#if classGroupName?has_content>
-                <h4>Limit ${classGroupName} to</h4>
+                <h4>${i18n().limit} ${classGroupName} to</h4>
             <#else>
-                <h4>Limit to</h4>
+                <h4>${i18n().limit_to}</h4>
             </#if>
             <ul>           
             <#list classLinks as link>
-                <li><a href="${link.url}" title="class link">${link.text}</a></li>
+                <li><a href="${link.url}" title="${i18n().class_link}">${link.text}</a><span>(${link.count})</span></li>
             </#list>
             </ul>
         </div>
@@ -53,15 +72,15 @@
     <#if (pagingLinks?size > 0)>
         <div class="searchpages">
             Pages: 
-            <#if prevPage??><a class="prev" href="${prevPage}" title="previous">Previous</a></#if>
+            <#if prevPage??><a class="prev" href="${prevPage}" title="${i18n().previous}">${i18n().previous}</a></#if>
             <#list pagingLinks as link>
                 <#if link.url??>
-                    <a href="${link.url}" title="page link">${link.text}</a>
+                    <a href="${link.url}" title="${i18n().page_link}">${link.text}</a>
                 <#else>
                     <span>${link.text}</span> <#-- no link if current page -->
                 </#if>
             </#list>
-            <#if nextPage??><a class="next" href="${nextPage}" title="next">Next</a></#if>
+            <#if nextPage??><a class="next" href="${nextPage}" title="${i18n().next_capitalized}">${i18n().next_capitalized}</a></#if>
         </div>
     </#if>
     <br />
@@ -93,4 +112,12 @@
 
 </div> <!-- end contentsBrowseGroup -->
 
-${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/search.css" />')}
+${stylesheets.add('<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />',
+  				  '<link rel="stylesheet" href="${urls.base}/css/search.css" />')}
+
+${headScripts.add('<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>',
+				  '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>',
+                  '<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>'
+                  )}
+
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/searchDownload.js"></script>')}

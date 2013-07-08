@@ -11,7 +11,7 @@
 <#--Display error messages if any-->
 <#if submissionErrors?has_content>
     <section id="error-alert" role="alert">
-        <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon" />
+        <img src="${urls.images}/iconAlert.png" width="24" height="24" alt="${i18n().error_alert_icon}" />
         <p>
         
         <#list submissionErrors?keys as errorFieldName>
@@ -39,7 +39,7 @@
     but that method may not return the correct result for other custom forms-->
     <input type="submit" id="submit" value="${editConfiguration.submitLabel}" role="button"/>
     <span class="or"> or </span>
-    <a title="Cancel" href="${cancelUrl}">Cancel</a>
+    <a title="${i18n().cancel_title}" href="${cancelUrl}">${i18n().cancel_link}</a>
 
 </form>
 

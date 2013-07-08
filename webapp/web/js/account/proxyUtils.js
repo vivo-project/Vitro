@@ -1,6 +1,8 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
     
 $(document).ready(function(){
+    // Get the i18n variables from the template
+    $.extend(this, i18nStrings);
      //Remove initial value of input text 'Select an existing last name'
     $('input[name="proxySelectorAC"]').click(function(){
         $(this).val('');
@@ -20,7 +22,7 @@ $(document).ready(function(){
            if ($errorAlert !=""){
                return false;
            }else{
-               $('#error-alert p').append("You must select a minimum of 1 editor and profile.");
+               $('#error-alert p').append(i18nStrings.selectEditorAndProfile);
                return false;
            }
        }     

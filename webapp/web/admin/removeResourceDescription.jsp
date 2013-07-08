@@ -6,6 +6,7 @@
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
+<%@page import="edu.cornell.mannlib.vitro.webapp.dao.ModelAccess"%>
 <% request.setAttribute("requestedActions", SimplePermission.USE_MISCELLANEOUS_CURATOR_PAGES.ACTION); %>
 <vitro:confirmAuthorization />
 
@@ -16,7 +17,7 @@
         String describeQueryStr = 
             "DESCRIBE <" + resourceURIStr + ">";
             
-        OntModel ontModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+    	OntModel ontModel = ModelAccess.on(getServletContext()).getBaseOntModel();
         Model resourceDescription = ModelFactory.createDefaultModel();
         try {
             ontModel.enterCriticalSection(Lock.READ);

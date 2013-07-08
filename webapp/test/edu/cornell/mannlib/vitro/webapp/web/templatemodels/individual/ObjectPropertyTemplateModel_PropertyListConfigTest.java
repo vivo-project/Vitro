@@ -25,6 +25,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
 import stubs.freemarker.cache.TemplateLoaderStub;
@@ -36,6 +40,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.InvalidConfigurationException;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.PropertyListConfig;
@@ -123,7 +129,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 		hreq.setSession(session);
 
 		vreq = new VitroRequest(hreq);
-		vreq.setWebappDaoFactory(wadf);
+		ModelAccess.on(vreq).setWebappDaoFactory(wadf);
 
 		subject = new IndividualImpl();
 
@@ -273,6 +279,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	@Test
 	public void constructQueryNodeMissing()
 			throws InvalidConfigurationException {
+		ModelAccess.on(vreq).setOntModel(ModelID.UNION_FULL, emptyOntModel());
 		op = buildOperation("constructQueryMissing");
 		optm = new NonCollatingOPTM(op, subject, vreq, true);
 		// Not an error.
@@ -281,6 +288,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	@Test
 	public void constructQueryMultipleValues()
 			throws InvalidConfigurationException {
+		ModelAccess.on(vreq).setOntModel(ModelID.UNION_FULL, emptyOntModel());
 		op = buildOperation("constructQueryMultiple");
 		optm = new NonCollatingOPTM(op, subject, vreq, true);
 		assertConstructQueries("multiple construct queries", "ONE", "TWO",
@@ -366,6 +374,10 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	// ----------------------------------------------------------------------
 	// Helper methods
 	// ----------------------------------------------------------------------
+
+	private OntModel emptyOntModel() {
+		return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+	}
 
 	/**
 	 * Sets up an operation with name "foobar" and adds it to the

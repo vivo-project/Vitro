@@ -7,20 +7,20 @@
                 <#-- Property display name -->
                 <#if property.localName == "authorInAuthorship" && editable  >
                     <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
-                        <a id="managePubLink" class="manageLinks" href="${urls.base}/managePublications?subjectUri=${subjectUri[1]!}" title="manage publications" <#if verbose>style="padding-top:10px"</#if> >
-                            manage publications
+                        <a id="managePubLink" class="manageLinks" href="${urls.base}/managePublications?subjectUri=${subjectUri[1]!}" title="${i18n().manage_publications}" <#if verbose>style="padding-top:10px"</#if> >
+                            ${i18n().manage_publications}
                         </a>
                     </h3>
                 <#elseif property.localName == "hasResearcherRole" && editable  >
                     <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
-                        <a id="manageGrantLink" class="manageLinks" href="${urls.base}/manageGrants?subjectUri=${subjectUri[1]!}" title="manage grants & projects" <#if verbose>style="padding-top:10px"</#if> >
-                            manage grants & projects
+                        <a id="manageGrantLink" class="manageLinks" href="${urls.base}/manageGrants?subjectUri=${subjectUri[1]!}" title="${i18n().manage_grants_and_projects}" <#if verbose>style="padding-top:10px"</#if> >
+                            ${i18n().manage_grants_and_projects}
                         </a>
                     </h3>
                 <#elseif property.localName == "organizationForPosition" && editable  >
                     <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
-                        <a id="managePeopleLink" class="manageLinks" href="${urls.base}/managePeople?subjectUri=${subjectUri[1]!}" title="manage people" <#if verbose>style="padding-top:10px"</#if> >
-                            manage affiliated people
+                        <a id="managePeopleLink" class="manageLinks" href="${urls.base}/managePeople?subjectUri=${subjectUri[1]!}" title="${i18n().manage_affiliated_people}" <#if verbose>style="padding-top:10px"</#if> >
+                            ${i18n().manage_affiliated_people_link}
                         </a>
                     </h3>
                 <#else>

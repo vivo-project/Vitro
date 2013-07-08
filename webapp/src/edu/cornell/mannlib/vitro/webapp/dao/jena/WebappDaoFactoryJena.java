@@ -11,7 +11,6 @@ import java.util.Set;
 
 import com.hp.hpl.jena.iri.IRI;
 import com.hp.hpl.jena.iri.IRIFactory;
-import com.hp.hpl.jena.iri.Violation;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntResource;
@@ -184,7 +183,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 	    IRI iri = factory.create( uriStr );
 	    if (iri.hasViolation(false) ) {
 	    	validURI = false;
-	    	errorMsg += ((Violation)iri.violations(false).next())
+	    	errorMsg += (iri.violations(false).next())
 	    	                    .getShortMessage() + " ";
 	    } else if (checkUniqueness) {
 	    	OntModel ontModel = ontModelSelector.getFullModel(); 
@@ -377,7 +376,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     protected VClassDao vClassDao = null;
     public VClassDao getVClassDao() {
         if( vClassDao == null )
-            vClassDao = new VClassDaoJena(this);
+            vClassDao = new VClassDaoJena(this, config.isUnderlyingStoreReasoned());
         return vClassDao;
     }
 

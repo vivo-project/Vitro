@@ -2,44 +2,43 @@
 
 <#-- Template for adding a user account -->
 
-<h3>Create your Password</h3>
-    <#if errorPasswordIsEmpty??>
-        <#assign errorMessage = "No password supplied." />
-    </#if>
-    
-    <#if errorPasswordIsWrongLength??>
-        <#assign errorMessage = "Password must be between ${minimumLength} and ${maximumLength} characters." />
-    </#if>
-    
-    <#if errorPasswordsDontMatch??>
-        <#assign errorMessage = "Passwords do not match." />
-    </#if>
-    
-    <#if errorMessage?has_content>
-        <section id="error-alert" role="alert">
-            <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon"/>
-            <p>${errorMessage}</p>
-        </section>
-    </#if>
+<#assign strings = i18n() />
+
+<h3>${strings.create_your_password}</h3>
+
+<#if errorPasswordIsEmpty??>
+    <#assign errorMessage = strings.error_no_password />
+<#elseif errorPasswordIsWrongLength??>
+    <#assign errorMessage = strings.error_password_length(minimumLength, maximumLength) />
+<#elseif errorPasswordsDontMatch??>
+    <#assign errorMessage = strings.error_password_mismatch />
+</#if>
+
+<#if errorMessage?has_content>
+    <section id="error-alert" role="alert">
+        <img src="${urls.images}/iconAlert.png" width="24" height="24" alt="${strings.alt_error_alert}"/>
+        <p>${errorMessage}</p>
+    </section>
+</#if>
 
 <section id="create-password" role="region">
-    <p>Please enter your new password for ${userAccount.emailAddress}</p>
+    <p>${strings.enter_new_password(userAccount.emailAddress)}</p>
 
     <form method="POST" action="${formUrls.createPassword}" class="customForm" role="create password">
         <input type="hidden" name="user" value="${userAccount.emailAddress}" role="input" />
         <input type="hidden" name="key"  value="${userAccount.passwordLinkExpiresHash}" role="input" />
     
-        <label for="new-password">Password<span class="requiredHint"> *</span></label>
+        <label for="new-password">${strings.new_password}<span class="requiredHint"> *</span></label>
         <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
         
-        <p class="note">Minimum of ${minimumLength} characters in length.</p>
+        <p class="note">${strings.minimum_password_length(minimumLength)}</p>
 
-        <label for="confirm-password">Confirm Password<span class="requiredHint"> *</span></label>
+        <label for="confirm-password">${strings.confirm_password}<span class="requiredHint"> *</span></label>
         <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />
 
-        <p><input type="submit" name="submit" value="Save changes" class="submit"/></p>
+        <p><input type="submit" name="submit" value="${strings.save_changes}" class="submit"/></p>
 
-        <p class="requiredHint">* required fields</p>
+        <p class="requiredHint">* ${strings.required_fields}</p>
     </form>
 </section>
 

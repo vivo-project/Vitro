@@ -5,7 +5,7 @@ $(document).ready(function(){
     $.extend(this, individualLocalName);
     adjustFontSize();
     padSectionBottoms();
-    retrieveLocalStorage();
+    checkLocationHash();
     
     // ensures that shorter property group sections don't cause the page to "jump around"
     // when the tabs are clicked
@@ -33,7 +33,7 @@ $(document).ready(function(){
                 $propertyGroupLi.removeClass("nonSelectedGroupTab clickable");
                 $propertyGroupLi.addClass("selectedGroupTab clickable");
             }
-            if ( $propertyGroupLi.text() == "View All" ) {
+            if ( $propertyGroupLi.attr("groupname") == "viewAll" ) {
                 processViewAllTab();
             }
             else {
@@ -59,6 +59,61 @@ $(document).ready(function(){
         });        
     }
    
+    // If users click a marker on the home page map, they are taken to the profile
+    // page of the corresponding country. The url contains the word "Research" in
+    // the location hash. Use this to select the Research tab, which displays the
+    // researchers who have this countru as a geographic focus.
+    function checkLocationHash() {
+        if ( location.hash ) {
+            // remove the trailing white space
+            location.hash = location.hash.replace(/\s+/g, '');
+            if ( location.hash.indexOf("map") >= 0 ) {  
+                // get the name of the group that contains the geographicFocusOf property.
+                var tabName = $('h3#geographicFocusOf').parent('article').parent('div').attr("id");
+                tabName = tabName.replace("Group","");
+                tabNameCapped = tabName.charAt(0).toUpperCase() + tabName.slice(1);
+                // if the name of the first tab section = tabName we don't have to do anything;
+                // otherwise, select the correct tab and deselect the first one
+                var $firstTab = $('li.clickable').first();
+                if ( $firstTab.text() != tabNameCapped ) {
+                    // select the correct tab
+                    $('li[groupName="' + tabName + '"]').removeClass("nonSelectedGroupTab clickable");
+                    $('li[groupName="' + tabName + '"]').addClass("selectedGroupTab clickable");
+                    // deselect the first tab
+                    $firstTab.removeClass("selectedGroupTab clickable");
+                    $firstTab.addClass("nonSelectedGroupTab clickable");
+                    $('section.property-group:visible').hide();
+                    // show the selected tab section
+                    $('section#' + tabName).show();                
+                }
+                // if there is a more link, "click" more to show all the researchers
+                // we need the timeout delay so that the more link can get rendered                
+                setTimeout(geoFocusExpand,250);
+            }
+            else {
+                retrieveLocalStorage();
+            }            
+        }
+        else {
+            retrieveLocalStorage();
+        }
+    }
+
+    function geoFocusExpand() {
+        // if the ontology is set to collate by subclass, $list.length will be > 0 
+        // this ensures both possibilities are covered
+        var $list = $('ul#geographicFocusOfList').find('ul');
+        if ( $list.length > 0 )
+        {
+            var $more = $list.find('a.more-less');
+            $more.click();
+        }
+        else {
+            var $more = $('ul#geographicFocusOfList').find('a.more-less');
+            $more.click();
+        }
+    }
+    
     //  Next two functions --  keep track of which property group tab was selected,
     //  so if we return from a custom form or a related individual, even via the back button,
     //  the same property group will be selected as before.
@@ -96,15 +151,16 @@ $(document).ready(function(){
     }
 
     function retrieveLocalStorage() {
+        
         var localName = this.individualLocalName;
         var selectedTab = amplify.store(individualLocalName);
         
         if ( selectedTab != undefined ) {
             var groupName = selectedTab[0];
             
-            // unlikely, but it's possible a tab that was previously selected and stored won't be displayed
-            // because the object properties would have been deleted (in non-edit mode). So ensure that the tab in local
-            // storage has been rendered on the page.     
+            // unlikely, but it's possible a tab that was previously selected and stored won't be 
+            // displayed because the object properties would have been deleted (in non-edit mode). 
+            // So ensure that the tab in local storage has been rendered on the page.     
             if ( $("ul.propertyTabsList li[groupName='" + groupName + "']").length ) { 
                 // if the selected tab is the default first one, don't do anything
                 if ( $('li.clickable').first().attr("groupName") != groupName ) {   
@@ -136,7 +192,7 @@ $(document).ready(function(){
             width += $(this).outerWidth();
         });
         if ( width < 922 ) {
-            var diff = 926-width;
+            var diff = 927-width;
             $('ul.propertyTabsList li:last-child').css('width', diff + 'px');
         }
         else {

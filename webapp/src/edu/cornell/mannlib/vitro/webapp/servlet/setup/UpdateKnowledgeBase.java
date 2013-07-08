@@ -32,8 +32,8 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
 
@@ -99,14 +99,14 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setErrorLogFile(ctx.getRealPath(errorLogFileName));
 			settings.setAddedDataFile(ctx.getRealPath(ADDED_DATA_FILE));
 			settings.setRemovedDataFile(ctx.getRealPath(REMOVED_DATA_FILE));
-			WebappDaoFactory wadf = (WebappDaoFactory) ctx.getAttribute("webappDaoFactory");
+			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());
-			settings.setAssertionOntModelSelector(ModelContext.getBaseOntModelSelector(ctx));
-			settings.setInferenceOntModelSelector(ModelContext.getInferenceOntModelSelector(ctx));
-			settings.setUnionOntModelSelector(ModelContext.getUnionOntModelSelector(ctx));
+			settings.setAssertionOntModelSelector(ModelAccess.on(ctx).getBaseOntModelSelector());
+			settings.setInferenceOntModelSelector(ModelAccess.on(ctx).getInferenceOntModelSelector());
+			settings.setUnionOntModelSelector(ModelAccess.on(ctx).getUnionOntModelSelector());
 			boolean tryMigrateDisplay = true;
 			try {
-				settings.setDisplayModel(ModelContext.getDisplayModel(ctx));
+				settings.setDisplayModel(ModelAccess.on(ctx).getDisplayModel());
 				OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
 				settings.setOldTBoxModel(oldTBoxModel);
 				OntModel newTBoxModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_MODEL_DIR));

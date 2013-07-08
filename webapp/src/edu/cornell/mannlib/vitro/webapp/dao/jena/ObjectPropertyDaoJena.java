@@ -27,6 +27,9 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -38,6 +41,7 @@ import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
+import com.hp.hpl.jena.sdb.util.Pair;
 
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -90,7 +94,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             p.setNamespace(op.getNameSpace());
             p.setLocalName(op.getLocalName());
             OntologyDao oDao=getWebappDaoFactory().getOntologyDao();
-            Ontology o = (Ontology)oDao.getOntologyByURI(p.getNamespace());
+            Ontology o = oDao.getOntologyByURI(p.getNamespace());
             if (o==null) {
                 if (!VitroVocabulary.vitroURI.equals(p.getNamespace())) {
                     log.debug("propertyFromOntProperty(): no ontology object found for the namespace "+p.getNamespace());
@@ -178,7 +182,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 Statement stmt = it.nextStatement();
                 RDFNode obj;
                 if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                    Resource res = (Resource)obj.as(Resource.class);
+                    Resource res = obj.as(Resource.class);
                     if( res != null && res.getURI() != null ){
                         BaseResourceBean.RoleLevel roleFromModel =  BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
                         if( roleFromModel != null && 
@@ -197,7 +201,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 Statement stmt = it.nextStatement();
                 RDFNode obj;
                 if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                    Resource res = (Resource)obj.as(Resource.class);
+                    Resource res = obj.as(Resource.class);
                     if( res != null && res.getURI() != null ){
                         BaseResourceBean.RoleLevel roleFromModel =  BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
                         if( roleFromModel != null && 
@@ -229,12 +233,6 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         }
         return p;
     }
-    
-    private String stripItalics(String in) {
-    	String out = in.replaceAll("\\<i\\>","");
-    	out = out.replaceAll("\\<\\/i\\>","");
-    	return out;
-    }
 
     public List getAllObjectProperties() {
         getOntModel().enterCriticalSection(Lock.READ);
@@ -257,7 +255,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 	                while (opIt.hasNext()) {
 	                	Resource res = (Resource) opIt.next();
 	                	if ( (res.canAs(OntProperty.class)) && (!NONUSER_NAMESPACES.contains(res.getNameSpace())) ) {
-	                		props.add(propertyFromOntProperty((OntProperty)res.as(OntProperty.class)));
+	                		props.add(propertyFromOntProperty(res.as(OntProperty.class)));
 	                	}
 	                }
 	            } finally {
@@ -285,6 +283,64 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             getOntModel().leaveCriticalSection();
         }
     }
+    
+    public ObjectProperty getObjectPropertyByURIAndRangeURI(String propertyURI, String rangeURI) {
+        ObjectProperty op = getObjectPropertyByURI(propertyURI);
+        if (op == null) {
+            return op;
+        }
+        op.setRangeVClassURI(rangeURI);
+        String propQuery = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
+                "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
+                "SELECT ?range ?label ?group ?customForm ?displayLevel ?updateLevel WHERE { \n" +
+                "    ?context config:configContextFor <" + propertyURI + "> . \n" +
+                "    ?context config:qualifiedBy <" + rangeURI + "> . \n" +
+                "    ?context config:hasConfiguration ?configuration . \n" +
+                "    OPTIONAL { ?configuration config:propertyGroup ?group } \n" +
+                "    OPTIONAL { ?configuration config:displayName ?label } \n" +
+                "    OPTIONAL { ?configuration vitro:customEntryFormAnnot ?customForm } \n" +
+                "    OPTIONAL { ?configuration vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayLevel } \n" +
+                "    OPTIONAL { ?configuration vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateLevel } \n" +
+                "}"; 
+      
+        Query q = QueryFactory.create(propQuery);
+        QueryExecution qe = QueryExecutionFactory.create(q, getOntModelSelector().getDisplayModel());
+        try {
+            ResultSet rs = qe.execSelect();
+            if (rs.hasNext()) {
+                QuerySolution qsoln = rs.nextSolution();
+                Resource groupRes = qsoln.getResource("group");
+                if (groupRes != null) {
+                    op.setGroupURI(groupRes.getURI());
+                } 
+                Resource displayLevelRes = qsoln.getResource("displayLevel");
+                if (displayLevelRes != null) {
+                    op.setHiddenFromDisplayBelowRoleLevel(
+                            BaseResourceBean.RoleLevel.getRoleByUri(
+                                    displayLevelRes.getURI()));
+                }
+                Resource updateLevelRes = qsoln.getResource("updateLevel");
+                if (updateLevelRes != null) {
+                    op.setProhibitedFromUpdateBelowRoleLevel(
+                            BaseResourceBean.RoleLevel.getRoleByUri(
+                                    updateLevelRes.getURI()));
+                }
+                Literal labelLit = qsoln.getLiteral("label");
+                if (labelLit != null) {
+                    op.setDomainPublic(labelLit.getLexicalForm());
+                } 
+                Literal customFormLit = qsoln.getLiteral("customForm");
+                if (customFormLit != null) {
+                    op.setCustomEntryForm(customFormLit.getLexicalForm());
+                } 
+            }  
+        } finally {
+            qe.close();
+        }            
+        return op;
+    }
+    
 
     public List<ObjectProperty> getObjectPropertiesForObjectPropertyStatements(List objPropertyStmts) {
         if( objPropertyStmts == null || objPropertyStmts.size() < 1) return new ArrayList();
@@ -296,7 +352,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             while(it.hasNext()){
                 ObjectPropertyStatement objPropertyStmt = (ObjectPropertyStatement)it.next();
                 if (hash.containsKey(objPropertyStmt.getPropertyURI())) {
-                    ObjectProperty p = (ObjectProperty) hash.get(objPropertyStmt.getPropertyURI());
+                    ObjectProperty p = hash.get(objPropertyStmt.getPropertyURI());
                     p.addObjectPropertyStatement(objPropertyStmt);
                 } else {
                     OntProperty op = getOntModel().getOntProperty(objPropertyStmt.getPropertyURI());
@@ -601,7 +657,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             	while(restIt.hasNext()) {
             		Resource restRes = restIt.next();
             		if (restRes.canAs(OntResource.class)) {
-            			OntResource restOntRes = (OntResource) restRes.as(OntResource.class);
+            			OntResource restOntRes = restRes.as(OntResource.class);
             			smartRemove(restOntRes, ontModel);
             		}
             	}            	
@@ -625,7 +681,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 	            	while(restIt.hasNext()) {
 	            		Resource restRes = restIt.next();
 	            		if (restRes.canAs(OntResource.class)) {
-	            			OntResource restOntRes = (OntResource) restRes.as(OntResource.class);
+	            			OntResource restOntRes = restRes.as(OntResource.class);
 	            			smartRemove(restOntRes, ontModel);
 	            		}
 	            	}
@@ -658,7 +714,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 while (propIt.hasNext()) {
                 	Resource res = (Resource) propIt.next();
                 	if (res.canAs(OntProperty.class)) {
-	                    com.hp.hpl.jena.ontology.OntProperty op = (com.hp.hpl.jena.ontology.OntProperty) res.as(OntProperty.class);
+	                    com.hp.hpl.jena.ontology.OntProperty op = res.as(OntProperty.class);
 	                    boolean isRoot = false;
 	                    Iterator parentIt = op.listSuperProperties();
 	                    if (parentIt != null) {
@@ -798,7 +854,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         PREFIXES + "\n" +
         "SELECT DISTINCT ?property WHERE { \n" +
         "   ?subject ?property ?object . \n" + 
-        "   ?property a owl:ObjectProperty . \n" +
+//        "   ?property a owl:ObjectProperty . \n" +
         "   FILTER ( \n" +
         "       isURI(?object) && \n" +
                 PROPERTY_FILTERS + "\n" +
@@ -844,11 +900,19 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     }
 
     protected static final String LIST_VIEW_CONFIG_FILE_QUERY_STRING =
-        "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>" +
-        "SELECT ?property ?filename WHERE { \n" +
-        "    ?property display:listViewConfigFile ?filename . \n" +
+        "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> \n" +
+        "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
+        "SELECT ?property ?range ?filename WHERE { \n" +
+        "    { ?property display:listViewConfigFile ?filename \n" +
+        "    } UNION { \n" +
+        "        ?lv config:listViewConfigFile ?filename . \n " +
+        "        ?configuration config:hasListView ?lv . " +
+        "        ?context config:hasConfiguration ?configuration . \n" +
+        "        ?context config:configContextFor ?property . \n" +
+        "        ?context config:qualifiedBy ?range . \n" +
+        "    } \n" +
         "}";
-    
+        
     protected static Query listViewConfigFileQuery = null;
     static {
         try {
@@ -859,12 +923,16 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         }           
     }
     
-    Map<ObjectProperty, String> customListViewConfigFileMap = null;
+    //TODO private void addPropertyClassCombinationsToListViewMap(HashMap)    
+    
+    // Map key is pair of object property and range class URI
+    // If range is unspecified, OWL.Thing.getURI() is used in the key.
+    Map<Pair<ObjectProperty, String>, String> customListViewConfigFileMap = null;
     
     @Override
     public String getCustomListViewConfigFileName(ObjectProperty op) {
         if (customListViewConfigFileMap == null) {
-            customListViewConfigFileMap = new HashMap<ObjectProperty, String>();
+            customListViewConfigFileMap = new HashMap<Pair<ObjectProperty, String>, String>();
             OntModel displayModel = getOntModelSelector().getDisplayModel();
             //Get all property to list view config file mappings in the system
             QueryExecution qexec = QueryExecutionFactory.create(listViewConfigFileQuery, displayModel); 
@@ -873,6 +941,10 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             while (results.hasNext()) {
                 QuerySolution soln = results.next();
                 String propertyUri = soln.getResource("property").getURI();
+                RDFNode rangeNode = soln.get("range");
+                String rangeUri = (rangeNode != null)
+                        ? ((Resource) rangeNode).getURI()
+                        : OWL.Thing.getURI();
                 ObjectProperty prop = getObjectPropertyByURI(propertyUri);
                 if (prop == null) {
                 	//This is a warning only if this property is the one for which we're searching
@@ -883,12 +955,18 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 	}
                 } else {
                     String filename = soln.getLiteral("filename").getLexicalForm();
-                    customListViewConfigFileMap.put(prop, filename);     
+                    customListViewConfigFileMap.put(new Pair<ObjectProperty, String>(prop, rangeUri), filename);     
                 }
             }       
             qexec.close();
-        }        
-        return customListViewConfigFileMap.get(op);
+        }      
+        
+        String customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<ObjectProperty, String>(op, op.getRangeVClassURI()));
+        if (customListViewConfigFileName == null) {
+            customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<ObjectProperty, String>(op, OWL.Thing.getURI()));
+        }
+        
+        return customListViewConfigFileName;
     }
 
 }

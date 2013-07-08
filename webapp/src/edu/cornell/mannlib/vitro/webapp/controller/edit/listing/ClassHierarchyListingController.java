@@ -27,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
@@ -52,8 +53,8 @@ public class ClassHierarchyListingController extends BaseEditController {
         try {
         boolean inferred = (vrequest.getParameter("inferred") != null);
         
-        if (vrequest.getAssertionsWebappDaoFactory() != null && !inferred) {
-        	vcDao = vrequest.getAssertionsWebappDaoFactory().getVClassDao();
+        if (!inferred) {
+        	vcDao = ModelAccess.on(vrequest).getBaseWebappDaoFactory().getVClassDao();
         } else {
         	vcDao = vrequest.getFullWebappDaoFactory().getVClassDao();
         }

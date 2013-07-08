@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.login;
 
-import java.text.MessageFormat;
 import java.util.Arrays;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,6 +9,8 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 /**
  * Where are we in the process of logging on? What message should we show to the
@@ -110,60 +111,32 @@ public class LoginProcessBean {
 	}
 
 	public static class Message {
-		public static final Message NO_MESSAGE = new Message("", MLevel.NONE);
+		public static final Message NO_MESSAGE = new Message();
 
-		public static final Message PASSWORD_CHANGE_SAVED = new Message(
-				"Your password has been saved.<br/>" + "Please log in.",
-				MLevel.INFO);
-
-		public static final Message NO_USERNAME = new Message(
-				"Please enter your email address.", MLevel.ERROR);
-
-		public static final Message NO_PASSWORD = new Message(
-				"Please enter your password.", MLevel.ERROR);
-
-		public static final Message UNKNOWN_USERNAME = new Message(
-				"The email or password you entered is incorrect.", MLevel.ERROR);
-
-		public static final Message LOGIN_DISABLED = new Message(
-				"User logins are temporarily disabled while the system is being maintained.",
-				MLevel.ERROR);
-
-		public static final Message INCORRECT_PASSWORD = new Message(
-				"The email or password you entered is incorrect.", MLevel.ERROR);
-
-		public static final Message NO_NEW_PASSWORD = new Message(
-				"Please enter your new password.", MLevel.ERROR);
-
-		public static final Message MISMATCH_PASSWORD = new Message(
-				"The passwords entered do not match.", MLevel.ERROR);
-
-		public static final Message PASSWORD_LENGTH = new Message(
-				"Please enter a password between {0} and {1} characters in length.",
-				MLevel.ERROR);
-
-		public static final Message USING_OLD_PASSWORD = new Message(
-				"Your new password cannot match the current one.", MLevel.ERROR);
-
-		private final String format;
+		private final String text;
 		private final MLevel messageLevel;
 
-		public Message(String format, MLevel messageLevel) {
-			this.format = format;
-			this.messageLevel = messageLevel;
+		public Message() {
+			this.messageLevel = MLevel.NONE;
+			this.text = "";
 		}
-
+		
+		public Message(HttpServletRequest req, MLevel messageLevel, String textKey, Object... parameters) {
+			this.messageLevel = messageLevel;
+			this.text = I18n.bundle(req).text(textKey, parameters);
+		}
+		
 		public MLevel getMessageLevel() {
 			return this.messageLevel;
 		}
 
-		public String formatMessage(Object[] args) {
-			return new MessageFormat(this.format).format(args);
+		public String getText() {
+			return text;
 		}
 
 		@Override
 		public String toString() {
-			return "Message[" + messageLevel + ", '" + format + "']";
+			return "Message[" + messageLevel + ", '" + text + "']";
 		}
 	}
 
@@ -210,10 +183,15 @@ public class LoginProcessBean {
 		}
 	}
 
-	public void setMessage(Message message, Object... args) {
+	public void setMessage(Message message) {
 		synchronized (messageSynchronizer) {
 			this.message = message;
-			this.messageArguments = args;
+		}
+	}
+	
+	public void setMessage(HttpServletRequest req, MLevel level, String textKey, Object... parameters) {
+		synchronized (messageSynchronizer) {
+			this.message = new Message(req, level, textKey, parameters);
 		}
 	}
 
@@ -221,7 +199,7 @@ public class LoginProcessBean {
 		synchronized (messageSynchronizer) {
 			String text = "";
 			if (message.getMessageLevel() == MLevel.INFO) {
-				text = message.formatMessage(messageArguments);
+				text = message.getText();
 				clearMessage();
 			}
 			return text;
@@ -232,7 +210,7 @@ public class LoginProcessBean {
 		synchronized (messageSynchronizer) {
 			String text = "";
 			if (message.getMessageLevel() == MLevel.ERROR) {
-				text = message.formatMessage(messageArguments);
+				text = message.getText();
 				clearMessage();
 			}
 			return text;

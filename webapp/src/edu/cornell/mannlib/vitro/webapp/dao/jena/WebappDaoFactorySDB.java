@@ -91,7 +91,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 		if (vClassDao != null) 
 			return vClassDao;
 		else
-			return vClassDao = new VClassDaoSDB(dwf, datasetMode, this);
+			return vClassDao = new VClassDaoSDB(dwf, datasetMode, this, config.isUnderlyingStoreReasoned());
 	}
 	
 	public WebappDaoFactory getUserAwareDaoFactory(String userURI) {

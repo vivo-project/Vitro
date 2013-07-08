@@ -7,17 +7,14 @@
  -->
 
 <#-- This is included by identity.ftl --> 
-<#if selectLocale??>
-    <li>
-      <form method="get" action="${selectLocale.selectLocaleUrl}" >
-        <#list selectLocale.locales as locale>
-          <button type="submit" name="selection" value="${locale.code}">
-            <img src="${locale.imageUrl}" height="15" align="middle" alt="${locale.label}"/>
-          </button>
-          <#if locale_has_next>|</#if>
-        </#list>
-      </form>
-    </li>
+<#if selectLocale??>    
+    <#list selectLocale.locales as locale>
+        <li>
+            <a href="${selectLocale.selectLocaleUrl}?selection=${locale.code}" title="${i18n().select_locale} -- ${locale.label}">
+                <img src="${locale.imageUrl}" height="15" style="vertical-align:middle" alt="${locale.label}"/>
+            </a>
+        </li>
+    </#list>
 </#if>
 
 <#-- 

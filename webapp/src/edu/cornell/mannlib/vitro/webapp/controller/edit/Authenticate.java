@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MAX_PASSWORD_LENGTH;
 import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MIN_PASSWORD_LENGTH;
+import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.MLevel.ERROR;
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.FORCED_PASSWORD_CHANGE;
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.LOGGED_IN;
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.LOGGING_IN;
@@ -37,8 +38,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator.Lo
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginInProcessFlag;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
-import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.Message;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginLogoutEvent;
 
 public class Authenticate extends VitroHttpServlet {
@@ -308,7 +309,7 @@ public class Authenticate extends VitroHttpServlet {
 				+ bean);
 
 		if ((username == null) || username.isEmpty()) {
-			bean.setMessage(Message.NO_USERNAME);
+			bean.setMessage(request, ERROR, "error_no_email_address");
 			return;
 		}
 
@@ -319,22 +320,22 @@ public class Authenticate extends VitroHttpServlet {
 		log.trace("User is " + (user == null ? "null" : user.getUri()));
 
 		if (user == null) {
-			bean.setMessage(Message.UNKNOWN_USERNAME, username);
+			bean.setMessage(request, ERROR, "error_incorrect_credentials");
 			return;
 		}
 
 		if ((password == null) || password.isEmpty()) {
-			bean.setMessage(Message.NO_PASSWORD);
+			bean.setMessage(request, ERROR, "error_no_password");
 			return;
 		}
 
 		if (!getAuthenticator(request).isUserPermittedToLogin(user)) {
-			bean.setMessage(Message.LOGIN_DISABLED);
+			bean.setMessage(request, ERROR, "logins_disabled_for_maintenance");
 			return;
 		}
 
 		if (!getAuthenticator(request).isCurrentPassword(user, password)) {
-			bean.setMessage(Message.INCORRECT_PASSWORD);
+			bean.setMessage(request, ERROR, "error_incorrect_credentials");
 			return;
 		}
 
@@ -346,7 +347,8 @@ public class Authenticate extends VitroHttpServlet {
 				transitionToLoggedIn(request, user);
 			} catch (LoginNotPermitted e) {
 				// This should have been caught by isUserPermittedToLogin()
-				bean.setMessage(Message.LOGIN_DISABLED);
+				bean.setMessage(request, ERROR,
+						"logins_disabled_for_maintenance");
 				return;
 			}
 		}
@@ -378,19 +380,19 @@ public class Authenticate extends VitroHttpServlet {
 				+ ", bean=" + bean);
 
 		if ((newPassword == null) || newPassword.isEmpty()) {
-			bean.setMessage(Message.NO_NEW_PASSWORD);
+			bean.setMessage(request, ERROR, "error_no_new_password");
 			return;
 		}
 
 		if (!newPassword.equals(confirm)) {
-			bean.setMessage(Message.MISMATCH_PASSWORD);
+			bean.setMessage(request, ERROR, "error_passwords_dont_match");
 			return;
 		}
 
 		if ((newPassword.length() < MIN_PASSWORD_LENGTH)
 				|| (newPassword.length() > MAX_PASSWORD_LENGTH)) {
-			bean.setMessage(Message.PASSWORD_LENGTH, MIN_PASSWORD_LENGTH,
-					MAX_PASSWORD_LENGTH);
+			bean.setMessage(request, ERROR, "error_password_length",
+					MIN_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH);
 			return;
 		}
 
@@ -399,7 +401,7 @@ public class Authenticate extends VitroHttpServlet {
 		UserAccount user = getAuthenticator(request).getAccountForInternalAuth(
 				username);
 		if (getAuthenticator(request).isCurrentPassword(user, newPassword)) {
-			bean.setMessage(Message.USING_OLD_PASSWORD);
+			bean.setMessage(request, ERROR, "error_previous_password");
 			return;
 		}
 
@@ -408,7 +410,7 @@ public class Authenticate extends VitroHttpServlet {
 			transitionToLoggedIn(request, user, newPassword);
 		} catch (LoginNotPermitted e) {
 			// This should have been caught by isUserPermittedToLogin()
-			bean.setMessage(Message.LOGIN_DISABLED);
+			bean.setMessage(request, ERROR, "logins_disabled_for_maintenance");
 			return;
 		}
 	}
@@ -557,16 +559,7 @@ public class Authenticate extends VitroHttpServlet {
 			return;
 		}
 
-		OntModel jenaOntModel = (OntModel) session.getAttribute("jenaOntModel");
-		if (jenaOntModel == null) {
-			jenaOntModel = (OntModel) context.getAttribute("jenaOntModel");
-		}
-		if (jenaOntModel == null) {
-			log.error("Unable to notify audit model of login event "
-					+ "because no model could be found");
-			return;
-		}
-
+		OntModel jenaOntModel = ModelAccess.on(session).getJenaOntModel();
 		jenaOntModel.getBaseModel().notifyEvent(event);
 	}
 

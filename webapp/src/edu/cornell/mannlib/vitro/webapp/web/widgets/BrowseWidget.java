@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.json.JsonServlet;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.utils.JsonToFmModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
@@ -123,7 +124,7 @@ public class BrowseWidget extends Widget {
                 
         VitroRequest vreq = new VitroRequest(request);
         
-        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+        VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(request);
         List<VClassGroup> cgList = vcgc.getGroups();
         
 //        List<VClassGroup> classGroups =
@@ -186,7 +187,7 @@ public class BrowseWidget extends Widget {
         VitroRequest vreq = new VitroRequest(request);        
         //VClassGroup vcg = vreq.getWebappDaoFactory().getVClassGroupDao().getGroupByURI(vcgUri);
         
-        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+        VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(request);
         VClassGroup vcg = vcgc.getGroup(vcgUri);        
         
         //vreq.getWebappDaoFactory().getVClassDao().addVClassesToGroup(vcg, false, true);

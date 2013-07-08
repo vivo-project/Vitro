@@ -4,7 +4,7 @@
 
 <#import "lib-string.ftl" as str>
 <noscript>
-<p style="padding: 20px 20px 20px 20px;background-color:#f8ffb7">This browse page requires javascript, but your browser is set to disable javascript. Either enable javascript or use the <a href="http://localhost:8080/vivo/browse" title="index page">index page</a> to browse for information.</p>
+<p style="padding: 20px 20px 20px 20px;background-color:#f8ffb7">${i18n().browse_page_javascript_one} <a href="${urls.base}/browse" title="${i18n().index_page}">${i18n().index_page}</a> ${i18n().browse_page_javascript_two}</p>
 </noscript>
 
 <section id="noJavascriptContainer" class="hidden">
@@ -20,7 +20,7 @@
                 <#assign vClassCamel = str.camelCase(vClass.name) />
                 <#-- Only display vClasses with individuals -->
                 <#if (vClass.entityCount > 0)>
-                    <li id="${vClassCamel}"><a href="#${vClassCamel}" title="Browse all individuals in this class" data-uri="${vClass.URI}">${vClass.name} <span class="count-classes">(${vClass.entityCount})</span></a></li>
+                    <li id="${vClassCamel}"><a href="#${vClassCamel}" title="${i18n().browse_all_in_class}" data-uri="${vClass.URI}">${vClass.name} <span class="count-classes">(${vClass.entityCount})</span></a></li>
                 </#if>
             </#list>
         </ul>
@@ -28,9 +28,9 @@
             <h3 class="selected-class"></h3>
             <#assign alphabet = ["A", "B", "C", "D", "E", "F", "G" "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"] />
             <ul id="alpha-browse-individuals">
-                <li><a href="#" class="selected" data-alpha="all" title="select all">All</a></li>
+                <li><a href="#" class="selected" data-alpha="all" title="${i18n().select_all}">${i18n().all}</a></li>
                 <#list alphabet as letter>
-                    <li><a href="#" data-alpha="${letter?lower_case}" title="Browse all individuals whose name starts with ${letter}">${letter}</a></li>
+                    <li><a href="#" data-alpha="${letter?lower_case}" title="${i18n().browse_all_starts_with(letter)}">${letter}</a></li>
                 </#list>
             </ul>
         </nav>

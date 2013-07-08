@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
-import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,13 +22,13 @@ import org.apache.solr.common.SolrDocumentList;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
@@ -102,10 +100,15 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     }
 	
     protected List<String> getRangeTypes(VitroRequest vreq) {
+        WebappDaoFactory wDaoFact = vreq.getWebappDaoFactory();
+        List<String> types = new ArrayList<String>();
     	Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
    		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
-		WebappDaoFactory wDaoFact = vreq.getWebappDaoFactory();
-		List<String> types = new ArrayList<String>();
+   		String rangeUri = EditConfigurationUtils.getRangeUri(vreq);
+   		if (rangeUri != null) {
+   		    types.add(rangeUri);
+	        return types;
+   		}
 		//Get all vclasses applicable to subject
 		List<VClass> vClasses = subject.getVClasses();
 		HashSet<String> typesHash = new HashSet<String>();
@@ -141,11 +144,10 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     		}else{
     			query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type);
     		}
-    		query.setRows(0);
-    		
+    		query.setRows(0);	
     		QueryResponse rsp = solrServer.query(query);
     		SolrDocumentList docs = rsp.getResults();
-    		long found = docs.getNumFound();    
+    		long found = docs.getNumFound();
     		count = count + found;
     		if( count > maxNonACRangeIndividualCount )
     			break;
@@ -182,7 +184,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	this.setSparqlQueries(editConfiguration);
     	
     	//set fields
-    	setFields(editConfiguration, vreq, EditConfigurationUtils.getPredicateUri(vreq));
+    	setFields(editConfiguration, vreq, EditConfigurationUtils.getPredicateUri(vreq), EditConfigurationUtils.getRangeUri(vreq));
     	
     //	No need to put in session here b/c put in session within edit request dispatch controller instead
     	//placing in session depends on having edit key which is handled in edit request dispatch controller
@@ -352,7 +354,11 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	return map;
     }
     
-    protected void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) throws Exception {    	
+    protected void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) throws Exception {
+        setFields(editConfiguration, vreq, predicateUri, null);
+    }
+    
+    protected void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri, String rangeUri) throws Exception {
 		FieldVTwo field = new FieldVTwo();
     	field.setName("objectVar");    	
     	
@@ -363,7 +369,8 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	if( ! doAutoComplete ){
     		field.setOptions( new IndividualsViaObjectPropetyOptions(
     	        subjectUri, 
-    	        predicateUri, 
+    	        predicateUri,
+    	        rangeUri,
     	        objectUri));
     	}else{
     		field.setOptions(null);
@@ -377,7 +384,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 
 	private void prepareForUpdate(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
     	//Here, retrieve model from 
-    	Model model = (Model) session.getServletContext().getAttribute("jenaOntModel");
+		OntModel model = ModelAccess.on(session.getServletContext()).getJenaOntModel();
     	//if object property
     	if(EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)){
 	    	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);
@@ -408,16 +415,11 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	if(isSelectFromExisting(vreq)) {
     		// set ProhibitedFromSearch object so picklist doesn't show
             // individuals from classes that should be hidden from list views
-    		//TODO: Check how model is retrieved
-            OntModel displayOntModel = 
-               (OntModel) session.getServletContext()
-                    .getAttribute(DISPLAY_ONT_MODEL);
-            if (displayOntModel != null) {
-                ProhibitedFromSearch pfs = new ProhibitedFromSearch(
-                    DisplayVocabulary.SEARCH_INDEX_URI, displayOntModel);
-                if( editConfig != null )
-                    editConfig.setProhibitedFromSearch(pfs);
-            }
+            OntModel displayOntModel = ModelAccess.on(session.getServletContext()).getDisplayModel();
+            ProhibitedFromSearch pfs = new ProhibitedFromSearch(
+                DisplayVocabulary.SEARCH_INDEX_URI, displayOntModel);
+            if( editConfig != null )
+                editConfig.setProhibitedFromSearch(pfs);
     	}
     }
     
@@ -468,7 +470,8 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	boolean rangeIndividualsFound = false;
     	for( String type:types){
     		//solr for type count.
-    		SolrQuery query = new SolrQuery();    
+    		SolrQuery query = new SolrQuery();   
+    		
     		query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type);
     		query.setRows(0);
     		

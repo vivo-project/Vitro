@@ -37,13 +37,13 @@ public class SolrResultsParser {
 		List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
 
 		if (queryResponse == null) {
-			log.error("Query response for a search was null");
+			log.debug("Query response for a search was null");
 			return maps;
 		}
 
 		SolrDocumentList docs = queryResponse.getResults();
 		if (docs == null) {
-			log.error("Docs for a search was null");
+			log.debug("Docs for a search was null");
 			return maps;
 		}
 		log.debug("Total number of hits = " + docs.getNumFound());
@@ -65,13 +65,13 @@ public class SolrResultsParser {
 		List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
 
 		if (queryResponse == null) {
-			log.error("Query response for a search was null");
+			log.debug("Query response for a search was null");
 			return maps;
 		}
 
 		SolrDocumentList docs = queryResponse.getResults();
 		if (docs == null) {
-			log.error("Docs for a search was null");
+			log.debug("Docs for a search was null");
 			return maps;
 		}
 		log.debug("Total number of hits = " + docs.getNumFound());

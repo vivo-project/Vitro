@@ -99,7 +99,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 	            ClosableIterator<Statement> propIt = ind.listProperties();
 	            try {
 	                while (propIt.hasNext()) {
-	                    Statement st = (Statement) propIt.next();
+	                    Statement st = propIt.next();
 	                    
 	                    if (st.getObject().isResource() && !(NONUSER_NAMESPACES.contains(st.getPredicate().getNameSpace()))) {
 	                        try {
@@ -173,7 +173,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     		try {
     			int count = 0;
     			while ( (opsIt.hasNext()) && ((endIndex<0) || (count<endIndex)) ) {
-    				Statement stmt = (Statement) opsIt.next();
+    				Statement stmt = opsIt.next();
     				if (stmt.getObject().isResource()) {
 	    				++count;
 	    				if (startIndex<0 || startIndex<=count) {
@@ -271,6 +271,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             String subjectUri, 
             String propertyUri,             
             String objectKey, 
+            String rangeUri,
             String queryString, 
             Set<String> constructQueryStrings,
             String sortDirection) {    	        
@@ -296,6 +297,9 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         QuerySolutionMap initialBindings = new QuerySolutionMap();
         initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
         initialBindings.add("property", ResourceFactory.createResource(propertyUri));
+        if (rangeUri != null) {
+            initialBindings.add("objectType", ResourceFactory.createResource(rangeUri));
+        }
         
         // Run the SPARQL query to get the properties
         List<Map<String, String>> list = new ArrayList<Map<String, String>>();

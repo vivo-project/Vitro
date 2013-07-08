@@ -88,6 +88,17 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>
 
+  <!-- If language support is enabled, this must not precede the LocaleSelectionFilter -->
+  <filter>
+    <description>Recognize conditional requests, and generate Cache-Control headers.</description>
+    <filter-name>Caching Response filter</filter-name>
+    <filter-class>edu.cornell.mannlib.vitro.webapp.filters.CachingResponseFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>Caching Response filter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
   <filter>
     <filter-name>JSession Strip Filter</filter-name>
     <filter-class>edu.cornell.mannlib.vitro.webapp.filters.JSessionStripFilter</filter-class>
@@ -107,20 +118,11 @@
   </filter-mapping>
 
   <filter>
-     <filter-name>WebappDaoFactorySDBPrep</filter-name>
-     <filter-class>edu.cornell.mannlib.vitro.webapp.filters.WebappDaoFactorySDBPrep</filter-class>
+    <filter-name>RequestModelsPrep</filter-name>
+    <filter-class>edu.cornell.mannlib.vitro.webapp.filters.RequestModelsPrep</filter-class>
   </filter>
   <filter-mapping>
-     <filter-name>WebappDaoFactorySDBPrep</filter-name>
-     <url-pattern>/*</url-pattern>
-  </filter-mapping>
-
-  <filter>
-    <filter-name>VitroRequestPrep</filter-name>
-    <filter-class>edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>VitroRequestPrep</filter-name>
+    <filter-name>RequestModelsPrep</filter-name>
     <url-pattern>/*</url-pattern>
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>FORWARD</dispatcher>
@@ -1082,14 +1084,6 @@
   <servlet-mapping>
     <servlet-name>logout</servlet-name>
     <url-pattern>/logout</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>pubsbyorg</servlet-name>
-    <url-pattern>/pubsbyorg</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>coauthors</servlet-name>
-    <url-pattern>/coauthors</url-pattern>
   </servlet-mapping>
 
   <!-- ==================== sparql query builder ==================== -->

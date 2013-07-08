@@ -114,9 +114,11 @@ public class DisplayByRolePermission extends Permission {
 		ObjectPropertyStatement stmt = action.getObjectPropertyStatement();
 		String subjectUri = stmt.getSubjectURI();
 		String predicateUri = stmt.getPropertyURI();
+		String rangeUri = (stmt.getProperty() == null) ? null 
+		        : stmt.getProperty().getRangeVClassURI();
 		String objectUri = stmt.getObjectURI();
 		return canDisplayResource(subjectUri)
-				&& canDisplayPredicate(predicateUri)
+				&& canDisplayPredicate(predicateUri, rangeUri)
 				&& canDisplayResource(objectUri);
 	}
 
@@ -124,10 +126,14 @@ public class DisplayByRolePermission extends Permission {
 		return PropertyRestrictionPolicyHelper.getBean(ctx).canDisplayResource(
 				resourceUri, this.roleLevel);
 	}
-
+	
 	private boolean canDisplayPredicate(String predicateUri) {
+	    return canDisplayPredicate(predicateUri, null);
+	}
+
+	private boolean canDisplayPredicate(String predicateUri, String rangeUri) {
 		return PropertyRestrictionPolicyHelper.getBean(ctx)
-				.canDisplayPredicate(predicateUri, this.roleLevel);
+				.canDisplayPredicate(predicateUri, rangeUri, this.roleLevel);
 	}
 
 	@Override

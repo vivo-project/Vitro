@@ -8,6 +8,9 @@
     <section class="siteMap" role="region">
         <div id="isotope-container">
             <#list classGroups as classGroup>
+                <#assign groupSize = classGroup.classes?size >
+                <#assign classCount = 0 >
+                <#assign splitGroup = false>
                 <#-- Only render classgroups that have at least one populated class -->
                 <#if (classGroup.individualCount > 0)> 
                 	<div class="class-group">             
@@ -16,7 +19,15 @@
                             <#list classGroup.classes as class> 
                                 <#-- Only render populated classes -->
                                 <#if (class.individualCount > 0)>
-                                    <li role="listitem"><a href="${class.url}" title="class name">${class.name}</a> (${class.individualCount})</li>
+                                    <li role="listitem"><a href="${class.url}" title="${i18n().class_name}">${class.name}</a> (${class.individualCount})</li>
+                                <#assign classCount = classCount + 1 >
+                                </#if>
+                                <#if (classCount > 34) && !splitGroup >
+                                   <#assign splitGroup = true >
+                                   </ul></div>
+                                   <div class="class-group">
+                                       <h2>${classGroup.displayName} (${i18n().continued})</h2>
+                                          <ul role="list">
                                 </#if>
                             </#list>
                         </ul>
@@ -29,7 +40,7 @@
     ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/isotope/jquery.isotope.min.js"></script>')}
     <script>
         var initHeight = $("#isotope-container").height();
-        initHeight = (initHeight/2.225)+200 ;
+        initHeight = (initHeight/2.1) ;
         $("#isotope-container").css("height",initHeight + "px");
     </script>
     <script>

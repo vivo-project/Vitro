@@ -21,6 +21,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 
 /**
  * A user has just completed the login process. What page do we direct them to?
@@ -30,6 +32,7 @@ public class LoginRedirector {
 
 	private final HttpServletRequest request;
 	private final HttpSession session;
+	private final I18nBundle i18n;
 
 	private final String uriOfAssociatedIndividual;
 	private final String afterLoginPage;
@@ -37,6 +40,7 @@ public class LoginRedirector {
 	public LoginRedirector(HttpServletRequest request, String afterLoginPage) {
 		this.request = request;
 		this.session = request.getSession();
+		this.i18n = I18n.bundle(request);
 		this.afterLoginPage = afterLoginPage;
 
 		uriOfAssociatedIndividual = getAssociatedIndividualUri();
@@ -114,26 +118,23 @@ public class LoginRedirector {
 	public String assembleWelcomeMessage() {
 		if (!canSeeSiteAdminPage() && !isSelfEditorWithIndividual()) {
 			// A special message for unrecognized self-editors:
-			return "You have logged in, "
-					+ "but the system contains no profile for you.";
+			return i18n.text("logged_in_but_no_profile");
 		}
 
-		String backString = "";
-		String greeting = "";
+		String greeting = i18n.text("unknown_user_name");
+		int loginCount = 0;
 
 		UserAccount userAccount = LoginStatusBean.getCurrentUser(request);
 		if (userAccount != null) {
-			greeting = userAccount.getEmailAddress();
-			if (userAccount.getLoginCount() > 1) {
-				backString = " back";
-			}
-			String name = userAccount.getFirstName();
-			if (!StringUtils.isEmpty(name)) {
-				greeting = name;
+			loginCount = userAccount.getLoginCount();
+			if (StringUtils.isNotEmpty(userAccount.getFirstName())) {
+				greeting = userAccount.getFirstName();
+			} else if (StringUtils.isNotEmpty(userAccount.getEmailAddress())) {
+				greeting = userAccount.getEmailAddress();
 			}
 		}
 
-		return "Welcome" + backString + ", " + greeting;
+		return i18n.text("login_welcome_message", greeting, loginCount);
 	}
 
 	public void redirectCancellingUser(HttpServletResponse response)
