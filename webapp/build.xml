@@ -69,6 +69,8 @@
 	<property name="solr.webapp.dir" location="${solr.build.dir}/webapp" />
 	<property name="solr.homeimage.dir" location="${solr.build.dir}/homeimage" />
 
+    <property name="solr.lib.dir" location="${solr.template.dir}/solrjClientLibs" />
+
 	<property name="distribution.dir" location="${build.dir}/distribution" />
 	<property name="distribution.tar.gz.file" location="${build.dir}/distribution.tar.gz" />
 
@@ -240,10 +242,14 @@
 	<!-- ================================= 
           target: test              
          ================================= -->
-	<target name="test" depends="compile, compileBuildtools" unless="skiptests" description="--> Run JUnit tests">
+	<target name="test" depends="compile, compileBuildtools, prepareSolr" unless="skiptests" description="--> Run JUnit tests">
 		<path id="test.compile.classpath">
 			<pathelement location="${main.compiled.dir}" />
 			<path refid="main.compile.classpath" />
+            <!-- need the solr runtime becuase we do a test where a solr server is started -->
+            <fileset dir="${solr.webapp.dir}/WEB-INF/lib">
+              <include name="*.jar"/>
+            </fileset>
 		</path>
 
 		<mkdir dir="${unittests.compiled.dir}" />
@@ -263,6 +269,9 @@
 			<pathelement location="${unittests.compiled.dir}" />
 			<path refid="test.compile.classpath" />
 			<path refid="utility.run.classpath" />
+            <fileset dir="${solr.webapp.dir}/WEB-INF/lib">
+              <include name="*.jar"/>
+            </fileset>
 		</path>
 
 		<java classname="edu.cornell.mannlib.vitro.utilities.testing.VitroTestRunner" fork="yes" failonerror="true">
