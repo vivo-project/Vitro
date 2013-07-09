@@ -24,8 +24,8 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.core.CoreContainer;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.xml.sax.SAXException;
@@ -37,10 +37,12 @@ import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.util.FileManager;
 
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
+import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualToSolrDocument;
 
 /**
@@ -54,27 +56,37 @@ import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualT
  * 
  * This code is based on a similar test from the CUL Discovery and Access
  * integration layer.
+ * 
+ * All RDF/XML files in webapp/test/testontologies/SolrQueryTestRDF will be 
+ * loaded into the model.
  */
-public class SolrQueryTest {
+public class SolrQueryTest extends AbstractTestClass {
 	/** Key of system property for build directory. */
-	static final String buildDirSystemPropertyKey = "vitro.build.dir";
+	final static String buildDirSystemPropertyKey = "vitro.build.dir";
 	
 	/** Solr index to run test queries on. */
 	static SolrServer solr = null;
 	
+    /** Container for solr */
+    static CoreContainer coreContainer = null;
+
 	/** Folder to store the temporary Solr index. */ 
     public static TemporaryFolder solrIndexFolder = null;
-	   
+
 	/**
 	 * This test needs to load RDF data to use as a 
 	 * source of individuals to to build documents. 
 	 * This is relative to the build directory.
 	 */
-	static final String testRDFDir =  
-		"webapp/test/testontologies/SolrQueryTestData.n3";
+	 final static String testRDFDir =  
+        "/webapp/test/testontologies/SolrQueryTestRDF";
 				
-	@BeforeClass
-	public static void setup() throws Exception{
+    @Before
+    public void setup() throws Exception{
+        //solr makes a lot of output
+        suppressSysout();
+        suppressSyserr();
+
 		File buildDir = findBuildDir();
 		
 		solrIndexFolder = new TemporaryFolder();
@@ -84,9 +96,20 @@ public class SolrQueryTest {
 		FileUtils.copyDirectory(getSolrTemplateDir(buildDir), tempSolrBase );		
 		solr = setupSolr( tempSolrBase );			
 		
-		indexRdf( loadTestRDF( buildDir ) );				
+		indexRdf( loadTestRDF( buildDir ) );
+    }
+
+	@After
+	public void takedown() throws Exception{
+        if( coreContainer != null )
+            coreContainer.shutdown();
+            
+        restoreOutputStreams();
+
+		if( solrIndexFolder != null )
+			solrIndexFolder.delete();
 	}
-			
+
 	/**
 	 * This will return the directory to use as the Solr
 	 * home template directory.  
@@ -94,7 +117,7 @@ public class SolrQueryTest {
 	 * Throws an exception if the directory is not found.
 	 * @param buildDir - must not be null, must be the base of the build.
 	 */
-	private static File getSolrTemplateDir(File buildDir) throws Exception {				
+	private   File getSolrTemplateDir(File buildDir) throws Exception {				
 		if(buildDir == null || !buildDir.exists() )
 			throw new Exception("buildDir must not be null");
 		
@@ -108,22 +131,22 @@ public class SolrQueryTest {
 			return solrTemplateDir;		
 	}
 	
-	protected static SolrServer setupSolr(File solrBase) 
+	protected   SolrServer setupSolr(File solrBase) 
 	throws ParserConfigurationException, IOException, SAXException{		
 		System.setProperty("solr.solr.home", solrBase.getAbsolutePath());
 		CoreContainer.Initializer initializer = new CoreContainer.Initializer();
-		CoreContainer coreContainer = initializer.initialize();
+		coreContainer = initializer.initialize();
 		return new EmbeddedSolrServer(coreContainer, "");
 	}
 
-	private static OntModel loadTestRDF(File buildDir) throws Exception {
-		String dirname = buildDir.getAbsolutePath() + "/webapp/test/testontologies/solrTestRDF";
-		File testRDFDir = new File( dirname );		
-		assertNotNull("could not find dir " + dirname , testRDFDir);
-		assertTrue(dirname + " must be a directory." ,testRDFDir.isDirectory());
+	private  OntModel loadTestRDF(File buildDir) throws Exception {
+		String dirname = buildDir.getAbsolutePath() + testRDFDir;
+		File rdfDir = new File( dirname );		
+		assertNotNull("could not find dir " + dirname , rdfDir);
+		assertTrue(dirname + " must be a directory." ,rdfDir.isDirectory());
 		
 		//load all files in test dir.
-		File[] files = testRDFDir.listFiles();
+		File[] files = rdfDir.listFiles();
 		assertNotNull("no test RDF files found",files);
 		assertTrue("no test RDF files found", files.length > 0 );
 		
@@ -132,9 +155,9 @@ public class SolrQueryTest {
 			InputStream in = FileManager.get().open( file.getAbsolutePath() );	
 			assertNotNull("Could not load file " + file.getAbsolutePath(), in );
 			try{
-				model.read(in,null,"N-TRIPLE");
+				model.read(in,null);
 			}catch(Throwable th){
-				throw new Exception( "Could not load N-TRIPLE file " 
+				throw new Exception( "Could not load RDF/XML file " 
 						+ file.getAbsolutePath() , th);
 			}
 		}				 
@@ -147,7 +170,7 @@ public class SolrQueryTest {
 	 * or it will throw an exception if none can be found.
 	 * @throws Exception 
 	 */
-	private static File findBuildDir() throws Exception {							
+	private  File findBuildDir() throws Exception {							
 		
 		//First try to find the base directory 
 		//of the build in the system properties.
@@ -163,7 +186,7 @@ public class SolrQueryTest {
 		//If there is no system property try to 
 		//guess the location based on the working directory 
 		File f = null;		
-		String[] fallBackBases = {"./","../","../../"};
+		String[] fallBackBases = {"","../","../../"};
 		List<String> attempted = new ArrayList<String>();
 		for( String base: fallBackBases){
 			String attemptedDir =base + "solr/homeDirectoryTemplate";		
@@ -191,12 +214,15 @@ public class SolrQueryTest {
 
 
 	/** Query the RDF, build Solr Documents from results, load them to Solr. */
-	private static void indexRdf(OntModel model) throws Exception {
+	private  void indexRdf(OntModel model) throws Exception {
 		RDFServiceModel rdfService = new RDFServiceModel(model);
 							
-		IndividualToSolrDocument r2d =  SolrSetup.setupTransltion(model, 
-				new RDFServiceFactorySingle(rdfService),
-				null, null);
+		IndividualToSolrDocument r2d =  
+		    SolrSetup.setupTransltion(
+		            model,
+		            model,
+		            new RDFServiceFactorySingle(rdfService),
+		            null, null);
 		
 		WebappDaoFactory wdf = new WebappDaoFactoryJena(model);
 		
@@ -210,16 +236,13 @@ public class SolrQueryTest {
 			try {
 				solr.add( doc );
 			} catch (Exception e) {
-				System.err.println("Failed adding doc to solr for uri:" + uri);				
-//				System.err.println( IndexingUtilities.toString( doc ) + "\n\n" );
-//				System.err.println( IndexingUtilities.prettyFormat( ClientUtils.toXML( doc ) ) );
-				throw e;
+				throw new Exception("Failed adding doc to solr for uri:" + uri, e);
 			}
 		}
 		solr.commit();
 	}
 	
-	private static List<String> getURISToIndex(Model model) {
+	private  List<String> getURISToIndex(Model model) {
 		//just return all the URIs in the subject position		
 		List<String> uris = new LinkedList<String>();
 		ResIterator it = model.listSubjects();
@@ -239,58 +262,41 @@ public class SolrQueryTest {
 	}
 	
 	@Test
-	public void testBronte() throws SolrServerException{
+	public void testCorsonSearch() throws SolrServerException{
 		
 		/* make sure that we have the document in the index before we do anything */
-		SolrQuery query = 
-				new SolrQuery().setQuery("id:4696").setParam("qt", "standard");		
-	
-		testQueryGetsDocs("Expect to find Bronte document by doc:id 4696",
-				query,new String[]{ "4696" } ) ;			
-		
-		query =  new SolrQuery().setQuery("bronte");
-		testQueryGetsDocs("Expect to find doc:id 4696 when searching for 'bronte'",
-				query,new String[]{ "4696" } ) ;
-		
-		query = new SolrQuery().setQuery( "Selected Bronte\u0308 poems") ;
-		testQueryGetsDocs("Expect to find doc:id 4696 when searching for 'Selected Bronte\u0308 poems'",
-				query,new String[]{ "4696" } ) ;
-		
-		query = new SolrQuery().setQuery( "\"Selected Bronte\u0308 poems\"") ;
-		testQueryGetsDocs("Expect to find doc:id 4696 when searching for 'Selected Bronte\u0308 poems' all in quotes",
-				query,new String[]{ "4696" } ) ;
-	}
-	
-	@AfterClass
-	public static void down() throws Exception{
-		if( solrIndexFolder != null )
-			solrIndexFolder.delete();
+		SolrQuery query = new SolrQuery().setQuery("corson");
+
+		testQueryGetsDocs("Expect to find a doc when searching for 'corson'",
+				query,new String[]{ "http://vivo.cornell.edu/individual/individual22972" } ) ;
 	}
 
+
+
 	/** 
-	 * Test that a document with the given IDs are in the results for the query. 
+	 * Test that a document with the given URIs are in the results for the query. 
 	 * @throws SolrServerException */
-	void testQueryGetsDocs(String errmsg, SolrQuery query, String[] docIds) throws SolrServerException{
+	void testQueryGetsDocs(String errmsg, SolrQuery query, String[] expectedUris) throws SolrServerException{
 		assertNotNull(errmsg + " but query was null", query);
-		assertNotNull(errmsg + " but docIds was null", docIds );
+		assertNotNull(errmsg + " but expected URIs was null", expectedUris );
 									
 		QueryResponse resp = solr.query(query);
 		if( resp == null )
 			fail( errmsg + " but Could not get a solr response");
 		
-		Set<String> expecteIds = new HashSet<String>(Arrays.asList( docIds ));
+		Set<String> uris = new HashSet<String>(Arrays.asList( expectedUris ));
 		for( SolrDocument doc : resp.getResults()){
 			assertNotNull(errmsg + ": solr doc was null", doc);
-			String id = (String) doc.getFirstValue("id");
-			assertNotNull(errmsg+": no id field in solr doc" , id);
-			expecteIds.remove( id );			
+			String uri = (String) doc.getFirstValue( VitroSearchTermNames.URI );
+			assertNotNull(errmsg+": no URI field in solr doc" , uri);
+			uris.remove( uri );
 		}
-		if( expecteIds.size() > 0){
+		if( uris.size() > 0){
 			String errorMsg = 
 					"\nThe query '"+ query + "' was expected " +
-					"to return the following ids but did not:";
-			for( String id : expecteIds){
-				errorMsg= errorMsg+"\n" + id;
+					"to return the following URIs but did not:";
+			for( String uri : uris){
+				errorMsg= errorMsg+"\n" + uri;
 			}					
 			
 			fail( errmsg + errorMsg);

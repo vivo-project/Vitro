@@ -15,6 +15,7 @@ import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.impl.XMLResponseParser;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
@@ -217,7 +218,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
         
         modifiers.add( new NameFields( rdfServiceFactory ));
         modifiers.add( new NameBoost(  1.2f ));
-        modifiers.add( new ThumbnailImageURL(jenaOntModel));                        
+        modifiers.add( new ThumbnailImageURL( rdfServiceFactory ));                        
         
         /* try to get context attribute SearchIndexExcludes 
          * and use that as the start of the list of exclude 
