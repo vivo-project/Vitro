@@ -1,0 +1,45 @@
+@prefix sce: <http://vivoweb.org/ontology/SchoolOfContinuingEducation#>.
+@prefix dcterms: <http://purl.org/dc/terms/>.
+@prefix local: <http://vivo.cornell.edu/ontology/local#>.
+@prefix skos: <http://www.w3.org/2004/02/skos/core#>.
+@prefix foaf: <http://xmlns.com/foaf/0.1/>.
+@prefix pubmed: <http://vitro.mannlib.cornell.edu/ns/pubmed#>.
+@prefix vitro-public: <http://vitro.mannlib.cornell.edu/ns/vitro/public#>.
+@prefix bibo: <http://purl.org/ontology/bibo/>.
+@prefix owl: <http://www.w3.org/2002/07/owl#>.
+@prefix hr: <http://vivo.cornell.edu/ns/hr/0.9/hr.owl#>.
+@prefix cce: <http://vivoweb.org/ontology/cornell-cooperative-extension#>.
+@prefix vivo: <http://vivoweb.org/ontology/core#>.
+@prefix aktp: <http://www.aktors.org/ontology/portal#>.
+@prefix scires: <http://vivoweb.org/ontology/scientific-research#>.
+@prefix dcelem: <http://purl.org/dc/elements/1.1/>.
+@prefix vivoc: <http://vivo.library.cornell.edu/ns/0.1#>.
+@prefix stars: <http://vitro.mannlib.cornell.edu/ns/cornell/stars/classes#>.
+@prefix far: <http://vitro.mannlib.cornell.edu/ns/reporting#>.
+@prefix pvs: <http://vivoweb.org/ontology/provenance-support#>.
+@prefix acti: <http://vivoweb.org/ontology/activity-insight#>.
+@prefix mann: <http://vivo.cornell.edu/ns/mannadditions/0.1#>.
+@prefix event: <http://purl.org/NET/c4dm/event.owl#>.
+@prefix aka: <http://vivoweb.org/ontology/aka#>.
+@prefix geo: <http://aims.fao.org/aos/geopolitical.owl#>.
+@prefix ero: <http://purl.obolibrary.org/obo/>.
+@prefix fabio: <http://purl.org/spar/fabio/>.
+@prefix rdfsyn: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>.
+@prefix socsci: <http://vivo.library.cornell.edu/ns/vivo/socsci/0.1#>.
+@prefix j.0: <http://vivoweb.org/ontology/newhr#>.
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
+@prefix ospcu: <http://vivoweb.org/ontology/cu-vivo-osp#>.
+@prefix c4o: <http://purl.org/spar/c4o/>.
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#>.
+
+<http://vivo.cornell.edu/individual/individualIssueVivo15> vivo:overview "There is a form feed in the following text. Hex 0c, that sometimes displays as ^L. Star Award for excellence in scientic publication and for productive collaborations with other Center scientists, U.S. Department of the Interior, 2009. Publications Award for scientist at Florida Integrated Science Center with highest annual scien-tic productivity as measured by number, quality, and impact of publications., U.S. Department of the Interior, 2009.";
+	vivo:webpage <https://jira.duraspace.org/browse/VIVO-15>;
+	a mann:CornellNonAcademicStaff,
+		local:InternalThing,
+		vivoc:CornellAffiliatedPerson,
+		vivoc:CornellEmployee,
+		vivo:NonAcademic,
+		owl:Thing,
+		foaf:Agent,
+		foaf:Person;
+	rdfs:label "Test individual for issue vivo15".
