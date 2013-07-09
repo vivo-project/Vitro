@@ -69,8 +69,6 @@
 	<property name="solr.webapp.dir" location="${solr.build.dir}/webapp" />
 	<property name="solr.homeimage.dir" location="${solr.build.dir}/homeimage" />
 
-    <property name="solr.lib.dir" location="${solr.template.dir}/solrjClientLibs" />
-
 	<property name="distribution.dir" location="${build.dir}/distribution" />
 	<property name="distribution.tar.gz.file" location="${build.dir}/distribution.tar.gz" />
 
