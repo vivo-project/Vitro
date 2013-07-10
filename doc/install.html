@@ -205,7 +205,7 @@
                             using "Contact Us" form)</a>
                     </li>
                     <li>
-                        <a href="#tomcat_connector">Setup Apache Tomcat Connector</a>
+                        <a href="#httpd">Set up Apache HTTPD</a>
                     </li>
                     <li>
                         <a href="#external_auth">Using an External Authentication
@@ -770,7 +770,7 @@
                 At the command line, change to the <code>webapp</code> directory inside the Vitro distribution 
                 directory. Then type: 
             </p>
-            <pre>                ant all<br>            </pre>
+            <pre>    ant all<br>            </pre>
             <p>
                 to build Vitro and deploy to Tomcat's webapps directory. 
             </p>
@@ -785,7 +785,7 @@
                 <br>
                 For example: 
             </p>
-            <pre>                    export CATALINA_OPTS="-Xms512m -Xmx512m -XX:MaxPermSize=128m"<br>                </pre>
+            <pre>    export CATALINA_OPTS="-Xms512m -Xmx512m -XX:MaxPermSize=128m"<br>                </pre>
             <p>
                 This sets Tomcat to allocate an initial heap of 512 megabytes, a
                 maximum heap of 512 megabytes, and a PermGen space of 128 megs. Lower 
@@ -837,7 +837,7 @@
                 deployment parameters from the overridden context fragment.
             </p>
             <p>
-                See <a href="#tomcat_connector">Section XI</a> below, 
+                See <a href="#httpd">Section XI</a> below, 
                 for an example of overriding the Vitro context fragment.
             </p>
 
@@ -921,43 +921,22 @@
                 provide an email address in this step, your users will receive a java  
                 error in the interface. 
             </p>
-            <h3 id="tomcat_connector">XI. Set up Apache Tomcat Connector </h3>
+            <h3 id="httpd">XI. Set up Apache HTTPD </h3>
             <p>
-                It is recommended that a Tomcat Connector such as mod_jk be used to 
-                ensure that the site address does not include the port number (e.g. 
-                8080) and an additional reference to the Tomcat context name (e.g.  
-                /vitro). 
+                It is recommended to run an Apache HTTPD web server to accept requests
+                and then proxy them to the VIVO Tomcat context. This will make Vitro
+                available at "http://example.com" instead of "http://example.com:8080/vitro".
+                It will also allow the use of external authentication.
             </p>
             <p>
-                This will make Vitro available at "http://example.com" instead of 
-                "http://example.com:8080/vitro" 
+                Setup HTTPD to send all of the requests that it receives to Tomcat's AJP
+                connector. This can be done in HTTPD 2.x with a simple directive in httpd.conf:
             </p>
+            <pre>     ProxyPass / ajp://localhost:8009/ <br><br></pre>
             <p>
-                Using the mod_jk connector allows for communication between Tomcat 
-                and the primary web server. The <a href="http://tomcat.apache.org/connectors-doc/generic_howto/quick.html">Quick
-                    Start HowTo</a>
-                on the Apache site describes the minimum server 
-                configurations for several popular web servers. 
-            </p>
-            <p>
-                After setting up the mod_jk connector above, you will need to 
-                modify the Tomcat's server.xml (located in <code>[tomcat root]/conf/</code>)
-                to
-                respond 
-                to 
-                requests from Apache via the connector. Look for the  
-                &lt;connector&gt; directive and add the following properties: 
-            </p>
-            <pre>                connectionTimeout="20000" maxThreads="320" keepAliveTimeout="20000"&nbsp; <br>            </pre>
-            <p>
-                Note: the value for maxThreads (320) is equal to the value for 
-                MaxClients in the apache's <code>httpd.conf</code>
-                file. 
-            </p>
-            <p>
-                Locate the <code>&lt;Host name="localhost"...&gt;</code>
-                directive 
-                and update as follows: 
+                Modify the &lt;Host&gt; in Tomcat server.xml (located in <code>[tomcat root]/conf/</code>)
+                so that the context path is empty to allow VIVO to be servred from the root path.
+                Locate the <code>&lt;Host name="localhost"...&gt;</code> directive and update as follows: 
             </p>
             <pre>              &lt;Host name="localhost" appBase="webapps"
                        DeployOnStartup="false"
@@ -976,6 +955,17 @@
                   
                    ...
             </pre>
+            <p>
+                After setting up the above, it is recommended that you modify the Tomcat AJP connector
+                parameters in server.xml. Look for the &lt;connector&gt; directive and add the
+                following properties: 
+            </p>
+            <pre>    connectionTimeout="20000" maxThreads="320" keepAliveTimeout="20000"&nbsp;<br><br></pre>
+            <p>
+                Note: the value for maxThreads (320) is equal or greater than the value for 
+                MaxClients in the apache's <code>httpd.conf</code> file. 
+            </p>
+
             <h3 id="external_auth">XII. Using an External Authentication System 
                 with Vitro </h3>
             <p>
