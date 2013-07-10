@@ -11,7 +11,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 
 
 public class EditN3UtilsTest {
@@ -27,7 +27,7 @@ public class EditN3UtilsTest {
         
         Assert.assertFalse(isSerializableAsXML(m));
         
-        String stripped = EditN3Utils.stripInvalidXMLChars(
+        String stripped = N3EditUtils.stripInvalidXMLChars(
                                 containsInvalidXMLChars);
         Assert.assertEquals(clean, stripped);
         

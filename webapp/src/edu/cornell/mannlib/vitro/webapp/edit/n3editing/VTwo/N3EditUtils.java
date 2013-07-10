@@ -4,9 +4,17 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.xerces.util.XMLChar;
+
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasProfile;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsUser;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -115,6 +123,38 @@ public class N3EditUtils {
             }
         }
         
+    }
+
+
+    /** Several places could give an editor URI. Return the first one. */
+    public static String getEditorUri(HttpServletRequest request) {
+        IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(request);
+    
+        List<String> uris = new ArrayList<String>();
+        uris.addAll(IsUser.getUserUris(ids));
+        uris.addAll(HasProfile.getProfileUris(ids));
+        uris.add("Unknown N3 Editor");
+        return uris.get(0);
+    }
+
+
+    /**
+     * Strips from a string any characters that are not valid in XML 1.0
+     * @param in
+     * @return
+     */
+    public static String stripInvalidXMLChars(String in) {
+        if (in == null) {
+            return null;
+        }
+        StringBuffer out = new StringBuffer();
+        for (int i = 0; i < in.length(); i++) {
+            char c = in.charAt(i);
+            if (!XMLChar.isInvalid(c)) {
+                out.append(c);
+            }
+        }
+        return out.toString();
     }    
     
    

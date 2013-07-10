@@ -25,8 +25,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardModelSelector;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
 
 public class PrimitiveRdfEdit extends VitroAjaxController {
 
@@ -78,7 +78,7 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
             return;
         }
 
-        String editorUri = EditN3Utils.getEditorUri(vreq);           
+        String editorUri = N3EditUtils.getEditorUri(vreq);           
         try {
 			Model a = mergeModels(additions);
 			Model r = mergeModels(retractions);

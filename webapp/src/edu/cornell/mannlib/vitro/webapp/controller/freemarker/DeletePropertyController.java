@@ -20,7 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 /*
  * Custom deletion controller to which deletion requests from default property form are sent. May be replaced 
@@ -107,7 +107,7 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
 		//This is the standard mechanism but note that datapropStmtDelete uses wdf with user aware
 
 		//DataProperty prop = EditConfigurationUtils.getDataProperty(vreq);
-		String editorUri = EditN3Utils.getEditorUri(vreq);
+		String editorUri = N3EditUtils.getEditorUri(vreq);
 		WebappDaoFactory wdf = vreq.getWebappDaoFactory().getUserAwareDaoFactory(editorUri);
 		DataProperty prop = wdf.getDataPropertyDao().getDataPropertyByURI(
 				EditConfigurationUtils.getPredicateUri(vreq));
