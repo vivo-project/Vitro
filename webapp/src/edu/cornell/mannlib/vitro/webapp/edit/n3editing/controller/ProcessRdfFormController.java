@@ -37,8 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.RdfLiteralHash;
 
 /**
  * This servlet will convert a request to an EditSubmission, 
@@ -102,7 +101,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		
 		N3EditUtils.preprocessModels(changes, configuration, vreq);		
 		
-		ProcessRdfForm.applyChangesToWriteModel(changes, queryModel, writeModel, EditN3Utils.getEditorUri(vreq) );
+		ProcessRdfForm.applyChangesToWriteModel(changes, queryModel, writeModel, N3EditUtils.getEditorUri(vreq) );
 		
 		//Here we are trying to get the entity to return to URL,  
 		//More involved processing for data property apparently

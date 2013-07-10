@@ -27,7 +27,6 @@ import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
 
 public class MultiValueEditSubmission {
 
@@ -263,7 +262,7 @@ public class MultiValueEditSubmission {
         	List<Literal> literalsArray = new ArrayList<Literal>();
         	//now support multiple values
         	for(String value:valueList) {
-        		value = EditN3Utils.stripInvalidXMLChars(value);
+        		value = N3EditUtils.stripInvalidXMLChars(value);
                 //Add to array of literals corresponding to this variable
                 if (!StringUtils.isEmpty(value)) {
                     literalsArray.add(createLiteral(

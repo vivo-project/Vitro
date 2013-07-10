@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -20,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 /*
  * Custom deletion controller to which deletion requests from default property form are sent. May be replaced 
@@ -28,17 +30,11 @@ import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
  */
 public class DeletePropertyController extends FreemarkerHttpServlet {
     private static final Log log = LogFactory.getLog(DeletePropertyController.class);
-  
-    //since forwarding from edit Request dispatch for now
-   //TODO: Check what required actions would make sense here
-    //public final static Actions REQUIRED_ACTIONS = new Actions(new ManageMenus());
-    
-   
-    /*
-     *  @Override
-    protected Actions requiredActions(VitroRequest vreq) {
-    	return REQUIRED_ACTIONS;
-    }*/
+ 
+    @Override
+	protected Actions requiredActions(VitroRequest vreq) {
+    	return SimplePermission.DO_FRONT_END_EDITING.ACTIONS ;
+	}
 
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) {
@@ -107,7 +103,7 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
 		//This is the standard mechanism but note that datapropStmtDelete uses wdf with user aware
 
 		//DataProperty prop = EditConfigurationUtils.getDataProperty(vreq);
-		String editorUri = EditN3Utils.getEditorUri(vreq);
+		String editorUri = N3EditUtils.getEditorUri(vreq);
 		WebappDaoFactory wdf = vreq.getWebappDaoFactory().getUserAwareDaoFactory(editorUri);
 		DataProperty prop = wdf.getDataPropertyDao().getDataPropertyByURI(
 				EditConfigurationUtils.getPredicateUri(vreq));

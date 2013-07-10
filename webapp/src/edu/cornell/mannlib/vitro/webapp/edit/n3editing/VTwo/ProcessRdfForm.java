@@ -314,24 +314,7 @@ public class ProcessRdfForm {
        }
               
        return rdfModels;       
-    }  
-
-	/**
-	 * TODO: bdc34: what does this check? Why?
-	 */
-	public static boolean isGenerateModelFromField(
-	        String fieldName, 
-	        EditConfigurationVTwo configuration, MultiValueEditSubmission submission) {
-//		if(Utilities.isObjectProperty(configuration, vreq)) {
-//			return true;
-//		}
-//		if(Utilities.isDataProperty(configuration, vreq)) {
-//			if(Utilities.hasFieldChanged(fieldName, configuration, submission)) {
-//				return true;
-//			}
-//		}
-		return false;
-	}	
+    }      
 		    
     protected void logSubstitue(String msg, List<String> requiredAsserts,
             List<String> optionalAsserts, List<String> requiredRetracts,
