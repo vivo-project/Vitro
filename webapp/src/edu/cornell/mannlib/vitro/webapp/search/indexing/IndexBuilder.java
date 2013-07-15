@@ -20,6 +20,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.query.QueryParseException;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -130,12 +131,22 @@ public class IndexBuilder extends VitroBackgroundThread {
      * your changes with a call to doUpdateIndex().
      */
 	public void addToChanged(Statement stmt) {
-		log.debug("call to addToChanged()");
+		log.debug("call to addToChanged(Statement)");
 		synchronized(changedStmts){
 			changedStmts.add(stmt);
 		}
 	}
     
+	/**
+	 * Convenience method to add a URI to the change queue.  
+	 */
+	public void addToChanged(String uri){
+	    addToChanged(ResourceFactory.createStatement(
+	            ResourceFactory.createResource(uri),
+	            ResourceFactory.createProperty("http://ex.com/f"),
+	            ResourceFactory.createPlainLiteral("added by IndexBuilder.addToChanged(uri)")));	            	           
+	}
+	
     /**
      * This method will cause the IndexBuilder to completely rebuild
      * the index.
@@ -244,7 +255,8 @@ public class IndexBuilder extends VitroBackgroundThread {
         for( StatementToURIsToUpdate stu : stmtToURIsToIndexFunctions ) {
             stu.startIndexing();        
         }
-                    
+        
+        //keep uris unique by using a HashSet
         Collection<String> urisToUpdate = new HashSet<String>();                
         for( Statement stmt : getAndClearChangedStmts() ){
         	for( StatementToURIsToUpdate stu : stmtToURIsToIndexFunctions ){
@@ -256,7 +268,7 @@ public class IndexBuilder extends VitroBackgroundThread {
         for( StatementToURIsToUpdate stu : stmtToURIsToIndexFunctions ) {
             stu.endIndxing();
         }
-        
+                
         return urisToUpdate;        
     }
     
