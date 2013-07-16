@@ -56,11 +56,15 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
  * A synchronous rebuild can be performed with VClassGroupCache.doSynchronousRebuild() 
  * 
  * This class should handle the condition where Solr is not available.  
+ * It will not throw an exception but it will return a empty list of classes
+ * or class groups.
+ * 
  * VClassGroupCache.doSynchronousRebuild() and the RebuildGroupCacheThread will try
  * to connect to the Solr server a couple of times and then give up.  
  * 
- * As of VIVO release 1.4, the counts come from the Solr index.  Before that they
- * came from the DAOs.  
+ * As of VIVO release 1.4, the counts come from the Solr index. If the
+ * solr index is not built or if there were problems building the index,
+ * the class counts from VClassGroupCache will be incorrect.
  */
 public class VClassGroupCache implements IndexingEventListener {
     private static final Log log = LogFactory.getLog(VClassGroupCache.class);
