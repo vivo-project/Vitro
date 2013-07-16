@@ -17,6 +17,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.joda.time.DateTime;
 import org.jsoup.Jsoup;
 
+import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -160,23 +161,28 @@ public class IndividualToSolrDocument {
         //ALLTEXT, all of the 'full text'
         StringBuffer allTextValue = new StringBuffer();
 
-        //collecting data property statements
-        List<DataPropertyStatement> dataPropertyStatements = ind.getDataPropertyStatements();
-        if (dataPropertyStatements != null) {
-            Iterator<DataPropertyStatement> dataPropertyStmtIter = dataPropertyStatements.iterator();
-            while (dataPropertyStmtIter.hasNext()) {
-                DataPropertyStatement dataPropertyStmt =  dataPropertyStmtIter.next();
-                if(dataPropertyStmt.getDatapropURI().equals(label)){ // we don't want label to be added to alltext
-                    continue;
-                } else if(dataPropertyStmt.getDatapropURI().equals("http://vivoweb.org/ontology/core#preferredTitle")){
-                	//add the preferredTitle field
-                	String preferredTitle = null;
-                	doc.addField(term.PREFERRED_TITLE, ((preferredTitle=dataPropertyStmt.getData()) == null)?"":preferredTitle);
-                	log.debug("Preferred Title: " + dataPropertyStmt.getData());
+        try{
+            //collecting data property statements
+            List<DataPropertyStatement> dataPropertyStatements = ind.getDataPropertyStatements();
+            if (dataPropertyStatements != null) {
+                Iterator<DataPropertyStatement> dataPropertyStmtIter = dataPropertyStatements.iterator();
+                while (dataPropertyStmtIter.hasNext()) {
+                    DataPropertyStatement dataPropertyStmt =  dataPropertyStmtIter.next();
+                    if(dataPropertyStmt.getDatapropURI().equals(label)){ // we don't want label to be added to alltext
+                        continue;
+                    } else if(dataPropertyStmt.getDatapropURI().equals("http://vivoweb.org/ontology/core#preferredTitle")){
+                    	//add the preferredTitle field
+                    	String preferredTitle = null;
+                    	doc.addField(term.PREFERRED_TITLE, ((preferredTitle=dataPropertyStmt.getData()) == null)?"":preferredTitle);
+                    	log.debug("Preferred Title: " + dataPropertyStmt.getData());
+                    }
+                    allTextValue.append(" ");
+                    allTextValue.append(((t=dataPropertyStmt.getData()) == null)?"":t);
                 }
-                allTextValue.append(" ");
-                allTextValue.append(((t=dataPropertyStmt.getData()) == null)?"":t);
             }
+        }catch(JenaException je){
+            //VIVO-15 Trap for characters that cause search indexing to abort
+            log.error(String.format("Continuing to index %s but could not get all dataproperties because %s",ind.getURI(),je.getMessage()));            
         }
          
         allTextValue.append(objectNames.toString());
@@ -209,25 +215,31 @@ public class IndividualToSolrDocument {
      */
     protected void addObjectPropertyText(Individual ind, SolrInputDocument doc,
             StringBuffer objectNames, StringBuffer addUri) {
-        List<ObjectPropertyStatement> objectPropertyStatements = ind.getObjectPropertyStatements();
-        if (objectPropertyStatements != null) {
-            Iterator<ObjectPropertyStatement> objectPropertyStmtIter = objectPropertyStatements.iterator();
-            while (objectPropertyStmtIter.hasNext()) {
-                ObjectPropertyStatement objectPropertyStmt = objectPropertyStmtIter.next();
-                if( "http://www.w3.org/2002/07/owl#differentFrom".equals(objectPropertyStmt.getPropertyURI()) ){
-                    continue;
+        
+        try{
+            List<ObjectPropertyStatement> objectPropertyStatements = ind.getObjectPropertyStatements();
+            if (objectPropertyStatements != null) {
+                Iterator<ObjectPropertyStatement> objectPropertyStmtIter = objectPropertyStatements.iterator();
+                while (objectPropertyStmtIter.hasNext()) {
+                    ObjectPropertyStatement objectPropertyStmt = objectPropertyStmtIter.next();
+                    if( "http://www.w3.org/2002/07/owl#differentFrom".equals(objectPropertyStmt.getPropertyURI()) ){
+                        continue;
+                    }
+                    try {
+                        objectNames.append(" ");
+                        String t=null;
+                        objectNames.append(((t=objectPropertyStmt.getObject().getRdfsLabel()) == null)?"":t);   
+                        addUri.append(" ");
+                        addUri.append(((t=objectPropertyStmt.getObject().getURI()) == null)?"":t);
+                    } catch (Exception e) { 
+                         log.debug("could not index name of related object: " + e.getMessage());
+                    }
                 }
-                try {
-                    objectNames.append(" ");
-                    String t=null;
-                    objectNames.append(((t=objectPropertyStmt.getObject().getRdfsLabel()) == null)?"":t);   
-                    addUri.append(" ");
-                    addUri.append(((t=objectPropertyStmt.getObject().getURI()) == null)?"":t);
-                } catch (Exception e) { 
-                     log.debug("could not index name of related object: " + e.getMessage());
-                }
-            }
-        }        
+            }   
+        }catch(JenaException je){
+            //VIVO-15 Trap for characters that cause search indexing to abort
+            log.error(String.format("Continuing to index %s but could not get all object properties because %s",ind.getURI(),je.getMessage()));            
+        }
     }
 
     /**
