@@ -860,7 +860,7 @@
                   class="solr.XmlUpdateRequestHandler">
     <!-- Run the etag processor on each update request. -->
        <lst name="defaults">
-         <str name="update.processor">etag</str>
+         <str name="update.chain">etag</str>
        </lst>
   </requestHandler>
   
