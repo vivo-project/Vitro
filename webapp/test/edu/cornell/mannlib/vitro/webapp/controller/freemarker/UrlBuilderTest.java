@@ -1,3 +1,4 @@
+
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
@@ -58,4 +59,21 @@ public class UrlBuilderTest extends AbstractTestClass {
         Assert.assertEquals(vClassUri, UrlBuilder.urlDecode(vClassUriEncoded));          
     }
     
+
+    @Test
+    public void testUtf8Encode(){
+        UrlBuilder.contextPath = "/vivo";
+        String path = "/individual";
+        ParamMap params = new ParamMap();
+        params.put("name", "★Tom★");
+        Assert.assertEquals("/vivo/individual?name=%E2%98%85Tom%E2%98%85", UrlBuilder.getUrl(path, params));
+    }
+
+
+    @Test
+    public void testDecodeUtf8Url() {
+        String vClassUri = "http://vivoweb.org/ontology/core#FacultyMember★";
+        String vClassUriEncoded = "http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23FacultyMember%E2%98%85";
+        Assert.assertEquals(vClassUri, UrlBuilder.urlDecode(vClassUriEncoded));          
+    }
 }
