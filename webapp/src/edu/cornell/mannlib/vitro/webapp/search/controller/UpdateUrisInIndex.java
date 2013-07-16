@@ -41,33 +41,39 @@ public class UpdateUrisInIndex {
     protected void doUpdateUris(HttpServletRequest req, IndexBuilder builder)
     throws ServletException, IOException{
         
-
-        boolean isMultipart = ServletFileUpload.isMultipartContent(req);
-        if( ! isMultipart ) 
+        if( ! ServletFileUpload.isMultipartContent(req) ) 
             throw new ServletException("Expected Multipart Content");
         
- 
-        String charEncoding = getEncoding(req);
+        String enc = getEncoding(req);
         try{
-            int count = 0;
+            //loop over the fileds and add any URIs to the IndexBuilder queue
             ServletFileUpload upload = new ServletFileUpload();
             FileItemIterator iter = upload.getItemIterator(req);
             while( iter.hasNext()){
                 FileItemStream item = iter.next();
                 String name = item.getFieldName();
+                if( "email".equals(name) || "password".equals(name) )
+                    continue;  //skip the password and email fields
+
                 InputStream stream = item.openStream();
                 try{
-                    count = count + addToSearchQueue(builder, new InputStreamReader(stream, charEncoding));
+                    addToSearchQueue(builder, stream, enc);
                 }finally{
                     stream.close();
-                    builder.doUpdateIndex();
                 }
             }
         }catch (FileUploadException fex){
             throw new ServletException("Could not upload file to SearchServiceController", fex);
+        }finally{
+            builder.doUpdateIndex();
         }
     }
 
+    /**
+     * Get the encoding of the request, default to UTF-8
+     * since that is in the vitro install instructions
+     * to put on the connector.
+     */
     private String getEncoding(HttpServletRequest req){
         String enc = req.getCharacterEncoding();
         if( enc == null || enc.isEmpty() ){
@@ -83,22 +89,26 @@ public class UpdateUrisInIndex {
         return enc;
     }
 
-    private int addToSearchQueue( IndexBuilder builder, Reader in  )
+    /**
+     * Adds URIs from Reader to search queue.
+     */
+    private void addToSearchQueue( IndexBuilder builder, InputStream stream , String charEncoding )
         throws IOException{
-        int addedUriCount = 0;
 
-        Iterator<String> uris = new UrisFromInputIterator( in );
+        Iterator<String> uris = 
+            new UrisFromInputIterator( new InputStreamReader(stream, charEncoding) );
+
         while(uris.hasNext()){
             String uri = uris.next();
             log.debug("Request to index uri '" + uri + "'");
             builder.addToChanged( uri );
-            addedUriCount++;
         }
-
-        return addedUriCount;
     }
 
 
+    /**
+     * Iterator for URIs in a reader to make top level methods simpler.
+     */
     public static class UrisFromInputIterator implements Iterator<String> {
         BufferedReader reader;
         Iterator<String> uris;
@@ -148,11 +158,16 @@ public class UpdateUrisInIndex {
             return false;            
         }
     }
-    
-  
-    
-    private static List<String> removeNullAndEmpty(List<String> in ){
+
+    /**
+     * Removes null and empty elements from in.
+     * Returned list will not be null.
+     */
+    private static List<String> removeNullAndEmpty(List<String> in ){        
         ArrayList<String> out = new ArrayList<String>();
+        if( in == null )
+            return out;
+
         for( String s : in ){
             if( s != null && !s.trim().isEmpty() ){
                 out.add(s);
@@ -161,12 +176,17 @@ public class UpdateUrisInIndex {
         return out;        
     }
 
+    /** 
+     * Parses a line to a list of URIs.
+     * Retruned list will not be null.
+     * No elements in returned list will be empty or null.
+     */
     protected static List<String> lineToUris(String line){
         List<String> parts = removeNullAndEmpty( Arrays.asList(commaAndWhitespace.split( line ) ));
         return parts;
     }
     
-    //split uris on whitespace and commas
+    /** Pattern to split URIs on whitespace and commas. */
     private static final Pattern commaAndWhitespace = Pattern.compile("[,\\s]");
 
 }
