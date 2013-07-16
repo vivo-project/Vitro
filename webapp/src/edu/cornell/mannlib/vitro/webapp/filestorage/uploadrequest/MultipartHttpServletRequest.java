@@ -29,29 +29,60 @@ import org.apache.commons.logging.LogFactory;
  * any parameter-related requests. File-related information will also be held
  * here, to answer file-related requests.
  */
-class MultipartHttpServletRequest extends FileUploadServletRequest {
+public class MultipartHttpServletRequest extends FileUploadServletRequest {
 	private static final Log log = LogFactory
 			.getLog(MultipartHttpServletRequest.class);
 
 	private static final String[] EMPTY_ARRAY = new String[0];
 
-	private final Map<String, List<String>> parameters;
-	private final Map<String, List<FileItem>> files;
+	private Map<String, List<String>> parameters;
+	private Map<String, List<FileItem>> files;
 	private FileUploadException fileUploadException;
 
+    private boolean storeFilesToTempDir = false;
+    private int maxFileSize = 0;
+    private File tempDir = null;
+
+    /** 
+     * Parse the multipart request. Store the info about the request parameters.
+     * Don't store the uploaded files to a temporary directory to allow streaming.
+     *
+     * Only use this constructor if you plan to consume the FileItems using streaming
+     * to deal with inputs of very large sizes.
+     *
+     * In all other case you should use the maxFileSize constructor to deal with
+     * the size of the uploaded file in a safe way.
+     */
+    public MultipartHttpServletRequest(HttpServletRequest request)
+        throws IOException{
+        super(request);
+        storeFilesToTempDir = false;
+        
+    }
+            
 	/**
 	 * Parse the multipart request. Store the info about the request parameters
-	 * and the uploaded files.
+	 * and the uploaded files to a temporary directory.
+     *
+     * This offers a simple way to deal with uploaded files by having a size
+     * limit.  This limit may be rather large if desired. Many megabytes for example.
 	 */
 	public MultipartHttpServletRequest(HttpServletRequest request,
 			int maxFileSize) throws IOException {
 		super(request);
+        storeFilesToTempDir = true;
+        this.maxFileSize = maxFileSize;
+        this.tempDir = figureTemporaryDirectory(request);
+	}
 
+    private void setup(HttpServletRequest request){
 		Map<String, List<String>> parameters = new HashMap<String, List<String>>();
 		Map<String, List<FileItem>> files = new HashMap<String, List<FileItem>>();
 
-		File tempDir = figureTemporaryDirectory(request);
-		ServletFileUpload upload = createUploadHandler(maxFileSize, tempDir);
+		ServletFileUpload upload = createUploadHandler();
+        
+		//File tempDir = figureTemporaryDirectory(request);
+		//ServletFileUpload upload = createUploadHandler(maxFileSize, tempDir);
 
 		parseQueryString(request.getQueryString(), parameters);
 
@@ -75,14 +106,16 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 			fileUploadException = e;
 			request.setAttribute(
 					FileUploadServletRequest.FILE_UPLOAD_EXCEPTION, e);
-		}
+		} catch (UnsupportedEncodingException e) {
+		    log.error("could not convert to UTF-8",e);
+        }
 
 		this.parameters = Collections.unmodifiableMap(parameters);
 		log.debug("Parameters are: " + this.parameters);
 		this.files = Collections.unmodifiableMap(files);
 		log.debug("Files are: " + this.files);
 		request.setAttribute(FILE_ITEM_MAP, this.files);
-	}
+    }
 
 	/**
 	 * Pull any parameters out of the URL.
@@ -130,6 +163,18 @@ class MultipartHttpServletRequest extends FileUploadServletRequest {
 		return (File) request.getSession().getServletContext().getAttribute(
 				"javax.servlet.context.tempdir");
 	}
+
+    
+    /**
+     * Create an upload handler based on this.storeFilesToTempDir.
+     */
+    private ServletFileUpload createUploadHandler(){
+        if( storeFilesToTempDir ){
+            return createUploadHandler( this.maxFileSize, this.tempDir );
+        }else{
+            return new ServletFileUpload();
+        }
+    }
 
 	/**
 	 * Create an upload handler that will throw an exception if the file is too
