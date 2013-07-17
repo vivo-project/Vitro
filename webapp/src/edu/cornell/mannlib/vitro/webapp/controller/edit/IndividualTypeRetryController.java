@@ -123,12 +123,24 @@ public class IndividualTypeRetryController extends BaseEditController {
 	
 	public void doPost (HttpServletRequest request, HttpServletResponse response) {
 		// shouldn't be posting to this controller
-	}
+	}	
 	
-	private class OptionCollator implements Comparator {
-	    public int compare (Object o1, Object o2) {
-	        Collator collator = Collator.getInstance();
-	        return collator.compare( ((Option)o1).getBody().toString().substring(((Option)o1).getBody().toString().indexOf(":")) , ((Option)o2).getBody().toString().substring(((Option)o2).getBody().toString().indexOf(":")) );
+	static class OptionCollator implements Comparator<Option> {
+	    public int compare (Option o1, Option o2) {
+//	        Collator collator = Collator.getInstance(); 	       
+	        return getLocalName ( o1.getBody().toString() )
+	                .compareTo( 
+	                        getLocalName ( o2.getBody().toString() ) );	        	        
+	    }
+	    
+	    private String getLocalName( String in ){
+	        if( in == null )
+	            return "";
+	        int i = in.indexOf(':');
+	        if( i >= 0 )
+	            return in.substring( i );
+	        else
+	            return in;	    
 	    }
 	}
 	
