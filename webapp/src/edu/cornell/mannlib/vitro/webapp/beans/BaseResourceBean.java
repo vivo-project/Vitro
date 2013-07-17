@@ -148,8 +148,9 @@ public class BaseResourceBean implements ResourceBean {
     }
 
     public String getLocalNameWithPrefix() {
-        return localNameWithPrefix==null ? getLocalName()==null ? 
-                (URI==null ? "(no name)" : URI ): getLocalName() : localNameWithPrefix;
+        return localNameWithPrefix != null ? localNameWithPrefix : 
+                    getLocalName() != null ?  getLocalName() :
+                        URI != null ? URI : "(no name)" ;
     }
     public void setLocalNameWithPrefix(String prefixedLocalName) {
         this.localNameWithPrefix = prefixedLocalName;
