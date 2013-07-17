@@ -5,9 +5,9 @@
 <#assign languageTag = "" >
 <#assign labelSeq = [] >
 <#if subjectName?? >
-<h2>Manage Labels for ${subjectName}</h2>
+<h2>${i18n().manage_labels_for} ${subjectName}</h2>
 <#else>
-<h2>${i18n().manage_labels}</h2>
+<h2>${i18n().manage_labels_capitalized}</h2>
 </#if>
 <p id="mngLabelsText">${i18n().manage_labels_intro}</p>
 
