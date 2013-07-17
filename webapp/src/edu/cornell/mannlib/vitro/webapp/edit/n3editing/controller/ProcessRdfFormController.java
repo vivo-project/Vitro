@@ -61,7 +61,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		//get the EditConfiguration 
 		EditConfigurationVTwo configuration = EditConfigurationUtils.getEditConfiguration(vreq);
         if(configuration == null)
-            throw new Error("No edit configuration found.");        
+            return handleMissingConfiguration(vreq);
 
         //get the EditSubmission
         MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq.getParameterMap(), configuration);        	
@@ -177,6 +177,17 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		}
 		return null; //no errors		
 	}
+
+    /**
+     * If the edit configuration cannot be found in the Session,
+     * show a message and display any request parameters so that the user's
+     * efforts  won't be lost.
+     */
+    protected ResponseValues handleMissingConfiguration(VitroRequest vreq){
+        Map<String,Object> map = new HashMap<String,Object>();
+        map.put("params",vreq.getParameterMap());
+        return new TemplateResponseValues( "missingEditConfig.ftl", map );
+    }
 	
 	//Move to EditN3Utils but keep make new uris here
 	public static class Utilities {
@@ -313,4 +324,5 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 
 			
 	}
+
 }
