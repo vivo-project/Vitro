@@ -30,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.FactoryID;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
@@ -140,27 +141,32 @@ public class RequestModelsPrep implements Filter {
 
 		WebappDaoFactoryConfig config = createWadfConfig(langs, req);
 		
-		WebappDaoFactory assertions = new WebappDaoFactorySDB(rdfService,
-				ModelAccess.on(ctx).getBaseOntModelSelector(), config,
-				SDBDatasetMode.ASSERTIONS_ONLY);
-		ModelAccess.on(vreq).setBaseWebappDaoFactory(assertions);
-
 		ModelAccess.on(vreq).setJenaOntModel(
 				ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
 						dataset.getDefaultModel()));
 
-		OntModelSelector oms = ModelAccess.on(ctx).getUnionOntModelSelector();
-		WebappDaoFactory wadf = new WebappDaoFactorySDB(rdfService, oms, config);
-		vreq.setUnfilteredWebappDaoFactory(wadf);
-		
 		addLanguageAwarenessToRequestModel(req, ModelID.DISPLAY);
 		addLanguageAwarenessToRequestModel(req, ModelID.APPLICATION_METADATA);
 		addLanguageAwarenessToRequestModel(req, ModelID.UNION_TBOX);
 		addLanguageAwarenessToRequestModel(req, ModelID.UNION_FULL);
 		addLanguageAwarenessToRequestModel(req, ModelID.BASE_TBOX);
 		addLanguageAwarenessToRequestModel(req, ModelID.BASE_FULL);
+		
+		WebappDaoFactory unfilteredWadf = new WebappDaoFactorySDB(rdfService,
+				ModelAccess.on(ctx).getUnionOntModelSelector(), config);
+		ModelAccess.on(vreq).setWebappDaoFactory(FactoryID.UNFILTERED_UNION,
+				unfilteredWadf);
+		
+		WebappDaoFactory unfilteredAssertionsWadf = new WebappDaoFactorySDB(
+				rdfService, ModelAccess.on(vreq).getBaseOntModelSelector(),
+				config, SDBDatasetMode.ASSERTIONS_ONLY);
+		ModelAccess.on(vreq).setWebappDaoFactory(FactoryID.BASE,
+				unfilteredAssertionsWadf);
+		ModelAccess.on(vreq).setWebappDaoFactory(FactoryID.UNFILTERED_BASE,
+				unfilteredAssertionsWadf);
 
-		wadf = new WebappDaoFactorySDB(rdfService, ModelAccess.on(vreq).getUnionOntModelSelector(), config);
+		WebappDaoFactory wadf = new WebappDaoFactorySDB(rdfService, ModelAccess
+				.on(vreq).getUnionOntModelSelector(), config);
 
 		// Do model switching and replace the WebappDaoFactory with
 		// a different version if requested by parameters
@@ -172,7 +178,7 @@ public class RequestModelsPrep implements Filter {
 				ServletPolicyList.getPolicies(ctx));
 		WebappDaoFactoryFiltering filteredWadf = new WebappDaoFactoryFiltering(
 				switchedWadf, filter);
-		ModelAccess.on(vreq).setWebappDaoFactory(filteredWadf);
+		ModelAccess.on(vreq).setWebappDaoFactory(FactoryID.UNION, filteredWadf);
 	}
 
 	private WebappDaoFactoryConfig createWadfConfig(List<String> langs, HttpServletRequest req) {

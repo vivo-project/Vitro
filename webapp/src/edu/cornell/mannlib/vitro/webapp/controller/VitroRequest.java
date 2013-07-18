@@ -16,6 +16,7 @@ import com.hp.hpl.jena.query.Dataset;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.FactoryID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource.ModelName;
@@ -76,16 +77,12 @@ public class VitroRequest extends HttpServletRequestWrapper {
     	return ModelAccess.on(this).getWebappDaoFactory();
     }
     
-    public void setUnfilteredWebappDaoFactory(WebappDaoFactory wdf) {
-    	setAttribute("unfilteredWebappDaoFactory", wdf);
-    }
-    
     /** Gets a WebappDaoFactory with request-specific dataset but no filtering. 
      * Use this for any servlets that need to bypass filtering.
      * @return
      */
     public WebappDaoFactory getUnfilteredWebappDaoFactory() {
-    	return (WebappDaoFactory) getAttribute("unfilteredWebappDaoFactory");
+    	return ModelAccess.on(this).getWebappDaoFactory(FactoryID.UNFILTERED_UNION);
     }
     
     public Dataset getDataset() {
@@ -103,7 +100,7 @@ public class VitroRequest extends HttpServletRequestWrapper {
     
     /** gets assertions-only WebappDaoFactory with no filtering */
     public WebappDaoFactory getAssertionsWebappDaoFactory() {
-    	return ModelAccess.on(this).getBaseWebappDaoFactory();
+    	return ModelAccess.on(this).getWebappDaoFactory(FactoryID.UNFILTERED_BASE);
     }
         
     //Method that retrieves write model, returns special model in case of write model

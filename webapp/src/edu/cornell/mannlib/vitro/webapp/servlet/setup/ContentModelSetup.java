@@ -110,11 +110,13 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         
         OntModelSelector baseOms = models.getBaseOntModelSelector();
         WebappDaoFactory baseWadf = new WebappDaoFactorySDB(rdfService, baseOms, config, ASSERTIONS_ONLY);
-        ModelAccess.on(ctx).setBaseWebappDaoFactory(baseWadf);
+        ModelAccess.on(ctx).setWebappDaoFactory(FactoryID.BASE, baseWadf);
+        ModelAccess.on(ctx).setWebappDaoFactory(FactoryID.UNFILTERED_BASE, baseWadf);
         
         OntModelSelector unionOms = models.getUnionOntModelSelector();
         WebappDaoFactory wadf = new WebappDaoFactorySDB(rdfService, unionOms, config);
         ModelAccess.on(ctx).setWebappDaoFactory(FactoryID.UNION, wadf);
+        ModelAccess.on(ctx).setWebappDaoFactory(FactoryID.UNFILTERED_UNION, wadf);
 
         log.info("Model makers set up");
         

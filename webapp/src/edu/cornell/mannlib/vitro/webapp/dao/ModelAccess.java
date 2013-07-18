@@ -29,7 +29,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
  * VitroRequest.getUnfilteredRDFService()
  * VitroRequest.getWebappDaoFactory()
  * VitroRequest.getWriteModel()
- * vreq.setUnfilteredWebappDaoFactory(wadf);
  * 
  * OntModelSelector.getABoxModel
  * OntModelSelector.getFullModel()
@@ -68,7 +67,7 @@ public class ModelAccess {
 	}
 
 	public enum FactoryID {
-		BASE, UNION
+		BASE, UNION, UNFILTERED_BASE, UNFILTERED_UNION
 	}
 
 	private enum Scope {
