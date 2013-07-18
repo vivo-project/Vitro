@@ -88,39 +88,18 @@ public class JenaBaseDaoCon {
 
     protected  OntClass           PORTAL = _constModel.createClass(VitroVocabulary.PORTAL);
     protected  DatatypeProperty   APPLICATION_THEMEDIR = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_THEMEDIR);
-    protected  DatatypeProperty   PORTAL_BANNERIMAGE = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_BANNERIMAGE);
     protected  DatatypeProperty   APPLICATION_CONTACTMAIL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_CONTACTMAIL);
-    protected  DatatypeProperty   APPLICATION_CORRECTIONMAIL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_CORRECTIONMAIL);
-    protected  DatatypeProperty   PORTAL_SHORTHAND = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_SHORTHAND);
+    protected  DatatypeProperty   APPLICATION_CORRECTIONMAIL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_CORRECTIONMAIL);   
     protected  DatatypeProperty   APPLICATION_ABOUTTEXT = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_ABOUTTEXT);
-    protected  DatatypeProperty   APPLICATION_ACKNOWLEGETEXT = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_ACKNOWLEGETEXT);
-    protected  DatatypeProperty   PORTAL_BANNERWIDTH = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_BANNERWIDTH);
-    protected  DatatypeProperty   PORTAL_BANNERHEIGHT = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_BANNERHEIGHT);
+    protected  DatatypeProperty   APPLICATION_ACKNOWLEGETEXT = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_ACKNOWLEGETEXT);    
     protected  DatatypeProperty   APPLICATION_COPYRIGHTURL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_COPYRIGHTURL);
     protected  DatatypeProperty   APPLICATION_COPYRIGHTANCHOR = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_COPYRIGHTANCHOR);
-    protected  DatatypeProperty   PORTAL_ROOTBREADCRUMBURL = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_ROOTBREADCRUMBURL);
-    protected  DatatypeProperty   PORTAL_ROOTBREADCRUMBANCHOR = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_ROOTBREADCRUMBANCHOR);
-    protected  DatatypeProperty   PORTAL_LOGOTYPEIMAGE = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_LOGOTYPEIMAGE);
-    protected  DatatypeProperty   PORTAL_LOGOTYPEHEIGHT = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_LOGOTYPEHEIGHT);
-    protected  DatatypeProperty   PORTAL_LOGOTYPEWIDTH = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_LOGOTYPEWIDTH);
-    protected  DatatypeProperty   PORTAL_IMAGETHUMBWIDTH = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_IMAGETHUMBWIDTH);
-    protected  DatatypeProperty   PORTAL_URLPREFIX = _constModel.createDatatypeProperty(VitroVocabulary.PORTAL_URLPREFIX);
-
+    
     protected AnnotationProperty  ONTOLOGY_PREFIX_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.ONTOLOGY_PREFIX_ANNOT);
     
     protected  Ontology           VITRO_PUBLIC_ONTOLOGY = _constModel.createOntology(VitroVocabulary.VITRO_PUBLIC_ONTOLOGY);
 
-    protected  OntClass           FS_FILE = _constModel.createClass(VitroVocabulary.FS_FILE_CLASS);
-    protected  OntClass           FS_BYTESTREAM = _constModel.createClass(VitroVocabulary.FS_BYTESTREAM_CLASS);
-    protected  ObjectProperty     FS_DOWNLOAD_LOCATION = _constModel.createObjectProperty(VitroVocabulary.FS_DOWNLOAD_LOCATION);
-    protected  ObjectProperty     FS_THUMBNAIL_IMAGE = _constModel.createObjectProperty(VitroVocabulary.FS_THUMBNAIL_IMAGE);
-    protected  DatatypeProperty   FS_FILENAME = _constModel.createDatatypeProperty(VitroVocabulary.FS_FILENAME);
-    protected  DatatypeProperty   FS_MIME_TYPE = _constModel.createDatatypeProperty(VitroVocabulary.FS_MIME_TYPE);
-    protected  DatatypeProperty   FS_ATTRIBUTION = _constModel.createDatatypeProperty(VitroVocabulary.FS_ATTRIBUTION);
-    protected  DatatypeProperty   FS_ALIAS_URL = _constModel.createDatatypeProperty(VitroVocabulary.FS_ALIAS_URL);
-
     protected  ObjectProperty     IND_MAIN_IMAGE = _constModel.createObjectProperty(VitroVocabulary.IND_MAIN_IMAGE);
-    protected  ObjectProperty     IND_IMAGE = _constModel.createObjectProperty(VitroVocabulary.IND_IMAGE);
 
     /* ***************** User Account Model constants ***************** */
 
