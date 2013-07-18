@@ -140,8 +140,21 @@
 .searchTOC ul span {
 	float:right;
 	padding-right: 10px;
-	color:grey;
+	color:gray;
 	font-size:smaller;
+}
+.contentsBrowseGroup  {
+    clear:both;
+    padding-top: 5px;
+}
+.searchResultsHeader {
+    width: 675px;
+    float:left;
+}
+a.close {
+    float: right;
+    margin-right: .3em;
+    font-size: .8em;
 }
 
 /* ------------------------------------------------->  */

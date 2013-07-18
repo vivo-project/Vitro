@@ -268,11 +268,6 @@ input#uriLink {
     width: 350px;
     font-size: .8em;
 }
-a.close {
-    float: right;
-    margin-right: .3em;
-    font-size: .8em;
-}
 .rdf-url {
     display: block;
     padding-top: 0.8em;
