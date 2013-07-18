@@ -43,7 +43,7 @@ public class PropertyGroupsListingController extends BaseEditController {
     	
         VitroRequest vreq = new VitroRequest(request);
 
-        PropertyGroupDao dao = vreq.getFullWebappDaoFactory().getPropertyGroupDao();
+        PropertyGroupDao dao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 
         List<PropertyGroup> groups = dao.getPublicGroups(WITH_PROPERTIES);
         

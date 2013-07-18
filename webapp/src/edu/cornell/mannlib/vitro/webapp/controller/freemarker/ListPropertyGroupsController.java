@@ -52,7 +52,7 @@ public class ListPropertyGroupsController extends FreemarkerHttpServlet {
             body.put("displayOption", "group");
             body.put("pageTitle", "Property Groups");
 
-            PropertyGroupDao dao = vreq.getFullWebappDaoFactory().getPropertyGroupDao();
+            PropertyGroupDao dao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 
             List<PropertyGroup> groups = dao.getPublicGroups(WITH_PROPERTIES);
         

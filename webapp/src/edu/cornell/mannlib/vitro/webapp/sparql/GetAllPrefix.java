@@ -63,7 +63,7 @@ public class GetAllPrefix extends BaseEditController {
 		}
 
 		VitroRequest vreq = new VitroRequest(request);	
-		Map<String, String> prefixMap = getPrefixMap(vreq.getFullWebappDaoFactory());		
+		Map<String, String> prefixMap = getPrefixMap(vreq.getUnfilteredWebappDaoFactory());		
 		
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");

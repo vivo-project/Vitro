@@ -60,10 +60,10 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
 
             String ontologyUri = vreq.getParameter("ontologyUri");
 
-            DataPropertyDao dao = vreq.getFullWebappDaoFactory().getDataPropertyDao();
-            VClassDao vcDao = vreq.getFullWebappDaoFactory().getVClassDao();
-            DatatypeDao dDao = vreq.getFullWebappDaoFactory().getDatatypeDao();
-            PropertyGroupDao pgDao = vreq.getFullWebappDaoFactory().getPropertyGroupDao();
+            DataPropertyDao dao = vreq.getUnfilteredWebappDaoFactory().getDataPropertyDao();
+            VClassDao vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
+            DatatypeDao dDao = vreq.getUnfilteredWebappDaoFactory().getDatatypeDao();
+            PropertyGroupDao pgDao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 
             List<DataProperty> props = new ArrayList<DataProperty>();
             if (vreq.getParameter("propsForClass") != null) {

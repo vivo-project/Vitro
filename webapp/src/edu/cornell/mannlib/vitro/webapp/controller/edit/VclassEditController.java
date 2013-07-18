@@ -44,11 +44,11 @@ public class VclassEditController extends BaseEditController {
         EditProcessObject epo = super.createEpo(request, FORCE_NEW);
         request.setAttribute("epoKey", epo.getKey());
 
-        VClassDao vcwDao = request.getFullWebappDaoFactory().getVClassDao();
+        VClassDao vcwDao = request.getUnfilteredWebappDaoFactory().getVClassDao();
         VClass vcl = (VClass)vcwDao.getVClassByURI(request.getParameter("uri"));
         
         if (vcl == null) {
-        	vcl = request.getFullWebappDaoFactory()
+        	vcl = request.getUnfilteredWebappDaoFactory()
         	        .getVClassDao().getTopConcept();
         }
 
@@ -72,13 +72,13 @@ public class VclassEditController extends BaseEditController {
         
         String ontologyName = null;
         if (vcl.getNamespace() != null) {
-            Ontology ont = request.getFullWebappDaoFactory().getOntologyDao().getOntologyByURI(vcl.getNamespace());
+            Ontology ont = request.getUnfilteredWebappDaoFactory().getOntologyDao().getOntologyByURI(vcl.getNamespace());
             if ( (ont != null) && (ont.getName() != null) ) {
                 ontologyName = ont.getName();
             }
         }
 
-        WebappDaoFactory wadf = request.getFullWebappDaoFactory();
+        WebappDaoFactory wadf = request.getUnfilteredWebappDaoFactory();
         String groupURI = vcl.getGroupURI();
         String groupName = "none";
         if(groupURI != null) { 
@@ -95,7 +95,7 @@ public class VclassEditController extends BaseEditController {
         
         boolean foundComment = false;
         StringBuffer commSb = null;
-        for (Iterator<String> commIt = request.getFullWebappDaoFactory().getCommentsForResource(vcl.getURI()).iterator(); commIt.hasNext();) { 
+        for (Iterator<String> commIt = request.getUnfilteredWebappDaoFactory().getCommentsForResource(vcl.getURI()).iterator(); commIt.hasNext();) { 
             if (commSb==null) {
                 commSb = new StringBuffer();
                 foundComment=true;
@@ -141,12 +141,7 @@ public class VclassEditController extends BaseEditController {
         request.setAttribute("formSelect",formSelect);
 
         // if supported, we want to show only the asserted superclasses and subclasses.  Don't want to see anonymous classes, restrictions, etc.
-        VClassDao vcDao;
-        if (request.getAssertionsWebappDaoFactory() != null) {
-        	vcDao = request.getAssertionsWebappDaoFactory().getVClassDao();
-        } else {
-        	vcDao = request.getFullWebappDaoFactory().getVClassDao();
-        }
+        VClassDao vcDao = request.getUnfilteredAssertionsWebappDaoFactory().getVClassDao();
         List superURIs = vcDao.getSuperClassURIs(vcl.getURI(),false);
         List superVClasses = new ArrayList();
         Iterator superURIit = superURIs.iterator();

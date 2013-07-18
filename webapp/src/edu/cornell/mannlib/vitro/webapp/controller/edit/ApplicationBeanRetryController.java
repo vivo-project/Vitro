@@ -52,7 +52,7 @@ public class ApplicationBeanRetryController extends BaseEditController {
 
         String action = "update";
 
-        ApplicationDao aDao = request.getFullWebappDaoFactory().getApplicationDao();
+        ApplicationDao aDao = request.getUnfilteredWebappDaoFactory().getApplicationDao();
         ApplicationBean applicationForEditing = aDao.getApplicationBean();
         epo.setDataAccessObject(aDao);
  

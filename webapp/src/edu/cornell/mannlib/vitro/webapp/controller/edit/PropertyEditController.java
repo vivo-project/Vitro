@@ -46,10 +46,10 @@ public class PropertyEditController extends BaseEditController {
 
         VitroRequest vreq = new VitroRequest(request);
         
-        ObjectPropertyDao propDao = vreq.getFullWebappDaoFactory().getObjectPropertyDao();
-        VClassDao vcDao = vreq.getFullWebappDaoFactory().getVClassDao();
-        PropertyGroupDao pgDao = vreq.getFullWebappDaoFactory().getPropertyGroupDao();
-        DataPropertyDao dpDao = vreq.getFullWebappDaoFactory().getDataPropertyDao();
+        ObjectPropertyDao propDao = vreq.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
+        VClassDao vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
+        PropertyGroupDao pgDao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
+        DataPropertyDao dpDao = vreq.getUnfilteredWebappDaoFactory().getDataPropertyDao();
         ObjectProperty p = (ObjectProperty)propDao.getObjectPropertyByURI(request.getParameter("uri"));
         request.setAttribute("property",p);
 
@@ -107,7 +107,7 @@ public class PropertyEditController extends BaseEditController {
         
         String ontologyName = null;
         if (p.getNamespace() != null) {
-            Ontology ont = vreq.getFullWebappDaoFactory().getOntologyDao().getOntologyByURI(p.getNamespace());
+            Ontology ont = vreq.getUnfilteredWebappDaoFactory().getOntologyDao().getOntologyByURI(p.getNamespace());
             if ( (ont != null) && (ont.getName() != null) ) {
                 ontologyName = ont.getName();
             }
@@ -209,12 +209,7 @@ public class PropertyEditController extends BaseEditController {
 
         // superproperties and subproperties
         
-        ObjectPropertyDao opDao;
-        if (vreq.getAssertionsWebappDaoFactory() != null) {
-        	opDao = vreq.getAssertionsWebappDaoFactory().getObjectPropertyDao();
-        } else {
-        	opDao = vreq.getFullWebappDaoFactory().getObjectPropertyDao();
-        }
+        ObjectPropertyDao opDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getObjectPropertyDao();
         List superURIs = opDao.getSuperPropertyURIs(p.getURI(),false);
         List superProperties = new ArrayList();
         Iterator superURIit = superURIs.iterator();

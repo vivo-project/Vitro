@@ -64,10 +64,10 @@ public class VclassRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        VClassDao vcwDao = request.getAssertionsWebappDaoFactory().getVClassDao();
+        VClassDao vcwDao = request.getUnfilteredAssertionsWebappDaoFactory().getVClassDao();
         epo.setDataAccessObject(vcwDao);
-        VClassGroupDao cgDao = request.getFullWebappDaoFactory().getVClassGroupDao();
-        OntologyDao oDao = request.getFullWebappDaoFactory().getOntologyDao();
+        VClassGroupDao cgDao = request.getUnfilteredWebappDaoFactory().getVClassGroupDao();
+        OntologyDao oDao = request.getUnfilteredWebappDaoFactory().getOntologyDao();
 
         VClass vclassForEditing = null;
         if (!epo.getUseRecycledBean()){
@@ -110,7 +110,7 @@ public class VclassRetryController extends BaseEditController {
         //set up any listeners
         List changeListenerList = new LinkedList();
         if (request.getParameter("superclassUri") != null) {
-            changeListenerList.add(new SubclassListener(request.getParameter("superclassUri"), request.getFullWebappDaoFactory()));
+            changeListenerList.add(new SubclassListener(request.getParameter("superclassUri"), request.getUnfilteredWebappDaoFactory()));
         }
         epo.setChangeListenerList(changeListenerList);
 
@@ -130,7 +130,7 @@ public class VclassRetryController extends BaseEditController {
 
         HashMap<String, List<Option>> optionMap = new HashMap<String,List<Option>>();
         try {
-            VClassGroupDao vcgDao = request.getFullWebappDaoFactory().getVClassGroupDao();
+            VClassGroupDao vcgDao = request.getUnfilteredWebappDaoFactory().getVClassGroupDao();
             List classGroupOptionList = FormUtils.makeOptionListFromBeans(vcgDao.getPublicGroupsWithVClasses(),"URI","PublicName",vclassForEditing.getGroupURI(),null,(vclassForEditing.getGroupURI()!=null && !(vclassForEditing.getGroupURI().equals(""))));
             classGroupOptionList.add(0,new Option("", "none", ("update".equals(action) && (vclassForEditing.getGroupURI()==null || vclassForEditing.getGroupURI().equals("")))));
             optionMap.put("GroupURI", classGroupOptionList);
@@ -142,7 +142,7 @@ public class VclassRetryController extends BaseEditController {
             List namespaceIdList = (action.equals("insert"))
                     ? FormUtils.makeOptionListFromBeans(oDao.getAllOntologies(),"URI","Name", ((vclassForEditing.getNamespace()==null) ? "" : vclassForEditing.getNamespace()), null, false)
                     : FormUtils.makeOptionListFromBeans(oDao.getAllOntologies(),"URI","Name", ((vclassForEditing.getNamespace()==null) ? "" : vclassForEditing.getNamespace()), null, true);
-	        namespaceIdList.add(0, new Option(request.getFullWebappDaoFactory().getDefaultNamespace(),"default"));
+	        namespaceIdList.add(0, new Option(request.getUnfilteredWebappDaoFactory().getDefaultNamespace(),"default"));
             optionMap.put("Namespace", namespaceIdList);
         } catch (Exception e) {
             log.error(this.getClass().getName() + "unable to create Namespace option list");

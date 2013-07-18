@@ -78,10 +78,10 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
             
             body.put("propertyType", "data");
             
-            dpDao = vreq.getAssertionsWebappDaoFactory().getDataPropertyDao();
-            vcDao = vreq.getAssertionsWebappDaoFactory().getVClassDao();
-            pgDao = vreq.getAssertionsWebappDaoFactory().getPropertyGroupDao();
-            dDao = vreq.getAssertionsWebappDaoFactory().getDatatypeDao();
+            dpDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getDataPropertyDao();
+            vcDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getVClassDao();
+            pgDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getPropertyGroupDao();
+            dDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getDatatypeDao();
 
             String json = new String();
 

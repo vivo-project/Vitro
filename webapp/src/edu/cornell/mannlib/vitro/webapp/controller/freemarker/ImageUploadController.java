@@ -256,7 +256,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues doIntroScreen(VitroRequest vreq, Individual entity) {
 		ImageInfo imageInfo = ImageInfo.instanceFromEntityUri(
-				vreq.getFullWebappDaoFactory(), entity);
+				vreq.getUnfilteredWebappDaoFactory(), entity);
 		if (imageInfo == null) {
 			return showAddImagePage(vreq, entity);
 		} else {
@@ -270,7 +270,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues doUploadImage(VitroRequest vreq, Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory(), getServletContext());
+				vreq.getUnfilteredWebappDaoFactory(), getServletContext());
 
 		try {
 			// Did they provide a file to upload? If not, show an error.
@@ -298,7 +298,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			Individual entity, String message) {
 
 		ImageInfo imageInfo = ImageInfo.instanceFromEntityUri(
-				vreq.getFullWebappDaoFactory(), entity);
+				vreq.getUnfilteredWebappDaoFactory(), entity);
 		if (imageInfo == null) {
 			return showAddImagePageWithError(vreq, entity, message);
 		} else {
@@ -314,7 +314,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	private ResponseValues doCreateThumbnail(VitroRequest vreq,
 			Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory(), getServletContext());
+				vreq.getUnfilteredWebappDaoFactory(), getServletContext());
 
 		try {
 			CropRectangle crop = validateCropCoordinates(vreq);
@@ -336,7 +336,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues doDeleteImage(VitroRequest vreq, Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory(), getServletContext());
+				vreq.getUnfilteredWebappDaoFactory(), getServletContext());
 
 		helper.removeExistingImage(entity);
 
@@ -349,7 +349,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues doDeleteThenEdit(VitroRequest vreq, Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory(), getServletContext());
+				vreq.getUnfilteredWebappDaoFactory(), getServletContext());
 
 		helper.removeExistingImage(entity);
 
@@ -366,7 +366,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			throw new UserMistakeException(ERROR_CODE_NO_URI);
 		}
 
-		Individual entity = vreq.getFullWebappDaoFactory().getIndividualDao()
+		Individual entity = vreq.getUnfilteredWebappDaoFactory().getIndividualDao()
 				.getIndividualByURI(entityUri);
 		if (entity == null) {
 			throw new UserMistakeException(ERROR_CODE_UNRECOGNIZED_URI,

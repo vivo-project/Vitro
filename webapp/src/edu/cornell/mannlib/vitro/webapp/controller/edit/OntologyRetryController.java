@@ -49,7 +49,7 @@ public class OntologyRetryController extends BaseEditController {
 
         String action = "insert";
 
-        OntologyDao oDao = request.getFullWebappDaoFactory().getOntologyDao();
+        OntologyDao oDao = request.getUnfilteredWebappDaoFactory().getOntologyDao();
         epo.setDataAccessObject(oDao);
 
         Ontology ontologyForEditing = null;

@@ -66,7 +66,7 @@ public class GetClazzAllProperties extends BaseEditController {
 		 * "http://www.w3.org/2000/01/rdf-schema#label" + "</value>" +
 		 * "<type>0</type>" + "</option>";
 		 */
-		DataPropertyDao ddao = vreq.getFullWebappDaoFactory()
+		DataPropertyDao ddao = vreq.getUnfilteredWebappDaoFactory()
 				.getDataPropertyDao();
 
 		Collection<DataProperty> dataProps = ddao
@@ -95,11 +95,11 @@ public class GetClazzAllProperties extends BaseEditController {
 
 		// Get Object Properties
 
-		ObjectPropertyDao odao = vreq.getFullWebappDaoFactory()
+		ObjectPropertyDao odao = vreq.getUnfilteredWebappDaoFactory()
 				.getObjectPropertyDao();
-		PropertyInstanceDao piDao = vreq.getFullWebappDaoFactory()
+		PropertyInstanceDao piDao = vreq.getUnfilteredWebappDaoFactory()
 				.getPropertyInstanceDao();
-		VClassDao vcDao = vreq.getFullWebappDaoFactory().getVClassDao();
+		VClassDao vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
 
 		// incomplete list of classes to check, but better than before
 		List<String> superclassURIs = vcDao.getAllSuperClassURIs(vClassURI);

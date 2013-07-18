@@ -50,7 +50,7 @@ public class PropertyGroupRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        PropertyGroupDao pgDao = request.getFullWebappDaoFactory().getPropertyGroupDao();
+        PropertyGroupDao pgDao = request.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 
         epo.setDataAccessObject(pgDao);
 

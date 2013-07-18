@@ -52,7 +52,7 @@ public class GetEntitiesByVClass extends JsonArrayProducer {
 	protected JSONArray process() throws ServletException {
         log.debug("in getEntitiesByVClass()");
         String vclassURI = vreq.getParameter("vclassURI");
-        WebappDaoFactory daos = vreq.getFullWebappDaoFactory();
+        WebappDaoFactory daos = vreq.getUnfilteredWebappDaoFactory();
         
         if( vclassURI == null ){
             throw new ServletException("getEntitiesByVClass(): no value for 'vclassURI' found in the HTTP request");

@@ -71,11 +71,11 @@ public class ObjectPropertyStatementRetryController extends BaseEditController {
                 
         String action = "insert";
 
-        PropertyInstanceDao piDao = vreq.getFullWebappDaoFactory().getPropertyInstanceDao();
+        PropertyInstanceDao piDao = vreq.getUnfilteredWebappDaoFactory().getPropertyInstanceDao();
         epo.setDataAccessObject(piDao);
-        ObjectPropertyDao pDao = vreq.getFullWebappDaoFactory().getObjectPropertyDao();
-        IndividualDao eDao = vreq.getFullWebappDaoFactory().getIndividualDao();
-        VClassDao vcDao = vreq.getFullWebappDaoFactory().getVClassDao();
+        ObjectPropertyDao pDao = vreq.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
+        IndividualDao eDao = vreq.getUnfilteredWebappDaoFactory().getIndividualDao();
+        VClassDao vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
 
         PropertyInstance objectForEditing = null;
         if (!epo.getUseRecycledBean()){

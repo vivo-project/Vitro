@@ -69,10 +69,10 @@ public class PropertyRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        ObjectPropertyDao propDao = request.getFullWebappDaoFactory().getObjectPropertyDao();
+        ObjectPropertyDao propDao = request.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
         epo.setDataAccessObject(propDao);
-        OntologyDao ontDao = request.getFullWebappDaoFactory().getOntologyDao();
-        VClassDao vclassDao = request.getFullWebappDaoFactory().getVClassDao();
+        OntologyDao ontDao = request.getUnfilteredWebappDaoFactory().getOntologyDao();
+        VClassDao vclassDao = request.getUnfilteredWebappDaoFactory().getVClassDao();
 
         ObjectProperty propertyForEditing = null;
         if (!epo.getUseRecycledBean()){
@@ -150,7 +150,7 @@ public class PropertyRetryController extends BaseEditController {
         optionMap.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(propertyForEditing));    
         optionMap.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(propertyForEditing));
 
-        List groupOptList = FormUtils.makeOptionListFromBeans(request.getFullWebappDaoFactory().getPropertyGroupDao().getPublicGroups(true),"URI","Name", ((propertyForEditing.getGroupURI()==null) ? "" : propertyForEditing.getGroupURI()), null, (propertyForEditing.getGroupURI()!=null));
+        List groupOptList = FormUtils.makeOptionListFromBeans(request.getUnfilteredWebappDaoFactory().getPropertyGroupDao().getPublicGroups(true),"URI","Name", ((propertyForEditing.getGroupURI()==null) ? "" : propertyForEditing.getGroupURI()), null, (propertyForEditing.getGroupURI()!=null));
         HashMap<String,Option> hashMap = new HashMap<String,Option>();
         groupOptList = getSortedList(hashMap,groupOptList);
         groupOptList.add(0,new Option("","none"));
@@ -221,7 +221,7 @@ public class PropertyRetryController extends BaseEditController {
                                 : propertyForEditing.getNamespace()), 
                         null, (propertyForEditing.getNamespace() != null));
         namespaceIdList.add(0, new Option(
-                request.getFullWebappDaoFactory().getDefaultNamespace(), "default"));
+                request.getUnfilteredWebappDaoFactory().getDefaultNamespace(), "default"));
         optionMap.put("Namespace", namespaceIdList);
         
         List<Option> namespaceIdInverseList = FormUtils.makeOptionListFromBeans(
@@ -231,7 +231,7 @@ public class PropertyRetryController extends BaseEditController {
                                 : propertyForEditing.getNamespaceInverse()), 
                         null, (propertyForEditing.getNamespaceInverse() != null));
         namespaceIdInverseList.add(0, new Option(
-                request.getFullWebappDaoFactory().getDefaultNamespace(),"default"));
+                request.getUnfilteredWebappDaoFactory().getDefaultNamespace(),"default"));
         optionMap.put("NamespaceInverse", namespaceIdInverseList);
         
         List<ObjectProperty> objPropList = propDao.getAllObjectProperties();
@@ -258,7 +258,7 @@ public class PropertyRetryController extends BaseEditController {
         */
         
         List<Option> domainOptionList = FormUtils.makeVClassOptionList(
-                request.getFullWebappDaoFactory(), 
+                request.getUnfilteredWebappDaoFactory(), 
                         propertyForEditing.getDomainVClassURI());
         if (propertyForEditing.getDomainVClass() != null 
                 && propertyForEditing.getDomainVClass().isAnonymous()) {
@@ -271,7 +271,7 @@ public class PropertyRetryController extends BaseEditController {
         optionMap.put("DomainVClassURI", domainOptionList);
         
         List<Option> rangeOptionList = FormUtils.makeVClassOptionList(
-                request.getFullWebappDaoFactory(), 
+                request.getUnfilteredWebappDaoFactory(), 
                         propertyForEditing.getRangeVClassURI());
         if (propertyForEditing.getRangeVClass() != null 
                 && propertyForEditing.getRangeVClass().isAnonymous()) {

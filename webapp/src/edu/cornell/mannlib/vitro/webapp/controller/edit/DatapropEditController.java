@@ -44,9 +44,9 @@ public class DatapropEditController extends BaseEditController {
 
         String datapropURI = request.getParameter("uri");
 
-        DataPropertyDao dpDao = vreq.getFullWebappDaoFactory().getDataPropertyDao();
+        DataPropertyDao dpDao = vreq.getUnfilteredWebappDaoFactory().getDataPropertyDao();
         DataProperty dp = dpDao.getDataPropertyByURI(datapropURI);
-        PropertyGroupDao pgDao = vreq.getFullWebappDaoFactory().getPropertyGroupDao();
+        PropertyGroupDao pgDao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 
         ArrayList results = new ArrayList();
         results.add("data property");         // column 1
@@ -85,7 +85,7 @@ public class DatapropEditController extends BaseEditController {
         
         String ontologyName = null;
         if (dp.getNamespace() != null) {
-            Ontology ont = vreq.getFullWebappDaoFactory().getOntologyDao().getOntologyByURI(dp.getNamespace());
+            Ontology ont = vreq.getUnfilteredWebappDaoFactory().getOntologyDao().getOntologyByURI(dp.getNamespace());
             if ( (ont != null) && (ont.getName() != null) ) {
                 ontologyName = ont.getName();
             }
@@ -138,9 +138,7 @@ public class DatapropEditController extends BaseEditController {
         foo.setOptionLists(OptionMap);
         epo.setFormObject(foo);
 
-        DataPropertyDao assertionsDpDao = (vreq.getAssertionsWebappDaoFactory() != null) 
-            ? vreq.getAssertionsWebappDaoFactory().getDataPropertyDao()
-            : vreq.getFullWebappDaoFactory().getDataPropertyDao();
+        DataPropertyDao assertionsDpDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getDataPropertyDao();
         
         List superURIs = assertionsDpDao.getSuperPropertyURIs(dp.getURI(),false);
         List superProperties = new ArrayList();

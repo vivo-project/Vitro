@@ -41,10 +41,10 @@ public class IndividualsListingController extends BaseEditController {
         WebappDaoFactory wadf = null;
         
         if (assertedOnlyStr != null && assertedOnlyStr.equalsIgnoreCase("true")) {
-        	wadf = vrequest.getAssertionsWebappDaoFactory();
+        	wadf = vrequest.getUnfilteredAssertionsWebappDaoFactory();
         }
         if (wadf == null) {
-        	wadf = vrequest.getFullWebappDaoFactory();
+        	wadf = vrequest.getUnfilteredWebappDaoFactory();
         }
         
         IndividualDao dao = wadf.getIndividualDao();

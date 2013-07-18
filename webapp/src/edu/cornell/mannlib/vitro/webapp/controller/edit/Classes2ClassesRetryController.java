@@ -43,7 +43,7 @@ public class Classes2ClassesRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        VClassDao vcDao = request.getFullWebappDaoFactory().getVClassDao();
+        VClassDao vcDao = request.getUnfilteredWebappDaoFactory().getVClassDao();
         epo.setDataAccessObject(vcDao);
         Classes2Classes objectForEditing = new Classes2Classes();
 

@@ -54,7 +54,7 @@ public class GetAllClasses extends BaseEditController {
 
 		// EditProcessObject epo = super.createEpo(request);
 
-		List classGroups = vreq.getFullWebappDaoFactory().getVClassGroupDao()
+		List classGroups = vreq.getUnfilteredWebappDaoFactory().getVClassGroupDao()
 				.getPublicGroupsWithVClasses(true, true, false); // order by
 																	// displayRank,
 																	// include

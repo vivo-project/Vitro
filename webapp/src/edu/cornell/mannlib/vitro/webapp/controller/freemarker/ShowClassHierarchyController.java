@@ -6,15 +6,11 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -25,7 +21,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -74,10 +69,10 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
                 body.put("pageTitle", "Asserted Class Hierarchy");
             }
 
-            if (vreq.getAssertionsWebappDaoFactory() != null && !inferred) {
-            	vcDao = vreq.getAssertionsWebappDaoFactory().getVClassDao();
+            if (!inferred) {
+            	vcDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getVClassDao();
             } else {
-            	vcDao = vreq.getFullWebappDaoFactory().getVClassDao();
+            	vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
             }
             String json = new String();
 
@@ -97,7 +92,7 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
 
             if (roots.isEmpty()) {
             	roots = new LinkedList<VClass>();
-            	roots.add(vreq.getFullWebappDaoFactory().getVClassDao()
+            	roots.add(vreq.getUnfilteredWebappDaoFactory().getVClassDao()
             			.getTopConcept());
             }
             Collections.sort(roots);
@@ -107,12 +102,12 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
             if (!rootIt.hasNext()) {
                 VClass vcw = new VClass();
                 vcw.setName("<strong>No classes found.</strong>");
-                json += addVClassDataToResultsList(vreq.getFullWebappDaoFactory(), vcw,0,ontologyUri,counter);
+                json += addVClassDataToResultsList(vreq.getUnfilteredWebappDaoFactory(), vcw,0,ontologyUri,counter);
             } else {
                 while (rootIt.hasNext()) {
                     VClass root = (VClass) rootIt.next();
     	            if (root != null) {
-    	                json += addChildren(vreq.getFullWebappDaoFactory(), root, 0, ontologyUri,counter);
+    	                json += addChildren(vreq.getUnfilteredWebappDaoFactory(), root, 0, ontologyUri,counter);
     	                counter += 1;
                     }
                 }

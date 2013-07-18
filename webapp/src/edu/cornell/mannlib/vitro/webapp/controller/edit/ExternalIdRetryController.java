@@ -46,12 +46,12 @@ public class ExternalIdRetryController extends BaseEditController {
 
         String action = "insert";
 
-        DataPropertyDao dpDao = vreq.getFullWebappDaoFactory().getDataPropertyDao();
-        DataPropertyStatementDao edDao = vreq.getFullWebappDaoFactory().getDataPropertyStatementDao();
+        DataPropertyDao dpDao = vreq.getUnfilteredWebappDaoFactory().getDataPropertyDao();
+        DataPropertyStatementDao edDao = vreq.getUnfilteredWebappDaoFactory().getDataPropertyStatementDao();
         epo.setDataAccessObject(edDao);
         epo.setBeanClass(DataPropertyStatement.class);
 
-        IndividualDao eDao = vreq.getFullWebappDaoFactory().getIndividualDao();
+        IndividualDao eDao = vreq.getUnfilteredWebappDaoFactory().getIndividualDao();
 
         DataPropertyStatement eidForEditing = null;
         if (!epo.getUseRecycledBean()){

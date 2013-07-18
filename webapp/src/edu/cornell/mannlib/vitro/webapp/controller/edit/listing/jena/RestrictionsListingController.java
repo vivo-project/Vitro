@@ -54,9 +54,9 @@ public class RestrictionsListingController extends BaseEditController {
         
 		OntModel ontModel = ModelAccess.on(getServletContext()).getJenaOntModel();
 
-        ObjectPropertyDao opDao = vrequest.getFullWebappDaoFactory().getObjectPropertyDao();
-        VClassDao vcDao = vrequest.getFullWebappDaoFactory().getVClassDao();
-        IndividualDao iDao = vrequest.getFullWebappDaoFactory().getIndividualDao();
+        ObjectPropertyDao opDao = vrequest.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
+        VClassDao vcDao = vrequest.getUnfilteredWebappDaoFactory().getVClassDao();
+        IndividualDao iDao = vrequest.getUnfilteredWebappDaoFactory().getIndividualDao();
         
         ArrayList results = new ArrayList();
         request.setAttribute("results",results);

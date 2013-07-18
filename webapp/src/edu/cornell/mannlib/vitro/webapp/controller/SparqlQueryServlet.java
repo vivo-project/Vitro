@@ -273,7 +273,7 @@ public class SparqlQueryServlet extends BaseEditController {
     private void doHelp(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
             VitroRequest vreq = new VitroRequest(req);
             
-            OntologyDao daoObj = vreq.getFullWebappDaoFactory().getOntologyDao();
+            OntologyDao daoObj = vreq.getUnfilteredWebappDaoFactory().getOntologyDao();
             List<Ontology> ontologiesObj = daoObj.getAllOntologies();
             ArrayList<String> prefixList = new ArrayList<String>();
             

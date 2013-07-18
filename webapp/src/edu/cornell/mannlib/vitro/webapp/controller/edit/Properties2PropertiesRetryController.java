@@ -51,8 +51,8 @@ public class Properties2PropertiesRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        ObjectPropertyDao opDao = request.getFullWebappDaoFactory().getObjectPropertyDao();
-        DataPropertyDao dpDao = request.getFullWebappDaoFactory().getDataPropertyDao();
+        ObjectPropertyDao opDao = request.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
+        DataPropertyDao dpDao = request.getUnfilteredWebappDaoFactory().getDataPropertyDao();
         epo.setDataAccessObject(opDao);
         
         List propList = ("data".equals(request.getParameter("propertyType"))) 

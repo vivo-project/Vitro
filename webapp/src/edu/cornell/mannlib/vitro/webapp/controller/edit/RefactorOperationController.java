@@ -188,7 +188,7 @@ public class RefactorOperationController extends BaseEditController {
 		// validateURI
 		String errorMsg = null;
 		try {
-			request.getFullWebappDaoFactory().checkURI(newURIStr);
+			request.getUnfilteredWebappDaoFactory().checkURI(newURIStr);
 		} catch (InvalidPropertyURIException ipue) {
 			// TODO We don't know if we're editing a property's URI or not here!
 		}
@@ -255,7 +255,7 @@ public class RefactorOperationController extends BaseEditController {
 				        userURI, oldURIStr, newURIStr, !NOTIFY);
     	
 		// there are no statements to delete, but we want indexes updated appropriately
-		request.getFullWebappDaoFactory().getIndividualDao().deleteIndividual(oldURIStr);
+		request.getUnfilteredWebappDaoFactory().getIndividualDao().deleteIndividual(oldURIStr);
 		
 		String redirectStr = null;
 		

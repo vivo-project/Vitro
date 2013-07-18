@@ -48,7 +48,7 @@ public class ListClassGroupsController extends FreemarkerHttpServlet {
             body.put("displayOption", "group");
             body.put("pageTitle", "Class Groups");
 
-            VClassGroupDao dao = vreq.getFullWebappDaoFactory().getVClassGroupDao();
+            VClassGroupDao dao = vreq.getUnfilteredWebappDaoFactory().getVClassGroupDao();
 
             List<VClassGroup> groups = dao.getPublicGroupsWithVClasses(); 
 

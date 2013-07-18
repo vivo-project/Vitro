@@ -51,8 +51,7 @@ public class IndividualTypeRetryController extends BaseEditController {
 		
         VitroRequest vreq = new VitroRequest(request);
         
-        WebappDaoFactory t;
-        WebappDaoFactory wadf = ((t = vreq.getAssertionsWebappDaoFactory()) != null) ? t : vreq.getFullWebappDaoFactory();
+        WebappDaoFactory wadf = vreq.getUnfilteredAssertionsWebappDaoFactory();
         IndividualDao iDao = wadf.getIndividualDao();
         VClassDao vcDao = wadf.getVClassDao();
         

@@ -85,7 +85,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
             map.put("formAction", UrlBuilder.getUrl("/editRequestDispatch"));
             
-            WebappDaoFactory wadf = vreq.getFullWebappDaoFactory();
+            WebappDaoFactory wadf = vreq.getUnfilteredWebappDaoFactory();
             
             // Create map for data input entry form options list
             List<VClassGroup> classGroups = wadf.getVClassGroupDao().getPublicGroupsWithVClasses(true,true,false); // order by displayRank, include uninstantiated classes, don't get the counts of individuals

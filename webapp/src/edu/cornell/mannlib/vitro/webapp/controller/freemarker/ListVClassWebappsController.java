@@ -60,10 +60,10 @@ public class ListVClassWebappsController extends FreemarkerHttpServlet {
             List<VClass> classes = null;
 
             if (vreq.getParameter("showPropertyRestrictions") != null) {
-            	PropertyDao pdao = vreq.getFullWebappDaoFactory().getObjectPropertyDao();
+            	PropertyDao pdao = vreq.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
             	classes = pdao.getClassesWithRestrictionOnProperty(vreq.getParameter("propertyURI"));
             } else {
-            	VClassDao vcdao = vreq.getFullWebappDaoFactory().getVClassDao();
+            	VClassDao vcdao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
 
             	if (vreq.getParameter("iffRoot") != null) {
                     classes = vcdao.getRootClasses();
@@ -99,7 +99,7 @@ public class ListVClassWebappsController extends FreemarkerHttpServlet {
     	                json += "\"data\": { \"shortDef\": \"" + shortDef + "\", ";
 
     	                // get group name
-    	                WebappDaoFactory wadf = vreq.getFullWebappDaoFactory();
+    	                WebappDaoFactory wadf = vreq.getUnfilteredWebappDaoFactory();
     	                VClassGroupDao groupDao= wadf.getVClassGroupDao();
     	                String groupURI = cls.getGroupURI();                
     	                String groupName = "";

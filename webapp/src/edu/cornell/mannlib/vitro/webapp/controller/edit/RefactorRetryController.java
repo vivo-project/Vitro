@@ -54,18 +54,18 @@ public class RefactorRetryController extends BaseEditController {
 		epo.setFormObject(foo);
 		HashMap<String,List<Option>> optMap = new HashMap<String,List<Option>>();
 		foo.setOptionLists(optMap);
-		List<Option> subjectClassOpts = FormUtils.makeOptionListFromBeans(request.getFullWebappDaoFactory().getVClassDao().getAllVclasses(),"URI","Name", null, null);
+		List<Option> subjectClassOpts = FormUtils.makeOptionListFromBeans(request.getUnfilteredWebappDaoFactory().getVClassDao().getAllVclasses(),"URI","Name", null, null);
 		subjectClassOpts.add(0,new Option("","? wildcard",true));
 		optMap.put("SubjectClassURI", subjectClassOpts);
 		optMap.put("ObjectClassURI", subjectClassOpts);
 		
 		List newPropertyOpts;
 		if (epo.getAttribute("propertyType").equals("ObjectProperty"))  {
-			List<ObjectProperty> opList = request.getFullWebappDaoFactory().getObjectPropertyDao().getAllObjectProperties();
+			List<ObjectProperty> opList = request.getUnfilteredWebappDaoFactory().getObjectPropertyDao().getAllObjectProperties();
 			Collections.sort(opList);
 			newPropertyOpts = FormUtils.makeOptionListFromBeans(opList,"URI","LocalNameWithPrefix", null, null);
 		} else {
-			List<DataProperty> dpList = request.getFullWebappDaoFactory().getDataPropertyDao().getAllDataProperties();
+			List<DataProperty> dpList = request.getUnfilteredWebappDaoFactory().getDataPropertyDao().getAllDataProperties();
 			Collections.sort(dpList);
 			newPropertyOpts = FormUtils.makeOptionListFromBeans(dpList,"URI","Name", null, null);
 		}
@@ -90,7 +90,7 @@ public class RefactorRetryController extends BaseEditController {
 		epo.setFormObject(foo);
 		HashMap<String,List<Option>> optMap = new HashMap<String,List<Option>>();
 		foo.setOptionLists(optMap);
-		List<Option> newClassURIopts = FormUtils.makeOptionListFromBeans(request.getFullWebappDaoFactory().getVClassDao().getAllVclasses(),"URI","LocalNameWithPrefix", null, null);
+		List<Option> newClassURIopts = FormUtils.makeOptionListFromBeans(request.getUnfilteredWebappDaoFactory().getVClassDao().getAllVclasses(),"URI","LocalNameWithPrefix", null, null);
 		newClassURIopts.add(new Option ("","move to trash"));
 		optMap.put("NewVClassURI", newClassURIopts);
 		request.setAttribute("editAction","refactorOp");

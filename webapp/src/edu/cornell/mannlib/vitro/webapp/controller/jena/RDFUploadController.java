@@ -182,13 +182,13 @@ public class RDFUploadController extends JenaIngestController {
                 boolean AGGRESSIVE = true;
                 tboxChangeModel = xutil.extractTBox(uploadModel, AGGRESSIVE);
                 // aggressively seek all statements that are part of the TBox  
-                tboxstmtCount = operateOnModel(request.getFullWebappDaoFactory(),
+                tboxstmtCount = operateOnModel(request.getUnfilteredWebappDaoFactory(),
                         tboxModel, tboxChangeModel, ontModelSelector,
                                 remove, makeClassgroups, loginBean.getUserURI());
             }
             if (aboxModel != null) {
                 aboxChangeModel = uploadModel.remove(tboxChangeModel);
-                aboxstmtCount = operateOnModel(request.getFullWebappDaoFactory(),
+                aboxstmtCount = operateOnModel(request.getUnfilteredWebappDaoFactory(),
                         aboxModel, aboxChangeModel, ontModelSelector, 
                                 remove, makeClassgroups, loginBean.getUserURI());
             }

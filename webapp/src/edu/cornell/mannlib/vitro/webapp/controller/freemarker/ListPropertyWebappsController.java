@@ -60,10 +60,10 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
 
             String ontologyUri = vreq.getParameter("ontologyUri");
 
-            ObjectPropertyDao dao = vreq.getFullWebappDaoFactory().getObjectPropertyDao();
-            PropertyInstanceDao piDao = vreq.getFullWebappDaoFactory().getPropertyInstanceDao();
-            VClassDao vcDao = vreq.getFullWebappDaoFactory().getVClassDao();
-            PropertyGroupDao pgDao = vreq.getFullWebappDaoFactory().getPropertyGroupDao();
+            ObjectPropertyDao dao = vreq.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
+            PropertyInstanceDao piDao = vreq.getUnfilteredWebappDaoFactory().getPropertyInstanceDao();
+            VClassDao vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
+            PropertyGroupDao pgDao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 
             String vclassURI = vreq.getParameter("vclassUri");
         
@@ -105,7 +105,7 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
                     : dao.getAllObjectProperties();
             }
         
-            OntologyDao oDao = vreq.getFullWebappDaoFactory().getOntologyDao();
+            OntologyDao oDao = vreq.getUnfilteredWebappDaoFactory().getOntologyDao();
             HashMap<String,String> ontologyHash = new HashMap<String,String>();
 
             Iterator propIt = props.iterator();

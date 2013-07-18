@@ -58,8 +58,8 @@ public class RestrictionRetryController extends BaseEditController {
 			boolean propertyType = ("data".equals(request.getParameter("propertyType"))) ? DATA : OBJECT ;
 			
 			List<? extends Property> pList = (propertyType == OBJECT) 
-				? request.getFullWebappDaoFactory().getObjectPropertyDao().getAllObjectProperties()
-			    : request.getFullWebappDaoFactory().getDataPropertyDao().getAllDataProperties();
+				? request.getUnfilteredWebappDaoFactory().getObjectPropertyDao().getAllObjectProperties()
+			    : request.getUnfilteredWebappDaoFactory().getDataPropertyDao().getAllDataProperties();
 			List<Option> onPropertyList = new LinkedList<Option>(); 
 			Collections.sort(pList, new PropSorter());
 			for (Property p: pList) {
@@ -116,7 +116,7 @@ public class RestrictionRetryController extends BaseEditController {
 	
 	private List<Option> getValueClassOptionList(VitroRequest request) {
 		List<Option> valueClassOptionList = new LinkedList<Option>();
-		VClassDao vcDao = request.getFullWebappDaoFactory().getVClassDao();
+		VClassDao vcDao = request.getUnfilteredWebappDaoFactory().getVClassDao();
 		for (VClass vc: vcDao.getAllVclasses()) {
 			valueClassOptionList.add(new Option(vc.getURI(), vc.getLocalNameWithPrefix()));
 		}
@@ -125,7 +125,7 @@ public class RestrictionRetryController extends BaseEditController {
 	
 	private List<Option> getValueDatatypeOptionList(VitroRequest request) {
 		List<Option> valueDatatypeOptionList = new LinkedList<Option>();
-		DatatypeDao dtDao = request.getFullWebappDaoFactory().getDatatypeDao();
+		DatatypeDao dtDao = request.getUnfilteredWebappDaoFactory().getDatatypeDao();
 		for (Datatype dt: dtDao.getAllDatatypes()) {
 			valueDatatypeOptionList.add(new Option(dt.getUri(), dt.getName()));
 		}

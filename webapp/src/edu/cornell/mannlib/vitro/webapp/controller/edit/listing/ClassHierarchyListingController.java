@@ -56,7 +56,7 @@ public class ClassHierarchyListingController extends BaseEditController {
         if (!inferred) {
         	vcDao = ModelAccess.on(vrequest).getBaseWebappDaoFactory().getVClassDao();
         } else {
-        	vcDao = vrequest.getFullWebappDaoFactory().getVClassDao();
+        	vcDao = vrequest.getUnfilteredWebappDaoFactory().getVClassDao();
         }
 
         ArrayList<String> results = new ArrayList<String>();
@@ -86,7 +86,7 @@ public class ClassHierarchyListingController extends BaseEditController {
         
         if (roots.isEmpty()) {
         	roots = new LinkedList<VClass>();
-        	roots.add(vrequest.getFullWebappDaoFactory().getVClassDao()
+        	roots.add(vrequest.getUnfilteredWebappDaoFactory().getVClassDao()
         			.getTopConcept());
         }
         
@@ -96,13 +96,13 @@ public class ClassHierarchyListingController extends BaseEditController {
         if (!rootIt.hasNext()) {
             VClass vcw = new VClass();
             vcw.setName("<strong>No classes found.</strong>");
-            results.addAll(addVClassDataToResultsList(vrequest.getFullWebappDaoFactory(), vcw,0,ontologyUri));
+            results.addAll(addVClassDataToResultsList(vrequest.getUnfilteredWebappDaoFactory(), vcw,0,ontologyUri));
         } else {
             while (rootIt.hasNext()) {
                 VClass root = (VClass) rootIt.next();
 	            if (root != null) {
 	                ArrayList childResults = new ArrayList();
-	                addChildren(vrequest.getFullWebappDaoFactory(), root, childResults, 0, ontologyUri);
+	                addChildren(vrequest.getUnfilteredWebappDaoFactory(), root, childResults, 0, ontologyUri);
 	                results.addAll(childResults);
                 }
             }

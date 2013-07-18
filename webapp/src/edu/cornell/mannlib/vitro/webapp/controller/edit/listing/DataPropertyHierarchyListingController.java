@@ -54,10 +54,10 @@ public class DataPropertyHierarchyListingController extends BaseEditController {
         VitroRequest vrequest = new VitroRequest(request);
         try {
 
-        dpDao = vrequest.getAssertionsWebappDaoFactory().getDataPropertyDao();
-        vcDao = vrequest.getAssertionsWebappDaoFactory().getVClassDao();
-        pgDao = vrequest.getAssertionsWebappDaoFactory().getPropertyGroupDao();
-        dDao = vrequest.getAssertionsWebappDaoFactory().getDatatypeDao();
+        dpDao = vrequest.getUnfilteredAssertionsWebappDaoFactory().getDataPropertyDao();
+        vcDao = vrequest.getUnfilteredAssertionsWebappDaoFactory().getVClassDao();
+        pgDao = vrequest.getUnfilteredAssertionsWebappDaoFactory().getPropertyGroupDao();
+        dDao = vrequest.getUnfilteredAssertionsWebappDaoFactory().getDatatypeDao();
 
         ArrayList<String> results = new ArrayList<String>();
         results.add("XX");            // column 1

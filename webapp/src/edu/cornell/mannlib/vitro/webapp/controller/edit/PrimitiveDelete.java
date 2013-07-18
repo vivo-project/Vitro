@@ -46,7 +46,7 @@ public class PrimitiveDelete extends VitroAjaxController {
             return;
         }
 
-        WebappDaoFactory wdf = vreq.getFullWebappDaoFactory();
+        WebappDaoFactory wdf = vreq.getUnfilteredWebappDaoFactory();
         IndividualDao idao = wdf.getIndividualDao();
         int result = idao.deleteIndividual(uriToDelete);
         if (result == 1) {

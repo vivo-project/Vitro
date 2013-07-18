@@ -61,12 +61,12 @@ public class GetObjectClasses extends BaseEditController {
 			return;
 		}
 
-		ObjectPropertyDao odao = vreq.getFullWebappDaoFactory()
+		ObjectPropertyDao odao = vreq.getUnfilteredWebappDaoFactory()
 				.getObjectPropertyDao();
 		ObjectProperty oprop = (ObjectProperty) odao
 				.getObjectPropertyByURI(predicate);
 
-		VClassDao vcDao = vreq.getFullWebappDaoFactory().getVClassDao();
+		VClassDao vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
 		VClass vClass = (oprop.getRangeVClassURI() != null) ? vcDao
 				.getVClassByURI(oprop.getRangeVClassURI()) : null;
 
@@ -79,7 +79,7 @@ public class GetObjectClasses extends BaseEditController {
 			respo += "<option>" + "<key>" + vClass.getPickListName() + "</key>"
 					+ "<value>" + vClass.getURI() + "</value>" + "</option>";
 		} else {
-			List classGroups = vreq.getFullWebappDaoFactory()
+			List classGroups = vreq.getUnfilteredWebappDaoFactory()
 					.getVClassGroupDao().getPublicGroupsWithVClasses(true,
 							true, false); // order by displayRank, include
 											// uninstantiated classes, don't get

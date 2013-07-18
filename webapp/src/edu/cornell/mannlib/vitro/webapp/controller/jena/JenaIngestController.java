@@ -548,7 +548,7 @@ public class JenaIngestController extends BaseEditController {
             jenaOntModel.leaveCriticalSection();
         }
         /*ass92*/
-        OntologyDao daoObj = vreq.getFullWebappDaoFactory().getOntologyDao();
+        OntologyDao daoObj = vreq.getUnfilteredWebappDaoFactory().getOntologyDao();
         List ontologiesObj = daoObj.getAllOntologies();
         ArrayList prefixList = new ArrayList();       
         if(ontologiesObj !=null && ontologiesObj.size()>0){
@@ -637,7 +637,7 @@ public class JenaIngestController extends BaseEditController {
             } else {
                 namespaceList.add("no resources present");
             }
-            String defaultNamespace = vreq.getFullWebappDaoFactory().getDefaultNamespace();
+            String defaultNamespace = vreq.getUnfilteredWebappDaoFactory().getDefaultNamespace();
             vreq.setAttribute("modelName", modelName);
             vreq.setAttribute("defaultNamespace", defaultNamespace);
               vreq.setAttribute("namespaceList", namespaceList);

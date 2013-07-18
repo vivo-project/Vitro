@@ -733,7 +733,7 @@ public class JenaIngestUtils {
             String newNamespace, String dNamespace, ModelMaker maker, 
             VitroRequest vreq) {
 
-        WebappDaoFactory wdf = vreq.getFullWebappDaoFactory();
+        WebappDaoFactory wdf = vreq.getUnfilteredWebappDaoFactory();
         Model m = maker.getModel(oldModel);
         Model saveModel = maker.getModel(newModel);
         Model tempModel = ModelFactory.createDefaultModel();
@@ -766,7 +766,7 @@ public class JenaIngestUtils {
                     }while(!urlFound);
                     urlFound = false;
                 }
-                else if(dNamespace.equals(vreq.getFullWebappDaoFactory().getDefaultNamespace())){
+                else if(dNamespace.equals(vreq.getUnfilteredWebappDaoFactory().getDefaultNamespace())){
                     try{
                         do{
                             uri = wdf.getIndividualDao().getUnusedURI(null);
@@ -788,7 +788,7 @@ public class JenaIngestUtils {
         if(!newNamespace.equals("")){
             changeNamespace = newNamespace;
         }
-        else if(dNamespace.equals(vreq.getFullWebappDaoFactory().getDefaultNamespace())){
+        else if(dNamespace.equals(vreq.getUnfilteredWebappDaoFactory().getDefaultNamespace())){
             changeNamespace = dNamespace;
         }
         if(!oldModel.equals(newModel)){

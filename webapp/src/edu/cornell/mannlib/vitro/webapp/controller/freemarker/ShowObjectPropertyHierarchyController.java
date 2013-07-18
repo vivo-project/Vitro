@@ -78,9 +78,9 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
             
             body.put("propertyType", "object");
             
-            opDao = vreq.getAssertionsWebappDaoFactory().getObjectPropertyDao();
-            vcDao = vreq.getAssertionsWebappDaoFactory().getVClassDao();
-            pgDao = vreq.getAssertionsWebappDaoFactory().getPropertyGroupDao();
+            opDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getObjectPropertyDao();
+            vcDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getVClassDao();
+            pgDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getPropertyGroupDao();
 
             String json = new String();
 

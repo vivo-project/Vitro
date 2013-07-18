@@ -71,9 +71,9 @@ public class DataPropertyStatementListingController extends BaseEditController {
         results.add("property");
         results.add("object");
         
-        DataPropertyStatementDao dpsDao = vrequest.getFullWebappDaoFactory().getDataPropertyStatementDao();
-        DataPropertyDao dpDao = vrequest.getFullWebappDaoFactory().getDataPropertyDao();
-        IndividualDao iDao = vrequest.getFullWebappDaoFactory().getIndividualDao();
+        DataPropertyStatementDao dpsDao = vrequest.getUnfilteredWebappDaoFactory().getDataPropertyStatementDao();
+        DataPropertyDao dpDao = vrequest.getUnfilteredWebappDaoFactory().getDataPropertyDao();
+        IndividualDao iDao = vrequest.getUnfilteredWebappDaoFactory().getIndividualDao();
         
         String propURIStr = request.getParameter("propertyURI");
         

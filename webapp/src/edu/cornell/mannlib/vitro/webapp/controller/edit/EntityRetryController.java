@@ -182,7 +182,7 @@ public class EntityRetryController extends BaseEditController {
         	vclasses = new ArrayList<VClass>();
         	if (individualForEditing.getVClassURI() != null) {
         		try {
-	        		VClass cls = vreq.getFullWebappDaoFactory().getVClassDao().getVClassByURI(individualForEditing.getVClassURI());
+	        		VClass cls = vreq.getUnfilteredWebappDaoFactory().getVClassDao().getVClassByURI(individualForEditing.getVClassURI());
 	        		if (cls != null) {
 	        			vclasses.add(cls);
 	        		}

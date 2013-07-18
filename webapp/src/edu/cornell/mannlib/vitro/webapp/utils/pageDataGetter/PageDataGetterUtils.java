@@ -185,7 +185,7 @@ public class PageDataGetterUtils {
             }
               
             //need an unfiltered dao to get firstnames and lastnames
-            WebappDaoFactory fullWdf = vreq.getFullWebappDaoFactory();
+            WebappDaoFactory fullWdf = vreq.getUnfilteredWebappDaoFactory();
                       
             String[] vitroClassIdStr = vreq.getParameterValues("vclassId");                            
             if ( vitroClassIdStr != null && vitroClassIdStr.length > 0){    

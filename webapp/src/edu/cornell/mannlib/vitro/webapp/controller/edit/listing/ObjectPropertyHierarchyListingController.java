@@ -52,9 +52,9 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
         VitroRequest vrequest = new VitroRequest(request);
         try {
 
-        opDao = vrequest.getAssertionsWebappDaoFactory().getObjectPropertyDao();
-        vcDao = vrequest.getAssertionsWebappDaoFactory().getVClassDao();
-        pgDao = vrequest.getAssertionsWebappDaoFactory().getPropertyGroupDao();
+        opDao = vrequest.getUnfilteredAssertionsWebappDaoFactory().getObjectPropertyDao();
+        vcDao = vrequest.getUnfilteredAssertionsWebappDaoFactory().getVClassDao();
+        pgDao = vrequest.getUnfilteredAssertionsWebappDaoFactory().getPropertyGroupDao();
 
         ArrayList<String> results = new ArrayList<String>();
         results.add("XX");            // column 1

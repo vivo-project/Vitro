@@ -49,7 +49,7 @@ public class EntityEditController extends BaseEditController {
         ApplicationBean application = vreq.getAppBean();
         
         //Individual ent = vreq.getWebappDaoFactory().getIndividualDao().getIndividualByURI(entURI);
-        Individual ent = vreq.getAssertionsWebappDaoFactory().getIndividualDao().getIndividualByURI(entURI);
+        Individual ent = vreq.getUnfilteredAssertionsWebappDaoFactory().getIndividualDao().getIndividualByURI(entURI);
         if (ent == null) {
         	try {
         		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
@@ -64,7 +64,7 @@ public class EntityEditController extends BaseEditController {
             }
         }
         
-        Individual inferredEnt = vreq.getFullWebappDaoFactory().getIndividualDao().getIndividualByURI(entURI);
+        Individual inferredEnt = vreq.getUnfilteredWebappDaoFactory().getIndividualDao().getIndividualByURI(entURI);
         if (inferredEnt == null) {
         	inferredEnt = new IndividualImpl(entURI);
         }
@@ -150,13 +150,13 @@ public class EntityEditController extends BaseEditController {
                 
         try{
             OptionMap.put("VClassURI", FormUtils.makeOptionListFromBeans(
-                    vreq.getFullWebappDaoFactory().getVClassDao().getAllVclasses(),
+                    vreq.getUnfilteredWebappDaoFactory().getVClassDao().getAllVclasses(),
                             "URI", "PickListName", ent.getVClassURI(), null, false));        
         } catch (Exception e) {
             log.error(e, e);
         }
         
-        PropertyInstanceDao piDao = vreq.getFullWebappDaoFactory().getPropertyInstanceDao();
+        PropertyInstanceDao piDao = vreq.getUnfilteredWebappDaoFactory().getPropertyInstanceDao();
         // existing property statements
         try {
             List epiOptionList = new LinkedList();

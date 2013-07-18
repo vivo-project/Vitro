@@ -72,17 +72,19 @@ public class VitroRequest extends HttpServletRequestWrapper {
         setAttribute("unfilteredRDFService", rdfService);
     }
     
-    /** gets WebappDaoFactory with appropriate filtering for the request */
+    /** Gets WebappDaoFactory with appropriate filtering for the request */
     public WebappDaoFactory getWebappDaoFactory(){
-    	return ModelAccess.on(this).getWebappDaoFactory();
+    	return ModelAccess.on(this).getWebappDaoFactory(FactoryID.UNION);
     }
     
-    /** Gets a WebappDaoFactory with request-specific dataset but no filtering. 
-     * Use this for any servlets that need to bypass filtering.
-     * @return
-     */
+    /** gets assertions+inference WebappDaoFactory with no policy filtering */
     public WebappDaoFactory getUnfilteredWebappDaoFactory() {
     	return ModelAccess.on(this).getWebappDaoFactory(FactoryID.UNFILTERED_UNION);
+    }
+    
+    /** gets assertions-only WebappDaoFactory with no policy filtering */
+    public WebappDaoFactory getUnfilteredAssertionsWebappDaoFactory() {
+    	return ModelAccess.on(this).getWebappDaoFactory(FactoryID.UNFILTERED_BASE);
     }
     
     public Dataset getDataset() {
@@ -93,16 +95,6 @@ public class VitroRequest extends HttpServletRequestWrapper {
     	setAttribute("dataset", dataset);
     }
     
-    /** gets assertions + inferences WebappDaoFactory with no filtering **/
-    public WebappDaoFactory getFullWebappDaoFactory() {
-    	return getUnfilteredWebappDaoFactory();
-    }
-    
-    /** gets assertions-only WebappDaoFactory with no filtering */
-    public WebappDaoFactory getAssertionsWebappDaoFactory() {
-    	return ModelAccess.on(this).getWebappDaoFactory(FactoryID.UNFILTERED_BASE);
-    }
-        
     //Method that retrieves write model, returns special model in case of write model
     public OntModel getWriteModel() {
     	//if special write model doesn't exist use get ont model 
