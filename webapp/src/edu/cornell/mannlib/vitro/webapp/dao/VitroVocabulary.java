@@ -24,9 +24,7 @@ public class VitroVocabulary {
     public static final String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
     public static final String RDFS = "http://www.w3.org/2000/01/rdf-schema#";
     public static final String RDF_TYPE = RDF+"type";
-    public static final String LABEL = RDFS + "label";
-    
-    public static final String SUBCLASS_OF = RDFS+"subClassOf";
+    public static final String LABEL = RDFS + "label";   
 
     public static final String OWL = "http://www.w3.org/2002/07/owl#";
     public static final String OWL_ONTOLOGY = OWL+"Ontology";
@@ -123,23 +121,14 @@ public class VitroVocabulary {
     // ================== Vitro Portal vocabulary ===========================
 
     public static final String PORTAL = vitroURI+"Portal";
-    public static final String PORTAL_THEMEDIR = vitroURI+"themeDir";
-    public static final String PORTAL_BANNERIMAGE = vitroURI+"bannerImage";
+    public static final String PORTAL_THEMEDIR = vitroURI+"themeDir";   
     public static final String PORTAL_CONTACTMAIL = vitroURI+"contactMail";
-    public static final String PORTAL_CORRECTIONMAIL = vitroURI+"correctionMail";
-    public static final String PORTAL_SHORTHAND = vitroURI+"shortHand";
+    public static final String PORTAL_CORRECTIONMAIL = vitroURI+"correctionMail";    
     public static final String PORTAL_ABOUTTEXT = vitroURI+"aboutText";
-    public static final String PORTAL_ACKNOWLEGETEXT = vitroURI+"acknowledgeText";
-    public static final String PORTAL_BANNERWIDTH = vitroURI+"bannerWidth";
-    public static final String PORTAL_BANNERHEIGHT = vitroURI+"bannerHeight";
+    public static final String PORTAL_ACKNOWLEGETEXT = vitroURI+"acknowledgeText";       
     public static final String PORTAL_COPYRIGHTURL = vitroURI+"copyrightURL";
     public static final String PORTAL_COPYRIGHTANCHOR = vitroURI+"copyrightAnchor";
-    public static final String PORTAL_ROOTBREADCRUMBURL = vitroURI+"rootBreadCrumbURL";
-    public static final String PORTAL_ROOTBREADCRUMBANCHOR = vitroURI+"rootBreadCrumbAnchor";
-    public static final String PORTAL_LOGOTYPEIMAGE = vitroURI+"logotypeImage";
-    public static final String PORTAL_LOGOTYPEHEIGHT = vitroURI+"logotypeHeight";
-    public static final String PORTAL_LOGOTYPEWIDTH = vitroURI+"logotypeWidth";
-    public static final String PORTAL_IMAGETHUMBWIDTH = vitroURI+"imageThumbWidth";
+    
     // reusing displayRank property above
     public static final String PORTAL_URLPREFIX = vitroURI + "urlPrefix";
 
