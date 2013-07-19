@@ -63,7 +63,7 @@ public class BrowseDataGetter implements PageDataGetter {
         return DisplayVocabulary.HOME_PAGE_TYPE;
     }
     
-  //Get data servuice
+  //Get data service
     @Override
 	public String getDataServiceUrl() {
     	return UrlBuilder.getUrl("/dataservice?getSolrIndividualsByVClass=1&vclassId=");
