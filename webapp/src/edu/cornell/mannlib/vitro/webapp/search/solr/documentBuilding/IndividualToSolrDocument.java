@@ -272,7 +272,6 @@ public class IndividualToSolrDocument {
                 
                 if(clz.getLocalName() != null){
                     doc.addField(term.CLASSLOCALNAME, clz.getLocalName());
-                    doc.addField(term.CLASSLOCALNAMELOWERCASE, clz.getLocalName().toLowerCase());
                 }
                 
                 if(clz.getName() != null){

@@ -192,7 +192,6 @@
   <field name="type" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
   
   <field name="classLocalName" type="text" indexed="true" stored="true" multiValued="true"/>
-  <field name="classLocalNameLowerCase" type="text" indexed="true" stored="false" multiValued="true"/>
   
   <field name="classgroup" type="string" indexed="true" stored="true" multiValued="true"/>
   <field name="PROHIBITED_FROM_TEXT_RESULTS" type="string" indexed="true" stored="false" omitNorms="true" multiValued="true"/>

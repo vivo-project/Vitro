@@ -26,8 +26,6 @@ public class VitroSearchTermNames {
     /** Does the individual have a thumbnail image? 1=yes 0=no */
     public static final String THUMBNAIL = "THUMBNAIL";        
     /** class names in human readable form of an individual*/
-    public static final String CLASSLOCALNAMELOWERCASE = "classLocalNameLowerCase";
-    /** class names in human readable form of an individual*/
     public static final String CLASSLOCALNAME = "classLocalName";      
 
     // Fields derived from rdfs:label
