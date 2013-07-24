@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServ
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.MultipartHttpServletRequest;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 
@@ -45,7 +46,7 @@ public class SearchServiceController extends FreemarkerHttpServlet {
 	protected Actions requiredActions(VitroRequest vreq) {
         try{
 			// Works by side effect: parse the multi-part request and stash FileItems in request			
-			new MultipartHttpServletRequest( vreq );
+			FileUploadServletRequest.parseRequest(vreq, 0);
 
             //first figure out if the password and email login to an account with a password
             String pw = vreq.getParameter("password");

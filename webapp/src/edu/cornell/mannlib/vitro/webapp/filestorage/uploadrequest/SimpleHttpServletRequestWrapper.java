@@ -33,26 +33,7 @@ class SimpleHttpServletRequestWrapper extends FileUploadServletRequest {
 		return false;
 	}
 
-	@Override
-	public Map<String, List<FileItem>> getFiles() {
-		return Collections.emptyMap();
-	}
-
-	@Override
-	public FileItem getFileItem(String string) {
-		return null;
-	}
-
-	@Override
-	public FileUploadException getFileUploadException() {
-		return null;
-	}
-
-	@Override
-	public boolean hasFileUploadException() {
-		return false;
-	}
-
+	
 	// ----------------------------------------------------------------------
 	// Since this is not a multipart request, the parameter methods can be
 	// delegated.
@@ -64,7 +45,7 @@ class SimpleHttpServletRequestWrapper extends FileUploadServletRequest {
 	}
 
 	@Override
-	public Map<?, ?> getParameterMap() {
+	public Map<String, String[]> getParameterMap() {
 		return getDelegate().getParameterMap();
 	}
 
