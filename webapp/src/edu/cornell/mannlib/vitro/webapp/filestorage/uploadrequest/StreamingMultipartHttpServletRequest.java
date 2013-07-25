@@ -1,13 +1,9 @@
-package edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest;
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+package edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 /**
@@ -26,8 +22,7 @@ public class StreamingMultipartHttpServletRequest extends
      * to deal with inputs of very large sizes.
      * 
      */
-    public StreamingMultipartHttpServletRequest(HttpServletRequest request)
-        throws IOException{
+    public StreamingMultipartHttpServletRequest(HttpServletRequest request) {
         super(request);        
         
         //use a file uploader that does not save the files to a temporary directory.
