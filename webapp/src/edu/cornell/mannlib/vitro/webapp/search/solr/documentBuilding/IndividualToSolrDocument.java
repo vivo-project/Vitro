@@ -69,6 +69,7 @@ public class IndividualToSolrDocument {
         	//add classes, classgroups get if prohibited because of its class
             StringBuffer classPublicNames = new StringBuffer("");
         	addClasses(ind, doc, classPublicNames);
+        	addMostSpecificTypeUris( ind, doc );
         	
         	log.debug(ind.getURI() + " post class boost: " + doc.getDocumentBoost());
         	
@@ -202,7 +203,6 @@ public class IndividualToSolrDocument {
         
         doc.addField(term.ALLTEXT, alltext);
         doc.addField(term.ALLTEXTUNSTEMMED, alltext);
-        doc.addField(term.ALLTEXT_PHONETIC, alltext);
     }
 
 
@@ -256,7 +256,7 @@ public class IndividualToSolrDocument {
         if( vclasses == null || vclasses.isEmpty() ){
             throw new SkipIndividualException("Not indexing because individual has no classes");
         }        
-                
+                        
         for(VClass clz : vclasses){
             if(clz.getURI() == null){
                 continue;
@@ -285,6 +285,16 @@ public class IndividualToSolrDocument {
                 }               
             }
         }                                                
+    }
+    
+    protected void addMostSpecificTypeUris(Individual ind, SolrInputDocument doc){        
+        List<String> mstURIs = ind.getMostSpecificTypeURIs();
+        if( mstURIs != null ){
+            for( String typeURI : mstURIs ){
+                if( typeURI != null && ! typeURI.trim().isEmpty() )
+                    doc.addField(term.MOST_SPECIFIC_TYPE_URIS, typeURI);
+            }
+        }
     }
         
     protected void addLabel(Individual ind, SolrInputDocument doc) {
