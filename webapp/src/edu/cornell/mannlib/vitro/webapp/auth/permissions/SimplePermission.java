@@ -74,18 +74,31 @@ public class SimplePermission extends Permission {
 			"SeeVerbosePropertyInformation");
 	public static final SimplePermission USE_ADVANCED_DATA_TOOLS_PAGES = new SimplePermission(
 			"UseAdvancedDataToolsPages");
-	public static final SimplePermission USE_BASIC_AJAX_CONTROLLERS = new SimplePermission(
-			"UseBasicAjaxControllers");
-	public static final SimplePermission USE_MISCELLANEOUS_ADMIN_PAGES = new SimplePermission(
-			"UseMiscellaneousAdminPages");
-	public static final SimplePermission USE_MISCELLANEOUS_CURATOR_PAGES = new SimplePermission(
-			"UseMiscellaneousCuratorPages");
-	public static final SimplePermission USE_MISCELLANEOUS_EDITOR_PAGES = new SimplePermission(
-			"UseMiscellaneousEditorPages");
-	public static final SimplePermission USE_MISCELLANEOUS_PAGES = new SimplePermission(
-			"UseMiscellaneousPages");
 	public static final SimplePermission USE_SPARQL_QUERY_PAGE = new SimplePermission(
 			"UseSparqlQueryPage");
+
+	// ----------------------------------------------------------------------
+	// These deprecated instances are "catch all" permissions to cover
+	// poorly defined groups of actions until better definitions were found.
+	// Don't add usages of these, and remove existing usages where
+	// possible.
+	// ----------------------------------------------------------------------
+
+	@Deprecated
+	public static final SimplePermission USE_BASIC_AJAX_CONTROLLERS = new SimplePermission(
+			"UseBasicAjaxControllers");
+	@Deprecated
+	public static final SimplePermission USE_MISCELLANEOUS_ADMIN_PAGES = new SimplePermission(
+			"UseMiscellaneousAdminPages");
+	@Deprecated
+	public static final SimplePermission USE_MISCELLANEOUS_CURATOR_PAGES = new SimplePermission(
+			"UseMiscellaneousCuratorPages");
+	@Deprecated
+	public static final SimplePermission USE_MISCELLANEOUS_EDITOR_PAGES = new SimplePermission(
+			"UseMiscellaneousEditorPages");
+	@Deprecated
+	public static final SimplePermission USE_MISCELLANEOUS_PAGES = new SimplePermission(
+			"UseMiscellaneousPages");
 
 	public static List<SimplePermission> getAllInstances() {
 		return new ArrayList<SimplePermission>(allInstances.values());
