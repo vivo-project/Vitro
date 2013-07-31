@@ -2,10 +2,7 @@
 
 <#-- Template for displaying paged search results -->
 
-
-
-
-<h2 style="float:left">
+<h2 class="searchResultsHeader">
 <#escape x as x?html>
     ${i18n().search_results_for} '${querytext}'
     <#if classGroupName?has_content>${i18n().limited_to_type} '${classGroupName}'</#if>
@@ -22,11 +19,10 @@
 	
 	var urlsBase = '${urls.base}';
 </script>
-</h2>
 
-<span id="downloadResults" title="Download Results">
-	<img id="downloadIcon" src="images/download-icon.png" alt="Download Results"  />
-</span>
+	<img id="downloadIcon" src="images/download-icon.png" alt="Download Results" title="Download Results" />
+<#-- <span id="downloadResults" style="float:left"></span>  -->
+</h2>
 
 <span id="searchHelp"><a href="${urls.base}/searchHelp" title="${i18n().search_help}">${i18n().not_expected_results}</a></span>
 <div class="contentsBrowseGroup">

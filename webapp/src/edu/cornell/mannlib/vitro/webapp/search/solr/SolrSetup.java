@@ -11,8 +11,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
 import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.apache.solr.client.solrj.impl.XMLResponseParser;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -90,22 +89,12 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
                     "It should be something like http://localhost:${port}" + context.getContextPath() + "solr" 
                     );
             return;
-        }
-        
-        URL solrServerUrl = null;
-        try {
-        	solrServerUrl = new URL(solrServerUrlString);
-        } catch (MalformedURLException e) {
-            ss.fatal(this, "Can't connect with the solr server. " +
-            		"The value for vitro.local.solr.url in runtime.properties is not a valid URL: " + solrServerUrlString);
-            return;
-        }
+        }        
         
         try {                                            
-            CommonsHttpSolrServer server;
+            HttpSolrServer server;
             boolean useMultiPartPost = true;
-            //It would be nice to use the default binary handler but there seem to be library problems
-            server = new CommonsHttpSolrServer(solrServerUrl,null,new XMLResponseParser(),useMultiPartPost); 
+            server = new HttpSolrServer( solrServerUrlString ); 
             server.setSoTimeout(10000);  // socket read timeout
             server.setConnectionTimeout(10000);
             server.setDefaultMaxConnectionsPerHost(100);

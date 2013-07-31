@@ -26,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.Authenticate;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.FactoryID;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginEvent;
@@ -263,12 +264,7 @@ public class BasicAuthenticator extends Authenticator {
 	 * Get a reference to the UserAccountsDao, or null.
 	 */
 	private UserAccountsDao getUserAccountsDao() {
-		WebappDaoFactory wadf = getWebappDaoFactory();
-		if (wadf == null) {
-			return null;
-		}
-
-		UserAccountsDao userAccountsDao = wadf.getUserAccountsDao();
+		UserAccountsDao userAccountsDao = getWebappDaoFactory().getUserAccountsDao();
 		if (userAccountsDao == null) {
 			log.error("getUserAccountsDao: no UserAccountsDao");
 		}
@@ -280,12 +276,7 @@ public class BasicAuthenticator extends Authenticator {
 	 * Get a reference to the IndividualDao, or null.
 	 */
 	private IndividualDao getIndividualDao() {
-		WebappDaoFactory wadf = getWebappDaoFactory();
-		if (wadf == null) {
-			return null;
-		}
-
-		IndividualDao individualDao = wadf.getIndividualDao();
+		IndividualDao individualDao = getWebappDaoFactory().getIndividualDao();
 		if (individualDao == null) {
 			log.error("getIndividualDao: no IndividualDao");
 		}
@@ -297,13 +288,7 @@ public class BasicAuthenticator extends Authenticator {
 	 * Get a reference to the WebappDaoFactory, or null.
 	 */
 	private WebappDaoFactory getWebappDaoFactory() {
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			return null;
-		}
-
-		ServletContext servletContext = session.getServletContext();
-		return ModelAccess.on(servletContext).getWebappDaoFactory();
+		return ModelAccess.on(request).getWebappDaoFactory();
 	}
 
 	@Override

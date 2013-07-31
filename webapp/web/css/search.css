@@ -83,18 +83,11 @@ span#searchHelp {
     font-size:.825em;
     padding-right:32px
 }
-
-span#downloadResults {
-    float:left;
-    margin-top:10px;
-    font-size:.825em;
-    padding-left:10px
-}
-
 img#downloadIcon {
     cursor: pointer;
+    margin-left: 6px;
+    vertical-align: top;
 }
-
 .download-url {
 	padding: 5px 25px 5px;
 }

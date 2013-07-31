@@ -153,7 +153,7 @@ public class RequestModelsPrep implements Filter {
 		addLanguageAwarenessToRequestModel(req, ModelID.BASE_FULL);
 		
 		WebappDaoFactory unfilteredWadf = new WebappDaoFactorySDB(rdfService,
-				ModelAccess.on(ctx).getUnionOntModelSelector(), config);
+				ModelAccess.on(vreq).getUnionOntModelSelector(), config);
 		ModelAccess.on(vreq).setWebappDaoFactory(FactoryID.UNFILTERED_UNION,
 				unfilteredWadf);
 		
