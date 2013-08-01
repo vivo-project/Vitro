@@ -200,6 +200,7 @@ public class ServletContextStub implements ServletContext {
 	}
 
 	@Override
+	@Deprecated
 	public Servlet getServlet(String arg0) throws ServletException {
 		throw new RuntimeException(
 				"ServletContextStub.getServlet() not implemented.");
@@ -213,6 +214,7 @@ public class ServletContextStub implements ServletContext {
 
 	@Override
 	@SuppressWarnings("rawtypes")
+	@Deprecated
 	public Enumeration getServletNames() {
 		throw new RuntimeException(
 				"ServletContextStub.getServletNames() not implemented.");
@@ -220,6 +222,7 @@ public class ServletContextStub implements ServletContext {
 
 	@Override
 	@SuppressWarnings("rawtypes")
+	@Deprecated
 	public Enumeration getServlets() {
 		throw new RuntimeException(
 				"ServletContextStub.getServlets() not implemented.");
@@ -231,6 +234,7 @@ public class ServletContextStub implements ServletContext {
 	}
 
 	@Override
+	@Deprecated
 	public void log(Exception arg0, String arg1) {
 		throw new RuntimeException("ServletContextStub.log() not implemented.");
 	}
