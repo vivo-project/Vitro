@@ -78,25 +78,19 @@ public class SimplePermission extends Permission {
 			"UseSparqlQueryPage");
 
 	// ----------------------------------------------------------------------
-	// These deprecated instances are "catch all" permissions to cover
-	// poorly defined groups of actions until better definitions were found.
-	// Don't add usages of these, and remove existing usages where
-	// possible.
+	// These instances are "catch all" permissions to cover poorly defined
+	// groups of actions until better definitions were found. Don't add usages
+	// of these, and remove existing usages where possible.
 	// ----------------------------------------------------------------------
 
-	@Deprecated
 	public static final SimplePermission USE_BASIC_AJAX_CONTROLLERS = new SimplePermission(
 			"UseBasicAjaxControllers");
-	@Deprecated
 	public static final SimplePermission USE_MISCELLANEOUS_ADMIN_PAGES = new SimplePermission(
 			"UseMiscellaneousAdminPages");
-	@Deprecated
 	public static final SimplePermission USE_MISCELLANEOUS_CURATOR_PAGES = new SimplePermission(
 			"UseMiscellaneousCuratorPages");
-	@Deprecated
 	public static final SimplePermission USE_MISCELLANEOUS_EDITOR_PAGES = new SimplePermission(
 			"UseMiscellaneousEditorPages");
-	@Deprecated
 	public static final SimplePermission USE_MISCELLANEOUS_PAGES = new SimplePermission(
 			"UseMiscellaneousPages");
 
