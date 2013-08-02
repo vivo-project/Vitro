@@ -547,7 +547,8 @@ public class SimpleReasoner extends StatementListener {
 	 *  
 	 * If it is removed	that x is sameAs y, then remove y sameAs x from 
 	 * the inference graph and then recompute the inferences for x and
-	 * y based on their respective assertions.																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														 that x owl:sameAs y, then all asserted and inferred
+	 * y based on their respective assertions.
+     * that x owl:sameAs y, then all asserted and inferred
 	 */
 	protected void removedABoxSameAsAssertion(Statement stmt, Model inferenceModel) {
 		Resource subject = null;
