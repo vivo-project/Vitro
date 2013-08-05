@@ -30,6 +30,11 @@ public class AtomicOntologyChange {
 		this.notes = notes;
     }
 
+	@Override
+	public String toString() {
+	    return "Source: " + sourceURI + "; Destination: " + destinationURI +
+	            "; Type: " + atomicChangeType + "; Notes:" + notes;
+	}
 	
 	/**
 	 * Contains the URI of a class or property in the previous version of

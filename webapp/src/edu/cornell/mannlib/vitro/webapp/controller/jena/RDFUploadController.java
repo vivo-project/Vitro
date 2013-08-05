@@ -77,11 +77,16 @@ public class RDFUploadController extends JenaIngestController {
         VitroRequest request = new VitroRequest(req);        
         LoginStatusBean loginBean = LoginStatusBean.getBean(request);
         
-        String modelName = req.getParameter("modelName");
-        if(modelName!=null){
-            loadRDF(req,request,response);
-            return;
-        }            
+        try {
+            String modelName = req.getParameter("modelName");
+            if(modelName!=null){
+                loadRDF(req,request,response);
+                return;
+            }    
+        } catch (Exception e) {
+            log.error(e,e);
+            throw new RuntimeException(e);
+        }
                        
         boolean remove = "remove".equals(request.getParameter("mode"));
         String verb = remove?"Removed":"Added";

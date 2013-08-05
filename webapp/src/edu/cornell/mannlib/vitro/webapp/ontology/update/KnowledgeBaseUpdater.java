@@ -98,14 +98,18 @@ public class KnowledgeBaseUpdater {
 		AtomicOntologyChangeLists changes = new AtomicOntologyChangeLists(rawChanges,settings.getNewTBoxModel(),settings.getOldTBoxModel());
 		
         //process the TBox before the ABox
-		log.info("\tupdating tbox annotations");
-	    updateTBoxAnnotations();
-
+		try {
+		    log.info("\tupdating tbox annotations");
+	        updateTBoxAnnotations();
+		} catch (Exception e) {
+		    log.error(e,e);
+		}
+	    
 	    try {
     	    migrateMigrationMetadata(servletContext);
 		    logger.log("Migrated migration metadata");
 	    } catch (Exception e) {
-	    	log.debug("unable to migrate migration metadata " + e.getMessage());
+	    	log.error("unable to migrate migration metadata " + e.getMessage());
 	    }
 	    
 		log.info("\tupdating the abox");
@@ -390,11 +394,13 @@ public class KnowledgeBaseUpdater {
 			while(listItr.hasNext()) {
 				AtomicOntologyChange changeObj = listItr.next();
 				if (changeObj.getSourceURI() != null){
-			
+			        log.info("triaging " + changeObj);
 					if (oldTboxModel.getOntProperty(changeObj.getSourceURI()) != null){
 						 atomicPropertyChanges.add(changeObj);
+						 log.info("added to property changes");
 					} else if (oldTboxModel.getOntClass(changeObj.getSourceURI()) != null) {
 						 atomicClassChanges.add(changeObj);
+						 log.info("added to class changes");
 					} else if ("Prop".equals(changeObj.getNotes())) {
 						 atomicPropertyChanges.add(changeObj);
 					} else if ("Class".equals(changeObj.getNotes())) {

@@ -4,9 +4,11 @@ package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -24,7 +26,6 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange.AtomicChangeType;
 
@@ -34,6 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange.Ato
 */ 
 public class ABoxUpdater {
 
+    private final Log log = LogFactory.getLog(ABoxUpdater.class);
 	private OntModel oldTboxModel;
 	private OntModel newTboxModel;
 	private OntModel aboxModel;
@@ -388,20 +390,33 @@ public class ABoxUpdater {
 		Iterator<AtomicOntologyChange> propItr = changes.iterator();
 		while(propItr.hasNext()){
 			AtomicOntologyChange propChangeObj = propItr.next();
-			switch (propChangeObj.getAtomicChangeType()){
-			  case ADD: 
-			   addProperty(propChangeObj);
-			   break;
-			case DELETE: 
-			   deleteProperty(propChangeObj);
-			   break;
-			case RENAME: 
-			   renameProperty(propChangeObj);
-			   break;
-			default: 
-			   logger.logError("unexpected change type indicator: " + propChangeObj.getAtomicChangeType());
-			   break;
-		    }		
+			log.info("processing " + propChangeObj);
+			try {
+			    if (propChangeObj.getAtomicChangeType() == null) {
+			        log.error("Missing change type; skipping " + propChangeObj);
+			        continue;
+			    }
+    			switch (propChangeObj.getAtomicChangeType()){
+    			  case ADD: 
+    			   log.info("add");
+    			   addProperty(propChangeObj);
+    			   break;
+    			case DELETE: 
+    			   log.info("delete");
+    			   deleteProperty(propChangeObj);
+    			   break;
+    			case RENAME: 
+    			   log.info("rename");
+    			   renameProperty(propChangeObj);
+    			   break;
+    			default: 
+    			   log.info("unknown");
+    			   logger.logError("unexpected change type indicator: " + propChangeObj.getAtomicChangeType());
+    			   break;
+    		    }	
+			} catch (Exception e) {
+			    log.error(e,e);
+			}
 		}
 	}
 	
@@ -518,7 +533,7 @@ public class ABoxUpdater {
 	
 	private void renameProperty(AtomicOntologyChange propObj) throws IOException {
 		
-		//logger.log("Processing a property rename from: " + propObj.getSourceURI() + " to " + propObj.getDestinationURI());
+		logger.log("Processing a property rename from: " + propObj.getSourceURI() + " to " + propObj.getDestinationURI());
 		
 		OntProperty oldProperty = oldTboxModel.getOntProperty(propObj.getSourceURI());
 		OntProperty newProperty = newTboxModel.getOntProperty(propObj.getDestinationURI());

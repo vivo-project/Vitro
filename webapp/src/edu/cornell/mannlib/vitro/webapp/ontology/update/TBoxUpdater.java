@@ -104,6 +104,11 @@ public class TBoxUpdater {
          //  if the default has changed in the new version of the ontology AND if 
          //  the site hasn't overidden the previous default in their knowledge base.
     		    
+	      if(oldTboxAnnotationsModel == null) {
+	          logger.log("oldTboxAnnotationModel is null; aborting update of annotation values");
+	          return;
+	      }
+	       
 		  StmtIterator iter = oldTboxAnnotationsModel.listStatements();
 		  		  		  
 		  while (iter.hasNext()) {

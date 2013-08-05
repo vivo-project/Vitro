@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.skife.csv.CSVReader;
 import org.skife.csv.SimpleReader;
 
@@ -23,6 +25,8 @@ import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange.Ato
 
 public class OntologyChangeParser {
 
+    private final Log log = LogFactory.getLog(OntologyChangeParser.class);
+    
 	private ChangeLogger logger;
 	
 	public OntologyChangeParser(ChangeLogger logger) {
@@ -84,6 +88,8 @@ public class OntologyChangeParser {
 							cols[2] + " " + cols[3] + "'");
 				}
 				
+				
+				log.info(changeObj);
 				
 				changeObjects.add(changeObj);
 					

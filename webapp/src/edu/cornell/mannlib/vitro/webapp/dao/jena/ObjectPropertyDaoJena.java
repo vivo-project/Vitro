@@ -905,8 +905,8 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         "SELECT ?property ?range ?filename WHERE { \n" +
         "    { ?property display:listViewConfigFile ?filename \n" +
         "    } UNION { \n" +
-        "        ?lv config:listViewConfigFile ?filename . \n " +
-        "        ?configuration config:hasListView ?lv . " +
+        "        ?configuration config:listViewConfigFile ?filename . \n " +
+//        "        ?configuration config:hasListView ?lv . " +
         "        ?context config:hasConfiguration ?configuration . \n" +
         "        ?context config:configContextFor ?property . \n" +
         "        ?context config:qualifiedBy ?range . \n" +
@@ -955,6 +955,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 	}
                 } else {
                     String filename = soln.getLiteral("filename").getLexicalForm();
+                    log.info("putting " + prop.getURI() + " " + rangeUri + " " + filename + " into list view map");
                     customListViewConfigFileMap.put(new Pair<ObjectProperty, String>(prop, rangeUri), filename);     
                 }
             }       
@@ -963,6 +964,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         
         String customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<ObjectProperty, String>(op, op.getRangeVClassURI()));
         if (customListViewConfigFileName == null) {
+            log.info("no list view found for " + op.getURI() + " qualified by " + op.getRangeVClassURI());
             customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<ObjectProperty, String>(op, OWL.Thing.getURI()));
         }
         

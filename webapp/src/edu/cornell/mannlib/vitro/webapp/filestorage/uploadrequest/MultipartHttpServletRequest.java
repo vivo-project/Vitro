@@ -57,6 +57,7 @@ public class MultipartHttpServletRequest extends FileUploadServletRequest {
         throws IOException{
         super(request);
         storeFilesToTempDir = false;
+        setup(request);
         
     }
             
@@ -73,6 +74,7 @@ public class MultipartHttpServletRequest extends FileUploadServletRequest {
         storeFilesToTempDir = true;
         this.maxFileSize = maxFileSize;
         this.tempDir = figureTemporaryDirectory(request);
+        setup(request);
 	}
 
     private void setup(HttpServletRequest request){
