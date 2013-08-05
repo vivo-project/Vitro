@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -316,6 +317,56 @@ public class FreemarkerConfiguration extends Configuration {
 				env.setGlobalVariable(key, wrapper.wrap(value));
 				log.debug("Stored in environment: '" + key + "' = '" + value + "'");
 			}
+		}
+	}
+
+	// ----------------------------------------------------------------------
+	// Request info and overrides
+	// ----------------------------------------------------------------------
+
+	private ThreadLocal<FreemarkerRequestInfo> reqInfo = new ThreadLocal<>();
+
+	void setRequestInfo(HttpServletRequest req) {
+		reqInfo.set(new FreemarkerRequestInfo(req));
+	}
+
+	@Override
+	public Object getCustomAttribute(String name) {
+		if ("request".equals(name)) {
+			return reqInfo.get().getRequest();
+		} else {
+			return super.getCustomAttribute(name);
+		}
+	}
+
+	@Override
+	public String[] getCustomAttributeNames() {
+		String[] nameArray = super.getCustomAttributeNames();
+		Set<String> nameSet = new HashSet<String>(Arrays.asList(nameArray));
+		nameSet.add("request");
+		return nameSet.toArray(new String[nameSet.size()]);
+	}
+	
+	@Override
+	public Locale getLocale() {
+		return reqInfo.get().getLocale();
+	}
+
+
+
+	public static class FreemarkerRequestInfo {
+		private final HttpServletRequest req;
+
+		public FreemarkerRequestInfo(HttpServletRequest req) {
+			this.req = req;
+		}
+		
+		public HttpServletRequest getRequest() {
+			return req;
+		}
+		
+		public Locale getLocale() {
+			return req.getLocale();
 		}
 	}
 

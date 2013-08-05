@@ -84,8 +84,6 @@ public class FreemarkerProcessingServiceImpl implements
 			// can be used in directives.
 			Environment env = template.createProcessingEnvironment(map, writer);
 			env.setCustomAttribute("request", req);
-			env.setCustomAttribute("context", req.getSession()
-					.getServletContext());
 			env.process();
 			return writer.toString();
 		} catch (TemplateException e) {

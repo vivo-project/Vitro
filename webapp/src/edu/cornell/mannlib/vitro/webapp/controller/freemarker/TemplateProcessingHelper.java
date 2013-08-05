@@ -46,14 +46,6 @@ public class TemplateProcessingHelper {
         
         try {
             Environment env = template.createProcessingEnvironment(map, writer);
-            // Add request and servlet context as custom attributes of the environment, so they
-            // can be used in directives.
-            env.setCustomAttribute("request", request);
-            env.setCustomAttribute("context", context);
-            
-            // Set the Locale from the request into the environment, so date builtins will be
-            // Locale-dependent
-            env.setLocale(request.getLocale());
             
             // Define a setup template to be included by every page template
             String templateType = (String) map.get("templateType");
