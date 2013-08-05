@@ -29,6 +29,8 @@ import edu.cornell.mannlib.vitro.webapp.i18n.freemarker.I18nMethodModel;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
 import edu.cornell.mannlib.vitro.webapp.web.directives.IndividualShortViewDirective;
+import edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective;
+import edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective;
 import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualLocalNameMethod;
 import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualPlaceholderImageUrlMethod;
 import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualProfileUrlMethod;
@@ -167,12 +169,16 @@ public class FreemarkerConfiguration extends Configuration {
         return urls;
     }
  
-    public static Map<String, Object> getDirectives() {
+    private static Map<String, Object> getDirectives() {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("dump", new freemarker.ext.dump.DumpDirective());
         map.put("dumpAll", new freemarker.ext.dump.DumpAllDirective());  
         map.put("help", new freemarker.ext.dump.HelpDirective());    
         map.put("shortView", new IndividualShortViewDirective());
+        map.put("url", new UrlDirective()); 
+        map.put("widget", new WidgetDirective());
+        
+
         return map;
     }
     
