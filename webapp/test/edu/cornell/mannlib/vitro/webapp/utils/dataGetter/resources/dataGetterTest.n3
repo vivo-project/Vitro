@@ -20,14 +20,5 @@ display:query1data
     display:saveToVar "people" .      
     
     
-### test of what happens with a PageDataGetter instead of a DataGetter ###
-    
-display:pageX
-    a display:Page ;
-    display:title "A PageDataGetter, not a DataGetter" ;
-    display:urlMapping "/query2" ;
-    display:hasDataGetter display:pageDataGetterX .
-    
-display:pageDataGetterX
-  a <java:edu.cornell.mannlib.vitro.webapp.utils.pageDataGetter.ClassGroupPageData> .
+
       
