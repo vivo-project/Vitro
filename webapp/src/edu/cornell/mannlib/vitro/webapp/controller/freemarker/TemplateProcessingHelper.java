@@ -24,13 +24,9 @@ public class TemplateProcessingHelper {
     private static final Log log = LogFactory.getLog(TemplateProcessingHelper.class);
     
     private Configuration config = null;
-    private HttpServletRequest request = null;
-    private ServletContext context = null;
     
     public TemplateProcessingHelper(HttpServletRequest request, ServletContext context) {
         this.config = FreemarkerConfigurationLoader.getConfig(new VitroRequest(request));
-        this.request = request;
-        this.context = context;
     }
     
     public StringWriter processTemplate(String templateName, Map<String, Object> map) 

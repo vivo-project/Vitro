@@ -182,7 +182,7 @@ public class FreemarkerConfiguration extends Configuration {
         return map;
     }
     
-    public static Map<String, Object> getMethods() {
+    private static Map<String, Object> getMethods() {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("profileUrl", new IndividualProfileUrlMethod());
         map.put("localName", new IndividualLocalNameMethod());
