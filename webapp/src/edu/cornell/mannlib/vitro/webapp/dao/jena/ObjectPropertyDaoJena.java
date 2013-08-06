@@ -286,7 +286,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     
     public ObjectProperty getObjectPropertyByURIAndRangeURI(String propertyURI, String rangeURI) {
         ObjectProperty op = getObjectPropertyByURI(propertyURI);
-        if (op == null) {
+        if (op == null || rangeURI == null) {
             return op;
         }
         op.setRangeVClassURI(rangeURI);
