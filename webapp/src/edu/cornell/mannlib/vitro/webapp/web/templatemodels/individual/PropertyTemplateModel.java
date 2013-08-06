@@ -29,6 +29,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     protected final VitroRequest vreq;
     protected final String subjectUri;
     protected final String propertyUri;
+    protected String rangeUri;
     private final String localName;
 
     protected Map<String, Object> verboseDisplay;
@@ -108,6 +109,10 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     public String getUri() {
         return propertyUri;
+    }
+    
+    public String getRangeUri() {
+        return rangeUri;
     }
     
     public String getAddUrl() {
