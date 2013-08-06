@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +29,8 @@ import edu.cornell.mannlib.vitro.webapp.i18n.freemarker.I18nMethodModel;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
 import edu.cornell.mannlib.vitro.webapp.web.directives.IndividualShortViewDirective;
+import edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective;
+import edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective;
 import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualLocalNameMethod;
 import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualPlaceholderImageUrlMethod;
 import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualProfileUrlMethod;
@@ -166,16 +169,20 @@ public class FreemarkerConfiguration extends Configuration {
         return urls;
     }
  
-    public static Map<String, Object> getDirectives() {
+    private static Map<String, Object> getDirectives() {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("dump", new freemarker.ext.dump.DumpDirective());
         map.put("dumpAll", new freemarker.ext.dump.DumpAllDirective());  
         map.put("help", new freemarker.ext.dump.HelpDirective());    
         map.put("shortView", new IndividualShortViewDirective());
+        map.put("url", new UrlDirective()); 
+        map.put("widget", new WidgetDirective());
+        
+
         return map;
     }
     
-    public static Map<String, Object> getMethods() {
+    private static Map<String, Object> getMethods() {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("profileUrl", new IndividualProfileUrlMethod());
         map.put("localName", new IndividualLocalNameMethod());
@@ -316,6 +323,56 @@ public class FreemarkerConfiguration extends Configuration {
 				env.setGlobalVariable(key, wrapper.wrap(value));
 				log.debug("Stored in environment: '" + key + "' = '" + value + "'");
 			}
+		}
+	}
+
+	// ----------------------------------------------------------------------
+	// Request info and overrides
+	// ----------------------------------------------------------------------
+
+	private ThreadLocal<FreemarkerRequestInfo> reqInfo = new ThreadLocal<>();
+
+	void setRequestInfo(HttpServletRequest req) {
+		reqInfo.set(new FreemarkerRequestInfo(req));
+	}
+
+	@Override
+	public Object getCustomAttribute(String name) {
+		if ("request".equals(name)) {
+			return reqInfo.get().getRequest();
+		} else {
+			return super.getCustomAttribute(name);
+		}
+	}
+
+	@Override
+	public String[] getCustomAttributeNames() {
+		String[] nameArray = super.getCustomAttributeNames();
+		Set<String> nameSet = new HashSet<String>(Arrays.asList(nameArray));
+		nameSet.add("request");
+		return nameSet.toArray(new String[nameSet.size()]);
+	}
+	
+	@Override
+	public Locale getLocale() {
+		return reqInfo.get().getLocale();
+	}
+
+
+
+	public static class FreemarkerRequestInfo {
+		private final HttpServletRequest req;
+
+		public FreemarkerRequestInfo(HttpServletRequest req) {
+			this.req = req;
+		}
+		
+		public HttpServletRequest getRequest() {
+			return req;
+		}
+		
+		public Locale getLocale() {
+			return req.getLocale();
 		}
 	}
 

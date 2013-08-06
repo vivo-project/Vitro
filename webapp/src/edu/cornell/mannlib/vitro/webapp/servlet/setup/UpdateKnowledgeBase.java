@@ -5,7 +5,11 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,11 +35,13 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * Invokes process to test whether the knowledge base needs any updating
@@ -44,21 +50,10 @@ import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
  *
  */
 public class UpdateKnowledgeBase implements ServletContextListener {
-	
     public static final String KBM_REQURIED_AT_STARTUP = "KNOWLEDGE_BASE_MIGRATION_REQUIRED_AT_STARTUP";
 	private final static Log log = LogFactory.getLog(UpdateKnowledgeBase.class);
 	
 	private static final String DATA_DIR = "/WEB-INF/ontologies/update/";
-	private static final String LOG_DIR = "logs/";
-	private static final String CHANGED_DATA_DIR = "changedData/";
-	private static final String ASK_QUERY_FILE = DATA_DIR + "askUpdated.sparql";
-	private static final String SUCCESS_ASSERTIONS_FILE = DATA_DIR + "success.n3";
-	private static final String SUCCESS_RDF_FORMAT = "N3";
-	private static final String DIFF_FILE = DATA_DIR + "diff.tab.txt";
-	private static final String REMOVED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + 	"removedData.n3";
-	private static final String ADDED_DATA_FILE = DATA_DIR + CHANGED_DATA_DIR + "addedData.n3";
-	private static final String SPARQL_CONSTRUCT_ADDITIONS_DIR = DATA_DIR + "sparqlConstructs/additions/";
-	private static final String SPARQL_CONSTRUCT_DELETIONS_DIR = DATA_DIR + "sparqlConstructs/deletions/";
 	private static final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
 	private static final String NEW_TBOX_MODEL_DIR = "/WEB-INF/filegraph/tbox/";
 	private static final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
@@ -72,33 +67,15 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private static final String LOADED_STARTUPT_DISPLAYMODEL_DIR = "/WEB-INF/ontologies/app/loadedAtStartup/";
 	private static final String OLD_DISPLAYMODEL_VIVOLISTVIEW_PATH = DATA_DIR + "oldDisplayModel/vivoListViewConfig.rdf";
 
+	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		try {
-			ServletContext ctx = sce.getServletContext();
-			
-			// If the DATA_DIR directory doesn't exist no migration check will be done.
-			// This is a normal situation for Vitro.
-			File updateDirectory = new File(ctx.getRealPath(DATA_DIR));
-			if (!updateDirectory.exists()) {
-				log.debug("Directory " + ctx.getRealPath(DATA_DIR) + " does not exist, no migration check will be attempted.");
-				return;
-			}
+		ServletContext ctx = sce.getServletContext();
+		StartupStatus ss = StartupStatus.getBean(ctx);
 
-			String logFileName =  DATA_DIR + LOG_DIR + timestampedFileName("knowledgeBaseUpdate", "log");
-			String errorLogFileName = DATA_DIR + LOG_DIR + 	timestampedFileName("knowledgeBaseUpdate.error", "log");
-						
+		try {
 			UpdateSettings settings = new UpdateSettings();
-			settings.setAskUpdatedQueryFile(getAskUpdatedQueryPath(ctx));
-			settings.setDataDir(ctx.getRealPath(DATA_DIR));
-			settings.setSparqlConstructAdditionsDir(ctx.getRealPath(SPARQL_CONSTRUCT_ADDITIONS_DIR));
-			settings.setSparqlConstructDeletionsDir(ctx.getRealPath(SPARQL_CONSTRUCT_DELETIONS_DIR));
-			settings.setDiffFile(ctx.getRealPath(DIFF_FILE));
-			settings.setSuccessAssertionsFile(ctx.getRealPath(SUCCESS_ASSERTIONS_FILE));
-			settings.setSuccessRDFFormat(SUCCESS_RDF_FORMAT);
-			settings.setLogFile(ctx.getRealPath(logFileName));
-			settings.setErrorLogFile(ctx.getRealPath(errorLogFileName));
-			settings.setAddedDataFile(ctx.getRealPath(ADDED_DATA_FILE));
-			settings.setRemovedDataFile(ctx.getRealPath(REMOVED_DATA_FILE));
+			putReportingPathsIntoSettings(ctx, settings);
+
 			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());
 			settings.setAssertionOntModelSelector(ModelAccess.on(ctx).getBaseOntModelSelector());
@@ -157,21 +134,54 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 					  }
 				  }
 			   } catch (Exception ioe) {
-					String errMsg = "Exception updating knowledge base " +
-						"for ontology changes: ";
-					// Tomcat doesn't always seem to print exceptions thrown from
-					// context listeners
-					System.out.println(errMsg);
-					ioe.printStackTrace();
-					throw new RuntimeException(errMsg, ioe);
+					ss.fatal(this, "Exception updating knowledge base for ontology changes: ", ioe);
 			   }	
 			} catch (Throwable t){
-				  log.warn("warning", t);
+				ss.fatal(this, "Exception updating knowledge base for ontology changes: ", t);
 			}
 		} catch (Throwable t) {
-			t.printStackTrace();
+			ss.fatal(this, "Exception updating knowledge base for ontology changes: ", t);
 		}
 	}	
+
+	/**
+	 * Create the directories where we will report on the update. 
+	 * Put the paths for the directories and files into the settings object.
+	 */
+	private void putReportingPathsIntoSettings(ServletContext ctx, UpdateSettings settings) throws IOException {
+		ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
+		Path homeDir = Paths.get(props.getProperty("vitro.home"));
+		
+		Path dataDir = createDirectory(homeDir, "upgrade", "knowledgeBase");
+		settings.setDataDir(dataDir.toString());
+		StartupStatus.getBean(ctx).info(this, "Updating knowledge base: reports are in '" + dataDir + "'");
+
+		settings.setAskUpdatedQueryFile(dataDir.resolve("askUpdated.sparql").toString());
+		settings.setDiffFile(dataDir.resolve("diff.tab.txt").toString());
+		settings.setSuccessAssertionsFile(dataDir.resolve("success.n3").toString());
+		settings.setSuccessRDFFormat("N3");
+
+		settings.setSparqlConstructAdditionsDir(createDirectory(dataDir, "sparqlConstructs", "additions").toString());
+		settings.setSparqlConstructDeletionsDir(createDirectory(dataDir, "sparqlConstructs", "deletions").toString());
+		
+		Path changedDir = createDirectory(dataDir, "changedData");
+		settings.setAddedDataFile(changedDir.resolve("addedData.n3").toString());
+		settings.setRemovedDataFile(changedDir.resolve("removedData.n3").toString());
+		
+		Path logDir = createDirectory(dataDir, "logs");
+		settings.setLogFile(logDir.resolve(timestampedFileName("knowledgeBaseUpdate", "log")).toString());
+		settings.setErrorLogFile(logDir.resolve(timestampedFileName("knowledgeBaseUpdate.error", "log")).toString());
+	}
+
+	private Path createDirectory(Path parent, String... children) throws IOException {
+		Path dir = parent;
+		for (String child : children) {
+			dir = dir.resolve(child);
+		}
+		Files.createDirectories(dir);
+		return dir;
+	}
+
 	
 	//Multiple changes from 1.4 to 1.5 will occur
 	//update migration model
@@ -473,14 +483,10 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		}	
 	}
 	
+	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
 		// nothing to do	
 	}
-	
-	public static String getAskUpdatedQueryPath(ServletContext ctx) {
-		return ctx.getRealPath(ASK_QUERY_FILE);
-	
-    }
 	
 	private static String timestampedFileName(String prefix, String suffix) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH-mm-sss");

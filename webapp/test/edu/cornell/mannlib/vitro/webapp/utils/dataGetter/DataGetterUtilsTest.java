@@ -67,15 +67,6 @@ public class DataGetterUtilsTest extends AbstractTestClass{
     }
 
 
-    @Test
-    public void testNonPageDataGetter() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException{        
-        DataGetter dg = DataGetterUtils.dataGetterForURI(vreq, displayModel,dataGetterX);
-        Assert.assertNull(dg);        
-        
-        List<DataGetter> dgList = 
-            DataGetterUtils.getDataGettersForPage(vreq, displayModel, pageX);
-        Assert.assertNotNull(dgList);
-        Assert.assertTrue("List should be, it was not", dgList.size() == 0);                
-    }
+    
 
 }

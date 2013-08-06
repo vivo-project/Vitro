@@ -30,8 +30,6 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.web.directives.EmailDirective;
-import freemarker.core.Environment;
-import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 /**
@@ -144,14 +142,8 @@ public class FreemarkerEmailMessage {
 		bodyMap.put("email", new EmailDirective(this));
 
 		try {
-			Template template = config.getTemplate(templateName);
-
-			Environment env = template.createProcessingEnvironment(bodyMap,
+			config.getTemplate(templateName).process(bodyMap,
 					new StringWriter());
-			env.setCustomAttribute("request", vreq);
-			env.setCustomAttribute("context", vreq.getSession()
-					.getServletContext());
-			env.process();
 		} catch (TemplateException e) {
 			log.error(e, e);
 		} catch (IOException e) {

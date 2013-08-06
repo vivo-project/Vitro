@@ -427,10 +427,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // the copyright text can be viewed with having to restart Tomcat
         map.put("copyright", getCopyrightInfo(appBean));    
         
-        map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
-        map.put("widget", new edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective());
-        map.putAll( FreemarkerConfiguration.getDirectives() );
-        
         // Add these accumulator objects. They will collect tags so the template can write them 
         // at the appropriate location.
         map.put("stylesheets", new Tags().wrap());

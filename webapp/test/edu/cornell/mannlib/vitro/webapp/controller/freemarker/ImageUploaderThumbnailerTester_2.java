@@ -23,7 +23,6 @@ import java.util.Set;
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.StreamDescriptor;
-import javax.media.jai.widget.ImageCanvas;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
@@ -107,7 +106,7 @@ public class ImageUploaderThumbnailerTester_2 extends Frame {
 		JPanel p = new JPanel();
 		p.setLayout(new BorderLayout());
 		p.add("South", l);
-		p.add("Center", new ImageCanvas(image));
+		p.add("Center", new javax.media.jai.widget.ImageCanvas(image));
 		p.setBackground(new Color(0xFFFFFF));
 		p.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 

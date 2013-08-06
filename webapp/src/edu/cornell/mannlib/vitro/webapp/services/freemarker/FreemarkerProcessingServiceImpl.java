@@ -13,10 +13,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
 import edu.cornell.mannlib.vitro.webapp.utils.log.LogUtils;
-import freemarker.core.Environment;
 import freemarker.core.ParseException;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -75,18 +73,7 @@ public class FreemarkerProcessingServiceImpl implements
 
 		StringWriter writer = new StringWriter();
 		try {
-			// Add directives to the map. For some reason, having them in the
-			// configuration is not enough.
-			map.putAll(FreemarkerConfiguration.getDirectives());
-
-			// Add request and servlet context as custom attributes of the
-			// environment, so they
-			// can be used in directives.
-			Environment env = template.createProcessingEnvironment(map, writer);
-			env.setCustomAttribute("request", req);
-			env.setCustomAttribute("context", req.getSession()
-					.getServletContext());
-			env.process();
+			template.process(map, writer);
 			return writer.toString();
 		} catch (TemplateException e) {
 			throw new TemplateProcessingException(

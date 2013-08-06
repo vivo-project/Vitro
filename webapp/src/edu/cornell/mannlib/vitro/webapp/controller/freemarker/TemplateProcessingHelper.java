@@ -24,13 +24,9 @@ public class TemplateProcessingHelper {
     private static final Log log = LogFactory.getLog(TemplateProcessingHelper.class);
     
     private Configuration config = null;
-    private HttpServletRequest request = null;
-    private ServletContext context = null;
     
     public TemplateProcessingHelper(HttpServletRequest request, ServletContext context) {
         this.config = FreemarkerConfigurationLoader.getConfig(new VitroRequest(request));
-        this.request = request;
-        this.context = context;
     }
     
     public StringWriter processTemplate(String templateName, Map<String, Object> map) 
@@ -46,14 +42,6 @@ public class TemplateProcessingHelper {
         
         try {
             Environment env = template.createProcessingEnvironment(map, writer);
-            // Add request and servlet context as custom attributes of the environment, so they
-            // can be used in directives.
-            env.setCustomAttribute("request", request);
-            env.setCustomAttribute("context", context);
-            
-            // Set the Locale from the request into the environment, so date builtins will be
-            // Locale-dependent
-            env.setLocale(request.getLocale());
             
             // Define a setup template to be included by every page template
             String templateType = (String) map.get("templateType");

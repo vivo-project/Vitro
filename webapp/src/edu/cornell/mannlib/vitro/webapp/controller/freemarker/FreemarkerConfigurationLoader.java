@@ -21,7 +21,9 @@ public class FreemarkerConfigurationLoader {
 
 	public static FreemarkerConfiguration getConfig(VitroRequest vreq) {
 		String themeDir = getThemeDir(vreq.getAppBean());
-		return getConfigForTheme(themeDir, vreq.getAppBean(), vreq.getSession().getServletContext());
+		FreemarkerConfiguration config = getConfigForTheme(themeDir, vreq.getAppBean(), vreq.getSession().getServletContext());
+		config.setRequestInfo(vreq);
+		return config;
 	}
 
 	private static String getThemeDir(ApplicationBean appBean) {
