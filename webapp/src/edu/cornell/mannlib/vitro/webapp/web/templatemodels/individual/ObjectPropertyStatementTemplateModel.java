@@ -31,7 +31,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     private final String editUrl;
     private final String deleteUrl;
     
-    public ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, String objectKey, 
+    public ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, String rangeUri, String objectKey, 
             Map<String, String> data, String templateName, VitroRequest vreq) {
         super(subjectUri, propertyUri, vreq);
 
@@ -45,7 +45,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         
         // Do delete url first, since it is used in building edit url
         this.deleteUrl = makeDeleteUrl();
-        this.editUrl = makeEditUrl(ops);
+        this.editUrl = makeEditUrl(ops, rangeUri);
     }
 
 	private String makeDeleteUrl() {
@@ -90,7 +90,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         return UrlBuilder.getUrl(EDIT_PATH, params);
 	}
 
-	private String makeEditUrl(ObjectPropertyStatement ops) {
+	private String makeEditUrl(ObjectPropertyStatement ops, String rangeUri) {
     	// Is the edit link suppressed for this property?
     	if (new EditLinkSuppressor(vreq).isEditLinkSuppressed(propertyUri)) {
     		return "";
@@ -113,6 +113,10 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         
         if ( deleteUrl.isEmpty() ) {
             params.put("deleteProhibited", "prohibited");
+        }
+        
+        if (rangeUri != null) {
+            params.put("rangeUri", rangeUri);
         }
         
         params.putAll(UrlBuilder.getModelParams(vreq));

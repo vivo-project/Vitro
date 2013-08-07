@@ -171,6 +171,9 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     	    	    makeEditConfigurationVTwo( editConfGeneratorName, vreq, session);
     	}
     	 
+    	if(editConfig == null) {
+    	    log.error("editConfig is null! How did this happen?");
+    	}
     	String editKey = EditConfigurationUtils.getEditKey(vreq); 
     	editConfig.setEditKey(editKey);        
         
