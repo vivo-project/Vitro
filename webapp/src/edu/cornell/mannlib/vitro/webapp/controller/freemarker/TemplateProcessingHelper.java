@@ -13,7 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
+import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfigurationImpl;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -26,7 +27,7 @@ public class TemplateProcessingHelper {
     private Configuration config = null;
     
     public TemplateProcessingHelper(HttpServletRequest request, ServletContext context) {
-        this.config = FreemarkerConfigurationLoader.getConfig(new VitroRequest(request));
+        this.config = FreemarkerConfiguration.getConfig(request);
     }
     
     public StringWriter processTemplate(String templateName, Map<String, Object> map) 
@@ -50,7 +51,8 @@ public class TemplateProcessingHelper {
             }
             
             // Apply any data-getters that are associated with this template.
-            FreemarkerConfiguration.retrieveAndRunDataGetters(env, template.getName());
+            // TODO clean this up VIVO-249
+            FreemarkerConfigurationImpl.retrieveAndRunDataGetters(env, template.getName());
             
             // Now process it.
             env.process();

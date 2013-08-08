@@ -61,6 +61,8 @@ public class FreemarkerComponentGenerator extends FreemarkerHttpServlet {
         return get(templateName, root, request);        
     }
     
+    // JB Because this is pretending to be a servlet, but the init method has not been called, providing the context.
+    // Do that in the constructor, and we should be fine. VIVO-251
     // RY We need the servlet context in getConfig(). For some reason using the method inherited from
     // GenericServlet bombs.
     @Override

@@ -37,10 +37,12 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
+import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
 import freemarker.ext.beans.BeansWrapper;
+import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
@@ -336,7 +338,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     private Map<String, Object> buildRequestUrls(VitroRequest vreq) {
         Map<String, Object> requestUrls = new HashMap<String, Object>();
     	
-        FreemarkerConfiguration config = FreemarkerConfigurationLoader.getConfig(vreq);
+        Configuration config = FreemarkerConfiguration.getConfig(vreq);
         TemplateModel urlModel = config.getSharedVariable("urls");
         
         try {
