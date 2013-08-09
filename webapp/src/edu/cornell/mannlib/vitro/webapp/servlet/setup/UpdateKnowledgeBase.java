@@ -54,6 +54,9 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private final static Log log = LogFactory.getLog(UpdateKnowledgeBase.class);
 	
 	private static final String DATA_DIR = "/WEB-INF/ontologies/update/";
+	private static final String DIFF_FILE = DATA_DIR + "diff.tab.txt";
+	private static final String ASK_QUERY_FILE = DATA_DIR + "askUpdated.sparql";
+	private static final String SUCCESS_ASSERTIONS_FILE = DATA_DIR + "success.n3";
 	private static final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
 	private static final String NEW_TBOX_MODEL_DIR = "/WEB-INF/filegraph/tbox/";
 	private static final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
@@ -75,6 +78,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		try {
 			UpdateSettings settings = new UpdateSettings();
 			putReportingPathsIntoSettings(ctx, settings);
+			putNonReportingPathsIntoSettings(ctx, settings);
 
 			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());
@@ -113,7 +117,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 				OntModel oldDisplayModelVivoListView = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_VIVOLISTVIEW_PATH));
 				settings.setVivoListViewConfigDisplayModel(oldDisplayModelVivoListView);
 			} catch (Exception e) {
-				log.info("unable to read display model migration files, display model not migrated. " + e.getMessage());
+				log.info("Unable to read display model migration files. " + e.getMessage());
 				tryMigrateDisplay = false;
 			}
 				
@@ -121,8 +125,11 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			   KnowledgeBaseUpdater ontologyUpdater = new KnowledgeBaseUpdater(settings);
 			  
 			   try {
-				  if (ontologyUpdater.updateRequired(ctx)) {
+				  if (!ontologyUpdater.updateRequired(ctx)) {
+				      log.info("No data migration required.");
+				  } else {
 					  ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
+					  log.info("Data migration required");
 					  ontologyUpdater.update(ctx);
 					  if (tryMigrateDisplay) {
 						  try {
@@ -144,6 +151,17 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		}
 	}	
 
+	
+	/**
+	 * Set the paths for the files that specify how to perform the update
+	 */
+	private void putNonReportingPathsIntoSettings(ServletContext ctx, UpdateSettings settings) {
+        settings.setAskUpdatedQueryFile(ctx.getRealPath(ASK_QUERY_FILE));
+        settings.setDiffFile(ctx.getRealPath(DIFF_FILE));
+        settings.setSuccessAssertionsFile(ctx.getRealPath(SUCCESS_ASSERTIONS_FILE));
+        settings.setSuccessRDFFormat("N3");
+	}
+	
 	/**
 	 * Create the directories where we will report on the update. 
 	 * Put the paths for the directories and files into the settings object.
@@ -155,11 +173,6 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		Path dataDir = createDirectory(homeDir, "upgrade", "knowledgeBase");
 		settings.setDataDir(dataDir.toString());
 		StartupStatus.getBean(ctx).info(this, "Updating knowledge base: reports are in '" + dataDir + "'");
-
-		settings.setAskUpdatedQueryFile(dataDir.resolve("askUpdated.sparql").toString());
-		settings.setDiffFile(dataDir.resolve("diff.tab.txt").toString());
-		settings.setSuccessAssertionsFile(dataDir.resolve("success.n3").toString());
-		settings.setSuccessRDFFormat("N3");
 
 		settings.setSparqlConstructAdditionsDir(createDirectory(dataDir, "sparqlConstructs", "additions").toString());
 		settings.setSparqlConstructDeletionsDir(createDirectory(dataDir, "sparqlConstructs", "deletions").toString());

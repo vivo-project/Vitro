@@ -955,7 +955,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 	}
                 } else {
                     String filename = soln.getLiteral("filename").getLexicalForm();
-                    log.info("putting " + prop.getURI() + " " + rangeUri + " " + filename + " into list view map");
+                    log.debug("putting " + prop.getURI() + " " + rangeUri + " " + filename + " into list view map");
                     customListViewConfigFileMap.put(new Pair<ObjectProperty, String>(prop, rangeUri), filename);     
                 }
             }       
@@ -964,7 +964,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         
         String customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<ObjectProperty, String>(op, op.getRangeVClassURI()));
         if (customListViewConfigFileName == null) {
-            log.info("no list view found for " + op.getURI() + " qualified by " + op.getRangeVClassURI());
+            log.debug("no list view found for " + op.getURI() + " qualified by " + op.getRangeVClassURI());
             customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<ObjectProperty, String>(op, OWL.Thing.getURI()));
         }
         

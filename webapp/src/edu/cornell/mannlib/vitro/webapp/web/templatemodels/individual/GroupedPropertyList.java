@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
@@ -175,7 +176,13 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // There is no ObjectPropertyDao.getAllPossibleObjectPropertiesForIndividual() parallel to 
         // DataPropertyDao.getAllPossibleDatapropsForIndividual(). The comparable method for object properties
         // is defined using PropertyInstance rather than ObjectProperty.
-        PropertyInstanceDao piDao = wdf.getPropertyInstanceDao();
+        
+        // Getting WebappDaoFactory from the session because we can't have the filtering
+        // that gets applied to the request.  This breaks blank node structures in the
+        // restrictions that determine applicable properties.
+        WebappDaoFactory wadf = ModelAccess.on(vreq.getSession().getServletContext()).getWebappDaoFactory();
+        PropertyInstanceDao piDao = wadf.getPropertyInstanceDao();
+        
         Collection<PropertyInstance> allPropInstColl = piDao
                 .getAllPossiblePropInstForIndividual(subject.getURI());
         if (allPropInstColl != null) {

@@ -73,7 +73,7 @@ public class KnowledgeBaseUpdater {
 		     performUpdate(servletContext);
 		} catch (Exception e) {
 			 logger.logError(e.getMessage());
-			 e.printStackTrace();
+			 log.error(e,e);
 		}
 
 		if (!logger.errorsWritten()) {
@@ -300,7 +300,7 @@ public class KnowledgeBaseUpdater {
 	 * needs to be updated to conform to a new ontology version
 	 */
 	public boolean updateRequired(ServletContext servletContext) throws IOException {
-		boolean required = false;
+		boolean required = true;
 		
 		String sparqlQueryStr = loadSparqlQuery(settings.getAskUpdatedQueryFile());
 		if (sparqlQueryStr == null) {
@@ -342,7 +342,7 @@ public class KnowledgeBaseUpdater {
 		
 		File file = new File(filePath);	
 		if (!file.exists()) {
-			return null;
+			throw new RuntimeException("SPARQL file not found at " + filePath);
 		}
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		StringBuffer fileContents = new StringBuffer();

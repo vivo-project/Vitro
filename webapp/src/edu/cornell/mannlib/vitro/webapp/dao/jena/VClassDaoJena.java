@@ -462,9 +462,11 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 while (classIt.hasNext()) {
                     try {
                         Individual classInd = classIt.next();
-                        OntClass cls = classInd.as(OntClass.class);
-                        if (!cls.isAnon() && !(NONUSER_NAMESPACES.contains(cls.getNameSpace()))) {
-                            classes.add(new VClassJena(cls,getWebappDaoFactory()));
+                        if(classInd.canAs(OntClass.class)) {
+                            OntClass cls = classInd.as(OntClass.class);
+                            if (!cls.isAnon() && !(NONUSER_NAMESPACES.contains(cls.getNameSpace()))) {
+                                classes.add(new VClassJena(cls,getWebappDaoFactory()));
+                            }
                         }
                     } catch (ClassCastException cce) {
                         log.error(cce, cce);

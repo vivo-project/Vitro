@@ -721,7 +721,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 	                            propInsts.add(getPropInstForPropertyAndRange(op, rangeRes, applicableProperties));
 	            List<String> additionalFauxSubpropertyRangeURIs = getAdditionalFauxSubpropertyRangeURIsForPropertyURI(propertyURI);
 	            for (String rangeURI : additionalFauxSubpropertyRangeURIs) {
-	                if (getWebappDaoFactory().getVClassDao().isSubClassOf(rangeURI, rangeRes.getURI())) {
+	                if (rangeRes == null || getWebappDaoFactory().getVClassDao().isSubClassOf(rangeURI, rangeRes.getURI())) {
 	                    propInsts.add(getPropInstForPropertyAndRange(
 	                            op, ResourceFactory.createResource(rangeURI), applicableProperties));
 	                }
@@ -740,7 +740,9 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                                                               Map<String, Resource[]> applicableProperties) {                   
         PropertyInstance pi = new PropertyInstance();
         String domainURIStr = getURIStr(op.getDomain());
-        if (rangeRes != null) {
+        if (rangeRes == null) {
+            pi.setRangeClassURI(OWL.Thing.getURI()); // TODO see above
+        } else {
             String rangeClassURI;
             if (rangeRes.isAnon()) {
                 rangeClassURI = PSEUDO_BNODE_NS + rangeRes.getId()
@@ -757,8 +759,6 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                 range.setName(range.getLocalName());
             }
             pi.setRangeClassName(range.getName());
-        } else {
-            pi.setRangeClassURI(OWL.Thing.getURI()); // TODO see above
         }
         pi.setDomainClassURI(domainURIStr);
         VClass domain = getWebappDaoFactory().getVClassDao()
