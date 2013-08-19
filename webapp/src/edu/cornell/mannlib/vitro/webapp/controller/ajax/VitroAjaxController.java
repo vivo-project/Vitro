@@ -17,7 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
+import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
@@ -73,8 +73,8 @@ public abstract class VitroAjaxController extends HttpServlet {
 	 * Process data through a Freemarker template and output the result.
 	 */
 	protected void writeTemplate(String templateName, Map<String, Object> map,
-			VitroRequest vreq, HttpServletResponse response) {
-		Configuration config = FreemarkerConfigurationLoader.getConfig(vreq);
+			HttpServletRequest req, HttpServletResponse response) {
+		Configuration config = FreemarkerConfiguration.getConfig(req);
 		try {
 			Template template = config.getTemplate(templateName);
 			PrintWriter out = response.getWriter();

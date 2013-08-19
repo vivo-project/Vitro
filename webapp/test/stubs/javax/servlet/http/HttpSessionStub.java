@@ -126,12 +126,14 @@ public class HttpSessionStub implements HttpSession {
 	}
 
 	@Override
+	@Deprecated
 	public Object getValue(String arg0) {
 		throw new RuntimeException(
 				"HttpSessionStub.getValue() not implemented.");
 	}
 
 	@Override
+	@Deprecated
 	public String[] getValueNames() {
 		throw new RuntimeException(
 				"HttpSessionStub.getValueNames() not implemented.");
@@ -149,12 +151,14 @@ public class HttpSessionStub implements HttpSession {
 	}
 
 	@Override
+	@Deprecated
 	public void putValue(String arg0, Object arg1) {
 		throw new RuntimeException(
 				"HttpSessionStub.putValue() not implemented.");
 	}
 
 	@Override
+	@Deprecated
 	public void removeValue(String arg0) {
 		throw new RuntimeException(
 				"HttpSessionStub.removeValue() not implemented.");

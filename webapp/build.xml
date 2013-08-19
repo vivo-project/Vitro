@@ -188,13 +188,6 @@
 		<!-- Copy the build.properties file to the resources directory. -->
 		<copy todir="${main.resources.dir}" file="${build.properties.file}" />
 
-		<!-- If there is a runtime.properties file in the same directory as build.properties, copy that too. -->
-		<dirname file="${build.properties.file}" property="runtime.properties.dir"/>
-		<copy todir="${main.resources.dir}" >
-			<fileset dir="${runtime.properties.dir}" >
-				<filename name="runtime.properties" />
-			</fileset>
-		</copy>
 
 		<!-- copy any xml files from source tree to the war directory -->
 		<copy todir="${main.compiled.dir}">

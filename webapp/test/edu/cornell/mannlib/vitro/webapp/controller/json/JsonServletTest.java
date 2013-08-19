@@ -192,6 +192,7 @@ public class JsonServletTest extends AbstractTestClass {
 	public void individualsByClassNoIndividuals() throws ServletException,
 			IOException {
 		setLoggerLevel(JsonServlet.class, Level.FATAL);
+		setLoggerLevel(ModelAccess.class, Level.ERROR);
 		String vclassId = "http://myVclass";
 		vcDao.setVClass(vclassId, new VClass(vclassId));
 		req.addParameter(GET_SOLR_INDIVIDUALS_BY_VCLASS, "true");

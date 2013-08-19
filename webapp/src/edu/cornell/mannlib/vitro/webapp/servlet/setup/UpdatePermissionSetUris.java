@@ -190,7 +190,7 @@ public class UpdatePermissionSetUris implements ServletContextListener {
 			File homeDirectory = new File(homeDirectoryPath);
 			confirmIsDirectory(homeDirectory);
 
-			File upgradeDirectory = createDirectory(homeDirectory, "upgrade");
+			File upgradeDirectory = createDirectory(homeDirectory, "upgrade/permissions");
 			String filename = timestampedFilename("UpgradePermissionSetUris",
 					".txt");
 			this.file = new File(upgradeDirectory, filename);

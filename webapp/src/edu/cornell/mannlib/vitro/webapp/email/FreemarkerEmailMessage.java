@@ -28,10 +28,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.web.directives.EmailDirective;
-import freemarker.core.Environment;
-import freemarker.template.Template;
+import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 
 /**
@@ -51,7 +49,7 @@ public class FreemarkerEmailMessage {
 
 	private final VitroRequest vreq;
 	private final Session mailSession;
-	private final FreemarkerConfiguration config;
+	private final Configuration config;
 
 	private final List<Recipient> recipients = new ArrayList<Recipient>();
 	private final InternetAddress replyToAddress;
@@ -66,7 +64,7 @@ public class FreemarkerEmailMessage {
 	/**
 	 * Package access - should only be created by the factory.
 	 */
-	FreemarkerEmailMessage(VitroRequest vreq, FreemarkerConfiguration fConfig,
+	FreemarkerEmailMessage(VitroRequest vreq, Configuration fConfig,
 			Session mailSession, InternetAddress replyToAddress) {
 		this.vreq = vreq;
 		this.mailSession = mailSession;
@@ -144,14 +142,8 @@ public class FreemarkerEmailMessage {
 		bodyMap.put("email", new EmailDirective(this));
 
 		try {
-			Template template = config.getTemplate(templateName);
-
-			Environment env = template.createProcessingEnvironment(bodyMap,
+			config.getTemplate(templateName).process(bodyMap,
 					new StringWriter());
-			env.setCustomAttribute("request", vreq);
-			env.setCustomAttribute("context", vreq.getSession()
-					.getServletContext());
-			env.process();
 		} catch (TemplateException e) {
 			log.error(e, e);
 		} catch (IOException e) {

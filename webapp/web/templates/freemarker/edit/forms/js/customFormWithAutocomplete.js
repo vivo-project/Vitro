@@ -55,7 +55,12 @@ var customForm = {
         // the verify popup window. Although there could be multiple verifyMatch objects
         // selecting one and binding the event works for all of them     
         this.verifyMatch = this.form.find('.verifyMatch');
-                
+        this.defaultAcType = ""; // will be set in setType() first time through 
+        this.templateDefinedAcTypes = false;
+        if ( this.acTypes != undefined ) {
+            this.templateDefinedAcTypes = true;
+        }
+        
         // find all the acSelector input elements 
         this.acSelectors = [] ;
         
@@ -86,7 +91,7 @@ var customForm = {
         // Used with the cancel link. If the user cancels after a type selection, this check
         // ensures that any a/c fields (besides the one associated with the type) will be reset
         this.clearAcSelections = false;
-        
+
     },
 
     // Set up the form on page load
@@ -126,6 +131,10 @@ var customForm = {
         
         this.initFormView();
 
+        // Set the initial autocomplete help text in the acSelector fields.
+        $.each(this.acSelectors, function() {
+                customForm.addAcHelpText($(this));
+        });
     },
 
     initFormView: function() {
@@ -288,7 +297,7 @@ var customForm = {
         //to the filtering list
         this.getAcFilterForIndividuals();
         this.acCache = {};
-                        
+        
         $(selectedObj).autocomplete({
             minLength: 3,
             source: function(request, response) {
@@ -312,8 +321,9 @@ var customForm = {
                     },
                     complete: function(xhr, status) {
                         // Not sure why, but we need an explicit json parse here. 
-                        var results = $.parseJSON(xhr.responseText), 
+                        var results = $.parseJSON(xhr.responseText),                        
                             filteredResults = customForm.filterAcResults(results);
+
                         customForm.acCache[request.term] = filteredResults;
                         response(filteredResults);
                     }
@@ -321,6 +331,9 @@ var customForm = {
             },
             select: function(event, ui) {
                 customForm.showAutocompleteSelection(ui.item.label, ui.item.uri, $(selectedObj));
+                if ( $(selectedObj).attr('acGroupName') == customForm.typeSelector.attr('acGroupName') ) {
+                    customForm.typeSelector.val(ui.item.msType);
+                }
             }
         });
     },
@@ -420,17 +433,24 @@ var customForm = {
         // provides a way to monitor selection in other js files, e.g. to hide fields upon selection
         $acDiv.addClass("userSelected");
 
-        // If the form has a type selector, add type name to label in add mode. In edit mode, use typeSelectorSpan
-        // html. The second case is an "else if" and not an else because the template may not be passing the label
-        // to the acSelection macro or it may not be using the macro at all and the label is hard-coded in the html.
-        if ( this.typeSelector.length && ($acDiv.attr('acGroupName') == this.typeSelector.attr('acGroupName')) ) {
-             $acDiv.find('label').html('Selected ' + this.typeName + ':');
-        }
-        else if ( this.typeSelectorSpan.html() && ($acDiv.attr('acGroupName') == this.typeSelectorInput.attr('acGroupName')) ) {
-            $acDiv.find('label').html('Selected ' + this.typeSelectorSpan.html() + ':');
-        }
-        else if ( $acDiv.find('label').html() == '' ) {
-            $acDiv.find('label').html('Selected ' + this.multipleTypeNames[$(selectedObj).attr('acGroupName')] + ':');
+        // If the form has a type selector, add type name to label in add mode. In edit mode, 
+        // use typeSelectorSpan html. The second case is an "else if" and not an else because 
+        // the template may not be passing the label to the acSelection macro or it may not be 
+        // using the macro at all and the label is hard-coded in the html.
+        // ** With release 1.6 and display of all fields, more labels are hard-coded in html.
+        // ** So check if there's a label before doing anything else.
+        
+        if ( $acDiv.find('label').html().length === 0 ) {
+                    
+            if ( this.typeSelector.length && ($acDiv.attr('acGroupName') == this.typeSelector.attr('acGroupName')) ) {
+                $acDiv.find('label').html('Selected ' + this.typeName + ':');
+            }
+            else if ( this.typeSelectorSpan.html() && ($acDiv.attr('acGroupName') == this.typeSelectorInput.attr('acGroupName')) ) {
+                $acDiv.find('label').html('Selected ' + this.typeSelectorSpan.html() + ':');
+            }
+            else if ( $acDiv.find('label').html() == '' ) {
+                $acDiv.find('label').html('Selected ' + this.multipleTypeNames[$(selectedObj).attr('acGroupName')] + ':');
+            }
         }
         
         $acDiv.show();
@@ -447,7 +467,6 @@ var customForm = {
         	//On initialization in this mode, submit button is disabled
         	this.enableSubmit();  
         }
-
     },
     
     undoAutocompleteSelection: function(selectedObj) {
@@ -482,11 +501,12 @@ var customForm = {
                         $acSelector = customForm.getAcSelector($checkSelection);
                         $acSelector.parent('p').show();
                     }
-            });
-        }
+                });
+            }
         }
         else {
             $acSelectionObj = $(selectedObj);
+            customForm.typeSelector.val('');
         }
 
         $acSelector = this.getAcSelector($acSelectionObj);
@@ -530,10 +550,9 @@ var customForm = {
     // Note: we still need this in edit mode, to set the text values.
     setType: function() {
         var selectedType;
-        
         // If there's no type selector, these values have been specified in customFormData,
         // and will not change over the life of the form.
-        if (!this.typeSelector.length) {
+        if (!this.typeSelector.length) {    
             if ( this.editMode == 'edit' && (this.typeSelectorSpan.html() != null && this.typeSelectorInput.val() != null) ) {
                 this.typeName = this.typeSelectorSpan.html();
                 this.acTypes[this.typeSelectorInput.attr('acGroupName')] = this.typeSelectorInput.val();
@@ -542,7 +561,11 @@ var customForm = {
         }
 
         selectedType = this.typeSelector.find(':selected');
-        var acTypeKey = this.typeSelector.attr('acGroupName'); 
+        var acTypeKey = this.typeSelector.attr('acGroupName');
+
+        if ( this.templateDefinedAcTypes && !this.defaultAcType.length ) {
+            this.defaultAcType = this.acTypes[acTypeKey];
+        }
         if (selectedType.val().length) {
             this.acTypes[acTypeKey] = selectedType.val();
             this.typeName = selectedType.html();
@@ -551,15 +574,20 @@ var customForm = {
                 $acSelect.find('label').html( customForm.selectedString + ' ' + this.typeName + ':');
             }
         } 
-        // reset to empty values; may not need
+        // reset to empty values; 
         else {
-            delete this.acTypes[acTypeKey];
-            this.typeName = '';
+            if ( this.templateDefinedAcTypes ) {
+                this.acTypes[acTypeKey] = this.defaultAcType;
+            }
+            else {
+                this.acTypes = new Object();
+            }
+            this.typeName = this.defaultTypeName;
         }
     },
 
     // Set field labels based on type selection. Although these won't change in edit
-    // mode, it's easier to specify the text here than in the jsp.
+    // mode, it's easier to specify the text here than in the ftl.
     setLabels: function() {
         var typeName = this.getTypeNameForLabels();
 
@@ -575,10 +603,20 @@ var customForm = {
         // or in repair mode in a two-step form with no type selected. Use the default type
         // name specified in the form data.
         if ( !selectedObj || !this.hasMultipleTypeNames ) {
-            return this.acTypes ? this.typeName : this.capitalize(this.defaultTypeName);
+            if ( this.acTypes && this.typeName ) {
+                return this.typeName;
+            }
+            else {
+                return this.capitalize(this.defaultTypeName);                
+            }
         }
         else if ( selectedObj && ( $(selectedObj).attr('acGroupName') == this.typeSelector.attr('acGroupName') ) ) {
-            return this.acTypes ? this.typeName : this.capitalize(this.defaultTypeName);
+            if ( this.acTypes && this.typeName ) {
+                return this.typeName;
+            }
+            else {
+                return this.capitalize(this.defaultTypeName);                
+            }
         }
         else {
             var name = customForm.multipleTypeNames[$(selectedObj).attr('id')];

@@ -37,10 +37,12 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
+import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
 import freemarker.ext.beans.BeansWrapper;
+import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
@@ -336,7 +338,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     private Map<String, Object> buildRequestUrls(VitroRequest vreq) {
         Map<String, Object> requestUrls = new HashMap<String, Object>();
     	
-        FreemarkerConfiguration config = FreemarkerConfigurationLoader.getConfig(vreq);
+        Configuration config = FreemarkerConfiguration.getConfig(vreq);
         TemplateModel urlModel = config.getSharedVariable("urls");
         
         try {
@@ -426,10 +428,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // NIHVIVO-3307: we need this here instead of FreemarkerConfiguration.java so that updates to
         // the copyright text can be viewed with having to restart Tomcat
         map.put("copyright", getCopyrightInfo(appBean));    
-        
-        map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
-        map.put("widget", new edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective());
-        map.putAll( FreemarkerConfiguration.getDirectives() );
         
         // Add these accumulator objects. They will collect tags so the template can write them 
         // at the appropriate location.
