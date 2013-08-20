@@ -24,8 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
  */
 public class UserModelSetup extends JenaDataSourceSetupBase 
                                            implements ServletContextListener {
-    protected static String AUTHPATH = BASE + "auth/";
-    
     private static final Log log = LogFactory.getLog(
             UserModelSetup.class.getName());
 
@@ -58,9 +56,7 @@ public class UserModelSetup extends JenaDataSourceSetupBase
                 ModelFactory.createOntologyModel( MEM_ONT_MODEL_SPEC);
     
             // This is used in Selenium testing, when we load user accounts from a file.
-        	if (userAccountsDbModel.isEmpty()) {
-        		readOntologyFilesInPathSet(AUTHPATH, ctx, userAccountsDbModel);
-        	}
+            new RDFFilesLoader(ctx).loadFirstTimeFiles("auth", userAccountsDbModel);
 
         	userAccountsModel.add(userAccountsDbModel);
             userAccountsModel.getBaseModel().register(

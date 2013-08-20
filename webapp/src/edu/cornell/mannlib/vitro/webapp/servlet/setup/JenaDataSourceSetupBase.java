@@ -70,11 +70,6 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
             DEFAULT_TESTONRETURN = true, DEFAULT_TESTWHILEIDLE = true;
 
     protected static String BASE = "/WEB-INF/ontologies/";
-    protected static String USERPATH = BASE+"user/";
-    protected static String USER_ABOX_PATH = BASE+"user/abox";
-    protected static String USER_TBOX_PATH = BASE+"user/tbox";
-    protected static String USER_APPMETA_PATH = BASE+"user/applicationMetadata";
-    protected static String SYSTEMPATH = BASE+"system/";       
     public static String APPPATH = BASE+"app/";
     //these files are loaded everytime the system starts up
     public static String APPPATH_LOAD = APPPATH + "menuload/";
@@ -395,6 +390,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        return dbModel;
    }
 
+   // TODO get rid of this?
     public static void readOntologyFilesInPathSet(String path,
             ServletContext ctx, Model model) {
         log.debug("Reading ontology files from '" + path + "'");
@@ -406,6 +402,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         }
     }
    
+    // TODO get rid of this?
     public static void readOntologyFileFromPath(String p, 
                                                 Model model, 
                                                 ServletContext ctx) {
