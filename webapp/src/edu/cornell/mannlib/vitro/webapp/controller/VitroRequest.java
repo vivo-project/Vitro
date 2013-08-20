@@ -171,6 +171,18 @@ public class VitroRequest extends HttpServletRequestWrapper {
     	return getWebappDaoFactory().getApplicationDao().getApplicationBean();
     }
 
+    /**
+     * Gets the the ip of the client.
+     * This will be X-forwarded-for header or, if that header is not
+     * set, getRemoteAddr(). This still may not be the client's address
+     * as they may be using a proxy. 
+     * 
+     */
+    public String getClientAddr(){
+        String xff = getHeader("x-forwarded-for");
+        return ( xff == null || xff.trim().isEmpty() ) ? getRemoteAddr() : xff;
+    }
+    
     @SuppressWarnings("unchecked")
 	@Override
     public Map<String, String[]> getParameterMap() {        

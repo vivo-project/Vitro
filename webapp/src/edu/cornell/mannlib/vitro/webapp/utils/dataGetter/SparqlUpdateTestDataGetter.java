@@ -21,7 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 
 /**
- * Test to experement with Jena ARQ SPARQL update and the RDFServiceDataset.
+ * Test to experiment with Jena ARQ SPARQL update and the RDFServiceDataset.
  */
 public class SparqlUpdateTestDataGetter implements DataGetter{
     private static final Log log = LogFactory.getLog(SparqlUpdateTestDataGetter.class);

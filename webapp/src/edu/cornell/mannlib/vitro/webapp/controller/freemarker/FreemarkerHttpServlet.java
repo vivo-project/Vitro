@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import static javax.mail.Message.RecipientType.TO;
+import static javax.mail.Message.RecipientType.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,6 +23,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequiresActions;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
@@ -48,7 +49,7 @@ import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 import freemarker.template.utility.DeepUnwrap;
 
-public class FreemarkerHttpServlet extends VitroHttpServlet {
+public class FreemarkerHttpServlet extends VitroHttpServlet  {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreemarkerHttpServlet.class);
@@ -203,7 +204,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
      * NB This method can't be static, because then the superclass method gets called rather than
      * the subclass method. For the same reason, it can't refer to a static or instance field
      * REQUIRED_ACTIONS which is overridden in the subclass.
-     */
+     * 
+     */    
     protected Actions requiredActions(VitroRequest vreq) {
         return Actions.AUTHORIZED;
     }
