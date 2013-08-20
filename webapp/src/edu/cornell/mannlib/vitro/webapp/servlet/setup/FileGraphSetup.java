@@ -2,13 +2,17 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,23 +30,36 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 // This ContextListener must run after the JenaDataSourceSetup ContextListener
 
 public class FileGraphSetup implements ServletContextListener {
+	private static final Log log = LogFactory.getLog(FileGraphSetup.class);
 
+	private static final String RDFFILES = "rdffiles";
     private static final String ABOX = "abox";
     private static final String TBOX = "tbox";
-    private static final String PATH_ROOT = "/WEB-INF/filegraph/";
+    private static final String FILEGRAPH = "filegraph";
+    private static final String PROPERTY_VITRO_HOME = "vitro.home";
+
     public static final String FILEGRAPH_URI_ROOT = "http://vitro.mannlib.cornell.edu/filegraph/";
+    
+    /** Ignore hidden files when looking for filegraph RDF. */
+	private static final DirectoryStream.Filter<Path> REJECT_HIDDEN_FILES = new DirectoryStream.Filter<Path>() {
+		@Override
+		public boolean accept(Path entry) throws IOException {
+			return !Files.isHidden(entry);
+		}
+	};    
 
-    private static final Log log = LogFactory.getLog(FileGraphSetup.class);
-
-    public void contextInitialized(ServletContextEvent sce) {
+    @Override
+	public void contextInitialized(ServletContextEvent sce) {
 
         boolean aboxChanged = false; // indicates whether any ABox file graph model has changed
         boolean tboxChanged = false; // indicates whether any TBox file graph model has changed
@@ -57,24 +74,20 @@ public class FileGraphSetup implements ServletContextListener {
             RDFServiceModelMaker maker = new RDFServiceModelMaker(RDFServiceUtils.getRDFServiceFactory(ctx));
 
             // ABox files
-            Set<String> pathSet = ctx.getResourcePaths(PATH_ROOT + ABOX);
+            Set<Path> paths = getFilegraphPaths(ctx, RDFFILES, ABOX, FILEGRAPH);
 
-            cleanupDB(dataset, pathToURI(pathSet, ABOX), ABOX);
+            cleanupDB(dataset, pathsToURIs(paths, ABOX), ABOX);
 
-            if (pathSet != null) {
-                OntModel aboxBaseModel = baseOms.getABoxModel();
-                aboxChanged = readGraphs(sce, pathSet, maker, ABOX, aboxBaseModel);		
-            }
+            OntModel aboxBaseModel = baseOms.getABoxModel();
+            aboxChanged = readGraphs(paths, maker, ABOX, aboxBaseModel);		
 
             // TBox files
-            pathSet = ctx.getResourcePaths(PATH_ROOT + TBOX);
+            paths = getFilegraphPaths(ctx, RDFFILES, TBOX, FILEGRAPH);
 
-            cleanupDB(dataset, pathToURI(pathSet, TBOX),TBOX);
+            cleanupDB(dataset, pathsToURIs(paths, TBOX),TBOX);
 
-            if (pathSet != null) {
-                OntModel tboxBaseModel = baseOms.getTBoxModel();
-                tboxChanged = readGraphs(sce, pathSet, maker, TBOX, tboxBaseModel);
-            }
+            OntModel tboxBaseModel = baseOms.getTBoxModel();
+            tboxChanged = readGraphs(paths, maker, TBOX, tboxBaseModel);
         } catch (ClassCastException cce) {
             String errMsg = "Unable to cast servlet context attribute to the appropriate type " + cce.getLocalizedMessage();
             log.error(errMsg);
@@ -99,7 +112,35 @@ public class FileGraphSetup implements ServletContextListener {
         }
     }
 
-    /*
+	private Set<Path> getFilegraphPaths(ServletContext ctx, String... strings) {
+		StartupStatus ss = StartupStatus.getBean(ctx);
+
+		ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
+		String homeDirProperty = props.getProperty(PROPERTY_VITRO_HOME);
+		Path filegraphDir = Paths.get(homeDirProperty, strings);
+
+		Set<Path> paths = new TreeSet<>();
+		if (Files.isDirectory(filegraphDir)) {
+			try (DirectoryStream<Path> stream = Files.newDirectoryStream(
+					filegraphDir, REJECT_HIDDEN_FILES)) {
+				for (Path p : stream) {
+					paths.add(p);
+				}
+				ss.info(this, "Read " + paths.size() + " RDF files from '"
+						+ filegraphDir + "'");
+			} catch (IOException e) {
+				ss.fatal(this, "Failed to read filegraph RDF from '"
+						+ filegraphDir + "' directory.", e);
+			}
+		} else {
+			ss.info(this, "Filegraph directory '" + filegraphDir
+					+ "' doesn't exist.");
+		}
+		log.debug("Paths from '" + filegraphDir + "': " + paths);
+		return paths;
+	}
+
+	/*
      * Reads the graphs stored as files in sub-directories of 
      *   1. updates the SDB store to reflect the current contents of the graph.
      *   2. adds the graph as an in-memory submodel of the base in-memory graph 
@@ -107,7 +148,7 @@ public class FileGraphSetup implements ServletContextListener {
      * Note: no connection needs to be maintained between the in-memory copy of the
      * graph and the DB copy.
      */
-    public boolean readGraphs(ServletContextEvent sce, Set<String> pathSet, RDFServiceModelMaker dataset, String type, OntModel baseModel) {
+    public boolean readGraphs(Set<Path> pathSet, RDFServiceModelMaker dataset, String type, OntModel baseModel) {
 
         int count = 0;
 
@@ -115,18 +156,17 @@ public class FileGraphSetup implements ServletContextListener {
 
         // For each file graph in the target directory update or add that graph to
         // the Jena SDB, and attach the graph as a submodel of the base model
-        for ( String p : pathSet ) {
+        for ( Path p : pathSet ) {
 
             count++; // note this will count the empty files too
-            File file = new File(sce.getServletContext().getRealPath(p));
-
             try {
-                FileInputStream fis = new FileInputStream( file );
+                FileInputStream fis = new FileInputStream( p.toFile() );
                 try {
                     OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-                    if ( p.endsWith(".n3") || p.endsWith(".N3") || p.endsWith(".ttl") || p.endsWith(".TTL") ) {
+                    String fn = p.getFileName().toString().toLowerCase();
+                    if ( fn.endsWith(".n3") || fn.endsWith(".ttl") ) {
                         model.read( fis, null, "N3" );
-                    } else if ( p.endsWith(".owl") || p.endsWith(".OWL") || p.endsWith(".rdf") || p.endsWith(".RDF") || p.endsWith(".xml") || p.endsWith(".XML") ) {
+                    } else if ( fn.endsWith(".owl") || fn.endsWith(".rdf") || fn.endsWith(".xml") ) {
                         model.read( fis, null, "RDF/XML" );
                     } else {
                         log.warn("Ignoring " + type + " file graph " + p + " because the file extension is unrecognized.");
@@ -134,7 +174,7 @@ public class FileGraphSetup implements ServletContextListener {
 
                     if ( !model.isEmpty() ) {							
                         baseModel.addSubModel(model);
-                        log.info("Attached file graph as " + type + " submodel " + p);
+                        log.info("Attached file graph as " + type + " submodel " + pathToURI(p, type));
                     } 
 
                     modelChanged = modelChanged | updateGraphInDB(dataset, model, type, p);
@@ -155,8 +195,8 @@ public class FileGraphSetup implements ServletContextListener {
                 log.warn("Exception while trying to close file graph file: " + p,ioe);
             }
         } // end - for
-
-        System.out.println("Read " + count + " "  + type + " file graph" + ((count == 1) ? "" : "s") + " from " + PATH_ROOT + type);
+        
+		log.info("Read " + count + " " + type + " file graph" + ((count == 1) ? "" : "s"));
 
         return modelChanged;
     }
@@ -171,7 +211,7 @@ public class FileGraphSetup implements ServletContextListener {
      * Otherwise, if a graph with the given name is in the DB and is isomorphic with
      * the graph that was read from the files system, then do nothing. 
      */
-    public boolean updateGraphInDB(RDFServiceModelMaker dataset, Model fileModel, String type, String path) {
+    public boolean updateGraphInDB(RDFServiceModelMaker dataset, Model fileModel, String type, Path path) {
         String graphURI = pathToURI(path,type);
         Model dbModel = dataset.getModel(graphURI);
         boolean modelChanged = false;
@@ -224,46 +264,34 @@ public class FileGraphSetup implements ServletContextListener {
         return;
     }
 
+	/*
+	 * Takes a set of paths for file graphs and returns a set containing a graph
+	 * uri for each path.
+	 */
+	private Set<String> pathsToURIs(Set<Path> paths, String type) {
+		HashSet<String> uriSet = new HashSet<String>();
+		for (Path path : paths) {
+			uriSet.add(pathToURI(path, type));
+		}
+		log.debug("uriSet = " + uriSet);
+		return uriSet;
+	}
+    
     /*
-     * Takes a set of path names for file graphs and returns a set containing
-     * a graph uri for each path name in the input set. If pathSet is null
-     * returns an empty set.
-     */
-    public Set<String> pathToURI (Set<String> pathSet, String type) {
-
-        HashSet<String> uriSet = new HashSet<String>();
-
-        if (pathSet != null) {
-            for ( String path : pathSet ) {
-                uriSet.add(pathToURI(path,type));
-            }
-        }
-
-        return uriSet;
-    }
-
-    /*
-     * Takes a path name for a file graph and returns the corresponding SDB URI
+     * Takes a path for a file graph and returns the corresponding SDB URI
      * for the graph. The correspondence is by defined convention.
      */
-    public String pathToURI(String path, String type) {
-
-        String uri = null;
-
-        if (path != null) {
-            File file = new File(path);
-            uri = FILEGRAPH_URI_ROOT + type + "/" + file.getName(); 
-        }
-
-        return uri;
+    private String pathToURI(Path path, String type) {
+    		return FILEGRAPH_URI_ROOT + type + "/" + path.getFileName(); 
     }
-
-    public void contextDestroyed( ServletContextEvent sce ) {
+    
+    @Override
+	public void contextDestroyed( ServletContextEvent sce ) {
         // nothing to do
     }
 
     private static boolean isUpdateRequired(ServletContext ctx) {
         return (ctx.getAttribute(UpdateKnowledgeBase.KBM_REQURIED_AT_STARTUP) != null);
     }    
-
+    
 }

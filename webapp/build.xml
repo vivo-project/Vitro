@@ -69,6 +69,9 @@
 	<property name="solr.webapp.dir" location="${solr.build.dir}/webapp" />
 	<property name="solr.homeimage.dir" location="${solr.build.dir}/homeimage" />
 
+	<property name="vitrohome.build.dir" location="${build.dir}/vitrohome" />
+	<property name="vitrohome.image.dir" location="${vitrohome.build.dir}/image" />
+
 	<property name="distribution.dir" location="${build.dir}/distribution" />
 	<property name="distribution.tar.gz.file" location="${build.dir}/distribution.tar.gz" />
 
@@ -193,6 +196,21 @@
 			<fileset dir="${appbase.dir}/src" includes="**/*.xml" />
 		</copy>
 	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: prepareVitroHomeDir                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="prepareVitroHomeDir" depends="prepare">
+		<mkdir dir="${vitrohome.build.dir}" />
+		<mkdir dir="${vitrohome.image.dir}" />
+		<copy todir="${vitrohome.image.dir}" file="${appbase.dir}/config/example.runtime.properties" />
+		<copy todir="${vitrohome.image.dir}" >
+			<fileset dir="${appbase.dir}" >
+				<include name="rdffiles/**/*" />
+			</fileset>
+		</copy>
+    </target>
+
 
 	<!-- ================================= 
           target: clean              
@@ -369,12 +387,22 @@
 			</fileset>
 		</copy>
 	</target>
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: deployVitroHome                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="deployVitroHome" depends="deployProperties, prepareVitroHomeDir">
+    	<copy toDir="${vitro.home}" >
+    		<fileset dir="${vitrohome.image.dir}" />
+    	</copy>
+    </target>
+
 
 	<!-- ================================= 
       target: deploy              
      ================================= -->
 	<target name="deploy" 
-	        depends="deployWebapp, deploySolr" 
+	        depends="deployWebapp, deploySolr, deployVitroHome" 
 	        description="--> Build the app and install in Tomcat">
 	</target>
 
@@ -399,6 +427,7 @@
 		<jar basedir="${main.webapp.dir}" destfile="${distribution.dir}/${webapp.name}.war" />
 		<jar basedir="${solr.webapp.dir}" destfile="${distribution.dir}/${solr.app.name}.war" />
 		<tar basedir="${solr.homeimage.dir}" destfile="${distribution.dir}/solrhome.tar" />
+		<tar basedir="${vitrohome.image.dir}" destfile="${distribution.dir}/vitrohome.tar" />
 
 		<tar basedir="${distribution.dir}" destfile="${distribution.tar.gz.file}" compression="gzip" />
 	</target>
