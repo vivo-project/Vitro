@@ -33,6 +33,7 @@ public class RDFFilesLoader {
 
 	private static final String PROPERTY_VITRO_HOME = "vitro.home";
 	private static final String DEFAULT_RDF_FORMAT = "RDF/XML";
+	private static final String RDF_FILES = "rdffiles";
 	private static final String FIRST_TIME = "firsttime";
 	private static final String EVERY_TIME = "everytime";
 
@@ -63,11 +64,14 @@ public class RDFFilesLoader {
 	public static void loadFirstTimeFiles(ServletContext ctx, String modelPath,
 			Model model, boolean firstTime) {
 		if (firstTime) {
-			Set<Path> paths = getPaths(locateHomeDirectory(ctx), modelPath,
-					FIRST_TIME);
+			Set<Path> paths = getPaths(locateHomeDirectory(ctx), RDF_FILES,
+					modelPath, FIRST_TIME);
 			for (Path p : paths) {
 				readOntologyFileIntoModel(p, model);
 			}
+		} else {
+			log.debug("Not loading first time files on '" + modelPath
+					+ "', firstTime=false");
 		}
 	}
 
@@ -83,8 +87,8 @@ public class RDFFilesLoader {
 			OntModel model) {
 		OntModel everytimeModel = ModelFactory
 				.createOntologyModel(OntModelSpec.OWL_MEM);
-		Set<Path> paths = getPaths(locateHomeDirectory(ctx), modelPath,
-				EVERY_TIME);
+		Set<Path> paths = getPaths(locateHomeDirectory(ctx), RDF_FILES,
+				modelPath, EVERY_TIME);
 		for (Path p : paths) {
 			readOntologyFileIntoModel(p, everytimeModel);
 		}
@@ -144,13 +148,13 @@ public class RDFFilesLoader {
 
 	private static void readOntologyFileIntoModel(Path p, Model model) {
 		String format = getRdfFormat(p);
-		log.info("Loading ontology file at " + p + " as format " + format);
+		log.info("Loading file at " + p + " as " + format);
 		try (InputStream stream = new FileInputStream(p.toFile())) {
 			model.read(stream, null, format);
 			log.debug("...successful");
 		} catch (Exception e) {
-			log.warn("Could not load RDF file '" + p
-					+ "'. Check that it contains valid " + format + " data.", e);
+			log.warn("Could not load file '" + p + "' as " + format
+					+ ". Check that it contains valid data.", e);
 		}
 	}
 

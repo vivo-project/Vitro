@@ -82,11 +82,9 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 
 
         if (isFirstStartup()) {
+        	initializeApplicationMetadata(ctx, applicationMetadataModel);
         	RDFFilesLoader.loadFirstTimeFiles(ctx, "abox", baseABoxModel, true);
         	RDFFilesLoader.loadFirstTimeFiles(ctx, "tbox", baseTBoxModel, true);
-
-        	RDFFilesLoader.loadFirstTimeFiles(ctx, "applicationMetadata", applicationMetadataModel, true);
-        	setPortalUriOnFirstTime(applicationMetadataModel, ctx);
         } else {
         	checkForNamespaceMismatch( applicationMetadataModel, ctx );
         }
@@ -172,12 +170,26 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
     /* ===================================================================== */
 
 	/**
+	 * We need to read the RDF files and change the Portal from a blank node to
+	 * one with a URI in the default namespace.
+	 * 
+	 * Do this before adding the data to the RDFService-backed model, to avoid
+	 * warnings about editing a blank node.
+	 */
+	private void initializeApplicationMetadata(ServletContext ctx,
+			OntModel applicationMetadataModel) {
+		OntModel temporaryAMModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
+    	RDFFilesLoader.loadFirstTimeFiles(ctx, "applicationMetadata", temporaryAMModel, true);
+    	setPortalUriOnFirstTime(temporaryAMModel, ctx);
+    	applicationMetadataModel.add(temporaryAMModel);
+	}
+
+	/**
 	 * If we are loading the application metadata for the first time, set the
 	 * URI of the Portal based on the default namespace.
 	 */
 	private void setPortalUriOnFirstTime(OntModel model, ServletContext ctx) {
-		// currently, only a single portal is permitted in the initialization
-		// data
+		// Only a single portal is permitted in the initialization data
 		Resource portalResource = null;
 		ClosableIterator<Resource> portalResIt = model
 				.listSubjectsWithProperty(RDF.type,
