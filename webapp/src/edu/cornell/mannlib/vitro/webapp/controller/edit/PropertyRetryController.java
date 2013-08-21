@@ -37,6 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
@@ -69,7 +70,8 @@ public class PropertyRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        ObjectPropertyDao propDao = request.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
+        ObjectPropertyDao propDao = ModelAccess.on(getServletContext()).getWebappDaoFactory().getObjectPropertyDao();
+                //getUnfilteredWebappDaoFactory().getObjectPropertyDao();
         epo.setDataAccessObject(propDao);
         OntologyDao ontDao = request.getUnfilteredWebappDaoFactory().getOntologyDao();
         VClassDao vclassDao = request.getUnfilteredWebappDaoFactory().getVClassDao();
