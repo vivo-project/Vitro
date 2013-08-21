@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +18,10 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 
@@ -30,8 +34,9 @@ public class RDFFilesLoader {
 	private static final String PROPERTY_VITRO_HOME = "vitro.home";
 	private static final String DEFAULT_RDF_FORMAT = "RDF/XML";
 	private static final String FIRST_TIME = "firsttime";
+	private static final String EVERY_TIME = "everytime";
 
-	/** Directory filter that ignores sub-directories and hidden files. */
+	/** Path filter that ignores sub-directories and hidden files. */
 	private static final DirectoryStream.Filter<Path> RDF_FILE_FILTER = new DirectoryStream.Filter<Path>() {
 		@Override
 		public boolean accept(Path p) throws IOException {
@@ -47,33 +52,77 @@ public class RDFFilesLoader {
 		}
 	};
 
-	private final String homeDirProperty;
-
-	public RDFFilesLoader(ServletContext ctx) {
-		ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
-		this.homeDirProperty = props.getProperty(PROPERTY_VITRO_HOME);
-	}
-
-	/**
-	 * Load the "first time" files if the model is empty.
-	 */
-	public void loadFirstTimeFiles(String modelPath, Model model) {
-		loadFirstTimeFiles(modelPath, model, model.isEmpty());
-	}
-	
 	/**
 	 * Load the "first time" files if we say it is the first time.
+	 * 
+	 * The location is based on the home directory and the model path: "abox",
+	 * "display", etc.
+	 * 
+	 * The files from the directory are added to the model.
 	 */
-	public void loadFirstTimeFiles(String modelPath, Model model, boolean firstTime) {
+	public static void loadFirstTimeFiles(ServletContext ctx, String modelPath,
+			Model model, boolean firstTime) {
 		if (firstTime) {
-			Set<Path> paths = getPaths(homeDirProperty, modelPath, FIRST_TIME);
+			Set<Path> paths = getPaths(locateHomeDirectory(ctx), modelPath,
+					FIRST_TIME);
 			for (Path p : paths) {
 				readOntologyFileIntoModel(p, model);
 			}
 		}
 	}
 
-	private Set<Path> getPaths(String parentDir, String... strings) {
+	/**
+	 * Load the "every time" files.
+	 * 
+	 * The location is based on the home directory and the model path: "abox",
+	 * "display", etc.
+	 * 
+	 * The files from the directory become a sub-model of the model.
+	 */
+	public static void loadEveryTimeFiles(ServletContext ctx, String modelPath,
+			OntModel model) {
+		OntModel everytimeModel = ModelFactory
+				.createOntologyModel(OntModelSpec.OWL_MEM);
+		Set<Path> paths = getPaths(locateHomeDirectory(ctx), modelPath,
+				EVERY_TIME);
+		for (Path p : paths) {
+			readOntologyFileIntoModel(p, everytimeModel);
+		}
+		model.addSubModel(everytimeModel);
+	}
+
+	/**
+	 * Create a model from all the RDF files in the specified directory.
+	 */
+	public static OntModel getModelFromDir(File dir) {
+		OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		if (dir == null) {
+			log.warn("Must pass a File to getModelFromDir()");
+			return model;
+		}
+		if (!dir.isDirectory()) {
+			log.warn("Directory must be a File object for a directory");
+			return model;
+		}
+		if (!dir.canRead()) {
+			log.warn("getModelFromDir(): Directory "
+					+ " must be readable, check permissions on "
+					+ dir.getAbsolutePath());
+			return model;
+		}
+
+		Set<Path> paths = getPaths(dir.getPath());
+		for (Path p : paths) {
+			readOntologyFileIntoModel(p, model);
+		}
+		return model;
+	}
+
+	/**
+	 * Find the paths to RDF files in this directory. Sub-directories and hidden
+	 * files are ignored.
+	 */
+	private static Set<Path> getPaths(String parentDir, String... strings) {
 		Path dir = Paths.get(parentDir, strings);
 
 		Set<Path> paths = new TreeSet<>();
@@ -87,7 +136,7 @@ public class RDFFilesLoader {
 				log.warn("Failed to read directory '" + dir + "'", e);
 			}
 		} else {
-			log.debug("Filegraph directory '" + dir + "' doesn't exist.");
+			log.debug("Directory '" + dir + "' doesn't exist.");
 		}
 		log.debug("Paths from '" + dir + "': " + paths);
 		return paths;
@@ -99,9 +148,9 @@ public class RDFFilesLoader {
 		try (InputStream stream = new FileInputStream(p.toFile())) {
 			model.read(stream, null, format);
 			log.debug("...successful");
-		} catch (IOException e) {
-			log.error("Failed to load ontology file at '" + p + "' as format "
-					+ format, e);
+		} catch (Exception e) {
+			log.warn("Could not load RDF file '" + p
+					+ "'. Check that it contains valid " + format + " data.", e);
 		}
 	}
 
@@ -113,6 +162,18 @@ public class RDFFilesLoader {
 			return "TURTLE";
 		else
 			return DEFAULT_RDF_FORMAT;
+	}
+
+	private static String locateHomeDirectory(ServletContext ctx) {
+		return ConfigurationProperties.getBean(ctx).getProperty(
+				PROPERTY_VITRO_HOME);
+	}
+
+	/**
+	 * No need to create an instance -- all methods are static.
+	 */
+	private RDFFilesLoader() {
+		// Nothing to initialize.
 	}
 
 }

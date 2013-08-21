@@ -82,11 +82,10 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 
 
         if (isFirstStartup()) {
-        	RDFFilesLoader loader = new RDFFilesLoader(ctx);
-        	loader.loadFirstTimeFiles("abox", baseABoxModel, true);
-        	loader.loadFirstTimeFiles("tbox", baseTBoxModel, true);
+        	RDFFilesLoader.loadFirstTimeFiles(ctx, "abox", baseABoxModel, true);
+        	RDFFilesLoader.loadFirstTimeFiles(ctx, "tbox", baseTBoxModel, true);
 
-        	loader.loadFirstTimeFiles("applicationMetadata", applicationMetadataModel, true);
+        	RDFFilesLoader.loadFirstTimeFiles(ctx, "applicationMetadata", applicationMetadataModel, true);
         	setPortalUriOnFirstTime(applicationMetadataModel, ctx);
         } else {
         	checkForNamespaceMismatch( applicationMetadataModel, ctx );

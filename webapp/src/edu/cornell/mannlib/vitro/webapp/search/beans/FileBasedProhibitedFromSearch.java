@@ -3,12 +3,10 @@
 package edu.cornell.mannlib.vitro.webapp.search.beans;
 
 import java.io.File;
-import java.io.FileInputStream;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.RDFFilesLoader;
 
 public class FileBasedProhibitedFromSearch extends ProhibitedFromSearch {
 
@@ -19,7 +17,7 @@ public class FileBasedProhibitedFromSearch extends ProhibitedFromSearch {
      * @param dir to find N3 files in.
      */
     public FileBasedProhibitedFromSearch(String uri, File dir){    
-        super( uri, JenaDataSourceSetupBase.getModelFromDir(dir));
+        super( uri, RDFFilesLoader.getModelFromDir(dir));
     }
     
     public FileBasedProhibitedFromSearch(String URI, OntModel model) {
