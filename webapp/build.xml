@@ -206,7 +206,7 @@
 		<copy todir="${vitrohome.image.dir}" file="${appbase.dir}/config/example.runtime.properties" />
 		<copy todir="${vitrohome.image.dir}" >
 			<fileset dir="${appbase.dir}" >
-				<include name="rdffiles/**/*" />
+				<include name="rdf/**/*" />
 			</fileset>
 		</copy>
     </target>

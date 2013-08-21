@@ -33,7 +33,7 @@ public class RDFFilesLoader {
 
 	private static final String PROPERTY_VITRO_HOME = "vitro.home";
 	private static final String DEFAULT_RDF_FORMAT = "RDF/XML";
-	private static final String RDF_FILES = "rdffiles";
+	private static final String RDF = "rdf";
 	private static final String FIRST_TIME = "firsttime";
 	private static final String EVERY_TIME = "everytime";
 
@@ -64,7 +64,7 @@ public class RDFFilesLoader {
 	public static void loadFirstTimeFiles(ServletContext ctx, String modelPath,
 			Model model, boolean firstTime) {
 		if (firstTime) {
-			Set<Path> paths = getPaths(locateHomeDirectory(ctx), RDF_FILES,
+			Set<Path> paths = getPaths(locateHomeDirectory(ctx), RDF,
 					modelPath, FIRST_TIME);
 			for (Path p : paths) {
 				readOntologyFileIntoModel(p, model);
@@ -87,8 +87,8 @@ public class RDFFilesLoader {
 			OntModel model) {
 		OntModel everytimeModel = ModelFactory
 				.createOntologyModel(OntModelSpec.OWL_MEM);
-		Set<Path> paths = getPaths(locateHomeDirectory(ctx), RDF_FILES,
-				modelPath, EVERY_TIME);
+		Set<Path> paths = getPaths(locateHomeDirectory(ctx), RDF, modelPath,
+				EVERY_TIME);
 		for (Path p : paths) {
 			readOntologyFileIntoModel(p, everytimeModel);
 		}

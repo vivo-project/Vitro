@@ -42,7 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 public class FileGraphSetup implements ServletContextListener {
 	private static final Log log = LogFactory.getLog(FileGraphSetup.class);
 
-	private static final String RDFFILES = "rdffiles";
+	private static final String RDF = "rdf";
     private static final String ABOX = "abox";
     private static final String TBOX = "tbox";
     private static final String FILEGRAPH = "filegraph";
@@ -74,7 +74,7 @@ public class FileGraphSetup implements ServletContextListener {
             RDFServiceModelMaker maker = new RDFServiceModelMaker(RDFServiceUtils.getRDFServiceFactory(ctx));
 
             // ABox files
-            Set<Path> paths = getFilegraphPaths(ctx, RDFFILES, ABOX, FILEGRAPH);
+            Set<Path> paths = getFilegraphPaths(ctx, RDF, ABOX, FILEGRAPH);
 
             cleanupDB(dataset, pathsToURIs(paths, ABOX), ABOX);
 
@@ -82,7 +82,7 @@ public class FileGraphSetup implements ServletContextListener {
             aboxChanged = readGraphs(paths, maker, ABOX, aboxBaseModel);		
 
             // TBox files
-            paths = getFilegraphPaths(ctx, RDFFILES, TBOX, FILEGRAPH);
+            paths = getFilegraphPaths(ctx, RDF, TBOX, FILEGRAPH);
 
             cleanupDB(dataset, pathsToURIs(paths, TBOX),TBOX);
 
