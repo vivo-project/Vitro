@@ -55,7 +55,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 public class DataGetterUtils {
     
     final static Log log = LogFactory.getLog(DataGetterUtils.class);
-
+    
+    /**
+     * Attribute name in request for DataGetters
+     */
+    public final static String DATA_GETTERS_FOR_PAGE = "data_getters_for_page";
+    
     /**
      * Get a list of DataGetter objects that are associated with a page.
      * This should not return PageDataGetters and should not throw an 
@@ -63,10 +68,16 @@ public class DataGetterUtils {
      */
 	public static List<DataGetter> getDataGettersForPage(VitroRequest vreq, Model displayModel, String pageURI) 
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
-		List<String> dgUris = getDataGetterURIsForAssociatedURI(displayModel, pageURI);
-		List<DataGetter> dgList = dataGettersForURIs(vreq, displayModel, dgUris);
-		log.debug("getDataGettersForPage: " + dgList);
-		return dgList;
+
+	    if( vreq.getAttribute(DATA_GETTERS_FOR_PAGE) != null){
+	        return (List<DataGetter>) vreq.getAttribute(DATA_GETTERS_FOR_PAGE);
+	    }else{
+    		List<String> dgUris = getDataGetterURIsForAssociatedURI(displayModel, pageURI);
+    		List<DataGetter> dgList = dataGettersForURIs(vreq, displayModel, dgUris);
+    		log.debug("getDataGettersForPage: " + dgList);
+    		vreq.setAttribute( DATA_GETTERS_FOR_PAGE , dgList );
+    		return dgList;
+	    }
 	}
     
     /**

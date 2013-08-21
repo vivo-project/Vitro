@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,8 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequiresActions;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -41,6 +44,42 @@ public class PageController extends FreemarkerHttpServlet{
 
     protected static final String DATA_GETTER_MAP = "pageTypeToDataGetterMap";
  
+    /**
+     * Get the required actions for all the data getters then
+     * AND them together.
+     */
+    @Override
+    protected Actions requiredActions(VitroRequest vreq) {
+        try {
+            Actions actAcc = null;
+            List<DataGetter> dgList = 
+                DataGetterUtils.getDataGettersForPage(vreq, vreq.getDisplayModel(), getPageUri(vreq));
+            for( DataGetter dg : dgList){
+                if( dg instanceof RequiresActions ){
+                    RequiresActions ra = (RequiresActions) dg;
+                    Actions acts = ra.requiredActions(vreq);                        
+                    if( acts != null ){
+                        if( actAcc != null ){
+                            actAcc.and( acts );
+                        }else{
+                            actAcc = acts;
+                        }
+                    }
+                }
+            }
+            
+            if( actAcc == null )
+                return Actions.AUTHORIZED;
+            else
+                return actAcc;
+            
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            log.debug(e);
+            return Actions.UNAUTHORIZED;
+        }                
+    }
+    
     @Override
     protected ResponseValues processRequest(VitroRequest vreq) throws Exception {
                    

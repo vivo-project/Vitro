@@ -39,15 +39,39 @@ public class Actions {
 		return (actions == null) ? AUTHORIZED : actions;
 	}
 
-	private final List<Set<RequestedAction>> clauseList;
-
+	/**
+	 * This is a list of clauses that get ORed together. 
+	 * If all of the RequestedAction objects from any of the
+	 * Sets are authorized, then the Actions object should
+	 * be considered authorized.   
+	 */
+	private List<Set<RequestedAction>> clauseList;
+	
+	public Actions(){
+        clauseList= new ArrayList<Set<RequestedAction>>();
+	}	    
+	
 	public Actions(RequestedAction... actions) {
 		this(Arrays.asList(actions));
 	}
 
+	public Actions(Actions... actions){
+	    Set<RequestedAction> accumActs = new HashSet<RequestedAction>();
+	    for( Actions actionToAnd : actions){
+	        if( actionToAnd != null ){
+	            for( Set<RequestedAction> ras : actionToAnd.clauseList){
+	                accumActs.addAll( ras );
+	            }	            
+	        }
+	    }
+	    clauseList= new ArrayList<Set<RequestedAction>>();
+	    clauseList.add( accumActs );
+	}
+	
 	public Actions(Collection<RequestedAction> actions) {
 		this(Collections.<Set<RequestedAction>> emptyList(), actions);
 	}
+	
 
 	private Actions(List<Set<RequestedAction>> oldList,
 			Collection<RequestedAction> newActions) {
@@ -61,7 +85,19 @@ public class Actions {
 		}
 		this.clauseList = Collections.unmodifiableList(newList);
 	}
-
+	
+	public Actions and(RequestedAction... newActions){
+	    return and(Arrays.asList( newActions));
+	}
+		
+	public Actions and(Collection<RequestedAction> newActions){
+	    return new Actions( this.clauseList, newActions);
+	}
+	
+	public void and( Actions otherAct ) throws Exception{
+	    andWithAction(otherAct);
+	}
+		
 	public Actions or(RequestedAction... newActions) {
 		return or(Arrays.asList(newActions));
 	}
@@ -143,6 +179,42 @@ public class Actions {
 		return sb.toString();
 	}
 
+	/**
+	 * AND for Actions.
+	 * ANDing with an Action with multiple disjoint clauses is not supported.
+	 *  
+	 * To do the AND, we take each ORed clause, and add all of the RequestedActions
+	 * so now in each of the alternative clauses, all of the singleClauseToAnd
+	 * RequestedActions are required.
+	 * 
+	 * @throws Exception  when multiple disjoint clauses are present on both Actions.
+	 */
+	private void andWithAction( Actions otherAct ) throws Exception{
+	    Set<RequestedAction> singleClauseToAnd;
+	    List<Set<RequestedAction>> clauses;
+	    
+	    if( otherAct.singleAndClause() ){
+	        clauses = this.clauseList; 
+	        singleClauseToAnd = otherAct.clauseList.get(0);
+	    }else if( this.singleAndClause() ){
+	        clauses = new ArrayList<Set<RequestedAction>>( otherAct.clauseList );
+	        singleClauseToAnd = this.clauseList.get(0);
+	    }else{
+	        //both have multiple ORed clauses, give up
+	       throw new Exception("ANDing with an Action with multiple disjoint clauses is not supported.");
+	    }
+	    
+	    // 
+	    for( Set<RequestedAction> clause : clauses){
+	        clause.addAll( singleClauseToAnd );
+	    }	    
+	    this.clauseList = clauses;
+	}
+	
+	private boolean singleAndClause(){
+	    return clauseList.size() == 1;
+	}
+	
 	/**
 	 * Nobody knows about this action class, so only the root user should be
 	 * authorized for it.

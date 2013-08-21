@@ -5,18 +5,17 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-### Test page for SPARQL UPDATE ###
-### Not For Production ###
-display:SparqlTestMenuItem
+###  page for SPARQL UPDATE ###
+display:SparqlUpdateMenuItem
     a display:NavigationElement ;
-    display:linkText "SPARQL Update Test";
-    display:toPage display:SparqlUpdateTestPage .
+    display:linkText "SPARQL Update";
+    display:toPage display:SparqlUpdatePage .
 
-display:SparqlUpdateTestPage
+display:SparqlUpdatePage
     a display:Page ;
-    display:title "SPARQL Update Test" ;
-    display:urlMapping "/sparqlUpdateTest" ;
+    display:title "SPARQL Update" ;
+    display:urlMapping "/sparql" ;
     display:hasDataGetter display:sparqlUpdateDataGetter .
     
 display:sparqlUpdateDataGetter
-      a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlUpdateTestDataGetter> .  
+      a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlUpdate> .  
