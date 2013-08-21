@@ -3,7 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 
-import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +19,8 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleRequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequiresActions;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -51,33 +53,70 @@ public class PageController extends FreemarkerHttpServlet{
     @Override
     protected Actions requiredActions(VitroRequest vreq) {
         try {
-            Actions actAcc = null;
-            List<DataGetter> dgList = 
-                DataGetterUtils.getDataGettersForPage(vreq, vreq.getDisplayModel(), getPageUri(vreq));
-            for( DataGetter dg : dgList){
-                if( dg instanceof RequiresActions ){
-                    RequiresActions ra = (RequiresActions) dg;
-                    Actions acts = ra.requiredActions(vreq);                        
-                    if( acts != null ){
-                        if( actAcc != null ){
-                            actAcc.and( acts );
-                        }else{
-                            actAcc = acts;
-                        }
-                    }
-                }
-            }
-            
-            if( actAcc == null )
+            Actions pageActs = getActionsForPage( vreq );
+            Actions dgActs = getActionsForDataGetters( vreq );
+
+            if( pageActs == null && dgActs == null){
                 return Actions.AUTHORIZED;
-            else
-                return actAcc;
+            }else if( pageActs == null && dgActs != null ){
+                return dgActs;
+            }else{
+                return pageActs;
+            }                
             
         } catch (Exception e) {
             // TODO Auto-generated catch block
             log.debug(e);
             return Actions.UNAUTHORIZED;
         }                
+    }
+
+    /**
+     * Get all the required actions directly required for the page.
+     */
+    private Actions getActionsForPage( VitroRequest vreq ) throws Exception{
+        List<String> simplePremUris = vreq.getWebappDaoFactory().getPageDao()
+            .getRequiredActions( getPageUri(vreq) );
+        
+        List<RequestedAction> actions = new ArrayList<RequestedAction>();
+        
+        for( String uri : simplePremUris ){
+            actions.add( new SimpleRequestedAction(uri) );
+        }
+        
+        return new Actions( actions );
+    }
+    /**
+     * Get Actions object for the data getters for the page.
+     */
+    private Actions getActionsForDataGetters(VitroRequest vreq ){
+        try {
+            Actions dgActs = null;
+
+            List<DataGetter> dgList = 
+                DataGetterUtils.getDataGettersForPage(
+                    vreq, vreq.getDisplayModel(), getPageUri(vreq));
+
+            for( DataGetter dg : dgList){
+                if( dg instanceof RequiresActions ){
+                    RequiresActions ra = (RequiresActions) dg;
+                    Actions acts = ra.requiredActions(vreq);                        
+                    if( acts != null ){
+                        if( dgActs != null ){
+                            dgActs.and( acts );
+                        }else{
+                            dgActs = acts;
+                        }
+                    }
+                }
+            }
+            
+            return dgActs;
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            log.debug(e);
+            return Actions.UNAUTHORIZED;
+        }
     }
     
     @Override
