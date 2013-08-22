@@ -11,11 +11,13 @@ display:SparqlUpdateMenuItem
     display:linkText "SPARQL Update";
     display:toPage display:SparqlUpdatePage .
 
+display:sparqlUpdateDataGetter
+      a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlUpdate> .  
+
 display:SparqlUpdatePage
     a display:Page ;
     display:title "SPARQL Update" ;
     display:urlMapping "/sparql" ;
-    display:hasDataGetter display:sparqlUpdateDataGetter .
+    display:hasDataGetter display:sparqlUpdateDataGetter ;
+    display:requiredAction <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#UseAdvancedDataToolsPages> .
     
-display:sparqlUpdateDataGetter
-      a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlUpdate> .  

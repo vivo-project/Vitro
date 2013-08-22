@@ -143,8 +143,7 @@ public class PageController extends FreemarkerHttpServlet{
             return doNotFound(vreq);
         }
         
-        //executePageDataGetters( pageUri, vreq, getServletContext(), mapForTemplate );
-        //these should all be data getters now
+        //these should all be DataGetters now, not PageDataGetters
         executeDataGetters( pageUri, vreq, mapForTemplate);
 
         mapForTemplate.putAll( getPageControllerValues( pageUri, vreq, getServletContext(), mapForTemplate));
