@@ -100,12 +100,12 @@ public class PageController extends FreemarkerHttpServlet{
             for( DataGetter dg : dgList){
                 if( dg instanceof RequiresActions ){
                     RequiresActions ra = (RequiresActions) dg;
-                    Actions acts = ra.requiredActions(vreq);                        
-                    if( acts != null ){
+                    Actions newActions = ra.requiredActions(vreq);                        
+                    if( newActions != null ){
                         if( dgActs != null ){
-                            dgActs.and( acts );
+                            dgActs = dgActs.and( newActions );
                         }else{
-                            dgActs = acts;
+                            dgActs = newActions;
                         }
                     }
                 }
