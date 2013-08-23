@@ -115,9 +115,16 @@ public class QueryUtils {
     }
     
     public static ResultSet getQueryResults(String queryStr, VitroRequest vreq) {
-        
-        Dataset dataset = vreq.getDataset();
-        dataset.getLock().enterCriticalSection(Lock.READ);
+        return getQueryResults(queryStr, vreq.getDataset());
+    }
+
+    public static ResultSet getLanguageNeutralQueryResults(String queryStr, VitroRequest vreq) {
+    	return getQueryResults(queryStr, vreq.getUnfilteredDataset());
+    }
+
+    /** Already have the dataset, so process the query and return the results. */
+	private static ResultSet getQueryResults(String queryStr, Dataset dataset) {
+		dataset.getLock().enterCriticalSection(Lock.READ);
         QueryExecution qexec = null;
         ResultSet results = null;
         try {
@@ -133,6 +140,6 @@ public class QueryUtils {
         } 
         
         return results;
-    }
+	}
 
 }

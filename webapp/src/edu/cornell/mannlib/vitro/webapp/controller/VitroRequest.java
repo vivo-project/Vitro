@@ -95,6 +95,14 @@ public class VitroRequest extends HttpServletRequestWrapper {
     	setAttribute("dataset", dataset);
     }
     
+    public Dataset getUnfilteredDataset() {
+    	return (Dataset) getAttribute("unfilteredDataset");
+    }
+    
+    public void setUnfilteredDataset(Dataset dataset) {
+    	setAttribute("unfilteredDataset", dataset);
+    }
+    
     //Method that retrieves write model, returns special model in case of write model
     public OntModel getWriteModel() {
     	//if special write model doesn't exist use get ont model 
