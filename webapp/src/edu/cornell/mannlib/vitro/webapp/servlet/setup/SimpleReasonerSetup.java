@@ -142,7 +142,8 @@ public class SimpleReasonerSetup implements ServletContextListener {
     private void waitForTBoxReasoning(PelletListener pelletListener) 
         throws InterruptedException {
       int sleeps = 0;
-      while (sleeps < 1000 && pelletListener.isReasoning()) {
+      // sleep at least once to make sure the TBox reasoning gets started
+      while ((0 == sleeps) || ((sleeps < 1000) && pelletListener.isReasoning())) {
           if ((sleeps % 10) == 0) { // print message at 10 second intervals
               log.info("Waiting for initial TBox reasoning to complete");
           }

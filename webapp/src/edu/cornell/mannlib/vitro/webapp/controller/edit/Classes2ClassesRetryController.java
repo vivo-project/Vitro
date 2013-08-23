@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
 public class Classes2ClassesRetryController extends BaseEditController {
@@ -43,7 +44,7 @@ public class Classes2ClassesRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        VClassDao vcDao = request.getUnfilteredWebappDaoFactory().getVClassDao();
+        VClassDao vcDao = ModelAccess.on(getServletContext()).getWebappDaoFactory().getVClassDao();
         epo.setDataAccessObject(vcDao);
         Classes2Classes objectForEditing = new Classes2Classes();
 
