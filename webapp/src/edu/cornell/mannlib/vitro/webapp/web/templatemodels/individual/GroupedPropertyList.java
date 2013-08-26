@@ -75,9 +75,9 @@ public class GroupedPropertyList extends BaseTemplateModel {
         List<ObjectProperty> populatedObjectPropertyList = subject
                 .getPopulatedObjectPropertyList();
         
-        List<ObjectProperty> additions = ApplicationConfigurationOntologyUtils
+        Collection<ObjectProperty> additions = ApplicationConfigurationOntologyUtils
                 .getAdditionalFauxSubpropertiesForList(
-                        populatedObjectPropertyList, vreq);
+                        populatedObjectPropertyList, subject, vreq);
         if (log.isDebugEnabled()) {
             for (ObjectProperty t : additions) {
                 log.debug(t.getDomainPublic() + " " + t.getGroupURI());

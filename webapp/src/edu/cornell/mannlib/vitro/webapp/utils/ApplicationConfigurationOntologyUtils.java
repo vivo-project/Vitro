@@ -20,8 +20,12 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
@@ -30,16 +34,17 @@ public class ApplicationConfigurationOntologyUtils {
 
     private static final Log log = LogFactory.getLog(ApplicationConfigurationOntologyUtils.class);
     
-    public static List<ObjectProperty> getAdditionalFauxSubpropertiesForList(List<ObjectProperty> propList, VitroRequest vreq) {
+    public static List<ObjectProperty> getAdditionalFauxSubpropertiesForList(List<ObjectProperty> propList, Individual subject, VitroRequest vreq) {
         ServletContext ctx = vreq.getSession().getServletContext();
 		Model displayModel = ModelAccess.on(ctx).getDisplayModel();
         Model tboxModel = ModelAccess.on(ctx).getOntModel(ModelID.UNION_TBOX);
-        return getAdditionalFauxSubpropertiesForList(propList, displayModel, tboxModel);
+        return getAdditionalFauxSubpropertiesForList(propList, subject, displayModel, tboxModel);
     }
     
     
     
     public static List<ObjectProperty> getAdditionalFauxSubpropertiesForList(List<ObjectProperty> propList, 
+                                                                         Individual subject, 
                                                                          Model displayModel, 
                                                                          Model tboxModel) {
         List<ObjectProperty> additionalProps = new ArrayList<ObjectProperty>();
@@ -47,11 +52,12 @@ public class ApplicationConfigurationOntologyUtils {
         String propQuery = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
                 "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
                 "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
-                "SELECT ?range ?label ?group ?customForm WHERE { \n" +
+                "SELECT DISTINCT ?range ?domain ?label ?group ?customForm WHERE { \n" +
         		"    ?p rdfs:subPropertyOf ?property . \n" +
                 "    ?context config:configContextFor ?p . \n" +
         		"    ?context config:qualifiedBy ?range . \n" +
                 "    ?context config:hasConfiguration ?configuration . \n" +
+        		"    OPTIONAL { ?context config:qualifiedByDomain ?domain } \n" +
         		"    OPTIONAL { ?configuration config:propertyGroup ?group } \n" +
                 "    OPTIONAL { ?configuration config:displayName ?label } \n" +
                 "    OPTIONAL { ?configuration vitro:customEntryFormAnnot ?customForm } \n" +
@@ -70,6 +76,10 @@ public class ApplicationConfigurationOntologyUtils {
                     newProp.setURI(op.getURI());
                     QuerySolution qsoln = rs.nextSolution();
                     log.debug(qsoln);
+                    Resource domainRes = qsoln.getResource("domain");
+                    if(domainRes != null && !appropriateDomain(domainRes, subject, tboxModel)) {
+                        continue;
+                    }
                     Resource rangeRes = qsoln.getResource("range");
                     if (rangeRes != null) {
                         newProp.setRangeVClassURI(rangeRes.getURI());
@@ -104,6 +114,17 @@ public class ApplicationConfigurationOntologyUtils {
         return additionalProps;
     }
     
-    
+    private static boolean appropriateDomain(Resource domainRes, Individual subject, Model tboxModel) {
+        for (VClass vclass : subject.getVClasses()) {
+            if ((vclass.getURI() != null) &&
+                    ((vclass.getURI().equals(domainRes.getURI()) ||
+                    (tboxModel.contains(
+                            ResourceFactory.createResource(
+                                    vclass.getURI()), RDFS.subClassOf, domainRes))))) {
+                return true;
+            }
+        }
+        return false;
+    }
     
 }
