@@ -282,8 +282,6 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     	if("desc".equalsIgnoreCase( sortDirection ) ){
     		queryString = queryString.replaceAll(" ASC\\(", " DESC(");
     	}
-    	
-        log.debug("Query string for object property " + propertyUri + ": " + queryString);
         
         Query query = null;
         try {
@@ -297,9 +295,11 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         QuerySolutionMap initialBindings = new QuerySolutionMap();
         initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
         initialBindings.add("property", ResourceFactory.createResource(propertyUri));
-        if (rangeUri != null) {
+        if (rangeUri != null && !rangeUri.startsWith(VitroVocabulary.PSEUDO_BNODE_NS)) {
             initialBindings.add("objectType", ResourceFactory.createResource(rangeUri));
         }
+        
+        log.debug("Query string for object property " + propertyUri + ": " + queryString);
         
         // Run the SPARQL query to get the properties
         List<Map<String, String>> list = new ArrayList<Map<String, String>>();
@@ -350,13 +350,13 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         Model constructedModel = ModelFactory.createDefaultModel();
         
         for (String queryString : constructQueries) {
+                     
+            queryString = queryString.replace("?subject", "<" + subjectUri + ">");
+            queryString = queryString.replace("?property", "<" + propertyUri + ">");
          
             log.debug("CONSTRUCT query string for object property " + 
                     propertyUri + ": " + queryString);
             
-            queryString = queryString.replace("?subject", "<" + subjectUri + ">");
-            queryString = queryString.replace("?property", "<" + propertyUri + ">");
-                       
             // we no longer need this query object, but we might want to do this
             // query parse step to improve debugging, depending on the error returned
             // through the RDF API

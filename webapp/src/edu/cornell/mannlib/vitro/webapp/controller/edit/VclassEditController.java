@@ -24,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -44,7 +45,7 @@ public class VclassEditController extends BaseEditController {
         EditProcessObject epo = super.createEpo(request, FORCE_NEW);
         request.setAttribute("epoKey", epo.getKey());
 
-        VClassDao vcwDao = request.getUnfilteredWebappDaoFactory().getVClassDao();
+        VClassDao vcwDao = ModelAccess.on(getServletContext()).getBaseWebappDaoFactory().getVClassDao();
         VClass vcl = (VClass)vcwDao.getVClassByURI(request.getParameter("uri"));
         
         if (vcl == null) {
@@ -140,8 +141,8 @@ public class VclassEditController extends BaseEditController {
         HashMap formSelect = new HashMap(); // tells the JSP what select lists are populated, and thus should be displayed
         request.setAttribute("formSelect",formSelect);
 
-        // if supported, we want to show only the asserted superclasses and subclasses.  Don't want to see anonymous classes, restrictions, etc.
-        VClassDao vcDao = request.getUnfilteredAssertionsWebappDaoFactory().getVClassDao();
+        // if supported, we want to show only the asserted superclasses and subclasses.
+        VClassDao vcDao = ModelAccess.on(getServletContext()).getBaseWebappDaoFactory().getVClassDao();
         List superURIs = vcDao.getSuperClassURIs(vcl.getURI(),false);
         List superVClasses = new ArrayList();
         Iterator superURIit = superURIs.iterator();

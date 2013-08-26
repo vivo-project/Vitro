@@ -99,41 +99,60 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	return getDefaultObjectEditConfiguration(vreq, session);
     }
 	
-    protected List<String> getRangeTypes(VitroRequest vreq) {
-        WebappDaoFactory wDaoFact = vreq.getWebappDaoFactory();
-        List<String> types = new ArrayList<String>();
+    protected List<VClass> getRangeTypes(VitroRequest vreq) {
+        // This first part needs a WebappDaoFactory with no filtering/RDFService
+        // funny business because it needs to be able to retrieve anonymous union
+        // classes by their "pseudo-bnode URIs".
+        // Someday we'll need to figure out a different way of doing this.
+        WebappDaoFactory ctxDaoFact = ModelAccess.on(
+                vreq.getSession().getServletContext()).getWebappDaoFactory();
+        List<VClass> types = new ArrayList<VClass>();
     	Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
    		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
    		String rangeUri = EditConfigurationUtils.getRangeUri(vreq);
    		if (rangeUri != null) {
-   		    types.add(rangeUri);
+   		    VClass rangeVClass = ctxDaoFact.getVClassDao().getVClassByURI(rangeUri);
+   		    if (!rangeVClass.isUnion()) {
+   		        types.add(rangeVClass);    
+   		    } else {
+   		        for (VClass unionComponent : rangeVClass.getUnionComponents()) {
+   		            types.add(unionComponent);
+   		        }
+   		    }
 	        return types;
    		}
+   		WebappDaoFactory wDaoFact = vreq.getWebappDaoFactory();
 		//Get all vclasses applicable to subject
 		List<VClass> vClasses = subject.getVClasses();
-		HashSet<String> typesHash = new HashSet<String>();
+		HashMap<String, VClass> typesHash = new HashMap<String, VClass>();
 		for(VClass vclass: vClasses) {
 			 List<VClass> rangeVclasses = wDaoFact.getVClassDao().getVClassesForProperty(vclass.getURI(),predicateUri);
 			 if(rangeVclasses !=  null) {
 				 for(VClass range: rangeVclasses) {
 					 //a hash will keep a unique list of types and so prevent duplicates
-					 typesHash.add(range.getURI());
+					 typesHash.put(range.getURI(), range);
 				 }
 			 }
 		}
-		types.addAll(typesHash);
+		types.addAll(typesHash.values());
         return types;
 	}	
 	
     private boolean tooManyRangeOptions(VitroRequest vreq, HttpSession session ) throws SolrServerException {
-    	List<String> types = getRangeTypes(vreq);
+    	List<VClass> rangeTypes = getRangeTypes(vreq);
     	SolrServer solrServer = SolrSetup.getSolrServer(session.getServletContext());
     	
+    	List<String> types = new ArrayList<String>();
     	//empty list means the range is not set to anything, force Thing
-    	if(types.size() == 0 ){
-    		types = new ArrayList<String>();
-    		types.add(VitroVocabulary.OWL_THING);
-    	}
+        if(types.size() == 0 ){
+            types.add(VitroVocabulary.OWL_THING);
+        } else { 
+        	for (VClass vclass : rangeTypes) {
+        	    if (vclass.getURI() != null) {
+        	        types.add(vclass.getURI());
+        	    }
+        	}
+        }
     	
     	long count = 0;    		   
     	for( String type:types){
@@ -184,7 +203,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	this.setSparqlQueries(editConfiguration);
     	
     	//set fields
-    	setFields(editConfiguration, vreq, EditConfigurationUtils.getPredicateUri(vreq), EditConfigurationUtils.getRangeUri(vreq));
+    	setFields(editConfiguration, vreq, EditConfigurationUtils.getPredicateUri(vreq), getRangeTypes(vreq));
     	
     //	No need to put in session here b/c put in session within edit request dispatch controller instead
     	//placing in session depends on having edit key which is handled in edit request dispatch controller
@@ -358,7 +377,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
         setFields(editConfiguration, vreq, predicateUri, null);
     }
     
-    protected void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri, String rangeUri) throws Exception {
+    protected void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri, List<VClass> rangeTypes) throws Exception {
 		FieldVTwo field = new FieldVTwo();
     	field.setName("objectVar");    	
     	
@@ -370,7 +389,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     		field.setOptions( new IndividualsViaObjectPropetyOptions(
     	        subjectUri, 
     	        predicateUri,
-    	        rangeUri,
+    	        rangeTypes,
     	        objectUri));
     	}else{
     		field.setOptions(null);
@@ -441,14 +460,22 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 		formSpecificData.put("editMode", getEditMode(vreq).toString().toLowerCase());
 		
 		//We also need the type of the object itself
-		List<String> types = getRangeTypes(vreq);
+		List<VClass> types = getRangeTypes(vreq);
         //if types array contains only owl:Thing, the search will not return any results
         //In this case, set an empty array
-        if(types.size() == 1 && types.get(0).equals(VitroVocabulary.OWL_THING) ){
-        	types = new ArrayList<String>();
+        if(types.size() == 1 && types.get(0).getURI().equals(VitroVocabulary.OWL_THING) ){
+        	types = new ArrayList<VClass>();
         }
 		
-		formSpecificData.put("objectTypes", StringUtils.join(types, ","));
+        StringBuffer typesBuff = new StringBuffer();
+        for (VClass type : types) {
+            if (type.getURI() != null) {
+                typesBuff.append(type.getURI()).append(",");
+            }
+        }
+        
+		formSpecificData.put("objectTypes", typesBuff.toString());
+		log.debug("autocomplete object types : "  + formSpecificData.get("objectTypes"));
 		
 		//Get label for individual if it exists
 		if(EditConfigurationUtils.getObjectIndividual(vreq) != null) {
@@ -464,15 +491,15 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 		editConfiguration.setFormSpecificData(formSpecificData);
 	}
 	
-	private Object rangeIndividualsExist(HttpSession session, List<String> types) throws SolrServerException {		
+	private Object rangeIndividualsExist(HttpSession session, List<VClass> types) throws SolrServerException {		
     	SolrServer solrServer = SolrSetup.getSolrServer(session.getServletContext());
     	
     	boolean rangeIndividualsFound = false;
-    	for( String type:types){
+    	for( VClass type:types){
     		//solr for type count.
     		SolrQuery query = new SolrQuery();   
     		
-    		query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type);
+    		query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type.getURI());
     		query.setRows(0);
     		
     		QueryResponse rsp = solrServer.query(query);

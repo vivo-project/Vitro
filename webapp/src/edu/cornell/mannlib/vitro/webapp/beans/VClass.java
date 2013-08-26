@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.beans;
 
 import java.text.Collator;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.openrdf.model.impl.URIImpl;
 
@@ -90,6 +92,9 @@ public class VClass extends BaseResourceBean implements Comparable<VClass>
     protected Float searchBoost = null;
     public Float getSearchBoost() { return searchBoost; }
     public void setSearchBoost( Float boost ){ searchBoost = boost;}
+    
+    public boolean isUnion() { return false; }
+    public List<VClass> getUnionComponents() { return new ArrayList<VClass>(); }
     
     /**
      * Default constructor

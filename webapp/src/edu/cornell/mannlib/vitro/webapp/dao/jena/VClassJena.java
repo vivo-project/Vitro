@@ -2,10 +2,15 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntClass;
+import com.hp.hpl.jena.ontology.UnionClass;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -376,4 +381,27 @@ public class VClassJena extends VClass {
             }
         }		 	                      
     }
+    
+    @Override
+    public boolean isUnion() {
+        return this.cls.isUnionClass();
+    }
+    
+    //TODO consider anonymous components
+    @Override
+    public List<VClass> getUnionComponents() {
+        List<VClass> unionComponents = new ArrayList<VClass>();
+        if (isUnion()) {
+            UnionClass union = this.cls.as(UnionClass.class);
+            Iterator<? extends OntClass> opIt = union.listOperands();
+            while(opIt.hasNext()) {
+                OntClass component = opIt.next();
+                if (!component.isAnon()) {
+                    unionComponents.add(new VClassJena(component, this.webappDaoFactory));  
+                }
+            }
+        }
+        return unionComponents;
+    }
+    
 }

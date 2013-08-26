@@ -925,8 +925,10 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     			return null;
     		if (vitroURIStr.indexOf(PSEUDO_BNODE_NS)==0) {
     			String idStr = vitroURIStr.split("#")[1];
+    			log.debug("Trying to get bnode " + idStr);
     			RDFNode rdfNode = ontModel.getRDFNode(Node.createAnon(AnonId.create(idStr)));
     			if ( (rdfNode != null) && (rdfNode.canAs(OntClass.class)) ) {
+    			    log.debug("found it");
     				cls = rdfNode.as(OntClass.class);
     			}
 			} else {

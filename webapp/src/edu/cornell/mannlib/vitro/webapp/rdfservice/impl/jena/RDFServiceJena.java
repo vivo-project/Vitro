@@ -129,6 +129,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                                 Resource s2 = (Resource) n;
                                 // now run yet another describe query
                                 String smallerTree = makeDescribe(s2);
+                                log.info(smallerTree);
                                 Query smallerTreeQuery = QueryFactory.create(smallerTree);
                                 QueryExecution qe3 = QueryExecutionFactory.create(
                                         smallerTreeQuery, tree);
@@ -184,7 +185,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         }
         queryBuff.append("} \n");
         
-        log.debug(queryBuff.toString());
+        log.info(queryBuff.toString());
         
         Query construct = QueryFactory.create(queryBuff.toString());
         // make a plain dataset to force the query to be run in a way that

@@ -16,6 +16,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.IntersectionClass;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
@@ -348,7 +349,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 				   Statement statement = stmtIter.next();
 				   
 				   if ( statement.getSubject().canAs(OntClass.class) ) {
-					   classURISet.addAll(getRelatedClasses(statement.getSubject().as(OntClass.class)));
+					   classURISet.addAll(getRestrictedClasses(statement.getSubject().as(OntClass.class)));
 				   } else {
 					   log.warn("getClassesWithRestrictionOnProperty: Unexpected use of onProperty: it is not applied to a class");
 				   }
@@ -381,9 +382,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     }
 
 	/**
-	 * Finds all named superclasses, subclasses and equivalent classes of
-	 * the given class.
-	 *
+	 * Find named classes to which a restriction "applies"
 	 * @param   resourceURI  identifier of a class
 	 * @return  set of class URIs
 	 * 
@@ -391,13 +390,12 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 	 * the ontology model.
 	 */
 
-    public HashSet<String> getRelatedClasses(OntClass ontClass) {
+    public HashSet<String> getRestrictedClasses(OntClass ontClass) {
     	
         HashSet<String> classSet = new HashSet<String>();
   
         List<OntClass> classList = ontClass.listEquivalentClasses().toList();
         classList.addAll(ontClass.listSubClasses().toList());
-        classList.addAll(ontClass.listSuperClasses().toList());
         
         Iterator<OntClass> it = classList.iterator();
 		         
@@ -406,6 +404,8 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         	
         	if (!oc.isAnon()) {
         		classSet.add(oc.getURI());
+        	} else {
+        	    classSet.addAll(getRestrictedClasses(oc));
         	}
         }
         		
@@ -621,6 +621,28 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         return classes;
     }
     
+    private List<Restriction> getRelatedRestrictions(OntClass ontClass) {
+        List<Restriction> relatedRestrictions = new ArrayList<Restriction>();
+        if (ontClass.isRestriction()) {
+            relatedRestrictions.add(ontClass.as(Restriction.class));
+        } else if (ontClass.isIntersectionClass()) {
+            IntersectionClass inter = ontClass.as(IntersectionClass.class);
+            Iterator<? extends OntClass> operIt = inter.listOperands();
+            while (operIt.hasNext()) {
+                relatedRestrictions.addAll(getRelatedRestrictions(operIt.next()));
+            }   
+        } else {
+            List<OntClass> superClasses = listSuperClasses(ontClass);
+            superClasses.addAll(listEquivalentClasses(ontClass));
+            for (OntClass sup : superClasses) {
+                if (!sup.equals(ontClass)) {
+                    relatedRestrictions.addAll(getRelatedRestrictions(sup));
+                }
+            }
+        }
+        return relatedRestrictions;
+    }
+    
     public List<PropertyInstance> getAllPropInstByVClasses(List<VClass> vclasses) {
         
         List<PropertyInstance> propInsts = new ArrayList<PropertyInstance>();
@@ -651,55 +673,52 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 		            String VClassURI = vclass.getURI();
 		            
 		        	OntClass ontClass = getOntClass(ontModel,VClassURI);
-		        	if (ontClass != null) {
-		        	    List<OntClass> relatedClasses = new ArrayList<OntClass>();
-		        	    relatedClasses.addAll(listEquivalentClasses(ontClass));		        	    
-		        	    relatedClasses.addAll(listSuperClasses(ontClass));
-		        	    for (OntClass relatedClass : relatedClasses) {
-    		        	    // find properties in restrictions
-    		        		if (relatedClass.isRestriction() && relatedClass.canAs(Restriction.class)) {
-    		        			// TODO: check if restriction is something like
-    		        			// maxCardinality 0 or allValuesFrom owl:Nothing,
-    		        			// in which case the property is NOT applicable!
-    		        			Restriction rest = relatedClass.as(Restriction.class);
-    		        			OntProperty onProperty = rest.getOnProperty();
-    		        			if (onProperty != null) {
-    		        			    Resource[] ranges = new Resource[2];
-    		        			    if (rest.isAllValuesFromRestriction()) {
-    		        			        ranges[0] = (rest.asAllValuesFromRestriction()).getAllValuesFrom();
-    		        			    } else if (rest.isSomeValuesFromRestriction()) {
-                                        ranges[1] = (rest.asSomeValuesFromRestriction()).getSomeValuesFrom();
-                                    }
-    		        				updatePropertyRangeMap(applicableProperties, onProperty.getURI(), ranges);
-    		        			}
-    		        		}
-		        	    }
-		        		
-		        	    List<Resource> propertyList = 
-		        	    	    getPropertiesWithAppropriateDomainFor(VClassURI);
-		        		for (Resource prop : propertyList) {
-		        		    if (prop.getNameSpace() != null 
-		        		            && !NONUSER_NAMESPACES.contains(
-		        		                    prop.getNameSpace()) ) {
-		        		        StmtIterator rangeSit = prop.listProperties(
-		        		                RDFS.range);
-		        		        Resource rangeRes = null;
-		        		        while (rangeSit.hasNext()) {    
-		        		            Statement s = rangeSit.nextStatement();
-		        		            if (s.getObject().isURIResource()) {
-		        		                rangeRes = (Resource) s.getObject();
-		        		            }
-		        		        }
-		        		        Resource[] ranges = new Resource[2];
-		        		        ranges[0] = rangeRes;
-		        		        updatePropertyRangeMap(
-		        		                applicableProperties, prop.getURI(), ranges);
-		        		        
-		        		    }
-		        		}
-		        		
+		        	if (ontClass == null) {
+		        	    continue;  
 		        	}
-		        }       
+	        	    List<Restriction> relatedRestrictions = getRelatedRestrictions(ontClass);
+	        	    for (Restriction rest : relatedRestrictions) {
+		        	    // find properties in restrictions
+	        			// TODO: check if restriction is something like
+	        			// maxCardinality 0 or allValuesFrom owl:Nothing,
+	        			// in which case the property is NOT applicable!
+	        			OntProperty onProperty = rest.getOnProperty();
+	        			if (onProperty != null) {
+	        			    Resource[] ranges = new Resource[2];
+	        			    if (rest.isAllValuesFromRestriction()) {
+	        			        ranges[0] = (rest.asAllValuesFromRestriction()).getAllValuesFrom();
+	        			    } else if (rest.isSomeValuesFromRestriction()) {
+                                ranges[1] = (rest.asSomeValuesFromRestriction()).getSomeValuesFrom();
+                            }
+	        				updatePropertyRangeMap(applicableProperties, onProperty.getURI(), ranges);
+		        		}
+	        	    }
+	        		
+	        	    List<Resource> propertyList = 
+	        	    	    getPropertiesWithAppropriateDomainFor(VClassURI);
+	        		for (Resource prop : propertyList) {
+	        		    if (prop.getNameSpace() != null 
+	        		            && !NONUSER_NAMESPACES.contains(
+	        		                    prop.getNameSpace()) ) {
+	        		        StmtIterator rangeSit = prop.listProperties(
+	        		                RDFS.range);
+	        		        Resource rangeRes = null;
+	        		        while (rangeSit.hasNext()) {    
+	        		            Statement s = rangeSit.nextStatement();
+	        		            if (s.getObject().isURIResource()) {
+	        		                rangeRes = (Resource) s.getObject();
+	        		            }
+	        		        }
+	        		        Resource[] ranges = new Resource[2];
+	        		        ranges[0] = rangeRes;
+	        		        updatePropertyRangeMap(
+	        		                applicableProperties, prop.getURI(), ranges);
+	        		        
+	        		    }
+	        		}
+	        		
+	        	}
+		             
         	} catch (Exception e) {
         		log.error("Unable to get applicable properties " +
         		          "by examining property restrictions and domains", e);

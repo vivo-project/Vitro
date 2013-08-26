@@ -525,15 +525,23 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	if( subjectVClasses == null ) {
     		vclasses = wdf.getVClassDao().getAllVclasses();
     	} else if (rangeClass != null) {
+    	    List<VClass> rangeVClasses = new ArrayList<VClass>();
     	    vclasses = new ArrayList<VClass>();
-    	    vclasses.add(rangeClass);
-    	    List<String> subURIs = wdf.getVClassDao().getSubClassURIs(rangeClass.getURI());
-    	    for (String subClassURI : subURIs) {
-    	        VClass subClass = wdf.getVClassDao().getVClassByURI(subClassURI);
-    	        if (subClass != null) {
-    	            vclasses.add(subClass);
-    	        }
-    	   }
+    	    if (!rangeClass.isUnion()) {    	        
+    	        rangeVClasses.add(rangeClass);
+    	    } else {
+    	        rangeVClasses.addAll(rangeClass.getUnionComponents());
+    	    }
+            for(VClass rangeVClass : rangeVClasses) {	
+                vclasses.add(rangeVClass);
+        	    List<String> subURIs = wdf.getVClassDao().getSubClassURIs(rangeVClass.getURI());
+        	    for (String subClassURI : subURIs) {
+        	        VClass subClass = wdf.getVClassDao().getVClassByURI(subClassURI);
+        	        if (subClass != null) {
+        	            vclasses.add(subClass);
+        	        }
+        	    }
+            }
     	} else {
     		//this hash is used to make sure there are no duplicates in the vclasses
     		//a more elegant method may look at overriding equals/hashcode to enable a single hashset of VClass objects
