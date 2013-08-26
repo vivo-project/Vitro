@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -37,6 +38,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
@@ -44,42 +47,40 @@ import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 
 /**
  * Services a sparql query.  This will return a simple error message and a 501 if
- * there is no jena Model.
+ * there is no Model.
  *
  * @author bdc34
  *
  */
 public class SparqlQueryServlet extends BaseEditController {
     private static final Log log = LogFactory.getLog(SparqlQueryServlet.class.getName());
-    
-    protected static HashMap<String,ResultSetFormat>formatSymbols = new HashMap<String,ResultSetFormat>();
-    static{
-        formatSymbols.put( ResultSetFormat.syntaxXML.getSymbol(),     ResultSetFormat.syntaxXML);
-        formatSymbols.put( ResultSetFormat.syntaxRDF_XML.getSymbol(), ResultSetFormat.syntaxRDF_XML);
-        formatSymbols.put( ResultSetFormat.syntaxRDF_N3.getSymbol(),  ResultSetFormat.syntaxRDF_N3);
-        formatSymbols.put( ResultSetFormat.syntaxText.getSymbol() ,   ResultSetFormat.syntaxText);
-        formatSymbols.put( ResultSetFormat.syntaxJSON.getSymbol() ,   ResultSetFormat.syntaxJSON);
-        formatSymbols.put( "vitro:csv", null);
-    }
-    
-    protected static HashMap<String,String> rdfFormatSymbols = new HashMap<String,String>();
-    static {
-    	rdfFormatSymbols.put( "RDF/XML", "application/rdf+xml" );
-    	rdfFormatSymbols.put( "RDF/XML-ABBREV", "application/rdf+xml" );
-    	rdfFormatSymbols.put( "N3", "text/n3" );
-    	rdfFormatSymbols.put( "N-TRIPLE", "text/plain" );
-    	rdfFormatSymbols.put( "TTL", "application/x-turtle" );
-    }
 
-    protected static HashMap<String, String>mimeTypes = new HashMap<String,String>();
-    static{
-        mimeTypes.put( ResultSetFormat.syntaxXML.getSymbol() ,         "text/xml" );
-        mimeTypes.put( ResultSetFormat.syntaxRDF_XML.getSymbol(),      "application/rdf+xml"  );
-        mimeTypes.put( ResultSetFormat.syntaxRDF_N3.getSymbol(),       "text/plain" );
-        mimeTypes.put( ResultSetFormat.syntaxText.getSymbol() ,        "text/plain");
-        mimeTypes.put( ResultSetFormat.syntaxJSON.getSymbol(),         "application/javascript" );
-        mimeTypes.put( "vitro:csv",                                    "text/csv");
-    }
+    private final static boolean CONVERT = true;
+        
+    /**
+     * format configurations for SELECT queries.
+     */
+    protected static HashMap<String,RSFormatConfig> rsFormats = new HashMap<String,RSFormatConfig>();
+
+    private static RSFormatConfig[] rsfs = {
+        new RSFormatConfig( "RS_XML", !CONVERT, ResultFormat.XML, null, "text/xml"),
+        new RSFormatConfig( "RS_TEXT", !CONVERT, ResultFormat.TEXT, null, "text/plain"),
+        new RSFormatConfig( "vitro:csv", !CONVERT, ResultFormat.CSV, null, "text/csv"),
+        new RSFormatConfig( "RS_JSON", !CONVERT, ResultFormat.JSON, null, "application/javascript") };
+    
+    /**
+     * format configurations for CONSTRUCT/DESCRIBE queries.
+     */
+    protected static HashMap<String,ModelFormatConfig> modelFormats = 
+        new HashMap<String,ModelFormatConfig>();
+
+    private static ModelFormatConfig[] fmts = {
+        new ModelFormatConfig("RDF/XML", !CONVERT, ModelSerializationFormat.RDFXML, null, "application/rdf+xml" ),
+        new ModelFormatConfig("RDF/XML-ABBREV", CONVERT, ModelSerializationFormat.N3, "RDF/XML-ABBREV", "application/rdf+xml" ),
+        new ModelFormatConfig("N3", !CONVERT, ModelSerializationFormat.N3, null, "text/n3" ),
+        new ModelFormatConfig("N-TRIPLE", !CONVERT, ModelSerializationFormat.NTRIPLE, null, "text/plain" ),
+        new ModelFormatConfig("TTL", CONVERT, ModelSerializationFormat.N3, "TTL", "application/x-turtle" ),
+        new ModelFormatConfig("JSON-LD", CONVERT, ModelSerializationFormat.N3, null, "application/x-turtle" ) };
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -119,9 +120,9 @@ public class SparqlQueryServlet extends BaseEditController {
 
         if( queryParam == null || "".equals(queryParam) ||
             resultFormatParam == null || "".equals(resultFormatParam) ||
-            !formatSymbols.containsKey(resultFormatParam) || 
+            !rsFormats.containsKey( resultFormatParam ) || 
             rdfResultFormatParam == null || "".equals(rdfResultFormatParam) ||
-            !rdfFormatSymbols.keySet().contains(rdfResultFormatParam) ) {
+            !modelFormats.containsKey( rdfResultFormatParam ) ) {
             doHelp(request,response);
             return;
         }
@@ -135,9 +136,7 @@ public class SparqlQueryServlet extends BaseEditController {
                               String resultFormatParam, 
                               String rdfResultFormatParam, 
                               String queryParam, 
-                              RDFService rdfService ) throws IOException {
-        
-    	ResultSetFormat rsf = null;
+                              RDFService rdfService ) throws IOException {        
     	/* BJL23 2008-11-06
     	 * modified to support CSV output.
     	 * Unfortunately, ARQ doesn't make it easy to
@@ -145,56 +144,105 @@ public class SparqlQueryServlet extends BaseEditController {
     	 * ResultSetFormatter is hardwired with expected values.
     	 * This slightly ugly approach will have to do for now. 
     	 */
-        if ( !("vitro:csv").equals(resultFormatParam) ) {
-        	rsf = formatSymbols.get(resultFormatParam);
-        }                       
-        String mimeType = mimeTypes.get(resultFormatParam);
+//        if ( !("vitro:csv").equals(resultFormatParam) ) {
+//        	rsf = selectFormatSymbols.get(resultFormatParam);
+//        }                       
+//        String mimeType = rdfFormatToMimeType.get(resultFormatParam);
         
         try{
             Query query = SparqlQueryUtils.create(queryParam);
             if( query.isSelectType() ){
-                ResultSet results = null;
-                results = ResultSetFactory.fromJSON(rdfService.sparqlSelectQuery(
-                        queryParam, RDFService.ResultFormat.JSON));
-                response.setContentType(mimeType);
-                if (rsf != null) {
-                	OutputStream out = response.getOutputStream();
-                	ResultSetFormatter.output(out, results, rsf);
-                } else {
-                	Writer out = response.getWriter();
-                	toCsv(out, results);
-                }
-            } else {
-                Model resultModel = null;
-                if( query.isConstructType() ){
-                    resultModel = RDFServiceUtils.parseModel(
-                            rdfService.sparqlConstructQuery(
-                                    queryParam, 
-                                    RDFService.ModelSerializationFormat.N3), 
-                                            RDFService.ModelSerializationFormat.N3);
-                }else if ( query.isDescribeType() ){
-                    resultModel = RDFServiceUtils.parseModel(
-                            rdfService.sparqlDescribeQuery(
-                                    queryParam, 
-                                    RDFService.ModelSerializationFormat.N3), 
-                                            RDFService.ModelSerializationFormat.N3);
-                }else if(query.isAskType()){
-                	// Irrespective of the ResultFormatParam, 
-                	// this always prints a boolean to the default OutputStream.
-                	String result = (rdfService.sparqlAskQuery(queryParam) == true) 
-                	        ? "true" 
-                	        : "false";
-                	PrintWriter p = response.getWriter();
-                	p.write(result);
-                    return;
-                }
-                response.setContentType(rdfFormatSymbols.get(rdfResultFormatParam));
-                OutputStream out = response.getOutputStream();
-                resultModel.write(out, rdfResultFormatParam);
+                doSelectQuery( queryParam, rdfService, resultFormatParam, response);
+            } else if(query.isAskType()){
+                // Irrespective of the ResultFormatParam, 
+                // this always prints a boolean to the default OutputStream.
+                String result = (rdfService.sparqlAskQuery(queryParam) == true) 
+                    ? "true" 
+                    : "false";
+                PrintWriter p = response.getWriter();
+                p.write(result);
+                return;                
+            } else {                
+                doModelResultQuery( query, rdfService, rdfResultFormatParam, response);
             }
         } catch (RDFServiceException e) {
                 throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Execute the query and send the result to out. Attempt to
+     * send the RDFService the same format as the rdfResultFormatParam
+     * so that the results from the RDFService can be directly piped to the client.
+     * @param rdfService 
+     * @throws IOException 
+     * @throws RDFServiceException 
+     */
+    private void doSelectQuery( String queryParam,
+                                RDFService rdfService, String resultFormatParam,
+                                HttpServletResponse response) throws IOException, RDFServiceException{                
+        RSFormatConfig config = rsFormats.get( resultFormatParam );
+                
+        if( ! config.converstionFromWireFormat ){
+            response.setContentType( config.responseMimeType );
+            InputStream results = rdfService.sparqlSelectQuery(queryParam, config.wireFormat );                        
+            pipe( results, response.getOutputStream() );
+        }else{                        
+            //always use JSON when conversion is needed.
+            InputStream results = rdfService.sparqlSelectQuery(queryParam, ResultFormat.JSON );
+            
+            response.setContentType( config.responseMimeType );
+                        
+            ResultSet rs = ResultSetFactory.fromJSON( results );            
+            OutputStream out = response.getOutputStream();
+            ResultSetFormatter.output(out, rs, config.jenaResponseFormat);
+            
+            // } else {
+            //     Writer out = response.getWriter();
+            //     toCsv(out, results);
+            //}
+        }
+    }
+
+    /**
+     * Execute the query and send the result to out. Attempt to
+     * send the RDFService the same format as the rdfResultFormatParam
+     * so that the results from the RDFService can be directly piped to the client.
+     * @param rdfService 
+     * @throws IOException 
+     * @throws RDFServiceException 
+     */
+    private void doModelResultQuery( Query query, 
+                                      RDFService rdfService, String rdfResultFormatParam, 
+                                      HttpServletResponse response) throws IOException, RDFServiceException{
+
+        //config drives what formats and conversions to use 
+        ModelFormatConfig config = modelFormats.get( rdfResultFormatParam );
+
+        InputStream rawResult = null;        
+        if( query.isConstructType() ){                    
+            rawResult= rdfService.sparqlConstructQuery( query.toString(), config.wireFormat );
+        }else if ( query.isDescribeType() ){
+            rawResult = rdfService.sparqlDescribeQuery( query.toString(), config.wireFormat );
+        }
+
+        response.setContentType(  config.responseMimeType );
+        OutputStream out = response.getOutputStream();
+
+        if( config.converstionFromWireFormat ){
+            Model resultModel = RDFServiceUtils.parseModel( rawResult, config.wireFormat );
+            resultModel.write(out, config.jenaResponseFormat );
+        }else{
+            pipe( rawResult, out );
+        }
+    }
+
+    private void pipe( InputStream in, OutputStream out) throws IOException{
+        int size;
+        byte[] buffer = new byte[4096];
+        while( (size = in.read(buffer)) > -1 ) {
+            out.write(buffer,0,size);
+        }        
     }
 
     private void doNoModelInContext(HttpServletResponse res){
@@ -297,6 +345,55 @@ public class SparqlQueryServlet extends BaseEditController {
             
             RequestDispatcher rd = req.getRequestDispatcher("/"+Controllers.BASIC_JSP);
             rd.forward(req,res);
+    }
+
+
+protected static class ModelFormatConfig{
+    String valueFromForm;
+    boolean converstionFromWireFormat;
+    RDFService.ModelSerializationFormat wireFormat;
+    String jenaResponseFormat;
+    String responseMimeType;
+    public ModelFormatConfig( String valueFromForm,
+                              boolean converstionFromWireFormat, 
+                              RDFService.ModelSerializationFormat wireFormat, 
+                              String jenaResponseFormat, 
+                              String responseMimeType){
+        this.valueFromForm = valueFromForm;
+        this.converstionFromWireFormat = converstionFromWireFormat;
+        this.wireFormat = wireFormat;
+        this.jenaResponseFormat = jenaResponseFormat;
+        this.responseMimeType = responseMimeType;
+    }
+}
+
+    protected static class RSFormatConfig{
+        String valueFromForm;
+        boolean converstionFromWireFormat;
+        ResultFormat wireFormat;
+        ResultSetFormat jenaResponseFormat;
+        String responseMimeType;
+        public RSFormatConfig( String valueFromForm,
+                               boolean converstionFromWireFormat,
+                               ResultFormat wireFormat,
+                               ResultSetFormat jenaResponseFormat,
+                               String responseMimeType ){
+            this.valueFromForm = valueFromForm;
+            this.converstionFromWireFormat = converstionFromWireFormat;
+            this.wireFormat = wireFormat;
+            this.jenaResponseFormat = jenaResponseFormat;
+            this.responseMimeType = responseMimeType;
+        }    
+    }
+
+    static{
+        /* move the lists of configs into maps for easy lookup */
+        for( RSFormatConfig rsfc : rsfs ){
+            rsFormats.put( rsfc.valueFromForm, rsfc );
+        }
+        for( ModelFormatConfig mfc : fmts ){
+            modelFormats.put( mfc.valueFromForm, mfc);
+        }        
     }
 
 }
