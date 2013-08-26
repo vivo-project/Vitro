@@ -910,6 +910,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         "        ?context config:hasConfiguration ?configuration . \n" +
         "        ?context config:configContextFor ?property . \n" +
         "        ?context config:qualifiedBy ?range . \n" +
+        "        OPTIONAL { ?context config:qualifiedByDomain ?domain } \n" +
         "    } \n" +
         "}";
         
@@ -925,14 +926,15 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     
     //TODO private void addPropertyClassCombinationsToListViewMap(HashMap)    
     
-    // Map key is pair of object property and range class URI
-    // If range is unspecified, OWL.Thing.getURI() is used in the key.
-    Map<Pair<ObjectProperty, String>, String> customListViewConfigFileMap = null;
+    // Map key is inner pair of object property and range class URI,
+    // with first member of outer pair being a domain class URI.
+    // If domain or range is unspecified, OWL.Thing.getURI() is used in the key.
+    Map<Pair<String,Pair<ObjectProperty, String>>, String> customListViewConfigFileMap = null;
     
     @Override
     public String getCustomListViewConfigFileName(ObjectProperty op) {
         if (customListViewConfigFileMap == null) {
-            customListViewConfigFileMap = new HashMap<Pair<ObjectProperty, String>, String>();
+            customListViewConfigFileMap = new HashMap<Pair<String,Pair<ObjectProperty, String>>, String>();
             OntModel displayModel = getOntModelSelector().getDisplayModel();
             //Get all property to list view config file mappings in the system
             QueryExecution qexec = QueryExecutionFactory.create(listViewConfigFileQuery, displayModel); 
@@ -945,6 +947,10 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 String rangeUri = (rangeNode != null)
                         ? ((Resource) rangeNode).getURI()
                         : OWL.Thing.getURI();
+                RDFNode domainNode = soln.get("domain");
+                String domainUri = (domainNode != null)
+                        ? ((Resource) domainNode).getURI()
+                        : OWL.Thing.getURI();
                 ObjectProperty prop = getObjectPropertyByURI(propertyUri);
                 if (prop == null) {
                 	//This is a warning only if this property is the one for which we're searching
@@ -955,17 +961,24 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 	}
                 } else {
                     String filename = soln.getLiteral("filename").getLexicalForm();
-                    log.debug("putting " + prop.getURI() + " " + rangeUri + " " + filename + " into list view map");
-                    customListViewConfigFileMap.put(new Pair<ObjectProperty, String>(prop, rangeUri), filename);     
+                    log.debug("putting " + domainUri + " " + prop.getURI() + " " + rangeUri + " " + filename + " into list view map");
+                    customListViewConfigFileMap.put(
+                            new Pair<String,Pair<ObjectProperty,String>>(
+                                    domainUri, new Pair<ObjectProperty, String>(
+                                            prop, rangeUri)), filename);     
                 }
             }       
             qexec.close();
         }      
         
-        String customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<ObjectProperty, String>(op, op.getRangeVClassURI()));
+        String customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<String, Pair<ObjectProperty, String>>(op.getDomainVClassURI(), new Pair<ObjectProperty,String>(op, op.getRangeVClassURI())));
         if (customListViewConfigFileName == null) {
-            log.debug("no list view found for " + op.getURI() + " qualified by " + op.getRangeVClassURI());
-            customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<ObjectProperty, String>(op, OWL.Thing.getURI()));
+            log.debug("no list view found for " + op.getURI() + " qualified by range " + op.getRangeVClassURI() + " and domain " + op.getDomainVClassURI());
+            customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<String, Pair<ObjectProperty, String>>(OWL.Thing.getURI(), new Pair<ObjectProperty,String>(op, op.getRangeVClassURI())));
+        }
+        if (customListViewConfigFileName == null) {
+            log.debug("no list view found for " + op.getURI() + " qualified by range " + op.getRangeVClassURI());
+            customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<String, Pair<ObjectProperty, String>>(OWL.Thing.getURI(), new Pair<ObjectProperty,String>(op, OWL.Thing.getURI())));
         }
         
         return customListViewConfigFileName;

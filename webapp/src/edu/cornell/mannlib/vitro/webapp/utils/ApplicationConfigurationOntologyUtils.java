@@ -77,8 +77,14 @@ public class ApplicationConfigurationOntologyUtils {
                     QuerySolution qsoln = rs.nextSolution();
                     log.debug(qsoln);
                     Resource domainRes = qsoln.getResource("domain");
-                    if(domainRes != null && !appropriateDomain(domainRes, subject, tboxModel)) {
-                        continue;
+                    if(domainRes != null) {
+                        if(!appropriateDomain(domainRes, subject, tboxModel)) {
+                            continue;
+                        } else {
+                            newProp.setDomainVClassURI(domainRes.getURI());
+                        }
+                    } else {
+                        newProp.setDomainVClassURI(op.getDomainVClassURI());
                     }
                     Resource rangeRes = qsoln.getResource("range");
                     if (rangeRes != null) {
