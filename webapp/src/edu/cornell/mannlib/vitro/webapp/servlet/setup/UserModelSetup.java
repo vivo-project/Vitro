@@ -57,15 +57,17 @@ public class UserModelSetup extends JenaDataSourceSetupBase implements
 			OntModel userAccountsModel = ModelFactory
 					.createOntologyModel(MEM_ONT_MODEL_SPEC);
 
-			// This is used in Selenium testing, to load accounts from a file.
-			RDFFilesLoader.loadFirstTimeFiles(ctx, "auth", userAccountsDbModel,
-					userAccountsDbModel.isEmpty());
-
 			userAccountsModel.add(userAccountsDbModel);
 			userAccountsModel.getBaseModel().register(
 					new ModelSynchronizer(userAccountsDbModel));
-			ModelAccess.on(ctx).setUserAccountsModel(userAccountsModel);
 
+			// This is used in Selenium testing, to load accounts from a file.
+			RDFFilesLoader.loadFirstTimeFiles(ctx, "auth", userAccountsModel,
+					userAccountsDbModel.isEmpty());
+			// This gets the permissions configuration.
+			RDFFilesLoader.loadEveryTimeFiles(ctx, "auth", userAccountsModel);
+
+			ModelAccess.on(ctx).setUserAccountsModel(userAccountsModel);
 		} catch (Throwable t) {
 			log.error("Unable to load user accounts model from DB", t);
 			ss.fatal(this, "Unable to load user accounts model from DB", t);

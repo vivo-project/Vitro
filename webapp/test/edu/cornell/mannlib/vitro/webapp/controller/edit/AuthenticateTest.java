@@ -2,8 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader.URI_DBA;
-import static edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader.URI_SELF_EDITOR;
+import static edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSets.URI_DBA;
+import static edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSets.URI_SELF_EDITOR;
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.FORCED_PASSWORD_CHANGE;
 import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State.LOGGING_IN;
 import static org.junit.Assert.assertEquals;

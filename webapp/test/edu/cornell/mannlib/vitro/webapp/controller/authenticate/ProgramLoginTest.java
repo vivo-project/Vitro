@@ -27,7 +27,7 @@ import stubs.javax.servlet.http.HttpServletResponseStub;
 import stubs.javax.servlet.http.HttpSessionStub;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
-import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSets;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 
 /**
@@ -97,7 +97,7 @@ public class ProgramLoginTest extends AbstractTestClass {
 		user.setEmailAddress(name);
 		user.setUri(uri);
 		user.setPermissionSetUris(Collections
-				.singleton(PermissionSetsLoader.URI_DBA));
+				.singleton(PermissionSets.URI_DBA));
 		user.setMd5Password(Authenticator.applyMd5Encoding(password));
 		user.setLoginCount(loginCount);
 		user.setPasswordChangeRequired(loginCount == 0);
