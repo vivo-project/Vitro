@@ -22,6 +22,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.github.jsonldjava.core.JSONLD;
+import com.github.jsonldjava.core.JSONLDProcessingError;
+import com.github.jsonldjava.impl.JenaRDFParser;
+import com.github.jsonldjava.utils.JSONUtils;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
@@ -56,7 +60,7 @@ public class SparqlQueryServlet extends BaseEditController {
     private static final Log log = LogFactory.getLog(SparqlQueryServlet.class.getName());
 
     private final static boolean CONVERT = true;
-        
+    
     /**
      * format configurations for SELECT queries.
      */
@@ -66,7 +70,7 @@ public class SparqlQueryServlet extends BaseEditController {
         new RSFormatConfig( "RS_XML", !CONVERT, ResultFormat.XML, null, "text/xml"),
         new RSFormatConfig( "RS_TEXT", !CONVERT, ResultFormat.TEXT, null, "text/plain"),
         new RSFormatConfig( "vitro:csv", !CONVERT, ResultFormat.CSV, null, "text/csv"),
-        new RSFormatConfig( "RS_JSON", !CONVERT, ResultFormat.JSON, null, "application/javascript") };
+        new RSFormatConfig( "RS_JSON", !CONVERT, ResultFormat.JSON, null, "application/javascript") };        
     
     /**
      * format configurations for CONSTRUCT/DESCRIBE queries.
@@ -80,7 +84,7 @@ public class SparqlQueryServlet extends BaseEditController {
         new ModelFormatConfig("N3", !CONVERT, ModelSerializationFormat.N3, null, "text/n3" ),
         new ModelFormatConfig("N-TRIPLE", !CONVERT, ModelSerializationFormat.NTRIPLE, null, "text/plain" ),
         new ModelFormatConfig("TTL", CONVERT, ModelSerializationFormat.N3, "TTL", "application/x-turtle" ),
-        new ModelFormatConfig("JSON-LD", CONVERT, ModelSerializationFormat.N3, null, "application/x-turtle" ) };
+        new ModelFormatConfig("JSON-LD", CONVERT, ModelSerializationFormat.N3, "JSON-LD", "application/javascript" ) };
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -142,8 +146,8 @@ public class SparqlQueryServlet extends BaseEditController {
     	 * Unfortunately, ARQ doesn't make it easy to
     	 * do this by implementing a new ResultSetFormat, because 
     	 * ResultSetFormatter is hardwired with expected values.
-    	 * This slightly ugly approach will have to do for now. 
-    	 */
+    	 * This slightly ugly approach will have to do for now.
+    	 */            	
 //        if ( !("vitro:csv").equals(resultFormatParam) ) {
 //        	rsf = selectFormatSymbols.get(resultFormatParam);
 //        }                       
@@ -211,6 +215,7 @@ public class SparqlQueryServlet extends BaseEditController {
      * @param rdfService 
      * @throws IOException 
      * @throws RDFServiceException 
+     * @throws  
      */
     private void doModelResultQuery( Query query, 
                                       RDFService rdfService, String rdfResultFormatParam, 
@@ -227,12 +232,24 @@ public class SparqlQueryServlet extends BaseEditController {
         }
 
         response.setContentType(  config.responseMimeType );
-        OutputStream out = response.getOutputStream();
-
+        
         if( config.converstionFromWireFormat ){
-            Model resultModel = RDFServiceUtils.parseModel( rawResult, config.wireFormat );
-            resultModel.write(out, config.jenaResponseFormat );
+            Model resultModel = RDFServiceUtils.parseModel( rawResult, config.wireFormat );                        
+            if( "JSON-LD".equals( config.jenaResponseFormat )){
+                //since jena 2.6.4 doesn't support JSON-LD we do it                                                                   
+                try {
+                    JenaRDFParser parser = new JenaRDFParser();
+                    Object json = JSONLD.fromRDF(resultModel, parser);
+                    JSONUtils.write(response.getWriter(), json);
+                } catch (JSONLDProcessingError e) {
+                   throw new RDFServiceException("Could not convert from Jena model to JSON-LD", e);
+                }
+            }else{
+                OutputStream out = response.getOutputStream();
+                resultModel.write(out, config.jenaResponseFormat );
+            }
         }else{
+            OutputStream out = response.getOutputStream();
             pipe( rawResult, out );
         }
     }
@@ -338,8 +355,6 @@ public class SparqlQueryServlet extends BaseEditController {
             
             req.setAttribute("prefixList", prefixList);
             
-            // nac26: 2009-09-25 - this was causing problems in safari on localhost installations because the href did not include the context.  The edit.css is not being used here anyway (or anywhere else for that matter)
-            // req.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+portal.getThemeDir()+"css/edit.css\"/>");
             req.setAttribute("title","SPARQL Query");
             req.setAttribute("bodyJsp", "/admin/sparqlquery/sparqlForm.jsp");
             
@@ -348,31 +363,33 @@ public class SparqlQueryServlet extends BaseEditController {
     }
 
 
-protected static class ModelFormatConfig{
-    String valueFromForm;
-    boolean converstionFromWireFormat;
-    RDFService.ModelSerializationFormat wireFormat;
-    String jenaResponseFormat;
-    String responseMimeType;
-    public ModelFormatConfig( String valueFromForm,
-                              boolean converstionFromWireFormat, 
-                              RDFService.ModelSerializationFormat wireFormat, 
-                              String jenaResponseFormat, 
-                              String responseMimeType){
-        this.valueFromForm = valueFromForm;
-        this.converstionFromWireFormat = converstionFromWireFormat;
-        this.wireFormat = wireFormat;
-        this.jenaResponseFormat = jenaResponseFormat;
-        this.responseMimeType = responseMimeType;
+    public static class ModelFormatConfig{
+        public String valueFromForm;
+        public boolean converstionFromWireFormat;
+        public RDFService.ModelSerializationFormat wireFormat;
+        public String jenaResponseFormat;
+        public String responseMimeType;
+        
+        public ModelFormatConfig( String valueFromForm,
+                                  boolean converstionFromWireFormat, 
+                                  RDFService.ModelSerializationFormat wireFormat, 
+                                  String jenaResponseFormat, 
+                                  String responseMimeType){
+            this.valueFromForm = valueFromForm;
+            this.converstionFromWireFormat = converstionFromWireFormat;
+            this.wireFormat = wireFormat;
+            this.jenaResponseFormat = jenaResponseFormat;
+            this.responseMimeType = responseMimeType;
+        }
     }
-}
 
-    protected static class RSFormatConfig{
-        String valueFromForm;
-        boolean converstionFromWireFormat;
-        ResultFormat wireFormat;
-        ResultSetFormat jenaResponseFormat;
-        String responseMimeType;
+    public static class RSFormatConfig{
+        public String valueFromForm;
+        public boolean converstionFromWireFormat;
+        public ResultFormat wireFormat;
+        public ResultSetFormat jenaResponseFormat;
+        public String responseMimeType;
+        
         public RSFormatConfig( String valueFromForm,
                                boolean converstionFromWireFormat,
                                ResultFormat wireFormat,
@@ -386,7 +403,7 @@ protected static class ModelFormatConfig{
         }    
     }
 
-    static{
+    static{                
         /* move the lists of configs into maps for easy lookup */
         for( RSFormatConfig rsfc : rsfs ){
             rsFormats.put( rsfc.valueFromForm, rsfc );

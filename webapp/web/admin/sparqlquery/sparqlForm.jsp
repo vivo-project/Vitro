@@ -52,6 +52,7 @@ LIMIT 20
 
 <div>
 	 <h3>Format for SELECT query results:</h3>
+              	   
 	 <input id='RS_XML_BUTTON' type='radio' name='resultFormat' value='RS_XML'> <label for='RS_XML_BUTTON'>RS_XML</label>
 	 <input id='RS_TEXT_BUTTON' type='radio' name='resultFormat' value='RS_TEXT' checked='checked'> <label for='RS_TEXT_BUTTON'>RS_TEXT</label>
 	 <input id='RS_CSV_BUTTON' type='radio' name='resultFormat' value='vitro:csv'> <label for='RS_CSV_BUTTON'>CSV</label>
@@ -66,23 +67,11 @@ LIMIT 20
 	 <input id='RR_N3_BUTTON' type='radio' name='rdfResultFormat' value='N3'> <label for='RR_N3_BUTTON'>N3</label>
 	 <input id='RR_NTRIPLE_BUTTON' type='radio' name='rdfResultFormat' value='N-TRIPLE'> <label for='RR_NTRIPLE_BUTTON'>N-Triples</label>
 	 <input id='RR_TURTLE_BUTTON' type='radio' name='rdfResultFormat' value='TTL'> <label for='RR_TURTLE_BUTTON'>Turtle</label>
+	    <input id='RR_JSON_LD_BUTTON' type='radio' name='rdfResultFormat' value='JSON-LD'> <label for='RR_JSON_LD_BUTTON'>JSON-LD</label>
 </div>
 
 <input class="submit" type="submit" value="Run Query" />
 </form>
-<%--
-<h4>Notes</h4>
-<p>CONSTRUCT and DESCRIBE queries always return RDF XML</p>
-<p>The parameter 'resultFormat' must not be null or zero length</p>
-<p>The parameter 'resultFormat' must be one of the following: <ul>
-    <li>RS_XML</li>
-    <li>RS_TEXT</li>
-    <li>RS_RDF/N3</li>
-    <li>RS_JSON</li>
-    <li>RS_RDF</li>
-    </ul>
-</p>
---%>
 </div><!-- content -->
 </body></html>
 
