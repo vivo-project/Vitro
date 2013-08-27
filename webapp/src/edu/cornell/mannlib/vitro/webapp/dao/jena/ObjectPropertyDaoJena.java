@@ -902,7 +902,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     protected static final String LIST_VIEW_CONFIG_FILE_QUERY_STRING =
         "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> \n" +
         "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
-        "SELECT ?property ?range ?filename WHERE { \n" +
+        "SELECT ?property ?range ?domain ?filename WHERE { \n" +
         "    { ?property display:listViewConfigFile ?filename \n" +
         "    } UNION { \n" +
         "        ?configuration config:listViewConfigFile ?filename . \n " +

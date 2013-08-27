@@ -80,7 +80,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                         populatedObjectPropertyList, subject, vreq);
         if (log.isDebugEnabled()) {
             for (ObjectProperty t : additions) {
-                log.debug(t.getDomainPublic() + " " + t.getGroupURI());
+                log.debug(t.getDomainPublic() + " " + t.getGroupURI() + " domain " + t.getDomainVClassURI());
             }
             log.debug("Added " + additions.size() + 
                     " properties due to application configuration ontology");
