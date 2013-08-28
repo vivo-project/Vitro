@@ -48,6 +48,7 @@ public class DisplayVocabulary {
     public static final String ITEM_TO_PAGE = NS + "toPage";
     public static final String HAS_ELEMENT = NS + "hasElement";
     public static final String USES_DATAGETTER_CLASS = NS + "usesDataGetterClass";
+    public static final String REQUIRED_ACTIONS = NS + "requiredAction";
 
     /**Data Getter object properties **/
     public static final String HAS_DATA_GETTER = NS + "hasDataGetter";

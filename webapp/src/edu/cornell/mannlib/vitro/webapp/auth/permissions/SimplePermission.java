@@ -27,55 +27,55 @@ public class SimplePermission extends Permission {
 	private static final Map<String, SimplePermission> allInstances = new HashMap<String, SimplePermission>();
 
 	public static final SimplePermission ACCESS_SPECIAL_DATA_MODELS = new SimplePermission(
-			"AccessSpecialDataModels");
+		NAMESPACE + "AccessSpecialDataModels");
 	public static final SimplePermission DO_BACK_END_EDITING = new SimplePermission(
-			"DoBackEndEditing");
+		NAMESPACE + "DoBackEndEditing");
 	public static final SimplePermission DO_FRONT_END_EDITING = new SimplePermission(
-			"DoFrontEndEditing");
+		NAMESPACE + "DoFrontEndEditing");
 	public static final SimplePermission EDIT_ONTOLOGY = new SimplePermission(
-			"EditOntology");
+		NAMESPACE + "EditOntology");
 	public static final SimplePermission EDIT_OWN_ACCOUNT = new SimplePermission(
-			"EditOwnAccount");
+		NAMESPACE + "EditOwnAccount");
 	public static final SimplePermission EDIT_SITE_INFORMATION = new SimplePermission(
-			"EditSiteInformation");
+		NAMESPACE + "EditSiteInformation");
 	public static final SimplePermission LOGIN_DURING_MAINTENANCE = new SimplePermission(
-			"LoginDuringMaintenance");
+		NAMESPACE + "LoginDuringMaintenance");
 	public static final SimplePermission MANAGE_MENUS = new SimplePermission(
-			"ManageMenus");
+		NAMESPACE + "ManageMenus");
 	public static final SimplePermission MANAGE_OWN_PROXIES = new SimplePermission(
-			"ManageOwnProxies");
+		NAMESPACE + "ManageOwnProxies");
 	public static final SimplePermission MANAGE_PORTALS = new SimplePermission(
-			"ManagePortals");
+		NAMESPACE + "ManagePortals");
 	public static final SimplePermission MANAGE_PROXIES = new SimplePermission(
-			"ManageProxies");
+		NAMESPACE + "ManageProxies");
 	public static final SimplePermission MANAGE_SEARCH_INDEX = new SimplePermission(
-			"ManageSearchIndex");
+		NAMESPACE + "ManageSearchIndex");
 	public static final SimplePermission MANAGE_TABS = new SimplePermission(
-			"ManageTabs");
+		NAMESPACE + "ManageTabs");
 	public static final SimplePermission MANAGE_USER_ACCOUNTS = new SimplePermission(
-			"ManageUserAccounts");
+		NAMESPACE + "ManageUserAccounts");
 	public static final SimplePermission QUERY_FULL_MODEL = new SimplePermission(
-			"QueryFullModel");
+		NAMESPACE + "QueryFullModel");
 	public static final SimplePermission QUERY_USER_ACCOUNTS_MODEL = new SimplePermission(
-			"QueryUserAccountsModel");
+		NAMESPACE + "QueryUserAccountsModel");
 	public static final SimplePermission REBUILD_VCLASS_GROUP_CACHE = new SimplePermission(
-			"RebuildVClassGroupCache");
+		NAMESPACE + "RebuildVClassGroupCache");
 	public static final SimplePermission REFRESH_VISUALIZATION_CACHE = new SimplePermission(
-			"RefreshVisualizationCache");
+		NAMESPACE + "RefreshVisualizationCache");
 	public static final SimplePermission SEE_INDVIDUAL_EDITING_PANEL = new SimplePermission(
-			"SeeIndividualEditingPanel");
+		NAMESPACE + "SeeIndividualEditingPanel");
 	public static final SimplePermission SEE_REVISION_INFO = new SimplePermission(
-			"SeeRevisionInfo");
+		NAMESPACE + "SeeRevisionInfo");
 	public static final SimplePermission SEE_SITE_ADMIN_PAGE = new SimplePermission(
-			"SeeSiteAdminPage");
+		NAMESPACE + "SeeSiteAdminPage");
 	public static final SimplePermission SEE_STARTUP_STATUS = new SimplePermission(
-			"SeeStartupStatus");
+		NAMESPACE + "SeeStartupStatus");
 	public static final SimplePermission SEE_VERBOSE_PROPERTY_INFORMATION = new SimplePermission(
-			"SeeVerbosePropertyInformation");
+		NAMESPACE + "SeeVerbosePropertyInformation");
 	public static final SimplePermission USE_ADVANCED_DATA_TOOLS_PAGES = new SimplePermission(
-			"UseAdvancedDataToolsPages");
+		NAMESPACE + "UseAdvancedDataToolsPages");
 	public static final SimplePermission USE_SPARQL_QUERY_PAGE = new SimplePermission(
-			"UseSparqlQueryPage");
+		NAMESPACE + "UseSparqlQueryPage");
 
 	// ----------------------------------------------------------------------
 	// These instances are "catch all" permissions to cover poorly defined
@@ -84,33 +84,35 @@ public class SimplePermission extends Permission {
 	// ----------------------------------------------------------------------
 
 	public static final SimplePermission USE_BASIC_AJAX_CONTROLLERS = new SimplePermission(
-			"UseBasicAjaxControllers");
+		NAMESPACE + "UseBasicAjaxControllers");
 	public static final SimplePermission USE_MISCELLANEOUS_ADMIN_PAGES = new SimplePermission(
-			"UseMiscellaneousAdminPages");
+		NAMESPACE + "UseMiscellaneousAdminPages");
 	public static final SimplePermission USE_MISCELLANEOUS_CURATOR_PAGES = new SimplePermission(
-			"UseMiscellaneousCuratorPages");
+		NAMESPACE + "UseMiscellaneousCuratorPages");
 	public static final SimplePermission USE_MISCELLANEOUS_EDITOR_PAGES = new SimplePermission(
-			"UseMiscellaneousEditorPages");
+		NAMESPACE + "UseMiscellaneousEditorPages");
 	public static final SimplePermission USE_MISCELLANEOUS_PAGES = new SimplePermission(
-			"UseMiscellaneousPages");
+		NAMESPACE + "UseMiscellaneousPages");
 
 	public static List<SimplePermission> getAllInstances() {
 		return new ArrayList<SimplePermission>(allInstances.values());
 	}
 
-	private final String localName;
+	//private final String localName;
+	private final String uri;
 	public final RequestedAction ACTION;
 	public final Actions ACTIONS;
 
-	public SimplePermission(String localName) {
-		super(NAMESPACE + localName);
+	public SimplePermission(String uri) {
+		super(uri);
 		
-		if (localName == null) {
-			throw new NullPointerException("name may not be null.");
+		if (uri == null) {
+			throw new NullPointerException("uri may not be null.");
 		}
 
-		this.localName = localName;
-		this.ACTION = new SimpleRequestedAction(localName);
+		//this.localName = localName;
+		this.uri = uri;
+		this.ACTION = new SimpleRequestedAction(uri);
 		this.ACTIONS = new Actions(this.ACTION);
 
 		if (allInstances.containsKey(this.uri)) {
@@ -118,14 +120,6 @@ public class SimplePermission extends Permission {
 					+ this.uri + "' already exists.");
 		}
 		allInstances.put(uri, this);
-	}
-
-	public String getLocalName() {
-		return this.localName;
-	}
-
-	public String getNamespace() {
-		return NAMESPACE;
 	}
 
 	@Override
@@ -142,7 +136,7 @@ public class SimplePermission extends Permission {
 
 	@Override
 	public String toString() {
-		return "SimplePermission['" + localName + "']";
+		return "SimplePermission['" + uri+ "']";
 	}
 
 }

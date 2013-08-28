@@ -9,8 +9,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -61,7 +59,10 @@ public class IndexBuilder extends VitroBackgroundThread {
     
     /** Indicates that a stop of the indexing objects has been requested. */
     private volatile boolean stopRequested = false;
-    
+
+    /** Indicates that new updates should not be started. */
+    private boolean deferNewUpdates = false;
+
     /** Length of time to wait before looking for work (if not wakened sooner). */
     public static final long MAX_IDLE_INTERVAL = 1000 * 60 /* msec */ ;        
     
@@ -163,7 +164,7 @@ public class IndexBuilder extends VitroBackgroundThread {
      * This will re-index Individuals were added with addToChanged(). 
      */
     public synchronized void doUpdateIndex() {
-    	log.debug("callto doUpdateIndex()");
+    	log.debug("call to doUpdateIndex()");
     	//wake up thread and it will attempt to index anything in changedUris
         this.notifyAll();    	    	   
     }
@@ -184,12 +185,33 @@ public class IndexBuilder extends VitroBackgroundThread {
 	    this.notifyAll();		    
 	    this.interrupt();
 	}
-	
+
+    /**
+     * Calling this will cause the IndexBuider to no start a new index update
+     * until unpuase is called. This is intended to allow a large change 
+     * without slowing it down with incremental search index updates.
+     */ 
+    public synchronized void pause(){
+        this.deferNewUpdates = true;
+    }
+
+    public synchronized void unpause(){
+        if( deferNewUpdates == true ){
+            this.deferNewUpdates = false;
+            this.notifyAll();
+            this.interrupt();
+        }
+    }
+
     @Override
     public void run() {
         while(! stopRequested ){                        
             try{
-                if( reindexRequested ){
+                if ( deferNewUpdates ){
+                    log.debug("there is no indexing working to do, waiting for work");
+                    synchronized (this) { this.wait(MAX_IDLE_INTERVAL); }
+                } 
+                else if ( reindexRequested ){
                 	setWorkLevel(WorkLevel.WORKING, FLAG_REBUILDING);
                     log.debug("full re-index requested");
                     
@@ -198,7 +220,8 @@ public class IndexBuilder extends VitroBackgroundThread {
                     notifyListeners( IndexingEventListener.EventTypes.FINISH_FULL_REBUILD );
                     
                     setWorkLevel(WorkLevel.IDLE);
-                }else{
+                }
+                else{
                 	boolean workToDo = false;
                 	synchronized (changedStmts ){
                 		 workToDo = !changedStmts.isEmpty(); 
