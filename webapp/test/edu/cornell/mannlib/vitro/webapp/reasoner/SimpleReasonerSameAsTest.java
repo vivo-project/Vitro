@@ -91,6 +91,37 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 		Assert.assertFalse(aBox.contains(b,S,literal1));
 		Assert.assertFalse(aBox.contains(a,Q,d));
 		Assert.assertFalse(aBox.contains(a,T,literal2));
+        
+        //run same test with sameAs = false
+        inf = ModelFactory.createDefaultModel();
+        aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+        SimpleReasoner sres = new SimpleReasoner(tBox,aBox,inf);
+        sres.setSameAsEnabled( false );
+		aBox.register(sres);
+		
+		a = aBox.createResource("http://test.vivo/a");
+		b = aBox.createResource("http://test.vivo/b");
+		c = aBox.createResource("http://test.vivo/c");
+		d = aBox.createResource("http://test.vivo/d");
+		
+        aBox.add(a,P,c);
+		aBox.add(a,S,literal1);
+		aBox.add(b,Q,d);
+		aBox.add(b,T,literal2);
+		aBox.add(a,OWL.sameAs,b);
+
+        //these are now false since sameAs is off
+		Assert.assertFalse(inf.contains(b,OWL.sameAs,a));
+		Assert.assertFalse(inf.contains(b,P,c));
+		Assert.assertFalse(inf.contains(b,S,literal1));
+		Assert.assertFalse(inf.contains(a,Q,d));
+		Assert.assertFalse(inf.contains(a,T,literal2));
+        //these still shouldn't be in the abox
+		Assert.assertFalse(aBox.contains(b,OWL.sameAs,a));
+		Assert.assertFalse(aBox.contains(b,P,c));
+		Assert.assertFalse(aBox.contains(b,S,literal1));
+		Assert.assertFalse(aBox.contains(a,Q,d));
+		Assert.assertFalse(aBox.contains(a,T,literal2));
 	}
 			
 	/*
@@ -246,7 +277,93 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 		Assert.assertFalse(inf.contains(f,Q,d));
 		Assert.assertFalse(inf.contains(f,T,literal2));		
 	}
-	
+
+    /**
+     * test of enableSameAs( false )
+     */
+	@Test
+	public void disabledSameAs() {
+
+		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		
+		OntProperty P = tBox.createObjectProperty("http://test.vivo/P");		
+	    P.setLabel("property P", "en-US");
+
+		OntProperty Q = tBox.createObjectProperty("http://test.vivo/Q");
+		Q.setLabel("property Q", "en-US");
+	            
+		OntProperty S = tBox.createDatatypeProperty("http://test.vivo/");
+		S.setLabel("property S", "en-US");
+		
+		OntProperty T = tBox.createDatatypeProperty("http://test.vivo/");
+		T.setLabel("property T", "en-US");
+		
+		Literal literal1 = tBox.createLiteral("Literal value 1");
+		Literal literal2 = tBox.createLiteral("Literal value 2");
+		
+        // this is the model to receive inferences
+        Model inf = ModelFactory.createDefaultModel();
+        
+		// create an ABox and register the SimpleReasoner listener with it
+		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		aBox.register(new SimpleReasoner(tBox, aBox, inf));
+		
+        // Individuals a, b, c and d
+		Resource a = aBox.createResource("http://test.vivo/a");
+		Resource b = aBox.createResource("http://test.vivo/b");
+		Resource c = aBox.createResource("http://test.vivo/c");
+		Resource d = aBox.createResource("http://test.vivo/d");
+		
+		aBox.add(a,P,c);
+		aBox.add(a,S,literal1);
+		aBox.add(b,Q,d);
+		aBox.add(b,T,literal2);
+		aBox.add(a,OWL.sameAs,b);
+
+		Assert.assertTrue(inf.contains(b,OWL.sameAs,a));
+		Assert.assertTrue(inf.contains(b,P,c));
+		Assert.assertTrue(inf.contains(b,S,literal1));
+		Assert.assertTrue(inf.contains(a,Q,d));
+		Assert.assertTrue(inf.contains(a,T,literal2));
+
+		Assert.assertFalse(aBox.contains(b,OWL.sameAs,a));
+		Assert.assertFalse(aBox.contains(b,P,c));
+		Assert.assertFalse(aBox.contains(b,S,literal1));
+		Assert.assertFalse(aBox.contains(a,Q,d));
+		Assert.assertFalse(aBox.contains(a,T,literal2));
+        
+        //run same test with sameAs = false
+        inf = ModelFactory.createDefaultModel();
+        aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+        SimpleReasoner sres = new SimpleReasoner(tBox,aBox,inf);
+        sres.setSameAsEnabled( false );
+		aBox.register(sres);
+		
+		a = aBox.createResource("http://test.vivo/a");
+		b = aBox.createResource("http://test.vivo/b");
+		c = aBox.createResource("http://test.vivo/c");
+		d = aBox.createResource("http://test.vivo/d");
+		
+        aBox.add(a,P,c);
+		aBox.add(a,S,literal1);
+		aBox.add(b,Q,d);
+		aBox.add(b,T,literal2);
+		aBox.add(a,OWL.sameAs,b);
+
+        //these are now false since sameAs is off
+		Assert.assertFalse(inf.contains(b,OWL.sameAs,a));
+		Assert.assertFalse(inf.contains(b,P,c));
+		Assert.assertFalse(inf.contains(b,S,literal1));
+		Assert.assertFalse(inf.contains(a,Q,d));
+		Assert.assertFalse(inf.contains(a,T,literal2));
+        //these still shouldn't be in the abox
+		Assert.assertFalse(aBox.contains(b,OWL.sameAs,a));
+		Assert.assertFalse(aBox.contains(b,P,c));
+		Assert.assertFalse(aBox.contains(b,S,literal1));
+		Assert.assertFalse(aBox.contains(a,Q,d));
+		Assert.assertFalse(aBox.contains(a,T,literal2));
+	}
+
 	/*
 	* sameAs with datatype properties
 	*/
