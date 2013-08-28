@@ -20,10 +20,14 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.github.jsonldjava.core.JSONLD;
+import com.github.jsonldjava.core.JSONLDProcessingError;
+import com.github.jsonldjava.impl.JenaRDFParser;
+import com.github.jsonldjava.utils.JSONUtils;
+
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequiresActions;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
@@ -39,6 +43,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
 import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
@@ -308,17 +313,29 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         
         String mediaType = values.getContentType().getMediaType();
         response.setContentType(mediaType);
-        
-        String format = ""; 
-        if ( RDFXML_MIMETYPE.equals(mediaType)) {
-            format = "RDF/XML";
-        } else if( N3_MIMETYPE.equals(mediaType)) {
-            format = "N3";
-        } else if ( TTL_MIMETYPE.equals(mediaType)) {
-            format ="TTL";
+                
+        if (   JSON_MIMETYPE.equals(mediaType)){
+            //json-ld is not supported by jena v2.6.4
+            try {   
+                JenaRDFParser parser = new JenaRDFParser();
+                Object json = JSONLD.fromRDF( values.getModel() , parser);
+                JSONUtils.write(response.getWriter(), json);
+            } catch (JSONLDProcessingError e) {
+               throw new IOException("Could not convert from Jena model to JSON-LD", e);
+            }           
+        }else{
+            String format = "";
+            if ( RDFXML_MIMETYPE.equals(mediaType)) {
+                format = "RDF/XML";
+            } else if( N3_MIMETYPE.equals(mediaType)) {
+                format = "N3";
+            } else if ( TTL_MIMETYPE.equals(mediaType)) {
+                format ="TTL";
+            }
+            values.getModel().write( response.getOutputStream(), format );
         }
         
-        values.getModel().write( response.getOutputStream(), format );      
+              
     }
 
     protected void doException(VitroRequest vreq, HttpServletResponse response, 
