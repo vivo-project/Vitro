@@ -242,7 +242,7 @@ public abstract class FreemarkerConfiguration {
 			 * URL?
 			 */
 			try {
-				c.setSetting("url_escaping_charset", "ISO-8859-1");
+				c.setSetting("url_escaping_charset", "UTF-8");
 			} catch (TemplateException e) {
 				log.error("Error setting value for url_escaping_charset.");
 			}
