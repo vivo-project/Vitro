@@ -31,6 +31,16 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		setLoggerLevel(ABoxRecomputer.class, Level.OFF);
 	}
 	
+    @Test
+    public void addABoxAssertion1Test(){
+        addABoxAssertion1(true);        
+    }
+
+    @Test
+    public void addABoxAssertion1NoSameAsTest(){
+        addABoxAssertion1(false);
+    }
+
 	/*
 	* basic scenarios around adding abox data
 	* 
@@ -40,8 +50,7 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
     * Add a statement c Q d and verify that d Q c 
 	* is inferred. 
 	*/
-	@Test
-	public void addABoxAssertion1() {
+	public void addABoxAssertion1(boolean sameAs ) {
 
 		// set up the tbox
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
@@ -57,7 +66,11 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
         
 		// create an abox and register the SimpleReasoner listener with it
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-		aBox.register(new SimpleReasoner(tBox, aBox, inf));
+
+        SimpleReasoner sr = new SimpleReasoner(tBox,aBox,inf);
+        sr.setSameAsEnabled( sameAs );
+
+		aBox.register( sr );
 		
         // add assertions to the abox and verify inferences
 		Resource a = aBox.createResource("http://test.vivo/a");
@@ -68,15 +81,24 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		aBox.add(a,P,b);		
 		Assert.assertTrue(inf.contains(b,Q,a));				
 		aBox.add(c,Q,d);		
-		Assert.assertTrue(inf.contains(d,P,c));	
+		Assert.assertTrue(inf.contains(d,P,c));	       
 	}
-	
+
+    @Test
+	public void addABoxAssertion2Test() {
+        addABoxAssertion2(true);
+    }
+
+    @Test
+	public void addABoxAssertion2NoSameAsTest() {
+        addABoxAssertion2(false);
+    }
+
 	/*
 	 * don't infer statements already in the abox
 	 * (never infer because it's in the abox already)
 	*/
-	@Test
-	public void addABoxAssertion2() {
+	public void addABoxAssertion2(boolean sameAs ) {
 
 		// set up the tbox
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
@@ -107,12 +129,20 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		Assert.assertFalse(inf.contains(b,Q,a));	
 	}
 
+    @Test
+	public void addABoxAssertion3Test() {
+        addABoxAssertion3(true);
+    }
+    @Test
+    public void addABoxAssertion3NoSameAsTest(){
+        addABoxAssertion3(false);
+    }
+
 	/*
 	 * don't infer statements already in the abox
 	 * (remove the inference when it is asserted)
 	*/
-	@Test
-	public void addABoxAssertion3() {
+	public void addABoxAssertion3(boolean sameAs) {
 		
 		// set up the tbox
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
@@ -127,7 +157,11 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
         
 		// create abox and register SimpleReasoner
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
-		aBox.register(new SimpleReasoner(tBox, aBox, inf));
+
+        SimpleReasoner sr = new SimpleReasoner(tBox, aBox, inf);
+        sr.setSameAsEnabled( sameAs );
+
+		aBox.register( sr );
 		
         // add statements to the abox and verify inferences
 		Resource a = aBox.createResource("http://test.vivo/a");
@@ -138,13 +172,21 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		aBox.add(b,Q,a); // this should cause the inference to be removed
 		Assert.assertFalse(inf.contains(b,Q,a));	
 	}
-	
+
+    @Test
+	public void addABoxAssertion4Test() {
+        addABoxAssertion4(true);
+    }
+    @Test
+	public void addABoxAssertion4NoSameAsTest() {
+        addABoxAssertion4(false);
+    }
+
 	/*
 	* adding abox data where the property has an inverse and
 	* and equivalent property.
 	*/
-	@Test
-	public void addABoxAssertion4() {
+	public void addABoxAssertion4( boolean sameAs ) {
 
 		// set up the tbox
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
@@ -163,7 +205,10 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
         
 		// create an ABox and register the SimpleReasoner with it
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-		aBox.register(new SimpleReasoner(tBox, aBox, inf));
+
+        SimpleReasoner sr = new SimpleReasoner(tBox, aBox, inf);
+        sr.setSameAsEnabled( sameAs );
+		aBox.register( sr );
 		
         // add abox statements and verify inferences
 		Resource a = aBox.createResource("http://test.vivo/a");
@@ -179,13 +224,22 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		Assert.assertTrue(inf.contains(d,R,c));	
 	}
 	
+    @Test
+    public void removedABoxAssertion1Test(){
+        removedABoxAssertion1(true);
+    }
+
+    @Test
+    public void removedABoxAssertion1NoSameAsTest(){
+        removedABoxAssertion1(false);
+    }
+
 	/*
 	 *  basic scenarios around removing abox data
 	 *  don't remove an inference if it's still 
 	 *  entailed by something else in the abox.
 	 */ 
-	@Test
-	public void removedABoxAssertion1() {
+	public void removedABoxAssertion1(boolean sameAs) {
 		
 		// set up the tbox
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
@@ -203,7 +257,9 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
         
 		// create an ABox and register the SimpleReasoner with it
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-		aBox.register(new SimpleReasoner(tBox, aBox, inf));
+        SimpleReasoner sr = new SimpleReasoner(tBox, aBox, inf);
+        sr.setSameAsEnabled( sameAs );
+		aBox.register( sr );
 		
         // add statements to the abox and verify inferences
 		Resource a = aBox.createResource("http://test.vivo/a");
@@ -226,12 +282,21 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		Assert.assertTrue(inf.contains(d,P,c)); // still inferred from c T d
 	}
 	
+    @Test
+    public void removedABoxAssertion2Test(){
+        removedABoxAssertion2(true);
+    }
+
+    @Test
+    public void removedABoxAssertion2NoSameAsTest(){
+        removedABoxAssertion2(false);
+    }
+
 	/*
 	 *  removing abox data with equivalent and inverse properties
 	 *  don't remove inference if it's still inferred.
 	 */ 
-	@Test
-	public void removedABoxAssertion2() {
+	public void removedABoxAssertion2(boolean sameAs) {
 		
 		// set up the tbox
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
@@ -253,7 +318,9 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
         
 		// create an abox and register the SimpleReasoner listener with it
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-		aBox.register(new SimpleReasoner(tBox, aBox, inf));
+        SimpleReasoner sr = new SimpleReasoner(tBox, aBox, inf);
+        sr.setSameAsEnabled( sameAs );
+		aBox.register( sr );
 		
         // add abox data and verify inferences
 		Resource a = aBox.createResource("http://test.vivo/a");
@@ -270,11 +337,20 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		Assert.assertTrue(inf.contains(b,Q,a));
 	}
 	
+    @Test
+    public void removedABoxAssertion3Test(){
+        removedABoxAssertion3(true);
+    }
+
+    @Test
+    public void removedABoxAssertion3NoSameAsTest(){
+        removedABoxAssertion3(false);
+    }
+
 	/*
 	 *  removing abox data with equivalent and inverse properties
 	 */ 
-	@Test
-	public void removedABoxAssertion3() {
+	public void removedABoxAssertion3(boolean sameAs) {
 		
 		//set up the tbox
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
@@ -297,7 +373,9 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		aBox.add(a,P,b);
 
 		// register the SimpleReasoner
-		aBox.register(new SimpleReasoner(tBox, aBox, inf));
+        SimpleReasoner sr = new SimpleReasoner(tBox, aBox, inf);
+        sr.setSameAsEnabled( sameAs );
+		aBox.register( sr );
 		
 		// add abox statements and verify inferences
 		aBox.add(b,Q,a);
@@ -309,11 +387,20 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		                                         // when it's removed from the abox
 	}
 	
+    @Test
+    public void addTBoxInverseAssertion1Test() throws InterruptedException {
+        addTBoxInverseAssertion1(true);
+    }
+
+    @Test
+    public void addTBoxInverseAssertion1NoSameAsTest() throws InterruptedException {
+        addTBoxInverseAssertion1(false);
+    }
+
 	/*
 	 * adding an inverseOf assertion to the tbox
 	 */
-	@Test
-	public void addTBoxInverseAssertion1() throws InterruptedException {
+	public void addTBoxInverseAssertion1(boolean sameAs) throws InterruptedException {
          
 		// Set up the TBox. 
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
@@ -330,7 +417,8 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
         
 		// set up SimpleReasoner and register it with abox. register 
 		// SimpleReasonerTBoxListener with the tbox.
-		SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf );
+        simpleReasoner.setSameAsEnabled( sameAs );        
 		aBox.register(simpleReasoner);
 		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
 		tBox.register(simpleReasonerTBoxListener);
@@ -361,12 +449,21 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		
 		simpleReasonerTBoxListener.setStopRequested();
 	}
-		
+	
+    @Test
+    public void removeTBoxInverseAssertion1Test() throws InterruptedException {
+        removeTBoxInverseAssertion1(true);
+    }	
+
+    @Test
+    public void removeTBoxInverseAssertion1NoSameAsTest() throws InterruptedException {
+        removeTBoxInverseAssertion1(false);
+    }
+
 	/*
 	 * removing an inverseOf assertion from the tbox
 	 */
-	@Test
-	public void removeTBoxInverseAssertion1() throws InterruptedException {
+	public void removeTBoxInverseAssertion1(boolean sameAs) throws InterruptedException {
 				
 		// set up the tbox.
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
@@ -385,7 +482,8 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
         
 		// set up SimpleReasoner and SimpleReasonerTBox listener,
 		// register them with abox and tbox
-		SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+        simpleReasoner.setSameAsEnabled( sameAs );                         
 		aBox.register(simpleReasoner);
 		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
 		tBox.register(simpleReasonerTBoxListener);	    
@@ -411,11 +509,20 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		simpleReasonerTBoxListener.setStopRequested();
 	}
 	
+    @Test
+    public void recomputeABox1Test() throws InterruptedException {
+        recomputeABox1(true);
+    }
+
+    @Test
+    public void recomputeABox1NoSameAsTest() throws InterruptedException {
+        recomputeABox1(false);
+    }
+
 	/*
 	 * Basic scenario around recomputing the ABox inferences
 	 */
-	@Test
-	public void recomputeABox1() throws InterruptedException {
+	public void recomputeABox1(boolean sameAs) throws InterruptedException {
 				
         // set up tbox
 		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
@@ -437,6 +544,7 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+        simpleReasoner.setSameAsEnabled( sameAs );
 		aBox.register(simpleReasoner);
 		
         // abox statements
