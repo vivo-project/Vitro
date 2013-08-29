@@ -5,6 +5,10 @@ package edu.cornell.mannlib.vitro.webapp.reasoner.plugin;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Statement;
+
 import edu.cornell.mannlib.vitro.webapp.reasoner.ReasonerPlugin;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 
