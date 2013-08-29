@@ -2,10 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
-
 import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mindswap.pellet.jena.PelletReasonerFactory;
 
@@ -38,12 +38,20 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		setLoggerLevel(SimpleReasonerTBoxListener.class, Level.OFF);
 	}
 	
+    @Test
+    public void addABoxTypeAssertion1Test(){
+        addABoxTypeAssertion1(true);
+    }
+
+    @Test
+    public void addABoxTypeAssertion1NoSameAsTest(){
+        addABoxTypeAssertion1(false);
+    }
 	/*
 	* Test that when an individual is asserted to be of a type,
 	* its asserted type is not added to the inference graph
 	*/
-	@Test
-	public void addABoxTypeAssertion1(){
+	public void addABoxTypeAssertion1( boolean sameAsEnabled ){
 			
 		// Create a Tbox with a simple class hierarchy. B is a subclass of A.
 		// Pellet will compute TBox inferences
@@ -62,7 +70,9 @@ public class SimpleReasonerTest extends AbstractTestClass {
         
 		// create an ABox and register the SimpleReasoner listener with it
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-		aBox.register(new SimpleReasoner(tBox, aBox, inf));
+        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+        simpleReasoner.setSameAsEnabled( sameAsEnabled );
+		aBox.register(simpleReasoner);
 		
         // Individual x 
 		Resource ind_x = aBox.createResource("http://test.vivo/x");
@@ -75,13 +85,20 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		Assert.assertFalse(inf.contains(xisb));	
 	}
 
+    @Test
+    public void addABoxTypeAssertion2Test(){
+        addABoxTypeAssertion2(true);
+    }
+    @Test
+    public void addABoxTypeAssertion2NoSameAs(){
+        addABoxTypeAssertion2(false);
+    }
 	/*
 	* Test that when an individual is asserted have a type,
 	* that inferences are materialized that it has the types
 	* of its superclasses
 	*/
-	@Test
-	public void addABoxTypeAssertion2(){
+	public void addABoxTypeAssertion2(boolean enableSameAs){
 	
 		// Create a Tbox with a simple class hierarchy. D and E are subclasses
 		// of C. B and C are subclasses of A. Pellet will compute TBox inferences.
@@ -113,7 +130,9 @@ public class SimpleReasonerTest extends AbstractTestClass {
         
 		// create an Abox and register the SimpleReasoner listener with it
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-		aBox.register(new SimpleReasoner(tBox, aBox, inf));
+        SimpleReasoner sr = new SimpleReasoner(tBox, aBox, inf);
+        sr.setSameAsEnabled( enableSameAs );
+		aBox.register( sr );
 		
         // add a statement to the ABox that individual x is of type E.
 		Resource ind_x = aBox.createResource("http://test.vivo/x");
@@ -128,11 +147,18 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		Assert.assertTrue(inf.contains(xisa));	
 	}
 
+    @Test
+    public void addABoxTypeAssertion3Test() throws InterruptedException{
+        addABoxTypeAssertion3(true);
+    }
+    @Test
+    public void addABoxTypeAssertion3NoSameAs() throws InterruptedException{
+        addABoxTypeAssertion3(false);
+    }
 	/*
 	* Test inference based on class equivalence
 	*/ 
-	@Test
-	public void addABoxTypeAssertion3() throws InterruptedException {
+	public void addABoxTypeAssertion3(boolean enableSameAs) throws InterruptedException {
 				
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
@@ -142,7 +168,9 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+        SimpleReasoner sr = new SimpleReasoner(tBox, aBox, inf);
+        sr.setSameAsEnabled( enableSameAs );
+        SimpleReasoner simpleReasoner =  sr ;
 		aBox.register(simpleReasoner);
 		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
 		tBox.register(simpleReasonerTBoxListener);
@@ -182,11 +210,18 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		simpleReasonerTBoxListener.setStopRequested();;
 	}
 	
+    @Test
+    public void addABoxTypeAssertion4Test()throws InterruptedException{
+        addABoxTypeAssertion4(true);
+    }
+    @Test
+    public void addABoxTypeAssertion4NoSameAs()throws InterruptedException{
+        addABoxTypeAssertion4(false);
+    }
 	/*
 	 * Test inference based on class equivalence
 	 */ 
-	@Test
-	public void addABoxTypeAssertion4() throws InterruptedException {
+	public void addABoxTypeAssertion4(boolean enableSameAs) throws InterruptedException {
 				
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
@@ -196,7 +231,9 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+        SimpleReasoner sr = new SimpleReasoner(tBox, aBox, inf);
+        sr.setSameAsEnabled( enableSameAs );
+        SimpleReasoner simpleReasoner =  sr ;
 		aBox.register(simpleReasoner);
 		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
 		tBox.register(simpleReasonerTBoxListener);
@@ -228,11 +265,18 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	}
 	
 
+    @Test
+    public void addABoxTypeAssertion5Test()throws InterruptedException{
+        addABoxTypeAssertion5(true);
+    }
+    @Test
+    public void addABoxTypeAssertion5NoSameAs()throws InterruptedException{
+        addABoxTypeAssertion5(false);
+    }
 	/*
 	 * Test inference based on class equivalence
 	 */
-	@Test
-	public void addABoxTypeAssertion5() throws InterruptedException {
+	public void addABoxTypeAssertion5(boolean enableSameAs) throws InterruptedException {
 				
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
@@ -242,7 +286,9 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+        SimpleReasoner sr = new SimpleReasoner(tBox, aBox, inf);
+        sr.setSameAsEnabled( enableSameAs );
+        SimpleReasoner simpleReasoner =  sr ;
 		aBox.register(simpleReasoner);
 		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
 		tBox.register(simpleReasonerTBoxListener);
@@ -279,6 +325,14 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		simpleReasonerTBoxListener.setStopRequested();
 	}
 
+    @Test
+    public void removeABoxTypeAssertion1Test()throws InterruptedException{
+        removeABoxTypeAssertion1(true);
+    }
+    @Test
+    public void removeABoxTypeAssertion1NoSameAs()throws InterruptedException{
+        removeABoxTypeAssertion1(false);
+    }
 	/*
 	* Test that when it is retracted that an individual is of a type,
 	* that the inferences that it is of the type of all superclasses
@@ -287,8 +341,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	* TBox, ABox and inference graph minus the retracted type statement)
 	* should not be retracted.
 	*/
-	@Test
-	public void removeABoxTypeAssertion1(){
+	public void removeABoxTypeAssertion1(boolean enableSameAs){
 	
 		// Create a Tbox with a simple class hierarchy. C is a subclass of B
 		// and B is a subclass of A. Pellet will compute TBox inferences.
@@ -312,7 +365,9 @@ public class SimpleReasonerTest extends AbstractTestClass {
         
 		// create an Abox and register the SimpleReasoner listener with it
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-		aBox.register(new SimpleReasoner(tBox, aBox, inf));
+        SimpleReasoner sr = new SimpleReasoner(tBox, aBox, inf);
+        sr.setSameAsEnabled( enableSameAs );
+		aBox.register( sr );
 		
         // add a statement to the ABox that individual x is of type C.
 		Resource ind_x = aBox.createResource("http://test.vivo/x");
@@ -335,6 +390,14 @@ public class SimpleReasonerTest extends AbstractTestClass {
 
 	}
 	
+    @Test
+    public void addTBoxSubClassAssertion1Test()throws InterruptedException{
+        addTBoxSubClassAssertion1(true);
+    }
+    @Test
+    public void addTBoxSubClassAssertion1NoSameAs()throws InterruptedException{
+        addTBoxSubClassAssertion1(false);
+    }
 	/*
 	 * Test the addition of a subClassOf statement to 
 	 * the TBox. The instance data that is the basis
@@ -351,8 +414,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	 * rdfs:subClassOf statement, this test serves
 	 * as a test of equivalentClass statements also.
 	 */
-	@Test
-	public void addTBoxSubClassAssertion1() throws InterruptedException {
+	public void addTBoxSubClassAssertion1(boolean enableSameAs) throws InterruptedException {
 				
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
@@ -362,7 +424,9 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+        SimpleReasoner sr = new SimpleReasoner(tBox, aBox, inf);
+        sr.setSameAsEnabled( enableSameAs );
+        SimpleReasoner simpleReasoner =  sr ;
 		aBox.register(simpleReasoner);
 		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
 		tBox.register(simpleReasonerTBoxListener);
@@ -408,6 +472,14 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		simpleReasonerTBoxListener.setStopRequested();
 	}
 
+    @Test
+    public void addTBoxSubClassAssertion2Test()throws InterruptedException{
+        addTBoxSubClassAssertion2(true);
+    }
+    @Test
+    public void addTBoxSubClassAssertion2NoSameAs()throws InterruptedException{
+        addTBoxSubClassAssertion2(false);
+    }
 	/*
 	 * Test the addition of a subClassOf statement to 
 	 * the TBox. The instance data that is the basis
@@ -424,8 +496,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	 * as some test of equivalentClass statements also.
 	 * 
 	 */
-	@Test
-	public void addTBoxSubClassAssertion2() throws InterruptedException {
+	public void addTBoxSubClassAssertion2(boolean enableSameAs) throws InterruptedException {
 				
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
@@ -435,7 +506,9 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+        SimpleReasoner sr = new SimpleReasoner(tBox, aBox, inf);
+        sr.setSameAsEnabled( enableSameAs );
+        SimpleReasoner simpleReasoner =  sr ;
 		aBox.register(simpleReasoner);
 		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
 		tBox.register(simpleReasonerTBoxListener);
@@ -480,6 +553,14 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	}
 	
 	
+    @Test
+    public void removeTBoxSubClassAssertion1Test()throws InterruptedException{
+        removeTBoxSubClassAssertion1(true);
+    }
+    @Test
+    public void removeTBoxSubClassAssertion1NoSameAs()throws InterruptedException{
+        removeTBoxSubClassAssertion1(false);
+    }
 	/*
 	 * Test the removal of a subClassOf statement from 
 	 * the TBox. The instance data that is the basis
@@ -487,8 +568,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	 * inference graph. 
 	 * 
 	 */
-	@Test
-	public void removeTBoxSubClassAssertion1() throws InterruptedException {
+	public void removeTBoxSubClassAssertion1(boolean enableSameAs) throws InterruptedException {
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
 		// Pellet will compute TBox inferences
@@ -497,7 +577,9 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+        SimpleReasoner sr = new SimpleReasoner(tBox, aBox, inf);
+        sr.setSameAsEnabled( enableSameAs );
+        SimpleReasoner simpleReasoner =  sr ;
 		aBox.register(simpleReasoner);
 		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
 		tBox.register(simpleReasonerTBoxListener);
@@ -582,6 +664,17 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		simpleReasonerTBoxListener.setStopRequested();
 	}
 	
+    @Ignore(" needs PelletListener infrastructure which is not in this suite.")
+    @Test
+    public void bcdTest()throws InterruptedException{
+        bcd(true);
+    }
+
+    @Ignore(" needs PelletListener infrastructure which is not in this suite.")
+    @Test
+    public void bcdNoSameAsTest()throws InterruptedException{
+        bcd(false);
+    }
 	/*
 	 * Test the removal of a subClassOf statement from 
 	 * the TBox. The instance data that is the basis
@@ -589,12 +682,12 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	 * inference graph. 
 	 * 
 	 */
-	//@Test  - this test would need PelletListener infrastructure, which we're not
+	// this test would need PelletListener infrastructure, which we're not
 	// testing in this suite. The reason it doesn't work as it is because
 	// the SimpleReasonerTBoxListener is not listening to the tBox inference
 	// model as Pellet is updating it. I could simulate it by adding to the
 	// tBox assertions what we can count on Pellet to infer.
-	public void bcdTest() throws InterruptedException {
+	public void bcd(boolean enableSameAs) throws InterruptedException {
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
 		// Pellet will compute TBox inferences
@@ -604,6 +697,7 @@ public class SimpleReasonerTest extends AbstractTestClass {
         Model inf = ModelFactory.createDefaultModel();
 		
         SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+        simpleReasoner.setSameAsEnabled( enableSameAs );
 		aBox.register(simpleReasoner);
 		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
 		tBox.register(simpleReasonerTBoxListener);
@@ -654,12 +748,19 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		simpleReasonerTBoxListener.setStopRequested();
 	}
 	
+    @Test
+    public void mstTest1Test()throws InterruptedException{
+        mstTest1(true);
+    }
+    @Test
+    public void mstTest1NoSameAs()throws InterruptedException{
+        mstTest1(false);
+    }
 	/*
      * Test computation of mostSpecificType annotations in response
      * to an added/removed ABox type assertion.
 	 */
-	@Test
-	public void mstTest1() throws InterruptedException {
+	public void mstTest1(boolean enableSameAs) throws InterruptedException {
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
 		// Pellet will compute TBox inferences
@@ -668,7 +769,9 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+        SimpleReasoner sr = new SimpleReasoner(tBox, aBox, inf);
+        sr.setSameAsEnabled( enableSameAs );
+        SimpleReasoner simpleReasoner =  sr ;
 		aBox.register(simpleReasoner);
 		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
 		tBox.register(simpleReasonerTBoxListener);
@@ -732,12 +835,19 @@ public class SimpleReasonerTest extends AbstractTestClass {
 	}
 	
 
+    @Test
+    public void mstTest2Test()throws InterruptedException{
+        mstTest2(true);
+    }
+    @Test
+    public void mstTest2NoSameAs()throws InterruptedException{
+        mstTest2(false);
+    }
 	/*
      * Test computation of mostSpecificType annotations in response
      * to an added ABox type assertion.
 	 */
-	@Test
-	public void mstTest2() throws InterruptedException {
+	public void mstTest2(boolean enableSameAs) throws InterruptedException {
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
 		// Pellet will compute TBox inferences
@@ -746,7 +856,9 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+        SimpleReasoner sr = new SimpleReasoner(tBox, aBox, inf);
+        sr.setSameAsEnabled( enableSameAs );
+        SimpleReasoner simpleReasoner =  sr ;
 		aBox.register(simpleReasoner);
 		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
 		tBox.register(simpleReasonerTBoxListener);
@@ -785,13 +897,20 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		
 		simpleReasonerTBoxListener.setStopRequested();
 	}
-		
+	
+    @Test
+    public void mstTest3Test()throws InterruptedException{
+        mstTest3(true);
+    }
+    @Test
+    public void mstTest3NoSameAs()throws InterruptedException{
+        mstTest3(false);
+    }
 	/*
      * Test computation of mostSpecificType annotations in response
      * to an added/removed TBox assertions.
 	 */
-	@Test
-	public void mstTest3() throws InterruptedException {
+	public void mstTest3(boolean enableSameAs) throws InterruptedException {
 		// Create TBox, ABox and Inference models and register
 		// the ABox reasoner listeners with the ABox and TBox
 		// Pellet will compute TBox inferences
@@ -800,7 +919,9 @@ public class SimpleReasonerTest extends AbstractTestClass {
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
-        SimpleReasoner simpleReasoner = new SimpleReasoner(tBox, aBox, inf);
+        SimpleReasoner sr = new SimpleReasoner(tBox, aBox, inf);
+        sr.setSameAsEnabled( enableSameAs );
+        SimpleReasoner simpleReasoner =  sr ;
 		aBox.register(simpleReasoner);
 		SimpleReasonerTBoxListener simpleReasonerTBoxListener = getTBoxListener(simpleReasoner);
 		tBox.register(simpleReasonerTBoxListener);
