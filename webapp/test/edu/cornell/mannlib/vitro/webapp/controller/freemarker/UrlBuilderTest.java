@@ -76,4 +76,6 @@ public class UrlBuilderTest extends AbstractTestClass {
         String vClassUriEncoded = "http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23FacultyMember%E2%98%85";
         Assert.assertEquals(vClassUri, UrlBuilder.urlDecode(vClassUriEncoded));          
     }
+
+
 }
