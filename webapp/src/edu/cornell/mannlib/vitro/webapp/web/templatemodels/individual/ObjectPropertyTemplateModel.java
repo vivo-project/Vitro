@@ -89,6 +89,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         setName(op.getDomainPublic());
         
         sortDirection = op.getDomainEntitySortDirection();
+        domainUri = op.getDomainVClassURI();
         rangeUri = op.getRangeVClassURI();
         
         // Get the config for this object property
@@ -132,6 +133,9 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                     "subjectUri", subjectUri,
                     "predicateUri", propertyUri);
             
+            if (domainUri != null) {
+                params.put("domainUri", domainUri);
+            }
             if (rangeUri != null) {
                 params.put("rangeUri", rangeUri);
             }

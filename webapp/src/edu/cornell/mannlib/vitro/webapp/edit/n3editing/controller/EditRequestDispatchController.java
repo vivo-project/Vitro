@@ -202,6 +202,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 	    String editConfGeneratorName = null;
 	    
 	    String predicateUri =  getPredicateUri(vreq);
+	    String domainUri = EditConfigurationUtils.getDomainUri(vreq);
 	    String rangeUri = EditConfigurationUtils.getRangeUri(vreq);
 	    
         // *** handle the case where the form is specified as a request parameter ***	    
@@ -218,7 +219,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 
       	// *** check for a predicate URI in the request        	
         }else if( predicateUri != null && !predicateUri.isEmpty() ){                      
-            Property prop = getProperty( predicateUri, rangeUri, vreq);
+            Property prop = getProperty( predicateUri, domainUri, rangeUri, vreq);
             if (prop != null && rangeUri != null) {
                 editConfGeneratorName = getCustomEntryForm(prop);
             } else if( prop != null && prop.getCustomEntryForm() != null ){
@@ -258,11 +259,11 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 	    }
 	}
 	
-	private Property getProperty(String predicateUri, String rangeUri, VitroRequest vreq) {	   
+	private Property getProperty(String predicateUri, String domainUri, String rangeUri, VitroRequest vreq) {	   
 		Property p = null;
 		try{
-    		p = vreq.getWebappDaoFactory().getObjectPropertyDao().getObjectPropertyByURIAndRangeURI(
-    		        predicateUri, rangeUri);
+    		p = vreq.getWebappDaoFactory().getObjectPropertyDao().getObjectPropertyByURIs(
+    		        predicateUri, domainUri, rangeUri);
     		if(p == null) {
     			p = vreq.getWebappDaoFactory().getDataPropertyDao().getDataPropertyByURI(predicateUri);
     		}

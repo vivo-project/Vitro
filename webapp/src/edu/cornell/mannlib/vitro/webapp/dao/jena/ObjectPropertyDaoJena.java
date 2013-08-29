@@ -284,19 +284,28 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         }
     }
     
-    public ObjectProperty getObjectPropertyByURIAndRangeURI(String propertyURI, String rangeURI) {
+    public ObjectProperty getObjectPropertyByURIs(String propertyURI, String domainURI, String rangeURI) {
+        if(log.isDebugEnabled()) {
+            log.debug("Getting " + propertyURI + " with domain " + domainURI + " and range " + rangeURI);
+        }
         ObjectProperty op = getObjectPropertyByURI(propertyURI);
         if (op == null || rangeURI == null) {
             return op;
         }
+        op.setDomainVClassURI(domainURI);
         op.setRangeVClassURI(rangeURI);
         String propQuery = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
                 "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
                 "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
                 "SELECT ?range ?label ?group ?customForm ?displayLevel ?updateLevel WHERE { \n" +
-                "    ?context config:configContextFor <" + propertyURI + "> . \n" +
-                "    ?context config:qualifiedBy <" + rangeURI + "> . \n" +
-                "    ?context config:hasConfiguration ?configuration . \n" +
+                "    ?context config:configContextFor <" + propertyURI + "> . \n";
+        if (domainURI != null) {
+                propQuery += "    ?context config:qualifiedByDomain <" + domainURI + "> . \n";
+        };
+        if (rangeURI != null) {
+            propQuery += "    ?context config:qualifiedBy <" + rangeURI + "> . \n";
+        };
+                propQuery += "    ?context config:hasConfiguration ?configuration . \n" +
                 "    OPTIONAL { ?configuration config:propertyGroup ?group } \n" +
                 "    OPTIONAL { ?configuration config:displayName ?label } \n" +
                 "    OPTIONAL { ?configuration vitro:customEntryFormAnnot ?customForm } \n" +

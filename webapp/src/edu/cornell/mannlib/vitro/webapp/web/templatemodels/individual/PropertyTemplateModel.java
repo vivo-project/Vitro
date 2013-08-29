@@ -29,6 +29,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     protected final VitroRequest vreq;
     protected final String subjectUri;
     protected final String propertyUri;
+    protected String domainUri;
     protected String rangeUri;
     private final String localName;
 

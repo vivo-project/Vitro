@@ -1093,11 +1093,8 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         OntModel ontModel = getOntModel();
         try {
             ontModel.enterCriticalSection(Lock.READ);
-            OntClass oc1 = getOntClass(ontModel, vclassURI1);
-            OntClass oc2 = getOntClass(ontModel, vclassURI2);
-            if (oc1 == null || oc2 == null) {
-                return false;
-            } 
+            Resource oc1 = ontModel.getResource(vclassURI1);
+            Resource oc2 = ontModel.getResource(vclassURI2);
             return ontModel.contains(oc1, RDFS.subClassOf, oc2);
         } finally {
             ontModel.leaveCriticalSection();

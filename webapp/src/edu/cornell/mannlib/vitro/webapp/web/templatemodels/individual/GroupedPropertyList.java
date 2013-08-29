@@ -89,7 +89,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         populatedObjectPropertyList.addAll(additions);
         
         propertyList.addAll(populatedObjectPropertyList);
-
+        
         // If editing this page, merge in object properties applicable to the individual that are currently
         // unpopulated, so the properties are displayed to allow statements to be added to these properties.
         // RY In future, we should limit this to properties that the user has permission to add properties to.
@@ -190,7 +190,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                 if (pi != null) {
                     if (!alreadyOnObjectPropertyList(
                             populatedObjectPropertyList, pi)) {
-                        addObjectPropertyToPropertyList(pi.getPropertyURI(), pi.getRangeClassURI(),
+                        addObjectPropertyToPropertyList(pi.getPropertyURI(), pi.getDomainClassURI(), pi.getRangeClassURI(),
                                 propertyList);
                     }
                 } else {
@@ -206,7 +206,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // constitute a special case (i.e., included in piDao.getAllPossiblePropInstForIndividual()).
         for (String propertyUri : VITRO_PROPS_TO_ADD_TO_LIST) {
             if (!alreadyOnPropertyList(propertyList, propertyUri)) {
-                addObjectPropertyToPropertyList(propertyUri, null, propertyList);
+                addObjectPropertyToPropertyList(propertyUri, null, null, propertyList);
             }
         }
     }
@@ -218,16 +218,29 @@ public class GroupedPropertyList extends BaseTemplateModel {
         }
         for (ObjectProperty op : opList) {
             if (op.getURI() != null && op.getURI().equals(pi.getPropertyURI())) {
-                return true;
+                if(op.getDomainVClassURI() == null) {
+                    if(pi.getDomainClassURI() == null) {
+                        return true;   
+                    }
+                } else if (op.getDomainVClassURI().equals(pi.getDomainClassURI())) {
+                    return true;
+                }
+                if(op.getRangeVClassURI() == null) {
+                    if (pi.getDomainClassURI() == null) {
+                        return true;
+                    }
+                } else if (op.getRangeVClassURI().equals(pi.getRangeClassURI())) {
+                    return true;
+                }
             }
         }
         return false;
     }
 
-    private void addObjectPropertyToPropertyList(String propertyUri, String rangeUri,
+    private void addObjectPropertyToPropertyList(String propertyUri, String domainUri, String rangeUri,
             List<Property> propertyList) {
         ObjectPropertyDao opDao = wdf.getObjectPropertyDao();
-        ObjectProperty op = opDao.getObjectPropertyByURIAndRangeURI(propertyUri, rangeUri);
+        ObjectProperty op = opDao.getObjectPropertyByURIs(propertyUri, domainUri, rangeUri);
         if (op == null) {
             log.error("ObjectProperty op returned null from opDao.getObjectPropertyByURI(" + propertyUri + ")");
         } else if (op.getURI() == null) {

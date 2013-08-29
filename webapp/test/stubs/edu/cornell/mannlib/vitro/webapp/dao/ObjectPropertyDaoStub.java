@@ -67,7 +67,7 @@ public class ObjectPropertyDaoStub implements ObjectPropertyDao {
 	}
 	
     @Override
-    public ObjectProperty getObjectPropertyByURIAndRangeURI(String objectPropertyURI, String rangeURI) {
+    public ObjectProperty getObjectPropertyByURIs(String objectPropertyURI, String domainURI, String rangeURI) {
         return getObjectPropertyByURI(objectPropertyURI);
     }
 

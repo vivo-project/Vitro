@@ -53,6 +53,10 @@ public class EditConfigurationUtils {
     	return vreq.getParameter("objectUri");
     }
     
+    public static String getDomainUri(VitroRequest vreq) {
+        return vreq.getParameter("domainUri");
+    }
+    
     public static String getRangeUri(VitroRequest vreq) {
         return vreq.getParameter("rangeUri");
     }

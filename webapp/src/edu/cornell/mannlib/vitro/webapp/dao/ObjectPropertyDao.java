@@ -15,7 +15,7 @@ public interface ObjectPropertyDao extends PropertyDao {
 
     public ObjectProperty getObjectPropertyByURI(String objectPropertyURI);
     
-    public ObjectProperty getObjectPropertyByURIAndRangeURI(String objectPropertyURI, String rangeURI);
+    public ObjectProperty getObjectPropertyByURIs(String objectPropertyURI, String domainURI, String rangeURI);
 
     public List <ObjectProperty> getObjectPropertiesForObjectPropertyStatements(List /*of ObjectPropertyStatement */ objectPropertyStatements);
 
