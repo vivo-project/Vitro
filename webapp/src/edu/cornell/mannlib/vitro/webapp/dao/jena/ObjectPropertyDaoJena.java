@@ -301,7 +301,9 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 "    ?context config:configContextFor <" + propertyURI + "> . \n";
         if (domainURI != null) {
                 propQuery += "    ?context config:qualifiedByDomain <" + domainURI + "> . \n";
-        };
+        } else {
+                propQuery += "   FILTER NOT EXISTS { ?context config:qualifiedByDomain ?domainURI } \n";
+        }
         if (rangeURI != null) {
             propQuery += "    ?context config:qualifiedBy <" + rangeURI + "> . \n";
         };
