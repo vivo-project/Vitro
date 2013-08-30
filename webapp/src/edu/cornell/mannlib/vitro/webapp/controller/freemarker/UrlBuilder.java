@@ -242,23 +242,12 @@ public class UrlBuilder {
     }
     
     public static String getIndividualProfileUrl(Individual individual, VitroRequest vreq) {
-        return getIndividualProfileUrl(individual, individual.getURI(),vreq);
-    }
-
-    public static String getIndividualProfileUrl(String individualUri, VitroRequest vreq) {
-        Individual individual = new IndividualImpl(individualUri);
-        return getIndividualProfileUrl(individual, individualUri, vreq);
-    }    
-    
-    private static String getIndividualProfileUrl(Individual individual, String individualUri, VitroRequest vreq) {
         WebappDaoFactory wadf = vreq.getWebappDaoFactory();
         String profileUrl = null;
         try {
-            URI uri = new URIImpl(individualUri); // throws exception if individualUri is invalid
-            String namespace = uri.getNamespace();
-            String defaultNamespace = wadf.getDefaultNamespace();
-    
             String localName = individual.getLocalName();
+            String namespace = individual.getNamespace();
+            String defaultNamespace = wadf.getDefaultNamespace();                
                     
             if (defaultNamespace.equals(namespace)) {
                 profileUrl = getUrl(Route.INDIVIDUAL.path() + "/" + localName);
@@ -267,7 +256,7 @@ public class UrlBuilder {
                     log.debug("Found externally linked namespace " + namespace);
                     profileUrl = namespace + localName;
                 } else {
-                    ParamMap params = new ParamMap("uri", individualUri);
+                    ParamMap params = new ParamMap("uri", individual.getURI());
                     profileUrl = getUrl("/individual", params);
                 }
             }
@@ -276,25 +265,56 @@ public class UrlBuilder {
             return null;
         }        
 
-    	if (profileUrl != null) {
-    		LinkedHashMap<String, String> specialParams = getModelParams(vreq);
-    		if(specialParams.size() != 0) {
-    			profileUrl = addParams(profileUrl, new ParamMap(specialParams));
-    		}
-    	}
-    	
-    	return profileUrl;
+        if (profileUrl != null) {
+            LinkedHashMap<String, String> specialParams = getModelParams(vreq);
+            if(specialParams.size() != 0) {
+                profileUrl = addParams(profileUrl, new ParamMap(specialParams));
+            }
+        }
+        
+        return profileUrl;
     }
 
+    /**
+     * If you already have an Individual object around, 
+     * call getIndividualProfileUrl(Individual, VitroRequest) 
+     * instead of this method. 
+     */
+    public static String getIndividualProfileUrl(String individualUri, VitroRequest vreq) {        
+        return getIndividualProfileUrl(new IndividualImpl(individualUri),  vreq);
+    }    
+    
+    protected static String getIndividualProfileUrl( 
+            String individualUri, 
+            String namespace, String localName, 
+            String defaultNamespace){
+        String profileUrl = "";
+        try{            
+            if ( isUriInDefaultNamespace( individualUri, defaultNamespace) ) {
+                profileUrl = getUrl(Route.INDIVIDUAL.path() + "/" + localName);
+            } else {
+                ParamMap params = new ParamMap("uri", individualUri);
+                profileUrl = getUrl("/individual", params);            
+            }
+        } catch (Exception e) {
+            log.warn(e);
+            return null;
+        }                
+        return profileUrl;
+    }
+    
     public static boolean isUriInDefaultNamespace(String individualUri, VitroRequest vreq) {
         return isUriInDefaultNamespace(individualUri, vreq.getWebappDaoFactory());
     }
     
-    public static boolean isUriInDefaultNamespace(String individualUri, WebappDaoFactory wadf) {       
+    public static boolean isUriInDefaultNamespace(String individualUri, WebappDaoFactory wadf) {
+        return isUriInDefaultNamespace( individualUri, wadf.getDefaultNamespace());
+    }
+    
+    public static boolean isUriInDefaultNamespace(String individualUri, String defaultNamespace){
         try {
-            URI uri = new URIImpl(individualUri); // throws exception if individualUri is invalid
-            String namespace = uri.getNamespace();
-            String defaultNamespace = wadf.getDefaultNamespace();  
+            Individual ind = new IndividualImpl(individualUri); 
+            String namespace = ind.getNamespace();          
             return defaultNamespace.equals(namespace);
         } catch (Exception e) {
             log.warn(e);

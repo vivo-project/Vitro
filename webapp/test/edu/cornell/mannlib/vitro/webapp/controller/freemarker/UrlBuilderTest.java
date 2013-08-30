@@ -3,12 +3,21 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
+import static org.easymock.EasyMock.*;
+
+import javax.servlet.http.HttpServletRequest;
+
 import junit.framework.Assert;
 
 import org.junit.Test;
 
+import stubs.edu.cornell.mannlib.vitro.webapp.dao.ApplicationDaoStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
 public class UrlBuilderTest extends AbstractTestClass {
     
@@ -77,5 +86,80 @@ public class UrlBuilderTest extends AbstractTestClass {
         Assert.assertEquals(vClassUri, UrlBuilder.urlDecode(vClassUriEncoded));          
     }
 
+    
+    @Test 
+    public void testGetIndividualProfileURI(){
+        VitroRequest vreq = makeMockVitroRequest( "http://example.com/individual/");
+        UrlBuilder.contextPath = "http://example.com";
+        
+        String uri = "http://example.com/individual/n2343";
+        String url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
+        Assert.assertEquals("http://example.com/individual/n2343", url);
+                
+        uri = "http://example.com/individual/bob";                
+        url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
+        Assert.assertEquals("http://example.com/individual/bob",url);
+        
+        uri = "http://nondefaultNS.com/individual/n2343";                
+        url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
+        Assert.assertEquals("http://example.com/individual?uri=" + URLEncoder.encode(uri), url);
+        
+        uri = "http://example.com/individual#n2343";                
+        url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
+        Assert.assertEquals("http://example.com/individual?uri=" + URLEncoder.encode(uri), url);
+        
+        uri = "http://example.com/individual/5LNCannotStartWithNumber";                
+        url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
+        Assert.assertEquals("http://example.com/individual?uri=" + URLEncoder.encode(uri), url);        
+    }
+    
+    protected VitroRequest makeMockVitroRequest( final String defaultNS){        
+        HttpServletRequest req = createMock( HttpServletRequest.class );        
+        return new VitroRequest(req){
+            
+            @Override
+            public String getParameter(String key){ return null; }
+            
+            @Override
+            public WebappDaoFactory getWebappDaoFactory(){
+                return makeMockWDF(defaultNS);
+            }
+        };
+    }
+    protected WebappDaoFactoryStub makeMockWDF( String defaultNS){
+        WebappDaoFactoryStub wdf = new WebappDaoFactoryStub();
+        wdf.setDefaultNamespace("http://example.com/individual/");
+        ApplicationDaoStub aDao = new ApplicationDaoStub(){
+            @Override
+            public boolean isExternallyLinkedNamespace(String ns){                
+                return false;
+            }
+        };        
+        wdf.setApplicationDao( aDao );
+        return wdf;
+    }
+    
+    @Test
+    public void testIsUriInDefaultNamespace(){        
+        String[][] examples = {
+                { "http://example.com/individual/n3234", "http://example.com/individual/"},
+                { "http://example.com/individual#n3234", "http://example.com/individual#"},
+                { "http://example.com:8080/individual/n3234", "http://example.com:8080/individual/"},
+                { "http://example.com:8080/individual#n3234", "http://example.com:8080/individual#"}                
+        };
+
+        for( String[] example : examples ){
+            Assert.assertTrue("expected '"+ example[0] + "' to be in the default NS of '"+example[1]+"'",
+                    UrlBuilder.isUriInDefaultNamespace(example[0], example[1]));    
+        }            
+        
+        String[][] counterExamples = {                
+                { "http://example.com/individual/5LNCannotStartWithNumber", "http://example.com/individual/" }
+        };
+        for( String[] example : counterExamples ){
+            Assert.assertFalse("expected '"+ example[0] + "' to NOT be in the default NS of '"+example[1]+"'",
+                    UrlBuilder.isUriInDefaultNamespace(example[0], example[1]));    
+        }
+    }
 
 }
