@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
 /**
  * A base class for requested actions that involve adding, editing, or dropping
@@ -14,12 +15,16 @@ public abstract class AbstractDataPropertyStatementAction extends
 		AbstractPropertyStatementAction {
 	private final String subjectUri;
 	private final String predicateUri;
+	private final Property predicate;
 
 	public AbstractDataPropertyStatementAction(OntModel ontModel,
 			String subjectUri, String predicateUri) {
 		super(ontModel);
 		this.subjectUri = subjectUri;
 		this.predicateUri = predicateUri;
+		Property dataProperty = new Property();
+		dataProperty.setURI(predicateUri);
+		this.predicate = dataProperty;
 	}
 
 	public AbstractDataPropertyStatementAction(OntModel ontModel,
@@ -28,12 +33,19 @@ public abstract class AbstractDataPropertyStatementAction extends
 		this.subjectUri = (dps.getIndividual() == null) ? dps
 				.getIndividualURI() : dps.getIndividual().getURI();
 		this.predicateUri = dps.getDatapropURI();
+	    Property dataProperty = new Property();
+	    dataProperty.setURI(predicateUri);
+	    this.predicate = dataProperty;
 	}
 
 	public String getSubjectUri() {
 		return subjectUri;
 	}
 
+	public Property getPredicate() {
+	    return predicate;
+	}
+	
 	@Override
 	public String getPredicateUri() {
 		return predicateUri;

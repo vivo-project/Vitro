@@ -41,7 +41,7 @@ public class UncollatedObjectPropertyTemplateModel extends ObjectPropertyTemplat
             String objectKey = getObjectKey();
             for (Map<String, String> map : statementData) {
                 statements.add(new ObjectPropertyStatementTemplateModel(subjectUri, 
-                        propertyUri, rangeUri, objectKey, map, getTemplateName(), vreq));
+                        op, objectKey, map, getTemplateName(), vreq));
             }
             
             postprocessStatementList(statements);

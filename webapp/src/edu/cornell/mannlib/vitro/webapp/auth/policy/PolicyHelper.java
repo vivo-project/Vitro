@@ -75,7 +75,8 @@ public class PolicyHelper {
 		}
 
 		Resource subject = stmt.getSubject();
-		Property predicate = stmt.getPredicate();
+		edu.cornell.mannlib.vitro.webapp.beans.Property predicate = 
+		        new edu.cornell.mannlib.vitro.webapp.beans.Property(stmt.getPredicate().getURI());
 		RDFNode objectNode = stmt.getObject();
 		if ((subject == null) || (predicate == null) || (objectNode == null)) {
 			return false;
@@ -84,7 +85,7 @@ public class PolicyHelper {
 		RequestedAction action;
 		if (objectNode.isResource()) {
 			action = new AddObjectPropertyStatement(modelToBeModified,
-					subject.getURI(), predicate.getURI(), objectNode
+					subject.getURI(), predicate, objectNode
 							.asResource().getURI());
 		} else {
 			action = new AddDataPropertyStatement(modelToBeModified,
@@ -106,7 +107,9 @@ public class PolicyHelper {
 		}
 
 		Resource subject = stmt.getSubject();
-		Property predicate = stmt.getPredicate();
+		edu.cornell.mannlib.vitro.webapp.beans.Property predicate = 
+		        new edu.cornell.mannlib.vitro.webapp.beans.Property();
+		predicate.setURI(stmt.getPredicate().getURI());
 		RDFNode objectNode = stmt.getObject();
 		if ((subject == null) || (predicate == null) || (objectNode == null)) {
 			return false;
@@ -115,7 +118,7 @@ public class PolicyHelper {
 		RequestedAction action;
 		if (objectNode.isResource()) {
 			action = new DropObjectPropertyStatement(modelToBeModified,
-					subject.getURI(), predicate.getURI(), objectNode
+					subject.getURI(), predicate, objectNode
 							.asResource().getURI());
 		} else {
 			action = new DropDataPropertyStatement(modelToBeModified,

@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -17,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -24,18 +26,23 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.rdf.model.impl.Util;
+import com.hp.hpl.jena.sdb.util.Pair;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import edu.cornell.mannlib.vitro.webapp.utils.ApplicationConfigurationOntologyUtils;
 
 /**
  * Assists the role-based policies in determining whether a property or resource
@@ -108,17 +115,22 @@ public class PropertyRestrictionPolicyHelper {
 	                                                         Model displayModel) {
 	    
 	    
-		Map<String, RoleLevel> displayThresholdMap = new HashMap<String, RoleLevel>();
-		Map<String, RoleLevel> modifyThresholdMap = new HashMap<String, RoleLevel>();
+		Map<Pair<String, Pair<String,String>>, RoleLevel> displayThresholdMap = 
+		        new HashMap<Pair<String, Pair<String,String>>, RoleLevel>();
+		Map<Pair<String, Pair<String,String>>, RoleLevel> modifyThresholdMap = 
+		        new HashMap<Pair<String, Pair<String,String>>, RoleLevel>();
+		
+		OntModel union = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
+		        ModelFactory.createUnion(displayModel, model));
 
-		if (model != null) {
-			populateThresholdMap(model, displayThresholdMap,
-					VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
-			populateThresholdMap(
-					model,
-					modifyThresholdMap,
-					VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
-		}
+
+		populateThresholdMap(union, displayThresholdMap,
+				VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
+		populateThresholdMap(
+				union,
+				modifyThresholdMap,
+				VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
+
 
 		PropertyRestrictionPolicyHelper bean = new PropertyRestrictionPolicyHelper(
 				PROHIBITED_NAMESPACES, PERMITTED_EXCEPTIONS,
@@ -127,15 +139,49 @@ public class PropertyRestrictionPolicyHelper {
 		return bean;
 	}
 
+	private RoleLevel getModifyThreshold(Property property) {
+	    return getThreshold(property, modifyThresholdMap);
+	}
+	
+	private RoleLevel getThreshold(Property property, 
+	                               Map<Pair<String, Pair<String,String>>, RoleLevel> 
+	                                       thresholdMap) {
+	    if (property.getURI() == null) {
+	        return RoleLevel.NOBODY;
+	    }
+	    String domainURI = (false && property.getDomainVClassURI() == null) 
+	            ? OWL.Thing.getURI() : property.getDomainVClassURI();
+        String rangeURI = (false && property.getRangeVClassURI() == null) 
+                ? OWL.Thing.getURI() : property.getRangeVClassURI();
+	    RoleLevel roleLevel = getRoleLevelFromMap(
+	            domainURI, property.getURI(), rangeURI, thresholdMap);
+	    if (roleLevel == null) {
+	        roleLevel = getRoleLevelFromMap(
+	                OWL.Thing.getURI(), property.getURI(), OWL.Thing.getURI(),
+	                        thresholdMap);
+	    }
+	    return roleLevel;
+	}
+	
+	private RoleLevel getRoleLevelFromMap(String domainURI, 
+	                                      String predicateURI, 
+	                                      String rangeURI,
+	                                      Map<Pair<String, Pair<String,String>>, RoleLevel> map) {
+	    return map.get(
+                new Pair<String, Pair<String,String>>(
+                        domainURI, new Pair<String,String>(
+                                predicateURI, rangeURI)));
+	}
+	
 	/**
 	 * Find all the resources that possess this property, and map the resource
 	 * URI to the required RoleLevel.
 	 */
 	private static void populateThresholdMap(OntModel model,
-			Map<String, RoleLevel> map, String propertyUri) {
+			Map<Pair<String,Pair<String,String>>, RoleLevel> map, String propertyUri) {
 		model.enterCriticalSection(Lock.READ);
 		try {
-			Property property = model.getProperty(propertyUri);
+		    com.hp.hpl.jena.rdf.model.Property property = model.getProperty(propertyUri);
 			StmtIterator stmts = model.listStatements((Resource) null,
 					property, (Resource) null);
 			while (stmts.hasNext()) {
@@ -147,7 +193,29 @@ public class PropertyRestrictionPolicyHelper {
 				}
 				Resource object = (Resource) objectNode;
 				RoleLevel role = RoleLevel.getRoleByUri(object.getURI());
-				map.put(subject.getURI(), role);
+				map.put(new Pair<String,Pair<String,String>>(
+				        OWL.Thing.getURI(), new Pair<String,String>(
+				                subject.getURI(), OWL.Thing.getURI())), role);
+				ObjectProperty op = new ObjectProperty();
+				op.setURI(subject.getURI());
+				List<ObjectProperty> fauxOps = ApplicationConfigurationOntologyUtils
+				        .getAdditionalFauxSubproperties(op, null, model, model);
+				for (ObjectProperty faux : fauxOps) {
+				    role = null;
+				    if(VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT
+				            .equals(propertyUri)) {
+				        role = faux.getProhibitedFromUpdateBelowRoleLevel();
+				    } else if (VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT
+				            .equals(propertyUri)) {
+				        role = faux.getHiddenFromDisplayBelowRoleLevel();
+				    }
+				    if (role != null) {
+				        log.info("Putting D:" + faux.getDomainVClassURI() + " P:" + subject.getURI() + " R:" + faux.getRangeVClassURI() + " ==> L:" + role);
+    				    map.put(new Pair<String,Pair<String,String>>(
+    	                        faux.getDomainVClassURI(), new Pair<String,String>(
+    	                                subject.getURI(), faux.getRangeVClassURI())), role);
+				    }
+				}
 			}
 			stmts.close();
 		} finally {
@@ -175,15 +243,14 @@ public class PropertyRestrictionPolicyHelper {
 	 * These URIs can be displayed only if the user's role is at least as high
 	 * as the threshold role.
 	 */
-	private final Map<String, RoleLevel> displayThresholdMap;
+	private final Map<Pair<String, Pair<String,String>>, RoleLevel> displayThresholdMap;
 
 	/**
 	 * These URIs can be modified only if the user's role is at least as high as
 	 * the threshold role.
 	 */
-	private final Map<String, RoleLevel> modifyThresholdMap;
+	private final Map<Pair<String, Pair<String,String>>, RoleLevel> modifyThresholdMap;
 	
-	private final Model displayModel;
 
 	/**
 	 * Store unmodifiable versions of the inputs.
@@ -194,14 +261,15 @@ public class PropertyRestrictionPolicyHelper {
 	protected PropertyRestrictionPolicyHelper(
 			Collection<String> modifyProhibitedNamespaces,
 			Collection<String> modifyExceptionsAllowedUris,
-			Map<String, RoleLevel> displayThresholdMap,
-			Map<String, RoleLevel> modifyThresholdMap,
+			Map<Pair<String, Pair<String,String>>, RoleLevel> displayThresholdMap,
+			Map<Pair<String, Pair<String,String>>, RoleLevel> modifyThresholdMap,
 			Model displayModel) {
 		this.modifyProhibitedNamespaces = unmodifiable(modifyProhibitedNamespaces);
 		this.modifyExceptionsAllowedUris = unmodifiable(modifyExceptionsAllowedUris);
-		this.displayThresholdMap = unmodifiable(displayThresholdMap);
-		this.modifyThresholdMap = unmodifiable(modifyThresholdMap);
-		this.displayModel = displayModel;
+		this.displayThresholdMap = displayThresholdMap;
+		this.modifyThresholdMap = modifyThresholdMap;
+//	    this.displayThresholdMap = unmodifiable(displayThresholdMap);
+//	    this.modifyThresholdMap = unmodifiable(modifyThresholdMap);
 
 		if (log.isDebugEnabled()) {
 			log.debug("prohibited: " + this.modifyProhibitedNamespaces);
@@ -219,6 +287,7 @@ public class PropertyRestrictionPolicyHelper {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private Map<String, RoleLevel> unmodifiable(Map<String, RoleLevel> raw) {
 		if (raw == null) {
 			return Collections.emptyMap();
@@ -271,32 +340,21 @@ public class PropertyRestrictionPolicyHelper {
 		log.debug("can modify resource '" + resourceUri + "'");
 		return true;
 	}
-	
-	public boolean canDisplayPredicate(String predicateUri, RoleLevel userRole) {
-	    return canDisplayPredicate(predicateUri, null, userRole);
-	}
 
 	/**
 	 * If display of a predicate is restricted, the user's role must be at least
 	 * as high as the restriction level.
 	 */
-	public boolean canDisplayPredicate(String predicateUri, String rangeUri, RoleLevel userRole) {
+	public boolean canDisplayPredicate(Property predicate, RoleLevel userRole) {
+	    //TODO change
+	    String predicateUri = predicate.getURI();
+	    
 		if (predicateUri == null) {
 			log.debug("can't display predicate: predicateUri was null");
 			return false;
 		}
 		
-		RoleLevel displayThreshold = RoleLevel.NOBODY;
-		if (rangeUri == null) {
-		    displayThreshold = displayThresholdMap.get(predicateUri); 
-		} else {
-		    log.debug("Getting display threshold for " + predicateUri + " " + rangeUri);
-		    displayThreshold = getDisplayThreshold(predicateUri, rangeUri);
-		    if (displayThreshold == null) {
-		        displayThreshold = displayThresholdMap.get(predicateUri);
-		    }
-		    log.debug(displayThreshold);
-		}
+		RoleLevel displayThreshold = getThreshold(predicate, displayThresholdMap);		
 		       	        
 		if (isAuthorized(userRole, displayThreshold)) {
 			log.debug("can display predicate: '" + predicateUri
@@ -311,76 +369,42 @@ public class PropertyRestrictionPolicyHelper {
 	}
 	
 	/**
-	 * Gets the role level threshold for displaying a predicate with a particular
-	 * object class
-	 * @param predicateUri
-	 * @param rangeUri
-	 * @return RoleLevel threshold
-	 */
-	private RoleLevel getDisplayThreshold(String predicateUri, String rangeUri) {
-	    String query = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
-                "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
-	            "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
-                "SELECT ?level WHERE { \n" +
-//                "    ?p rdfs:subPropertyOf ?property . \n" +
-                "    ?context config:configContextFor ?p . \n" +
-                "    ?context config:qualifiedBy ?range . \n" +
-                "    ?context config:hasConfiguration ?configuration . \n" +
-                "    ?configuration vitro:hiddenFromDisplayBelowRoleLevelAnnot ?level \n" +
-                "}";
-	    Query q = QueryFactory.create(query);
-	    QueryExecution qe = QueryExecutionFactory.create(q, displayModel);
-	    try {
-	        ResultSet rs = qe.execSelect();
-	        if (!rs.hasNext()) {
-	            return null;
-	        } 
-	        while(rs.hasNext()) {
-	          QuerySolution qsoln = rs.nextSolution();
-	          Resource levelRes = qsoln.getResource("level");
-	          if (levelRes != null) {
-	              return RoleLevel.getRoleByUri(levelRes.getURI());
-	          }
-	        }
-	    } finally {
-	        qe.close();
-	    }
-	    return null;
-	}
-	
-	/**
 	 * A predicate cannot be modified if its namespace is in the prohibited list
 	 * (some exceptions are allowed).
 	 * 
 	 * If modification of a predicate is restricted, the user's role must be at
 	 * least as high as the restriction level.
 	 */
-	public boolean canModifyPredicate(String predicateUri, RoleLevel userRole) {
-		if (predicateUri == null) {
-			log.debug("can't modify predicate: predicateUri was null");
+	public boolean canModifyPredicate(Property predicate, RoleLevel userRole) {
+		if (predicate == null || predicate.getURI() == null) {
+			log.debug("can't modify predicate: predicate was null");
 			return false;
 		}
 
-		if (modifyProhibitedNamespaces.contains(namespace(predicateUri))) {
-			if (modifyExceptionsAllowedUris.contains(predicateUri)) {
-				log.debug("'" + predicateUri + "' is a permitted exception");
+		if (modifyProhibitedNamespaces.contains(namespace(predicate.getURI()))) {
+			if (modifyExceptionsAllowedUris.contains(predicate.getURI())) {
+				log.debug("'" + predicate.getURI() + "' is a permitted exception");
 			} else {
-				log.debug("can't modify resource '" + predicateUri
+				log.debug("can't modify resource '" + predicate.getURI()
 						+ "': prohibited namespace: '"
-						+ namespace(predicateUri) + "'");
+						+ namespace(predicate.getURI()) + "'");
 				return false;
 			}
 		}
 
-		RoleLevel modifyThreshold = modifyThresholdMap.get(predicateUri);
+		RoleLevel modifyThreshold = getModifyThreshold(predicate);
 		if (isAuthorized(userRole, modifyThreshold)) {
-			log.debug("can modify predicate: '" + predicateUri + "', userRole="
+			log.debug("can modify predicate: '" + predicate.getURI() + "', domain=" 
+		            + predicate.getDomainVClassURI() + ", range=" 
+			        + predicate.getRangeVClassURI() + ", userRole="
 					+ userRole + ", thresholdRole=" + modifyThreshold);
 			return true;
 		}
 
-		log.debug("can't modify predicate: '" + predicateUri + "', userRole="
-				+ userRole + ", thresholdRole=" + modifyThreshold);
+        log.debug("can't modify predicate: '" + predicate.getURI() + "', domain=" 
+                + predicate.getDomainVClassURI() + ", range=" 
+                + predicate.getRangeVClassURI() + ", userRole="
+                + userRole + ", thresholdRole=" + modifyThreshold);
 		return false;
 	}
 
@@ -422,7 +446,7 @@ public class PropertyRestrictionPolicyHelper {
                     throw new NullPointerException(
                             "display model has not been initialized.");
                 }
-				
+                
 				PropertyRestrictionPolicyHelper bean = PropertyRestrictionPolicyHelper
 						.createBean(model, displayModel);
 				PropertyRestrictionPolicyHelper.setBean(ctx, bean);

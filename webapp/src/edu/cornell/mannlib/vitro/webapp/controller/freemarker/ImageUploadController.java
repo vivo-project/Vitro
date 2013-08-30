@@ -23,6 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectP
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
@@ -146,20 +147,23 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			String action = vreq.getParameter(PARAMETER_ACTION);
 			Individual entity = validateEntityUri(vreq);
 			String imageUri = entity.getMainImageUri();
+			
+			Property indMainImage = new Property();
+			indMainImage.setURI(VitroVocabulary.IND_MAIN_IMAGE);
 
 			RequestedAction ra;
 			if (ACTION_DELETE.equals(action)
 					|| ACTION_DELETE_EDIT.equals(action)) {
 				ra = new DropObjectPropertyStatement(vreq.getJenaOntModel(),
-						entity.getURI(), VitroVocabulary.IND_MAIN_IMAGE,
+						entity.getURI(), indMainImage,
 						imageUri);
 			} else if (imageUri != null) {
 				ra = new EditObjectPropertyStatement(vreq.getJenaOntModel(),
-						entity.getURI(), VitroVocabulary.IND_MAIN_IMAGE,
+						entity.getURI(), indMainImage,
 						imageUri);
 			} else {
 				ra = new AddObjectPropertyStatement(vreq.getJenaOntModel(),
-						entity.getURI(), VitroVocabulary.IND_MAIN_IMAGE,
+						entity.getURI(), indMainImage,
 						RequestActionConstants.SOME_URI);
 			}
 			return new Actions(ra);

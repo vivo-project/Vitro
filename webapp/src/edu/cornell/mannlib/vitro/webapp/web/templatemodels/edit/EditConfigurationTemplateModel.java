@@ -453,13 +453,14 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		String objectKey = vreq.getParameter("objectKey");
 		statementDisplay.put(objectKey, objectUri);
 		
+		ObjectProperty predicate = new ObjectProperty();
+		predicate.setURI(predicateUri);
+		
 		//Using object property statement template model here
 		ObjectPropertyStatementTemplateModel osm = new ObjectPropertyStatementTemplateModel(
 				subjectUri, 
-				predicateUri, 
+				predicate, 
 				objectKey, 
-				null,
-				null,
 		        statementDisplay, 
 		        null, vreq);
 		ReadOnlyBeansWrapper wrapper = new ReadOnlyBeansWrapper();

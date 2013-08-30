@@ -78,10 +78,12 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
         e.writeObject(this);
     }
 
-
+    @Override
     public String getDomainVClassURI() {
         return domainVClassURI;
     }
+    
+    @Override
     public void setDomainVClassURI(String domainClassURI) {
         this.domainVClassURI = domainClassURI;
     }
@@ -111,9 +113,13 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     public void setParentURI(String parentURI) {
         this.parentURI = parentURI;
     }
+    
+    @Override
     public String getRangeVClassURI() {
         return rangeVClassURI;
     }
+    
+    @Override
     public void setRangeVClassURI(String rangeClassURI) {
         this.rangeVClassURI = rangeClassURI;
     }

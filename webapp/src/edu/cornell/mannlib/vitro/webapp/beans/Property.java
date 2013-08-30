@@ -15,10 +15,16 @@ public class Property extends BaseResourceBean {
     private String  groupURI              = null;
     private String  label                 = null; // keep so can set in a context-specific way
     private final boolean subjectSide     = true; // only relevant to ObjectProperty
+    private String domainVClassURI        = null;
+    private String rangeVClassURI         = null;
     
     public Property() {
         this.groupURI = null;
         this.label = null;
+    }
+    
+    public Property(String URI) {
+        this.setURI(URI);
     }
 
     public String getCustomEntryForm() {
@@ -41,6 +47,22 @@ public class Property extends BaseResourceBean {
     }
     public void setLabel(String label) {
         this.label = label;
+    }
+    
+    public String getDomainVClassURI() {
+        return this.domainVClassURI;
+    }
+    
+    public void setDomainVClassURI(String domainVClassURI) {
+        this.domainVClassURI = domainVClassURI;
+    }
+    
+    public String getRangeVClassURI() {
+        return this.rangeVClassURI;
+    }
+    
+    public void setRangeVClassURI(String rangeVClassURI) {
+        this.rangeVClassURI = rangeVClassURI;
     }
     
     public boolean isSubjectSide() {

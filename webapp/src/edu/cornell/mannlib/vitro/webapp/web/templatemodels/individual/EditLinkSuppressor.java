@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 /**
@@ -73,22 +74,22 @@ public class EditLinkSuppressor {
 	/**
 	 * Should we suppress the Edit link on this property?
 	 */
-	public boolean isEditLinkSuppressed(String propertyUri) {
-		if (propertyUri == null) {
+	public boolean isEditLinkSuppressed(Property property) {
+		if (property == null || property.getURI() == null) {
 			log.error("Suppressing the edit link on a null property.");
 			return true;
 		}
-		return suppressEditLinksForThese.contains(propertyUri);
+		return suppressEditLinksForThese.contains(property.getURI());
 	}
 
 	/**
 	 * Should we suppress the Delete link on this property?
 	 */
-	public boolean isDeleteLinkSuppressed(String propertyUri) {
-		if (propertyUri == null) {
+	public boolean isDeleteLinkSuppressed(Property property) {
+		if (property == null || property.getURI() == null) {
 			log.error("Suppressing the delete link on a null property.");
 			return true;
 		}
-		return suppressDeleteLinksForThese.contains(propertyUri);
+		return suppressDeleteLinksForThese.contains(property.getURI());
 	}
 }

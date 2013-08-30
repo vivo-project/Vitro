@@ -23,6 +23,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -41,86 +42,118 @@ public class ApplicationConfigurationOntologyUtils {
         return getAdditionalFauxSubpropertiesForList(propList, subject, displayModel, tboxModel);
     }
     
+    public static List<ObjectProperty> getAdditionalFauxSubproperties(ObjectProperty op, 
+                                                                         Individual subject,
+                                                                         Model tboxModel,
+                                                                         Model union) {
+
+        List<ObjectProperty> additionalProps = new ArrayList<ObjectProperty>();
+        String propQuery = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
+                "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
+                "SELECT DISTINCT ?range ?domain ?label ?group ?customForm ?displayLevel ?updateLevel WHERE { \n" +
+//                "    ?p rdfs:subPropertyOf ?property . \n" +
+                "    ?context config:configContextFor ?property . \n" +
+                "    ?context config:qualifiedBy ?range . \n" +
+                "    ?context config:hasConfiguration ?configuration . \n" +
+                "    OPTIONAL { ?context config:qualifiedByDomain ?domain } \n" +
+                "    OPTIONAL { ?configuration config:propertyGroup ?group } \n" +
+                "    OPTIONAL { ?configuration config:displayName ?label } \n" +
+                "    OPTIONAL { ?configuration vitro:customEntryFormAnnot ?customForm } \n" +
+                "    OPTIONAL { ?configuration vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayLevel } \n" +
+                "    OPTIONAL { ?configuration vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateLevel } \n" +
+                "}"; 
+      
+       
+        log.debug("Checking " + op.getURI() + " for additional properties");
+        String queryStr = propQuery.replaceAll("\\?property", "<" + op.getURI() + ">");
+        log.debug(queryStr);
+        Query q = QueryFactory.create(queryStr);
+        QueryExecution qe = QueryExecutionFactory.create(q, union);
+        try {
+            ResultSet rs = qe.execSelect();
+            while (rs.hasNext()) {
+                ObjectProperty newProp = new ObjectProperty();
+                newProp.setURI(op.getURI());
+                QuerySolution qsoln = rs.nextSolution();
+                log.debug(qsoln);
+                Resource domainRes = qsoln.getResource("domain");
+                if(domainRes != null) {
+                    if(!appropriateDomain(
+                        domainRes, subject, tboxModel)) {
+                        continue;
+                    } else {
+                        newProp.setDomainVClassURI(domainRes.getURI());
+                    }
+                } else { 
+                    newProp.setDomainVClassURI(op.getDomainVClassURI());
+                }
+                Resource rangeRes = qsoln.getResource("range");
+                if (rangeRes != null) {
+                    newProp.setRangeVClassURI(rangeRes.getURI());
+                } else {
+                    newProp.setRangeVClassURI(op.getRangeVClassURI());
+                }
+                Resource groupRes = qsoln.getResource("group");
+                if (groupRes != null) {
+                    newProp.setGroupURI(groupRes.getURI());
+                } else {
+                    newProp.setGroupURI(op.getURI());
+                }
+                Literal labelLit = qsoln.getLiteral("label");
+                if (labelLit != null) {
+                    newProp.setDomainPublic(labelLit.getLexicalForm());
+                } else {
+                    newProp.setDomainPublic(op.getDomainPublic());
+                }
+                Literal customFormLit = qsoln.getLiteral("customForm");
+                if (customFormLit != null) {
+                    newProp.setCustomEntryForm(customFormLit.getLexicalForm());
+                } else {
+                    newProp.setCustomEntryForm(op.getCustomEntryForm());
+                }
+                Resource displayLevelRes = qsoln.getResource("displayLevel");
+                if (displayLevelRes != null) {
+                    newProp.setHiddenFromDisplayBelowRoleLevel(
+                            BaseResourceBean.RoleLevel.getRoleByUri(
+                                    displayLevelRes.getURI()));
+                }
+                Resource updateLevelRes = qsoln.getResource("updateLevel");
+                if (updateLevelRes != null) {
+                    log.info("updateLevel!");
+                    newProp.setProhibitedFromUpdateBelowRoleLevel(
+                            BaseResourceBean.RoleLevel.getRoleByUri(
+                                    updateLevelRes.getURI()));
+                }
+                additionalProps.add(newProp);
+            }  
+        } finally {
+            qe.close();
+        }
+        return additionalProps;
+    }   
+    
     
     
     public static List<ObjectProperty> getAdditionalFauxSubpropertiesForList(List<ObjectProperty> propList, 
                                                                          Individual subject, 
                                                                          Model displayModel, 
                                                                          Model tboxModel) {
+        
         List<ObjectProperty> additionalProps = new ArrayList<ObjectProperty>();
         Model union = ModelFactory.createUnion(displayModel, tboxModel);
-        String propQuery = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
-                "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
-                "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
-                "SELECT DISTINCT ?range ?domain ?label ?group ?customForm WHERE { \n" +
-        		"    ?p rdfs:subPropertyOf ?property . \n" +
-                "    ?context config:configContextFor ?p . \n" +
-        		"    ?context config:qualifiedBy ?range . \n" +
-                "    ?context config:hasConfiguration ?configuration . \n" +
-        		"    OPTIONAL { ?context config:qualifiedByDomain ?domain } \n" +
-        		"    OPTIONAL { ?configuration config:propertyGroup ?group } \n" +
-                "    OPTIONAL { ?configuration config:displayName ?label } \n" +
-                "    OPTIONAL { ?configuration vitro:customEntryFormAnnot ?customForm } \n" +
-        		"}"; 
-      
-        for (ObjectProperty op : propList) {
-            log.debug("Checking " + op.getURI() + " for additional properties");
-            String queryStr = propQuery.replaceAll("\\?property", "<" + op.getURI() + ">");
-            log.debug(queryStr);
-            Query q = QueryFactory.create(queryStr);
-            QueryExecution qe = QueryExecutionFactory.create(q, union);
-            try {
-                ResultSet rs = qe.execSelect();
-                while (rs.hasNext()) {
-                    ObjectProperty newProp = new ObjectProperty();
-                    newProp.setURI(op.getURI());
-                    QuerySolution qsoln = rs.nextSolution();
-                    log.debug(qsoln);
-                    Resource domainRes = qsoln.getResource("domain");
-                    if(domainRes != null) {
-                        if(!appropriateDomain(domainRes, subject, tboxModel)) {
-                            continue;
-                        } else {
-                            newProp.setDomainVClassURI(domainRes.getURI());
-                        }
-                    } else {
-                        newProp.setDomainVClassURI(op.getDomainVClassURI());
-                    }
-                    Resource rangeRes = qsoln.getResource("range");
-                    if (rangeRes != null) {
-                        newProp.setRangeVClassURI(rangeRes.getURI());
-                    } else {
-                        newProp.setRangeVClassURI(op.getRangeVClassURI());
-                    }
-                    Resource groupRes = qsoln.getResource("group");
-                    if (groupRes != null) {
-                        newProp.setGroupURI(groupRes.getURI());
-                    } else {
-                        newProp.setGroupURI(op.getURI());
-                    }
-                    Literal labelLit = qsoln.getLiteral("label");
-                    if (labelLit != null) {
-                        newProp.setDomainPublic(labelLit.getLexicalForm());
-                    } else {
-                        newProp.setDomainPublic(op.getDomainPublic());
-                    }
-                    Literal customFormLit = qsoln.getLiteral("customForm");
-                    if (customFormLit != null) {
-                        newProp.setCustomEntryForm(customFormLit.getLexicalForm());
-                    } else {
-                        newProp.setCustomEntryForm(op.getCustomEntryForm());
-                    }
-                    additionalProps.add(newProp);
-                }  
-            } finally {
-                qe.close();
-            }
-        }
         
+        for (ObjectProperty op : propList) {
+            propList.addAll(getAdditionalFauxSubproperties(op, subject, tboxModel, union));
+        }    
+
         return additionalProps;
     }
     
     private static boolean appropriateDomain(Resource domainRes, Individual subject, Model tboxModel) {
+        if (subject == null) {
+            return true;
+        }
         for (VClass vclass : subject.getVClasses()) {
             if ((vclass.getURI() != null) &&
                     ((vclass.getURI().equals(domainRes.getURI()) ||

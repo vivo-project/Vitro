@@ -117,7 +117,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
 				RequestActionConstants.SOME_URI);
 		AddObjectPropertyStatement aops = new AddObjectPropertyStatement(
 				vreq.getJenaOntModel(), individual.getURI(),
-				RequestActionConstants.SOME_URI,
+				RequestActionConstants.SOME_PREDICATE,
 				RequestActionConstants.SOME_URI);
     	return PolicyHelper.isAuthorizedForActions(vreq, new Actions(adps).or(aops));
     }

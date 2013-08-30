@@ -16,6 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
 /**
  * Is the user authorized to display properties that are marked as restricted to
@@ -82,7 +83,7 @@ public class DisplayByRolePermission extends Permission {
 	 */
 	private boolean isAuthorized(DisplayDataProperty action) {
 		String predicateUri = action.getDataProperty().getURI();
-		return canDisplayPredicate(predicateUri);
+		return canDisplayPredicate(new Property(predicateUri));
 	}
 
 	/**
@@ -90,8 +91,7 @@ public class DisplayByRolePermission extends Permission {
 	 * predicate.
 	 */
 	private boolean isAuthorized(DisplayObjectProperty action) {
-		String predicateUri = action.getObjectProperty().getURI();
-		return canDisplayPredicate(predicateUri);
+		return canDisplayPredicate(action.getObjectProperty());
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class DisplayByRolePermission extends Permission {
 		String subjectUri = stmt.getIndividualURI();
 		String predicateUri = stmt.getDatapropURI();
 		return canDisplayResource(subjectUri)
-				&& canDisplayPredicate(predicateUri);
+				&& canDisplayPredicate(new Property(predicateUri));
 	}
 
 	/**
@@ -113,12 +113,10 @@ public class DisplayByRolePermission extends Permission {
 	private boolean isAuthorized(DisplayObjectPropertyStatement action) {
 		ObjectPropertyStatement stmt = action.getObjectPropertyStatement();
 		String subjectUri = stmt.getSubjectURI();
-		String predicateUri = stmt.getPropertyURI();
-		String rangeUri = (stmt.getProperty() == null) ? null 
-		        : stmt.getProperty().getRangeVClassURI();
+		Property predicate = stmt.getProperty(); 
 		String objectUri = stmt.getObjectURI();
 		return canDisplayResource(subjectUri)
-				&& canDisplayPredicate(predicateUri, rangeUri)
+				&& canDisplayPredicate(predicate)
 				&& canDisplayResource(objectUri);
 	}
 
@@ -126,14 +124,10 @@ public class DisplayByRolePermission extends Permission {
 		return PropertyRestrictionPolicyHelper.getBean(ctx).canDisplayResource(
 				resourceUri, this.roleLevel);
 	}
-	
-	private boolean canDisplayPredicate(String predicateUri) {
-	    return canDisplayPredicate(predicateUri, null);
-	}
 
-	private boolean canDisplayPredicate(String predicateUri, String rangeUri) {
+	private boolean canDisplayPredicate(Property predicate) {
 		return PropertyRestrictionPolicyHelper.getBean(ctx)
-				.canDisplayPredicate(predicateUri, rangeUri, this.roleLevel);
+				.canDisplayPredicate(predicate, this.roleLevel);
 	}
 
 	@Override

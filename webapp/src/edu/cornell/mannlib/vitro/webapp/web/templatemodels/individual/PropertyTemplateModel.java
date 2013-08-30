@@ -28,6 +28,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     protected final VitroRequest vreq;
     protected final String subjectUri;
+    protected final Property property;
     protected final String propertyUri;
     protected String domainUri;
     protected String rangeUri;
@@ -41,6 +42,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     PropertyTemplateModel(Property property, Individual subject, VitroRequest vreq) {
         this.vreq = vreq;
         subjectUri = subject.getURI(); 
+        this.property = property;
         propertyUri = property.getURI();
         localName = property.getLocalName();        
         log.debug("Local name for property " + propertyUri + ": " + localName);

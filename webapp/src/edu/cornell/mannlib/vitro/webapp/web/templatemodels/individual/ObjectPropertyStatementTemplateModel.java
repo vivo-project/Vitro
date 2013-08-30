@@ -13,8 +13,10 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
@@ -31,14 +33,9 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     private final String editUrl;
     private final String deleteUrl;
     
-    public ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, String rangeUri, String objectKey, 
+    public ObjectPropertyStatementTemplateModel(String subjectUri, ObjectProperty predicate, String objectKey, 
             Map<String, String> data, String templateName, VitroRequest vreq) {
-        this (subjectUri, propertyUri, null, rangeUri, objectKey, data, templateName, vreq);
-    }
-    
-    public ObjectPropertyStatementTemplateModel(String subjectUri, String propertyUri, String domainUri, String rangeUri, String objectKey, 
-            Map<String, String> data, String templateName, VitroRequest vreq) {
-        super(subjectUri, propertyUri, vreq);
+        super(subjectUri, predicate, vreq);
 
         this.data = Collections.unmodifiableMap(new HashMap<String, String>(data));
         this.objectUri = data.get(objectKey);        
@@ -46,33 +43,34 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         //to keep track of later
         this.objectKey = objectKey;
         
-        ObjectPropertyStatement ops = new ObjectPropertyStatementImpl(subjectUri, propertyUri, objectUri);
+        ObjectPropertyStatement ops = new ObjectPropertyStatementImpl(subjectUri, property.getURI(), objectUri);
+        ops.setProperty(predicate);
         
         // Do delete url first, since it is used in building edit url
         this.deleteUrl = makeDeleteUrl();
-        this.editUrl = makeEditUrl(ops, domainUri, rangeUri);
+        this.editUrl = makeEditUrl(ops);
     }
 
 	private String makeDeleteUrl() {
     	// Is the delete link suppressed for this property?
-    	if (new EditLinkSuppressor(vreq).isDeleteLinkSuppressed(propertyUri)) {
+    	if (new EditLinkSuppressor(vreq).isDeleteLinkSuppressed(property)) {
     		return "";
     	}
         
         // Determine whether the statement can be deleted
 		RequestedAction action = new DropObjectPropertyStatement(
-				vreq.getJenaOntModel(), subjectUri, propertyUri, objectUri);
+				vreq.getJenaOntModel(), subjectUri, property, objectUri);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return "";
         }
         
-        if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
+        if (VitroVocabulary.IND_MAIN_IMAGE.equals(property.getURI())) {
             return ObjectPropertyTemplateModel.getImageUploadUrl(subjectUri, "delete");
         } 
         
         ParamMap params = new ParamMap(
                 "subjectUri", subjectUri,
-                "predicateUri", propertyUri,
+                "predicateUri", property.getURI(),
                 "objectUri", objectUri,
                 "cmd", "delete",
                 "objectKey", objectKey);
@@ -95,9 +93,9 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         return UrlBuilder.getUrl(EDIT_PATH, params);
 	}
 
-	private String makeEditUrl(ObjectPropertyStatement ops, String domainUri, String rangeUri) {
+	private String makeEditUrl(ObjectPropertyStatement ops) {
     	// Is the edit link suppressed for this property?
-    	if (new EditLinkSuppressor(vreq).isEditLinkSuppressed(propertyUri)) {
+    	if (new EditLinkSuppressor(vreq).isEditLinkSuppressed(property)) {
     		return "";
     	}
         
@@ -107,24 +105,24 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
             return "";
         }
         
-        if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
+        if (VitroVocabulary.IND_MAIN_IMAGE.equals(property.getURI())) {
             return ObjectPropertyTemplateModel.getImageUploadUrl(subjectUri, "edit");
         } 
 
         ParamMap params = new ParamMap(
                 "subjectUri", subjectUri,
-                "predicateUri", propertyUri,
+                "predicateUri", property.getURI(),
                 "objectUri", objectUri);
         
         if ( deleteUrl.isEmpty() ) {
             params.put("deleteProhibited", "prohibited");
         }
         
-        if (domainUri != null) {
-            params.put("domainUri", rangeUri);
+        if (ops.getProperty()!= null && ops.getProperty().getDomainVClassURI() != null) {
+            params.put("domainUri", ops.getProperty().getDomainVClassURI());
         }
-        if (rangeUri != null) {
-            params.put("rangeUri", rangeUri);
+        if (ops.getProperty()!= null && ops.getProperty().getRangeVClassURI() != null) {
+            params.put("rangeUri", ops.getProperty().getRangeVClassURI());
         }
         
         params.putAll(UrlBuilder.getModelParams(vreq));

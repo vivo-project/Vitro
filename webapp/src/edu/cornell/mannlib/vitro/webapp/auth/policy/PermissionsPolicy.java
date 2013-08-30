@@ -35,6 +35,8 @@ public class PermissionsPolicy implements PolicyIface {
 				log.debug("Permission " + p + " approves request " + whatToAuth);
 				return new BasicPolicyDecision(Authorization.AUTHORIZED,
 						"PermissionsPolicy: approved by " + p);
+			} else {
+			    log.trace("Permission " + p + " denies request " + whatToAuth);
 			}
 		}
 		log.debug("No permission will approve " + whatToAuth);
