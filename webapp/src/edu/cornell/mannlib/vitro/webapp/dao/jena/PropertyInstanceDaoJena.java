@@ -12,6 +12,7 @@ import java.util.List;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -39,7 +40,8 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
     	deleteObjectPropertyStatement(subjectURI, propertyURI, objectURI, getOntModelSelector());
     }
 
-    public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI, OntModelSelector ontModelSelector) {
+    public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI, 
+                                              OntModelSelector ontModelSelector) {
         OntModel ontModel = ontModelSelector.getABoxModel();
         OntModel tboxModel = ontModelSelector.getTBoxModel();
         ontModel.enterCriticalSection(Lock.WRITE);
@@ -51,29 +53,31 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
             	invPred = pred.as(OntProperty.class).getInverse();
             }
             Resource objRes = ontModel.getResource(objectURI);
+            Model baseModel = getOntModel().getBaseModel();
+            String userUri = getWebappDaoFactory().getUserURI();
             if ( (subjRes != null) && (pred != null) && (objRes != null) ) {            	
-            	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,subjectURI));
+            	baseModel.notifyEvent(new IndividualUpdateEvent(userUri,true,subjectURI));
             	try {
-            		ontModel.remove(subjRes,pred,objRes);
-            		
-            		updatePropertyDateTimeValue(subjRes,MODTIME,Calendar.getInstance().getTime(),getOntModel());
+            		ontModel.remove(subjRes,pred,objRes);            		
+            		updatePropertyDateTimeValue(subjRes,MODTIME,Calendar.getInstance().getTime(),ontModel);
             	} finally {
-            		getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,subjectURI));
+            		baseModel.notifyEvent(new IndividualUpdateEvent(userUri,false,subjectURI));
             	}
             	try{            		
-            		getOntModel().getBaseModel().notifyEvent(new IndividualDeletionEvent(getWebappDaoFactory().getUserURI(),true,objectURI));            		
-            		List<Statement> depResStmts = DependentResourceDeleteJena.getDependentResourceDeleteList(ResourceFactory.createStatement(subjRes, pred, objRes),ontModel);
-            		getOntModel().remove(depResStmts);
+            		baseModel.notifyEvent(new IndividualDeletionEvent(userUri,true,objectURI));            		
+            		List<Statement> depResStmts = DependentResourceDeleteJena
+                        .getDependentResourceDeleteList(ResourceFactory.createStatement(subjRes, pred, objRes),ontModel);
+            		ontModel.remove(depResStmts);
             	} finally {
-            		getOntModel().getBaseModel().notifyEvent(new IndividualDeletionEvent(getWebappDaoFactory().getUserURI(),false,objectURI));
+            		baseModel.notifyEvent(new IndividualDeletionEvent(userUri,false,objectURI));
             	}
                 if (invPred != null) {
-                	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,objectURI));
+                	baseModel.notifyEvent(new IndividualUpdateEvent(userUri,true,objectURI));
                 	try {
                 		ontModel.remove(objRes,invPred,subjRes);
-                		updatePropertyDateTimeValue(objRes,MODTIME,Calendar.getInstance().getTime(),getOntModel());
+                		updatePropertyDateTimeValue(objRes,MODTIME,Calendar.getInstance().getTime(),ontModel);
                 	} finally {
-                		getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,subjectURI));
+                		baseModel.notifyEvent(new IndividualUpdateEvent(userUri,false,subjectURI));
                 	}
                 }
             }
