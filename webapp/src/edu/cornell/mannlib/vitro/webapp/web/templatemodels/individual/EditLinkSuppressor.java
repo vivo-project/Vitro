@@ -63,12 +63,12 @@ public class EditLinkSuppressor {
 	/**
 	 * Should we suppress the Add link on this property?
 	 */
-	public boolean isAddLinkSuppressed(String propertyUri) {
-		if (propertyUri == null) {
+	public boolean isAddLinkSuppressed(Property property) {
+		if (property == null) {
 			log.error("Suppressing the add link on a null property.");
 			return true;
 		}
-		return suppressAddLinksForThese.contains(propertyUri);
+		return suppressAddLinksForThese.contains(property.getURI());
 	}
 
 	/**

@@ -297,7 +297,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         String propQuery = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
                 "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
                 "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
-                "SELECT ?range ?label ?group ?customForm ?displayLevel ?updateLevel WHERE { \n" +
+                "SELECT ?range ?label ?group ?customForm ?displayRank ?displayLevel ?updateLevel WHERE { \n" +
                 "    ?context config:configContextFor <" + propertyURI + "> . \n";
         if (domainURI != null) {
                 propQuery += "    ?context config:qualifiedByDomain <" + domainURI + "> . \n";
@@ -310,6 +310,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 propQuery += "    ?context config:hasConfiguration ?configuration . \n" +
                 "    OPTIONAL { ?configuration config:propertyGroup ?group } \n" +
                 "    OPTIONAL { ?configuration config:displayName ?label } \n" +
+                "    OPTIONAL { ?configuration vitro:displayRankAnnot ?displayRank } \n" +
                 "    OPTIONAL { ?configuration vitro:customEntryFormAnnot ?customForm } \n" +
                 "    OPTIONAL { ?configuration vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayLevel } \n" +
                 "    OPTIONAL { ?configuration vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateLevel } \n" +
@@ -324,6 +325,11 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 Resource groupRes = qsoln.getResource("group");
                 if (groupRes != null) {
                     op.setGroupURI(groupRes.getURI());
+                } 
+                Literal displayRankLit = qsoln.getLiteral("displayRank");
+                if(displayRankLit != null) {
+                    op.setDomainDisplayTier(
+                            Integer.parseInt(displayRankLit.getLexicalForm()));
                 } 
                 Resource displayLevelRes = qsoln.getResource("displayLevel");
                 if (displayLevelRes != null) {

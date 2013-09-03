@@ -149,12 +149,9 @@ public class PropertyRestrictionPolicyHelper {
 	    if (property.getURI() == null) {
 	        return RoleLevel.NOBODY;
 	    }
-	    String domainURI = (false && property.getDomainVClassURI() == null) 
-	            ? OWL.Thing.getURI() : property.getDomainVClassURI();
-        String rangeURI = (false && property.getRangeVClassURI() == null) 
-                ? OWL.Thing.getURI() : property.getRangeVClassURI();
 	    RoleLevel roleLevel = getRoleLevelFromMap(
-	            domainURI, property.getURI(), rangeURI, thresholdMap);
+	            property.getDomainVClassURI(), property.getURI(), 
+	                    property.getRangeVClassURI(), thresholdMap);
 	    if (roleLevel == null) {
 	        roleLevel = getRoleLevelFromMap(
 	                OWL.Thing.getURI(), property.getURI(), OWL.Thing.getURI(),
@@ -166,7 +163,8 @@ public class PropertyRestrictionPolicyHelper {
 	private RoleLevel getRoleLevelFromMap(String domainURI, 
 	                                      String predicateURI, 
 	                                      String rangeURI,
-	                                      Map<Pair<String, Pair<String,String>>, RoleLevel> map) {
+	                                      Map<Pair<String, Pair<String,String>>, 
+	                                              RoleLevel> map) {
 	    return map.get(
                 new Pair<String, Pair<String,String>>(
                         domainURI, new Pair<String,String>(
@@ -184,40 +182,42 @@ public class PropertyRestrictionPolicyHelper {
 		    com.hp.hpl.jena.rdf.model.Property property = model.getProperty(propertyUri);
 			StmtIterator stmts = model.listStatements((Resource) null,
 					property, (Resource) null);
-			while (stmts.hasNext()) {
-				Statement stmt = stmts.next();
-				Resource subject = stmt.getSubject();
-				RDFNode objectNode = stmt.getObject();
-				if ((subject == null) || (!(objectNode instanceof Resource))) {
-					continue;
-				}
-				Resource object = (Resource) objectNode;
-				RoleLevel role = RoleLevel.getRoleByUri(object.getURI());
-				map.put(new Pair<String,Pair<String,String>>(
-				        OWL.Thing.getURI(), new Pair<String,String>(
-				                subject.getURI(), OWL.Thing.getURI())), role);
-				ObjectProperty op = new ObjectProperty();
-				op.setURI(subject.getURI());
-				List<ObjectProperty> fauxOps = ApplicationConfigurationOntologyUtils
-				        .getAdditionalFauxSubproperties(op, null, model, model);
-				for (ObjectProperty faux : fauxOps) {
-				    role = null;
-				    if(VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT
-				            .equals(propertyUri)) {
-				        role = faux.getProhibitedFromUpdateBelowRoleLevel();
-				    } else if (VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT
-				            .equals(propertyUri)) {
-				        role = faux.getHiddenFromDisplayBelowRoleLevel();
-				    }
-				    if (role != null) {
-				        log.info("Putting D:" + faux.getDomainVClassURI() + " P:" + subject.getURI() + " R:" + faux.getRangeVClassURI() + " ==> L:" + role);
-    				    map.put(new Pair<String,Pair<String,String>>(
-    	                        faux.getDomainVClassURI(), new Pair<String,String>(
-    	                                subject.getURI(), faux.getRangeVClassURI())), role);
-				    }
-				}
+			try {
+    			while (stmts.hasNext()) {
+    				Statement stmt = stmts.next();
+    				Resource subject = stmt.getSubject();
+    				RDFNode objectNode = stmt.getObject();
+    				if ((subject == null) || (!(objectNode instanceof Resource))) {
+    					continue;
+    				}
+    				Resource object = (Resource) objectNode;
+    				RoleLevel role = RoleLevel.getRoleByUri(object.getURI());
+    				map.put(new Pair<String,Pair<String,String>>(
+    				        OWL.Thing.getURI(), new Pair<String,String>(
+    				                subject.getURI(), OWL.Thing.getURI())), role);
+    			} 
+			} finally {
+	            stmts.close();			    
 			}
-			stmts.close();
+            List<ObjectProperty> fauxOps = ApplicationConfigurationOntologyUtils
+                    .getAdditionalFauxSubproperties(null, null, model, model);
+            for (ObjectProperty faux : fauxOps) {
+                RoleLevel role = null;
+                if(VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT
+                        .equals(propertyUri)) {
+                    role = faux.getProhibitedFromUpdateBelowRoleLevel();
+                } else if (VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT
+                        .equals(propertyUri)) {
+                    role = faux.getHiddenFromDisplayBelowRoleLevel();
+                }
+                if (role != null) {
+                    log.debug("Putting D:" + faux.getDomainVClassURI() + " P:" + faux.getURI() + " R:" + faux.getRangeVClassURI() + " ==> L:" + role);
+                    map.put(new Pair<String,Pair<String,String>>(
+                            faux.getDomainVClassURI(), new Pair<String,String>(
+                                    faux.getURI(), faux.getRangeVClassURI())), role);
+                }
+            }
+
 		} finally {
 			model.leaveCriticalSection();
 		}

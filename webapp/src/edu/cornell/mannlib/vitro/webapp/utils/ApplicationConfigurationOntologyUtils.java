@@ -10,6 +10,8 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -30,6 +32,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 
 public class ApplicationConfigurationOntologyUtils {
 
@@ -42,16 +46,16 @@ public class ApplicationConfigurationOntologyUtils {
         return getAdditionalFauxSubpropertiesForList(propList, subject, displayModel, tboxModel);
     }
     
-    public static List<ObjectProperty> getAdditionalFauxSubproperties(ObjectProperty op, 
+    public static List<ObjectProperty> getAdditionalFauxSubproperties(ObjectProperty prop, 
                                                                          Individual subject,
                                                                          Model tboxModel,
                                                                          Model union) {
 
         List<ObjectProperty> additionalProps = new ArrayList<ObjectProperty>();
-        String propQuery = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
+        String queryStr = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
                 "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
                 "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
-                "SELECT DISTINCT ?range ?domain ?label ?group ?customForm ?displayLevel ?updateLevel WHERE { \n" +
+                "SELECT DISTINCT ?range ?domain ?label ?group ?customForm ?displayLevel ?updateLevel ?property WHERE { \n" +
 //                "    ?p rdfs:subPropertyOf ?property . \n" +
                 "    ?context config:configContextFor ?property . \n" +
                 "    ?context config:qualifiedBy ?range . \n" +
@@ -64,19 +68,30 @@ public class ApplicationConfigurationOntologyUtils {
                 "    OPTIONAL { ?configuration vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateLevel } \n" +
                 "}"; 
       
-       
-        log.debug("Checking " + op.getURI() + " for additional properties");
-        String queryStr = propQuery.replaceAll("\\?property", "<" + op.getURI() + ">");
+        if(prop != null) {
+            log.debug("Checking " + prop.getURI() + " for additional properties");
+            queryStr = queryStr.replaceAll("\\?property", "<" + prop.getURI() + ">");
+        }
         log.debug(queryStr);
         Query q = QueryFactory.create(queryStr);
         QueryExecution qe = QueryExecutionFactory.create(q, union);
         try {
             ResultSet rs = qe.execSelect();
             while (rs.hasNext()) {
-                ObjectProperty newProp = new ObjectProperty();
-                newProp.setURI(op.getURI());
                 QuerySolution qsoln = rs.nextSolution();
                 log.debug(qsoln);
+                ObjectProperty op = null;
+                if (prop == null) {
+                    String opURI = qsoln.getResource("property").getURI();
+                    OntModel tboxOntModel = ModelFactory.createOntologyModel(
+                            OntModelSpec.OWL_MEM, tboxModel);
+                    WebappDaoFactory wadf = new WebappDaoFactoryJena(tboxOntModel); 
+                    op = wadf.getObjectPropertyDao().getObjectPropertyByURI(opURI);
+                } else {
+                    op = prop;
+                }
+                ObjectProperty newProp = new ObjectProperty();
+                newProp.setURI(op.getURI());
                 Resource domainRes = qsoln.getResource("domain");
                 if(domainRes != null) {
                     if(!appropriateDomain(
@@ -85,9 +100,7 @@ public class ApplicationConfigurationOntologyUtils {
                     } else {
                         newProp.setDomainVClassURI(domainRes.getURI());
                     }
-                } else { 
-                    newProp.setDomainVClassURI(op.getDomainVClassURI());
-                }
+                } 
                 Resource rangeRes = qsoln.getResource("range");
                 if (rangeRes != null) {
                     newProp.setRangeVClassURI(rangeRes.getURI());
