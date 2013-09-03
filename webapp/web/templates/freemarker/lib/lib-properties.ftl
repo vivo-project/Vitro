@@ -209,13 +209,18 @@ name will be used as the label. -->
 
 <#-- Label -->
 <#macro label individual editable labelCount>
+	<#assign labelPropertyUri = ("http://www.w3.org/2000/01/rdf-schema#label"?url) />
+	<#-- Will need to deal with multiple languages as well-->
     <#local label = individual.nameStatement>
     ${label.value}
     <#if (labelCount > 1)  && editable >
+    	<#-- Changing this so that manage labels now goes to generator -->
         <span class="inline">
-            <a id="manageLabels" href="${urls.base}/manageLabels?subjectUri=${individual.uri!}">
-                ${i18n().manage_labels}
-            </a>
+        	<#--Previous link which went to manage labels controller-->
+            <#--a id="manageLabels" href="${urls.base}/manageLabels?subjectUri=${individual.uri!}"-->
+            <a class="add-label" href="${urls.base}/editRequestDispatch?subjectUri=${individual.uri!}&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManageLabelsForIndividualGenerator&predicateUri=${labelPropertyUri}"
+             title="${i18n().manage_list_of} labels">
+        	<img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="${i18n().manage}" /></a>
         </span>
     <#else>
         <@editingLinks "label" label editable />

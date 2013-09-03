@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocess
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.ResIterator;
@@ -30,7 +31,21 @@ public class FoafNameToRdfsLabelPreprocessor implements ModelChangePreprocessor 
 			Statement fname = sub.getProperty( firstNameP );
 			Statement lname = sub.getProperty( lastNameP );
 			if( fname != null && lname != null && fname.getString() != null && lname.getString() != null ){
-				additionsModel.add(sub, rdfsLabelP, lname.getString() + ", " + fname.getString() );
+				//Check if there are languages associated with first name and last name and add the language
+				//attribute to the label
+				//This preprocessor is used in multiple places, including for managing labels
+				Literal firstNameLiteral = fname.getLiteral();
+				Literal lastNameLiteral = lname.getLiteral();
+				String firstNameLanguage = firstNameLiteral.getLanguage();
+				String lastNameLanguage = lastNameLiteral.getLanguage();
+				String newLabel = lname.getString() + ", " + fname.getString();
+				if(firstNameLanguage != null && lastNameLanguage != null && firstNameLanguage.equals(lastNameLanguage)) {
+					//create a literal with the appropriate value and the language
+					Literal labelWithLanguage = additionsModel.createLiteral(newLabel, firstNameLanguage);
+					additionsModel.add(sub, rdfsLabelP, labelWithLanguage);
+				} else {
+					additionsModel.add(sub, rdfsLabelP, newLabel );
+				}
 			}
 		}
 		

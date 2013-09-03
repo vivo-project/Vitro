@@ -279,7 +279,9 @@ class IndividualResponseBuilder {
         log.debug("queryStr = " + queryStr);
         int theCount = 0;
         try {
-            ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
+            //ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
+            //Get query results across all languages in order for template to show manage labels link correctly
+            ResultSet results = QueryUtils.getLanguageNeutralQueryResults(queryStr, vreq);
             if (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
                 String countStr = soln.get("labelCount").toString();
