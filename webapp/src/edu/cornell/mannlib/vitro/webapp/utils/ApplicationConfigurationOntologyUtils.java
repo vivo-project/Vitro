@@ -70,7 +70,7 @@ public class ApplicationConfigurationOntologyUtils {
       
         if(prop != null) {
             log.debug("Checking " + prop.getURI() + " for additional properties");
-            queryStr = queryStr.replaceAll("\\?property", "<" + prop.getURI() + ">");
+            queryStr = queryStr.replaceAll("For \\?property", "For <" + prop.getURI() + ">");
         }
         log.debug(queryStr);
         Query q = QueryFactory.create(queryStr);
@@ -156,7 +156,7 @@ public class ApplicationConfigurationOntologyUtils {
         Model union = ModelFactory.createUnion(displayModel, tboxModel);
         
         for (ObjectProperty op : propList) {
-            propList.addAll(getAdditionalFauxSubproperties(op, subject, tboxModel, union));
+            additionalProps.addAll(getAdditionalFauxSubproperties(op, subject, tboxModel, union));
         }    
 
         return additionalProps;
