@@ -120,7 +120,6 @@ public class ApplicationConfigurationOntologyUtils {
                 }
                 Resource updateLevelRes = qsoln.getResource("updateLevel");
                 if (updateLevelRes != null) {
-                    log.info("updateLevel!");
                     newProp.setProhibitedFromUpdateBelowRoleLevel(
                             BaseResourceBean.RoleLevel.getRoleByUri(
                                     updateLevelRes.getURI()));
