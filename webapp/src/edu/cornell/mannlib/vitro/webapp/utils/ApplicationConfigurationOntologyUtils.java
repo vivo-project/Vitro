@@ -10,7 +10,6 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -18,21 +17,19 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.sparql.expr.NodeValue;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 
@@ -56,21 +53,12 @@ public class ApplicationConfigurationOntologyUtils {
         String queryStr = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
                 "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
                 "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
-                "SELECT DISTINCT ?range ?domain ?label ?group ?customForm ?displayRank ?displayLevel ?updateLevel ?editLinkSuppressed ?addLinkSuppressed ?deleteLinkSuppressed ?property WHERE { \n" +
-//                "    ?p rdfs:subPropertyOf ?property . \n" +
+                "SELECT DISTINCT ?range ?domain ?property WHERE { \n" +
                 "    ?context config:configContextFor ?property . \n" +
                 "    ?context config:qualifiedBy ?range . \n" +
                 "    ?context config:hasConfiguration ?configuration . \n" +
+                "    ?configuration a config:ObjectPropertyDisplayConfig . \n" +
                 "    OPTIONAL { ?context config:qualifiedByDomain ?domain } \n" +
-                "    OPTIONAL { ?configuration config:propertyGroup ?group } \n" +
-                "    OPTIONAL { ?configuration config:displayName ?label } \n" +
-                "    OPTIONAL { ?configuration vitro:displayRankAnnot ?displayRank } \n" +
-                "    OPTIONAL { ?configuration config:editLinkSuppressed ?editLinkSuppressed } \n" +
-                "    OPTIONAL { ?configuration config:addLinkSuppressed ?addLinkSuppressed } \n" +
-                "    OPTIONAL { ?configuration config:deleteLinkSuppressed ?deleteLinkSuppressed } \n" +
-                "    OPTIONAL { ?configuration vitro:customEntryFormAnnot ?customForm } \n" +
-                "    OPTIONAL { ?configuration vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayLevel } \n" +
-                "    OPTIONAL { ?configuration vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateLevel } \n" +
                 "}"; 
       
         if(prop != null) {
@@ -80,86 +68,23 @@ public class ApplicationConfigurationOntologyUtils {
         log.debug(queryStr);
         Query q = QueryFactory.create(queryStr);
         QueryExecution qe = QueryExecutionFactory.create(q, union);
+        WebappDaoFactory wadf = new WebappDaoFactoryJena(
+                ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, union));
+        ObjectPropertyDao opDao = wadf.getObjectPropertyDao();
         try {
             ResultSet rs = qe.execSelect();
             while (rs.hasNext()) {
                 QuerySolution qsoln = rs.nextSolution();
                 log.debug(qsoln);
-                ObjectProperty op = null;
-                if (prop == null) {
-                    String opURI = qsoln.getResource("property").getURI();
-                    OntModel tboxOntModel = ModelFactory.createOntologyModel(
-                            OntModelSpec.OWL_MEM, tboxModel);
-                    WebappDaoFactory wadf = new WebappDaoFactoryJena(tboxOntModel); 
-                    op = wadf.getObjectPropertyDao().getObjectPropertyByURI(opURI);
-                } else {
-                    op = prop;
-                }
-                ObjectProperty newProp = new ObjectProperty();
-                newProp.setURI(op.getURI());
+                String opURI = (prop != null) ? prop.getURI() : qsoln.getResource(
+                        "property").getURI();
                 Resource domainRes = qsoln.getResource("domain");
-                if(domainRes != null) {
-                    if(!appropriateDomain(
-                        domainRes, subject, tboxModel)) {
-                        continue;
-                    } else {
-                        newProp.setDomainVClassURI(domainRes.getURI());
-                    }
-                } 
-                Resource rangeRes = qsoln.getResource("range");
-                if (rangeRes != null) {
-                    newProp.setRangeVClassURI(rangeRes.getURI());
-                } else {
-                    newProp.setRangeVClassURI(op.getRangeVClassURI());
+                String domainURI = (domainRes != null) ? domainRes.getURI() : null;
+                String rangeURI = qsoln.getResource("range").getURI();
+                if (appropriateDomain(domainRes, subject, tboxModel)) {
+                    additionalProps.add(opDao.getObjectPropertyByURIs(
+                        opURI, domainURI, rangeURI));              
                 }
-                Resource groupRes = qsoln.getResource("group");
-                if (groupRes != null) {
-                    newProp.setGroupURI(groupRes.getURI());
-                } else {
-                    newProp.setGroupURI(op.getURI());
-                }
-                Literal labelLit = qsoln.getLiteral("label");
-                if (labelLit != null) {
-                    newProp.setDomainPublic(labelLit.getLexicalForm());
-                } else {
-                    newProp.setDomainPublic(op.getDomainPublic());
-                }
-                Literal customFormLit = qsoln.getLiteral("customForm");
-                if (customFormLit != null) {
-                    newProp.setCustomEntryForm(customFormLit.getLexicalForm());
-                } else {
-                    newProp.setCustomEntryForm(op.getCustomEntryForm());
-                }
-                Literal displayRankLit = qsoln.getLiteral("displayRank");
-                if(displayRankLit != null) {
-                    op.setDomainDisplayTier(
-                            Integer.parseInt(displayRankLit.getLexicalForm()));
-                } 
-                Resource displayLevelRes = qsoln.getResource("displayLevel");
-                if (displayLevelRes != null) {
-                    newProp.setHiddenFromDisplayBelowRoleLevel(
-                            BaseResourceBean.RoleLevel.getRoleByUri(
-                                    displayLevelRes.getURI()));
-                }
-                Resource updateLevelRes = qsoln.getResource("updateLevel");
-                if (updateLevelRes != null) {
-                    newProp.setProhibitedFromUpdateBelowRoleLevel(
-                            BaseResourceBean.RoleLevel.getRoleByUri(
-                                    updateLevelRes.getURI()));
-                }
-                Literal editLinkSuppressedLit = qsoln.getLiteral("editLinkSuppressed");
-                if (editLinkSuppressedLit != null ) {
-                    op.setEditLinkSuppressed(editLinkSuppressedLit.getBoolean());
-                }
-                Literal addLinkSuppressedLit = qsoln.getLiteral("addLinkSuppressed");
-                if (addLinkSuppressedLit != null ) {
-                    op.setAddLinkSuppressed(addLinkSuppressedLit.getBoolean());
-                }
-                Literal deleteLinkSuppressedLit = qsoln.getLiteral("deleteLinkSuppressed");
-                if (deleteLinkSuppressedLit != null ) {
-                    op.setDeleteLinkSuppressed(deleteLinkSuppressedLit.getBoolean());
-                }
-                additionalProps.add(newProp);              
             }  
         } finally {
             qe.close();
@@ -185,7 +110,7 @@ public class ApplicationConfigurationOntologyUtils {
     }
     
     private static boolean appropriateDomain(Resource domainRes, Individual subject, Model tboxModel) {
-        if (subject == null) {
+        if (subject == null || domainRes == null) {
             return true;
         }
         for (VClass vclass : subject.getVClasses()) {

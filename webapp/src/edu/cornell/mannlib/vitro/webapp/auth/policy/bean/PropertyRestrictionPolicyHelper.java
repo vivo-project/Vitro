@@ -345,26 +345,26 @@ public class PropertyRestrictionPolicyHelper {
 	 * If display of a predicate is restricted, the user's role must be at least
 	 * as high as the restriction level.
 	 */
-	public boolean canDisplayPredicate(Property predicate, RoleLevel userRole) {
-	    //TODO change
-	    String predicateUri = predicate.getURI();
-	    
-		if (predicateUri == null) {
-			log.debug("can't display predicate: predicateUri was null");
+	public boolean canDisplayPredicate(Property predicate, RoleLevel userRole) {	    
+		if (predicate == null) {
+			log.debug("can't display predicate: predicate was null");
 			return false;
 		}
 		
 		RoleLevel displayThreshold = getThreshold(predicate, displayThresholdMap);		
 		       	        
 		if (isAuthorized(userRole, displayThreshold)) {
-			log.debug("can display predicate: '" + predicateUri
-					+ "', userRole=" + userRole + ", thresholdRole="
-					+ displayThreshold);
+            log.debug("can display predicate: '" + predicate.getURI() + "', domain=" 
+                    + predicate.getDomainVClassURI() + ", range=" 
+                    + predicate.getRangeVClassURI() + ", userRole="
+                    + userRole + ", thresholdRole=" + displayThreshold);
 			return true;
 		}
 
-		log.debug("can't display predicate: '" + predicateUri + "', userRole="
-				+ userRole + ", thresholdRole=" + displayThreshold);
+        log.debug("can't display predicate: '" + predicate.getURI() + "', domain=" 
+                + predicate.getDomainVClassURI() + ", range=" 
+                + predicate.getRangeVClassURI() + ", userRole="
+                + userRole + ", thresholdRole=" + displayThreshold);
 		return false;
 	}
 	

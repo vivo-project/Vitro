@@ -216,7 +216,7 @@ public class ObjectPropertyStatementDaoStub implements
 
 	@Override
 	public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
-			String subjectUri, String propertyUri, String objectKey, String rangeUri,
+			String subjectUri, String propertyUri, String objectKey, String domainUri, String rangeUri,
 			String query, Set<String> constructQueries, String sortDir) {
 		throw new RuntimeException(
 				"ObjectPropertyStatementDaoStub.getObjectPropertyStatementsForIndividualByProperty() not implemented.");

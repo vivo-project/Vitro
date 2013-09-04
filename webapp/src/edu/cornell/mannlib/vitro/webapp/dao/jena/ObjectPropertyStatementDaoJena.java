@@ -270,8 +270,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
             String subjectUri, 
             String propertyUri,             
-            String objectKey, 
-            String rangeUri,
+            String objectKey, String domainUri, String rangeUri,
             String queryString, 
             Set<String> constructQueryStrings,
             String sortDirection) {    	        
@@ -299,6 +298,9 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         QuerySolutionMap initialBindings = new QuerySolutionMap();
         initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
         initialBindings.add("property", ResourceFactory.createResource(propertyUri));
+        if (domainUri != null && !domainUri.startsWith(VitroVocabulary.PSEUDO_BNODE_NS)) {
+            initialBindings.add("subjectType", ResourceFactory.createResource(domainUri));
+        }
         if (rangeUri != null && !rangeUri.startsWith(VitroVocabulary.PSEUDO_BNODE_NS)) {
             initialBindings.add("objectType", ResourceFactory.createResource(rangeUri));
         }
