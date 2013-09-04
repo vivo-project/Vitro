@@ -17,7 +17,10 @@
 	<#assign submissionErrors = editSubmission.validationErrors/>
 	<#assign submissionErrorsExist = "true" />
 </#if>
-
+<#assign availableLocalesNumber = 0/>
+<#if editConfiguration.pageData.selectLocale?has_content>
+	<#assign availableLocalesNumber = editConfiguration.pageData.selectLocale?size />
+</#if>
 <#if editConfiguration.pageData.subjectName?? >
 <h2>${i18n().manage_labels_for} ${editConfiguration.pageData.subjectName}</h2>
 <#else>
@@ -64,7 +67,7 @@
 	    </#if>
 	    
 		</p>
-		    	    </section>
+	</section>
 	    
 
 <script type="text/javascript">
@@ -83,7 +86,8 @@ var customFormData = {
     processingUrl: '${urls.base}/edit/primitiveRdfEdit',
     individualUri: '${subjectUri!}',
     submissionErrorsExist: '${submissionErrorsExist}',
-    selectLocalesFullList: selectLocalesFullList
+    selectLocalesFullList: selectLocalesFullList,
+    numberAvailableLocales:${availableLocalesNumber}
 };
 var i18nStrings = {
     errorProcessingLabels: '${i18n().error_processing_labels}',

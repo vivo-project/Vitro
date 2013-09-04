@@ -34,36 +34,35 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapperFactory;
 //We are representing semantic types from the UMLS Semantic Network as OWL Classes
 //and this preprocessor will add the appropriate class information to the TBox
 
-public class ConceptSparqlUpdatePreprocessor implements ModelChangePreprocessor {
+public class ConceptSemanticTypesPreprocessor implements ModelChangePreprocessor {
 
 	private static String VIVOCore = "http://vivoweb.org/ontology/core#";
 	private static String SKOSConceptType = "http://www.w3.org/2004/02/skos/core#Concept";	
-	private Log log = LogFactory.getLog(ConceptSparqlUpdatePreprocessor.class);
+	private Log log = LogFactory.getLog(ConceptSemanticTypesPreprocessor.class);
 
 	private OntModel toUpdateModel = null;
-	private DatasetWrapperFactory dwf = null;
 	
 	//Custom constructor
-	public ConceptSparqlUpdatePreprocessor(OntModel updateModel, DatasetWrapperFactory inputDwf) {
+	public ConceptSemanticTypesPreprocessor(OntModel updateModel) {
 		this.toUpdateModel = updateModel;
-		this.dwf = inputDwf;
 	}
 	
 	@Override
 	public void preprocess(Model retractionsModel, Model additionsModel,
 			HttpServletRequest request) {
 		//Run a construct query against the additions model
-		String prefixes = "PREFIX RDFS:<" + RDFS.getURI() + "> " + 
-		"PREFIX OWL:<http://www.w3.org/2002/07/owl#> " + 
-		"PREFIX RDF:<" + RDF.getURI() + ">";		
+		String prefixes = "PREFIX rdfs:<" + RDFS.getURI() + "> " + 
+		"PREFIX owl:<http://www.w3.org/2002/07/owl#> " + 
+		"PREFIX rdf:<" + RDF.getURI() + ">" + 
+		"PREFIX skos:<http://www.w3.org/2004/02/skos/core#>";		
 		String constructQuery = prefixes + " CONSTRUCT { " + 
-				"?semanticType rdf:type OWL:Class. { " + 
-				"?semanticType rdfs:subClassOf SKOS:Concept . { " + 
-				"?semanticType rdfs:label ?label. { " + 
+				"?semanticType rdf:type owl:Class.  " + 
+				"?semanticType rdfs:subClassOf skos:Concept .  " + 
+				"?semanticType rdfs:label ?label.  " + 
 			"} WHERE { " + 
-				"?concept rdf:type ?semanticType. { " + 
-				"?semanticType rdfs:label ?label .{ " + 
-				"?semanticType rdfs:subClassOf SKOS:Concept .{ " + 
+				"?concept rdf:type ?semanticType.  " + 
+				"?semanticType rdfs:label ?label . " + 
+				"?semanticType rdfs:subClassOf skos:Concept . " + 
 			"}";
 		
 		//Execute construct query 
@@ -84,13 +83,11 @@ public class ConceptSparqlUpdatePreprocessor implements ModelChangePreprocessor 
 	        
 	           
 	        
-        DatasetWrapper w = dwf.getDatasetWrapper();
-        Dataset dataset = w.getDataset();
-        dataset.getLock().enterCriticalSection(Lock.READ);
+        additionsModel.getLock().enterCriticalSection(Lock.READ);
         QueryExecution qe = null;
         try {                           
             qe = QueryExecutionFactory.create(
-                    query, dataset);
+                    query, additionsModel);
             qe.execConstruct(constructedModel);
         } catch (Exception e) {
             log.error("Error getting constructed model for query string " + constructQuery);
@@ -98,8 +95,7 @@ public class ConceptSparqlUpdatePreprocessor implements ModelChangePreprocessor 
             if (qe != null) {
                 qe.close();
             }
-            dataset.getLock().leaveCriticalSection();
-            w.close();
+            additionsModel.getLock().leaveCriticalSection();
         }
         
         //Add constructed model to the designated update model

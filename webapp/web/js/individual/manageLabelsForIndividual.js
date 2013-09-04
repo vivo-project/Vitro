@@ -32,20 +32,31 @@ var manageLabels = {
 
     // Initial page setup. Called only at page load.
     initPage: function() {
-    	//disable submit until user selects a language
-        this.submit.attr('disabled', 'disabled');
-        this.submit.addClass('disabledSubmit');
+    	
+        var disableSubmit = true;
         if(this.submissionErrorsExist == "false") {
         	//hide the form to add label
         	this.addLabelForm.hide();
-        	 //the cancel in add label can be unbound until the form is visible
-            //this.addLabelCancel.unbind("click");
+        	//If the number of available locales is zero, then hide the ability to show the form as well
+        	if(this.numberAvailableLocales == 0) {
+            	manageLabels.showFormButtonWrapper.hide();
+        	}
+        	
         } else {
         	//Display the form
         	this.onShowAddForm();
+        	//Also make sure the save button is enabled in case there is a value selected for the drop down
+        	if(this.labelLanguage.val() != "") {
+        		disableSubmit = false;
+        	}
         
         }
        
+        if(disableSubmit) {
+        	//disable submit until user selects a language
+            this.submit.attr('disabled', 'disabled');
+            this.submit.addClass('disabledSubmit');
+        }
        
         this.bindEventListeners();
                        
@@ -88,25 +99,15 @@ var manageLabels = {
         });
         
         
-        this.addLabelForm.find("a.cancel").click(function(){
+        this.addLabelForm.find("a.cancel").click(function(event){
+        	event.preventDefault();
         	//clear the add form
         	manageLabels.clearAddForm();
         	//hide the add form
         	manageLabels.onHideAddForm();
-        	
+        	return false;
         });
 
-        //TODO: Add method to check that language is selected on submission
-        
-        /*
-        $('input#submit').click( function() {
-             manageLabels.processLabel(manageLabels.selectedRadio);
-             $('span.or').hide();
-             $('a.cancel').hide();
-             $('span#indicator').removeClass('hidden');
-             $('input.submit').addClass('disabledSubmit');
-             $('input.submit').attr('disabled', 'disabled');             
-        });*/
 
     },
     clearAddForm:function() {
@@ -179,12 +180,12 @@ var manageLabels = {
     	var languageName = $(selectedLink).attr("languageName");
     	$(selectedLink).parent().remove();
     	//See if there are any other remove link
-    	if(languageCode != "untyped") {
+    	if(languageName != "untyped") {
     		//find if there are any other remove links for the same language
     		var removeLinks = manageLabels.existingLabelsList.find("a.remove[languageName='" + languageName + "']");
     		if(removeLinks.length == 0) {
     			//if there aren't any other labels for this language, also remove the heading
-    			manageLabels.existingLabelsList.find("h3[languageName='" + langaugeName + "']").remove();
+    			manageLabels.existingLabelsList.find("h3[languageName='" + languageName + "']").remove();
     			
     		}
     	}
@@ -223,6 +224,11 @@ var manageLabels = {
     	        var compB = b["label"];
     	        return compA < compB ? -1 : 1;
     	    });
+    	 //Re-show the add button and the form if they were hidden before
+    	 if(availableLocalesList.length > 0 && manageLabels.showFormButtonWrapper.is(":hidden")) {
+    		 manageLabels.showFormButtonWrapper.show();
+    	 }
+    	 
     	 //Now replace dropdown with this new list
     	 manageLabels.generateLocalesDropdown(availableLocalesList);
     	
