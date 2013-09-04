@@ -215,8 +215,10 @@ name will be used as the label. -->
     ${label.value}
     <#if (labelCount > 1)  && editable >
     	<#-- Manage labels now goes to generator -->
+    	<#assign individualUri = individual.uri!""/>
+    	<#assign individualUri = (individualUri?url)/>
         <span class="inline">
-            <a class="add-label" href="${urls.base}/editRequestDispatch?subjectUri=${individual.uri!}&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManageLabelsForIndividualGenerator&predicateUri=${labelPropertyUri}"
+            <a class="add-label" href="${urls.base}/editRequestDispatch?subjectUri=${individualUri}&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManageLabelsForIndividualGenerator&predicateUri=${labelPropertyUri}"
              title="${i18n().manage_list_of_labels}">
         	<img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="${i18n().manage}" /></a>
         </span>
