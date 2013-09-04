@@ -37,6 +37,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.sparql.expr.NodeValue;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -224,6 +225,13 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             Boolean collateBySubclass = getPropertyBooleanValue(op,PROPERTY_COLLATEBYSUBCLASSANNOT);
             p.setCollateBySubclass(collateBySubclass==null ? false : collateBySubclass);
             
+            Boolean editLinkSuppressed = getPropertyBooleanValue(op, PROPERTY_EDITLINKSUPPRESSED);
+            p.setEditLinkSuppressed(editLinkSuppressed == null ? false : editLinkSuppressed);
+            Boolean addLinkSuppressed = getPropertyBooleanValue(op, PROPERTY_ADDLINKSUPPRESSED);
+            p.setAddLinkSuppressed(addLinkSuppressed == null ? false : addLinkSuppressed);
+            Boolean deleteLinkSuppressed = getPropertyBooleanValue(op, PROPERTY_DELETELINKSUPPRESSED);
+            p.setDeleteLinkSuppressed(deleteLinkSuppressed == null ? false : deleteLinkSuppressed);
+            
             Resource groupRes = (Resource) op.getPropertyValue(PROPERTY_INPROPERTYGROUPANNOT);
             if (groupRes != null) {
                 p.setGroupURI(groupRes.getURI());
@@ -297,7 +305,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         String propQuery = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
                 "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
                 "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
-                "SELECT ?range ?label ?group ?customForm ?displayRank ?displayLevel ?updateLevel WHERE { \n" +
+                "SELECT ?range ?label ?group ?customForm ?displayRank ?displayLevel ?updateLevel ?editLinkSuppressed ?addLinkSuppressed ?deleteLinkSuppressed WHERE { \n" +
                 "    ?context config:configContextFor <" + propertyURI + "> . \n";
         if (domainURI != null) {
                 propQuery += "    ?context config:qualifiedByDomain <" + domainURI + "> . \n";
@@ -310,6 +318,9 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 propQuery += "    ?context config:hasConfiguration ?configuration . \n" +
                 "    OPTIONAL { ?configuration config:propertyGroup ?group } \n" +
                 "    OPTIONAL { ?configuration config:displayName ?label } \n" +
+                "    OPTIONAL { ?configuration config:editLinkSuppressed ?editLinkSuppressed } \n" +
+                "    OPTIONAL { ?configuration config:addLinkSuppressed ?addLinkSuppressed } \n" +
+                "    OPTIONAL { ?configuration config:deleteLinkSuppressed ?deleteLinkSuppressed } \n" +
                 "    OPTIONAL { ?configuration vitro:displayRankAnnot ?displayRank } \n" +
                 "    OPTIONAL { ?configuration vitro:customEntryFormAnnot ?customForm } \n" +
                 "    OPTIONAL { ?configuration vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayLevel } \n" +
@@ -351,6 +362,18 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 if (customFormLit != null) {
                     op.setCustomEntryForm(customFormLit.getLexicalForm());
                 } 
+                Literal editLinkSuppressedLit = qsoln.getLiteral("editLinkSuppressed");
+                if (editLinkSuppressedLit != null ) {
+                    op.setEditLinkSuppressed(editLinkSuppressedLit.getBoolean());
+                }
+                Literal addLinkSuppressedLit = qsoln.getLiteral("addLinkSuppressed");
+                if (addLinkSuppressedLit != null ) {
+                    op.setAddLinkSuppressed(addLinkSuppressedLit.getBoolean());
+                }
+                Literal deleteLinkSuppressedLit = qsoln.getLiteral("deleteLinkSuppressed");
+                if (deleteLinkSuppressedLit != null ) {
+                    op.setDeleteLinkSuppressed(deleteLinkSuppressedLit.getBoolean());
+                }
             }  
         } finally {
             qe.close();

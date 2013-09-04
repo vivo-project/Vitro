@@ -53,7 +53,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
 
 	private String makeDeleteUrl() {
     	// Is the delete link suppressed for this property?
-    	if (new EditLinkSuppressor(vreq).isDeleteLinkSuppressed(property)) {
+    	if (property.isDeleteLinkSuppressed()) {
     		return "";
     	}
         
@@ -95,7 +95,7 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
 
 	private String makeEditUrl(ObjectPropertyStatement ops) {
     	// Is the edit link suppressed for this property?
-    	if (new EditLinkSuppressor(vreq).isEditLinkSuppressed(property)) {
+    	if (property.isEditLinkSuppressed()) {
     		return "";
     	}
         

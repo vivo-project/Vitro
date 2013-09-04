@@ -17,6 +17,9 @@ public class Property extends BaseResourceBean {
     private final boolean subjectSide     = true; // only relevant to ObjectProperty
     private String domainVClassURI        = null;
     private String rangeVClassURI         = null;
+    private boolean editLinkSuppressed    = false;
+    private boolean addLinkSuppressed     = false;
+    private boolean deleteLinkSuppressed  = false;
     
     public Property() {
         this.groupURI = null;
@@ -67,6 +70,33 @@ public class Property extends BaseResourceBean {
     
     public boolean isSubjectSide() {
         return subjectSide;
+    }
+    
+    public boolean isEditLinkSuppressed() {
+        return editLinkSuppressed;
+    }
+    
+    public boolean isAddLinkSuppressed() {
+        return addLinkSuppressed;
+    }
+    
+    public boolean isDeleteLinkSuppressed() {
+        return deleteLinkSuppressed;
+    }
+    
+    public void setEditLinkSuppressed(boolean editLinkSuppressed) {
+        this.editLinkSuppressed = editLinkSuppressed;
+    }
+    
+    public void setAddLinkSuppressed(boolean addLinkSuppressed) {
+        if (this.addLinkSuppressed) {
+            throw new RuntimeException("addLinkSuppressed already true");
+        }
+        this.addLinkSuppressed = addLinkSuppressed;
+    }
+    
+    public void setDeleteLinkSuppressed(boolean deleteLinkSuppressed) {
+        this.deleteLinkSuppressed = deleteLinkSuppressed;
     }
     
     /**

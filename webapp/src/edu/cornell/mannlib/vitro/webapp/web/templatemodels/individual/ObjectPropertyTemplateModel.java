@@ -110,7 +110,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
 
     protected void setAddUrl(Property property) {
     	// Is the add link suppressed for this property?
-    	if (new EditLinkSuppressor(vreq).isAddLinkSuppressed(property)) {
+    	if (property.isAddLinkSuppressed()) {
     		return;
     	}
         

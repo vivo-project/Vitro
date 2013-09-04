@@ -75,6 +75,9 @@ public class JenaBaseDaoCon {
     protected AnnotationProperty PROPERTY_INPROPERTYGROUPANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_INPROPERTYGROUPANNOT);
     protected AnnotationProperty PROPERTY_COLLATEBYSUBCLASSANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_COLLATEBYSUBCLASSANNOT);
     protected AnnotationProperty PROPERTY_STUBOBJECTPROPERTYANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_STUBOBJECTPROPERTYANNOT);
+    protected AnnotationProperty PROPERTY_EDITLINKSUPPRESSED = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_EDITLINKSUPPRESSED);
+    protected AnnotationProperty PROPERTY_ADDLINKSUPPRESSED = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_ADDLINKSUPPRESSED);
+    protected AnnotationProperty PROPERTY_DELETELINKSUPPRESSED = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_DELETELINKSUPPRESSED);
     
     protected OntClass 		     PROPERTYGROUP = _constModel.createClass(VitroVocabulary.PROPERTYGROUP);
 

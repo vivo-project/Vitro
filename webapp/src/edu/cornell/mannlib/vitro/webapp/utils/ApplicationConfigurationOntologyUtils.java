@@ -23,6 +23,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.sparql.expr.NodeValue;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
@@ -55,7 +56,7 @@ public class ApplicationConfigurationOntologyUtils {
         String queryStr = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
                 "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
                 "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
-                "SELECT DISTINCT ?range ?domain ?label ?group ?customForm ?displayLevel ?updateLevel ?property WHERE { \n" +
+                "SELECT DISTINCT ?range ?domain ?label ?group ?customForm ?displayRank ?displayLevel ?updateLevel ?editLinkSuppressed ?addLinkSuppressed ?deleteLinkSuppressed ?property WHERE { \n" +
 //                "    ?p rdfs:subPropertyOf ?property . \n" +
                 "    ?context config:configContextFor ?property . \n" +
                 "    ?context config:qualifiedBy ?range . \n" +
@@ -63,6 +64,10 @@ public class ApplicationConfigurationOntologyUtils {
                 "    OPTIONAL { ?context config:qualifiedByDomain ?domain } \n" +
                 "    OPTIONAL { ?configuration config:propertyGroup ?group } \n" +
                 "    OPTIONAL { ?configuration config:displayName ?label } \n" +
+                "    OPTIONAL { ?configuration vitro:displayRankAnnot ?displayRank } \n" +
+                "    OPTIONAL { ?configuration config:editLinkSuppressed ?editLinkSuppressed } \n" +
+                "    OPTIONAL { ?configuration config:addLinkSuppressed ?addLinkSuppressed } \n" +
+                "    OPTIONAL { ?configuration config:deleteLinkSuppressed ?deleteLinkSuppressed } \n" +
                 "    OPTIONAL { ?configuration vitro:customEntryFormAnnot ?customForm } \n" +
                 "    OPTIONAL { ?configuration vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayLevel } \n" +
                 "    OPTIONAL { ?configuration vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateLevel } \n" +
@@ -125,6 +130,11 @@ public class ApplicationConfigurationOntologyUtils {
                 } else {
                     newProp.setCustomEntryForm(op.getCustomEntryForm());
                 }
+                Literal displayRankLit = qsoln.getLiteral("displayRank");
+                if(displayRankLit != null) {
+                    op.setDomainDisplayTier(
+                            Integer.parseInt(displayRankLit.getLexicalForm()));
+                } 
                 Resource displayLevelRes = qsoln.getResource("displayLevel");
                 if (displayLevelRes != null) {
                     newProp.setHiddenFromDisplayBelowRoleLevel(
@@ -137,7 +147,19 @@ public class ApplicationConfigurationOntologyUtils {
                             BaseResourceBean.RoleLevel.getRoleByUri(
                                     updateLevelRes.getURI()));
                 }
-                additionalProps.add(newProp);
+                Literal editLinkSuppressedLit = qsoln.getLiteral("editLinkSuppressed");
+                if (editLinkSuppressedLit != null ) {
+                    op.setEditLinkSuppressed(editLinkSuppressedLit.getBoolean());
+                }
+                Literal addLinkSuppressedLit = qsoln.getLiteral("addLinkSuppressed");
+                if (addLinkSuppressedLit != null ) {
+                    op.setAddLinkSuppressed(addLinkSuppressedLit.getBoolean());
+                }
+                Literal deleteLinkSuppressedLit = qsoln.getLiteral("deleteLinkSuppressed");
+                if (deleteLinkSuppressedLit != null ) {
+                    op.setDeleteLinkSuppressed(deleteLinkSuppressedLit.getBoolean());
+                }
+                additionalProps.add(newProp);              
             }  
         } finally {
             qe.close();
