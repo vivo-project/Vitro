@@ -22,10 +22,13 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
     
     private final String name;
     private final List<PropertyTemplateModel> properties;
-      
+
+
+
     PropertyGroupTemplateModel(VitroRequest vreq, PropertyGroup group, 
             Individual subject, boolean editing, 
-            List<DataProperty> populatedDataPropertyList, List<ObjectProperty> populatedObjectPropertyList) {
+            List<DataProperty> populatedDataPropertyList, 
+            List<ObjectProperty> populatedObjectPropertyList) {
 
         this.name = group.getName();
         
@@ -49,6 +52,17 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
         properties.remove(ptm);
     }
     
+
+    public String toString(){
+        String ptmStr ="";
+        for( int i=0; i < properties.size() ; i ++ ){
+            PropertyTemplateModel ptm = properties.get(i);
+            String spacer = "\n  ";
+            if( ptm != null )
+                ptmStr = ptmStr + spacer + ptm.toString();
+        }
+        return String.format("\nPropertyGroupTemplateModel %s[%s] ",name, ptmStr );
+    }
     
     /* Accessor methods for templates */
     // Add this so it's included in dumps for debugging. The templates will want to display
@@ -58,18 +72,14 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
     }
     
     public String getName(String otherGroupName) {
-        String displayName = name;
-        if (displayName == null) {
-            displayName = "";
-        } else if (displayName.isEmpty()) {
-            displayName = otherGroupName;
-        } 
-        return displayName;
+        if (name == null || name.isEmpty()) {
+            return otherGroupName;
+        } else {
+            return name;
+        }
     }
     
     public List<PropertyTemplateModel> getProperties() {
         return properties;
-    }
-    
-
+    }    
 }
