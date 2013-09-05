@@ -182,13 +182,21 @@ var manageLabels = {
     	//See if there are any other remove link
     	if(languageName != "untyped") {
     		//find if there are any other remove links for the same language
+    		var allRemoveLinks = manageLabels.existingLabelsList.find("a.remove");
     		var removeLinks = manageLabels.existingLabelsList.find("a.remove[languageName='" + languageName + "']");
     		if(removeLinks.length == 0) {
     			//if there aren't any other labels for this language, also remove the heading
     			manageLabels.existingLabelsList.find("h3[languageName='" + languageName + "']").remove();
     			
     		}
+    		//Check to see if there is only one label left on the page, if so remove or hide the remove link
+    		if(allRemoveLinks.length == 1) {
+    			allRemoveLinks.remove();
+    			//These will be removed instead of hidden because currently add will reload the page
+    			//whereas remove executes an ajax query and the page isn't reloaded
+    		}
     	}
+    	
     	
     },
     //Determine if there are new locales that can be added to the options once a delete has occurred

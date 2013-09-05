@@ -7,6 +7,8 @@ import java.lang.Integer;
 import java.lang.String;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -31,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ExecuteDataRetrieval;
 import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
@@ -108,6 +111,8 @@ class IndividualResponseBuilder {
 		 */
 		// body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
 	    body.put("labelCount", getLabelCount(itm.getUri(), vreq));
+	    //We also need to know the number of available locales
+	    body.put("localesCount", SelectedLocale.getSelectableLocales(vreq).size());
 	    body.put("profileType", getProfileType(itm.getUri(), vreq));
 		body.put("individual", wrap(itm, new ReadOnlyBeansWrapper()));
 		

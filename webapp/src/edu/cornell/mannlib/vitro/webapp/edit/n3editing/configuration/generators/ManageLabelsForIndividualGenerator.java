@@ -258,6 +258,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
         HashMap<String, String> localeCodeToNameMap = this.getFullCodeToLanguageNameMap(locales);
 		//the labels already added by the user
 		ArrayList<Literal> existingLabels = this.getExistingLabels(config.getSubjectUri(), vreq);
+		int numberExistingLabels = existingLabels.size();
 		//existing labels keyed by language name and each of the list of labels is sorted by language name
 		HashMap<String, List<LabelInformation>> existingLabelsByLanguageName = this.getLabelsSortedByLanguageName(existingLabels, localeCodeToNameMap, config, vreq);
 		//Get available locales for the drop down for adding a new label, also sorted by language name
@@ -270,6 +271,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 		 //Save labels sorted by language name, untyped have "untyped" as the language name value
 		 config.addFormSpecificData("labelsSortedByLanguageName", existingLabelsByLanguageName);
 		 config.addFormSpecificData("selectLocale",availableLocalesForAdd);
+		 config.addFormSpecificData("displayRemoveLink", (numberExistingLabels > 1));
       
 		
         //How do we edit? Will need to see

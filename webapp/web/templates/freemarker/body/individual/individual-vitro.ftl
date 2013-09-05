@@ -2,6 +2,9 @@
 <#if !labelCount??>
     <#assign labelCount = 0 >
 </#if>
+<#if !localesCount??>
+	<#assign localesCount = 1>
+</#if>
 
 <#-- Default individual profile page template -->
 <#--@dumpAll /-->
@@ -32,7 +35,7 @@
             <#else>                
                 <h1 class="fn">
                     <#-- Label -->
-                    <@p.label individual editable labelCount />
+                    <@p.label individual editable labelCount localesCount/>
 
                     <#--  Most-specific types -->
                     <@p.mostSpecificTypes individual />

@@ -1,5 +1,5 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
-
+<#include "manageLabelsForIndividualTerms.ftl" >
 <#-- Custom form for managing labels for individuals -->
 <#import "manageLabelsForIndividualMacros.ftl" as m >
 <#assign requiredHint = "<span class='requiredHint'> *</span>" />
@@ -12,6 +12,10 @@
 <#assign editable = false/>
 <#if editConfiguration.pageData.editable?has_content>
 	<#assign editable = editConfiguration.pageData.editable />
+</#if>
+<#assign displayRemoveLink = true/>
+<#if editConfiguration.pageData.displayRemoveLink?has_content>
+	<#assign displayRemoveLink = editConfiguration.pageData.displayRemoveLink/>
 </#if>
 <#if editSubmission?has_content && editSubmission.submissionExists = true && editSubmission.validationErrors?has_content>
 	<#assign submissionErrors = editSubmission.validationErrors/>
@@ -60,7 +64,7 @@
 		    <#include "manageLabelsForIndividualSubmissionErrors.ftl">
 			<div id="showAddForm">
 				<input type="submit" value="${i18n().add_label}" id="showAddFormButton" name="showAddFormButton">  ${i18n().or} 
-				<a class="cancel" href="${cancelUrl}&url=/individual" title="${i18n().return_to_profile}">${i18n().return_to_profile}</a>
+				<a class="cancel" href="${cancelUrl}&url=/individual" title="${returnText}">${returnText}</a>
 			</div>  
 		
 		    <#include "manageLabelsForIndividualAddForm.ftl" >
