@@ -36,12 +36,13 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     private String name;
 
+
+       
     PropertyTemplateModel(Property property, Individual subject, VitroRequest vreq) {
         this.vreq = vreq;
         subjectUri = subject.getURI(); 
         propertyUri = property.getURI();
-        localName = property.getLocalName();        
-        log.debug("Local name for property " + propertyUri + ": " + localName);
+        localName = property.getLocalName();
         setVerboseDisplayValues(property);
         addUrl = "";
         
@@ -53,14 +54,18 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     protected void setVerboseDisplayValues(Property property) {  
         
         // No verbose display for vitro and vitro public properties.
-        // This models previous behavior. In theory the verbose display can be provided, but we may not want
-        // to give anyone access to these properties, since the application is dependent on them.
+        // This models previous behavior. In theory the verbose display can be provided, 
+        // but we may not want to give anyone access to these properties, since the
+        // application is dependent on them.
         String namespace = property.getNamespace();        
-        if (VitroVocabulary.vitroURI.equals(namespace) || VitroVocabulary.VITRO_PUBLIC.equals(namespace)) {
+        if (VitroVocabulary.vitroURI.equals(namespace) 
+            || VitroVocabulary.VITRO_PUBLIC.equals(namespace)) {
             return;
         }
         
-        Boolean verboseDisplayValue = (Boolean) vreq.getSession().getAttribute("verbosePropertyDisplay");
+        Boolean verboseDisplayValue = 
+            (Boolean) vreq.getSession().getAttribute("verbosePropertyDisplay");
+
         if ( ! Boolean.TRUE.equals(verboseDisplayValue))  {
             return;
         }
@@ -94,6 +99,12 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         this.name = name;
     }
     
+    public String toString() {
+        return String.format("%s on %s",
+                             propertyUri != null ? propertyUri : "null Prop URI",
+                             subjectUri != null ? subjectUri : "null Sub URI" );
+    }
+
     /* Template properties */
     
     public abstract String getType();
@@ -117,6 +128,5 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     public Map<String, Object> getVerboseDisplay() {
         return verboseDisplay;
-    }
- 
+    } 
 }
