@@ -158,6 +158,8 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private void putNonReportingPathsIntoSettings(ServletContext ctx, UpdateSettings settings) {
         settings.setAskUpdatedQueryFile(ctx.getRealPath(ASK_QUERY_FILE));
         settings.setDiffFile(ctx.getRealPath(DIFF_FILE));
+        settings.setSparqlConstructAdditionsDir(ctx.getRealPath(DATA_DIR + "sparqlConstructs/additions"));
+        settings.setSparqlConstructDeletionsDir(ctx.getRealPath(DATA_DIR + "sparqlConstructs/deletions"));
         settings.setSuccessAssertionsFile(ctx.getRealPath(SUCCESS_ASSERTIONS_FILE));
         settings.setSuccessRDFFormat("N3");
 	}
@@ -174,9 +176,6 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		settings.setDataDir(dataDir.toString());
 		StartupStatus.getBean(ctx).info(this, "Updating knowledge base: reports are in '" + dataDir + "'");
 
-		settings.setSparqlConstructAdditionsDir(createDirectory(dataDir, "sparqlConstructs", "additions").toString());
-		settings.setSparqlConstructDeletionsDir(createDirectory(dataDir, "sparqlConstructs", "deletions").toString());
-		
 		Path changedDir = createDirectory(dataDir, "changedData");
 		settings.setAddedDataFile(changedDir.resolve("addedData.n3").toString());
 		settings.setRemovedDataFile(changedDir.resolve("removedData.n3").toString());

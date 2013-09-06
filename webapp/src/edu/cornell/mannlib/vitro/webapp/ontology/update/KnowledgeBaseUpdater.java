@@ -11,6 +11,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -112,126 +114,123 @@ public class KnowledgeBaseUpdater {
 	    	log.error("unable to migrate migration metadata " + e.getMessage());
 	    }
 	    
+	    log.warn("KnowledgeBaseUpdater needs to be modified to work on all graphs!");
+	    OntModel readModel = settings.getUnionOntModelSelector().getABoxModel();
+	    OntModel writeModel = settings.getAssertionOntModelSelector().getABoxModel();
+	    // TODO make sure the ABox update applies to all graphs
+	    
 		log.info("\tupdating the abox");
     	updateABox(changes);
-	}
-		
-	private void performSparqlConstructAdditions(String sparqlConstructDir, OntModel readModel, OntModel writeModel) throws IOException {
-		
-		Model anonModel = performSparqlConstructs(sparqlConstructDir, readModel, true);
-		
-		if (anonModel == null) {
-			return;
-		}
-		
-		writeModel.enterCriticalSection(Lock.WRITE);
-		try {
-			JenaIngestUtils jiu = new JenaIngestUtils();
-			Model additions = jiu.renameBNodes(anonModel, settings.getDefaultNamespace() + "n", writeModel);
-			Model actualAdditions = ModelFactory.createDefaultModel();
-			StmtIterator stmtIt = additions.listStatements();
-			
-			while (stmtIt.hasNext()) {
-				Statement stmt = stmtIt.nextStatement();
-				if (!writeModel.contains(stmt)) {
-					actualAdditions.add(stmt);
-				}
-			}
-			
-			writeModel.add(actualAdditions);
-			record.recordAdditions(actualAdditions);
-		} finally {
-			writeModel.leaveCriticalSection();
-		}	
+    	
+    	log.info("performing SPARQL CONSTRUCT additions");
+    	performSparqlConstructs(settings.getSparqlConstructAdditionsDir(), readModel, writeModel, ADD);
+    	
+        log.info("performing SPARQL CONSTRUCT retractions");
+        performSparqlConstructs(settings.getSparqlConstructDeletionsDir(), readModel, writeModel, RETRACT);
+
 	}
 	
-	private void performSparqlConstructRetractions(String sparqlConstructDir, OntModel readModel, OntModel writeModel) throws IOException {
-		
-		Model retractions = performSparqlConstructs(sparqlConstructDir, readModel, false);
-		
-		if (retractions == null) {
-			return;
-		}
-		
-		writeModel.enterCriticalSection(Lock.WRITE);
-		
-		try {
-			writeModel.remove(retractions);
-			record.recordRetractions(retractions);
-		} finally {
-			writeModel.leaveCriticalSection();
-		}
-		
-	}
+    private static final boolean ADD = true;
+    private static final boolean RETRACT = !ADD;
 	
-	/**
-	 * Performs a set of arbitrary SPARQL CONSTRUCT queries on the 
-	 * data, for changes that cannot be expressed as simple property
-	 * or class additions, deletions, or renamings.
-	 * Blank nodes created by the queries are given random URIs.
-	 * @param sparqlConstructDir
-	 * @param aboxModel
-	 */
-	private Model performSparqlConstructs(String sparqlConstructDir, 
-			                              OntModel readModel,
-			                              boolean add)   throws IOException {
-		
-		Model anonModel = ModelFactory.createDefaultModel();
-		File sparqlConstructDirectory = new File(sparqlConstructDir);
-		
-		if (!sparqlConstructDirectory.isDirectory()) {
-			logger.logError(this.getClass().getName() + 
-					"performSparqlConstructs() expected to find a directory " +
-					" at " + sparqlConstructDir + ". Unable to execute " +
-					" SPARQL CONSTRUCTS.");
-			return null;
-		}
-		
-		File[] sparqlFiles = sparqlConstructDirectory.listFiles();
-		for (int i = 0; i < sparqlFiles.length; i ++) {
-			File sparqlFile = sparqlFiles[i];			
-			try {
-				BufferedReader reader = new BufferedReader(new FileReader(sparqlFile));
-				StringBuffer fileContents = new StringBuffer();
-				String ln;
-				
-				while ( (ln = reader.readLine()) != null) {
-					fileContents.append(ln).append('\n');
-				}
-				
-				try {
-					log.debug("\t\tprocessing SPARQL construct query from file " + sparqlFiles[i].getName());
-					Query q = QueryFactory.create(fileContents.toString(), Syntax.syntaxARQ);
-					readModel.enterCriticalSection(Lock.READ);
-					try {
-						QueryExecution qe = QueryExecutionFactory.create(q,	readModel);
-						long numBefore = anonModel.size();
-						qe.execConstruct(anonModel);
-						long numAfter = anonModel.size();
-                        long num = numAfter - numBefore;
-                        
-                        if (num > 0) {
-						   logger.log((add ? "Added " : "Removed ") + num + 
-								   " statement"  + ((num > 1) ? "s" : "") + 
-								   " using the SPARQL construct query from file " + sparqlFiles[i].getParentFile().getName() + "/" + sparqlFiles[i].getName());
+    /**
+     * Performs a set of arbitrary SPARQL CONSTRUCT queries on the 
+     * data, for changes that cannot be expressed as simple property
+     * or class additions, deletions, or renamings.
+     * Blank nodes created by the queries are given random URIs.
+     * @param sparqlConstructDir
+     * @param readModel
+     * @param writeModel
+     * @param add (add = true; retract = false)
+     */
+    private void performSparqlConstructs(String sparqlConstructDir, 
+            OntModel readModel, OntModel writeModel,
+            boolean add)   throws IOException {
+        File sparqlConstructDirectory = new File(sparqlConstructDir);
+        log.info("Using SPARQL CONSTRUCT director " + sparqlConstructDirectory);
+        if (!sparqlConstructDirectory.isDirectory()) {
+            String logMsg = this.getClass().getName() + 
+                    "performSparqlConstructs() expected to find a directory " +
+                    " at " + sparqlConstructDir + ". Unable to execute " +
+                    " SPARQL CONSTRUCTS.";
+            logger.logError(logMsg);
+            log.error(logMsg);
+            return;
+        }
+        List<File> sparqlFiles = Arrays.asList(sparqlConstructDirectory.listFiles());
+        Collections.sort(sparqlFiles); // queries may depend on being run in a certain order
+        JenaIngestUtils jiu = new JenaIngestUtils();
+        for (File sparqlFile : sparqlFiles) {			
+            Model anonModel = ModelFactory.createDefaultModel();
+            StringBuffer fileContents = new StringBuffer();
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(sparqlFile));
+                String ln;
+                while ( (ln = reader.readLine()) != null) {
+                    fileContents.append(ln).append('\n');
+                }
+            } catch (FileNotFoundException fnfe) {
+                String logMsg = "WARNING: performSparqlConstructs() could not find " +
+                        " SPARQL CONSTRUCT file " + sparqlFile + ". Skipping.";
+                logger.log(logMsg);
+                log.info(logMsg);
+                continue;
+            }   
+            try {
+                log.info("\t\tprocessing SPARQL construct query from file " + sparqlFile.getName());
+                Query q = QueryFactory.create(fileContents.toString(), Syntax.syntaxARQ);
+                readModel.enterCriticalSection(Lock.READ);
+                try {
+                    QueryExecution qe = QueryExecutionFactory.create(q,	readModel);
+                    long numBefore = anonModel.size();
+                    qe.execConstruct(anonModel);
+                    long numAfter = anonModel.size();
+                    long num = numAfter - numBefore;
+                    if (num > 0) {
+                        String logMsg = (add ? "Added " : "Removed ") + num + 
+                                " statement"  + ((num > 1) ? "s" : "") + 
+                                " using the SPARQL construct query from file " + 
+                                sparqlFile.getParentFile().getName() +
+                                "/" + sparqlFile.getName();
+                        logger.log(logMsg);
+                        log.info(logMsg);
+                    }
+                    qe.close();
+                } finally {
+                    readModel.leaveCriticalSection();
+                }
+            } catch (Exception e) {
+                logger.logError(this.getClass().getName() + 
+                        ".performSparqlConstructs() unable to execute " +
+                        "query at " + sparqlFile + ". Error message is: " + e.getMessage());
+                log.error(e,e);
+            }
+            writeModel.enterCriticalSection(Lock.WRITE);
+            try {
+                if(!add) {
+                    writeModel.remove(anonModel);
+                    record.recordRetractions(anonModel);
+                    //log.info("removed " + anonModel.size() + " statements from SPARQL CONSTRUCTs");
+                } else {
+                    Model additions = jiu.renameBNodes(
+                            anonModel, settings.getDefaultNamespace() + "n", writeModel);
+                    Model actualAdditions = ModelFactory.createDefaultModel();
+                    StmtIterator stmtIt = additions.listStatements();      
+                    while (stmtIt.hasNext()) {
+                        Statement stmt = stmtIt.nextStatement();
+                        if (!writeModel.contains(stmt)) {
+                            actualAdditions.add(stmt);
                         }
-                        qe.close();
-					} finally {
-						readModel.leaveCriticalSection();
-					}
-				} catch (Exception e) {
-					logger.logError(this.getClass().getName() + 
-							".performSparqlConstructs() unable to execute " +
-							"query at " + sparqlFile + ". Error message is: " + e.getMessage());
-				}
-			} catch (FileNotFoundException fnfe) {
-				logger.log("WARNING: performSparqlConstructs() could not find " +
-						   " SPARQL CONSTRUCT file " + sparqlFile + ". Skipping.");
-			}	
-		}
-		
-        return anonModel;
-	}
+                    }      
+                    writeModel.add(actualAdditions);
+                    //log.info("added " + actualAdditions.size() + " statements from SPARQL CONSTRUCTs");
+                    record.recordAdditions(actualAdditions);
+                }
+            } finally {
+                writeModel.leaveCriticalSection();
+            }
+        }
+    }
 	
 	
 	private List<AtomicOntologyChange> getAtomicOntologyChanges() 

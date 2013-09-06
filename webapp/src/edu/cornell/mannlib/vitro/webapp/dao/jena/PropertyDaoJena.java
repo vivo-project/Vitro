@@ -616,22 +616,36 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         return classes;
     }
     
+    private static final int DEPTH_LIMIT = 20;
+    
     private List<Restriction> getRelatedRestrictions(OntClass ontClass) {
-        List<Restriction> relatedRestrictions = new ArrayList<Restriction>();
+        return getRelatedRestrictions(ontClass, new ArrayList<Restriction>(), DEPTH_LIMIT);
+    }
+    
+    private List<Restriction> getRelatedRestrictions(OntClass ontClass, 
+            List<Restriction> relatedRestrictions, int limit) {
+        limit--;
         if (ontClass.isRestriction()) {
             relatedRestrictions.add(ontClass.as(Restriction.class));
         } else if (ontClass.isIntersectionClass()) {
             IntersectionClass inter = ontClass.as(IntersectionClass.class);
             Iterator<? extends OntClass> operIt = inter.listOperands();
             while (operIt.hasNext()) {
-                relatedRestrictions.addAll(getRelatedRestrictions(operIt.next()));
+                OntClass operand = operIt.next();
+                if (!relatedRestrictions.contains(operand) && limit > 0) {
+                    relatedRestrictions.addAll(
+                            getRelatedRestrictions(
+                                    operand, relatedRestrictions, limit));
+                }
             }   
         } else {
             List<OntClass> superClasses = listSuperClasses(ontClass);
             superClasses.addAll(listEquivalentClasses(ontClass));
             for (OntClass sup : superClasses) {
-                if (!sup.equals(ontClass)) {
-                    relatedRestrictions.addAll(getRelatedRestrictions(sup));
+                if (sup.isAnon() && !sup.equals(ontClass) 
+                        && !relatedRestrictions.contains(ontClass) && limit > 0) {
+                    relatedRestrictions.addAll(
+                            getRelatedRestrictions(sup, relatedRestrictions, limit));
                 }
             }
         }
