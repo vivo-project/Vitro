@@ -25,4 +25,5 @@
  *       -- code
  *       -- label (tooltip relative to the current Locale)
  *       -- imageUrl
+ *       -- selected (boolean)
 -->

@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,6 +36,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
+import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -353,7 +356,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             return null;
         }
         
-        Model constructedModel = ModelFactory.createDefaultModel();
+        Model constructedModel = ModelFactory.createDefaultModel();                        
         
         for (String queryString : constructQueries) {
                      
@@ -408,13 +411,24 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                         w.close();
                     }	
             	} else {
-                constructedModel.read(
-                        rdfService.sparqlConstructQuery(
-                                queryString, RDFService.ModelSerializationFormat.N3), null, "N3");
-            
+            	    String parseFormat = "N3";
+            	    RDFService.ModelSerializationFormat resultFormat = RDFService.ModelSerializationFormat.N3;
+            	    
+            	    /* If the test ObjectPropertyStatementDaoJenaTest.testN3WithSameAs() fails
+            	     * this code can be removed: */
+            	    if( OWL.sameAs.getURI().equals( propertyUri )){
+            	        // VIVO-111: owl:sameAs can be represented as = in n3 but Jena's parser does not recognize it. 
+            	        // Switch to rdf/xml only for sameAs since it seems like n3 would be faster the rest of the time.            	        
+            	        parseFormat = "RDF/XML";
+                        resultFormat = RDFService.ModelSerializationFormat.RDFXML;
+            	    }
+            	    /* end of removal */
+            	    
+            	    InputStream is = rdfService.sparqlConstructQuery(queryString, resultFormat);            	                	    
+            	    constructedModel.read( is,  null, parseFormat);            
             	}
-            } catch (Exception e) {
-                log.error("Error getting constructed model for subject " + subjectUri + " and property " + propertyUri);
+            } catch (Exception e) {                
+                log.error("Error getting constructed model for subject " + subjectUri + " and property " + propertyUri, e);
             } 
         }
         

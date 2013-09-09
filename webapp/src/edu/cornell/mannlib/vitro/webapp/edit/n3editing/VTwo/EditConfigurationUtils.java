@@ -23,11 +23,11 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
+import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
 import freemarker.template.Configuration;
 
 public class EditConfigurationUtils {
@@ -282,7 +282,7 @@ public class EditConfigurationUtils {
 	//Generate HTML for a specific field name given 
 	public static String generateHTMLForElement(VitroRequest vreq, String fieldName, EditConfigurationVTwo editConfig) {
 		String html = "";
-        Configuration fmConfig = FreemarkerConfigurationLoader.getConfig(vreq);
+        Configuration fmConfig = FreemarkerConfiguration.getConfig(vreq);
 
         FieldVTwo field = editConfig == null ? null : editConfig.getField(fieldName);
         MultiValueEditSubmission editSub = EditSubmissionUtils.getEditSubmissionFromSession(vreq.getSession(), editConfig);

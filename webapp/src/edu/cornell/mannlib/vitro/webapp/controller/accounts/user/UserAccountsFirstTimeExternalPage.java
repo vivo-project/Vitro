@@ -11,7 +11,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 
-import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSets;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount.Status;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -200,7 +200,7 @@ public class UserAccountsFirstTimeExternalPage extends UserAccountsPage {
 		u.setLoginCount(0);
 		u.setStatus(Status.ACTIVE);
 		u.setPermissionSetUris(Collections
-				.singleton(PermissionSetsLoader.URI_SELF_EDITOR));
+				.singleton(PermissionSets.URI_SELF_EDITOR));
 
 		userAccountsDao.insertUserAccount(u);
 

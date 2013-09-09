@@ -69,6 +69,9 @@
 	<property name="solr.webapp.dir" location="${solr.build.dir}/webapp" />
 	<property name="solr.homeimage.dir" location="${solr.build.dir}/homeimage" />
 
+	<property name="vitrohome.build.dir" location="${build.dir}/vitrohome" />
+	<property name="vitrohome.image.dir" location="${vitrohome.build.dir}/image" />
+
 	<property name="distribution.dir" location="${build.dir}/distribution" />
 	<property name="distribution.tar.gz.file" location="${build.dir}/distribution.tar.gz" />
 
@@ -144,6 +147,32 @@
          - - - - - - - - - - - - - - - - - -->
 	<target name="prepare">
 		<mkdir dir="${build.dir}" />
+		
+		<!-- Get ready to copy language files. 
+			Use JavaScript functions to add "includes" to this PatternSet, 
+			depending on which languages are selected. -->
+		<patternset id="language_files" />
+	    
+		<script language="javascript"> <![CDATA[
+	        function echo(e, message) {
+	            e.setMessage(message);
+	            e.perform();
+	        }
+
+	        prop = project.getProperty("languages.addToBuild");
+	        ps = project.getReference("language_files");
+	        e = project.createTask("echo"); 
+
+	        if (prop != null) {
+	            languages = prop.trim().split(",");
+	            for (var i=0; i < languages.length; i++) {
+	                ps.setIncludes([languages[i] + "/**/*"])
+	                echo(e, "Adding language: " + languages[i])
+	            }
+	        } else {
+	            ps.appendExcludes(["**/*"])
+	        }
+	    ]]> </script>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -188,11 +217,47 @@
 		<!-- Copy the build.properties file to the resources directory. -->
 		<copy todir="${main.resources.dir}" file="${build.properties.file}" />
 
+
 		<!-- copy any xml files from source tree to the war directory -->
 		<copy todir="${main.compiled.dir}">
 			<fileset dir="${appbase.dir}/src" includes="**/*.xml" />
 		</copy>
+		
+		<!-- Copy any requested language files to the webapp directory. -->
+		<!-- Use a mapper to remove the language directory name when copying. -->
+	    <copy todir="${main.webapp.dir}/">
+	        <fileset dir="${appbase.dir}/languages" >
+	        	<patternset refid="language_files" />
+		    	<filename regex="/i18n/|/templates/|/themes/" />
+	        </fileset>
+	        <regexpmapper from="^[^/]+/(.*)$$" to="\1" />
+	    </copy>
 	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: prepareVitroHomeDir                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="prepareVitroHomeDir" depends="prepare">
+		<mkdir dir="${vitrohome.build.dir}" />
+		<mkdir dir="${vitrohome.image.dir}" />
+		<copy todir="${vitrohome.image.dir}" file="${appbase.dir}/config/example.runtime.properties" />
+		<copy todir="${vitrohome.image.dir}" >
+			<fileset dir="${appbase.dir}" >
+				<include name="rdf/**/*" />
+			</fileset>
+		</copy>
+	
+		<!-- Copy any requested language files to the webapp directory. -->
+		<!-- Use a mapper to remove the language directory name when copying. -->
+	    <copy todir="${vitrohome.image.dir}" >
+	        <fileset dir="${appbase.dir}/languages" >
+	        	<patternset refid="language_files" />
+		    	<filename name="*/rdf/**/*" />
+	        </fileset>
+	        <regexpmapper from="^[^/]+/(.*)$$" to="\1" />
+	    </copy>
+</target>
+
 
 	<!-- ================================= 
           target: clean              
@@ -369,12 +434,22 @@
 			</fileset>
 		</copy>
 	</target>
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: deployVitroHome                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="deployVitroHome" depends="deployProperties, prepareVitroHomeDir">
+    	<copy toDir="${vitro.home}" >
+    		<fileset dir="${vitrohome.image.dir}" />
+    	</copy>
+    </target>
+
 
 	<!-- ================================= 
       target: deploy              
      ================================= -->
 	<target name="deploy" 
-	        depends="deployWebapp, deploySolr" 
+	        depends="deployWebapp, deploySolr, deployVitroHome" 
 	        description="--> Build the app and install in Tomcat">
 	</target>
 
@@ -399,6 +474,7 @@
 		<jar basedir="${main.webapp.dir}" destfile="${distribution.dir}/${webapp.name}.war" />
 		<jar basedir="${solr.webapp.dir}" destfile="${distribution.dir}/${solr.app.name}.war" />
 		<tar basedir="${solr.homeimage.dir}" destfile="${distribution.dir}/solrhome.tar" />
+		<tar basedir="${vitrohome.image.dir}" destfile="${distribution.dir}/vitrohome.tar" />
 
 		<tar basedir="${distribution.dir}" destfile="${distribution.tar.gz.file}" compression="gzip" />
 	</target>

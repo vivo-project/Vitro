@@ -12,8 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
+import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.utils.log.LogUtils;
 import freemarker.core.ParseException;
 import freemarker.template.Configuration;
@@ -51,8 +50,7 @@ public class FreemarkerProcessingServiceImpl implements
 			throws TemplateProcessingException {
 		Template template = null;
 		try {
-			Configuration config = FreemarkerConfigurationLoader
-					.getConfig(new VitroRequest(req));
+			Configuration config = FreemarkerConfiguration.getConfig(req);
 			template = config.getTemplate(templateName);
 		} catch (ParseException e) {
 			log.warn("Failed to parse the template at '" + templateName + "'"

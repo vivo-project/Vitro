@@ -15,3 +15,13 @@ rdf:type
               "true"^^xsd:boolean ;   
               
               
+display:requiresAction
+      a owl:ObjectProperty ;
+      rdfs:label "Required Action"@en-US ;
+      rdfs:comment "Indicates that a resource has a required action that may need to be authorized" .
+      rdfs:range display:RequiredAction .
+      <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#offerCreateNewOptionAnnot>
+              "true"^^xsd:boolean ;
+      <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#selectFromExistingAnnot>
+              "true"^^xsd:boolean ;   
+      

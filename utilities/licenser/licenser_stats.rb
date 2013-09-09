@@ -7,7 +7,7 @@ Collect the statistics of a licenser run.
 =end
 
 class LicenserStats
-  attr_reader :substitutions
+  attr_reader :tagged_files
   attr_reader :missing_tags
   attr_reader :known_exceptions
   attr_reader :file_count
@@ -33,10 +33,10 @@ class LicenserStats
     @file_matchers = file_matchers
     @full = full
 
-    # keep track of how many substitutions for all file types
-    @substitutions = Hash.new()
+    # keep track of how many tags are found in all file types
+    @tagged_files = Hash.new()
     file_matchers.each do |matcher|
-      @substitutions[matcher] = 0
+      @tagged_files[matcher] = 0
     end
 
     # keep track of missing tags, only in file types that have missing tags
@@ -84,8 +84,8 @@ class LicenserStats
   end
 
   def record_tag(filename)
-    puts "    Substituted license text into #{filename}" if @full
-    @substitutions[which_match(filename)] += 1
+    puts "    Found license tag into #{filename}" if @full
+    @tagged_files[which_match(filename)] += 1
   end
 
   def record_no_tag(filename, source_path)

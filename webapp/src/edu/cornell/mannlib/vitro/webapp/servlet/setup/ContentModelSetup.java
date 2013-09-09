@@ -24,11 +24,13 @@ import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.ResourceUtils;
+import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.FactoryID;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
@@ -40,7 +42,6 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
-import edu.cornell.mannlib.vitro.webapp.utils.jena.InitialJenaModelUtils;
 
 /**
  * Sets up the content models, OntModelSelectors and webapp DAO factories.
@@ -79,9 +80,13 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         OntModel unionABoxModel = createCombinedBulkUpdatingModel(baseABoxModel, inferenceABoxModel);
         OntModel unionTBoxModel = createCombinedBulkUpdatingModel(baseTBoxModel, inferenceTBoxModel);
 
+
         if (isFirstStartup()) {
-        	loadInitialApplicationMetadataModel(applicationMetadataModel, ctx);
-        	loadDataFromFilesystem(baseABoxModel, baseTBoxModel, applicationMetadataModel, ctx);
+        	initializeApplicationMetadata(ctx, applicationMetadataModel);
+        	RDFFilesLoader.loadFirstTimeFiles(ctx, "abox", baseABoxModel, true);
+        	RDFFilesLoader.loadFirstTimeFiles(ctx, "tbox", baseTBoxModel, true);
+        } else {
+        	checkForNamespaceMismatch( applicationMetadataModel, ctx );
         }
         
         log.info("Setting up full models");
@@ -101,7 +106,6 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         models.setOntModel(ModelID.UNION_TBOX, unionTBoxModel);
         models.setOntModel(ModelID.UNION_FULL, unionFullModel);
         
-        checkForNamespaceMismatch( applicationMetadataModel, ctx );
         
 		log.info("Setting up DAO factories");
 		
@@ -159,35 +163,54 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 		return ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC, unionModel);
 	}
 
-	private void loadInitialApplicationMetadataModel(OntModel applicationMetadataModel,
-			ServletContext ctx) {
-		try {
-			applicationMetadataModel.add(
-					InitialJenaModelUtils.loadInitialModel(ctx, getDefaultNamespace(ctx)));
-		} catch (Throwable e) {
-			throw new RuntimeException("Unable to load application metadata model cache from DB", e);
-		}
-	}
-
-	private void loadDataFromFilesystem(OntModel baseABoxModel, OntModel baseTBoxModel, OntModel applicationMetadataModel, 
-			ServletContext ctx) {
-		Long startTime = System.currentTimeMillis();
-		log.info("Initializing models from RDF files");    
-		
-		readOntologyFilesInPathSet(USER_ABOX_PATH, ctx, baseABoxModel);
-		readOntologyFilesInPathSet(USER_TBOX_PATH, ctx, baseTBoxModel);
-		readOntologyFilesInPathSet(USER_APPMETA_PATH, ctx, applicationMetadataModel);
-		
-		log.debug(((System.currentTimeMillis() - startTime) / 1000)
-				+ " seconds to read RDF files ");
-	}
-	
 	private long secondsSince(long startTime) {
 		return (System.currentTimeMillis() - startTime) / 1000;
 	}
 
     /* ===================================================================== */
 
+	/**
+	 * We need to read the RDF files and change the Portal from a blank node to
+	 * one with a URI in the default namespace.
+	 * 
+	 * Do this before adding the data to the RDFService-backed model, to avoid
+	 * warnings about editing a blank node.
+	 */
+	private void initializeApplicationMetadata(ServletContext ctx,
+			OntModel applicationMetadataModel) {
+		OntModel temporaryAMModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
+    	RDFFilesLoader.loadFirstTimeFiles(ctx, "applicationMetadata", temporaryAMModel, true);
+    	setPortalUriOnFirstTime(temporaryAMModel, ctx);
+    	applicationMetadataModel.add(temporaryAMModel);
+	}
+
+	/**
+	 * If we are loading the application metadata for the first time, set the
+	 * URI of the Portal based on the default namespace.
+	 */
+	private void setPortalUriOnFirstTime(OntModel model, ServletContext ctx) {
+		// Only a single portal is permitted in the initialization data
+		Resource portalResource = null;
+		ClosableIterator<Resource> portalResIt = model
+				.listSubjectsWithProperty(RDF.type,
+						model.getResource(VitroVocabulary.PORTAL));
+		try {
+			if (portalResIt.hasNext()) {
+				Resource portalRes = portalResIt.next();
+				if (portalRes.isAnon()) {
+					portalResource = portalRes;
+				}
+			}
+		} finally {
+			portalResIt.close();
+		}
+		
+		if (portalResource != null) {
+			ResourceUtils.renameResource(portalResource, getDefaultNamespace(ctx) + "portal1");
+		}
+	}
+
+	
     /**
      * If we find a "portal1" portal (and we should), its URI should use the
      * default namespace.

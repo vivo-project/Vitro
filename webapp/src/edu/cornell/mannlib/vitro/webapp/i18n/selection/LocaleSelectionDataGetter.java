@@ -60,11 +60,11 @@ public class LocaleSelectionDataGetter implements DataGetter {
 			return Collections.emptyMap();
 		}
 
-		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> result = new HashMap<>();
 		result.put("selectLocaleUrl", UrlBuilder.getUrl("/selectLocale"));
 		result.put("locales", buildLocalesList(selectables));
 
-		Map<String, Object> bodyMap = new HashMap<String, Object>();
+		Map<String, Object> bodyMap = new HashMap<>();
 		bodyMap.put("selectLocale", result);
 		log.debug("Sending these values: " + bodyMap);
 		return bodyMap;
@@ -72,7 +72,7 @@ public class LocaleSelectionDataGetter implements DataGetter {
 
 	private List<Map<String, Object>> buildLocalesList(List<Locale> selectables) {
 		Locale currentLocale = SelectedLocale.getCurrentLocale(vreq);
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> list = new ArrayList<>();
 		for (Locale locale : selectables) {
 			try {
 				list.add(buildLocaleMap(locale, currentLocale));
@@ -86,10 +86,12 @@ public class LocaleSelectionDataGetter implements DataGetter {
 
 	private Map<String, Object> buildLocaleMap(Locale locale,
 			Locale currentLocale) throws FileNotFoundException {
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 		map.put("code", locale.toString());
 		map.put("label", locale.getDisplayName(currentLocale));
 		map.put("imageUrl", LocaleSelectorUtilities.getImageUrl(vreq, locale));
+		map.put("selected", currentLocale.equals(locale));
 		return map;
 	}
+	
 }

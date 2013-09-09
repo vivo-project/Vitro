@@ -131,6 +131,7 @@ public class RequestModelsPrep implements Filter {
 		VitroRequest vreq = new VitroRequest(req);
 
 		vreq.setUnfilteredRDFService(rawRdfService);
+		vreq.setUnfilteredDataset(new RDFServiceDataset(rawRdfService));
 
 		List<String> langs = getPreferredLanguages(req);
 		RDFService rdfService = addLanguageAwareness(langs, rawRdfService);

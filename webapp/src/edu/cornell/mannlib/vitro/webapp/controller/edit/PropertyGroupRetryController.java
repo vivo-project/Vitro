@@ -65,12 +65,9 @@ public class PropertyGroupRetryController extends BaseEditController {
                     log.error("Need to implement 'record not found' error message.");
                 }
                 if (propertyGroupForEditing == null) {
-                    try {
-                        String uriToFind = new String(request.getParameter("uri").getBytes("ISO-8859-1"),"UTF-8");
-                        propertyGroupForEditing = (PropertyGroup)pgDao.getGroupByURI(uriToFind);
-                    } catch (java.io.UnsupportedEncodingException uee) {
-                        // forget it
-                    }
+                    // UTF-8 expected due to URIEncoding on Connector element in server.xml
+                    String uriToFind = new String(request.getParameter("uri"));
+                    propertyGroupForEditing = (PropertyGroup)pgDao.getGroupByURI(uriToFind);
                 }
             } else {
                 propertyGroupForEditing = new PropertyGroup();

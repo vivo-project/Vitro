@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.individual;
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet.N3_MIMETYPE;
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet.RDFXML_MIMETYPE;
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet.TTL_MIMETYPE;
+import static edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet.JSON_MIMETYPE;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -117,7 +118,9 @@ public class IndividualRequestAnalyzer {
 				return "/individual/" + m.group(1) + "/" + m.group(1) + ".n3";
 			} else if (TTL_MIMETYPE.equals(mediaType)) {
 				return "/individual/" + m.group(1) + "/" + m.group(1) + ".ttl";
-			}
+			} else if (JSON_MIMETYPE.equals(mediaType)){
+                return "/individual/" + m.group(1) + "/" + m.group(1) + ".jsonld";
+            }
 		}
 		// or redirect to the canonical URL for HTML representation.
 		return "/display/" + m.group(1);
@@ -244,7 +247,10 @@ public class IndividualRequestAnalyzer {
 		if (formatParam.contains("ttl")) {
 			return ContentType.TURTLE;
 		}
-
+        if (formatParam.contains("jsonld") || formatParam.contains("json")){
+            return ContentType.JSON;
+        }
+                
 		/*
 		 * Check for parts of URL that indicate request for RDF. Examples:
 		 * http://vivo.cornell.edu/individual/n23/n23.rdf

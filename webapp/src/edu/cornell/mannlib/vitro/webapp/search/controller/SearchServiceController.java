@@ -43,7 +43,7 @@ public class SearchServiceController extends FreemarkerHttpServlet {
      * userAccount associated with the email.
      */
 	@Override
-	protected Actions requiredActions(VitroRequest vreq) {
+	public Actions requiredActions(VitroRequest vreq) {
         try{
 			// Works by side effect: parse the multi-part request and stash FileItems in request			
 			FileUploadServletRequest.parseRequest(vreq, 0);
@@ -52,42 +52,21 @@ public class SearchServiceController extends FreemarkerHttpServlet {
             String pw = vreq.getParameter("password");
             String email = vreq.getParameter("email");
 
-            log.debug(String.format("email: '%s' password: '%s' ",email,pw));
-
             if( pw == null || email == null || pw.isEmpty() || email.isEmpty()){
                 return SimplePermission.MANAGE_SEARCH_INDEX.ACTIONS;
             }
 
-            Authenticator basicAuth = new BasicAuthenticator(vreq);            
-            UserAccount user = basicAuth.getAccountForInternalAuth( email );
-            log.debug("userAccount is " + user==null?"null":user.getUri() );
-                
-            if( ! basicAuth.isCurrentPassword( user, pw ) ){
-                log.debug(String.format("UNAUTHORIZED, password not accepted for %s, account URI: %s",
-                                        user.getEmailAddress(), user.getUri()));
-                return Actions.UNAUTHORIZED;
-            }else{
-                log.debug(String.format("password accepted for %s, account URI: %s",
-                                        user.getEmailAddress(), user.getUri() ));
-            }
-                
-            //then figure out if that account can manage the search index.
-            IdentifierBundle ids = 
-                ActiveIdentifierBundleFactories.getUserIdentifierBundle(vreq,user);
-            PolicyIface policy = ServletPolicyList.getPolicies(vreq);
-            boolean canManageSearchIndex = 
-                PolicyHelper.isAuthorizedForActions( ids, policy, 
-                                                     SimplePermission.MANAGE_SEARCH_INDEX.ACTIONS );
-            if( canManageSearchIndex ){
+            if( PolicyHelper.isAuthorizedForActions(vreq, email, pw, 
+                    SimplePermission.MANAGE_SEARCH_INDEX.ACTIONS ) ){
                 return Actions.AUTHORIZED;
             }else{
-                log.debug(String.format("userAccount is unauthorized to" +
-                                        " manage the search index.",user.getUri()));
+                log.debug(email + " is unauthorized to manage the search index. " +
+                		"client IP "+vreq.getClientAddr());
                 return Actions.UNAUTHORIZED;
             }
 
         }catch(Exception ex){
-            log.error("Error while attempting to log in " + 
+            log.error("Error while client IP "+ vreq.getClientAddr() + " attempting to log in " + 
                       "to SearchServiceController: " + ex.getMessage());
             return Actions.UNAUTHORIZED;
         }

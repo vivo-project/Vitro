@@ -22,12 +22,12 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.InvalidConfigurationException;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.PropertyListConfig;
 import freemarker.cache.TemplateLoader;
@@ -155,7 +155,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
      * This will do for now.
      */
 	protected TemplateLoader getFreemarkerTemplateLoader() {
-		return FreemarkerConfigurationLoader.getConfig(vreq).getTemplateLoader();
+		return FreemarkerConfiguration.getConfig(vreq).getTemplateLoader();
 	}
     
     protected List<Map<String, String>> getStatementData() {

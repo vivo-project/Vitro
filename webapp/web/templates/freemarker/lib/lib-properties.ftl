@@ -208,17 +208,34 @@ name will be used as the label. -->
 </#macro>
 
 <#-- Label -->
-<#macro label individual editable labelCount>
+<#macro label individual editable labelCount localesCount=1>
+	<#assign labelPropertyUri = ("http://www.w3.org/2000/01/rdf-schema#label"?url) />
+	<#assign useEditLink = false />
+	<#--edit link used if in edit mode and only one label and one language-->
+	<#if labelCount = 1 &&  editable && localeCount = 1 >
+		<#assign useEditLink = true/>
+	</#if>
     <#local label = individual.nameStatement>
     ${label.value}
-    <#if (labelCount > 1)  && editable >
+    <#if useEditLink>
+    	<@editingLinks "label" label editable />
+    <#elseif editable || (labelCount > 1)>
+    <#--We display the link even when the user is not logged in case of multiple labels-->
+    	<#if editable>
+    		<#assign imageAlt = "${i18n().manage}" />
+    		<#assign linkTitle = "${i18n().manage_list_of_labels}">
+    	<#else>
+			<#assign linkTitle = "${i18n().view_list_of_labels}">
+			<#assign imageAlt = "${i18n().view}" />    		
+    	</#if>
+    	<#-- Manage labels now goes to generator -->
+    	<#assign individualUri = individual.uri!""/>
+    	<#assign individualUri = (individualUri?url)/>
         <span class="inline">
-            <a id="manageLabels" href="${urls.base}/manageLabels?subjectUri=${individual.uri!}">
-                ${i18n().manage_labels}
-            </a>
+            <a class="add-label" href="${urls.base}/editRequestDispatch?subjectUri=${individualUri}&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManageLabelsForIndividualGenerator&predicateUri=${labelPropertyUri}"
+             title="${linkTitle}">
+        	<img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="${imageAlt}" /></a>
         </span>
-    <#else>
-        <@editingLinks "label" label editable />
     </#if>
 </#macro>
 

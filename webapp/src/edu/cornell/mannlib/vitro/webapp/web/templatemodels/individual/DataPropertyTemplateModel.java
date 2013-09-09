@@ -5,8 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -21,13 +19,12 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.InvalidConfigurationException;
+import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.DataPropertyListConfig;
 import freemarker.cache.TemplateLoader;
 
@@ -136,7 +133,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     }
     
 	protected TemplateLoader getFreemarkerTemplateLoader() {
-		return FreemarkerConfigurationLoader.getConfig(vreq).getTemplateLoader();
+		return FreemarkerConfiguration.getConfig(vreq).getTemplateLoader();
 	}
     
     @Override 

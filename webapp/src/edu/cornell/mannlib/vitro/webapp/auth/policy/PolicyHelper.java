@@ -17,8 +17,10 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
@@ -26,6 +28,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPro
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.BasicAuthenticator;
 
 /**
  * A collection of static methods to help determine whether requested actions
@@ -53,7 +58,7 @@ public class PolicyHelper {
 		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(req);
 		return isAuthorizedForActions(ids, policy, actions);
 	}
-
+	
 	/**
 	 * Are these actions authorized for these identifiers by these policies?
 	 */
@@ -62,6 +67,48 @@ public class PolicyHelper {
 		return Actions.notNull(actions).isAuthorized(policy, ids);
 	}
 
+	/**
+	 * Is the email/password authorized for these actions?
+	 * This should be used when a controller or something needs allow 
+	 * actions if the user passes in their email and password.
+	 * 
+	 * It may be better to check this as part of a servlet Filter and
+	 * add an identifier bundle.
+	 */
+	public static boolean isAuthorizedForActions( HttpServletRequest req, 
+	        String email, String password,
+	         Actions actions){        
+	    
+        if( password == null || email == null || 
+            password.isEmpty() || email.isEmpty()){
+            return false;
+        }
+        
+        try{    
+            Authenticator basicAuth = new BasicAuthenticator(req);            
+            UserAccount user = basicAuth.getAccountForInternalAuth( email );
+            log.debug("userAccount is " + user==null?"null":user.getUri() );
+                
+            if( ! basicAuth.isCurrentPassword( user, password ) ){
+                log.debug(String.format("UNAUTHORIZED, password not accepted for %s, account URI: %s",
+                                        user.getEmailAddress(), user.getUri()));
+                return false;
+            }else{
+                log.debug(String.format("password accepted for %s, account URI: %s",
+                                        user.getEmailAddress(), user.getUri() ));
+                // figure out if that account can do the actions
+                IdentifierBundle ids = 
+                    ActiveIdentifierBundleFactories.getUserIdentifierBundle(req,user);
+                PolicyIface policy = ServletPolicyList.getPolicies(req);
+                return PolicyHelper.isAuthorizedForActions( ids, policy, actions );
+            }                
+        
+        }catch(Exception ex){
+            log.error("Error while attempting to authorize actions " + actions.toString(), ex);
+            return false;
+        }
+	}
+	
 	/**
 	 * Do the current policies authorize the current user to add this statement
 	 * to this model?
@@ -263,6 +310,7 @@ public class PolicyHelper {
 				+ stmt.getObject() + ">";
 	}
 
+	
 	/**
 	 * No need to instantiate this helper class - all methods are static.
 	 */

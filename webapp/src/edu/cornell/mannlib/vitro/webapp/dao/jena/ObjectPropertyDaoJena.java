@@ -874,7 +874,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
      */
     
     protected static final List<String> EXCLUDED_NAMESPACES = Arrays.asList(
-            "http://www.w3.org/2002/07/owl#"            
+                                                                            //"http://www.w3.org/2002/07/owl#"            
         ); 
     /*
      * This is a hack to throw out properties in the vitro, rdf, rdfs, and owl namespaces.
