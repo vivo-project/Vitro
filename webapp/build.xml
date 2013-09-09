@@ -170,7 +170,7 @@
 	                echo(e, "Adding language: " + languages[i])
 	            }
 	        } else {
-	            ps.appendExcludes(["**/*"])
+	            ps.setExcludes(["**/*"])
 	        }
 	    ]]> </script>
 	</target>
