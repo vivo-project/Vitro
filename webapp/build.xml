@@ -147,6 +147,32 @@
          - - - - - - - - - - - - - - - - - -->
 	<target name="prepare">
 		<mkdir dir="${build.dir}" />
+		
+		<!-- Get ready to copy language files. 
+			Use JavaScript functions to add "includes" to this PatternSet, 
+			depending on which languages are selected. -->
+		<patternset id="language_files" />
+	    
+		<script language="javascript"> <![CDATA[
+	        function echo(e, message) {
+	            e.setMessage(message);
+	            e.perform();
+	        }
+
+	        prop = project.getProperty("languages.addToBuild");
+	        ps = project.getReference("language_files");
+	        e = project.createTask("echo"); 
+
+	        if (prop != null) {
+	            languages = prop.trim().split(",");
+	            for (var i=0; i < languages.length; i++) {
+	                ps.setIncludes([languages[i] + "/**/*"])
+	                echo(e, "Adding language: " + languages[i])
+	            }
+	        } else {
+	            ps.appendExcludes(["**/*"])
+	        }
+	    ]]> </script>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -196,6 +222,16 @@
 		<copy todir="${main.compiled.dir}">
 			<fileset dir="${appbase.dir}/src" includes="**/*.xml" />
 		</copy>
+		
+		<!-- Copy any requested language files to the webapp directory. -->
+		<!-- Use a mapper to remove the language directory name when copying. -->
+	    <copy todir="${main.webapp.dir}/">
+	        <fileset dir="${appbase.dir}/languages" >
+	        	<patternset refid="language_files" />
+		    	<filename regex="/i18n/|/templates/|/themes/" />
+	        </fileset>
+	        <regexpmapper from="^[^/]+/(.*)$$" to="\1" />
+	    </copy>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
@@ -210,7 +246,17 @@
 				<include name="rdf/**/*" />
 			</fileset>
 		</copy>
-    </target>
+	
+		<!-- Copy any requested language files to the webapp directory. -->
+		<!-- Use a mapper to remove the language directory name when copying. -->
+	    <copy todir="${vitrohome.image.dir}" >
+	        <fileset dir="${appbase.dir}/languages" >
+	        	<patternset refid="language_files" />
+		    	<filename name="*/rdf/**/*" />
+	        </fileset>
+	        <regexpmapper from="^[^/]+/(.*)$$" to="\1" />
+	    </copy>
+</target>
 
 
 	<!-- ================================= 
