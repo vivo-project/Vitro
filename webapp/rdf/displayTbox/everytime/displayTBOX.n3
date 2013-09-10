@@ -12,7 +12,7 @@
 owl:Class a owl:Class .
 owl:Ontology a owl:Class .     
 owl:AnnotationProperty a owl:Class .   
-owl:DatatypeProperty a owl:
+owl:DatatypeProperty a owl:Class .
 owl:ObjectProperty a owl:Class .
       
 ###Display Model 
@@ -39,7 +39,7 @@ display:RequiredAction a owl:Class ;
 
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>
     a owl:Class ;
-    rdfs:comment "Data getter for running a SPARQL query."
+    rdfs:comment "Data getter for running a SPARQL query." .
     
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SolrIndividualsDataGetter>
     a owl:Class ;
