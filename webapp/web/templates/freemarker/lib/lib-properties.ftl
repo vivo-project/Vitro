@@ -212,7 +212,7 @@ name will be used as the label. -->
 	<#assign labelPropertyUri = ("http://www.w3.org/2000/01/rdf-schema#label"?url) />
 	<#assign useEditLink = false />
 	<#--edit link used if in edit mode and only one label and one language-->
-	<#if labelCount = 1 &&  editable && localeCount = 1 >
+	<#if labelCount = 1 &&  editable>
 		<#assign useEditLink = true/>
 	</#if>
     <#local label = individual.nameStatement>

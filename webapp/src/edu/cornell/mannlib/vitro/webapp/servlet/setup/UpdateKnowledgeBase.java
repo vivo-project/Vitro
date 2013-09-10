@@ -58,9 +58,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private static final String ASK_QUERY_FILE = DATA_DIR + "askUpdated.sparql";
 	private static final String SUCCESS_ASSERTIONS_FILE = DATA_DIR + "success.n3";
 	private static final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
-	private static final String NEW_TBOX_MODEL_DIR = "/WEB-INF/filegraph/tbox/";
 	private static final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
-	private static final String NEW_TBOX_ANNOTATIONS_DIR = "/WEB-INF/ontologies/user/tbox/";
 	//For display model migration
 	private static final String OLD_DISPLAYMODEL_TBOX_PATH = DATA_DIR + "oldDisplayModel/displayTBOX.n3";
 	private static final String NEW_DISPLAYMODEL_TBOX_PATH = "/WEB-INF/ontologies/app/menuload/displayTBOX.n3";
@@ -85,17 +83,21 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setAssertionOntModelSelector(ModelAccess.on(ctx).getBaseOntModelSelector());
 			settings.setInferenceOntModelSelector(ModelAccess.on(ctx).getInferenceOntModelSelector());
 			settings.setUnionOntModelSelector(ModelAccess.on(ctx).getUnionOntModelSelector());
-			boolean tryMigrateDisplay = true;
+			
+		    ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
+		    Path homeDir = Paths.get(props.getProperty("vitro.home"));
+			settings.setDisplayModel(ModelAccess.on(ctx).getDisplayModel());
+			OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
+			settings.setOldTBoxModel(oldTBoxModel);
+			OntModel newTBoxModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "tbox", "filegraph").toString());
+			settings.setNewTBoxModel(newTBoxModel);
+			OntModel oldTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_ANNOTATIONS_DIR));
+			settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
+			OntModel newTBoxAnnotationsModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "tbox", "everytime").toString());
+			settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
+				
+	        boolean tryMigrateDisplay = true;
 			try {
-				settings.setDisplayModel(ModelAccess.on(ctx).getDisplayModel());
-				OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
-				settings.setOldTBoxModel(oldTBoxModel);
-				OntModel newTBoxModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_MODEL_DIR));
-				settings.setNewTBoxModel(newTBoxModel);
-				OntModel oldTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_ANNOTATIONS_DIR));
-				settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
-				OntModel newTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_ANNOTATIONS_DIR));
-				settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
 				//Display model tbox and display metadata 
 				//old display model tbox model
 				OntModel oldDisplayModelTboxModel = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_TBOX_PATH));
@@ -117,7 +119,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 				OntModel oldDisplayModelVivoListView = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_VIVOLISTVIEW_PATH));
 				settings.setVivoListViewConfigDisplayModel(oldDisplayModelVivoListView);
 			} catch (Exception e) {
-				log.info("Unable to read display model migration files. " + e.getMessage());
+				log.info("Unable to read display model migration files. ", e);
 				tryMigrateDisplay = false;
 			}
 				
