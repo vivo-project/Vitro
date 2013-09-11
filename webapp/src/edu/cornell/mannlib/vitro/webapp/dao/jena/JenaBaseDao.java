@@ -834,7 +834,11 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         try {                       
             String localName = r.getLocalName();
             if (localName != null) {
-                label = localName;
+                if(localName.trim().length() > 0) {
+                    label = localName;
+                } else {
+                    label = r.getURI();
+                }
             } else if (r.isAnon()) {
                 label = r.getId().toString();
             } else {
