@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.ontology.update;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 
 public class UpdateSettings {
 
@@ -37,6 +38,8 @@ public class UpdateSettings {
 	private OntModel newDisplayModelFromFile;
 	private OntModel loadedAtStartupDisplayModel;
 	private OntModel oldDisplayModelVivoListViewConfig;
+	private RDFService rdfService;
+	
 	public String getDataDir() {
 		return dataDir;
 	}
@@ -223,6 +226,13 @@ public class UpdateSettings {
 		return this.oldDisplayModelVivoListViewConfig;
 	}
 	
+	public RDFService getRDFService() {
+	    return this.rdfService;
+	}
+	
+	public void setRDFService(RDFService rdfService) {
+	    this.rdfService = rdfService;
+	}
 	
 	
 }

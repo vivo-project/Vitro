@@ -24,19 +24,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.Syntax;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.shared.Lock;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
@@ -123,10 +120,10 @@ public class KnowledgeBaseUpdater {
     	updateABox(changes);
     	
     	log.info("performing SPARQL CONSTRUCT additions");
-    	performSparqlConstructs(settings.getSparqlConstructAdditionsDir(), readModel, writeModel, ADD);
+    	performSparqlConstructs(settings.getSparqlConstructAdditionsDir(), settings.getRDFService(), ADD);
     	
         log.info("performing SPARQL CONSTRUCT retractions");
-        performSparqlConstructs(settings.getSparqlConstructDeletionsDir(), readModel, writeModel, RETRACT);
+        performSparqlConstructs(settings.getSparqlConstructDeletionsDir(), settings.getRDFService(), RETRACT);
 
 	}
 	
@@ -144,10 +141,11 @@ public class KnowledgeBaseUpdater {
      * @param add (add = true; retract = false)
      */
     private void performSparqlConstructs(String sparqlConstructDir, 
-            OntModel readModel, OntModel writeModel,
+            RDFService rdfService,
             boolean add)   throws IOException {
+        Dataset dataset = new RDFServiceDataset(rdfService);
         File sparqlConstructDirectory = new File(sparqlConstructDir);
-        log.info("Using SPARQL CONSTRUCT director " + sparqlConstructDirectory);
+        log.info("Using SPARQL CONSTRUCT directory " + sparqlConstructDirectory);
         if (!sparqlConstructDirectory.isDirectory()) {
             String logMsg = this.getClass().getName() + 
                     "performSparqlConstructs() expected to find a directory " +
@@ -161,7 +159,6 @@ public class KnowledgeBaseUpdater {
         Collections.sort(sparqlFiles); // queries may depend on being run in a certain order
         JenaIngestUtils jiu = new JenaIngestUtils();
         for (File sparqlFile : sparqlFiles) {			
-            Model anonModel = ModelFactory.createDefaultModel();
             StringBuffer fileContents = new StringBuffer();
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(sparqlFile));
@@ -176,59 +173,68 @@ public class KnowledgeBaseUpdater {
                 log.info(logMsg);
                 continue;
             }   
+            Model anonModel = ModelFactory.createDefaultModel();
             try {
                 log.info("\t\tprocessing SPARQL construct query from file " + sparqlFile.getName());
-                Query q = QueryFactory.create(fileContents.toString(), Syntax.syntaxARQ);
-                readModel.enterCriticalSection(Lock.READ);
-                try {
-                    QueryExecution qe = QueryExecutionFactory.create(q,	readModel);
-                    long numBefore = anonModel.size();
-                    qe.execConstruct(anonModel);
-                    long numAfter = anonModel.size();
-                    long num = numAfter - numBefore;
-                    if (num > 0) {
-                        String logMsg = (add ? "Added " : "Removed ") + num + 
-                                " statement"  + ((num > 1) ? "s" : "") + 
-                                " using the SPARQL construct query from file " + 
-                                sparqlFile.getParentFile().getName() +
-                                "/" + sparqlFile.getName();
-                        logger.log(logMsg);
-                        log.info(logMsg);
-                    }
-                    qe.close();
-                } finally {
-                    readModel.leaveCriticalSection();
+                
+                anonModel = RDFServiceUtils.parseModel(
+                        rdfService.sparqlConstructQuery(fileContents.toString(), 
+                                RDFService.ModelSerializationFormat.NTRIPLE), 
+                                ModelSerializationFormat.NTRIPLE);
+
+                long num = anonModel.size();
+                if (num > 0) {
+                    String logMsg = (add ? "Added " : "Removed ") + num + 
+                            " statement"  + ((num > 1) ? "s" : "") + 
+                            " using the SPARQL construct query from file " + 
+                            sparqlFile.getParentFile().getName() +
+                            "/" + sparqlFile.getName();
+                    logger.log(logMsg);
+                    log.info(logMsg);
                 }
+        
             } catch (Exception e) {
                 logger.logError(this.getClass().getName() + 
                         ".performSparqlConstructs() unable to execute " +
                         "query at " + sparqlFile + ". Error message is: " + e.getMessage());
                 log.error(e,e);
             }
-            writeModel.enterCriticalSection(Lock.WRITE);
-            try {
-                if(!add) {
-                    writeModel.remove(anonModel);
-                    record.recordRetractions(anonModel);
-                    //log.info("removed " + anonModel.size() + " statements from SPARQL CONSTRUCTs");
-                } else {
-                    Model additions = jiu.renameBNodes(
-                            anonModel, settings.getDefaultNamespace() + "n", writeModel);
-                    Model actualAdditions = ModelFactory.createDefaultModel();
-                    StmtIterator stmtIt = additions.listStatements();      
-                    while (stmtIt.hasNext()) {
-                        Statement stmt = stmtIt.nextStatement();
-                        if (!writeModel.contains(stmt)) {
-                            actualAdditions.add(stmt);
+        
+            if(!add) {
+                StmtIterator sit = anonModel.listStatements();
+                while (sit.hasNext()) {
+                    Statement stmt = sit.nextStatement();
+                    Iterator<String> graphIt = dataset.listNames();
+                    while(graphIt.hasNext()) {
+                        String graph = graphIt.next();
+                        if(!isUpdatableABoxGraph(graph)) {
+                            continue;
                         }
-                    }      
-                    writeModel.add(actualAdditions);
-                    //log.info("added " + actualAdditions.size() + " statements from SPARQL CONSTRUCTs");
-                    record.recordAdditions(actualAdditions);
-                }
-            } finally {
-                writeModel.leaveCriticalSection();
+                        Model writeModel = dataset.getNamedModel(graph);
+                        if (writeModel.contains(stmt)) {
+                            writeModel.remove(stmt);
+                        }
+                    }
+                }            
+                record.recordRetractions(anonModel);
+                //log.info("removed " + anonModel.size() + " statements from SPARQL CONSTRUCTs");
+            } else {
+                Model writeModel = dataset.getNamedModel(JenaDataSourceSetupBase.JENA_DB_MODEL);
+                Model additions = jiu.renameBNodes(
+                        anonModel, settings.getDefaultNamespace() + "n", writeModel);
+                Model actualAdditions = ModelFactory.createDefaultModel();
+                StmtIterator stmtIt = additions.listStatements();      
+                while (stmtIt.hasNext()) {
+                    Statement stmt = stmtIt.nextStatement();
+                    if (!writeModel.contains(stmt)) {
+                        actualAdditions.add(stmt);
+                    }
+                }      
+                writeModel.add(actualAdditions);
+                //log.info("added " + actualAdditions.size() + " statements from SPARQL CONSTRUCTs");
+                record.recordAdditions(actualAdditions);
             }
+            
         }
     }
 	
@@ -245,8 +251,8 @@ public class KnowledgeBaseUpdater {
 		
 		OntModel oldTBoxModel = settings.getOldTBoxModel();
 		OntModel newTBoxModel = settings.getNewTBoxModel();
-		OntModel ABoxModel = settings.getAssertionOntModelSelector().getABoxModel();
-		ABoxUpdater aboxUpdater = new ABoxUpdater(oldTBoxModel, newTBoxModel, ABoxModel,settings.getNewTBoxAnnotationsModel(), logger, record);
+		RDFService rdfService = settings.getRDFService();
+		ABoxUpdater aboxUpdater = new ABoxUpdater(oldTBoxModel, newTBoxModel, rdfService, settings.getNewTBoxAnnotationsModel(), logger, record);
 		aboxUpdater.processPropertyChanges(changes.getAtomicPropertyChanges());
 		aboxUpdater.processClassChanges(changes.getAtomicClassChanges());
 	}
@@ -366,8 +372,10 @@ public class KnowledgeBaseUpdater {
 					" update to new ontology version: ", e);
 		}		
 	}
-		
-
+	
+	public static boolean isUpdatableABoxGraph(String graphName) {
+	    return (!graphName.contains("tbox") && !graphName.contains("filegraph"));
+	}
 
 	/**
 	 * A class that allows to access two different ontology change lists,
@@ -434,5 +442,6 @@ public class KnowledgeBaseUpdater {
 		public List<AtomicOntologyChange> getAtomicPropertyChanges() {
 			return atomicPropertyChanges;
 		}		
+		
 	}	
 }

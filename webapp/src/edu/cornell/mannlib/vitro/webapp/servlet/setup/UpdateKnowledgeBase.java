@@ -41,6 +41,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -95,6 +98,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
 			OntModel newTBoxAnnotationsModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "tbox", "everytime").toString());
 			settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
+			settings.setRDFService(RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService());
 				
 	        boolean tryMigrateDisplay = true;
 			try {

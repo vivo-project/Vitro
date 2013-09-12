@@ -14,6 +14,7 @@ import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntProperty;
+import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -27,7 +28,9 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange.AtomicChangeType;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 
 /**  
 * Performs knowledge base updates to the abox to align with a new ontology version
@@ -38,7 +41,8 @@ public class ABoxUpdater {
     private final Log log = LogFactory.getLog(ABoxUpdater.class);
 	private OntModel oldTboxModel;
 	private OntModel newTboxModel;
-	private OntModel aboxModel;
+	private Dataset dataset;
+	private RDFService rdfService;
 	private OntModel newTBoxAnnotationsModel;
 	private ChangeLogger logger;  
 	private ChangeRecord record;
@@ -59,14 +63,15 @@ public class ABoxUpdater {
 	 */
 	public ABoxUpdater(OntModel oldTboxModel,
 			           OntModel newTboxModel,
-			           OntModel aboxModel,
+			           RDFService rdfService,
 			           OntModel newAnnotationsModel,
 		               ChangeLogger logger,
 		               ChangeRecord record) {
 		
 		this.oldTboxModel = oldTboxModel;
 		this.newTboxModel = newTboxModel;
-		this.aboxModel = aboxModel;
+		this.dataset = new RDFServiceDataset(rdfService);
+		this.rdfService = rdfService;
 		this.newTBoxAnnotationsModel = newAnnotationsModel;
 		this.logger = logger;
 		this.record = record;
@@ -126,68 +131,75 @@ public class ABoxUpdater {
 	public void renameClass(AtomicOntologyChange change) throws IOException {
 		
 		//logger.log("Processing a class rename from: " + change.getSourceURI() + " to " + change.getDestinationURI());
-		aboxModel.enterCriticalSection(Lock.WRITE);
-		
-		try {
-			
-	       Model additions = ModelFactory.createDefaultModel();
-	       Model retractions = ModelFactory.createDefaultModel();
-	       
-	       //TODO - look for these in the models and log error if not found
-		   Resource oldClass = ResourceFactory.createResource(change.getSourceURI());
-		   Resource newClass = ResourceFactory.createResource(change.getDestinationURI());	   
-		   
-		   // Change class references in the subjects of statements
-		   
-		   // BJL 2010-04-09 : In future versions we need to keep track of
-		   // the difference between true direct renamings and "use-insteads."
-		   // For now, the best behavior is to remove any remaining statements
-		   // where the old class is the subject, *unless* the statements
-		   // is part of the new annotations file (see comment below) or the
-		   // predicate is vitro:autolinkedToTab.  In the latter case,
-		   // the autolinking annotation should be rewritten using the 
-		   // new class name.
-		   
-		   StmtIterator iter = aboxModel.listStatements(oldClass, (Property) null, (RDFNode) null);
-
-		   int removeCount = 0;
-		   while (iter.hasNext()) {
-			   Statement oldStatement = iter.next();
-			   removeCount++;
-			   retractions.add(oldStatement);
-		   }
-		   
-		   //log summary of changes
-		   if (removeCount > 0) {
-			   logger.log("Removed " + removeCount + " subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class");
-		   }
-
-		   // Change class references in the objects of rdf:type statements
-		   iter = aboxModel.listStatements((Resource) null, RDF.type, oldClass);
-
-		   int renameCount = 0;
-		   while (iter.hasNext()) {
-			   renameCount++;
-			   Statement oldStatement = iter.next();
-			   Statement newStatement = ResourceFactory.createStatement(oldStatement.getSubject(), RDF.type, newClass);
-			   retractions.add(oldStatement);
-			   additions.add(newStatement);
-		   }
-		   
-		   //log summary of changes
-		   if (renameCount > 0) {
-			   logger.log("Retyped " + renameCount + " individual" + ((renameCount > 1) ? "s" : "") + " from type "  + oldClass.getURI() + " to type " + newClass.getURI());
-		   }
-		   
-		   aboxModel.remove(retractions);
-		   record.recordRetractions(retractions);
-		   aboxModel.add(additions);
-		   record.recordAdditions(additions);
-		   
-		} finally {
-			aboxModel.leaveCriticalSection();
-		}
-		
+	    
+	    Iterator<String> graphIt = dataset.listNames();
+	    while(graphIt.hasNext()) {
+	        String graph = graphIt.next();
+	        if(!KnowledgeBaseUpdater.isUpdatableABoxGraph(graph)){
+	            continue;
+	        }
+	        Model aboxModel = dataset.getNamedModel(graph);
+	        aboxModel.enterCriticalSection(Lock.WRITE);
+    		try {
+    			
+    	       Model additions = ModelFactory.createDefaultModel();
+    	       Model retractions = ModelFactory.createDefaultModel();
+    	       
+    	       //TODO - look for these in the models and log error if not found
+    		   Resource oldClass = ResourceFactory.createResource(change.getSourceURI());
+    		   Resource newClass = ResourceFactory.createResource(change.getDestinationURI());	   
+    		   
+    		   // Change class references in the subjects of statements
+    		   
+    		   // BJL 2010-04-09 : In future versions we need to keep track of
+    		   // the difference between true direct renamings and "use-insteads."
+    		   // For now, the best behavior is to remove any remaining statements
+    		   // where the old class is the subject, *unless* the statements
+    		   // is part of the new annotations file (see comment below) or the
+    		   // predicate is vitro:autolinkedToTab.  In the latter case,
+    		   // the autolinking annotation should be rewritten using the 
+    		   // new class name.
+    		   
+    		   StmtIterator iter = aboxModel.listStatements(oldClass, (Property) null, (RDFNode) null);
+    
+    		   int removeCount = 0;
+    		   while (iter.hasNext()) {
+    			   Statement oldStatement = iter.next();
+    			   removeCount++;
+    			   retractions.add(oldStatement);
+    		   }
+    		   
+    		   //log summary of changes
+    		   if (removeCount > 0) {
+    			   logger.log("Removed " + removeCount + " subject reference" + ((removeCount > 1) ? "s" : "") + " to the "  + oldClass.getURI() + " class");
+    		   }
+    
+    		   // Change class references in the objects of rdf:type statements
+    		   iter = aboxModel.listStatements((Resource) null, RDF.type, oldClass);
+    
+    		   int renameCount = 0;
+    		   while (iter.hasNext()) {
+    			   renameCount++;
+    			   Statement oldStatement = iter.next();
+    			   Statement newStatement = ResourceFactory.createStatement(oldStatement.getSubject(), RDF.type, newClass);
+    			   retractions.add(oldStatement);
+    			   additions.add(newStatement);
+    		   }
+    		   
+    		   //log summary of changes
+    		   if (renameCount > 0) {
+    			   logger.log("Retyped " + renameCount + " individual" + ((renameCount > 1) ? "s" : "") + " from type "  + oldClass.getURI() + " to type " + newClass.getURI());
+    		   }
+    		   
+    		   aboxModel.remove(retractions);
+    		   record.recordRetractions(retractions);
+    		   aboxModel.add(additions);
+    		   record.recordAdditions(additions);
+    		   
+    		} finally {
+    			aboxModel.leaveCriticalSection();
+    		}
+	    }
 	}
 
 	/**
@@ -233,24 +245,26 @@ public class ABoxUpdater {
 
 			if (!parentOfAddedClass.equals(OWL.Thing)) {
 				
-				StmtIterator stmtIter = aboxModel.listStatements(null, RDF.type, parentOfAddedClass);
-				
-				int count = stmtIter.toList().size();
-				if (count > 0) {
-					
-					String indList = "";
-					while (stmtIter.hasNext()) {
-						Statement stmt = stmtIter.next();
-						indList += "\n\t" + stmt.getSubject().getURI(); 
-					}
-					
+			    Iterator<String> graphIt = dataset.listNames();
+	            while(graphIt.hasNext()) {
+	                String graph = graphIt.next();
+	                if(!KnowledgeBaseUpdater.isUpdatableABoxGraph(graph)){
+	                    continue;
+	                }
+			        Model aboxModel = dataset.getNamedModel(graph);
+			            
+    				StmtIterator stmtIter = aboxModel.listStatements(null, RDF.type, parentOfAddedClass);
+    				
+    				int count = stmtIter.toList().size();
+    					
 					if (count > 0) {
 						//TODO - take out the detailed logging after our internal testing is completed.
 				        logger.log("There " + ((count > 1) ? "are" : "is") + " " + count + " individual" + ((count > 1) ? "s" : "")  + " in the model that " + ((count > 1) ? "are" : "is") + " of type " + parentOfAddedClass.getURI() + "," +
 				        		    " and a new subclass of that class has been added: " + addedClass.getURI() + ". " +
 				        		    "Please review " + ((count > 1) ? "these" : "this") + " individual" + ((count > 1) ? "s" : "") + " to see whether " + ((count > 1) ? "they" : "it") + " should be of type: " +  addedClass.getURI() );
 					}
-				}				
+				
+	            }
 			}			
 		}
 	}
@@ -332,25 +346,33 @@ public class ABoxUpdater {
 		}
 		
 		// Remove instances of the deleted class
-		aboxModel.enterCriticalSection(Lock.WRITE);
-	    try {
-	       int count = 0;
-	       int refCount = 0;
-	       StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, deletedClass);
-
-    	   while (iter.hasNext()) {
-			   count++;
-			   Statement typeStmt = iter.next();   
-			   refCount = deleteIndividual(typeStmt.getSubject());
-		   }   
-		   
-		   if (count > 0) {
-			   logger.log("Removed " + count + " individual" + (((count > 1) ? "s" : "") + " of type " + deletedClass.getURI()) + " (refs = " + refCount + ")");
-		   }
-		   		   
-		} finally {
-			aboxModel.leaveCriticalSection();
-		}
+        Iterator<String> graphIt = dataset.listNames();
+        while(graphIt.hasNext()) {
+            String graph = graphIt.next();
+            if(!KnowledgeBaseUpdater.isUpdatableABoxGraph(graph)){
+                continue;
+            }
+            Model aboxModel = dataset.getNamedModel(graph);
+    		aboxModel.enterCriticalSection(Lock.WRITE);
+    	    try {
+    	       int count = 0;
+    	       int refCount = 0;
+    	       StmtIterator iter = aboxModel.listStatements((Resource) null, RDF.type, deletedClass);
+    
+        	   while (iter.hasNext()) {
+    			   count++;
+    			   Statement typeStmt = iter.next();   
+    			   refCount = deleteIndividual(typeStmt.getSubject());
+    		   }   
+    		   
+    		   if (count > 0) {
+    			   logger.log("Removed " + count + " individual" + (((count > 1) ? "s" : "") + " of type " + deletedClass.getURI()) + " (refs = " + refCount + ")");
+    		   }
+    		   		   
+    		} finally {
+    			aboxModel.leaveCriticalSection();
+    		}
+        }
 	}
 	
 	protected int deleteIndividual(Resource individual) throws IOException {
@@ -358,29 +380,37 @@ public class ABoxUpdater {
 	    Model retractions = ModelFactory.createDefaultModel();
 	    int refCount = 0;
 	    
-		aboxModel.enterCriticalSection(Lock.WRITE);
-	    try {			   
-		   StmtIterator iter = aboxModel.listStatements(individual, (Property) null, (RDFNode) null);
-			   
-		   while (iter.hasNext()) {
-			  Statement subjstmt = iter.next();
-			  retractions.add(subjstmt);
-		   }
-			   
-		   iter = aboxModel.listStatements((Resource) null, (Property) null, individual);
-			   
-		    while (iter.hasNext()) {
-			    Statement objstmt = iter.next();
-			    retractions.add(objstmt);
-			    refCount++;
-			}
-		   
-		   aboxModel.remove(retractions);
-		   record.recordRetractions(retractions);		
-		   
-		} finally {
-			aboxModel.leaveCriticalSection();
-		}
+        Iterator<String> graphIt = dataset.listNames();
+        while(graphIt.hasNext()) {
+            String graph = graphIt.next();
+            if(!KnowledgeBaseUpdater.isUpdatableABoxGraph(graph)){
+                continue;
+            }
+            Model aboxModel = dataset.getNamedModel(graph);
+    		aboxModel.enterCriticalSection(Lock.WRITE);
+    	    try {			   
+    		   StmtIterator iter = aboxModel.listStatements(individual, (Property) null, (RDFNode) null);
+    			   
+    		   while (iter.hasNext()) {
+    			  Statement subjstmt = iter.next();
+    			  retractions.add(subjstmt);
+    		   }
+    			   
+    		   iter = aboxModel.listStatements((Resource) null, (Property) null, individual);
+    			   
+    		    while (iter.hasNext()) {
+    			    Statement objstmt = iter.next();
+    			    retractions.add(objstmt);
+    			    refCount++;
+    			}
+    		   
+    		   aboxModel.remove(retractions);
+    		   record.recordRetractions(retractions);		
+    		   
+    		} finally {
+    			aboxModel.leaveCriticalSection();
+    		}
+        }
 		
 		return refCount;
 	}
@@ -439,37 +469,45 @@ public class ABoxUpdater {
 		
 		if (inverseOfAddedProperty != null) {
 			Model additions = ModelFactory.createDefaultModel();
-			aboxModel.enterCriticalSection(Lock.WRITE);
-			
-			try {
-				StmtIterator iter = aboxModel.listStatements((Resource) null, inverseOfAddedProperty, (RDFNode) null);
-		
-				while (iter.hasNext()) {
-					
-					Statement stmt = iter.next();
-					
-					if (stmt.getObject().isResource()) {
-					   Statement newStmt = ResourceFactory.createStatement(stmt.getObject().asResource(), addedProperty, stmt.getSubject());
-					   additions.add(newStmt);
-					} else {
-						logger.log("WARNING: expected the object of this statement to be a Resource but it is not. No inverse has been asserted: " + stmtString(stmt));
-					}
-				}
-				
-				aboxModel.add(additions);
-				record.recordAdditions(additions);
-				
-				if (additions.size() > 0) {
-					logger.log("Added " + additions.size() + " statement" + 
-							((additions.size() > 1) ? "s" : "") +
-							" with predicate " + addedProperty.getURI() + 
-							" (as an inverse to existing  " + inverseOfAddedProperty.getURI() + 
-							" statement" + ((additions.size() > 1) ? "s" : "") + ")");
-				}
-				
-			} finally {
-				aboxModel.leaveCriticalSection();
-			}
+            Iterator<String> graphIt = dataset.listNames();
+            while(graphIt.hasNext()) {
+                String graph = graphIt.next();
+                if(!KnowledgeBaseUpdater.isUpdatableABoxGraph(graph)){
+                    continue;
+                }
+                Model aboxModel = dataset.getNamedModel(graph);
+    			aboxModel.enterCriticalSection(Lock.WRITE);
+    			
+    			try {
+    				StmtIterator iter = aboxModel.listStatements((Resource) null, inverseOfAddedProperty, (RDFNode) null);
+    		
+    				while (iter.hasNext()) {
+    					
+    					Statement stmt = iter.next();
+    					
+    					if (stmt.getObject().isResource()) {
+    					   Statement newStmt = ResourceFactory.createStatement(stmt.getObject().asResource(), addedProperty, stmt.getSubject());
+    					   additions.add(newStmt);
+    					} else {
+    						logger.log("WARNING: expected the object of this statement to be a Resource but it is not. No inverse has been asserted: " + stmtString(stmt));
+    					}
+    				}
+    				
+    				aboxModel.add(additions);
+    				record.recordAdditions(additions);
+    				
+    				if (additions.size() > 0) {
+    					logger.log("Added " + additions.size() + " statement" + 
+    							((additions.size() > 1) ? "s" : "") +
+    							" with predicate " + addedProperty.getURI() + 
+    							" (as an inverse to existing  " + inverseOfAddedProperty.getURI() + 
+    							" statement" + ((additions.size() > 1) ? "s" : "") + ")");
+    				}
+    				
+    			} finally {
+    				aboxModel.leaveCriticalSection();
+    			}
+            }
 		}
 	}
 	
@@ -507,27 +545,35 @@ public class ABoxUpdater {
 			}
 		}
 		
-		Model deletePropModel = ModelFactory.createDefaultModel();
-		
-		if (replacementProperty == null) {
-						
-			aboxModel.enterCriticalSection(Lock.WRITE);
-			try {
-				deletePropModel.add(aboxModel.listStatements((Resource) null, deletedProperty, (RDFNode) null));
-				aboxModel.remove(deletePropModel);
-			} finally {
-				aboxModel.leaveCriticalSection();
-			}
-			record.recordRetractions(deletePropModel);
-			boolean plural = (deletePropModel.size() > 1);
-			if (deletePropModel.size() > 0) {
-				logger.log("Removed " + deletePropModel.size() + " statement" + (plural ? "s" : "") + " with predicate " + 
-						propObj.getSourceURI());
-			}
-		} else {
-			AtomicOntologyChange chg = new AtomicOntologyChange(deletedProperty.getURI(), replacementProperty.getURI(), AtomicChangeType.RENAME, propObj.getNotes());
-			renameProperty(chg);
-		}		
+        Iterator<String> graphIt = dataset.listNames();
+        while(graphIt.hasNext()) {
+            String graph = graphIt.next();
+            if(!KnowledgeBaseUpdater.isUpdatableABoxGraph(graph)){
+                continue;
+            }
+            Model aboxModel = dataset.getNamedModel(graph);
+    		Model deletePropModel = ModelFactory.createDefaultModel();
+    		
+    		if (replacementProperty == null) {
+    						
+    			aboxModel.enterCriticalSection(Lock.WRITE);
+    			try {
+    				deletePropModel.add(aboxModel.listStatements((Resource) null, deletedProperty, (RDFNode) null));
+    				aboxModel.remove(deletePropModel);
+    			} finally {
+    				aboxModel.leaveCriticalSection();
+    			}
+    			record.recordRetractions(deletePropModel);
+    			boolean plural = (deletePropModel.size() > 1);
+    			if (deletePropModel.size() > 0) {
+    				logger.log("Removed " + deletePropModel.size() + " statement" + (plural ? "s" : "") + " with predicate " + 
+    						propObj.getSourceURI());
+    			}
+    		} else {
+    			AtomicOntologyChange chg = new AtomicOntologyChange(deletedProperty.getURI(), replacementProperty.getURI(), AtomicChangeType.RENAME, propObj.getNotes());
+    			renameProperty(chg);
+    		}		
+        }
 		
 	}
 	
@@ -548,35 +594,44 @@ public class ABoxUpdater {
 			return;
 		}
 		
-		Model renamePropAddModel = ModelFactory.createDefaultModel();
-		Model renamePropRetractModel = 	ModelFactory.createDefaultModel();
+        Iterator<String> graphIt = dataset.listNames();
+        while(graphIt.hasNext()) {
+            String graph = graphIt.next();
+            if(!KnowledgeBaseUpdater.isUpdatableABoxGraph(graph)){
+                continue;
+            }
+            Model aboxModel = dataset.getNamedModel(graph);
 		
-		aboxModel.enterCriticalSection(Lock.WRITE);
-		try {
-			renamePropRetractModel.add(	aboxModel.listStatements(
-					(Resource) null, oldProperty, (RDFNode) null));
-			StmtIterator stmItr = renamePropRetractModel.listStatements();
-			while(stmItr.hasNext()) {
-				Statement tempStatement = stmItr.nextStatement();
-				renamePropAddModel.add( tempStatement.getSubject(),
-										newProperty,
-										tempStatement.getObject() );
-			}
-			aboxModel.remove(renamePropRetractModel);
-			aboxModel.add(renamePropAddModel);
-		} finally {
-			aboxModel.leaveCriticalSection();
-		}
-		
-		record.recordAdditions(renamePropAddModel);
-		record.recordRetractions(renamePropRetractModel);
-		
-		if (renamePropRetractModel.size() > 0) {
-			logger.log("Changed " + renamePropRetractModel.size() + " statement" + 
-					((renamePropRetractModel.size() > 1) ? "s" : "") +
-					" with predicate " + propObj.getSourceURI() + " to use " +
-					propObj.getDestinationURI() + " instead");		
-		}
+    		Model renamePropAddModel = ModelFactory.createDefaultModel();
+    		Model renamePropRetractModel = 	ModelFactory.createDefaultModel();
+    		
+    		aboxModel.enterCriticalSection(Lock.WRITE);
+    		try {
+    			renamePropRetractModel.add(	aboxModel.listStatements(
+    					(Resource) null, oldProperty, (RDFNode) null));
+    			StmtIterator stmItr = renamePropRetractModel.listStatements();
+    			while(stmItr.hasNext()) {
+    				Statement tempStatement = stmItr.nextStatement();
+    				renamePropAddModel.add( tempStatement.getSubject(),
+    										newProperty,
+    										tempStatement.getObject() );
+    			}
+    			aboxModel.remove(renamePropRetractModel);
+    			aboxModel.add(renamePropAddModel);
+    		} finally {
+    			aboxModel.leaveCriticalSection();
+    		}
+    		
+    		record.recordAdditions(renamePropAddModel);
+    		record.recordRetractions(renamePropRetractModel);
+    		
+    		if (renamePropRetractModel.size() > 0) {
+    			logger.log("Changed " + renamePropRetractModel.size() + " statement" + 
+    					((renamePropRetractModel.size() > 1) ? "s" : "") +
+    					" with predicate " + propObj.getSourceURI() + " to use " +
+    					propObj.getDestinationURI() + " instead");		
+    		}
+        }
 	}
 	
 	public void logChanges(Statement oldStatement, Statement newStatement) throws IOException {
