@@ -143,6 +143,10 @@ public class RequestModelsPrep implements Filter {
 		
 		setRawModels(vreq, dataset);
 		
+		// We need access to the language-ignorant version of this model.
+		// Grab it before it gets wrapped in language awareness.
+		vreq.setLanguageNeutralUnionFullModel(ModelAccess.on(vreq).getOntModel(ModelID.UNION_FULL));
+		
 		wrapModelsWithLanguageAwareness(vreq);
 		
 		setWebappDaoFactories(vreq, rdfService);

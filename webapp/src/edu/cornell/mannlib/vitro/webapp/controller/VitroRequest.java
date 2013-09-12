@@ -205,7 +205,15 @@ public class VitroRequest extends HttpServletRequestWrapper {
     @Override
     public String[] getParameterValues(String name) {
         return _req.getParameterValues(name);        
-    }                
+    }
+
+	public void setLanguageNeutralUnionFullModel(OntModel model) {
+		setAttribute("languageNeutralUnionFullModel", model);
+	}                
             
+	public OntModel getLanguageNeutralUnionFullModel() {
+		return (OntModel) getAttribute("languageNeutralUnionFullModel");
+	}                
+	
     
 }
