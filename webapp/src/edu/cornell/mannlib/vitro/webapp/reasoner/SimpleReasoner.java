@@ -251,18 +251,24 @@ public class SimpleReasoner extends StatementListener {
 				    return;
 				}
 			
-				OntClass subject = tboxModel.getOntClass((stmt.getSubject()).getURI());
-				if (subject == null) {
-					log.debug("didn't find subject class in the tbox: " 
-                              + (stmt.getSubject()).getURI());
-					return;
-				}
-				
-				OntClass object = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
-				if (object == null) {
-					log.debug("didn't find object class in the tbox: " 
-                              + ((Resource)stmt.getObject()).getURI());
-					return;
+				OntClass subject, object;
+				tboxModel.enterCriticalSection(Lock.READ);
+				try {
+    				subject = tboxModel.getOntClass((stmt.getSubject()).getURI());
+    				if (subject == null) {
+    					log.debug("didn't find subject class in the tbox: " 
+                                  + (stmt.getSubject()).getURI());
+    					return;
+    				}
+    				
+    				object = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
+    				if (object == null) {
+    					log.debug("didn't find object class in the tbox: " 
+                                  + ((Resource)stmt.getObject()).getURI());
+    					return;
+    				}
+				} finally {
+				    tboxModel.leaveCriticalSection();
 				}
 				
 				if (stmt.getPredicate().equals(RDFS.subClassOf)) {
