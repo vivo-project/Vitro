@@ -88,6 +88,8 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         } else {
         	checkForNamespaceMismatch( applicationMetadataModel, ctx );
         }
+    	RDFFilesLoader.loadEveryTimeFiles(ctx, "abox", baseABoxModel);
+    	RDFFilesLoader.loadEveryTimeFiles(ctx, "tbox", baseTBoxModel);
         
         log.info("Setting up full models");
         OntModel baseFullModel = createCombinedBulkUpdatingModel(baseABoxModel, baseTBoxModel);
