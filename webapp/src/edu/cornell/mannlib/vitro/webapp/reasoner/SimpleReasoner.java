@@ -1678,6 +1678,10 @@ public class SimpleReasoner extends StatementListener {
                                             typeURIs = getRemainingAssertedTypeURIs(stmt.getSubject());
                                         }
                                         removedABoxTypeAssertion(stmt, inferenceModel, typeURIs);
+                                    } else if (doSameAs && stmt.getPredicate().equals(OWL.sameAs)) {
+                                        removedABoxSameAsAssertion(stmt, inferenceModel);   
+                                    } else {
+                                        removedABoxAssertion(stmt, inferenceModel);
                                     }
                                     doPlugins(ModelUpdate.Operation.RETRACT,stmt);
                                 } catch (NullPointerException npe) {

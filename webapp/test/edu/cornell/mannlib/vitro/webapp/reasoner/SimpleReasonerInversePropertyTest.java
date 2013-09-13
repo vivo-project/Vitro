@@ -81,7 +81,14 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		aBox.add(a,P,b);		
 		Assert.assertTrue(inf.contains(b,Q,a));				
 		aBox.add(c,Q,d);		
-		Assert.assertTrue(inf.contains(d,P,c));	       
+		Assert.assertTrue(inf.contains(d,P,c));	      
+		
+		// delete assertions and verify that inferences go away
+		aBox.remove(c,Q,d);
+		Assert.assertFalse(inf.contains(d,P,c));
+		aBox.remove(a,P,b);
+		Assert.assertFalse(inf.contains(b,Q,a));
+		
 	}
 
     @Test
