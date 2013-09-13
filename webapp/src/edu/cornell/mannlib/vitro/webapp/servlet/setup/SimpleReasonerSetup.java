@@ -87,11 +87,12 @@ public class SimpleReasonerSetup implements ServletContextListener {
             Dataset dataset = new RDFServiceDataset(rdfService);
             
             Model rebuildModel = dataset.getNamedModel(JENA_INF_MODEL_REBUILD); 
-            Model scratchModel = dataset.getNamedModel(JENA_INF_MODEL_SCRATCHPAD); 
+            Model scratchModel = dataset.getNamedModel(JENA_INF_MODEL_SCRATCHPAD);
+            Model inferenceModel = dataset.getNamedModel(JenaDataSourceSetupBase.JENA_INF_MODEL);
 
             // the simple reasoner will register itself as a listener to the ABox assertions
             SimpleReasoner simpleReasoner = new SimpleReasoner(
-                    unionOms.getTBoxModel(), rdfService, inferencesOms.getABoxModel(), rebuildModel, scratchModel);
+                    unionOms.getTBoxModel(), rdfService, inferenceModel, rebuildModel, scratchModel);
             sce.getServletContext().setAttribute(SimpleReasoner.class.getName(),simpleReasoner);
             
             StartupStatus ss = StartupStatus.getBean(ctx);
