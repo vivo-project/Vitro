@@ -56,7 +56,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
             OntModelSelector inferencesOms = ModelAccess.on(ctx).getInferenceOntModelSelector();
             OntModelSelector unionOms = ModelAccess.on(ctx).getUnionOntModelSelector();
 
-			WebappDaoFactoryJena wadf = (WebappDaoFactoryJena) ModelAccess.on(ctx).getWebappDaoFactory();
+			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
             
             if (!assertionsOms.getTBoxModel().getProfile().NAMESPACE().equals(OWL.NAMESPACE.getNameSpace())) {        
                 log.error("Not connecting Pellet reasoner - the TBox assertions model is not an OWL model");
@@ -75,19 +75,14 @@ public class SimpleReasonerSetup implements ServletContextListener {
             sce.getServletContext().setAttribute("pelletListener",pelletListener);
             sce.getServletContext().setAttribute("pelletOntModel", pelletListener.getPelletModel());
             
-            if (wadf != null) {
-                wadf.setPelletListener(pelletListener);
+            if (wadf instanceof WebappDaoFactoryJena) {
+                ((WebappDaoFactoryJena) wadf).setPelletListener(pelletListener);
             }
             
             log.info("Pellet reasoner connected for the TBox");
      
-           // set up simple reasoning for the ABox
-                    
-            DataSource bds = JenaDataSourceSetupBase
-                                    .getApplicationDataSource(ctx);
-            String dbType = ConfigurationProperties.getBean(ctx).getProperty( // database type
-                    "VitroConnection.DataSource.dbtype","MySQL");
-            
+            // set up simple reasoning for the ABox
+                                
             RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService();            
             Dataset dataset = new RDFServiceDataset(rdfService);
             
