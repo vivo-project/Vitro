@@ -83,6 +83,10 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
     	return innerWebappDaoFactory.checkURI(uriStr, checkUniqueness);
     }
     
+    public boolean hasExistingURI(String uriStr) {
+    	return innerWebappDaoFactory.hasExistingURI(uriStr);
+    }
+    
     public WebappDaoFactory getUserAwareDaoFactory(String userURI) {
         //TODO: need to clone the filtering factory
         return innerWebappDaoFactory.getUserAwareDaoFactory(userURI);

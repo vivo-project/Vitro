@@ -154,6 +154,12 @@ return this.objectPropertyStatementDao;	}
 		throw new RuntimeException(
 				"WebappDaoFactory.checkURI() not implemented.");
 	}
+	
+	@Override
+	public boolean hasExistingURI(String uriStr) {
+		throw new RuntimeException(
+				"WebappDaoFactory.hasExistingURI() not implemented.");
+	}
 
 	@Override
 	public Set<String> getNonuserNamespaces() {
