@@ -44,6 +44,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.search.IndexConstants;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
@@ -164,9 +165,9 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             log.debug("Query text is \""+ queryText + "\""); 
 
 
-            String badQueryMsg = badQueryText( queryText );
+            String badQueryMsg = badQueryText( queryText, vreq );
             if( badQueryMsg != null ){
-                return doFailedSearch(badQueryMsg, queryText, format);
+                return doFailedSearch(badQueryMsg, queryText, format, vreq);
             }
                 
             SolrQuery query = getQuery(queryText, hitsPerPage, startIndex, vreq);            
@@ -176,26 +177,26 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             try {
                 response = solr.query(query);
             } catch (Exception ex) {                
-                String msg = makeBadSearchMessage(queryText, ex.getMessage());
+                String msg = makeBadSearchMessage(queryText, ex.getMessage(), vreq);
                 log.error("could not run Solr query",ex);
-                return doFailedSearch(msg, queryText, format);              
+                return doFailedSearch(msg, queryText, format, vreq);              
             }
             
             if (response == null) {
                 log.error("Search response was null");                                
-                return doFailedSearch("The search request contained errors.", queryText, format);
+                return doFailedSearch(I18n.text(vreq, "error_in_search_request"), queryText, format, vreq);
             }
             
             SolrDocumentList docs = response.getResults();
             if (docs == null) {
                 log.error("Document list for a search was null");                
-                return doFailedSearch("The search request contained errors.", queryText,format);
+                return doFailedSearch(I18n.text(vreq, "error_in_search_request"), queryText,format, vreq);
             }
                        
             long hitCount = docs.getNumFound();
             log.debug("Number of hits = " + hitCount);
             if ( hitCount < 1 ) {                
-                return doNoHits(queryText,format);
+                return doNoHits(queryText,format, vreq);
             }            
             
             List<Individual> individuals = new ArrayList<Individual>(docs.size());
@@ -275,7 +276,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             body.put("pagingLinks", 
                     getPagingLinks(startIndex, hitsPerPage, hitCount,  
                                    vreq.getServletPath(),
-                                   pagingLinkParams));
+                                   pagingLinkParams, vreq));
 
             if (startIndex != 0) {
                 body.put("prevPage", getPreviousPageLink(startIndex,
@@ -339,12 +340,12 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return startIndex;
     }
 
-    private String badQueryText(String qtxt) {
+    private String badQueryText(String qtxt, VitroRequest vreq) {
         if( qtxt == null || "".equals( qtxt.trim() ) )
-            return "Please enter a search term.";
+        	return I18n.text(vreq, "enter_search_term");
         
         if( qtxt.equals("*:*") )
-            return "Search term was invalid" ;
+        	return I18n.text(vreq, "invalid_search_term") ;
         
         return null;
     }
@@ -526,7 +527,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         public String getCount() { return Long.toString(count); }               
     }
     
-    protected static List<PagingLink> getPagingLinks(int startIndex, int hitsPerPage, long hitCount, String baseUrl, ParamMap params) {
+    protected static List<PagingLink> getPagingLinks(int startIndex, int hitsPerPage, long hitCount, String baseUrl, ParamMap params, VitroRequest vreq) {
 
         List<PagingLink> pagingLinks = new ArrayList<PagingLink>();
         
@@ -550,7 +551,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                     pagingLinks.add(new PagingLink(pageNumber, baseUrl, params));
                 }
             } else {
-                pagingLinks.add(new PagingLink("more...", baseUrl, params));
+            	pagingLinks.add(new PagingLink(I18n.text(vreq, "paging_link_more"), baseUrl, params));
                 break;
             }
         }   
@@ -591,20 +592,20 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return new ExceptionResponseValues(getTemplate(f,Result.ERROR), body, e);
     }   
     
-    private TemplateResponseValues doFailedSearch(String message, String querytext, Format f) {
+    private TemplateResponseValues doFailedSearch(String message, String querytext, Format f, VitroRequest vreq) {
         Map<String, Object> body = new HashMap<String, Object>();       
-        body.put("title", "Search for '" + querytext + "'");        
+        body.put("title", I18n.text(vreq, "search_for", querytext));        
         if ( StringUtils.isEmpty(message) ) {
-            message = "Search failed.";
+        	message = I18n.text(vreq, "search_failed");
         }        
         body.put("message", message);
         return new TemplateResponseValues(getTemplate(f,Result.ERROR), body);
     }
 
-    private TemplateResponseValues doNoHits(String querytext, Format f) {
+    private TemplateResponseValues doNoHits(String querytext, Format f, VitroRequest vreq) {
         Map<String, Object> body = new HashMap<String, Object>();       
-        body.put("title", "Search for '" + querytext + "'");        
-        body.put("message", "No matching results.");     
+        body.put("title", I18n.text(vreq, "search_for", querytext));        
+        body.put("message", I18n.text(vreq, "no_matching_results"));     
         return new TemplateResponseValues(getTemplate(f,Result.ERROR), body);        
     }
 
@@ -613,7 +614,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
      * @param queryText
      * @param exceptionMsg
      */
-    private String makeBadSearchMessage(String querytext, String exceptionMsg){
+    private String makeBadSearchMessage(String querytext, String exceptionMsg, VitroRequest vreq){
         String rv = "";
         try{
             //try to get the column in the search term that is causing the problems
@@ -641,7 +642,8 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             if (post > i)
                 after = querytext.substring(i + 1, post);
 
-            rv = "The search term had an error near <span class='searchQuote'>"
+            rv = I18n.text(vreq, "search_term_error_near") +
+            		" <span class='searchQuote'>"
                 + before + "<span class='searchError'>" + querytext.charAt(i)
                 + "</span>" + after + "</span>";
         } catch (Throwable ex) {
