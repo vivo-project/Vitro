@@ -297,6 +297,7 @@ var customForm = {
         //to the filtering list
         this.getAcFilterForIndividuals();
         this.acCache = {};
+        var theType = customForm.acTypes[$(selectedObj).attr('acGroupName')];
         
         $(selectedObj).autocomplete({
             minLength: 3,
@@ -316,13 +317,17 @@ var customForm = {
                     dataType: 'json',
                     data: {
                         term: request.term,
-                        type: customForm.acTypes[$(selectedObj).attr('acGroupName')],
+                        type: theType,
                         multipleTypes:(customForm.acMultipleTypes == undefined || customForm.acMultipleTypes == null)? null: customForm.acMultipleTypes
                     },
                     complete: function(xhr, status) {
                         // Not sure why, but we need an explicit json parse here. 
-                        var results = $.parseJSON(xhr.responseText),                        
-                            filteredResults = customForm.filterAcResults(results);
+                        var results = $.parseJSON(xhr.responseText);                        
+                        var filteredResults = customForm.filterAcResults(results);
+                        
+                        if ( theType == "http://www.w3.org/2004/02/skos/core#Concept" ) {
+                            filteredResults = customForm.removeConceptSubclasses(filteredResults);
+                        }
 
                         customForm.acCache[request.term] = filteredResults;
                         response(filteredResults);
@@ -423,6 +428,16 @@ var customForm = {
         
     },
         
+    removeConceptSubclasses: function(array) {
+       $(array).each(function(i) {
+          if(this["msType"] != "http://www.w3.org/2004/02/skos/core#Concept") {
+              //Remove from array
+              array.splice(i, 1);
+          }    
+       });
+       return array;
+    },
+
     showAutocompleteSelection: function(label, uri, selectedObj) {
         // hide the acSelector field and set it's value to the selected ac item
         this.hideFields($(selectedObj).parent());
