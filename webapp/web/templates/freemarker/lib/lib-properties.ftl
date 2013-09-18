@@ -108,13 +108,13 @@ name will be used as the label. -->
     <#if editable>
         <#local url = property.addUrl>
         <#if url?has_content>
-            <@showAddLink property.localName label url />
+            <@showAddLink property.localName property.name label url />
         </#if>
     </#if>
 </#macro>
 
-<#macro showAddLink propertyLocalName label url>
-    <#if propertyLocalName == "informationResourceInAuthorship" || propertyLocalName == "webpage" || propertyLocalName == "hasResearchArea">
+<#macro showAddLink propertyLocalName propertyName label url>
+    <#if propertyName == "informationResourceInAuthorship" || propertyName == "webpage" || propertyLocalName == "hasResearchArea">
         <a class="add-${propertyLocalName}" href="${url}" title="${i18n().manage_list_of} ${label?lower_case}">
         <img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="${i18n().manage}" /></a>
     <#else>
@@ -131,30 +131,42 @@ name will be used as the label. -->
 <#macro propertyListItem property statement editable >
     <li role="listitem">    
         <#nested>       
-        <@editingLinks "${property.localName}" statement editable/>
+        <@editingLinks "${property.localName}" "${property.name}" statement editable/>
     </li>
 </#macro>
 
-<#macro editingLinks propertyLocalName statement editable>
-    <#if editable && (propertyLocalName != "informationResourceInAuthorship" && propertyLocalName != "webpage" && propertyLocalName != "hasResearchArea")>
-        <@editLink propertyLocalName statement />
-        <@deleteLink propertyLocalName statement />
+<#macro editingLinks propertyLocalName propertyName statement editable>
+    <#if editable && (propertyName != "authors" && propertyName != "webpage" && propertyLocalName != "hasResearchArea")>
+        <@editLink propertyLocalName propertyName statement />
+        <@deleteLink propertyLocalName propertyName statement />
      
     </#if>
 </#macro>
-
-<#macro editLink propertyLocalName statement>
+<#macro editLink propertyLocalName propertyName statement>
+<#if propertyLocalName?contains("ARG_2000028")>
+    <#if propertyName?contains("mailing address")>
+        <#local url = statement.editUrl + "&addressUri=" + "${statement.address!}">
+    <#elseif propertyName?contains("phone")>
+        <#local url = statement.editUrl + "&phoneUri=" + "${statement.phone!}">
+    <#elseif propertyName?contains("primary email") || propertyName?contains("additional emails")>
+        <#local url = statement.editUrl + "&emailUri=" + "${statement.email!}">
+    <#elseif propertyName?contains("full name")>
+        <#local url = statement.editUrl + "&fullNameUri=" + "${statement.fullName!}">
+    </#if>
+<#else>
     <#local url = statement.editUrl>
+</#if>
     <#if url?has_content>
         <@showEditLink propertyLocalName url />
     </#if>
+
 </#macro>
 
 <#macro showEditLink propertyLocalName url>
     <a class="edit-${propertyLocalName}" href="${url}" title="${i18n().edit_entry}"><img class="edit-individual" src="${urls.images}/individual/editIcon.gif" alt="${i18n().edit_entry}" /></a>
 </#macro>
 
-<#macro deleteLink propertyLocalName statement> 
+<#macro deleteLink propertyLocalName propertyName statement> 
     <#local url = statement.deleteUrl>
     <#if url?has_content>
         <@showDeleteLink propertyLocalName url />
@@ -197,7 +209,7 @@ name will be used as the label. -->
         <a href="${individual.imageUrl}" title="${i18n().alt_thumbnail_photo}">
         	<img class="individual-photo" src="${thumbUrl}" title="${i18n().click_to_view_larger}" alt="${individual.name}" width="${imageWidth!}" />
         </a>
-        <@editingLinks "${mainImage.localName}" mainImage.first() editable />
+        <@editingLinks "${mainImage.localName}" "" mainImage.first() editable />
     <#else>
         <#local imageLabel><@addLinkWithLabel mainImage editable "${i18n().photo}" /></#local>
         ${imageLabel}
@@ -218,7 +230,7 @@ name will be used as the label. -->
     <#local label = individual.nameStatement>
     ${label.value}
     <#if useEditLink>
-    	<@editingLinks "label" label editable />
+    	<@editingLinks "label" "" label editable />
     <#elseif editable || (labelCount > 1)>
     <#--We display the link even when the user is not logged in case of multiple labels-->
     	<#if editable>

@@ -144,7 +144,7 @@ var customForm = {
         // Put this case first, because in edit mode with
         // validation errors we just want initFormFullView.
 //        if ((!this.supportEdit) && (this.editMode == 'edit' || this.editMode == 'repair')) {
-        if (this.editMode == 'edit' || this.editMode == 'repair') {
+        if (this.editMode == 'edit' || this.editMode == 'repair' || this.editMode == 'error') {
             this.initFormWithValidationErrors();
         }
         else if (this.findValidationErrors()) {
