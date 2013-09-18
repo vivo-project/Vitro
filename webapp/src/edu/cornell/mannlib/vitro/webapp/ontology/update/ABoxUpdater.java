@@ -44,6 +44,7 @@ public class ABoxUpdater {
 	private Dataset dataset;
 	private RDFService rdfService;
 	private OntModel newTBoxAnnotationsModel;
+	private TBoxUpdater tboxUpdater;
 	private ChangeLogger logger;  
 	private ChangeRecord record;
 	private OntClass OWL_THING = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createClass(OWL.Thing.getURI());
@@ -61,20 +62,19 @@ public class ABoxUpdater {
 	 *                         and the retractions model.
 	 *                    
 	 */
-	public ABoxUpdater(OntModel oldTboxModel,
-			           OntModel newTboxModel,
-			           RDFService rdfService,
-			           OntModel newAnnotationsModel,
+	public ABoxUpdater(UpdateSettings settings,
 		               ChangeLogger logger,
 		               ChangeRecord record) {
 		
-		this.oldTboxModel = oldTboxModel;
-		this.newTboxModel = newTboxModel;
+	    this.oldTboxModel = settings.getOldTBoxModel();
+        this.newTboxModel = settings.getNewTBoxModel();
+        RDFService rdfService = settings.getRDFService();
 		this.dataset = new RDFServiceDataset(rdfService);
 		this.rdfService = rdfService;
-		this.newTBoxAnnotationsModel = newAnnotationsModel;
+		this.newTBoxAnnotationsModel = settings.getNewTBoxAnnotationsModel();
 		this.logger = logger;
 		this.record = record;
+		this.tboxUpdater = new TBoxUpdater(settings, logger, record);
 	}
 	
 	/**
@@ -632,6 +632,8 @@ public class ABoxUpdater {
     					propObj.getDestinationURI() + " instead");		
     		}
         }
+        
+        tboxUpdater.renameProperty(propObj);
 	}
 	
 	public void logChanges(Statement oldStatement, Statement newStatement) throws IOException {

@@ -64,7 +64,6 @@ public class KnowledgeBaseUpdater {
 		}
 			
 		long startTime = System.currentTimeMillis();
-        System.out.println("Migrating the knowledge base");
         log.info("Migrating the knowledge base");
         logger.log("Started knowledge base migration");
 		
@@ -84,7 +83,6 @@ public class KnowledgeBaseUpdater {
 		logger.closeLogs();
 
 		long elapsedSecs = (System.currentTimeMillis() - startTime)/1000;		
-		System.out.println("Finished knowledge base migration in " + elapsedSecs + " second" + (elapsedSecs != 1 ? "s" : ""));
 		log.info("Finished knowledge base migration in " + elapsedSecs + " second" + (elapsedSecs != 1 ? "s" : ""));
 		
 		return;
@@ -110,20 +108,15 @@ public class KnowledgeBaseUpdater {
 	    } catch (Exception e) {
 	    	log.error("unable to migrate migration metadata " + e.getMessage());
 	    }
-	    
-	    log.warn("KnowledgeBaseUpdater needs to be modified to work on all graphs!");
-	    OntModel readModel = settings.getUnionOntModelSelector().getABoxModel();
-	    OntModel writeModel = settings.getAssertionOntModelSelector().getABoxModel();
-	    // TODO make sure the ABox update applies to all graphs
-	    
-		log.info("\tupdating the abox");
-    	updateABox(changes);
-    	
+	        	
     	log.info("performing SPARQL CONSTRUCT additions");
     	performSparqlConstructs(settings.getSparqlConstructAdditionsDir(), settings.getRDFService(), ADD);
     	
         log.info("performing SPARQL CONSTRUCT retractions");
         performSparqlConstructs(settings.getSparqlConstructDeletionsDir(), settings.getRDFService(), RETRACT);
+        
+        log.info("\tupdating the abox");
+        updateABox(changes);
 
 	}
 	
@@ -249,10 +242,8 @@ public class KnowledgeBaseUpdater {
 	private void updateABox(AtomicOntologyChangeLists changes) 
 			throws IOException {
 		
-		OntModel oldTBoxModel = settings.getOldTBoxModel();
-		OntModel newTBoxModel = settings.getNewTBoxModel();
-		RDFService rdfService = settings.getRDFService();
-		ABoxUpdater aboxUpdater = new ABoxUpdater(oldTBoxModel, newTBoxModel, rdfService, settings.getNewTBoxAnnotationsModel(), logger, record);
+	
+		ABoxUpdater aboxUpdater = new ABoxUpdater(settings, logger, record);
 		aboxUpdater.processPropertyChanges(changes.getAtomicPropertyChanges());
 		aboxUpdater.processClassChanges(changes.getAtomicClassChanges());
 	}
@@ -290,14 +281,18 @@ public class KnowledgeBaseUpdater {
 		rdfService.changeSetUpdate(removeChangeSet);	
 	}
 	
-	private void updateTBoxAnnotations() throws IOException {
-		
-		TBoxUpdater tboxUpdater = new TBoxUpdater(settings.getOldTBoxAnnotationsModel(),
-		                                          settings.getNewTBoxAnnotationsModel(),
-                                                  settings.getAssertionOntModelSelector().getTBoxModel(), logger, record);
-                                                  
-        tboxUpdater.updateDefaultAnnotationValues();
-        //tboxUpdater.updateAnnotationModel();
+	private void updateTBoxAnnotations() {
+		TBoxUpdater tboxUpdater = new TBoxUpdater(settings, logger, record);         
+		try {
+		    tboxUpdater.modifyPropertyQualifications();
+		} catch (Exception e) {
+		    log.error("Unable to modify qualified property config file ", e);
+		}
+		try {
+            tboxUpdater.updateDefaultAnnotationValues();
+		} catch (Exception e) {
+		    log.error("Unable to update default annotation values ", e);
+		}
 	}
 	
 	/**

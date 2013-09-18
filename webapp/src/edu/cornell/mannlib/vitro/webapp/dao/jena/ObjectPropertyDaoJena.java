@@ -949,7 +949,6 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         "    { ?property display:listViewConfigFile ?filename \n" +
         "    } UNION { \n" +
         "        ?configuration config:listViewConfigFile ?filename . \n " +
-//        "        ?configuration config:hasListView ?lv . " +
         "        ?context config:hasConfiguration ?configuration . \n" +
         "        ?context config:configContextFor ?property . \n" +
         "        ?context config:qualifiedBy ?range . \n" +

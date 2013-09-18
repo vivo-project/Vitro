@@ -96,7 +96,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setNewTBoxModel(newTBoxModel);
 			OntModel oldTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_ANNOTATIONS_DIR));
 			settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
-			OntModel newTBoxAnnotationsModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "tbox", "everytime").toString());
+			OntModel newTBoxAnnotationsModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "tbox", "firsttime").toString());
 			settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
 			settings.setRDFService(RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService());
 				
@@ -145,6 +145,9 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 							   log.warn("unable to successfully update display model: " + e.getMessage());
 						  }
 					  }
+					  // reload the display model since the TBoxUpdater may have 
+					  // modified it
+					  new ApplicationModelSetup().contextInitialized(sce);
 				  }
 			   } catch (Exception ioe) {
 					ss.fatal(this, "Exception updating knowledge base for ontology changes: ", ioe);
@@ -189,8 +192,19 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		Path logDir = createDirectory(dataDir, "logs");
 		settings.setLogFile(logDir.resolve(timestampedFileName("knowledgeBaseUpdate", "log")).toString());
 		settings.setErrorLogFile(logDir.resolve(timestampedFileName("knowledgeBaseUpdate.error", "log")).toString());
+		
+		Path qualifiedPropertyConfigFile = getFilePath(homeDir, "rdf", "display", "everytime", "PropertyConfig.n3");
+		settings.setQualifiedPropertyConfigFile(qualifiedPropertyConfigFile.toString());
 	}
 
+	private Path getFilePath(Path parent, String... children) throws IOException {
+        Path path = parent;
+        for (String child : children) {
+            path = path.resolve(child);
+        }
+        return path;	    
+	}
+	
 	private Path createDirectory(Path parent, String... children) throws IOException {
 		Path dir = parent;
 		for (String child : children) {

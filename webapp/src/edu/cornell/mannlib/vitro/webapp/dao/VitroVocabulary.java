@@ -12,6 +12,8 @@ public class VitroVocabulary {
     public static final String VITRO_AUTH = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#";
     public static final String VITRO_PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/public#";
     public static final String VITRO_PUBLIC_ONTOLOGY = "http://vitro.mannlib.cornell.edu/ns/vitro/public";
+    // TODO change the following before 1.6 release
+    public static final String PROPERTY_CONFIG_DATA = "http://example.org/appConfig/";
     
     
     /** BJL23 2008-02-25:

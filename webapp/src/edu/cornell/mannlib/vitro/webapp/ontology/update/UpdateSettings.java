@@ -21,6 +21,7 @@ public class UpdateSettings {
 	private String errorLogFile;
 	private String addedDataFile;
 	private String removedDataFile;
+	private String qualifiedPropertyConfigFile;
 	private String defaultNamespace;
 	private OntModelSelector assertionOntModelSelector;
 	private OntModelSelector inferenceOntModelSelector;
@@ -121,7 +122,13 @@ public class UpdateSettings {
 	public void setRemovedDataFile(String removedDataFile) {
 		this.removedDataFile = removedDataFile;
 	}
-	public String getDefaultNamespace() {
+	public String getQualifiedPropertyConfigFile() {
+	    return qualifiedPropertyConfigFile;
+	}
+	public void setQualifiedPropertyConfigFile(String qualifiedPropertyConfigFile) {
+	    this.qualifiedPropertyConfigFile = qualifiedPropertyConfigFile;
+	}
+ 	public String getDefaultNamespace() {
 		return defaultNamespace;
 	}
 	public void setDefaultNamespace(String defaultNamespace) {
