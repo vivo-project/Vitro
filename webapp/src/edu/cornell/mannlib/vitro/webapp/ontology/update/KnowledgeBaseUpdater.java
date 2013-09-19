@@ -117,6 +117,15 @@ public class KnowledgeBaseUpdater {
         
         log.info("\tupdating the abox");
         updateABox(changes);
+        
+        log.info("performing post-processing SPARQL CONSTRUCT additions");
+        performSparqlConstructs(settings.getSparqlConstructAdditionsDir() + "/post/", 
+                settings.getRDFService(), ADD);
+        
+        log.info("performing post-processing SPARQL CONSTRUCT retractions");
+        performSparqlConstructs(settings.getSparqlConstructDeletionsDir() + "/post/", 
+                settings.getRDFService(), RETRACT);
+        
 
 	}
 	

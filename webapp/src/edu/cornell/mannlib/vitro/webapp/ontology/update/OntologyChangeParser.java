@@ -89,7 +89,7 @@ public class OntologyChangeParser {
 				}
 				
 				
-				log.info(changeObj);
+			    log.debug(changeObj);
 				
 				changeObjects.add(changeObj);
 					
