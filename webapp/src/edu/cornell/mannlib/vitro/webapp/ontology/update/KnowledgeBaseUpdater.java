@@ -160,7 +160,10 @@ public class KnowledgeBaseUpdater {
         List<File> sparqlFiles = Arrays.asList(sparqlConstructDirectory.listFiles());
         Collections.sort(sparqlFiles); // queries may depend on being run in a certain order
         JenaIngestUtils jiu = new JenaIngestUtils();
-        for (File sparqlFile : sparqlFiles) {			
+        for (File sparqlFile : sparqlFiles) {	
+            if(sparqlFile.isDirectory()) {
+                continue;
+            }
             StringBuffer fileContents = new StringBuffer();
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(sparqlFile));
