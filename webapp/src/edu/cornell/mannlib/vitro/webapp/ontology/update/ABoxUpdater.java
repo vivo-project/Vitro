@@ -420,7 +420,7 @@ public class ABoxUpdater {
 		Iterator<AtomicOntologyChange> propItr = changes.iterator();
 		while(propItr.hasNext()){
 			AtomicOntologyChange propChangeObj = propItr.next();
-			log.info("processing " + propChangeObj);
+			log.debug("processing " + propChangeObj);
 			try {
 			    if (propChangeObj.getAtomicChangeType() == null) {
 			        log.error("Missing change type; skipping " + propChangeObj);
@@ -428,19 +428,19 @@ public class ABoxUpdater {
 			    }
     			switch (propChangeObj.getAtomicChangeType()){
     			  case ADD: 
-    			   log.info("add");
+    			   log.debug("add");
     			   addProperty(propChangeObj);
     			   break;
     			case DELETE: 
-    			   log.info("delete");
+    			   log.debug("delete");
     			   deleteProperty(propChangeObj);
     			   break;
     			case RENAME: 
-    			   log.info("rename");
+    			   log.debug("rename");
     			   renameProperty(propChangeObj);
     			   break;
     			default: 
-    			   log.info("unknown");
+    			   log.debug("unknown");
     			   logger.logError("unexpected change type indicator: " + propChangeObj.getAtomicChangeType());
     			   break;
     		    }	

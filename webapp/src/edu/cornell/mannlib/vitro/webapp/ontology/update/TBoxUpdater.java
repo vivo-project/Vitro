@@ -454,20 +454,23 @@ public class TBoxUpdater {
     }
     
     public void renameProperty(AtomicOntologyChange changeObj) throws IOException {
+        Dataset dataset = new RDFServiceDataset(settings.getRDFService());
+        Model userAnnotationsModel = dataset.getNamedModel(
+                JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);
         if(changeObj.getNotes() != null && changeObj.getNotes().startsWith("cc:")) {
-            mergePropertyAnnotationsToPropertyConfig(changeObj);
+            mergePropertyAnnotationsToPropertyConfig(changeObj, userAnnotationsModel);
         }        
-        
+        Resource renamedProperty = userAnnotationsModel.getResource(changeObj.getSourceURI());
+        userAnnotationsModel.removeAll(renamedProperty, null, (RDFNode) null);
+        userAnnotationsModel.removeAll(null, null, renamedProperty);
     }
     
-    private void mergePropertyAnnotationsToPropertyConfig(AtomicOntologyChange changeObj) throws IOException {
+    private void mergePropertyAnnotationsToPropertyConfig(AtomicOntologyChange changeObj,
+            Model userAnnotationsModel) throws IOException {
         String contextURI = VitroVocabulary.PROPERTY_CONFIG_DATA + changeObj.getNotes().substring(3);
         String oldPropertyURI = changeObj.getSourceURI();
         
         Model oldAnnotationsModel = settings.getOldTBoxAnnotationsModel();
-        Dataset dataset = new RDFServiceDataset(settings.getRDFService());
-        Model userAnnotationsModel = dataset.getNamedModel(
-                JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);
         
         String propertyAnnotationsQuery = 
                 "PREFIX config: <" + VitroVocabulary.configURI + "> \n" +

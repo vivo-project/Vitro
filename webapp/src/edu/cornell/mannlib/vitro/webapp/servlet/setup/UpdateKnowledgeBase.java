@@ -122,7 +122,10 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 				settings.setLoadedAtStartupDisplayModel(loadedAtStartupFiles);
 				OntModel oldDisplayModelVivoListView = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_VIVOLISTVIEW_PATH));
 				settings.setVivoListViewConfigDisplayModel(oldDisplayModelVivoListView);
-			} catch (Exception e) {
+			} catch (ModelFileNotFoundException e) {
+                // expected if no display migration was intended
+                tryMigrateDisplay = false;
+            } catch (Exception e) {
 				log.info("Unable to read display model migration files. ", e);
 				tryMigrateDisplay = false;
 			}

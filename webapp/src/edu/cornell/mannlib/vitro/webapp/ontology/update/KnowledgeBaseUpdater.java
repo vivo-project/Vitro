@@ -96,7 +96,7 @@ public class KnowledgeBaseUpdater {
 		
         //process the TBox before the ABox
 		try {
-		    log.info("\tupdating tbox annotations");
+		    log.debug("\tupdating tbox annotations");
 	        updateTBoxAnnotations();
 		} catch (Exception e) {
 		    log.error(e,e);
@@ -396,13 +396,13 @@ public class KnowledgeBaseUpdater {
 			while(listItr.hasNext()) {
 				AtomicOntologyChange changeObj = listItr.next();
 				if (changeObj.getSourceURI() != null){
-			        log.info("triaging " + changeObj);
+			        log.debug("triaging " + changeObj);
 					if (oldTboxModel.getOntProperty(changeObj.getSourceURI()) != null){
 						 atomicPropertyChanges.add(changeObj);
-						 log.info("added to property changes");
+						 log.debug("added to property changes");
 					} else if (oldTboxModel.getOntClass(changeObj.getSourceURI()) != null) {
 						 atomicClassChanges.add(changeObj);
-						 log.info("added to class changes");
+						 log.debug("added to class changes");
 					} else if ("Prop".equals(changeObj.getNotes())) {
 						 atomicPropertyChanges.add(changeObj);
 					} else if ("Class".equals(changeObj.getNotes())) {

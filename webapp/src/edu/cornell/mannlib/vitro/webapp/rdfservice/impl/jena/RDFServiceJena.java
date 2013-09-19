@@ -6,13 +6,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.DataSource;
 import com.hp.hpl.jena.query.Dataset;
@@ -21,11 +24,9 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -129,7 +130,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                                 Resource s2 = (Resource) n;
                                 // now run yet another describe query
                                 String smallerTree = makeDescribe(s2);
-                                log.info(smallerTree);
+                                log.debug(smallerTree);
                                 Query smallerTreeQuery = QueryFactory.create(smallerTree);
                                 QueryExecution qe3 = QueryExecutionFactory.create(
                                         smallerTreeQuery, tree);
@@ -173,19 +174,23 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         
         StringBuffer queryBuff = new StringBuffer();
         queryBuff.append("CONSTRUCT { \n");
-        addStatementPatterns(stmtIt, queryBuff, !WHERE_CLAUSE);
+        List<Statement> stmts = stmtIt.toList();
+        stmts = sort(stmts);
+        addStatementPatterns(stmts, queryBuff, !WHERE_CLAUSE);
         queryBuff.append("} WHERE { \n");
         if (graphURI != null) {
             queryBuff.append("    GRAPH <" + graphURI + "> { \n");
         }
         stmtIt = model.listStatements();
-        addStatementPatterns(stmtIt, queryBuff, WHERE_CLAUSE);
+        stmts = stmtIt.toList();
+        stmts = sort(stmts);
+        addStatementPatterns(stmts, queryBuff, WHERE_CLAUSE);
         if (graphURI != null) {
             queryBuff.append("    } \n");
         }
         queryBuff.append("} \n");
         
-        log.info(queryBuff.toString());
+        log.debug(queryBuff.toString());
         
         Query construct = QueryFactory.create(queryBuff.toString());
         // make a plain dataset to force the query to be run in a way that
@@ -209,11 +214,61 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         }       
     }
     
+    private List<Statement> sort(List<Statement> stmts) {
+        List<Statement> output = new ArrayList<Statement>();
+        int originalSize = stmts.size();
+        List <Statement> remaining = stmts;
+        ConcurrentLinkedQueue<Resource> subjQueue = new ConcurrentLinkedQueue<Resource>();
+        for(Statement stmt : remaining) {
+            if(stmt.getSubject().isURIResource()) {
+                subjQueue.add(stmt.getSubject());
+                break;
+            }
+        }
+        if (subjQueue.isEmpty()) {
+            throw new RuntimeException("No named subject in statement patterns");
+        }
+        while(remaining.size() > 0) {
+            if(subjQueue.isEmpty()) {
+                subjQueue.add(remaining.get(0).getSubject());
+            }
+            while(!subjQueue.isEmpty()) {
+                Resource subj = subjQueue.poll();
+                List<Statement> temp = new ArrayList<Statement>();
+                for (Statement stmt : remaining) {
+                    if(stmt.getSubject().equals(subj)) {
+                        output.add(stmt);
+                        if (stmt.getObject().isResource()) {
+                            subjQueue.add((Resource) stmt.getObject()); 
+                        }
+                    } else {
+                        temp.add(stmt);
+                    }
+                }
+                remaining = temp;
+            }
+        }
+        if(output.size() != originalSize) {
+            throw new RuntimeException("original list size was " + originalSize + 
+                    " but sorted size is " + output.size());      
+        }
+        return output;
+    }
+    
+    private String getHexString(Node node) {
+        String label = node.getBlankNodeLabel().replaceAll("\\W", "").toUpperCase();
+        if (label.length() > 7) {
+            return label.substring(label.length() - 7);
+        } else {
+            return label;
+        }
+    }
+    
     private static final boolean WHERE_CLAUSE = true;
     
-    private void addStatementPatterns(StmtIterator stmtIt, StringBuffer patternBuff, boolean whereClause) {
-        while(stmtIt.hasNext()) {
-            Triple t = stmtIt.next().asTriple();
+    private void addStatementPatterns(List<Statement> stmts, StringBuffer patternBuff, boolean whereClause) {
+        for(Statement stmt : stmts) {
+            Triple t = stmt.asTriple();
             patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getSubject(), null));
             patternBuff.append(" ");
             patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getPredicate(), null));

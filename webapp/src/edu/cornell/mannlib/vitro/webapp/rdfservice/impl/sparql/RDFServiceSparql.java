@@ -9,6 +9,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
@@ -715,7 +716,9 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         if (graphURI != null) {
             queryBuff.append("    GRAPH <" + graphURI + "> { \n");
         }
-        addStatementPatterns(stmtIt, queryBuff, !WHERE_CLAUSE);
+        List<Statement> stmts = stmtIt.toList();
+        sort(stmts);
+        addStatementPatterns(stmts, queryBuff, !WHERE_CLAUSE);
         if (graphURI != null) {
             queryBuff.append("    } \n");
         }
@@ -724,7 +727,9 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
             queryBuff.append("    GRAPH <" + graphURI + "> { \n");
         }
         stmtIt = model.listStatements();
-        addStatementPatterns(stmtIt, queryBuff, WHERE_CLAUSE);
+        stmts = stmtIt.toList();
+        sort(stmts);
+        addStatementPatterns(stmts, queryBuff, WHERE_CLAUSE);
         if (graphURI != null) {
             queryBuff.append("    } \n");
         }
@@ -736,11 +741,53 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         executeUpdate(queryBuff.toString());
     }
     
+    private List<Statement> sort(List<Statement> stmts) {
+        List<Statement> output = new ArrayList<Statement>();
+        int originalSize = stmts.size();
+        List <Statement> remaining = stmts;
+        ConcurrentLinkedQueue<com.hp.hpl.jena.rdf.model.Resource> subjQueue = 
+                new ConcurrentLinkedQueue<com.hp.hpl.jena.rdf.model.Resource>();
+        for(Statement stmt : remaining) {
+            if(stmt.getSubject().isURIResource()) {
+                subjQueue.add(stmt.getSubject());
+                break;
+            }
+        }
+        if (subjQueue.isEmpty()) {
+            throw new RuntimeException("No named subject in statement patterns");
+        }
+        while(remaining.size() > 0) {
+            if(subjQueue.isEmpty()) {
+                subjQueue.add(remaining.get(0).getSubject());
+            }
+            while(!subjQueue.isEmpty()) {
+                com.hp.hpl.jena.rdf.model.Resource subj = subjQueue.poll();
+                List<Statement> temp = new ArrayList<Statement>();
+                for (Statement stmt : remaining) {
+                    if(stmt.getSubject().equals(subj)) {
+                        output.add(stmt);
+                        if (stmt.getObject().isResource()) {
+                            subjQueue.add((com.hp.hpl.jena.rdf.model.Resource) stmt.getObject()); 
+                        }
+                    } else {
+                        temp.add(stmt);
+                    }
+                }
+                remaining = temp;
+            }
+        }
+        if(output.size() != originalSize) {
+            throw new RuntimeException("original list size was " + originalSize + 
+                    " but sorted size is " + output.size());      
+        }
+        return output;
+    }
+    
     private static final boolean WHERE_CLAUSE = true;
     
-    private void addStatementPatterns(StmtIterator stmtIt, StringBuffer patternBuff, boolean whereClause) {
-        while(stmtIt.hasNext()) {
-            Triple t = stmtIt.next().asTriple();
+    private void addStatementPatterns(List<Statement> stmts, StringBuffer patternBuff, boolean whereClause) {
+        for(Statement stmt : stmts) {
+            Triple t = stmt.asTriple();
             patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getSubject(), null));
             patternBuff.append(" ");
             patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getPredicate(), null));
