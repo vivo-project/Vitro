@@ -57,7 +57,7 @@ public class KnowledgeBaseUpdater {
 		this.record = new SimpleChangeRecord(settings.getAddedDataFile(), settings.getRemovedDataFile());
 	}
 	
-	public void update(ServletContext servletContext) throws IOException {	
+	public boolean update(ServletContext servletContext) throws IOException {	
 					
 		if (this.logger == null) {
 			this.logger = new SimpleChangeLogger(settings.getLogFile(),	settings.getErrorLogFile());
@@ -85,7 +85,7 @@ public class KnowledgeBaseUpdater {
 		long elapsedSecs = (System.currentTimeMillis() - startTime)/1000;		
 		log.info("Finished knowledge base migration in " + elapsedSecs + " second" + (elapsedSecs != 1 ? "s" : ""));
 		
-		return;
+		return record.hasRecordedChanges();
 	}
 	
 	private void performUpdate(ServletContext servletContext) throws Exception {

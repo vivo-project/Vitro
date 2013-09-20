@@ -41,9 +41,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.reasoner.ABoxRecomputer;
+import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -76,11 +76,15 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		ServletContext ctx = sce.getServletContext();
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
+        boolean migrationChangesMade = false;
+		
 		try {
 			UpdateSettings settings = new UpdateSettings();
 			putReportingPathsIntoSettings(ctx, settings);
 			putNonReportingPathsIntoSettings(ctx, settings);
 
+            SimpleReasonerSetup.waitForTBoxReasoning(sce); 
+			
 			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());
 			settings.setAssertionOntModelSelector(ModelAccess.on(ctx).getBaseOntModelSelector());
@@ -132,14 +136,14 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 				
 			try {		
 			   KnowledgeBaseUpdater ontologyUpdater = new KnowledgeBaseUpdater(settings);
-			  
+			   
 			   try {
 				  if (!ontologyUpdater.updateRequired(ctx)) {
 				      log.info("No data migration required.");
 				  } else {
 					  ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
 					  log.info("Data migration required");
-					  ontologyUpdater.update(ctx);
+					  migrationChangesMade = ontologyUpdater.update(ctx);
 					  if (tryMigrateDisplay) {
 						  try {
 						       migrateDisplayModel(settings);
@@ -161,7 +165,39 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		} catch (Throwable t) {
 			ss.fatal(this, "Exception updating knowledge base for ontology changes: ", t);
 		}
+        
+		if (SimpleReasonerSetup.isRecomputeRequired(sce.getServletContext())) {   
+		    log.info("ABox inference recompute required.");
+		   
+	        SimpleReasoner simpleReasoner = (SimpleReasoner) sce.getServletContext()
+	                .getAttribute(SimpleReasoner.class.getName());
+	        if (simpleReasoner != null) {
+	            if (JenaDataSourceSetupBase.isFirstStartup() || migrationChangesMade) {
+	                simpleReasoner.recompute();
+	            } else {
+	                log.info("starting ABox inference recompute in a separate thread.");
+	                new Thread(
+	                        new ABoxRecomputer(
+	                                simpleReasoner),"ABoxRecomputer").start();
+	            }
+	        }
+		    
+		}
+		
 	}	
+
+	private class ABoxRecomputer implements Runnable {
+
+	    private SimpleReasoner simpleReasoner;
+
+	    public ABoxRecomputer(SimpleReasoner simpleReasoner) {
+	        this.simpleReasoner = simpleReasoner;
+	    }
+
+	    public void run() {
+	        simpleReasoner.recompute();
+	    }
+	}
 
 	
 	/**
