@@ -103,86 +103,80 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			OntModel newTBoxAnnotationsModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "tbox", "firsttime").toString());
 			settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
 			settings.setRDFService(RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService());
-				
-	        boolean tryMigrateDisplay = true;
+
+			boolean tryMigrateDisplay = true;
 			try {
-				//Display model tbox and display metadata 
-				//old display model tbox model
-				OntModel oldDisplayModelTboxModel = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_TBOX_PATH));
-				settings.setOldDisplayModelTboxModel(oldDisplayModelTboxModel);
-				//new display model tbox model
-				OntModel newDisplayModelTboxModel = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_TBOX_PATH));
-				settings.setNewDisplayModelTboxModel(newDisplayModelTboxModel);
-				//old display model display model metadata
-				OntModel oldDisplayModelDisplayMetadataModel = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_DISPLAYMETADATA_PATH));
-				settings.setOldDisplayModelDisplayMetadataModel(oldDisplayModelDisplayMetadataModel);
-				//new display model display model metadata
-				OntModel newDisplayModelDisplayMetadataModel = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_DISPLAYMETADATA_PATH));
-				settings.setNewDisplayModelDisplayMetadataModel(newDisplayModelDisplayMetadataModel);
-				//Get new display model
-				OntModel newDisplayModelFromFile = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_PATH));
-				settings.setNewDisplayModelFromFile(newDisplayModelFromFile);
-				OntModel loadedAtStartupFiles = loadModelFromDirectory(ctx.getRealPath(LOADED_STARTUPT_DISPLAYMODEL_DIR));
-				settings.setLoadedAtStartupDisplayModel(loadedAtStartupFiles);
-				OntModel oldDisplayModelVivoListView = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_VIVOLISTVIEW_PATH));
-				settings.setVivoListViewConfigDisplayModel(oldDisplayModelVivoListView);
+			    //Display model tbox and display metadata 
+			    //old display model tbox model
+			    OntModel oldDisplayModelTboxModel = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_TBOX_PATH));
+			    settings.setOldDisplayModelTboxModel(oldDisplayModelTboxModel);
+			    //new display model tbox model
+			    OntModel newDisplayModelTboxModel = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_TBOX_PATH));
+			    settings.setNewDisplayModelTboxModel(newDisplayModelTboxModel);
+			    //old display model display model metadata
+			    OntModel oldDisplayModelDisplayMetadataModel = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_DISPLAYMETADATA_PATH));
+			    settings.setOldDisplayModelDisplayMetadataModel(oldDisplayModelDisplayMetadataModel);
+			    //new display model display model metadata
+			    OntModel newDisplayModelDisplayMetadataModel = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_DISPLAYMETADATA_PATH));
+			    settings.setNewDisplayModelDisplayMetadataModel(newDisplayModelDisplayMetadataModel);
+			    //Get new display model
+			    OntModel newDisplayModelFromFile = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_PATH));
+			    settings.setNewDisplayModelFromFile(newDisplayModelFromFile);
+			    OntModel loadedAtStartupFiles = loadModelFromDirectory(ctx.getRealPath(LOADED_STARTUPT_DISPLAYMODEL_DIR));
+			    settings.setLoadedAtStartupDisplayModel(loadedAtStartupFiles);
+			    OntModel oldDisplayModelVivoListView = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_VIVOLISTVIEW_PATH));
+			    settings.setVivoListViewConfigDisplayModel(oldDisplayModelVivoListView);
 			} catch (ModelFileNotFoundException e) {
-                // expected if no display migration was intended
-                tryMigrateDisplay = false;
-            } catch (Exception e) {
-				log.info("Unable to read display model migration files. ", e);
-				tryMigrateDisplay = false;
+			    // expected if no display migration was intended
+			    tryMigrateDisplay = false;
+			} catch (Exception e) {
+			    log.info("Unable to read display model migration files. ", e);
+			    tryMigrateDisplay = false;
 			}
-				
-			try {		
-			   KnowledgeBaseUpdater ontologyUpdater = new KnowledgeBaseUpdater(settings);
-			   
-			   try {
-				  if (!ontologyUpdater.updateRequired(ctx)) {
-				      log.info("No data migration required.");
-				  } else {
-					  ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
-					  log.info("Data migration required");
-					  migrationChangesMade = ontologyUpdater.update(ctx);
-					  if (tryMigrateDisplay) {
-						  try {
-						       migrateDisplayModel(settings);
-						       log.info("Migrated display model");
-						  } catch (Exception e) {
-							   log.warn("unable to successfully update display model: " + e.getMessage());
-						  }
-					  }
-					  // reload the display model since the TBoxUpdater may have 
-					  // modified it
-					  new ApplicationModelSetup().contextInitialized(sce);
-				  }
-			   } catch (Exception ioe) {
-					ss.fatal(this, "Exception updating knowledge base for ontology changes: ", ioe);
-			   }	
-			} catch (Throwable t){
-				ss.fatal(this, "Exception updating knowledge base for ontology changes: ", t);
-			}
-		} catch (Throwable t) {
-			ss.fatal(this, "Exception updating knowledge base for ontology changes: ", t);
+
+
+			KnowledgeBaseUpdater ontologyUpdater = new KnowledgeBaseUpdater(settings);
+			boolean requiredUpdate = ontologyUpdater.updateRequired(ctx);
+
+			try {
+			    ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
+			    log.info("Data migration required");
+			    migrationChangesMade = ontologyUpdater.update(ctx);
+			    if (tryMigrateDisplay) {
+			        try {
+			            migrateDisplayModel(settings);
+			            log.info("Migrated display model");
+			        } catch (Exception e) {
+			            log.warn("unable to successfully update display model: " + e.getMessage());
+			        }
+			    }
+			    // reload the display model since the TBoxUpdater may have 
+			    // modified it
+			    new ApplicationModelSetup().contextInitialized(sce);				  
+			} catch (Exception ioe) {
+			    ss.fatal(this, "Exception updating knowledge base for ontology changes: ", ioe);
+			}	
+
+		    SimpleReasoner simpleReasoner = (SimpleReasoner) sce.getServletContext()
+		            .getAttribute(SimpleReasoner.class.getName());
+		    if (simpleReasoner != null) {
+		        if ( (requiredUpdate && migrationChangesMade) 
+		                || JenaDataSourceSetupBase.isFirstStartup()) {
+		            log.info("ABox inference recompute required.");
+		            simpleReasoner.recompute();
+		        } else if (SimpleReasonerSetup.isRecomputeRequired(sce.getServletContext()) || migrationChangesMade) {
+		            log.info("starting ABox inference recompute in a separate thread.");
+		            new Thread(
+		                    new ABoxRecomputer(
+		                            simpleReasoner),"ABoxRecomputer").start();
+		        }
+		    }			
+			
+		} catch (Throwable t){
+		    ss.fatal(this, "Exception updating knowledge base for ontology changes: ", t);
 		}
         
-		if (SimpleReasonerSetup.isRecomputeRequired(sce.getServletContext())) {   
-		    log.info("ABox inference recompute required.");
-		   
-	        SimpleReasoner simpleReasoner = (SimpleReasoner) sce.getServletContext()
-	                .getAttribute(SimpleReasoner.class.getName());
-	        if (simpleReasoner != null) {
-	            if (JenaDataSourceSetupBase.isFirstStartup() || migrationChangesMade) {
-	                simpleReasoner.recompute();
-	            } else {
-	                log.info("starting ABox inference recompute in a separate thread.");
-	                new Thread(
-	                        new ABoxRecomputer(
-	                                simpleReasoner),"ABoxRecomputer").start();
-	            }
-	        }
-		    
-		}
+
 		
 	}	
 
