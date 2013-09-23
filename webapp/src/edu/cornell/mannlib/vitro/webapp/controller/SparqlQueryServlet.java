@@ -63,33 +63,17 @@ import edu.cornell.mannlib.vitro.webapp.web.ContentType;
  */
 public class SparqlQueryServlet extends BaseEditController {
     private static final Log log = LogFactory.getLog(SparqlQueryServlet.class.getName());
-
-    private final static boolean CONVERT = true;
     
     /**
      * format configurations for SELECT queries.
      */
     protected static HashMap<String,RSFormatConfig> rsFormats = new HashMap<String,RSFormatConfig>();
-
-    private static RSFormatConfig[] rsfs = {
-        new RSFormatConfig( "RS_XML", !CONVERT, ResultFormat.XML, null, "text/xml"),
-        new RSFormatConfig( "RS_TEXT", !CONVERT, ResultFormat.TEXT, null, "text/plain"),
-        new RSFormatConfig( "vitro:csv", !CONVERT, ResultFormat.CSV, null, "text/csv"),
-        new RSFormatConfig( "RS_JSON", !CONVERT, ResultFormat.JSON, null, "application/javascript") };        
-    
+   
     /**
      * format configurations for CONSTRUCT/DESCRIBE queries.
      */
     protected static HashMap<String,ModelFormatConfig> modelFormats = 
         new HashMap<String,ModelFormatConfig>();
-
-    private static ModelFormatConfig[] fmts = {
-        new ModelFormatConfig("RDF/XML", !CONVERT, ModelSerializationFormat.RDFXML, null, "application/rdf+xml" ),
-        new ModelFormatConfig("RDF/XML-ABBREV", CONVERT, ModelSerializationFormat.N3, "RDF/XML-ABBREV", "application/rdf+xml" ),
-        new ModelFormatConfig("N3", !CONVERT, ModelSerializationFormat.N3, null, "text/n3" ),
-        new ModelFormatConfig("N-TRIPLE", !CONVERT, ModelSerializationFormat.NTRIPLE, null, "text/plain" ),
-        new ModelFormatConfig("TTL", CONVERT, ModelSerializationFormat.N3, "TTL", "application/x-turtle" ),
-        new ModelFormatConfig("JSON-LD", CONVERT, ModelSerializationFormat.N3, "JSON-LD", "application/javascript" ) };
 
     /**
      * Use this map to decide which MIME type is suited for the "accept" header.
@@ -194,12 +178,7 @@ public class SparqlQueryServlet extends BaseEditController {
                             
                 ResultSet rs = ResultSetFactory.fromJSON( results );            
                 OutputStream out = response.getOutputStream();
-                ResultSetFormatter.output(out, rs, formatConf.jenaResponseFormat);
-                
-                // } else {
-                //     Writer out = response.getWriter();
-                //     toCsv(out, results);
-                //}
+                ResultSetFormatter.output(out, rs, formatConf.jenaResponseFormat);                
             }
         } catch (RDFServiceException e) {
             throw new ServletException("Cannot get result from the RDFService",e);
@@ -367,12 +346,32 @@ public class SparqlQueryServlet extends BaseEditController {
             rd.forward(req,res);
     }
 
+    /** Simple boolean vaule to improve the legibility of confiugrations. */
+    private final static boolean CONVERT = true;
+
+    /** Simple vaule to improve the legibility of confiugrations. */
+    private final static String NO_CONVERSION = null;
+
     public static class FormatConfig{
         public String valueFromForm;
         public boolean converstionFromWireFormat;
         public String responseMimeType;
     }
     
+    private static ModelFormatConfig[] fmts = {
+        new ModelFormatConfig("RDF/XML", 
+                              !CONVERT, ModelSerializationFormat.RDFXML,  NO_CONVERSION,    "application/rdf+xml" ),
+        new ModelFormatConfig("RDF/XML-ABBREV", 
+                              CONVERT,  ModelSerializationFormat.N3,      "RDF/XML-ABBREV", "application/rdf+xml" ),
+        new ModelFormatConfig("N3", 
+                              !CONVERT, ModelSerializationFormat.N3,      NO_CONVERSION,    "text/n3" ),
+        new ModelFormatConfig("N-TRIPLE", 
+                              !CONVERT, ModelSerializationFormat.NTRIPLE, NO_CONVERSION,    "text/plain" ),
+        new ModelFormatConfig("TTL", 
+                              CONVERT,  ModelSerializationFormat.N3,      "TTL",            "application/x-turtle" ),
+        new ModelFormatConfig("JSON-LD", 
+                              CONVERT,  ModelSerializationFormat.N3,      "JSON-LD",        "application/javascript" ) };
+
     public static class ModelFormatConfig extends FormatConfig{                
         public RDFService.ModelSerializationFormat wireFormat;
         public String jenaResponseFormat;        
@@ -389,6 +388,17 @@ public class SparqlQueryServlet extends BaseEditController {
             this.responseMimeType = responseMimeType;
         }
     }
+
+
+    private static RSFormatConfig[] rsfs = {
+        new RSFormatConfig( "RS_XML", 
+                            !CONVERT, ResultFormat.XML,  null, "text/xml"),
+        new RSFormatConfig( "RS_TEXT", 
+                            !CONVERT, ResultFormat.TEXT, null, "text/plain"),
+        new RSFormatConfig( "vitro:csv", 
+                            !CONVERT, ResultFormat.CSV,  null, "text/csv"),
+        new RSFormatConfig( "RS_JSON", 
+                            !CONVERT, ResultFormat.JSON, null, "application/javascript") }; 
 
     public static class RSFormatConfig extends FormatConfig{        
         public ResultFormat wireFormat;
