@@ -28,6 +28,14 @@ public interface WebappDaoFactory {
 	 */
 	public String checkURI(String uriStr, boolean checkUniqueness);
 	
+	/**
+	 * Check if a given URI string exists in the system:
+	 * checks for the following conditions: URI found as subject in a statement or an object or as a property
+	 * @param uriStr
+	 * @return
+	 */
+	public boolean hasExistingURI(String uriStr);
+	
     public String getDefaultNamespace();
     
     public Set<String> getNonuserNamespaces();

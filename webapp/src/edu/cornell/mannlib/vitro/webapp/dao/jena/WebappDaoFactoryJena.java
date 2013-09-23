@@ -186,38 +186,56 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 	    	errorMsg += (iri.violations(false).next())
 	    	                    .getShortMessage() + " ";
 	    } else if (checkUniqueness) {
-	    	OntModel ontModel = ontModelSelector.getFullModel(); 
-			ontModel.enterCriticalSection(Lock.READ);
-			try {
-				Resource newURIAsRes = ResourceFactory.createResource(uriStr);
-				Property newURIAsProp = ResourceFactory.createProperty(uriStr);
-				StmtIterator closeIt = ontModel.listStatements(
-						newURIAsRes, null, (RDFNode)null);
-				if (closeIt.hasNext()) {
-					validURI = false;
-					errorMsg+="Not a valid URI.  Please enter another URI. ";
-					errorMsg+=duplicateMsg;
-				}
-				if (validURI) {
-					closeIt = ontModel.listStatements(null, null, newURIAsRes);
-					if (closeIt.hasNext()) {
-						validURI = false;
-						errorMsg+=duplicateMsg;
-					}
-				}
-				if (validURI) {
-					closeIt = ontModel.listStatements(
-							null, newURIAsProp, (RDFNode)null);
-					if (closeIt.hasNext()) {
-						validURI = false;
-						errorMsg+=duplicateMsg;
-					}
-				}
-			} finally {
-				ontModel.leaveCriticalSection();
-			}
+	    	boolean existingURI = this.hasExistingURI(uriStr);
+	    	if(existingURI) {
+				errorMsg+="Not a valid URI.  Please enter another URI. ";
+				errorMsg+=duplicateMsg;
+				//the original code included an extra line "Not a valid URI.  Please enter another URI. "
+				//in the error message in addition to the duplicate error message in the case where the uri
+				//is in the subject position of any of the statements in the system - but not so where the
+				//uri was only in the object position or was a propery.  In this code, the same error message
+				//is returned for all duplicate uris
+	    	}
 	    }
 	    return (errorMsg.length()>0) ? errorMsg : null;
+    }
+    
+    
+    
+    //Check if URI already in use or not either as resource OR as property
+    public boolean hasExistingURI(String uriStr) {
+    	boolean existingURI = false;
+    	OntModel ontModel = ontModelSelector.getFullModel(); 
+		ontModel.enterCriticalSection(Lock.READ);
+		try {
+			Resource newURIAsRes = ResourceFactory.createResource(uriStr);
+			Property newURIAsProp = ResourceFactory.createProperty(uriStr);
+			StmtIterator closeIt = ontModel.listStatements(
+					newURIAsRes, null, (RDFNode)null);
+			if (closeIt.hasNext()) {
+				existingURI = true;
+				
+			}
+			//if not in the subject position, check in object position
+			if (!existingURI) {
+				closeIt = ontModel.listStatements(null, null, newURIAsRes);
+				if (closeIt.hasNext()) {
+					existingURI= true;
+				}
+			}
+			//Check for property
+			if (!existingURI) {
+				closeIt = ontModel.listStatements(
+						null, newURIAsProp, (RDFNode)null);
+				if (closeIt.hasNext()) {
+					existingURI = true;
+				}
+			}
+		} finally {
+			ontModel.leaveCriticalSection();
+		}
+		
+		return existingURI;
     }
     
     public WebappDaoFactory getUserAwareDaoFactory(String userURI) {

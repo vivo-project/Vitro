@@ -132,10 +132,11 @@ public class IndividualRequestAnalyzer {
 	 * only provide a set of bytes.
 	 */
 	protected ContentType checkAcceptHeaderForLinkedDataRequest() {
-		String acceptHeader = vreq.getHeader("accept");
-		if (acceptHeader == null) {
-			return null;
-		}
+		String acceptHeader = vreq.getHeader("Accept");
+		if (acceptHeader == null) 
+		    acceptHeader = vreq.getHeader("accept");		   
+		if (acceptHeader == null)
+			return null;		
 	
 		try {
 			Map<String, Float> typesAndQ = ContentType

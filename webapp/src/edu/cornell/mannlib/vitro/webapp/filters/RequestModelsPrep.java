@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.filters;
 
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.JENA_DB_MODEL;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.JENA_INF_MODEL;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -19,9 +22,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.graph.BulkUpdateHandler;
+import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
@@ -36,8 +42,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HideFromDisplayByPolicyFilter;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.SpecialBulkUpdateHandlerGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -61,7 +67,7 @@ public class RequestModelsPrep implements Filter {
 	 * parameters, e.g. "/vitro/index.jsp" "/vitro/themes/enhanced/css/edit.css"
 	 */
 	private final static Pattern[] skipPatterns = {
-			Pattern.compile(".*\\.(gif|GIF|jpg|jpeg)$"),
+			Pattern.compile(".*\\.(gif|GIF|jpg|jpeg|png|PNG)$"),
 			Pattern.compile(".*\\.css$"), Pattern.compile(".*\\.js$"),
 			Pattern.compile("/.*/themes/.*/site_icons/.*"),
 			Pattern.compile("/.*/images/.*") };
@@ -130,28 +136,120 @@ public class RequestModelsPrep implements Filter {
 			HttpServletRequest req) {
 		VitroRequest vreq = new VitroRequest(req);
 
+		setRdfServicesAndDatasets(rawRdfService, vreq);
+
+		RDFService rdfService = vreq.getRDFService();
+		Dataset dataset = vreq.getDataset();
+		
+		setRawModels(vreq, dataset);
+		
+		// We need access to the language-ignorant version of this model.
+		// Grab it before it gets wrapped in language awareness.
+		vreq.setLanguageNeutralUnionFullModel(ModelAccess.on(vreq).getOntModel(ModelID.UNION_FULL));
+		
+		wrapModelsWithLanguageAwareness(vreq);
+		
+		setWebappDaoFactories(vreq, rdfService);
+	}
+
+	/**
+	 * Set language-neutral and language-aware versions of the RdfService and
+	 * Dataset.
+	 */
+	private void setRdfServicesAndDatasets(RDFService rawRdfService,
+			VitroRequest vreq) {
 		vreq.setUnfilteredRDFService(rawRdfService);
 		vreq.setUnfilteredDataset(new RDFServiceDataset(rawRdfService));
 
-		List<String> langs = getPreferredLanguages(req);
-		RDFService rdfService = addLanguageAwareness(langs, rawRdfService);
+		RDFService rdfService = addLanguageAwareness(vreq, rawRdfService);
 		vreq.setRDFService(rdfService);
 
 		Dataset dataset = new RDFServiceDataset(rdfService);
 		vreq.setDataset(dataset);
+	}
+	
+	private void setRawModels(VitroRequest vreq, Dataset dataset) {
+		// These are memory-mapped (fast), and read-mostly (low contention), so
+		// just use the ones from the context.
+		useModelFromContext(vreq, ModelID.APPLICATION_METADATA);
+		useModelFromContext(vreq, ModelID.USER_ACCOUNTS);
+		useModelFromContext(vreq, ModelID.DISPLAY);
+		useModelFromContext(vreq, ModelID.DISPLAY_DISPLAY);
+		useModelFromContext(vreq, ModelID.DISPLAY_TBOX);
+		useModelFromContext(vreq, ModelID.BASE_TBOX);
+		useModelFromContext(vreq, ModelID.INFERRED_TBOX);
+		useModelFromContext(vreq, ModelID.UNION_TBOX);
 
-		WebappDaoFactoryConfig config = createWadfConfig(langs, req);
-		
-		ModelAccess.on(vreq).setJenaOntModel(
-				ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
-						dataset.getDefaultModel()));
+		// Anything derived from the ABOX is not memory-mapped, so create
+		// versions from the short-term RDF service.
+		OntModel baseABoxModel = createNamedModelFromDataset(dataset,
+				JENA_DB_MODEL);
+		OntModel inferenceABoxModel = createNamedModelFromDataset(dataset,
+				JENA_INF_MODEL);
+		OntModel unionABoxModel = createCombinedBulkUpdatingModel(
+				baseABoxModel, inferenceABoxModel);
 
-		addLanguageAwarenessToRequestModel(req, ModelID.DISPLAY);
-		addLanguageAwarenessToRequestModel(req, ModelID.APPLICATION_METADATA);
-		addLanguageAwarenessToRequestModel(req, ModelID.UNION_TBOX);
-		addLanguageAwarenessToRequestModel(req, ModelID.UNION_FULL);
-		addLanguageAwarenessToRequestModel(req, ModelID.BASE_TBOX);
-		addLanguageAwarenessToRequestModel(req, ModelID.BASE_FULL);
+		OntModel baseFullModel = createCombinedBulkUpdatingModel(baseABoxModel,
+				ModelAccess.on(vreq).getOntModel(ModelID.BASE_TBOX));
+		OntModel inferenceFullModel = createCombinedModel(inferenceABoxModel,
+				ModelAccess.on(vreq).getOntModel(ModelID.INFERRED_TBOX));
+		OntModel unionFullModel = ModelFactory.createOntologyModel(
+				OntModelSpec.OWL_MEM, dataset.getDefaultModel());
+
+		ModelAccess.on(vreq).setOntModel(ModelID.BASE_ABOX, baseABoxModel);
+		ModelAccess.on(vreq).setOntModel(ModelID.INFERRED_ABOX, unionABoxModel);
+		ModelAccess.on(vreq)
+				.setOntModel(ModelID.UNION_ABOX, inferenceABoxModel);
+		ModelAccess.on(vreq).setOntModel(ModelID.BASE_FULL, baseFullModel);
+		ModelAccess.on(vreq).setOntModel(ModelID.INFERRED_FULL,
+				inferenceFullModel);
+		ModelAccess.on(vreq).setOntModel(ModelID.UNION_FULL, unionFullModel);
+	}
+
+	private void useModelFromContext(VitroRequest vreq, ModelID modelId) {
+		OntModel contextModel = ModelAccess.on(ctx).getOntModel(modelId);
+		ModelAccess.on(vreq).setOntModel(modelId, contextModel);
+	}
+	
+	private OntModel createNamedModelFromDataset(Dataset dataset, String name) {
+    	return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, dataset.getNamedModel(name));
+    }
+
+	private OntModel createCombinedModel(OntModel oneModel, OntModel otherModel) {
+        return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, 
+        		ModelFactory.createUnion(oneModel, otherModel));
+	}
+
+	private OntModel createCombinedBulkUpdatingModel(OntModel baseModel,
+			OntModel otherModel) {
+		BulkUpdateHandler bulkUpdateHandler = baseModel.getGraph().getBulkUpdateHandler();
+		Graph unionGraph = ModelFactory.createUnion(baseModel, otherModel).getGraph();
+		Model unionModel = ModelFactory.createModelForGraph(
+				new SpecialBulkUpdateHandlerGraph(unionGraph, bulkUpdateHandler));
+		return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, unionModel);
+	}
+
+	private void wrapModelsWithLanguageAwareness(VitroRequest vreq) {
+		wrapModelWithLanguageAwareness(vreq, ModelID.DISPLAY);
+		wrapModelWithLanguageAwareness(vreq, ModelID.APPLICATION_METADATA);
+		wrapModelWithLanguageAwareness(vreq, ModelID.BASE_TBOX);
+		wrapModelWithLanguageAwareness(vreq, ModelID.UNION_TBOX);
+		wrapModelWithLanguageAwareness(vreq, ModelID.UNION_FULL);
+		wrapModelWithLanguageAwareness(vreq, ModelID.BASE_FULL);
+	}
+
+	private void wrapModelWithLanguageAwareness(HttpServletRequest req,
+			ModelID id) {
+		if (isLanguageAwarenessEnabled()) {
+			OntModel unaware = ModelAccess.on(req).getOntModel(id);
+			OntModel aware = LanguageFilteringUtils
+					.wrapOntModelInALanguageFilter(unaware, req);
+			ModelAccess.on(req).setOntModel(id, aware);
+		}
+	}
+	
+	private void setWebappDaoFactories(VitroRequest vreq, RDFService rdfService) {
+		WebappDaoFactoryConfig config = createWadfConfig(vreq);
 		
 		WebappDaoFactory unfilteredWadf = new WebappDaoFactorySDB(rdfService,
 				ModelAccess.on(vreq).getUnionOntModelSelector(), config);
@@ -175,14 +273,15 @@ public class RequestModelsPrep implements Filter {
 				.checkForModelSwitching(vreq, wadf);
 
 		HideFromDisplayByPolicyFilter filter = new HideFromDisplayByPolicyFilter(
-				RequestIdentifiers.getIdBundleForRequest(req),
+				RequestIdentifiers.getIdBundleForRequest(vreq),
 				ServletPolicyList.getPolicies(ctx));
 		WebappDaoFactoryFiltering filteredWadf = new WebappDaoFactoryFiltering(
 				switchedWadf, filter);
 		ModelAccess.on(vreq).setWebappDaoFactory(FactoryID.UNION, filteredWadf);
 	}
 
-	private WebappDaoFactoryConfig createWadfConfig(List<String> langs, HttpServletRequest req) {
+	private WebappDaoFactoryConfig createWadfConfig(HttpServletRequest req) {
+		List<String> langs = getPreferredLanguages(req);
 		WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
 		config.setDefaultNamespace(defaultNamespace);
 		config.setPreferredLanguages(langs);
@@ -203,8 +302,9 @@ public class RequestModelsPrep implements Filter {
 				"true"));
 	}
 
-	private RDFService addLanguageAwareness(List<String> langs,
+	private RDFService addLanguageAwareness(HttpServletRequest req,
 			RDFService rawRDFService) {
+		List<String> langs = getPreferredLanguages(req);
 		if (isLanguageAwarenessEnabled()) {
 			return new LanguageFilteringRDFService(rawRDFService, langs);
 		} else {
@@ -212,15 +312,6 @@ public class RequestModelsPrep implements Filter {
 		}
 	}
 
-	private void addLanguageAwarenessToRequestModel(HttpServletRequest req, ModelID id) {
-		if (isLanguageAwarenessEnabled()) {
-			OntModel unaware = ModelAccess.on(req.getSession()).getOntModel(id);
-			OntModel aware = LanguageFilteringUtils
-					.wrapOntModelInALanguageFilter(unaware, req);
-			ModelAccess.on(req).setOntModel(id, aware);
-		}
-	}
-	
 	private boolean isStoreReasoned(ServletRequest req) {
 	    String isStoreReasoned = ConfigurationProperties.getBean(req).getProperty(
 	            "VitroConnection.DataSource.isStoreReasoned", "true");
