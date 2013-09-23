@@ -18,7 +18,7 @@
     <#-- List the menu items -->
     <ul class="menuItems">
         <#list hasElement.statements as statement>
-            <li class="menuItem"><#include "${hasElement.template}"> <span class="controls"><!--p.editingLinks "hasElement" statement editable /--></span></li>
+            <li class="menuItem"><#include "${hasElement.template}"> <span class="controls"><!--p.editingLinks "hasElement" "" statement editable /--></span></li>
         </#list>
     </ul>
     

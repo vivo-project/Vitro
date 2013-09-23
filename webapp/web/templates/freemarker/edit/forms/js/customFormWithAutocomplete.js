@@ -297,7 +297,6 @@ var customForm = {
         //to the filtering list
         this.getAcFilterForIndividuals();
         this.acCache = {};
-        var theType = customForm.acTypes[$(selectedObj).attr('acGroupName')];
         
         $(selectedObj).autocomplete({
             minLength: 3,
@@ -317,7 +316,7 @@ var customForm = {
                     dataType: 'json',
                     data: {
                         term: request.term,
-                        type: theType,
+                        type: customForm.acTypes[$(selectedObj).attr('acGroupName')],
                         multipleTypes:(customForm.acMultipleTypes == undefined || customForm.acMultipleTypes == null)? null: customForm.acMultipleTypes
                     },
                     complete: function(xhr, status) {
@@ -325,7 +324,7 @@ var customForm = {
                         var results = $.parseJSON(xhr.responseText);                        
                         var filteredResults = customForm.filterAcResults(results);
                         
-                        if ( theType == "http://www.w3.org/2004/02/skos/core#Concept" ) {
+                        if ( customForm.acTypes[$(selectedObj).attr('acGroupName')] == "http://www.w3.org/2004/02/skos/core#Concept" ) {
                             filteredResults = customForm.removeConceptSubclasses(filteredResults);
                         }
 
