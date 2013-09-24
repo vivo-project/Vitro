@@ -30,8 +30,7 @@ public class ReasonerConfiguration {
 	/**
 	 * The default reasoner configuration is designed to provide acceptable performance on larger knowledge bases.
 	 * It will classify and realize, and add inferred disjointWith statements.
-	 * It ignores domain and range "axioms," on the assumption that they are not truly axioms but editing constraints.
-	 * It also ignores "owl:inverseOf."  
+	 * It ignores domain and range "axioms," on the assumption that they are not truly axioms but editing constraints.  
 	 */
 	public static ReasonerConfiguration DEFAULT;
 	
@@ -78,6 +77,7 @@ public class ReasonerConfiguration {
         defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,RDF.first,null));
         defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,RDF.rest,null));
         defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.disjointWith,null));
+        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.inverseOf,null));
         DEFAULT.setInferenceDrivingPatternAllowSet(defaultInferenceDrivingPatternAllowSet);
         Set<ObjectPropertyStatementPattern> defaultInferenceReceivingPatternAllowSet = new HashSet<ObjectPropertyStatementPattern>();
         defaultInferenceReceivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,RDF.type,null));

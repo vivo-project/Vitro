@@ -28,7 +28,10 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     protected final VitroRequest vreq;
     protected final String subjectUri;
+    protected final Property property;
     protected final String propertyUri;
+    protected String domainUri;
+    protected String rangeUri;
     private final String localName;
 
     protected Map<String, Object> verboseDisplay;
@@ -41,6 +44,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     PropertyTemplateModel(Property property, Individual subject, VitroRequest vreq) {
         this.vreq = vreq;
         subjectUri = subject.getURI(); 
+        this.property = property;
         propertyUri = property.getURI();
         localName = property.getLocalName();
         setVerboseDisplayValues(property);
@@ -119,6 +123,10 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     public String getUri() {
         return propertyUri;
+    }
+    
+    public String getRangeUri() {
+        return rangeUri;
     }
     
     public String getAddUrl() {

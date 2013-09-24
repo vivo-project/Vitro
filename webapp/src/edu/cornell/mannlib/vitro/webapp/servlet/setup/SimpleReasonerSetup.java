@@ -56,7 +56,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
             OntModelSelector inferencesOms = ModelAccess.on(ctx).getInferenceOntModelSelector();
             OntModelSelector unionOms = ModelAccess.on(ctx).getUnionOntModelSelector();
 
-			WebappDaoFactoryJena wadf = (WebappDaoFactoryJena) ModelAccess.on(ctx).getWebappDaoFactory();
+			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
             
             if (!assertionsOms.getTBoxModel().getProfile().NAMESPACE().equals(OWL.NAMESPACE.getNameSpace())) {        
                 log.error("Not connecting Pellet reasoner - the TBox assertions model is not an OWL model");
@@ -75,28 +75,24 @@ public class SimpleReasonerSetup implements ServletContextListener {
             sce.getServletContext().setAttribute("pelletListener",pelletListener);
             sce.getServletContext().setAttribute("pelletOntModel", pelletListener.getPelletModel());
             
-            if (wadf != null) {
-                wadf.setPelletListener(pelletListener);
+            if (wadf instanceof WebappDaoFactoryJena) {
+                ((WebappDaoFactoryJena) wadf).setPelletListener(pelletListener);
             }
             
             log.info("Pellet reasoner connected for the TBox");
      
-           // set up simple reasoning for the ABox
-                    
-            DataSource bds = JenaDataSourceSetupBase
-                                    .getApplicationDataSource(ctx);
-            String dbType = ConfigurationProperties.getBean(ctx).getProperty( // database type
-                    "VitroConnection.DataSource.dbtype","MySQL");
-            
+            // set up simple reasoning for the ABox
+                                
             RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService();            
             Dataset dataset = new RDFServiceDataset(rdfService);
             
             Model rebuildModel = dataset.getNamedModel(JENA_INF_MODEL_REBUILD); 
-            Model scratchModel = dataset.getNamedModel(JENA_INF_MODEL_SCRATCHPAD); 
+            Model scratchModel = dataset.getNamedModel(JENA_INF_MODEL_SCRATCHPAD);
+            Model inferenceModel = dataset.getNamedModel(JenaDataSourceSetupBase.JENA_INF_MODEL);
 
             // the simple reasoner will register itself as a listener to the ABox assertions
             SimpleReasoner simpleReasoner = new SimpleReasoner(
-                    unionOms.getTBoxModel(), rdfService, inferencesOms.getABoxModel(), rebuildModel, scratchModel);
+                    unionOms.getTBoxModel(), rdfService, inferenceModel, rebuildModel, scratchModel);
             sce.getServletContext().setAttribute(SimpleReasoner.class.getName(),simpleReasoner);
             
             StartupStatus ss = StartupStatus.getBean(ctx);
@@ -114,19 +110,6 @@ public class SimpleReasonerSetup implements ServletContextListener {
             }
             simpleReasoner.setPluginList(pluginList);
             
-            
-            if (isRecomputeRequired(sce.getServletContext())) {   
-                log.info("ABox inference recompute required.");
-                waitForTBoxReasoning(pelletListener);  
-                if (JenaDataSourceSetupBase.isFirstStartup()) {
-                    simpleReasoner.recompute();
-                } else {
-                    log.info("starting ABox inference recompute in a separate thread.");
-                    new Thread(new ABoxRecomputer(simpleReasoner),"ABoxRecomputer").start();
-                }
-                
-            } 
-
             SimpleReasonerTBoxListener simpleReasonerTBoxListener = new SimpleReasonerTBoxListener(simpleReasoner);
             sce.getServletContext().setAttribute(SimpleReasonerTBoxListener.class.getName(),simpleReasonerTBoxListener);
             assertionsOms.getTBoxModel().register(simpleReasonerTBoxListener);
@@ -139,16 +122,21 @@ public class SimpleReasonerSetup implements ServletContextListener {
         }        
     }
     
-    private void waitForTBoxReasoning(PelletListener pelletListener) 
+    public static void waitForTBoxReasoning(ServletContextEvent sce) 
         throws InterruptedException {
-      int sleeps = 0;
-      while (sleeps < 1000 && pelletListener.isReasoning()) {
-          if ((sleeps % 10) == 0) { // print message at 10 second intervals
-              log.info("Waiting for initial TBox reasoning to complete");
-          }
-          Thread.sleep(1000);   
-          sleeps++;
-      }
+        PelletListener pelletListener = (PelletListener) sce.getServletContext().getAttribute("pelletListener");
+        if (pelletListener == null) {
+            return ;
+        }
+        int sleeps = 0;
+        // sleep at least once to make sure the TBox reasoning gets started
+        while ((0 == sleeps) || ((sleeps < 1000) && pelletListener.isReasoning())) {
+            if ((sleeps % 10) == 0) { // print message at 10 second intervals
+                log.info("Waiting for initial TBox reasoning to complete");
+            }
+            Thread.sleep(1000);   
+            sleeps++;
+        }
     }
     
     @Override
@@ -196,7 +184,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
         ctx.setAttribute(RECOMPUTE_REQUIRED_ATTR, true);
     }
     
-    private static boolean isRecomputeRequired(ServletContext ctx) {
+    public static boolean isRecomputeRequired(ServletContext ctx) {
         return (ctx.getAttribute(RECOMPUTE_REQUIRED_ATTR) != null);
     }
   
@@ -209,19 +197,6 @@ public class SimpleReasonerSetup implements ServletContextListener {
     
     private static boolean isMSTComputeRequired(ServletContext ctx) {
         return (ctx.getAttribute(MSTCOMPUTE_REQUIRED_ATTR) != null);
-    }
-    
-    private class ABoxRecomputer implements Runnable {
-        
-        private SimpleReasoner simpleReasoner;
-        
-        public ABoxRecomputer(SimpleReasoner simpleReasoner) {
-            this.simpleReasoner = simpleReasoner;
-        }
-        
-        public void run() {
-            simpleReasoner.recompute();
-        }
     }
         
     /**

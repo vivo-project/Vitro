@@ -37,6 +37,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.sparql.expr.NodeValue;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
@@ -224,6 +225,13 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             Boolean collateBySubclass = getPropertyBooleanValue(op,PROPERTY_COLLATEBYSUBCLASSANNOT);
             p.setCollateBySubclass(collateBySubclass==null ? false : collateBySubclass);
             
+            Boolean editLinkSuppressed = getPropertyBooleanValue(op, PROPERTY_EDITLINKSUPPRESSED);
+            p.setEditLinkSuppressed(editLinkSuppressed == null ? false : editLinkSuppressed);
+            Boolean addLinkSuppressed = getPropertyBooleanValue(op, PROPERTY_ADDLINKSUPPRESSED);
+            p.setAddLinkSuppressed(addLinkSuppressed == null ? false : addLinkSuppressed);
+            Boolean deleteLinkSuppressed = getPropertyBooleanValue(op, PROPERTY_DELETELINKSUPPRESSED);
+            p.setDeleteLinkSuppressed(deleteLinkSuppressed == null ? false : deleteLinkSuppressed);
+            
             Resource groupRes = (Resource) op.getPropertyValue(PROPERTY_INPROPERTYGROUPANNOT);
             if (groupRes != null) {
                 p.setGroupURI(groupRes.getURI());
@@ -284,21 +292,39 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         }
     }
     
-    public ObjectProperty getObjectPropertyByURIAndRangeURI(String propertyURI, String rangeURI) {
+    public ObjectProperty getObjectPropertyByURIs(String propertyURI, String domainURI, String rangeURI) {
+        if(log.isDebugEnabled()) {
+            log.debug("Getting " + propertyURI + " with domain " + domainURI + " and range " + rangeURI);
+        }
         ObjectProperty op = getObjectPropertyByURI(propertyURI);
-        if (op == null) {
+        if (op == null || rangeURI == null) {
             return op;
         }
+        op.setDomainVClassURI(domainURI);
         op.setRangeVClassURI(rangeURI);
         String propQuery = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
                 "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
                 "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
-                "SELECT ?range ?label ?group ?customForm ?displayLevel ?updateLevel WHERE { \n" +
-                "    ?context config:configContextFor <" + propertyURI + "> . \n" +
-                "    ?context config:qualifiedBy <" + rangeURI + "> . \n" +
-                "    ?context config:hasConfiguration ?configuration . \n" +
+                "SELECT ?range ?label ?group ?customForm ?displayRank ?displayLevel " +
+                "    ?updateLevel ?editLinkSuppressed ?addLinkSuppressed ?deleteLinkSuppressed \n" +
+                " WHERE { \n" +
+                "    ?context config:configContextFor <" + propertyURI + "> . \n";
+        if (domainURI != null) {
+                propQuery += "    ?context config:qualifiedByDomain <" + domainURI + "> . \n";
+        } else {
+                propQuery += "   FILTER NOT EXISTS { ?context config:qualifiedByDomain ?domainURI } \n";
+        }
+        if (rangeURI != null) {
+            propQuery += "    ?context config:qualifiedBy <" + rangeURI + "> . \n";
+        };
+                propQuery += "    ?context config:hasConfiguration ?configuration . \n" +
+                "    ?configuration a config:ObjectPropertyDisplayConfig . \n" +
                 "    OPTIONAL { ?configuration config:propertyGroup ?group } \n" +
                 "    OPTIONAL { ?configuration config:displayName ?label } \n" +
+                "    OPTIONAL { ?configuration config:editLinkSuppressed ?editLinkSuppressed } \n" +
+                "    OPTIONAL { ?configuration config:addLinkSuppressed ?addLinkSuppressed } \n" +
+                "    OPTIONAL { ?configuration config:deleteLinkSuppressed ?deleteLinkSuppressed } \n" +
+                "    OPTIONAL { ?configuration vitro:displayRankAnnot ?displayRank } \n" +
                 "    OPTIONAL { ?configuration vitro:customEntryFormAnnot ?customForm } \n" +
                 "    OPTIONAL { ?configuration vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayLevel } \n" +
                 "    OPTIONAL { ?configuration vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateLevel } \n" +
@@ -313,6 +339,11 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 Resource groupRes = qsoln.getResource("group");
                 if (groupRes != null) {
                     op.setGroupURI(groupRes.getURI());
+                } 
+                Literal displayRankLit = qsoln.getLiteral("displayRank");
+                if(displayRankLit != null) {
+                    op.setDomainDisplayTier(
+                            Integer.parseInt(displayRankLit.getLexicalForm()));
                 } 
                 Resource displayLevelRes = qsoln.getResource("displayLevel");
                 if (displayLevelRes != null) {
@@ -334,6 +365,18 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 if (customFormLit != null) {
                     op.setCustomEntryForm(customFormLit.getLexicalForm());
                 } 
+                Literal editLinkSuppressedLit = qsoln.getLiteral("editLinkSuppressed");
+                if (editLinkSuppressedLit != null ) {
+                    op.setEditLinkSuppressed(editLinkSuppressedLit.getBoolean());
+                }
+                Literal addLinkSuppressedLit = qsoln.getLiteral("addLinkSuppressed");
+                if (addLinkSuppressedLit != null ) {
+                    op.setAddLinkSuppressed(addLinkSuppressedLit.getBoolean());
+                }
+                Literal deleteLinkSuppressedLit = qsoln.getLiteral("deleteLinkSuppressed");
+                if (deleteLinkSuppressedLit != null ) {
+                    op.setDeleteLinkSuppressed(deleteLinkSuppressedLit.getBoolean());
+                }
             }  
         } finally {
             qe.close();
@@ -902,14 +945,14 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     protected static final String LIST_VIEW_CONFIG_FILE_QUERY_STRING =
         "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> \n" +
         "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
-        "SELECT ?property ?range ?filename WHERE { \n" +
+        "SELECT ?property ?range ?domain ?filename WHERE { \n" +
         "    { ?property display:listViewConfigFile ?filename \n" +
         "    } UNION { \n" +
-        "        ?lv config:listViewConfigFile ?filename . \n " +
-        "        ?configuration config:hasListView ?lv . " +
+        "        ?configuration config:listViewConfigFile ?filename . \n " +
         "        ?context config:hasConfiguration ?configuration . \n" +
         "        ?context config:configContextFor ?property . \n" +
         "        ?context config:qualifiedBy ?range . \n" +
+        "        OPTIONAL { ?context config:qualifiedByDomain ?domain } \n" +
         "    } \n" +
         "}";
         
@@ -925,14 +968,15 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     
     //TODO private void addPropertyClassCombinationsToListViewMap(HashMap)    
     
-    // Map key is pair of object property and range class URI
-    // If range is unspecified, OWL.Thing.getURI() is used in the key.
-    Map<Pair<ObjectProperty, String>, String> customListViewConfigFileMap = null;
+    // Map key is inner pair of object property and range class URI,
+    // with first member of outer pair being a domain class URI.
+    // If domain or range is unspecified, OWL.Thing.getURI() is used in the key.
+    Map<Pair<String,Pair<ObjectProperty, String>>, String> customListViewConfigFileMap = null;
     
     @Override
     public String getCustomListViewConfigFileName(ObjectProperty op) {
         if (customListViewConfigFileMap == null) {
-            customListViewConfigFileMap = new HashMap<Pair<ObjectProperty, String>, String>();
+            customListViewConfigFileMap = new HashMap<Pair<String,Pair<ObjectProperty, String>>, String>();
             OntModel displayModel = getOntModelSelector().getDisplayModel();
             //Get all property to list view config file mappings in the system
             QueryExecution qexec = QueryExecutionFactory.create(listViewConfigFileQuery, displayModel); 
@@ -945,6 +989,10 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 String rangeUri = (rangeNode != null)
                         ? ((Resource) rangeNode).getURI()
                         : OWL.Thing.getURI();
+                RDFNode domainNode = soln.get("domain");
+                String domainUri = (domainNode != null)
+                        ? ((Resource) domainNode).getURI()
+                        : OWL.Thing.getURI();
                 ObjectProperty prop = getObjectPropertyByURI(propertyUri);
                 if (prop == null) {
                 	//This is a warning only if this property is the one for which we're searching
@@ -955,15 +1003,24 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 	}
                 } else {
                     String filename = soln.getLiteral("filename").getLexicalForm();
-                    customListViewConfigFileMap.put(new Pair<ObjectProperty, String>(prop, rangeUri), filename);     
+                    log.debug("putting " + domainUri + " " + prop.getURI() + " " + rangeUri + " " + filename + " into list view map");
+                    customListViewConfigFileMap.put(
+                            new Pair<String,Pair<ObjectProperty,String>>(
+                                    domainUri, new Pair<ObjectProperty, String>(
+                                            prop, rangeUri)), filename);     
                 }
             }       
             qexec.close();
         }      
         
-        String customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<ObjectProperty, String>(op, op.getRangeVClassURI()));
+        String customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<String, Pair<ObjectProperty, String>>(op.getDomainVClassURI(), new Pair<ObjectProperty,String>(op, op.getRangeVClassURI())));
         if (customListViewConfigFileName == null) {
-            customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<ObjectProperty, String>(op, OWL.Thing.getURI()));
+            log.debug("no list view found for " + op.getURI() + " qualified by range " + op.getRangeVClassURI() + " and domain " + op.getDomainVClassURI());
+            customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<String, Pair<ObjectProperty, String>>(OWL.Thing.getURI(), new Pair<ObjectProperty,String>(op, op.getRangeVClassURI())));
+        }
+        if (customListViewConfigFileName == null) {
+            log.debug("no list view found for " + op.getURI() + " qualified by range " + op.getRangeVClassURI());
+            customListViewConfigFileName = customListViewConfigFileMap.get(new Pair<String, Pair<ObjectProperty, String>>(OWL.Thing.getURI(), new Pair<ObjectProperty,String>(op, OWL.Thing.getURI())));
         }
         
         return customListViewConfigFileName;

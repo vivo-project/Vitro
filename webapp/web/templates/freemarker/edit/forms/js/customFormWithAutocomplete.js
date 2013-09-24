@@ -144,7 +144,7 @@ var customForm = {
         // Put this case first, because in edit mode with
         // validation errors we just want initFormFullView.
 //        if ((!this.supportEdit) && (this.editMode == 'edit' || this.editMode == 'repair')) {
-        if (this.editMode == 'edit' || this.editMode == 'repair') {
+        if (this.editMode == 'edit' || this.editMode == 'repair' || this.editMode == 'error') {
             this.initFormWithValidationErrors();
         }
         else if (this.findValidationErrors()) {
@@ -321,8 +321,12 @@ var customForm = {
                     },
                     complete: function(xhr, status) {
                         // Not sure why, but we need an explicit json parse here. 
-                        var results = $.parseJSON(xhr.responseText),                        
-                            filteredResults = customForm.filterAcResults(results);
+                        var results = $.parseJSON(xhr.responseText);                        
+                        var filteredResults = customForm.filterAcResults(results);
+                        
+                        if ( customForm.acTypes[$(selectedObj).attr('acGroupName')] == "http://www.w3.org/2004/02/skos/core#Concept" ) {
+                            filteredResults = customForm.removeConceptSubclasses(filteredResults);
+                        }
 
                         customForm.acCache[request.term] = filteredResults;
                         response(filteredResults);
@@ -423,6 +427,16 @@ var customForm = {
         
     },
         
+    removeConceptSubclasses: function(array) {
+       $(array).each(function(i) {
+          if(this["msType"] != "http://www.w3.org/2004/02/skos/core#Concept") {
+              //Remove from array
+              array.splice(i, 1);
+          }    
+       });
+       return array;
+    },
+
     showAutocompleteSelection: function(label, uri, selectedObj) {
         // hide the acSelector field and set it's value to the selected ac item
         this.hideFields($(selectedObj).parent());

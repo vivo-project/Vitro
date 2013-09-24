@@ -25,8 +25,6 @@ edu.cornell.mannlib.vitro.webapp.servlet.setup.UserModelSetup
 edu.cornell.mannlib.vitro.webapp.servlet.setup.ContentModelSetup
 edu.cornell.mannlib.vitro.webapp.servlet.setup.ModelMakerSetup
 
-edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateKnowledgeBase
-
 edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup
 
 edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil$Setup
@@ -37,6 +35,8 @@ edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdatePermissionSetUris
 edu.cornell.mannlib.vitro.webapp.servlet.setup.FileGraphSetup
 
 edu.cornell.mannlib.vitro.webapp.servlet.setup.SimpleReasonerSetup
+
+edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateKnowledgeBase
 
 # Must run after JenaDataSourceSetup
 edu.cornell.mannlib.vitro.webapp.servlet.setup.ThemeInfoSetup

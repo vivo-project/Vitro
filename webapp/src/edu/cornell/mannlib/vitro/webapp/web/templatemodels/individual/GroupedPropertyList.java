@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
@@ -74,12 +75,12 @@ public class GroupedPropertyList extends BaseTemplateModel {
         List<ObjectProperty> populatedObjectPropertyList = subject
                 .getPopulatedObjectPropertyList();
         
-        List<ObjectProperty> additions = ApplicationConfigurationOntologyUtils
+        Collection<ObjectProperty> additions = ApplicationConfigurationOntologyUtils
                 .getAdditionalFauxSubpropertiesForList(
-                        populatedObjectPropertyList, vreq);
+                        populatedObjectPropertyList, subject, vreq);
         if (log.isDebugEnabled()) {
             for (ObjectProperty t : additions) {
-                log.debug(t.getDomainPublic() + " " + t.getGroupURI());
+                log.debug(t.getDomainPublic() + " " + t.getGroupURI() + " domain " + t.getDomainVClassURI());
             }
             log.debug("Added " + additions.size() + 
                     " properties due to application configuration ontology");
@@ -88,7 +89,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         populatedObjectPropertyList.addAll(additions);
         
         propertyList.addAll(populatedObjectPropertyList);
-
+        
         // If editing this page, merge in object properties applicable to the individual that are currently
         // unpopulated, so the properties are displayed to allow statements to be added to these properties.
         // RY In future, we should limit this to properties that the user has permission to add properties to.
@@ -175,7 +176,13 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // There is no ObjectPropertyDao.getAllPossibleObjectPropertiesForIndividual() parallel to 
         // DataPropertyDao.getAllPossibleDatapropsForIndividual(). The comparable method for object properties
         // is defined using PropertyInstance rather than ObjectProperty.
-        PropertyInstanceDao piDao = wdf.getPropertyInstanceDao();
+        
+        // Getting WebappDaoFactory from the session because we can't have the filtering
+        // that gets applied to the request.  This breaks blank node structures in the
+        // restrictions that determine applicable properties.
+        WebappDaoFactory wadf = ModelAccess.on(vreq.getSession().getServletContext()).getWebappDaoFactory();
+        PropertyInstanceDao piDao = wadf.getPropertyInstanceDao();
+        
         Collection<PropertyInstance> allPropInstColl = piDao
                 .getAllPossiblePropInstForIndividual(subject.getURI());
         if (allPropInstColl != null) {
@@ -183,7 +190,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                 if (pi != null) {
                     if (!alreadyOnObjectPropertyList(
                             populatedObjectPropertyList, pi)) {
-                        addObjectPropertyToPropertyList(pi.getPropertyURI(), pi.getRangeClassURI(),
+                        addObjectPropertyToPropertyList(pi.getPropertyURI(), pi.getDomainClassURI(), pi.getRangeClassURI(),
                                 propertyList);
                     }
                 } else {
@@ -199,7 +206,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // constitute a special case (i.e., included in piDao.getAllPossiblePropInstForIndividual()).
         for (String propertyUri : VITRO_PROPS_TO_ADD_TO_LIST) {
             if (!alreadyOnPropertyList(propertyList, propertyUri)) {
-                addObjectPropertyToPropertyList(propertyUri, null, propertyList);
+                addObjectPropertyToPropertyList(propertyUri, null, null, propertyList);
             }
         }
     }
@@ -211,16 +218,29 @@ public class GroupedPropertyList extends BaseTemplateModel {
         }
         for (ObjectProperty op : opList) {
             if (op.getURI() != null && op.getURI().equals(pi.getPropertyURI())) {
-                return true;
+                if(op.getDomainVClassURI() == null) {
+                    if(pi.getDomainClassURI() == null) {
+                        return true;   
+                    }
+                } else if (op.getDomainVClassURI().equals(pi.getDomainClassURI())) {
+                    return true;
+                }
+                if(op.getRangeVClassURI() == null) {
+                    if (pi.getDomainClassURI() == null) {
+                        return true;
+                    }
+                } else if (op.getRangeVClassURI().equals(pi.getRangeClassURI())) {
+                    return true;
+                }
             }
         }
         return false;
     }
 
-    private void addObjectPropertyToPropertyList(String propertyUri, String rangeUri,
+    private void addObjectPropertyToPropertyList(String propertyUri, String domainUri, String rangeUri,
             List<Property> propertyList) {
         ObjectPropertyDao opDao = wdf.getObjectPropertyDao();
-        ObjectProperty op = opDao.getObjectPropertyByURIAndRangeURI(propertyUri, rangeUri);
+        ObjectProperty op = opDao.getObjectPropertyByURIs(propertyUri, domainUri, rangeUri);
         if (op == null) {
             log.error("ObjectProperty op returned null from opDao.getObjectPropertyByURI(" + propertyUri + ")");
         } else if (op.getURI() == null) {
@@ -457,11 +477,16 @@ public class GroupedPropertyList extends BaseTemplateModel {
     }
 
     public PropertyTemplateModel pullProperty(String propertyUri) {
+        return pullProperty(propertyUri, null);
+    }
+    
+    public PropertyTemplateModel pullProperty(String propertyUri, String rangeUri) {
 
         for (PropertyGroupTemplateModel pgtm : groups) {
             List<PropertyTemplateModel> properties = pgtm.getProperties();
             for (PropertyTemplateModel ptm : properties) {
-                if (propertyUri.equals(ptm.getUri())) {
+                if (propertyUri.equals(ptm.getUri()) && 
+                        (rangeUri == null || rangeUri.equals(ptm.getRangeUri()))) {
                     // Remove the property from the group.
                     // NB Works with a for-each loop instead of an iterator,
                     // since iteration doesn't continue after the remove.

@@ -53,12 +53,22 @@ public class EditConfigurationUtils {
     	return vreq.getParameter("objectUri");
     }
     
+    public static String getDomainUri(VitroRequest vreq) {
+        return vreq.getParameter("domainUri");
+    }
+    
     public static String getRangeUri(VitroRequest vreq) {
         return vreq.getParameter("rangeUri");
     }
     
     public static VClass getRangeVClass(VitroRequest vreq) {
-        return vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(getRangeUri(vreq));
+        // This needs a WebappDaoFactory with no filtering/RDFService
+        // funny business because it needs to be able to retrieve anonymous union
+        // classes by their "pseudo-bnode URIs".
+        // Someday we'll need to figure out a different way of doing this.
+        WebappDaoFactory ctxDaoFact = ModelAccess.on(
+                vreq.getSession().getServletContext()).getWebappDaoFactory();
+        return ctxDaoFact.getVClassDao().getVClassByURI(getRangeUri(vreq));
     }
     
     //get individual

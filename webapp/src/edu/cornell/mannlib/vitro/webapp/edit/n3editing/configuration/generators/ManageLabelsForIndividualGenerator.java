@@ -28,8 +28,10 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActio
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
@@ -272,7 +274,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 				RequestActionConstants.SOME_URI);
 		AddObjectPropertyStatement aops = new AddObjectPropertyStatement(
 				vreq.getJenaOntModel(), individual.getURI(),
-				RequestActionConstants.SOME_URI,
+				RequestActionConstants.SOME_PREDICATE,
 				RequestActionConstants.SOME_URI);
     	return PolicyHelper.isAuthorizedForActions(vreq, new Actions(adps).or(aops));
 	}
@@ -317,8 +319,8 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 				//This should put the label in the list
 				//Create label information instance with the required information
 				//To generate link
-				DataPropertyStatementTemplateModel dpstm = new DataPropertyStatementTemplateModel(subjectUri, propertyUri, l,
-			            template, vreq);
+				DataPropertyStatementTemplateModel dpstm = new DataPropertyStatementTemplateModel(
+				        subjectUri, new Property(propertyUri), l, template, vreq);
 				labelsList.add(new LabelInformation(
 						l, dpstm.getEditUrl(), dpstm.getDeleteUrl(), languageTag, languageName));
 			}

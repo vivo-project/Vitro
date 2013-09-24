@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
 /**
  * A base class for requested actions that involve adding, editing, or deleting
@@ -13,14 +14,14 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 public abstract class AbstractObjectPropertyStatementAction extends
 		AbstractPropertyStatementAction {
 	private final String subjectUri;
-	private final String predicateUri;
+	private final Property predicate;
 	private final String objectUri;
 
 	public AbstractObjectPropertyStatementAction(OntModel ontModel, String subjectUri,
-			String predicateUri, String objectUri) {
+			Property predicate, String objectUri) {
 		super(ontModel);
 		this.subjectUri = subjectUri;
-		this.predicateUri = predicateUri;
+		this.predicate = predicate;
 		this.objectUri = objectUri;
 	}
 
@@ -28,8 +29,7 @@ public abstract class AbstractObjectPropertyStatementAction extends
 		super(ontModel);
 		this.subjectUri = (ops.getSubject() == null) ? ops.getSubjectURI()
 				: ops.getSubject().getURI();
-		this.predicateUri = (ops.getProperty() == null) ? ops.getPropertyURI()
-				: ops.getProperty().getURI();
+		this.predicate = (ops.getProperty());
 		this.objectUri = (ops.getObject() == null) ? ops.getObjectURI() : ops
 				.getObject().getURI();
 	}
@@ -42,9 +42,13 @@ public abstract class AbstractObjectPropertyStatementAction extends
 		return objectUri;
 	}
 	
+	public Property getPredicate() {
+	    return predicate;
+	}
+	
 	@Override
 	public String getPredicateUri() {
-		return predicateUri;
+		return predicate.getURI();
 	}
 
 	@Override
@@ -55,6 +59,6 @@ public abstract class AbstractObjectPropertyStatementAction extends
 	@Override
 	public String toString() {
 		return this.getClass().getSimpleName() + ": <" + subjectUri + "> <"
-				+ predicateUri + "> <" + objectUri + ">";
+				+ predicate.getURI() + "> <" + objectUri + ">";
 	}
 }

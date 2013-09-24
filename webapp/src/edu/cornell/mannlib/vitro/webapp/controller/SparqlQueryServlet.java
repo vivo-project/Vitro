@@ -9,9 +9,11 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -40,6 +42,7 @@ import com.hp.hpl.jena.vocabulary.XSD;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
+import edu.cornell.mannlib.vitro.webapp.controller.individual.IndividualController;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
@@ -47,45 +50,37 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
+import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
 
 /**
- * Services a sparql query.  This will return a simple error message and a 501 if
+ * Services a SPARQL query.  This will return a simple error message and a 501 if
  * there is no Model.
+ *
  *
  * @author bdc34
  *
  */
 public class SparqlQueryServlet extends BaseEditController {
     private static final Log log = LogFactory.getLog(SparqlQueryServlet.class.getName());
-
-    private final static boolean CONVERT = true;
     
     /**
      * format configurations for SELECT queries.
      */
     protected static HashMap<String,RSFormatConfig> rsFormats = new HashMap<String,RSFormatConfig>();
-
-    private static RSFormatConfig[] rsfs = {
-        new RSFormatConfig( "RS_XML", !CONVERT, ResultFormat.XML, null, "text/xml"),
-        new RSFormatConfig( "RS_TEXT", !CONVERT, ResultFormat.TEXT, null, "text/plain"),
-        new RSFormatConfig( "vitro:csv", !CONVERT, ResultFormat.CSV, null, "text/csv"),
-        new RSFormatConfig( "RS_JSON", !CONVERT, ResultFormat.JSON, null, "application/javascript") };        
-    
+   
     /**
      * format configurations for CONSTRUCT/DESCRIBE queries.
      */
     protected static HashMap<String,ModelFormatConfig> modelFormats = 
         new HashMap<String,ModelFormatConfig>();
 
-    private static ModelFormatConfig[] fmts = {
-        new ModelFormatConfig("RDF/XML", !CONVERT, ModelSerializationFormat.RDFXML, null, "application/rdf+xml" ),
-        new ModelFormatConfig("RDF/XML-ABBREV", CONVERT, ModelSerializationFormat.N3, "RDF/XML-ABBREV", "application/rdf+xml" ),
-        new ModelFormatConfig("N3", !CONVERT, ModelSerializationFormat.N3, null, "text/n3" ),
-        new ModelFormatConfig("N-TRIPLE", !CONVERT, ModelSerializationFormat.NTRIPLE, null, "text/plain" ),
-        new ModelFormatConfig("TTL", CONVERT, ModelSerializationFormat.N3, "TTL", "application/x-turtle" ),
-        new ModelFormatConfig("JSON-LD", CONVERT, ModelSerializationFormat.N3, "JSON-LD", "application/javascript" ) };
+    /**
+     * Use this map to decide which MIME type is suited for the "accept" header.
+     */
+    public static final Map<String, Float> ACCEPTED_CONTENT_TYPES;
 
+   
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
@@ -113,100 +108,85 @@ public class SparqlQueryServlet extends BaseEditController {
         String queryParam = vreq.getParameter("query");
         log.debug("queryParam was : " + queryParam);
 
-        String resultFormatParam = vreq.getParameter("resultFormat");
-        log.debug("resultFormat was: " + resultFormatParam);
-        
-        String rdfResultFormatParam = vreq.getParameter("rdfResultFormat");
-        if (rdfResultFormatParam == null) {
-        	rdfResultFormatParam = "RDF/XML-ABBREV";
-        }
-        log.debug("rdfResultFormat was: " + rdfResultFormatParam);
-
-        if( queryParam == null || "".equals(queryParam) ||
-            resultFormatParam == null || "".equals(resultFormatParam) ||
-            !rsFormats.containsKey( resultFormatParam ) || 
-            rdfResultFormatParam == null || "".equals(rdfResultFormatParam) ||
-            !modelFormats.containsKey( rdfResultFormatParam ) ) {
+        if( queryParam == null || "".equals(queryParam) ){
             doHelp(request,response);
             return;
         }
-
-        executeQuery(response, resultFormatParam, rdfResultFormatParam, 
-                queryParam, vreq.getUnfilteredRDFService()); 
+        
+        String contentType = checkForContentType(vreq.getHeader("Accept"));        
+        
+        Query query = SparqlQueryUtils.create(queryParam);
+        if( query.isSelectType() ){            
+            String format =  contentType!=null ? contentType:vreq.getParameter("resultFormat");            
+            RSFormatConfig formatConf = rsFormats.get(format);                    
+            doSelect(response, queryParam, formatConf, vreq.getRDFService());            
+        }else if( query.isAskType()){
+            doAsk( queryParam, vreq.getRDFService(), response ); 
+        }else if( query.isConstructType() ){
+            String format = contentType != null ? contentType : vreq.getParameter("rdfResultFormat");                        
+            if (format== null) {
+                format= "RDF/XML-ABBREV";
+            }            
+            ModelFormatConfig formatConf = modelFormats.get(format);
+            doConstruct(response, query, formatConf, vreq.getRDFService());
+        }else{
+            doHelp(request,response);            
+        }
         return;
     }
     
-    private void executeQuery(HttpServletResponse response, 
-                              String resultFormatParam, 
-                              String rdfResultFormatParam, 
-                              String queryParam, 
-                              RDFService rdfService ) throws IOException {        
-    	/* BJL23 2008-11-06
-    	 * modified to support CSV output.
-    	 * Unfortunately, ARQ doesn't make it easy to
-    	 * do this by implementing a new ResultSetFormat, because 
-    	 * ResultSetFormatter is hardwired with expected values.
-    	 * This slightly ugly approach will have to do for now.
-    	 */            	
-//        if ( !("vitro:csv").equals(resultFormatParam) ) {
-//        	rsf = selectFormatSymbols.get(resultFormatParam);
-//        }                       
-//        String mimeType = rdfFormatToMimeType.get(resultFormatParam);
-        
-        try{
-            Query query = SparqlQueryUtils.create(queryParam);
-            if( query.isSelectType() ){
-                doSelectQuery( queryParam, rdfService, resultFormatParam, response);
-            } else if(query.isAskType()){
-                // Irrespective of the ResultFormatParam, 
-                // this always prints a boolean to the default OutputStream.
-                String result = (rdfService.sparqlAskQuery(queryParam) == true) 
-                    ? "true" 
-                    : "false";
-                PrintWriter p = response.getWriter();
-                p.write(result);
-                return;                
-            } else {                
-                doModelResultQuery( query, rdfService, rdfResultFormatParam, response);
-            }
-        } catch (RDFServiceException e) {
-                throw new RuntimeException(e);
-        }
-    }
 
+    private void doAsk(String queryParam, RDFService rdfService,
+            HttpServletResponse response) throws ServletException, IOException {
+        
+        // Irrespective of the ResultFormatParam, 
+        // this always prints a boolean to the default OutputStream.
+        String result;
+        try {
+            result = (rdfService.sparqlAskQuery(queryParam) == true) 
+                ? "true" 
+                : "false";
+        } catch (RDFServiceException e) {
+            throw new ServletException( "Could not execute ask query ", e );
+        }
+        PrintWriter p = response.getWriter();
+        p.write(result);
+        return;
+    }
+    
     /**
      * Execute the query and send the result to out. Attempt to
      * send the RDFService the same format as the rdfResultFormatParam
      * so that the results from the RDFService can be directly piped to the client.
-     * @param rdfService 
-     * @throws IOException 
-     * @throws RDFServiceException 
      */
-    private void doSelectQuery( String queryParam,
-                                RDFService rdfService, String resultFormatParam,
-                                HttpServletResponse response) throws IOException, RDFServiceException{                
-        RSFormatConfig config = rsFormats.get( resultFormatParam );
+    private void doSelect(HttpServletResponse response,
+                                String queryParam,
+                                RSFormatConfig formatConf, 
+                                RDFService rdfService 
+                                ) throws ServletException {
+        try {
+            if( ! formatConf.converstionFromWireFormat ){
+                response.setContentType( formatConf.responseMimeType );
+                InputStream results;                
+                results = rdfService.sparqlSelectQuery(queryParam, formatConf.wireFormat );
+                pipe( results, response.getOutputStream() );
+            }else{                        
+                //always use JSON when conversion is needed.
+                InputStream results = rdfService.sparqlSelectQuery(queryParam, ResultFormat.JSON );
                 
-        if( ! config.converstionFromWireFormat ){
-            response.setContentType( config.responseMimeType );
-            InputStream results = rdfService.sparqlSelectQuery(queryParam, config.wireFormat );                        
-            pipe( results, response.getOutputStream() );
-        }else{                        
-            //always use JSON when conversion is needed.
-            InputStream results = rdfService.sparqlSelectQuery(queryParam, ResultFormat.JSON );
-            
-            response.setContentType( config.responseMimeType );
-                        
-            ResultSet rs = ResultSetFactory.fromJSON( results );            
-            OutputStream out = response.getOutputStream();
-            ResultSetFormatter.output(out, rs, config.jenaResponseFormat);
-            
-            // } else {
-            //     Writer out = response.getWriter();
-            //     toCsv(out, results);
-            //}
+                response.setContentType( formatConf.responseMimeType );
+                            
+                ResultSet rs = ResultSetFactory.fromJSON( results );            
+                OutputStream out = response.getOutputStream();
+                ResultSetFormatter.output(out, rs, formatConf.jenaResponseFormat);                
+            }
+        } catch (RDFServiceException e) {
+            throw new ServletException("Cannot get result from the RDFService",e);
+        } catch (IOException e) {
+            throw new ServletException("Cannot perform SPARQL SELECT",e);
         }
     }
+    
 
     /**
      * Execute the query and send the result to out. Attempt to
@@ -217,40 +197,44 @@ public class SparqlQueryServlet extends BaseEditController {
      * @throws RDFServiceException 
      * @throws  
      */
-    private void doModelResultQuery( Query query, 
-                                      RDFService rdfService, String rdfResultFormatParam, 
-                                      HttpServletResponse response) throws IOException, RDFServiceException{
-
-        //config drives what formats and conversions to use 
-        ModelFormatConfig config = modelFormats.get( rdfResultFormatParam );
-
-        InputStream rawResult = null;        
-        if( query.isConstructType() ){                    
-            rawResult= rdfService.sparqlConstructQuery( query.toString(), config.wireFormat );
-        }else if ( query.isDescribeType() ){
-            rawResult = rdfService.sparqlDescribeQuery( query.toString(), config.wireFormat );
-        }
-
-        response.setContentType(  config.responseMimeType );
-        
-        if( config.converstionFromWireFormat ){
-            Model resultModel = RDFServiceUtils.parseModel( rawResult, config.wireFormat );                        
-            if( "JSON-LD".equals( config.jenaResponseFormat )){
-                //since jena 2.6.4 doesn't support JSON-LD we do it                                                                   
-                try {
-                    JenaRDFParser parser = new JenaRDFParser();
-                    Object json = JSONLD.fromRDF(resultModel, parser);
-                    JSONUtils.write(response.getWriter(), json);
-                } catch (JSONLDProcessingError e) {
-                   throw new RDFServiceException("Could not convert from Jena model to JSON-LD", e);
+    private void doConstruct( HttpServletResponse response, 
+                               Query query, 
+                               ModelFormatConfig formatConfig,
+                               RDFService rdfService 
+                               ) throws ServletException{
+        try{
+            InputStream rawResult = null;        
+            if( query.isConstructType() ){                    
+                rawResult= rdfService.sparqlConstructQuery( query.toString(), formatConfig.wireFormat );
+            }else if ( query.isDescribeType() ){
+                rawResult = rdfService.sparqlDescribeQuery( query.toString(), formatConfig.wireFormat );
+            }
+    
+            response.setContentType(  formatConfig.responseMimeType );
+            
+            if( formatConfig.converstionFromWireFormat ){
+                Model resultModel = RDFServiceUtils.parseModel( rawResult, formatConfig.wireFormat );                        
+                if( "JSON-LD".equals( formatConfig.jenaResponseFormat )){
+                    //since jena 2.6.4 doesn't support JSON-LD we do it                                                                   
+                    try {
+                        JenaRDFParser parser = new JenaRDFParser();
+                        Object json = JSONLD.fromRDF(resultModel, parser);
+                        JSONUtils.write(response.getWriter(), json);
+                    } catch (JSONLDProcessingError e) {
+                       throw new RDFServiceException("Could not convert from Jena model to JSON-LD", e);
+                    }
+                }else{
+                    OutputStream out = response.getOutputStream();
+                    resultModel.write(out, formatConfig.jenaResponseFormat );
                 }
             }else{
                 OutputStream out = response.getOutputStream();
-                resultModel.write(out, config.jenaResponseFormat );
+                pipe( rawResult, out );
             }
-        }else{
-            OutputStream out = response.getOutputStream();
-            pipe( rawResult, out );
+        }catch( IOException ex){
+            throw new ServletException("could not run SPARQL CONSTRUCT",ex);
+        } catch (RDFServiceException ex) {
+            throw new ServletException("could not run SPARQL CONSTRUCT",ex);
         }
     }
 
@@ -362,13 +346,35 @@ public class SparqlQueryServlet extends BaseEditController {
             rd.forward(req,res);
     }
 
+    /** Simple boolean vaule to improve the legibility of confiugrations. */
+    private final static boolean CONVERT = true;
 
-    public static class ModelFormatConfig{
+    /** Simple vaule to improve the legibility of confiugrations. */
+    private final static String NO_CONVERSION = null;
+
+    public static class FormatConfig{
         public String valueFromForm;
         public boolean converstionFromWireFormat;
-        public RDFService.ModelSerializationFormat wireFormat;
-        public String jenaResponseFormat;
         public String responseMimeType;
+    }
+    
+    private static ModelFormatConfig[] fmts = {
+        new ModelFormatConfig("RDF/XML", 
+                              !CONVERT, ModelSerializationFormat.RDFXML,  NO_CONVERSION,    "application/rdf+xml" ),
+        new ModelFormatConfig("RDF/XML-ABBREV", 
+                              CONVERT,  ModelSerializationFormat.N3,      "RDF/XML-ABBREV", "application/rdf+xml" ),
+        new ModelFormatConfig("N3", 
+                              !CONVERT, ModelSerializationFormat.N3,      NO_CONVERSION,    "text/n3" ),
+        new ModelFormatConfig("N-TRIPLE", 
+                              !CONVERT, ModelSerializationFormat.NTRIPLE, NO_CONVERSION,    "text/plain" ),
+        new ModelFormatConfig("TTL", 
+                              CONVERT,  ModelSerializationFormat.N3,      "TTL",            "application/x-turtle" ),
+        new ModelFormatConfig("JSON-LD", 
+                              CONVERT,  ModelSerializationFormat.N3,      "JSON-LD",        "application/javascript" ) };
+
+    public static class ModelFormatConfig extends FormatConfig{                
+        public RDFService.ModelSerializationFormat wireFormat;
+        public String jenaResponseFormat;        
         
         public ModelFormatConfig( String valueFromForm,
                                   boolean converstionFromWireFormat, 
@@ -383,12 +389,20 @@ public class SparqlQueryServlet extends BaseEditController {
         }
     }
 
-    public static class RSFormatConfig{
-        public String valueFromForm;
-        public boolean converstionFromWireFormat;
+
+    private static RSFormatConfig[] rsfs = {
+        new RSFormatConfig( "RS_XML", 
+                            !CONVERT, ResultFormat.XML,  null, "text/xml"),
+        new RSFormatConfig( "RS_TEXT", 
+                            !CONVERT, ResultFormat.TEXT, null, "text/plain"),
+        new RSFormatConfig( "vitro:csv", 
+                            !CONVERT, ResultFormat.CSV,  null, "text/csv"),
+        new RSFormatConfig( "RS_JSON", 
+                            !CONVERT, ResultFormat.JSON, null, "application/javascript") }; 
+
+    public static class RSFormatConfig extends FormatConfig{        
         public ResultFormat wireFormat;
         public ResultSetFormat jenaResponseFormat;
-        public String responseMimeType;
         
         public RSFormatConfig( String valueFromForm,
                                boolean converstionFromWireFormat,
@@ -403,14 +417,48 @@ public class SparqlQueryServlet extends BaseEditController {
         }    
     }
 
-    static{                
-        /* move the lists of configs into maps for easy lookup */
+    static{
+        HashMap<String, Float> map = new HashMap<String, Float>();
+        
+        /* move the lists of configurations into maps for easy lookup
+         * by both MIME content type and the parameters from the form */
         for( RSFormatConfig rsfc : rsfs ){
             rsFormats.put( rsfc.valueFromForm, rsfc );
+            rsFormats.put( rsfc.responseMimeType, rsfc);
+            map.put(rsfc.responseMimeType, 1.0f);
         }
         for( ModelFormatConfig mfc : fmts ){
             modelFormats.put( mfc.valueFromForm, mfc);
-        }        
+            modelFormats.put(mfc.responseMimeType, mfc);
+            map.put(mfc.responseMimeType, 1.0f);
+        }
+        
+        ACCEPTED_CONTENT_TYPES = Collections.unmodifiableMap(map);
     }
 
+
+    /**
+     * Get the content type based on content negotiation.
+     * Returns null of no content type can be agreed on or
+     * if there is no accept header.   
+     */
+    protected String checkForContentType( String acceptHeader ) {        
+        if (acceptHeader == null) 
+            return null;        
+    
+        try {
+            Map<String, Float> typesAndQ = ContentType
+                    .getTypesAndQ(acceptHeader);
+            
+            String ctStr = ContentType
+                    .getBestContentType(typesAndQ,ACCEPTED_CONTENT_TYPES); 
+                    
+            if( ACCEPTED_CONTENT_TYPES.containsKey( ctStr )){
+                return ctStr;
+            }
+        } catch (Throwable th) {
+            log.error("Problem while checking accept header ", th);
+        }
+        return null;
+    }
 }

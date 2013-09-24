@@ -7,10 +7,13 @@ public class VitroVocabulary {
 
 	
     public static final String vitroURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#";
+    public static final String configURI= "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#";
     
     public static final String VITRO_AUTH = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#";
     public static final String VITRO_PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/public#";
     public static final String VITRO_PUBLIC_ONTOLOGY = "http://vitro.mannlib.cornell.edu/ns/vitro/public";
+    // TODO change the following before 1.6 release
+    public static final String PROPERTY_CONFIG_DATA = "http://example.org/appConfig/";
     
     
     /** BJL23 2008-02-25:
@@ -95,6 +98,9 @@ public class VitroVocabulary {
     public static final String PROPERTY_CUSTOM_LIST_VIEW_ANNOT = vitroURI + "customListViewAnnot";
     public static final String PROPERTY_SELECTFROMEXISTINGANNOT = vitroURI+"selectFromExistingAnnot";
     public static final String PROPERTY_OFFERCREATENEWOPTIONANNOT = vitroURI+"offerCreateNewOptionAnnot";
+    public static final String PROPERTY_EDITLINKSUPPRESSED = configURI + "editLinkSuppressed";
+    public static final String PROPERTY_ADDLINKSUPPRESSED = configURI + "addLinkSuppressed";
+    public static final String PROPERTY_DELETELINKSUPPRESSED = configURI + "deleteLinkSuppressed";
     public static final String PROPERTY_INPROPERTYGROUPANNOT = vitroURI+"inPropertyGroupAnnot";
     public static final String PROPERTYGROUP = vitroURI + "PropertyGroup";
     public static final String MASKS_PROPERTY = vitroURI + "masksProperty";

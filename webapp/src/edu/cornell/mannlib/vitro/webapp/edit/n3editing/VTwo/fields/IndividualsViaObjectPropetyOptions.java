@@ -27,13 +27,13 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
     private static final String LEFT_BLANK = "";
     private String subjectUri;
     private String predicateUri;    
-    private String rangeUri;
+    private List<VClass> rangeTypes;
     private String objectUri;
     
     private String defaultOptionLabel;
     
     public IndividualsViaObjectPropetyOptions(String subjectUri,
-            String predicateUri, String rangeUri, String objectUri) throws Exception {
+            String predicateUri, List<VClass> rangeTypes, String objectUri) throws Exception {
         super();
         
         if (subjectUri == null || subjectUri.equals("")) {
@@ -45,7 +45,7 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
 
         this.subjectUri = subjectUri;
         this.predicateUri = predicateUri;
-        this.rangeUri = rangeUri;
+        this.rangeTypes = rangeTypes;
         this.objectUri = objectUri;
     }
     
@@ -78,8 +78,8 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
         //get all vclasses applicable to the individual subject
         HashSet<String> vclassesURIs = getApplicableVClassURIs(subject, wDaoFact);
         
-        if (rangeUri != null) {
-            vclassesURIs = filterToSubclassesOfRange(vclassesURIs, rangeUri, wDaoFact);
+        if (!rangeTypes.isEmpty()) {
+            vclassesURIs = filterToSubclassesOfRange(vclassesURIs, rangeTypes, wDaoFact);
         }
                 
         if (vclassesURIs.size() == 0) {           
@@ -117,9 +117,13 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
 
     private HashSet<String> getApplicableVClassURIs(Individual subject, WebappDaoFactory wDaoFact) {
         HashSet<String> vclassesURIs = new HashSet<String>();
-        if (rangeUri != null) {
-            log.debug("individualsViaObjectProperty using rangeUri " + rangeUri);
-            vclassesURIs.add(rangeUri);
+        if (!rangeTypes.isEmpty()) {
+            StringBuffer rangeBuff = new StringBuffer();
+            for (VClass rangeType : rangeTypes) {
+                vclassesURIs.add(rangeType.getURI());
+                rangeBuff.append(rangeType.getURI()).append(", ");
+            }
+            log.debug("individualsViaObjectProperty using rangeUri " + rangeBuff.toString());            
             return vclassesURIs;
         } 
         
@@ -144,13 +148,15 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
     }
     
     private HashSet<String> filterToSubclassesOfRange(HashSet<String> vclassesURIs, 
-                                              String rangeUri, 
+                                              List<VClass> rangeTypes, 
                                               WebappDaoFactory wDaoFact) {
         HashSet<String> filteredVClassesURIs = new HashSet<String>();
         VClassDao vcDao = wDaoFact.getVClassDao();
         for (String vclass : vclassesURIs) {
-            if (vclass.equals(rangeUri) || vcDao.isSubClassOf(vclass, rangeUri)) {
-                filteredVClassesURIs.add(vclass);
+            for (VClass rangeType : rangeTypes) {
+                if (vclass.equals(rangeType.getURI()) || vcDao.isSubClassOf(vclass, rangeType.getURI())) {
+                    filteredVClassesURIs.add(vclass);
+                }
             }
         }
         return filteredVClassesURIs;

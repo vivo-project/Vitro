@@ -86,12 +86,13 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
 	
     @Override
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
-            String subjectUri, String propertyUri, String objectKey, String rangeUri,
-            String query, Set<String> queryStrings, String sortDirection) {
+            String subjectUri, String propertyUri, String objectKey, String domainUri, 
+            String rangeUri, String query, Set<String> queryStrings, String sortDirection) {
         
         List<Map<String, String>> data = 
         	innerObjectPropertyStatementDao.getObjectPropertyStatementsForIndividualByProperty(
-        			subjectUri, propertyUri, objectKey, rangeUri, query, queryStrings,sortDirection);
+        			subjectUri, propertyUri, objectKey, domainUri, rangeUri, query, 
+        			        queryStrings,sortDirection);
         
         /* Filter the data
          * 
@@ -107,6 +108,7 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
             ObjectPropertyStatement statement = new ObjectPropertyStatementImpl(subjectUri, propertyUri, objectUri);
             ObjectProperty op = new ObjectProperty();
             op.setURI(propertyUri);
+            op.setDomainVClassURI(domainUri);
             op.setRangeVClassURI(rangeUri);
             statement.setProperty(op);
             stmtsToData.put(statement, map);

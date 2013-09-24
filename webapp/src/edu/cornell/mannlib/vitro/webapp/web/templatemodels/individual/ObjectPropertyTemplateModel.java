@@ -80,7 +80,6 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     private PropertyListConfig config;
     private String objectKey;    
     private String sortDirection;
-    private String rangeURI;
     
     ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, 
             boolean editing)
@@ -90,7 +89,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         setName(op.getDomainPublic());
         
         sortDirection = op.getDomainEntitySortDirection();
-        rangeURI = op.getRangeVClassURI();
+        domainUri = op.getDomainVClassURI();
+        rangeUri = op.getRangeVClassURI();
         
         // Get the config for this object property
         try {
@@ -110,13 +110,13 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
 
     protected void setAddUrl(Property property) {
     	// Is the add link suppressed for this property?
-    	if (new EditLinkSuppressor(vreq).isAddLinkSuppressed(propertyUri)) {
+    	if (property.isAddLinkSuppressed()) {
     		return;
     	}
         
         // Determine whether a new statement can be added
 		RequestedAction action = new AddObjectPropertyStatement(
-				vreq.getJenaOntModel(), subjectUri, propertyUri,
+				vreq.getJenaOntModel(), subjectUri, property,
 				RequestActionConstants.SOME_URI);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return;
@@ -133,6 +133,9 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
                     "subjectUri", subjectUri,
                     "predicateUri", propertyUri);
             
+            if (domainUri != null) {
+                params.put("domainUri", domainUri);
+            }
             if (rangeUri != null) {
                 params.put("rangeUri", rangeUri);
             }
@@ -157,7 +160,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     
     protected List<Map<String, String>> getStatementData() {
         ObjectPropertyStatementDao opDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
-        return opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, rangeURI, getSelectQuery(), getConstructQueries(), sortDirection);
+        return opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, domainUri, rangeUri, getSelectQuery(), getConstructQueries(), sortDirection);
     }
     
     protected abstract boolean isEmpty();

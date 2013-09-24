@@ -834,7 +834,11 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         try {                       
             String localName = r.getLocalName();
             if (localName != null) {
-                label = localName;
+                if(localName.trim().length() > 0) {
+                    label = localName;
+                } else {
+                    label = r.getURI();
+                }
             } else if (r.isAnon()) {
                 label = r.getId().toString();
             } else {
@@ -925,8 +929,10 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     			return null;
     		if (vitroURIStr.indexOf(PSEUDO_BNODE_NS)==0) {
     			String idStr = vitroURIStr.split("#")[1];
+    			log.debug("Trying to get bnode " + idStr);
     			RDFNode rdfNode = ontModel.getRDFNode(Node.createAnon(AnonId.create(idStr)));
     			if ( (rdfNode != null) && (rdfNode.canAs(OntClass.class)) ) {
+    			    log.debug("found it");
     				cls = rdfNode.as(OntClass.class);
     			}
 			} else {

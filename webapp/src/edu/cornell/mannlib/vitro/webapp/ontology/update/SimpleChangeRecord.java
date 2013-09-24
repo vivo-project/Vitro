@@ -26,6 +26,9 @@ public class SimpleChangeRecord implements ChangeRecord {
 	private File additionsFile;
 	private File retractionsFile;
 	
+	private int additionsCount = 0;
+	private int retractionsCount = 0;
+	
 	public SimpleChangeRecord(
 			String additionsFile, String retractionsFile) {
 		this.additionsFile = new File(additionsFile);
@@ -46,11 +49,12 @@ public class SimpleChangeRecord implements ChangeRecord {
 	
 	public void recordAdditions(Model incrementalAdditions) {
 		additionsModel.add(incrementalAdditions);
-	
+	    additionsCount += incrementalAdditions.size();
 	}
 
 	public void recordRetractions(Model incrementalRetractions) {
 		retractionsModel.add(incrementalRetractions);
+		retractionsCount += incrementalRetractions.size();
 	}
 	
 	private void write(Model model, File file) {
@@ -70,6 +74,10 @@ public class SimpleChangeRecord implements ChangeRecord {
 		if (retractionsModel.size() > 0) {
 			write(retractionsModel, retractionsFile);
 		}
+	}
+	
+	public boolean hasRecordedChanges() {
+	    return additionsCount > 0 || retractionsCount > 0;
 	}
 
 }

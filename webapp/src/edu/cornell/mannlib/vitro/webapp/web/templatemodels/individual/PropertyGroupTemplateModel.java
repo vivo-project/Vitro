@@ -36,8 +36,13 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
         properties = new ArrayList<PropertyTemplateModel>(propertyList.size());
         for (Property p : propertyList)  {
             if (p instanceof ObjectProperty) {
-                ObjectProperty op = (ObjectProperty)p;
-                properties.add(ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(op, subject, vreq, editing, populatedObjectPropertyList));
+                ObjectProperty op = (ObjectProperty) p;
+                ObjectPropertyTemplateModel tm = ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(
+                        op, subject, vreq, editing, populatedObjectPropertyList);
+                if (!tm.isEmpty() || (editing && !tm.getAddUrl().isEmpty())) {
+                    properties.add(tm);                    
+                }
+
             } else {
                 properties.add(new DataPropertyTemplateModel((DataProperty)p, subject, vreq, editing, populatedDataPropertyList));
             }

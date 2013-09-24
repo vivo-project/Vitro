@@ -8,7 +8,7 @@
         
         <ul role="navigation">
             <#if siteConfig.internalClass?has_content>
-                <li role="listitem"><a href="${siteConfig.internalClass}" title="${i18n().internal_class}">${i18n().internal_class}</a></li>
+                <li role="listitem"><a href="${siteConfig.internalClass}" title="${i18n().internal_class}">${i18n().internal_class_i_capped}</a></li>
             </#if>     
             
             <#if siteConfig.manageProxies?has_content>

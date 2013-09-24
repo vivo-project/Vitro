@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.ontology.update;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 
 public class UpdateSettings {
 
@@ -20,6 +21,7 @@ public class UpdateSettings {
 	private String errorLogFile;
 	private String addedDataFile;
 	private String removedDataFile;
+	private String qualifiedPropertyConfigFile;
 	private String defaultNamespace;
 	private OntModelSelector assertionOntModelSelector;
 	private OntModelSelector inferenceOntModelSelector;
@@ -37,6 +39,8 @@ public class UpdateSettings {
 	private OntModel newDisplayModelFromFile;
 	private OntModel loadedAtStartupDisplayModel;
 	private OntModel oldDisplayModelVivoListViewConfig;
+	private RDFService rdfService;
+	
 	public String getDataDir() {
 		return dataDir;
 	}
@@ -118,7 +122,13 @@ public class UpdateSettings {
 	public void setRemovedDataFile(String removedDataFile) {
 		this.removedDataFile = removedDataFile;
 	}
-	public String getDefaultNamespace() {
+	public String getQualifiedPropertyConfigFile() {
+	    return qualifiedPropertyConfigFile;
+	}
+	public void setQualifiedPropertyConfigFile(String qualifiedPropertyConfigFile) {
+	    this.qualifiedPropertyConfigFile = qualifiedPropertyConfigFile;
+	}
+ 	public String getDefaultNamespace() {
 		return defaultNamespace;
 	}
 	public void setDefaultNamespace(String defaultNamespace) {
@@ -223,6 +233,13 @@ public class UpdateSettings {
 		return this.oldDisplayModelVivoListViewConfig;
 	}
 	
+	public RDFService getRDFService() {
+	    return this.rdfService;
+	}
+	
+	public void setRDFService(RDFService rdfService) {
+	    this.rdfService = rdfService;
+	}
 	
 	
 }

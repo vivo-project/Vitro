@@ -41,6 +41,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.reasoner.ABoxRecomputer;
+import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -54,10 +57,11 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	private final static Log log = LogFactory.getLog(UpdateKnowledgeBase.class);
 	
 	private static final String DATA_DIR = "/WEB-INF/ontologies/update/";
+	private static final String DIFF_FILE = DATA_DIR + "diff.tab.txt";
+	private static final String ASK_QUERY_FILE = DATA_DIR + "askUpdated.sparql";
+	private static final String SUCCESS_ASSERTIONS_FILE = DATA_DIR + "success.n3";
 	private static final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
-	private static final String NEW_TBOX_MODEL_DIR = "/WEB-INF/filegraph/tbox/";
 	private static final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
-	private static final String NEW_TBOX_ANNOTATIONS_DIR = "/WEB-INF/ontologies/user/tbox/";
 	//For display model migration
 	private static final String OLD_DISPLAYMODEL_TBOX_PATH = DATA_DIR + "oldDisplayModel/displayTBOX.n3";
 	private static final String NEW_DISPLAYMODEL_TBOX_PATH = "/WEB-INF/ontologies/app/menuload/displayTBOX.n3";
@@ -72,78 +76,136 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		ServletContext ctx = sce.getServletContext();
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
+        boolean migrationChangesMade = false;
+		
 		try {
 			UpdateSettings settings = new UpdateSettings();
 			putReportingPathsIntoSettings(ctx, settings);
+			putNonReportingPathsIntoSettings(ctx, settings);
 
+            SimpleReasonerSetup.waitForTBoxReasoning(sce); 
+			
 			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());
 			settings.setAssertionOntModelSelector(ModelAccess.on(ctx).getBaseOntModelSelector());
 			settings.setInferenceOntModelSelector(ModelAccess.on(ctx).getInferenceOntModelSelector());
 			settings.setUnionOntModelSelector(ModelAccess.on(ctx).getUnionOntModelSelector());
+			
+		    ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
+		    Path homeDir = Paths.get(props.getProperty("vitro.home"));
+			settings.setDisplayModel(ModelAccess.on(ctx).getDisplayModel());
+			OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
+			settings.setOldTBoxModel(oldTBoxModel);
+			OntModel newTBoxModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "tbox", "filegraph").toString());
+			settings.setNewTBoxModel(newTBoxModel);
+			OntModel oldTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_ANNOTATIONS_DIR));
+			settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
+			OntModel newTBoxAnnotationsModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "tbox", "firsttime").toString());
+			settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
+			settings.setRDFService(RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService());
+
 			boolean tryMigrateDisplay = true;
 			try {
-				settings.setDisplayModel(ModelAccess.on(ctx).getDisplayModel());
-				OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
-				settings.setOldTBoxModel(oldTBoxModel);
-				OntModel newTBoxModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_MODEL_DIR));
-				settings.setNewTBoxModel(newTBoxModel);
-				OntModel oldTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_ANNOTATIONS_DIR));
-				settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
-				OntModel newTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(NEW_TBOX_ANNOTATIONS_DIR));
-				settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
-				//Display model tbox and display metadata 
-				//old display model tbox model
-				OntModel oldDisplayModelTboxModel = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_TBOX_PATH));
-				settings.setOldDisplayModelTboxModel(oldDisplayModelTboxModel);
-				//new display model tbox model
-				OntModel newDisplayModelTboxModel = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_TBOX_PATH));
-				settings.setNewDisplayModelTboxModel(newDisplayModelTboxModel);
-				//old display model display model metadata
-				OntModel oldDisplayModelDisplayMetadataModel = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_DISPLAYMETADATA_PATH));
-				settings.setOldDisplayModelDisplayMetadataModel(oldDisplayModelDisplayMetadataModel);
-				//new display model display model metadata
-				OntModel newDisplayModelDisplayMetadataModel = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_DISPLAYMETADATA_PATH));
-				settings.setNewDisplayModelDisplayMetadataModel(newDisplayModelDisplayMetadataModel);
-				//Get new display model
-				OntModel newDisplayModelFromFile = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_PATH));
-				settings.setNewDisplayModelFromFile(newDisplayModelFromFile);
-				OntModel loadedAtStartupFiles = loadModelFromDirectory(ctx.getRealPath(LOADED_STARTUPT_DISPLAYMODEL_DIR));
-				settings.setLoadedAtStartupDisplayModel(loadedAtStartupFiles);
-				OntModel oldDisplayModelVivoListView = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_VIVOLISTVIEW_PATH));
-				settings.setVivoListViewConfigDisplayModel(oldDisplayModelVivoListView);
+			    //Display model tbox and display metadata 
+			    //old display model tbox model
+			    OntModel oldDisplayModelTboxModel = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_TBOX_PATH));
+			    settings.setOldDisplayModelTboxModel(oldDisplayModelTboxModel);
+			    //new display model tbox model
+			    OntModel newDisplayModelTboxModel = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_TBOX_PATH));
+			    settings.setNewDisplayModelTboxModel(newDisplayModelTboxModel);
+			    //old display model display model metadata
+			    OntModel oldDisplayModelDisplayMetadataModel = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_DISPLAYMETADATA_PATH));
+			    settings.setOldDisplayModelDisplayMetadataModel(oldDisplayModelDisplayMetadataModel);
+			    //new display model display model metadata
+			    OntModel newDisplayModelDisplayMetadataModel = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_DISPLAYMETADATA_PATH));
+			    settings.setNewDisplayModelDisplayMetadataModel(newDisplayModelDisplayMetadataModel);
+			    //Get new display model
+			    OntModel newDisplayModelFromFile = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_PATH));
+			    settings.setNewDisplayModelFromFile(newDisplayModelFromFile);
+			    OntModel loadedAtStartupFiles = loadModelFromDirectory(ctx.getRealPath(LOADED_STARTUPT_DISPLAYMODEL_DIR));
+			    settings.setLoadedAtStartupDisplayModel(loadedAtStartupFiles);
+			    OntModel oldDisplayModelVivoListView = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_VIVOLISTVIEW_PATH));
+			    settings.setVivoListViewConfigDisplayModel(oldDisplayModelVivoListView);
+			} catch (ModelFileNotFoundException e) {
+			    // expected if no display migration was intended
+			    tryMigrateDisplay = false;
 			} catch (Exception e) {
-				log.info("unable to read display model migration files, display model not migrated. " + e.getMessage());
-				tryMigrateDisplay = false;
+			    log.info("Unable to read display model migration files. ", e);
+			    tryMigrateDisplay = false;
 			}
-				
-			try {		
-			   KnowledgeBaseUpdater ontologyUpdater = new KnowledgeBaseUpdater(settings);
-			  
-			   try {
-				  if (ontologyUpdater.updateRequired(ctx)) {
-					  ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
-					  ontologyUpdater.update(ctx);
-					  if (tryMigrateDisplay) {
-						  try {
-						       migrateDisplayModel(settings);
-						       log.info("Migrated display model");
-						  } catch (Exception e) {
-							   log.warn("unable to successfully update display model: " + e.getMessage());
-						  }
-					  }
-				  }
-			   } catch (Exception ioe) {
-					ss.fatal(this, "Exception updating knowledge base for ontology changes: ", ioe);
-			   }	
-			} catch (Throwable t){
-				ss.fatal(this, "Exception updating knowledge base for ontology changes: ", t);
-			}
-		} catch (Throwable t) {
-			ss.fatal(this, "Exception updating knowledge base for ontology changes: ", t);
+
+
+			KnowledgeBaseUpdater ontologyUpdater = new KnowledgeBaseUpdater(settings);
+			boolean requiredUpdate = ontologyUpdater.updateRequired(ctx);
+
+			try {
+			    ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
+			    log.info("Data migration required");
+			    migrationChangesMade = ontologyUpdater.update(ctx);
+			    if (tryMigrateDisplay) {
+			        try {
+			            migrateDisplayModel(settings);
+			            log.info("Migrated display model");
+			        } catch (Exception e) {
+			            log.warn("unable to successfully update display model: " + e.getMessage());
+			        }
+			    }
+			    // reload the display model since the TBoxUpdater may have 
+			    // modified it
+			    new ApplicationModelSetup().contextInitialized(sce);				  
+			} catch (Exception ioe) {
+			    ss.fatal(this, "Exception updating knowledge base for ontology changes: ", ioe);
+			}	
+
+		    SimpleReasoner simpleReasoner = (SimpleReasoner) sce.getServletContext()
+		            .getAttribute(SimpleReasoner.class.getName());
+		    if (simpleReasoner != null) {
+		        if ( (requiredUpdate && migrationChangesMade) 
+		                || JenaDataSourceSetupBase.isFirstStartup()) {
+		            log.info("ABox inference recompute required.");
+		            simpleReasoner.recompute();
+		        } else if (SimpleReasonerSetup.isRecomputeRequired(sce.getServletContext()) || migrationChangesMade) {
+		            log.info("starting ABox inference recompute in a separate thread.");
+		            new Thread(
+		                    new ABoxRecomputer(
+		                            simpleReasoner),"ABoxRecomputer").start();
+		        }
+		    }			
+			
+		} catch (Throwable t){
+		    ss.fatal(this, "Exception updating knowledge base for ontology changes: ", t);
 		}
+        
+
+		
 	}	
 
+	private class ABoxRecomputer implements Runnable {
+
+	    private SimpleReasoner simpleReasoner;
+
+	    public ABoxRecomputer(SimpleReasoner simpleReasoner) {
+	        this.simpleReasoner = simpleReasoner;
+	    }
+
+	    public void run() {
+	        simpleReasoner.recompute();
+	    }
+	}
+
+	
+	/**
+	 * Set the paths for the files that specify how to perform the update
+	 */
+	private void putNonReportingPathsIntoSettings(ServletContext ctx, UpdateSettings settings) {
+        settings.setAskUpdatedQueryFile(ctx.getRealPath(ASK_QUERY_FILE));
+        settings.setDiffFile(ctx.getRealPath(DIFF_FILE));
+        settings.setSparqlConstructAdditionsDir(ctx.getRealPath(DATA_DIR + "sparqlConstructs/additions"));
+        settings.setSparqlConstructDeletionsDir(ctx.getRealPath(DATA_DIR + "sparqlConstructs/deletions"));
+        settings.setSuccessAssertionsFile(ctx.getRealPath(SUCCESS_ASSERTIONS_FILE));
+        settings.setSuccessRDFFormat("N3");
+	}
+	
 	/**
 	 * Create the directories where we will report on the update. 
 	 * Put the paths for the directories and files into the settings object.
@@ -156,14 +218,6 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		settings.setDataDir(dataDir.toString());
 		StartupStatus.getBean(ctx).info(this, "Updating knowledge base: reports are in '" + dataDir + "'");
 
-		settings.setAskUpdatedQueryFile(dataDir.resolve("askUpdated.sparql").toString());
-		settings.setDiffFile(dataDir.resolve("diff.tab.txt").toString());
-		settings.setSuccessAssertionsFile(dataDir.resolve("success.n3").toString());
-		settings.setSuccessRDFFormat("N3");
-
-		settings.setSparqlConstructAdditionsDir(createDirectory(dataDir, "sparqlConstructs", "additions").toString());
-		settings.setSparqlConstructDeletionsDir(createDirectory(dataDir, "sparqlConstructs", "deletions").toString());
-		
 		Path changedDir = createDirectory(dataDir, "changedData");
 		settings.setAddedDataFile(changedDir.resolve("addedData.n3").toString());
 		settings.setRemovedDataFile(changedDir.resolve("removedData.n3").toString());
@@ -171,8 +225,19 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		Path logDir = createDirectory(dataDir, "logs");
 		settings.setLogFile(logDir.resolve(timestampedFileName("knowledgeBaseUpdate", "log")).toString());
 		settings.setErrorLogFile(logDir.resolve(timestampedFileName("knowledgeBaseUpdate.error", "log")).toString());
+		
+		Path qualifiedPropertyConfigFile = getFilePath(homeDir, "rdf", "display", "everytime", "PropertyConfig.n3");
+		settings.setQualifiedPropertyConfigFile(qualifiedPropertyConfigFile.toString());
 	}
 
+	private Path getFilePath(Path parent, String... children) throws IOException {
+        Path path = parent;
+        for (String child : children) {
+            path = path.resolve(child);
+        }
+        return path;	    
+	}
+	
 	private Path createDirectory(Path parent, String... children) throws IOException {
 		Path dir = parent;
 		for (String child : children) {

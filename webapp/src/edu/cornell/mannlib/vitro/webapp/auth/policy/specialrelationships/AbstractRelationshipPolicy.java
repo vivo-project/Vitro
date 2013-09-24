@@ -13,6 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
 /**
  * A collection of building-block methods so we can code a policy based on the
@@ -34,9 +35,9 @@ public abstract class AbstractRelationshipPolicy implements PolicyIface {
 				uri, RoleLevel.SELF);
 	}
 
-	protected boolean canModifyPredicate(String uri) {
+	protected boolean canModifyPredicate(Property predicate) {
 		return PropertyRestrictionPolicyHelper.getBean(ctx).canModifyPredicate(
-				uri, RoleLevel.SELF);
+				predicate, RoleLevel.SELF);
 	}
 
 	protected PolicyDecision cantModifyResource(String uri) {

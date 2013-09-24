@@ -624,8 +624,10 @@ public class PelletListener implements ModelChangedListener {
 				if ( (additionModel.size() > 0) || (removalModel.size()>0) ) {
 					if (!isSynchronizing) {
 						if (foreground) {
+                            log.debug("Running Pellet in foreground.");
 							(new PelletSynchronizer()).run();
 						} else {
+                            log.debug("Running Pellet in background.");
 							new Thread(new PelletSynchronizer(), "PelletListener.PelletSynchronizer").start();
 						}
 					}
