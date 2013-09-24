@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.BaseEditSubmissionPreprocessorVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
@@ -48,7 +49,7 @@ public class ManagePagePreprocessor extends
 		editConfiguration = editConfig;
 	}
 
-	public void preprocess(MultiValueEditSubmission inputSubmission) {
+	public void preprocess(MultiValueEditSubmission inputSubmission, VitroRequest vreq) {
 		submission = inputSubmission;
 		// Get the input elements for concept node and concept label as well
 		// as vocab uri (which is based on thge

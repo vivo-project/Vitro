@@ -33,7 +33,7 @@ public class FoafNameToRdfsLabelPreprocessor implements ModelChangePreprocessor 
 			Resource sub = subs.nextResource();
 			Statement fname = sub.getProperty( firstNameP );
 			Statement lname = sub.getProperty( lastNameP );
-			Statement mname = sub.getProperty(middleNameP)l
+			Statement mname = sub.getProperty(middleNameP);
 			if( fname != null && lname != null && fname.getString() != null && lname.getString() != null ){
 				//Check if there are languages associated with first name and last name and add the language
 				//attribute to the label

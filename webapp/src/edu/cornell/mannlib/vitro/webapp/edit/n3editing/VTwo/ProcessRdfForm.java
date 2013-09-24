@@ -21,6 +21,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.Lock;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
@@ -68,12 +69,13 @@ public class ProcessRdfForm {
      */
     public AdditionsAndRetractions  process(
             EditConfigurationVTwo configuration,
-            MultiValueEditSubmission submission) 
+            MultiValueEditSubmission submission,
+            VitroRequest vreq) 
     throws Exception{  
         log.debug("configuration:\n" + configuration.toString());
         log.debug("submission:\n" + submission.toString());
         
-        applyEditSubmissionPreprocessors( configuration, submission );
+        applyEditSubmissionPreprocessors( configuration, submission, vreq );
         
         AdditionsAndRetractions changes;
         if( configuration.isUpdate() ){
@@ -378,11 +380,11 @@ public class ProcessRdfForm {
     }
 
    private void applyEditSubmissionPreprocessors(
-            EditConfigurationVTwo configuration, MultiValueEditSubmission submission) {
+            EditConfigurationVTwo configuration, MultiValueEditSubmission submission, VitroRequest vreq) {
         List<EditSubmissionVTwoPreprocessor> preprocessors = configuration.getEditSubmissionPreprocessors();
         if(preprocessors != null) {
             for(EditSubmissionVTwoPreprocessor p: preprocessors) {
-                p.preprocess(submission);
+                p.preprocess(submission, vreq);
             }
         }
     }

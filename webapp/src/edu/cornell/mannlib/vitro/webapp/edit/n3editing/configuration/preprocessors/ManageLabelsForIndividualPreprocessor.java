@@ -17,6 +17,7 @@ import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 /*
  * This preprocessor is used to set the language attribute on the label based on the user selection
@@ -37,7 +38,7 @@ public class ManageLabelsForIndividualPreprocessor extends BaseEditSubmissionPre
 	}
 	
 	@Override
-	public void preprocess(MultiValueEditSubmission inputSubmission) {
+	public void preprocess(MultiValueEditSubmission inputSubmission, VitroRequest vreq) {
 		//Check and see if a language was selected by the user, and this is the regular label submission
 		//TODO: Check if firstname and lastname should be changed here or elsewhere
 		if(inputSubmission.hasLiteralValue("label") && inputSubmission.hasLiteralValue("newLabelLanguage")) {

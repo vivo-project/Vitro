@@ -90,7 +90,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 
             ProcessRdfForm prf = 
                 new ProcessRdfForm(configuration, new NewURIMakerVitro(vreq.getWebappDaoFactory()));        
-            changes = prf.process(configuration, submission);  
+            changes = prf.process(configuration, submission, vreq);  
             
         } catch (Exception e) {
             throw new Error(e);
