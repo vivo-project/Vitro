@@ -49,6 +49,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.URIUtils;
 
 public class WebappDaoFactoryJena implements WebappDaoFactory {
 
@@ -204,39 +205,12 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     
     //Check if URI already in use or not either as resource OR as property
     public boolean hasExistingURI(String uriStr) {
-    	boolean existingURI = false;
     	OntModel ontModel = ontModelSelector.getFullModel(); 
-		ontModel.enterCriticalSection(Lock.READ);
-		try {
-			Resource newURIAsRes = ResourceFactory.createResource(uriStr);
-			Property newURIAsProp = ResourceFactory.createProperty(uriStr);
-			StmtIterator closeIt = ontModel.listStatements(
-					newURIAsRes, null, (RDFNode)null);
-			if (closeIt.hasNext()) {
-				existingURI = true;
-				
-			}
-			//if not in the subject position, check in object position
-			if (!existingURI) {
-				closeIt = ontModel.listStatements(null, null, newURIAsRes);
-				if (closeIt.hasNext()) {
-					existingURI= true;
-				}
-			}
-			//Check for property
-			if (!existingURI) {
-				closeIt = ontModel.listStatements(
-						null, newURIAsProp, (RDFNode)null);
-				if (closeIt.hasNext()) {
-					existingURI = true;
-				}
-			}
-		} finally {
-			ontModel.leaveCriticalSection();
-		}
-		
-		return existingURI;
+		return URIUtils.hasExistingURI(uriStr, ontModel);
     }
+    
+   
+    
     
     public WebappDaoFactory getUserAwareDaoFactory(String userURI) {
         return new WebappDaoFactoryJena(this, userURI);

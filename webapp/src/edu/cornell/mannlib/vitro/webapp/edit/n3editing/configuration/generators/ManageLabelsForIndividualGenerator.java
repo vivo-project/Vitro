@@ -17,42 +17,25 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
 import com.hp.hpl.jena.vocabulary.RDFS;
-import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.FoafNameToRdfsLabelPreprocessor;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ManageLabelsForIndividualPreprocessor;
-import edu.cornell.mannlib.vitro.webapp.i18n.selection.LocaleSelectionDataGetter;
-import edu.cornell.mannlib.vitro.webapp.i18n.selection.LocaleSelectorUtilities;
 import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DataPropertyStatementTemplateModel;
 
@@ -114,6 +97,14 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
         prepare(vreq, config);
         return config;
     }
+    
+    /**With ISF Changes**/
+    //For addition of a label, with ISF changes, the name is now linked to a vcard which  in turn is linked to a "fullname" that then has first/middle/last names
+    /*
+    private void addNewResources(EditConfigurationVTwo editConfiguration) {
+    	conf.addNewResource("fullName", DEFAULT_NS_FOR_NEW_RESOURCE);
+        conf.addNewResource("individualVcard", DEFAULT_NS_FOR_NEW_RESOURCE);
+    }*/
   
     private void setUrlToReturnTo(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
 		editConfiguration.setUrlPatternToReturnTo(EditConfigurationUtils.getFormUrlWithoutContext(vreq));		
@@ -134,11 +125,8 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 	private List<String> generateN3Optional(VitroRequest vreq) {
 		List<String> n3Optional = new ArrayList<String>();
 		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
-		String n3 = "?subject <" + predicateUri + "> ?label ";
-		//n3 used if the subject is a person
-		String personN3 = this.N3_PREFIX + "?subject foaf:firstName ?firstName ; foaf:lastName ?lastName .";
+		String n3 = "?subject <" + predicateUri + "> ?label ";		
 		n3Optional.add(n3);
-		n3Optional.add(personN3);
 		return n3Optional;
 	}
 	
@@ -151,41 +139,14 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
                 setName("label").
                 setValidators(getLabelValidators(vreq, editConfiguration)));    
     	editConfiguration.addField(new FieldVTwo(
-    			).setName("newLabelLanguage"));
-    	//no validators since all of this is optional
-    	//there should be error-checking client side though
-    	editConfiguration.addField(new FieldVTwo().
-    	        setName("firstName").
-    	        setValidators(getFirstNameValidators(vreq, editConfiguration)));
-    	
-    	editConfiguration.addField(new FieldVTwo().
-                setName("lastName").
-                setValidators(getLastNameValidators(vreq, editConfiguration)));     	
+    			).setName("newLabelLanguage"));    	
     }
     
-	//first and last name have validators if is person is true
-    private List<String> getFirstNameValidators(VitroRequest vreq, EditConfigurationVTwo config) {
-		List<String> validators = new ArrayList<String>();
-		if(isPersonType(vreq, config)) {
-			validators.add("nonempty");
-		}
-		return validators;
-	}
-
-	private List<String> getLastNameValidators(VitroRequest vreq, EditConfigurationVTwo config) {
-		List<String> validators = new ArrayList<String>();
-		if(isPersonType(vreq, config)) {
-			validators.add("nonempty");
-		}
-		return validators;
-	}
+	
 
 	//validate label if person is not true
 	private List<String> getLabelValidators(VitroRequest vreq, EditConfigurationVTwo config) {
 		List<String> validators = new ArrayList<String>();
-		if(!isPersonType(vreq, config)) {
-			validators.add("nonempty");
-		}
 		return validators;
 	}
     
@@ -196,9 +157,6 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 		List<String> literalsOnForm = new ArrayList<String>();
 		literalsOnForm.add("label");
 		literalsOnForm.add("newLabelLanguage");
-		//optional for person
-		literalsOnForm.add("firstName");
-		literalsOnForm.add("lastName");
 		config.setLiteralsOnForm(literalsOnForm);
 		
 	}
@@ -219,19 +177,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 	
 	private void initExistingLabels(EditConfigurationVTwo config,
 			VitroRequest vreq) {
-		this.existingLabelLiterals = this.getExistingLabels(config.getSubjectUri(), vreq);
-    //	this.labelsSortedByLanguage = this.getLabelsSortedByLanguage(config,vreq);
-    	//language names sorted for the existing languages
-   // 	this.existingSortedLanguageNameList = getExistingSortedLanguageNamesList();
-    	
-    	//Generate a label to language code hash map
-    	//TODO: 
-    	
-    	//HashMap<String, String> labelToLanguageCode = new HashMap<String, String>();
-    	
-    	//this.labels = getExistingLabels(config.getSubjectUri(), vreq);
-    	//this.labelsSortedByLanguage = getLabelsSortedByLanguage(config.getSubjectUri(), vreq);
-		
+		this.existingLabelLiterals = this.getExistingLabels(config.getSubjectUri(), vreq);		
 	}
     
 
@@ -284,16 +230,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
         }else{
             config.addFormSpecificData("subjectName", null);
         }
-        
-  //Put in whether or not person type
-  		if(isPersonType(vreq, config)) {
-  			//Doing this b/c unsure how freemarker will handle boolean value from JAVA
-  			config.addFormSpecificData("isPersonType", "true");
-  		} else {
-  			config.addFormSpecificData("isPersonType", "false");
-
-  		}
-  		
+       
   		//Include whether or not editable to enable edit/remove links and add to show up
   		config.addFormSpecificData("editable", isEditable(vreq, config));
 	}
@@ -341,28 +278,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 	}
 
 
-	//Copied from NewIndividualFormGenerator
-	//TODO: Refactor so common code can be used by both generators
-	public String getFOAFPersonClassURI() {
-		return "http://xmlns.com/foaf/0.1/Person";
-	}
-	
-	public boolean isPersonType(VitroRequest vreq, EditConfigurationVTwo config) {
-		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-		Boolean isPersonType = Boolean.FALSE;
-		String foafPersonType = getFOAFPersonClassURI();
-		List<VClass> vclasses = this.getVClasses(config, vreq);
-	    if( vclasses != null ){
-	    	for( VClass v: vclasses){
-	    		String typeUri = v.getURI();
-	    		if( foafPersonType.equals(typeUri)) {
-	    			isPersonType = Boolean.TRUE;
-	    			break;
-	    		}
-	    	}    	
-	    }
-	    return isPersonType;
-	}
+
 	
 	//how to get the type of the individual in question
 	public List<VClass> getVClasses(EditConfigurationVTwo config, VitroRequest vreq) {

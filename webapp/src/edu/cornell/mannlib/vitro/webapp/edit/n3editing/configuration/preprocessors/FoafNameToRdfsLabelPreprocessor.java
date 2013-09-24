@@ -22,6 +22,9 @@ public class FoafNameToRdfsLabelPreprocessor implements ModelChangePreprocessor 
 			HttpServletRequest request) {
 		Property firstNameP = additionsModel.getProperty(FOAF+"firstName");
 		Property lastNameP = additionsModel.getProperty(FOAF+"lastName");
+		//middle name is optional
+		Property middleNameP = additionsModel.getProperty(FOAF+"middleName");
+
 		Property rdfsLabelP = additionsModel.getProperty(VitroVocabulary.LABEL);
 		
 		ResIterator subs = 
@@ -30,12 +33,14 @@ public class FoafNameToRdfsLabelPreprocessor implements ModelChangePreprocessor 
 			Resource sub = subs.nextResource();
 			Statement fname = sub.getProperty( firstNameP );
 			Statement lname = sub.getProperty( lastNameP );
+			Statement mname = sub.getProperty(middleNameP)l
 			if( fname != null && lname != null && fname.getString() != null && lname.getString() != null ){
 				//Check if there are languages associated with first name and last name and add the language
 				//attribute to the label
 				//This preprocessor is used in multiple places, including for managing labels
 				Literal firstNameLiteral = fname.getLiteral();
 				Literal lastNameLiteral = lname.getLiteral();
+				
 				String firstNameLanguage = firstNameLiteral.getLanguage();
 				String lastNameLanguage = lastNameLiteral.getLanguage();
 				String newLabel = lname.getString() + ", " + fname.getString();
