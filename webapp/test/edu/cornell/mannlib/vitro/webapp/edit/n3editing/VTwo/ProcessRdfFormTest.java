@@ -53,7 +53,7 @@ public class ProcessRdfFormTest extends AbstractTestClass{
         assertNotNull(req.get(0));
         assertEquals("<http://test.com/uri1> <http://test.com/uri2> <http://test.com/uri3> .", req.get(0));
         /* test the N3 and parse RDF parts */
-        AdditionsAndRetractions changes = processor.process( config, submission );
+        AdditionsAndRetractions changes = processor.process( config, submission, null );
         
         assertNotNull( changes );
         assertNotNull( changes.getAdditions() );
@@ -105,7 +105,7 @@ public class ProcessRdfFormTest extends AbstractTestClass{
         MultiValueEditSubmission submission = new MultiValueEditSubmission(values, config);
         
         ProcessRdfForm processor = new ProcessRdfForm(config,getMockNewURIMaker());        
-        AdditionsAndRetractions changes = processor.process( config, submission );
+        AdditionsAndRetractions changes = processor.process( config, submission, null );
              
         assertNotNull( changes );
         assertNotNull( changes.getAdditions() );
@@ -190,7 +190,7 @@ public class ProcessRdfFormTest extends AbstractTestClass{
         assertEquals("<" +test1+ "> <" +test2+ "> <" +test3+ "> .", req.get(0));
         
         /* test the N3 and parse RDF parts */
-        AdditionsAndRetractions changes = processor.process( config, submission );
+        AdditionsAndRetractions changes = processor.process( config, submission, null );
         
         assertNotNull( changes );
         assertNotNull( changes.getAdditions() );
@@ -236,7 +236,7 @@ public class ProcessRdfFormTest extends AbstractTestClass{
         assertEquals("<" + NEWURI_STRING + "0>", submission.getEntityToReturnTo());
         
         /* test the N3 and parse RDF parts */
-        AdditionsAndRetractions changes = processor.process( config, submission );
+        AdditionsAndRetractions changes = processor.process( config, submission, null );
         
         assertNotNull( changes );
         assertNotNull( changes.getAdditions() );
@@ -286,7 +286,7 @@ public class ProcessRdfFormTest extends AbstractTestClass{
         assertEquals("<" + NEWURI_STRING + "0>", submission.getEntityToReturnTo());
         
         /* test the N3 and parse RDF parts */
-        AdditionsAndRetractions changes = processor.process( config, submission );
+        AdditionsAndRetractions changes = processor.process( config, submission, null );
         
         assertNotNull( changes );
         assertNotNull( changes.getAdditions() );
@@ -360,7 +360,7 @@ public class ProcessRdfFormTest extends AbstractTestClass{
         MultiValueEditSubmission submission = new MultiValueEditSubmission(values, config);
         
         ProcessRdfForm processor = new ProcessRdfForm(config,getMockNewURIMaker());        
-        AdditionsAndRetractions changes = processor.process( config, submission );
+        AdditionsAndRetractions changes = processor.process( config, submission, null );
              
         assertNotNull( changes );
         assertNotNull( changes.getAdditions() );
