@@ -3,22 +3,29 @@
 <#-- Template for property listing on individual profile page -->
 
         <#list group.properties as property>
+            <#assign rangeClass = "noRangeClass">
+            <#if property.rangeUri?has_content && property.rangeUri?contains("#")>
+                <#assign rangeClass = property.rangeUri?substring(property.rangeUri?last_index_of("#")+1)>
+            <#elseif property.rangeUri?has_content >
+                <#assign rangeClass = property.rangeUri?substring(property.rangeUri?last_index_of("/")+1)>
+            </#if>
+        
             <article class="property" role="article">
                 <#-- Property display name -->
-                <#if property.localName == "authorInAuthorship" && editable  >
-                    <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
-                        <a id="managePubLink" class="manageLinks" href="${urls.base}/managePublications?subjectUri=${subjectUri[1]!}" title="${i18n().manage_publications}" <#if verbose>style="padding-top:10px"</#if> >
-                            ${i18n().manage_publications}
+                <#if rangeClass == "Authorship" && editable  >
+                    <h3 id="${property.localName}-${rangeClass}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
+                        <a id="managePubLink" class="manageLinks" href="${urls.base}/managePublications?subjectUri=${subjectUri[1]!}" title="${i18n().manage_publications_link}" <#if verbose>style="padding-top:10px"</#if> >
+                            ${i18n().manage_publications_link}
                         </a>
                     </h3>
-                <#elseif property.localName == "hasResearcherRole" && editable  >
-                    <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
-                        <a id="manageGrantLink" class="manageLinks" href="${urls.base}/manageGrants?subjectUri=${subjectUri[1]!}" title="${i18n().manage_grants_and_projects}" <#if verbose>style="padding-top:10px"</#if> >
-                            ${i18n().manage_grants_and_projects}
+                <#elseif rangeClass == "ResearcherRole" && editable  >
+                    <h3 id="${property.localName}-${rangeClass}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
+                        <a id="manageGrantLink" class="manageLinks" href="${urls.base}/manageGrants?subjectUri=${subjectUri[1]!}" title="${i18n().manage_grants_and_projects_link}" <#if verbose>style="padding-top:10px"</#if> >
+                            ${i18n().manage_grants_and_projects_link}
                         </a>
                     </h3>
-                <#elseif property.localName == "organizationForPosition" && editable  >
-                    <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
+                <#elseif rangeClass == "Position" && editable  >
+                    <h3 id="${property.localName}-${rangeClass}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
                         <a id="managePeopleLink" class="manageLinks" href="${urls.base}/managePeople?subjectUri=${subjectUri[1]!}" title="${i18n().manage_affiliated_people}" <#if verbose>style="padding-top:10px"</#if> >
                             ${i18n().manage_affiliated_people_link}
                         </a>
@@ -27,13 +34,13 @@
                     <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> </h3>
                 </#if>
                 <#-- List the statements for each property -->
-                <ul class="property-list" role="list" id="${property.localName}List">
+                <ul class="property-list" role="list" id="${property.localName}-${rangeClass}-List">
                     <#-- data property -->
                     <#if property.type == "data">
                         <@p.dataPropertyList property editable />
                     <#-- object property -->
                     <#else>
-                        <@p.objectProperty property editable />
+                        <@p.objectProperty property editable /> 
                     </#if>
                 </ul>
             </article> <!-- end property -->

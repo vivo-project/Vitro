@@ -114,7 +114,7 @@ name will be used as the label. -->
 </#macro>
 
 <#macro showAddLink propertyLocalName propertyName label url>
-    <#if propertyName == "informationResourceInAuthorship" || propertyName == "webpage" || propertyLocalName == "hasResearchArea">
+    <#if propertyName == "authors" || propertyName == "webpage" || propertyLocalName == "hasResearchArea">
         <a class="add-${propertyLocalName}" href="${url}" title="${i18n().manage_list_of} ${label?lower_case}">
         <img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="${i18n().manage}" /></a>
     <#else>
