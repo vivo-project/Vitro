@@ -104,6 +104,10 @@ public class SparqlQueryServlet extends BaseEditController {
             doNoModelInContext(response);
             return;
         }
+        
+        // Use RDFService from context to avoid language filtering
+        RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(
+                getServletContext()).getRDFService();
 
         String queryParam = vreq.getParameter("query");
         log.debug("queryParam was : " + queryParam);
@@ -119,16 +123,16 @@ public class SparqlQueryServlet extends BaseEditController {
         if( query.isSelectType() ){            
             String format =  contentType!=null ? contentType:vreq.getParameter("resultFormat");            
             RSFormatConfig formatConf = rsFormats.get(format);                    
-            doSelect(response, queryParam, formatConf, vreq.getRDFService());            
+            doSelect(response, queryParam, formatConf, rdfService);            
         }else if( query.isAskType()){
-            doAsk( queryParam, vreq.getRDFService(), response ); 
+            doAsk( queryParam, rdfService, response ); 
         }else if( query.isConstructType() ){
             String format = contentType != null ? contentType : vreq.getParameter("rdfResultFormat");                        
             if (format== null) {
                 format= "RDF/XML-ABBREV";
             }            
             ModelFormatConfig formatConf = modelFormats.get(format);
-            doConstruct(response, query, formatConf, vreq.getRDFService());
+            doConstruct(response, query, formatConf, rdfService);
         }else{
             doHelp(request,response);            
         }
