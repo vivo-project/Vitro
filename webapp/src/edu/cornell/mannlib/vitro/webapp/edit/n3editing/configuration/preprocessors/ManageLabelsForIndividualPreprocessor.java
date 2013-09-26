@@ -64,45 +64,11 @@ public class ManageLabelsForIndividualPreprocessor extends BaseEditSubmissionPre
 				inputSubmission.setLiteralsFromForm(literalsFromForm);
 			}
 		}
-		//First name and last name would also have a language selected so make sure those literals are also
-		//correctly typed
-		if(inputSubmission.hasLiteralValue("firstName") && inputSubmission.hasLiteralValue("lastName") && inputSubmission.hasLiteralValue("newLabelLanguage")) {
-			Map<String, List<Literal>> literalsFromForm = inputSubmission.getLiteralsFromForm();
-			List<Literal> newLabelLanguages = literalsFromForm.get("newLabelLanguage");
-			List<Literal> firstNames = literalsFromForm.get("firstName");
-			List<Literal> lastNames = literalsFromForm.get("lastName");
-
-			//Expecting only one language
-			if(firstNames.size() > 0 && lastNames.size() > 0 && newLabelLanguages.size() > 0) {
-				Literal newLabelLanguage = newLabelLanguages.get(0);
-				Literal firstNameLiteral = firstNames.get(0);
-				Literal lastNameLiteral = lastNames.get(0);
-				//Get the string
-				String lang = this.getLanguage(newLabelLanguage.getString());
-				String firstNameValue = firstNameLiteral.getString();
-				String lastNameValue = lastNameLiteral.getString();
-				//Now add the language category to the literal
-				Literal firstNameWithLanguage = inputSubmission.createLiteral(firstNameValue, 
-						null, 
-						lang);
-				Literal lastNameWithLanguage = inputSubmission.createLiteral(lastNameValue, 
-						null, 
-						lang);
-				firstNames = new ArrayList<Literal>();
-				lastNames = new ArrayList<Literal>();
-				firstNames.add(firstNameWithLanguage);
-				lastNames.add(lastNameWithLanguage);
-				//replace the label with one with language, again assuming only one label being returned
-				literalsFromForm.put("firstName", firstNames);
-				literalsFromForm.put("lastName", lastNames);
-				inputSubmission.setLiteralsFromForm(literalsFromForm);
-			}
-		}
 		
 	}
 	
 	//The language code returned from JAVA locales has an underscore whereas we need a hyphen
-	private String getLanguage(String inputLanguageCode) {
+	protected String getLanguage(String inputLanguageCode) {
 		if(inputLanguageCode.contains("_")) {
 			return inputLanguageCode.replace("_", "-");
 		}

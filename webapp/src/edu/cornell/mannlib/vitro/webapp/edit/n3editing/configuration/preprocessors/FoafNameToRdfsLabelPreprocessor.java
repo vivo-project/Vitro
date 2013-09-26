@@ -43,7 +43,14 @@ public class FoafNameToRdfsLabelPreprocessor implements ModelChangePreprocessor 
 				
 				String firstNameLanguage = firstNameLiteral.getLanguage();
 				String lastNameLanguage = lastNameLiteral.getLanguage();
+				//Start creating string for new label
 				String newLabel = lname.getString() + ", " + fname.getString();
+
+				//Middle name handling
+				if(mname != null && mname.getString() != null) {
+					newLabel += " " + mname.getString();
+				} 
+				
 				if(firstNameLanguage != null && lastNameLanguage != null && firstNameLanguage.equals(lastNameLanguage)) {
 					//create a literal with the appropriate value and the language
 					Literal labelWithLanguage = additionsModel.createLiteral(newLabel, firstNameLanguage);
