@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.ibm.icu.text.Collator;
 
@@ -63,7 +64,7 @@ public class RestrictionRetryController extends BaseEditController {
 			List<Option> onPropertyList = new LinkedList<Option>(); 
 			Collections.sort(pList, new PropSorter());
 			for (Property p: pList) {
-				onPropertyList.add( new Option(p.getURI(),p.getLocalNameWithPrefix()) );
+				onPropertyList.add( new Option(p.getURI(),p.getPickListName()));
 			}
 					
 			epo.setFormObject(new FormObject());
@@ -117,8 +118,20 @@ public class RestrictionRetryController extends BaseEditController {
 	private List<Option> getValueClassOptionList(VitroRequest request) {
 		List<Option> valueClassOptionList = new LinkedList<Option>();
 		VClassDao vcDao = request.getUnfilteredWebappDaoFactory().getVClassDao();
-		for (VClass vc: vcDao.getAllVclasses()) {
-			valueClassOptionList.add(new Option(vc.getURI(), vc.getLocalNameWithPrefix()));
+		List<VClass> vclasses = vcDao.getAllVclasses();
+        boolean addOwlThing = true;
+        for (VClass vclass : vclasses) {
+            if (OWL.Thing.getURI().equals(vclass.getURI())) {
+                addOwlThing = false;
+                break;
+            }
+        }
+        if(addOwlThing) {
+            vclasses.add(new VClass(OWL.Thing.getURI()));
+        }
+        Collections.sort(vclasses);
+		for (VClass vc: vclasses) {
+			valueClassOptionList.add(new Option(vc.getURI(), vc.getPickListName()));
 		}
 		return valueClassOptionList;
 	}
