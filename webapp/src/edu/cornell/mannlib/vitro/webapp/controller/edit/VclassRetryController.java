@@ -31,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
@@ -64,10 +65,12 @@ public class VclassRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        VClassDao vcwDao = request.getUnfilteredAssertionsWebappDaoFactory().getVClassDao();
+        WebappDaoFactory wadf = ModelAccess.on(getServletContext()).getWebappDaoFactory();
+        
+        VClassDao vcwDao = wadf.getVClassDao();
         epo.setDataAccessObject(vcwDao);
-        VClassGroupDao cgDao = request.getUnfilteredWebappDaoFactory().getVClassGroupDao();
-        OntologyDao oDao = request.getUnfilteredWebappDaoFactory().getOntologyDao();
+        VClassGroupDao cgDao = wadf.getVClassGroupDao();
+        OntologyDao oDao = wadf.getOntologyDao();
 
         VClass vclassForEditing = null;
         if (!epo.getUseRecycledBean()){
@@ -82,18 +85,12 @@ public class VclassRetryController extends BaseEditController {
             } else {
                 vclassForEditing = new VClass();
                 if (request.getParameter("GroupId") != null) {
-                    try {
-                        vclassForEditing.setGroupURI(request.getParameter("GroupURI"));
-                    } catch (NumberFormatException e) {
-                        // too bad
-                    }
+                    vclassForEditing.setGroupURI(request.getParameter("GroupURI"));
                 }
             }
             epo.setOriginalBean(vclassForEditing);
         } else {
             vclassForEditing = (VClass) epo.getNewBean();
-            // action = "update";
-            // log.error("using newBean");
         }
 
         //make a simple mask for the class's id
