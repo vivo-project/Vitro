@@ -41,8 +41,8 @@ import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
-import edu.cornell.mannlib.vitro.webapp.controller.individual.IndividualController;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
@@ -92,12 +92,20 @@ public class SparqlQueryServlet extends BaseEditController {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException, IOException
     {    	    	   	
-		if (!isAuthorizedToDisplayPage(request, response,
-				SimplePermission.USE_SPARQL_QUERY_PAGE.ACTIONS)) {
-    		return;
-    	}
-
         VitroRequest vreq = new VitroRequest(request);
+        
+        //first check if the email and password are just in the request
+        String email = vreq.getParameter("email");
+        String password = vreq.getParameter("password");                        
+        boolean isAuth = PolicyHelper.isAuthorizedForActions(vreq, 
+                email, password, SimplePermission.USE_SPARQL_QUERY_PAGE.ACTIONS);
+        
+        //otherwise use the normal auth mechanism
+        if( ! isAuth && 
+            !isAuthorizedToDisplayPage(request, response,
+    				SimplePermission.USE_SPARQL_QUERY_PAGE.ACTIONS)) {
+            return;        	      
+        }
 
         Model model = vreq.getJenaOntModel(); 
         if( model == null ){
