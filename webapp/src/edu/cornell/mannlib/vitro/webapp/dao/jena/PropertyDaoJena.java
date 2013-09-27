@@ -525,7 +525,6 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                 vclasses.add(vclass);
             }
         }
-    	
     	return getAllPropInstByVClasses(vclasses);
     	
     }
@@ -619,10 +618,12 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     private static final int DEPTH_LIMIT = 20;
     
     private List<Restriction> getRelatedRestrictions(OntClass ontClass) {
-        return getRelatedRestrictions(ontClass, new ArrayList<Restriction>(), DEPTH_LIMIT);
+        List<Restriction> restList = new ArrayList<Restriction>();
+        addRelatedRestrictions(ontClass, restList, DEPTH_LIMIT);
+        return restList;
     }
     
-    private List<Restriction> getRelatedRestrictions(OntClass ontClass, 
+    private void addRelatedRestrictions(OntClass ontClass, 
             List<Restriction> relatedRestrictions, int limit) {
         limit--;
         if (ontClass.isRestriction()) {
@@ -633,9 +634,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
             while (operIt.hasNext()) {
                 OntClass operand = operIt.next();
                 if (!relatedRestrictions.contains(operand) && limit > 0) {
-                    relatedRestrictions.addAll(
-                            getRelatedRestrictions(
-                                    operand, relatedRestrictions, limit));
+                    addRelatedRestrictions(operand, relatedRestrictions, limit);
                 }
             }   
         } else {
@@ -644,12 +643,10 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
             for (OntClass sup : superClasses) {
                 if (sup.isAnon() && !sup.equals(ontClass) 
                         && !relatedRestrictions.contains(ontClass) && limit > 0) {
-                    relatedRestrictions.addAll(
-                            getRelatedRestrictions(sup, relatedRestrictions, limit));
+                    addRelatedRestrictions(sup, relatedRestrictions, limit);
                 }
             }
         }
-        return relatedRestrictions;
     }
     
     public List<PropertyInstance> getAllPropInstByVClasses(List<VClass> vclasses) {
