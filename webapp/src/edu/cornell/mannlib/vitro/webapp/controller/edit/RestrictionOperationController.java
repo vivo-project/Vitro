@@ -23,11 +23,14 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.vocabulary.DAML_OIL;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 
 public class RestrictionOperationController extends BaseEditController {
@@ -44,7 +47,8 @@ public class RestrictionOperationController extends BaseEditController {
 		
 	    try {
 	    	
-	    	OntModel ontModel = getOntModel(request, getServletContext());
+	    	OntModel ontModel = ModelAccess.on(
+	    	        getServletContext()).getOntModel(ModelID.BASE_TBOX);
 		    
             HashMap epoHash = null;
             EditProcessObject epo = null;

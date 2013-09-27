@@ -155,26 +155,6 @@ public class BaseEditController extends VitroHttpServlet {
         }
     }
     
-    protected OntModel getOntModel( HttpServletRequest request, ServletContext ctx ) {
-
-    	// TODO: JB - This method gets the UNION FULL model from the session, if there is one, 
-    	// TODO and the BASE_TBOX model otherwise.
-    	OntModel ontModel = null;
-    	try {
-    		ontModel = ModelAccess.on(request.getSession()).getJenaOntModel();
-    	} catch (Exception e) {
-    	    // ignoring any problems here - we're not really expecting
-    	    // this attribute to be populated anyway
-    	}
-    	
-    	if ( ontModel == null ) {
-            ontModel = ModelAccess.on(ctx).getOntModel(ModelID.BASE_TBOX);
-    	}
-    	
-    	return ontModel;
-    	
-    }
-    
     protected WebappDaoFactory getWebappDaoFactory() {
     	return ModelAccess.on(getServletContext()).getBaseWebappDaoFactory();
     }
