@@ -14,7 +14,7 @@ display:pageListPage
     display:urlMapping "/pageList" ;
     display:requiresBodyTemplate "pageList.ftl" ;   
     display:hasDataGetter display:pageListData;
-    display:requiredAction <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#ManageMenus> ;1
+    display:requiredAction <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#ManageMenus> ;
     display:cannotDeletePage "true" .
 
 display:pageListData
