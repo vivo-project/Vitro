@@ -476,6 +476,19 @@ public class GroupedPropertyList extends BaseTemplateModel {
         return null;
     }
 
+    public PropertyTemplateModel getProperty(String propertyUri, String rangeUri) {
+
+        for (PropertyGroupTemplateModel pgtm : groups) {
+            List<PropertyTemplateModel> properties = pgtm.getProperties();
+            for (PropertyTemplateModel ptm : properties) {
+                if (propertyUri.equals(ptm.getUri()) && rangeUri.equals(ptm.getRangeUri())) {
+                    return ptm;
+                }
+            }
+        }
+        return null;
+    }
+
     public PropertyTemplateModel pullProperty(String propertyUri) {
         return pullProperty(propertyUri, null);
     }

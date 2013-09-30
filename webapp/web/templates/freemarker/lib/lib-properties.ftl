@@ -22,6 +22,24 @@
     </#if>
 </#function>
 
+<#-- Return true iff there are statements for this property -->
+<#function hasVisualizationStatements propertyGroups propertyName rangeUri>
+
+    <#local property = propertyGroups.getProperty(propertyName, rangeUri)!>
+    
+        <#-- First ensure that the property is defined
+        (an unpopulated property while logged out is undefined) -->
+        <#if ! property?has_content>
+            <#return false>
+        </#if>
+    
+        <#if property.collatedBySubclass!false> <#-- collated object property-->
+            <#return property.subclasses?has_content>
+        <#else>
+            <#return property.statements?has_content> <#-- data property or uncollated object property -->
+        </#if>
+
+</#function>
 
 <#-----------------------------------------------------------------------------
     Macros for generating property lists
