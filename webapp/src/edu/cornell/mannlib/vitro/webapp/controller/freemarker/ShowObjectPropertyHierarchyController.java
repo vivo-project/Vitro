@@ -2,22 +2,18 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import net.sf.json.util.JSONUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,13 +22,13 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
 public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet {
 
@@ -146,19 +142,19 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
         int length = details.length();
         String leaves = "";
         leaves += details;
-        List childURIstrs = opDao.getSubPropertyURIs(parent.getURI());
-        if ((childURIstrs.size()>0) && position<MAXDEPTH) {
-            List childProps = new ArrayList();
-            Iterator childURIstrIt = childURIstrs.iterator();
+        List<String> childURIstrs = opDao.getSubPropertyURIs(parent.getURI());
+        if ( (childURIstrs.size() > 0) && (position < MAXDEPTH) ) {
+            List<ObjectProperty> childProps = new ArrayList<ObjectProperty>();
+            Iterator<String> childURIstrIt = childURIstrs.iterator();
             while (childURIstrIt.hasNext()) {
-                String URIstr = (String) childURIstrIt.next();
-                ObjectProperty child = (ObjectProperty) opDao.getObjectPropertyByURI(URIstr);
+                String URIstr = childURIstrIt.next();
+                ObjectProperty child = opDao.getObjectPropertyByURI(URIstr);
                 childProps.add(child);
             }
             Collections.sort(childProps);
-            Iterator childPropIt = childProps.iterator();
+            Iterator<ObjectProperty> childPropIt = childProps.iterator();
             while (childPropIt.hasNext()) {
-                ObjectProperty child = (ObjectProperty) childPropIt.next();
+                ObjectProperty child = childPropIt.next();
                 leaves += addChildren(child, position+1, ontologyUri, counter);
                 if (!childPropIt.hasNext()) {
                     if ( ontologyUri == null ) {
@@ -208,34 +204,45 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
                 tempString += "}, { \"name\": ";
             }
             
-            String nameStr = getDisplayLabel(op)==null ? "(no name)" : getDisplayLabel(op);
-            nameStr = nameStr.replace("\"","\\\"");
-            nameStr = nameStr.replace("\'","\\\'");
+            String nameStr = getDisplayLabel(op) == null ? "(no name)" : getDisplayLabel(op);
 
-            try {
-            	tempString +=  "\"<a href='propertyEdit?uri="+URLEncoder.encode(op.getURI(),"UTF-8") + "'>" + nameStr +"</a>\", ";
-            } catch (UnsupportedEncodingException uee) {
-                tempString +=  "\"" + nameStr + "\"";
-            	log.error("Unsupported: URLEncoder.encode() with UTF-8");
-            }
-            
-            tempString += "\"data\": { \"internalName\": \"" + op.getLocalNameWithPrefix() + "\", ";
+        	tempString += JSONUtils.quote(
+        	        "<a href='propertyEdit?uri=" + URLEncoder.encode(
+        	                op.getURI()) + "'>" + nameStr + "</a>") + ", ";
+             
+            tempString += "\"data\": { \"internalName\": " + JSONUtils.quote(
+                    op.getLocalNameWithPrefix()) + ", ";
 
             VClass tmp = null;
             
             try {
-            	tempString += "\"domainVClass\": \"" + (((tmp = vcDao.getVClassByURI(op.getDomainVClassURI())) != null && (tmp.getLocalNameWithPrefix() == null)) ? "" : vcDao.getVClassByURI(op.getDomainVClassURI()).getLocalNameWithPrefix()) + "\", " ;
+            	tempString += "\"domainVClass\": " + JSONUtils.quote(
+            	        ((tmp = vcDao.getVClassByURI(
+            	                op.getDomainVClassURI())) != null 
+            	                && (tmp.getLocalNameWithPrefix() == null)) 
+            	                        ? "" 
+            	                        : vcDao.getVClassByURI(
+            	                                op.getDomainVClassURI())
+            	                                .getLocalNameWithPrefix()) + ", " ;
             } catch (NullPointerException e) {
             	tempString += "\"domainVClass\": \"\",";
             }
             try {
-            	tempString += "\"rangeVClass\": \"" + (((tmp = vcDao.getVClassByURI(op.getRangeVClassURI())) != null && (tmp.getLocalNameWithPrefix() == null)) ? "" : vcDao.getVClassByURI(op.getRangeVClassURI()).getLocalNameWithPrefix()) + "\", " ;
+            	tempString += "\"rangeVClass\": " + JSONUtils.quote(
+            	        ((tmp = vcDao.getVClassByURI(
+            	                op.getRangeVClassURI())) != null 
+            	                && (tmp.getLocalNameWithPrefix() == null)) 
+            	                        ? "" 
+            	                        : vcDao.getVClassByURI(
+            	                                op.getRangeVClassURI())
+            	                                .getLocalNameWithPrefix()) + ", " ;
             } catch (NullPointerException e) {
             	tempString += "\"rangeVClass\": \"\",";
             }
             if (op.getGroupURI() != null) {
                 PropertyGroup pGroup = pgDao.getGroupByURI(op.getGroupURI());
-                tempString += "\"group\": \"" + ((pGroup == null) ? "unknown group" : pGroup.getName()) + "\" " ;
+                tempString += "\"group\": " + JSONUtils.quote(
+                        (pGroup == null) ? "unknown group" : pGroup.getName());
             } else {
                 tempString += "\"group\": \"unspecified\"";
             }

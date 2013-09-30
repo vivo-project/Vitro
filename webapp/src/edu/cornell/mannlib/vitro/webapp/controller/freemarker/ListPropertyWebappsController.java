@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -12,8 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import net.sf.json.util.JSONUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,7 +23,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -35,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
 public class ListPropertyWebappsController extends FreemarkerHttpServlet {
     private static Log log = LogFactory.getLog( ListPropertyWebappsController.class );
@@ -67,7 +65,7 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
 
             String vclassURI = vreq.getParameter("vclassUri");
         
-            List props = new ArrayList();
+            List<ObjectProperty> props = new ArrayList<ObjectProperty>();
             if (vreq.getParameter("propsForClass") != null) {
                 noResultsMsgStr = "There are no object properties that apply to this class.";
             
@@ -87,8 +85,8 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
                 propInsts.addAll(propInstMap.values());
                 Collections.sort(propInsts);
             
-                Iterator propInstIt = propInsts.iterator();
-                HashSet propURIs = new HashSet();
+                Iterator<PropertyInstance> propInstIt = propInsts.iterator();
+                HashSet<String> propURIs = new HashSet<String>();
                 while (propInstIt.hasNext()) {
                     PropertyInstance pi = (PropertyInstance) propInstIt.next();
                     if (!(propURIs.contains(pi.getPropertyURI()))) {
@@ -108,13 +106,13 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
             OntologyDao oDao = vreq.getUnfilteredWebappDaoFactory().getOntologyDao();
             HashMap<String,String> ontologyHash = new HashMap<String,String>();
 
-            Iterator propIt = props.iterator();
-            List<ObjectProperty> scratch = new ArrayList();
+            Iterator<ObjectProperty> propIt = props.iterator();
+            List<ObjectProperty> scratch = new ArrayList<ObjectProperty>();
             while (propIt.hasNext()) {
-                ObjectProperty p = (ObjectProperty) propIt.next();
-                if (p.getNamespace()!=null) {
+                ObjectProperty p = propIt.next();
+                if (p.getNamespace() != null) {
                     if( !ontologyHash.containsKey( p.getNamespace() )){
-                        Ontology o = (Ontology)oDao.getOntologyByURI(p.getNamespace());
+                        Ontology o = oDao.getOntologyByURI(p.getNamespace());
                         if (o==null) {
                             if (!VitroVocabulary.vitroURI.equals(p.getNamespace())) {
                                 log.debug("doGet(): no ontology object found for the namespace "+p.getNamespace());
@@ -144,36 +142,35 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
                 if (props.size()==0) {
                     json = "{ \"name\": \"" + noResultsMsgStr + "\" }";
                 } else {
-                    Iterator propsIt = props.iterator();
+                    Iterator<ObjectProperty> propsIt = props.iterator();
                     while (propsIt.hasNext()) {
                         if ( counter > 0 ) {
                             json += ", ";
                         }
-                        ObjectProperty prop = (ObjectProperty) propsIt.next();
+                        ObjectProperty prop = propsIt.next();
                     
                         String propNameStr = ShowObjectPropertyHierarchyController.getDisplayLabel(prop);
-                        propNameStr = propNameStr.replace("\"","\\\"");
-                        propNameStr = propNameStr.replace("\'","\\\'");
+
                         try {
-                            json += "{ \"name\": \"<a href='./propertyEdit?uri="+URLEncoder.encode(prop.getURI(),"UTF-8")+"'>" 
-                                 + propNameStr + "</a>\", "; 
+                            json += "{ \"name\": " + JSONUtils.quote("<a href='./propertyEdit?uri="+URLEncoder.encode(prop.getURI())+"'>" 
+                                 + propNameStr + "</a>") + ", "; 
                          } catch (Exception e) {
                              json += "{ \"name\": \"" + propNameStr + "\", "; 
                          }
                     
-                         json += "\"data\": { \"internalName\": \"" + prop.getLocalNameWithPrefix() + "\", "; 
+                         json += "\"data\": { \"internalName\": " + JSONUtils.quote(prop.getLocalNameWithPrefix()) + ", "; 
                     
                          VClass vc = (prop.getDomainVClassURI() != null) ? vcDao.getVClassByURI(prop.getDomainVClassURI()) : null;
                          String domainStr = (vc != null) ? vc.getLocalNameWithPrefix() : ""; 
-                         json += "\"domainVClass\": \"" + domainStr + "\", " ;
+                         json += "\"domainVClass\": " + JSONUtils.quote(domainStr) + ", " ;
                     
                          vc = (prop.getRangeVClassURI() != null) ? vcDao.getVClassByURI(prop.getRangeVClassURI()) : null;
                          String rangeStr = (vc != null) ? vc.getLocalNameWithPrefix() : ""; 
-                         json += "\"rangeVClass\": \"" + rangeStr + "\", " ; 
+                         json += "\"rangeVClass\": " + JSONUtils.quote(rangeStr) + ", " ; 
                     
                          if (prop.getGroupURI() != null) {
                              PropertyGroup pGroup = pgDao.getGroupByURI(prop.getGroupURI());
-                             json += "\"group\": \"" + ((pGroup == null) ? "unknown group" : pGroup.getName()) + "\" } } " ; 
+                             json += "\"group\": " + JSONUtils.quote((pGroup == null) ? "unknown group" : pGroup.getName()) + " } } " ; 
                          } else {
                              json += "\"group\": \"unspecified\" } }" ;
                          }
