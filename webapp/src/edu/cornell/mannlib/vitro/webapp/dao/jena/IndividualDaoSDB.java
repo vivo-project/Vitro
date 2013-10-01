@@ -321,11 +321,13 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     @Override
     public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, 
     	                                                 String value){        
+    	OntModel fullModel = getOntModelSelector().getFullModel();
+    	
         Property prop = null;
         if( RDFS.label.getURI().equals( dataPropertyUri )){
             prop = RDFS.label;
         }else{
-            prop = getOntModel().getProperty(dataPropertyUri);
+            prop = fullModel.getProperty(dataPropertyUri);
         }
 
         if( prop == null ) {            
@@ -340,20 +342,19 @@ public class IndividualDaoSDB extends IndividualDaoJena {
             return Collections.emptyList();
         }
         
-        Literal litv1 = getOntModel().createLiteral(value);        
-        Literal litv2 = getOntModel().createTypedLiteral(value);   
+        Literal litv1 = fullModel.createLiteral(value);        
+        Literal litv2 = fullModel.createTypedLiteral(value);   
         
         //warning: this assumes that any language tags will be EN
-        Literal litv3 = getOntModel().createLiteral(value,"EN");        
+        Literal litv3 = fullModel.createLiteral(value,"EN");        
         
         HashMap<String,Individual> individualsMap = 
         		new HashMap<String, Individual>();
                 
-        getOntModel().enterCriticalSection(Lock.READ);
+        fullModel.enterCriticalSection(Lock.READ);
         int count = 0;
         try{
-            StmtIterator stmts
-                = getOntModel().listStatements((Resource)null, prop, litv1);                                           
+            StmtIterator stmts = fullModel.listStatements((Resource)null, prop, litv1);    
             while(stmts.hasNext()){
                 count++;
                 Statement stmt = stmts.nextStatement();
@@ -377,7 +378,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                 }
             }
             
-            stmts = getOntModel().listStatements((Resource)null, prop, litv2);                                           
+            stmts = fullModel.listStatements((Resource)null, prop, litv2);                                           
             while(stmts.hasNext()){
                 count++;
                 Statement stmt = stmts.nextStatement();
@@ -401,7 +402,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                 }                
             }
             
-            stmts = getOntModel().listStatements((Resource)null, prop, litv3);                                           
+            stmts = fullModel.listStatements((Resource)null, prop, litv3);                                           
             while(stmts.hasNext()){
                 count++;
                 Statement stmt = stmts.nextStatement();
@@ -425,7 +426,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                 }                
             }
         } finally {
-            getOntModel().leaveCriticalSection();
+            fullModel.leaveCriticalSection();
         }
         
         List<Individual> rv = new ArrayList(individualsMap.size());
