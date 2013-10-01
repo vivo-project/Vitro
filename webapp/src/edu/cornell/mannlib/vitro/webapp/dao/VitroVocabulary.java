@@ -46,9 +46,10 @@ public class VitroVocabulary {
     
     public static final String DESCRIPTION_ANNOT = vitroURI + "descriptionAnnot";
     public static final String PUBLIC_DESCRIPTION_ANNOT = vitroURI + "publicDescriptionAnnot";
-    public static final String SHORTDEF = vitroURI+"shortDef";
-    public static final String EXAMPLE_ANNOT = vitroURI+"exampleAnnot";
+    public static final String SHORTDEF = "http://purl.obolibrary.org/obo/IAO_0000115";
+    public static final String EXAMPLE_ANNOT = "http://purl.obolibrary.org/obo/IAO_0000112";
 
+    
     public static final String EXTERNALID = vitroURI+"externalId";
     public static final String DATAPROPERTY_ISEXTERNALID = vitroURI+"isExternalId";
         

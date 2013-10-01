@@ -822,13 +822,11 @@ public class JenaIngestController extends BaseEditController {
     
     private void doAttachModel(String modelName, ModelMaker modelMaker) {
         if (attachedModels.containsKey(modelName)) {
-            return;
+            doDetachModel(modelName, modelMaker);
         }
-        Model m = modelMaker.getModel(modelName);
-        ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_ABOX).addSubModel(m);
+        Model m = ModelFactory.createDefaultModel();
+        m.add(modelMaker.getModel(modelName));        
         ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_TBOX).addSubModel(m);
-        ModelAccess.on(getServletContext()).getOntModel(ModelID.UNION_ABOX).addSubModel(m);
-        ModelAccess.on(getServletContext()).getOntModel(ModelID.UNION_TBOX).addSubModel(m);
         attachedModels.put(modelName, m);
         log.info("Attached " + modelName + " (" + m.hashCode() + ") to webapp");
     }
@@ -838,10 +836,7 @@ public class JenaIngestController extends BaseEditController {
         if (m == null) {
             return;
         }
-        ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_ABOX).removeSubModel(m);
         ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_TBOX).removeSubModel(m);
-        ModelAccess.on(getServletContext()).getOntModel(ModelID.UNION_ABOX).removeSubModel(m);
-        ModelAccess.on(getServletContext()).getOntModel(ModelID.UNION_TBOX).removeSubModel(m);
         attachedModels.remove(modelName);
         log.info("Detached " + modelName + " (" + m.hashCode() + ") from webapp");
     }

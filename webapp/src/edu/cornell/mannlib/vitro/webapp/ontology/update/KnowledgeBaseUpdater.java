@@ -94,21 +94,25 @@ public class KnowledgeBaseUpdater {
 		
 		AtomicOntologyChangeLists changes = new AtomicOntologyChangeLists(rawChanges,settings.getNewTBoxModel(),settings.getOldTBoxModel());
 		
-        //process the TBox before the ABox
-		try {
-		    log.debug("\tupdating tbox annotations");
-	        updateTBoxAnnotations();
-		} catch (Exception e) {
-		    log.error(e,e);
+		// Only modify the TBox and migration metadata the first time
+		if(updateRequired(servletContext)) {
+            //process the TBox before the ABox
+    		try {
+    		    log.debug("\tupdating tbox annotations");
+    	        updateTBoxAnnotations();
+    		} catch (Exception e) {
+    		    log.error(e,e);
+    		}
+    	    
+    	    try {
+        	    migrateMigrationMetadata(servletContext);
+    		    logger.log("Migrated migration metadata");
+    	    } catch (Exception e) {
+    	    	log.error("unable to migrate migration metadata " + e.getMessage());
+    	    }
 		}
-	    
-	    try {
-    	    migrateMigrationMetadata(servletContext);
-		    logger.log("Migrated migration metadata");
-	    } catch (Exception e) {
-	    	log.error("unable to migrate migration metadata " + e.getMessage());
-	    }
 	        	
+		// update ABox data any time
     	log.info("performing SPARQL CONSTRUCT additions");
     	performSparqlConstructs(settings.getSparqlConstructAdditionsDir(), settings.getRDFService(), ADD);
     	

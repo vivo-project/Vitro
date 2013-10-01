@@ -34,8 +34,10 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 
 public class DatapropRetryController extends BaseEditController {
@@ -54,11 +56,12 @@ public class DatapropRetryController extends BaseEditController {
         
         VitroRequest vreq = new VitroRequest(request);
 
-        DatatypeDao dDao = vreq.getUnfilteredWebappDaoFactory().getDatatypeDao();
-        DataPropertyDao dpDao = vreq.getUnfilteredWebappDaoFactory().getDataPropertyDao();
+        WebappDaoFactory wadf = ModelAccess.on(getServletContext()).getWebappDaoFactory();
+        
+        DatatypeDao dDao = wadf.getDatatypeDao();
+        DataPropertyDao dpDao = wadf.getDataPropertyDao();
         epo.setDataAccessObject(dpDao);
-        OntologyDao ontDao = vreq.getUnfilteredWebappDaoFactory().getOntologyDao();
-        VClassDao vclassDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
+        OntologyDao ontDao = wadf.getOntologyDao();
 
         DataProperty objectForEditing = null;
         String action = null;

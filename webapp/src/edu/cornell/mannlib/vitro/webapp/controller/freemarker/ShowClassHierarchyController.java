@@ -11,6 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.json.util.JSONUtils;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -50,77 +52,73 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
     protected ResponseValues processRequest(VitroRequest vreq) {
 
         Map<String, Object> body = new HashMap<String, Object>();
-        try {
-            String displayOption = "";
-            
-            if ( vreq.getParameter("displayOption") != null ) {
-                displayOption = vreq.getParameter("displayOption");
-            }
-            else {
-                displayOption = "asserted";
-            }
-
-            body.put("displayOption", displayOption);
-            boolean inferred = ( displayOption.equals("inferred") );
-            if ( inferred ) {
-                body.put("pageTitle", "Inferred Class Hierarchy");
-            }
-            else {
-                body.put("pageTitle", "Asserted Class Hierarchy");
-            }
-
-            if (!inferred) {
-            	vcDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getVClassDao();
-            } else {
-            	vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
-            }
-            String json = new String();
-
-            String ontologyUri = vreq.getParameter("ontologyUri");
-            String startClassUri = vreq.getParameter("vclassUri");
-
-            List<VClass> roots = null;
-
-            if (ontologyUri != null) {
-                roots = vcDao.getOntologyRootClasses(ontologyUri);
-            } else if (startClassUri != null) {
-            	roots = new LinkedList<VClass>();
-            	roots.add(vcDao.getVClassByURI(startClassUri));
-            } else {    	
-           		roots = vcDao.getRootClasses();
-            }
-
-            if (roots.isEmpty()) {
-            	roots = new LinkedList<VClass>();
-            	roots.add(vreq.getUnfilteredWebappDaoFactory().getVClassDao()
-            			.getTopConcept());
-            }
-            Collections.sort(roots);
-            int counter = 0;
-
-            Iterator rootIt = roots.iterator();
-            if (!rootIt.hasNext()) {
-                VClass vcw = new VClass();
-                vcw.setName("<strong>No classes found.</strong>");
-                json += addVClassDataToResultsList(vreq.getUnfilteredWebappDaoFactory(), vcw,0,ontologyUri,counter);
-            } else {
-                while (rootIt.hasNext()) {
-                    VClass root = (VClass) rootIt.next();
-    	            if (root != null) {
-    	                json += addChildren(vreq.getUnfilteredWebappDaoFactory(), root, 0, ontologyUri,counter);
-    	                counter += 1;
-                    }
-                }
-                int length = json.length();
-                if ( length > 0 ) {
-                    json += " }"; 
-                }
-            }
-            body.put("jsonTree",json);
- 
-        } catch (Throwable t) {
-                t.printStackTrace();
+        
+        String displayOption = "";
+        
+        if ( vreq.getParameter("displayOption") != null ) {
+            displayOption = vreq.getParameter("displayOption");
         }
+        else {
+            displayOption = "asserted";
+        }
+
+        body.put("displayOption", displayOption);
+        boolean inferred = ( displayOption.equals("inferred") );
+        if ( inferred ) {
+            body.put("pageTitle", "Inferred Class Hierarchy");
+        }
+        else {
+            body.put("pageTitle", "Asserted Class Hierarchy");
+        }
+
+        if (!inferred) {
+        	vcDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getVClassDao();
+        } else {
+        	vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
+        }
+        String json = new String();
+
+        String ontologyUri = vreq.getParameter("ontologyUri");
+        String startClassUri = vreq.getParameter("vclassUri");
+
+        List<VClass> roots = null;
+
+        if (ontologyUri != null) {
+            roots = vcDao.getOntologyRootClasses(ontologyUri);
+        } else if (startClassUri != null) {
+        	roots = new LinkedList<VClass>();
+        	roots.add(vcDao.getVClassByURI(startClassUri));
+        } else {    	
+       		roots = vcDao.getRootClasses();
+        }
+
+        if (roots.isEmpty()) {
+        	roots = new LinkedList<VClass>();
+        	roots.add(vreq.getUnfilteredWebappDaoFactory().getVClassDao()
+        			.getTopConcept());
+        }
+        Collections.sort(roots);
+        int counter = 0;
+
+        Iterator<VClass> rootIt = roots.iterator();
+        if (!rootIt.hasNext()) {
+            VClass vcw = new VClass();
+            vcw.setName("<strong>No classes found.</strong>");
+            json += addVClassDataToResultsList(vreq.getUnfilteredWebappDaoFactory(), vcw,0,ontologyUri,counter);
+        } else {
+            while (rootIt.hasNext()) {
+                VClass root = (VClass) rootIt.next();
+	            if (root != null) {
+	                json += addChildren(vreq.getUnfilteredWebappDaoFactory(), root, 0, ontologyUri,counter);
+	                counter += 1;
+                }
+            }
+            int length = json.length();
+            if ( length > 0 ) {
+                json += " }"; 
+            }
+        }
+        body.put("jsonTree",json);
         
         return new TemplateResponseValues(TEMPLATE_NAME, body);
     }
@@ -131,21 +129,21 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
         int length = rowElts.length();
         String leaves = "";
         leaves += rowElts;
-        List childURIstrs = vcDao.getSubClassURIs(parent.getURI());
+        List<String> childURIstrs = vcDao.getSubClassURIs(parent.getURI());
         if ((childURIstrs.size()>0) && position<MAXDEPTH) {
-            List childClasses = new ArrayList();
-            Iterator childURIstrIt = childURIstrs.iterator();
+            List<VClass> childClasses = new ArrayList<VClass>();
+            Iterator<String> childURIstrIt = childURIstrs.iterator();
             while (childURIstrIt.hasNext()) {
-                String URIstr = (String) childURIstrIt.next();
+                String URIstr = childURIstrIt.next();
                 try {
-                    VClass child = (VClass) vcDao.getVClassByURI(URIstr);
+                    VClass child = vcDao.getVClassByURI(URIstr);
                     if (!child.getURI().equals(OWL.Nothing.getURI())) {
                     	childClasses.add(child);
                     }
                 } catch (Exception e) {}
             }
             Collections.sort(childClasses);
-            Iterator childClassIt = childClasses.iterator();
+            Iterator<VClass> childClassIt = childClasses.iterator();
             while (childClassIt.hasNext()) {
                 VClass child = (VClass) childClassIt.next();
                 leaves += addChildren(wadf, child, position + childShift, ontologyUri, counter);
@@ -197,15 +195,16 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
                 tempString += "}, { \"name\": ";
             }
             try {
-                tempString +=  "\"<a href='vclassEdit?uri="+URLEncoder.encode(vcw.getURI(),"UTF-8")+"'>"+ vcw.getLocalNameWithPrefix() +"</a>\", ";
+                tempString += JSONUtils.quote("<a href='vclassEdit?uri=" + 
+                        URLEncoder.encode(vcw.getURI(),"UTF-8") + "'>" + 
+                        vcw.getLocalNameWithPrefix() + "</a>") +", ";
             } catch (Exception e) {
-                 tempString += "\" " + ((vcw.getLocalNameWithPrefix() == null) ? "" : vcw.getLocalNameWithPrefix()) + "\", ";
+                 tempString += JSONUtils.quote(((vcw.getLocalNameWithPrefix() == null) 
+                         ? "" : vcw.getLocalNameWithPrefix())) + ", ";
             }
 
             String shortDef = ((vcw.getShortDef() == null) ? "" : vcw.getShortDef()) ;
-            shortDef = shortDef.replace("\"","\\\"");
-            shortDef = shortDef.replace("\'","\\\'");
-            tempString += "\"data\": { \"shortDef\": \"" + shortDef + "\", ";
+            tempString += "\"data\": { \"shortDef\": " + JSONUtils.quote(shortDef) + ", ";
 
             // Get group name if it exists
             VClassGroupDao groupDao= wadf.getVClassGroupDao();
@@ -218,16 +217,17 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
             		groupName = classGroup.getPublicName();
             	}
             }
-            tempString += "\"classGroup\": \"" + ((groupName == null) ? "" : groupName) + "\", ";
+            tempString += "\"classGroup\": " + JSONUtils.quote(
+                    (groupName == null) ? "" : groupName) + ", ";
             // Get ontology name
-			String ontName = null;
-			try {
-            	OntologyDao ontDao = wadf.getOntologyDao();
-            	Ontology ont = ontDao.getOntologyByURI(vcw.getNamespace());
-            	ontName = ont.getName();
-			} catch (Exception e) {}
-
-            tempString += "\"ontology\": \"" + ((ontName == null) ? "" : ontName) + "\"}, \"children\": [";
+            OntologyDao ontDao = wadf.getOntologyDao();
+            String ontName = vcw.getNamespace();
+            Ontology ont = ontDao.getOntologyByURI(ontName);
+            if (ont != null && ont.getName() != null) {
+                ontName = ont.getName();
+            }
+            tempString += "\"ontology\": " + JSONUtils.quote(
+                    (ontName == null) ? "" : ontName) + "}, \"children\": [";
 
             previous_posn = position;
         }

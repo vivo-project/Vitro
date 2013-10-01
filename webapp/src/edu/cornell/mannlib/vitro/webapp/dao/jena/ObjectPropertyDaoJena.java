@@ -96,15 +96,17 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             p.setLocalName(op.getLocalName());
             OntologyDao oDao=getWebappDaoFactory().getOntologyDao();
             Ontology o = oDao.getOntologyByURI(p.getNamespace());
-            if (o==null) {
+            if (o == null) {
                 if (!VitroVocabulary.vitroURI.equals(p.getNamespace())) {
                     log.debug("propertyFromOntProperty(): no ontology object found for the namespace "+p.getNamespace());
                 }
+                p.setLocalNameWithPrefix(p.getLocalName());
+                p.setPickListName(getLabelOrId(op));                
             } else {
                 String prefix = o.getPrefix()==null?(o.getName()==null?"unspec":o.getName()):o.getPrefix();
                 p.setLocalNameWithPrefix(prefix+":"+p.getLocalName());
                 //log.warn("setting pickListName to: "+p.getLocalName()+" ("+prefix+")");
-                p.setPickListName(p.getLocalName()+" ("+prefix+")");
+                p.setPickListName(getLabelOrId(op) + " ("+prefix+")");
             }
             String propertyName = getPropertyStringValue(op,PROPERTY_FULLPROPERTYNAMEANNOT);
             if (op.getLabel(null) != null)

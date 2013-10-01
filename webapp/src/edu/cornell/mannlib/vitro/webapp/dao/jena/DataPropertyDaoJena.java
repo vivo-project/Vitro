@@ -183,9 +183,11 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
                 if (!VitroVocabulary.vitroURI.equals(dp.getNamespace())) {
                     log.debug("datapropFromOntProperty(): no ontology object found for the namespace "+dp.getNamespace());
                 }
+                dp.setLocalNameWithPrefix(dp.getLocalName());
+                dp.setPickListName(getLabelOrId(op));
             } else {
                 dp.setLocalNameWithPrefix(o.getPrefix()==null?(o.getName()==null?"unspec:"+dp.getLocalName():o.getName()+":"+dp.getLocalName()):o.getPrefix()+":"+dp.getLocalName());
-                dp.setPickListName(dp.getLocalName()+o.getPrefix()==null?(o.getName()==null?" (unspec:)":" ("+o.getName()+")"):" ("+o.getPrefix()+")");
+                dp.setPickListName(getLabelOrId(op)+o.getPrefix()==null?(o.getName()==null?" (unspec:)":" ("+o.getName()+")"):" ("+o.getPrefix()+")");
             }
             dp.setName(op.getLocalName());
             dp.setPublicName(getLabelOrId(op));
