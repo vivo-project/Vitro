@@ -233,18 +233,22 @@ name will be used as the label. -->
     	<@editingLinks "label" "" label editable />
     <#elseif editable || (labelCount > 1)>
     <#--We display the link even when the user is not logged in case of multiple labels-->
-    	<#if editable>
-    		<#assign imageAlt = "${i18n().manage}" />
-    		<#assign linkTitle = "${i18n().manage_list_of_labels}">
-    	<#else>
-			<#assign linkTitle = "${i18n().view_list_of_labels}">
-			<#assign imageAlt = "${i18n().view}" />    		
-    	</#if>
+    	<#assign labelLink = ""/>
     	<#-- Manage labels now goes to generator -->
     	<#assign individualUri = individual.uri!""/>
     	<#assign individualUri = (individualUri?url)/>
+    	<#if editable>
+    		<#assign imageAlt = "${i18n().manage}" />
+    		<#assign linkTitle = "${i18n().manage_list_of_labels}">
+    		<#assign labelLink= "${urls.base}/editRequestDispatch?subjectUri=${individualUri}&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManageLabelsGenerator&predicateUri=${labelPropertyUri}">
+    	<#else>
+			<#assign linkTitle = "${i18n().view_list_of_labels}">
+			<#assign imageAlt = "${i18n().view}" /> 
+			<#assign labelLink= "${urls.base}/viewLabels?subjectUri=${individualUri}">
+    	</#if>
+    	
         <span class="inline">
-            <a class="add-label" href="${urls.base}/editRequestDispatch?subjectUri=${individualUri}&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManageLabelsForIndividualGenerator&predicateUri=${labelPropertyUri}"
+            <a class="add-label" href="${labelLink}"
              title="${linkTitle}">
         	<img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="${imageAlt}" /></a>
         </span>

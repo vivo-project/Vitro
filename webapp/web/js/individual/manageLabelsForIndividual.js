@@ -24,6 +24,8 @@ var manageLabels = {
         this.addLabelForm = $('#addLabelForm');
         this.showFormButtonWrapper = $('#showAddForm');
         this.showFormButton = $("#showAddFormButton");
+        //button to return to profile - div with only cancel 
+        this.showCancelOnlyButton = $("#showCancelOnly");
         this.addLabelCancel = this.addLabelForm.find(".cancel");
         this.submit = this.addLabelForm.find('input#submit');
         this.labelLanguage = this.addLabelForm.find("#newLabelLanguage");
@@ -37,20 +39,28 @@ var manageLabels = {
         if(this.submissionErrorsExist == "false") {
         	//hide the form to add label
         	this.addLabelForm.hide();
+        	
         	//If the number of available locales is zero, then hide the ability to show the form as well
         	if(this.numberAvailableLocales == 0) {
             	manageLabels.showFormButtonWrapper.hide();
+            	this.showCancelOnlyButton.show();
+        	} else {
+        		//if the add label button is visible, don't need cancel only link
+        		this.showCancelOnlyButton.hide();
         	}
         	
         } else {
         	//Display the form
         	this.onShowAddForm();
+        	
         	//Also make sure the save button is enabled in case there is a value selected for the drop down
         	if(this.labelLanguage.val() != "") {
         		disableSubmit = false;
         	}
         
         }
+        
+       
        
         if(disableSubmit) {
         	//disable submit until user selects a language
@@ -235,6 +245,8 @@ var manageLabels = {
     	 //Re-show the add button and the form if they were hidden before
     	 if(availableLocalesList.length > 0 && manageLabels.showFormButtonWrapper.is(":hidden")) {
     		 manageLabels.showFormButtonWrapper.show();
+    		 //hide the cancel only button
+    		 manageLabels.showCancelOnlyButton.hide();
     	 }
     	 
     	 //Now replace dropdown with this new list

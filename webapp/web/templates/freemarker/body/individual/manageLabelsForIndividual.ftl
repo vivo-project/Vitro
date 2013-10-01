@@ -1,6 +1,7 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 <#include "manageLabelsForIndividualTerms.ftl" >
 <#-- Custom form for managing labels for individuals -->
+<#--This is used both for editing and for viewLabelsServlet-->
 <#import "manageLabelsForIndividualMacros.ftl" as m >
 <#assign requiredHint = "<span class='requiredHint'> *</span>" />
 <#assign subjectUri = editConfiguration.subjectUri/>
@@ -66,7 +67,9 @@
 				<input type="submit" value="${i18n().add_label}" id="showAddFormButton" name="showAddFormButton">  ${i18n().or} 
 				<a class="cancel" href="${cancelUrl}&url=/individual" title="${returnText}">${returnText}</a>
 			</div>  
-		
+			<div id="showCancelOnly">
+				<a class="cancel" href="${cancelUrl}&url=/individual" title="${returnText}">${returnText}</a>
+			</div>
 		    <#include "manageLabelsForIndividualAddForm.ftl" >
 	    </#if>
 	    

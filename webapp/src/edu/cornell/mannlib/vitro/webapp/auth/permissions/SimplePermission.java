@@ -76,6 +76,7 @@ public class SimplePermission extends Permission {
 		NAMESPACE + "UseAdvancedDataToolsPages");
 	public static final SimplePermission USE_SPARQL_QUERY_PAGE = new SimplePermission(
 		NAMESPACE + "UseSparqlQueryPage");
+	
 
 	// ----------------------------------------------------------------------
 	// These instances are "catch all" permissions to cover poorly defined
