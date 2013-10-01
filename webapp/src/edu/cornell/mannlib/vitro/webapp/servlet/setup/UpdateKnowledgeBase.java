@@ -138,24 +138,26 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			KnowledgeBaseUpdater ontologyUpdater = new KnowledgeBaseUpdater(settings);
 			boolean requiredUpdate = ontologyUpdater.updateRequired(ctx);
 
-			try {
-			    ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
-			    log.info("Data migration required");
-			    migrationChangesMade = ontologyUpdater.update(ctx);
-			    if (tryMigrateDisplay) {
-			        try {
-			            migrateDisplayModel(settings);
-			            log.info("Migrated display model");
-			        } catch (Exception e) {
-			            log.warn("unable to successfully update display model: " + e.getMessage());
-			        }
-			    }
-			    // reload the display model since the TBoxUpdater may have 
-			    // modified it
-			    new ApplicationModelSetup().contextInitialized(sce);				  
-			} catch (Exception ioe) {
-			    ss.fatal(this, "Exception updating knowledge base for ontology changes: ", ioe);
-			}	
+			if(!JenaDataSourceSetupBase.isFirstStartup()) {
+    			try {
+    			    ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
+    			    log.info("Data migration required");
+    			    migrationChangesMade = ontologyUpdater.update(ctx);
+    			    if (tryMigrateDisplay) {
+    			        try {
+    			            migrateDisplayModel(settings);
+    			            log.info("Migrated display model");
+    			        } catch (Exception e) {
+    			            log.warn("unable to successfully update display model: " + e.getMessage());
+    			        }
+    			    }
+    			    // reload the display model since the TBoxUpdater may have 
+    			    // modified it
+    			    new ApplicationModelSetup().contextInitialized(sce);				  
+    			} catch (Exception ioe) {
+    			    ss.fatal(this, "Exception updating knowledge base for ontology changes: ", ioe);
+    			}	
+			}
 
 		    SimpleReasoner simpleReasoner = (SimpleReasoner) sce.getServletContext()
 		            .getAttribute(SimpleReasoner.class.getName());
