@@ -14,7 +14,11 @@
 			<#assign label = labelLiteral />
 			<#assign labelLang = labelObject.languageName />
 			<#assign languageCode = labelObject.languageCode />
-			<#assign labelEditLink = labelObject.editLinkURL />
+			<#assign labelEditLink = ""/>
+			<#if labelObject.editLinkURL?has_content>
+				<#assign labelEditLink = labelObject.editLinkURL/>
+			</#if>
+		
 			<#if label?? && ( label?index_of("@") > -1 ) >
 		    	<#assign labelStr = label?substring(0, label?index_of("@")) >
 		    	<#assign tagOrTypeStr = label?substring(label?index_of("@")) >
@@ -52,7 +56,10 @@
 				<#assign label = labelLiteral />
 				<#assign labelLang = labelObject.languageName />
 				<#assign languageCode = labelObject.languageCode />
-				<#assign labelEditLink = labelObject.editLinkURL />
+				<#assign labelEditLink = ""/>
+				<#if labelObject.editLinkURL?has_content>
+					<#assign labelEditLink = labelObject.editLinkURL/>
+				</#if>
 				<#if label?? && ( label?index_of("@") > -1 ) >
 			    	<#assign labelStr = label?substring(0, label?index_of("@")) >
 			    	<#assign tagOrTypeStr = label?substring(label?index_of("@")) >
@@ -75,7 +82,7 @@
 <#macro displayLabel labelSeq labelStr languageCode labelEditLink tagOrTypeStr editGenerator editable displayRemoveLink>
     <li>${labelStr} <#if labelSeq?seq_contains(labelStr)> (duplicate value) </#if> 
     <#if editable> <#if labelEditLink?has_content> <a href="${labelEditLink}&${editGenerator}">Edit</a></#if>
-    <#if displayRemoveLink = true>
+    <#if displayRemoveLink>
 	<a href="${urls.base}/edit/primitiveRdfEdit" languageName="${labelLang}" languageCode="${languageCode}"
 	labelValue="${labelStr}" tagOrType="${tagOrTypeStr!}" class="remove" title="${i18n().remove_capitalized}">${i18n().remove_capitalized}</a>
 	</#if>

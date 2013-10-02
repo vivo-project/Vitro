@@ -54,7 +54,8 @@
   <owl:Class rdf:about="&display;IndividualsForClassesPage"/>
   <owl:Class rdf:about="&display;InternalClassesPage"/>
  
-
+ <!-- For permissions -->
+<owl:Class rdf:about="&display;RequiredAction"/>
 <!-- Annotation Properties -->
   <owl:AnnotationProperty rdf:about="&rdfs;comment"/>
   <owl:AnnotationProperty rdf:about="&rdfs;label"/>
@@ -127,7 +128,9 @@
 <owl:ObjectProperty rdf:about="&display;restrictResultsByClass"/>
 <owl:ObjectProperty rdf:about="&display;getIndividualsForClass"/>
 <owl:ObjectProperty rdf:about="&display;hasDataGetter"/>
-
+ <owl:ObjectProperty rdf:about="&display;requiresAction">
+    
+  </owl:ObjectProperty>
 <!--Custom properties-->
 
 

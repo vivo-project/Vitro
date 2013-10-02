@@ -1,10 +1,16 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#--Number of labels present-->
 <#if !labelCount??>
     <#assign labelCount = 0 >
 </#if>
+<#--Number of available locales-->
 <#if !localesCount??>
 	<#assign localesCount = 1>
 </#if>
+<#--Number of distinct languages represented, with no language tag counting as a language, across labels-->
+<#if !languageCount??>
+	<#assign languageCount = 1>
+</#if>	
 
 <#-- Default individual profile page template -->
 <#--@dumpAll /-->
@@ -35,7 +41,7 @@
             <#else>                
                 <h1 class="fn">
                     <#-- Label -->
-                    <@p.label individual editable labelCount localesCount/>
+                    <@p.label individual editable labelCount localesCount languageCount/>
 
                     <#--  Most-specific types -->
                     <@p.mostSpecificTypes individual />

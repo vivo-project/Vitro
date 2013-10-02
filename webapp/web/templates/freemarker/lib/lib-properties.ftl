@@ -238,7 +238,7 @@ name will be used as the label. -->
 </#macro>
 
 <#-- Label -->
-<#macro label individual editable labelCount localesCount=1>
+<#macro label individual editable labelCount localesCount=1 languageCount=1>
 	<#assign labelPropertyUri = ("http://www.w3.org/2000/01/rdf-schema#label"?url) />
 	<#assign useEditLink = false />
 	<#--edit link used if in edit mode and only one label and one language-->
@@ -249,8 +249,8 @@ name will be used as the label. -->
     ${label.value}
     <#if useEditLink>
     	<@editingLinks "label" "" label editable />
-    <#elseif editable || (labelCount > 1)>
-    <#--We display the link even when the user is not logged in case of multiple labels-->
+    <#elseif editable || (languageCount > 1)>
+    <#--We display the link even when the user is not logged in case of multiple labels with different languages-->
     	<#assign labelLink = ""/>
     	<#-- Manage labels now goes to generator -->
     	<#assign individualUri = individual.uri!""/>

@@ -83,7 +83,7 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
     static final protected String requiredActionsQuery =
         prefixes + "\n" +
         "SELECT ?requiredAction WHERE{\n" +
-        "    ?pageUri <" + DisplayVocabulary.REQUIRED_ACTIONS + ">  ?requiredAction .\n"+
+        "    ?pageUri <" + DisplayVocabulary.REQUIRES_ACTIONS + ">  ?requiredAction .\n"+
         "}";
 
     //Get data getter URIs

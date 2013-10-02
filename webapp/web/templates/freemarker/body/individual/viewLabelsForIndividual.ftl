@@ -8,11 +8,11 @@
 <#assign labelStr = "" >
 <#assign languageTag = "" >
 <#assign labelSeq = [] >
-<#assign editable = "false"/>
-<#assign displayRemoveLink = "false"/>
+<#assign editable = false/>
+<#assign displayRemoveLink = false/>
 
 <#if subjectName?? >
-<h2>${i18n().view_labels_for} ${editConfiguration.pageData.subjectName}</h2>
+<h2>${i18n().view_labels_for} ${subjectName}</h2>
 <#else>
 <h2>${i18n().view_labels_capitalized}</h2>
 </#if>
@@ -21,9 +21,9 @@
     <section id="rdfsLabels" role="container">
     
         <ul id="existingLabelsList" name="existingLabelsList">
-        <#if editConfiguration.pageData.labelsSortedByLanguageName?has_content>
+        <#if labelsSortedByLanguageName?has_content>
         	<#--List of labelInformation objects as value where key = language name -->
-        	<#assign labelsSorted = editConfiguration.pageData.labelsSortedByLanguageName />
+        	<#assign labelsSorted = labelsSortedByLanguageName />
         	<#--Keys would be the actual names of languages-->
         	<#assign labelLanguages = labelsSorted?keys?sort />
         	

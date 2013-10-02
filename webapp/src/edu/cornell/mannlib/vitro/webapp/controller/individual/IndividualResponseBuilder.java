@@ -111,6 +111,7 @@ class IndividualResponseBuilder {
 		 */
 		// body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
 	    body.put("labelCount", getLabelCount(itm.getUri(), vreq));
+	    body.put("languageCount", getLanguagesRepresentedCount(itm.getUri(), vreq));
 	    //We also need to know the number of available locales
 	    body.put("localesCount", SelectedLocale.getSelectableLocales(vreq).size());
 	    body.put("profileType", getProfileType(itm.getUri(), vreq));
@@ -279,6 +280,13 @@ class IndividualResponseBuilder {
         + "    FILTER isLiteral(?label) \n"
         + "}" ;
            
+    private static String DISTINCT_LANGUAGE_QUERY = ""
+            + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
+            + "SELECT ( str(COUNT(DISTINCT lang(?label))) AS ?languageCount ) WHERE { \n"
+            + "    ?subject rdfs:label ?label \n"
+            + "    FILTER isLiteral(?label) \n"
+            + "}" ;
+    
     private static Integer getLabelCount(String subjectUri, VitroRequest vreq) {
         String queryStr = QueryUtils.subUriForQueryVar(LABEL_COUNT_QUERY, "subject", subjectUri);
         log.debug("queryStr = " + queryStr);
@@ -296,6 +304,25 @@ class IndividualResponseBuilder {
             log.error(e, e);
         }    
         return theCount;
+    }
+    
+    //what is the number of languages represented across the labels
+    private static Integer getLanguagesRepresentedCount(String subjectUri, VitroRequest vreq) {
+    	   String queryStr = QueryUtils.subUriForQueryVar(DISTINCT_LANGUAGE_QUERY, "subject", subjectUri);
+           log.debug("queryStr = " + queryStr);
+           int theCount = 0;
+           try {
+              
+               ResultSet results = QueryUtils.getLanguageNeutralQueryResults(queryStr, vreq);
+               if (results.hasNext()) {
+                   QuerySolution soln = results.nextSolution();
+                   String countStr = soln.get("languageCount").toString();
+                   theCount = Integer.parseInt(countStr);
+               }
+           } catch (Exception e) {
+               log.error(e, e);
+           }    
+           return theCount;
     }
 
     private static String PROFILE_TYPE_QUERY = ""
