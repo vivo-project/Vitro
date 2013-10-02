@@ -1,5 +1,4 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 <#include "manageLabelsForIndividualTerms.ftl" >
 <#-- Custom form for managing labels for individuals -->
 <#--This is used both for editing and for viewLabelsServlet-->
