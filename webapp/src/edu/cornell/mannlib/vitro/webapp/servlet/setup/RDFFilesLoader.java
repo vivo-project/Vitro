@@ -148,7 +148,7 @@ public class RDFFilesLoader {
 
 	private static void readOntologyFileIntoModel(Path p, Model model) {
 		String format = getRdfFormat(p);
-		log.info("Loading file at " + p + " as " + format);
+		log.info("Loading "+ p);
 		try (InputStream stream = new FileInputStream(p.toFile())) {
 			model.read(stream, null, format);
 			log.debug("...successful");
