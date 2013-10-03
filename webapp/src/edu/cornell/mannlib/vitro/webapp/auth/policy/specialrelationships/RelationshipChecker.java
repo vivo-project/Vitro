@@ -32,6 +32,13 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 public class RelationshipChecker {
 	private static final Log log = LogFactory.getLog(RelationshipChecker.class);
 
+	protected static final String NS_CORE = "http://vivoweb.org/ontology/core#";
+	protected static final String NS_OBO = "http://purl.obolibrary.org/obo/";
+	protected static final String URI_RELATES = NS_CORE + "relates";
+	protected static final String URI_RELATED_BY = NS_CORE + "relatedBy";
+	protected static final String URI_INHERES_IN = NS_OBO + "RO_0000052";
+	protected static final String URI_REALIZES = NS_OBO + "BFO_0000055";
+
 	private final OntModel ontModel;
 
 	public RelationshipChecker(OntModel ontModel) {
@@ -145,6 +152,32 @@ public class RelationshipChecker {
 			}
 			ontModel.leaveCriticalSection();
 		}
+	}
+
+	/**
+	 * Get a list of URIs for object that link to the specified resource, by
+	 * means of the specified properties, through a linking node of the
+	 * specified type.
+	 * 
+	 * So we're looking for object URIs that statisfy these statements:
+	 * 
+	 * <resourceUri> <property1Uri> <linkNodeUri>
+	 * 
+	 * <linkNodeUri> rdfs:type <linkNodeTypeUri>
+	 * 
+	 * <linkNodeUri> <property2Uri> <objectUri>
+	 */
+	public List<String> getObjectsThroughLinkingNode(String resourceUri,
+			String property1Uri, String linkNodeTypeUri, String property2Uri) {
+		List<String> list = new ArrayList<String>();
+
+		for (String linkNodeUri : getObjectsOfProperty(resourceUri, property1Uri)) {
+			if (isResourceOfType(linkNodeUri, linkNodeTypeUri)) {
+				list.addAll(getObjectsOfProperty(linkNodeUri, property2Uri));
+			}
+		}
+		
+		return list;
 	}
 
 	public Selector createSelector(String subjectUri, String predicateUri,
