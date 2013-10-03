@@ -99,8 +99,8 @@ public class ContextNodeFields implements DocumentModifier{
             	}
             	
             }catch(Throwable t){
-                if( ! shutdown ) 
-                    log.error(t,t);
+                if( ! shutdown )                    
+                    log.error("problem while running query '" + subInUriQuery + "'",t);                
             } 
             
             if(log.isDebugEnabled()){
