@@ -36,7 +36,6 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DataPropertyStatementTemplateModel;
 
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 /*Servlet to view all labels in various languages for individual*/
 
