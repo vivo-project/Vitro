@@ -196,7 +196,7 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 	@Test
 	public void redirectFromLinkedDataPathAcceptStrange() {
 		req.setRequestUrl(url(DEFAULT_NAMESPACE + ID_INDIVIDUAL_TEST));
-		req.setHeader("accept", "application/json");
+		req.setHeader("accept", "image/jpg");
 		analyzeIt();
 		assertRdfRedirectRequestInfo(
 				"by linked data path, accept a strange content type",
