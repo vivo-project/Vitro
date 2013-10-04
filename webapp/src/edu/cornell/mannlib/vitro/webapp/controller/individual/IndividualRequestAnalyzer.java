@@ -28,7 +28,7 @@ public class IndividualRequestAnalyzer {
 			.getLog(IndividualRequestAnalyzer.class);
 	
 	
-	private static Pattern RDF_REQUEST = Pattern.compile("^/individual/([^/]+)/\\1\\.(rdf|n3|ttl)$");
+	private static Pattern RDF_REQUEST = Pattern.compile("^/individual/([^/]+)/\\1\\.(rdf|n3|ttl|jsonld)$");
     private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]+)$");
 	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individual/([^/]+)$");		
 	
@@ -145,7 +145,7 @@ public class IndividualRequestAnalyzer {
 					IndividualController.ACCEPTED_CONTENT_TYPES);
 	
 			if (RDFXML_MIMETYPE.equals(ctStr) || N3_MIMETYPE.equals(ctStr)
-					|| TTL_MIMETYPE.equals(ctStr)) {
+					|| TTL_MIMETYPE.equals(ctStr) || JSON_MIMETYPE.equals(ctStr)) {
 				return new ContentType(ctStr);
 			}
 		} catch (Throwable th) {
@@ -167,6 +167,7 @@ public class IndividualRequestAnalyzer {
 	 *     /individual/localname/localname.rdf
 	 *     /individual/localname/localname.n3
 	 *     /individual/localname/localname.ttl
+	 *     /individual/localname/localname.jsonld
 	 * </pre>
 	 * 
 	 * @return null on failure.
@@ -257,6 +258,7 @@ public class IndividualRequestAnalyzer {
 		 * http://vivo.cornell.edu/individual/n23/n23.rdf
 		 * http://vivo.cornell.edu/individual/n23/n23.n3
 		 * http://vivo.cornell.edu/individual/n23/n23.ttl
+		 * http://vivo.cornell.edu/individual/n23/n23.jsonld
 		 */
 		Matcher rdfMatch = RDF_REQUEST.matcher(url);
 		if (rdfMatch.matches() && rdfMatch.groupCount() == 2) {
@@ -269,6 +271,9 @@ public class IndividualRequestAnalyzer {
 			}
 			if ("ttl".equals(rdfType)) {
 				return ContentType.TURTLE;
+			}
+			if ("jsonld".equals(rdfType)) {
+				return ContentType.JSON;
 			}
 		}
 
