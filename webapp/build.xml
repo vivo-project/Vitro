@@ -22,6 +22,7 @@
 			</not>
 		</condition>
 		The Vitro build script requires Java 7 or later.
+		Ant property ant.java.version = ${ant.java.version}
 		Java system property java.version = ${java.version}
 		Java system property java.home = ${java.home}
 		JAVA_HOME environment variable = ${env.JAVA_HOME}
