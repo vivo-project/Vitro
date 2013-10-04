@@ -181,6 +181,10 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // that gets applied to the request.  This breaks blank node structures in the
         // restrictions that determine applicable properties.
         WebappDaoFactory wadf = ModelAccess.on(vreq.getSession().getServletContext()).getWebappDaoFactory();
+        //Allowing model switching for display model
+        if(vreq.getAttribute("specialWriteModel") != null) {
+        	wadf = ModelAccess.on(vreq).getWebappDaoFactory();
+        }
         PropertyInstanceDao piDao = wadf.getPropertyInstanceDao();
         
         Collection<PropertyInstance> allPropInstColl = piDao

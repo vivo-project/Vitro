@@ -1,5 +1,8 @@
 # $This file is distributed under the terms of the license in /doc/license.txt$ 
 
+# This file is for the portions of the pageList that should not be editable, i.e.
+that it cannot be deleted and that it requires certain permissions #
+
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -9,38 +12,6 @@
 ### This file defines the page list menu for vitro. ###
 
 display:pageListPage
-    a display:Page ;              
-    display:title "Pages" ;
-    display:urlMapping "/pageList" ;
-    display:requiresBodyTemplate "pageList.ftl" ;   
-    display:hasDataGetter display:pageListData;
+	display:queryModel <vitro:requestDisplayModel> ; 
     display:requiresAction <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#ManageMenus> ;
     display:cannotDeletePage "true" .
-
-display:pageListData
-    a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>;
-    display:queryModel <vitro:contextDisplayModel> ;                        
-    display:saveToVar "pages" ;
-     
-    display:query """
-    PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> 
-    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-    SELECT ?listedPageUri ?listedPageTitle ?listedPageUrlMapping ?listedPageTemplate ?listedPageMenuItem ?listedPageCannotDeletePage
-    WHERE { 
-        ?listedPageUri a display:Page .
-        OPTIONAL{ ?listedPageUri display:urlMapping ?listedPageUrlMapping. }
-        OPTIONAL{ ?listedPageUri display:title  ?listedPageTitle. }  
-        OPTIONAL {?listedPageUri display:requiresBodyTemplate ?listedPageTemplate .}
-        OPTIONAL {?listedPageMenuItem display:toPage ?listedPageUri .}
-        OPTIONAL {?listedPageUri display:cannotDeletePage ?listedPageCannotDeletePage .}
-     }  ORDER BY ?listedPageTitle """ .      
-###Page Management and Data Getters
-
-#Data getter type labels
-<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData>  rdfs:label "Class Group Page" .
-<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.BrowseDataGetter> rdfs:label "Browse Page" . 
-<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter> rdfs:label "Class Group Page - Selected Classes" .
-<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter> rdfs:label "Sparql Query Results" .
-        
- 
-                
