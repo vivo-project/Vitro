@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 
 
@@ -51,7 +52,8 @@ public class ClassgroupRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        VClassGroupDao cgDao = request.getUnfilteredWebappDaoFactory().getVClassGroupDao();
+        VClassGroupDao cgDao = ModelAccess.on(
+                getServletContext()).getWebappDaoFactory().getVClassGroupDao();
 
         epo.setDataAccessObject(cgDao);
 
