@@ -113,10 +113,10 @@ public class DisplayByRolePermission extends Permission {
 	private boolean isAuthorized(DisplayObjectPropertyStatement action) {
 		ObjectPropertyStatement stmt = action.getObjectPropertyStatement();
 		String subjectUri = stmt.getSubjectURI();
-		Property predicate = stmt.getProperty(); 
+		String predicateUri = stmt.getPropertyURI(); 
 		String objectUri = stmt.getObjectURI();
 		return canDisplayResource(subjectUri)
-				&& canDisplayPredicate(predicate)
+				&& canDisplayPredicate(new Property(predicateUri))
 				&& canDisplayResource(objectUri);
 	}
 
