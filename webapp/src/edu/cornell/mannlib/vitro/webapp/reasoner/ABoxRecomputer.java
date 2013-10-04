@@ -295,7 +295,8 @@ public class ABoxRecomputer {
 	 */
 	protected Collection<String> getAllIndividualURIs() {
 	    
-		String queryString = "select ?s where {?s a ?type}";
+		String queryString = "SELECT DISTINCT ?s WHERE { GRAPH ?g { ?s a ?type } " +
+		        " FILTER (!bound(?g) || !regex(str(?g),\"tbox\")) } ORDER BY ?s";
 	    return getIndividualURIs(queryString);
 	}
 

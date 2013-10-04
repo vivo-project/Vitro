@@ -226,7 +226,8 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
             }
         }
         if (subjQueue.isEmpty()) {
-            throw new RuntimeException("No named subject in statement patterns");
+            log.warn("No named subject in statement patterns");
+            return stmts;
         }
         while(remaining.size() > 0) {
             if(subjQueue.isEmpty()) {

@@ -82,8 +82,14 @@ public class ApplicationConfigurationOntologyUtils {
                 String domainURI = (domainRes != null) ? domainRes.getURI() : null;
                 String rangeURI = qsoln.getResource("range").getURI();
                 if (appropriateDomain(domainRes, subject, tboxModel)) {
-                    additionalProps.add(opDao.getObjectPropertyByURIs(
-                        opURI, domainURI, rangeURI));              
+                    ObjectProperty faux = opDao.getObjectPropertyByURIs(
+                            opURI, domainURI, rangeURI);
+                    if (faux != null) {
+                        additionalProps.add(faux);
+                    } else {
+                        log.error("Could not retrieve " + opURI + " qualified by " +
+                                " domain " + domainURI + " and range " + rangeURI); 
+                    }
                 }
             }  
         } finally {

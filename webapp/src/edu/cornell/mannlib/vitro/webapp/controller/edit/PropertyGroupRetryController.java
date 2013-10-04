@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 
 public class PropertyGroupRetryController extends BaseEditController {
@@ -50,7 +51,8 @@ public class PropertyGroupRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        PropertyGroupDao pgDao = request.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
+        PropertyGroupDao pgDao = ModelAccess.on(
+                getServletContext()).getWebappDaoFactory().getPropertyGroupDao();
 
         epo.setDataAccessObject(pgDao);
 

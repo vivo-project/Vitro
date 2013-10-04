@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.individual;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,10 +12,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -33,6 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RdfResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -70,6 +75,17 @@ public class IndividualRdfAssembler {
 
 	private static final String RICH_EXPORT_ROOT = "/WEB-INF/rich-export/";
 	private static final String INCLUDE_ALL = "all";
+
+	private static final String NS_DC = "http://purl.org/dc/elements/1.1/";
+	private static final String URI_RIGHTS = NS_DC + "rights";
+	private static final String URI_DATE = NS_DC + "date";
+	private static final String URI_PUBLISHER = NS_DC + "publisher";
+
+	private static final String NS_FOAF = "http://xmlns.com/foaf/0.1/";
+	private static final String URI_DOCUMENT = NS_FOAF + "Document";
+
+	private static final String URI_LABEL = VitroVocabulary.RDFS + "label";
+	private static final String URI_TYPE = VitroVocabulary.RDF_TYPE;
 
 	private final VitroRequest vreq;
 	private final ServletContext ctx;
@@ -118,6 +134,7 @@ public class IndividualRdfAssembler {
 		o.add(getStatementsAboutEntity());
 		o.add(getLabelsAndTypesOfRelatedObjects());
 		filterByPolicy(o);
+		addDocumentMetadata(o);
 		return o;
 	}
 
@@ -266,6 +283,67 @@ public class IndividualRdfAssembler {
 		}
 
 		return richExportModel;
+	}
+
+	/**
+	 * Add info about the RDF itself.
+	 * 
+	 * It will look something like this:
+	 * 
+	 * <pre>
+	 * <http://vivo.cornell.edu/individual/n6628/n6628.rdf>
+	 *     rdfs:label "RDF description of Baker, Able - http://vivo.cornell.edu/individual/n6628" ;
+	 *     rdf:type foaf:Document ;
+	 *     dc:publisher <http://vivo.cornell.edu> ;
+	 *     dc:date "2007-07-13"^^xsd:date ;
+	 *     dc:rights <http://vivo.cornell.edu/termsOfUse> .
+	 * </pre>
+	 */
+	private void addDocumentMetadata(OntModel o) {
+		String baseUrl = figureBaseUrl();
+		String documentUri = createDocumentUri();
+		String label = createDocumentLabel(o);
+		Literal dateLiteral = createDateLiteral(o);
+
+		Resource md = o.getResource(documentUri);
+
+		o.add(md, o.getProperty(URI_LABEL), label);
+		o.add(md, o.getProperty(URI_TYPE), o.getResource(URI_DOCUMENT));
+		o.add(md, o.getProperty(URI_PUBLISHER), o.getResource(baseUrl));
+		o.add(md, o.getProperty(URI_DATE), dateLiteral);
+		o.add(md, o.getProperty(URI_RIGHTS),
+				o.getResource(baseUrl + "/termsOfUse"));
+	}
+
+	private String figureBaseUrl() {
+		int cutHere = individualUri.indexOf("/individual");
+		return (cutHere > 0) ? individualUri.substring(0, cutHere)
+				: individualUri;
+	}
+
+	private String createDocumentUri() {
+		return vreq.getRequestURL().toString();
+	}
+
+	private String createDocumentLabel(OntModel o) {
+		String label = null;
+		NodeIterator nodes = o.listObjectsOfProperty(
+				o.getResource(individualUri), o.getProperty(URI_LABEL));
+		while (nodes.hasNext()) {
+			RDFNode n = nodes.nextNode();
+			if (n.isLiteral()) {
+				label = n.asLiteral().getString();
+			}
+		}
+		if (label == null) {
+			return "RDF description of " + individualUri;
+		} else {
+			return "RDF description of " + label + " - " + individualUri;
+		}
+	}
+
+	private Literal createDateLiteral(OntModel o) {
+		return o.createTypedLiteral(new Date(), XSDDatatype.XSDdate);
 	}
 
 }
