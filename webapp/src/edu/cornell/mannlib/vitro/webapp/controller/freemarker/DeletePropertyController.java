@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Red
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.FactoryID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
@@ -186,7 +187,7 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
     
     private void deleteObjectPropertyStatement(VitroRequest vreq) {
 		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-    	String objectUri = EditConfigurationUtils.getObjectUri(vreq);
+		String objectUri = EditConfigurationUtils.getObjectUri(vreq);
 		String subjectUri = EditConfigurationUtils.getSubjectUri(vreq);
 		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
 		//delete object property statement

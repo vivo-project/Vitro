@@ -250,24 +250,31 @@ name will be used as the label. -->
     <#if useEditLink>
     	<@editingLinks "label" "" label editable />
     <#elseif editable || (languageCount > 1)>
-    <#--We display the link even when the user is not logged in case of multiple labels with different languages-->
+    	<#--We display the link even when the user is not logged in case of multiple labels with different languages-->
     	<#assign labelLink = ""/>
     	<#-- Manage labels now goes to generator -->
     	<#assign individualUri = individual.uri!""/>
     	<#assign individualUri = (individualUri?url)/>
+    	<#assign individualProfileUrl = individual.profileUrl />
+    	<#assign profileParameters = individualProfileUrl?substring(individualProfileUrl?index_of("?") + 1)/>
+    	<#assign extraParameters = ""/>
+    	<#if profileParameters?contains("uri=")>
+    		<#assign extraParameters = profileParameters?replace("uri=" + individualUri, "") />
+    	</#if>
+    	<#--IF there are special parameters, then get those-->
     	<#if editable>
     		<#assign imageAlt = "${i18n().manage}" />
     		<#assign linkTitle = "${i18n().manage_list_of_labels}">
-    		<#assign labelLink= "${urls.base}/editRequestDispatch?subjectUri=${individualUri}&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManageLabelsGenerator&predicateUri=${labelPropertyUri}">
+    		<#assign labelLink= "${urls.base}/editRequestDispatch?subjectUri=${individualUri}&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManageLabelsGenerator&predicateUri=${labelPropertyUri}${extraParameters}">
     	<#else>
 			<#assign linkTitle = "${i18n().view_list_of_labels}">
 			<#assign imageAlt = "${i18n().view}" /> 
-			<#assign labelLink= "${urls.base}/viewLabels?subjectUri=${individualUri}">
+			<#assign labelLink= "${urls.base}/viewLabels?subjectUri=${individualUri}${extraParameters}">
     	</#if>
     	
         <span class="inline">
             <a class="add-label" href="${labelLink}"
-             title="${linkTitle}">
+             title="${linkTitle}">${individualProfileUrl} -> ${profileParameters} -> ${extraParameters}
         	<img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="${imageAlt}" /></a>
         </span>
     </#if>
