@@ -2,6 +2,9 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
 #Data getter type labels
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData>  rdfs:label "Class Group Page" .
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.BrowseDataGetter> rdfs:label "Browse Page" . 
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter> rdfs:label "Class Group Page - Selected Classes" .
