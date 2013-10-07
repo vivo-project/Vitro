@@ -215,5 +215,11 @@ public class VitroRequest extends HttpServletRequestWrapper {
 		return (OntModel) getAttribute("languageNeutralUnionFullModel");
 	}                
 	
-    
+    public void setLanguageNeutralWebappDaoFactory(WebappDaoFactory wadf) {
+    	setAttribute("languageNeutralWebappDaoFactory", wadf);
+    }
+
+    public WebappDaoFactory getLanguageNeutralWebappDaoFactory() {
+    	return (WebappDaoFactory) getAttribute("languageNeutralWebappDaoFactory");
+    }
 }
