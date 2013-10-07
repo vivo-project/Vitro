@@ -142,7 +142,7 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
         + " prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  \n"
         + " prefix core: <http://vivoweb.org/ontology/core#>  \n"
         + " prefix foaf: <http://xmlns.com/foaf/0.1/> \n"
-        + " prefix obo: <http://purl.obolibrary.org/> \n"
+        + " prefix obo: <http://purl.obolibrary.org/obo/> \n"
         + " prefix vcard: <http://www.w3.org/2006/vcard/ns#> \n"
         + " prefix event: <http://purl.org/NET/c4dm/event.owl#> \n"
         + " prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"
@@ -231,10 +231,12 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
                 "SELECT  \n" +
                     "(str(?e) as ?LeaderPerson ) WHERE {\n"
                     
-                    + " ?uri rdf:type foaf:Agent ; ?b ?c . \n"
+                    + " ?uri rdf:type foaf:Agent  . \n"
+                    + " ?uri core:contributingRole ?c . \n"
                     + " ?c rdf:type core:LeaderRole . \n"
                       
-                    + " OPTIONAL { ?c obo:RO_0000052 ?e . } . \n"                    
+                    + " OPTIONAL { ?c obo:RO_0000052 ?e  . \n"                    
+					+ "            ?e rdf:type foaf:Person . } . "					
                     +"}");
         
 	}
