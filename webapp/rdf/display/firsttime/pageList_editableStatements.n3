@@ -18,6 +18,7 @@ display:pageListPage
 display:pageListData
     a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>;                       
     display:saveToVar "pages" ;
+    display:queryModel <vitro:requestDisplayModel> ; 
     display:query """
     PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> 
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>

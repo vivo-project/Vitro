@@ -1,4 +1,5 @@
 # $This file is distributed under the terms of the license in /doc/license.txt$ 
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
 #Data getter type labels
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ClassGroupPageData>  rdfs:label "Class Group Page" .
