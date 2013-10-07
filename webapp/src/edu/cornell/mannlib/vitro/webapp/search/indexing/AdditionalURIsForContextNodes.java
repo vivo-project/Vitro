@@ -142,6 +142,9 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
         + " prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  \n"
         + " prefix core: <http://vivoweb.org/ontology/core#>  \n"
         + " prefix foaf: <http://xmlns.com/foaf/0.1/> \n"
+        + " prefix obo: <http://purl.obolibrary.org/> \n"
+        + " prefix vcard: <http://www.w3.org/2006/vcard/ns#> \n"
+        + " prefix event: <http://purl.org/NET/c4dm/event.owl#> \n"
         + " prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> \n"
         + " prefix localNav: <http://vitro.mannlib.cornell.edu/ns/localnav#>  \n"
         + " prefix bibo: <http://purl.org/ontology/bibo/>  \n";
@@ -151,30 +154,39 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
 	    // If a person changes then update
 	    // organizations for positions
 		multiValuedQueriesForAgent.add(prefix +
-				"SELECT \n" +
+				"SELECT DISTINCT \n" +
 				" (str(?i) as ?positionInOrganization) \n" +
 				" WHERE {\n" 
 				
-				+ "?uri rdf:type foaf:Agent  ; ?b ?c . \n"
+				+ "?uri rdf:type foaf:Agent  ; core:relatedBy ?c . \n"
 				+ " ?c rdf:type core:Position . \n"
 							
-				+ " OPTIONAL { ?c core:positionInOrganization ?i . } . \n"
+				+ " OPTIONAL { ?c core:relates ?i . ?i rdf:type foaf:Organization } . \n"
 				+ " }");
 		
         // If a person changes then update
 		// advisee, linkedAuthor and informationResource
 		multiValuedQueriesForAgent.add(prefix +
 				"SELECT (str(?d) as ?advisee) \n" +
-				" (str(?f) as ?linkedAuthor) (str(?h) as ?linkedInformationResource)  WHERE {\n" 
+				" (str(?f) as ?linkedAuthor) (str(?h) as ?linkedInformationResource)  WHERE { {\n" 
 				
-				+ "?uri rdf:type foaf:Agent  ; ?b ?c . \n"
-				+ " ?c rdf:type core:Relationship . \n"
-				
-				+ " OPTIONAL  { ?c core:advisee ?d . } . \n"
-				+ " OPTIONAL   { ?c core:linkedAuthor ?f . } . \n"
-				+ " OPTIONAL { ?c core:linkedInformationResource ?h . } . \n"
-				
-				+ " } ");
+				+ "?uri rdf:type foaf:Agent . \n"
+				+ "?uri core:relatedBy ?c . \n"
+				+ "?c rdf:type core:AdvisingRelationship .  \n"
+				+ "?c core:relates ?d .  \n"
+				+ "?d rdf:type core:AdviseeRole  .  \n"
+				+ "?d obo:RO_0000052 ?e .  \n"
+				+ "?e rdf:type foaf:Person .  \n"
+				+ "}  \n"
+				+ "UNION {  \n"
+				+ " ?uri rdf:type foaf:Agent .  \n"
+				+ " ?uri core:relatedBy ?c .  \n"
+				+ " ?c rdf:type core:Authorship . \n"
+				+ " OPTIONAL {?c core:relates ?f . \n"
+				+ "           ?f rdf:type foaf:Person . } \n"
+				+ " OPTIONAL  { ?c core:relates ?h . \n"
+				+ "             ?h rdf:type obo:IAO_0000030 . } \n"
+				+ " } } ");
 		
 	    // If a person changes then update
 		// award giver
@@ -185,7 +197,7 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
 				+ "?uri rdf:type foaf:Agent  ; ?b ?c . \n"
 				+ " ?c rdf:type core:AwardReceipt . \n"
 				
-				+ " OPTIONAL { ?c core:awardConferredBy ?d . } . \n"
+				+ " OPTIONAL { ?c core:assignedBy ?d . } . \n"
 				+ " }");
 		
         // If a person changes then update
@@ -195,7 +207,7 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
 				"WHERE {\n"
 				
 				+ "?uri rdf:type foaf:Agent  ; ?b ?c . \n"
-				+ " ?c rdf:type core:Role ; core:roleIn ?Organization .\n"
+				+ " ?c rdf:type obo:BFO_0000023 ; obo:BFO_0000054 ?Organization .\n"
 				+ " }");
 		
         // If a person changes then update
@@ -205,12 +217,13 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
 		         	"(str(?e) as ?trainingAtOrganization) WHERE {\n"
 					
 					+ " ?uri rdf:type foaf:Agent ; ?b ?c . \n"
-					+ " ?c rdf:type core:EducationalTraining . \n"
+					+ " ?c rdf:type core:EducationalProcess . \n"
 					  
-					+ " OPTIONAL { ?c core:trainingAtOrganization ?e . } . \n" 					
+					+ " OPTIONAL { ?c obo:RO_0000057 ?e  . \n"
+					+ "            ?e rdf:type foaf:Organization . } . "					
 					+"}");
 		
-		// If an organizatoin changes then update
+		// If an organization changes then update
         // people in head of relations
         multiValuedQueriesForAgent.add(
                 " # for organization, get leader  \n" +
@@ -221,10 +234,8 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
                     + " ?uri rdf:type foaf:Agent ; ?b ?c . \n"
                     + " ?c rdf:type core:LeaderRole . \n"
                       
-                    + " OPTIONAL { ?c core:leaderRoleOf ?e . } . \n"                    
+                    + " OPTIONAL { ?c obo:RO_0000052 ?e . } . \n"                    
                     +"}");
-        
-        
         
 	}
 	
@@ -233,20 +244,26 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
 		
 		multiValuedQueryForInformationResource = prefix + 
 				"SELECT  (str(?b) as ?linkedAuthor) (str(?d) as ?linkedInformationResource) \n"
-		         + "(str(?e) as ?editor) \n" +
+		         + "(str(?f) as ?editor) \n" +
 		         		"(str(?i) as ?features) WHERE {\n"
 					
-					+ " ?uri rdf:type core:InformationResource . \n"
+					+ " ?uri rdf:type obo:IAO_0000030 . \n"
 					  
-					+  "OPTIONAL { ?uri core:informationResourceInAuthorship ?a . ?a core:linkedAuthor ?b ; core:linkedInformationResource ?d .\n" +
-							"} . "
-					+  "OPTIONAL { ?uri bibo:editor ?e . } .\n"			  
+					+ " OPTIONAL { ?uri core:relatedBy ?a . \n"
+					+ "            ?a rdf:type core:Authorship . \n"
+					+ "            ?a core:relates ?b . ?b rdf:type foaf:Person .\n" 
+					+ "            ?a core:relates ?d . ?d rdf:type obo:IAO_0000030 .\n"
+				    +            "} . "
+
+        			+ " OPTIONAL { ?uri core:relatedBy ?e . \n"
+        			+ "            ?e rdf:type core:Editorship . \n"
+    				+ "            ?e core:relates ?f . ?f rdf:type foaf:Person .\n" 
+    				+			"} . "
 					+ " OPTIONAL { ?uri core:features ?i . } . \n" 
 					
 					+"}" ;
 	
 	}
-
 
 	protected static List<String> queriesForAuthorship(){
 	    List<String> queries = new ArrayList<String>();
@@ -257,8 +274,9 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
          + "SELECT  (str(?a) as ?infoResource) WHERE {\n"
             
          + " ?uri rdf:type foaf:Person . \n"
-         + " ?uri core:authorInAuthorship ?aship .\n"                       
-         +  "OPTIONAL { ?aship core:linkedInformationResource ?a } .\n"            
+         + " ?uri core:relatedBy ?aship .\n"                       
+         + " ?aship rdf:type core:Authorship  .\n"                       
+         +  "OPTIONAL { ?aship core:relates ?a . ?a rdf:type obo:IAO_0000030 } .\n"            
          +"}" );
 	    
 	    //get additional URIs of authors from information resource side
@@ -266,9 +284,9 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
          prefix  
          + "SELECT  (str(?a) as ?author ) WHERE {\n"
             
-         + " ?uri rdf:type core:InformationResource . \n"
-         + " ?uri core:informationResourceInAuthorship ?aship .\n"                       
-         +  "OPTIONAL { ?aship core:linkedAuthor ?a } .\n"            
+         + " ?uri rdf:type obo:IAO_0000030 . \n"
+         + " ?uri core:relatedBy ?aship . ?aship rdf:type core:Authorship . \n"                       
+         +  "OPTIONAL { ?aship core:relates ?a . ?a rdf:type foaf:Person  } .\n"            
          +"}" );
 	    return queries;
 	}
@@ -281,8 +299,9 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
          prefix  
          + "SELECT  (str(?x) as ?individual) WHERE {\n"
          
-         + " ?uri rdf:type  core:URLLink . \n"
-         + " ?uri core:webpageOf ?x .\n"            
+         + " ?i rdf:type  vcard:Individual . \n"
+         + " ?i vcard:hasURL ?uri . \n"
+         + " ?i obo:ARG_2000029 ?x . \n"
          +"}" );
         
         return queries;	    
@@ -302,8 +321,10 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
             + " SELECT  (str(?person) as ?personUri) WHERE {\n"
             
             + " ?uri rdf:type core:AcademicDegree . \n"                        
-            + " ?uri core:degreeOutcomeOf ?edTrainingNode .\n" 
-            + " ?edTrainingNode core:educationalTrainingOf ?person . \n"
+            + " ?uri core:relatedBy ?awardedDegree .\n" 
+            + " ?awardedDegree rdf:type core:AwardedDegree .\n" 
+            + " ?awardedDegree core:relates ?person .\n" 
+            + " ?person rdf:type foaf:Person .\n" 
             +"}" );
         
         //if the organization changes the person needs to be updated
@@ -313,8 +334,10 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
             + " SELECT  (str(?person) as ?personUri) WHERE {\n"
             
             + " ?uri rdf:type foaf:Organization . \n"                        
-            + " ?uri core:organizationGrantingDegree ?edTrainingNode .\n" 
-            + " ?edTrainingNode core:educationalTrainingOf ?person . \n"
+            + " ?uri obo:RO_0000056 ?edTrainingNode .\n" 
+            + " ?edTrainingNode rdf:type core:EducationalProcess . \n"
+            + " ?edTrainingNode obo:RO_0000057 ?person . \n"
+            + " ?person rdf:type foaf:Person ."
             +"}" );
         return queries;     
     }
@@ -328,8 +351,10 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
             + " SELECT  (str(?person) as ?personUri) WHERE {\n"
             
             + " ?uri rdf:type foaf:Organization . \n"                        
-            + " ?uri core:organizationForPosition ?positionNode .\n" 
-            + " ?person core:personInPosition ?positionNode . \n"
+            + " ?uri core:relatedBy ?positionNode .\n" 
+            + " ?positionNode rdf:type core:Position .\n" 
+            + " ?positionNode core:relates ?person . \n"
+            + " ?person rdf:type foaf:Person .\n" 
             +"}" );
         
         
@@ -339,8 +364,10 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
             + " SELECT  (str(?org) as ?orgUri) WHERE {\n"
             
             + " ?uri rdf:type foaf:Person . \n"       
-            + " ?uri core:personInPosition ?positionNode .\n" 
-            + " ?org core:organizationForPosition ?positionNode . \n"
+            + " ?uri core:relatedBy ?positionNode .\n" 
+            + " ?positionNode rdf:type core:Position .\n" 
+            + " ?positionNode core:relates ?org . \n"
+            + " ?org rdf:type foaf:Organization .\n" 
             +"}" );
         return queries;     
     }
@@ -348,21 +375,28 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
 	static{
 		//	core:AttendeeRole
 		// If the person changes, update the attendee role in organization
+		// core:AttendeeRole applies to events, not organizations; updating accordingly - tlw72
 		multiValuedQueriesForRole.add(prefix +
-				"SELECT (str(?d) as ?organization) \n " +
-				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
-				+ " ?c rdf:type core:AttendeeRole ; core:roleIn ?d .\n"
+				"SELECT (str(?d) as ?event) \n " +
+				"WHERE {\n"			
+				+ "?uri rdf:type foaf:Person . \n"
+				+ "?uri obo:RO_0000053 ?c . \n"
+				+ "?c rdf:type core:AttendeeRole . \n"
+				+ "?c obo:BFO_0000054 ?d . \n"
+				+ "?d rdf:type event:Event .\n"
 				+ " }");
 		
 		// If the organization changes, update the attendee role of person 
+		// core:AttendeeRole applies to events, not organizations; updating accordingly - tlw72
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {\n"
 				
-				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
-				+ " ?c rdf:type core:AttendeeRole ; core:roleOf ?d .\n"
+				+ "?uri rdf:type event:Event . \n"
+				+ "?uri obo:BFO_0000055 ?c . \n"
+				+ "?c rdf:type core:AttendeeRole . \n"
+				+ "?c obo:RO_0000052 ?d . \n"
+				+ "?d rdf:type foaf:Person .\n"
 				+ " }");	
 			
 		//	core:ClinicalRole  -- core:clinicalRoleOf
@@ -370,49 +404,68 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
 		// If the person changes, update the clinical role in project
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?project)  \n" +
-				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
-				+ " ?c rdf:type core:ClinicalRole ; core:roleIn ?d .\n"
+				"WHERE {\n"				
+				+ "?uri rdf:type foaf:Person . \n"
+				+ "?uri obo:RO_0000053 ?c . \n"
+				+ "?c rdf:type core:ClinicalRole . \n"
+				+ "?c obo:BFO_0000054 ?d .\n"
+				+ "?d rdf:type core:Project .\n"
 				+ " }");
 		
+
+	   // If the person changes, update the clinical role in service
+	   multiValuedQueriesForRole.add(prefix +
+			   "SELECT (str(?d) as ?service)  \n" +
+			   "WHERE {\n"				
+			   + "?uri rdf:type foaf:Person . \n"
+			   + "?uri obo:RO_0000053 ?c . \n"
+			   + "?c rdf:type core:ClinicalRole . \n"
+			   + "?c core:roleContributesTo ?d .\n"
+			   + "?d rdf:type obo:ERO_0000005 .\n"
+			   + " }");
+	
 		// If the project changes, update the clinical role of person 
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type core:Project  ; ?b ?c . \n"
-				+ " ?c rdf:type core:ClinicalRole ; core:clinicalRoleOf ?d .\n "
+				+ "?uri rdf:type core:Project  . \n"
+				+ "?uri obo:BFO_0000055 ?c . \n"
+				+ "?c rdf:type core:ClinicalRole . \n"
+				+ "?c obo:RO_0000052 ?d .\n "
+				+ "?d rdf:type foaf:Person .\n "
 				+ " }");
 		
 		// If the service changes, update the clinical role of person 
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
-				"WHERE {\n"
-				
-				+ "?uri rdf:type core:Service  ; ?b ?c . \n"
-				+ " ?c rdf:type core:ClinicalRole ; core:clinicalRoleOf ?d .\n "
+				"WHERE {\n"			
+				+ "?uri rdf:type obo:ERO_0000005 . \n"
+				+ "?uri core:contributingRole ?c . \n"
+				+ "?c rdf:type core:ClinicalRole . \n"
+				+ "?c obo:RO_0000052 ?d .\n "
+				+ "?d rdf:type foaf:Person .\n "
 				+ " }");
-		
-		
-		//	core:LeaderRole -- core:leaderRoleOf
-		
+				
 		// If the person changes, update the leader role in organization
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?organization)  \n" +
-				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
-				+ " ?c rdf:type core:LeaderRole ; core:roleIn ?d .\n"
+				"WHERE {\n"				
+				+ "?uri rdf:type foaf:Person . \n"
+				+ "?uri obo:RO_0000053 ?c . \n"
+				+ "?c rdf:type core:LeaderRole . \n"
+				+ "?c core:roleContributesTo ?d .\n"
+				+ "?d rdf:type foaf:Organization .\n "
 				+ " }");
 		
 		// If the organization changes, update the leader role of person 
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
-				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
-				+ " ?c rdf:type core:LeaderRole ; core:leaderRoleOf ?d .\n"
+				"WHERE {\n"				
+				+ "?uri rdf:type foaf:Organization . \n"
+				+ "?uri core:contributingRole ?c . \n"
+				+ "?c rdf:type core:LeaderRole . \n"
+				+ "?c obo:RO_0000052 ?d .\n "
+				+ "?d rdf:type foaf:Person .\n "
 				+ " }");
 		
 		//	core:MemberRole -- core:memberRoleOf
@@ -421,115 +474,142 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?organization)  \n" +
 				"WHERE \n{"
-				
-				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
-				+ " ?c rdf:type core:MemberRole ; core:roleIn ?d .\n"
+				+ "?uri rdf:type foaf:Person . \n"
+				+ "?uri obo:RO_0000053 ?c . \n"
+				+ "?c rdf:type core:MemberRole . \n"
+				+ "?c core:roleContributesTo ?d .\n"
+				+ "?d rdf:type foaf:Organization .\n "
 				+ " }");
 		
 		// If the organization changes, update the member role of person 
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {"
-				
-				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
-				+ " ?c rdf:type core:MemberRole ; core:memberRoleOf ?d .\n"
+				+ "?uri rdf:type foaf:Organization . \n"
+				+ "?uri core:contributingRole ?c . \n"
+				+ "?c rdf:type core:MemberRole . \n"
+				+ "?c obo:RO_0000052 ?d .\n "
+				+ "?d rdf:type foaf:Person .\n "
 				+ " }");
+
 		//	core:OrganizerRole -- core:organizerRoleOf
 		
 		// If the person changes, update the organizer role in organization
+		// organizerRole appplies to events not organizations; updating accordingly - tlw72
 		multiValuedQueriesForRole.add(prefix +
-				"SELECT (str(?d) as ?organization)  \n" +
+				"SELECT (str(?d) as ?event)  \n" +
 				"WHERE {"
-				
-				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
-				+ " ?c rdf:type core:OrganizerRole ; core:roleIn ?d .\n"
+				+ "?uri rdf:type foaf:Person . \n"
+				+ "?uri obo:RO_0000053 ?c . \n"
+				+ "?c rdf:type core:OrganizerRole .\n"
+				+ "?c obo:BFO_0000054 ?d .\n"
+				+ "?d rdf:type event:Event .\n "
 				+ " }");
 		
 		// If the organization changes, update the organizer role of person 
+		// organizerRole appplies to events not organizations; updating accordingly - tlw72
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
-				+ " ?c rdf:type core:OrganizerRole ; core:organizerRoleOf ?d .\n"
+				+ "?uri rdf:type event:Event . \n"
+				+ "?uri obo:BFO_0000055 ?c . \n"
+				+ "?c rdf:type core:OrganizerRole . \n"
+				+ "?c obo:RO_0000052 ?d .\n "
+				+ "?d rdf:type foaf:Person .\n "
 				+ " }");
+
 		//	core:OutreachProviderRole -- core:outreachProviderRoleOf
 		
 		// If the person changes, update the outreach provider role in organization
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?organization)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
-				+ " ?c rdf:type core:OutreachProviderRole ; core:roleIn ?d .\n"
+				+ "?uri rdf:type foaf:Person . \n"
+				+ "?uri obo:RO_0000053 ?c . \n"
+				+ "?c rdf:type core:OutreachProviderRole .\n"
+				+ "?c core:roleContributesTo ?d .\n"
+				+ "?d rdf:type foaf:Organization .\n "
 				+ " }");
 		
 		// If the organization changes, update the outreach provider role of person 
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
-				+ " ?c rdf:type core:OutreachProviderRole ; core:outreachProviderRoleOf ?d .\n"
+				+ "?uri rdf:type foaf:Organization . \n"
+				+ "?uri core:contributingRole ?c . \n"
+				+ "?c rdf:type core:OutreachProviderRole . \n"
+				+ "?c obo:RO_0000052 ?d .\n "
+				+ "?d rdf:type foaf:Person .\n "
 				+ " }");
-		
-		
+
 		//	core:PresenterRole -- core:presenterRoleOf
 		
 		// If the person changes, update the presentation
 		multiValuedQueriesForRole.add(prefix +
-				"SELECT (str(?d) as ?organization)  \n" +
+				"SELECT (str(?d) as ?presentation)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
-				+ " ?c rdf:type core:PresenterRole ; core:roleIn ?d .\n"
+				+ "?uri rdf:type foaf:Person . \n"
+				+ "?uri obo:RO_0000053 ?c . \n"
+				+ " ?c rdf:type core:PresenterRole . \n"
+				+ " ?c obo:BFO_0000054 ?d .\n"
+				+ " ?d rdf:type core:Presentation . \n"
 				+ " }");
 		
 		// If the presentation changes, update the person 
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type core:Presentation  ; ?b ?c . \n"
-				+ " ?c rdf:type core:PresenterRole ; core:presenterRoleOf ?d .\n"
+				+ "?uri rdf:type core:Presentation . \n"
+				+ "?uri obo:BFO_0000055 ?c . \n"
+				+ " ?c rdf:type core:PresenterRole . \n "
+				+ "?c obo:RO_0000052 ?d .\n "
+				+ "?d rdf:type foaf:Person .\n "
 				+ " }");
 		
 		//	core:ResearcherRole -- core:researcherRoleOf
 		
 		// If the person changes, update the grant
 		multiValuedQueriesForRole.add(prefix +
-				"SELECT (str(?d) as ?organization)  \n" +
+				"SELECT (str(?d) as ?grant)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
-				+ " ?c rdf:type core:ResearcherRole ; core:roleIn ?d .\n"
+				+ "?uri rdf:type foaf:Person . \n"
+				+ "?uri obo:RO_0000053 ?c . \n"
+				+ " ?c rdf:type core:ResearcherRole . \n "
+				+ " ?c core:relatedBy ?d .\n"
+				+ " ?d rdf:type core:Grant . \n"
 				+ " }");
 		
 		// If the grant changes, update the researcher 
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type core:Grant  ; ?b ?c . \n"
-				+ " ?c rdf:type core:ResearcherRole ; core:researcherRoleOf ?d .\n"
+				+ "?uri rdf:type core:Grant . \n"
+				+ "?uri core:relates ?c . \n"
+				+ " ?c rdf:type core:ResearcherRole . \n "
+				+ " ?c obo:RO_0000052 ?d .\n"
+				+ "?d rdf:type foaf:Person .\n "
 				+ " }");
 		
 		// If the grant changes, update the principal investigator 
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type core:Grant  ; ?b ?c . \n"
-				+ " ?c rdf:type core:PrincipalInvestigatorRole ; core:principalInvestigatorRoleOf ?d .\n"
+				+ "?uri rdf:type core:Grant . \n"
+				+ " ?uri core:relates ?c . \n"
+				+ " ?c rdf:type core:PrincipalInvestigatorRole . \n "
+				+ " ?c obo:RO_0000052 ?d .\n"
+				+ "?d rdf:type foaf:Person .\n "
 				+ " }");
 
 		// If the grant changes, update the co-principal investigator 
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type core:Grant  ; ?b ?c . \n"
-				+ " ?c rdf:type core:CoPrincipalInvestigatorRole ; core:co-PrincipalInvestigatorRoleOf ?d .\n"
+				+ "?uri rdf:type core:Grant . \n"
+				+ " ?uri core:relates ?c . \n"
+				+ " ?c rdf:type core:CoPrincipalInvestigatorRole . \n "
+				+ " ?c obo:RO_0000052 ?d .\n"
+				+ "?d rdf:type foaf:Person .\n "
 				+ " }");
 		
 		
@@ -537,45 +617,65 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type core:Grant  ; ?b ?c . \n"
-				+ " ?c rdf:type core:InvestigatorRole ; core:investigatorRoleOf ?d .\n"
+				+ "?uri rdf:type core:Grant . \n"
+				+ " ?uri core:relates ?c . \n"
+				+ " ?c rdf:type core:InvestigatorRole . \n "
+				+ " ?c obo:RO_0000052 ?d .\n"
+				+ "?d rdf:type foaf:Person .\n "
 				+ " }");
 		
+    	// If the person changes, update the project
+    	multiValuedQueriesForRole.add(prefix +
+    			"SELECT (str(?d) as ?project)  \n" +
+    			"WHERE {\n"
+    			+ "?uri rdf:type foaf:Person . \n"
+    			+ "?uri obo:RO_0000053 ?c . \n"
+    			+ " ?c rdf:type core:ResearcherRole . \n "
+    			+ " ?c obo:BFO_0000054 ?d .\n"
+    			+ " ?d rdf:type core:Project . \n"
+    			+ " }");
+
 		// If the project changes, update the researcher 
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type core:Project  ; ?b ?c . \n"
-				+ " ?c rdf:type core:ResearcherRole ; core:researcherRoleOf ?d .\n"
-				+ " }");
-		
-		
-		
+				+ "?uri rdf:type core:Project . \n"
+    			+ " ?uri obo:BFO_0000055 ?c .\n"
+				+ " ?c rdf:type core:ResearcherRole . \n "
+				+ " ?c obo:RO_0000052 ?d .\n"
+				+ "?d rdf:type foaf:Person .\n "
+				+ " }");		
+
 		//	core:EditorRole -- core:editorRoleOf, core:forInformationResource (person, informationresource)
 		
-		// If the person changes, update the editor role in organization
+		// If the person changes, update the editor role of the info resource
+		// changing foaf:Organization to info content entity. Org no longer applies here - tlw72
 		multiValuedQueriesForRole.add(prefix +
-				"SELECT (str(?d) as ?organization)  \n" +
+				"SELECT (str(?d) as ?informationResource)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
-				+ " ?c rdf:type core:EditorRole ; core:roleIn ?d .\n"
+    			+ "?uri rdf:type foaf:Person . \n"
+    			+ "?uri obo:RO_0000053 ?c . \n"
+    			+ " ?c rdf:type core:EditorRole . \n "
+				+ " ?c core:roleContributesTo ?d .\n"
+				+ "?d rdf:type obo:IAO_0000030 .\n "
 				+ " }");
 		
 		
-		// If the organization changes, update the editor role of person 
+		// If the info respource changes, update the editor role of person 
+		// changing foaf:Organization to info content entity. Org no longer applies here - tlw72
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
-				+ " ?c rdf:type core:EditorRole ; core:editorRoleOf ?d .\n"
+				+ "?uri rdf:type obo:IAO_0000030 . \n"
+    			+ "?uri core:contributingRole ?c . \n"
+    			+ " ?c rdf:type core:EditorRole . \n "
+				+ " ?c obo:RO_0000052 ?d .\n"
+				+ "?d rdf:type foaf:Person .\n "
 				+ " }");
 		
+		// Next two queries are covered by the previous two. Commenting them out - tlw72
 		// If the person changes, update the information resource associated with editor role
-		multiValuedQueriesForRole.add(prefix +
+/*		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?informationResource)  \n" +
 				"WHERE {\n"
 				
@@ -591,46 +691,56 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
 				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
 				+ " ?c rdf:type core:EditorRole ; core:forInformationResource ?d .\n"
 				+ " }");
-		
+*/		
 		//	core:ServiceProviderRole -- core:serviceProviderRoleOf
 		
 		// If the person changes, update the service provider role in organization
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?organization)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
-				+ " ?c rdf:type core:ServiceProviderRole ; core:roleIn ?d .\n"
+    			+ "?uri rdf:type foaf:Person . \n"
+    			+ "?uri obo:RO_0000053 ?c . \n"
+				+ " ?c rdf:type obo:ERO_0000012 . \n"
+				+ " ?c core:roleContributesTo ?d .\n"
+				+ " ?d rdf:type foaf:Organization .\n "
 				+ " }");
 		
 		// If the organization changes, update the service provider role of person 
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
-				+ " ?c rdf:type core:ServiceProviderRole ; core:serviceProviderRoleOf ?d .\n"
+				+ "?uri rdf:type foaf:Organization . \n"
+    			+ "?uri core:contributingRole ?c . \n"
+    			+ " ?c rdf:type obo:ERO_0000012 . \n "
+				+ " ?c obo:RO_0000052 ?d .\n"
+				+ "?d rdf:type foaf:Person .\n "
 				+ " }");
 		
 		
 		//	core:TeacherRole -- core:teacherRoleOf
 		
 		// If the person changes, update the teacher role in organization
+		// updated to make this an Event (e.g., a course) not an organization - tlw72
 		multiValuedQueriesForRole.add(prefix +
-				"SELECT (str(?d) as ?organization)  \n" +
+				"SELECT (str(?d) as ?event)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
-				+ " ?c rdf:type core:TeacherRole ; core:roleIn ?d .\n"
+    			+ "?uri rdf:type foaf:Person . \n"
+    			+ "?uri obo:RO_0000053 ?c . \n"
+				+ " ?c rdf:type core:TeacherRole . \n"
+				+ " ?c obo:BFO_0000054 ?d .\n"
+				+ " ?d rdf:type event:Event .\n "
 				+ " }");
 		
 		// If the organization changes, update the teacher role of person 
+		// updated to make this an Event (e.g., a course) not an organization - tlw72
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?person)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
-				+ " ?c rdf:type core:TeacherRole ; core:teacherRoleOf ?d .\n"
+				+ "?uri rdf:type event:Event . \n"
+    			+ "?uri obo:BFO_0000055 ?c . \n"
+    			+ " ?c rdf:type core:TeacherRole . \n "
+				+ " ?c obo:RO_0000052 ?d .\n"
+				+ "?d rdf:type foaf:Person .\n "
 				+ " }");
 		
 
@@ -638,7 +748,9 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
 //		core:PeerReviewerRole -- core:forInformationResource, core:reviewerRoleOf
 		
 		// If the person changes, update the reviewer role in organization
-		multiValuedQueriesForRole.add(prefix +
+		// There is no relationship between a reviewerRole and an organization; commenting
+		// the next two queries out - tlw72
+/*		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?organization)  \n" +
 				"WHERE {\n"
 				
@@ -656,23 +768,27 @@ public class AdditionalURIsForContextNodes implements StatementToURIsToUpdate {
 				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
 				+ " ?c rdf:type core:ReviewerRole ; core:reviewerRoleOf ?d .\n"
 				+ " }");
-		
+*/		
 		// If the person changes, update the information resource associated with reviewer role
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?informationResource) \n " +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Person  ; ?b ?c . \n"
-				+ " ?c rdf:type core:ReviewerRole ; core:forInformationResource ?d .\n"
+    			+ "?uri rdf:type foaf:Person . \n"
+    			+ "?uri obo:RO_0000053 ?c . \n"
+				+ " ?c rdf:type core:ReviewerRole . \n"
+				+ " ?c core:roleContributesTo ?d .\n"
+				+ " ?d rdf:type obo:IAO_0000030 .\n "
 				+ " }");
 		
 		// If the organization changes, update the information resource associated with reviewer role
 		multiValuedQueriesForRole.add(prefix +
 				"SELECT (str(?d) as ?informationResource)  \n" +
 				"WHERE {\n"
-				
-				+ "?uri rdf:type foaf:Organization  ; ?b ?c . \n"
-				+ " ?c rdf:type core:ReviewerRole ; core:forInformationResource ?d .\n"
+				+ "?uri rdf:type obo:IAO_0000030 . \n"
+    			+ "?uri core:contributingRole ?c . \n"
+    			+ " ?c rdf:type core:ReviewerRole. \n "
+				+ " ?c obo:RO_0000052 ?d .\n"
+				+ "?d rdf:type foaf:Person .\n "
 				+ " }");
 		
 	}
