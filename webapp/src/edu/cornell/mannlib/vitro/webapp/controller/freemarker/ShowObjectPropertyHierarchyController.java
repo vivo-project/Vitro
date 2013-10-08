@@ -96,7 +96,7 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
             } else {
                 roots = opDao.getRootObjectProperties();
                 if (roots!=null){
-                    Collections.sort(roots, new ObjectPropertyAlphaComparator()); // sorts by domain public
+                    Collections.sort(roots, new ObjectPropertyAlphaComparator(vreq)); // sorts by domain public
                 }
             }
 
@@ -254,6 +254,13 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
     }
 
     public static class ObjectPropertyAlphaComparator implements Comparator<ObjectProperty> {
+        
+        Collator collator;
+        
+        public ObjectPropertyAlphaComparator(VitroRequest vreq) {
+            this.collator = vreq.getCollator();
+        }
+        
         public int compare(ObjectProperty op1, ObjectProperty op2) {
         	if (op1 == null) {
         		return 1;
@@ -267,7 +274,7 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
         	} else if (propLabel2 == null) {
         		return -1;
         	} else {
-        		return Collator.getInstance().compare( propLabel1, propLabel2 );
+        		return collator.compare( propLabel1, propLabel2 );
         	}
         }
     }

@@ -132,7 +132,7 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
             }
 
             if (props != null) {
-        	    Collections.sort(props, new ShowObjectPropertyHierarchyController.ObjectPropertyAlphaComparator());
+        	    sortForPickList(props, vreq);
             }
 
             String json = new String();

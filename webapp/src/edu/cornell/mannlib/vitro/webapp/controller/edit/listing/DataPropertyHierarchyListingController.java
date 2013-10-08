@@ -236,11 +236,5 @@ public class DataPropertyHierarchyListingController extends BaseEditController {
         }
         return colIndex-1;
     }
-
-    private class DataPropertyAlphaComparator implements Comparator {
-        public int compare(Object o1, Object o2) {
-        	return Collator.getInstance().compare( ((DataProperty)o1).getName(), ((DataProperty)o2).getName());
-        }
-    }
 	
 }

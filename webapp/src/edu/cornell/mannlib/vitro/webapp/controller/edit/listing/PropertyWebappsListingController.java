@@ -125,7 +125,9 @@ public class PropertyWebappsListingController extends BaseEditController {
         }
 
         if (props != null) {
-        	Collections.sort(props, new ObjectPropertyHierarchyListingController.ObjectPropertyAlphaComparator());
+        	Collections.sort(
+        	        props, new ObjectPropertyHierarchyListingController
+        	                .ObjectPropertyAlphaComparator(vrequest.getCollator()));
         }
 
         ArrayList results = new ArrayList();

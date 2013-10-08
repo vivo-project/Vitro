@@ -64,11 +64,12 @@ public class IndividualTypeRetryController extends BaseEditController {
         request.setAttribute("individual", ind);
         
 		List<VClass> allVClasses = vcDao.getAllVclasses();
+	    sortForPickList(allVClasses, vreq);
 		Set<String> allClassURISet = new HashSet<String>();
 		Map<String,String> classNameMap = new HashMap<String,String>();
 		for (Iterator allClassIt = allVClasses.iterator(); allClassIt.hasNext(); ) {
 			VClass vc = (VClass) allClassIt.next();
-			classNameMap.put(vc.getURI(),vc.getLocalNameWithPrefix());
+			classNameMap.put(vc.getURI(),vc.getPickListName());
 			allClassURISet.add(vc.getURI());
 		}
 
@@ -98,7 +99,6 @@ public class IndividualTypeRetryController extends BaseEditController {
 			typeOptionList.add(opt);
 		}
 		
-		Collections.sort(typeOptionList,new OptionCollator());
 		optionMap.put("types",typeOptionList);
 		
 	       RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
@@ -123,24 +123,5 @@ public class IndividualTypeRetryController extends BaseEditController {
 	public void doPost (HttpServletRequest request, HttpServletResponse response) {
 		// shouldn't be posting to this controller
 	}	
-	
-	static class OptionCollator implements Comparator<Option> {
-	    public int compare (Option o1, Option o2) {
-//	        Collator collator = Collator.getInstance(); 	       
-	        return getLocalName ( o1.getBody().toString() )
-	                .compareTo( 
-	                        getLocalName ( o2.getBody().toString() ) );	        	        
-	    }
-	    
-	    private String getLocalName( String in ){
-	        if( in == null )
-	            return "";
-	        int i = in.indexOf(':');
-	        if( i >= 0 )
-	            return in.substring( i );
-	        else
-	            return in;	    
-	    }
-	}
 	
 }

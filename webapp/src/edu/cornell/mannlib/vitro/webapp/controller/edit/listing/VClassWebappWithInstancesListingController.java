@@ -115,11 +115,4 @@ public class VClassWebappWithInstancesListingController extends BaseEditControll
 
     }
 
-    private class EntityWebappAlphaComparator implements Comparator {
-        public int compare (Object o1, Object o2) {
-            Collator collator = Collator.getInstance();
-            return collator.compare(((ObjectProperty)o1).getLocalName(),((ObjectProperty)o2).getLocalName());
-        }
-    }
-
 }

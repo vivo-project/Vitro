@@ -83,7 +83,7 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
         } else {
             roots = opDao.getRootObjectProperties();
             if (roots!=null){
-                Collections.sort(roots, new ObjectPropertyAlphaComparator()); // sorts by domain public
+                Collections.sort(roots, new ObjectPropertyAlphaComparator(vrequest.getCollator())); // sorts by domain public
             }
         }
 
@@ -237,6 +237,13 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
     }
 
     public static class ObjectPropertyAlphaComparator implements Comparator<ObjectProperty> {
+        
+        Collator collator;
+        
+        public ObjectPropertyAlphaComparator(Collator collator) {
+            this.collator = collator;
+        }
+        
         public int compare(ObjectProperty op1, ObjectProperty op2) {
         	if (op1 == null) {
         		return 1;
@@ -250,7 +257,7 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
         	} else if (propLabel2 == null) {
         		return -1;
         	} else {
-        		return Collator.getInstance().compare( propLabel1, propLabel2 );
+        		return collator.compare( propLabel1, propLabel2 );
         	}
         }
     }

@@ -74,51 +74,28 @@ public class VClassJena extends VClass {
         }
     }
     
+    @Override 
+    public String getLabel() {
+        return getName();
+    }
+    
     @Override
-    public String getLocalNameWithPrefix() {
-    	
+    public String getLocalNameWithPrefix() { 	
         if (this.localNameWithPrefix != null) {
             return localNameWithPrefix;
         } else {
-            cls.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                VClassDao vClassDao = webappDaoFactory.getVClassDao();
-                
-                if (vClassDao instanceof VClassDaoJena) {
-                	this.localNameWithPrefix = ((VClassDaoJena) vClassDao).getLabelForClass(cls,true,false);
-                } else {
-                    log.error("WebappDaoFactory returned a type of " + vClassDao.getClass().getName() + ". Expected  VClassDaoJena");
-                    this.localNameWithPrefix = webappDaoFactory.getJenaBaseDao().getLabelOrId(cls);
-                }
-                      
-                return this.localNameWithPrefix;
-            } finally {
-                cls.getOntModel().leaveCriticalSection();
-            }
+            this.localNameWithPrefix = webappDaoFactory.makeLocalNameWithPrefix(this);
+            return this.localNameWithPrefix;
         }
     }
     
     @Override
     public String getPickListName() {
-    	
         if (this.pickListName != null) {
             return pickListName;
         } else {
-            cls.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                VClassDao vClassDao = webappDaoFactory.getVClassDao();
-                
-                if (vClassDao instanceof VClassDaoJena) {
-                	this.pickListName = ((VClassDaoJena) vClassDao).getLabelForClass(cls,false,true);
-                } else {
-                    log.error("WebappDaoFactory returned a type of " + vClassDao.getClass().getName() + ". Expected  VClassDaoJena");
-                    this.pickListName = webappDaoFactory.getJenaBaseDao().getLabelOrId(cls);
-                }
-                                      
-                return this.pickListName;
-            } finally {
-                cls.getOntModel().leaveCriticalSection();
-            }
+            this.pickListName = webappDaoFactory.makePickListName(this);
+            return this.pickListName;
         }
     }
 

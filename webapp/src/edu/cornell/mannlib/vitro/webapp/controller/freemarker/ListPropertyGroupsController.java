@@ -49,8 +49,7 @@ public class ListPropertyGroupsController extends FreemarkerHttpServlet {
             PropertyGroupDao dao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 
             List<PropertyGroup> groups = dao.getPublicGroups(WITH_PROPERTIES);
-        
-//            Comparator<Property> comparator = new PropertySorter();
+            sortForPickList(groups, vreq);
 
                 String json = new String();
                 int counter = 0;
@@ -124,34 +123,5 @@ public class ListPropertyGroupsController extends FreemarkerHttpServlet {
 
             return new TemplateResponseValues(TEMPLATE_NAME, body);
         }
-
-/*    
-    private class PropertySorter implements Comparator<Property> {
-    	
-    	private Collator coll = Collator.getInstance();
-    	
-    	public int compare(Property p1, Property p2) {
-    		String name1 = getName(p1);
-    		String name2 = getName(p2);
-    		if (name1 == null && name2 != null) {
-    			return 1;
-    		} else if (name2 == null && name1 != null) {
-    			return -1;
-    		} else if (name1 == null && name2 == null) {
-    			return 0;
-    		}
-    		return coll.compare(name1, name2);
-    	}
-    	
-    	private String getName(Property prop) {
-    		if (prop instanceof ObjectProperty) {
-    			return ((ObjectProperty) prop).getDomainPublic();
-    		} else if (prop instanceof DataProperty) {
-    			return ((DataProperty) prop).getName();
-    		} else {
-    			return prop.getLabel();
-    		}
-    	}
-    }
-*/    
+    
 }

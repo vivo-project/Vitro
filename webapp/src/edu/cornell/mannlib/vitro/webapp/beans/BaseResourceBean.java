@@ -133,6 +133,10 @@ public class BaseResourceBean implements ResourceBean {
             this.URI = namespace + localName;
         }
     }
+    
+    public String getLabel() {
+        return getLocalName();
+    }
 
     public String getLocalName() {
         if( localName == null && this.URI != null)

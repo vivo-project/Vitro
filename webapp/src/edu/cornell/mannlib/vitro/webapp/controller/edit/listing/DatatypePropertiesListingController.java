@@ -170,19 +170,4 @@ public class DatatypePropertiesListingController extends BaseEditController {
         }
     }
 
-    /*
-    private class DatatypePropertyAlphaComparator implements Comparator {
-        public int compare (Object o1, Object o2) {
-            Collator collator = Collator.getInstance();
-            DataProperty dp1 = (DataProperty) o1;
-            DataProperty dp2 = (DataProperty) o2;
-            String dp1Str = (dp1.getPublicName()==null) ? dp1.getName() : dp1.getPublicName();
-            dp1Str = (dp1Str == null) ? "" : dp1Str;
-            String dp2Str = (dp2.getPublicName()==null) ? dp2.getName() : dp2.getPublicName();
-            dp2Str = (dp2Str == null) ? "" : dp2Str;
-            return collator.compare(dp1Str,dp2Str);
-        }
-    }
-    */
-
 }

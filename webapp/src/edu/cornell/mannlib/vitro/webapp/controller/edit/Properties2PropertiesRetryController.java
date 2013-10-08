@@ -65,10 +65,10 @@ public class Properties2PropertiesRetryController extends BaseEditController {
          String subpropertyURIstr = request.getParameter("SubpropertyURI");
        
         HashMap<String,Option> hashMap = new HashMap<String,Option>();
-        List<Option> optionList = FormUtils.makeOptionListFromBeans(propList,"URI","LocalNameWithPrefix",superpropertyURIstr,null);
-        List<Option> superPropertyOptions = getSortedList(hashMap,optionList);
-        optionList = FormUtils.makeOptionListFromBeans(propList,"URI","LocalNameWithPrefix",subpropertyURIstr,null);
-        List<Option> subPropertyOptions = getSortedList(hashMap, optionList);
+        List<Option> optionList = FormUtils.makeOptionListFromBeans(propList,"URI","PickListName",superpropertyURIstr,null);
+        List<Option> superPropertyOptions = getSortedList(hashMap, optionList, request);
+        optionList = FormUtils.makeOptionListFromBeans(propList,"URI","PickListName",subpropertyURIstr,null);
+        List<Option> subPropertyOptions = getSortedList(hashMap, optionList, request);
         
         HashMap hash = new HashMap();
     	hash.put("SuperpropertyURI", superPropertyOptions);
@@ -103,36 +103,6 @@ public class Properties2PropertiesRetryController extends BaseEditController {
             log.error(e.getStackTrace());
         }
 
-    }
-    
-    public List<Option> getSortedList(HashMap<String,Option> hashMap, List<Option> optionList){
-    	
-    	 class ListComparator implements Comparator<String>{
- 			@Override
- 			public int compare(String str1, String str2) {
- 				// TODO Auto-generated method stub
- 				Collator collator = Collator.getInstance();
- 				return collator.compare(str1, str2);
- 			}
-         	
-         }
-
-    	List<String> bodyVal = new ArrayList<String>();
-    	List<Option> options = new ArrayList<Option>();
-    	Iterator<Option> itr = optionList.iterator();
-    	 while(itr.hasNext()){
-         	Option option = itr.next();
-         	hashMap.put(option.getBody(),option);
-            bodyVal.add(option.getBody());
-         }
-         
-                 
-        Collections.sort(bodyVal, new ListComparator());
-        ListIterator<String> itrStr = bodyVal.listIterator();
-        while(itrStr.hasNext()){
-        	options.add(hashMap.get(itrStr.next()));
-        }
-        return options;
     }
     
 }

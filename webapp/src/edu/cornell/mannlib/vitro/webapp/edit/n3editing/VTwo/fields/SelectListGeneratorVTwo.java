@@ -14,6 +14,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 
@@ -58,7 +60,8 @@ public class SelectListGeneratorVTwo {
     //Methods to sort the options map 
     // from http://forum.java.sun.com/thread.jspa?threadID=639077&messageID=4250708
     //Modified to allow for a custom comparator to be sent in, defaults to mapPairsComparator
-    public static Map<String,String> getSortedMap(Map<String,String> hmap, Comparator<String[]> comparator){
+    public static Map<String,String> getSortedMap(Map<String,String> hmap, 
+            Comparator<String[]> comparator, VitroRequest vreq){
         // first make temporary list of String arrays holding both the key and its corresponding value, so that the list can be sorted with a decent comparator
         List<String[]> objectsToSort = new ArrayList<String[]>(hmap.size());
         for (String key:hmap.keySet()) {
@@ -70,7 +73,7 @@ public class SelectListGeneratorVTwo {
         
         //if no comparator is passed in, utilize MapPairsComparator
         if(comparator == null) {
-        	comparator = new MapPairsComparator();
+        	comparator = new MapPairsComparator(vreq);
         }
         
         Collections.sort(objectsToSort, comparator);
@@ -84,8 +87,13 @@ public class SelectListGeneratorVTwo {
 
     //Sorts by the value of the 2nd element in each of the arrays 
     private static class MapPairsComparator implements Comparator<String[]> {
+        
+        private Collator collator;
+        
+        public MapPairsComparator(VitroRequest vreq) {
+            this.collator = vreq.getCollator();
+        }
         public int compare (String[] s1, String[] s2) {
-            Collator collator = Collator.getInstance();
             if (s2 == null) {
                 return 1;
             } else if (s1 == null) {
