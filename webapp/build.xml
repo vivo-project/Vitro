@@ -265,6 +265,8 @@
          ================================= -->
 	<target name="clean" description="--> Delete all artifacts.">
 		<delete dir="${build.dir}" />
+		<!-- delete the rdf files, removing any unused languages, for example. -->
+		<delete dir="${vitro.home}/rdf" />
 	</target>
 
 	<!-- ================================= 
