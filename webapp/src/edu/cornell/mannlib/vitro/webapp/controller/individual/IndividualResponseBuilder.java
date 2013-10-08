@@ -162,9 +162,7 @@ class IndividualResponseBuilder {
                 map = new HashMap<String, Object>();
                 map.put("name", relatedSubjectInd.getName());
 
-                // TODO find out which of these values is the correct one
                 map.put("url", UrlBuilder.getIndividualProfileUrl(relatedSubjectInd, vreq));
-                map.put("url", (new ListedIndividual(relatedSubjectInd, vreq)).getProfileUrl());
                 
                 String relatingPredicateUri = vreq.getParameter("relatingPredicateUri");
                 if (relatingPredicateUri != null) {
