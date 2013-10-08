@@ -374,7 +374,8 @@ a.filter-search {
 		line-height: 35px;	
 }
 #home-stats h4 {
-		width: 102px;
+    display: inline;
+    padding: 3px 10px;
 }
 #stats {
 		margin: 0 auto;
