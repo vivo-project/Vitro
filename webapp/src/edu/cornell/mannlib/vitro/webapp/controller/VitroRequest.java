@@ -224,5 +224,11 @@ public class VitroRequest extends HttpServletRequestWrapper {
 	    return (Collator) getAttribute("collator");
 	}
 	
-    
+    public void setLanguageNeutralWebappDaoFactory(WebappDaoFactory wadf) {
+    	setAttribute("languageNeutralWebappDaoFactory", wadf);
+    }
+
+    public WebappDaoFactory getLanguageNeutralWebappDaoFactory() {
+    	return (WebappDaoFactory) getAttribute("languageNeutralWebappDaoFactory");
+    }
 }

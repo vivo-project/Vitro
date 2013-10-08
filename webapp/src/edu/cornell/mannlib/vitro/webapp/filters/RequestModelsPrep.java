@@ -45,6 +45,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HideFromDisplayByPolicyFilter;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SpecialBulkUpdateHandlerGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
@@ -146,10 +148,13 @@ public class RequestModelsPrep implements Filter {
 		
 		setRawModels(vreq, dataset);
 		
-		// We need access to the language-ignorant version of this model.
-		// Grab it before it gets wrapped in language awareness.
+		// We need access to some language-neutral items - either because we need to see all
+		// contents regardless of language, or because we need to see the blank nodes that
+		// are removed during language filtering.
 		vreq.setLanguageNeutralUnionFullModel(ModelAccess.on(vreq).getOntModel(ModelID.UNION_FULL));
-		
+		vreq.setLanguageNeutralWebappDaoFactory(new WebappDaoFactorySDB(
+				rdfService, createLanguageNeutralOntModelSelector(vreq), createWadfConfig(vreq)));
+
 		wrapModelsWithLanguageAwareness(vreq);
 		
 		setCollator(vreq);
@@ -234,6 +239,19 @@ public class RequestModelsPrep implements Filter {
 		return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, unionModel);
 	}
 
+	/** Create an OntModelSelector that will hold the un-language-filtered models. */
+	private OntModelSelector createLanguageNeutralOntModelSelector(
+			VitroRequest vreq) {
+		OntModelSelectorImpl oms = new OntModelSelectorImpl();
+		oms.setABoxModel(ModelAccess.on(vreq).getOntModel(ModelID.UNION_ABOX));
+		oms.setTBoxModel(ModelAccess.on(vreq).getOntModel(ModelID.UNION_TBOX));
+		oms.setFullModel(ModelAccess.on(vreq).getOntModel(ModelID.UNION_FULL));
+		oms.setApplicationMetadataModel(ModelAccess.on(vreq).getOntModel(ModelID.APPLICATION_METADATA));
+		oms.setDisplayModel(ModelAccess.on(vreq).getOntModel(ModelID.DISPLAY));
+		oms.setUserAccountsModel(ModelAccess.on(vreq).getOntModel(ModelID.USER_ACCOUNTS));
+		return oms;
+	}
+
 	private void wrapModelsWithLanguageAwareness(VitroRequest vreq) {
 		wrapModelWithLanguageAwareness(vreq, ModelID.DISPLAY);
 		wrapModelWithLanguageAwareness(vreq, ModelID.APPLICATION_METADATA);
@@ -276,6 +294,10 @@ public class RequestModelsPrep implements Filter {
 		// a different version if requested by parameters
 		WebappDaoFactory switchedWadf = new ModelSwitcher()
 				.checkForModelSwitching(vreq, wadf);
+		// Switch the language-neutral one also.
+		vreq.setLanguageNeutralWebappDaoFactory(new ModelSwitcher()
+				.checkForModelSwitching(vreq,
+						vreq.getLanguageNeutralWebappDaoFactory()));
 
 		HideFromDisplayByPolicyFilter filter = new HideFromDisplayByPolicyFilter(
 				RequestIdentifiers.getIdBundleForRequest(vreq),
