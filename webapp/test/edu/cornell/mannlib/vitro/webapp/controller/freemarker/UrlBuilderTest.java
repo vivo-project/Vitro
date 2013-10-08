@@ -94,11 +94,11 @@ public class UrlBuilderTest extends AbstractTestClass {
         
         String uri = "http://example.com/individual/n2343";
         String url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
-        Assert.assertEquals("http://example.com/individual/n2343", url);
+        Assert.assertEquals("http://example.com/display/n2343", url);
                 
         uri = "http://example.com/individual/bob";                
         url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
-        Assert.assertEquals("http://example.com/individual/bob",url);
+        Assert.assertEquals("http://example.com/display/bob",url);
         
         uri = "http://nondefaultNS.com/individual/n2343";                
         url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
