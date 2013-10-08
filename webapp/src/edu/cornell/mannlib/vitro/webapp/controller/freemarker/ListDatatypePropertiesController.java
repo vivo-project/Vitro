@@ -92,7 +92,7 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
             }
 
             if (props != null) {
-        	    Collections.sort(props);
+        	    sortForPickList(props, vreq);
             }
 
             String json = new String();
@@ -107,7 +107,7 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
                             json += ", ";
                         }
                         
-                        String nameStr = prop.getPublicName()==null ? prop.getName()==null ? prop.getURI()==null ? "(no name)" : prop.getURI() : prop.getName() : prop.getPublicName();
+                        String nameStr = prop.getPickListName()==null ? prop.getName()==null ? prop.getURI()==null ? "(no name)" : prop.getURI() : prop.getName() : prop.getPublicName();
 
                         try {
                             json += "{ \"name\": " + JSONUtils.quote("<a href='datapropEdit?uri="+ URLEncoder.encode(prop.getURI())+"'>" + nameStr + "</a>") + ", "; 
@@ -115,7 +115,7 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
                             json += "{ \"name\": " + JSONUtils.quote(nameStr) + ", ";
                         }
                         
-                        json += "\"data\": { \"internalName\": " + JSONUtils.quote(prop.getLocalNameWithPrefix()) + ", ";
+                        json += "\"data\": { \"internalName\": " + JSONUtils.quote(prop.getPickListName()) + ", ";
                         
 /*                        VClass vc = null;
                         String domainStr="";
@@ -131,7 +131,7 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
                         }
 */                        
                         VClass vc = (prop.getDomainClassURI() != null) ? vcDao.getVClassByURI(prop.getDomainClassURI()) : null;
-                        String domainStr = (vc != null) ? vc.getLocalNameWithPrefix() : ""; 
+                        String domainStr = (vc != null) ? vc.getPickListName() : ""; 
                         json += "\"domainVClass\": " + JSONUtils.quote(domainStr) + ", " ;
 
                         Datatype rangeDatatype = dDao.getDatatypeByURI(prop.getRangeDatatypeURI());

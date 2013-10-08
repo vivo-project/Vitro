@@ -187,13 +187,13 @@ public class DataPropertyHierarchyListingController extends BaseEditController {
 
             String nameStr = dp.getPublicName()==null ? dp.getName()==null ? dp.getURI()==null ? "(no name)" : dp.getURI() : dp.getName() : dp.getPublicName();
             try {
-                numCols=addColToResults("<a href=\"datapropEdit?uri="+URLEncoder.encode(dp.getURI(),"UTF-8")+"\">"+nameStr+"</a> <span style='font-style:italic; color:\"grey\";'>"+dp.getLocalNameWithPrefix()+"</span>",results,numCols); // column 2
+                numCols=addColToResults("<a href=\"datapropEdit?uri="+URLEncoder.encode(dp.getURI(),"UTF-8")+"\">"+nameStr+"</a> <span style='font-style:italic; color:\"grey\";'>"+dp.getPickListName()+"</span>",results,numCols); // column 2
             } catch (Exception e) {
-                numCols=addColToResults(nameStr + " <i>" + dp.getLocalNameWithPrefix() + "</i>",results,numCols); // column 2
+                numCols=addColToResults(nameStr + " <i>" + dp.getPickListName() + "</i>",results,numCols); // column 2
             }
             VClass tmp = null;
             try {
-            	numCols = addColToResults((((tmp = vcDao.getVClassByURI(dp.getDomainClassURI())) != null && (tmp.getLocalNameWithPrefix() == null)) ? "" : vcDao.getVClassByURI(dp.getDomainClassURI()).getLocalNameWithPrefix()), results, numCols); // column 3
+            	numCols = addColToResults((((tmp = vcDao.getVClassByURI(dp.getDomainClassURI())) != null && (tmp.getPickListName() == null)) ? "" : vcDao.getVClassByURI(dp.getDomainClassURI()).getPickListName()), results, numCols); // column 3
             } catch (NullPointerException e) {
             	numCols = addColToResults("-",results,numCols);
             }

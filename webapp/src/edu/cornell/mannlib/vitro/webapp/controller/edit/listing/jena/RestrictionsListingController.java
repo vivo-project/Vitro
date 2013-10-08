@@ -124,7 +124,7 @@ public class RestrictionsListingController extends BaseEditController {
 				results.add("XX");
 				Property onProperty = rest.getOnProperty();
 				ObjectProperty op = opDao.getObjectPropertyByURI(onProperty.getURI());
-				results.add(op.getLocalNameWithPrefix());
+				results.add(op.getPickListName());
 				if (rest.isAllValuesFromRestriction()) {
 					results.add("all values from");
 					AllValuesFromRestriction avfrest = (AllValuesFromRestriction) rest.as(AllValuesFromRestriction.class);

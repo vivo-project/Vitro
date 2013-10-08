@@ -219,11 +219,11 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
             	tempString += "\"domainVClass\": " + JSONUtils.quote(
             	        ((tmp = vcDao.getVClassByURI(
             	                op.getDomainVClassURI())) != null 
-            	                && (tmp.getLocalNameWithPrefix() == null)) 
+            	                && (tmp.getPickListName() == null)) 
             	                        ? "" 
             	                        : vcDao.getVClassByURI(
             	                                op.getDomainVClassURI())
-            	                                .getLocalNameWithPrefix()) + ", " ;
+            	                                .getPickListName()) + ", " ;
             } catch (NullPointerException e) {
             	tempString += "\"domainVClass\": \"\",";
             }
@@ -231,11 +231,11 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
             	tempString += "\"rangeVClass\": " + JSONUtils.quote(
             	        ((tmp = vcDao.getVClassByURI(
             	                op.getRangeVClassURI())) != null 
-            	                && (tmp.getLocalNameWithPrefix() == null)) 
+            	                && (tmp.getPickListName() == null)) 
             	                        ? "" 
             	                        : vcDao.getVClassByURI(
             	                                op.getRangeVClassURI())
-            	                                .getLocalNameWithPrefix()) + ", " ;
+            	                                .getPickListName()) + ", " ;
             } catch (NullPointerException e) {
             	tempString += "\"rangeVClass\": \"\",";
             }
@@ -267,8 +267,8 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
         	} else if (op2 == null) {
         		return -1;
         	}
-        	String propLabel1 = getDisplayLabel(op1);
-        	String propLabel2 = getDisplayLabel(op2);
+        	String propLabel1 = op1.getPickListName();
+        	String propLabel2 = op2.getPickListName();
         	if (propLabel1 == null) {
         		return 1;
         	} else if (propLabel2 == null) {
@@ -283,9 +283,9 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
      * should never be null
      */
     public static String getDisplayLabel(ObjectProperty op) {
-    	String domainPublic = op.getDomainPublic();
-    	String displayLabel = (domainPublic != null && domainPublic.length() > 0)  
-			? domainPublic 
+        String displayLabel = op.getPickListName();
+    	displayLabel = (displayLabel != null && displayLabel.length() > 0)  
+			? displayLabel 
 			: op.getLocalName();
 		return (displayLabel != null) ? displayLabel : "[object property]" ;
     }

@@ -69,7 +69,7 @@ public class ListVClassWebappsController extends FreemarkerHttpServlet {
         String ontologyURI = vreq.getParameter("ontologyUri");
 
         if (classes != null) {
-            Collections.sort(classes);
+            sortForPickList(classes, vreq);
             Iterator<VClass> classesIt = classes.iterator();
             while (classesIt.hasNext()) {
                 if ( counter > 0 ) {
@@ -79,9 +79,9 @@ public class ListVClassWebappsController extends FreemarkerHttpServlet {
                 if ( (ontologyURI==null) || ( (ontologyURI != null) && (cls.getNamespace()!=null) && (ontologyURI.equals(cls.getNamespace())) ) ) {
 	                if (cls.getName() != null)
 	                    try {
-	                        json += "{ \"name\": " + JSONUtils.quote("<a href='./vclassEdit?uri="+URLEncoder.encode(cls.getURI(),"UTF-8")+"'>"+cls.getLocalNameWithPrefix()+"</a>") + ", ";
+	                        json += "{ \"name\": " + JSONUtils.quote("<a href='./vclassEdit?uri="+URLEncoder.encode(cls.getURI(),"UTF-8")+"'>"+cls.getPickListName()+"</a>") + ", ";
 	                    } catch (Exception e) {
-	                        json += "{ \"name\": " + JSONUtils.quote(cls.getLocalNameWithPrefix()) + ", ";
+	                        json += "{ \"name\": " + JSONUtils.quote(cls.getPickListName()) + ", ";
 	                    }
 	                else
 	                    json += "{ \"name\": \"\"";

@@ -79,9 +79,9 @@ public class VClassWebappsListingController extends BaseEditController {
 	                if (cls.getName() != null)
 	                    try {
 	                        //String className = (cls.getName()==null || cls.getName().length()==0) ? cls.getURI() : cls.getName();
-	                        results.add("<a href=\"./vclassEdit?uri="+URLEncoder.encode(cls.getURI(),"UTF-8")+"\">"+cls.getLocalNameWithPrefix()+"</a>");
+	                        results.add("<a href=\"./vclassEdit?uri="+URLEncoder.encode(cls.getURI(),"UTF-8")+"\">"+cls.getPickListName()+"</a>");
 	                    } catch (Exception e) {
-	                        results.add(cls.getLocalNameWithPrefix());
+	                        results.add(cls.getPickListName());
 	                    }
 	                else
 	                    results.add("");

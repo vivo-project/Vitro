@@ -60,8 +60,8 @@ public class Classes2ClassesRetryController extends BaseEditController {
         populateBeanFromParams(objectForEditing, request);
 
         HashMap hash = new HashMap();
-        hash.put("SuperclassURI", FormUtils.makeOptionListFromBeans(vcDao.getAllVclasses(),"URI","LocalNameWithPrefix",objectForEditing.getSuperclassURI(),null));
-        hash.put("SubclassURI", FormUtils.makeOptionListFromBeans(vcDao.getAllVclasses(),"URI","LocalNameWithPrefix",objectForEditing.getSubclassURI(),null));
+        hash.put("SuperclassURI", FormUtils.makeOptionListFromBeans(vcDao.getAllVclasses(),"URI","PickListName",objectForEditing.getSuperclassURI(),null));
+        hash.put("SubclassURI", FormUtils.makeOptionListFromBeans(vcDao.getAllVclasses(),"URI","PickListName",objectForEditing.getSubclassURI(),null));
 
         FormObject foo = new FormObject();
         foo.setOptionLists(hash);

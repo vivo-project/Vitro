@@ -178,9 +178,9 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             dp.setNamespace(op.getNameSpace());
             dp.setLocalName(op.getLocalName());
             dp.setLocalNameWithPrefix(getWebappDaoFactory().makeLocalNameWithPrefix(dp));
-            dp.setPickListName(getWebappDaoFactory().makePickListName(dp));
             dp.setName(op.getLocalName());
             dp.setPublicName(getLabelOrId(op));
+            dp.setPickListName(getWebappDaoFactory().makePickListName(dp));
             Resource dRes = op.getDomain();
             if (dRes != null) {
                 dp.setDomainClassURI(dRes.getURI());

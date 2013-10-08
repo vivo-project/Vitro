@@ -95,14 +95,13 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             p.setNamespace(op.getNameSpace());
             p.setLocalName(op.getLocalName());
             p.setLocalNameWithPrefix(getWebappDaoFactory().makeLocalNameWithPrefix(p));
-            p.setPickListName(getWebappDaoFactory().makePickListName(p));
-            String propertyName = getPropertyStringValue(op,PROPERTY_FULLPROPERTYNAMEANNOT);
             if (op.getLabel(null) != null)
                 p.setDomainPublic(getLabelOrId(op));
             else
                 p.setDomainPublic(op.getLocalName());
             if (p.getDomainPublic() == null)
                 p.setDomainPublic("[related to]");
+            p.setPickListName(getWebappDaoFactory().makePickListName(p));
             if (op.getDomain() != null)
                 p.setDomainVClassURI( (op.getDomain().isAnon()) ? PSEUDO_BNODE_NS+op.getDomain().getId().toString() : op.getDomain().getURI());
             if (op.getRange() != null)

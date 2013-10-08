@@ -201,9 +201,9 @@ public class ClassHierarchyListingController extends BaseEditController {
             Integer numCols = (NUM_COLS-1)-position;
 
             try {
-                numCols = addColToResults(((vcw.getLocalNameWithPrefix() == null) ? "" : "<a href=\"vclassEdit?uri="+URLEncoder.encode(vcw.getURI(),"UTF-8")+"\">"+vcw.getLocalNameWithPrefix()+"</a>"), results, numCols);
+                numCols = addColToResults(((vcw.getPickListName() == null) ? "" : "<a href=\"vclassEdit?uri="+URLEncoder.encode(vcw.getURI(),"UTF-8")+"\">"+vcw.getPickListName()+"</a>"), results, numCols);
             } catch (Exception e) {
-                numCols = addColToResults(((vcw.getLocalNameWithPrefix() == null) ? "" : vcw.getLocalNameWithPrefix()), results, numCols); // column 2
+                numCols = addColToResults(((vcw.getPickListName() == null) ? "" : vcw.getPickListName()), results, numCols); // column 2
             }
             numCols = addColToResults(((vcw.getShortDef() == null) ? "" : vcw.getShortDef()), results, numCols); // column 3
             numCols = addColToResults(((vcw.getExample() == null) ? "" : vcw.getExample()), results, numCols); // column 4

@@ -558,18 +558,20 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     public String makePickListName(ResourceBean bean) {
         OntologyDao oDao = this.getOntologyDao();
         Ontology o = oDao.getOntologyByURI(bean.getNamespace());
+        String label = (bean.getLabel() != null) ? bean.getLabel () : bean.getLocalName();
+        label = (label != null) ? label : bean.getURI();
         if (o == null) {
             if (VitroVocabulary.vitroURI.equals(bean.getNamespace())) {
-                return bean.getLabel() + " (vitro)";
+                return label + " (vitro)";
             } else {
                 log.debug("no ontology object found for namespace " + bean.getNamespace());
-                return bean.getLabel();
+                return label;
             }
         } else {
             String prefix = o.getPrefix() == null ? (
                     o.getName() == null ? 
                             "unspec" : o.getName()) : o.getPrefix();
-            return bean.getLabel() + " (" + prefix + ")";
+            return label + " (" + prefix + ")";
         }       
     }
     

@@ -140,7 +140,7 @@ public class ObjectPropertyStatementListingController extends
         
         if (count == 0) {
         	results.add("XX");
-        	results.add("No statements found for property \""+op.getLocalNameWithPrefix()+"\"");
+        	results.add("No statements found for property \""+op.getPickListName()+"\"");
         	results.add("");
         	results.add("");
         	if (showVClasses) {

@@ -24,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
@@ -101,7 +102,9 @@ public class DatapropEditController extends BaseEditController {
         // TODO - need unionOf/intersectionOf-style domains for domain class
         String domainStr="";
         try {
-            domainStr = (dp.getDomainClassURI() == null) ? "" : "<a href=\"vclassEdit?uri="+URLEncoder.encode(dp.getDomainClassURI(),"UTF-8")+"\">"+dp.getDomainClassURI()+"</a>";
+            VClass domainClass = getWebappDaoFactory().getVClassDao().getVClassByURI(dp.getDomainClassURI());
+            String domainLinkAnchor = (domainClass != null) ? domainClass.getPickListName() : dp.getDomainClassURI();
+            domainStr = (dp.getDomainClassURI() == null) ? "" : "<a href=\"vclassEdit?uri="+URLEncoder.encode(dp.getDomainClassURI(),"UTF-8")+"\">"+domainLinkAnchor+"</a>";
         } catch (UnsupportedEncodingException e) {
             log.error(e, e);
         }

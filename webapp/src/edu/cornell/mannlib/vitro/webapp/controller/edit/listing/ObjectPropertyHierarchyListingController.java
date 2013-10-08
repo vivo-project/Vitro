@@ -187,16 +187,16 @@ public class ObjectPropertyHierarchyListingController extends BaseEditController
             }
             
             numCols = addColToResults( ((hyperlink != null) ? hyperlink : getDisplayLabel(op)) 
-            		+ "<br/><span style='font-style:italic; color:\"grey\";'>"+op.getLocalNameWithPrefix()+"</span>", results, numCols); // column 2
+            		+ "<br/><span style='font-style:italic; color:\"grey\";'>"+op.getPickListName()+"</span>", results, numCols); // column 2
             
             VClass tmp = null;
             try {
-            	numCols = addColToResults((((tmp = vcDao.getVClassByURI(op.getDomainVClassURI())) != null && (tmp.getLocalNameWithPrefix() == null)) ? "" : vcDao.getVClassByURI(op.getDomainVClassURI()).getLocalNameWithPrefix()), results, numCols); // column 3
+            	numCols = addColToResults((((tmp = vcDao.getVClassByURI(op.getDomainVClassURI())) != null && (tmp.getPickListName() == null)) ? "" : vcDao.getVClassByURI(op.getDomainVClassURI()).getPickListName()), results, numCols); // column 3
             } catch (NullPointerException e) {
             	numCols = addColToResults("",results,numCols);
             }
             try {
-            	numCols = addColToResults((((tmp = vcDao.getVClassByURI(op.getRangeVClassURI())) != null && (tmp.getLocalNameWithPrefix() == null)) ? "" : vcDao.getVClassByURI(op.getRangeVClassURI()).getLocalNameWithPrefix()), results, numCols); // column 4
+            	numCols = addColToResults((((tmp = vcDao.getVClassByURI(op.getRangeVClassURI())) != null && (tmp.getPickListName() == null)) ? "" : vcDao.getVClassByURI(op.getRangeVClassURI()).getPickListName()), results, numCols); // column 4
             } catch (NullPointerException e) {
             	numCols = addColToResults("",results,numCols);
             }

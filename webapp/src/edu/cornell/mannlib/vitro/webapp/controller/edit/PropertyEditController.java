@@ -86,7 +86,7 @@ public class PropertyEditController extends BaseEditController {
         	ObjectProperty parent = propDao.getObjectPropertyByURI(p.getParentURI());
         	if (parent != null && parent.getURI() != null) {
         		try {
-        			parentPropertyStr = "<a href=\"propertyEdit?uri="+URLEncoder.encode(parent.getURI(),"UTF-8")+"\">"+parent.getLocalNameWithPrefix()+"</a>";
+        			parentPropertyStr = "<a href=\"propertyEdit?uri="+URLEncoder.encode(parent.getURI(),"UTF-8")+"\">"+parent.getPickListName()+"</a>";
         		} catch (UnsupportedEncodingException e) {
         		    log.error(e, e);
         		}
@@ -121,12 +121,12 @@ public class PropertyEditController extends BaseEditController {
         String domainStr = ""; 
         if (p.getDomainVClassURI() != null) {
         	VClass domainClass = vcDao.getVClassByURI(p.getDomainVClassURI());
-        	if (domainClass != null && domainClass.getURI() != null && domainClass.getLocalNameWithPrefix() != null) {
+        	if (domainClass != null && domainClass.getURI() != null && domainClass.getPickListName() != null) {
         		try {
         			if (domainClass.isAnonymous()) {
-        				domainStr = domainClass.getLocalNameWithPrefix();
+        				domainStr = domainClass.getPickListName();
         			} else {
-        				domainStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(domainClass.getURI(),"UTF-8")+"\">"+domainClass.getLocalNameWithPrefix()+"</a>";
+        				domainStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(domainClass.getURI(),"UTF-8")+"\">"+domainClass.getPickListName()+"</a>";
         			}
         		} catch (UnsupportedEncodingException e) {
         		    log.error(e, e);
@@ -138,12 +138,12 @@ public class PropertyEditController extends BaseEditController {
         String rangeStr = ""; 
         if (p.getRangeVClassURI() != null) {
         	VClass rangeClass = vcDao.getVClassByURI(p.getRangeVClassURI());
-        	if (rangeClass != null && rangeClass.getURI() != null && rangeClass.getLocalNameWithPrefix() != null) {
+        	if (rangeClass != null && rangeClass.getURI() != null && rangeClass.getPickListName() != null) {
         		try {
         			if (rangeClass.isAnonymous()) {
-        				rangeStr = rangeClass.getLocalNameWithPrefix();
+        				rangeStr = rangeClass.getPickListName();
         			} else {
-        				rangeStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(rangeClass.getURI(),"UTF-8")+"\">"+rangeClass.getLocalNameWithPrefix()+"</a>";
+        				rangeStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(rangeClass.getURI(),"UTF-8")+"\">"+rangeClass.getPickListName()+"</a>";
         			}
         		} catch (UnsupportedEncodingException e) {
         		    log.error(e, e);
@@ -175,22 +175,6 @@ public class PropertyEditController extends BaseEditController {
         results.add(p.getSelectFromExisting() ? "true" : "false");   // column 21
         results.add(p.getOfferCreateNewOption() ? "true" : "false"); // column 22
         
-        /*
-        String datapropStr = ""; 
-        if (p.getObjectIndividualSortPropertyURI() != null) {
-            DataProperty dProp = dpDao.getDataPropertyByURI(p.getObjectIndividualSortPropertyURI());
-            if (dProp != null && dProp.getURI() != null && dProp.getLocalNameWithPrefix() != null) {
-                try {
-                    datapropStr = "<a href=\"datapropEdit?uri="+URLEncoder.encode(dProp.getURI(),"UTF-8")+"\">"+dProp.getLocalNameWithPrefix()+"</a>";
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-            }
-            results.add(datapropStr); // column 16
-        } else {
-            results.add("name (rdfs:label)"); // column 16
-        }
-        */
         results.add(p.getDomainEntitySortDirection() == null ? "ascending" : p.getDomainEntitySortDirection()); // column 23
 
         results.add(p.getURI()); // column 24

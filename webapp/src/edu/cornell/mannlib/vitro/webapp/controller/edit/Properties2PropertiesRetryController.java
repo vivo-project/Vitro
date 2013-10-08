@@ -59,7 +59,7 @@ public class Properties2PropertiesRetryController extends BaseEditController {
     	? dpDao.getAllDataProperties()
     	: opDao.getAllObjectProperties();
         
-    	Collections.sort(propList);
+    	sortForPickList(propList, request);
     	
     	 String superpropertyURIstr = request.getParameter("SuperpropertyURI");
          String subpropertyURIstr = request.getParameter("SubpropertyURI");

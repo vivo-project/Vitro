@@ -111,9 +111,9 @@ public class DatatypePropertiesListingController extends BaseEditController {
                     results.add("XX"); // column 1
                     String nameStr = prop.getPublicName()==null ? prop.getName()==null ? prop.getURI()==null ? "(no name)" : prop.getURI() : prop.getName() : prop.getPublicName();
                     try {
-                        results.add("<a href=\"datapropEdit?uri="+URLEncoder.encode(prop.getURI(),"UTF-8")+"\">"+nameStr+"</a> <span style='font-style:italic; color:\"grey\";'>"+prop.getLocalNameWithPrefix()+"</span>"); // column 2
+                        results.add("<a href=\"datapropEdit?uri="+URLEncoder.encode(prop.getURI(),"UTF-8")+"\">"+nameStr+"</a> <span style='font-style:italic; color:\"grey\";'>"+prop.getPickListName()+"</span>"); // column 2
                     } catch (Exception e) {
-                        results.add(nameStr + " <span style='font-style:italic; color:\"grey\";'>" + prop.getLocalNameWithPrefix() + "</span>"); // column 2
+                        results.add(nameStr + " <span style='font-style:italic; color:\"grey\";'>" + prop.getPickListName() + "</span>"); // column 2
                     }
                     VClass vc = null;
                     String domainStr="";

@@ -54,7 +54,7 @@ public class RefactorRetryController extends BaseEditController {
 		epo.setFormObject(foo);
 		HashMap<String,List<Option>> optMap = new HashMap<String,List<Option>>();
 		foo.setOptionLists(optMap);
-		List<Option> subjectClassOpts = FormUtils.makeOptionListFromBeans(request.getUnfilteredWebappDaoFactory().getVClassDao().getAllVclasses(),"URI","Name", null, null);
+		List<Option> subjectClassOpts = FormUtils.makeOptionListFromBeans(request.getUnfilteredWebappDaoFactory().getVClassDao().getAllVclasses(),"URI","PickListName", null, null);
 		subjectClassOpts.add(0,new Option("","? wildcard",true));
 		optMap.put("SubjectClassURI", subjectClassOpts);
 		optMap.put("ObjectClassURI", subjectClassOpts);
@@ -90,7 +90,7 @@ public class RefactorRetryController extends BaseEditController {
 		epo.setFormObject(foo);
 		HashMap<String,List<Option>> optMap = new HashMap<String,List<Option>>();
 		foo.setOptionLists(optMap);
-		List<Option> newClassURIopts = FormUtils.makeOptionListFromBeans(request.getUnfilteredWebappDaoFactory().getVClassDao().getAllVclasses(),"URI","LocalNameWithPrefix", null, null);
+		List<Option> newClassURIopts = FormUtils.makeOptionListFromBeans(request.getUnfilteredWebappDaoFactory().getVClassDao().getAllVclasses(),"URI","PickListName", null, null);
 		newClassURIopts.add(new Option ("","move to trash"));
 		optMap.put("NewVClassURI", newClassURIopts);
 		request.setAttribute("editAction","refactorOp");

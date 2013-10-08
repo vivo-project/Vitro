@@ -77,7 +77,7 @@
 					<input type="hidden" name="VClassName" value="this anonymous class"/>
 				</c:when>
 				<c:otherwise>
-           			<input type="hidden" name="VClassName" value="${VClass.localNameWithPrefix}"/>
+           			<input type="hidden" name="VClassName" value="${VClass.pickListName}"/>
 				</c:otherwise>
 			</c:choose>
            	<input type="hidden" name="mode" value="moveInstances"/>
@@ -99,10 +99,10 @@
 				<li><input type="checkbox" name="SuperclassURI" value="${superclass.URI}" class="form-item"/>
 					<c:choose>
 						<c:when test="${!superclass.anonymous}">
-							<a href="${superclassURL}">${superclass.localNameWithPrefix}</a>
+							<a href="${superclassURL}">${superclass.pickListName}</a>
 						</c:when>
 						<c:otherwise>
-							${superclass.localNameWithPrefix}
+							${superclass.pickListName}
 						</c:otherwise>
 					</c:choose>
 				</li>
@@ -137,10 +137,10 @@
 				<li><input type="checkbox" name="SubclassURI" value="${subclass.URI}" class="form-item"/>
 					<c:choose>
 					    <c:when test="${!subclass.anonymous}">
-					    	<a href="${subclassURL}"> ${subclass.localNameWithPrefix} </a>
+					    	<a href="${subclassURL}"> ${subclass.pickListName} </a>
 					    </c:when>
 					    <c:otherwise>
-						${subclass.localNameWithPrefix}
+						${subclass.pickListName}
 					    </c:otherwise>
 				        </c:choose>
 				</li>						
@@ -181,10 +181,10 @@
 				<li><input type="checkbox" name="SubclassURI" value="${subclass.URI}" class="form-item"/>
 				    <c:choose>
 					    <c:when test="${!subclass.anonymous}">
-					        <a href="${subclassURL}"> ${subclass.localNameWithPrefix} </a>
+					        <a href="${subclassURL}"> ${subclass.pickListName} </a>
 					    </c:when>
 					    <c:otherwise>
-					        ${subclass.localNameWithPrefix}
+					        ${subclass.pickListName}
 					    </c:otherwise>
                     </c:choose>
 				</li>
@@ -223,10 +223,10 @@
 				<li><input type="checkbox" name="SubclassURI" value="${subclass.URI}" class="form-item"/>
 				    <c:choose>
 					<c:when test="${!subclass.anonymous}">
-					    <a href="${subclassURL}"> ${subclass.localNameWithPrefix} </a>
+					    <a href="${subclassURL}"> ${subclass.pickListName} </a>
 					</c:when>
 					<c:otherwise>
-					    ${subclass.localNameWithPrefix}
+					    ${subclass.pickListName}
 					</c:otherwise>
 				    </c:choose>
 				</li>

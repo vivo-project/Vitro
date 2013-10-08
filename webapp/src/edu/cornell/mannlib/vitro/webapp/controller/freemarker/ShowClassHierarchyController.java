@@ -97,7 +97,7 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
         	roots.add(vreq.getUnfilteredWebappDaoFactory().getVClassDao()
         			.getTopConcept());
         }
-        Collections.sort(roots);
+        sortForPickList(roots, vreq);
         int counter = 0;
 
         Iterator<VClass> rootIt = roots.iterator();
@@ -109,7 +109,8 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
             while (rootIt.hasNext()) {
                 VClass root = (VClass) rootIt.next();
 	            if (root != null) {
-	                json += addChildren(vreq.getUnfilteredWebappDaoFactory(), root, 0, ontologyUri,counter);
+	                json += addChildren(vreq.getUnfilteredWebappDaoFactory(), 
+	                        root, 0, ontologyUri, counter, vreq);
 	                counter += 1;
                 }
             }
@@ -123,7 +124,8 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
         return new TemplateResponseValues(TEMPLATE_NAME, body);
     }
 
-    private String addChildren(WebappDaoFactory wadf, VClass parent, int position, String ontologyUri, int counter) {
+    private String addChildren(WebappDaoFactory wadf, VClass parent, int position, 
+            String ontologyUri, int counter, VitroRequest vreq) {
         String rowElts = addVClassDataToResultsList(wadf, parent, position, ontologyUri, counter);
     	int childShift = (rowElts.length() > 0) ? 1 : 0;  // if addVClassDataToResultsList filtered out the result, don't shift the children over 
         int length = rowElts.length();
@@ -142,11 +144,11 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
                     }
                 } catch (Exception e) {}
             }
-            Collections.sort(childClasses);
+            sortForPickList(childClasses, vreq);
             Iterator<VClass> childClassIt = childClasses.iterator();
             while (childClassIt.hasNext()) {
                 VClass child = (VClass) childClassIt.next();
-                leaves += addChildren(wadf, child, position + childShift, ontologyUri, counter);
+                leaves += addChildren(wadf, child, position + childShift, ontologyUri, counter, vreq);
                 if (!childClassIt.hasNext()) {
                     if ( ontologyUri == null ) {
                         leaves += " }] ";
@@ -197,10 +199,10 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
             try {
                 tempString += JSONUtils.quote("<a href='vclassEdit?uri=" + 
                         URLEncoder.encode(vcw.getURI(),"UTF-8") + "'>" + 
-                        vcw.getLocalNameWithPrefix() + "</a>") +", ";
+                        vcw.getPickListName() + "</a>") +", ";
             } catch (Exception e) {
-                 tempString += JSONUtils.quote(((vcw.getLocalNameWithPrefix() == null) 
-                         ? "" : vcw.getLocalNameWithPrefix())) + ", ";
+                 tempString += JSONUtils.quote(((vcw.getPickListName() == null) 
+                         ? "" : vcw.getPickListName())) + ", ";
             }
 
             String shortDef = ((vcw.getShortDef() == null) ? "" : vcw.getShortDef()) ;

@@ -165,16 +165,16 @@ public class PropertyWebappsListingController extends BaseEditController {
                         results.add(propNameStr); // column 2
                     }
                     
-                    results.add(prop.getLocalNameWithPrefix()); // column 3
+                    results.add(prop.getPickListName()); // column 3
                     
                     VClass vc = (prop.getDomainVClassURI() != null) ?
                         vcDao.getVClassByURI(prop.getDomainVClassURI()) : null;
-                    String domainStr = (vc != null) ? vc.getLocalNameWithPrefix() : ""; 
+                    String domainStr = (vc != null) ? vc.getPickListName() : ""; 
                     results.add(domainStr); // column 4
                     
                     vc = (prop.getRangeVClassURI() != null) ?
                         vcDao.getVClassByURI(prop.getRangeVClassURI()) : null;
-                    String rangeStr = (vc != null) ? vc.getLocalNameWithPrefix() : ""; 
+                    String rangeStr = (vc != null) ? vc.getPickListName() : ""; 
                     results.add(rangeStr); // column 5
                     
                     if (prop.getGroupURI() != null) {
