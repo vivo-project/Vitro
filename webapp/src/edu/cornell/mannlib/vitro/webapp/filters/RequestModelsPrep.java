@@ -202,12 +202,10 @@ public class RequestModelsPrep implements Filter {
 				OntModelSpec.OWL_MEM, dataset.getDefaultModel());
 
 		ModelAccess.on(vreq).setOntModel(ModelID.BASE_ABOX, baseABoxModel);
-		ModelAccess.on(vreq).setOntModel(ModelID.INFERRED_ABOX, unionABoxModel);
-		ModelAccess.on(vreq)
-				.setOntModel(ModelID.UNION_ABOX, inferenceABoxModel);
+		ModelAccess.on(vreq).setOntModel(ModelID.INFERRED_ABOX, inferenceABoxModel);
+		ModelAccess.on(vreq).setOntModel(ModelID.UNION_ABOX, unionABoxModel);
 		ModelAccess.on(vreq).setOntModel(ModelID.BASE_FULL, baseFullModel);
-		ModelAccess.on(vreq).setOntModel(ModelID.INFERRED_FULL,
-				inferenceFullModel);
+		ModelAccess.on(vreq).setOntModel(ModelID.INFERRED_FULL, inferenceFullModel);
 		ModelAccess.on(vreq).setOntModel(ModelID.UNION_FULL, unionFullModel);
 	}
 
