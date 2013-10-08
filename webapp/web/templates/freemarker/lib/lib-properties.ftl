@@ -249,7 +249,7 @@ name will be used as the label. -->
     ${label.value}
     <#if useEditLink>
     	<@editingLinks "label" "" label editable />
-    <#elseif editable || (languageCount > 1)>
+    <#elseif (editable && (labelCount > 0)) || (languageCount > 1)>
     	<#--We display the link even when the user is not logged in case of multiple labels with different languages-->
     	<#assign labelLink = ""/>
     	<#-- Manage labels now goes to generator -->
@@ -274,7 +274,7 @@ name will be used as the label. -->
     	
         <span class="inline">
             <a class="add-label" href="${labelLink}"
-             title="${linkTitle}">${individualProfileUrl} -> ${profileParameters} -> ${extraParameters}
+             title="${linkTitle}">
         	<img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="${imageAlt}" /></a>
         </span>
     </#if>

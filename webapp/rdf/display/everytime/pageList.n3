@@ -1,7 +1,7 @@
 # $This file is distributed under the terms of the license in /doc/license.txt$ 
 
-# This file is for the portions of the pageList that should not be editable, i.e.
-# that it cannot be deleted and that it requires certain permissions
+# This file is for the portions of the pageList that should not be editable, i.e.#
+# that it cannot be deleted and that it requires certain permissions #
 
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
@@ -12,6 +12,5 @@
 ### This file defines the page list menu for vitro. ###
 
 display:pageListPage
-	display:queryModel <vitro:requestDisplayModel> ; 
     display:requiresAction <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#ManageMenus> ;
     display:cannotDeletePage "true" .
