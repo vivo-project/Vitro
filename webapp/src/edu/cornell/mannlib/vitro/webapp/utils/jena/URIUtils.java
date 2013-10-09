@@ -21,8 +21,14 @@ public class URIUtils {
 	    	boolean existingURI = false;
 			ontModel.enterCriticalSection(Lock.READ);
 			try {
+				boolean validPropertyURI = true;
+				String localName = uriStr.substring(uriStr.lastIndexOf("/") + 1);
+				//if local name is only numbers, this is not a valid uri for a property
+				if(localName.matches("\\d+")) {
+					validPropertyURI = false;
+				}
 				Resource newURIAsRes = ResourceFactory.createResource(uriStr);
-				Property newURIAsProp = ResourceFactory.createProperty(uriStr);
+				
 				StmtIterator closeIt = ontModel.listStatements(
 						newURIAsRes, null, (RDFNode)null);
 				if (closeIt.hasNext()) {
@@ -37,7 +43,8 @@ public class URIUtils {
 					}
 				}
 				//Check for property
-				if (!existingURI) {
+				if (validPropertyURI && !existingURI) {
+					Property newURIAsProp = ResourceFactory.createProperty(uriStr);
 					closeIt = ontModel.listStatements(
 							null, newURIAsProp, (RDFNode)null);
 					if (closeIt.hasNext()) {
