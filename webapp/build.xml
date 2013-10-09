@@ -229,9 +229,13 @@
 	    <copy todir="${main.webapp.dir}/">
 	        <fileset dir="${appbase.dir}/languages" >
 	        	<patternset refid="language_files" />
-		    	<filename regex="/i18n/|/templates/|/themes/" />
+	        	<or>
+		    		<filename name="*/i18n/**/*" />
+		    		<filename name="*/templates/**/*" />
+		    		<filename name="*/themes/**/*" />
+	        	</or>
 	        </fileset>
-	        <regexpmapper from="^[^/]+/(.*)$$" to="\1" />
+	        <regexpmapper from="^[^/]+/(.*)$$" to="\1" handledirsep="true" />
 	    </copy>
 	</target>
 
@@ -255,7 +259,7 @@
 	        	<patternset refid="language_files" />
 		    	<filename name="*/rdf/**/*" />
 	        </fileset>
-	        <regexpmapper from="^[^/]+/(.*)$$" to="\1" />
+	        <regexpmapper from="^[^/]+/(.*)$$" to="\1" handledirsep="true" />
 	    </copy>
 </target>
 
