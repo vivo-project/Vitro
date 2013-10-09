@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller;
 
 
+import java.text.Collator;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -213,7 +214,15 @@ public class VitroRequest extends HttpServletRequestWrapper {
             
 	public OntModel getLanguageNeutralUnionFullModel() {
 		return (OntModel) getAttribute("languageNeutralUnionFullModel");
-	}                
+	}           
+	
+	public void setCollator(Collator collator) {
+	    setAttribute("collator", collator);
+	}
+	
+	public Collator getCollator() {
+	    return (Collator) getAttribute("collator");
+	}
 	
     public void setLanguageNeutralWebappDaoFactory(WebappDaoFactory wadf) {
     	setAttribute("languageNeutralWebappDaoFactory", wadf);

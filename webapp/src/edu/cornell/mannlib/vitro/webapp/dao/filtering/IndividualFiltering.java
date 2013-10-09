@@ -258,6 +258,16 @@ public class IndividualFiltering implements Individual {
     public String getName() {
         return _innerIndividual.getName();
     }
+    
+    @Override
+    public String getLabel() {
+        return _innerIndividual.getLabel();
+    }
+    
+    @Override 
+    public String getPickListName() {
+        return getName();
+    }
 
     @Override
     public String getRdfsLabel(){

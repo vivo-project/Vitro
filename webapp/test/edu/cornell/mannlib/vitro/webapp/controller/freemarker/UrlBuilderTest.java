@@ -74,14 +74,14 @@ public class UrlBuilderTest extends AbstractTestClass {
         UrlBuilder.contextPath = "/vivo";
         String path = "/individual";
         ParamMap params = new ParamMap();
-        params.put("name", "★Tom★");
+        params.put("name", "\u2605Tom\u2605"); // \u2605 is Unicode for a five-pointed star.
         Assert.assertEquals("/vivo/individual?name=%E2%98%85Tom%E2%98%85", UrlBuilder.getUrl(path, params));
     }
 
 
     @Test
     public void testDecodeUtf8Url() {
-        String vClassUri = "http://vivoweb.org/ontology/core#FacultyMember★";
+        String vClassUri = "http://vivoweb.org/ontology/core#FacultyMember\u2605"; // \u2605 is Unicode for a five-pointed star.
         String vClassUriEncoded = "http%3A%2F%2Fvivoweb.org%2Fontology%2Fcore%23FacultyMember%E2%98%85";
         Assert.assertEquals(vClassUri, UrlBuilder.urlDecode(vClassUriEncoded));          
     }
@@ -94,11 +94,11 @@ public class UrlBuilderTest extends AbstractTestClass {
         
         String uri = "http://example.com/individual/n2343";
         String url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
-        Assert.assertEquals("http://example.com/individual/n2343", url);
+        Assert.assertEquals("http://example.com/display/n2343", url);
                 
         uri = "http://example.com/individual/bob";                
         url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
-        Assert.assertEquals("http://example.com/individual/bob",url);
+        Assert.assertEquals("http://example.com/display/bob",url);
         
         uri = "http://nondefaultNS.com/individual/n2343";                
         url = UrlBuilder.getIndividualProfileUrl(uri, vreq);

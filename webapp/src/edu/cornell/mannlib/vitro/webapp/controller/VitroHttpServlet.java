@@ -5,10 +5,13 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.Collator;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +30,9 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
+import edu.cornell.mannlib.vitro.webapp.beans.ResourceBean;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
@@ -185,6 +190,25 @@ public class VitroHttpServlet extends HttpServlet {
 		}
 		return request.getContextPath() + Controllers.AUTHENTICATE
 				+ "?afterLogin=" + encodedAfterLoginUrl;
+	}
+	
+	protected void sortForPickList(List<? extends ResourceBean> beans, 
+	        VitroRequest vreq) {
+	    Collections.sort(beans, new PickListSorter(vreq));
+	}
+	
+	protected class PickListSorter implements Comparator<ResourceBean> {
+	    
+	    Collator collator;
+	    
+	    public PickListSorter(VitroRequest vreq) {
+	        this.collator = vreq.getCollator();
+	    }
+	    
+	    public int compare(ResourceBean b1, ResourceBean b2) {
+	        return collator.compare(b1.getPickListName(), b2.getPickListName());
+	    }
+	    
 	}
 
 	/**

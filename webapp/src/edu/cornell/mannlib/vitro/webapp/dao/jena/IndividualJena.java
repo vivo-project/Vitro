@@ -78,6 +78,10 @@ public class IndividualJena extends IndividualImpl implements Individual {
             }
         }
     }
+    
+    public String getLabel() {
+        return getRdfsLabel();
+    }
 
     public String getRdfsLabel() {
         if (this.rdfsLabel != null) {

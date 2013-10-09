@@ -6,7 +6,10 @@ import static edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetup
 import static edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.JENA_INF_MODEL;
 
 import java.io.IOException;
+import java.text.Collator;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
@@ -153,6 +156,8 @@ public class RequestModelsPrep implements Filter {
 				rdfService, createLanguageNeutralOntModelSelector(vreq), createWadfConfig(vreq)));
 
 		wrapModelsWithLanguageAwareness(vreq);
+		
+		setCollator(vreq);
 		
 		setWebappDaoFactories(vreq, rdfService);
 	}
@@ -309,9 +314,19 @@ public class RequestModelsPrep implements Filter {
 		return config;
 	}
 
+	/**
+	 * This method is also used by VitroHttpServlet to retrieve the right Collator
+	 * instance for picklist sorting
+	 * @param req
+	 * @return
+	 */
+	public static Enumeration<Locale> getPreferredLocales(HttpServletRequest req) {
+	    return req.getLocales();
+	}
+	
 	private List<String> getPreferredLanguages(HttpServletRequest req) {
 		log.debug("Accept-Language: " + req.getHeader("Accept-Language"));
-		return LanguageFilteringUtils.localesToLanguages(req.getLocales());
+		return LanguageFilteringUtils.localesToLanguages(getPreferredLocales(req));
 	}
 
 	/**
@@ -331,6 +346,19 @@ public class RequestModelsPrep implements Filter {
 			return rawRDFService;
 		}
 	}
+	
+   private void setCollator(VitroRequest vreq) {
+        Enumeration<Locale> locales = getPreferredLocales(vreq);
+        while(locales.hasMoreElements()) {
+            Locale locale = locales.nextElement();
+            Collator collator = Collator.getInstance(locale);
+            if(collator != null) {
+                vreq.setCollator(collator);
+                return;
+            }
+        }
+        vreq.setCollator(Collator.getInstance());
+    }
 
 	private boolean isStoreReasoned(ServletRequest req) {
 	    String isStoreReasoned = ConfigurationProperties.getBean(req).getProperty(

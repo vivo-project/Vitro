@@ -94,27 +94,14 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             p.setURI(op.getURI());
             p.setNamespace(op.getNameSpace());
             p.setLocalName(op.getLocalName());
-            OntologyDao oDao=getWebappDaoFactory().getOntologyDao();
-            Ontology o = oDao.getOntologyByURI(p.getNamespace());
-            if (o == null) {
-                if (!VitroVocabulary.vitroURI.equals(p.getNamespace())) {
-                    log.debug("propertyFromOntProperty(): no ontology object found for the namespace "+p.getNamespace());
-                }
-                p.setLocalNameWithPrefix(p.getLocalName());
-                p.setPickListName(getLabelOrId(op));                
-            } else {
-                String prefix = o.getPrefix()==null?(o.getName()==null?"unspec":o.getName()):o.getPrefix();
-                p.setLocalNameWithPrefix(prefix+":"+p.getLocalName());
-                //log.warn("setting pickListName to: "+p.getLocalName()+" ("+prefix+")");
-                p.setPickListName(getLabelOrId(op) + " ("+prefix+")");
-            }
-            String propertyName = getPropertyStringValue(op,PROPERTY_FULLPROPERTYNAMEANNOT);
+            p.setLocalNameWithPrefix(getWebappDaoFactory().makeLocalNameWithPrefix(p));
             if (op.getLabel(null) != null)
                 p.setDomainPublic(getLabelOrId(op));
             else
                 p.setDomainPublic(op.getLocalName());
             if (p.getDomainPublic() == null)
                 p.setDomainPublic("[related to]");
+            p.setPickListName(getWebappDaoFactory().makePickListName(p));
             if (op.getDomain() != null)
                 p.setDomainVClassURI( (op.getDomain().isAnon()) ? PSEUDO_BNODE_NS+op.getDomain().getId().toString() : op.getDomain().getURI());
             if (op.getRange() != null)

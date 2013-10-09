@@ -22,7 +22,7 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
  * a class representing an object property
  *
  */
-public class ObjectProperty extends Property implements Comparable<ObjectProperty>
+public class ObjectProperty extends Property implements Comparable<ObjectProperty>, ResourceBean
 {
 	private static final Log log = LogFactory.getLog(ObjectProperty.class.getName());
 	
@@ -95,6 +95,10 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
         this.domainEntityURI = domainEntityURI;
     }
 
+    public String getLabel() {
+        return getDomainPublic();
+    }
+    
     public String getDomainPublic() {
         return domainPublic;
     }

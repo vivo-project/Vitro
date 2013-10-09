@@ -43,7 +43,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.search.IndexConstants;
 import edu.cornell.mannlib.vitro.webapp.search.SearchException;
@@ -250,7 +252,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             if( wasHtmlRequested ){                                
                 if ( !classGroupFilterRequested && !typeFilterRequested ) {
                     // Search request includes no ClassGroup and no type, so add ClassGroup search refinement links.
-                    body.put("classGroupLinks", getClassGroupsLinks(grpDao, docs, response, queryText));                            
+                    body.put("classGroupLinks", getClassGroupsLinks(vreq, grpDao, docs, response, queryText));                            
                 } else if ( classGroupFilterRequested && !typeFilterRequested ) {
                     // Search request is for a ClassGroup, so add rdf:type search refinement links
                     // but try to filter out classes that are subclasses
@@ -354,7 +356,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
      * Get the class groups represented for the individuals in the documents.
      * @param qtxt 
      */
-    private List<VClassGroupSearchLink> getClassGroupsLinks(VClassGroupDao grpDao, SolrDocumentList docs, QueryResponse rsp, String qtxt) {                                 
+    private List<VClassGroupSearchLink> getClassGroupsLinks(VitroRequest vreq, VClassGroupDao grpDao, SolrDocumentList docs, QueryResponse rsp, String qtxt) {                                 
         Map<String,Long> cgURItoCount = new HashMap<String,Long>();
         
         List<VClassGroup> classgroups = new ArrayList<VClassGroup>( );
@@ -376,11 +378,14 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         
         grpDao.sortGroupList(classgroups);     
         
+        VClassGroupsForRequest vcgfr = VClassGroupCache.getVClassGroups(vreq);
         List<VClassGroupSearchLink> classGroupLinks = new ArrayList<VClassGroupSearchLink>(classgroups.size());
         for (VClassGroup vcg : classgroups) {
-            long count = cgURItoCount.get( vcg.getURI() );
-            if (vcg.getPublicName() != null && count > 0 )  {
-                classGroupLinks.add(new VClassGroupSearchLink(qtxt, vcg, count));
+        	String groupURI = vcg.getURI();
+			VClassGroup localizedVcg = vcgfr.getGroup(groupURI);
+            long count = cgURItoCount.get( groupURI );
+            if (localizedVcg.getPublicName() != null && count > 0 )  {
+                classGroupLinks.add(new VClassGroupSearchLink(qtxt, localizedVcg, count));
             }
         }
         return classGroupLinks;
@@ -507,7 +512,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return query;
     }   
     
-    public class VClassGroupSearchLink extends LinkTemplateModel {        
+    public static class VClassGroupSearchLink extends LinkTemplateModel {        
         long count = 0;
         VClassGroupSearchLink(String querytext, VClassGroup classgroup, long count) {
             super(classgroup.getPublicName(), "/search", PARAM_QUERY_TEXT, querytext, PARAM_CLASSGROUP, classgroup.getURI());
@@ -517,7 +522,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         public String getCount() { return Long.toString(count); }
     }
     
-    public class VClassSearchLink extends LinkTemplateModel {
+    public static class VClassSearchLink extends LinkTemplateModel {
         long count = 0;
         VClassSearchLink(String querytext, VClass type, long count) {
             super(type.getName(), "/search", PARAM_QUERY_TEXT, querytext, PARAM_RDFTYPE, type.getURI());

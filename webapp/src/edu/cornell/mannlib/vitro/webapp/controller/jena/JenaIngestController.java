@@ -450,7 +450,7 @@ public class JenaIngestController extends BaseEditController {
             vreq.setAttribute("bodyJsp",INGEST_MENU_JSP);
         } else {
             List<String> dbTypes = DatabaseType.allNames();
-            Collections.sort(dbTypes, new CollationSort());
+            Collections.sort(dbTypes, new CollationSort(vreq));
             vreq.setAttribute("dbTypes", dbTypes);
             vreq.setAttribute("title", "Connect Jena Database");
             vreq.setAttribute("bodyJsp",CONNECT_DB_JSP);
@@ -1295,7 +1295,11 @@ public class JenaIngestController extends BaseEditController {
 
     private class CollationSort implements Comparator<String> {
         
-        Collator collator = Collator.getInstance();
+        Collator collator;
+        
+        public CollationSort(VitroRequest vreq) {
+             this.collator = vreq.getCollator();   
+        }
         
         public int compare(String s1, String s2) {
             return collator.compare(s1, s2);

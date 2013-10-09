@@ -132,7 +132,7 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
             }
 
             if (props != null) {
-        	    Collections.sort(props, new ShowObjectPropertyHierarchyController.ObjectPropertyAlphaComparator());
+        	    sortForPickList(props, vreq);
             }
 
             String json = new String();
@@ -161,11 +161,11 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
                          json += "\"data\": { \"internalName\": " + JSONUtils.quote(prop.getLocalNameWithPrefix()) + ", "; 
                     
                          VClass vc = (prop.getDomainVClassURI() != null) ? vcDao.getVClassByURI(prop.getDomainVClassURI()) : null;
-                         String domainStr = (vc != null) ? vc.getLocalNameWithPrefix() : ""; 
+                         String domainStr = (vc != null) ? vc.getPickListName() : ""; 
                          json += "\"domainVClass\": " + JSONUtils.quote(domainStr) + ", " ;
                     
                          vc = (prop.getRangeVClassURI() != null) ? vcDao.getVClassByURI(prop.getRangeVClassURI()) : null;
-                         String rangeStr = (vc != null) ? vc.getLocalNameWithPrefix() : ""; 
+                         String rangeStr = (vc != null) ? vc.getPickListName() : ""; 
                          json += "\"rangeVClass\": " + JSONUtils.quote(rangeStr) + ", " ; 
                     
                          if (prop.getGroupURI() != null) {

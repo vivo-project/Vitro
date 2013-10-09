@@ -2,13 +2,19 @@
 
 package edu.cornell.mannlib.vedit.controller;
 
+import java.text.Collator;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
 
@@ -21,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
+import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
@@ -154,6 +161,41 @@ public class BaseEditController extends VitroHttpServlet {
             }
         }
     }
+    
+    public List<Option> getSortedList(HashMap<String,Option> hashMap, List<Option> optionList, VitroRequest vreq){
+        
+        class ListComparator implements Comparator<String>{
+            
+            Collator collator;
+            
+            public ListComparator(Collator collator) {
+                this.collator = collator;
+            }
+            
+            @Override
+            public int compare(String str1, String str2) {
+                return collator.compare(str1, str2);
+            }
+            
+        }
+
+       List<String> bodyVal = new ArrayList<String>();
+       List<Option> options = new ArrayList<Option>();
+       Iterator<Option> itr = optionList.iterator();
+        while(itr.hasNext()){
+            Option option = itr.next();
+            hashMap.put(option.getBody(),option);
+           bodyVal.add(option.getBody());
+        }
+        
+                
+       Collections.sort(bodyVal, new ListComparator(vreq.getCollator()));
+       ListIterator<String> itrStr = bodyVal.listIterator();
+       while(itrStr.hasNext()){
+           options.add(hashMap.get(itrStr.next()));
+       }
+       return options;
+   }
     
     protected WebappDaoFactory getWebappDaoFactory() {
     	return ModelAccess.on(getServletContext()).getBaseWebappDaoFactory();

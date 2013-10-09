@@ -177,20 +177,10 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             dp.setURI(op.getURI());
             dp.setNamespace(op.getNameSpace());
             dp.setLocalName(op.getLocalName());
-            OntologyDao oDao=getWebappDaoFactory().getOntologyDao();
-            Ontology o = oDao.getOntologyByURI(dp.getNamespace());
-            if (o==null) {
-                if (!VitroVocabulary.vitroURI.equals(dp.getNamespace())) {
-                    log.debug("datapropFromOntProperty(): no ontology object found for the namespace "+dp.getNamespace());
-                }
-                dp.setLocalNameWithPrefix(dp.getLocalName());
-                dp.setPickListName(getLabelOrId(op));
-            } else {
-                dp.setLocalNameWithPrefix(o.getPrefix()==null?(o.getName()==null?"unspec:"+dp.getLocalName():o.getName()+":"+dp.getLocalName()):o.getPrefix()+":"+dp.getLocalName());
-                dp.setPickListName(getLabelOrId(op)+o.getPrefix()==null?(o.getName()==null?" (unspec:)":" ("+o.getName()+")"):" ("+o.getPrefix()+")");
-            }
+            dp.setLocalNameWithPrefix(getWebappDaoFactory().makeLocalNameWithPrefix(dp));
             dp.setName(op.getLocalName());
             dp.setPublicName(getLabelOrId(op));
+            dp.setPickListName(getWebappDaoFactory().makePickListName(dp));
             Resource dRes = op.getDomain();
             if (dRes != null) {
                 dp.setDomainClassURI(dRes.getURI());

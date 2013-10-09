@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,7 +15,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDFS;
-import com.ibm.icu.text.Collator;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
@@ -25,6 +23,7 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import edu.cornell.mannlib.vitro.webapp.beans.ResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -58,12 +57,12 @@ public class RestrictionRetryController extends BaseEditController {
 			// default to object property restriction
 			boolean propertyType = ("data".equals(request.getParameter("propertyType"))) ? DATA : OBJECT ;
 			
-			List<? extends Property> pList = (propertyType == OBJECT) 
+			List<? extends ResourceBean> pList = (propertyType == OBJECT) 
 				? request.getUnfilteredWebappDaoFactory().getObjectPropertyDao().getAllObjectProperties()
 			    : request.getUnfilteredWebappDaoFactory().getDataPropertyDao().getAllDataProperties();
 			List<Option> onPropertyList = new LinkedList<Option>(); 
-			Collections.sort(pList, new PropSorter());
-			for (Property p: pList) {
+			sortForPickList(pList, request);
+			for (ResourceBean p: pList) {
 				onPropertyList.add( new Option(p.getURI(),p.getPickListName()));
 			}
 					
@@ -146,14 +145,5 @@ public class RestrictionRetryController extends BaseEditController {
 		return valueDatatypeOptionList;
 	}
 	
-	private class PropSorter implements Comparator<Property> {
-		
-		public int compare(Property p1, Property p2) {
-			if (p1.getLocalNameWithPrefix() == null) return 1;
-			if (p2.getLocalNameWithPrefix() == null) return -1;
-			return Collator.getInstance().compare(p1.getLocalNameWithPrefix(), p2.getLocalNameWithPrefix());
-		}
-		
-	}
 	
 }

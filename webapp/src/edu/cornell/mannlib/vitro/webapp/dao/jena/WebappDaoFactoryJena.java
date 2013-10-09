@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.iri.IRI;
 import com.hp.hpl.jena.iri.IRIFactory;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -20,14 +23,12 @@ import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
+import edu.cornell.mannlib.vitro.webapp.beans.ResourceBean;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
@@ -44,6 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
@@ -53,6 +55,8 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.URIUtils;
 
 public class WebappDaoFactoryJena implements WebappDaoFactory {
 
+    private static final Log log = LogFactory.getLog(WebappDaoFactoryJena.class);
+    
     protected IndividualDao entityWebappDao;
     protected ApplicationDaoJena applicationDao;
     protected UserAccountsDao userAccountsDao;
@@ -532,5 +536,44 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     	ontModelSelector = specialSelector;
     	
     }
+    
+    public String makeLocalNameWithPrefix(ResourceBean bean) {
+        OntologyDao oDao = this.getOntologyDao();
+        Ontology o = oDao.getOntologyByURI(bean.getNamespace());
+        if (o == null) {
+            if (VitroVocabulary.vitroURI.equals(bean.getNamespace())) {
+                return "vitro:" + bean.getLocalName();
+            } else {
+                log.debug("no ontology object found for namespace " + bean.getNamespace());
+                return bean.getLocalName();
+            }
+        } else {
+            String prefix = o.getPrefix() == null ? (
+                    o.getName() == null ? 
+                            "unspec" : o.getName()) : o.getPrefix();
+            return prefix + ":" + bean.getLocalName();
+        }    
+    }
+    
+    public String makePickListName(ResourceBean bean) {
+        OntologyDao oDao = this.getOntologyDao();
+        Ontology o = oDao.getOntologyByURI(bean.getNamespace());
+        String label = (bean.getLabel() != null) ? bean.getLabel () : bean.getLocalName();
+        label = (label != null) ? label : bean.getURI();
+        if (o == null) {
+            if (VitroVocabulary.vitroURI.equals(bean.getNamespace())) {
+                return label + " (vitro)";
+            } else {
+                log.debug("no ontology object found for namespace " + bean.getNamespace());
+                return label;
+            }
+        } else {
+            String prefix = o.getPrefix() == null ? (
+                    o.getName() == null ? 
+                            "unspec" : o.getName()) : o.getPrefix();
+            return label + " (" + prefix + ")";
+        }       
+    }
+    
    
 }

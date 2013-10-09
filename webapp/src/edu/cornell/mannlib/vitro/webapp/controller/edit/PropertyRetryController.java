@@ -154,7 +154,7 @@ public class PropertyRetryController extends BaseEditController {
 
         List groupOptList = FormUtils.makeOptionListFromBeans(request.getUnfilteredWebappDaoFactory().getPropertyGroupDao().getPublicGroups(true),"URI","Name", ((propertyForEditing.getGroupURI()==null) ? "" : propertyForEditing.getGroupURI()), null, (propertyForEditing.getGroupURI()!=null));
         HashMap<String,Option> hashMap = new HashMap<String,Option>();
-        groupOptList = getSortedList(hashMap,groupOptList);
+        groupOptList = getSortedList(hashMap,groupOptList,request);
         groupOptList.add(0,new Option("","none"));
         optionMap.put("GroupURI", groupOptList);
         
@@ -241,23 +241,9 @@ public class PropertyRetryController extends BaseEditController {
         List<Option> parentIdList = FormUtils.makeOptionListFromBeans(
                 objPropList,"URI","PickListName",propertyForEditing.getParentURI(),null);
         HashMap<String,Option> hashMap = new HashMap<String,Option>();
-        parentIdList = getSortedList(hashMap,parentIdList);
+        parentIdList = getSortedList(hashMap,parentIdList,request);
         parentIdList.add(0,new Option("-1","none (root property)", false));
         optionMap.put("ParentURI", parentIdList);
-        
-        /*
-        List<DataProperty> dpList = dpDao.getAllDataProperties();
-        Collections.sort(dpList);
-        List<Option> objectIndividualSortPropertyList = 
-                FormUtils.makeOptionListFromBeans(
-                        dpList, "URI", "Name", 
-                        propertyForEditing.getObjectIndividualSortPropertyURI(),
-                        null);
-        objectIndividualSortPropertyList.add(0, new Option(
-                "","- name (rdfs:label) -"));
-        optionMap.put("ObjectIndividualSortPropertyURI", 
-                objectIndividualSortPropertyList);
-        */
         
         List<Option> domainOptionList = FormUtils.makeVClassOptionList(
                 request.getUnfilteredWebappDaoFactory(), 
@@ -266,7 +252,7 @@ public class PropertyRetryController extends BaseEditController {
                 && propertyForEditing.getDomainVClass().isAnonymous()) {
             domainOptionList.add(0, new Option(
                     propertyForEditing.getDomainVClass().getURI(), 
-                    propertyForEditing.getDomainVClass().getName(), 
+                    propertyForEditing.getDomainVClass().getPickListName(), 
                     true));
         }
         domainOptionList.add(0, new Option("","(none specified)"));
@@ -279,7 +265,7 @@ public class PropertyRetryController extends BaseEditController {
                 && propertyForEditing.getRangeVClass().isAnonymous()) {
             rangeOptionList.add(0, new Option(
                     propertyForEditing.getRangeVClass().getURI(), 
-                    propertyForEditing.getRangeVClass().getName(), 
+                    propertyForEditing.getRangeVClass().getPickListName(), 
                     true));
         }
         rangeOptionList.add(0, new Option("","(none specified)"));
@@ -316,33 +302,5 @@ public class PropertyRetryController extends BaseEditController {
         }
     }
     
-    public List<Option> getSortedList(HashMap<String,Option> hashMap, List<Option> optionList){
-        
-           class ListComparator implements Comparator<String>{
-               @Override
-               public int compare(String str1, String str2) {
-                   // TODO Auto-generated method stub
-                   Collator collator = Collator.getInstance();
-                   return collator.compare(str1, str2);
-               }
-               
-           }
 
-          List<String> bodyVal = new ArrayList<String>();
-          List<Option> options = new ArrayList<Option>();
-          Iterator<Option> itr = optionList.iterator();
-           while(itr.hasNext()){
-               Option option = itr.next();
-               hashMap.put(option.getBody(),option);
-              bodyVal.add(option.getBody());
-           }
-           
-                   
-          Collections.sort(bodyVal, new ListComparator());
-          ListIterator<String> itrStr = bodyVal.listIterator();
-          while(itrStr.hasNext()){
-              options.add(hashMap.get(itrStr.next()));
-          }
-          return options;
-      }
 }

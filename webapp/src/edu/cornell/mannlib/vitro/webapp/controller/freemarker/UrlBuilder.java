@@ -5,15 +5,12 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-//import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
@@ -33,6 +30,7 @@ public class UrlBuilder {
         BROWSE("/browse"),
         CONTACT("/contact"),
         DATA_PROPERTY_EDIT("/datapropEdit"),
+        DISPLAY("/display"),
         INDIVIDUAL("/individual"),
         INDIVIDUAL_EDIT("/entityEdit"),
         INDIVIDUAL_LIST("/individuallist"),
@@ -250,14 +248,14 @@ public class UrlBuilder {
             String defaultNamespace = wadf.getDefaultNamespace();                
                     
             if (defaultNamespace.equals(namespace)) {
-                profileUrl = getUrl(Route.INDIVIDUAL.path() + "/" + localName);
+                profileUrl = getUrl(Route.DISPLAY.path() + "/" + localName);
             } else {
                 if (wadf.getApplicationDao().isExternallyLinkedNamespace(namespace)) {
                     log.debug("Found externally linked namespace " + namespace);
                     profileUrl = namespace + localName;
                 } else {
                     ParamMap params = new ParamMap("uri", individual.getURI());
-                    profileUrl = getUrl("/individual", params);
+                    profileUrl = getUrl(Route.INDIVIDUAL.path(), params);
                 }
             }
         } catch (Exception e) {
@@ -283,25 +281,6 @@ public class UrlBuilder {
     public static String getIndividualProfileUrl(String individualUri, VitroRequest vreq) {        
         return getIndividualProfileUrl(new IndividualImpl(individualUri),  vreq);
     }    
-    
-    protected static String getIndividualProfileUrl( 
-            String individualUri, 
-            String namespace, String localName, 
-            String defaultNamespace){
-        String profileUrl = "";
-        try{            
-            if ( isUriInDefaultNamespace( individualUri, defaultNamespace) ) {
-                profileUrl = getUrl(Route.INDIVIDUAL.path() + "/" + localName);
-            } else {
-                ParamMap params = new ParamMap("uri", individualUri);
-                profileUrl = getUrl("/individual", params);            
-            }
-        } catch (Exception e) {
-            log.warn(e);
-            return null;
-        }                
-        return profileUrl;
-    }
     
     public static boolean isUriInDefaultNamespace(String individualUri, VitroRequest vreq) {
         return isUriInDefaultNamespace(individualUri, vreq.getWebappDaoFactory());

@@ -81,7 +81,17 @@ public class IndividualStub implements Individual {
 	public String getName() {
 		return name;
 	}
+	
+	@Override 
+	public String getLabel() {
+	    return getName();
+	}
 
+	@Override
+	public String getPickListName() {
+	    return getName();
+	}
+	
 	@Override
 	public List<DataPropertyStatement> getDataPropertyStatements() {
 		return new ArrayList<DataPropertyStatement>(dpsSet);
