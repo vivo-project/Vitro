@@ -47,7 +47,7 @@
             <#if externalAuthUrl??>
                 <#assign infoClassHide = 'class="vivoAccount"'/>
             
-                <p class="external-auth"><a class="blue button" href="${externalAuthUrl}" title="${i18n().external_auth_name}">${externalAuthName}</a></p>
+                <p class="external-auth"><a class="blue button" href="${externalAuthUrl}" title="${i18n().external_auth_name}">${i18n().external_login_text}</a></p>
                 <!--<p class="or-auth">or</p>-->
                 <h3 class="internal-auth"><!--Log in using your--> <b>${i18n().or}</b> ${siteName} ${i18n().account}</h3>
                 

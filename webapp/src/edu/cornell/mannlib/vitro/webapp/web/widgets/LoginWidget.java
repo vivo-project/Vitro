@@ -2,12 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.widgets;
 
-import java.io.IOException;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -126,8 +126,7 @@ public class LoginWidget extends Widget {
     /**
      * User is starting the login process. Show them the login screen.
      */
-    private WidgetTemplateValues showLoginScreen(HttpServletRequest request, String siteName)
-            throws IOException {
+    private WidgetTemplateValues showLoginScreen(HttpServletRequest request, String siteName) {
         LoginProcessBean bean = LoginProcessBean.getBean(request);
         log.trace("Going to login screen: " + bean);
 
@@ -135,13 +134,12 @@ public class LoginWidget extends Widget {
         values.put(TemplateVariable.FORM_ACTION.toString(), getAuthenticateUrl(request));
         values.put(TemplateVariable.LOGIN_NAME.toString(), bean.getUsername());
         
-		String externalAuthDisplayName = ConfigurationProperties.getBean(
-				request).getProperty("externalAuth.buttonText");
-		if (externalAuthDisplayName != null) {
+		boolean showExternalAuth = StringUtils.isNotBlank(
+				ConfigurationProperties.getBean(request).getProperty(
+						"externalAuth.netIdHeaderName"));
+		if (showExternalAuth) {
 			values.put(TemplateVariable.EXTERNAL_AUTH_URL.toString(),
 					UrlBuilder.getUrl(EXTERNAL_AUTH_SETUP_URL));
-			values.put(TemplateVariable.EXTERNAL_AUTH_NAME.toString(),
-					externalAuthDisplayName);
 		}
 
         String infoMessage = bean.getInfoMessageAndClear();
