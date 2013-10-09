@@ -127,7 +127,6 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 p.setURIInverse(invOp.getURI());
                 p.setNamespaceInverse(invOp.getNameSpace());
                 p.setLocalNameInverse(invOp.getLocalName());
-                String invPropertyName = getPropertyStringValue(invOp,PROPERTY_FULLPROPERTYNAMEANNOT);
                 p.setRangePublic(getLabelOrId(invOp));
             }
             try {
@@ -296,6 +295,9 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
                 "SELECT ?range ?label ?group ?customForm ?displayRank ?displayLevel " +
                 "    ?updateLevel ?editLinkSuppressed ?addLinkSuppressed ?deleteLinkSuppressed \n" +
+                "    ?collateBySubclass ?displayLimit ?individualSortProperty \n" +
+                "    ?entitySortDirection ?selectFromExisting ?offerCreateNew \n" +
+                "    ?publicDescription \n" + 
                 " WHERE { \n" +
                 "    ?context config:configContextFor <" + propertyURI + "> . \n";
         if (domainURI != null) {
@@ -317,6 +319,13 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 "    OPTIONAL { ?configuration vitro:customEntryFormAnnot ?customForm } \n" +
                 "    OPTIONAL { ?configuration vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayLevel } \n" +
                 "    OPTIONAL { ?configuration vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateLevel } \n" +
+                "    OPTIONAL { ?configuration <" + PROPERTY_COLLATEBYSUBCLASSANNOT.getURI() + "> ?collateBySubclass } \n" +
+                "    OPTIONAL { ?configuration <" + DISPLAY_LIMIT.getURI() + "> ?displayLimit } \n" +
+                "    OPTIONAL { ?configuration <" + PROPERTY_OBJECTINDIVIDUALSORTPROPERTY.getURI() + "> ?individualSortProperty } \n " +
+                "    OPTIONAL { ?configuration <" + PROPERTY_ENTITYSORTDIRECTION.getURI() + "> ?entitySortDirection } \n" +
+                "    OPTIONAL { ?configuration <" + PROPERTY_SELECTFROMEXISTINGANNOT.getURI() + "> ?selectFromExisting } \n" +
+                "    OPTIONAL { ?configuration <" + PROPERTY_OFFERCREATENEWOPTIONANNOT.getURI() + "> ?offerCreateNew } \n" +
+                "    OPTIONAL { ?configuration <" + PUBLIC_DESCRIPTION_ANNOT.getURI() + "> ?publicDescription } \n" +
                 "}"; 
       
         Query q = QueryFactory.create(propQuery);
@@ -333,6 +342,11 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 if(displayRankLit != null) {
                     op.setDomainDisplayTier(
                             Integer.parseInt(displayRankLit.getLexicalForm()));
+                } 
+                Literal displayLimitLit = qsoln.getLiteral("displayLimit");
+                if(displayLimitLit != null) {
+                    op.setDomainDisplayLimit(
+                            Integer.parseInt(displayLimitLit.getLexicalForm()));
                 } 
                 Resource displayLevelRes = qsoln.getResource("displayLevel");
                 if (displayLevelRes != null) {
@@ -366,7 +380,31 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 if (deleteLinkSuppressedLit != null ) {
                     op.setDeleteLinkSuppressed(deleteLinkSuppressedLit.getBoolean());
                 }
-            }  
+                Literal collateBySubclassLit = qsoln.getLiteral("collateBySubclass");
+                if (collateBySubclassLit != null) {
+                    op.setCollateBySubclass(collateBySubclassLit.getBoolean());
+                }
+                Resource individualSortPropertyRes = qsoln.getResource("individualSortProperty");
+                if (individualSortPropertyRes != null) {
+                    op.setObjectIndividualSortPropertyURI(individualSortPropertyRes.getURI());
+                } 
+                Literal entitySortDirectionLit = qsoln.getLiteral("entitySortDirection");
+                if (entitySortDirectionLit != null) {
+                    op.setDomainEntitySortDirection(entitySortDirectionLit.getLexicalForm());
+                }
+                Literal selectFromExistingLit = qsoln.getLiteral("selectFromExisting");
+                if (selectFromExistingLit != null) {
+                    op.setSelectFromExisting(selectFromExistingLit.getBoolean());
+                }
+                Literal offerCreateNewLit = qsoln.getLiteral("offerCreateNew");
+                if (offerCreateNewLit != null) {
+                    op.setOfferCreateNewOption(offerCreateNewLit.getBoolean());
+                }
+                Literal publicDescriptionLit = qsoln.getLiteral("publicDescription");
+                if (publicDescriptionLit != null) {
+                    op.setPublicDescription(publicDescriptionLit.getLexicalForm());
+                }        
+             }  
         } finally {
             qe.close();
         }            
