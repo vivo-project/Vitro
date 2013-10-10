@@ -170,6 +170,8 @@ name will be used as the label. -->
         <#local url = statement.editUrl + "&emailUri=" + "${statement.email!}">
     <#elseif propertyName?contains("full name")>
         <#local url = statement.editUrl + "&fullNameUri=" + "${statement.fullName!}">
+    <#elseif propertyName?contains("preferred title")>
+        <#local url = statement.editUrl + "&titleUri=" + "${statement.title!}">
     </#if>
 <#else>
     <#local url = statement.editUrl>
