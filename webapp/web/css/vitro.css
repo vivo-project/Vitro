@@ -89,7 +89,7 @@
     margin-right:25px;
 }
 #isotope-container {
-    overflow:visible;
+    overflow:visible !important;
 }
 #isotope-container li {
     width:290px;

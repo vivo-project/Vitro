@@ -49,7 +49,7 @@
           itemSelector : '.class-group',
           layoutMode : 'fitColumns'
         });
-    </script>    
+    </script>
 <#else>
     ${noDataNotification}
 </#if>
