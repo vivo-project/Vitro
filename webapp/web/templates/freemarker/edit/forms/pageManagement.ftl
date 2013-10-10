@@ -4,12 +4,15 @@
 <#--------Set up variables-------->
 <#assign pageData = editConfiguration.pageData />
 <#assign menuAction = pageData.menuAction />
+<#assign pageAvailablePermissions = pageData.availablePermissions />
+<#assign pageAvailablePermissionsURIsList = pageData.availablePermissionOrderedList />
 
 <#assign pageName = "" />
 <#assign selectedTemplateType = "default" />
 <#assign prettyUrl = ""/>
 <#assign menuItem = ""/>    	
 <#assign menuLinkText = "" />
+<#assign action = "" />
 <#assign menuPosition = pageData.highestMenuPosition />
 <#assign addMenuItem = "" />
 <#assign pageHeading = "${i18n().add_new_page}" />
@@ -27,6 +30,8 @@
 	<#assign menuLinkText =  lvf.getFormFieldValue(editSubmission, editConfiguration, "menuLinkText")/>
 	<#assign customTemplate = lvf.getFormFieldValue(editSubmission, editConfiguration, "customTemplate")/>
 	<#assign selfContainedTemplate = lvf.getFormFieldValue(editSubmission, editConfiguration, "isSelfContainedTemplate")/>
+	<#assign action = lvf.getFormFieldValue(editSubmission, editConfiguration, "action")/>
+	
 	<#assign pageHeading = "${i18n().edit_page(pageName)}" />
     <#assign saveBtnText = "${i18n().save_changes}" />
 	<#if customTemplate?has_content>
@@ -121,10 +126,24 @@
             </#if>
             >
                 <label for="default">${i18n().menu_item_name}</label>
+           
                 <input type="hidden" id="menuItem" name="menuItem" value="${menuItem!''}" />
                 <input type="text" id="menuLinkText" name="menuLinkText" value="${menuLinkText!''}" size="28" role="input" />
                 <input type="hidden" id="menuPosition" name="menuPosition" value="${menuPosition!''}" />
+                
+                
                 <p class="note">${i18n().if_blank_page_title_used}</p>
+              
+                
+            </section>
+            <section id="pagePermissions>
+              <label for="default">${i18n().page_select_permission}</label>
+                <select id="action" name="action">
+                	<option value="">${i18n().page_select_permission_option}</option>
+                <#list pageAvailablePermissionsURIsList as permissionURI>
+                	<option value="${permissionURI}"<#if action=permissionURI> selected="selected"</#if>>${pageAvailablePermissions[permissionURI]}</option>
+                </#list>
+           		</select>
             </section>
             <br />
         </section>

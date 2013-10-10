@@ -40,6 +40,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ManagePagePreprocessor;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3Utils;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.menuManagement.MenuManagementDataUtils;
 
@@ -98,7 +99,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 
 	private void setUrisAndLiteralsOnForm(EditConfigurationVTwo conf,
 			VitroRequest vreq) {
-		conf.setUrisOnForm(new String[]{"page", "menuItem"}); //new resources: should this be on form for new - should be for existing
+		conf.setUrisOnForm(new String[]{"page", "menuItem", "action"}); //new resources: should this be on form for new - should be for existing
 		conf.setLiteralsOnForm(new String[]{"pageName", "prettyUrl", "menuPosition", "menuLinkText", "customTemplate", "isSelfContainedTemplate", "pageContentUnit"}); //page content unit = data getter JSON object
 		
 	}
@@ -118,7 +119,8 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 		//body template is not required, and a given page may or may not be a menu item, but should linked to menu if menu item
 	      conf.setN3Optional(new ArrayList<String>(Arrays.asList(prefixes + pageBodyTemplateN3, 
 	    		  							prefixes + menuItemN3 + menuN3,
-	    		  							prefixes + isSelfContainedTemplateN3)));
+	    		  							prefixes + isSelfContainedTemplateN3,
+	    		  							prefixes + permissionN3)));
 	}
 
 	private void setN3Required(EditConfigurationVTwo conf) {
@@ -154,6 +156,10 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 		//If this is a self contained template, the appropriate flag will be set
 		FieldVTwo isSelfContainedTemplateField = new FieldVTwo().setName("isSelfContainedTemplate");
 		conf.addField(isSelfContainedTemplateField);
+		
+		//Permission for the page
+		FieldVTwo permissionField = new FieldVTwo().setName("action");
+		conf.addField(permissionField);
 		
 		//The actual page content information is stored in this field, and then
 		//interpreted using the preprocessor
@@ -413,11 +419,17 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
     private HashMap<String, String> generateSparqlForExistingUris() {
     	HashMap<String, String> map = new HashMap<String, String>();
     	map.put("menuItem", getExistingMenuItemQuery());
+    	map.put("action", getExistingActionQuery());
     	return map;
     }
     
     private String getExistingMenuItemQuery() {
 		String query = getSparqlPrefix() + "SELECT ?menuItem WHERE {?menuItem display:toPage ?page .}";
+		return query;
+	}
+    
+    private String getExistingActionQuery() {
+		String query = getSparqlPrefix() + "SELECT ?action WHERE {?page display:requiresAction ?action .}";
 		return query;
 	}
 
@@ -509,6 +521,8 @@ private String getExistingIsSelfContainedTemplateQuery() {
      	MenuManagementDataUtils.includeRequiredSystemData(vreq.getSession().getServletContext(), data);
     	data.put("classGroup", new ArrayList<String>());
     	data.put("classGroups", DataGetterUtils.getClassGroups(vreq));
+    	data.put("availablePermissions", this.getAvailablePermissions(vreq));
+    	data.put("availablePermissionOrderedList", this.getAvailablePermissonsOrderedURIs());
 	}
 	
 	private void addExistingPageData(VitroRequest vreq, Map<String, Object> data) {
@@ -529,6 +543,31 @@ private String getExistingIsSelfContainedTemplateQuery() {
     	if(menuItemParam != null) {
     		data.put("addMenuItem", menuItemParam);
     	} 
+	}
+	
+	private HashMap<String, String> getAvailablePermissions(VitroRequest vreq) {
+		HashMap<String, String> availablePermissions = new HashMap<String, String>();
+		String actionNamespace = "java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#";
+		availablePermissions.put(actionNamespace + "PageViewableAdmin", I18n.text(vreq, "page_admin_permission_option"));
+		availablePermissions.put(actionNamespace + "PageViewableCurator", I18n.text(vreq,"page_curator_permission_option"));
+		availablePermissions.put(actionNamespace + "PageViewableEditor", I18n.text(vreq,"page_editor_permission_option"));
+		availablePermissions.put(actionNamespace + "PageViewableLoggedIn", I18n.text(vreq,"page_loggedin_permission_option"));
+		availablePermissions.put(actionNamespace + "PageViewablePublic", I18n.text(vreq,"page_public_permission_option"));
+		return availablePermissions;
+	}
+	
+	//To display the permissions in a specific order, we can't rely on the hashmap whose keys are not guaranteed to return in a specific order
+	//This is to allow the display to work correctly
+	private List<String> getAvailablePermissonsOrderedURIs() {
+		List<String> availablePermissionsOrdered = new ArrayList<String>();
+		String actionNamespace = "java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#";
+		availablePermissionsOrdered.add(actionNamespace + "PageViewableAdmin");
+		availablePermissionsOrdered.add(actionNamespace + "PageViewableCurator");
+		availablePermissionsOrdered.add(actionNamespace + "PageViewableEditor");
+		availablePermissionsOrdered.add(actionNamespace + "PageViewableLoggedIn");
+		availablePermissionsOrdered.add(actionNamespace + "PageViewablePublic");
+
+		return availablePermissionsOrdered;
 	}
 	
 	//N3 strings
@@ -562,6 +601,9 @@ private String getExistingIsSelfContainedTemplateQuery() {
 	//so will be dealt with in the preprocessor
 	
 	final static String menuN3 = "display:DefaultMenu display:hasElement ?menuItem .";
+	
+	//N3 that will assign a permission to a page
+	final static String permissionN3 = "?page display:requiresAction ?action .";
 	
 	//These are public static methods that can be used in the preprocessor
 	public final static String getDataGetterN3(String dataGetterVar) {

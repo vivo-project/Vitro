@@ -95,6 +95,22 @@ public class SimplePermission extends Permission {
 	public static final SimplePermission USE_MISCELLANEOUS_PAGES = new SimplePermission(
 		NAMESPACE + "UseMiscellaneousPages");
 
+	// ----------------------------------------------------------------------
+	// These instances are permissions that can be specified for a given page created/managed through page management,
+	// e.g. this page is viewable only by admins, this page is viewable to anyone who is logged in, etc.
+	// ----------------------------------------------------------------------
+	public static final SimplePermission PAGE_VIEWABLE_ADMIN = new SimplePermission(
+			NAMESPACE + "PageViewableAdmin");
+		public static final SimplePermission PAGE_VIEWABLE_CURATOR = new SimplePermission(
+			NAMESPACE + "PageViewableCurator");
+		public static final SimplePermission PAGE_VIEWABLE_LOGGEDIN = new SimplePermission(
+			NAMESPACE + "PageViewableLoggedIn");
+		public static final SimplePermission PAGE_VIEWABLE_EDITOR = new SimplePermission(
+			NAMESPACE + "PageViewableEditor");
+		public static final SimplePermission PAGE_VIEWABLE_PUBLIC = new SimplePermission(
+			NAMESPACE + "PageViewablePublic");
+	
+	
 	public static List<SimplePermission> getAllInstances() {
 		return new ArrayList<SimplePermission>(allInstances.values());
 	}

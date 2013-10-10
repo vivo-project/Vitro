@@ -23,6 +23,7 @@ auth:ADMIN
     auth:hasPermission simplePermission:UseAdvancedDataToolsPages ;
     auth:hasPermission simplePermission:UseMiscellaneousAdminPages ;
     auth:hasPermission simplePermission:UseSparqlQueryPage ;
+   	auth:hasPermission simplePermission:PageViewableAdmin ;    
     
     # permissions for CURATOR and above.
     auth:hasPermission simplePermission:EditOntology ;
@@ -31,6 +32,7 @@ auth:ADMIN
     auth:hasPermission simplePermission:ManageTabs ;
     auth:hasPermission simplePermission:SeeVerbosePropertyInformation ;
     auth:hasPermission simplePermission:UseMiscellaneousCuratorPages ;
+	auth:hasPermission simplePermission:PageViewableCurator ;
     
     # permissions for EDITOR and above.
     auth:hasPermission simplePermission:DoBackEndEditing ;
@@ -38,6 +40,7 @@ auth:ADMIN
     auth:hasPermission simplePermission:SeeRevisionInfo ;
     auth:hasPermission simplePermission:SeeSiteAdminPage ;
     auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+    auth:hasPermission simplePermission:PageViewableEditor ;
 
     # permissions for ANY logged-in user.
     auth:hasPermission simplePermission:DoFrontEndEditing ;
@@ -46,9 +49,11 @@ auth:ADMIN
     auth:hasPermission simplePermission:QueryUserAccountsModel ;
     auth:hasPermission simplePermission:UseBasicAjaxControllers ;
     auth:hasPermission simplePermission:UseMiscellaneousPages ;
+  	auth:hasPermission simplePermission:PageViewableLoggedIn ;
     
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
+	auth:hasPermission simplePermission:PageViewablePublic ;
     
     # role-based permissions for ADMIN
     auth:hasPermission displayByRole:Admin ;
@@ -66,6 +71,7 @@ auth:CURATOR
     auth:hasPermission simplePermission:ManageTabs ;
     auth:hasPermission simplePermission:SeeVerbosePropertyInformation ;
     auth:hasPermission simplePermission:UseMiscellaneousCuratorPages ;
+    auth:hasPermission simplePermission:PageViewableCurator ;
     
     # permissions for EDITOR and above.
     auth:hasPermission simplePermission:DoBackEndEditing ;
@@ -73,6 +79,7 @@ auth:CURATOR
     auth:hasPermission simplePermission:SeeRevisionInfo ;
     auth:hasPermission simplePermission:SeeSiteAdminPage ;
     auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+    auth:hasPermission simplePermission:PageViewableEditor ;
 
     # permissions for ANY logged-in user.
     auth:hasPermission simplePermission:DoFrontEndEditing ;
@@ -81,9 +88,11 @@ auth:CURATOR
     auth:hasPermission simplePermission:QueryUserAccountsModel ;
     auth:hasPermission simplePermission:UseBasicAjaxControllers ;
     auth:hasPermission simplePermission:UseMiscellaneousPages ;
+   	auth:hasPermission simplePermission:PageViewableLoggedIn ;
     
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
+    auth:hasPermission simplePermission:PageViewablePublic ;
     
     # role-based permissions for CURATOR
     auth:hasPermission displayByRole:Curator ;
@@ -100,6 +109,7 @@ auth:EDITOR
     auth:hasPermission simplePermission:SeeRevisionInfo ;
     auth:hasPermission simplePermission:SeeSiteAdminPage ;
     auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+    auth:hasPermission simplePermission:PageViewableEditor ;
 
     # permissions for ANY logged-in user.
     auth:hasPermission simplePermission:DoFrontEndEditing ;
@@ -108,9 +118,11 @@ auth:EDITOR
     auth:hasPermission simplePermission:QueryUserAccountsModel ;
     auth:hasPermission simplePermission:UseBasicAjaxControllers ;
     auth:hasPermission simplePermission:UseMiscellaneousPages ;
+    auth:hasPermission simplePermission:PageViewableLoggedIn ;
     
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
+   	auth:hasPermission simplePermission:PageViewablePublic ;
     
     # role-based permissions for EDITOR
     auth:hasPermission displayByRole:Editor ;
@@ -129,9 +141,11 @@ auth:SELF_EDITOR
     auth:hasPermission simplePermission:QueryUserAccountsModel ;
     auth:hasPermission simplePermission:UseBasicAjaxControllers ;
     auth:hasPermission simplePermission:UseMiscellaneousPages ;
+    auth:hasPermission simplePermission:PageViewableLoggedIn ;
     
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
+	auth:hasPermission simplePermission:PageViewablePublic ;
 
     # role-based permissions for SELF_EDITOR
     #     For role-based display and editing, SelfEditor is like Public. 
@@ -146,6 +160,7 @@ auth:PUBLIC
     
     # permissions for ANY user, even if they are not logged in.
     auth:hasPermission simplePermission:QueryFullModel ;
+	auth:hasPermission simplePermission:PageViewablePublic ;
 
     # role-based permissions for PUBLIC
     auth:hasPermission displayByRole:Public ;

@@ -157,3 +157,23 @@ action:UseMiscellaneousPages
     a display:RequiredAction ;
     rdfs:label "USE_MISCELLANEOUS_PAGES" .
 
+##Page specific permissions
+action:PageViewableAdmin 
+	a display:RequiredAction ;
+    rdfs:label "PAGE_VIEWABLE_ADMIN" .
+    
+action:PageViewableCurator
+	a display:RequiredAction ;
+	rdfs:label "PAGE_VIEWABLE_CURATOR" .
+
+action:PageViewableEditor 
+	a display:RequiredAction ;
+	rdfs:label "PAGE_VIEWABLE_EDITOR" .
+
+action:PageViewableLoggedIn
+	a display:RequiredAction ;
+	rdfs:label "PAGE_VIEWABLE_LOGGEDIN" .
+
+action:PageViewablePublic 
+	a display:RequiredAction ;
+	rdfs:label "PAGE_VIEWABLE_PUBLIC" .
