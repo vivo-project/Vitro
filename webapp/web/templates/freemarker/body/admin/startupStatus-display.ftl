@@ -49,7 +49,7 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/startupStatus.c
 <#if status.warningItems?has_content>
     <h2>${i18n().warning}</h2>
     
-    <p>${i18n().warning_issued(applicationName)}</p>
+    <p>${i18n().warnings_issued(applicationName)}</p>
     
     <ul id="startup-trace" cellspacing="0" class="trace" role="navigation"><#list status.warningItems as item>
       <@statusItem item=item />
