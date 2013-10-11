@@ -108,6 +108,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         
         if (editing) {
             mergeAllPossibleDataProperties(propertyList);
+            propertyList = correctLanguageForProperties(propertyList);
         }
         
         sort(propertyList);
@@ -128,6 +129,35 @@ public class GroupedPropertyList extends BaseTemplateModel {
             pruneEmptyProperties();
         }
 
+    }
+    
+    // Use the language-filtering WebappDaoFactory to get the right version of
+    // each property.  When editing, the methods that add to the property list
+    // are blissfully (and intentionally) language-unaware.
+    private List<Property> correctLanguageForProperties(List<Property> properties) {
+        List<Property> languageCorrectedProps = new ArrayList<Property>();
+        for (Property p : properties) {
+            Property correctedProp = null;
+            if (p instanceof ObjectProperty) {
+                ObjectProperty op = (ObjectProperty) p;
+                correctedProp = wdf.getObjectPropertyDao()
+                        .getObjectPropertyByURIs(op.getURI(), 
+                                op.getDomainVClassURI(), op.getRangeVClassURI());
+            } else if (p instanceof DataProperty) {
+                correctedProp = wdf.getDataPropertyDao()
+                        .getDataPropertyByURI(((DataProperty) p).getURI());                
+            } else {
+                log.warn("Ignoring " + p.getURI() + " which is neither an " +
+                		 "ObjectProperty nor a DatatypeProperty.");
+            }
+            if (correctedProp != null) {
+                languageCorrectedProps.add(correctedProp);
+            } else {
+                log.error("Unable to retrieve property " + p.getURI() + 
+                        " using the WebappDaoFactory associated with the request.");                
+            }
+        }
+        return languageCorrectedProps;
     }
 
     // It's possible that an object property retrieved in the call to getPopulatedObjectPropertyList()
@@ -248,7 +278,9 @@ public class GroupedPropertyList extends BaseTemplateModel {
     }
 
     protected void mergeAllPossibleDataProperties(List<Property> propertyList) {
-        DataPropertyDao dpDao = wdf.getDataPropertyDao();
+        // see comments in mergeAllPossibleObjectProperties() for the reason
+        // that we need a neutral WebappDaoFactory here.
+        DataPropertyDao dpDao = vreq.getLanguageNeutralWebappDaoFactory().getDataPropertyDao();
         Collection<DataProperty> allDatapropColl = dpDao
                 .getAllPossibleDatapropsForIndividual(subject.getURI());
         if (allDatapropColl != null) {
