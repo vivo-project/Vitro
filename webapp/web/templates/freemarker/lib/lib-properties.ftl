@@ -164,7 +164,7 @@ name will be used as the label. -->
 <#if propertyLocalName?contains("ARG_2000028")>
     <#if propertyName?contains("mailing address")>
         <#local url = statement.editUrl + "&addressUri=" + "${statement.address!}">
-    <#elseif propertyName?contains("phone")>
+    <#elseif propertyName?contains("phone") || propertyName?contains("fax")>
         <#local url = statement.editUrl + "&phoneUri=" + "${statement.phone!}">
     <#elseif propertyName?contains("primary email") || propertyName?contains("additional emails")>
         <#local url = statement.editUrl + "&emailUri=" + "${statement.email!}">
