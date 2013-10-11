@@ -218,7 +218,7 @@ public class FileGraphSetup implements ServletContextListener {
         
         boolean isIsomorphic = dbModel.isIsomorphicWith(fileModel);
         
-        if (dbModel.isEmpty() ) {
+        if (dbModel.isEmpty()  && !fileModel.isEmpty()) {
             dbModel.add(fileModel);
             modelChanged = true;
         } else if (!isIsomorphic) {
