@@ -100,9 +100,7 @@ public class IndividualToSolrDocument {
             log.debug(ex);
             return null;
         }catch(Exception th){
-            //Odd exceptions can get thrown on shutdown
-            if( log != null )
-                log.error(th,th);
+            log.error(th,th);
             return null;
         }
     }
@@ -171,11 +169,6 @@ public class IndividualToSolrDocument {
                     DataPropertyStatement dataPropertyStmt =  dataPropertyStmtIter.next();
                     if(dataPropertyStmt.getDatapropURI().equals(label)){ // we don't want label to be added to alltext
                         continue;
-                    } else if(dataPropertyStmt.getDatapropURI().equals("http://vivoweb.org/ontology/core#preferredTitle")){
-                    	//add the preferredTitle field
-                    	String preferredTitle = null;
-                    	doc.addField(term.PREFERRED_TITLE, ((preferredTitle=dataPropertyStmt.getData()) == null)?"":preferredTitle);
-                    	log.debug("Preferred Title: " + dataPropertyStmt.getData());
                     }
                     allTextValue.append(" ");
                     allTextValue.append(((t=dataPropertyStmt.getData()) == null)?"":t);
