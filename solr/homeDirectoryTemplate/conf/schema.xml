@@ -235,7 +235,7 @@
   <field name="siteName" type="string" indexed="true" stored="true"/>
   
   <!--  field for preferred title -->
-  <field name="PREFERRED_TITLE" type="string" indexed="true" stored="true"/>
+  <field name="PREFERRED_TITLE" type="string" indexed="true" stored="true" multiValued="true"/>
   
   <!-- Copy nameRaw into several other fields -->  
   <copyField source="nameRaw" dest="nameStemmed" />
