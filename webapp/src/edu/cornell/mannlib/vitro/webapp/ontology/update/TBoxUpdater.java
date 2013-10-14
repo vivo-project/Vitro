@@ -88,10 +88,6 @@ public class TBoxUpdater {
     public void modifyPropertyQualifications() throws IOException {
  
     }
-
-    private Model mergeConfigurations(Model oldConfig, Model newConfig) {
-        return null;
-    }
     
     public void updateDefaultAnnotationValues() throws IOException {
         updateDefaultAnnotationValues(null);
@@ -528,7 +524,8 @@ public class TBoxUpdater {
                 "    OPTIONAL { <" + oldPropertyURI + "> vitro:inPropertyGroupAnnot ?group . \n" +
                 "               ?configuration config:propertyGroup ?rgroup } \n" +
                 "    OPTIONAL { <" + oldPropertyURI + "> <" + RDFS.label.getURI() + "> ?label . \n" +
-                "               ?configuration config:displayName ?rlabel } \n " +
+                "               ?configuration config:displayName ?rlabel . \n " +
+                "                   FILTER(?rlabel != ?label) } \n " +
                 "    OPTIONAL { <" + oldPropertyURI + "> vitro:displayRankAnnot ?displayRank . \n" +
                 "               ?configuration vitro:displayRantAnnot ?rdisplayRank } \n " +
                 "    OPTIONAL { <" + oldPropertyURI + "> vitro:customEntryFormAnnot ?customForm . \n" +
