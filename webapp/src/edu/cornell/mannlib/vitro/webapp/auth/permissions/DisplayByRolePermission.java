@@ -15,6 +15,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObje
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
@@ -112,11 +113,12 @@ public class DisplayByRolePermission extends Permission {
 	 */
 	private boolean isAuthorized(DisplayObjectPropertyStatement action) {
 		ObjectPropertyStatement stmt = action.getObjectPropertyStatement();
-		String subjectUri = stmt.getSubjectURI();
-		String predicateUri = stmt.getPropertyURI(); 
+		String subjectUri = stmt.getSubjectURI(); 
 		String objectUri = stmt.getObjectURI();
+		Property op = (stmt.getProperty() != null) 
+		        ? stmt.getProperty() : new Property(stmt.getPropertyURI());
 		return canDisplayResource(subjectUri)
-				&& canDisplayPredicate(new Property(predicateUri))
+				&& canDisplayPredicate(op)
 				&& canDisplayResource(objectUri);
 	}
 
