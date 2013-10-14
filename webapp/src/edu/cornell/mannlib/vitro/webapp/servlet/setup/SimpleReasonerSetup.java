@@ -81,6 +81,8 @@ public class SimpleReasonerSetup implements ServletContextListener {
             
             log.info("Pellet reasoner connected for the TBox");
      
+            waitForTBoxReasoning(sce); 
+            
             // set up simple reasoning for the ABox
                                 
             RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService();            
@@ -131,7 +133,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
         int sleeps = 0;
         // sleep at least once to make sure the TBox reasoning gets started
         while ((0 == sleeps) || ((sleeps < 1000) && pelletListener.isReasoning())) {
-            if ((sleeps % 10) == 0) { // print message at 10 second intervals
+            if (((sleeps - 1) % 10) == 0) { // print message at 10 second intervals
                 log.info("Waiting for initial TBox reasoning to complete");
             }
             Thread.sleep(1000);   
