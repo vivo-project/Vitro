@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,10 +31,14 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.XSD;
 
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
@@ -521,6 +526,8 @@ private String getExistingIsSelfContainedTemplateQuery() {
      	MenuManagementDataUtils.includeRequiredSystemData(vreq.getSession().getServletContext(), data);
     	data.put("classGroup", new ArrayList<String>());
     	data.put("classGroups", DataGetterUtils.getClassGroups(vreq));
+    	//for solr individuals data get getter
+    	data.put("classes", this.getAllVClasses(vreq));
     	data.put("availablePermissions", this.getAvailablePermissions(vreq));
     	data.put("availablePermissionOrderedList", this.getAvailablePermissonsOrderedURIs());
 	}
@@ -663,5 +670,34 @@ private String getExistingIsSelfContainedTemplateQuery() {
 				"ORDER BY DESC(?menuPosition) LIMIT 1";
 		return query;
 	}
+	
+	//Get all vclasses for the list of vclasses for solr
+	//Originally considered using an ajax request to get the vclasses list which is fine for adding a new content type
+	//but for an existing solr content type, would need to make yet another ajax request which seems too much
+	private List<HashMap<String, String>> getAllVClasses(VitroRequest vreq) {
+		List<VClass> vclasses = new ArrayList<VClass>();     
+        VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
+        List<VClassGroup> groups = vcgc.getGroups();
+        for(VClassGroup vcg: groups) {
+             for( VClass vc : vcg){
+                 vclasses.add(vc);
+             }
+            
+        }
+       
+        //Sort vclass by name
+        Collections.sort(vclasses);
+		ArrayList<HashMap<String, String>> classes = new ArrayList<HashMap<String, String>>(vclasses.size());
+
+
+        for(VClass vc: vclasses) {
+        	HashMap<String, String> vcObj = new HashMap<String, String>();
+        	vcObj.put("name", vc.getName());
+        	vcObj.put("URI", vc.getURI());
+        	classes.add(vcObj);            
+        }
+        return classes;
+	}
+	
 	
 }

@@ -83,6 +83,8 @@ public class JsonServlet extends VitroHttpServlet {
             new GetRenderedSolrIndividualsByVClass(vreq).process(resp);
         }else if( vreq.getParameter("getRandomSolrIndividualsByVClass") != null ){
             new GetRandomSolrIndividualsByVClass(vreq).process(resp);
+        } else if( vreq.getParameter("getAllVClasses") != null ){
+            new GetAllVClasses(vreq).process(resp);
         }
         
     }
