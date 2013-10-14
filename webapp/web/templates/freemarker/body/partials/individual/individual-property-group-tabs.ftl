@@ -10,6 +10,7 @@
 <ul class="propertyTabsList">
     <li  class="groupTabSpacer">&nbsp;</li>
 <#list propertyGroups.all as groupTabs>
+    <#if ( groupTabs.properties?size > 0 ) >
     <#assign groupName = groupTabs.getName(nameForOtherGroup)>
     <#if groupName?has_content>
 		<#--the function replaces spaces in the name with underscores, also called for the property group menu-->
@@ -26,6 +27,7 @@
             <li class="nonSelectedGroupTab clickable" groupName="${groupNameHtmlId}">${groupName?capitalize}</li>
             <li class="groupTabSpacer">&nbsp;</li>
         </#if>
+    </#if>
 </#list>
 <#if (propertyGroups.all?size > 1) >
     <li  class="nonSelectedGroupTab clickable" groupName="viewAll">${i18n().view_all_capitalized}</li>

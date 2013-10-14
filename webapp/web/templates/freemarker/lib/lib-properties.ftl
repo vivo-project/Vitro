@@ -122,17 +122,22 @@ name will be used as the label. -->
     </#if>
 </#macro>
 
-<#macro addLink property editable label="${property.name}">
+<#macro addLink property editable label="${property.name}">    
+    <#if property.rangeUri?? >
+        <#local rangeUri = property.rangeUri /> 
+    <#else>
+        <#local rangeUri = "" /> 
+    </#if>
     <#if editable>
         <#local url = property.addUrl>
         <#if url?has_content>
-            <@showAddLink property.localName property.name label url />
+            <@showAddLink property.localName label url rangeUri/>
         </#if>
     </#if>
 </#macro>
 
-<#macro showAddLink propertyLocalName propertyName label url>
-    <#if propertyName == "authors" || propertyName == "webpage" || propertyLocalName == "hasResearchArea">
+<#macro showAddLink propertyLocalName label url rangeUri>
+    <#if rangeUri?contains("Authorship") || rangeUri?contains("URL") || rangeUri?contains("Editorship") || label == "hasResearchArea">
         <a class="add-${propertyLocalName}" href="${url}" title="${i18n().manage_list_of} ${label?lower_case}">
         <img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="${i18n().manage}" /></a>
     <#else>
@@ -147,17 +152,23 @@ name will be used as the label. -->
 
 
 <#macro propertyListItem property statement editable >
+    <#if property.rangeUri?? >
+        <#local rangeUri = property.rangeUri /> 
+    <#else>
+        <#local rangeUri = "" /> 
+    </#if>
     <li role="listitem">    
         <#nested>       
-        <@editingLinks "${property.localName}" "${property.name}" statement editable/>
+        <@editingLinks "${property.localName}" "${property.name}" statement editable rangeUri/>
     </li>
 </#macro>
 
-<#macro editingLinks propertyLocalName propertyName statement editable>
-    <#if editable && (propertyName != "authors" && propertyName != "webpage" && propertyLocalName != "hasResearchArea")>
-        <@editLink propertyLocalName propertyName statement />
-        <@deleteLink propertyLocalName propertyName statement />
-     
+<#macro editingLinks propertyLocalName propertyName statement editable rangeUri="">
+    <#if editable >
+        <#if (!rangeUri?contains("Authorship") && !rangeUri?contains("URL") && !rangeUri?contains("Editorship") && propertyLocalName != "hasResearchArea")>
+            <@editLink propertyLocalName propertyName statement />
+            <@deleteLink propertyLocalName propertyName statement />
+        </#if>    
     </#if>
 </#macro>
 <#macro editLink propertyLocalName propertyName statement>
@@ -250,7 +261,7 @@ name will be used as the label. -->
     <#local label = individual.nameStatement>
     ${label.value}
     <#if useEditLink>
-    	<@editingLinks "label" "" label editable />
+    	<@editingLinks "label" "" label editable ""/>
     <#elseif (editable && (labelCount > 0)) || (languageCount > 1)>
     	<#--We display the link even when the user is not logged in case of multiple labels with different languages-->
     	<#assign labelLink = ""/>
