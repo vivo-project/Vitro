@@ -64,7 +64,7 @@ public class KnowledgeBaseUpdater {
 		}
 			
 		long startTime = System.currentTimeMillis();
-        log.info("Migrating the knowledge base");
+        log.info("Performing any necessary data migration");
         logger.log("Started knowledge base migration");
 		
 		try {
@@ -93,24 +93,6 @@ public class KnowledgeBaseUpdater {
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
 		
 		AtomicOntologyChangeLists changes = new AtomicOntologyChangeLists(rawChanges,settings.getNewTBoxModel(),settings.getOldTBoxModel());
-		
-		// Only modify the TBox and migration metadata the first time
-		if(updateRequired(servletContext)) {
-            //process the TBox before the ABox
-    		try {
-    		    log.debug("\tupdating tbox annotations");
-    	        updateTBoxAnnotations();
-    		} catch (Exception e) {
-    		    log.error(e,e);
-    		}
-    	    
-    	    try {
-        	    migrateMigrationMetadata(servletContext);
-    		    logger.log("Migrated migration metadata");
-    	    } catch (Exception e) {
-    	    	log.error("unable to migrate migration metadata " + e.getMessage());
-    	    }
-		}
 	        	
 		// update ABox data any time
     	log.info("performing SPARQL CONSTRUCT additions");
@@ -130,6 +112,18 @@ public class KnowledgeBaseUpdater {
         performSparqlConstructs(settings.getSparqlConstructDeletionsDir() + "/post/", 
                 settings.getRDFService(), RETRACT);
         
+        
+        // Only modify the TBox and migration metadata the first time
+        if(updateRequired(servletContext)) {
+            //process the TBox before the ABox
+            try {
+                log.debug("\tupdating tbox annotations");
+                updateTBoxAnnotations();
+            } catch (Exception e) {
+                log.error(e,e);
+            }
+            
+        }
 
 	}
 	
@@ -262,39 +256,6 @@ public class KnowledgeBaseUpdater {
 		ABoxUpdater aboxUpdater = new ABoxUpdater(settings, logger, record);
 		aboxUpdater.processPropertyChanges(changes.getAtomicPropertyChanges());
 		aboxUpdater.processClassChanges(changes.getAtomicClassChanges());
-	}
-	
-	// special for 1.5 - temporary code
-	// migrate past migration indicators to not use blank nodes and move them to app metadata model
-	// changing structure for pre 1.5 ones in the process
-	private void migrateMigrationMetadata(ServletContext servletContext) throws Exception {
-		
-		String baseResourceURI = "http://vitro.mannlib.cornell.edu/ns/vitro/metadata/migration/";
-		String queryFile = "MigrationData.sparql";
-		
-		RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(servletContext).getRDFService();
-
-		String fmQuery = FileUtils.readFileToString(new File(settings.getSparqlConstructDeletionsDir() + "/" + queryFile));
-		Model toRemove = ModelFactory.createDefaultModel();
-		toRemove.read(rdfService.sparqlConstructQuery(fmQuery, RDFService.ModelSerializationFormat.RDFXML), null);
-	
-		String cmQuery = FileUtils.readFileToString(new File(settings.getSparqlConstructAdditionsDir() + "/" + queryFile));
-		Model toAdd = ModelFactory.createDefaultModel();
-		toAdd.read(rdfService.sparqlConstructQuery(cmQuery, RDFService.ModelSerializationFormat.RDFXML), null);
-		
-		ByteArrayOutputStream outAdd = new ByteArrayOutputStream();
-		toAdd.write(outAdd);
-		InputStream inAdd = new ByteArrayInputStream(outAdd.toByteArray());		
-		ChangeSet addChangeSet = rdfService.manufactureChangeSet();		    
-	    addChangeSet.addAddition(inAdd, RDFService.ModelSerializationFormat.RDFXML, JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL);
-		rdfService.changeSetUpdate(addChangeSet);	
-
-		ByteArrayOutputStream outRemove = new ByteArrayOutputStream();
-		toRemove.write(outRemove);
-		InputStream inRemove = new ByteArrayInputStream(outRemove.toByteArray());		
-		ChangeSet removeChangeSet = rdfService.manufactureChangeSet();		    
-	    removeChangeSet.addRemoval(inRemove, RDFService.ModelSerializationFormat.RDFXML, JenaDataSourceSetupBase.JENA_DB_MODEL);
-		rdfService.changeSetUpdate(removeChangeSet);	
 	}
 	
 	private void updateTBoxAnnotations() {

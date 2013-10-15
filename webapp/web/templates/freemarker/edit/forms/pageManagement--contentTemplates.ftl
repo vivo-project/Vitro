@@ -3,3 +3,4 @@
 <#include "pageManagement--browseClassGroups.ftl">
 <#include "pageManagement--sparqlQuery.ftl">
 <#include "pageManagement--fixedHtml.ftl">
+<#include "pageManagement--solrIndividuals.ftl">

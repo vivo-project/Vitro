@@ -32,6 +32,8 @@
                     </h3>
                 <#elseif rangeClass == "Name" && property.statements?has_content && editable >
                     <h3 id="${property.localName}">${property.name}  <@p.verboseDisplay property /> </h3>
+                <#elseif rangeClass == "Title" && property.statements?has_content && editable >
+                    <h3 id="${property.localName}">${property.name}  <@p.verboseDisplay property /> </h3>
                 <#else>
                     <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> </h3>
                 </#if>

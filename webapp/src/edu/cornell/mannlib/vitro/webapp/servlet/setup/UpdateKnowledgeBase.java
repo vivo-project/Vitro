@@ -141,7 +141,6 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			if(!JenaDataSourceSetupBase.isFirstStartup()) {
     			try {
     			    ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
-    			    log.info("Data migration required");
     			    migrationChangesMade = ontologyUpdater.update(ctx);
     			    if (tryMigrateDisplay) {
     			        try {
@@ -221,8 +220,8 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		StartupStatus.getBean(ctx).info(this, "Updating knowledge base: reports are in '" + dataDir + "'");
 
 		Path changedDir = createDirectory(dataDir, "changedData");
-		settings.setAddedDataFile(changedDir.resolve("addedData.n3").toString());
-		settings.setRemovedDataFile(changedDir.resolve("removedData.n3").toString());
+		settings.setAddedDataFile(changedDir.resolve(timestampedFileName("addedData", "n3")).toString());
+		settings.setRemovedDataFile(changedDir.resolve(timestampedFileName("removedData", "n3")).toString());
 		
 		Path logDir = createDirectory(dataDir, "logs");
 		settings.setLogFile(logDir.resolve(timestampedFileName("knowledgeBaseUpdate", "log")).toString());

@@ -106,7 +106,8 @@ h1.fn .display-title {
     margin-left: 10px;
 }
 #individual-info h2 {
-    padding-bottom: 10px;
+    padding-bottom: 6px;
+    padding-top: 18px;
 }
 #individual-info nav {
     float: left;

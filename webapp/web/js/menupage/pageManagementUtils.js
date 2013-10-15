@@ -104,6 +104,7 @@ var pageManagementUtils = {
 		this.classGroupSection = $("section#browseClassGroup");
 		this.sparqlQuerySection = $("section#sparqlQuery");
 		this.fixedHTMLSection = $("section#fixedHtml");
+		this.solrIndividualsSection = $("section#solrIndividuals");
 		//From original menu management edit
 		this.defaultTemplateRadio = $('input.default-template');
         this.customTemplateRadio = $('input.custom-template');
@@ -117,6 +118,7 @@ var pageManagementUtils = {
         this.classesForClassGroup = $('section#classesInSelectedGroup');
         this.selectedGroupForPage = $('#selectedContentTypeValue');
         this.allClassesSelectedCheckbox = $('#allSelected');
+        
         this.displayInternalMessage = $('#internal-class label em');
         this.pageContentSubmissionInputs = $("#pageContentSubmissionInputs");
         this.headerBar = $("section#headerBar");
@@ -131,6 +133,8 @@ var pageManagementUtils = {
         this.rightSideDiv = $("div#rightSide");
         //contentDivs container where content added/existing placed
         this.savedContentDivs = $("section#contentDivs");
+    	//for solr individuals data getter
+        this.solrAllClassesDropdown = $("select#vclassUri");
 	},
 	initDisplay: function(){
 		//right side components
@@ -143,6 +147,7 @@ var pageManagementUtils = {
 	    this.classGroupSection.hide();
 	    this.sparqlQuerySection.hide();
 	    this.fixedHTMLSection.hide();
+	    this.solrIndividualsSection.hide();
 	    this.classesForClassGroup.addClass('hidden');
 	    //left side components
 	    //These depend on whether or not this is an existing item or not
@@ -155,8 +160,44 @@ var pageManagementUtils = {
 		    	this.menuSection.hide();
 	    	}
 	    }
-	
+	    //populates the dropdown of classes for the solr individuals template
+	    //dropdown now populated in template/from form specific data instead of ajax request
+	    //this.populateClassForSolrDropdown();
 	},
+	//this method can be utilized if using an ajax request to get the vclasses
+	/*
+	//for solr individuals - remember this populates the template class dropdown
+	populateClassForSolrDropdown:function() {
+	
+        //Run ajax query
+        var url = "dataservice?getAllVClasses=1";
+       
+        //Make ajax call to retrieve vclasses
+        $.getJSON(url, function(results) {
+        	//Moved the function to processClassGroupDataGetterContent
+        	//Should probably remove this entire method and copy there
+        	pageManagementUtils.displayAllClassesForSolrDropdown(results);
+        });
+	},
+	displayAllClassesForSolrDropdown:function(results) {
+		 if ( results.classes.length == 0 ) {
+	            
+        } else {
+        	var appendHtml = "";
+            $.each(results.classes, function(i, item) {
+                var thisClass = results.classes[i];
+                var thisClassName = thisClass.name;
+                //Create options for the dropdown
+                appendHtml += "<option value='" + thisClass.URI + "'>" + thisClassName + "</option>";
+            });
+        
+            //if there are options to add
+            if(appendHtml != "") {
+            	pageManagementUtils.solrAllClassesDropdown.html(appendHtml);
+            }
+         
+        }
+	},*/
 	bindEventListeners:function(){
 		
 	    this.defaultTemplateRadio.click( function() {
@@ -206,9 +247,12 @@ var pageManagementUtils = {
             pageManagementUtils.checkSelfContainedRadio();
 	    });
 	    //replacing with menu management edit version which is extended with some of the logic below
+	    //This is technically content specific and should be moved into the individual processor classes somehow
 	    this.selectClassGroupDropdown.change(function() {
             pageManagementUtils.chooseClassGroup();
         });
+	    
+	    
 	    
 	    this.contentTypeSelect.change( function() {
 	    	pageManagementUtils.handleContentTypeSelect();
@@ -229,6 +273,7 @@ var pageManagementUtils = {
 		pageManagementUtils.classGroupSection.hide();
 		pageManagementUtils.fixedHTMLSection.hide();
 		pageManagementUtils.sparqlQuerySection.hide();
+		pageManagementUtils.solrIndividualsSection.hide();
 		//Reset main content type drop-down
 		pageManagementUtils.contentTypeSelectOptions.eq(0).attr('selected', 'selected');
 		if ( pageManagementUtils.leftSideDiv.css("height") != undefined ) {
@@ -291,7 +336,8 @@ var pageManagementUtils = {
 		}
 	},
 	
-	//Select content type
+	//Select content type - this is content type specific
+	//TODO: Find better way to refactor this and/or see if any of this display functionality can be moved into content type processing
 	handleContentTypeSelect:function() {
 		_this = pageManagementUtils;
     	pageManagementUtils.clearSourceTemplateValues();
@@ -299,22 +345,31 @@ var pageManagementUtils = {
             pageManagementUtils.classGroupSection.show();
             pageManagementUtils.fixedHTMLSection.hide();
             pageManagementUtils.sparqlQuerySection.hide();
+            pageManagementUtils.solrIndividualsSection.hide();
             pageManagementUtils.headerBar.text(pageManagementUtils.browseClassGroup + " - ");
             pageManagementUtils.headerBar.show();
             $('div#selfContainedDiv').hide();
         }
-        if ( _this.contentTypeSelect.val() == "fixedHtml" || _this.contentTypeSelect.val() == "sparqlQuery" ) {
+        if ( _this.contentTypeSelect.val() == "fixedHtml" || _this.contentTypeSelect.val() == "sparqlQuery" || _this.contentTypeSelect.val() == "solrIndividuals") {
         	 pageManagementUtils.classGroupSection.hide();
         	 //if fixed html show that, otherwise show sparql results
             if ( _this.contentTypeSelect.val() == "fixedHtml" ) {
                 pageManagementUtils.headerBar.text(pageManagementUtils.fixedHtml + " - ");
                 pageManagementUtils.fixedHTMLSection.show();
             	pageManagementUtils.sparqlQuerySection.hide();
+            	pageManagementUtils.solrIndividualsSection.hide();
             }
-            else {
+            else if (_this.contentTypeSelect.val() == "sparqlQuery"){
                 pageManagementUtils.headerBar.text(pageManagementUtils.sparqlResults + " - ");
                 pageManagementUtils.sparqlQuerySection.show();
             	pageManagementUtils.fixedHTMLSection.hide();
+            	pageManagementUtils.solrIndividualsSection.hide();
+            } else {
+            	//solr individuals
+            	pageManagementUtils.headerBar.text(pageManagementUtils.solrIndividuals + " - ");
+                pageManagementUtils.sparqlQuerySection.hide();
+            	pageManagementUtils.fixedHTMLSection.hide();
+            	pageManagementUtils.solrIndividualsSection.show();
             }
            
             pageManagementUtils.headerBar.show();
@@ -325,6 +380,7 @@ var pageManagementUtils = {
         	pageManagementUtils.classGroupSection.hide();
         	pageManagementUtils.fixedHTMLSection.hide();
         	pageManagementUtils.sparqlQuerySection.hide();
+        	pageManagementUtils.solrIndividualsSection.hide();
             pageManagementUtils.classesForClassGroup.addClass('hidden');
             pageManagementUtils.headerBar.hide();
             pageManagementUtils.headerBar.text("");
@@ -359,6 +415,7 @@ var pageManagementUtils = {
 		pageManagementUtils.clearInputs(pageManagementUtils.fixedHTMLSection);
 		pageManagementUtils.clearInputs(pageManagementUtils.sparqlQuerySection);
 		pageManagementUtils.clearInputs(pageManagementUtils.classGroupSection);
+		pageManagementUtils.clearInputs(pageManagementUtils.solrIndividualsSection);
 
 	},
 	clearInputs:function($el) {
@@ -387,7 +444,7 @@ var pageManagementUtils = {
         // Get rid of the cancel link; it'll be replaced by a delete link
         $newContentObj.find('span#cancelContent' + counter).html('');
         
-        if ( contentType == "sparqlQuery" || contentType == "fixedHtml") {
+        if ( contentType == "sparqlQuery" || contentType == "fixedHtml" || contentType == "solrIndividuals") {
         	varOrClass = $newContentObj.find('input[name="saveToVar"]').val();
         } 
         else if ( contentType == "browseClassGroup" ) {

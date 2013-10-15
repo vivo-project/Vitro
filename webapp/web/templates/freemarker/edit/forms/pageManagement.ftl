@@ -80,7 +80,8 @@
                 <option value="" selected="selected">${i18n().select_type}</option>
                 <option value="browseClassGroup">${i18n().browse_class_group}</option>           
                 <option value="fixedHtml">${i18n().fixed_html}</option>           
-                <option value="sparqlQuery">${i18n().sparql_query_results}</option>           
+                <option value="sparqlQuery">${i18n().sparql_query_results}</option>   
+                <option value="solrIndividuals">${i18n().solr_individual_results}</option>                   
              </select>&nbsp;<span class="note">${i18n().add_types}</span>
             </section>
             <section id="contentDivs"></section>
@@ -136,8 +137,10 @@
               
                 
             </section>
-            <section id="pagePermissions>
-              <label for="default">${i18n().page_select_permission}</label>
+            <section id="pagePermissions">
+            <br/>
+              <label for="action">${i18n().page_select_permission}</label>
+              
                 <select id="action" name="action">
                 	<option value="">${i18n().page_select_permission_option}</option>
                 <#list pageAvailablePermissionsURIsList as permissionURI>
@@ -176,6 +179,7 @@
         browseClassGroup: '${i18n().browse_class_group}',
         fixedHtml: '${i18n().fixed_html}',
         sparqlResults: '${i18n().sparql_query_results}',
+        solrIndividuals: '${i18n().solr_individual_results}',
         orString: '${i18n().or}',
         deleteString: '${i18n().delete}',
         allCapitalized: '${i18n().all_capitalized}',

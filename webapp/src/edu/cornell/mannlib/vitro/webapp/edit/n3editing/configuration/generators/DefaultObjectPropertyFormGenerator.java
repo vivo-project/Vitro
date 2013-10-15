@@ -104,8 +104,10 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
         // funny business because it needs to be able to retrieve anonymous union
         // classes by their "pseudo-bnode URIs".
         // Someday we'll need to figure out a different way of doing this.
-        WebappDaoFactory ctxDaoFact = ModelAccess.on(
-                vreq.getSession().getServletContext()).getWebappDaoFactory();
+        //WebappDaoFactory ctxDaoFact = ModelAccess.on(
+        //        vreq.getSession().getServletContext()).getWebappDaoFactory();
+        WebappDaoFactory ctxDaoFact = vreq.getLanguageNeutralWebappDaoFactory();
+
         List<VClass> types = new ArrayList<VClass>();
     	Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
    		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);

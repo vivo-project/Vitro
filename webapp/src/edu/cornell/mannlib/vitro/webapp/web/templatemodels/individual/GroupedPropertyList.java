@@ -108,9 +108,9 @@ public class GroupedPropertyList extends BaseTemplateModel {
         
         if (editing) {
             mergeAllPossibleDataProperties(propertyList);
-            propertyList = correctLanguageForProperties(propertyList);
         }
         
+        propertyList = correctLanguageForProperties(propertyList);
         sort(propertyList);
 
         // Put the list into groups
