@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding;
 
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.THUMBNAIL;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.THUMBNAIL_URL;
+
 import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
@@ -9,21 +12,17 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.SolrInputDocument;
 
 import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 
 public class ThumbnailImageURL implements DocumentModifier {
 	
-    private static final String prefix = "prefix owl: <http://www.w3.org/2002/07/owl#> "
+    private static final String PREFIX = "prefix owl: <http://www.w3.org/2002/07/owl#> "
         + " prefix vitroDisplay: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>  "
         + " prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>  "
         + " prefix core: <http://vivoweb.org/ontology/core#>  "
@@ -32,19 +31,14 @@ public class ThumbnailImageURL implements DocumentModifier {
         + " prefix localNav: <http://vitro.mannlib.cornell.edu/ns/localnav#>  "
         + " prefix bibo: <http://purl.org/ontology/bibo/>  ";
     
-    private static final String query = prefix + 
-    
-    " SELECT (str(?downloadLocation) as ?DownloadLocation) WHERE { " +
-    " ?uri <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> ?a . " +
-    " ?a <http://vitro.mannlib.cornell.edu/ns/vitro/public#downloadLocation> ?downloadLocation . } " ;
-    //" ?b <http://vitro.mannlib.cornell.edu/ns/vitro/public#directDownloadUrl> ?thumbnailLocationURL . } ";
+	private static final String QUERY_TEMPLATE = PREFIX
+		+ " SELECT (str(?downloadLocation) as ?DownloadLocation) WHERE { "
+		+ " ?uri <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> ?a . "
+		+ " ?a <http://vitro.mannlib.cornell.edu/ns/vitro/public#downloadLocation> ?downloadLocation . } ";
     
     private RDFServiceFactory rsf;
     private Log log = LogFactory.getLog(ThumbnailImageURL.class);
     
-	static VitroSearchTermNames term = new VitroSearchTermNames();
-	String fieldForThumbnailURL = term.THUMBNAIL_URL;
-	
 	
 	public ThumbnailImageURL( RDFServiceFactory rsf ){
 		this.rsf = rsf;
@@ -55,30 +49,29 @@ public class ThumbnailImageURL implements DocumentModifier {
 			StringBuffer addUri) throws SkipIndividualException {
 		
 		//add a field for storing the location of thumbnail for the individual.
-		doc.addField(fieldForThumbnailURL, runQueryForThumbnailLocation(individual));
-		addThumbnailExistance(individual, doc);
+		doc.addField(THUMBNAIL_URL, runQueryForThumbnailLocation(individual));
+		addThumbnailExistence(individual, doc);
 	}
 
 	/**
      * Adds if the individual has a thumbnail image or not.
      */
-    protected void addThumbnailExistance(Individual ind, SolrInputDocument doc) {
+    protected void addThumbnailExistence(Individual ind, SolrInputDocument doc) {
         try{
             if(ind.hasThumb())
-                doc.addField(term.THUMBNAIL, "1");
+                doc.addField(THUMBNAIL, "1");
             else
-                doc.addField(term.THUMBNAIL, "0");
+                doc.addField(THUMBNAIL, "0");
         }catch(Exception ex){
             log.debug("could not index thumbnail: " + ex);
         }        
     }
 
 	protected String runQueryForThumbnailLocation(Individual individual) {
-		
 		StringBuffer result = new StringBuffer();
-		QuerySolutionMap initialBinding = new QuerySolutionMap();
-		Resource uriResource = ResourceFactory.createResource(individual.getURI());
-		initialBinding.add("uri", uriResource);
+
+		String uri = "<" + individual.getURI() + "> ";
+		String query = QUERY_TEMPLATE.replaceAll("\\?uri", uri);
 
 		RDFService rdf = rsf.getRDFService();
 		try{
@@ -106,6 +99,7 @@ public class ThumbnailImageURL implements DocumentModifier {
 
 	@Override
 	public void shutdown() {		
+		// nothing to release.
 	}
 
 }
