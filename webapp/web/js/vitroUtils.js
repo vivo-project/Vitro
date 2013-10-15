@@ -5,7 +5,7 @@ $(document).ready(function(){
     // Use jQuery() instead of $() alias, because dwr/util.js, loaded on back end editing 
     // pages, overwrites $.
     // fade out welcome-message when user logs in
-    $.extend(this, i18nStrings);
+    jQuery.extend(this, i18nStrings);
     
     jQuery('section#welcome-message').css('display', 'block').delay(2000).fadeOut(1500);
     
