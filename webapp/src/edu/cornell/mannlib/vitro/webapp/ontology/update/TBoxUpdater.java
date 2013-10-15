@@ -450,90 +450,69 @@ public class TBoxUpdater {
     }
     
     public void renameProperty(AtomicOntologyChange changeObj) throws IOException {
-        Dataset dataset = new RDFServiceDataset(settings.getRDFService());
-        Model userAnnotationsModel = dataset.getNamedModel(
-                JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);
         if(changeObj.getNotes() != null && changeObj.getNotes().startsWith("cc:")) {
-            mergePropertyAnnotationsToPropertyConfig(changeObj, userAnnotationsModel);
+            mergePropertyAnnotationsToPropertyConfig(changeObj, siteModel);
         }        
-        Resource renamedProperty = userAnnotationsModel.getResource(changeObj.getSourceURI());
-        userAnnotationsModel.removeAll(renamedProperty, null, (RDFNode) null);
-        userAnnotationsModel.removeAll(null, null, renamedProperty);
+        Resource renamedProperty = siteModel.getResource(changeObj.getSourceURI());
+        siteModel.removeAll(renamedProperty, null, (RDFNode) null);
+        siteModel.removeAll(null, null, renamedProperty);
     }
     
     private void mergePropertyAnnotationsToPropertyConfig(AtomicOntologyChange changeObj,
             Model userAnnotationsModel) throws IOException {
         String contextURI = VitroVocabulary.PROPERTY_CONFIG_DATA + changeObj.getNotes().substring(3);
         String oldPropertyURI = changeObj.getSourceURI();
-        
         Model oldAnnotationsModel = settings.getOldTBoxAnnotationsModel();
         
         String propertyAnnotationsQuery = 
                 "PREFIX config: <" + VitroVocabulary.configURI + "> \n" +
                 "PREFIX vitro: <" + VitroVocabulary.vitroURI  + "> \n" +
                 "CONSTRUCT { \n" +
-                "    <" + oldPropertyURI + "> vitro:inPropertyGroupAnnot ?group . \n" +
                 "    <" + oldPropertyURI + "> <" + RDFS.label.getURI() + "> ?label . \n" +
-                "    <" + oldPropertyURI + "> vitro:displayRankAnnot ?displayRank . \n" +
-                "    <" + oldPropertyURI + "> vitro:customEntryFormAnnot ?customForm . \n" +
-                "    <" + oldPropertyURI + "> vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayLevel . \n" +
-                "    <" + oldPropertyURI + "> vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateLevel . \n " +
+                "    <" + oldPropertyURI + "> ?vitroProp ?vitroValue \n" +
                 "} WHERE { \n" +
-                "    { <" + oldPropertyURI + "> vitro:inPropertyGroupAnnot ?group } \n" +
-                "    UNION { <" + oldPropertyURI + "> <" + RDFS.label.getURI() + "> ?label } \n" +
-                "    UNION { <" + oldPropertyURI + "> vitro:displayRankAnnot ?displayRank } \n" +
-                "    UNION { <" + oldPropertyURI + "> vitro:customEntryFormAnnot ?customForm } \n" +
-                "    UNION { <" + oldPropertyURI + "> vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayLevel } \n" +
-                "    UNION { <" + oldPropertyURI + "> vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateLevel } \n " +
+                "    { <" + oldPropertyURI + "> <" + RDFS.label.getURI() + "> ?label } \n" +
+                "    UNION { <" + oldPropertyURI + "> ?vitroProp ?vitroValue  \n" +
+                "    FILTER (regex(str(?vitroProp), \"" + VitroVocabulary.vitroURI + "\")) } \n" +
                 "} \n" ; 
         
         Model userChangesModel = construct(
                 propertyAnnotationsQuery, userAnnotationsModel).difference(
                         construct(propertyAnnotationsQuery, oldAnnotationsModel));
         
-        String addQuery = "PREFIX config: <" + VitroVocabulary.configURI + "> \n" +
-                          "PREFIX vitro: <" + VitroVocabulary.vitroURI  + "> \n" +
-                          "CONSTRUCT { \n" +
-                          "    ?configuration config:propertyGroup ?group . \n" +
-                          "    ?configuration config:displayName ?label . \n" +
-                          "    ?configuration vitro:displayRankAnnot ?displayRank . \n" +
-                          "    ?configuration vitro:customEntryFormAnnot ?customForm . \n" +
-                          "    ?configuration vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayLevel . \n" +
-                          "    ?configuration vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateLevel . \n " +                              
-                          "} WHERE { \n" +
-                          "    <" + contextURI + "> config:hasConfiguration ?configuration . \n" +
-                          "    OPTIONAL { <" + oldPropertyURI + "> vitro:inPropertyGroupAnnot ?group } \n" +
-                          "    OPTIONAL { <" + oldPropertyURI + "> <" + RDFS.label.getURI() + "> ?label } \n" +
-                          "    OPTIONAL { <" + oldPropertyURI + "> vitro:displayRankAnnot ?displayRank } \n" +
-                          "    OPTIONAL { <" + oldPropertyURI + "> vitro:customEntryFormAnnot ?customForm } \n" +
-                          "    OPTIONAL { <" + oldPropertyURI + "> vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayLevel } \n" +
-                          "    OPTIONAL { <" + oldPropertyURI + "> vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateLevel } \n " +
-                          "} \n" ;
+        if(userChangesModel.size() == 0) {
+            return;
+        } else {
+            log.info("Updating PropertyConfig.n3 to include locally-changed " +
+                    "settings from old property " + oldPropertyURI);
+        }
         
-        String retractQuery = "PREFIX config: <" + VitroVocabulary.configURI + "> \n" +
+        String newQuery = "PREFIX config: <" + VitroVocabulary.configURI + "> \n" +
                 "PREFIX vitro: <" + VitroVocabulary.vitroURI  + "> \n" +
                 "CONSTRUCT { \n" +
-                "    <" + oldPropertyURI + "> config:propertyGroup ?rgroup . \n" +
-                "    ?configuration config:displayName ?rlabel . \n" +
-                "    ?configuration vitro:displayRankAnnot ?rdisplayRank . \n" +
-                "    ?configuration vitro:customEntryFormAnnot ?rcustomForm . \n" +
-                "    ?configuration vitro:hiddenFromDisplayBelowRoleLevelAnnot ?rdisplayLevel . \n" +
-                "    ?configuration vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?rupdateLevel . \n " +                              
+                "    ?configuration config:propertyGroup ?group . \n" +
+                "    ?configuration config:displayName ?label . \n" +
+                "    ?configuration ?vitroProp ?vitroValue . \n" +
                 "} WHERE { \n" +
                 "    <" + contextURI + "> config:hasConfiguration ?configuration . \n" +
-                "    OPTIONAL { <" + oldPropertyURI + "> vitro:inPropertyGroupAnnot ?group . \n" +
-                "               ?configuration config:propertyGroup ?rgroup } \n" +
-                "    OPTIONAL { <" + oldPropertyURI + "> <" + RDFS.label.getURI() + "> ?label . \n" +
-                "               ?configuration config:displayName ?rlabel . \n " +
-                "                   FILTER(?rlabel != ?label) } \n " +
-                "    OPTIONAL { <" + oldPropertyURI + "> vitro:displayRankAnnot ?displayRank . \n" +
-                "               ?configuration vitro:displayRantAnnot ?rdisplayRank } \n " +
-                "    OPTIONAL { <" + oldPropertyURI + "> vitro:customEntryFormAnnot ?customForm . \n" +
-                "               ?configuration vitro:customEntryFormAnnot ?rcustomForm } \n" +
-                "    OPTIONAL { <" + oldPropertyURI + "> vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayLevel . \n" +
-                "               ?configuration vitro:hiddenFromDisplayBelowRoleLevelAnnot ?rdisplayLevel } \n" +
-                "    OPTIONAL { <" + oldPropertyURI + "> vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateLevel . \n " +
-                "               ?configuration vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateLevel } " +
+                "    OPTIONAL { <" + oldPropertyURI + "> vitro:inPropertyGroupAnnot ?group } \n" +
+                "    OPTIONAL { <" + oldPropertyURI + "> <" + RDFS.label.getURI() + "> ?label } \n" +
+                "    OPTIONAL { <" + oldPropertyURI + "> ?vitroProp ?vitroValue  \n" +
+                "    FILTER (regex(str(?vitroProp), \"" + VitroVocabulary.vitroURI + "\")) } \n" +
+                "} \n" ;
+        
+        String existingQuery = "PREFIX config: <" + VitroVocabulary.configURI + "> \n" +
+                "PREFIX vitro: <" + VitroVocabulary.vitroURI  + "> \n" +
+                "CONSTRUCT { \n" +
+                "    ?configuration config:propertyGroup ?group . \n" +
+                "    ?configuration config:displayName ?label . \n" +
+                "    ?configuration ?vitroProp ?vitroValue . \n" +                           
+                "} WHERE { \n" +
+                "    <" + contextURI + "> config:hasConfiguration ?configuration . \n" +
+                "    OPTIONAL { ?configuration config:propertyGroup ?group } \n" +
+                "    OPTIONAL { ?configuration config:displayName ?label } \n" +
+                "    OPTIONAL { ?configuration ?vitroProp ?vitroValue  \n" +
+                "    FILTER (regex(str(?vitroProp), \"" + VitroVocabulary.vitroURI + "\")) } \n" +
                 "} \n" ;
         
         Model configModel = ModelFactory.createDefaultModel();
@@ -542,17 +521,31 @@ public class TBoxUpdater {
         FileInputStream fis = new FileInputStream(file);
         configModel.read(fis, null, "N3");
 
-        Model union = ModelFactory.createUnion(configModel, 
-                userChangesModel);
+        Model currentUnion = ModelFactory.createUnion(configModel, 
+                userAnnotationsModel);
 
-        Model additions = construct(addQuery, union);
-        Model retractions = construct(retractQuery, union);
+        Model userAnnotationsAsConfig = construct(newQuery, currentUnion);
+        Model currentDefaultConfig = construct(existingQuery, currentUnion); 
         
-        if (additions.size() > 0 || retractions.size() > 0) {
-            configModel.remove(retractions);
-            log.info("Removing " + retractions.size() + " statements from " + contextURI);
+        Model additions = userAnnotationsAsConfig.difference(currentDefaultConfig);
+        Model retractions = currentDefaultConfig.difference(userAnnotationsAsConfig);
+        
+        // filter the retractions so we won't remove a value for a given predicate
+        // unless the additions model contains at least one value for the same predicate
+        Model filteredRetractions = ModelFactory.createDefaultModel();
+        StmtIterator retractIt = retractions.listStatements();
+        while(retractIt.hasNext()) {
+            Statement candidate = retractIt.nextStatement();
+            if(additions.contains(null, candidate.getPredicate(), (RDFNode) null)) {
+                filteredRetractions.add(candidate);
+            }
+        }
+        
+        if (additions.size() > 0 || filteredRetractions.size() > 0) {
+            configModel.remove(filteredRetractions);
+            log.debug("Removing " + filteredRetractions.size() + " statements from " + contextURI);
             configModel.add(additions);
-            log.info("Adding " + additions.size() + " statements from " + contextURI);
+            log.debug("Adding " + additions.size() + " statements from " + contextURI);
             FileOutputStream fos = new FileOutputStream(file);
             configModel.write(fos, "N3");
         }

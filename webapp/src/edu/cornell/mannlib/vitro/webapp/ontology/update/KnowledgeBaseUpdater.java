@@ -93,18 +93,6 @@ public class KnowledgeBaseUpdater {
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
 		
 		AtomicOntologyChangeLists changes = new AtomicOntologyChangeLists(rawChanges,settings.getNewTBoxModel(),settings.getOldTBoxModel());
-		
-		// Only modify the TBox and migration metadata the first time
-		if(updateRequired(servletContext)) {
-            //process the TBox before the ABox
-    		try {
-    		    log.debug("\tupdating tbox annotations");
-    	        updateTBoxAnnotations();
-    		} catch (Exception e) {
-    		    log.error(e,e);
-    		}
-    	    
-		}
 	        	
 		// update ABox data any time
     	log.info("performing SPARQL CONSTRUCT additions");
@@ -124,6 +112,18 @@ public class KnowledgeBaseUpdater {
         performSparqlConstructs(settings.getSparqlConstructDeletionsDir() + "/post/", 
                 settings.getRDFService(), RETRACT);
         
+        
+        // Only modify the TBox and migration metadata the first time
+        if(updateRequired(servletContext)) {
+            //process the TBox before the ABox
+            try {
+                log.debug("\tupdating tbox annotations");
+                updateTBoxAnnotations();
+            } catch (Exception e) {
+                log.error(e,e);
+            }
+            
+        }
 
 	}
 	
