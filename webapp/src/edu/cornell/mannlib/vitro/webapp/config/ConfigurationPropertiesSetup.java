@@ -29,20 +29,20 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
  * This must be invoked before any listener that requires configuration
  * properties.
  * 
- * The properties file must be called 'runtime.properties' in the Vitro home
- * directory. The path to the Vitro home directory can be specifed by an JNDI
- * value, or by a System property, or by a property in
- * WEB-INF/resources/build.properties, in that order. If the Vitro home
- * directory is specified in more than one way, a warning is issued and the
- * first value is used.
+ * The properties are determined from a file called 'build.properties' in the
+ * resources directory of the webapp, and a file called 'runtime.properties' in
+ * the Vitro home directory. In case of conflict, runtime.properties wins.
  * 
- * If the Vitro home directory cannot be located, or if it does not contain a
- * file called 'runtime.properties', or if the file cannot be loaded, a fatal
- * error is registered to abort the startup.
+ * The path to the Vitro home directory can be specifed by an JNDI value, or by
+ * a System property, or by a property in build.properties, in that order. If
+ * the Vitro home directory is specified in more than one way, a warning is
+ * issued and the first value is used.
  * 
- * The ConfigurationProperties bean is created from the key/value pairs found in
- * 'runtime.properties', and is stored in the servlet context. The value that
- * was determined for 'vitro.home' is also included in the bean.
+ * The value that was determined for 'vitro.home' is also included in the
+ * ConfigurationProperties bean.
+ * 
+ * If build.properties or runtime.properties cannot be located or loaded, a
+ * fatal error is registered to abort the startup.
  */
 public class ConfigurationPropertiesSetup implements ServletContextListener {
 	private static final Log log = LogFactory
@@ -63,6 +63,9 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 	/** Name of the file that contains runtime properties. */
 	private static final String FILE_RUNTIME_PROPERTIES = "runtime.properties";
 
+	/** Path to the file of build properties baked into the webapp. */
+	private static final String PATH_BUILD_PROPERTIES = "/WEB-INF/resources/build.properties";
+
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		ServletContext ctx = sce.getServletContext();
@@ -79,8 +82,9 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 
 				Map<String, String> preempts = createPreemptiveProperties(
 						VHD_CONFIGURATION_PROPERTY, vitroHomeDir);
+				
 				ConfigurationPropertiesImpl bean = new ConfigurationPropertiesImpl(
-						stream, preempts);
+						stream, preempts, getBuildProperties(ctx));
 
 				ConfigurationProperties.setBean(ctx, bean);
 				ss.info(this, "Loaded " + bean.getPropertyMap().size()
@@ -94,8 +98,6 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 					}
 				}
 			}
-		} catch (IllegalStateException e) {
-			ss.fatal(this, e.getMessage(), e);
 		} catch (Exception e) {
 			ss.fatal(this, e.getMessage(), e);
 		}
@@ -196,42 +198,44 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 
 	private void getVhdFromBuildProperties(ServletContext ctx,
 			Map<String, String> whereWasIt) {
-		String resourcePath = "/WEB-INF/resources/build.properties";
+		Map<String, String> buildProps = getBuildProperties(ctx);
+		String vhdPath = buildProps.get(VHD_BUILD_PROPERTY);
+		if (vhdPath == null) {
+			log.debug("'" + PATH_BUILD_PROPERTIES
+					+ "' didn't contain a value for '" + VHD_BUILD_PROPERTY
+					+ "'.");
+			return;
+		}
 
-		InputStream stream = null;
-		try {
-			stream = ctx.getResourceAsStream(resourcePath);
+		log.debug("'" + VHD_BUILD_PROPERTY
+				+ "' as specified by build.properties: " + vhdPath);
+		String message = String.format(
+				"In resource '%s', '%s' was set to '%s'.",
+				PATH_BUILD_PROPERTIES, VHD_BUILD_PROPERTY, vhdPath);
+		whereWasIt.put(message, vhdPath);
+	}
+
+	private Map<String, String> getBuildProperties(ServletContext ctx) {
+		Map<String, String> map = new HashMap<>();
+
+		try (InputStream stream = ctx
+				.getResourceAsStream(PATH_BUILD_PROPERTIES)) {
 			if (stream == null) {
-				log.debug("Didn't find a resource at '" + resourcePath + "'.");
-				return;
-			}
+				log.debug("Didn't find a resource at '" + PATH_BUILD_PROPERTIES
+						+ "'.");
+			} else {
 
-			Properties props = new Properties();
-			props.load(stream);
-			String vhdPath = props.getProperty(VHD_BUILD_PROPERTY);
-			if (vhdPath == null) {
-				log.debug("'" + resourcePath + "' didn't contain a value for '"
-						+ VHD_BUILD_PROPERTY + "'.");
-				return;
-			}
-
-			log.debug("'" + VHD_BUILD_PROPERTY
-					+ "' as specified by build.properties: " + vhdPath);
-			String message = String.format(
-					"In resource '%s', '%s' was set to '%s'.", resourcePath,
-					VHD_BUILD_PROPERTY, vhdPath);
-			whereWasIt.put(message, vhdPath);
-		} catch (IOException e) {
-			log.warn("Failed to load from '" + resourcePath + "'.", e);
-		} finally {
-			if (stream != null) {
-				try {
-					stream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
+				Properties props = new Properties();
+				props.load(stream);
+				for (String key : props.stringPropertyNames()) {
+					map.put(key, props.getProperty(key));
 				}
 			}
+		} catch (IOException e) {
+			throw new SetupException("Failed to load from '"
+					+ PATH_BUILD_PROPERTIES + "'.", e);
 		}
+		return map;
 	}
 
 	private File locateRuntimePropertiesFile(File vitroHomeDir, StartupStatus ss) {
@@ -266,4 +270,12 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 		ConfigurationProperties.removeBean(sce.getServletContext());
 	}
 
+	/**
+	 * Indicates a problem setting up. Abandon ship.
+	 */
+	private static class SetupException extends RuntimeException {
+		public SetupException(String message, Throwable cause) {
+			super(message, cause);
+		}
+	}
 }

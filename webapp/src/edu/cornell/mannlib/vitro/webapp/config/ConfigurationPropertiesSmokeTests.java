@@ -298,13 +298,13 @@ public class ConfigurationPropertiesSmokeTests implements
 	 */
 	private void checkLanguages(ConfigurationProperties props, StartupStatus ss) {
 		String buildString = props.getProperty(PROPERTY_LANGUAGE_BUILD);
-		boolean buildWithLanguages = StringUtils.isNotEmpty(buildString);
+		boolean buildWithLanguages = StringUtils.isNotBlank(buildString);
 
 		String selectString = props.getProperty(PROPERTY_LANGUAGE_SELECTABLE);
-		boolean selectableLanguages = StringUtils.isNotEmpty(selectString);
+		boolean selectableLanguages = StringUtils.isNotBlank(selectString);
 
 		String forceString = props.getProperty(PROPERTY_LANGUAGE_FORCE);
-		boolean forceLanguage = StringUtils.isNotEmpty(forceString);
+		boolean forceLanguage = StringUtils.isNotBlank(forceString);
 
 		String filterString = props.getProperty(PROPERTY_LANGUAGE_FILTER,
 				"true");
