@@ -18,6 +18,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -39,6 +40,10 @@ public class ConfigurationPropertiesSmokeTests implements
 	private static final String PROPERTY_DB_DRIVER_CLASS_NAME = "VitroConnection.DataSource.driver";
 	private static final String PROPERTY_DB_TYPE = "VitroConnection.DataSource.dbtype";
 	private static final String PROPERTY_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
+	private static final String PROPERTY_LANGUAGE_BUILD = "languages.addToBuild";
+	private static final String PROPERTY_LANGUAGE_SELECTABLE = "languages.selectableLocales";
+	private static final String PROPERTY_LANGUAGE_FORCE = "languages.forceLocale";
+	private static final String PROPERTY_LANGUAGE_FILTER = "RDFService.languageFilter";
 
 	private static final String DEFAULT_DB_DRIVER_CLASS = "com.mysql.jdbc.Driver";
 
@@ -51,6 +56,7 @@ public class ConfigurationPropertiesSmokeTests implements
 		checkHomeDirectory(ctx, props, ss);
 		checkDatabaseConnection(ctx, props, ss);
 		checkDefaultNamespace(ctx, props, ss);
+		checkLanguages(props, ss);
 	}
 
 	/**
@@ -280,6 +286,56 @@ public class ConfigurationPropertiesSmokeTests implements
 					"Default namespace does not match the expected form "
 							+ "(does not end with '" + suffix + "'): '" + ns
 							+ "'");
+		}
+	}
+
+	/**
+	 * Warn if we set up the languages incorrectly:
+	 * 
+	 * Must build with a language in order to select languages. Can't select
+	 * languages and force language. Shouldn't build with language unless
+	 * language filtering is enabled.
+	 */
+	private void checkLanguages(ConfigurationProperties props, StartupStatus ss) {
+		String buildString = props.getProperty(PROPERTY_LANGUAGE_BUILD);
+		boolean buildWithLanguages = StringUtils.isNotEmpty(buildString);
+
+		String selectString = props.getProperty(PROPERTY_LANGUAGE_SELECTABLE);
+		boolean selectableLanguages = StringUtils.isNotEmpty(selectString);
+
+		String forceString = props.getProperty(PROPERTY_LANGUAGE_FORCE);
+		boolean forceLanguage = StringUtils.isNotEmpty(forceString);
+
+		String filterString = props.getProperty(PROPERTY_LANGUAGE_FILTER,
+				"true");
+		boolean languageFilter = Boolean.valueOf(filterString);
+
+		if (selectableLanguages && !buildWithLanguages) {
+			ss.warning(this, String.format("Problem with Language setup - "
+					+ "runtime.properties specifies a "
+					+ "list of selectable languages (%s = %s), but "
+					+ "build.properties did not include any languages with %s",
+					PROPERTY_LANGUAGE_SELECTABLE, selectString,
+					PROPERTY_LANGUAGE_BUILD));
+		}
+
+		if (selectableLanguages && forceLanguage) {
+			ss.warning(this, String.format("Problem with Language setup - "
+					+ "runtime.properties specifies a "
+					+ "forced locale (%s = %s), and also a list of selectable "
+					+ "languages (%s = %s). These options are incompatible.",
+					PROPERTY_LANGUAGE_FORCE, forceString,
+					PROPERTY_LANGUAGE_SELECTABLE, selectString));
+		}
+
+		if (buildWithLanguages && !languageFilter) {
+			ss.warning(this, String.format("Problem with Language setup - "
+					+ "build.properties includes one or more additional "
+					+ "languages (%s = %s), but runtime.properties has "
+					+ "disabled language filtering (%s = %s). This will "
+					+ "likely result in a mix of languages in the "
+					+ "application.", PROPERTY_LANGUAGE_BUILD, buildString,
+					PROPERTY_LANGUAGE_FILTER, filterString));
 		}
 	}
 

@@ -37,6 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
  *         code =          [the code for the Locale, e.g. "en_US"]
  *         label =         [the alt text for the Locale, e.g. "Spanish (Spain)"]
  *         imageUrl =      [the URL of the image that represents the Locale]
+ *         selected =      [true, if this locale is currently selected]
  *       }
  *     }  
  *   }
