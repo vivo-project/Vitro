@@ -116,7 +116,7 @@ public class VclassEditController extends BaseEditController {
         
         String uri = (vcl.getURI() == null) ? "" : vcl.getURI();
         
-        results.add(vcl.getLocalNameWithPrefix());                                // 1
+        results.add(vcl.getPickListName());                                // 1
         results.add(vcl.getName() == null ? "(no public label)" : vcl.getName()); // 2
         results.add(groupName);                                                   // 3
         results.add(ontologyName==null ? "(not identified)" : ontologyName);      // 4

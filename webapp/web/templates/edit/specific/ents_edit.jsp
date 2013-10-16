@@ -127,7 +127,7 @@
 				<c:url var="typeURL" value="/vclassEdit">
 					<c:param name="uri" value="${type.URI}"/>
 				</c:url>
-				<li><input type="checkbox" name="TypeURI" value="${type.URI}" class="form-item"/><a href="${typeURL}"> ${type.localNameWithPrefix} </a></li>
+				<li><input type="checkbox" name="TypeURI" value="${type.URI}" class="form-item"/><a href="${typeURL}"> ${type.pickListName} </a></li>
 			</c:forEach>	
 			</ul>
 			<input type="hidden" name="individualURI" value="${individual.URI}"/>

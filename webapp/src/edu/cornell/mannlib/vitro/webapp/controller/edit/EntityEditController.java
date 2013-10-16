@@ -96,6 +96,7 @@ public class EntityEditController extends BaseEditController {
         
         String classStr = "";
         List<VClass> classList = inferredEnt.getVClasses(false);
+        sortForPickList(classList, vreq);
         if (classList != null) {
 	        for (Iterator<VClass> classIt = classList.iterator(); classIt.hasNext();) {
 	        	VClass vc = classIt.next();
@@ -103,7 +104,7 @@ public class EntityEditController extends BaseEditController {
 	            try {
 	                rClassName = "<a href=\"vclassEdit?uri=" +
 	                		URLEncoder.encode(vc.getURI(),"UTF-8")+"\">" + 
-	                		vc.getLocalNameWithPrefix()+"</a>";
+	                		vc.getPickListName()+"</a>";
 	            } catch (Exception e) {
 	                rClassName = vc.getLocalNameWithPrefix();
 	            }
@@ -131,7 +132,9 @@ public class EntityEditController extends BaseEditController {
         FormObject foo = new FormObject();
         HashMap<String, List<Option>> OptionMap = new HashMap<String, List<Option>>();
         
-        request.setAttribute("types",ent.getVClasses(false)); // we're displaying all assertions, including indirect types
+        List<VClass> types = ent.getVClasses(false);
+        sortForPickList(types, vreq);
+        request.setAttribute("types", types); // we're displaying all assertions, including indirect types
         
         try {
             List<Option> externalIdOptionList = new LinkedList<Option>();

@@ -79,7 +79,7 @@ public class PropertyEditController extends BaseEditController {
         results.add("sort direction");        // column 23
         results.add("URI");                   // column 24
 
-        results.add(p.getLocalNameWithPrefix()); // column 1
+        results.add(p.getPickListName()); // column 1
         
         String parentPropertyStr = "";
         if (p.getParentURI() != null) {

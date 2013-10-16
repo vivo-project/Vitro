@@ -65,27 +65,26 @@ public class IndividualTypeRetryController extends BaseEditController {
         
 		List<VClass> allVClasses = vcDao.getAllVclasses();
 	    sortForPickList(allVClasses, vreq);
-		Set<String> allClassURISet = new HashSet<String>();
-		Map<String,String> classNameMap = new HashMap<String,String>();
-		for (Iterator allClassIt = allVClasses.iterator(); allClassIt.hasNext(); ) {
-			VClass vc = (VClass) allClassIt.next();
-			classNameMap.put(vc.getURI(),vc.getPickListName());
-			allClassURISet.add(vc.getURI());
-		}
-
-		allVClasses = null;
 			
+		Set<String> prohibitedURIset = new HashSet<String>();
 		for (Iterator<VClass> indClassIt = ind.getVClasses(false).iterator(); indClassIt.hasNext(); ) {
 			VClass vc = indClassIt.next();
-			allClassURISet.remove(vc.getURI());
+			if(vc.isAnonymous()) {
+			    continue;
+			}
+			prohibitedURIset.add(vc.getURI());
 			for (Iterator<String> djURIIt = vcDao.getDisjointWithClassURIs(vc.getURI()).iterator(); djURIIt.hasNext(); ) {
 				String djURI = djURIIt.next();
-				allClassURISet.remove(djURI);
+	            prohibitedURIset.add(djURI);
 			}
 		}
 		
-		List<String> classURIList = new LinkedList<String>();
-		classURIList.addAll(allClassURISet);
+		List<VClass> eligibleVClasses = new ArrayList<VClass>();
+		for (VClass vc : allVClasses) {
+		    if(vc.getURI() != null && !(prohibitedURIset.contains(vc.getURI()))) {
+		        eligibleVClasses.add(vc);
+		    }
+		}
 		
 		FormObject foo = new FormObject();
 		epo.setFormObject(foo);
@@ -93,9 +92,8 @@ public class IndividualTypeRetryController extends BaseEditController {
 		foo.setOptionLists(optionMap);
 
 		List<Option> typeOptionList = new ArrayList<Option>(); 
-		for (Iterator<String> classURIIt = classURIList.iterator(); classURIIt.hasNext();) {
-			String classURI = classURIIt.next();
-			Option opt = new Option(classURI,classNameMap.get(classURI));
+		for (VClass vc : eligibleVClasses) {
+			Option opt = new Option(vc.getURI(), vc.getPickListName());
 			typeOptionList.add(opt);
 		}
 		

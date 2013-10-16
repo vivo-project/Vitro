@@ -70,7 +70,7 @@ public class DatapropEditController extends BaseEditController {
 
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
 
-        results.add(dp.getLocalNameWithPrefix()); // column 1
+        results.add(dp.getPickListName()); // column 1
         results.add(dp.getPublicName() == null ? "(no public label)" : dp.getPublicName()); // column 2
         
         if (dp.getGroupURI() != null) {
