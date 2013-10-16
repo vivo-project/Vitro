@@ -143,69 +143,27 @@ public class VclassEditController extends BaseEditController {
 
         // if supported, we want to show only the asserted superclasses and subclasses.
         VClassDao vcDao = ModelAccess.on(getServletContext()).getBaseWebappDaoFactory().getVClassDao();
-        List superURIs = vcDao.getSuperClassURIs(vcl.getURI(),false);
-        List superVClasses = new ArrayList();
-        Iterator superURIit = superURIs.iterator();
-        while (superURIit.hasNext()) {
-            String superURI = (String) superURIit.next();
-            if (superURI != null) {
-                VClass superVClass = vcDao.getVClassByURI(superURI);
-                if (superVClass != null) {
-                    superVClasses.add(superVClass);
-                }
-            }
-        }
+        
+        List<VClass> superVClasses = getVClassesForURIList(
+                vcDao.getSuperClassURIs(vcl.getURI(),false), vcDao);
+        sortForPickList(superVClasses, request);
         request.setAttribute("superclasses",superVClasses);
 
-        List subURIs = vcDao.getSubClassURIs(vcl.getURI());
-        List subVClasses = new ArrayList();
-        Iterator subURIit = subURIs.iterator();
-        while (subURIit.hasNext()) {
-            String subURI = (String) subURIit.next();
-            VClass subVClass = vcDao.getVClassByURI(subURI);
-            if (subVClass != null) {
-                subVClasses.add(subVClass);
-            }
-        }
+        List<VClass> subVClasses = getVClassesForURIList(
+                vcDao.getSubClassURIs(vcl.getURI()), vcDao);
+        sortForPickList(subVClasses, request);
         request.setAttribute("subclasses",subVClasses);
-        
-        try {
-	        List djURIs = vcDao.getDisjointWithClassURIs(vcl.getURI());
-	        List djVClasses = new ArrayList();
-	        Iterator djURIit = djURIs.iterator();
-	        while (djURIit.hasNext()) {
-	            String djURI = (String) djURIit.next();
-	            try {
-		            VClass djVClass = vcDao.getVClassByURI(djURI);
-		            if (djVClass != null) {
-		                djVClasses.add(djVClass);
-		            }
-	            } catch (Exception e) { /* probably owl:Nothing or some other such nonsense */ }
-	        }
-	        request.setAttribute("disjointClasses",djVClasses);
-        } catch (Exception e) {
-        	log.error(e, e);
-        }
-        
-        try {
-	        List eqURIs = vcDao.getEquivalentClassURIs(vcl.getURI());
-	        List eqVClasses = new ArrayList();
-	        Iterator eqURIit = eqURIs.iterator();
-	        while (eqURIit.hasNext()) {
-	            String eqURI = (String) eqURIit.next();
-	            try {
-		            VClass eqVClass = vcDao.getVClassByURI(eqURI);
-		            if (eqVClass != null) {
-		                eqVClasses.add(eqVClass);
-		            }
-	            } catch (Exception e) { }
-	        }
-	        request.setAttribute("equivalentClasses",eqVClasses);
-        } catch (Exception e) {
-        	log.error("Couldn't get the equivalent classes: ");
-        	log.error(e, e);
-        }
+            
+        List<VClass> djVClasses = getVClassesForURIList(
+                vcDao.getDisjointWithClassURIs(vcl.getURI()), vcDao);
+        sortForPickList(djVClasses, request);
+        request.setAttribute("disjointClasses",djVClasses);
 
+        List<VClass> eqVClasses = getVClassesForURIList(
+                vcDao.getEquivalentClassURIs(vcl.getURI()), vcDao);
+        sortForPickList(eqVClasses, request);
+        request.setAttribute("equivalentClasses",eqVClasses);
+   
         // add the options
         foo.setOptionLists(OptionMap);
         epo.setFormObject(foo);
@@ -232,6 +190,19 @@ public class VclassEditController extends BaseEditController {
 
     public void doGet (HttpServletRequest request, HttpServletResponse response) {
         doPost(request,response);
+    }
+    
+    private List<VClass> getVClassesForURIList(List<String> vclassURIs, VClassDao vcDao) {
+        List<VClass> vclasses = new ArrayList<VClass>();
+        Iterator<String> urIt = vclassURIs.iterator();
+        while (urIt.hasNext()) {
+            String vclassURI = urIt.next();
+            VClass vclass = vcDao.getVClassByURI(vclassURI);
+            if (vclass != null) {
+                vclasses.add(vclass);
+            }
+        }
+        return vclasses;
     }
 
 }
