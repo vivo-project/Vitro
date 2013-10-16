@@ -129,6 +129,10 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         return rangeUri;
     }
     
+    public String getDomainUri() {
+        return domainUri;
+    }
+    
     public String getAddUrl() {
         //log.info("addUrl=" + addUrl);
         return (addUrl != null) ? addUrl : "";

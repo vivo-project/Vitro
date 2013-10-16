@@ -128,16 +128,21 @@ name will be used as the label. -->
     <#else>
         <#local rangeUri = "" /> 
     </#if>
+    <#if property.domainUri?? >
+        <#local domainUri = property.domainUri /> 
+    <#else>
+        <#local domainUri = "" /> 
+    </#if>
     <#if editable>
         <#local url = property.addUrl>
         <#if url?has_content>
-            <@showAddLink property.localName label url rangeUri/>
+            <@showAddLink property.localName label url rangeUri domainUri/>
         </#if>
     </#if>
 </#macro>
 
-<#macro showAddLink propertyLocalName label url rangeUri>
-    <#if rangeUri?contains("Authorship") || rangeUri?contains("URL") || rangeUri?contains("Editorship") || label == "hasResearchArea">
+<#macro showAddLink propertyLocalName label url rangeUri domainUri="">
+    <#if (rangeUri?contains("Authorship") && domainUri?contains("IAO_0000030")) || (rangeUri?contains("Editorship") && domainUri?contains("IAO_0000030"))|| rangeUri?contains("URL") || label == "hasResearchArea">
         <a class="add-${propertyLocalName}" href="${url}" title="${i18n().manage_list_of} ${label?lower_case}">
         <img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="${i18n().manage}" /></a>
     <#else>
