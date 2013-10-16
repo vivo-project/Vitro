@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.SolrInputDocument;
@@ -124,10 +125,15 @@ public class ContextNodeFields implements DocumentModifier{
             String name = iter.next();
             RDFNode node = row.get( name );
             if( node != null ){
-            	if(addSpace) {
-            		text.append(" ").append( node.toString() );
-            	} else {
-            		text.append(node.toString());
+            	String value = (node.isLiteral()) ? 
+            			node.asLiteral().getString(): 
+            			node.toString();
+            	if (StringUtils.isNotBlank(value)) {
+	            	if(addSpace) {
+	            		text.append(" ").append( value );
+	            	} else {
+	            		text.append(value);
+	            	}
             	}
             }else{
                 log.debug(name + " is null");
