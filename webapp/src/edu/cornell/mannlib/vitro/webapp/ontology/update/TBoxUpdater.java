@@ -476,11 +476,24 @@ public class TBoxUpdater {
                 "    FILTER (regex(str(?vitroProp), \"" + VitroVocabulary.vitroURI + "\")) } \n" +
                 "} \n" ; 
         
-        Model userChangesModel = construct(
-                propertyAnnotationsQuery, userAnnotationsModel).difference(
-                        construct(propertyAnnotationsQuery, oldAnnotationsModel));
+        Model userAnnotations = construct(
+                propertyAnnotationsQuery, userAnnotationsModel);
+        Model oldAnnotations = construct(propertyAnnotationsQuery, oldAnnotationsModel);
         
-        if(userChangesModel.size() == 0) {
+        Model diff = userAnnotations.difference(oldAnnotations);
+        
+        // migrate all current values for any predicate that has been modified
+        // from the default
+        Model valuesToMigrate = ModelFactory.createDefaultModel();
+        StmtIterator sit = diff.listStatements();
+        while(sit.hasNext()) {
+            Statement stmt = sit.nextStatement();
+            valuesToMigrate.add(userAnnotations.listStatements(
+                    null, stmt.getPredicate(), (RDFNode) null));
+            
+        }
+        
+        if(valuesToMigrate.size() == 0) {
             return;
         } else {
             log.info("Updating PropertyConfig.n3 to include locally-changed " +
@@ -521,11 +534,10 @@ public class TBoxUpdater {
         FileInputStream fis = new FileInputStream(file);
         configModel.read(fis, null, "N3");
 
-        Model currentUnion = ModelFactory.createUnion(configModel, 
-                userAnnotationsModel);
+        Model userChangesUnion = ModelFactory.createUnion(configModel, valuesToMigrate);
 
-        Model userAnnotationsAsConfig = construct(newQuery, currentUnion);
-        Model currentDefaultConfig = construct(existingQuery, currentUnion); 
+        Model userAnnotationsAsConfig = construct(newQuery, userChangesUnion);
+        Model currentDefaultConfig = construct(existingQuery, configModel); 
         
         Model additions = userAnnotationsAsConfig.difference(currentDefaultConfig);
         Model retractions = currentDefaultConfig.difference(userAnnotationsAsConfig);
