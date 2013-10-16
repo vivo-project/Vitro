@@ -95,9 +95,11 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
         
         String individualUri = getUri();
         String profileUrl = getProfileUrl();
-        boolean isUriInDefaultNamespace = UrlBuilder.isUriInDefaultNamespace(individualUri, vreq);
-        return isUriInDefaultNamespace ? profileUrl + "/" + getLocalName() + ".rdf" 
-                                       : UrlBuilder.addParams(profileUrl, "format", "rdfxml");
+        if (UrlBuilder.isUriInDefaultNamespace(individualUri, vreq)) {
+        	return UrlBuilder.getUrl("/individual/" + getLocalName() + "/" + getLocalName() + ".rdf") ;
+        } else {
+        	return UrlBuilder.addParams(profileUrl, "format", "rdfxml");
+        }
     }
 
     public GroupedPropertyList getPropertyList() {
