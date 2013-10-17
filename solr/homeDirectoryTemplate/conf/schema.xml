@@ -191,8 +191,6 @@
   
   <field name="type" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
   
-  <field name="classLocalName" type="text" indexed="true" stored="true" multiValued="true"/>
-  
   <field name="classgroup" type="string" indexed="true" stored="true" multiValued="true"/>
 
   <field name="mostSpecificTypeURIs" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>

@@ -11,8 +11,6 @@ public class VitroSearchTermNames {
     
     /** rdf:type */
     public static String RDFTYPE    = "type";
-    /** class names in human readable form of an individual*/
-    public static final String CLASSLOCALNAME = "classLocalName";
     /** classgroups from the individual's rdf:types  */
     public static String CLASSGROUP_URI    = "classgroup";    
     /** Most specific types for individual*/

@@ -263,10 +263,6 @@ public class IndividualToSolrDocument {
                 
                 doc.addField(term.RDFTYPE, clz.getURI());
                 
-                if(clz.getLocalName() != null){
-                    doc.addField(term.CLASSLOCALNAME, clz.getLocalName());
-                }
-                
                 if(clz.getName() != null){
                     classPublicNames.append(" ");
                     classPublicNames.append(clz.getName());
