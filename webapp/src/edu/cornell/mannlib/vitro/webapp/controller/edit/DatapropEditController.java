@@ -6,7 +6,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -143,43 +142,20 @@ public class DatapropEditController extends BaseEditController {
 
         DataPropertyDao assertionsDpDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getDataPropertyDao();
         
-        List superURIs = assertionsDpDao.getSuperPropertyURIs(dp.getURI(),false);
-        List superProperties = new ArrayList();
-        Iterator superURIit = superURIs.iterator();
-        while (superURIit.hasNext()) {
-            String superURI = (String) superURIit.next();
-            if (superURI != null) {
-                DataProperty superProperty = assertionsDpDao.getDataPropertyByURI(superURI);
-                if (superProperty != null) {
-                    superProperties.add(superProperty);
-                }
-            }
-        }
-        request.setAttribute("superproperties",superProperties);
+        List<DataProperty> superProps = getDataPropertiesForURIList(
+                assertionsDpDao.getSuperPropertyURIs(dp.getURI(), false), assertionsDpDao);
+        sortForPickList(superProps, vreq);
+        request.setAttribute("superproperties", superProps);
 
-        List subURIs = assertionsDpDao.getSubPropertyURIs(dp.getURI());
-        List subProperties = new ArrayList();
-        Iterator subURIit = subURIs.iterator();
-        while (subURIit.hasNext()) {
-            String subURI = (String) subURIit.next();
-            DataProperty subProperty = dpDao.getDataPropertyByURI(subURI);
-            if (subProperty != null) {
-                subProperties.add(subProperty);
-            }
-        }
-        request.setAttribute("subproperties",subProperties);
+        List<DataProperty> subProps = getDataPropertiesForURIList(
+                assertionsDpDao.getSubPropertyURIs(dp.getURI()), assertionsDpDao);
+        sortForPickList(subProps, vreq);
+        request.setAttribute("subproperties", subProps);
         
-        List eqURIs = assertionsDpDao.getEquivalentPropertyURIs(dp.getURI());
-        List eqProperties = new ArrayList();
-        Iterator eqURIit = eqURIs.iterator();
-        while (eqURIit.hasNext()) {
-            String eqURI = (String) eqURIit.next();
-            DataProperty eqProperty = dpDao.getDataPropertyByURI(eqURI);
-            if (eqProperty != null) {
-                eqProperties.add(eqProperty);
-            }
-        }
-        request.setAttribute("equivalentProperties", eqProperties);
+        List<DataProperty> eqProps = getDataPropertiesForURIList(
+                assertionsDpDao.getEquivalentPropertyURIs(dp.getURI()), assertionsDpDao);
+        sortForPickList(eqProps, vreq);
+        request.setAttribute("equivalentProperties", eqProps);
         
         ApplicationBean appBean = vreq.getAppBean();
         
@@ -201,6 +177,18 @@ public class DatapropEditController extends BaseEditController {
 
     public void doGet (HttpServletRequest request, HttpServletResponse response) {
         doPost(request,response);
+    }
+    
+    private List<DataProperty> getDataPropertiesForURIList(List<String> propertyURIs, 
+            DataPropertyDao dpDao) {
+        List<DataProperty> properties = new ArrayList<DataProperty>();
+        for (String propertyURI : propertyURIs) {
+            DataProperty property = dpDao.getDataPropertyByURI(propertyURI);
+            if (property != null) {
+                properties.add(property);
+            }
+        }
+        return properties;
     }
 
 }

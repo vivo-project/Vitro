@@ -194,43 +194,20 @@ public class PropertyEditController extends BaseEditController {
         // superproperties and subproperties
         
         ObjectPropertyDao opDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getObjectPropertyDao();
-        List superURIs = opDao.getSuperPropertyURIs(p.getURI(),false);
-        List superProperties = new ArrayList();
-        Iterator superURIit = superURIs.iterator();
-        while (superURIit.hasNext()) {
-            String superURI = (String) superURIit.next();
-            if (superURI != null) {
-                ObjectProperty superProperty = opDao.getObjectPropertyByURI(superURI);
-                if (superProperty != null) {
-                    superProperties.add(superProperty);
-                }
-            }
-        }
-        request.setAttribute("superproperties",superProperties);
+        List<ObjectProperty> superProps = getObjectPropertiesForURIList(
+                opDao.getSuperPropertyURIs(p.getURI(), false), opDao);
+        sortForPickList(superProps, vreq);
+        request.setAttribute("superproperties", superProps);
 
-        List subURIs = opDao.getSubPropertyURIs(p.getURI());
-        List subProperties = new ArrayList();
-        Iterator subURIit = subURIs.iterator();
-        while (subURIit.hasNext()) {
-            String subURI = (String) subURIit.next();
-            ObjectProperty subProperty = opDao.getObjectPropertyByURI(subURI);
-            if (subProperty != null) {
-                subProperties.add(subProperty);
-            }
-        }
-        request.setAttribute("subproperties",subProperties);
+        List<ObjectProperty> subProps = getObjectPropertiesForURIList(
+                opDao.getSubPropertyURIs(p.getURI()), opDao);
+        sortForPickList(subProps, vreq);
+        request.setAttribute("subproperties", subProps);
         
-        List eqURIs = opDao.getEquivalentPropertyURIs(p.getURI());
-        List eqProperties = new ArrayList();
-        Iterator eqURIit = eqURIs.iterator();
-        while (eqURIit.hasNext()) {
-            String eqURI = (String) eqURIit.next();
-            ObjectProperty eqProperty = opDao.getObjectPropertyByURI(eqURI);
-            if (eqProperty != null) {
-                eqProperties.add(eqProperty);
-            }
-        }
-        request.setAttribute("equivalentProperties", eqProperties);
+        List<ObjectProperty> eqProps = getObjectPropertiesForURIList(
+                opDao.getEquivalentPropertyURIs(p.getURI()), opDao);
+        sortForPickList(eqProps, vreq);
+        request.setAttribute("equivalentProperties", eqProps);
         
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("epoKey",epo.getKey());
@@ -251,6 +228,18 @@ public class PropertyEditController extends BaseEditController {
 
     public void doGet (HttpServletRequest request, HttpServletResponse response) {
         doPost(request,response);
+    }
+    
+    private List<ObjectProperty> getObjectPropertiesForURIList(List<String> propertyURIs, 
+            ObjectPropertyDao opDao) {
+        List<ObjectProperty> properties = new ArrayList<ObjectProperty>();
+        for (String propertyURI : propertyURIs) {
+            ObjectProperty property = opDao.getObjectPropertyByURI(propertyURI);
+            if (property != null) {
+                properties.add(property);
+            }
+        }
+        return properties;
     }
 
 }
