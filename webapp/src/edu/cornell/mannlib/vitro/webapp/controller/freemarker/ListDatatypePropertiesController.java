@@ -107,7 +107,7 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
                             json += ", ";
                         }
                         
-                        String nameStr = prop.getPickListName()==null ? prop.getName()==null ? prop.getURI()==null ? "(no name)" : prop.getURI() : prop.getName() : prop.getPublicName();
+                        String nameStr = prop.getPickListName()==null ? prop.getName()==null ? prop.getURI()==null ? "(no name)" : prop.getURI() : prop.getName() : prop.getPickListName();
 
                         try {
                             json += "{ \"name\": " + JSONUtils.quote("<a href='datapropEdit?uri="+ URLEncoder.encode(prop.getURI())+"'>" + nameStr + "</a>") + ", "; 

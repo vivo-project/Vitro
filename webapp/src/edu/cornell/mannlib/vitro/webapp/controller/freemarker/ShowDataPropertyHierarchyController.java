@@ -208,7 +208,7 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
             String nameStr = dp.getPickListName() == null 
                     ? dp.getName() == null 
                             ? dp.getURI() == null 
-                                    ? "(no name)" : dp.getURI() : dp.getName() : dp.getPublicName();
+                                    ? "(no name)" : dp.getURI() : dp.getName() : dp.getPickListName();
   
             tempString += JSONUtils.quote(
                     "<a href='datapropEdit?uri=" + URLEncoder.encode(
