@@ -495,7 +495,7 @@ public class IndexBuilder extends VitroBackgroundThread {
             counter ++;
         }
         log.info("Number of individuals to be indexed : " + counter + " by " 
-        		+ workers + " worker theads.");
+        		+ workers + " worker threads.");
         return work;        
     }
     
