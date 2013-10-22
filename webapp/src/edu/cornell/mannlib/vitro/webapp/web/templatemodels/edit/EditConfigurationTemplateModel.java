@@ -666,7 +666,13 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     //this url is for canceling
     public String getCancelUrl() {
     	String editKey = editConfig.getEditKey();
-    	return EditConfigurationUtils.getCancelUrlBase(vreq) + "?editKey=" + editKey + "&cancel=true";
+    	String cancelURL = EditConfigurationUtils.getCancelUrlBase(vreq) + "?editKey=" + editKey + "&cancel=true";
+    	//Check for special return url parameter
+    	String returnURLParameter = vreq.getParameter("returnURL");
+    	if(returnURLParameter !=  null && !returnURLParameter.isEmpty() ) {
+    		cancelURL += "&returnURL=" + returnURLParameter;
+    	}
+    	return cancelURL;
     }
     
     //Get confirm deletion url
