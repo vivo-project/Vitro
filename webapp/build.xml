@@ -102,6 +102,24 @@
 	<target name="deployProperties" depends="buildProperties">
 		<fail unless="vitro.home" message="${build.properties.file} must contain a value for vitro.home" />
 		<fail unless="tomcat.home" message="${build.properties.file} must contain a value for tomcat.home" />
+		<fail>
+			<condition>
+				<not>
+					<available file="${tomcat.home}" />
+				</not>
+			</condition>
+            Tomcat home directory '${tomcat.home}' does not exist. 
+            Check the value of 'tomcat.home' in your build.properties file.
+		</fail>
+		<fail>
+			<condition>
+				<not>
+					<available file="${tomcat.home}/webapps" />
+				</not>
+			</condition>
+            '${tomcat.home}' does not refer to a valid Tomcat instance: it has no 'webapps' sub-directory. 
+            Check the value of 'tomcat.home' in your build.properties file."
+		</fail>
 
 		<property name="solr.home.dir" location="${vitro.home}/solr" />
 
