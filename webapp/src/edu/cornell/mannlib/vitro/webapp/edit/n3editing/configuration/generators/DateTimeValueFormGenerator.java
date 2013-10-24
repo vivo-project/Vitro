@@ -39,7 +39,7 @@ public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
         
         initBasics(conf, vreq);
         initPropertyParameters(vreq, session, conf);
-        initObjectPropForm(conf, vreq);               
+        initObjectPropForm(conf, vreq); 
         
         conf.setTemplate(this.getTemplate());
         
@@ -126,6 +126,7 @@ public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
 	public void addFormSpecificData(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
 		HashMap<String, Object> formSpecificData = new HashMap<String, Object>();
 		formSpecificData.put("editMode", getEditMode(vreq).name().toLowerCase());
+		formSpecificData.put("domainUri", getDomainUri(vreq));
 		editConfiguration.setFormSpecificData(formSpecificData);
 	}
 	
@@ -139,5 +140,11 @@ public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
 			
 		}
 		return editMode;
+	}
+
+	private String getDomainUri(VitroRequest vreq) {
+        String domainUri = vreq.getParameter("domainUri"); 
+        
+		return domainUri;
 	}
 }
