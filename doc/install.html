@@ -67,7 +67,7 @@
             <h4>Vitro inside Tomcat</h4>
             <p>
                 When you run the build script to compile and deploy Vitro 
-                (see <a href="#deploy">installation step VI</a>, below), 
+                (see <a href="#deploy">installation step V</a>, below), 
                 the files will be deployed to a
                 directory inside Tomcat. This is the actual executing code for Vitro, 
                 but you won’t need to look at it or change it. If you need to change 
@@ -86,7 +86,7 @@
                 build.properties file (see <a href="#build_properties">installation step IV</a>, 
                 below). You must create this directory before starting Vitro, 
                 you must create the <code>runtime.properties</code> file in this directory
-                (see <a href="#runtime_properties">Step V</a>, below), and you 
+                (see <a href="#runtime_properties">Step VI</a>, below), and you 
                 must ensure that Tomcat has permission to read and write to this  
                 directory when it runs. 
             </p>
@@ -186,10 +186,10 @@
                         <a href="#build_properties">Specify build properties</a>
                     </li>
                     <li>
-                        <a href="#runtime_properties">Specify runtime properties</a>
+                        <a href="#deploy">Compile and deploy</a>
                     </li>
                     <li>
-                        <a href="#deploy">Compile and deploy</a>
+                        <a href="#runtime_properties">Specify runtime properties</a>
                     </li>
                     <li>
                         <a href="#tomcat_settings">Configure Tomcat</a>
@@ -226,20 +226,19 @@
             </p>
             <ul>
                 <li>
-                    Java (SE) 1.6 or higher, <a href="http://java.sun.com">http://java.sun.com</a>
-                    (Not OpenJDK) 
+                    Java (SE) 1.7.x <a href="http://java.sun.com">http://java.sun.com</a>
+                    <ul>
+                    	<li>VIVO has not been tested with OpenJDK</li>
+                    </ul>
                 </li>
                 <li>
-                    Apache Tomcat 6.x or higher, <a href="http://tomcat.apache.org">http://tomcat.apache.org</a>
+                    Apache Tomcat 6.x or 7.x <a href="http://tomcat.apache.org">http://tomcat.apache.org</a>
                 </li>
                 <li>
                     Apache Ant 1.8 or higher, <a href="http://ant.apache.org">http://ant.apache.org</a>
                 </li>
                 <li>
-                    MySQL 5.1 or higher*, <a href="http://www.mysql.com">http://www.mysql.com</a>
-                </li>
-                <li>
-                    Apache Subversion 1.6.x or higher*, <a href="http://subversion.apache.org/">http://subversion.apache.org/</a>
+                    MySQL 5.1 or higher, <a href="http://www.mysql.com">http://www.mysql.com</a>
                 </li>
             </ul>
             <p>
@@ -320,8 +319,8 @@
             <p>
             	These properties are used in compilation and deployment. 
             	They will be incorporated into Vitro when it is compiled in
-            	<a href="#deploy">Step VI</a>. If you want to change these properties at
-            	a later date, you will need to stop Tomcat, repeat <a href="#deploy">Step VI</a>, 
+            	<a href="#deploy">Step V</a>. If you want to change these properties at
+            	a later date, you will need to stop Tomcat, repeat <a href="#deploy">Step V</a>, 
             	and restart Tomcat.
             </p>
             <p>
@@ -394,22 +393,64 @@
                 </tbody>
             </table>
 
-            <h3 id="runtime_properties">V. Specify runtime properties </h3>
+            <h3 id="deploy">V. Compile and deploy</h3>
             <p>
-                In <a href="#build_properties">Step IV</a>, you defined the location of the Vitro home directory, 
+                In <a href="#build_properties">Step IV</a>, you defined the location of the VIVO home directory, 
                 by specifying <code>vitro.home</code> in the <code>build.properties</code> file.
                 Create that directory now.
             </p>
             <p>
-            	In the <code>webapp/config</code> subdirectory of the Vitro distribution, you will find a file called 
-            	<code>example.runtime.properties</code>. Copy this to the Vitro home directory you have created, 
-            	renaming the copy to <code>runtime.properties</code>. 
-                Edit the file to suit your installation, as described in the following table. 
+                At the command line, change to the <code>webapp</code> directory inside the Vitro distribution 
+                directory. Then type: 
+            </p>
+            <pre>    ant all<br>            </pre>
+            <p>
+                to build Vitro and deploy to Tomcat's webapps directory. 
+            </p>
+            <p>
+                The build script may run for as much as five minutes, 
+                and creates more than 100 lines of output. 
+                The process comprises several steps:
+                <ul>
+                   <li>collecting the source files from the distribution directory,</li>
+                   <li>compiling the Java source code,</li>
+                   <li>compiling and running unit tests,</li>
+                   <li>preparing the Solr search engine,</li>
+                   <li>deploying Vitro and Solr to Tomcat.</li>
+                </ul> 
+            </p>
+            <p>
+                The output of the build may include a variety of warning messages.
+                The Java compiler may warn of code that is outdated.
+                Unit tests may produce warning messages, 
+                and some tests may be ignored if they do not produce consistent results.  
+            </p>
+            <table align="center"><tr><td>
+                BUILD SUCCESSFUL<br>Total time: 1 minute 49 seconds
+            </td></tr></table>
+            <p>
+                If the output ends with a success message, the build was successful. 
+                Proceed to the next step.
+            </p>
+            <table align="center"><tr><td>
+                BUILD FAILED<br>Total time: 35 seconds
+            </td></tr></table>
+            <p>
+                If the output ends with a failure message, the build has failed. 
+                Find the cause of the failure, fix the problem, and run the script again.
+            </p>
+
+            <h3 id="runtime_properties">VI. Specify runtime properties </h3>
+            <p>
+                The build process in <a href="deploy">Step V</a> created a file called <code>example.runtime.properties</code>
+                in your Vitro home directory (<code>vitro.home</code> in the <code>build.properties</code> file).
+                Rename this file to  <code>runtime.properties</code>, and  
+                edit the file to suit your installation, as described in the following table. 
             </p>
             <p>
                 These properties are loaded when Vitro starts up. If you want to change these 
                 properties at a later date, you will need to restart Tomcat for them to take 
-                effect. You will not need to repeat <a href="#deploy">Step VI</a>.
+                effect. You will not need to repeat <a href="#deploy">Step V</a>.
             </p>
             <p>
                 <em>Windows:</em>
@@ -800,47 +841,6 @@
                     
                 </tbody>
             </table>
-            <h3 id="deploy">VI. Compile and deploy</h3>
-            <p>
-                At the command line, change to the <code>webapp</code> directory inside the Vitro distribution 
-                directory. Then type: 
-            </p>
-            <pre>    ant all<br>            </pre>
-            <p>
-                to build Vitro and deploy to Tomcat's webapps directory. 
-            </p>
-            <p>
-                The build script may run for as much as five minutes, 
-                and creates more than 100 lines of output. 
-                The process comprises several steps:
-                <ul>
-                   <li>collecting the source files from the distribution directory,</li>
-                   <li>compiling the Java source code,</li>
-                   <li>compiling and running unit tests,</li>
-                   <li>preparing the Solr search engine,</li>
-                   <li>deploying Vitro and Solr to Tomcat.</li>
-                </ul> 
-            </p>
-            <p>
-                The output of the build may include a variety of warning messages.
-                The Java compiler may warn of code that is outdated.
-                Unit tests may produce warning messages, 
-                and some tests may be ignored if they do not produce consistent results.  
-            </p>
-            <table align="center"><tr><td>
-                BUILD SUCCESSFUL<br>Total time: 1 minute 49 seconds
-            </td></tr></table>
-            <p>
-                If the output ends with a success message, the build was successful. 
-                Proceed to the next step.
-            </p>
-            <table align="center"><tr><td>
-                BUILD FAILED<br>Total time: 35 seconds
-            </td></tr></table>
-            <p>
-                If the output ends with a failure message, the build has failed. 
-                Find the cause of the failure, fix the problem, and run the script again.
-            </p>
 
             <h3 id="tomcat_settings">VII. Configure Tomcat</h3>
             <h4>Set JVM parameters</h4>
@@ -921,8 +921,8 @@
                problem is detected, the normal Vitro pages will redirect
                to a startup status page describing the problem. You
                can stop tomcat, attempt to fix the problem and
-               proceeded from <a href="#deploy">Step VI</a>. The
-               startup status page may offer a continue link which
+               proceed from <a href="#deploy">Step V</a>. If the problem is not serious, the
+               startup status page may offer a <code>continue</code> link which
                will allow you to use VIVO in spite of the problems.
            </p>
             <p>
