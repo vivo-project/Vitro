@@ -353,14 +353,15 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
     public String getDataServiceUrl() {
     	return UrlBuilder.getUrl("/dataservice?getRenderedSolrIndividualsByVClass=1&vclassId=");
     }
+    
     /**
      * For processig of JSONObject
      */
-    public JSONObject convertToJSON(Map<String, Object> map, VitroRequest vreq) {
-    	JSONObject rObj = DataGetterUtils.processVclassResultsJSON(map, vreq, true);
+    public JSONObject convertToJSON(Map<String, Object> dataMap, VitroRequest vreq) {
+    	JSONObject rObj = null;
     	return rObj;
     }
-    
+
     protected static void setAllClassCountsToZero(VClassGroup vcg){
         for(VClass vc : vcg){
             vc.setEntityCount(0);
