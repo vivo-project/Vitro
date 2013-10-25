@@ -3,10 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.utils.dataGetter;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.hp.hpl.jena.query.Query;
@@ -35,20 +31,13 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.OWL;
 
-import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController.PageRecord;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.controller.json.JsonServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 
 
@@ -322,123 +311,6 @@ public class DataGetterUtils {
              }finally{ qexec.close(); }
          }finally{ displayModel.leaveCriticalSection(); }
          return classGroupUri;
-    }
-    
-    /**
-     * Process results related to VClass or vclasses. Handles both single and multiple vclasses being sent.
-     */
-    public static JSONObject processVclassResultsJSON(Map<String, Object> map, VitroRequest vreq, boolean multipleVclasses) {
-        JSONObject rObj = new JSONObject();
-        VClass vclass=null;         
-        
-        try { 
-              
-            // Properties from ontologies used by VIVO - should not be in vitro
-            DataProperty fNameDp = (new DataProperty());                         
-            fNameDp.setURI("http://xmlns.com/foaf/0.1/firstName");
-            DataProperty lNameDp = (new DataProperty());
-            lNameDp.setURI("http://xmlns.com/foaf/0.1/lastName");
-            DataProperty preferredTitleDp = (new DataProperty());
-            preferredTitleDp.setURI("http://vivoweb.org/ontology/core#preferredTitle");
-              
-            if( log.isDebugEnabled() ){
-                @SuppressWarnings("unchecked")
-                Enumeration<String> e = vreq.getParameterNames();
-                while(e.hasMoreElements()){
-                    String name = e.nextElement();
-                    log.debug("parameter: " + name);
-                    for( String value : vreq.getParameterValues(name) ){
-                        log.debug("value for " + name + ": '" + value + "'");
-                    }            
-                }
-            }
-              
-            //need an unfiltered dao to get firstnames and lastnames
-            WebappDaoFactory fullWdf = vreq.getUnfilteredWebappDaoFactory();
-                      
-            String[] vitroClassIdStr = vreq.getParameterValues("vclassId");                            
-            if ( vitroClassIdStr != null && vitroClassIdStr.length > 0){    
-                for(String vclassId: vitroClassIdStr) {
-                    vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vclassId);
-                    if (vclass == null) {
-                        log.error("Couldn't retrieve vclass ");   
-                        throw new Exception ("Class " + vclassId + " not found");
-                    }  
-                  }
-            }else{
-                log.error("parameter vclassId URI parameter expected ");
-                throw new Exception("parameter vclassId URI parameter expected ");
-            }
-            List<String> vclassIds = Arrays.asList(vitroClassIdStr);                           
-            //if single vclass expected, then include vclass. This relates to what the expected behavior is, not size of list 
-            if(!multipleVclasses) {
-                //currently used for ClassGroupPage
-                rObj.put("vclass", 
-                          new JSONObject().put("URI",vclass.getURI())
-                                  .put("name",vclass.getName()));
-            } else {
-                //For now, utilize very last VClass (assume that that is the one to be employed)
-                //TODO: Find more general way of dealing with this
-                //put multiple ones in?
-                if(vclassIds.size() > 0) {
-                	int numberVClasses = vclassIds.size();
-                    vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(vclassIds.get(numberVClasses - 1));
-                    rObj.put("vclass", new JSONObject().put("URI",vclass.getURI())
-                              .put("name",vclass.getName()));
-                } 
-                // rObj.put("vclasses",  new JSONObject().put("URIs",vitroClassIdStr)
-                //                .put("name",vclass.getName()));
-            }
-            if (vclass != null) {                                    
-                  
-                rObj.put("totalCount", map.get("totalCount"));
-                rObj.put("alpha", map.get("alpha"));
-                                  
-                List<Individual> inds = (List<Individual>)map.get("entities");
-                log.debug("Number of individuals returned from request: " + inds.size());
-                JSONArray jInds = new JSONArray();
-                for(Individual ind : inds ){
-                    JSONObject jo = new JSONObject();
-                    jo.put("URI", ind.getURI());
-                    jo.put("label",ind.getRdfsLabel());
-                    jo.put("name",ind.getName());
-                    jo.put("thumbUrl", ind.getThumbUrl());
-                    jo.put("imageUrl", ind.getImageUrl());
-                    jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq));
-                      
-                    jo.put("mostSpecificTypes", JsonServlet.getMostSpecificTypes(ind,fullWdf));                                          
-                    jo.put("preferredTitle", JsonServlet.getDataPropertyValue(ind, preferredTitleDp, fullWdf));                    
-                      
-                    jInds.put(jo);
-                }
-                rObj.put("individuals", jInds);
-                  
-                JSONArray wpages = new JSONArray();
-                //Made sure that PageRecord here is SolrIndividualListController not IndividualListController
-                List<PageRecord> pages = (List<PageRecord>)map.get("pages");                
-                for( PageRecord pr: pages ){                    
-                    JSONObject p = new JSONObject();
-                    p.put("text", pr.text);
-                    p.put("param", pr.param);
-                    p.put("index", pr.index);
-                    wpages.put( p );
-                }
-                rObj.put("pages",wpages);    
-                  
-                JSONArray jletters = new JSONArray();
-                List<String> letters = Controllers.getLetters();
-                for( String s : letters){
-                    JSONObject jo = new JSONObject();
-                    jo.put("text", s);
-                    jo.put("param", "alpha=" + URLEncoder.encode(s, "UTF-8"));
-                    jletters.put( jo );
-                }
-                rObj.put("letters", jletters);
-            }            
-        } catch(Exception ex) {
-             log.error("Error occurred in processing JSON object", ex);
-        }
-        return rObj;
     }
     
     private static final String forClassGroupURI = "<" + DisplayVocabulary.FOR_CLASSGROUP + ">";
