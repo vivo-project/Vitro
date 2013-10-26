@@ -11,7 +11,6 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -20,7 +19,6 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
-import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
@@ -136,7 +134,8 @@ public class PolicyHelper {
 							.asResource().getURI());
 		} else {
 			action = new AddDataPropertyStatement(modelToBeModified,
-					subject.getURI(), predicate.getURI());
+					subject.getURI(), predicate.getURI(), objectNode
+							.asLiteral().getString());
 		}
 		return isAuthorizedForActions(req, action);
 	}
@@ -169,7 +168,8 @@ public class PolicyHelper {
 							.asResource().getURI());
 		} else {
 			action = new DropDataPropertyStatement(modelToBeModified,
-					subject.getURI(), predicate.getURI());
+					subject.getURI(), predicate.getURI(), objectNode
+							.asLiteral().getString());
 		}
 		return isAuthorizedForActions(req, action);
 	}
