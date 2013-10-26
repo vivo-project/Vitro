@@ -14,8 +14,8 @@ public class DropDataPropertyStatement extends
 		AbstractDataPropertyStatementAction {
 
 	public DropDataPropertyStatement(OntModel ontModel, String subjectUri,
-			String predicateUri) {
-		super(ontModel, subjectUri, predicateUri);
+			String predicateUri, String dataValue) {
+		super(ontModel, subjectUri, predicateUri, dataValue);
 	}
 
 	public DropDataPropertyStatement(OntModel ontModel,

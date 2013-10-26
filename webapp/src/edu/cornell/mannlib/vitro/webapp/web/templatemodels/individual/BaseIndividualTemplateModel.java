@@ -2,6 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_LITERAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_PREDICATE;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_URI;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +20,6 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -116,11 +119,10 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
     public boolean isEditable() {
 		AddDataPropertyStatement adps = new AddDataPropertyStatement(
 				vreq.getJenaOntModel(), individual.getURI(),
-				RequestActionConstants.SOME_URI);
+				SOME_URI, SOME_LITERAL);
 		AddObjectPropertyStatement aops = new AddObjectPropertyStatement(
 				vreq.getJenaOntModel(), individual.getURI(),
-				RequestActionConstants.SOME_PREDICATE,
-				RequestActionConstants.SOME_URI);
+				SOME_PREDICATE, SOME_URI);
     	return PolicyHelper.isAuthorizedForActions(vreq, new Actions(adps).or(aops));
     }
     
