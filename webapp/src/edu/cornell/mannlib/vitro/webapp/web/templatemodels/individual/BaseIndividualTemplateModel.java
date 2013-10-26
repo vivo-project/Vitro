@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_LITERAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_URI;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -112,11 +115,10 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
     public boolean isEditable() {
 		AddDataPropertyStatement adps = new AddDataPropertyStatement(
 				vreq.getJenaOntModel(), individual.getURI(),
-				RequestActionConstants.SOME_URI);
+				SOME_URI, SOME_LITERAL);
 		AddObjectPropertyStatement aops = new AddObjectPropertyStatement(
 				vreq.getJenaOntModel(), individual.getURI(),
-				RequestActionConstants.SOME_URI,
-				RequestActionConstants.SOME_URI);
+				SOME_URI, SOME_URI);
     	return PolicyHelper.isAuthorizedForActions(vreq, new Actions(adps).or(aops));
     }
     

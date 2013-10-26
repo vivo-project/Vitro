@@ -14,12 +14,15 @@ public abstract class AbstractDataPropertyStatementAction extends
 		AbstractPropertyStatementAction {
 	private final String subjectUri;
 	private final String predicateUri;
+	private final String dataValue;
+
 
 	public AbstractDataPropertyStatementAction(OntModel ontModel,
-			String subjectUri, String predicateUri) {
+			String subjectUri, String predicateUri, String dataValue) {
 		super(ontModel);
 		this.subjectUri = subjectUri;
 		this.predicateUri = predicateUri;
+		this.dataValue = dataValue;
 	}
 
 	public AbstractDataPropertyStatementAction(OntModel ontModel,
@@ -28,6 +31,7 @@ public abstract class AbstractDataPropertyStatementAction extends
 		this.subjectUri = (dps.getIndividual() == null) ? dps
 				.getIndividualURI() : dps.getIndividual().getURI();
 		this.predicateUri = dps.getDatapropURI();
+		this.dataValue = dps.getData();
 	}
 
 	public String getSubjectUri() {
@@ -44,6 +48,10 @@ public abstract class AbstractDataPropertyStatementAction extends
 		return new String[] {subjectUri};
 	}
 
+	public String getDataValue() {
+		return dataValue;
+	}
+	
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + ": <" + subjectUri + "> <"
