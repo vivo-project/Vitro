@@ -8,11 +8,9 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.controller.json.JsonServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -27,11 +25,6 @@ public class IndividualJsonWrapper {
 		// need an unfiltered dao to get firstnames and lastnames
 		WebappDaoFactory fullWdf = vreq.getUnfilteredWebappDaoFactory();
 
-		// TODO -- get this VIVO property out of Vitro code!
-		DataProperty preferredTitleDp = (new DataProperty());
-		preferredTitleDp
-				.setURI("http://vivoweb.org/ontology/core#preferredTitle");
-
 		JSONObject jo = new JSONObject();
 		jo.put("URI", ind.getURI());
 		jo.put("label", ind.getRdfsLabel());
@@ -40,8 +33,6 @@ public class IndividualJsonWrapper {
 		jo.put("imageUrl", ind.getImageUrl());
 		jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq));
 		jo.put("mostSpecificTypes", getMostSpecificTypes(ind, fullWdf));
-		jo.put("preferredTitle", JsonServlet.getDataPropertyValue(ind,
-				preferredTitleDp, fullWdf));
 		return jo;
 	}
 
