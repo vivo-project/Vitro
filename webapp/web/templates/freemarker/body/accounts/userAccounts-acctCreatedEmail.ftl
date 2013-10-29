@@ -2,22 +2,67 @@
 
 <#-- Confirmation that an account has been created. -->
 
-<#assign strings = i18n() />
+<#assign subject = "Your ${siteName} account has been created." />
 
-<#assign subject = strings.account_created(siteName) />
+<#assign html>
+<html>
+    <head>
+        <title>${subject}</title>
+    </head>
+    <body>
+        <p>
+            ${userAccount.firstName} ${userAccount.lastName}
+        </p>
 
-<#assign html = strings.account_created_email_html(siteName, 
-                                                   subject, 
-                                                   userAccount.firstName, 
-                                                   userAccount.lastName, 
-                                                   userAccount.emailAddress, 
-                                                   passwordLink) />
+        <p>
+            <strong>Congratulations!</strong>
+        </p>
 
-<#assign text = strings.account_created_email_text(siteName, 
-                                                   subject, 
-                                                   userAccount.firstName, 
-                                                   userAccount.lastName, 
-                                                   userAccount.emailAddress, 
-                                                   passwordLink) />
+        <p>
+            We have created your new account on ${siteName}, associated with ${userAccount.emailAddress}.
+        </p>
+
+        <p>
+            If you did not request this new account you can safely ignore this email. 
+            This request will expire if not acted upon for 30 days.
+        </p>
+
+        <p>
+            Click the link below to create your password for your new account using our secure server.
+        </p>
+
+        <p>
+            <a href="${passwordLink}" title="password">${passwordLink}</a>
+        </p>
+
+        <p>
+            If the link above doesn't work, you can copy and paste the link directly into your browser's address bar.
+        </p>
+
+        <p>
+            Thanks!
+        </p>
+    </body>
+</html>
+</#assign>
+
+<#assign text>
+${userAccount.firstName} ${userAccount.lastName}
+
+Congratulations!
+
+We have created your new account on ${siteName},
+associated with ${userAccount.emailAddress}.
+
+If you did not request this new account you can safely ignore this email. 
+This request will expire if not acted upon for 30 days.
+
+Paste the link below into your browser's address bar to create your password 
+for your new account using our secure server.
+
+${passwordLink}
+
+Thanks!
+</#assign>
 
 <@email subject=subject html=html text=text />
