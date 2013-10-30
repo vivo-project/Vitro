@@ -164,7 +164,9 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     	//edit key is set here, NOT in the generator class
     	EditConfigurationVTwo editConfig = null;
     	EditConfigurationVTwo existingConfig = EditConfigurationVTwo.getConfigFromSession(session, vreq);
-    	if(existingConfig != null) {
+    	//if delete form from the editing page, then edit configuration already exists and the 
+    	//delete generator wouldn't be used, we need to make sure that it is used if it's a delete option
+    	if(existingConfig != null && !isDeleteForm(vreq)) {
     		editConfig = existingConfig;
     	} else {
     		editConfig = 
