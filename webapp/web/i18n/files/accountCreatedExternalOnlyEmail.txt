@@ -1,9 +1,0 @@
-${2} ${3}
-
-Congratulations!
-
-We have created your new VIVO account associated with 
-${4}.
-
-Thanks!
-

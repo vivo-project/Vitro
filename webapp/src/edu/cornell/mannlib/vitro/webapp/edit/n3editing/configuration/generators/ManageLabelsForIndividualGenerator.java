@@ -1,6 +1,10 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_LITERAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_PREDICATE;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_URI;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,14 +28,12 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
@@ -271,11 +273,10 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 		Individual individual = EditConfigurationUtils.getIndividual(vreq, config.getSubjectUri());
 		AddDataPropertyStatement adps = new AddDataPropertyStatement(
 				vreq.getJenaOntModel(), individual.getURI(),
-				RequestActionConstants.SOME_URI);
+				SOME_URI, SOME_LITERAL);
 		AddObjectPropertyStatement aops = new AddObjectPropertyStatement(
 				vreq.getJenaOntModel(), individual.getURI(),
-				RequestActionConstants.SOME_PREDICATE,
-				RequestActionConstants.SOME_URI);
+				SOME_PREDICATE, SOME_URI);
     	return PolicyHelper.isAuthorizedForActions(vreq, new Actions(adps).or(aops));
 	}
 

@@ -12,8 +12,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 public class EditDataPropertyStatement extends
 		AbstractDataPropertyStatementAction {
 	public EditDataPropertyStatement(OntModel ontModel, String subjectUri,
-			String predicateUri) {
-		super(ontModel, subjectUri, predicateUri);
+			String predicateUri, String dataValue) {
+		super(ontModel, subjectUri, predicateUri, dataValue);
 	}
 
 	public EditDataPropertyStatement(OntModel ontModel,

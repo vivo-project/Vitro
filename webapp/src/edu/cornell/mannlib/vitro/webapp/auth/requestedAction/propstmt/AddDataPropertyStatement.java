@@ -13,8 +13,8 @@ public class AddDataPropertyStatement extends
 		AbstractDataPropertyStatementAction {
 
 	public AddDataPropertyStatement(OntModel ontModel, String subjectUri,
-			String predicateUri) {
-		super(ontModel, subjectUri, predicateUri);
+			String predicateUri, String dataValue) {
+		super(ontModel, subjectUri, predicateUri, dataValue);
 	}
 
 	public AddDataPropertyStatement(OntModel ontModel, DataPropertyStatement dps) {

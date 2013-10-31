@@ -4,8 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.utils.solr;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,9 +18,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListQueryResults;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController.SearchException;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;

@@ -1,29 +1,30 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- Confirmation that an account has been created for an externally-authenticated user. -->
+<#-- Confirmation that a password has been reset. -->
 
-<#assign subject = "Your ${siteName} account has been created." />
+<#assign subject = "El ${siteName} contraseña cambiada." />
 
 <#assign html>
 <html>
     <head>
         <title>${subject}</title>
     </head>
+
     <body>
         <p>
             ${userAccount.firstName} ${userAccount.lastName}
         </p>
 
         <p>
-            <strong>Congratulations!</strong>
+            <strong>Contraseña cambiada con éxito.</strong>
         </p>
 
         <p>
-            We have created your new VIVO account associated with ${userAccount.emailAddress}.
+            Su nueva contraseña asociada con ${userAccount.emailAddress} ha sido cambiado.
         </p>
 
         <p>
-            Thanks!
+            Gracias.
         </p>
     </body>
 </html>
@@ -32,12 +33,12 @@
 <#assign text>
 ${userAccount.firstName} ${userAccount.lastName}
 
-Congratulations!
+Contraseña cambiada con éxito.
 
-We have created your new VIVO account associated with 
-${userAccount.emailAddress}.
+Su nueva contraseña asociada con ${userAccount.emailAddress} 
+ha sido cambiado.
 
-Thanks!
+Gracias.
 </#assign>
 
 <@email subject=subject html=html text=text />

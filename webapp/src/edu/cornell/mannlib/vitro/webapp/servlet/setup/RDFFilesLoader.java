@@ -87,12 +87,21 @@ public class RDFFilesLoader {
 			OntModel model) {
 		OntModel everytimeModel = ModelFactory
 				.createOntologyModel(OntModelSpec.OWL_MEM);
-		Set<Path> paths = getPaths(locateHomeDirectory(ctx), RDF, modelPath,
-				EVERY_TIME);
+		String home = locateHomeDirectory(ctx);
+		Set<Path> paths = getPaths(home, RDF, modelPath, EVERY_TIME);
 		for (Path p : paths) {
+			log.info("Loading " + relativePath(p, home));
 			readOntologyFileIntoModel(p, everytimeModel);
 		}
 		model.addSubModel(everytimeModel);
+	}
+
+	private static Path relativePath(Path p, String home) {
+		try {
+			return Paths.get(home).relativize(p);
+		} catch (Exception e) {
+			return p;
+		}
 	}
 
 	/**
@@ -148,7 +157,7 @@ public class RDFFilesLoader {
 
 	private static void readOntologyFileIntoModel(Path p, Model model) {
 		String format = getRdfFormat(p);
-		log.info("Loading "+ p);
+		log.debug("Loading "+ p);
 		try (InputStream stream = new FileInputStream(p.toFile())) {
 			model.read(stream, null, format);
 			log.debug("...successful");

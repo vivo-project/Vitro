@@ -439,9 +439,13 @@ public class FakeApplicationOntologyService {
 	 * "display model". The query finds a preferred title for the individual.
 	 */
 	private static class FakeVivoPeopleDataGetter extends SparqlQueryDataGetter {
-		private static final String QUERY_STRING = "SELECT ?uri ?pt WHERE {\n"
-				+ "   ?uri <http://vivoweb.org/ontology/core#preferredTitle> ?pt\n"
-				+ "} LIMIT 1";
+		private static String QUERY_STRING = ""
+				+ "PREFIX obo: <http://purl.obolibrary.org/obo/> \n"
+				+ "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>  \n"
+				+ "SELECT ?uri ?pt  \n" + "WHERE {  \n"
+				+ "    ?uri obo:ARG_2000028 ?vIndividual .  \n"
+				+ "    ?vIndividual vcard:hasTitle ?vTitle . \n"
+				+ "    ?vTitle vcard:title ?pt . \n" + "} LIMIT 1";
 
 		private static final String FAKE_VIVO_PEOPLE_DATA_GETTER_URI = "http://FakeVivoPeopleDataGetter";
 

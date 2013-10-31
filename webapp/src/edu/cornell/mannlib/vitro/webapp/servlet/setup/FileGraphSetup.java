@@ -188,6 +188,7 @@ public class FileGraphSetup implements ServletContextListener {
                             baseModel.add(model);
                         }
                         log.info("Attached file graph as " + type + " submodel " + p.getFileName());
+
                     } 
 
                     modelChanged = modelChanged | updateGraphInDB(dataset, model, type, p);
