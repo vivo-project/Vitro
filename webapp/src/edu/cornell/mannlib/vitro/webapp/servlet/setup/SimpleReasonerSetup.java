@@ -12,7 +12,6 @@ import java.util.List;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,7 +20,6 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.OWL;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
@@ -117,7 +115,16 @@ public class SimpleReasonerSetup implements ServletContextListener {
             assertionsOms.getTBoxModel().register(simpleReasonerTBoxListener);
             inferencesOms.getTBoxModel().register(simpleReasonerTBoxListener);
             
-            log.info("Simple reasoner connected for the ABox");
+            RecomputeMode mode = getRecomputeRequired(ctx);
+            if (RecomputeMode.FOREGROUND.equals(mode)) {
+                log.info("ABox inference recompute required.");
+                simpleReasoner.recompute();
+            } else if (RecomputeMode.BACKGROUND.equals(mode)) {
+                log.info("starting ABox inference recompute in a separate thread.");
+                new Thread(
+                        new ABoxRecomputer(
+                                simpleReasoner),"ABoxRecomputer").start();
+            }    
             
         } catch (Throwable t) {
             t.printStackTrace();
@@ -179,15 +186,19 @@ public class SimpleReasonerSetup implements ServletContextListener {
         }
     }
     
+    public enum RecomputeMode {
+        FOREGROUND, BACKGROUND
+    }
+    
     private static final String RECOMPUTE_REQUIRED_ATTR = 
             SimpleReasonerSetup.class.getName() + ".recomputeRequired";
     
-    public static void setRecomputeRequired(ServletContext ctx) {
-        ctx.setAttribute(RECOMPUTE_REQUIRED_ATTR, true);
+    public static void setRecomputeRequired(ServletContext ctx, RecomputeMode mode) {
+        ctx.setAttribute(RECOMPUTE_REQUIRED_ATTR, mode);
     }
     
-    public static boolean isRecomputeRequired(ServletContext ctx) {
-        return (ctx.getAttribute(RECOMPUTE_REQUIRED_ATTR) != null);
+    public static RecomputeMode getRecomputeRequired(ServletContext ctx) {
+        return (RecomputeMode) ctx.getAttribute(RECOMPUTE_REQUIRED_ATTR);
     }
   
     private static final String MSTCOMPUTE_REQUIRED_ATTR = 
@@ -249,6 +260,18 @@ public class SimpleReasonerSetup implements ServletContextListener {
         
         log.debug("Classnames of reasoner plugins = " + list);
         return list;
-        
+    }
+    
+    private class ABoxRecomputer implements Runnable {
+
+        private SimpleReasoner simpleReasoner;
+
+        public ABoxRecomputer(SimpleReasoner simpleReasoner) {
+            this.simpleReasoner = simpleReasoner;
+        }
+
+        public void run() {
+            simpleReasoner.recompute();
+        }
     }
 }

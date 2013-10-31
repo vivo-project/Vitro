@@ -8,6 +8,9 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -37,6 +40,10 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
         for (Property p : propertyList)  {
             if (p instanceof ObjectProperty) {
                 ObjectProperty op = (ObjectProperty) p;
+                RequestedAction dop = new DisplayObjectProperty(op);
+                if (!PolicyHelper.isAuthorizedForActions(vreq, dop)) {
+                    continue;
+                }
                 ObjectPropertyTemplateModel tm = ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(
                         op, subject, vreq, editing, populatedObjectPropertyList);
                 if (!tm.isEmpty() || (editing && !tm.getAddUrl().isEmpty())) {

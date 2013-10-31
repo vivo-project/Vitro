@@ -21,13 +21,13 @@ import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.ontology.Restriction;
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -36,7 +36,6 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sdb.util.Pair;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
@@ -49,6 +48,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 
 public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 	
@@ -74,17 +75,24 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         log.debug("Query prefixes: " + PREFIXES);
     }
     
+    protected RDFService rdfService;
     protected DatasetWrapperFactory dwf;
     
-    public PropertyDaoJena(DatasetWrapperFactory dwf, 
+    public PropertyDaoJena(RDFService rdfService,
+                           DatasetWrapperFactory dwf, 
                            WebappDaoFactoryJena wadf) {
         super(wadf);
+        this.rdfService = rdfService;
         this.dwf = dwf;
     }
     
     @Override
     protected OntModel getOntModel() {
     	return getOntModelSelector().getTBoxModel();
+    }
+    
+    protected RDFService getRDFService() {
+        return this.rdfService;
     }
 
 	public void addSuperproperty(ObjectProperty property, ObjectProperty superproperty) {
@@ -414,8 +422,8 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         return classSet;
     }
      
-    protected ResultSet getPropertyQueryResults(Query query) {        
-        log.debug("SPARQL query:\n" + query.toString());
+    protected ResultSet getPropertyQueryResults(String queryString) {        
+        log.debug("SPARQL query:\n" + queryString);
         
         // RY Removing prebinding due to Jena bug: when isLiteral(?object) or 
         // isURI(?object) is added to the query as a filter, the query fails with prebinding
@@ -424,23 +432,32 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         //subjectBinding.add("subject", ResourceFactory.createResource(subjectUri));
                 
         // Run the SPARQL query to get the properties
-        DatasetWrapper w = dwf.getDatasetWrapper();
-        Dataset dataset = w.getDataset();
-        dataset.getLock().enterCriticalSection(Lock.READ);
-        ResultSet rs = null;
+        
         try {
-            QueryExecution qexec = QueryExecutionFactory.create(
-                    query, dataset); //, subjectBinding);
-            try {
-                rs = new ResultSetMem(qexec.execSelect());
-            } finally {
-                qexec.close();
-            }
-        } finally {
-            dataset.getLock().leaveCriticalSection();
-            w.close();
+            return ResultSetFactory.fromJSON(
+                    getRDFService().sparqlSelectQuery(
+                            queryString, RDFService.ResultFormat.JSON));
+        } catch (RDFServiceException e) {
+            throw new RuntimeException(e);
         }
-        return rs;
+        
+//        DatasetWrapper w = dwf.getDatasetWrapper();
+//        Dataset dataset = w.getDataset();
+//        dataset.getLock().enterCriticalSection(Lock.READ);
+//        ResultSet rs = null;
+//        try {
+//            QueryExecution qexec = QueryExecutionFactory.create(
+//                    query, dataset); //, subjectBinding);
+//            try {
+//                rs = new ResultSetMem(qexec.execSelect());
+//            } finally {
+//                qexec.close();
+//            }
+//        } finally {
+//            dataset.getLock().leaveCriticalSection();
+//            w.close();
+//        }
+//        return rs;
     }
     
     /**
@@ -864,20 +881,6 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
             qe.close();
         }
         return domainAndRangeURIs;
-    }
-
-    private String getURIStr(Resource res) {
-    	String URIStr;
-    	if (res == null) {
-    		URIStr = OWL.Thing.getURI(); // TODO: rdf:Resource if using RDF model; or option to turn off entirely
-    	} else {
-            if (res.isAnon()) {
-            	URIStr = PSEUDO_BNODE_NS+res.getId().toString();
-            } else {
-            	URIStr = res.getURI();
-            }
-    	}
-    	return URIStr;
     }
     
     

@@ -79,7 +79,8 @@ public class FileGraphSetup implements ServletContextListener {
             cleanupDB(dataset, pathsToURIs(paths, ABOX), ABOX);
 
             OntModel aboxBaseModel = baseOms.getABoxModel();
-            aboxChanged = readGraphs(paths, maker, ABOX, aboxBaseModel);		
+            // Just update the ABox filegraphs in the DB; don't attach them to a base model.
+            aboxChanged = readGraphs(paths, maker, ABOX, /* aboxBaseModel */ null);		
 
             // TBox files
             paths = getFilegraphPaths(ctx, RDF, TBOX, FILEGRAPH);
@@ -108,7 +109,7 @@ public class FileGraphSetup implements ServletContextListener {
         if ( (aboxChanged || tboxChanged) && !isUpdateRequired(sce.getServletContext())) {
             log.info("a full recompute of the Abox will be performed because" +
                     " the filegraph abox(s) and/or tbox(s) have changed or are being read for the first time." );
-            SimpleReasonerSetup.setRecomputeRequired(sce.getServletContext());
+            SimpleReasonerSetup.setRecomputeRequired(sce.getServletContext(), SimpleReasonerSetup.RecomputeMode.BACKGROUND);
         }
     }
 
@@ -141,6 +142,14 @@ public class FileGraphSetup implements ServletContextListener {
 	}
 
 	/*
+	 * Reads graphs without using submodels to separate filegraph content from the
+	 * base model.
+	 */
+	public boolean readGraphs(Set<Path> pathSet, RDFServiceModelMaker dataset, String type, OntModel baseModel) {
+	    return readGraphs(pathSet, dataset, type, baseModel, false);
+	}
+	
+	/*
      * Reads the graphs stored as files in sub-directories of 
      *   1. updates the SDB store to reflect the current contents of the graph.
      *   2. adds the graph as an in-memory submodel of the base in-memory graph 
@@ -148,7 +157,7 @@ public class FileGraphSetup implements ServletContextListener {
      * Note: no connection needs to be maintained between the in-memory copy of the
      * graph and the DB copy.
      */
-    public boolean readGraphs(Set<Path> pathSet, RDFServiceModelMaker dataset, String type, OntModel baseModel) {
+    public boolean readGraphs(Set<Path> pathSet, RDFServiceModelMaker dataset, String type, OntModel baseModel, boolean useSubmodels) {
 
         int count = 0;
 
@@ -172,9 +181,14 @@ public class FileGraphSetup implements ServletContextListener {
                         log.warn("Ignoring " + type + " file graph " + p + " because the file extension is unrecognized.");
                     }
 
-                    if ( !model.isEmpty() ) {							
-                        baseModel.addSubModel(model);
-                        log.debug("Attached file graph as " + type + " submodel " + p.getFileName());
+                    if ( !model.isEmpty() && baseModel != null ) {
+                        if (useSubmodels) {
+                            baseModel.addSubModel(model);
+                        } else {
+                            baseModel.add(model);
+                        }
+                        log.info("Attached file graph as " + type + " submodel " + p.getFileName());
+
                     } 
 
                     modelChanged = modelChanged | updateGraphInDB(dataset, model, type, p);
