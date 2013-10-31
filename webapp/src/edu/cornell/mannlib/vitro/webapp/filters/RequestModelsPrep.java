@@ -10,6 +10,8 @@ import java.text.Collator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
@@ -24,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openjena.atlas.lib.Pair;
 
 import com.hp.hpl.jena.graph.BulkUpdateHandler;
 import com.hp.hpl.jena.graph.Graph;
@@ -35,6 +38,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -311,6 +315,8 @@ public class RequestModelsPrep implements Filter {
 		config.setDefaultNamespace(defaultNamespace);
 		config.setPreferredLanguages(langs);
 		config.setUnderlyingStoreReasoned(isStoreReasoned(req));
+		config.setCustomListViewConfigFileMap(getCustomListViewConfigFileMap(
+		        req.getSession().getServletContext()));
 		return config;
 	}
 
@@ -364,6 +370,18 @@ public class RequestModelsPrep implements Filter {
 	    String isStoreReasoned = ConfigurationProperties.getBean(req).getProperty(
 	            "VitroConnection.DataSource.isStoreReasoned", "true");
 	    return ("true".equals(isStoreReasoned));
+	}
+	
+	private Map<Pair<String,Pair<ObjectProperty, String>>, String> 
+	        getCustomListViewConfigFileMap(ServletContext ctx) {
+	    Map<Pair<String,Pair<ObjectProperty, String>>, String> map = 
+	            (Map<Pair<String,Pair<ObjectProperty, String>>, String>) 
+	                    ctx.getAttribute("customListViewConfigFileMap");
+	    if (map == null) {
+	        map = new ConcurrentHashMap<Pair<String,Pair<ObjectProperty, String>>, String>();
+	        ctx.setAttribute("customListViewConfigFileMap", map);
+	    }
+	    return map;
 	}
 
 	@Override

@@ -4,11 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.individual;
 
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -22,18 +17,13 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
  */
 public class IndividualRequestAnalysisContextImpl implements
 		IndividualRequestAnalysisContext {
-	private static final Log log = LogFactory
-			.getLog(IndividualRequestAnalysisContextImpl.class);
-	
-	
-	private final VitroRequest vreq;
-	private final ServletContext ctx;
+		
+	private final VitroRequest vreq;	
 	private final WebappDaoFactory wadf;
 	private final IndividualDao iDao;
 
 	public IndividualRequestAnalysisContextImpl(VitroRequest vreq) {
-		this.vreq = vreq;
-		this.ctx = vreq.getSession().getServletContext();
+		this.vreq = vreq;	
 		this.wadf = vreq.getWebappDaoFactory();
 		this.iDao = wadf.getIndividualDao();
 	}

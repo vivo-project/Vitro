@@ -157,42 +157,24 @@ public class UpdateKnowledgeBase implements ServletContextListener {
     			    ss.fatal(this, "Exception updating knowledge base for ontology changes: ", ioe);
     			}	
 			}
-
-		    SimpleReasoner simpleReasoner = (SimpleReasoner) sce.getServletContext()
-		            .getAttribute(SimpleReasoner.class.getName());
-		    if (simpleReasoner != null) {
-		        if ( (requiredUpdate && migrationChangesMade) 
-		                || JenaDataSourceSetupBase.isFirstStartup()) {
-		            log.info("ABox inference recompute required.");
-		            simpleReasoner.recompute();
-		        } else if (SimpleReasonerSetup.isRecomputeRequired(sce.getServletContext()) || migrationChangesMade) {
-		            log.info("starting ABox inference recompute in a separate thread.");
-		            new Thread(
-		                    new ABoxRecomputer(
-		                            simpleReasoner),"ABoxRecomputer").start();
-		        }
-		    }			
 			
+            log.info("Simple reasoner connected for the ABox");
+            if(JenaDataSourceSetupBase.isFirstStartup() 
+                    || (migrationChangesMade && requiredUpdate)) {
+                SimpleReasonerSetup.setRecomputeRequired(
+                        ctx, SimpleReasonerSetup.RecomputeMode.FOREGROUND);    
+            } else if (migrationChangesMade) {
+                SimpleReasonerSetup.setRecomputeRequired(
+                        ctx, SimpleReasonerSetup.RecomputeMode.BACKGROUND);  
+            }
+	
 		} catch (Throwable t){
 		    ss.fatal(this, "Exception updating knowledge base for ontology changes: ", t);
 		}
-        
-
 		
 	}	
 
-	private class ABoxRecomputer implements Runnable {
 
-	    private SimpleReasoner simpleReasoner;
-
-	    public ABoxRecomputer(SimpleReasoner simpleReasoner) {
-	        this.simpleReasoner = simpleReasoner;
-	    }
-
-	    public void run() {
-	        simpleReasoner.recompute();
-	    }
-	}
 
 	
 	/**

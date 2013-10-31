@@ -22,7 +22,7 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
  * a class representing an object property
  *
  */
-public class ObjectProperty extends Property implements Comparable<ObjectProperty>, ResourceBean
+public class ObjectProperty extends Property implements Comparable<ObjectProperty>, ResourceBean, Cloneable
 {
 	private static final Log log = LogFactory.getLog(ObjectProperty.class.getName());
 	
@@ -610,6 +610,55 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
         "selectFromExisting" + getSelectFromExisting() + "\n\t" +
         "offerCreateNewOption" + getOfferCreateNewOption() + "\n\t" +
         "** object property statements: " + list + "\n";
-
+    }
+    
+    @Override
+    public ObjectProperty clone()
+    {
+        ObjectProperty clone = new ObjectProperty();
+        clone.setAddLinkSuppressed(this.isAddLinkSuppressed());
+        clone.setCollateBySubclass(this.getCollateBySubclass());
+        clone.setCustomEntryForm(this.getCustomEntryForm());
+        clone.setDeleteLinkSuppressed(this.isDeleteLinkSuppressed());
+        clone.setDescription(this.getDescription());
+        clone.setDomainDisplayLimit(this.getDomainDisplayLimitInteger());
+        clone.setDomainDisplayTier(this.getDomainDisplayTier());
+        clone.setDomainEntitySortDirection(this.getDomainEntitySortDirection());
+        clone.setDomainEntityURI(this.getDomainEntityURI());
+        clone.setDomainPublic(this.getDomainPublic());
+        clone.setDomainVClass(this.getDomainVClass());
+        clone.setDomainVClassURI(this.getDomainVClassURI());
+        clone.setEditLinkSuppressed(this.isEditLinkSuppressed());
+        clone.setExample(this.getExample());
+        clone.setFunctional(this.getFunctional());
+        clone.setGroupURI(this.getGroupURI());
+        clone.setHiddenFromDisplayBelowRoleLevel(this.getHiddenFromDisplayBelowRoleLevel());
+        clone.setInverseFunctional(this.getInverseFunctional());
+        clone.setLabel(this.getLabel());
+        clone.setLocalName(this.getLocalName());
+        clone.setLocalNameInverse(this.getLocalNameInverse());
+        clone.setLocalNameWithPrefix(this.getLocalNameWithPrefix());
+        clone.setNamespace(this.getNamespace());
+        clone.setNamespaceInverse(this.getNamespaceInverse());
+        clone.setObjectIndividualSortPropertyURI(this.getObjectIndividualSortPropertyURI());
+        clone.setOfferCreateNewOption(this.getOfferCreateNewOption());
+        clone.setParentURI(this.getParentURI());
+        clone.setPickListName(this.getPickListName());
+        clone.setProhibitedFromUpdateBelowRoleLevel(this.getProhibitedFromUpdateBelowRoleLevel());
+        clone.setPublicDescription(this.getPublicDescription());
+        clone.setRangeDisplayLimit(this.getRangeDisplayLimit());
+        clone.setRangeDisplayTier(this.getRangeDisplayTier());
+        clone.setRangeEntitySortDirection(this.getRangeEntitySortDirection());
+        clone.setRangeEntityURI(this.getRangeEntityURI());
+        clone.setRangePublic(this.getRangePublic());
+        clone.setRangeVClass(this.getRangeVClass());
+        clone.setRangeVClassURI(this.getRangeVClassURI());
+        clone.setSelectFromExisting(this.getSelectFromExisting());
+        clone.setStubObjectRelation(this.getStubObjectRelation());
+        clone.setSymmetric(this.getSymmetric());
+        clone.setTransitive(this.getTransitive());
+        clone.setURI(this.getURI());
+        clone.setURIInverse(this.getURIInverse());
+        return clone;     
     }
 }

@@ -45,15 +45,14 @@ import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
-import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 
 public class DataPropertyDaoJena extends PropertyDaoJena implements
         DataPropertyDao {
@@ -71,9 +70,10 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         }
     }
 
-    public DataPropertyDaoJena(DatasetWrapperFactory dwf, 
+    public DataPropertyDaoJena(RDFService rdfService,
+                               DatasetWrapperFactory dwf, 
                                WebappDaoFactoryJena wadf) {
-        super(dwf, wadf);
+        super(rdfService, dwf, wadf);
     }
 
     public void deleteDataProperty(DataProperty dtp) {
@@ -672,7 +672,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         PREFIXES + "\n" +
         "SELECT DISTINCT ?property WHERE { \n" +
         "   ?subject ?property ?object . \n" + 
-        "   ?property a owl:DatatypeProperty . \n" +
+        //"   ?property a owl:DatatypeProperty . \n" +
         "   FILTER ( \n" +
         "       isLiteral(?object) && \n" +
         "       ( !regex(str(?property), \"^" + VitroVocabulary.PUBLIC + "\" )) && \n" +
@@ -708,7 +708,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         }                     
         log.debug("Data property query string:\n" + query);         
      
-        ResultSet results = getPropertyQueryResults(query);
+        ResultSet results = getPropertyQueryResults(queryString);
         List<DataProperty> properties = new ArrayList<DataProperty>();
         while (results.hasNext()) {
             QuerySolution sol = results.next();

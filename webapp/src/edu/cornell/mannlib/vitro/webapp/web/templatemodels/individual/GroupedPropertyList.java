@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -73,13 +75,23 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // so we cannot just rely on getting that list.
         List<ObjectProperty> populatedObjectPropertyList = subject
                 .getPopulatedObjectPropertyList();
+         
+        Map<String, List<String>> populatedObjTypes = makePopulatedObjTypeMap(
+                populatedObjectPropertyList);
+        
+        // save applicable ranges before deduping to filter later 
+        populatedObjectPropertyList = dedupe(populatedObjectPropertyList);
         
         Collection<ObjectProperty> additions = ApplicationConfigurationOntologyUtils
                 .getAdditionalFauxSubpropertiesForList(
                         populatedObjectPropertyList, subject, vreq);
+        
+        additions = filterAdditions(additions, populatedObjTypes);
+         
         if (log.isDebugEnabled()) {
             for (ObjectProperty t : additions) {
-                log.debug(t.getDomainPublic() + " " + t.getGroupURI() + " domain " + t.getDomainVClassURI());
+                log.debug(t.getDomainPublic() + " " + t.getGroupURI() + " domain " +
+                        t.getDomainVClassURI());
             }
             log.debug("Added " + additions.size() + 
                     " properties due to application configuration ontology");
@@ -110,12 +122,15 @@ public class GroupedPropertyList extends BaseTemplateModel {
             mergeAllPossibleDataProperties(propertyList);
         }
         
-        propertyList = correctLanguageForProperties(propertyList);
+        if (editing) {
+            propertyList = correctLanguageForProperties(propertyList);
+        }
+        
         sort(propertyList);
 
         // Put the list into groups
         List<PropertyGroup> propertyGroupList = addPropertiesToGroups(propertyList);
-
+        
         // Build the template data model from the groupList
         groups = new ArrayList<PropertyGroupTemplateModel>(
                 propertyGroupList.size());
@@ -129,6 +144,34 @@ public class GroupedPropertyList extends BaseTemplateModel {
             pruneEmptyProperties();
         }
 
+    }
+    
+    private Map<String, List<String>> makePopulatedObjTypeMap(List<ObjectProperty> props) {
+        Map<String, List<String>> map = new HashMap<String, List<String>>();
+        for (ObjectProperty prop : props) {
+            if(prop.getRangeVClassURI() != null) {
+                List<String> typeList = map.get(prop.getURI());
+                if(typeList == null) {
+                    typeList = new ArrayList<String>();
+                    map.put(prop.getURI(), typeList);
+                } 
+                typeList.add(prop.getRangeVClassURI());                
+            }
+        }
+        return map;
+    }
+    
+    private List<ObjectProperty> filterAdditions(Collection<ObjectProperty> additions, 
+            Map<String, List<String>> populatedObjTypes) {
+        List<ObjectProperty> filteredAdditions = new ArrayList<ObjectProperty>();
+        for (ObjectProperty prop : additions) {
+            List<String> allowedTypes = populatedObjTypes.get(prop.getURI());
+            if(allowedTypes != null && (allowedTypes.contains(prop.getRangeVClassURI()) 
+                    || allowedTypes.contains(prop.getRangeEntityURI()) ) ) {
+                filteredAdditions.add(prop);
+            }
+        }
+        return filteredAdditions;
     }
     
     // Use the language-filtering WebappDaoFactory to get the right version of
@@ -186,6 +229,19 @@ public class GroupedPropertyList extends BaseTemplateModel {
                 iGroups.remove();
             }
         }
+    }
+    
+    //assumes sorted list 
+    protected List<ObjectProperty> dedupe(List<ObjectProperty> propList) {
+        List<ObjectProperty> dedupedList = new ArrayList<ObjectProperty>();
+        String uriRegister = "";
+        for (ObjectProperty prop : propList) {
+            if(!uriRegister.equals(prop.getURI())) {
+                uriRegister = prop.getURI();
+                dedupedList.add(prop);
+            }
+        }
+        return dedupedList;
     }
 
     protected void sort(List<Property> propertyList) {
@@ -325,10 +381,12 @@ public class GroupedPropertyList extends BaseTemplateModel {
 
         // Get the property groups
         PropertyGroupDao pgDao = wdf.getPropertyGroupDao();
+        long start = System.currentTimeMillis();
         List<PropertyGroup> groupList = pgDao.getPublicGroups(false); // may be returned empty but not null
         // To test no property groups defined, use:
         // List<PropertyGroup> groupList = new ArrayList<PropertyGroup>();
 
+        start = System.currentTimeMillis();
         int groupCount = groupList.size();
 
         /*
@@ -353,7 +411,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
          */
         PropertyGroup groupForUnassignedProperties = pgDao
                 .createDummyPropertyGroup("", MAX_GROUP_DISPLAY_RANK);
-
+                
         if (groupCount > 1) {
             try {
                 Collections.sort(groupList);
@@ -377,6 +435,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
             log.error("Exception on trying to prune unpopulated groups from group list: "
                     + ex.getMessage());
         }
+        log.debug(System.currentTimeMillis() - start + " to remove unpopulated groups");
 
         // If the group for unassigned properties is populated, add it to the
         // group list.

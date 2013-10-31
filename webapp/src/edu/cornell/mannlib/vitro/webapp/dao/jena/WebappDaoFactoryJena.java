@@ -50,6 +50,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.URIUtils;
 
@@ -108,6 +109,8 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         
         Dataset dataset = makeInMemoryDataset(assertions, inferences);      
         this.dwf = new StaticDatasetFactory(dataset);
+        
+        this.rdfService = new RDFServiceModel(ontModelSelector.getFullModel());
         
     } 
 
@@ -327,7 +330,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     DataPropertyDao dataPropertyDao = null;
     public DataPropertyDao getDataPropertyDao() {
         if( dataPropertyDao == null )
-            dataPropertyDao = new DataPropertyDaoJena(dwf, this);
+            dataPropertyDao = new DataPropertyDaoJena(rdfService, dwf, this);
         return dataPropertyDao;
     }
 
@@ -358,14 +361,15 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     private ObjectPropertyDao objectPropertyDao = null;
     public ObjectPropertyDao getObjectPropertyDao() {
         if( objectPropertyDao == null )
-            objectPropertyDao = new ObjectPropertyDaoJena(dwf, this);
+            objectPropertyDao = new ObjectPropertyDaoJena(
+                    rdfService, dwf, config.customListViewConfigFileMap, this);
         return objectPropertyDao;
     }
 
     private PropertyInstanceDao propertyInstanceDao = null;
     public PropertyInstanceDao getPropertyInstanceDao() {
         if( propertyInstanceDao == null )
-            propertyInstanceDao = new PropertyInstanceDaoJena(dwf, this);
+            propertyInstanceDao = new PropertyInstanceDaoJena(rdfService, dwf, this);
         return propertyInstanceDao;
     }
 

@@ -29,11 +29,14 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualDeletionEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 public class PropertyInstanceDaoJena extends PropertyDaoJena implements
         PropertyInstanceDao {
 
-    public PropertyInstanceDaoJena(DatasetWrapperFactory dwf, WebappDaoFactoryJena wadf) {
-        super(dwf, wadf);
+    public PropertyInstanceDaoJena(RDFService rdfService, 
+                                   DatasetWrapperFactory dwf, 
+                                   WebappDaoFactoryJena wadf) {
+        super(rdfService, dwf, wadf);
     }
 
     public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI) {
