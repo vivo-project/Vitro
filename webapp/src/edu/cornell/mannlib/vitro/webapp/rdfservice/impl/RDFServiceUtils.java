@@ -23,6 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerialization
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging.LoggingRDFServiceFactory;
 
 public class RDFServiceUtils {
 
@@ -34,7 +35,18 @@ public class RDFServiceUtils {
        
     public static RDFServiceFactory getRDFServiceFactory(ServletContext context) {
         Object o = context.getAttribute(RDFSERVICEFACTORY_ATTR);
-        return (o instanceof RDFServiceFactory) ? (RDFServiceFactory) o : null;
+        if (o instanceof RDFServiceFactory) {
+        	RDFServiceFactory factory = (RDFServiceFactory) o;
+        	
+			/*
+			 * Every factory is wrapped in a logger, so we can dynamically
+			 * enable or disable logging.
+			 */
+        	return new LoggingRDFServiceFactory(context, factory);
+        } else {
+        	log.error("Expecting an RDFServiceFactory on the context, but found " + o);
+        	return null;
+        }
     }
     
     public static void setRDFServiceFactory(ServletContext context, 
