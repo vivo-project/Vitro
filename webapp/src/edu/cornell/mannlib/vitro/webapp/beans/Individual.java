@@ -34,6 +34,13 @@ public interface Individual extends ResourceBean, Comparable<Individual> {
     List<ObjectProperty> getObjectPropertyList();
     void setPropertyList(List<ObjectProperty> propertyList);
 
+    /**
+     * Returns a list of ObjectProperty objects for which statements exist about
+     * the individual.  Note that this method now returns multiple copies of
+     * a given predicate, with the rangeVClassURI changed to indicate the distinct
+     * types of the related objects.  This supports finding the approriate list
+     * views for the "faux" qualified properties.
+     */
     List<ObjectProperty> getPopulatedObjectPropertyList();
     void setPopulatedObjectPropertyList(List<ObjectProperty> propertyList);
     

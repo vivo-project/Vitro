@@ -2,7 +2,7 @@
 
 <#-- Confirmation that the user has changed his email account. -->
 
-<#assign subject = "Your ${siteName} email account has been changed." />
+<#assign subject = "Su cuenta de correo electrónico ${siteName} ha cambiado." />
 
 <#assign html>
 <html>
@@ -11,28 +11,28 @@
     </head>
     <body>
         <p>
-            Hi, ${userAccount.firstName} ${userAccount.lastName}
+            Hola, ${userAccount.firstName} ${userAccount.lastName}
         </p>
 
         <p>
-            You recently changed the email address associated with 
+            Ha cambiado recientemente la dirección de correo electrónico asociada a
             ${userAccount.firstName} ${userAccount.lastName}
         </p>
 
         <p>
-            Thank you.
+            Gracias.
         </p>
     </body>
 </html>
 </#assign>
 
 <#assign text>
-Hi, ${userAccount.firstName} ${userAccount.lastName}
+Hola, ${userAccount.firstName} ${userAccount.lastName}
 
-You recently changed the email address associated with 
+Ha cambiado recientemente la dirección de correo electrónico asociada a
 ${userAccount.firstName} ${userAccount.lastName}
 
-Thank you.
+Gracias.
 </#assign>
 
 <@email subject=subject html=html text=text />

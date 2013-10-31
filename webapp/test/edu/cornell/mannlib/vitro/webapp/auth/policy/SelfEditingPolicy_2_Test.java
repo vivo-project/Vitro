@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_LITERAL;
+
 import java.io.InputStream;
 
 import org.apache.commons.logging.Log;
@@ -306,7 +308,7 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 	private void assertEditDataPropStmt(String individualURI,
 			String datapropURI, String data, Authorization expectedAuthorization) {
 		EditDataPropertyStatement whatToAuth = new EditDataPropertyStatement(
-				ontModel, individualURI, datapropURI);
+				ontModel, individualURI, datapropURI, SOME_LITERAL);
 		PolicyDecision dec = policy.isAuthorized(ids, whatToAuth);
 		log.debug(dec);
 		Assert.assertNotNull(dec);

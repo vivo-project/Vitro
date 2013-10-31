@@ -145,16 +145,16 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	SolrServer solrServer = SolrSetup.getSolrServer(session.getServletContext());
     	
     	List<String> types = new ArrayList<String>();
+    	for (VClass vclass : rangeTypes) {
+    	    if (vclass.getURI() != null) {
+    	        types.add(vclass.getURI());
+    	    }
+    	}
+    	
     	//empty list means the range is not set to anything, force Thing
-        if(types.size() == 0 ){
-            types.add(VitroVocabulary.OWL_THING);
-        } else { 
-        	for (VClass vclass : rangeTypes) {
-        	    if (vclass.getURI() != null) {
-        	        types.add(vclass.getURI());
-        	    }
-        	}
-        }
+    	if(types.size() == 0 ){
+    		types.add(VitroVocabulary.OWL_THING);
+    	} 
     	
     	long count = 0;    		   
     	for( String type:types){
