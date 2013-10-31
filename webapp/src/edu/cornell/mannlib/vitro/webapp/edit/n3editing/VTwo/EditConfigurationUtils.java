@@ -105,10 +105,7 @@ public class EditConfigurationUtils {
    
     
     public static ObjectProperty getObjectProperty(VitroRequest vreq) {
-    	//gets the predicate uri from the request
-    	String predicateUri = getPredicateUri(vreq);
-    	String rangeUri = getRangeUri(vreq);
-    	return getObjectPropertyForPredicate(vreq, predicateUri, rangeUri);
+    	return getObjectPropertyForPredicate(vreq, getPredicateUri(vreq));
     }
     
     public static DataProperty getDataProperty(VitroRequest vreq) {
@@ -116,17 +113,18 @@ public class EditConfigurationUtils {
     	return getDataPropertyForPredicate(vreq, predicateUri);
     }
     
-    public static ObjectProperty getObjectPropertyForPredicate(VitroRequest vreq, String predicateUri) {
-        return getObjectPropertyForPredicate(vreq, predicateUri, null);
+    public static ObjectProperty getObjectPropertyForPredicate(VitroRequest vreq, 
+            String predicateUri) {
+        String domainUri = getDomainUri(vreq);
+        String rangeUri = getRangeUri(vreq);
+        return getObjectPropertyForPredicate(vreq, predicateUri, domainUri, rangeUri);
     }
     
-    public static ObjectProperty getObjectPropertyForPredicate(VitroRequest vreq, String predicateUri, String rangeUri) {
+    public static ObjectProperty getObjectPropertyForPredicate(VitroRequest vreq, 
+            String predicateUri, String domainUri, String rangeUri) {
     	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-    	ObjectProperty objectProp = wdf.getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
-    	if (rangeUri != null) {
-    	    objectProp.setRangeVClassURI(rangeUri);
-    	    // TODO implement this in the DAO?
-    	}
+    	ObjectProperty objectProp = wdf.getObjectPropertyDao().getObjectPropertyByURIs(
+    	        predicateUri, domainUri, rangeUri);
     	return objectProp;
     }
     
