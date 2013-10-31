@@ -35,8 +35,8 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
  * requested.
  * 
  * The stack trace is abbreviated. It will reach into this class, and will not
- * extend past the first reference to the ApplicationFilterChain. Perhaps it
- * should be abbreviated further?
+ * extend past the first reference to the ApplicationFilterChain. It also omits
+ * any Jena classes. Perhaps it should be abbreviated further?
  */
 public class RDFServiceLogger implements AutoCloseable {
 	private static final Log log = LogFactory.getLog(RDFServiceLogger.class);
@@ -96,6 +96,7 @@ public class RDFServiceLogger implements AutoCloseable {
 
 		trimStackTraceAtBeginning(list);
 		trimStackTraceAtEnd(list);
+		removeJenaClassesFromStackTrace(list);
 
 		if (list.isEmpty()) {
 			this.methodName = "UNKNOWN";
@@ -104,6 +105,8 @@ public class RDFServiceLogger implements AutoCloseable {
 		}
 
 		this.trace = list;
+		log.debug("Stack array: " + Arrays.toString(stack));
+		log.debug("Stack trace: " + this.trace);
 	}
 
 	private void trimStackTraceAtBeginning(List<StackTraceElement> list) {
@@ -131,12 +134,22 @@ public class RDFServiceLogger implements AutoCloseable {
 		}
 	}
 
+	private void removeJenaClassesFromStackTrace(List<StackTraceElement> list) {
+		ListIterator<StackTraceElement> iter = list.listIterator();
+		while (iter.hasNext()) {
+			StackTraceElement ste = iter.next();
+			if (ste.getClassName().startsWith("com.hp.hpl.jena.")) {
+				iter.remove();
+			}
+		}
+	}
+
 	private boolean passesRestrictions() {
 		if (restriction == null) {
 			return true;
 		}
 		for (StackTraceElement ste : trace) {
-			if (restriction.matcher(ste.getClassName()).matches()) {
+			if (restriction.matcher(ste.getClassName()).find()) {
 				return true;
 			}
 		}
@@ -163,8 +176,8 @@ public class RDFServiceLogger implements AutoCloseable {
 
 		if (traceRequested) {
 			for (StackTraceElement ste : trace) {
-				sb.append(String.format("\n   %d %s", ste.getLineNumber(),
-						ste.getClassName()));
+				sb.append(String.format("\n   line %d4, %s",
+						ste.getLineNumber(), ste.getClassName()));
 			}
 			sb.append("\n   ...");
 		}
