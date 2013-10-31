@@ -18,8 +18,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 public class IndividualsViaVClassOptions implements FieldOptions {
 
     public static final String LEFT_BLANK = "";
-    private List<String> vclassURIs;    
-    private String defaultOptionLabel;    
+    protected List<String> vclassURIs;    
+    protected String defaultOptionLabel;    
 
     public IndividualsViaVClassOptions(String ... vclassURIs) throws Exception {
         super();
