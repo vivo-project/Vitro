@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
+import edu.cornell.mannlib.vitro.webapp.utils.fields.FieldUtils;
 
 public class IndividualsViaObjectPropetyOptions implements FieldOptions {
     
@@ -100,7 +101,7 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
 
         List<ObjectPropertyStatement> stmts = subject.getObjectPropertyStatements();
 
-        individuals = removeIndividualsAlreadyInRange(
+        individuals = FieldUtils.removeIndividualsAlreadyInRange(
                 individuals, stmts, predicateUri, objectUri);
         // Collections.sort(individuals,new compareIndividualsByName());a
 
@@ -162,28 +163,7 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
         return filteredVClassesURIs;
     }
     
-    // copied from OptionsForPropertyTag.java in the thought that class may be deprecated
-    private static List<Individual> removeIndividualsAlreadyInRange(List<Individual> individuals,
-            List<ObjectPropertyStatement> stmts, String predicateUri, String objectUriBeingEdited){        
-        HashSet<String>  range = new HashSet<String>();
-
-        for(ObjectPropertyStatement ops : stmts){
-            if( ops.getPropertyURI().equals(predicateUri))
-                range.add( ops.getObjectURI() );
-        }
-
-        int removeCount=0;
-        ListIterator<Individual> it = individuals.listIterator();
-        while(it.hasNext()){
-            Individual ind = it.next();
-            if( range.contains( ind.getURI()) && !(ind.getURI().equals(objectUriBeingEdited)) ) {
-                it.remove();
-                ++removeCount;
-            }
-        }
-        
-        return individuals;
-    }
+   
     
     public Comparator<String[]> getCustomComparator() {
     	return null;
