@@ -9,18 +9,16 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 
 /** 
  * Utilities for executing queries and working with query results. 
@@ -115,31 +113,21 @@ public class QueryUtils {
     }
     
     public static ResultSet getQueryResults(String queryStr, VitroRequest vreq) {
-        return getQueryResults(queryStr, vreq.getDataset());
+        return getQueryResults(queryStr, vreq.getRDFService());
     }
 
     public static ResultSet getLanguageNeutralQueryResults(String queryStr, VitroRequest vreq) {
-    	return getQueryResults(queryStr, vreq.getUnfilteredDataset());
+    	return getQueryResults(queryStr, vreq.getUnfilteredRDFService());
     }
 
     /** Already have the dataset, so process the query and return the results. */
-	private static ResultSet getQueryResults(String queryStr, Dataset dataset) {
-		dataset.getLock().enterCriticalSection(Lock.READ);
-        QueryExecution qexec = null;
-        ResultSet results = null;
-        try {
-            qexec = QueryExecutionFactory.create(queryStr, dataset);                    
-            results = new ResultSetMem(qexec.execSelect());
-        } catch (Exception e) {
-            log.error(e, e);
-        } finally {
-            dataset.getLock().leaveCriticalSection();
-            if (qexec != null) {
-                qexec.close();
-            }
-        } 
-        
-        return results;
+	private static ResultSet getQueryResults(String queryStr, RDFService rdfService) {
+	    try {
+            return ResultSetFactory.fromJSON(
+                    rdfService.sparqlSelectQuery(queryStr, RDFService.ResultFormat.JSON));
+	    } catch (RDFServiceException e) {
+	        throw new RuntimeException(e);
+	    }
 	}
 
 }
