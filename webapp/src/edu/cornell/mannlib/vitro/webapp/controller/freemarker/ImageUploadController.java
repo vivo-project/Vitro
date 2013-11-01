@@ -102,7 +102,6 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 
 	private static final String URL_HERE = UrlBuilder.getUrl("/uploadImages");
 
-	private static final String TEXT_BUNDLE = "imageUpload";
 	private static final String TEXT_STRING_UPLOAD_TITLE = "upload_page_title";
 	private static final String TEXT_STRING_UPLOAD_TITLE_WITH_NAME = "upload_page_title_with_name";
 	private static final String TEXT_STRING_REPLACE_TITLE = "replace_page_title";
@@ -572,10 +571,10 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 		if (entity != null) {
 			String name = entity.getName();
 			if (name != null) {
-				return I18n.text(req, TEXT_BUNDLE, nameTitleKey, name);
+				return I18n.text(req, nameTitleKey, name);
 			}
 		}
-		return I18n.text(req, TEXT_BUNDLE, noNameTitleKey);
+		return I18n.text(req, noNameTitleKey);
 	}
 
 	/**
