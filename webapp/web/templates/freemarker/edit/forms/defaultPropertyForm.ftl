@@ -6,8 +6,11 @@
 <#if (rangeOptions?keys?size > 0)>
 	<#assign rangeOptionsExist = true/>
 </#if>
-
-<h2>${editConfiguration.formTitle}</h2>
+<#assign formTitle = editConfiguration.formTitle />
+<#if editConfiguration.objectPredicateProperty.rangeVClassURI?contains("IAO_0000030")>
+    <#assign formTitle = "${i18n().select_an_existing_document}" + " ${i18n().for} " + editConfiguration.subjectName/>
+</#if>
+<h2>${formTitle}</h2>
 
 <#if editConfiguration.propertySelectFromExisting = true>
     <#if rangeOptionsExist  = true >
@@ -47,4 +50,3 @@
 <#if editConfiguration.includeDeletionForm = true>
 <#include "defaultDeletePropertyForm.ftl">
 </#if>
-

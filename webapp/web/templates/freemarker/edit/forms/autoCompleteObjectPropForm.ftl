@@ -37,11 +37,11 @@
 	<#assign selectedObjectUri = ""/>
 	<#assign submitButtonText = "${i18n().create_entry}" />
 </#if>
-
+<#assign formTitle = editConfiguration.formTitle />
 <#if editConfiguration.formTitle?contains("collaborator") >
     <#assign formTitle = "${i18n().select_existing_collaborator(editConfiguration.subjectName)}" />
-<#else>
-    <#assign formTitle = editConfiguration.formTitle />
+<#elseif editConfiguration.objectPredicateProperty.rangeVClassURI?contains("IAO_0000030")>
+    <#assign formTitle = "${i18n().select_an_existing_document}" + " ${i18n().for} " + editConfiguration.subjectName/>
 </#if>
 <#--In order to fill out the subject-->
 <#assign acFilterForIndividuals =  "['" + editConfiguration.subjectUri + "']" />
@@ -82,7 +82,7 @@
             </p>
         </form>
     <#else>
-        <p> ${i18n().there_are_no_entries_for_selection}  </p>  
+        <p> ${i18n().there_are_no_entries_for_selection} </p>  
     </#if>
 </#if>
 <p>&nbsp;</p>
