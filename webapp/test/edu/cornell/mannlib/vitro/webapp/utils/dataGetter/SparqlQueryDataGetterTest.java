@@ -67,9 +67,9 @@ public class SparqlQueryDataGetterTest extends AbstractTestClass{
         String bobURI = "http://example.com/p/bob";
         dataModel.add(ResourceFactory.createResource(bobURI), RDF.type, ResourceFactory.createResource("http://xmlns.com/foaf/0.1/Person"));
         
-        Map<String, String[]> params = Collections.emptyMap();
+        Map<String, String> params = Collections.emptyMap();
         
-        Map<String,Object> mapOut = sdg.doQuery(params, dataModel);
+        Map<String,Object> mapOut = sdg.doQueryOnModel(sdg.queryText, dataModel);
         
         Assert.assertNotNull(mapOut);
         Assert.assertTrue("should contain key people" , mapOut.containsKey("people"));
