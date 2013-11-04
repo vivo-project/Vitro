@@ -58,7 +58,7 @@
     
     <body ${requestScope.bodyAttr}>
             ${ftl_identity}
-            
+            ${ftl_search}
             ${ftl_menu}
             
                 <c:import url="${bodyJsp}"/>
