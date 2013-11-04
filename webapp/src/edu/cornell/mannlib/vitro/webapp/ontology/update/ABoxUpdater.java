@@ -600,7 +600,6 @@ public class ABoxUpdater {
         Iterator<String> graphIt = dataset.listNames();
         while(graphIt.hasNext()) {
             String graph = graphIt.next();
-            //log.info(System.currentTimeMillis() - start + " to get graph");
             if(!KnowledgeBaseUpdater.isUpdatableABoxGraph(graph)){
                 continue;
             }
@@ -608,7 +607,7 @@ public class ABoxUpdater {
 		
     		Model renamePropAddModel = ModelFactory.createDefaultModel();
     		Model renamePropRetractModel = 	ModelFactory.createDefaultModel();
-    		log.info("renaming " + oldProperty.getURI() + " in graph " + graph);
+    		log.debug("renaming " + oldProperty.getURI() + " in graph " + graph);
     		aboxModel.enterCriticalSection(Lock.WRITE);
     		try {
     		    start = System.currentTimeMillis();
@@ -623,7 +622,7 @@ public class ABoxUpdater {
     		    start = System.currentTimeMillis();
     			renamePropRetractModel.add(	aboxModel.listStatements(
     					(Resource) null, oldProperty, (RDFNode) null));
-    			log.info(System.currentTimeMillis() - start + " to list " + renamePropRetractModel.size() + " old statements");
+    			log.debug(System.currentTimeMillis() - start + " to list " + renamePropRetractModel.size() + " old statements");
     			start = System.currentTimeMillis();
     			StmtIterator stmItr = renamePropRetractModel.listStatements();
     			while(stmItr.hasNext()) {
@@ -632,13 +631,13 @@ public class ABoxUpdater {
     										newProperty,
     										tempStatement.getObject() );
     			}
-    			log.info(System.currentTimeMillis() - start + " to make new statements");
+    			log.debug(System.currentTimeMillis() - start + " to make new statements");
     			start = System.currentTimeMillis();
     			aboxModel.remove(renamePropRetractModel);
-    			log.info(System.currentTimeMillis() - start + " to retract old statements");
+    			log.debug(System.currentTimeMillis() - start + " to retract old statements");
     			start = System.currentTimeMillis();
     			aboxModel.add(renamePropAddModel);
-    			log.info(System.currentTimeMillis() - start + " to add new statements");
+    			log.debug(System.currentTimeMillis() - start + " to add new statements");
     		} finally {
     			aboxModel.leaveCriticalSection();
     		}
