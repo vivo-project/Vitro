@@ -96,10 +96,10 @@ public class KnowledgeBaseUpdater {
 	        	
 		// update ABox data any time
     	log.info("performing SPARQL CONSTRUCT additions");
-    	//performSparqlConstructs(settings.getSparqlConstructAdditionsDir(), settings.getRDFService(), ADD);
+    	performSparqlConstructs(settings.getSparqlConstructAdditionsDir(), settings.getRDFService(), ADD);
     	
         log.info("performing SPARQL CONSTRUCT retractions");
-        //performSparqlConstructs(settings.getSparqlConstructDeletionsDir(), settings.getRDFService(), RETRACT);
+        performSparqlConstructs(settings.getSparqlConstructDeletionsDir(), settings.getRDFService(), RETRACT);
         
         log.info("\tupdating the abox");
         updateABox(changes);
@@ -207,11 +207,9 @@ public class KnowledgeBaseUpdater {
                 StmtIterator sit = anonModel.listStatements();
                 while (sit.hasNext()) {
                     Statement stmt = sit.nextStatement();
-                    long start = System.currentTimeMillis();
                     Iterator<String> graphIt = dataset.listNames();
                     while(graphIt.hasNext()) {
                         String graph = graphIt.next();
-                        log.info(System.currentTimeMillis() - start + " to get graph");
                         if(!isUpdatableABoxGraph(graph)) {
                             continue;
                         }
