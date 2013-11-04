@@ -146,7 +146,7 @@ public class FileGraphSetup implements ServletContextListener {
 	 * base model.
 	 */
 	public boolean readGraphs(Set<Path> pathSet, RDFServiceModelMaker dataset, String type, OntModel baseModel) {
-	    return readGraphs(pathSet, dataset, type, baseModel, false);
+	    return readGraphs(pathSet, dataset, type, baseModel, true);
 	}
 	
 	/*
