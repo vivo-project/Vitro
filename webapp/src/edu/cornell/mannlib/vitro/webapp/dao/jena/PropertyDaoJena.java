@@ -44,6 +44,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -761,8 +762,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 	                            ? foundRanges[1]
 	                                    : op.getRange();
 	            Resource domainRes = op.getDomain();
-	                            propInsts.add(getPropInst(
-	                                    op, domainRes, rangeRes, applicableProperties));
+	                            propInsts.add(getPropInst(op, domainRes, rangeRes));
 	            List<Pair<String,String>> additionalFauxSubpropertyDomainAndRangeURIs = 
 	                    getAdditionalFauxSubpropertyDomainAndRangeURIsForPropertyURI(
 	                            propertyURI);
@@ -787,8 +787,8 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     	                    propInsts.add(getPropInst(
                                     op,
                                     ResourceFactory.createResource(domainAndRangeURIs.getLeft()),
-                                    ResourceFactory.createResource(domainAndRangeURIs.getRight()), 
-                                    applicableProperties));
+                                    ResourceFactory.createResource(domainAndRangeURIs.getRight()) 
+                                    ));
 	                    }
 	                }
 	            }
@@ -797,13 +797,32 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         } finally {
         	ontModel.leaveCriticalSection();
         }
-           
+        
+        // add any faux properties with applicable domain where the predicate URI
+        // is not already on the list
+        List<ObjectProperty> stragglers = getAdditionalFauxSubpropertiesForVClasses(
+                vclasses, propInsts);
+        for (ObjectProperty op : stragglers) {
+            propInsts.add(makePropInst(op));
+        }
+        
         return propInsts;
         
     }
     
-    private PropertyInstance getPropInst(OntProperty op, Resource domainRes, Resource rangeRes, 
-                                                              Map<String, Resource[]> applicableProperties) {  
+    private PropertyInstance makePropInst(ObjectProperty op) {
+        PropertyInstance pi = new PropertyInstance();
+        pi.setDomainClassURI(op.getDomainVClassURI());
+        pi.setRangeClassURI(op.getRangeVClassURI());
+        pi.setSubjectSide(true);
+        pi.setPropertyURI(op.getURI());
+        pi.setPropertyName(op.getLabel());
+        pi.setDomainPublic(op.getDomainPublic());
+        return pi;
+    }
+    
+    private PropertyInstance getPropInst(OntProperty op, Resource domainRes, 
+            Resource rangeRes) {  
         if (log.isDebugEnabled() && domainRes != null && rangeRes != null) {
             log.debug("getPropInst() op: " + op.getURI() + " domain: " + 
                 domainRes.getURI() + " range: " + rangeRes.getURI());
@@ -849,6 +868,58 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         pi.setRangePublic(getLabelOrId(op));
         pi.setDomainPublic(getLabelOrId(op));
         return pi;
+    }
+    
+    private List<ObjectProperty> getAdditionalFauxSubpropertiesForVClasses(
+            List<VClass> vclasses, List<PropertyInstance> propInsts) {
+        
+        List<ObjectProperty> opList = new ArrayList<ObjectProperty>();
+        if (vclasses.size() == 0) {
+            return opList;
+        }
+        ObjectPropertyDao opDao = getWebappDaoFactory().getObjectPropertyDao();
+        String propQuery = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
+                "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
+                "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
+                "SELECT ?property ?domain ?range WHERE { \n" +
+                "    ?context config:configContextFor ?property . \n" +
+                "    ?context config:qualifiedByDomain ?domain . \n" +
+                "    ?context config:qualifiedBy ?range . \n";
+        for(PropertyInstance propInst : propInsts) {
+            propQuery += "    FILTER (?property != <" + propInst.getPropertyURI() + "> ) \n";
+        }
+        Iterator<VClass> classIt = vclasses.iterator();
+        if(classIt.hasNext()) {
+            propQuery += "    FILTER ( \n";
+            propQuery += "        (?domain = <" + OWL.Thing.getURI() + "> )\n";
+            while (classIt.hasNext()) {
+                VClass vclass = classIt.next();
+                if(vclass.isAnonymous()) {
+                    continue;
+                }
+                propQuery += "       || (?domain = <" + vclass.getURI() + "> ) \n";
+            }
+            propQuery += ") \n";
+        }
+        propQuery += "} \n";
+        log.debug(propQuery);
+        Query q = QueryFactory.create(propQuery);
+        QueryExecution qe = QueryExecutionFactory.create(
+                q, getOntModelSelector().getDisplayModel());
+        try {
+            ResultSet rs = qe.execSelect();
+            while (rs.hasNext()) {
+                QuerySolution qsoln = rs.nextSolution();
+                String propertyURI = qsoln.getResource("property").getURI();
+                String domainURI = qsoln.getResource("domain").getURI();
+                String rangeURI = qsoln.getResource("range").getURI();
+                opList.add(opDao.getObjectPropertyByURIs(
+                        propertyURI, domainURI, rangeURI, null));
+            }  
+        } finally {
+            qe.close();
+        } 
+        return opList;
     }
     
     private List<Pair<String,String>> getAdditionalFauxSubpropertyDomainAndRangeURIsForPropertyURI(String propertyURI) {

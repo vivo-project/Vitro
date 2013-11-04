@@ -479,10 +479,10 @@ public class FakeApplicationOntologyService {
 
 		@Override
 		public Map<String, Object> getData(Map<String, Object> pageData) {
-			Map<String, String[]> parms = new HashMap<String, String[]>();
-			parms.put("uri", new String[] { individualUri });
+			Map<String, Object> parms = new HashMap<>();
+			parms.put("uri", individualUri);
 
-			return doQuery(parms, getModel(ctx, vreq, null));
+			return super.getData(parms);
 		}
 
 	}

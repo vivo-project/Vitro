@@ -64,7 +64,9 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
             List<DataProperty> props = new ArrayList<DataProperty>();
             if (vreq.getParameter("propsForClass") != null) {
                 noResultsMsgStr = "There are no data properties that apply to this class.";
-                Collection <DataProperty> dataProps = dao.getDataPropertiesForVClass(vreq.getParameter("vclassUri"));
+                Collection <DataProperty> dataProps = vreq.getLanguageNeutralWebappDaoFactory()
+                        .getDataPropertyDao().getDataPropertiesForVClass(
+                                vreq.getParameter("vclassUri"));
                 Iterator<DataProperty> dataPropIt = dataProps.iterator();
                 HashSet<String> propURIs = new HashSet<String>();
                 while (dataPropIt.hasNext()) {
