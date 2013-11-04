@@ -51,7 +51,7 @@ public class ListVClassWebappsController extends FreemarkerHttpServlet {
         List<VClass> classes = null;
 
         if (vreq.getParameter("showPropertyRestrictions") != null) {
-        	PropertyDao pdao = vreq.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
+        	PropertyDao pdao = vreq.getLanguageNeutralWebappDaoFactory().getObjectPropertyDao();
         	classes = pdao.getClassesWithRestrictionOnProperty(vreq.getParameter("propertyURI"));
         } else {
         	VClassDao vcdao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
