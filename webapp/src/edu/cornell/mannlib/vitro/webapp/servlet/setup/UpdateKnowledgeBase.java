@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -24,6 +25,10 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -42,8 +47,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.reasoner.ABoxRecomputer;
-import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -157,6 +160,8 @@ public class UpdateKnowledgeBase implements ServletContextListener {
     			    ss.fatal(this, "Exception updating knowledge base for ontology changes: ", ioe);
     			}	
 			}
+			
+			removeBadRestrictions(settings.getAssertionOntModelSelector().getTBoxModel());
 			
             log.info("Simple reasoner connected for the ABox");
             if(JenaDataSourceSetupBase.isFirstStartup() 
@@ -529,6 +534,52 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			log.error(f.getName() + " not found. Unable to load" +
 					" RDF from this location: " + path);
 		}	
+	}
+	
+	/**
+	 *  Remove restrictions with missing owl:onProperty or obsolete core class
+	 *  This should be worked into the main migration later.
+	 */
+	private void removeBadRestrictions(Model tboxModel) {
+	    List<String> queryStrs = Arrays.asList("PREFIX owl:   <http://www.w3.org/2002/07/owl#> \n " +
+	            "CONSTRUCT { \n" +
+	            "    ?rest ?p ?o . \n" +
+	            "    ?oo ?pp ?rest \n" +
+	            "} WHERE { \n" +
+	            "    ?rest a owl:Restriction . \n" + 
+	            "    FILTER NOT EXISTS { ?rest owl:onProperty ?x } \n" +
+	            "    ?rest ?p ?o . \n" +
+	            "    ?oo ?pp ?rest \n" +
+	            "} \n" ,
+	            "PREFIX owl:   <http://www.w3.org/2002/07/owl#> \n " +
+                "CONSTRUCT { \n" +
+                "    ?rest ?p ?o . \n" +
+                "    ?oo ?pp ?rest \n" +
+                "} WHERE { \n" +
+                "    ?rest a owl:Restriction . \n" +
+                "    { ?rest owl:someValuesFrom ?c } UNION { ?rest owl:allValuesFrom ?c } \n" +
+                "    FILTER (regex(str(?c), \"vivoweb.org\")) \n" +
+                "    FILTER NOT EXISTS { ?c ?cp ?co } \n" +
+                "    ?rest ?p ?o . \n" +
+                "    ?oo ?pp ?rest \n" +
+                "} \n" );
+	    for (String queryStr : queryStrs) {
+            Query query = QueryFactory.create(queryStr);
+            QueryExecution qe = QueryExecutionFactory.create(query, tboxModel);
+            try {
+                Model bad = qe.execConstruct();
+                tboxModel.remove(bad);
+                if (bad.size() > 0) {
+                    log.info("Deleted " + bad.size() + 
+                            " triples of syntactically invalid restrictions");
+                    bad.write(System.out);
+                }
+            } finally {
+                if (qe != null) {
+                    qe.close();
+                }
+            }
+	    }
 	}
 	
 	@Override
