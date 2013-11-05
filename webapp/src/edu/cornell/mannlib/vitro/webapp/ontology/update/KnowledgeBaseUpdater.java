@@ -83,7 +83,7 @@ public class KnowledgeBaseUpdater {
 		logger.closeLogs();
 
 		long elapsedSecs = (System.currentTimeMillis() - startTime)/1000;		
-		log.info("Finished knowledge base migration in " + elapsedSecs + " second" + (elapsedSecs != 1 ? "s" : ""));
+		log.info("Finished checking knowledge base in " + elapsedSecs + " second" + (elapsedSecs != 1 ? "s" : ""));
 		
 		return record.hasRecordedChanges();
 	}
@@ -95,20 +95,20 @@ public class KnowledgeBaseUpdater {
 		AtomicOntologyChangeLists changes = new AtomicOntologyChangeLists(rawChanges,settings.getNewTBoxModel(),settings.getOldTBoxModel());
 	        	
 		// update ABox data any time
-    	log.info("performing SPARQL CONSTRUCT additions");
+    	log.debug("performing SPARQL CONSTRUCT additions");
     	performSparqlConstructs(settings.getSparqlConstructAdditionsDir(), settings.getRDFService(), ADD);
     	
-        log.info("performing SPARQL CONSTRUCT retractions");
+        log.debug("performing SPARQL CONSTRUCT retractions");
         performSparqlConstructs(settings.getSparqlConstructDeletionsDir(), settings.getRDFService(), RETRACT);
         
-        log.info("\tupdating the abox");
+        log.info("\tchecking the abox");
         updateABox(changes);
         
-        log.info("performing post-processing SPARQL CONSTRUCT additions");
+        log.debug("performing post-processing SPARQL CONSTRUCT additions");
         performSparqlConstructs(settings.getSparqlConstructAdditionsDir() + "/post/", 
                 settings.getRDFService(), ADD);
         
-        log.info("performing post-processing SPARQL CONSTRUCT retractions");
+        log.debug("performing post-processing SPARQL CONSTRUCT retractions");
         performSparqlConstructs(settings.getSparqlConstructDeletionsDir() + "/post/", 
                 settings.getRDFService(), RETRACT);
         
@@ -145,7 +145,7 @@ public class KnowledgeBaseUpdater {
             boolean add)   throws IOException {
         Dataset dataset = new RDFServiceDataset(rdfService);
         File sparqlConstructDirectory = new File(sparqlConstructDir);
-        log.info("Using SPARQL CONSTRUCT directory " + sparqlConstructDirectory);
+        log.debug("Using SPARQL CONSTRUCT directory " + sparqlConstructDirectory);
         if (!sparqlConstructDirectory.isDirectory()) {
             String logMsg = this.getClass().getName() + 
                     "performSparqlConstructs() expected to find a directory " +
@@ -178,7 +178,7 @@ public class KnowledgeBaseUpdater {
             }   
             Model anonModel = ModelFactory.createDefaultModel();
             try {
-                log.info("\t\tprocessing SPARQL construct query from file " + sparqlFile.getName());
+                log.debug("\t\tprocessing SPARQL construct query from file " + sparqlFile.getName());
                 
                 anonModel = RDFServiceUtils.parseModel(
                         rdfService.sparqlConstructQuery(fileContents.toString(), 
