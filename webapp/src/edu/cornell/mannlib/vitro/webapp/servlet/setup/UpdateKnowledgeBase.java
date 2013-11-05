@@ -572,7 +572,6 @@ public class UpdateKnowledgeBase implements ServletContextListener {
                 if (bad.size() > 0) {
                     log.info("Deleted " + bad.size() + 
                             " triples of syntactically invalid restrictions");
-                    bad.write(System.out);
                 }
             } finally {
                 if (qe != null) {
