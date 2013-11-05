@@ -241,6 +241,9 @@ public class FormUtils {
         	option.setValue(vclass.getURI());
         	option.setBody(vclass.getPickListName());
         	vclassOptionList.add(option);
+        	if(selectedVClassURI != null && selectedVClassURI.equals(vclass.getURI())) {
+        	    option.setSelected(true);
+        	}
         }
         return vclassOptionList;
     }
