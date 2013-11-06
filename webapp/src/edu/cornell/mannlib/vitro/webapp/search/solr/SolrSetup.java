@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +16,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -29,13 +26,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForContextNodes;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForDataProperties;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForObjectProperties;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForTypeStatements;
+import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalUriFinders;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.SearchReindexingListener;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.URIsForClassGroupChange;
 import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.DocumentModifier;
 import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.ExcludeBasedOnNamespace;
 import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.ExcludeBasedOnType;
@@ -140,7 +133,7 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             wadf = new WebappDaoFactoryFiltering(wadf, vf);            
             
             // make objects that will find additional URIs for context nodes etc
-            List<StatementToURIsToUpdate> uriFinders = makeURIFinders(jenaOntModel,wadf.getIndividualDao());
+            List<StatementToURIsToUpdate> uriFinders = AdditionalUriFinders.getList(jenaOntModel,wadf.getIndividualDao());
             
             // Make the IndexBuilder
             IndexBuilder builder = new IndexBuilder( solrIndexer, wadf, uriFinders );
@@ -159,22 +152,6 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
        
     }
 
-    /**
-     * Make a list of StatementToURIsToUpdate objects for use by the
-     * IndexBuidler.
-     * @param indDao 
-     */
-    public List<StatementToURIsToUpdate> makeURIFinders( OntModel jenaOntModel, IndividualDao indDao ){
-        List<StatementToURIsToUpdate> uriFinders = new ArrayList<StatementToURIsToUpdate>();
-        uriFinders.add( new AdditionalURIsForDataProperties() );
-        uriFinders.add( new AdditionalURIsForObjectProperties(jenaOntModel) );
-        uriFinders.add( new AdditionalURIsForContextNodes(jenaOntModel) );
-        uriFinders.add( new AdditionalURIsForTypeStatements() );
-        uriFinders.add( new URIsForClassGroupChange( indDao ));
-        return uriFinders;
-    }
-    
-    
     @Override
     public void contextDestroyed(ServletContextEvent sce) {       
         IndexBuilder builder = (IndexBuilder)sce.getServletContext().getAttribute(IndexBuilder.class.getName());

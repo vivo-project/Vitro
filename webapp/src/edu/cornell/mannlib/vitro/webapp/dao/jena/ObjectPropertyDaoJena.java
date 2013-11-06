@@ -319,7 +319,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 "    ?updateLevel ?editLinkSuppressed ?addLinkSuppressed ?deleteLinkSuppressed \n" +
                 "    ?collateBySubclass ?displayLimit ?individualSortProperty \n" +
                 "    ?entitySortDirection ?selectFromExisting ?offerCreateNew \n" +
-                "    ?publicDescription \n" + 
+                "    ?publicDescription ?stubDeletion \n" + 
                 " WHERE { \n" +
                 "    ?context config:configContextFor <" + propertyURI + "> . \n";
         if (domainURI != null) {
@@ -349,6 +349,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 "    OPTIONAL { ?configuration <" + PROPERTY_SELECTFROMEXISTINGANNOT.getURI() + "> ?selectFromExisting } \n" +
                 "    OPTIONAL { ?configuration <" + PROPERTY_OFFERCREATENEWOPTIONANNOT.getURI() + "> ?offerCreateNew } \n" +
                 "    OPTIONAL { ?configuration <" + PUBLIC_DESCRIPTION_ANNOT.getURI() + "> ?publicDescription } \n" +
+                "    OPTIONAL { ?configuration <" + PROPERTY_STUBOBJECTPROPERTYANNOT.getURI() + "> ?stubDeletion } \n" +
                 "}"; 
       
         Query q = QueryFactory.create(propQuery);
@@ -431,6 +432,10 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 Literal offerCreateNewLit = qsoln.getLiteral("offerCreateNew");
                 if (offerCreateNewLit != null) {
                     op.setOfferCreateNewOption(offerCreateNewLit.getBoolean());
+                }
+                Literal stubDeletionLit = qsoln.getLiteral("stubDeletion");
+                if (stubDeletionLit != null) {
+                    op.setStubObjectRelation(stubDeletionLit.getBoolean());
                 }
                 Literal publicDescriptionLit = qsoln.getLiteral("publicDescription");
                 if (publicDescriptionLit != null) {
