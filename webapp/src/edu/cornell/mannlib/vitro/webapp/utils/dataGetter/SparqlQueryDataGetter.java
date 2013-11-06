@@ -148,6 +148,10 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
 		for (String key: pageData.keySet()) {
 			merged.put(key, String.valueOf(pageData.get(key)));
 		}
+		if (log.isDebugEnabled()) {
+			log.debug("Merging request parameters " + parameterMap
+					+ " with page data " + pageData + " results in " + merged);
+		}
 		return merged;
 	}
 
@@ -161,9 +165,13 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
 	private String bindParameters(String text, Map<String, String> merged) {
 		String bound = text;
 		for (String key : merged.keySet()) {
-			bound.replace('?' + key, '<' + merged.get(key) + '>');
+			bound = bound.replace('?' + key, '<' + merged.get(key) + '>');
 		}
-		log.debug("query after binding parameters: " + bound);
+		if (log.isDebugEnabled()) {
+			log.debug("parameters: " + merged);
+			log.debug("query before binding parameters:" + text);
+			log.debug("query after binding parameters: " + bound);
+		}
 		return bound;
 	}
 
