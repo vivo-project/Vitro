@@ -271,7 +271,6 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 
     public ObjectProperty getObjectPropertyByURI(String propertyURI) {
         
-        long start = System.currentTimeMillis();
         if( propertyURI == null ) return null;
         
         OntModel ontModel = getOntModel();
@@ -279,7 +278,16 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         
         ontModel.enterCriticalSection(Lock.READ);
         try {
-            localModel.add(ontModel.listStatements(ontModel.getResource(propertyURI), null, (RDFNode) null));
+            Resource prop = ontModel.getResource(propertyURI);
+            localModel.add(ontModel.listStatements(prop, null, (RDFNode) null));
+            StmtIterator invit = ontModel.listStatements(prop, OWL.inverseOf, (RDFNode) null);
+            while (invit.hasNext()) {
+                Statement invSit = invit.nextStatement();
+                if (invSit.getObject().isURIResource()) {
+                    Resource invProp = (Resource) invSit.getObject();
+                    localModel.add(ontModel.listStatements(invProp, null, (RDFNode) null));
+                }
+            }
             OntProperty op = localModel.getObjectProperty(propertyURI);
             return propertyFromOntProperty(op);
         } finally {
