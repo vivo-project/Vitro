@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.reasoner.ReasonerPlugin;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasonerTBoxListener;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 public class SimpleReasonerSetup implements ServletContextListener {
 
@@ -121,7 +122,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
                 simpleReasoner.recompute();
             } else if (RecomputeMode.BACKGROUND.equals(mode)) {
                 log.info("starting ABox inference recompute in a separate thread.");
-                new Thread(
+                new VitroBackgroundThread(
                         new ABoxRecomputer(
                                 simpleReasoner),"ABoxRecomputer").start();
             }    
