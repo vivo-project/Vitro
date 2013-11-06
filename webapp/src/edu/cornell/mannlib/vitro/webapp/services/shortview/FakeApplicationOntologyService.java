@@ -442,7 +442,7 @@ public class FakeApplicationOntologyService {
 		private static String QUERY_STRING = ""
 				+ "PREFIX obo: <http://purl.obolibrary.org/obo/> \n"
 				+ "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>  \n"
-				+ "SELECT ?uri ?pt  \n" + "WHERE {  \n"
+				+ "SELECT ?pt  \n" + "WHERE {  \n"
 				+ "    ?uri obo:ARG_2000028 ?vIndividual .  \n"
 				+ "    ?vIndividual vcard:hasTitle ?vTitle . \n"
 				+ "    ?vTitle vcard:title ?pt . \n" + "} LIMIT 1";
