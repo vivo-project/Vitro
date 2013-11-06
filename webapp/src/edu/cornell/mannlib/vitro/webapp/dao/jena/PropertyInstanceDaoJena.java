@@ -62,7 +62,6 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
             	baseModel.notifyEvent(new IndividualUpdateEvent(userUri,true,subjectURI));
             	try {
             		ontModel.remove(subjRes,pred,objRes);            		
-            		updatePropertyDateTimeValue(subjRes,MODTIME,Calendar.getInstance().getTime(),ontModel);
             	} finally {
             		baseModel.notifyEvent(new IndividualUpdateEvent(userUri,false,subjectURI));
             	}
@@ -78,7 +77,6 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
                 	baseModel.notifyEvent(new IndividualUpdateEvent(userUri,true,objectURI));
                 	try {
                 		ontModel.remove(objRes,invPred,subjRes);
-                		updatePropertyDateTimeValue(objRes,MODTIME,Calendar.getInstance().getTime(),ontModel);
                 	} finally {
                 		baseModel.notifyEvent(new IndividualUpdateEvent(userUri,false,subjectURI));
                 	}
@@ -215,7 +213,6 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
                 	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,prop.getSubjectEntURI()));
                 	try {
                 		ontModel.add(subjRes,pred,objRes);
-                    	updatePropertyDateTimeValue(subjRes,MODTIME,Calendar.getInstance().getTime(),getOntModel());
                 	} finally {
                 		getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,prop.getSubjectEntURI()));
                 	}
@@ -224,7 +221,6 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
                     	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,prop.getObjectEntURI()));
                         try {
                         	ontModel.add(objRes,invPred,subjRes);
-                        	updatePropertyDateTimeValue(objRes,MODTIME,Calendar.getInstance().getTime(),getOntModel());
                         } finally {
                         	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,prop.getSubjectEntURI()));
                         }
