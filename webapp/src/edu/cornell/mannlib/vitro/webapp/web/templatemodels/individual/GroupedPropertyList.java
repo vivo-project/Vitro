@@ -300,21 +300,26 @@ public class GroupedPropertyList extends BaseTemplateModel {
             return false;
         }
         for (ObjectProperty op : opList) {
-            if (op.getURI() != null && op.getURI().equals(pi.getPropertyURI())) {
-                if(op.getDomainVClassURI() == null) {
-                    if(pi.getDomainClassURI() == null) {
-                        return true;   
-                    }
-                } else if (op.getDomainVClassURI().equals(pi.getDomainClassURI())) {
-                    return true;
+            boolean uriMatches = (op.getURI() != null 
+                    && op.getURI().equals(pi.getPropertyURI()));
+            boolean domainMatches = false;
+            boolean rangeMatches = false;
+            if(op.getDomainVClassURI() == null) {
+                if(pi.getDomainClassURI() == null) {
+                    domainMatches = true;   
                 }
-                if(op.getRangeVClassURI() == null) {
-                    if (pi.getDomainClassURI() == null) {
-                        return true;
-                    }
-                } else if (op.getRangeVClassURI().equals(pi.getRangeClassURI())) {
-                    return true;
+            } else if (op.getDomainVClassURI().equals(pi.getDomainClassURI())) {
+                domainMatches = true;
+            }
+            if(op.getRangeVClassURI() == null) {
+                if (pi.getDomainClassURI() == null) {
+                    rangeMatches = true;
                 }
+            } else if (op.getRangeVClassURI().equals(pi.getRangeClassURI())) {
+                rangeMatches = true;
+            }
+            if (uriMatches && domainMatches && rangeMatches) {
+                return true;
             }
         }
         return false;
