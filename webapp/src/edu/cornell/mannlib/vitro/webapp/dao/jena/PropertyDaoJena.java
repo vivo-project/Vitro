@@ -595,17 +595,32 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     
     private void updatePropertyRangeMap(Map<String, Resource[]> map, 
                                         String propURI, 
-                                        Resource[] ranges) {
+                                        Resource[] ranges, 
+                                        boolean replaceIfMoreSpecific) {
         Resource[] existingRanges = map.get(propURI);
         if (existingRanges == null) {
             map.put(propURI, ranges);
         } else if (existingRanges[0] == null && existingRanges[1] != null) {
             existingRanges[0] = ranges[0];
             map.put(propURI, existingRanges);
-        } else if (existingRanges[0] != null && existingRanges[1] == null) {
-            existingRanges[1] = ranges[1];
+        } else if (existingRanges[0] != null) {
+            if (existingRanges[1] == null) {
+                existingRanges[1] = ranges[1];
+            }
+            if (moreSpecificThan(ranges[0], existingRanges[0])) {
+                existingRanges[0] = ranges[0];
+            }
             map.put(propURI, existingRanges);            
+        } 
+    }
+    
+    private boolean moreSpecificThan(Resource r1, Resource r2) {
+        if(r1.getURI() == null) {
+            return false;
+        } else if (r2.getURI() == null) {
+            return true;
         }
+        return getWebappDaoFactory().getVClassDao().isSubClassOf(r1.getURI(), r2.getURI());
     }
     
     private List<OntClass> listSuperClasses(OntClass ontClass) {
@@ -711,10 +726,11 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 	        			    Resource[] ranges = new Resource[2];
 	        			    if (rest.isAllValuesFromRestriction()) {
 	        			        ranges[0] = (rest.asAllValuesFromRestriction()).getAllValuesFrom();
+	                            updatePropertyRangeMap(applicableProperties, onProperty.getURI(), ranges, true);
 	        			    } else if (rest.isSomeValuesFromRestriction()) {
                                 ranges[1] = (rest.asSomeValuesFromRestriction()).getSomeValuesFrom();
+                                updatePropertyRangeMap(applicableProperties, onProperty.getURI(), ranges, false);
                             }
-	        				updatePropertyRangeMap(applicableProperties, onProperty.getURI(), ranges);
 		        		}
 	        	    }
 	        		
@@ -736,7 +752,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 	        		        Resource[] ranges = new Resource[2];
 	        		        ranges[0] = rangeRes;
 	        		        updatePropertyRangeMap(
-	        		                applicableProperties, prop.getURI(), ranges);
+	        		                applicableProperties, prop.getURI(), ranges, false);
 	        		        
 	        		    }
 	        		}
@@ -831,9 +847,9 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         String domainURIStr = (domainRes != null && !domainRes.isAnon()) ? 
                 domainURIStr = domainRes.getURI()
                 : null;
-        if (rangeRes == null) {
-            pi.setRangeClassURI(OWL.Thing.getURI()); // TODO see above
-        } else {
+//        if (rangeRes == null) {
+//            pi.setRangeClassURI(OWL.Thing.getURI()); // TODO see above
+        if(rangeRes != null) {
             String rangeClassURI;
             if (rangeRes.isAnon()) {
                 rangeClassURI = PSEUDO_BNODE_NS + rangeRes.getId()

@@ -105,7 +105,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         // unpopulated, so the properties are displayed to allow statements to be added to these properties.
         // RY In future, we should limit this to properties that the user has permission to add properties to.
         if (editing) {
-            mergeAllPossibleObjectProperties(populatedObjectPropertyList, propertyList);
+            propertyList = mergeAllPossibleObjectProperties(populatedObjectPropertyList, propertyList);
         }
         
         // Now do much the same with data properties: get the list of populated data properties, then add in placeholders for missing ones 
@@ -122,9 +122,11 @@ public class GroupedPropertyList extends BaseTemplateModel {
             mergeAllPossibleDataProperties(propertyList);
         }
         
-        if (editing) {
-            propertyList = correctLanguageForProperties(propertyList);
-        }
+// Not currently necessary since the language-specific version is now added
+// during the merge
+//        if (editing) {
+//            propertyList = correctLanguageForProperties(propertyList);
+//        }
         
         sort(propertyList);
 
@@ -253,7 +255,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         }
     }
 
-    private void mergeAllPossibleObjectProperties(
+    private List<Property> mergeAllPossibleObjectProperties(
             List<ObjectProperty> populatedObjectPropertyList,
             List<Property> propertyList) {
 
@@ -271,10 +273,27 @@ public class GroupedPropertyList extends BaseTemplateModel {
         if (allPropInstColl != null) {
             for (PropertyInstance pi : allPropInstColl) {
                 if (pi != null) {
-                    if (!alreadyOnObjectPropertyList(
-                            populatedObjectPropertyList, pi)) {
-                        addObjectPropertyToPropertyList(pi.getPropertyURI(), pi.getDomainClassURI(), pi.getRangeClassURI(),
-                                propertyList);
+                    // use the language-aware wdf because redundancy check
+                    // for display will depend on public label match
+                    ObjectProperty piOp = wdf.getObjectPropertyDao().getObjectPropertyByURIs(
+                            pi.getPropertyURI(), pi.getDomainClassURI(), pi.getRangeClassURI());
+                    if (piOp == null) {
+                        continue;
+                    }
+                    boolean addToList = true;
+                    int opIndex = 0;
+                    for(ObjectProperty op : populatedObjectPropertyList) {
+                        if(redundant(op, piOp)) {
+                            addToList = false;
+                            if (moreRestrictiveRange(piOp, op, wadf)) {
+                                propertyList = replaceOpWithPiOpInList(piOp, op, opIndex, propertyList);
+                            }
+                            break;
+                        } 
+                        opIndex++;
+                    }
+                    if(addToList) {
+                        propertyList.add(piOp);         
                     }
                 } else {
                     log.error("a property instance in the Collection created by PropertyInstanceDao.getAllPossiblePropInstForIndividual() is unexpectedly null");
@@ -292,35 +311,73 @@ public class GroupedPropertyList extends BaseTemplateModel {
                 addObjectPropertyToPropertyList(propertyUri, null, null, propertyList);
             }
         }
+        
+        return propertyList;
     }
-
-    private boolean alreadyOnObjectPropertyList(List<ObjectProperty> opList,
-            PropertyInstance pi) {
-        if (pi.getPropertyURI() == null) {
+    
+    private boolean moreRestrictiveRange(ObjectProperty piOp, ObjectProperty op, 
+            WebappDaoFactory wadf) {
+        if(piOp.getRangeVClassURI() == null) {
+            return false;
+        } else if (op.getRangeVClassURI() == null) {
+            return (piOp.getRangeVClassURI() != null);
+        } else {
+            return (wadf.getVClassDao().isSubClassOf(
+                    piOp.getRangeVClassURI(), op.getRangeVClassURI()));
+        }
+    }
+    
+    private List<Property> replaceOpWithPiOpInList(ObjectProperty piOp, 
+            ObjectProperty op, int opIndex, List<Property> propertyList) {
+                
+        List<Property> returnList = new ArrayList<Property>();
+        int index = 0;
+        for(Property p : propertyList) {
+            if(index == opIndex /* p.equals(op) */) {
+                returnList.add(piOp);
+            } else {
+                returnList.add(p);
+            }
+            index++;
+        }
+        return returnList;
+    }
+    
+    private boolean redundant(ObjectProperty op, ObjectProperty op2) {
+        if (op2.getURI() == null) {
             return false;
         }
-        for (ObjectProperty op : opList) {
-            boolean uriMatches = (op.getURI() != null 
-                    && op.getURI().equals(pi.getPropertyURI()));
-            boolean domainMatches = false;
-            boolean rangeMatches = false;
-            if(op.getDomainVClassURI() == null) {
-                if(pi.getDomainClassURI() == null) {
-                    domainMatches = true;   
-                }
-            } else if (op.getDomainVClassURI().equals(pi.getDomainClassURI())) {
-                domainMatches = true;
+        boolean uriMatches = (op.getURI() != null 
+                && op.getURI().equals(op2.getURI()));
+        boolean domainMatches = false;
+        boolean rangeMatches = false;
+        boolean labelMatches = false;
+        if(op.getDomainPublic() == null) {
+            if(op2.getDomainPublic() == null) {
+                labelMatches = true;
             }
-            if(op.getRangeVClassURI() == null) {
-                if (pi.getDomainClassURI() == null) {
-                    rangeMatches = true;
-                }
-            } else if (op.getRangeVClassURI().equals(pi.getRangeClassURI())) {
+        } else if (op.getDomainPublic().equals(op2.getDomainPublic())) {
+            labelMatches = true;
+        }
+        if(uriMatches && labelMatches) {
+            return true;
+        }
+        if(op.getDomainVClassURI() == null) {
+            if(op2.getDomainVClassURI() == null) {
+                domainMatches = true;   
+            }
+        } else if (op.getDomainVClassURI().equals(op2.getDomainVClassURI())) {
+            domainMatches = true;
+        }
+        if(op.getRangeVClassURI() == null) {
+            if (op2.getRangeVClassURI() == null) {
                 rangeMatches = true;
             }
-            if (uriMatches && domainMatches && rangeMatches) {
-                return true;
-            }
+        } else if (op.getRangeVClassURI().equals(op2.getRangeVClassURI())) {
+            rangeMatches = true;
+        }
+        if (uriMatches && domainMatches && rangeMatches) {
+            return true;
         }
         return false;
     }

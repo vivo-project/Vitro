@@ -1014,14 +1014,14 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             if (uri.equals(propRegister.getURI())) {
                 property = propRegister.clone();
             } else {
-                property = getObjectPropertyByURI(uri);
-                if (property != null) {
-                    propRegister = property;
+                ObjectProperty newProperty = getObjectPropertyByURI(uri);
+                if (newProperty != null) {
+                    propRegister = newProperty;
                     // add canonical instance of the property first in the list
                     // before the range-changed versions
-                    properties.add(property); 
+                    properties.add(newProperty); 
                     // isolate the canonical prop from what's about to happen next
-                    property = property.clone();
+                    property = newProperty.clone();
                 } 
             }
             if (property != null) {
