@@ -281,11 +281,24 @@ public class IndexBuilder extends VitroBackgroundThread {
         
         //keep uris unique by using a HashSet
         Collection<String> urisToUpdate = new HashSet<String>();                
-        for( Statement stmt : getAndClearChangedStmts() ){
-        	for( StatementToURIsToUpdate stu : stmtToURIsToIndexFunctions ){
-        		urisToUpdate.addAll( stu.findAdditionalURIsToIndex(stmt) );
-        	}
-        }
+        Statement[] changedStatements = getAndClearChangedStmts();
+        int howManyChanges = changedStatements.length;
+        
+		if (howManyChanges > 100) {
+			log.info("Finding URIs that are affected by " + howManyChanges
+					+ " changed statements.");
+		}
+        
+		for (int i = 0; i < howManyChanges; i++) {
+			Statement stmt = changedStatements[i];
+			for (StatementToURIsToUpdate stu : stmtToURIsToIndexFunctions) {
+				urisToUpdate.addAll(stu.findAdditionalURIsToIndex(stmt));
+			}
+			if ((i > 0) && (i % 1000 == 0)) {
+				log.info("Processed " + i + " changed statements; found "
+						+ urisToUpdate.size() + " affected URIs.");
+			}
+		}
         
         //inform StatementToURIsToUpdate that they are done
         for( StatementToURIsToUpdate stu : stmtToURIsToIndexFunctions ) {
