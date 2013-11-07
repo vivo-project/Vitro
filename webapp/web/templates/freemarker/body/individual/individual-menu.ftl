@@ -5,8 +5,7 @@
 <#include "individual-setup.ftl">
 
 <#assign hasElement = propertyGroups.pullProperty("${namespaces.display}hasElement")!>
-
-<#assign addNewMenuItemUrl = "${urls.base}/menuManagementController?cmd=add" >
+<#assign returnURL = "/vivo/individual?uri=http%3A%2F%2Fvitro.mannlib.cornell.edu%2Fontologies%2Fdisplay%2F1.1%23DefaultMenu&switchToDisplayModel=true" />
 
 <#if hasElement?has_content>
     <script type="text/javascript">
@@ -24,22 +23,21 @@
     
     <#-- Link to add a new menu item -->
     <#if editable>
-        <#if addNewMenuItemUrl?has_content>
-        <form id="pageListForm" action="${urls.base}/editRequestDispatch" method="get">
-            <input type="hidden" name="typeOfNew" value="http://vitro.mannlib.cornell.edu/ontologies/display/1.1#Page">              
-            <input type="hidden" name="switchToDisplayModel" value="1">
-            <input type="hidden" name="editForm" value="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator" role="input">
-       		<input type="hidden" name="addMenuItem" value="true" />
-       	<input id="submit" value="Add new menu page" role="button" type="submit" >
-       	<#if verbosePropertySwitch.url?contains("pageManagement")>
-       	    <span class="or"> ${i18n().or} </span>
-       	    <a  style="margin-left:7px" href="${urls.base}/pageList" title="Return to Profile Page">Return to Page Management</a>
-       	</#if>
-        
-        </form>
-            <br />
-            <p class="note">${i18n().refresh_page_after_reordering}</p>
-        </#if>
+	    <form id="pageListForm" action="${urls.base}/editRequestDispatch" method="get">
+	        <input type="hidden" name="typeOfNew" value="http://vitro.mannlib.cornell.edu/ontologies/display/1.1#Page">              
+	        <input type="hidden" name="switchToDisplayModel" value="1">
+	        <input type="hidden" name="editForm" value="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator" role="input">
+	   		<input type="hidden" name="addMenuItem" value="true" />
+	   		<input id="submit" value="Add new menu page" role="button" type="submit" >
+	   		<input type="hidden" name="returnURL" value="${returnURL?url}" />
+	   	<#if verbosePropertySwitch.url?contains("pageManagement")>
+	   	    <span class="or"> ${i18n().or} </span>
+	   	    <a  style="margin-left:7px" href="${urls.base}/pageList" title="Return to Profile Page">Return to Page Management</a>
+	   	</#if>
+	    
+	    </form>
+	    <br />
+	    <p class="note">${i18n().refresh_page_after_reordering}</p>
     </#if>
     
     ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/individual.css" />',

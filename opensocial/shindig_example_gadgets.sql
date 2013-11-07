@@ -4,13 +4,13 @@
 DELETE FROM `orng_apps`;
 
 INSERT INTO `orng_apps` (`appid`, `name`, `url`, `PersonFilterID`, `enabled`, `channels`) VALUES
-(100, 'Google Search', 'http://dev-profiles.ucsf.edu/orng/GoogleSearch.xml', NULL, 1, NULL),
-(101, 'Featured Presentations', 'http://dev-profiles.ucsf.edu/orng/SlideShare.xml', NULL, 1, NULL),
-(102, 'Faculty Mentor', 'http://dev-profiles.ucsf.edu/orng/Mentor.xml', NULL, 0, NULL),
-(103, 'Websites', 'http://dev-profiles.ucsf.edu/orng/Links.xml', NULL, 1, NULL),
-(104, 'Profile List', 'http://dev-profiles.ucsf.edu/orng/ProfileListTool.xml', NULL, 1, 'JSONPersonIds'),
-(106, 'RDF Test Gadget', 'http://dev-profiles.ucsf.edu/orng/RDFTest.xml', NULL, 1, NULL),
-(112, 'Twitter', 'http://dev-profiles.ucsf.edu/ORNG/Twitter.xml', NULL, 1, NULL);
+(100, 'Google Search', 'http://stage-profiles.ucsf.edu/apps/ucsfsearch.xml', NULL, 1, NULL),
+(101, 'Featured Presentations', 'http://stage-profiles.ucsf.edu/apps/SlideShare.xml', NULL, 1, NULL),
+(102, 'Faculty Mentor', 'http://stage-profiles.ucsf.edu/apps/Mentor.xml', NULL, 0, NULL),
+(103, 'Websites', 'http://stage-profiles.ucsf.edu/apps/Links.xml', NULL, 1, NULL),
+(104, 'Profile List', 'http://stage-profiles.ucsf.edu/apps/ProfileListTool.xml', NULL, 1, 'JSONPersonIds'),
+(106, 'RDF Test Gadget', 'http://stage-profiles.ucsf.edu/apps/RDFTest.xml', NULL, 1, NULL),
+(112, 'Twitter', 'http://stage-profiles.ucsf.edu/apps/Twitter.xml', NULL, 1, NULL);
 
 DELETE FROM `orng_app_views`;
 

@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_LITERAL;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -118,7 +120,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
           
         // Determine whether a new statement can be added
 		RequestedAction action = new AddDataPropertyStatement(
-				vreq.getJenaOntModel(), subjectUri, propertyUri);
+				vreq.getJenaOntModel(), subjectUri, propertyUri, SOME_LITERAL);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return;
         }

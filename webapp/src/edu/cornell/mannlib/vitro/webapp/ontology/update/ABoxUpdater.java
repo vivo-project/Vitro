@@ -31,6 +31,8 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange.AtomicChangeType;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 /**  
 * Performs knowledge base updates to the abox to align with a new ontology version
@@ -594,6 +596,7 @@ public class ABoxUpdater {
 			return;
 		}
 		
+		long start = System.currentTimeMillis();
         Iterator<String> graphIt = dataset.listNames();
         while(graphIt.hasNext()) {
             String graph = graphIt.next();
@@ -604,11 +607,23 @@ public class ABoxUpdater {
 		
     		Model renamePropAddModel = ModelFactory.createDefaultModel();
     		Model renamePropRetractModel = 	ModelFactory.createDefaultModel();
-    		
+    		log.debug("renaming " + oldProperty.getURI() + " in graph " + graph);
     		aboxModel.enterCriticalSection(Lock.WRITE);
     		try {
+    		    start = System.currentTimeMillis();
+    		    
+//    		    String queryStr = "CONSTRUCT { ?s <" + oldProperty.getURI() + "> ?o } WHERE { GRAPH<" + graph + "> { ?s <" + oldProperty.getURI() + "> ?o } } ";
+//    		    try {
+//    		        renamePropRetractModel = RDFServiceUtils.parseModel(rdfService.sparqlConstructQuery(queryStr, RDFService.ModelSerializationFormat.NTRIPLE), RDFService.ModelSerializationFormat.NTRIPLE);
+//    		    } catch (RDFServiceException e) {
+//    		        log.error(e,e);
+//    		    }
+//    		    log.info(System.currentTimeMillis() - start + " to run sparql construct for " + renamePropRetractModel.size() + " statements" );
+    		    start = System.currentTimeMillis();
     			renamePropRetractModel.add(	aboxModel.listStatements(
     					(Resource) null, oldProperty, (RDFNode) null));
+    			log.debug(System.currentTimeMillis() - start + " to list " + renamePropRetractModel.size() + " old statements");
+    			start = System.currentTimeMillis();
     			StmtIterator stmItr = renamePropRetractModel.listStatements();
     			while(stmItr.hasNext()) {
     				Statement tempStatement = stmItr.nextStatement();
@@ -616,8 +631,13 @@ public class ABoxUpdater {
     										newProperty,
     										tempStatement.getObject() );
     			}
+    			log.debug(System.currentTimeMillis() - start + " to make new statements");
+    			start = System.currentTimeMillis();
     			aboxModel.remove(renamePropRetractModel);
+    			log.debug(System.currentTimeMillis() - start + " to retract old statements");
+    			start = System.currentTimeMillis();
     			aboxModel.add(renamePropAddModel);
+    			log.debug(System.currentTimeMillis() - start + " to add new statements");
     		} finally {
     			aboxModel.leaveCriticalSection();
     		}

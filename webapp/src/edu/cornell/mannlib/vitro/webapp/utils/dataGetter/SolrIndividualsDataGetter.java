@@ -3,9 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.utils.dataGetter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +21,6 @@ import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.shared.Lock;
@@ -33,8 +30,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController.SearchException;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.individuallist.IndividualListResults;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
@@ -174,16 +172,15 @@ public class SolrIndividualsDataGetter extends DataGetterBase implements DataGet
         try {
 	    	String alpha = SolrQueryUtils.getAlphaParameter(vreq);
 	        int page = SolrQueryUtils.getPageParameter(vreq);
-	        Map<String,Object> map = IndividualListController.getResultsForVClass(
+	        IndividualListResults vcResults = IndividualListController.getResultsForVClass(
 	                vclass.getURI(), 
 	                page, 
 	                alpha, 
 	                vreq.getWebappDaoFactory().getIndividualDao(), 
 	                vreq.getSession().getServletContext());                                
-	        body.putAll(map);
+	        body.putAll(vcResults.asFreemarkerMap());
 	
-	        @SuppressWarnings("unchecked")
-	        List<Individual> inds = (List<Individual>)map.get("entities");
+	        List<Individual> inds = vcResults.getEntities();
 	        List<ListedIndividual> indsTm = new ArrayList<ListedIndividual>();
 	        if (inds != null) {
 	            for ( Individual ind : inds ) {

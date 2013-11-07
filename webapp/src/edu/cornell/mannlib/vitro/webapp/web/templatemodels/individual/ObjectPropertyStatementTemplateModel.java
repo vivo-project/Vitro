@@ -47,11 +47,11 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
         ops.setProperty(predicate);
         
         // Do delete url first, since it is used in building edit url
-        this.deleteUrl = makeDeleteUrl();
+        this.deleteUrl = makeDeleteUrl(ops);
         this.editUrl = makeEditUrl(ops);
     }
 
-	private String makeDeleteUrl() {
+	private String makeDeleteUrl(ObjectPropertyStatement ops) {
     	// Is the delete link suppressed for this property?
     	if (property.isDeleteLinkSuppressed()) {
     		return "";
@@ -85,6 +85,13 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
             if (value != null) {
                 params.put("statement_" + key, data.get(key));
             }
+        }
+        
+        if (ops.getProperty()!= null && ops.getProperty().getDomainVClassURI() != null) {
+            params.put("domainUri", ops.getProperty().getDomainVClassURI());
+        }
+        if (ops.getProperty()!= null && ops.getProperty().getRangeVClassURI() != null) {
+            params.put("rangeUri", ops.getProperty().getRangeVClassURI());
         }
         
         params.put("templateName", templateName);

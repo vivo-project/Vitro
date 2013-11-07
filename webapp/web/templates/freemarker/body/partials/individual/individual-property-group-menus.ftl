@@ -4,7 +4,6 @@
 
 <#import "lib-properties.ftl" as p>
 <#assign subjectUri = individual.controlPanelUrl()?split("=") >
-<#assign nameForOtherGroup = nameForOtherGroup!"other">
 
 <#if (propertyGroups.all)??>
     <#assign groups = propertyGroups.all>   
@@ -13,6 +12,7 @@
             <nav id="property-group-menu" role="navigation">
                 <ul role="list">
                     <#list groups as group>
+                      <#if (group.properties?size > 0) >
                         <#assign groupname = group.getName(nameForOtherGroup)>                        
                         <#if groupname?has_content>
                     		<#--create property group html id is the function that will replace all spaces with underscore to make a valid id-->
@@ -21,13 +21,15 @@
                             function to capitalize all except function words. -->
                             <li role="listitem"><a href="#${groupnameHtmlId}" title="${i18n().group_name}">${groupname?capitalize}</a></li>
                         </#if>
+                      </#if>
                     </#list>
                 </ul>
             </nav>
-        </#if> 
-    </#if>
+        </#if>
+      </#if>
 </#if>
 <#list propertyGroups.all as group>
+  <#if (group.properties?size > 0)>
     <#assign groupName = group.getName(nameForOtherGroup)>
     <#assign verbose = (verbosePropertySwitch.currentValue)!false>
     
@@ -50,4 +52,5 @@
         <#-- List the properties in the group -->
         <#include "individual-properties.ftl">
     </section> <!-- end property-group -->
+  </#if>
 </#list>

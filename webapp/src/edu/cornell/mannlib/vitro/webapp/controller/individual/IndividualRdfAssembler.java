@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.individual;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -343,7 +344,9 @@ public class IndividualRdfAssembler {
 	}
 
 	private Literal createDateLiteral(OntModel o) {
-		return o.createTypedLiteral(new Date(), XSDDatatype.XSDdate);
+		String date = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss")
+				.format(new Date());
+		return o.createTypedLiteral(date, XSDDatatype.XSDdateTime);
 	}
 
 }

@@ -267,7 +267,8 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		ConfigurationProperties.removeBean(sce.getServletContext());
+		// No need to remove the bean. It's only a map of strings, and if we
+		// restart the app, it will be replaced.
 	}
 
 	/**

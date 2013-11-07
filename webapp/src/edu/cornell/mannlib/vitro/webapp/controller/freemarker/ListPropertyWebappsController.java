@@ -59,7 +59,7 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
             String ontologyUri = vreq.getParameter("ontologyUri");
 
             ObjectPropertyDao dao = vreq.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
-            PropertyInstanceDao piDao = vreq.getUnfilteredWebappDaoFactory().getPropertyInstanceDao();
+            PropertyInstanceDao piDao = vreq.getLanguageNeutralWebappDaoFactory().getPropertyInstanceDao();
             VClassDao vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
             PropertyGroupDao pgDao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 

@@ -16,15 +16,17 @@ public abstract class AbstractDataPropertyStatementAction extends
 	private final String subjectUri;
 	private final String predicateUri;
 	private final Property predicate;
+	private final String dataValue;
 
 	public AbstractDataPropertyStatementAction(OntModel ontModel,
-			String subjectUri, String predicateUri) {
+			String subjectUri, String predicateUri, String dataValue) {
 		super(ontModel);
 		this.subjectUri = subjectUri;
 		this.predicateUri = predicateUri;
 		Property dataProperty = new Property();
 		dataProperty.setURI(predicateUri);
 		this.predicate = dataProperty;
+		this.dataValue = dataValue;
 	}
 
 	public AbstractDataPropertyStatementAction(OntModel ontModel,
@@ -36,12 +38,14 @@ public abstract class AbstractDataPropertyStatementAction extends
 	    Property dataProperty = new Property();
 	    dataProperty.setURI(predicateUri);
 	    this.predicate = dataProperty;
+	    this.dataValue = dps.getData();
 	}
 
 	public String getSubjectUri() {
 		return subjectUri;
 	}
 
+	@Override
 	public Property getPredicate() {
 	    return predicate;
 	}

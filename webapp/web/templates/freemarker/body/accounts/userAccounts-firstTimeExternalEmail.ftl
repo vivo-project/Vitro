@@ -2,20 +2,42 @@
 
 <#-- Confirmation that an account has been created for an externally-authenticated user. -->
 
-<#assign strings = i18n() />
+<#assign subject = "Your ${siteName} account has been created." />
 
-<#assign subject = strings.account_created(siteName) />
+<#assign html>
+<html>
+    <head>
+        <title>${subject}</title>
+    </head>
+    <body>
+        <p>
+            ${userAccount.firstName} ${userAccount.lastName}
+        </p>
 
-<#assign html = strings.first_time_external_email_html(siteName, 
-                                                   subject, 
-                                                   userAccount.firstName, 
-                                                   userAccount.lastName, 
-                                                   userAccount.emailAddress) />
+        <p>
+            <strong>Congratulations!</strong>
+        </p>
 
-<#assign text = strings.first_time_external_email_text(siteName, 
-                                                   subject, 
-                                                   userAccount.firstName, 
-                                                   userAccount.lastName, 
-                                                   userAccount.emailAddress) />
+        <p>
+            We have created your new VIVO account associated with ${userAccount.emailAddress}.
+        </p>
+
+        <p>
+            Thanks!
+        </p>
+    </body>
+</html>
+</#assign>
+
+<#assign text>
+${userAccount.firstName} ${userAccount.lastName}
+
+Congratulations!
+
+We have created your new VIVO account associated with 
+${userAccount.emailAddress}.
+
+Thanks!
+</#assign>
 
 <@email subject=subject html=html text=text />

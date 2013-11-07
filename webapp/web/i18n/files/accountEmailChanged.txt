@@ -1,6 +1,0 @@
-Hi, {2} {3}
-
-You recently changed the email address associated with 
-{2} {3}
-
-Thank you.

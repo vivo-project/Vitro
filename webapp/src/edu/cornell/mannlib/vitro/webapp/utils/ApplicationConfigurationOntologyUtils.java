@@ -83,7 +83,7 @@ public class ApplicationConfigurationOntologyUtils {
                 String rangeURI = qsoln.getResource("range").getURI();
                 if (appropriateDomain(domainRes, subject, tboxModel)) {
                     ObjectProperty faux = opDao.getObjectPropertyByURIs(
-                            opURI, domainURI, rangeURI);
+                            opURI, domainURI, rangeURI, (prop != null) ? prop.clone() : null);
                     if (faux != null) {
                         additionalProps.add(faux);
                     } else {

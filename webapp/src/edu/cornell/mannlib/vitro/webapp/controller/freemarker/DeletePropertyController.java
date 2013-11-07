@@ -174,7 +174,7 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
 	//process object property
     private void processObjectProperty(VitroRequest vreq) {
     	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
-    	
+    	    	
     	//if this property is true, it means the object needs to be deleted along with statement
     	if(prop.getStubObjectRelation())
     	{

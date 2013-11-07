@@ -54,6 +54,11 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
         return (newOprop == null) ? null : new ObjectPropertyFiltering(newOprop, filters);
     }
 
+    public ObjectProperty getObjectPropertyByURIs(String objectPropertyURI, String domainURI, String rangeURI, ObjectProperty base) {
+        ObjectProperty newOprop=innerObjectPropertyDao.getObjectPropertyByURIs(objectPropertyURI, domainURI, rangeURI, base);
+        return (newOprop == null) ? null : new ObjectPropertyFiltering(newOprop, filters);
+    }
+    
     public List<ObjectPropertyStatement> getStatementsUsingObjectProperty(ObjectProperty op) {
         return ObjectPropertyStatementDaoFiltering.filterAndWrapList(innerObjectPropertyDao.getStatementsUsingObjectProperty(op),filters);       
     }
