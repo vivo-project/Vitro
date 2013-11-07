@@ -23,6 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
@@ -133,7 +134,8 @@ public class SolrSetup implements javax.servlet.ServletContextListener{
             wadf = new WebappDaoFactoryFiltering(wadf, vf);            
             
             // make objects that will find additional URIs for context nodes etc
-            List<StatementToURIsToUpdate> uriFinders = AdditionalUriFinders.getList(jenaOntModel,wadf.getIndividualDao());
+            RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(context).getRDFService();
+			List<StatementToURIsToUpdate> uriFinders = AdditionalUriFinders.getList(rdfService,wadf.getIndividualDao());
             
             // Make the IndexBuilder
             IndexBuilder builder = new IndexBuilder( solrIndexer, wadf, uriFinders );

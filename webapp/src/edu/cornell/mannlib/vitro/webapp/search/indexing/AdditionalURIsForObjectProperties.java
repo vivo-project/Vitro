@@ -10,22 +10,17 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.Syntax;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
 
 /**
@@ -38,13 +33,13 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
 public class AdditionalURIsForObjectProperties implements StatementToURIsToUpdate {
     protected static final Log log = LogFactory.getLog(AdditionalURIsForObjectProperties.class);
     
-    protected Model model;              
+    protected final RDFService rdfService;
     
-    public AdditionalURIsForObjectProperties( Model model){
-        this.model = model;
-    }
-    
-    @Override
+    public AdditionalURIsForObjectProperties(RDFService rdfService) {
+		this.rdfService = rdfService;
+	}
+
+	@Override
     public List<String> findAdditionalURIsToIndex(Statement stmt) {
         if(  stmt == null )
             return Collections.emptyList();
@@ -102,37 +97,27 @@ public class AdditionalURIsForObjectProperties implements StatementToURIsToUpdat
         Resource uriResource = ResourceFactory.createResource(uri);        
         initialBinding.add("uri", uriResource);
         
-        Query sparqlQuery = QueryFactory.create( QUERY_FOR_RELATED );
-        model.getLock().enterCriticalSection(Lock.READ);
-        try{
-            QueryExecution qExec = QueryExecutionFactory.create(sparqlQuery, model, initialBinding);
-            try{                
-                ResultSet results = qExec.execSelect();                
-                while(results.hasNext()){                    
-                    QuerySolution soln = results.nextSolution();                                   
-                    Iterator<String> iter =  soln.varNames() ;
-                    while( iter.hasNext()){
-                        String name = iter.next();
-                        RDFNode node = soln.get( name );
-                        if( node != null ){
-                            if( node.isURIResource() ){
-                                additionalUris.add( node.as( Resource.class ).getURI()  );
-                            }else{
-                                log.warn( "value from query for var " + name + "  was not a URIResource, it was " + node);    
-                            }
-                        }else{
-                            log.warn("value for query for var " + name + " was null");
-                        }                        
+		ResultSet results = QueryUtils.getQueryResults(QUERY_FOR_RELATED,
+				initialBinding, rdfService);
+
+        while(results.hasNext()){                    
+            QuerySolution soln = results.nextSolution();                                   
+            Iterator<String> iter =  soln.varNames() ;
+            while( iter.hasNext()){
+                String name = iter.next();
+                RDFNode node = soln.get( name );
+                if( node != null ){
+                    if( node.isURIResource() ){
+                        additionalUris.add( node.as( Resource.class ).getURI()  );
+                    }else{
+                        log.warn( "value from query for var " + name + "  was not a URIResource, it was " + node);    
                     }
-                }
-            }catch(Throwable t){
-                    log.error(t,t);
-            } finally{
-                qExec.close();
-            } 
-        }finally{
-            model.getLock().leaveCriticalSection();
+                }else{
+                    log.warn("value for query for var " + name + " was null");
+                }                        
+            }
         }
+
         return additionalUris;
     }
 
