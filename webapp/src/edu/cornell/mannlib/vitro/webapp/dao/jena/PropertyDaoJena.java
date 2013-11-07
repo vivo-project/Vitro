@@ -607,7 +607,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
             if (existingRanges[1] == null) {
                 existingRanges[1] = ranges[1];
             }
-            if (moreSpecificThan(ranges[0], existingRanges[0])) {
+            if (ranges[0] != null && moreSpecificThan(ranges[0], existingRanges[0])) {
                 existingRanges[0] = ranges[0];
             }
             map.put(propURI, existingRanges);            
