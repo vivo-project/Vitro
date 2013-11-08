@@ -38,9 +38,8 @@ public class ApplicationConfigurationOntologyUtils {
     private static final Log log = LogFactory.getLog(ApplicationConfigurationOntologyUtils.class);
     
     public static List<ObjectProperty> getAdditionalFauxSubpropertiesForList(List<ObjectProperty> propList, Individual subject, VitroRequest vreq) {
-        ServletContext ctx = vreq.getSession().getServletContext();
-		Model displayModel = ModelAccess.on(ctx).getDisplayModel();
-        Model tboxModel = ModelAccess.on(ctx).getOntModel(ModelID.UNION_TBOX);
+		Model displayModel = vreq.getDisplayModel();
+        Model tboxModel = vreq.getOntModelSelector().getTBoxModel();
         return getAdditionalFauxSubpropertiesForList(propList, subject, displayModel, tboxModel);
     }
     
