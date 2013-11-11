@@ -171,22 +171,22 @@ name will be used as the label. -->
 <#macro editingLinks propertyLocalName propertyName statement editable rangeUri="">
     <#if editable >
         <#if (!rangeUri?contains("Authorship") && !rangeUri?contains("URL") && !rangeUri?contains("Editorship") && propertyLocalName != "hasResearchArea")>
-            <@editLink propertyLocalName propertyName statement />
+            <@editLink propertyLocalName propertyName statement rangeUri/>
             <@deleteLink propertyLocalName propertyName statement />
         </#if>    
     </#if>
 </#macro>
-<#macro editLink propertyLocalName propertyName statement>
+<#macro editLink propertyLocalName propertyName statement rangeUri="">
 <#if propertyLocalName?contains("ARG_2000028")>
-    <#if propertyName?contains("mailing address")>
+    <#if rangeUri?contains("Address")>
         <#local url = statement.editUrl + "&addressUri=" + "${statement.address!}">
-    <#elseif propertyName?contains("phone") || propertyName?contains("fax")>
+    <#elseif rangeUri?contains("Telephone") || rangeUri?contains("Fax")>
         <#local url = statement.editUrl + "&phoneUri=" + "${statement.phone!}">
-    <#elseif propertyName?contains("primary email") || propertyName?contains("additional emails")>
+    <#elseif rangeUri?contains("Work") || rangeUri?contains("Email")>
         <#local url = statement.editUrl + "&emailUri=" + "${statement.email!}">
-    <#elseif propertyName?contains("full name")>
+    <#elseif rangeUri?contains("Name")>
         <#local url = statement.editUrl + "&fullNameUri=" + "${statement.fullName!}">
-    <#elseif propertyName?contains("preferred title")>
+    <#elseif rangeUri?contains("Title")>
         <#local url = statement.editUrl + "&titleUri=" + "${statement.title!}">
     </#if>
 <#else>
