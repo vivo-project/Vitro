@@ -346,7 +346,9 @@ public class KnowledgeBaseUpdater {
 	}
 	
 	public static boolean isUpdatableABoxGraph(String graphName) {
-	    return (!graphName.contains("tbox") && !graphName.contains("filegraph"));
+	    return (graphName != null && !graphName.contains("tbox") 
+	            && !graphName.contains("filegraph") 
+	            && !graphName.contains("x-arq:UnionGraph"));
 	}
 
 	/**
