@@ -205,6 +205,20 @@ name will be used as the label. -->
 <#macro deleteLink propertyLocalName propertyName statement> 
     <#local url = statement.deleteUrl>
     <#if url?has_content>
+    	<#--We need to specify the actual object to be deleted as it is different from the object uri-->
+	    <#if propertyLocalName?contains("ARG_2000028")>
+		    <#if propertyName?contains("mailing address")>
+		        <#local url = url + "&deleteObjectUri=" + "${statement.address!}">
+		    <#elseif propertyName?contains("phone") || propertyName?contains("fax")>
+		        <#local url = url + "&deleteObjectUri=" + "${statement.phone!}">
+		    <#elseif propertyName?contains("primary email") || propertyName?contains("additional emails")>
+		        <#local url = url + "&deleteObjectUri=" + "${statement.email!}">
+		    <#elseif propertyName?contains("full name")>
+		        <#local url = url + "&deleteObjectUri=" + "${statement.fullName!}">
+		    <#elseif propertyName?contains("preferred title")>
+		        <#local url = url + "&deleteObjectUri=" + "${statement.title!}">
+		    </#if>
+		</#if>
         <@showDeleteLink propertyLocalName url />
     </#if>
 </#macro>

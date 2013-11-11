@@ -167,21 +167,21 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
 		
 	}
 
-
-	
-
-
 	//process object property
     private void processObjectProperty(VitroRequest vreq) {
     	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
     	    	
     	//if this property is true, it means the object needs to be deleted along with statement
-    	if(prop.getStubObjectRelation())
+    	//while the second test is to see if a different object uri (i.e. not the direct objet of the predicate)
+    	//needs to be deleted
+    	if(prop.getStubObjectRelation() || hasDeleteObjectUri(vreq))
     	{
     		deleteObjectIndividual(vreq);
     	}
     	
-    	deleteObjectPropertyStatement(vreq);
+    	if(!hasDeleteObjectUri(vreq)) {
+    		deleteObjectPropertyStatement(vreq);
+    	}
 		
     }
     
@@ -194,7 +194,7 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
 		wdf.getPropertyInstanceDao().deleteObjectPropertyStatement(subjectUri, predicateUri, objectUri);
 	}
 
-	private Individual getObjectIndividualForStubRelation(VitroRequest vreq, String objectUri) {
+	private Individual getObjectIndividualForDeletion(VitroRequest vreq, String objectUri) {
     
     	Individual object = EditConfigurationUtils.getIndividual(vreq, objectUri);
     	if(object == null) {
@@ -208,15 +208,29 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
     
     private void deleteObjectIndividual(VitroRequest vreq) {
     	String objectUri = EditConfigurationUtils.getObjectUri(vreq);
-    	Individual object = getObjectIndividualForStubRelation(vreq, objectUri);
+    	if(hasDeleteObjectUri(vreq)) {
+    		//if a different individual needs to be deleted, get that uri instead
+    		objectUri = getDeleteObjectUri(vreq);
+    	}
+    	Individual object = getObjectIndividualForDeletion(vreq, objectUri);
     	if(object != null) {
-    		log.warn("Deleting individual " + object.getName() + "since property has been set to force range object deletion");
+    		log.warn("Deleting individual " + object.getName() + "since property has been set to force range object deletion or has been set to delete a specific object");
     		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     		wdf.getIndividualDao().deleteIndividual(object);
     	} else {
     		//TODO: Throw error?
     		log.error("could not find object as request attribute or in model " + objectUri);
     	}
+    }
+    
+    //This checks if the object uri is not the individual to be deleted but another individual connected
+    private String getDeleteObjectUri(VitroRequest vreq) {
+    	return (String) vreq.getParameter("deleteObjectUri");
+    }
+    
+    private boolean hasDeleteObjectUri(VitroRequest vreq) {
+    	String deleteObjectUri = getDeleteObjectUri(vreq);
+    	return (deleteObjectUri != null && !deleteObjectUri.isEmpty());
     }
 
     

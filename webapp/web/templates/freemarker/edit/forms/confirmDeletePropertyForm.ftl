@@ -32,7 +32,7 @@
     <input type="hidden" name="predicateUri" value="${editConfiguration.predicateUri}" role="input" />
     <input type="hidden" name="domainUri" value="${editConfiguration.domainUri}" role="input" />
     <input type="hidden" name="rangeUri" value="${editConfiguration.rangeUri}" role="input" />
-    
+    <input type="hidden" name="deleteObjectUri" value="${editConfiguration.customDeleteObjectUri}" />
     <#if editConfiguration.dataProperty = true>
         <input type="hidden" name="datapropKey" value="${editConfiguration.datapropKey}" role="input" />
         <input type="hidden" name="vitroNsProp" value="${editConfiguration.vitroNsProperty}" role="input" />
