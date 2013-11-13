@@ -172,7 +172,7 @@ name will be used as the label. -->
     <#if editable >
         <#if (!rangeUri?contains("Authorship") && !rangeUri?contains("URL") && !rangeUri?contains("Editorship") && propertyLocalName != "hasResearchArea")>
             <@editLink propertyLocalName propertyName statement rangeUri/>
-            <@deleteLink propertyLocalName propertyName statement />
+            <@deleteLink propertyLocalName propertyName statement rangeUri/>
         </#if>    
     </#if>
 </#macro>
@@ -202,20 +202,20 @@ name will be used as the label. -->
     <a class="edit-${propertyLocalName}" href="${url}" title="${i18n().edit_entry}"><img class="edit-individual" src="${urls.images}/individual/editIcon.gif" alt="${i18n().edit_entry}" /></a>
 </#macro>
 
-<#macro deleteLink propertyLocalName propertyName statement> 
+<#macro deleteLink propertyLocalName propertyName statement rangeUri=""> 
     <#local url = statement.deleteUrl>
     <#if url?has_content>
     	<#--We need to specify the actual object to be deleted as it is different from the object uri-->
 	    <#if propertyLocalName?contains("ARG_2000028")>
-		    <#if propertyName?contains("mailing address")>
+		    <#if rangeUri?contains("Address")>
 		        <#local url = url + "&deleteObjectUri=" + "${statement.address!}">
-		    <#elseif propertyName?contains("phone") || propertyName?contains("fax")>
+		    <#elseif rangeUri?contains("Telephone") || rangeUri?contains("Fax")>
 		        <#local url = url + "&deleteObjectUri=" + "${statement.phone!}">
-		    <#elseif propertyName?contains("primary email") || propertyName?contains("additional emails")>
+		    <#elseif rangeUri?contains("Work") || rangeUri?contains("Email")>
 		        <#local url = url + "&deleteObjectUri=" + "${statement.email!}">
-		    <#elseif propertyName?contains("full name")>
+		    <#elseif rangeUri?contains("Name")>
 		        <#local url = url + "&deleteObjectUri=" + "${statement.fullName!}">
-		    <#elseif propertyName?contains("preferred title")>
+		    <#elseif rangeUri?contains("Title")>
 		        <#local url = url + "&deleteObjectUri=" + "${statement.title!}">
 		    </#if>
 		</#if>
