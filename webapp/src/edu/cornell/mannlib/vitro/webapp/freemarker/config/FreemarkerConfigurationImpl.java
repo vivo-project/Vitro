@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -50,17 +49,17 @@ public class FreemarkerConfigurationImpl extends Configuration {
 	private static final Log log = LogFactory
 			.getLog(FreemarkerConfigurationImpl.class);
 
-	private final ThreadLocal<HttpServletRequest> currentRequest = new ThreadLocal<>();
-	private final Map<HttpServletRequest, RequestBasedInformation> rbiMap = Collections
-			.synchronizedMap(new WeakHashMap<HttpServletRequest, RequestBasedInformation>());
+	private final ThreadLocal<Integer> currentRequestHash = new ThreadLocal<>();
+	private final Map<Integer, RequestBasedInformation> rbiMap = Collections
+			.synchronizedMap(new HashMap<Integer, RequestBasedInformation>());
 
 	protected void setRequestInfo(HttpServletRequest req) {
-		currentRequest.set(req);
-		rbiMap.put(req, new RequestBasedInformation(req, this));
+		currentRequestHash.set(req.hashCode());
+		rbiMap.put(req.hashCode(), new RequestBasedInformation(req, this));
 	}
 
 	private RequestBasedInformation getRequestInfo() {
-		return rbiMap.get(currentRequest.get());
+		return rbiMap.get(currentRequestHash.get());
 	}
 
 	@Override
@@ -103,7 +102,7 @@ public class FreemarkerConfigurationImpl extends Configuration {
 
 	@Override
 	public Locale getLocale() {
-		return currentRequest.get().getLocale();
+		return getRequestInfo().getReq().getLocale();
 	}
 
 	private String[] joinNames(Set<String> nameSet, String[] nameArray) {
@@ -235,14 +234,21 @@ public class FreemarkerConfigurationImpl extends Configuration {
 	 * custom attribute, and the locale. In the future, it could be more.
 	 */
 	private static class RequestBasedInformation {
+		private final HttpServletRequest req;
 		private final Configuration c;
 		private final Map<String, Object> customAttributes = new HashMap<>();
 		private final Map<String, TemplateModel> sharedVariables = new HashMap<>();
 
 		public RequestBasedInformation(HttpServletRequest req, Configuration c) {
+			this.req = req;
 			this.c = c;
+
 			setSharedVariables(req);
 			setCustomAttributes(req);
+		}
+
+		public HttpServletRequest getReq() {
+			return req;
 		}
 
 		public Map<String, Object> getCustomAttributes() {
