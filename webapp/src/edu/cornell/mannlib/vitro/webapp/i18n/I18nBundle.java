@@ -24,24 +24,28 @@ public class I18nBundle {
 	private static final String MESSAGE_BUNDLE_NOT_FOUND = "Text bundle ''{0}'' not found.";
 	private static final String MESSAGE_KEY_NOT_FOUND = "Text bundle ''{0}'' has no text for ''{1}''";
 
-	public static I18nBundle emptyBundle(String bundleName) {
-		return new I18nBundle(bundleName);
+	public static I18nBundle emptyBundle(String bundleName,
+			I18nLogger i18nLogger) {
+		return new I18nBundle(bundleName, i18nLogger);
 	}
 
 	private final String bundleName;
 	private final ResourceBundle resources;
 	private final String notFoundMessage;
+	private final I18nLogger i18nLogger;
 
-	private I18nBundle(String bundleName) {
-		this(bundleName, new EmptyResourceBundle(), MESSAGE_BUNDLE_NOT_FOUND);
+	private I18nBundle(String bundleName, I18nLogger i18nLogger) {
+		this(bundleName, new EmptyResourceBundle(), MESSAGE_BUNDLE_NOT_FOUND,
+				i18nLogger);
 	}
 
-	public I18nBundle(String bundleName, ResourceBundle resources) {
-		this(bundleName, resources, MESSAGE_KEY_NOT_FOUND);
+	public I18nBundle(String bundleName, ResourceBundle resources,
+			I18nLogger i18nLogger) {
+		this(bundleName, resources, MESSAGE_KEY_NOT_FOUND, i18nLogger);
 	}
 
 	private I18nBundle(String bundleName, ResourceBundle resources,
-			String notFoundMessage) {
+			String notFoundMessage, I18nLogger i18nLogger) {
 		if (bundleName == null) {
 			throw new IllegalArgumentException("bundleName may not be null");
 		}
@@ -57,22 +61,27 @@ public class I18nBundle {
 		this.bundleName = bundleName;
 		this.resources = resources;
 		this.notFoundMessage = notFoundMessage;
+		this.i18nLogger = i18nLogger;
 	}
 
 	public String text(String key, Object... parameters) {
-
 		String textString;
 		if (resources.containsKey(key)) {
 			textString = resources.getString(key);
 			log.debug("In '" + bundleName + "', " + key + "='" + textString
 					+ "')");
-			return formatString(textString, parameters);
 		} else {
 			String message = MessageFormat.format(notFoundMessage, bundleName,
 					key);
 			log.warn(message);
-			return "ERROR: " + message;
+			textString = "ERROR: " + message;
 		}
+		String result = formatString(textString, parameters);
+
+		if (i18nLogger != null) {
+			i18nLogger.log(bundleName, key, parameters, textString, result);
+		}
+		return result;
 	}
 
 	private static String formatString(String textString, Object... parameters) {

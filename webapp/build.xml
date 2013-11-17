@@ -263,7 +263,12 @@
 	<target name="prepareVitroHomeDir" depends="prepare">
 		<mkdir dir="${vitrohome.build.dir}" />
 		<mkdir dir="${vitrohome.image.dir}" />
-		<copy todir="${vitrohome.image.dir}" file="${appbase.dir}/config/example.runtime.properties" />
+		<copy todir="${vitrohome.image.dir}" >
+			<fileset dir="${appbase.dir}/config" >
+				<include name="example.runtime.properties" />
+				<include name="example.developer.properties" />
+			</fileset>
+		</copy>
 		<copy todir="${vitrohome.image.dir}" >
 			<fileset dir="${appbase.dir}" >
 				<include name="rdf/**/*" />
