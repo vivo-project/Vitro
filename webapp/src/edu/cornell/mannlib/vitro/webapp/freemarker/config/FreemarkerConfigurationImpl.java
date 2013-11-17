@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.freemarker.config;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -49,22 +48,15 @@ public class FreemarkerConfigurationImpl extends Configuration {
 	private static final Log log = LogFactory
 			.getLog(FreemarkerConfigurationImpl.class);
 
-	private final ThreadLocal<Integer> currentRequestHash = new ThreadLocal<>();
-	private final Map<Integer, RequestBasedInformation> rbiMap = Collections
-			.synchronizedMap(new HashMap<Integer, RequestBasedInformation>());
+	private final ThreadLocal<RequestBasedInformation> rbiRef = new ThreadLocal<>();
 
-	protected void setRequestInfo(HttpServletRequest req) {
-		currentRequestHash.set(req.hashCode());
-		rbiMap.put(req.hashCode(), new RequestBasedInformation(req, this));
-	}
-
-	private RequestBasedInformation getRequestInfo() {
-		return rbiMap.get(currentRequestHash.get());
+	void setRequestInfo(HttpServletRequest req) {
+		rbiRef.set(new RequestBasedInformation(req, this));
 	}
 
 	@Override
 	public Object getCustomAttribute(String name) {
-		Map<String, Object> attribs = getRequestInfo().getCustomAttributes();
+		Map<String, Object> attribs = rbiRef.get().getCustomAttributes();
 		if (attribs.containsKey(name)) {
 			return attribs.get(name);
 		} else {
@@ -74,13 +66,13 @@ public class FreemarkerConfigurationImpl extends Configuration {
 
 	@Override
 	public String[] getCustomAttributeNames() {
-		Set<String> rbiNames = getRequestInfo().getCustomAttributes().keySet();
+		Set<String> rbiNames = rbiRef.get().getCustomAttributes().keySet();
 		return joinNames(rbiNames, super.getCustomAttributeNames());
 	}
 
 	@Override
 	public TemplateModel getSharedVariable(String name) {
-		Map<String, TemplateModel> vars = getRequestInfo().getSharedVariables();
+		Map<String, TemplateModel> vars = rbiRef.get().getSharedVariables();
 		if (vars.containsKey(name)) {
 			return vars.get(name);
 		} else {
@@ -90,7 +82,7 @@ public class FreemarkerConfigurationImpl extends Configuration {
 
 	@Override
 	public Set<String> getSharedVariableNames() {
-		Set<String> rbiNames = getRequestInfo().getSharedVariables().keySet();
+		Set<String> rbiNames = rbiRef.get().getSharedVariables().keySet();
 
 		@SuppressWarnings("unchecked")
 		Set<String> superNames = super.getSharedVariableNames();
@@ -102,7 +94,7 @@ public class FreemarkerConfigurationImpl extends Configuration {
 
 	@Override
 	public Locale getLocale() {
-		return getRequestInfo().getReq().getLocale();
+		return rbiRef.get().getReq().getLocale();
 	}
 
 	private String[] joinNames(Set<String> nameSet, String[] nameArray) {
