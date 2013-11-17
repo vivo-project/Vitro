@@ -3,12 +3,14 @@
 package edu.cornell.mannlib.vitro.webapp.freemarker.config;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -48,15 +50,22 @@ public class FreemarkerConfigurationImpl extends Configuration {
 	private static final Log log = LogFactory
 			.getLog(FreemarkerConfigurationImpl.class);
 
-	private final ThreadLocal<RequestBasedInformation> rbiRef = new ThreadLocal<>();
+	private final ThreadLocal<HttpServletRequest> currentRequest = new ThreadLocal<>();
+	private final Map<HttpServletRequest, RequestBasedInformation> rbiMap = Collections
+			.synchronizedMap(new WeakHashMap<HttpServletRequest, RequestBasedInformation>());
 
-	void setRequestInfo(HttpServletRequest req) {
-		rbiRef.set(new RequestBasedInformation(req, this));
+	protected void setRequestInfo(HttpServletRequest req) {
+		currentRequest.set(req);
+		rbiMap.put(req, new RequestBasedInformation(req, this));
+	}
+
+	private RequestBasedInformation getRequestInfo() {
+		return rbiMap.get(currentRequest.get());
 	}
 
 	@Override
 	public Object getCustomAttribute(String name) {
-		Map<String, Object> attribs = rbiRef.get().getCustomAttributes();
+		Map<String, Object> attribs = getRequestInfo().getCustomAttributes();
 		if (attribs.containsKey(name)) {
 			return attribs.get(name);
 		} else {
@@ -66,13 +75,13 @@ public class FreemarkerConfigurationImpl extends Configuration {
 
 	@Override
 	public String[] getCustomAttributeNames() {
-		Set<String> rbiNames = rbiRef.get().getCustomAttributes().keySet();
+		Set<String> rbiNames = getRequestInfo().getCustomAttributes().keySet();
 		return joinNames(rbiNames, super.getCustomAttributeNames());
 	}
 
 	@Override
 	public TemplateModel getSharedVariable(String name) {
-		Map<String, TemplateModel> vars = rbiRef.get().getSharedVariables();
+		Map<String, TemplateModel> vars = getRequestInfo().getSharedVariables();
 		if (vars.containsKey(name)) {
 			return vars.get(name);
 		} else {
@@ -82,7 +91,7 @@ public class FreemarkerConfigurationImpl extends Configuration {
 
 	@Override
 	public Set<String> getSharedVariableNames() {
-		Set<String> rbiNames = rbiRef.get().getSharedVariables().keySet();
+		Set<String> rbiNames = getRequestInfo().getSharedVariables().keySet();
 
 		@SuppressWarnings("unchecked")
 		Set<String> superNames = super.getSharedVariableNames();
@@ -94,7 +103,7 @@ public class FreemarkerConfigurationImpl extends Configuration {
 
 	@Override
 	public Locale getLocale() {
-		return rbiRef.get().getReq().getLocale();
+		return currentRequest.get().getLocale();
 	}
 
 	private String[] joinNames(Set<String> nameSet, String[] nameArray) {
@@ -226,21 +235,14 @@ public class FreemarkerConfigurationImpl extends Configuration {
 	 * custom attribute, and the locale. In the future, it could be more.
 	 */
 	private static class RequestBasedInformation {
-		private final HttpServletRequest req;
 		private final Configuration c;
 		private final Map<String, Object> customAttributes = new HashMap<>();
 		private final Map<String, TemplateModel> sharedVariables = new HashMap<>();
 
 		public RequestBasedInformation(HttpServletRequest req, Configuration c) {
-			this.req = req;
 			this.c = c;
-
 			setSharedVariables(req);
 			setCustomAttributes(req);
-		}
-
-		public HttpServletRequest getReq() {
-			return req;
 		}
 
 		public Map<String, Object> getCustomAttributes() {
