@@ -67,7 +67,7 @@ public class DeveloperSettings {
 		 * Enable the I18nLogger to log each string request.
 		 */
 		I18N_LOG_STRINGS("developer.i18n.logStringRequests", true),
-		
+
 		/**
 		 * Enable the LoggingRDFService
 		 */
@@ -85,21 +85,74 @@ public class DeveloperSettings {
 		LOGGING_RDF_RESTRICTION("developer.loggingRDFService.restriction",
 				false);
 
-		private final String key;
+		private final String propertyName;
+		private final String elementId;
 		private final boolean bool;
 
-		Keys(String key, boolean bool) {
-			this.key = key;
+		private Keys(String propertyName, boolean bool) {
+			this.propertyName = propertyName;
+			this.elementId = produceElementId();
 			this.bool = bool;
 		}
 
-		public String key() {
-			return key;
+		public String propertyName() {
+			return propertyName;
+		}
+
+		public String elementId() {
+			return elementId;
 		}
 
 		boolean isBoolean() {
 			return bool;
 		}
+
+		/**
+		 * The element ID is camel-case instead of period-delimited. So
+		 * "developer.enabled" becomes "developerEnabled".
+		 */
+		String produceElementId() {
+			StringBuilder id = new StringBuilder(propertyName.length());
+			boolean capitalize = false;
+			for (int i = 0; i < propertyName.length(); i++) {
+				char c = propertyName.charAt(i);
+				if (c == '.') {
+					capitalize = true;
+				} else if (capitalize) {
+					id.append(Character.toUpperCase(c));
+					capitalize = false;
+				} else {
+					id.append(c);
+				}
+			}
+			return id.toString();
+		}
+
+		@Override
+		public String toString() {
+			return propertyName;
+		}
+
+		static Keys fromElementId(String id) {
+			for (Keys k : Keys.values()) {
+				if (k.elementId.equals(id)) {
+					return k;
+				}
+			}
+			log.error("Can't find key for element id: '" + id + "'");
+			return null;
+		}
+
+		static Keys fromPropertyName(String name) {
+			for (Keys k : Keys.values()) {
+				if (k.propertyName.equals(name)) {
+					return k;
+				}
+			}
+			log.error("Can't find key for property name: '" + name + "'");
+			return null;
+		}
+
 	}
 
 	// ----------------------------------------------------------------------
@@ -133,7 +186,7 @@ public class DeveloperSettings {
 	private DeveloperSettings(ServletContext ctx) {
 		updateFromFile(ctx);
 	}
-	
+
 	/**
 	 * Read the initial settings from "developer.properties" in the Vitro home
 	 * directory.
@@ -141,7 +194,7 @@ public class DeveloperSettings {
 	 * This method is "protected" so we can override it for unit tests.
 	 */
 	protected void updateFromFile(ServletContext ctx) {
-		Map<String, String> fromFile = new HashMap<>();
+		Map<Keys, String> fromFile = new HashMap<>();
 
 		ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
 		String home = props.getProperty("vitro.home");
@@ -152,7 +205,8 @@ public class DeveloperSettings {
 				Properties dsProps = new Properties();
 				dsProps.load(reader);
 				for (String key : dsProps.stringPropertyNames()) {
-					fromFile.put(key, dsProps.getProperty(key));
+					fromFile.put(Keys.fromPropertyName(key),
+							dsProps.getProperty(key));
 				}
 			} catch (Exception e) {
 				log.warn("Failed to load 'developer.properties' file.", e);
@@ -171,16 +225,16 @@ public class DeveloperSettings {
 			dumpParameterMap(parameterMap);
 		}
 
-		Map<String, String> fromRequest = new HashMap<>();
+		Map<Keys, String> fromRequest = new HashMap<>();
 		for (String key : parameterMap.keySet()) {
-			fromRequest.put(key, parameterMap.get(key)[0]);
+			fromRequest.put(Keys.fromElementId(key), parameterMap.get(key)[0]);
 		}
 		update(fromRequest);
 	}
 
-	private void update(Map<String, String> changedSettings) {
+	private void update(Map<Keys, String> changedSettings) {
 		for (Keys key : Keys.values()) {
-			String s = changedSettings.get(key.key());
+			String s = changedSettings.get(key);
 			if (s != null) {
 				if (key.isBoolean()) {
 					settings.put(key, Boolean.valueOf(s));
@@ -199,10 +253,10 @@ public class DeveloperSettings {
 			return getString(key);
 		}
 	}
-	
+
 	public boolean getBoolean(Keys key) {
 		if (!key.isBoolean()) {
-			throw new IllegalArgumentException("Key '" + key.key()
+			throw new IllegalArgumentException("Key '" + key
 					+ "' does not take a boolean value.");
 		}
 		if (settings.containsKey(key)) {
@@ -215,7 +269,7 @@ public class DeveloperSettings {
 
 	public String getString(Keys key) {
 		if (key.isBoolean()) {
-			throw new IllegalArgumentException("Key '" + key.key()
+			throw new IllegalArgumentException("Key '" + key
 					+ "' takes a boolean value.");
 		}
 		if (settings.containsKey(key)) {
@@ -229,7 +283,7 @@ public class DeveloperSettings {
 	public Map<String, Object> getSettingsMap() {
 		Map<String, Object> map = new HashMap<>();
 		for (Keys key : Keys.values()) {
-			map.put(key.key(), get(key));
+			map.put(key.elementId(), get(key));
 		}
 		return map;
 	}

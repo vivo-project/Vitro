@@ -34,34 +34,33 @@
 	    document.getElementById("developerPanelSaveButton").onclick = function() {
 			updateDeveloperPanel(collectFormData());
 	    }
-	    document.getElementById("developer.enabled").onchange = updateDisabledFields
-	    document.getElementById("developer.loggingRDFService.enable").onchange = updateDisabledFields
+	    document.getElementById("developerEnabled").onchange = updateDisabledFields
+	    document.getElementById("developerLoggingRDFServiceEnable").onchange = updateDisabledFields
 	}
 	
 	function updateDisabledFields() {
-		var developerEnabled = document.getElementById("developer.enabled").checked;
-		document.getElementById("developer.defeatFreemarkerCache").disabled = !developerEnabled;
-		document.getElementById("developer.insertFreemarkerDelimiters").disabled = !developerEnabled;
-		document.getElementById("developer.i18n.defeatCache").disabled = !developerEnabled;
-		document.getElementById("developer.i18n.logStringRequests").disabled = !developerEnabled;
-		document.getElementById("developer.loggingRDFService.enable").disabled = !developerEnabled;
+		var developerEnabled = document.getElementById("developerEnabled").checked;
+		document.getElementById("developerDefeatFreemarkerCache").disabled = !developerEnabled;
+		document.getElementById("developerInsertFreemarkerDelimiters").disabled = !developerEnabled;
+		document.getElementById("developerI18nDefeatCache").disabled = !developerEnabled;
+		document.getElementById("developerI18nLogStringRequests").disabled = !developerEnabled;
+		document.getElementById("developerLoggingRDFServiceEnable").disabled = !developerEnabled;
 	
-		var rdfServiceEnabled = developerEnabled && document.getElementById("developer.loggingRDFService.enable").checked;
-		document.getElementById("developer.loggingRDFService.stackTrace").disabled = !rdfServiceEnabled;
-		document.getElementById("developer.loggingRDFService.restriction").disabled = !rdfServiceEnabled;
+		var rdfServiceEnabled = developerEnabled && document.getElementById("developerLoggingRDFServiceEnable").checked;
+		document.getElementById("developerLoggingRDFServiceStackTrace").disabled = !rdfServiceEnabled;
+		document.getElementById("developerLoggingRDFServiceRestriction").disabled = !rdfServiceEnabled;
 	}
 
 	function collectFormData() {
 		var data = new Object();
-		data["developer.panelOpen"] = false;
-		getCheckbox("developer.enabled", data);
-		getCheckbox("developer.defeatFreemarkerCache", data);
-		getCheckbox("developer.insertFreemarkerDelimiters", data);
-		getCheckbox("developer.i18n.defeatCache", data);
-		getCheckbox("developer.i18n.logStringRequests", data);
-		getCheckbox("developer.loggingRDFService.enable", data);
-		getCheckbox("developer.loggingRDFService.stackTrace", data);
-		getText("developer.loggingRDFService.restriction", data);
+		getCheckbox("developerEnabled", data);
+		getCheckbox("developerDefeatFreemarkerCache", data);
+		getCheckbox("developerInsertFreemarkerDelimiters", data);
+		getCheckbox("developerI18nDefeatCache", data);
+		getCheckbox("developerI18nLogStringRequests", data);
+		getCheckbox("developerLoggingRDFServiceEnable", data);
+		getCheckbox("developerLoggingRDFServiceStackTrace", data);
+		getText("developerLoggingRDFServiceRestriction", data);
 		return data;
 	}
 

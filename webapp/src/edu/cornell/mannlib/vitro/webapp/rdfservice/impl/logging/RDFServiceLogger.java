@@ -82,8 +82,8 @@ public class RDFServiceLogger implements AutoCloseable {
 				restriction = Pattern.compile(restrictionString);
 			} catch (Exception e) {
 				log.error("Failed to compile the pattern for "
-						+ Keys.LOGGING_RDF_RESTRICTION.key() + " = "
-						+ restriction + " " + e);
+						+ Keys.LOGGING_RDF_RESTRICTION + " = " + restriction
+						+ " " + e);
 				isEnabled = false;
 			}
 		}
