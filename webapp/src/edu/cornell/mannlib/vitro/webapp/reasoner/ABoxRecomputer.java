@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -295,14 +296,35 @@ public class ABoxRecomputer {
 	 */
 	protected Collection<String> getAllIndividualURIs() {
 	    
-		String queryString = "SELECT DISTINCT ?s WHERE { GRAPH ?g { ?s a ?type } " +
-		        " FILTER (!bound(?g) || !regex(str(?g),\"tbox\")) } ORDER BY ?s";
-	    return getIndividualURIs(queryString);
+	    HashSet<String> individualURIs = new HashSet<String>();
+	    
+	    List<String> classList = new ArrayList<String>();
+	    
+	    tboxModel.enterCriticalSection(Lock.READ);
+	    try {
+	        StmtIterator classIt = tboxModel.listStatements(
+	                (Resource) null, RDF.type, OWL.Class);
+	        while(classIt.hasNext()) {
+	            Statement stmt = classIt.nextStatement();
+	            if(stmt.getSubject().isURIResource() 
+	                    && stmt.getSubject().getURI() != null 
+	                    && !stmt.getSubject().getURI().isEmpty()) {
+	                classList.add(stmt.getSubject().getURI());
+	            }
+	        }
+	    } finally {
+	        tboxModel.leaveCriticalSection();
+	    }
+	    
+	    for (String classURI : classList) {
+		    String queryString = "SELECT ?s WHERE { ?s a <" + classURI + "> } ";
+	        getIndividualURIs(queryString, individualURIs);
+	    }
+	    
+	    return individualURIs;
 	}
 
-	protected Collection<String> getIndividualURIs(String queryString) {
-	    
-		Set<String> individuals = new HashSet<String>();
+	protected void getIndividualURIs(String queryString, Set<String> individuals) {
 
 		int batchSize = 50000;
 		int offset = 0;
@@ -342,7 +364,6 @@ public class ABoxRecomputer {
     		offset += batchSize;
 		}
 				
-		return individuals;
 	}
 
 	protected void addedABoxTypeAssertion(Resource individual, Model inferenceModel, HashSet<String> unknownTypes) {
