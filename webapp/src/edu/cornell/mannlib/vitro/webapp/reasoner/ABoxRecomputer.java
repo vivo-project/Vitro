@@ -410,6 +410,11 @@ public class ABoxRecomputer {
 			while (iter.hasNext()) {
 				Statement stmt = iter.next();
 				
+				// skip statements with blank nodes to avoid excessive deletion
+				if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
+				    continue;
+				}
+				
 				inferenceModel.enterCriticalSection(Lock.WRITE);
 				try {
 					inferenceModel.remove(stmt);

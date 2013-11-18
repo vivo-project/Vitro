@@ -744,6 +744,8 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
     private List<Statement> sort(List<Statement> stmts) {
         List<Statement> output = new ArrayList<Statement>();
         int originalSize = stmts.size();
+        if (originalSize == 1) 
+            return stmts;
         List <Statement> remaining = stmts;
         ConcurrentLinkedQueue<com.hp.hpl.jena.rdf.model.Resource> subjQueue = 
                 new ConcurrentLinkedQueue<com.hp.hpl.jena.rdf.model.Resource>();
