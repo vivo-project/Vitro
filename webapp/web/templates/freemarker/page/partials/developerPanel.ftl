@@ -27,8 +27,8 @@ div.developer .container {
 }
 </style>
 
-<#if !settings["developer.enabled"]>
-<#elseif !settings["mayControl"]>
+<#if !settings.developerEnabled>
+<#elseif !settings.mayControl>
 	<div class="developer">
 		<h1>${siteName} is running in developer mode.</h1>
 	</div>
@@ -40,18 +40,18 @@ div.developer .container {
 		<div id="developerPanelBody">
 			<form>
 				<label>
-					<@showCheckbox "developer.enabled" />
+					<@showCheckbox "developerEnabled" />
 					Enable developer mode
 				</label>
 				
 				<div class="container">
 					Freemarker templates
 					<label>
-						<@showCheckbox "developer.defeatFreemarkerCache" />
+						<@showCheckbox "developerDefeatFreemarkerCache" />
 						Defeat the template cache
 					</label>
 					<label>
-						<@showCheckbox "developer.insertFreemarkerDelimiters" />
+						<@showCheckbox "developerInsertFreemarkerDelimiters" />
 						Insert HTML comments at start and end of templates
 					</label>
 				</div>
@@ -59,27 +59,27 @@ div.developer .container {
 				<div class="container">
 					SPARQL Queries
 					<label>
-						<@showCheckbox "developer.loggingRDFService.enable" />
+						<@showCheckbox "developerLoggingRDFServiceEnable" />
 						Log each query 
 					</label>
 					<label>
-						<@showCheckbox "developer.loggingRDFService.stackTrace" />
+						<@showCheckbox "developerLoggingRDFServiceStackTrace" />
 						Add stack trace
 					</label>
 					<label>
 						Restrict by calling stack
-						<@showTextbox "developer.loggingRDFService.restriction" />
+						<@showTextbox "developerLoggingRDFServiceRestriction" />
 					</label>
 				</div>
 
 				<div class="container">
 					Language support
 					<label>
-						<@showCheckbox "developer.i18n.defeatCache" />
+						<@showCheckbox "developerI18nDefeatCache" />
 						Defeat the cache of language property files
 					</label>
 					<label>
-						<@showCheckbox "developer.i18n.logStringRequests" />
+						<@showCheckbox "developerI18nLogStringRequests" />
 						Log the retrieval of language strings
 					</label>
 				</div>
