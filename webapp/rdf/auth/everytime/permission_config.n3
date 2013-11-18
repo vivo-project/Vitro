@@ -24,6 +24,7 @@ auth:ADMIN
     auth:hasPermission simplePermission:UseMiscellaneousAdminPages ;
     auth:hasPermission simplePermission:UseSparqlQueryPage ;
    	auth:hasPermission simplePermission:PageViewableAdmin ;    
+   	auth:hasPermission simplePermission:EnableDeveloperPanel ;    
     
     # permissions for CURATOR and above.
     auth:hasPermission simplePermission:EditOntology ;
