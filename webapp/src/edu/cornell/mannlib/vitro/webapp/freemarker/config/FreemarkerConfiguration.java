@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.freemarker.config;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,9 +20,9 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.DelimitingTemplateLoader;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FlatteningTemplateLoader;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
+import edu.cornell.mannlib.vitro.webapp.freemarker.loader.FreemarkerTemplateLoader;
 import edu.cornell.mannlib.vitro.webapp.i18n.freemarker.I18nMethodModel;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
@@ -35,7 +34,6 @@ import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualLocalNameMethod;
 import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualPlaceholderImageUrlMethod;
 import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualProfileUrlMethod;
 import freemarker.cache.ClassTemplateLoader;
-import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.ext.beans.BeansWrapper;
@@ -150,38 +148,31 @@ public abstract class FreemarkerConfiguration {
 
 		List<TemplateLoader> loaders = new ArrayList<TemplateLoader>();
 
-		// Theme template loader
+		// Theme template loader - only if the theme has a template directory.
 		String themeTemplatePath = ctx.getRealPath(themeDir) + "/templates";
 		File themeTemplateDir = new File(themeTemplatePath);
-		// A theme need not contain a template directory.
 		if (themeTemplateDir.exists()) {
-			try {
-				FileTemplateLoader themeFtl = new FileTemplateLoader(
-						themeTemplateDir);
-				loaders.add(themeFtl);
-			} catch (IOException e) {
-				log.error("Error creating theme template loader", e);
-			}
+			loaders.add(new FreemarkerTemplateLoader(themeTemplateDir));
 		}
 
 		// Vitro template loader
 		String vitroTemplatePath = ctx.getRealPath("/templates/freemarker");
-		loaders.add(new FlatteningTemplateLoader(new File(vitroTemplatePath)));
+		loaders.add(new FreemarkerTemplateLoader(new File(vitroTemplatePath)));
 
 		// TODO VIVO-243 Why is this here?
 		loaders.add(new ClassTemplateLoader(FreemarkerConfiguration.class, ""));
-
+		
 		TemplateLoader[] loaderArray = loaders
 				.toArray(new TemplateLoader[loaders.size()]);
-		MultiTemplateLoader mtl = new MultiTemplateLoader(loaderArray);
+		TemplateLoader tl = new MultiTemplateLoader(loaderArray);
 
 		// If requested, add delimiters to the templates.
 		DeveloperSettings settings = DeveloperSettings.getBean(req);
 		if (settings.getBoolean(Keys.INSERT_FREEMARKER_DELIMITERS)) {
-			return new DelimitingTemplateLoader(mtl);
-		} else {
-			return mtl;
+			tl =  new DelimitingTemplateLoader(tl);
 		}
+		
+		return tl;
 	}
 
 	private static void setThreadLocalsForRequest(HttpServletRequest req) {

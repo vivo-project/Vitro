@@ -221,7 +221,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        int[] maxActiveAndIdle = getMaxActiveAndIdle(ctx);
        cpds.setMaxPoolSize(maxActiveAndIdle[0]);
        cpds.setMinPoolSize(maxActiveAndIdle[1]);
-       cpds.setMaxIdleTime(3600); // ms
+       cpds.setMaxIdleTime(43200); // s
        cpds.setMaxIdleTimeExcessConnections(300);
        cpds.setAcquireIncrement(5);
        cpds.setNumHelperThreads(6);

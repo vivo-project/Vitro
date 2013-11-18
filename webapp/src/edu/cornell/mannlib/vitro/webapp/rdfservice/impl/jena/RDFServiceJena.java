@@ -217,6 +217,9 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     private List<Statement> sort(List<Statement> stmts) {
         List<Statement> output = new ArrayList<Statement>();
         int originalSize = stmts.size();
+        if(originalSize == 1) {
+            return stmts;
+        }
         List <Statement> remaining = stmts;
         ConcurrentLinkedQueue<Resource> subjQueue = new ConcurrentLinkedQueue<Resource>();
         for(Statement stmt : remaining) {
