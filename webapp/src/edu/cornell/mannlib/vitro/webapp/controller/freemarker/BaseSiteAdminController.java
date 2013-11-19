@@ -73,6 +73,10 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 			urls.put("rebuildSearchIndex", UrlBuilder.getUrl("/SearchIndex"));
 		}
 		
+		if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.ENABLE_DEVELOPER_PANEL.ACTIONS)) {
+			urls.put("activateDeveloperPanel", "javascript:new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel({developerEnabled: true});");
+		}
+		
         return urls;
     }
 

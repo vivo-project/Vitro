@@ -1,9 +1,9 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
- function DeveloperPanel(developerAjaxUrl) {
- 	this.setupDeveloperPanel = updateDeveloperPanel;
- 	
- 	function updateDeveloperPanel(data) {
+function DeveloperPanel(developerAjaxUrl) {
+	this.setupDeveloperPanel = updateDeveloperPanel;
+	
+	function updateDeveloperPanel(data) {
 	    $.ajax({
 	        url: developerAjaxUrl,
 	        dataType: "json",
@@ -79,3 +79,4 @@
 $(document).ready(function() {   
 	new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel({});	
 }); 
+
