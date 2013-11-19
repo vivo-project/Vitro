@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.i18n.selection;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -124,7 +125,14 @@ public abstract class SelectedLocale {
 	 * an empty list, but never returns null.
 	 */
 	public static List<Locale> getSelectableLocales(HttpServletRequest req) {
-		ServletContext ctx = req.getSession().getServletContext();
+		return getSelectableLocales(req.getSession().getServletContext());
+	}
+
+	/**
+	 * Get the list of selectable Locales from the servlet context. May return
+	 * an empty list, but never returns null.
+	 */
+	public static List<Locale> getSelectableLocales(ServletContext ctx) {
 		Object ctxInfo = ctx.getAttribute(ATTRIBUTE_NAME);
 		if (ctxInfo instanceof ContextSelectedLocale) {
 			List<Locale> selectableLocales = ((ContextSelectedLocale) ctxInfo)
@@ -164,7 +172,8 @@ public abstract class SelectedLocale {
 			}
 
 			this.forcedLocale = null;
-			this.selectableLocales = selectableLocales;
+			this.selectableLocales = Collections
+					.unmodifiableList(new ArrayList<>(selectableLocales));
 		}
 
 		public Locale getForcedLocale() {
