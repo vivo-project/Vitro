@@ -15,8 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings.Keys;
 
 /**
  * Provides access to a bundle of text strings, based on the name of the bundle,
@@ -31,7 +32,6 @@ public class I18n {
 	private static final Log log = LogFactory.getLog(I18n.class);
 
 	public static final String DEFAULT_BUNDLE_NAME = "all";
-	private static final String PROPERTY_DEVELOPER_DEFEAT_CACHE = "developer.defeatI18nCache";
 
 	/**
 	 * If this attribute is present on the request, then the cache has already
@@ -103,6 +103,7 @@ public class I18n {
 	protected I18nBundle getBundle(String bundleName, HttpServletRequest req) {
 		log.debug("Getting bundle '" + bundleName + "'");
 
+		I18nLogger i18nLogger = new I18nLogger(req);
 		try {
 			checkDevelopmentMode(req);
 			checkForChangeInThemeDirectory(req);
@@ -113,13 +114,13 @@ public class I18n {
 			ResourceBundle.Control control = new ThemeBasedControl(ctx, dir);
 			ResourceBundle rb = ResourceBundle.getBundle(bundleName,
 					req.getLocale(), control);
-			return new I18nBundle(bundleName, rb);
+			return new I18nBundle(bundleName, rb, i18nLogger);
 		} catch (MissingResourceException e) {
 			log.warn("Didn't find text bundle '" + bundleName + "'");
-			return I18nBundle.emptyBundle(bundleName);
+			return I18nBundle.emptyBundle(bundleName, i18nLogger);
 		} catch (Exception e) {
 			log.error("Failed to create text bundle '" + bundleName + "'", e);
-			return I18nBundle.emptyBundle(bundleName);
+			return I18nBundle.emptyBundle(bundleName, i18nLogger);
 		}
 	}
 
@@ -127,11 +128,7 @@ public class I18n {
 	 * If we are in development mode, clear the cache on each request.
 	 */
 	private void checkDevelopmentMode(HttpServletRequest req) {
-		ConfigurationProperties bean = ConfigurationProperties.getBean(req);
-
-		String flag = bean
-				.getProperty(PROPERTY_DEVELOPER_DEFEAT_CACHE, "false");
-		if (Boolean.valueOf(flag.trim())) {
+		if (DeveloperSettings.getBean(req).getBoolean(Keys.I18N_DEFEAT_CACHE) ) {
 			log.debug("In development mode - clearing the cache.");
 			clearCacheOnRequest(req);
 		}

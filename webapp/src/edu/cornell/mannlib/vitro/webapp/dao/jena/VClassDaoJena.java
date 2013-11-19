@@ -1048,11 +1048,20 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         try {
             OntResource subclass = getOntClass(ontModel,c2c.getSubclassURI());
             OntResource superclass = getOntClass(ontModel,c2c.getSuperclassURI());
+            if(subclass == null || superclass == null) {
+                log.warn("unable to delete " + c2c.getSubclassURI() + 
+                        " rdfs:subClassOf " + c2c.getSuperclassURI());
+                if (subclass == null) {
+                    log.warn(c2c.getSubclassURI() + " not found in the model.");
+                }
+                if (superclass == null) {
+                    log.warn(c2c.getSuperclassURI() + " not found in the model.");
+                }
+                return;
+            }
             Model removal = ModelFactory.createDefaultModel();
             Model additions = ModelFactory.createDefaultModel(); // to repair any rdf:Lists
-            if ((subclass != null) && (superclass != null)) {
-                removal.add(ontModel.listStatements(subclass, RDFS.subClassOf, superclass));
-            }
+            removal.add(ontModel.listStatements(subclass, RDFS.subClassOf, superclass));
             if (subclass.isAnon()) {
                 Model[] changeSet = getSmartRemoval(subclass, getOntModel());
                 removal.add(changeSet[0]);

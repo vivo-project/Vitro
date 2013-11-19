@@ -15,7 +15,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings.Keys;
 
 /**
  * Writes the log message for the LoggingRDFService.
@@ -40,10 +41,6 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
  */
 public class RDFServiceLogger implements AutoCloseable {
 	private static final Log log = LogFactory.getLog(RDFServiceLogger.class);
-
-	private static final String PROPERTY_ENABLED = "developer.loggingRDFService.enable";
-	private static final String PROPERTY_STACK_TRACE = "developer.loggingRDFService.stackTrace";
-	private static final String PROPERTY_RESTRICTION = "developer.loggingRDFService.restriction";
 
 	private final ServletContext ctx;
 	private final Object[] args;
@@ -72,18 +69,21 @@ public class RDFServiceLogger implements AutoCloseable {
 	}
 
 	private void getProperties() {
-		ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
-		isEnabled = Boolean.valueOf(props.getProperty(PROPERTY_ENABLED));
-		traceRequested = Boolean.valueOf(props
-				.getProperty(PROPERTY_STACK_TRACE));
+		DeveloperSettings settings = DeveloperSettings.getBean(ctx);
+		isEnabled = settings.getBoolean(Keys.LOGGING_RDF_ENABLE);
+		traceRequested = settings.getBoolean(Keys.LOGGING_RDF_STACK_TRACE);
 
-		String restrictionString = props.getProperty(PROPERTY_RESTRICTION);
-		if (StringUtils.isNotBlank(restrictionString)) {
+		String restrictionString = settings
+				.getString(Keys.LOGGING_RDF_RESTRICTION);
+		if (StringUtils.isBlank(restrictionString)) {
+			restriction = null;
+		} else {
 			try {
 				restriction = Pattern.compile(restrictionString);
 			} catch (Exception e) {
 				log.error("Failed to compile the pattern for "
-						+ PROPERTY_RESTRICTION + " = " + restriction + " " + e);
+						+ Keys.LOGGING_RDF_RESTRICTION + " = " + restriction
+						+ " " + e);
 				isEnabled = false;
 			}
 		}

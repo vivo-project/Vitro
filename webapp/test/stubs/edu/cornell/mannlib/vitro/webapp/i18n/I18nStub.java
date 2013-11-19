@@ -51,7 +51,7 @@ public class I18nStub extends I18n {
 
 	private class I18nBundleStub extends I18nBundle {
 		public I18nBundleStub(String bundleName) {
-			super(bundleName, new DummyResourceBundle());
+			super(bundleName, new DummyResourceBundle(), null);
 		}
 
 		@Override
