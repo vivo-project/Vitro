@@ -12,7 +12,7 @@
 
 <style>
 div.developer {
-	background-color: red; 
+	background-color: #f7dd8a; 
 	padding: 0px 10px 0px 10px;
 	font-size: small;
 	font-variant: small-caps;
