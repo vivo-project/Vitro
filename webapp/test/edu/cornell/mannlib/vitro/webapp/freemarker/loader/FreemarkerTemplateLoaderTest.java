@@ -266,20 +266,19 @@ public class FreemarkerTemplateLoaderTest {
 	 * @throws IOException
 	 */
 	private void assertMatches(String searchTerm, int expectedHowMany,
-			String expectedBestFit) {
+			String expectedBestFitString) {
+		Path expectedBestFit = (expectedBestFitString == null) ? null : Paths
+				.get(expectedBestFitString);
+
 		SortedSet<PathPieces> matches = runTheVisitor(searchTerm);
 		int actualHowMany = matches.size();
-		String actualBestFit = matches.isEmpty() ? null : matches.last().path
-				.toString();
+		Path actualBestFit = matches.isEmpty() ? null : matches.last().path;
 
 		if (expectedHowMany != actualHowMany) {
 			fail("How many results: expected " + expectedHowMany
 					+ ", but was  " + actualHowMany + ": " + matches);
 		}
-		if (!StringUtils.equals(expectedBestFit, actualBestFit)) {
-			fail("Best result: expected '" + expectedBestFit + "', but was '"
-					+ actualBestFit + "': " + matches);
-		}
+		assertEquals("Best result", expectedBestFit, actualBestFit);
 	}
 
 	/**
