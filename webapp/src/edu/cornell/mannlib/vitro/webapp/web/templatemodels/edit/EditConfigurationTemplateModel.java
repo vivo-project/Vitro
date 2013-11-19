@@ -548,7 +548,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	    }
             for(VClass rangeVClass : rangeVClasses) {	
                 vclasses.add(rangeVClass);
-        	    List<String> subURIs = wdf.getVClassDao().getSubClassURIs(rangeVClass.getURI());
+        	    List<String> subURIs = wdf.getVClassDao().getAllSubClassURIs(rangeVClass.getURI());
         	    for (String subClassURI : subURIs) {
         	        VClass subClass = wdf.getVClassDao().getVClassByURI(subClassURI);
         	        if (subClass != null) {

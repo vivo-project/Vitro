@@ -118,7 +118,7 @@ name will be used as the label. -->
     </#if>
     -->
     <#if editable> 
-        <h2 id="${property.localName}">${label} ${addLink!} ${verboseDisplay!}</h2>         
+        <h2 id="${property.localName!}">${label} ${addLink!} ${verboseDisplay!}</h2>         
     </#if>
 </#macro>
 
@@ -134,8 +134,8 @@ name will be used as the label. -->
         <#local domainUri = "" /> 
     </#if>
     <#if editable>
-        <#local url = property.addUrl>
-        <#if url?has_content>
+        <#if property.addUrl?has_content>
+        	<#local url = property.addUrl>
             <@showAddLink property.localName label url rangeUri domainUri/>
         </#if>
     </#if>
@@ -274,7 +274,8 @@ name will be used as the label. -->
 	<#assign labelPropertyUri = ("http://www.w3.org/2000/01/rdf-schema#label"?url) />
 	<#assign useEditLink = false />
 	<#--edit link used if in edit mode and only one label and one language-->
-	<#if labelCount = 1 &&  editable && localesCount = 1 >
+	<#--locales count may be 0 in case where no languages/selectable locales are specified-->
+	<#if labelCount = 1 &&  editable && (localesCount >= 0) >
 		<#assign useEditLink = true/>
 	</#if>
     <#local label = individual.nameStatement>
