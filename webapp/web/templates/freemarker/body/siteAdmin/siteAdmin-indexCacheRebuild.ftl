@@ -18,6 +18,10 @@
             <#if indexCacheRebuild.recomputeInferences?has_content>
                 <li role="listitem"><a href="${indexCacheRebuild.recomputeInferences}" title="${i18n().recompute_inferences}">${i18n().recompute_inferences_mixed_caps}</a></li>
             </#if>
+            
+            <#if indexCacheRebuild.activateDeveloperPanel?has_content>
+                <li role="listitem"><a href="${indexCacheRebuild.activateDeveloperPanel}" title="${i18n().activate_developer_panel}">${i18n().activate_developer_panel_mixed_caps}</a></li>
+            </#if>
         </ul>
     </section>
 </#if>
