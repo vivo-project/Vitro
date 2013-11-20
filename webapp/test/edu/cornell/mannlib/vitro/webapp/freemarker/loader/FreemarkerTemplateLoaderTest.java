@@ -286,18 +286,20 @@ public class FreemarkerTemplateLoaderTest {
 	 * would.
 	 */
 	private void assertFM(String searchTerm, int expectedNumberOfTries,
-			String expectedBestFit) {
+			String expectedBestString) {
+		Path expectedBestFit = expectedBestString == null ? null : Paths
+				.get(expectedBestString);
 		PathPieces stPp = new PathPieces(searchTerm);
 
 		int actualNumberOfTries = 0;
-		String actualBestFit = null;
+		Path actualBestFit = null;
 
 		if (StringUtils.isNotBlank(stPp.region)) {
 			actualNumberOfTries++;
 			SortedSet<PathPieces> matches = runTheVisitor(stPp.base
 					+ stPp.language + stPp.region + stPp.extension);
 			if (!matches.isEmpty()) {
-				actualBestFit = matches.last().path.toString();
+				actualBestFit = matches.last().path;
 			}
 		}
 		if (actualBestFit == null && StringUtils.isNotBlank(stPp.language)) {
@@ -305,7 +307,7 @@ public class FreemarkerTemplateLoaderTest {
 			SortedSet<PathPieces> matches = runTheVisitor(stPp.base
 					+ stPp.language + stPp.extension);
 			if (!matches.isEmpty()) {
-				actualBestFit = matches.last().path.toString();
+				actualBestFit = matches.last().path;
 			}
 		}
 		if (actualBestFit == null) {
@@ -313,7 +315,7 @@ public class FreemarkerTemplateLoaderTest {
 			SortedSet<PathPieces> matches = runTheVisitor(stPp.base
 					+ stPp.extension);
 			if (!matches.isEmpty()) {
-				actualBestFit = matches.last().path.toString();
+				actualBestFit = matches.last().path;
 			}
 		}
 
