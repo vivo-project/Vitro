@@ -42,13 +42,16 @@ function DeveloperPanel(developerAjaxUrl) {
 		var developerEnabled = document.getElementById("developerEnabled").checked;
 		document.getElementById("developerDefeatFreemarkerCache").disabled = !developerEnabled;
 		document.getElementById("developerInsertFreemarkerDelimiters").disabled = !developerEnabled;
+		document.getElementById("developerPageContentsLogCustomListView").disabled = !developerEnabled;
+		document.getElementById("developerPageContentsLogCustomShortView").disabled = !developerEnabled;
 		document.getElementById("developerI18nDefeatCache").disabled = !developerEnabled;
 		document.getElementById("developerI18nLogStringRequests").disabled = !developerEnabled;
 		document.getElementById("developerLoggingRDFServiceEnable").disabled = !developerEnabled;
 	
 		var rdfServiceEnabled = developerEnabled && document.getElementById("developerLoggingRDFServiceEnable").checked;
 		document.getElementById("developerLoggingRDFServiceStackTrace").disabled = !rdfServiceEnabled;
-		document.getElementById("developerLoggingRDFServiceRestriction").disabled = !rdfServiceEnabled;
+		document.getElementById("developerLoggingRDFServiceQueryRestriction").disabled = !rdfServiceEnabled;
+		document.getElementById("developerLoggingRDFServiceStackRestriction").disabled = !rdfServiceEnabled;
 	}
 
 	function collectFormData() {
@@ -56,11 +59,14 @@ function DeveloperPanel(developerAjaxUrl) {
 		getCheckbox("developerEnabled", data);
 		getCheckbox("developerDefeatFreemarkerCache", data);
 		getCheckbox("developerInsertFreemarkerDelimiters", data);
+		getCheckbox("developerPageContentsLogCustomListView", data);
+		getCheckbox("developerPageContentsLogCustomShortView", data);
 		getCheckbox("developerI18nDefeatCache", data);
 		getCheckbox("developerI18nLogStringRequests", data);
 		getCheckbox("developerLoggingRDFServiceEnable", data);
 		getCheckbox("developerLoggingRDFServiceStackTrace", data);
-		getText("developerLoggingRDFServiceRestriction", data);
+		getText("developerLoggingRDFServiceQueryRestriction", data);
+		getText("developerLoggingRDFServiceStackRestriction", data);
 		return data;
 	}
 
