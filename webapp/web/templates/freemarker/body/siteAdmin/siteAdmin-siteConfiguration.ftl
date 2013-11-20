@@ -23,10 +23,6 @@
                 <li role="listitem"><a href="${siteConfig.menuManagement}" title="${i18n().menu_ordering}">${i18n().menu_ordering_mixed_caps}</a></li>
             </#if>      
             
-            <#if siteConfig.restrictLogins?has_content>
-                <li role="listitem"><a href="${siteConfig.restrictLogins}" title="${i18n().restrict_logins}">${i18n().restrict_logins_mixed_caps}</a></li>
-            </#if>
-            
             <#if siteConfig.siteInfo?has_content>
                 <li role="listitem"><a href="${siteConfig.siteInfo}" title="${i18n().site_information}">${i18n().site_information}</a></li>
             </#if>

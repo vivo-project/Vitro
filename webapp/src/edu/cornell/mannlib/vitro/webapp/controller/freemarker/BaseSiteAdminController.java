@@ -53,14 +53,14 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
         body.put("dataInput", getDataInputData(vreq));
         body.put("siteConfig", getSiteConfigData(vreq));        
-        body.put("indexCacheRebuild", getIndexCacheRebuildUrls(vreq));     
+        body.put("siteMaintenance", getSiteMaintenanceUrls(vreq));     
         body.put("ontologyEditor", getOntologyEditorData(vreq));
         body.put("dataTools", getDataToolsUrls(vreq));
 
         return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
     }
     
-    protected Map<String, String> getIndexCacheRebuildUrls(VitroRequest vreq) {
+    protected Map<String, String> getSiteMaintenanceUrls(VitroRequest vreq) {
         
         Map<String, String> urls = new HashMap<String, String>();
 
@@ -73,6 +73,10 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 			urls.put("rebuildSearchIndex", UrlBuilder.getUrl("/SearchIndex"));
 		}
 		
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.LOGIN_DURING_MAINTENANCE.ACTIONS)) {
+            urls.put("restrictLogins", UrlBuilder.getUrl("/admin/restrictLogins"));
+        }
+        
 		if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.ENABLE_DEVELOPER_PANEL.ACTIONS)) {
 			urls.put("activateDeveloperPanel", "javascript:new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel({developerEnabled: true});");
 		}
@@ -145,10 +149,6 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
         if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.SEE_STARTUP_STATUS.ACTIONS)) {
         	data.put("startupStatus", UrlBuilder.getUrl("/startupStatus"));
         	data.put("startupStatusAlert", !StartupStatus.getBean(getServletContext()).allClear());
-        }
-        
-        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.LOGIN_DURING_MAINTENANCE.ACTIONS)) {
-            data.put("restrictLogins", UrlBuilder.getUrl("/admin/restrictLogins"));
         }
         
         return data;
