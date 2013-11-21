@@ -232,12 +232,9 @@ name will be used as the label. -->
     <#if verboseDisplay?has_content>       
         <section class="verbosePropertyListing">
             <#if verboseDisplay.fauxProperty??>
-                 (faux property of
+                 a faux property of
             </#if>
             <a class="propertyLink" href="${verboseDisplay.propertyEditUrl}" title="${i18n().name}">${verboseDisplay.localName}</a> 
-            <#if verboseDisplay.fauxProperty??>
-                 )
-            </#if>
             (<span>${property.type?lower_case}</span> property);
             order in group: <span>${verboseDisplay.displayRank};</span> 
             display level: <span>${verboseDisplay.displayLevel};</span>
