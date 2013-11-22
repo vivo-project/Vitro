@@ -142,7 +142,7 @@ name will be used as the label. -->
 </#macro>
 
 <#macro showAddLink propertyLocalName label url rangeUri domainUri="">
-    <#if (rangeUri?contains("Authorship") && domainUri?contains("IAO_0000030")) || (rangeUri?contains("Editorship") && domainUri?contains("IAO_0000030"))|| rangeUri?contains("URL") || label == "hasResearchArea">
+    <#if (rangeUri?contains("Authorship") && domainUri?contains("IAO_0000030")) || (rangeUri?contains("Editorship") && domainUri?contains("IAO_0000030"))|| rangeUri?contains("URL") || propertyLocalName == "hasResearchArea">
         <a class="add-${propertyLocalName}" href="${url}" title="${i18n().manage_list_of} ${label?lower_case}">
         <img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="${i18n().manage}" /></a>
     <#else>
