@@ -9,47 +9,6 @@
 	<input type="text" id="${key}" size="30" value="${settings[key]}" >
 </#macro>
 
-
-<style>
-div.developer {
-	background-color: #f7dd8a; 
-	padding: 0px 10px 0px 10px;
-	font-variant: small-caps;
-}
-
-div.developer #developerPanelBody {
-	display: none;
-	line-height: 1em;
-	font-size: small;
-}
-
-div.developer div.devleft {
-	width: 49%
-}
-
-div.developer div.devright {
-	float: right;
-	width: 49%
-}
-
-div.developer div.container {
-	border: thin groove black;
-	padding: 3px 10px 0px 10px;
-	margin: 3px 0px 3px 0px;
-}
-
-div.developer div.within {
-	padding-left: 1em;
-}
-
-div.developer input[type="text"] { 
-	padding: 2px 10px 2px 10px; 
-	line-height: 1em;
-	margin: 2px 2px 2px 2px; 
-	}
-
-</style>
-
 <#if !settings.developerEnabled>
 <#elseif !settings.mayControl>
 	<div class="developer">
@@ -91,6 +50,14 @@ div.developer input[type="text"] {
 						<@showCheckbox "developerI18nLogStringRequests" />
 						Log the retrieval of language strings
 					</label>
+				</div>
+
+				<div class="container">
+					Links
+					<br/>
+					<a href="${urls.base}/admin/log4j.jsp">Set log levels</a>
+					<a href="${urls.base}/admin/showAuth">Show authorization info</a>
+					<a href="${urls.base}/admin/showThreads">Show background threads</a>
 				</div>
 			</div>
 				
