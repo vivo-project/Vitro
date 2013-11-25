@@ -13,19 +13,15 @@ $(document).ready(function(){
     jQuery('section#flash-message').css('display', 'none').fadeIn(1500);
     
     /////////////////////////////
-     // Home search fiter
+     // Home search filter
      // Toggle filter select list
      var $searchFilterList = $('#filter-search-nav');
      var $isFilterOpen = false;
-
-     console.log("Filter is open = " + $isFilterOpen);
 
      $('a.filter-search').click(function(e) {
          e.preventDefault();
 
          if (!$isFilterOpen) {
-
-            console.log("Filter is closed = " + $isFilterOpen);
 
              //Change button filter state to selected
              //$(this).css('background','url(../../themes/vivo-cornell/images/filteredSearchActive.gif) no-repeat right top');
@@ -37,7 +33,6 @@ $(document).ready(function(){
 
              $isFilterOpen = true;
 
-             console.log("open");
          } else {
              //Change button filter state to default
              //$('a.filter-search').css('background','url(../../themes/vivo-cornell/images/filteredSearch.gif) no-repeat right top');
@@ -49,7 +44,6 @@ $(document).ready(function(){
 
              $isFilterOpen = false;
 
-             console.log("closed");
          }
     });
 
@@ -63,7 +57,6 @@ $(document).ready(function(){
                   //Selected filter feedback
                   $('.search-filter-selected').text('');
                   $('input[name="classgroup"]').val('');
-                  console.log("ALL");
                } else {
 
                      $('.search-filter-selected').text($(this).text()).fadeIn('slow');
@@ -110,6 +103,5 @@ $(document).ready(function(){
 
              }
 
-           console.log("HIDE input value ") ;
        });
 });
