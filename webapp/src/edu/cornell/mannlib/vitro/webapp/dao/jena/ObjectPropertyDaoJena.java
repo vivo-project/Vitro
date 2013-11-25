@@ -71,8 +71,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     }
     
     public void deleteObjectProperty(String propertyURI) {
-        ObjectProperty op = new ObjectProperty();
-        op.setURI(propertyURI);
+        ObjectProperty op = getObjectPropertyByURI(propertyURI);
         deleteObjectProperty(op);
     }
 

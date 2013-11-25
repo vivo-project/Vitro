@@ -491,6 +491,10 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	return getDataLiteralValuesFromParameter();
     }
     
+    //Get a custom object uri for deletion if one exists, i.e. not the object uri for the property
+    public String getCustomDeleteObjectUri() {
+    	return (String) vreq.getParameter("deleteObjectUri");
+    }
     //Used for deletion in case there's a specific template to be employed
     public String getDeleteTemplate() {
     	String templateName = vreq.getParameter("templateName");
@@ -544,7 +548,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	    }
             for(VClass rangeVClass : rangeVClasses) {	
                 vclasses.add(rangeVClass);
-        	    List<String> subURIs = wdf.getVClassDao().getSubClassURIs(rangeVClass.getURI());
+        	    List<String> subURIs = wdf.getVClassDao().getAllSubClassURIs(rangeVClass.getURI());
         	    for (String subClassURI : subURIs) {
         	        VClass subClass = wdf.getVClassDao().getVClassByURI(subClassURI);
         	        if (subClass != null) {

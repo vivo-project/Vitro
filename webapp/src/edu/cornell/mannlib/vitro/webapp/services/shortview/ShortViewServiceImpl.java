@@ -15,9 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessingService;
 import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessingService.TemplateParsingException;
 import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessingService.TemplateProcessingException;
@@ -116,11 +114,13 @@ public class ShortViewServiceImpl implements ShortViewService {
 			TemplateAndDataGetters tdg = faker.getShortViewProperties(vreq,
 					individual, classUri, svContext.name());
 			if (tdg != null) {
+				ShortViewLogger.log(vreq, svContext.name(), individual, classUri, tdg);
 				return tdg;
 			}
 		}
 
 		// Didn't find one? Use the default values.
+		ShortViewLogger.log(vreq, svContext.name(), individual);
 		return new TemplateAndDataGetters(svContext.getDefaultTemplateName());
 	}
 

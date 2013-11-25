@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.freemarker.config;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,15 +17,16 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.DelimitingTemplateLoader;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FlatteningTemplateLoader;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
+import edu.cornell.mannlib.vitro.webapp.freemarker.loader.FreemarkerTemplateLoader;
 import edu.cornell.mannlib.vitro.webapp.i18n.freemarker.I18nMethodModel;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings.Keys;
 import edu.cornell.mannlib.vitro.webapp.web.directives.IndividualShortViewDirective;
 import edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective;
 import edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective;
@@ -34,7 +34,6 @@ import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualLocalNameMethod;
 import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualPlaceholderImageUrlMethod;
 import edu.cornell.mannlib.vitro.webapp.web.methods.IndividualProfileUrlMethod;
 import freemarker.cache.ClassTemplateLoader;
-import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import freemarker.ext.beans.BeansWrapper;
@@ -55,18 +54,17 @@ import freemarker.template.TemplateModelException;
  * own locale, etc.
  * 
  * Each time a request asks for the configuration, check to see whether the
- * cache is still valid, and whether the theme has changed (needs a new
- * TemplateLoader). Store the request info to the ThreadLocal.
+ * cache is still valid, whether the theme has changed (needs a new
+ * TemplateLoader), and whether the DeveloperSettings have changed (might need a
+ * new TemplateLoader). Store the request info to the ThreadLocal.
  */
 public abstract class FreemarkerConfiguration {
 	private static final Log log = LogFactory
 			.getLog(FreemarkerConfiguration.class);
 
-	private static final String PROPERTY_DEFEAT_CACHE = "developer.defeatFreemarkerCache";
-	private static final String PROPERTY_INSERT_DELIMITERS = "developer.insertFreemarkerDelimiters";
-
 	private static volatile FreemarkerConfigurationImpl instance;
 	private static volatile String previousThemeDir;
+	private static volatile Map<String, Object> previousSettingsMap;
 
 	public static Configuration getConfig(HttpServletRequest req) {
 		confirmInstanceIsSet();
@@ -92,14 +90,12 @@ public abstract class FreemarkerConfiguration {
 		}
 	}
 
+	/** If the developer doesn't want the cache, it's invalid. */
 	private static boolean isTemplateCacheInvalid(HttpServletRequest req) {
-		ConfigurationProperties props = ConfigurationProperties.getBean(req);
-
-		// If the developer doesn't want the cache, it's invalid.
-		if (Boolean.valueOf(props.getProperty(PROPERTY_DEFEAT_CACHE))) {
+		DeveloperSettings settings = DeveloperSettings.getBean(req);
+		if (settings.getBoolean(Keys.DEFEAT_FREEMARKER_CACHE)) {
 			return true;
 		}
-
 		return false;
 	}
 
@@ -113,7 +109,8 @@ public abstract class FreemarkerConfiguration {
 	private static void keepTemplateLoaderCurrentWithThemeDirectory(
 			HttpServletRequest req) {
 		String themeDir = getThemeDirectory(req);
-		if (hasThemeDirectoryChanged(themeDir)) {
+		if (hasThemeDirectoryChanged(themeDir)
+				|| haveDeveloperSettingsChanged(req)) {
 			TemplateLoader tl = createTemplateLoader(req, themeDir);
 			instance.setTemplateLoader(tl);
 		}
@@ -134,44 +131,48 @@ public abstract class FreemarkerConfiguration {
 		}
 	}
 
+	private static boolean haveDeveloperSettingsChanged(HttpServletRequest req) {
+		Map<String, Object> settingsMap = DeveloperSettings.getBean(req)
+				.getSettingsMap();
+		if (settingsMap.equals(previousSettingsMap)) {
+			return false;
+		} else {
+			previousSettingsMap = settingsMap;
+			return true;
+		}
+	}
+
 	private static TemplateLoader createTemplateLoader(HttpServletRequest req,
 			String themeDir) {
 		ServletContext ctx = req.getSession().getServletContext();
-		ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
 
 		List<TemplateLoader> loaders = new ArrayList<TemplateLoader>();
 
-		// Theme template loader
+		// Theme template loader - only if the theme has a template directory.
 		String themeTemplatePath = ctx.getRealPath(themeDir) + "/templates";
 		File themeTemplateDir = new File(themeTemplatePath);
-		// A theme need not contain a template directory.
 		if (themeTemplateDir.exists()) {
-			try {
-				FileTemplateLoader themeFtl = new FileTemplateLoader(
-						themeTemplateDir);
-				loaders.add(themeFtl);
-			} catch (IOException e) {
-				log.error("Error creating theme template loader", e);
-			}
+			loaders.add(new FreemarkerTemplateLoader(themeTemplateDir));
 		}
 
 		// Vitro template loader
 		String vitroTemplatePath = ctx.getRealPath("/templates/freemarker");
-		loaders.add(new FlatteningTemplateLoader(new File(vitroTemplatePath)));
+		loaders.add(new FreemarkerTemplateLoader(new File(vitroTemplatePath)));
 
 		// TODO VIVO-243 Why is this here?
 		loaders.add(new ClassTemplateLoader(FreemarkerConfiguration.class, ""));
-
+		
 		TemplateLoader[] loaderArray = loaders
 				.toArray(new TemplateLoader[loaders.size()]);
-		MultiTemplateLoader mtl = new MultiTemplateLoader(loaderArray);
+		TemplateLoader tl = new MultiTemplateLoader(loaderArray);
 
 		// If requested, add delimiters to the templates.
-		if (Boolean.valueOf(props.getProperty(PROPERTY_INSERT_DELIMITERS))) {
-			return new DelimitingTemplateLoader(mtl);
-		} else {
-			return mtl;
+		DeveloperSettings settings = DeveloperSettings.getBean(req);
+		if (settings.getBoolean(Keys.INSERT_FREEMARKER_DELIMITERS)) {
+			tl =  new DelimitingTemplateLoader(tl);
 		}
+		
+		return tl;
 	}
 
 	private static void setThreadLocalsForRequest(HttpServletRequest req) {

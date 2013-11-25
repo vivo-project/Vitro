@@ -287,6 +287,7 @@ public class FreemarkerConfigurationImpl extends Configuration {
 			urls.put("images", UrlBuilder.getUrl("/images"));
 			urls.put("theme", UrlBuilder.getUrl(themeDir));
 			urls.put("index", UrlBuilder.getUrl("/browse"));
+			urls.put("developerAjax", UrlBuilder.getUrl("/admin/developerAjax"));
 
 			return urls;
 		}

@@ -141,7 +141,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			KnowledgeBaseUpdater ontologyUpdater = new KnowledgeBaseUpdater(settings);
 			boolean requiredUpdate = ontologyUpdater.updateRequired(ctx);
 
-			if(!JenaDataSourceSetupBase.isFirstStartup()) {
+			if(requiredUpdate && !JenaDataSourceSetupBase.isFirstStartup()) {
     			try {
     			    ctx.setAttribute(KBM_REQURIED_AT_STARTUP, Boolean.TRUE);
     			    migrationChangesMade = ontologyUpdater.update(ctx);

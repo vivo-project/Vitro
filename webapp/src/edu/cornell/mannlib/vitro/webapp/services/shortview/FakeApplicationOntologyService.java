@@ -380,6 +380,12 @@ public class FakeApplicationOntologyService {
 			return dataGetters;
 		}
 
+		@Override
+		public String toString() {
+			return "[template=" + templateName + ", dataGetters=" + dataGetters
+					+ "]";
+		}
+
 	}
 
 	/** The view specifications that we read from the config file. */

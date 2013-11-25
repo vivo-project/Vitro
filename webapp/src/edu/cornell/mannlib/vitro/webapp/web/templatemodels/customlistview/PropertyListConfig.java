@@ -61,6 +61,8 @@ public class PropertyListConfig {
         String configFileName = wadf.getObjectPropertyDao().getCustomListViewConfigFileName(op);
         if (configFileName == null) { // no custom config; use default config
             configFileName = DEFAULT_CONFIG_FILE_NAME;
+        } else {
+        	CustomListViewLogger.log(vreq, op, configFileName);
         }
         log.debug("Using list view config file " + configFileName + " for object property " + op.getURI());
         

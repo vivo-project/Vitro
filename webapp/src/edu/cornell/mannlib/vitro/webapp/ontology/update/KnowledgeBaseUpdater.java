@@ -207,6 +207,14 @@ public class KnowledgeBaseUpdater {
                 StmtIterator sit = anonModel.listStatements();
                 while (sit.hasNext()) {
                     Statement stmt = sit.nextStatement();
+                    // Skip statements with blank nodes (unsupported) to avoid 
+                    // excessive deletion.  In the future, the whole updater 
+                    // could be modified to change whole graphs at once through
+                    // the RDFService, but right now this whole thing is statement
+                    // based.
+                    if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
+                        continue;
+                    }
                     Iterator<String> graphIt = dataset.listNames();
                     while(graphIt.hasNext()) {
                         String graph = graphIt.next();
@@ -223,8 +231,9 @@ public class KnowledgeBaseUpdater {
                 //log.info("removed " + anonModel.size() + " statements from SPARQL CONSTRUCTs");
             } else {
                 Model writeModel = dataset.getNamedModel(JenaDataSourceSetupBase.JENA_DB_MODEL);
+                Model dedupeModel = dataset.getDefaultModel();
                 Model additions = jiu.renameBNodes(
-                        anonModel, settings.getDefaultNamespace() + "n", writeModel);
+                        anonModel, settings.getDefaultNamespace() + "n", dedupeModel);
                 Model actualAdditions = ModelFactory.createDefaultModel();
                 StmtIterator stmtIt = additions.listStatements();      
                 while (stmtIt.hasNext()) {
@@ -346,7 +355,9 @@ public class KnowledgeBaseUpdater {
 	}
 	
 	public static boolean isUpdatableABoxGraph(String graphName) {
-	    return (!graphName.contains("tbox") && !graphName.contains("filegraph"));
+	    return (graphName != null && !graphName.contains("tbox") 
+	            && !graphName.contains("filegraph") 
+	            && !graphName.contains("x-arq:UnionGraph"));
 	}
 
 	/**

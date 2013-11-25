@@ -7,8 +7,8 @@
     
     <input type="hidden" name="subjectUri"   value="${editConfiguration.subjectUri}"/>
     <input type="hidden" name="predicateUri" value="${editConfiguration.predicateUri}"/>
-    <input type="hidden" name="domainUri" value="${editConfiguration.domainUri}"/>
-    <input type="hidden" name="rangeUri" value="${editConfiguration.rangeUri}"/>
+    <input type="hidden" name="domainUri" value="${editConfiguration.domainUri!}"/>
+    <input type="hidden" name="rangeUri" value="${editConfiguration.rangeUri!}"/>
     <input type="hidden" name="cmd"          value="delete"/>
     <input type="hidden" name="editKey" value="${editConfiguration.editKey}"/>
     <#if editConfiguration.dataProperty = true>

@@ -76,6 +76,8 @@ public class SimplePermission extends Permission {
 		NAMESPACE + "UseAdvancedDataToolsPages");
 	public static final SimplePermission USE_SPARQL_QUERY_PAGE = new SimplePermission(
 		NAMESPACE + "UseSparqlQueryPage");
+	public static final SimplePermission ENABLE_DEVELOPER_PANEL = new SimplePermission(
+			NAMESPACE + "EnableDeveloperPanel");
 	
 
 	// ----------------------------------------------------------------------

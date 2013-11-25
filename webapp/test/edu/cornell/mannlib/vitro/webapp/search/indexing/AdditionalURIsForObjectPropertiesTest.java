@@ -15,9 +15,13 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
+
 public class AdditionalURIsForObjectPropertiesTest {
 
     Model model;
+    RDFService rdfService;
     
     String testNS = "http://example.com/test#";
     String n3 = "" +
@@ -39,11 +43,12 @@ public class AdditionalURIsForObjectPropertiesTest {
     public void setUp() throws Exception {
         model = ModelFactory.createDefaultModel();
         model.read(new StringReader(n3 ), null , "N3");
+        rdfService = new RDFServiceModel(model);
     }
 
     @Test
     public void testChangeOfRdfsLabel() {
-        AdditionalURIsForObjectProperties aufop = new AdditionalURIsForObjectProperties(model);
+        AdditionalURIsForObjectProperties aufop = new AdditionalURIsForObjectProperties(rdfService);
         List<String> uris = aufop.findAdditionalURIsToIndex( 
                 ResourceFactory.createStatement(
                         ResourceFactory.createResource(testNS + "bob"),
@@ -66,7 +71,7 @@ public class AdditionalURIsForObjectPropertiesTest {
     @Test
     public void testChangeOfObjPropStmt() {
         
-        AdditionalURIsForObjectProperties aufop = new AdditionalURIsForObjectProperties(model);
+        AdditionalURIsForObjectProperties aufop = new AdditionalURIsForObjectProperties(rdfService);
         List<String> uris = aufop.findAdditionalURIsToIndex( 
                 ResourceFactory.createStatement(
                         ResourceFactory.createResource(testNS + "bob"),
@@ -88,7 +93,7 @@ public class AdditionalURIsForObjectPropertiesTest {
     
     @Test
     public void testOfDataPropChange() {
-        AdditionalURIsForObjectProperties aufop = new AdditionalURIsForObjectProperties(model);
+        AdditionalURIsForObjectProperties aufop = new AdditionalURIsForObjectProperties(rdfService);
         List<String> uris = aufop.findAdditionalURIsToIndex( 
                 ResourceFactory.createStatement(
                         ResourceFactory.createResource(testNS + "bob"),
@@ -107,8 +112,9 @@ public class AdditionalURIsForObjectPropertiesTest {
         
         Model model = ModelFactory.createDefaultModel();
         model.read(new StringReader( n3ForNIHVIVO_2902 ), null , "N3");
-        
-        AdditionalURIsForObjectProperties aufop = new AdditionalURIsForObjectProperties(model);
+        RDFService rdfService = new RDFServiceModel(model);
+
+        AdditionalURIsForObjectProperties aufop = new AdditionalURIsForObjectProperties(rdfService);
         List<String> uris = aufop.findAdditionalURIsToIndex( 
                 ResourceFactory.createStatement(
                         ResourceFactory.createResource("http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n2241"),

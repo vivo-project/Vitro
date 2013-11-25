@@ -6,8 +6,9 @@
 <#if (rangeOptions?keys?size > 0)>
 	<#assign rangeOptionsExist = true/>
 </#if>
+<#assign rangeUri = editConfiguration.objectPredicateProperty.rangeVClassURI!"" />
 <#assign formTitle = editConfiguration.formTitle />
-<#if editConfiguration.objectPredicateProperty.rangeVClassURI?contains("IAO_0000030")>
+<#if rangeUri?contains("IAO_0000030")>
     <#assign formTitle = "${i18n().select_an_existing_document}" + " ${i18n().for} " + editConfiguration.subjectName/>
 </#if>
 <h2>${formTitle}</h2>

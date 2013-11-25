@@ -15,16 +15,20 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings.Keys;
 
 /**
  * Writes the log message for the LoggingRDFService.
  * 
  * If not enabled, or if the logging level is insufficient, this does nothing.
  * 
- * If enabled, it checks for restrictions. If there is a restriction pattern
- * (regular expression), the a log message will only be printed if one of the
- * fully-qualified class names in the stack trace matches that pattern.
+ * If enabled, it checks for restrictions. If there is a restriction on the call
+ * stack (regular expression), then a log message will only be printed if the
+ * pattern is found in the concatenated call stack (fully-qualified class names
+ * and method names). If there is a restriction on the query string (regular
+ * expression) then a log message will only be printed if the pattern is found
+ * in the query string.
  * 
  * If everything passes muster, the constructor will record the time that the
  * instance was created.
@@ -41,16 +45,13 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 public class RDFServiceLogger implements AutoCloseable {
 	private static final Log log = LogFactory.getLog(RDFServiceLogger.class);
 
-	private static final String PROPERTY_ENABLED = "developer.loggingRDFService.enable";
-	private static final String PROPERTY_STACK_TRACE = "developer.loggingRDFService.stackTrace";
-	private static final String PROPERTY_RESTRICTION = "developer.loggingRDFService.restriction";
-
 	private final ServletContext ctx;
 	private final Object[] args;
 
 	private boolean isEnabled;
 	private boolean traceRequested;
-	private Pattern restriction;
+	private Pattern queryStringRestriction;
+	private Pattern callStackRestriction;
 
 	private String methodName;
 	private List<StackTraceElement> trace = Collections.emptyList();
@@ -65,27 +66,33 @@ public class RDFServiceLogger implements AutoCloseable {
 
 		if (isEnabled && log.isInfoEnabled()) {
 			loadStackTrace();
-			if (passesRestrictions()) {
+			if (passesQueryRestriction() && passesStackRestriction()) {
 				this.startTime = System.currentTimeMillis();
 			}
 		}
 	}
 
 	private void getProperties() {
-		ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
-		isEnabled = Boolean.valueOf(props.getProperty(PROPERTY_ENABLED));
-		traceRequested = Boolean.valueOf(props
-				.getProperty(PROPERTY_STACK_TRACE));
+		DeveloperSettings settings = DeveloperSettings.getBean(ctx);
+		isEnabled = settings.getBoolean(Keys.LOGGING_RDF_ENABLE);
+		traceRequested = settings.getBoolean(Keys.LOGGING_RDF_STACK_TRACE);
+		queryStringRestriction = patternFromSettings(settings,
+				Keys.LOGGING_RDF_QUERY_RESTRICTION);
+		callStackRestriction = patternFromSettings(settings,
+				Keys.LOGGING_RDF_STACK_RESTRICTION);
+	}
 
-		String restrictionString = props.getProperty(PROPERTY_RESTRICTION);
-		if (StringUtils.isNotBlank(restrictionString)) {
-			try {
-				restriction = Pattern.compile(restrictionString);
-			} catch (Exception e) {
-				log.error("Failed to compile the pattern for "
-						+ PROPERTY_RESTRICTION + " = " + restriction + " " + e);
-				isEnabled = false;
-			}
+	private Pattern patternFromSettings(DeveloperSettings settings, Keys key) {
+		String patternString = settings.getString(key);
+		if (StringUtils.isBlank(patternString)) {
+			return null;
+		}
+		try {
+			return Pattern.compile(patternString);
+		} catch (Exception e) {
+			log.error("Failed to compile the pattern for " + key + " = "
+					+ patternString + " " + e);
+			return Pattern.compile("^_____NEVER MATCH_____$");
 		}
 	}
 
@@ -144,16 +151,39 @@ public class RDFServiceLogger implements AutoCloseable {
 		}
 	}
 
-	private boolean passesRestrictions() {
-		if (restriction == null) {
+	private boolean passesQueryRestriction() {
+		if (queryStringRestriction == null) {
 			return true;
 		}
-		for (StackTraceElement ste : trace) {
-			if (restriction.matcher(ste.getClassName()).find()) {
-				return true;
+		String q = assembleQueryString();
+		return queryStringRestriction.matcher(q).find();
+	}
+
+	private String assembleQueryString() {
+		StringBuilder query = new StringBuilder();
+		for (Object arg : args) {
+			if (arg instanceof String) {
+				query.append((String) arg).append(" ");
 			}
 		}
-		return false;
+		return query.deleteCharAt(query.length() - 1).toString();
+	}
+
+	private boolean passesStackRestriction() {
+		if (callStackRestriction == null) {
+			return true;
+		}
+		String q = assembleCallStackString();
+		return callStackRestriction.matcher(q).find();
+	}
+
+	private String assembleCallStackString() {
+		StringBuilder stack = new StringBuilder();
+		for (StackTraceElement ste : trace) {
+			stack.append(ste.getClassName()).append(" ")
+					.append(ste.getMethodName()).append(" ");
+		}
+		return stack.deleteCharAt(stack.length() - 1).toString();
 	}
 
 	@Override

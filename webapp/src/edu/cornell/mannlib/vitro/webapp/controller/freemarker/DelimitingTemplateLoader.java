@@ -38,6 +38,7 @@ public class DelimitingTemplateLoader implements TemplateLoader {
 	@Override
 	public Object findTemplateSource(String name) throws IOException {
 		Object innerTS = innerLoader.findTemplateSource(name);
+		log.debug("template source for '" + name + "' is '" + innerTS + "'");
 		if (innerTS == null) {
 			return null;
 		} else {

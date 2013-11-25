@@ -336,11 +336,11 @@ public class RequestModelsPrep implements Filter {
 	}
 
 	/**
-	 * Language awareness is enabled unless they explicitly disable it.
+	 * Language awareness is disabled unless they explicitly enable it.
 	 */
 	private Boolean isLanguageAwarenessEnabled() {
 		return Boolean.valueOf(props.getProperty("RDFService.languageFilter",
-				"true"));
+				"false"));
 	}
 
 	private RDFService addLanguageAwareness(HttpServletRequest req,
