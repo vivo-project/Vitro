@@ -83,11 +83,11 @@ public class PolicyHelper {
         }
         
         try{    
-            Authenticator basicAuth = new BasicAuthenticator(req);            
-            UserAccount user = basicAuth.getAccountForInternalAuth( email );
+            Authenticator auth = Authenticator.getInstance(req);            
+            UserAccount user = auth.getAccountForInternalAuth( email );
             log.debug("userAccount is " + user==null?"null":user.getUri() );
                 
-            if( ! basicAuth.isCurrentPassword( user, password ) ){
+            if( ! auth.isCurrentPassword( user, password ) ){
                 log.debug(String.format("UNAUTHORIZED, password not accepted for %s, account URI: %s",
                                         user.getEmailAddress(), user.getUri()));
                 return false;
