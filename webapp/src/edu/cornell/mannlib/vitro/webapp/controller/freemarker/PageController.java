@@ -67,8 +67,7 @@ public class PageController extends FreemarkerHttpServlet{
             }                
             
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            log.debug(e);
+            log.warn(e);
             return Actions.UNAUTHORIZED;
         }                
     }
