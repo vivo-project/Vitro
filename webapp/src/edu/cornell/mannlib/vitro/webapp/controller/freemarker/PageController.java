@@ -58,10 +58,12 @@ public class PageController extends FreemarkerHttpServlet{
 
             if( pageActs == null && dgActs == null){
                 return Actions.AUTHORIZED;
-            }else if( pageActs == null && dgActs != null ){
+            }else if( pageActs == null ){
                 return dgActs;
+            }else if( dgActs == null ){
+            	return pageActs;
             }else{
-                return pageActs;
+                return pageActs.and(dgActs);
             }                
             
         } catch (Exception e) {
