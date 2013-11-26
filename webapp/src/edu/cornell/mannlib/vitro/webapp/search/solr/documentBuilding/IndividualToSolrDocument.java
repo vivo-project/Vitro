@@ -110,6 +110,9 @@ public class IndividualToSolrDocument {
         for( SearchIndexExcluder excluder : excludes){
             try{
                 String msg = excluder.checkForExclusion(ind);
+				log.debug("individual=" + ind.getURI() + " (" + ind.getLabel()
+						+ "), excluder=" + excluder + ", types="
+						+ ind.getMostSpecificTypeURIs() + ", msg=" + msg);
                 if( msg != DONT_EXCLUDE)
                     return msg;
             }catch (Exception e) {

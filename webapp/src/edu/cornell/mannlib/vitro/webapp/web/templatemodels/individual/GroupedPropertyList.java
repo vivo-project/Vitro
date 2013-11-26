@@ -81,7 +81,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         
         // save applicable ranges before deduping to filter later 
         populatedObjectPropertyList = dedupe(populatedObjectPropertyList);
-        
+                
         Collection<ObjectProperty> additions = ApplicationConfigurationOntologyUtils
                 .getAdditionalFauxSubpropertiesForList(
                         populatedObjectPropertyList, subject, vreq);
@@ -121,13 +121,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
         if (editing) {
             mergeAllPossibleDataProperties(propertyList);
         }
-        
-// Not currently necessary since the language-specific version is now added
-// during the merge
-//        if (editing) {
-//            propertyList = correctLanguageForProperties(propertyList);
-//        }
-        
+                
         sort(propertyList);
 
         // Put the list into groups
@@ -176,35 +170,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
         return filteredAdditions;
     }
     
-    // Use the language-filtering WebappDaoFactory to get the right version of
-    // each property.  When editing, the methods that add to the property list
-    // are blissfully (and intentionally) language-unaware.
-    private List<Property> correctLanguageForProperties(List<Property> properties) {
-        List<Property> languageCorrectedProps = new ArrayList<Property>();
-        for (Property p : properties) {
-            Property correctedProp = null;
-            if (p instanceof ObjectProperty) {
-                ObjectProperty op = (ObjectProperty) p;
-                correctedProp = wdf.getObjectPropertyDao()
-                        .getObjectPropertyByURIs(op.getURI(), 
-                                op.getDomainVClassURI(), op.getRangeVClassURI());
-            } else if (p instanceof DataProperty) {
-                correctedProp = wdf.getDataPropertyDao()
-                        .getDataPropertyByURI(((DataProperty) p).getURI());                
-            } else {
-                log.warn("Ignoring " + p.getURI() + " which is neither an " +
-                		 "ObjectProperty nor a DatatypeProperty.");
-            }
-            if (correctedProp != null) {
-                languageCorrectedProps.add(correctedProp);
-            } else {
-                log.error("Unable to retrieve property " + p.getURI() + 
-                        " using the WebappDaoFactory associated with the request.");                
-            }
-        }
-        return languageCorrectedProps;
-    }
-
     // It's possible that an object property retrieved in the call to getPopulatedObjectPropertyList()
     // is now empty of statements, because if not editing, some statements without a linked individual
     // are not retrieved by the query. (See <linked-individual-required> elements in queries.)
@@ -281,16 +246,17 @@ public class GroupedPropertyList extends BaseTemplateModel {
                         continue;
                     }
                     boolean addToList = true;
-                    int opIndex = 0;
                     for(ObjectProperty op : populatedObjectPropertyList) {
-                        if(redundant(op, piOp)) {
+                        RedundancyReason reason = redundant(op, piOp); 
+                        if(reason != null) {
                             addToList = false;
-                            if (moreRestrictiveRange(piOp, op, wadf)) {
-                                propertyList = replaceOpWithPiOpInList(piOp, op, opIndex, propertyList);
+                            if (reason == RedundancyReason.LABEL_AND_URI_MATCH 
+                                    && moreRestrictiveRange(piOp, op, wadf)) {
+                                op.setRangeVClassURI(piOp.getRangeVClassURI());
+                                op.setRangeVClass(piOp.getRangeVClass());
                             }
                             break;
                         } 
-                        opIndex++;
                     }
                     if(addToList) {
                         propertyList.add(piOp);         
@@ -315,6 +281,10 @@ public class GroupedPropertyList extends BaseTemplateModel {
         return propertyList;
     }
     
+    private enum RedundancyReason {
+         LABEL_AND_URI_MATCH, LABEL_URI_DOMAIN_AND_RANGE_MATCH   
+    }
+    
     private boolean moreRestrictiveRange(ObjectProperty piOp, ObjectProperty op, 
             WebappDaoFactory wadf) {
         if(piOp.getRangeVClassURI() == null) {
@@ -327,25 +297,9 @@ public class GroupedPropertyList extends BaseTemplateModel {
         }
     }
     
-    private List<Property> replaceOpWithPiOpInList(ObjectProperty piOp, 
-            ObjectProperty op, int opIndex, List<Property> propertyList) {
-                
-        List<Property> returnList = new ArrayList<Property>();
-        int index = 0;
-        for(Property p : propertyList) {
-            if(index == opIndex /* p.equals(op) */) {
-                returnList.add(piOp);
-            } else {
-                returnList.add(p);
-            }
-            index++;
-        }
-        return returnList;
-    }
-    
-    private boolean redundant(ObjectProperty op, ObjectProperty op2) {
+    private RedundancyReason redundant(ObjectProperty op, ObjectProperty op2) {
         if (op2.getURI() == null) {
-            return false;
+            return null;
         }
         boolean uriMatches = (op.getURI() != null 
                 && op.getURI().equals(op2.getURI()));
@@ -360,7 +314,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
             labelMatches = true;
         }
         if(uriMatches && labelMatches) {
-            return true;
+            return RedundancyReason.LABEL_AND_URI_MATCH;
         }
         if(op.getDomainVClassURI() == null) {
             if(op2.getDomainVClassURI() == null) {
@@ -377,9 +331,9 @@ public class GroupedPropertyList extends BaseTemplateModel {
             rangeMatches = true;
         }
         if (uriMatches && domainMatches && rangeMatches) {
-            return true;
+            return RedundancyReason.LABEL_URI_DOMAIN_AND_RANGE_MATCH;
         }
-        return false;
+        return null;
     }
 
     private void addObjectPropertyToPropertyList(String propertyUri, String domainUri, String rangeUri,

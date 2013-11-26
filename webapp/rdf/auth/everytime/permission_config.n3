@@ -12,6 +12,7 @@ auth:ADMIN
     
     # ADMIN-only permissions
     auth:hasPermission simplePermission:AccessSpecialDataModels ;
+   	auth:hasPermission simplePermission:EnableDeveloperPanel ;    
     auth:hasPermission simplePermission:LoginDuringMaintenance ;
     auth:hasPermission simplePermission:ManageMenus ;
     auth:hasPermission simplePermission:ManageProxies ;
@@ -23,7 +24,12 @@ auth:ADMIN
     auth:hasPermission simplePermission:UseAdvancedDataToolsPages ;
     auth:hasPermission simplePermission:UseMiscellaneousAdminPages ;
     auth:hasPermission simplePermission:UseSparqlQueryPage ;
-   	auth:hasPermission simplePermission:PageViewableAdmin ;    
+   	auth:hasPermission simplePermission:PageViewableAdmin ;  
+   	
+		# Uncomment the following permission line to enable the SPARQL update API. 
+		# Before enabling, be sure that the URL api/sparqlUpdate is secured by SSH, 
+		# so passwords will not be sent in clear text.   	  
+#  	auth:hasPermission simplePermission:UseSparqlUpdateApi ;    
     
     # permissions for CURATOR and above.
     auth:hasPermission simplePermission:EditOntology ;

@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.freemarker.config;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,28 +36,52 @@ import freemarker.template.utility.DeepUnwrap;
  * Extend the Freemarker Configuration class to include some information that is
  * particular to the current request.
  * 
- * Takes advantage of the fact that each servlet request runs in a separate
- * thread. Stores the request-based information in a ThreadLocal. Override any
- * methods that should return that information instead of (or in addition to)
- * the common info.
+ * A reference to the current request is not always available to the Freemarker
+ * Configuration, so we take advantage of the fact that each request runs in a
+ * separate thread, and store a reference to that request in a ThreadLocal
+ * object.
+ * 
+ * Then, we override any methods that should return that request-based
+ * information instead of (or in addition to) the common info.
  * 
  * Only the getters are overridden, not the setters. So if you call
  * setAllSharedVariables(), for example, it will have no effect on the
  * request-based information.
+ * 
+ * Notice that the reference to the current request is actually stored through a
+ * WeakReference. This is because the ThreadLocal will not be cleared when the
+ * webapp is stopped, so none of the references from that ThreadLocal are
+ * eligible for garbage collection. If any of those references is an instance of
+ * a class that is loaded by the webapp, then the webapp ClassLoader is not
+ * eligible for garbage collection. This would be a huge memory leak.
+ * 
+ * Thanks to the WeakReference, the request is eligible for garbage collection
+ * if nothing else refers to it. In theory, this means that the WeakReference
+ * could return a null, but if the garbage collector has taken the request, then
+ * who is invoking this object?
  */
 public class FreemarkerConfigurationImpl extends Configuration {
 	private static final Log log = LogFactory
 			.getLog(FreemarkerConfigurationImpl.class);
 
-	private final ThreadLocal<RequestBasedInformation> rbiRef = new ThreadLocal<>();
+	private static final String ATTRIBUTE_NAME = RequestBasedInformation.class
+			.getName();
+
+	private final ThreadLocal<WeakReference<HttpServletRequest>> reqRef = new ThreadLocal<>();
 
 	void setRequestInfo(HttpServletRequest req) {
-		rbiRef.set(new RequestBasedInformation(req, this));
+		reqRef.set(new WeakReference<>(req));
+		req.setAttribute(ATTRIBUTE_NAME, new RequestBasedInformation(req, this));
+	}
+
+	private RequestBasedInformation getRequestInfo() {
+		HttpServletRequest req = reqRef.get().get();
+		return (RequestBasedInformation) req.getAttribute(ATTRIBUTE_NAME);
 	}
 
 	@Override
 	public Object getCustomAttribute(String name) {
-		Map<String, Object> attribs = rbiRef.get().getCustomAttributes();
+		Map<String, Object> attribs = getRequestInfo().getCustomAttributes();
 		if (attribs.containsKey(name)) {
 			return attribs.get(name);
 		} else {
@@ -66,13 +91,13 @@ public class FreemarkerConfigurationImpl extends Configuration {
 
 	@Override
 	public String[] getCustomAttributeNames() {
-		Set<String> rbiNames = rbiRef.get().getCustomAttributes().keySet();
+		Set<String> rbiNames = getRequestInfo().getCustomAttributes().keySet();
 		return joinNames(rbiNames, super.getCustomAttributeNames());
 	}
 
 	@Override
 	public TemplateModel getSharedVariable(String name) {
-		Map<String, TemplateModel> vars = rbiRef.get().getSharedVariables();
+		Map<String, TemplateModel> vars = getRequestInfo().getSharedVariables();
 		if (vars.containsKey(name)) {
 			return vars.get(name);
 		} else {
@@ -82,7 +107,7 @@ public class FreemarkerConfigurationImpl extends Configuration {
 
 	@Override
 	public Set<String> getSharedVariableNames() {
-		Set<String> rbiNames = rbiRef.get().getSharedVariables().keySet();
+		Set<String> rbiNames = getRequestInfo().getSharedVariables().keySet();
 
 		@SuppressWarnings("unchecked")
 		Set<String> superNames = super.getSharedVariableNames();
@@ -94,7 +119,7 @@ public class FreemarkerConfigurationImpl extends Configuration {
 
 	@Override
 	public Locale getLocale() {
-		return rbiRef.get().getReq().getLocale();
+		return getRequestInfo().getReq().getLocale();
 	}
 
 	private String[] joinNames(Set<String> nameSet, String[] nameArray) {
@@ -287,6 +312,7 @@ public class FreemarkerConfigurationImpl extends Configuration {
 			urls.put("images", UrlBuilder.getUrl("/images"));
 			urls.put("theme", UrlBuilder.getUrl(themeDir));
 			urls.put("index", UrlBuilder.getUrl("/browse"));
+			urls.put("developerAjax", UrlBuilder.getUrl("/admin/developerAjax"));
 
 			return urls;
 		}

@@ -17,6 +17,8 @@
     <input type="hidden" value="${editConfiguration.subjectUri}" name="subjectUri" role="input" />  
     <input type="hidden" value="${editConfiguration.predicateUri}" name="predicateUri" role="input" />  
     <input type="hidden" value="${objectUri}" name="objectUri" role="input" />      
+   <input type="hidden" name="domainUri" value="${editConfiguration.domainUri!}"/>
+    <input type="hidden" name="rangeUri" value="${editConfiguration.rangeUri!}"/>
     <input type="hidden" value="create" name="cmd" role="input" />     
         
     <select id="typeOfNew" name="typeOfNew" role="selection">

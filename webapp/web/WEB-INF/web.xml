@@ -814,6 +814,15 @@
     <url-pattern>/searchHelp</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>DeveloperAjax</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettingsServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DeveloperAjax</servlet-name>
+    <url-pattern>/admin/developerAjax</url-pattern>
+  </servlet-mapping>
+
   <!-- for now, need to make sure the links on CALS' site doesn't break -->
   <servlet-mapping>
     <servlet-name>SearchController</servlet-name>
@@ -1014,6 +1023,16 @@
   <servlet-mapping>
     <servlet-name>SparqlQuery</servlet-name>
     <url-pattern>/admin/sparqlquery</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>SparqlUpdateApi</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.api.SparqlUpdateApiController</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>SparqlUpdateApi</servlet-name>
+    <url-pattern>/api/sparqlUpdate</url-pattern>
   </servlet-mapping>
   
   <servlet>

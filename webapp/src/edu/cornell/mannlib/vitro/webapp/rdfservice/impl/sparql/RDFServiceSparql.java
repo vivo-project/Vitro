@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sparql;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -14,7 +15,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,6 +41,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
@@ -84,11 +88,11 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         this.readRepository = new HTTPRepository(readEndpointURI);
         this.updateRepository = new HTTPRepository(updateEndpointURI);
 
-        testConnection();
-
         MultiThreadedHttpConnectionManager mgr = new MultiThreadedHttpConnectionManager();
-        mgr.getParams().setDefaultMaxConnectionsPerHost(10);
+        mgr.getParams().setDefaultMaxConnectionsPerHost(50);
         this.httpClient = new HttpClient(mgr);
+        
+        testConnection();
     }
     
     private void testConnection() {
@@ -278,13 +282,28 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	 */
 	@Override
 	public InputStream sparqlSelectQuery(String queryStr, RDFService.ResultFormat resultFormat) throws RDFServiceException {
-		
-        Query query = createQuery(queryStr);
-        QueryExecution qe = QueryExecutionFactory.sparqlService(readEndpointURI, query);
-        
+			    
+        //QueryEngineHTTP qh = new QueryEngineHTTP(readEndpointURI, queryStr);
+
+        GetMethod meth = new GetMethod(readEndpointURI);
         try {
-        	ResultSet resultSet = qe.execSelect();
-        	ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
+            meth.addRequestHeader("Accept", "application/sparql-results+xml");
+            NameValuePair param = new NameValuePair();
+            param.setName("query");
+            param.setValue(queryStr);
+            NameValuePair[] params = new NameValuePair[1];
+            params[0] = param;
+            meth.setQueryString(params);           
+            int response = httpClient.executeMethod(meth);
+            if (response > 399) {
+                log.error("response " + response + " to query. \n");
+                log.debug("update string: \n" + queryStr);
+                throw new RDFServiceException("Unable to perform SPARQL UPDATE");
+            }
+        
+            InputStream in = meth.getResponseBodyAsStream();
+            ResultSet resultSet = ResultSetFactory.fromXML(in);
+        	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         	
         	switch (resultFormat) {
         	   case CSV:
@@ -301,12 +320,14 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         		  break;
         	   default: 
         		  throw new RDFServiceException("unrecognized result format");
-        	}
-        	
+        	}     	
         	InputStream result = new ByteArrayInputStream(outputStream.toByteArray());
         	return result;
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
         } finally {
-            qe.close();
+            //qh.close();
+            meth.releaseConnection();
         }
 	}
 	
@@ -474,7 +495,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
                 int response = httpClient.executeMethod(meth);
                 if (response > 399) {
                     log.error("response " + response + " to update. \n");
-                    log.debug("update string: \n" + updateString);
+                    //log.debug("update string: \n" + updateString);
                     throw new RDFServiceException("Unable to perform SPARQL UPDATE");
                 }
             } finally {
@@ -744,6 +765,8 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
     private List<Statement> sort(List<Statement> stmts) {
         List<Statement> output = new ArrayList<Statement>();
         int originalSize = stmts.size();
+        if (originalSize == 1) 
+            return stmts;
         List <Statement> remaining = stmts;
         ConcurrentLinkedQueue<com.hp.hpl.jena.rdf.model.Resource> subjQueue = 
                 new ConcurrentLinkedQueue<com.hp.hpl.jena.rdf.model.Resource>();

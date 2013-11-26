@@ -56,7 +56,10 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 	public static boolean isCreateNewIndividual(VitroRequest vreq, HttpSession session) {
 		String command = vreq.getParameter("cmd");
 		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
-		ObjectProperty objProp = vreq.getWebappDaoFactory().getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
+		//This method also looks at domain and range uris and so is different than just getting the
+		//object property based on predicate uri alone
+		ObjectProperty objProp = EditConfigurationUtils.getObjectPropertyForPredicate(vreq, 
+	            predicateUri);
 		if(objProp != null) {
 			return(objProp.getOfferCreateNewOption() && 
 					(

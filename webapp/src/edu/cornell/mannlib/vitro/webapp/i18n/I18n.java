@@ -3,10 +3,14 @@
 package edu.cornell.mannlib.vitro.webapp.i18n;
 
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.ServletContext;
@@ -15,8 +19,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings.Keys;
 
 /**
  * Provides access to a bundle of text strings, based on the name of the bundle,
@@ -31,7 +37,6 @@ public class I18n {
 	private static final Log log = LogFactory.getLog(I18n.class);
 
 	public static final String DEFAULT_BUNDLE_NAME = "all";
-	private static final String PROPERTY_DEVELOPER_DEFEAT_CACHE = "developer.defeatI18nCache";
 
 	/**
 	 * If this attribute is present on the request, then the cache has already
@@ -103,6 +108,7 @@ public class I18n {
 	protected I18nBundle getBundle(String bundleName, HttpServletRequest req) {
 		log.debug("Getting bundle '" + bundleName + "'");
 
+		I18nLogger i18nLogger = new I18nLogger(req);
 		try {
 			checkDevelopmentMode(req);
 			checkForChangeInThemeDirectory(req);
@@ -113,13 +119,13 @@ public class I18n {
 			ResourceBundle.Control control = new ThemeBasedControl(ctx, dir);
 			ResourceBundle rb = ResourceBundle.getBundle(bundleName,
 					req.getLocale(), control);
-			return new I18nBundle(bundleName, rb);
+			return new I18nBundle(bundleName, rb, i18nLogger);
 		} catch (MissingResourceException e) {
 			log.warn("Didn't find text bundle '" + bundleName + "'");
-			return I18nBundle.emptyBundle(bundleName);
+			return I18nBundle.emptyBundle(bundleName, i18nLogger);
 		} catch (Exception e) {
 			log.error("Failed to create text bundle '" + bundleName + "'", e);
-			return I18nBundle.emptyBundle(bundleName);
+			return I18nBundle.emptyBundle(bundleName, i18nLogger);
 		}
 	}
 
@@ -127,11 +133,7 @@ public class I18n {
 	 * If we are in development mode, clear the cache on each request.
 	 */
 	private void checkDevelopmentMode(HttpServletRequest req) {
-		ConfigurationProperties bean = ConfigurationProperties.getBean(req);
-
-		String flag = bean
-				.getProperty(PROPERTY_DEVELOPER_DEFEAT_CACHE, "false");
-		if (Boolean.valueOf(flag.trim())) {
+		if (DeveloperSettings.getBean(req).getBoolean(Keys.I18N_DEFEAT_CACHE)) {
 			log.debug("In development mode - clearing the cache.");
 			clearCacheOnRequest(req);
 		}
@@ -170,7 +172,7 @@ public class I18n {
 	 * Instead of looking in the classpath, look in the theme i18n directory and
 	 * the application i18n directory.
 	 */
-	private static class ThemeBasedControl extends ResourceBundle.Control {
+	static class ThemeBasedControl extends ResourceBundle.Control {
 		private static final String BUNDLE_DIRECTORY = "i18n/";
 		private final ServletContext ctx;
 		private final String themeDirectory;
@@ -219,6 +221,52 @@ public class I18n {
 		}
 
 		/**
+		 * When creating the chain of acceptable Locales, include approximate
+		 * matches before giving up and using the root Locale.
+		 * 
+		 * Check the list of supported Locales to see if any have the same
+		 * language but different region. If we find any, sort them and insert
+		 * them into the usual result list, just before the root Locale.
+		 */
+		@Override
+		public List<Locale> getCandidateLocales(String baseName, Locale locale) {
+			// Find the list of Locales that would normally be returned.
+			List<Locale> usualList = super
+					.getCandidateLocales(baseName, locale);
+
+			// If our "selectable locales" include no approximate matches that
+			// are not already in the list, we're done.
+			SortedSet<Locale> approximateMatches = findApproximateMatches(locale);
+			approximateMatches.removeAll(usualList);
+			if (approximateMatches.isEmpty()) {
+				return usualList;
+			}
+
+			// Otherwise, insert those approximate matches into the list just
+			// before the ROOT locale.
+			List<Locale> mergedList = new LinkedList<>(usualList);
+			int rootLocaleHere = mergedList.indexOf(Locale.ROOT);
+			if (rootLocaleHere == -1) {
+				mergedList.addAll(approximateMatches);
+			} else {
+				mergedList.addAll(rootLocaleHere, approximateMatches);
+			}
+			return mergedList;
+		}
+
+		private SortedSet<Locale> findApproximateMatches(Locale locale) {
+			SortedSet<Locale> set = new TreeSet<>(new LocaleComparator());
+
+			for (Locale l : SelectedLocale.getSelectableLocales(ctx)) {
+				if (locale.getLanguage().equals(l.getLanguage())) {
+					set.add(l);
+				}
+			}
+
+			return set;
+		}
+
+		/**
 		 * The documentation for ResourceBundle.Control.newBundle() says I
 		 * should throw these exceptions.
 		 */
@@ -237,6 +285,21 @@ public class I18n {
 				throw new IllegalArgumentException(
 						"format must be one of these: " + FORMAT_DEFAULT);
 			}
+		}
+
+	}
+
+	private static class LocaleComparator implements Comparator<Locale> {
+		@Override
+		public int compare(Locale o1, Locale o2) {
+			int c = o1.getLanguage().compareTo(o2.getLanguage());
+			if (c == 0) {
+				c = o1.getCountry().compareTo(o2.getCountry());
+				if (c == 0) {
+					c = o1.getVariant().compareTo(o2.getVariant());
+				}
+			}
+			return c;
 		}
 	}
 }

@@ -38,6 +38,8 @@ public class SimplePermission extends Permission {
 		NAMESPACE + "EditOwnAccount");
 	public static final SimplePermission EDIT_SITE_INFORMATION = new SimplePermission(
 		NAMESPACE + "EditSiteInformation");
+	public static final SimplePermission ENABLE_DEVELOPER_PANEL = new SimplePermission(
+		NAMESPACE + "EnableDeveloperPanel");
 	public static final SimplePermission LOGIN_DURING_MAINTENANCE = new SimplePermission(
 		NAMESPACE + "LoginDuringMaintenance");
 	public static final SimplePermission MANAGE_MENUS = new SimplePermission(
@@ -76,7 +78,8 @@ public class SimplePermission extends Permission {
 		NAMESPACE + "UseAdvancedDataToolsPages");
 	public static final SimplePermission USE_SPARQL_QUERY_PAGE = new SimplePermission(
 		NAMESPACE + "UseSparqlQueryPage");
-	
+	public static final SimplePermission USE_SPARQL_UPDATE_API = new SimplePermission(
+		NAMESPACE + "UseSparqlUpdateApi");
 
 	// ----------------------------------------------------------------------
 	// These instances are "catch all" permissions to cover poorly defined

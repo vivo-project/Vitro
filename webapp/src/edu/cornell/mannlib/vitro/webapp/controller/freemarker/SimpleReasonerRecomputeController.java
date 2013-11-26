@@ -56,7 +56,7 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
 								"SimpleReasonerRecomputController.Recomputer");
 						thread.setWorkLevel(WORKING);
 						thread.start();
-                        messageStr = "Recompute of inferences started. See vivo log for further details.";                       
+                        messageStr = "Recompute of inferences started. See log for further details.";                       
                     } else {
                         body.put("formAction", UrlBuilder.getUrl("/RecomputeInferences"));
                     } 

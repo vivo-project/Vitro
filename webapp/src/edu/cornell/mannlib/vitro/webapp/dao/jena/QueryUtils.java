@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -116,7 +117,11 @@ public class QueryUtils {
         return getQueryResults(queryStr, vreq.getRDFService());
     }
 
-    public static ResultSet getLanguageNeutralQueryResults(String queryStr, VitroRequest vreq) {
+    public static ResultSet getQueryResults(String queryStr, QuerySolution initialBindings, RDFService rdfService) {
+    	return getQueryResults(bindVariables(queryStr, initialBindings), rdfService);
+    }
+    
+	public static ResultSet getLanguageNeutralQueryResults(String queryStr, VitroRequest vreq) {
     	return getQueryResults(queryStr, vreq.getUnfilteredRDFService());
     }
 
@@ -129,5 +134,39 @@ public class QueryUtils {
 	        throw new RuntimeException(e);
 	    }
 	}
+
+	/**
+	 * The RDFService interface doesn't support initial bindings, so do text
+	 * substitutions instead.
+	 */
+	public static String bindVariables(String queryStr,
+			QuerySolution initialBindings) {
+		String bound = queryStr;
+		for (Iterator<String> it = initialBindings.varNames(); it.hasNext();) {
+			String name = it.next();
+			RDFNode node = initialBindings.get(name);
+			if (node.isLiteral()) {
+				bound = bound.replace('?' + name, literalToString(node.asLiteral()));
+			} else if (node.isURIResource()) {
+				bound = bound.replace('?' + name,  '<'+node.asResource().getURI()+ '>');
+			}else {
+				log.warn("Failed to bind anonymous resource variable '" + name
+						+ "' to query '" + bound + "'");
+			}
+		}
+		return bound;
+	}
+
+	private static String literalToString(Literal l) {
+		StringBuilder buffer = new StringBuilder();
+		buffer.append('"').append(l.getLexicalForm()).append('"');
+		if (l.getDatatypeURI() != null) {
+			buffer.append("^^<").append(l.getDatatypeURI()).append(">");
+		} else if (StringUtils.isNotEmpty(l.getLanguage())) {
+			buffer.append("@").append(l.getLanguage());
+		}
+		return buffer.toString();
+	}
+
 
 }

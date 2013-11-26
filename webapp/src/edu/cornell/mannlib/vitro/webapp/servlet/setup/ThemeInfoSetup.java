@@ -73,8 +73,8 @@ public class ThemeInfoSetup implements ServletContextListener {
 
 		ApplicationBean.themeInfo = new ThemeInfo(themesBaseDir,
 				defaultThemeName, themeNames);
-		ss.info(this, ", current theme: " + currentThemeName
-				+ "default theme: " + defaultThemeName + ", available themes: "
+		ss.info(this, "current theme: " + currentThemeName
+				+ ", default theme: " + defaultThemeName + ", available themes: "
 				+ themeNames);
 	}
 

@@ -9,7 +9,7 @@
  -->
  
 <#assign rangeOptionsExist = true /> 
-
+<#assign rangeVClassURI = editConfiguration.objectPredicateProperty.rangeVClassURI!"" />
 <#assign objectTypes = editConfiguration.pageData.objectTypes />
 <#assign objectTypesSize = objectTypes?length />
 <#assign objectTypesExist = false />
@@ -40,7 +40,7 @@
 <#assign formTitle = editConfiguration.formTitle />
 <#if editConfiguration.formTitle?contains("collaborator") >
     <#assign formTitle = "${i18n().select_existing_collaborator(editConfiguration.subjectName)}" />
-<#elseif editConfiguration.objectPredicateProperty.rangeVClassURI?contains("IAO_0000030")>
+<#elseif rangeVClassURI?contains("IAO_0000030")>
     <#assign formTitle = "${i18n().select_an_existing_document}" + " ${i18n().for} " + editConfiguration.subjectName/>
 </#if>
 <#--In order to fill out the subject-->
