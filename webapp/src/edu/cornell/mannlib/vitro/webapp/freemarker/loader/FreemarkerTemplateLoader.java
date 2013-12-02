@@ -15,6 +15,8 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -178,64 +180,71 @@ public class FreemarkerTemplateLoader implements TemplateLoader {
 	 * search term, and how well they match.
 	 */
 	static class PathPieces {
+		static final Pattern PATTERN = Pattern.compile("(.+?)" // base name
+				+ "(_[a-z]{2})?" // optional language
+				+ "(_[A-Z]{2})?" // optional country
+				+ "(\\.\\w+)?" // optional extension
+		);
+
 		final Path path;
 		final String base;
 		final String language;
 		final String region;
 		final String extension;
 
-		public PathPieces(String searchTerm) {
-			this(Paths.get(searchTerm));
+		public PathPieces(String pathString) {
+			this(Paths.get(pathString));
 		}
 
 		public PathPieces(Path path) {
 			this.path = path;
 
 			String filename = path.getFileName().toString();
-			int dotHere = filename.lastIndexOf('.');
-			String basename;
-			if (dotHere != -1) {
-				basename = filename.substring(0, dotHere);
-				this.extension = filename.substring(dotHere);
-			} else {
-				basename = filename;
-				this.extension = "";
-			}
 
-			int break2 = basename.lastIndexOf('_');
-			int break1 = basename.lastIndexOf('_', break2 - 1);
-			if (break1 != -1) {
-				this.base = basename.substring(0, break1);
-				this.language = basename.substring(break1, break2);
-				this.region = basename.substring(break2);
-			} else if (break2 != -1) {
-				this.base = basename.substring(0, break2);
-				this.language = basename.substring(break2);
-				this.region = "";
+			Matcher m = PATTERN.matcher(filename);
+			if (m.matches()) {
+				base = getGroup(m, 1);
+				language = getGroup(m, 2);
+				region = getGroup(m, 3);
+				extension = getGroup(m, 4);
 			} else {
-				this.base = basename;
-				this.language = "";
-				this.region = "";
+				base = filename;
+				language = "";
+				region = "";
+				extension = "";
 			}
 		}
 
-		/** This is the search term. Does that candidate qualify as a result? */
+		private String getGroup(Matcher m, int i) {
+			return (m.start(i) == -1) ? "" : m.group(i);
+		}
+
+		/**
+		 * If I'm searching for this, is that an acceptable match?
+		 * 
+		 * Note that this is asymetrical -- a search term without a region will
+		 * match a candidate with a region, but not vice versa. Same with
+		 * language.
+		 */
 		public boolean matches(PathPieces that) {
 			return base.equals(that.base) && extension.equals(that.extension)
 					&& (language.isEmpty() || language.equals(that.language))
 					&& (region.isEmpty() || region.equals(that.region));
 		}
 
+		/**
+		 * How good a match is that to this?
+		 */
 		public int score(PathPieces that) {
 			if (matches(that)) {
 				if (that.language.equals(language)) {
 					if (that.region.equals(region)) {
-						return 3; // match language and region
+						return 3; // exact match.
 					} else {
-						return 2; // match language, default region.
+						return 2; // same language, approximate region.
 					}
 				} else {
-					return 1; // default language.
+					return 1; // approximate language.
 				}
 			} else {
 				return -1; // doesn't match.
@@ -276,7 +285,7 @@ public class FreemarkerTemplateLoader implements TemplateLoader {
 		}
 
 		public boolean fileQualifies(Path path) {
-			return Files.isRegularFile(path) && Files.isReadable(path);
+			return Files.isReadable(path) && !Files.isDirectory(path);
 		}
 
 		public SortedSet<PathPieces> getMatches() {

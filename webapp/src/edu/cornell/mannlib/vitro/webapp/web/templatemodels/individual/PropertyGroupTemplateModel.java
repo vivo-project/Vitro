@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataProperty;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
@@ -50,8 +51,15 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
                     properties.add(tm);                    
                 }
 
+            } else if (p instanceof DataProperty){
+                DataProperty dp = (DataProperty) p;
+                RequestedAction dop = new DisplayDataProperty(dp);
+                if (!PolicyHelper.isAuthorizedForActions(vreq, dop)) {
+                    continue;
+                }
+                properties.add(new DataPropertyTemplateModel(dp, subject, vreq, editing, populatedDataPropertyList));
             } else {
-                properties.add(new DataPropertyTemplateModel((DataProperty)p, subject, vreq, editing, populatedDataPropertyList));
+                log.debug(p.getURI() + " is neither an ObjectProperty nor a DataProperty; skipping display");
             }
         }
     }

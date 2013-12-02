@@ -6,26 +6,8 @@
 </#macro>
 
 <#macro showTextbox key>
-	<input type="text" id="${key}" size="40" value="${settings[key]}" >
+	<input type="text" id="${key}" size="30" value="${settings[key]}" >
 </#macro>
-
-
-<style>
-div.developer {
-	background-color: #f7dd8a; 
-	padding: 0px 10px 0px 10px;
-	font-size: small;
-	font-variant: small-caps;
-}
-
-div.developer #developerPanelBody {
-	display: none;
-}
-
-div.developer .container {
-	border: thin groove black
-}
-</style>
 
 <#if !settings.developerEnabled>
 <#elseif !settings.mayControl>
@@ -38,40 +20,26 @@ div.developer .container {
 			<span id="developerPanelClickText">(click for Options)</span>
 		</h1>
 		<div id="developerPanelBody">
-			<form>
+			<div>
 				<label>
 					<@showCheckbox "developerEnabled" />
 					Enable developer mode
 				</label>
-				
+			</div>
+			
+			<div class="devright">
 				<div class="container">
-					Freemarker templates
+					Page configuration
 					<label>
-						<@showCheckbox "developerDefeatFreemarkerCache" />
-						Defeat the template cache
+						<@showCheckbox "developerPageContentsLogCustomListView" />
+						Log the use of custom list view XML files.
 					</label>
 					<label>
-						<@showCheckbox "developerInsertFreemarkerDelimiters" />
-						Insert HTML comments at start and end of templates
+						<@showCheckbox "developerPageContentsLogCustomShortView" />
+						Log the use of custom short views in search, index and browse pages.
 					</label>
 				</div>
 				
-				<div class="container">
-					SPARQL Queries
-					<label>
-						<@showCheckbox "developerLoggingRDFServiceEnable" />
-						Log each query 
-					</label>
-					<label>
-						<@showCheckbox "developerLoggingRDFServiceStackTrace" />
-						Add stack trace
-					</label>
-					<label>
-						Restrict by calling stack
-						<@showTextbox "developerLoggingRDFServiceRestriction" />
-					</label>
-				</div>
-
 				<div class="container">
 					Language support
 					<label>
@@ -84,8 +52,54 @@ div.developer .container {
 					</label>
 				</div>
 
+				<div class="container">
+					Links
+					<br/>
+					<a href="${urls.base}/admin/log4j.jsp">Set log levels</a>
+					<a href="${urls.base}/admin/showAuth">Show authorization info</a>
+					<a href="${urls.base}/admin/showThreads">Show background threads</a>
+				</div>
+			</div>
+				
+			<div class="devleft">
+				<div class="container">
+					Freemarker templates
+					<label>
+						<@showCheckbox "developerDefeatFreemarkerCache" />
+						Defeat the template cache
+					</label>
+					<label>
+						<@showCheckbox "developerInsertFreemarkerDelimiters" />
+						Insert HTML comments at start and end of templates
+					</label>
+				</div>
+
+				<div class="container">
+					SPARQL Queries
+					<label>
+						<@showCheckbox "developerLoggingRDFServiceEnable" />
+						Log each query 
+					</label>
+					<div class="within">
+						<label>
+							<@showCheckbox "developerLoggingRDFServiceStackTrace" />
+							Add stack trace
+						</label>
+						<label>
+							Restrict by query string
+							<@showTextbox "developerLoggingRDFServiceQueryRestriction" />
+						</label>
+						<label>
+							Restrict by calling stack
+							<@showTextbox "developerLoggingRDFServiceStackRestriction" />
+						</label>
+					</div>
+				</div>
+			</div>
+
+			<div>
 				<input type="button" id="developerPanelSaveButton" value="Save Settings" name="foo" />
-			</form>
+			</div>
 		</div>
 	</div>
 </#if>	

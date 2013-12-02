@@ -82,9 +82,29 @@ public class DeveloperSettings {
 		 * Don't log with the LoggingRDFService unless the calling stack meets
 		 * this restriction.
 		 */
-		LOGGING_RDF_RESTRICTION("developer.loggingRDFService.restriction",
-				false);
+		LOGGING_RDF_QUERY_RESTRICTION(
+				"developer.loggingRDFService.queryRestriction", false),
 
+		/**
+		 * Don't log with the LoggingRDFService unless the calling stack meets
+		 * this restriction.
+		 */
+		LOGGING_RDF_STACK_RESTRICTION(
+				"developer.loggingRDFService.stackRestriction", false),
+
+		/**
+		 * Tell the CustomListViewLogger to note the use of non-default custom
+		 * list views.
+		 */
+		PAGE_CONTENTS_LOG_CUSTOM_LIST_VIEW(
+				"developer.pageContents.logCustomListView", true),
+
+		/**
+		 * Tell the ShortViewLogger to note the use of non-default short views.
+		 */
+		PAGE_CONTENTS_LOG_CUSTOM_SHORT_VIEW(
+				"developer.pageContents.logCustomShortView", true);
+		
 		private final String propertyName;
 		private final String elementId;
 		private final boolean bool;
@@ -159,7 +179,7 @@ public class DeveloperSettings {
 	// The factory
 	// ----------------------------------------------------------------------
 
-	private static final String ATTRIBUTE_NAME = DeveloperSettings.class
+	protected static final String ATTRIBUTE_NAME = DeveloperSettings.class
 			.getName();
 
 	public static DeveloperSettings getBean(HttpServletRequest req) {
@@ -183,7 +203,7 @@ public class DeveloperSettings {
 
 	private final Map<Keys, Object> settings = new EnumMap<>(Keys.class);
 
-	private DeveloperSettings(ServletContext ctx) {
+	protected DeveloperSettings(ServletContext ctx) {
 		updateFromFile(ctx);
 	}
 
