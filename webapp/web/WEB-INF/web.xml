@@ -1026,6 +1026,16 @@
   </servlet-mapping>
   
   <servlet>
+    <servlet-name>SparqlUpdateApi</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.api.SparqlUpdateApiController</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>SparqlUpdateApi</servlet-name>
+    <url-pattern>/api/sparqlUpdate</url-pattern>
+  </servlet-mapping>
+  
+  <servlet>
   	<servlet-name>primitiveRdfEdit</servlet-name>
   	<servlet-class>edu.cornell.mannlib.vitro.webapp.controller.edit.PrimitiveRdfEdit</servlet-class>  	
   </servlet>
