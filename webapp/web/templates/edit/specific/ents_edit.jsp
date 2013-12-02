@@ -99,11 +99,6 @@
             	<input type="hidden" name="controller" value="Entity"/>
         	</form>
         	<form action="editForm" method="get">
-            	<input type="submit" class="form-button" value="Add an External Identifier"/>
-            	<input type="hidden" name="IndividualURI" value="${individual.URI}"/>
-            	<input type="hidden" name="controller" value="ExternalId"/>
-        	</form>
-        	<form action="editForm" method="get">
             	<input type="submit" class="form-button" value="Change URI"/>
             	<input type="hidden" name="oldURI" value="${individual.URI}"/>
             	<input type="hidden" name="mode" value="renameResource"/>
