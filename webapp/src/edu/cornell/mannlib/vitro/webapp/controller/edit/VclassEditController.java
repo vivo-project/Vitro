@@ -143,24 +143,25 @@ public class VclassEditController extends BaseEditController {
 
         // if supported, we want to show only the asserted superclasses and subclasses.
         VClassDao vcDao = ModelAccess.on(getServletContext()).getBaseWebappDaoFactory().getVClassDao();
+        VClassDao displayVcDao = ModelAccess.on(getServletContext()).getWebappDaoFactory().getVClassDao();
         
         List<VClass> superVClasses = getVClassesForURIList(
-                vcDao.getSuperClassURIs(vcl.getURI(),false), vcDao);
+                vcDao.getSuperClassURIs(vcl.getURI(),false), displayVcDao);
         sortForPickList(superVClasses, request);
         request.setAttribute("superclasses",superVClasses);
 
         List<VClass> subVClasses = getVClassesForURIList(
-                vcDao.getSubClassURIs(vcl.getURI()), vcDao);
+                vcDao.getSubClassURIs(vcl.getURI()), displayVcDao);
         sortForPickList(subVClasses, request);
         request.setAttribute("subclasses",subVClasses);
             
         List<VClass> djVClasses = getVClassesForURIList(
-                vcDao.getDisjointWithClassURIs(vcl.getURI()), vcDao);
+                vcDao.getDisjointWithClassURIs(vcl.getURI()), displayVcDao);
         sortForPickList(djVClasses, request);
         request.setAttribute("disjointClasses",djVClasses);
 
         List<VClass> eqVClasses = getVClassesForURIList(
-                vcDao.getEquivalentClassURIs(vcl.getURI()), vcDao);
+                vcDao.getEquivalentClassURIs(vcl.getURI()), displayVcDao);
         sortForPickList(eqVClasses, request);
         request.setAttribute("equivalentClasses",eqVClasses);
    
