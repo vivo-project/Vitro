@@ -547,11 +547,14 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	        rangeVClasses.addAll(rangeClass.getUnionComponents());
     	    }
             for(VClass rangeVClass : rangeVClasses) {	
-                vclasses.add(rangeVClass);
+            	if(rangeVClass.getGroupURI() != null) {
+            		vclasses.add(rangeVClass);
+            	}
         	    List<String> subURIs = wdf.getVClassDao().getAllSubClassURIs(rangeVClass.getURI());
         	    for (String subClassURI : subURIs) {
         	        VClass subClass = wdf.getVClassDao().getVClassByURI(subClassURI);
-        	        if (subClass != null) {
+        	        //if the subclass exists and also belongs to a particular class group
+        	        if (subClass != null && subClass.getGroupURI() != null) {
         	            vclasses.add(subClass);
         	        }
         	    }
@@ -567,7 +570,8 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 	        	//add range vclass to hash
 	        	if(rangeVclasses != null) {
 	        		for(VClass v: rangeVclasses) {
-	        			if(!vclassesURIs.contains(v.getURI())) {
+	        			//Need to make sure any class added will belong to a class group
+	        			if(!vclassesURIs.contains(v.getURI()) && v.getGroupURI() != null) {
 	        				vclassesURIs.add(v.getURI());
 	        				vclasses.add(v);
 	        			}
@@ -577,7 +581,13 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	}
     	//if each subject vclass resulted in null being returned for range vclasses, then size of vclasses would be zero
     	if(vclasses.size() == 0) {
-    		vclasses = wdf.getVClassDao().getAllVclasses();
+    		List<VClass> allVClasses  = wdf.getVClassDao().getAllVclasses();
+    		//Since these are all vclasses, we should check whether vclasses included are in a class group
+    		for(VClass v:allVClasses) {
+    			if(v.getGroupURI() != null) {
+    				vclasses.add(v);
+    			}
+    		}
     	}
     	
     	
