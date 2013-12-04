@@ -112,7 +112,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
    		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
    		String rangeUri = EditConfigurationUtils.getRangeUri(vreq);
-   		if (rangeUri != null) {
+   		if (rangeUri != null && !rangeUri.isEmpty()) {
    		    VClass rangeVClass = ctxDaoFact.getVClassDao().getVClassByURI(rangeUri);
    		    if (!rangeVClass.isUnion()) {
    		        types.add(rangeVClass);    
@@ -125,18 +125,23 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
    		}
    		WebappDaoFactory wDaoFact = vreq.getWebappDaoFactory();
 		//Get all vclasses applicable to subject
-		List<VClass> vClasses = subject.getVClasses();
-		HashMap<String, VClass> typesHash = new HashMap<String, VClass>();
-		for(VClass vclass: vClasses) {
-			 List<VClass> rangeVclasses = wDaoFact.getVClassDao().getVClassesForProperty(vclass.getURI(),predicateUri);
-			 if(rangeVclasses !=  null) {
-				 for(VClass range: rangeVclasses) {
-					 //a hash will keep a unique list of types and so prevent duplicates
-					 typesHash.put(range.getURI(), range);
+   		if(subject != null) {
+			List<VClass> vClasses = subject.getVClasses();
+			HashMap<String, VClass> typesHash = new HashMap<String, VClass>();
+			for(VClass vclass: vClasses) {
+				 List<VClass> rangeVclasses = wDaoFact.getVClassDao().getVClassesForProperty(vclass.getURI(),predicateUri);
+				 if(rangeVclasses !=  null) {
+					 for(VClass range: rangeVclasses) {
+						 //a hash will keep a unique list of types and so prevent duplicates
+						 typesHash.put(range.getURI(), range);
+					 }
 				 }
-			 }
-		}
-		types.addAll(typesHash.values());
+			}
+			types.addAll(typesHash.values());
+   		} else {
+   			log.error("Subject individual was null for");
+   		}
+		
         return types;
 	}	
 	
