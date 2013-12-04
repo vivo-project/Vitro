@@ -179,7 +179,7 @@ public class DeveloperSettings {
 	// The factory
 	// ----------------------------------------------------------------------
 
-	private static final String ATTRIBUTE_NAME = DeveloperSettings.class
+	protected static final String ATTRIBUTE_NAME = DeveloperSettings.class
 			.getName();
 
 	public static DeveloperSettings getBean(HttpServletRequest req) {
@@ -203,7 +203,7 @@ public class DeveloperSettings {
 
 	private final Map<Keys, Object> settings = new EnumMap<>(Keys.class);
 
-	private DeveloperSettings(ServletContext ctx) {
+	protected DeveloperSettings(ServletContext ctx) {
 		updateFromFile(ctx);
 	}
 

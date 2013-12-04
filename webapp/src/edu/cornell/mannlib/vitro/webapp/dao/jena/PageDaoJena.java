@@ -537,13 +537,14 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         List<String> actions = new ArrayList<String>();
         
         Model dModel = getOntModelSelector().getDisplayModel();
+        dModel.enterCriticalSection(false);
         try{
             QueryExecution qe = 
                 QueryExecutionFactory.create( requiredActionsQuery, dModel, initialBindings);
             actions = executeQueryToList( qe );
             qe.close();
         }finally{
-            dModel.enterCriticalSection(false);
+            dModel.leaveCriticalSection();
         }
         return actions;            
     }
