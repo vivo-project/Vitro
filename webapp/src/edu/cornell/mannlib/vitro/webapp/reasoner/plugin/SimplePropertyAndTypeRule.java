@@ -36,6 +36,10 @@ public abstract class SimplePropertyAndTypeRule implements ReasonerPlugin {
         INFERRED_PROP = ResourceFactory.createProperty(inferredProp);
 	}
 	
+	public boolean isConfigurationOnlyPlugin() {
+        return false;
+    }
+	
 	public boolean isInterestedInAddedStatement(Statement stmt) {
 		return (RDF.type.equals(stmt.getPredicate()) || isRelevantPredicate(stmt));
 	}

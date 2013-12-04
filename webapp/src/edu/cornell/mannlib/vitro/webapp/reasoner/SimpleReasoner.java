@@ -161,6 +161,10 @@ public class SimpleReasoner extends StatementListener {
     public void setSameAsEnabled( boolean tf){
         this.doSameAs = tf;
     }
+    
+    public boolean getSameAsEnabled() {
+        return this.doSameAs;
+    }
 
 	/*
 	 * Performs incremental ABox reasoning based
@@ -342,6 +346,12 @@ public class SimpleReasoner extends StatementListener {
 	public void removedTBoxStatement(Statement stmt) {	
         changedTBoxStatement(stmt, false);
 	}
+
+	protected void addedABoxTypeAssertion(Statement stmt, 
+	        Model inferenceModel, 
+	        HashSet<String> unknownTypes) {
+	    addedABoxTypeAssertion(stmt, inferenceModel, unknownTypes, true);
+	}
 	
 	/**
 	 * Performs incremental reasoning based on a new type assertion
@@ -353,7 +363,8 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	protected void addedABoxTypeAssertion(Statement stmt, 
                                           Model inferenceModel, 
-                                          HashSet<String> unknownTypes) {
+                                          HashSet<String> unknownTypes,
+                                          boolean checkRedundancy) {
 				
 	    tboxModel.enterCriticalSection(Lock.READ);
 		try {
@@ -379,7 +390,7 @@ public class SimpleReasoner extends StatementListener {
 							Statement infStmt = 
                                 ResourceFactory.createStatement(stmt.getSubject(), 
                                                                 RDF.type, parentClass);
-							addInference(infStmt,inferenceModel,true);
+							addInference(infStmt, inferenceModel, true, checkRedundancy);
 						}						
 					}					
 				} else {
@@ -1189,13 +1200,20 @@ public class SimpleReasoner extends StatementListener {
         addInference(infStmt,inferenceModel,true);
 	}
 	
-	protected void addInference(Statement infStmt, Model inferenceModel, boolean handleSameAs) {
+	protected void addInference(Statement infStmt, Model inferenceModel, 
+	        boolean handleSameAs) {
+	    addInference(infStmt, inferenceModel, handleSameAs, true);
+	}
+	
+	protected void addInference(Statement infStmt, Model inferenceModel, 
+	        boolean handleSameAs, boolean checkRedundancy) {
 		
 		aboxModel.enterCriticalSection(Lock.READ);
 		try {
 			inferenceModel.enterCriticalSection(Lock.WRITE);
 			try {
-				if (!inferenceModel.contains(infStmt) && !aboxModel.contains(infStmt))  {
+				if (!checkRedundancy 
+				        || (!inferenceModel.contains(infStmt) && !aboxModel.contains(infStmt)))  {
 					inferenceModel.add(infStmt);
 			    }
 		
@@ -1730,9 +1748,7 @@ public class SimpleReasoner extends StatementListener {
         	
         	log.info("ending DeltaComputer.run. batchMode = " + batchMode);
         }        
-    }   
-
-
+    } 
 
 	/**
 	 * Utility method for logging

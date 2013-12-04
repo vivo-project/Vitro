@@ -62,6 +62,10 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
         
 	}
 	
+	public boolean isConfigurationOnlyPlugin() {
+	    return false;
+	}
+	
 	public boolean isInterestedInAddedStatement(Statement stmt) {
 		return isRelevantPredicate(stmt);
 	}

@@ -15,7 +15,7 @@ import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 /**
  * Disables sameAs in associated SimpleReasoner.
  */
-public abstract class DisableSameAs implements ReasonerPlugin {
+public class DisableSameAs implements ReasonerPlugin {
 	
     private static final Log log = LogFactory.getLog(DisableSameAs.class);
     	
@@ -27,6 +27,10 @@ public abstract class DisableSameAs implements ReasonerPlugin {
         log.info("owl:sameAs disabled in SimpleReasoner.");
     }	
 	
+    public boolean isConfigurationOnlyPlugin() {
+        return true;
+    }
+    
     public SimpleReasoner getSimpleReasoner() {
     	return this.simpleReasoner;
     }
