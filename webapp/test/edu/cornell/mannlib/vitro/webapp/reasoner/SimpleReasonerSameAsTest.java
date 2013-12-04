@@ -782,10 +782,10 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 		aBox.register(simpleReasoner);
 		
         // Individuals a, b, c and d
-		Resource a = aBox.createResource("http://test.vivo/a");
-		Resource b = aBox.createResource("http://test.vivo/b");
-		Resource c = aBox.createResource("http://test.vivo/c");
-		Resource d = aBox.createResource("http://test.vivo/d");
+		Resource a = aBox.createIndividual("http://test.vivo/a", OWL.Thing);
+		Resource b = aBox.createIndividual("http://test.vivo/b", OWL.Thing);
+		Resource c = aBox.createIndividual("http://test.vivo/c", OWL.Thing);
+		Resource d = aBox.createIndividual("http://test.vivo/d", OWL.Thing);
 		
 		aBox.add(a,P,c);
 		aBox.add(a,S,literal1);
