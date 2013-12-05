@@ -3,15 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -19,8 +12,6 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>
@@ -51,41 +42,22 @@ import org.apache.commons.logging.LogFactory;
  * implemented in the sub-classes.
  * </p>
  */
-@SuppressWarnings("deprecation")
 public abstract class FileUploadServletRequest extends HttpServletRequestWrapper  {
-    
-    private static final Log log = LogFactory
-            .getLog(FileUploadServletRequest.class);
-    
 	public static final String FILE_ITEM_MAP = "file_item_map";
 	public static final String FILE_UPLOAD_EXCEPTION = "file_upload_exception";
 
-	private Map<String, List<String>> parameters;
-    private Map<String, List<FileItem>> files;
-    private FileUploadException fileUploadException;
-
-    private static final String[] EMPTY_ARRAY = new String[0];
-    
 	// ----------------------------------------------------------------------
 	// The factory method
 	// ----------------------------------------------------------------------
 
 	/**
 	 * Wrap this {@link HttpServletRequest} in an appropriate wrapper class.
-	 * set maxTempFileSize to 0 or -1 if streaming is desired.  Set it to > 0 if
-	 * you want any parts uploaded to a temporary directory 
 	 */
-	public static FileUploadServletRequest parseRequest(		
-	        HttpServletRequest request, int maxTempFileSize) throws IOException {
-	    
+	public static FileUploadServletRequest parseRequest(
+			HttpServletRequest request, int maxFileSize) throws IOException {
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-		
 		if (isMultipart) {
-		    if( maxTempFileSize <= 0 ){
-		        return new StreamingMultipartHttpServletRequest(request);
-		    }else{
-		        return new MultipartHttpServletRequest(request, maxTempFileSize);
-		    }
+			return new MultipartHttpServletRequest(request, maxFileSize);
 		} else {
 			return new SimpleHttpServletRequestWrapper(request);
 		}
@@ -112,184 +84,29 @@ public abstract class FileUploadServletRequest extends HttpServletRequestWrapper
 
 	/** Was this a multipart HTTP request? */
 	public abstract boolean isMultipart();
-	
-	protected void stashParametersInRequest(HttpServletRequest request, ServletFileUpload upload){
-	    Map<String, List<String>> parameters = new HashMap<String, List<String>>();
-	    Map<String, List<FileItem>> files = new HashMap<String, List<FileItem>>();      
-
-	    parseQueryString(request.getQueryString(), parameters);
-
-	    try {
-	        List<FileItem> items = upload.parseRequest( request );
-
-	        for (FileItem item : items) {
-	            // Process a regular form field
-	            if (item.isFormField()) {
-	                addToParameters(parameters, item.getFieldName(), item
-	                        .getString("UTF-8"));
-	                log.debug("Form field (parameter) " + item.getFieldName()
-	                        + "=" + item.getString());
-	            } else {
-	                addToFileItems(files, item);
-	                log.debug("File " + item.getFieldName() + ": "
-	                        + item.getName());
-	            }
-	        }
-	    } catch (FileUploadException e) {
-	        fileUploadException = e;
-	        request.setAttribute(
-	                FileUploadServletRequest.FILE_UPLOAD_EXCEPTION, e);
-	    } catch (UnsupportedEncodingException e) {
-	        log.error("could not convert to UTF-8",e);
-	    }
-
-	    this.parameters = Collections.unmodifiableMap(parameters);
-	    log.debug("Parameters are: " + this.parameters);
-	    this.files = Collections.unmodifiableMap(files);
-	    log.debug("Files are: " + this.files);
-	    request.setAttribute(FILE_ITEM_MAP, this.files);
-	}
-
-
 
 	/**
-	 * Pull any parameters out of the URL.
+	 * Get the map of file items, by name.
 	 */
-	private void parseQueryString(String queryString,
-	        Map<String, List<String>> parameters) {
-	    log.debug("Query string is : '" + queryString + "'");
-	    if (queryString != null) {
-	        String[] pieces = queryString.split("&");
-
-	        for (String piece : pieces) {
-	            int equalsHere = piece.indexOf('=');
-	            if (piece.trim().isEmpty()) {
-	                // Ignore an empty piece.
-	            } else if (equalsHere <= 0) {
-	                // A parameter without a value.
-	                addToParameters(parameters, decode(piece), "");
-	            } else {
-	                // A parameter with a value.
-	                String key = piece.substring(0, equalsHere);
-	                String value = piece.substring(equalsHere + 1);
-	                addToParameters(parameters, decode(key), decode(value));
-	            }
-	        }
-	    }
-	    log.debug("Parameters from query string are: " + parameters);
-	}
+	public abstract Map<String, List<FileItem>> getFiles();
 
 	/**
-	 * Remove any special URL-style encoding.
+	 * Find a non-empty file item with this name.
+	 * 
+	 * @return the first such file item, or <code>null</code> if no matching,
+	 *         non-empty items were found.
 	 */
-	private String decode(String encoded) {
-	    try {
-	        return URLDecoder.decode(encoded, "UTF-8");
-	    } catch (UnsupportedEncodingException e) {
-	        log.error(e, e);
-	        return encoded;
-	    }
-	}
+	public abstract FileItem getFileItem(String string);
 
+	/**
+	 * Was there an exception when uploading the file items?
+	 */
+	public abstract boolean hasFileUploadException();
 
-	/** Either create a new List for the value, or add to an existing List. */
-	private void addToParameters(Map<String, List<String>> map, String name,
-	        String value) {
-	    if (!map.containsKey(name)) {
-	        map.put(name, new ArrayList<String>());
-	    }
-	    map.get(name).add(value);
-	}
-
-	/** Either create a new List for the file, or add to an existing List. */
-	private void addToFileItems(Map<String, List<FileItem>> map, FileItem file) {
-	    String name = file.getFieldName();
-	    if (!map.containsKey(name)) {
-	        map.put(name, new ArrayList<FileItem>());
-	    }
-	    map.get(name).add(file);
-	}
-
-	
-	public FileUploadException getFileUploadException() {
-	    return fileUploadException;
-	}
-
-	public boolean hasFileUploadException() {
-	    return fileUploadException != null;
-	}
-
-	// ----------------------------------------------------------------------
-	// Parameter-related methods won't find anything on the delegate request,
-	// since parsing consumed the parameters. So we need to look to the parsed
-	// info for the answers.
-	// ----------------------------------------------------------------------
-
-	@Override
-	public String getParameter(String name) {
-	    if (parameters.containsKey(name)) {
-	        return parameters.get(name).get(0);
-	    } else {
-	        return null;
-	    }
-	}
-
-	@Override
-	public Enumeration<?> getParameterNames() {
-	    return Collections.enumeration(parameters.keySet());
-	}
-
-	@Override
-	public String[] getParameterValues(String name) {
-	    if (parameters.containsKey(name)) {
-	        return parameters.get(name).toArray(EMPTY_ARRAY);
-	    } else {
-	        return null;
-	    }
-	}
-
-	@Override
-	public Map<String, String[]> getParameterMap() {
-	    Map<String, String[]> result = new HashMap<String, String[]>();
-	    for (Entry<String, List<String>> entry : parameters.entrySet()) {
-	        result.put(entry.getKey(), entry.getValue().toArray(EMPTY_ARRAY));
-	    }
-	    log.debug("resulting parameter map: " + result);
-	    return result;
-	}
-
-	
-    /**
-     * {@inheritDoc}
-     * <p>
-     * There may be more than one file item with the given name. If the first
-     * one is empty (size is zero), keep looking for a non-empty one.
-     * </p>
-     */    
-    public FileItem getFileItem(String name) {
-        List<FileItem> items = files.get(name);
-        if (items == null) {
-            return null;
-        }
-
-        for (FileItem item : items) {
-            if (item.getSize() > 0L) {
-                return item;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Gets a map of parameter names to files.
-     * This will should return null.
-     */
-    public Map<String, List<FileItem>> getFiles() {
-        if( files == null )
-            return Collections.emptyMap();
-        else
-            return files;
-    }
+	/**
+	 * Get the exception that occurred when uploading the file items. If no such
+	 * exception, return <code>null</code>.
+	 */
+	public abstract FileUploadException getFileUploadException();
 
 }

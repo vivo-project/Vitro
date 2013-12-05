@@ -189,7 +189,8 @@
         supplyPrettyUrl: '${i18n().supply_url}',
         startUrlWithSlash: '${i18n().start_url_with_slash}',
         supplyTemplate: '${i18n().supply_template}',
-        selectContentType: '${i18n().select_content_type}'
+        selectContentType: '${i18n().select_content_type}',
+        multipleContentWithDefaultTemplateError: '${i18n().multiple_content_default_template_error}'
     };
 </script>
 
