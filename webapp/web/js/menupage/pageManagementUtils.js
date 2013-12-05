@@ -205,13 +205,15 @@ var pageManagementUtils = {
 	            //Also clear custom template value so as not to submit it
 	            pageManagementUtils.clearInputs(pageManagementUtils.customTemplate);
 	            pageManagementUtils.rightSideDiv.show(); 
-	            pageManagementUtils.disablePageSave();           
+	            //Check to see if there is already content on page, in which case save should be enabled
+	        	var pageContentSections = $("section[class='pageContent']");
+	        	if(pageContentSections.length == 0) {
+	        		pageManagementUtils.disablePageSave();
+	        	} 
 	    });
 
 	    this.customTemplateRadio.click( function() {
-	            pageManagementUtils.customTemplate.removeClass('hidden');            
-	            pageManagementUtils.rightSideDiv.show();
-	            pageManagementUtils.disablePageSave();            
+	            pageManagementUtils.handleSelectCustomTemplate();  
 	    });
 	
 	    this.selfContainedTemplateRadio.click( function() {
@@ -265,6 +267,16 @@ var pageManagementUtils = {
          });
     
 	},
+	handleSelectCustomTemplate: function() {
+		pageManagementUtils.customTemplate.removeClass('hidden');            
+        pageManagementUtils.rightSideDiv.show();
+        //Check to see if there is already content on page, in which case save should be enabled
+        var pageContentSections = $("section[class='pageContent']");
+    	if(pageContentSections.length == 0) {
+    		pageManagementUtils.disablePageSave();
+    	}          
+	},
+	
 	handleClickDone:function() {
 		var selectedType = pageManagementUtils.contentTypeSelect.val();
 		var selectedTypeText = $("#typeSelect option:selected").text();
@@ -392,6 +404,9 @@ var pageManagementUtils = {
         pageManagementUtils.adjustSaveButtonHeight();
         //Disable save button until the user has clicked done or cancel from the addition
         pageManagementUtils.disablePageSave();
+        //If the default template is selected, there is already content on the page, and the user is selecting new content
+        //display alert message that they must select a custom template and select 
+        pageManagementUtils.checkTemplateForMultipleContent(_this.contentTypeSelect.val());
 	},
 	disablePageSave:function() {
         pageManagementUtils.pageSaveButton.attr("disabled", "disabled");
@@ -429,6 +444,21 @@ var pageManagementUtils = {
 		//resetting class group section as well so selection is reset if type changes
 		$el.find("select option:eq(0)").attr("selected", "selected");
 		
+	},
+	checkTemplateForMultipleContent:function(contentTypeSelected) {
+		if(contentTypeSelected != "") {
+	    	var pageContentSections = $("section[class='pageContent']");
+            var selectedTemplateValue = $('input:radio[name=selectedTemplate]:checked').val();
+	    	//A new section hasn't been added yet so check to see if there is at least one content type already on page
+	    	if(selectedTemplateValue == "default" && pageContentSections.length >= 1) {
+	    		//alert the user that they should be picking custom template instead
+	    		alert(pageManagementUtils.multipleContentWithDefaultTemplateError);
+	    		//pick custom template
+	    		 $('input:radio[name=selectedTemplate][value="custom"]').attr("checked", true);
+	    		 pageManagementUtils.handleSelectCustomTemplate();  
+
+	    	}
+		}
 	},
 	//Clone content area
 	//When adding a new content type, this function will copy the values from the new content form and generate
@@ -874,7 +904,12 @@ var pageManagementUtils = {
     	if(pageContentSections.length == 0) {
     		validationErrorMsg = pageManagementUtils.selectContentType + " <br /> ";
     	} else {
-	    	//For each, based on type, validate if a validation function exists
+    		//If there are multiple content types, and the default template option is selected, then display error message
+            var selectedTemplateValue = $('input:radio[name=selectedTemplate]:checked').val();
+            if(selectedTemplateValue == "default") {
+            	validationErrorMsg += pageManagementUtils.multipleContentWithDefaultTemplateError;
+            }
+    		//For each, based on type, validate if a validation function exists
 	    	$.each(pageContentSections, function(i) {
 	    		if(pageManagementUtils.processDataGetterUtils != null) {
 	    			var dataGetterType = pageManagementUtils.processDataGetterUtils.selectDataGetterType($(this));
