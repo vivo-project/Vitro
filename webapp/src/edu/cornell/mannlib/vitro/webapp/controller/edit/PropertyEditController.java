@@ -27,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
@@ -47,10 +48,12 @@ public class PropertyEditController extends BaseEditController {
         VitroRequest vreq = new VitroRequest(request);
         
         ObjectPropertyDao propDao = vreq.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
-        VClassDao vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
+        ObjectPropertyDao propDaoLangNeut = vreq.getLanguageNeutralWebappDaoFactory().getObjectPropertyDao();
+        VClassDao vcDao = vreq.getLanguageNeutralWebappDaoFactory().getVClassDao();
+        VClassDao vcDaoWLang = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
         PropertyGroupDao pgDao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
-        DataPropertyDao dpDao = vreq.getUnfilteredWebappDaoFactory().getDataPropertyDao();
-        ObjectProperty p = (ObjectProperty)propDao.getObjectPropertyByURI(request.getParameter("uri"));
+        ObjectProperty p = propDao.getObjectPropertyByURI(request.getParameter("uri"));
+        ObjectProperty pLangNeut = propDaoLangNeut.getObjectPropertyByURI(request.getParameter("uri"));
         request.setAttribute("property",p);
 
         ArrayList<String> results = new ArrayList<String>();
@@ -119,14 +122,15 @@ public class PropertyEditController extends BaseEditController {
         results.add(p.getDomainPublic() == null ? "(no public label)" : p.getDomainPublic()); // column 6
         
         String domainStr = ""; 
-        if (p.getDomainVClassURI() != null) {
-        	VClass domainClass = vcDao.getVClassByURI(p.getDomainVClassURI());
+        if (pLangNeut.getDomainVClassURI() != null) {
+        	VClass domainClass = vcDao.getVClassByURI(pLangNeut.getDomainVClassURI());
+        	VClass domainWLang = vcDaoWLang.getVClassByURI(pLangNeut.getDomainVClassURI()); 
         	if (domainClass != null && domainClass.getURI() != null && domainClass.getPickListName() != null) {
         		try {
         			if (domainClass.isAnonymous()) {
         				domainStr = domainClass.getPickListName();
         			} else {
-        				domainStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(domainClass.getURI(),"UTF-8")+"\">"+domainClass.getPickListName()+"</a>";
+        				domainStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(domainClass.getURI(),"UTF-8")+"\">"+domainWLang.getPickListName()+"</a>";
         			}
         		} catch (UnsupportedEncodingException e) {
         		    log.error(e, e);
@@ -136,14 +140,15 @@ public class PropertyEditController extends BaseEditController {
         results.add(domainStr); // column 7
         
         String rangeStr = ""; 
-        if (p.getRangeVClassURI() != null) {
-        	VClass rangeClass = vcDao.getVClassByURI(p.getRangeVClassURI());
+        if (pLangNeut.getRangeVClassURI() != null) {
+        	VClass rangeClass = vcDao.getVClassByURI(pLangNeut.getRangeVClassURI());
+        	VClass rangeWLang = vcDaoWLang.getVClassByURI(pLangNeut.getRangeVClassURI()); 
         	if (rangeClass != null && rangeClass.getURI() != null && rangeClass.getPickListName() != null) {
         		try {
         			if (rangeClass.isAnonymous()) {
         				rangeStr = rangeClass.getPickListName();
         			} else {
-        				rangeStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(rangeClass.getURI(),"UTF-8")+"\">"+rangeClass.getPickListName()+"</a>";
+        				rangeStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(rangeClass.getURI(),"UTF-8")+"\">"+rangeWLang.getPickListName()+"</a>";
         			}
         		} catch (UnsupportedEncodingException e) {
         		    log.error(e, e);

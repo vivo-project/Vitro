@@ -39,7 +39,9 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
     private int MAXDEPTH = 5;
 
     private ObjectPropertyDao opDao = null;
+    private ObjectPropertyDao opDaoLangNeut = null;
     private VClassDao vcDao = null;
+    private VClassDao vcDaoLangNeut = null;
     private PropertyGroupDao pgDao = null;
     
     private int previous_posn = 0;
@@ -75,7 +77,9 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
             body.put("propertyType", "object");
             
             opDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getObjectPropertyDao();
+            opDaoLangNeut = vreq.getLanguageNeutralWebappDaoFactory().getObjectPropertyDao();
             vcDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getVClassDao();
+            vcDaoLangNeut = vreq.getLanguageNeutralWebappDaoFactory().getVClassDao();
             pgDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getPropertyGroupDao();
 
             String json = new String();
@@ -212,30 +216,21 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
              
             tempString += "\"data\": { \"internalName\": " + JSONUtils.quote(
                     op.getLocalNameWithPrefix()) + ", ";
-
-            VClass tmp = null;
+            
+            ObjectProperty opLangNeut = opDaoLangNeut.getObjectPropertyByURI(op.getURI());
+            if(opLangNeut == null) {
+                opLangNeut = op;
+            }
+            String domainStr = getVClassNameFromURI(opLangNeut.getDomainVClassURI(), vcDao, vcDaoLangNeut);
+            String rangeStr = getVClassNameFromURI(opLangNeut.getRangeVClassURI(), vcDao, vcDaoLangNeut);
             
             try {
-            	tempString += "\"domainVClass\": " + JSONUtils.quote(
-            	        ((tmp = vcDao.getVClassByURI(
-            	                op.getDomainVClassURI())) != null 
-            	                && (tmp.getPickListName() == null)) 
-            	                        ? "" 
-            	                        : vcDao.getVClassByURI(
-            	                                op.getDomainVClassURI())
-            	                                .getPickListName()) + ", " ;
+            	tempString += "\"domainVClass\": " + JSONUtils.quote(domainStr) + ", " ;
             } catch (NullPointerException e) {
             	tempString += "\"domainVClass\": \"\",";
             }
             try {
-            	tempString += "\"rangeVClass\": " + JSONUtils.quote(
-            	        ((tmp = vcDao.getVClassByURI(
-            	                op.getRangeVClassURI())) != null 
-            	                && (tmp.getPickListName() == null)) 
-            	                        ? "" 
-            	                        : vcDao.getVClassByURI(
-            	                                op.getRangeVClassURI())
-            	                                .getPickListName()) + ", " ;
+            	tempString += "\"rangeVClass\": " + JSONUtils.quote(rangeStr) + ", " ;
             } catch (NullPointerException e) {
             	tempString += "\"rangeVClass\": \"\",";
             }
@@ -251,6 +246,22 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
             previous_posn = position;
         }
         return tempString;
+    }
+    
+    private String getVClassNameFromURI(String vclassURI, VClassDao vcDao, VClassDao vcDaoLangNeut) {
+        if(vclassURI == null) {
+            return "";
+        }
+        VClass vclass = vcDaoLangNeut.getVClassByURI(vclassURI);
+        if(vclass == null) {
+            return ""; 
+        }
+        if(vclass.isAnonymous()) {
+            return vclass.getPickListName();
+        } else {
+            VClass vclassWLang = vcDao.getVClassByURI(vclassURI);
+            return (vclassWLang != null) ? vclassWLang.getPickListName() : vclass.getPickListName();
+        }
     }
 
     public static class ObjectPropertyAlphaComparator implements Comparator<ObjectProperty> {
