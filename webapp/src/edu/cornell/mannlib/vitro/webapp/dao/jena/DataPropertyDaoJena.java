@@ -183,7 +183,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             dp.setPickListName(getWebappDaoFactory().makePickListName(dp));
             Resource dRes = op.getDomain();
             if (dRes != null) {
-                dp.setDomainClassURI(dRes.getURI());
+                dp.setDomainClassURI(dRes.isAnon()? PSEUDO_BNODE_NS + dRes.getId().toString() : dRes.getURI());
             }
             Resource rRes = op.getRange();
             if (rRes != null) {

@@ -192,6 +192,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 return getLabelOrId(cls);
             }
         } catch (Exception e) {
+            log.error(e, e);
             return "???";
         } finally {
             cls.getModel().leaveCriticalSection();

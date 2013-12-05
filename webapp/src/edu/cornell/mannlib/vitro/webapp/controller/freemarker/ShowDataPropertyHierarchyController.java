@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -40,7 +41,9 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
     private int MAXDEPTH = 5;
 
     private DataPropertyDao dpDao = null;
+    private DataPropertyDao dpDaoLangNeut = null;
     private VClassDao vcDao = null;
+    private VClassDao vcDaoLangNeut = null;
     private PropertyGroupDao pgDao = null;
     private DatatypeDao dDao = null;
 
@@ -77,7 +80,9 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
             body.put("propertyType", "data");
             
             dpDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getDataPropertyDao();
+            dpDaoLangNeut = vreq.getLanguageNeutralWebappDaoFactory().getDataPropertyDao();
             vcDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getVClassDao();
+            vcDaoLangNeut = vreq.getLanguageNeutralWebappDaoFactory().getVClassDao();
             pgDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getPropertyGroupDao();
             dDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getDatatypeDao();
 
@@ -217,15 +222,14 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
             tempString += "\"data\": { \"internalName\": " + JSONUtils.quote(
                     dp.getPickListName()) + ", ";
 
-            VClass tmp = null;
+            DataProperty dpLangNeut = dpDaoLangNeut.getDataPropertyByURI(dp.getURI());
+            if(dpLangNeut == null) {
+                dpLangNeut = dp;
+            }
+            String domainStr = getVClassNameFromURI(dpLangNeut.getDomainVClassURI(), vcDao, vcDaoLangNeut);
+            
             try {
-            	tempString += "\"domainVClass\": " + JSONUtils.quote(
-            	        ((tmp = vcDao.getVClassByURI(dp.getDomainClassURI())) != null
-            	        && (tmp.getPickListName() == null)) 
-            	                ? "" 
-            	                : vcDao.getVClassByURI(
-            	                        dp.getDomainClassURI())
-            	                        .getPickListName()) + ", " ;
+            	tempString += "\"domainVClass\": " + JSONUtils.quote(domainStr) + ", " ;
             } catch (NullPointerException e) {
             	tempString += "\"domainVClass\": \"\",";
             }
@@ -249,4 +253,20 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
         return tempString;
     }
 
+    private String getVClassNameFromURI(String vclassURI, VClassDao vcDao, VClassDao vcDaoLangNeut) {
+        if(vclassURI == null) {
+            return "";
+        }
+        VClass vclass = vcDaoLangNeut.getVClassByURI(vclassURI);
+        if(vclass == null) {
+            return ""; 
+        }
+        if(vclass.isAnonymous()) {
+            return vclass.getPickListName();
+        } else {
+            VClass vclassWLang = vcDao.getVClassByURI(vclassURI);
+            return (vclassWLang != null) ? vclassWLang.getPickListName() : vclass.getPickListName();
+        }
+    }
+    
 }

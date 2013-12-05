@@ -28,6 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
 public class DatapropEditController extends BaseEditController {
 	
@@ -45,7 +46,13 @@ public class DatapropEditController extends BaseEditController {
         String datapropURI = request.getParameter("uri");
 
         DataPropertyDao dpDao = vreq.getUnfilteredWebappDaoFactory().getDataPropertyDao();
+        DataPropertyDao dpDaoLangNeut = vreq.getLanguageNeutralWebappDaoFactory().getDataPropertyDao();
+        VClassDao vcDao = vreq.getLanguageNeutralWebappDaoFactory().getVClassDao();
+        VClassDao vcDaoWLang = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
+        
         DataProperty dp = dpDao.getDataPropertyByURI(datapropURI);
+        DataProperty pLangNeut = dpDaoLangNeut.getDataPropertyByURI(request.getParameter("uri"));
+        
         PropertyGroupDao pgDao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 
         ArrayList results = new ArrayList();
@@ -98,14 +105,21 @@ public class DatapropEditController extends BaseEditController {
         //String parentPropertyStr = "<i>(datatype properties are not yet modeled in a property hierarchy)</i>"; // TODO - need multiple inheritance
         //results.add(parentPropertyStr);
         
-        // TODO - need unionOf/intersectionOf-style domains for domain class
-        String domainStr="";
-        try {
-            VClass domainClass = getWebappDaoFactory().getVClassDao().getVClassByURI(dp.getDomainClassURI());
-            String domainLinkAnchor = (domainClass != null) ? domainClass.getPickListName() : dp.getDomainClassURI();
-            domainStr = (dp.getDomainClassURI() == null) ? "" : "<a href=\"vclassEdit?uri="+URLEncoder.encode(dp.getDomainClassURI(),"UTF-8")+"\">"+domainLinkAnchor+"</a>";
-        } catch (UnsupportedEncodingException e) {
-            log.error(e, e);
+        String domainStr = ""; 
+        if (pLangNeut.getDomainVClassURI() != null) {
+            VClass domainClass = vcDao.getVClassByURI(pLangNeut.getDomainVClassURI());
+            VClass domainWLang = vcDaoWLang.getVClassByURI(pLangNeut.getDomainVClassURI()); 
+            if (domainClass != null && domainClass.getURI() != null && domainClass.getPickListName() != null) {
+                try {
+                    if (domainClass.isAnonymous()) {
+                        domainStr = domainClass.getPickListName();
+                    } else {
+                        domainStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(domainClass.getURI(),"UTF-8")+"\">"+domainWLang.getPickListName()+"</a>";
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    log.error(e, e);
+                }
+            }
         }
         results.add(domainStr); // column 6
 
