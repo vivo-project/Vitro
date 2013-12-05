@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -57,7 +58,9 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
             String ontologyUri = vreq.getParameter("ontologyUri");
 
             DataPropertyDao dao = vreq.getUnfilteredWebappDaoFactory().getDataPropertyDao();
+            DataPropertyDao dpDaoLangNeut = vreq.getLanguageNeutralWebappDaoFactory().getDataPropertyDao();
             VClassDao vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
+            VClassDao vcDaoLangNeut = vreq.getLanguageNeutralWebappDaoFactory().getVClassDao();
             DatatypeDao dDao = vreq.getUnfilteredWebappDaoFactory().getDatatypeDao();
             PropertyGroupDao pgDao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 
@@ -132,8 +135,11 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
                             }
                         }
 */                        
-                        VClass vc = (prop.getDomainClassURI() != null) ? vcDao.getVClassByURI(prop.getDomainClassURI()) : null;
-                        String domainStr = (vc != null) ? vc.getPickListName() : ""; 
+                        DataProperty dpLangNeut = dpDaoLangNeut.getDataPropertyByURI(prop.getURI());
+                        if(dpLangNeut == null) {
+                            dpLangNeut = prop;
+                        }
+                        String domainStr = getVClassNameFromURI(dpLangNeut.getDomainVClassURI(), vcDao, vcDaoLangNeut); 
                         json += "\"domainVClass\": " + JSONUtils.quote(domainStr) + ", " ;
 
                         Datatype rangeDatatype = dDao.getDatatypeByURI(prop.getRangeDatatypeURI());
@@ -155,5 +161,21 @@ public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
             t.printStackTrace();
         }
         return new TemplateResponseValues(TEMPLATE_NAME, body);
+    }
+    
+    private String getVClassNameFromURI(String vclassURI, VClassDao vcDao, VClassDao vcDaoLangNeut) {
+        if(vclassURI == null) {
+            return "";
+        }
+        VClass vclass = vcDaoLangNeut.getVClassByURI(vclassURI);
+        if(vclass == null) {
+            return ""; 
+        }
+        if(vclass.isAnonymous()) {
+            return vclass.getPickListName();
+        } else {
+            VClass vclassWLang = vcDao.getVClassByURI(vclassURI);
+            return (vclassWLang != null) ? vclassWLang.getPickListName() : vclass.getPickListName();
+        }
     }
 }

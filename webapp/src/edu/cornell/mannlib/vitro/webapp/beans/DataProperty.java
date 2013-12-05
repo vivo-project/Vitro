@@ -70,6 +70,11 @@ public class DataProperty extends Property implements Comparable<DataProperty>, 
     public String getDomainClassURI() {
         return domainClassURI;
     }
+    
+    @Override
+    public String getDomainVClassURI() {
+        return domainClassURI;
+    }
 
     public void setDomainClassURI(String domainClassURI) {
         this.domainClassURI = domainClassURI;

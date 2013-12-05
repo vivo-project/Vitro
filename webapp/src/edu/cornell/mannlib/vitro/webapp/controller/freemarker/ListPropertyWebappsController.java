@@ -59,8 +59,10 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
             String ontologyUri = vreq.getParameter("ontologyUri");
 
             ObjectPropertyDao dao = vreq.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
+            ObjectPropertyDao opDaoLangNeut = vreq.getLanguageNeutralWebappDaoFactory().getObjectPropertyDao();
             PropertyInstanceDao piDao = vreq.getLanguageNeutralWebappDaoFactory().getPropertyInstanceDao();
             VClassDao vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
+            VClassDao vcDaoLangNeut = vreq.getLanguageNeutralWebappDaoFactory().getVClassDao();
             PropertyGroupDao pgDao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 
             String vclassURI = vreq.getParameter("vclassUri");
@@ -160,12 +162,14 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
                     
                          json += "\"data\": { \"internalName\": " + JSONUtils.quote(prop.getLocalNameWithPrefix()) + ", "; 
                     
-                         VClass vc = (prop.getDomainVClassURI() != null) ? vcDao.getVClassByURI(prop.getDomainVClassURI()) : null;
-                         String domainStr = (vc != null) ? vc.getPickListName() : ""; 
+                         ObjectProperty opLangNeut = opDaoLangNeut.getObjectPropertyByURI(prop.getURI());
+                         if(opLangNeut == null) {
+                             opLangNeut = prop;
+                         }
+                         String domainStr = getVClassNameFromURI(opLangNeut.getDomainVClassURI(), vcDao, vcDaoLangNeut); 
                          json += "\"domainVClass\": " + JSONUtils.quote(domainStr) + ", " ;
                     
-                         vc = (prop.getRangeVClassURI() != null) ? vcDao.getVClassByURI(prop.getRangeVClassURI()) : null;
-                         String rangeStr = (vc != null) ? vc.getPickListName() : ""; 
+                         String rangeStr = getVClassNameFromURI(opLangNeut.getRangeVClassURI(), vcDao, vcDaoLangNeut);
                          json += "\"rangeVClass\": " + JSONUtils.quote(rangeStr) + ", " ; 
                     
                          if (prop.getGroupURI() != null) {
@@ -185,5 +189,21 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
         }
 
         return new TemplateResponseValues(TEMPLATE_NAME, body);
+    }
+    
+    private String getVClassNameFromURI(String vclassURI, VClassDao vcDao, VClassDao vcDaoLangNeut) {
+        if(vclassURI == null) {
+            return "";
+        }
+        VClass vclass = vcDaoLangNeut.getVClassByURI(vclassURI);
+        if(vclass == null) {
+            return ""; 
+        }
+        if(vclass.isAnonymous()) {
+            return vclass.getPickListName();
+        } else {
+            VClass vclassWLang = vcDao.getVClassByURI(vclassURI);
+            return (vclassWLang != null) ? vclassWLang.getPickListName() : vclass.getPickListName();
+        }
     }
 }

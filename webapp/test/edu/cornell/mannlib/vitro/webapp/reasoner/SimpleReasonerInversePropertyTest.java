@@ -14,6 +14,7 @@ import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
@@ -431,10 +432,10 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		tBox.register(simpleReasonerTBoxListener);
 
         // add abox data
-		Resource a = aBox.createResource("http://test.vivo/a");
-		Resource b = aBox.createResource("http://test.vivo/b");
-		Resource c = aBox.createResource("http://test.vivo/c");
-		Resource d = aBox.createResource("http://test.vivo/d");
+		Resource a = aBox.createIndividual("http://test.vivo/a", OWL.Thing);
+		Resource b = aBox.createIndividual("http://test.vivo/b", OWL.Thing);
+		Resource c = aBox.createIndividual("http://test.vivo/c", OWL.Thing);
+		Resource d = aBox.createIndividual("http://test.vivo/d", OWL.Thing);
 				
 		aBox.add(a,P,b);	
 	    aBox.add(c,P,d);
@@ -496,8 +497,8 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		tBox.register(simpleReasonerTBoxListener);	    
 		
         // add statements to the abox and verify inference
-		Resource c = aBox.createResource("http://test.vivo/c");
-		Resource d = aBox.createResource("http://test.vivo/d");
+		Resource c = aBox.createIndividual("http://test.vivo/c", OWL.Thing);
+		Resource d = aBox.createIndividual("http://test.vivo/d", OWL.Thing);
 	    aBox.add(c,P,d);
 		Assert.assertTrue(inf.contains(d,Q,c));
 		
@@ -555,10 +556,10 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		aBox.register(simpleReasoner);
 		
         // abox statements
-		Resource a = aBox.createResource("http://test.vivo/a");
-		Resource b = aBox.createResource("http://test.vivo/b");
-		Resource c = aBox.createResource("http://test.vivo/c");
-		Resource d = aBox.createResource("http://test.vivo/d");
+		Resource a = aBox.createIndividual("http://test.vivo/a", OWL.Thing);
+		Resource b = aBox.createIndividual("http://test.vivo/b", OWL.Thing);
+		Resource c = aBox.createIndividual("http://test.vivo/c", OWL.Thing);
+		Resource d = aBox.createIndividual("http://test.vivo/d", OWL.Thing);
 
 	    aBox.add(a,P,b);
         aBox.add(c,X,d);
