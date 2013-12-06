@@ -117,10 +117,11 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 		if(rangeUri != null && !rangeUri.isEmpty()) {
 	        WebappDaoFactory ctxDaoFact = vreq.getLanguageNeutralWebappDaoFactory();
    		    rangeVClass = ctxDaoFact.getVClassDao().getVClassByURI(rangeUri);
+   		    if(rangeVClass == null) {
+   		    	errorMessages = I18n.text(vreq,"the_range_class_does_not_exist");
+   		    }
 		}
-		if(rangeVClass == null) {
-			errorMessages = I18n.text(vreq,"the_range_class_does_not_exist");
-		}
+		
 		return errorMessages;
 	}
 
