@@ -36,6 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.IndividualsViaObjectPropetyOptions;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
@@ -64,6 +65,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 	protected boolean tooManyRangeIndividuals = false;
 	
 	protected long maxNonACRangeIndividualCount = 300;
+	protected String customErrorMessages = null;
 	
 	private static HashMap<String,String> defaultsForXSDtypes ;
 	  static {
@@ -76,8 +78,17 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     @Override
     public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq,
             HttpSession session) throws Exception {
+
     	if(!EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)) {    	    	
     	    throw new Exception("DefaultObjectPropertyFormGenerator does not handle data properties.");
+    	}
+    	
+    	//Custom error can also be represented as an exception above, but in this case
+    	//we would like the page to enable the user to go back to the profile page
+    	
+    	customErrorMessages = getCustomErrorMessages(vreq);
+    	if(customErrorMessages != null) {
+    		return this.getCustomErrorEditConfiguration(vreq, session);
     	}
     	
      	if( tooManyRangeOptions( vreq, session ) ){
@@ -90,7 +101,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     		DefaultAddMissingIndividualFormGenerator generator = new DefaultAddMissingIndividualFormGenerator();
     		return generator.getEditConfiguration(vreq, session);
     	}
-    	    	    	
+    	    
     	//TODO: Add a generator for delete: based on command being delete - propDelete.jsp
         //Generate a edit configuration for the default object property form and return it.
     	//if(DefaultDeleteGenerator.isDelete( vreq,session)){
@@ -99,7 +110,21 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	return getDefaultObjectEditConfiguration(vreq, session);
     }
 	
-    protected List<VClass> getRangeTypes(VitroRequest vreq) {
+    private String getCustomErrorMessages(VitroRequest vreq) {
+		String errorMessages = null;
+    	String rangeUri = vreq.getParameter("rangeUri");
+		VClass rangeVClass = null;
+		if(rangeUri != null && !rangeUri.isEmpty()) {
+	        WebappDaoFactory ctxDaoFact = vreq.getLanguageNeutralWebappDaoFactory();
+   		    rangeVClass = ctxDaoFact.getVClassDao().getVClassByURI(rangeUri);
+		}
+		if(rangeVClass == null) {
+			errorMessages = I18n.text(vreq,"the_range_class_does_not_exist");
+		}
+		return errorMessages;
+	}
+
+	protected List<VClass> getRangeTypes(VitroRequest vreq) {
         // This first part needs a WebappDaoFactory with no filtering/RDFService
         // funny business because it needs to be able to retrieve anonymous union
         // classes by their "pseudo-bnode URIs".
@@ -114,14 +139,18 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
    		String rangeUri = EditConfigurationUtils.getRangeUri(vreq);
    		if (rangeUri != null && !rangeUri.isEmpty()) {
    		    VClass rangeVClass = ctxDaoFact.getVClassDao().getVClassByURI(rangeUri);
-   		    if (!rangeVClass.isUnion()) {
-   		        types.add(rangeVClass);    
+   		    if(rangeVClass != null) {
+	   		    if (!rangeVClass.isUnion()) {
+	   		        types.add(rangeVClass);    
+	   		    } else {
+	   		        for (VClass unionComponent : rangeVClass.getUnionComponents()) {
+	   		            types.add(unionComponent);
+	   		        }
+	   		    }
+	   		    return types;
    		    } else {
-   		        for (VClass unionComponent : rangeVClass.getUnionComponents()) {
-   		            types.add(unionComponent);
-   		        }
+   		    	log.error("Range VClass does not exist for " + rangeUri);
    		    }
-	        return types;
    		}
    		WebappDaoFactory wDaoFact = vreq.getWebappDaoFactory();
 		//Get all vclasses applicable to subject
@@ -238,6 +267,36 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	
     	return editConfiguration;
     }
+	
+	//We only need enough for the error message to show up
+	private EditConfigurationVTwo getCustomErrorEditConfiguration(VitroRequest vreq, HttpSession session) {
+		EditConfigurationVTwo editConfiguration = new EditConfigurationVTwo();    	
+    	
+    	//process subject, predicate, object parameters
+    	this.initProcessParameters(vreq, session, editConfiguration);
+    	
+    	this.setUrisAndLiteralsInScope(editConfiguration);
+    	
+    	//Sparql queries
+    	this.setSparqlQueries(editConfiguration);
+    	
+    
+    	prepareForUpdate(vreq, session, editConfiguration);
+    	
+    	editConfiguration.setTemplate("customErrorMessages.ftl");
+    	
+    	//Set edit key
+    	setEditKey(editConfiguration, vreq);
+    	
+    	//if custom error messages is not null, then add to form specific data
+    	if(customErrorMessages != null) {
+    		//at this point, it shouldn't be null
+    		HashMap<String, Object> formSpecificData = new HashMap<String, Object>();
+    		formSpecificData.put("customErrorMessages", customErrorMessages);
+    		editConfiguration.setFormSpecificData(formSpecificData);
+    	}
+    	return editConfiguration;
+	}
     
     private void setEditKey(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
     	String editKey = EditConfigurationUtils.getEditKey(vreq);	
@@ -458,6 +517,9 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 		objectSelect.add(editConfiguration.getVarNameForObject());
 		//TODO: Check if this is the proper way to do this?
 		formSpecificData.put("objectSelect", objectSelect);
+		if(customErrorMessages != null && !customErrorMessages.isEmpty()) {
+			formSpecificData.put("customErrorMessages", customErrorMessages);
+		}
 		editConfiguration.setFormSpecificData(formSpecificData);
 	}
         			
@@ -494,6 +556,9 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 		formSpecificData.put("rangeIndividualsExist", rangeIndividualsExist(session,types) );
 		
 		formSpecificData.put("sparqlForAcFilter", getSparqlForAcFilter(vreq));
+		if(customErrorMessages != null && !customErrorMessages.isEmpty()) {
+			formSpecificData.put("customErrorMessages", customErrorMessages);
+		}
 		editConfiguration.setTemplate(acObjectPropertyTemplate);
 		editConfiguration.setFormSpecificData(formSpecificData);
 	}
