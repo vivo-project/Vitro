@@ -63,8 +63,11 @@ public class DateTimeIntervalValidationVTwo implements N3ValidatorVTwo {
 //            errors.put(startFieldName, "If there is an end date, there should be a start date");
 //            return errors;              
 //        }
-        
-        
+        // We need to ensure that the user has entered a start year or end year -- tlw72
+        if ( literalListIsNull(formStartYear) && literalListIsNull(formStartYear) ) {  
+            errors.put(startFieldName, "Date/time intervals must begin with a year. Please enter a start year or an end year.");
+            return errors;              
+        }
         //Assuming form start year and form end year are working in conjunction with multiple values
         int index;
         if (!literalListIsNull(formStartYear) && !literalListIsNull(formEndYear)) {
