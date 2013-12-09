@@ -58,7 +58,7 @@
  <#if htmlForElements?keys?seq_contains("endField")>
 	${i18n().end_capitalized}&nbsp; ${htmlForElements["endField"]}
  </#if>
-
+    <span class="requiredHint"> *${i18n().datetime_year_required}</span>
     <p class="submit">
         <input type="hidden" name="editKey" value="${editKey}" />
         <input type="submit" id="submit" value="${submitButtonText}" role="button" />
@@ -69,8 +69,7 @@
     </p>
 </form>
 
-${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customForm.css" />',
-                  '<link rel="stylesheet" href="${urls.base}/edit/forms/css/personHasEducationalTraining.css" />')}
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/templates/freemarker/edit/forms/css/customForm.css" />')}
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/utils.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/customFormUtils.js"></script>')}
