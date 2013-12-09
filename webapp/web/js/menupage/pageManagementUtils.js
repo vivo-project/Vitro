@@ -905,9 +905,11 @@ var pageManagementUtils = {
     		validationErrorMsg = pageManagementUtils.selectContentType + " <br /> ";
     	} else {
     		//If there are multiple content types, and the default template option is selected, then display error message
-            var selectedTemplateValue = $('input:radio[name=selectedTemplate]:checked').val();
-            if(selectedTemplateValue == "default") {
-            	validationErrorMsg += pageManagementUtils.multipleContentWithDefaultTemplateError;
+            if(pageContentSections.length > 1) {
+	    		var selectedTemplateValue = $('input:radio[name=selectedTemplate]:checked').val();
+	            if(selectedTemplateValue == "default") {
+	            	validationErrorMsg += pageManagementUtils.multipleContentWithDefaultTemplateError + "<br/>";
+	            }
             }
     		//For each, based on type, validate if a validation function exists
 	    	$.each(pageContentSections, function(i) {
