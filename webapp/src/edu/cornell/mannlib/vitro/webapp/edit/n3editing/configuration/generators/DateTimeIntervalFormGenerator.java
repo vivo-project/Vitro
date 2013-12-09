@@ -92,7 +92,7 @@ public class DateTimeIntervalFormGenerator extends
         conf.addField(startField);
         conf.addField(endField);
         //Need to add validators
-        conf.addValidator(new DateTimeIntervalValidationVTwo("startField","endField"));
+        conf.addValidator(new DateTimeIntervalValidationVTwo("startField","endField","dateTimeIntervalForm.ftl"));
         //Adding additional data, specifically edit mode
         addFormSpecificData(conf, vreq);
 	}
