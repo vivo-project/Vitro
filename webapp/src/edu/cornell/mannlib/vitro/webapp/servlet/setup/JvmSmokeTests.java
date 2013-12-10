@@ -22,7 +22,24 @@ public class JvmSmokeTests implements ServletContextListener {
 		ServletContext ctx = sce.getServletContext();
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
+		checkJvmLevel(ss);
 		checkTempDirectory(ss);
+	}
+
+	/**
+	 * We need to run at 1.7 or later.
+	 */
+	private void checkJvmLevel(StartupStatus ss) {
+		String specLevel = System.getProperty("java.specification.version", "");
+		if (specLevel.isEmpty()) {
+			ss.warning(this, "Can't determine the current level of Java. "
+					+ "VIVO requires at least Java 1.7.");
+		} else if (specLevel.compareTo("1.7") < 0) {
+			ss.warning(this, "VIVO requires at least Java 1.7 - "
+					+ "currently running on Java " + specLevel);
+		} else {
+			ss.info(this, "Java version is " + specLevel);
+		}
 	}
 
 	/**
