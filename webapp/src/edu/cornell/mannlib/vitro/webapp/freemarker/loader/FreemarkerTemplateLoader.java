@@ -285,7 +285,7 @@ public class FreemarkerTemplateLoader implements TemplateLoader {
 		}
 
 		public boolean fileQualifies(Path path) {
-			return Files.isReadable(path) && !Files.isDirectory(path);
+			return !Files.isDirectory(path);
 		}
 
 		public SortedSet<PathPieces> getMatches() {
