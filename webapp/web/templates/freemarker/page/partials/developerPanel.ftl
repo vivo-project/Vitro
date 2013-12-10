@@ -56,6 +56,8 @@
 					Links
 					<br/>
 					<a href="${urls.base}/admin/log4j.jsp">Set log levels</a>
+					<a href="${urls.base}/admin/showConfiguration">Show Configuration</a>
+					<br/>
 					<a href="${urls.base}/admin/showAuth">Show authorization info</a>
 					<a href="${urls.base}/admin/showThreads">Show background threads</a>
 				</div>

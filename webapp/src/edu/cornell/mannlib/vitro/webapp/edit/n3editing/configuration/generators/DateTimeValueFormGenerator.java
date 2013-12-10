@@ -46,7 +46,7 @@ public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
         conf.setVarNameForSubject("subject");
         conf.setVarNameForPredicate("toDateTimeValue");
         conf.setVarNameForObject("valueNode");
-        
+        //Value node value will be in scope if we have an object uri that exists for editing
         conf.setN3Optional(Arrays.asList(getN3ForValue()));
         
         conf.addNewResource("valueNode", DEFAULT_NS_FOR_NEW_RESOURCE);
@@ -55,7 +55,6 @@ public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
         		"dateTimeField-value", getExistingDateTimeValueQuery());
         conf.addSparqlForExistingUris(
         		"dateTimeField-precision", getExistingPrecisionQuery());
-        conf.addSparqlForExistingUris("valueNode", getExistingNodeQuery());
         
         FieldVTwo dateTimeField = new FieldVTwo().setName(this.getDateTimeFieldName());
         		dateTimeField.setEditElement(new DateTimeWithPrecisionVTwo(dateTimeField, 
@@ -84,23 +83,18 @@ public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
 	
 	protected String getExistingDateTimeValueQuery () {
         return "SELECT ?existingDateTimeValue WHERE { \n" +
-        "?subject <" + this.getToDateTimeValuePredicate() + "> ?existingValueNode . \n" +
-        "?existingValueNode a <" + valueType + "> . \n" +
-        "?existingValueNode <" + dateTimeValue + "> ?existingDateTimeValue }";
+        "?subject <" + this.getToDateTimeValuePredicate() + "> ?valueNode . \n" +
+        "?valueNode a <" + valueType + "> . \n" +
+        "?valueNode <" + dateTimeValue + "> ?existingDateTimeValue }";
 	}
 	
 	protected String getExistingPrecisionQuery() {
         return "SELECT ?existingPrecision WHERE { \n" +
-        "?subject <" + this.getToDateTimeValuePredicate() + "> ?existingValueNode . \n" +
-        "?existingValueNode a <" + valueType + "> . \n" +
-        "?existingValueNode <"  + dateTimePrecision + "> ?existingPrecision }";
+        "?subject <" + this.getToDateTimeValuePredicate() + "> ?valueNode . \n" +
+        "?valueNode a <" + valueType + "> . \n" +
+        "?valueNode <"  + dateTimePrecision + "> ?existingPrecision }";
 	}
-	protected String getExistingNodeQuery() {
-        return "SELECT ?existingNode WHERE { \n" +
-        "?subject <" + this.getToDateTimeValuePredicate() + "> ?existingNode . \n" +
-        "?existingNode a <" + valueType + "> }";
-
-	}
+	
 	public static String getNodeVar() {
 		return "valueNode";
 	}
