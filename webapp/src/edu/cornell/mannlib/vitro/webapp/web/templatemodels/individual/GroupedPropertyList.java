@@ -20,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
@@ -292,6 +293,14 @@ public class GroupedPropertyList extends BaseTemplateModel {
         } else if (op.getRangeVClassURI() == null) {
             return (piOp.getRangeVClassURI() != null);
         } else {
+        	//Check and see if the range vclass exists for the possible piOp and populated op properties,
+        	//because for populated properties, if the range class is a union,
+        	//blank nodes will be broken and the code should instead use the existing or piOp range class uri
+        	VClass piOpRangeClass = wadf.getVClassDao().getVClassByURI(piOp.getRangeVClassURI());
+        	VClass opRangeClass = wadf.getVClassDao().getVClassByURI(op.getRangeVClassURI());
+        	//if the possible range class exists but the populated one does not, then return true to allow the possible
+        	//class to be utilized
+        	if(piOpRangeClass != null && opRangeClass == null) return true;
             return (wadf.getVClassDao().isSubClassOf(
                     piOp.getRangeVClassURI(), op.getRangeVClassURI()));
         }
