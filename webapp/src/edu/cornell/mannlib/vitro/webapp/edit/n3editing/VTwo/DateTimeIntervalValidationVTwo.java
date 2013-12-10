@@ -27,6 +27,7 @@ public class DateTimeIntervalValidationVTwo implements N3ValidatorVTwo {
     
     private String startFieldName;
     private String endFieldName;
+    private String templateName;
 
     private String startValueName;
     private String endValueName;
@@ -43,6 +44,16 @@ public class DateTimeIntervalValidationVTwo implements N3ValidatorVTwo {
         endPrecisionName = endFieldName + "-precision";
     }
     
+    public DateTimeIntervalValidationVTwo(String startFieldName, String endFieldName, String template){
+        this.templateName = template;
+        this.startFieldName = startFieldName;
+        this.endFieldName = endFieldName;
+        startValueName = startFieldName + "-value";
+        endValueName = endFieldName + "-value";
+        startPrecisionName = startFieldName + "-precision";
+        endPrecisionName = endFieldName + "-precision";
+    }
+
     public Map<String, String> validate(EditConfigurationVTwo editConfig,
             MultiValueEditSubmission editSub) {
         Map<String, List<Literal>> existingLiterals = editConfig.getLiteralsInScope();
@@ -63,8 +74,13 @@ public class DateTimeIntervalValidationVTwo implements N3ValidatorVTwo {
 //            errors.put(startFieldName, "If there is an end date, there should be a start date");
 //            return errors;              
 //        }
-        
-        
+        // We need to ensure that the user has entered a start year or end year -- tlw72
+        if ( templateName != null && templateName.equals("dateTimeIntervalForm.ftl")) {
+            if ( literalListIsNull(formStartYear) && literalListIsNull(formEndYear) ) {  
+                errors.put(startFieldName, "Date/time intervals must begin with a year. Please enter a start year, an end year or both.");
+                return errors;              
+            }
+        }
         //Assuming form start year and form end year are working in conjunction with multiple values
         int index;
         if (!literalListIsNull(formStartYear) && !literalListIsNull(formEndYear)) {
