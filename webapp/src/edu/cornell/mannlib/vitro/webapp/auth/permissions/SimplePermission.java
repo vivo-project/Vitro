@@ -64,6 +64,8 @@ public class SimplePermission extends Permission {
 		NAMESPACE + "RebuildVClassGroupCache");
 	public static final SimplePermission REFRESH_VISUALIZATION_CACHE = new SimplePermission(
 		NAMESPACE + "RefreshVisualizationCache");
+	public static final SimplePermission SEE_CONFIGURATION = new SimplePermission(
+			NAMESPACE + "SeeConfiguration");
 	public static final SimplePermission SEE_INDVIDUAL_EDITING_PANEL = new SimplePermission(
 		NAMESPACE + "SeeIndividualEditingPanel");
 	public static final SimplePermission SEE_REVISION_INFO = new SimplePermission(

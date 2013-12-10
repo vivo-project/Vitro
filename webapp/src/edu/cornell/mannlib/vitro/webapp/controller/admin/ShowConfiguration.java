@@ -8,6 +8,7 @@ import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -21,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 public class ShowConfiguration extends FreemarkerHttpServlet {
 	@Override
 	protected Actions requiredActions(VitroRequest vreq) {
-		return Actions.AUTHORIZED;
+		return SimplePermission.SEE_CONFIGURATION.ACTIONS;
 	}
 
 	@Override
@@ -34,8 +35,14 @@ public class ShowConfiguration extends FreemarkerHttpServlet {
 
 	private SortedMap<String, String> getConfigurationProperties(
 			VitroRequest vreq) {
-		return new TreeMap<>(ConfigurationProperties.getBean(vreq)
-				.getPropertyMap());
+		ConfigurationProperties props = ConfigurationProperties.getBean(vreq);
+		TreeMap<String, String> map = new TreeMap<>(props.getPropertyMap());
+		for (String key : map.keySet()) {
+			if (key.toLowerCase().endsWith("password")) {
+				map.put(key, "********");
+			}
+		}
+		return map;
 	}
 
 	private SortedMap<String, String> getSystemProperties() {
