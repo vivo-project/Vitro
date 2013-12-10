@@ -167,40 +167,50 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
                         
             DateTime value = getTimeValue(editConfig,editSub);
             /* This is the case where there is a precision so there should be a datetime */
-            if( value == null )
-                log.debug("Field " + getFieldName() + " has precision " + precisionUri 
-                        + " but the date time is " + value);                        
-            
-            /* only put the values in the map for ones which are significant based on the precision */
-            if( existingPrec.ordinal() >= VitroVocabulary.Precision.SECOND.ordinal() )
-                map.put("second", Integer.toString(value.getSecondOfMinute() )) ;
-            else
-                map.put("second", "");
-            
-            if( existingPrec.ordinal() >= VitroVocabulary.Precision.MINUTE.ordinal()  )
-                map.put("minute", Integer.toString(value.getMinuteOfHour()) );    
-            else
-                map.put("minute", "");
-            
-            if( existingPrec.ordinal() >= VitroVocabulary.Precision.HOUR.ordinal() )
-                map.put("hour", Integer.toString(value.getHourOfDay()) );
-            else
-                map.put("hour", "");
-            
-            if( existingPrec.ordinal() >= VitroVocabulary.Precision.DAY.ordinal()  )
-                map.put("day", Integer.toString(value.getDayOfMonth()) );                    
-            else
-                map.put("day", "");
-            
-            if( existingPrec.ordinal() >= VitroVocabulary.Precision.MONTH.ordinal() )
-                map.put("month", Integer.toString(value.getMonthOfYear()));                            
-            else
-                map.put("month", "");
-            
-            if( existingPrec.ordinal() >= VitroVocabulary.Precision.YEAR.ordinal() )
-                map.put("year", Integer.toString(value.getYear()));                  
-            else
+            if( value == null ) {
+            	//If there is no value, then this is an error condition
+                log.error("Field " + getFieldName() + " has precision " + precisionUri 
+                        + " but the date time value is null ");  
                 map.put("year", "");
+                map.put("month", "");
+                map.put("day", "");
+                map.put("hour", "");
+                map.put("minute", "");
+                map.put("second", "") ;
+                
+            } else {
+            
+	            /* only put the values in the map for ones which are significant based on the precision */
+	            if( existingPrec.ordinal() >= VitroVocabulary.Precision.SECOND.ordinal() )
+	            		map.put("second", Integer.toString(value.getSecondOfMinute() )) ;
+	            else
+	                map.put("second", "");
+	            
+	            if( existingPrec.ordinal() >= VitroVocabulary.Precision.MINUTE.ordinal()  )
+	                map.put("minute", Integer.toString(value.getMinuteOfHour()) );    
+	            else
+	                map.put("minute", "");
+	            
+	            if( existingPrec.ordinal() >= VitroVocabulary.Precision.HOUR.ordinal() )
+	                map.put("hour", Integer.toString(value.getHourOfDay()) );
+	            else
+	                map.put("hour", "");
+	            
+	            if( existingPrec.ordinal() >= VitroVocabulary.Precision.DAY.ordinal()  )
+	                map.put("day", Integer.toString(value.getDayOfMonth()) );                    
+	            else
+	                map.put("day", "");
+	            
+	            if( existingPrec.ordinal() >= VitroVocabulary.Precision.MONTH.ordinal() )
+	                map.put("month", Integer.toString(value.getMonthOfYear()));                            
+	            else
+	                map.put("month", "");
+	            
+	            if( existingPrec.ordinal() >= VitroVocabulary.Precision.YEAR.ordinal() )
+	                map.put("year", Integer.toString(value.getYear()));                  
+	            else
+	                map.put("year", "");
+	            }
         }               
         
         return map;

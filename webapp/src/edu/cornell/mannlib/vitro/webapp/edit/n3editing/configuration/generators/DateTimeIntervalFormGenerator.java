@@ -70,8 +70,7 @@ public class DateTimeIntervalFormGenerator extends
         		"startField-value", existingStartDateQuery);
         conf.addSparqlForExistingLiteral(
         		"endField-value", existingEndDateQuery);
-        conf.addSparqlForExistingUris(
-        		getNodeVar(), existingIntervalNodeQuery);
+        
         conf.addSparqlForExistingUris("startNode", existingStartNodeQuery);
         conf.addSparqlForExistingUris("endNode", existingEndNodeQuery);
         conf.addSparqlForExistingUris(
@@ -115,7 +114,7 @@ public class DateTimeIntervalFormGenerator extends
 	
 	final  String existingStartDateQuery =
         "SELECT ?existingDateStart WHERE { \n" +     
-        "?subject <" + getToDateTimeIntervalPredicate() + "> ?existingIntervalNode . \n" +     
+        "?subject <" + getToDateTimeIntervalPredicate() + "> " + getNodeN3Var() + " . \n" +     
         getNodeN3Var() + " a <" + intervalType + "> . \n" +
         getNodeN3Var() + " <" + intervalToStart + "> ?startNode . \n" +
         "?startNode a <" + dateTimeValueType + "> . \n" +
@@ -123,34 +122,30 @@ public class DateTimeIntervalFormGenerator extends
 
 	final  String existingEndDateQuery = 
         "SELECT ?existingEndDate WHERE { \n" +
-        "?subject <" + getToDateTimeIntervalPredicate() + "> ?existingIntervalNode . \n" +
+        "?subject <" + getToDateTimeIntervalPredicate() + "> " + getNodeN3Var() + " . \n" +
         getNodeN3Var() + " a <" + intervalType + "> . \n" +
         getNodeN3Var() + " <" + intervalToEnd + "> ?endNode . \n" +
         "?endNode a <" + dateTimeValueType + "> . \n " +
         "?endNode <" + dateTimeValue + "> ?existingEndDate . }";
 	
-	final  String existingIntervalNodeQuery = 
-        "SELECT ?existingIntervalNode WHERE { \n" +
-        "?subject <" + getToDateTimeIntervalPredicate() + "> ?existingIntervalNode . \n" +
-        "?existingIntervalNode a <" + intervalType + "> . }";
 	
 	final  String existingStartNodeQuery =
 		"SELECT ?existingStartNode WHERE { \n" +
-        "?subject <" + getToDateTimeIntervalPredicate() + "> ?existingIntervalNode . \n" +
+        "?subject <" + getToDateTimeIntervalPredicate() + "> " + getNodeN3Var() + " . \n" +
         getNodeN3Var() + " a <" + intervalType + "> . \n" +
         getNodeN3Var() + " <" + intervalToStart + "> ?existingStartNode . \n" + 
         "?existingStartNode a <" + dateTimeValueType + "> .}  ";
 	
 	final  String existingEndNodeQuery = 
         "SELECT ?existingEndNode WHERE { \n" + 
-        "?subject <" + getToDateTimeIntervalPredicate() + "> ?existingIntervalNode . \n" +
+        "?subject <" + getToDateTimeIntervalPredicate() + "> " + getNodeN3Var() + " . \n" +
         getNodeN3Var() + " a <" + intervalType + "> . \n" +
         getNodeN3Var() + " <" + intervalToEnd + "> ?existingEndNode . \n" + 
         "?existingEndNode a <" + dateTimeValueType + "> .} ";
 	
 	final  String existingStartPrecisionQuery = 
         "SELECT ?existingStartPrecision WHERE { \n" +    
-        "?subject <" + getToDateTimeIntervalPredicate() + "> ?existingIntervalNode . \n" +      
+        "?subject <" + getToDateTimeIntervalPredicate() + "> " + getNodeN3Var() + " . \n" +      
         getNodeN3Var() + " a <" + intervalType + "> . \n" +
         getNodeN3Var() + " <" + intervalToStart + "> ?startNode . \n" +
         "?startNode a <" + dateTimeValueType + "> . \n" +          
@@ -158,7 +153,7 @@ public class DateTimeIntervalFormGenerator extends
 	
 	final  String existingEndPrecisionQuery =
 		"SELECT ?existingEndPrecision WHERE { \n" +
-        "?subject <" + getToDateTimeIntervalPredicate() + "> ?existingIntervalNode . \n" +      
+        "?subject <" + getToDateTimeIntervalPredicate() + "> " + getNodeN3Var() + " . \n" +      
         getNodeN3Var() + " a <" + intervalType + "> . \n" +
         getNodeN3Var() + " <" + intervalToEnd + "> ?endNode . \n" +
         "?endNode a <" + dateTimeValueType + "> . \n" +          
