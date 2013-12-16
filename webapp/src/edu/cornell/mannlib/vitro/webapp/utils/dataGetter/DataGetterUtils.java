@@ -80,25 +80,6 @@ public class DataGetterUtils {
         log.debug("getDataGettersForClass: " + dgList);
         return dgList;
     }
-    
-    /**
-     * Get a list of DataGetter objects that are associated with a JAVA class.
-     * This allows the individual profile for an individual of a specific class to be returned .  
-     */
-    public static List<DataGetter> getDataGettersForClass( VitroRequest vreq, Model displayModel, String classURI) 
-    	    throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException{
-    	        //get data getter uris for pageURI
-    	        List<String> dgUris = getDataGetterURIsForClassURI( displayModel, classURI);
-    	        
-    	        List<DataGetter> dgList = new ArrayList<DataGetter>();
-    	        for( String dgURI: dgUris){
-    	            DataGetter dg =dataGetterForURI(vreq, displayModel, dgURI) ;
-    	            if( dg != null )
-    	                dgList.add(dg); 
-    	        }
-    	        log.debug("getDataGettersForClass: " + dgList);
-    	        return dgList;
-    	    }
 
     /**
      * Get a list of DataGetter objects that are associated with a Freemarker template.
@@ -245,35 +226,6 @@ public class DataGetterUtils {
         }finally{ displayModel.leaveCriticalSection(); }
                 
 		log.debug("Found " + dgURIs.size() +" DataGetter URIs for '" + associatedURI + "': " + dgURIs);
-        return dgURIs;
-    }
-    
-    //Get data getters for a specific JAVA class - associates data getters with individuals for a specific JAVA class
-    private static List<String> getDataGetterURIsForClassURI(Model displayModel, String classURI) {
-    	//Class URI will be substituted in so this is for a specific class uri
-        String query = prefixes + 
-             "SELECT ?dataGetter WHERE { ?classURI display:hasDataGetter ?dataGetter }";
-        Query dgForPageQuery = QueryFactory.create(query);
-        
-        QuerySolutionMap initialBindings = new QuerySolutionMap();
-        initialBindings.add("classURI", ResourceFactory.createResource( classURI ));
-        
-        List<String> dgURIs = new ArrayList<String>();
-        displayModel.enterCriticalSection(false);
-        try{
-            QueryExecution qexec = QueryExecutionFactory.create(dgForPageQuery,displayModel,initialBindings );
-            try{                                                    
-                ResultSet results = qexec.execSelect();                
-                while (results.hasNext()) {
-                    QuerySolution soln = results.nextSolution();
-                    Resource dg = soln.getResource("dataGetter");
-                    if( dg != null && dg.getURI() != null){
-                        dgURIs.add( dg.getURI());
-                    }
-                }
-            }finally{ qexec.close(); }
-        }finally{ displayModel.leaveCriticalSection(); }
-                
         return dgURIs;
     }
     

@@ -93,10 +93,6 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         this.httpClient = new HttpClient(mgr);
         
         testConnection();
-
-        MultiThreadedHttpConnectionManager mgr = new MultiThreadedHttpConnectionManager();
-        mgr.getParams().setDefaultMaxConnectionsPerHost(10);
-        this.httpClient = new HttpClient(mgr);
     }
     
     private void testConnection() {

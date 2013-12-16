@@ -97,8 +97,9 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
 		for(String fieldName: editConfig.getFields().keySet()){
 		    FieldVTwo field = editConfig.getField(fieldName);
+		    //TODO: Check if we even need empty options if field options do not exist
 		    if( field.getFieldOptions() == null ){ 
-		    	//empty options if none were set
+		    	//empty options
 		    	field.setOptions(new ConstantFieldOptions());
 		    }
 		    Map<String, String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, fieldName, wdf);	
