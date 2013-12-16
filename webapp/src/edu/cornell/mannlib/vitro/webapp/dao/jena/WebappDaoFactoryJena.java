@@ -9,9 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.iri.IRI;
 import com.hp.hpl.jena.iri.IRIFactory;
-import com.hp.hpl.jena.iri.Violation;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntResource;
@@ -21,14 +23,12 @@ import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
+import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
+import edu.cornell.mannlib.vitro.webapp.beans.ResourceBean;
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
@@ -45,14 +45,19 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.URIUtils;
 
 public class WebappDaoFactoryJena implements WebappDaoFactory {
 
+    private static final Log log = LogFactory.getLog(WebappDaoFactoryJena.class);
+    
     protected IndividualDao entityWebappDao;
     protected ApplicationDaoJena applicationDao;
     protected UserAccountsDao userAccountsDao;
@@ -104,6 +109,8 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         
         Dataset dataset = makeInMemoryDataset(assertions, inferences);      
         this.dwf = new StaticDatasetFactory(dataset);
+        
+        this.rdfService = new RDFServiceModel(ontModelSelector.getFullModel());
         
     } 
 
@@ -184,42 +191,33 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 	    IRI iri = factory.create( uriStr );
 	    if (iri.hasViolation(false) ) {
 	    	validURI = false;
-	    	errorMsg += ((Violation)iri.violations(false).next())
+	    	errorMsg += (iri.violations(false).next())
 	    	                    .getShortMessage() + " ";
 	    } else if (checkUniqueness) {
-	    	OntModel ontModel = ontModelSelector.getFullModel(); 
-			ontModel.enterCriticalSection(Lock.READ);
-			try {
-				Resource newURIAsRes = ResourceFactory.createResource(uriStr);
-				Property newURIAsProp = ResourceFactory.createProperty(uriStr);
-				StmtIterator closeIt = ontModel.listStatements(
-						newURIAsRes, null, (RDFNode)null);
-				if (closeIt.hasNext()) {
-					validURI = false;
-					errorMsg+="Not a valid URI.  Please enter another URI. ";
-					errorMsg+=duplicateMsg;
-				}
-				if (validURI) {
-					closeIt = ontModel.listStatements(null, null, newURIAsRes);
-					if (closeIt.hasNext()) {
-						validURI = false;
-						errorMsg+=duplicateMsg;
-					}
-				}
-				if (validURI) {
-					closeIt = ontModel.listStatements(
-							null, newURIAsProp, (RDFNode)null);
-					if (closeIt.hasNext()) {
-						validURI = false;
-						errorMsg+=duplicateMsg;
-					}
-				}
-			} finally {
-				ontModel.leaveCriticalSection();
-			}
+	    	boolean existingURI = this.hasExistingURI(uriStr);
+	    	if(existingURI) {
+				errorMsg+="Not a valid URI.  Please enter another URI. ";
+				errorMsg+=duplicateMsg;
+				//the original code included an extra line "Not a valid URI.  Please enter another URI. "
+				//in the error message in addition to the duplicate error message in the case where the uri
+				//is in the subject position of any of the statements in the system - but not so where the
+				//uri was only in the object position or was a propery.  In this code, the same error message
+				//is returned for all duplicate uris
+	    	}
 	    }
 	    return (errorMsg.length()>0) ? errorMsg : null;
     }
+    
+    
+    
+    //Check if URI already in use or not either as resource OR as property
+    public boolean hasExistingURI(String uriStr) {
+    	OntModel ontModel = ontModelSelector.getFullModel(); 
+		return URIUtils.hasExistingURI(uriStr, ontModel);
+    }
+    
+   
+    
     
     public WebappDaoFactory getUserAwareDaoFactory(String userURI) {
         return new WebappDaoFactoryJena(this, userURI);
@@ -332,7 +330,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     DataPropertyDao dataPropertyDao = null;
     public DataPropertyDao getDataPropertyDao() {
         if( dataPropertyDao == null )
-            dataPropertyDao = new DataPropertyDaoJena(dwf, this);
+            dataPropertyDao = new DataPropertyDaoJena(rdfService, dwf, this);
         return dataPropertyDao;
     }
 
@@ -363,21 +361,22 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     private ObjectPropertyDao objectPropertyDao = null;
     public ObjectPropertyDao getObjectPropertyDao() {
         if( objectPropertyDao == null )
-            objectPropertyDao = new ObjectPropertyDaoJena(dwf, this);
+            objectPropertyDao = new ObjectPropertyDaoJena(
+                    rdfService, dwf, config.customListViewConfigFileMap, this);
         return objectPropertyDao;
     }
 
     private PropertyInstanceDao propertyInstanceDao = null;
     public PropertyInstanceDao getPropertyInstanceDao() {
         if( propertyInstanceDao == null )
-            propertyInstanceDao = new PropertyInstanceDaoJena(dwf, this);
+            propertyInstanceDao = new PropertyInstanceDaoJena(rdfService, dwf, this);
         return propertyInstanceDao;
     }
 
     protected VClassDao vClassDao = null;
     public VClassDao getVClassDao() {
         if( vClassDao == null )
-            vClassDao = new VClassDaoJena(this);
+            vClassDao = new VClassDaoJena(this, config.isUnderlyingStoreReasoned());
         return vClassDao;
     }
 
@@ -541,5 +540,44 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     	ontModelSelector = specialSelector;
     	
     }
+    
+    public String makeLocalNameWithPrefix(ResourceBean bean) {
+        OntologyDao oDao = this.getOntologyDao();
+        Ontology o = oDao.getOntologyByURI(bean.getNamespace());
+        if (o == null) {
+            if (VitroVocabulary.vitroURI.equals(bean.getNamespace())) {
+                return "vitro:" + bean.getLocalName();
+            } else {
+                log.debug("no ontology object found for namespace " + bean.getNamespace());
+                return bean.getLocalName();
+            }
+        } else {
+            String prefix = o.getPrefix() == null ? (
+                    o.getName() == null ? 
+                            "unspec" : o.getName()) : o.getPrefix();
+            return prefix + ":" + bean.getLocalName();
+        }    
+    }
+    
+    public String makePickListName(ResourceBean bean) {
+        OntologyDao oDao = this.getOntologyDao();
+        Ontology o = oDao.getOntologyByURI(bean.getNamespace());
+        String label = (bean.getLabel() != null) ? bean.getLabel () : bean.getLocalName();
+        label = (label != null) ? label : bean.getURI();
+        if (o == null) {
+            if (VitroVocabulary.vitroURI.equals(bean.getNamespace())) {
+                return label + " (vitro)";
+            } else {
+                log.debug("no ontology object found for namespace " + bean.getNamespace());
+                return label;
+            }
+        } else {
+            String prefix = o.getPrefix() == null ? (
+                    o.getName() == null ? 
+                            "unspec" : o.getName()) : o.getPrefix();
+            return label + " (" + prefix + ")";
+        }       
+    }
+    
    
 }

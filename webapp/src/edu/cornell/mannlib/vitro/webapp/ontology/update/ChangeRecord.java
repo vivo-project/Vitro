@@ -12,4 +12,6 @@ public interface ChangeRecord {
 	
 	public void writeChanges();
 	
+	public boolean hasRecordedChanges();
+	
 }

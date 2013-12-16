@@ -2,7 +2,7 @@
 
 <#-- Template for email message sent to site administrator when an error occurs on the site. -->
 
-<#assign subject = "An error occurred on the VIVO site" />
+<#assign subject = "${i18n().error_occurred}" />
 
 <#assign datetime = datetime?string("yyyy-MM-dd HH:mm:ss zzz")>
 
@@ -13,26 +13,26 @@
     </head>
     <body>
         <p>
-            An error occurred on your VIVO site at ${datetime!}.
+            ${i18n().error_occurred_at(datetime!)}
         </p>
         
         <p>
-            <strong>Requested url:</strong> ${requestedUrl!}
+            <strong>${i18n().requested_url}:</strong> ${requestedUrl!}
         </p>
         
         <p>
         <#if errorMessage?has_content>
-            <strong>Error message:</strong> ${errorMessage!}
+            <strong>${i18n().error_message}:</strong> ${errorMessage!}
         </#if>
         </p>
         
         <p>
-            <strong>Stack trace</strong> (full trace available in the vivo log): 
+            <strong>${i18n().stack_trace}</strong> (${i18n().trace_available}): 
             <pre>${stackTrace!}</pre>
         </p>
         
         <#if cause?has_content>
-            <p><strong>Caused by:</strong> 
+            <p><strong>${i18n().caused_by}:</strong> 
                 <pre>${cause!}</pre>
             </p>
         </#if>
@@ -42,19 +42,19 @@
 </#assign>
 
 <#assign text>
-An error occurred on your VIVO site at ${datetime!}.
+${i18n().error_occurred_at(datetime!)}
 
-Requested url: ${requestedUrl!}
+${i18n().requested_url}: ${requestedUrl!}
 
 <#if errorMessage?has_content>
-    Error message: ${errorMessage!}
+    ${i18n().error_message}: ${errorMessage!}
 </#if>
 
-Stack trace (full trace available in the vivo log): 
+${i18n().stack_trace} (${i18n().trace_available}): 
 ${stackTrace!}
 
 <#if cause?has_content>
-Caused by: 
+${i18n().caused_by}: 
 ${cause!}
 </#if>       
 </#assign>

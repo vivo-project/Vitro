@@ -40,7 +40,7 @@ public class VClassWebappWithInstancesListingController extends BaseEditControll
 
         if(uriStr != null) {
 
-            VClassDao dao = vrequest.getFullWebappDaoFactory().getVClassDao();
+            VClassDao dao = vrequest.getUnfilteredWebappDaoFactory().getVClassDao();
 
             results.add("XX");
             results.add("name");
@@ -64,7 +64,7 @@ public class VClassWebappWithInstancesListingController extends BaseEditControll
                 results.add(lastModifiedStr);
                 results.add("XX");
 
-                IndividualDao ewDao = vrequest.getFullWebappDaoFactory().getIndividualDao();
+                IndividualDao ewDao = vrequest.getUnfilteredWebappDaoFactory().getIndividualDao();
 
                 List ents = ewDao.getIndividualsByVClassURI(vcw.getURI(), -2, -2);
                 if (ents != null && ents.size()>0) {
@@ -113,13 +113,6 @@ public class VClassWebappWithInstancesListingController extends BaseEditControll
             t.printStackTrace();
         }
 
-    }
-
-    private class EntityWebappAlphaComparator implements Comparator {
-        public int compare (Object o1, Object o2) {
-            Collator collator = Collator.getInstance();
-            return collator.compare(((ObjectProperty)o1).getLocalName(),((ObjectProperty)o2).getLocalName());
-        }
     }
 
 }

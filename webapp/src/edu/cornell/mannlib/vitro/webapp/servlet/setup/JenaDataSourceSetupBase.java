@@ -3,11 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import java.beans.PropertyVetoException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
@@ -69,21 +65,6 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     protected final static boolean DEFAULT_TESTONBORROW = true,
             DEFAULT_TESTONRETURN = true, DEFAULT_TESTWHILEIDLE = true;
 
-    protected static String BASE = "/WEB-INF/ontologies/";
-    protected static String USERPATH = BASE+"user/";
-    protected static String USER_ABOX_PATH = BASE+"user/abox";
-    protected static String USER_TBOX_PATH = BASE+"user/tbox";
-    protected static String USER_APPMETA_PATH = BASE+"user/applicationMetadata";
-    protected static String SYSTEMPATH = BASE+"system/";       
-    public static String APPPATH = BASE+"app/";
-    //these files are loaded everytime the system starts up
-    public static String APPPATH_LOAD = APPPATH + "menuload/";
-    
-    //All files in this directory will be reloaded every startup
-    //and attached as sub-models to the displayOntModel.
-    static final String DISPLAY_MODEL_LOAD_AT_STARTUP_DIR =
-        APPPATH + "loadedAtStartup";
-    
     protected static boolean firstStartup = false;
 
     String DB_USER =   "jenatest";                          // database user id
@@ -240,7 +221,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        int[] maxActiveAndIdle = getMaxActiveAndIdle(ctx);
        cpds.setMaxPoolSize(maxActiveAndIdle[0]);
        cpds.setMinPoolSize(maxActiveAndIdle[1]);
-       cpds.setMaxIdleTime(3600); // ms
+       cpds.setMaxIdleTime(43200); // s
        cpds.setMaxIdleTimeExcessConnections(300);
        cpds.setAcquireIncrement(5);
        cpds.setNumHelperThreads(6);
@@ -395,45 +376,6 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        return dbModel;
    }
 
-    public static void readOntologyFilesInPathSet(String path,
-            ServletContext ctx, Model model) {
-        log.debug("Reading ontology files from '" + path + "'");
-        Set<String> paths = ctx.getResourcePaths(path);
-        if (paths != null) {
-            for (String p : paths) {
-               readOntologyFileFromPath(p, model, ctx);
-            }
-        }
-    }
-   
-    public static void readOntologyFileFromPath(String p, 
-                                                Model model, 
-                                                ServletContext ctx) {
-        //Check that this is a file and not a directory
-        File f = new File(ctx.getRealPath(p));
-        if(f.exists() && f.isFile()){
-            String format = getRdfFormat(p);
-             log.info("Loading ontology file at " + p + 
-                      " as format " + format);
-             InputStream ontologyInputStream = ctx.getResourceAsStream(p);
-             try {
-                 model.read(ontologyInputStream, null, format);
-                 log.debug("...successful");
-             } catch (Throwable t) {
-                 log.error("Failed to load ontology file at '" + p + 
-                           "' as format " + format, t);
-             }
-        } else {
-            if(!f.exists()) {
-                log.info("File for path " + p + " does not exist");
-            }
-            else if(f.isDirectory()) {
-                log.info("Path " + p + 
-                        " corresponds to directory and not file so was not read in");
-            }
-        }
-   }
-    
     private static String getRdfFormat(String filename){
         String defaultformat = "RDF/XML";
         if( filename == null )
@@ -471,7 +413,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         } else if (TripleStoreType.SDB.equals(type)) {
             StoreDesc storeDesc = new StoreDesc(
                     LayoutType.LayoutTripleNodesHash, DatabaseType.fetch(dbtypeStr));
-            DataSource bds = WebappDaoSetup.makeC3poDataSource(
+            DataSource bds = ContentModelSetup.makeC3poDataSource(
                     getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
 //            DataSource bds = WebappDaoSetup.makeBasicDataSource(
 //                    getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
@@ -487,42 +429,6 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         
         return;
         
-    }
-    
-    /**
-     * Read all the files in the directory as RDF files
-     * and return a model build from all RDF data found in those files.
-     * This will attempt to load formats supported by getRdfFormat().
-     */
-    public static OntModel getModelFromDir( File dir){
-        if( dir == null )
-            throw new IllegalStateException("Must pass a File to getModelFromDir()");
-        if( !dir.isDirectory() )
-            throw new IllegalStateException(
-                    "Directory must be a File object for a directory");
-        if( !dir.canRead() )
-            throw new IllegalStateException("getModelFromDir(): Directory " +
-                    " must be readable, check premissions on " 
-                    + dir.getAbsolutePath());
-        
-        OntModel model = ModelFactory.createOntologyModel();
-        for( File file : dir.listFiles()){
-            if( file.isFile() 
-                && file.canRead() 
-                && file.getName() != null ){
-                String format = getRdfFormat( file.getName() );
-                try{                   
-                    model.read( new FileInputStream(file), null, format);
-                    log.info("read in file " + file.getCanonicalPath() );
-                }catch( Throwable th){
-                    log.warn("Could not load file " + 
-                            file.getAbsolutePath() + file.separator + file.getName() +
-                            " check that it contains valid " + format + " data.", 
-                            th);
-                }                
-            }
-        }                                               
-        return model;
     }
     
     public static void setVitroJenaModelMaker(VitroJenaModelMaker vjmm, 
@@ -546,7 +452,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         if ((dns != null) && (!dns.isEmpty())) {
             return dns;
         } else {
-            throw new IllegalStateException("deploy.properties does not "
+            throw new IllegalStateException("runtime.properties does not "
                     + "contain a value for '" + VITRO_DEFAULT_NAMESPACE + "'");
         }
     }

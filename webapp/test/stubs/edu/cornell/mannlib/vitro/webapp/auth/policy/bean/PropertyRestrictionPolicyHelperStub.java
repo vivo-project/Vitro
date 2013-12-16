@@ -8,6 +8,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.sdb.util.Pair;
+import com.hp.hpl.jena.vocabulary.OWL;
+
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 
@@ -40,10 +45,15 @@ public class PropertyRestrictionPolicyHelperStub extends
 			namespaceSet.addAll(Arrays.asList(restrictedNamespaces));
 		}
 		
-		Map<String, RoleLevel> thresholdMap = new HashMap<String, RoleLevel>();
+		Map<Pair<String, Pair<String,String>>, RoleLevel> thresholdMap = new HashMap<
+		        Pair<String, Pair<String,String>>, RoleLevel>();
 		if (restrictedProperties != null) {
 			for (String prop : restrictedProperties) {
-				thresholdMap.put(prop, RoleLevel.NOBODY);
+				thresholdMap.put(
+				        new Pair<String, Pair<String, String>>(
+				                OWL.Thing.getURI(), new Pair<String, String>(
+				                        prop, OWL.Thing.getURI())), 
+				                                RoleLevel.NOBODY);
 			}
 		}
 		
@@ -54,10 +64,10 @@ public class PropertyRestrictionPolicyHelperStub extends
 	private PropertyRestrictionPolicyHelperStub(
 			Set<String> modifyRestrictedNamespaces,
 			Set<String> modifyPermittedExceptions,
-			Map<String, RoleLevel> displayThresholds,
-			Map<String, RoleLevel> modifyThresholds) {
+			Map<Pair<String, Pair<String,String>>, RoleLevel> displayThresholds,
+			Map<Pair<String, Pair<String,String>>, RoleLevel> modifyThresholds) {
 		super(modifyRestrictedNamespaces, modifyPermittedExceptions,
-				displayThresholds, modifyThresholds);
+				displayThresholds, modifyThresholds, ModelFactory.createDefaultModel());
 	}
 
 }

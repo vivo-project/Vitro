@@ -1,5 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
+$.extend(this, i18nStringsBrowseGroups);
 //Process sparql data getter and provide a json object with the necessary information
 //Depending on what is included here, a different type of data getter might be used
 var processClassGroupDataGetterContent = {
@@ -34,7 +35,7 @@ var processClassGroupDataGetterContent = {
 	},
 	//For the label of the content section for editing, need to add additional value
 	retrieveContentLabel:function() {
-		return "Browse Class Group";
+		return i18nStringsBrowseGroups.browseClassGroup;
 	},
 	retrieveAdditionalLabelText:function(existingContentObject) {
 		var label = "";
@@ -61,7 +62,7 @@ var processClassGroupDataGetterContent = {
             
             selectedClassesList.empty();
             var newId = "allSelected" + contentNumber;
-            selectedClassesList.append('<li class="ui-state-default"> <input type="checkbox" name="allSelected" id="' + contentNumber + '" value="all" checked="checked" /> <label class="inline" for="All"> All</label> </li>');
+            selectedClassesList.append('<li class="ui-state-default"> <input type="checkbox" name="allSelected" id="' + contentNumber + '" value="all" checked="checked" /> <label class="inline" for="All"> ' + i18nStringsBrowseGroups.allCapitalized + '</label> </li>');
             
             $.each(results.classes, function(i, item) {
                 var thisClass = results.classes[i];
@@ -134,14 +135,14 @@ var processClassGroupDataGetterContent = {
     validateFormSubmission: function(pageContentSection, pageContentSectionLabel) {
     	var validationError = "";
     	 if (pageContentSection.find('select[name="selectClassGroup"]').val() =='-1') {
-             validationError += pageContentSectionLabel + ": You must supply a class group <br />"; 
+             validationError += pageContentSectionLabel + ": " + i18nStringsBrowseGroups.supplyClassGroup + " <br />"; 
          } else {
              //class group has been selected, make sure there is at least one class selected
              var allSelected = pageContentSection.find('input[name="allSelected"]:checked').length;
              var noClassesSelected = pageContentSection.find('input[name="classInClassGroup"]:checked').length;
              if (allSelected == 0 && noClassesSelected == 0) {
                  //at least one class should be selected
-                 validationError +=  pageContentSectionLabel + ":You must select the classes to display<br />";
+                 validationError +=  pageContentSectionLabel + ": " + i18nStringsBrowseGroups.selectClasses + "<br />";
              }
          }
     	 return validationError;

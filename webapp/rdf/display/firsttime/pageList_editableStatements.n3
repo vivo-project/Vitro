@@ -1,0 +1,36 @@
+# $This file is distributed under the terms of the license in /doc/license.txt$ 
+
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix action: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
+
+### This file defines the page list menu for vitro. These statements can be edited through the interface.###
+
+display:pageListPage
+    a display:Page ;              
+    display:title "Pages" ;
+    display:urlMapping "/pageList" ;
+    display:requiresBodyTemplate "pageList.ftl" ;   
+    display:hasDataGetter display:pageListData.
+
+display:pageListData
+    a <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter>;                       
+    display:saveToVar "pages" ;
+    display:queryModel <vitro:requestDisplayModel> ; 
+    display:query """
+    PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> 
+    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    SELECT ?listedPageUri ?listedPageTitle ?listedPageUrlMapping ?listedPageTemplate ?listedPageMenuItem ?listedPageCannotDeletePage
+    WHERE { 
+        ?listedPageUri a display:Page .
+        OPTIONAL{ ?listedPageUri display:urlMapping ?listedPageUrlMapping. }
+        OPTIONAL{ ?listedPageUri display:title  ?listedPageTitle. }  
+        OPTIONAL {?listedPageUri display:requiresBodyTemplate ?listedPageTemplate .}
+        OPTIONAL {?listedPageMenuItem display:toPage ?listedPageUri .}
+        OPTIONAL {?listedPageUri display:cannotDeletePage ?listedPageCannotDeletePage .}
+     }  ORDER BY ?listedPageTitle """ .      
+###Page Management and Data Getters
+
+          

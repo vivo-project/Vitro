@@ -2,7 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.json;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -24,7 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.Individual
  * Does a Solr search for individuals, and uses the short view to render each of
  * the results.
  */
-public class GetRenderedSolrIndividualsByVClass extends JsonObjectProducer {
+public class GetRenderedSolrIndividualsByVClass extends GetSolrIndividualsByVClasses {
 	private static final Log log = LogFactory
 			.getLog(GetRenderedSolrIndividualsByVClass.class);
 
@@ -33,21 +35,34 @@ public class GetRenderedSolrIndividualsByVClass extends JsonObjectProducer {
 	}
 
 	/**
-	 * Search for individuals by VClass. The class URI and the paging
+	 * Search for individuals by VClass or VClasses in the case of multiple parameters. The class URI(s) and the paging
 	 * information are in the request parameters.
 	 */
 	@Override
 	protected JSONObject process() throws Exception {
 		JSONObject rObj = null;
-		VClass vclass = getVclassParameter(vreq);
-		String vclassId = vclass.getURI();
-
+		
+		//This gets the first vclass value and sets that as display type
+		List<String> vclassIds = super.getVclassIds(vreq);
+		String vclassId = null;
+		if(vclassIds.size() > 1) {
+			//This ensures the second class instead of the first 
+			//This is a temporary fix in cases where institutional internal classes are being sent in
+			//and thus the second class is the actual class with display information associated
+			vclassId = vclassIds.get(1);
+		} else {
+			vclassId = vclassIds.get(0);
+		}
 		vreq.setAttribute("displayType", vclassId);
-		rObj = JsonServlet.getSolrIndividualsByVClass(vclassId, vreq, ctx);
+		
+		//This will get all the solr individuals by VClass (if one value) or the intersection
+		//i.e. individuals that have all the types for the different vclasses entered
+		rObj = super.process();
 		addShortViewRenderings(rObj);
-
 		return rObj;
 	}
+	
+	//Get 
 
 	/**
 	 * Look through the return object. For each individual, render the short

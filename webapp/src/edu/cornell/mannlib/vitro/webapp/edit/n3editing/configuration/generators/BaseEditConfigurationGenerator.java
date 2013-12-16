@@ -4,8 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
@@ -13,13 +11,11 @@ import org.apache.commons.lang.StringUtils;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.IdModelSelector;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.ModelSelector;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardModelSelector;
-import edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep;
 
 public abstract class BaseEditConfigurationGenerator implements EditConfigurationGenerator {
 
@@ -66,7 +62,7 @@ public abstract class BaseEditConfigurationGenerator implements EditConfiguratio
         //setup the model selectors for query, write and display models on editConfig
         setupModelSelectorsFromVitroRequest(vreq, editConfig);        
         
-        OntModel queryModel = vreq.getJenaOntModel(); // (OntModel)vreq.getAttribute("jenaOntModel");
+        OntModel queryModel = ModelAccess.on(vreq).getJenaOntModel();
         
         if( editConfig.getSubjectUri() == null)
             editConfig.setSubjectUri( EditConfigurationUtils.getSubjectUri(vreq));

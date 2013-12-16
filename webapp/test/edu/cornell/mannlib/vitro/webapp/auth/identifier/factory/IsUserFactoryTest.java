@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsUser;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 
 /**
  * The simplest of the IdentifierBundleFactory classes.
@@ -46,7 +47,7 @@ public class IsUserFactoryTest extends AbstractTestClass {
 		wdf.setUserAccountsDao(uaDao);
 
 		ctx = new ServletContextStub();
-		ctx.setAttribute("webappDaoFactory", wdf);
+		ModelAccess.on(ctx).setWebappDaoFactory(wdf);
 
 		session = new HttpSessionStub();
 		session.setServletContext(ctx);

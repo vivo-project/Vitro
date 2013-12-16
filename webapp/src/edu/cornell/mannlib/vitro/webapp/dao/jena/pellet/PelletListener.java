@@ -320,9 +320,9 @@ public class PelletListener implements ModelChangedListener {
 						        		try {
 						        			if ( ( ((Resource)stmt.getObject()).equals(RDFS.Resource) ) ) {
 						        				reject = true;
-						        			} else if ( ( ((Resource)stmt.getSubject()).equals(OWL.Nothing) ) )  {
+						        			} else if ( ( stmt.getSubject().equals(OWL.Nothing) ) )  {
 												reject = true; 
-											}  else if ( ( ((Resource)stmt.getObject()).equals(OWL.Nothing) ) )  {
+											}  else if ( ( stmt.getObject().equals(OWL.Nothing) ) )  {
 												reject = true;
 											}
 						        		} catch (Exception e) {}
@@ -624,8 +624,10 @@ public class PelletListener implements ModelChangedListener {
 				if ( (additionModel.size() > 0) || (removalModel.size()>0) ) {
 					if (!isSynchronizing) {
 						if (foreground) {
+                            log.debug("Running Pellet in foreground.");
 							(new PelletSynchronizer()).run();
 						} else {
+                            log.debug("Running Pellet in background.");
 							new Thread(new PelletSynchronizer(), "PelletListener.PelletSynchronizer").start();
 						}
 					}

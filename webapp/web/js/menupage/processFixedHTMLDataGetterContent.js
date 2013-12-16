@@ -1,5 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
+$.extend(this, i18nStringsFixedHtml);
 //Process sparql data getter and provide a json object with the necessary information
 var processFixedHTMLDataGetterContent = {
 	dataGetterClass:null,
@@ -30,7 +31,7 @@ var processFixedHTMLDataGetterContent = {
 	},
 	//For the label of the content section for editing, need to add additional value
 	retrieveContentLabel:function() {
-		return "Fixed HTML";
+		return i18nStringsFixedHtml.fixedHtml;
 	},
 	//For the label of the content section for editing, need to add additional value
 	retrieveAdditionalLabelText:function(existingContentObject) {
@@ -43,17 +44,17 @@ var processFixedHTMLDataGetterContent = {
     	//Check that query and saveToVar have been input
     	var variableValue = pageContentSection.find("input[name='saveToVar']").val();
     	if(variableValue == "") {
-    		validationError += pageContentSectionLabel + ": You must supply a variable to save HTML content. <br />";
+    		validationError += pageContentSectionLabel + ": " + i18nStringsFixedHtml.supplyVariableName + " <br />";
     	}
     	if(processFixedHTMLDataGetterContent.stringHasSingleQuote(variableValue)) {
-    		validationError += pageContentSectionLabel + ": The variable name should not have an apostrophe . <br />";
+    		validationError += pageContentSectionLabel + ": " + i18nStringsFixedHtml.noApostrophes + " <br />";
     	}
     	if(processFixedHTMLDataGetterContent.stringHasDoubleQuote(variableValue)) {
-    		validationError += pageContentSectionLabel + ": The variable name should not have a double quote . <br />";
+    		validationError += pageContentSectionLabel + ": " + i18nStringsFixedHtml.noDoubleQuotes + " <br />";
     	}
 		var htmlValue = pageContentSection.find("textarea[name='htmlValue']").val();
 		if(htmlValue == "") {
-			validationError += pageContentSectionLabel + ": You must supply some HTML or text. <br />";
+			validationError += pageContentSectionLabel + ": " + i18nStringsFixedHtml.supplyHtml + " <br />";
 		}
     	return validationError;
     },

@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +19,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Literal;
-import  com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -27,18 +26,26 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Literal;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.XSD;
 
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ManagePagePreprocessor;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3Utils;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.menuManagement.MenuManagementDataUtils;
 
@@ -97,7 +104,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 
 	private void setUrisAndLiteralsOnForm(EditConfigurationVTwo conf,
 			VitroRequest vreq) {
-		conf.setUrisOnForm(new String[]{"page", "menuItem"}); //new resources: should this be on form for new - should be for existing
+		conf.setUrisOnForm(new String[]{"page", "menuItem", "action"}); //new resources: should this be on form for new - should be for existing
 		conf.setLiteralsOnForm(new String[]{"pageName", "prettyUrl", "menuPosition", "menuLinkText", "customTemplate", "isSelfContainedTemplate", "pageContentUnit"}); //page content unit = data getter JSON object
 		
 	}
@@ -117,7 +124,8 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 		//body template is not required, and a given page may or may not be a menu item, but should linked to menu if menu item
 	      conf.setN3Optional(new ArrayList<String>(Arrays.asList(prefixes + pageBodyTemplateN3, 
 	    		  							prefixes + menuItemN3 + menuN3,
-	    		  							prefixes + isSelfContainedTemplateN3)));
+	    		  							prefixes + isSelfContainedTemplateN3,
+	    		  							prefixes + permissionN3)));
 	}
 
 	private void setN3Required(EditConfigurationVTwo conf) {
@@ -153,6 +161,10 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 		//If this is a self contained template, the appropriate flag will be set
 		FieldVTwo isSelfContainedTemplateField = new FieldVTwo().setName("isSelfContainedTemplate");
 		conf.addField(isSelfContainedTemplateField);
+		
+		//Permission for the page
+		FieldVTwo permissionField = new FieldVTwo().setName("action");
+		conf.addField(permissionField);
 		
 		//The actual page content information is stored in this field, and then
 		//interpreted using the preprocessor
@@ -207,7 +219,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	  void prepare(VitroRequest vreq, EditConfigurationVTwo editConfig) {
 	        //setup the model selectors for query, write and display models on editConfig
 	        setupModelSelectorsFromVitroRequest(vreq, editConfig);         
-	        OntModel queryModel = (OntModel)vreq.getAttribute("jenaOntModel");
+			OntModel queryModel = ModelAccess.on(vreq).getJenaOntModel();
 	        if (editConfig.isParamUpdate()) { 
 	        	editConfig.prepareForParamUpdate(queryModel);
 	        	
@@ -224,7 +236,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
         if (editConfig.isParamUpdate()) { 
         	 //setup the model selectors for query, write and display models on editConfig
 	        setupModelSelectorsFromVitroRequest(vreq, editConfig);         
-	        OntModel queryModel = (OntModel)vreq.getAttribute("jenaOntModel");
+			OntModel queryModel = ModelAccess.on(vreq).getJenaOntModel();
         	retrieveExistingDataGetterInfo(context, editConfig, queryModel);
         }
 		
@@ -412,11 +424,17 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
     private HashMap<String, String> generateSparqlForExistingUris() {
     	HashMap<String, String> map = new HashMap<String, String>();
     	map.put("menuItem", getExistingMenuItemQuery());
+    	map.put("action", getExistingActionQuery());
     	return map;
     }
     
     private String getExistingMenuItemQuery() {
 		String query = getSparqlPrefix() + "SELECT ?menuItem WHERE {?menuItem display:toPage ?page .}";
+		return query;
+	}
+    
+    private String getExistingActionQuery() {
+		String query = getSparqlPrefix() + "SELECT ?action WHERE {?page display:requiresAction ?action .}";
 		return query;
 	}
 
@@ -507,7 +525,11 @@ private String getExistingIsSelfContainedTemplateQuery() {
 	private void addRequiredPageData(VitroRequest vreq, Map<String, Object> data) {
      	MenuManagementDataUtils.includeRequiredSystemData(vreq.getSession().getServletContext(), data);
     	data.put("classGroup", new ArrayList<String>());
-    	data.put("classGroups", DataGetterUtils.getClassGroups(vreq.getSession().getServletContext()));
+    	data.put("classGroups", DataGetterUtils.getClassGroups(vreq));
+    	//for solr individuals data get getter
+    	data.put("classes", this.getAllVClasses(vreq));
+    	data.put("availablePermissions", this.getAvailablePermissions(vreq));
+    	data.put("availablePermissionOrderedList", this.getAvailablePermissonsOrderedURIs());
 	}
 	
 	private void addExistingPageData(VitroRequest vreq, Map<String, Object> data) {
@@ -528,6 +550,31 @@ private String getExistingIsSelfContainedTemplateQuery() {
     	if(menuItemParam != null) {
     		data.put("addMenuItem", menuItemParam);
     	} 
+	}
+	
+	private HashMap<String, String> getAvailablePermissions(VitroRequest vreq) {
+		HashMap<String, String> availablePermissions = new HashMap<String, String>();
+		String actionNamespace = "java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#";
+		availablePermissions.put(actionNamespace + "PageViewableAdmin", I18n.text(vreq, "page_admin_permission_option"));
+		availablePermissions.put(actionNamespace + "PageViewableCurator", I18n.text(vreq,"page_curator_permission_option"));
+		availablePermissions.put(actionNamespace + "PageViewableEditor", I18n.text(vreq,"page_editor_permission_option"));
+		availablePermissions.put(actionNamespace + "PageViewableLoggedIn", I18n.text(vreq,"page_loggedin_permission_option"));
+		availablePermissions.put(actionNamespace + "PageViewablePublic", I18n.text(vreq,"page_public_permission_option"));
+		return availablePermissions;
+	}
+	
+	//To display the permissions in a specific order, we can't rely on the hashmap whose keys are not guaranteed to return in a specific order
+	//This is to allow the display to work correctly
+	private List<String> getAvailablePermissonsOrderedURIs() {
+		List<String> availablePermissionsOrdered = new ArrayList<String>();
+		String actionNamespace = "java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#";
+		availablePermissionsOrdered.add(actionNamespace + "PageViewableAdmin");
+		availablePermissionsOrdered.add(actionNamespace + "PageViewableCurator");
+		availablePermissionsOrdered.add(actionNamespace + "PageViewableEditor");
+		availablePermissionsOrdered.add(actionNamespace + "PageViewableLoggedIn");
+		availablePermissionsOrdered.add(actionNamespace + "PageViewablePublic");
+
+		return availablePermissionsOrdered;
 	}
 	
 	//N3 strings
@@ -562,6 +609,9 @@ private String getExistingIsSelfContainedTemplateQuery() {
 	
 	final static String menuN3 = "display:DefaultMenu display:hasElement ?menuItem .";
 	
+	//N3 that will assign a permission to a page
+	final static String permissionN3 = "?page display:requiresAction ?action .";
+	
 	//These are public static methods that can be used in the preprocessor
 	public final static String getDataGetterN3(String dataGetterVar) {
 		return prefixes + "?page display:hasDataGetter " + dataGetterVar + ".";
@@ -589,7 +639,8 @@ private String getExistingIsSelfContainedTemplateQuery() {
 		int maxMenuPosition = 0;
 		Literal menuPosition = null;
 		setupModelSelectorsFromVitroRequest(vreq, editConfig);         
-	    OntModel queryModel = (OntModel)vreq.getAttribute("jenaOntModel");
+		OntModel queryModel = ModelAccess.on(vreq).getJenaOntModel();
+
 		String maxMenuPositionQuery = getMaxMenuPositionQueryString();
     	QueryExecution qe = null;
         try{
@@ -619,5 +670,34 @@ private String getExistingIsSelfContainedTemplateQuery() {
 				"ORDER BY DESC(?menuPosition) LIMIT 1";
 		return query;
 	}
+	
+	//Get all vclasses for the list of vclasses for solr
+	//Originally considered using an ajax request to get the vclasses list which is fine for adding a new content type
+	//but for an existing solr content type, would need to make yet another ajax request which seems too much
+	private List<HashMap<String, String>> getAllVClasses(VitroRequest vreq) {
+		List<VClass> vclasses = new ArrayList<VClass>();     
+        VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
+        List<VClassGroup> groups = vcgc.getGroups();
+        for(VClassGroup vcg: groups) {
+             for( VClass vc : vcg){
+                 vclasses.add(vc);
+             }
+            
+        }
+       
+        //Sort vclass by name
+        Collections.sort(vclasses);
+		ArrayList<HashMap<String, String>> classes = new ArrayList<HashMap<String, String>>(vclasses.size());
+
+
+        for(VClass vc: vclasses) {
+        	HashMap<String, String> vcObj = new HashMap<String, String>();
+        	vcObj.put("name", vc.getName());
+        	vcObj.put("URI", vc.getURI());
+        	classes.add(vcObj);            
+        }
+        return classes;
+	}
+	
 	
 }

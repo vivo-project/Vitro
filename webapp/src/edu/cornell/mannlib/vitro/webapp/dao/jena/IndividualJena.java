@@ -78,6 +78,10 @@ public class IndividualJena extends IndividualImpl implements Individual {
             }
         }
     }
+    
+    public String getLabel() {
+        return getRdfsLabel();
+    }
 
     public String getRdfsLabel() {
         if (this.rdfsLabel != null) {
@@ -254,8 +258,8 @@ public class IndividualJena extends IndividualImpl implements Individual {
     			if (!s.getSubject().canAs(OntResource.class) || !s.getObject().canAs(OntResource.class)) {
     			    continue;	
     			}
-    			Individual subj = new IndividualJena((OntResource) s.getSubject().as(OntResource.class), webappDaoFactory);
-    			Individual obj = new IndividualJena((OntResource) s.getObject().as(OntResource.class), webappDaoFactory);
+    			Individual subj = new IndividualJena(s.getSubject().as(OntResource.class), webappDaoFactory);
+    			Individual obj = new IndividualJena(s.getObject().as(OntResource.class), webappDaoFactory);
     			ObjectProperty op = webappDaoFactory.getObjectPropertyDao().getObjectPropertyByURI(s.getPredicate().getURI());
     			if (subj != null && obj != null && op != null) {
     				ObjectPropertyStatement ops = new ObjectPropertyStatementImpl();
@@ -287,7 +291,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
     	    	RDFNode value = values.nextNode();
     	    	if (value.canAs(OntResource.class)) {
         	    	relatedIndividuals.add(
-        	    		new IndividualJena((OntResource) value.as(OntResource.class), webappDaoFactory) );  
+        	    		new IndividualJena(value.as(OntResource.class), webappDaoFactory) );  
         	    } 
     	    }
     	} finally {
@@ -305,7 +309,7 @@ public class IndividualJena extends IndividualImpl implements Individual {
     	try {
     	    RDFNode value = ind.getPropertyValue(ind.getModel().getProperty(propertyURI));
     	    if (value != null && value.canAs(OntResource.class)) {
-    	    	return new IndividualJena((OntResource) value.as(OntResource.class), webappDaoFactory);  
+    	    	return new IndividualJena(value.as(OntResource.class), webappDaoFactory);  
     	    } else {
     	    	return null;
     	    }
@@ -582,11 +586,11 @@ public class IndividualJena extends IndividualImpl implements Individual {
                     int rv = 0;
                     try {
                         if( val1 instanceof String )
-                        	rv = collator.compare( ((String)val1) , ((String)val2) );
+                        	rv = collator.compare(val1 , val2);
                             //rv = ((String)val1).compareTo((String)val2);
                         else if( val1 instanceof Date ) {
-                            DateTime dt1 = new DateTime((Date)val1);
-                            DateTime dt2 = new DateTime((Date)val2);
+                            DateTime dt1 = new DateTime(val1);
+                            DateTime dt2 = new DateTime(val2);
                             rv = dt1.compareTo(dt2);
                         }
                         else

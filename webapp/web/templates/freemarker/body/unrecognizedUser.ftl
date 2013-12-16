@@ -3,13 +3,12 @@
 <#-- Template for the Unrecognized User page. -->
 
 <section role="region">
-    <h2>Unrecognized user</h2>
+    <h2>${i18n().unrecognized_user}</h2>
     
     <p>
-      For some reason, there is no individual in VIVO that is associated with your Net ID. 
-      Perhaps you should contact your VIVO administrator.
+      ${i18n().no_individual_associated_with_id}
     </p>
 
     <br/>
-    <a href="${urls.home}" title="continue">Continue</a>
+    <a href="${urls.home}" title="${i18n().continue}">${i18n().continue}</a>
 </section>

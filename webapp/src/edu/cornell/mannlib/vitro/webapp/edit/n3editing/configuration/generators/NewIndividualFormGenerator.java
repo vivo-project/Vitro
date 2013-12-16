@@ -10,13 +10,14 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
@@ -239,7 +240,7 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
 
 	private void prepareForUpdate(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
     	//Here, retrieve model from 
-    	Model model = (Model) session.getServletContext().getAttribute("jenaOntModel");
+		OntModel model = ModelAccess.on(session.getServletContext()).getJenaOntModel();
     	//This form is always doing a non-update
     	editConfiguration.prepareForNonUpdate( model );
 	      

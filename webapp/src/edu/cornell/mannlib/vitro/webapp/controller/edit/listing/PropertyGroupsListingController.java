@@ -43,11 +43,11 @@ public class PropertyGroupsListingController extends BaseEditController {
     	
         VitroRequest vreq = new VitroRequest(request);
 
-        PropertyGroupDao dao = vreq.getFullWebappDaoFactory().getPropertyGroupDao();
+        PropertyGroupDao dao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 
         List<PropertyGroup> groups = dao.getPublicGroups(WITH_PROPERTIES);
         
-        Comparator<Property> comparator = new PropertySorter();
+        Comparator<Property> comparator = new PropertySorter(vreq.getCollator());
 
         List<String> results = new ArrayList<String>();
         results.add("XX");
@@ -138,7 +138,11 @@ public class PropertyGroupsListingController extends BaseEditController {
     
     private class PropertySorter implements Comparator<Property> {
     	
-    	private Collator coll = Collator.getInstance();
+        Collator collator;
+        
+        public PropertySorter(Collator collator) {
+            this.collator = collator;
+        }
     	
     	public int compare(Property p1, Property p2) {
     		String name1 = getName(p1);
@@ -150,7 +154,7 @@ public class PropertyGroupsListingController extends BaseEditController {
     		} else if (name1 == null && name2 == null) {
     			return 0;
     		}
-    		return coll.compare(name1, name2);
+    		return collator.compare(name1, name2);
     	}
     	
     	private String getName(Property prop) {

@@ -2,10 +2,15 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntClass;
+import com.hp.hpl.jena.ontology.UnionClass;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -69,51 +74,28 @@ public class VClassJena extends VClass {
         }
     }
     
+    @Override 
+    public String getLabel() {
+        return getName();
+    }
+    
     @Override
-    public String getLocalNameWithPrefix() {
-    	
+    public String getLocalNameWithPrefix() { 	
         if (this.localNameWithPrefix != null) {
             return localNameWithPrefix;
         } else {
-            cls.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                VClassDao vClassDao = webappDaoFactory.getVClassDao();
-                
-                if (vClassDao instanceof VClassDaoJena) {
-                	this.localNameWithPrefix = ((VClassDaoJena) vClassDao).getLabelForClass(cls,true,false);
-                } else {
-                    log.error("WebappDaoFactory returned a type of " + vClassDao.getClass().getName() + ". Expected  VClassDaoJena");
-                    this.localNameWithPrefix = webappDaoFactory.getJenaBaseDao().getLabelOrId(cls);
-                }
-                      
-                return this.localNameWithPrefix;
-            } finally {
-                cls.getOntModel().leaveCriticalSection();
-            }
+            this.localNameWithPrefix = webappDaoFactory.makeLocalNameWithPrefix(this);
+            return this.localNameWithPrefix;
         }
     }
     
     @Override
     public String getPickListName() {
-    	
         if (this.pickListName != null) {
             return pickListName;
         } else {
-            cls.getOntModel().enterCriticalSection(Lock.READ);
-            try {
-                VClassDao vClassDao = webappDaoFactory.getVClassDao();
-                
-                if (vClassDao instanceof VClassDaoJena) {
-                	this.pickListName = ((VClassDaoJena) vClassDao).getLabelForClass(cls,false,true);
-                } else {
-                    log.error("WebappDaoFactory returned a type of " + vClassDao.getClass().getName() + ". Expected  VClassDaoJena");
-                    this.pickListName = webappDaoFactory.getJenaBaseDao().getLabelOrId(cls);
-                }
-                                      
-                return this.pickListName;
-            } finally {
-                cls.getOntModel().leaveCriticalSection();
-            }
+            this.pickListName = webappDaoFactory.makePickListName(this);
+            return this.pickListName;
         }
     }
 
@@ -324,7 +306,7 @@ public class VClassJena extends VClass {
                     Statement stmt = it.nextStatement();
                     RDFNode obj;
                     if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                        Resource res = (Resource)obj.as(Resource.class);
+                        Resource res = obj.as(Resource.class);
                         if( res != null && res.getURI() != null ){
                             BaseResourceBean.RoleLevel roleFromModel = BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
                             if( roleFromModel != null && 
@@ -358,7 +340,7 @@ public class VClassJena extends VClass {
                     Statement stmt = it.nextStatement();
                     RDFNode obj;
                     if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
-                        Resource res = (Resource)obj.as(Resource.class);
+                        Resource res = obj.as(Resource.class);
                         if( res != null && res.getURI() != null ){
                             BaseResourceBean.RoleLevel roleFromModel = BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
                             if( roleFromModel != null && 
@@ -376,4 +358,27 @@ public class VClassJena extends VClass {
             }
         }		 	                      
     }
+    
+    @Override
+    public boolean isUnion() {
+        return this.cls.isUnionClass();
+    }
+    
+    //TODO consider anonymous components
+    @Override
+    public List<VClass> getUnionComponents() {
+        List<VClass> unionComponents = new ArrayList<VClass>();
+        if (isUnion()) {
+            UnionClass union = this.cls.as(UnionClass.class);
+            Iterator<? extends OntClass> opIt = union.listOperands();
+            while(opIt.hasNext()) {
+                OntClass component = opIt.next();
+                if (!component.isAnon()) {
+                    unionComponents.add(new VClassJena(component, this.webappDaoFactory));  
+                }
+            }
+        }
+        return unionComponents;
+    }
+    
 }

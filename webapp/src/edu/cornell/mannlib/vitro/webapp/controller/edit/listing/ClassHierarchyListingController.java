@@ -27,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
@@ -52,10 +53,10 @@ public class ClassHierarchyListingController extends BaseEditController {
         try {
         boolean inferred = (vrequest.getParameter("inferred") != null);
         
-        if (vrequest.getAssertionsWebappDaoFactory() != null && !inferred) {
-        	vcDao = vrequest.getAssertionsWebappDaoFactory().getVClassDao();
+        if (!inferred) {
+        	vcDao = ModelAccess.on(vrequest).getBaseWebappDaoFactory().getVClassDao();
         } else {
-        	vcDao = vrequest.getFullWebappDaoFactory().getVClassDao();
+        	vcDao = vrequest.getUnfilteredWebappDaoFactory().getVClassDao();
         }
 
         ArrayList<String> results = new ArrayList<String>();
@@ -85,7 +86,7 @@ public class ClassHierarchyListingController extends BaseEditController {
         
         if (roots.isEmpty()) {
         	roots = new LinkedList<VClass>();
-        	roots.add(vrequest.getFullWebappDaoFactory().getVClassDao()
+        	roots.add(vrequest.getUnfilteredWebappDaoFactory().getVClassDao()
         			.getTopConcept());
         }
         
@@ -95,13 +96,13 @@ public class ClassHierarchyListingController extends BaseEditController {
         if (!rootIt.hasNext()) {
             VClass vcw = new VClass();
             vcw.setName("<strong>No classes found.</strong>");
-            results.addAll(addVClassDataToResultsList(vrequest.getFullWebappDaoFactory(), vcw,0,ontologyUri));
+            results.addAll(addVClassDataToResultsList(vrequest.getUnfilteredWebappDaoFactory(), vcw,0,ontologyUri));
         } else {
             while (rootIt.hasNext()) {
                 VClass root = (VClass) rootIt.next();
 	            if (root != null) {
 	                ArrayList childResults = new ArrayList();
-	                addChildren(vrequest.getFullWebappDaoFactory(), root, childResults, 0, ontologyUri);
+	                addChildren(vrequest.getUnfilteredWebappDaoFactory(), root, childResults, 0, ontologyUri);
 	                results.addAll(childResults);
                 }
             }
@@ -200,9 +201,9 @@ public class ClassHierarchyListingController extends BaseEditController {
             Integer numCols = (NUM_COLS-1)-position;
 
             try {
-                numCols = addColToResults(((vcw.getLocalNameWithPrefix() == null) ? "" : "<a href=\"vclassEdit?uri="+URLEncoder.encode(vcw.getURI(),"UTF-8")+"\">"+vcw.getLocalNameWithPrefix()+"</a>"), results, numCols);
+                numCols = addColToResults(((vcw.getPickListName() == null) ? "" : "<a href=\"vclassEdit?uri="+URLEncoder.encode(vcw.getURI(),"UTF-8")+"\">"+vcw.getPickListName()+"</a>"), results, numCols);
             } catch (Exception e) {
-                numCols = addColToResults(((vcw.getLocalNameWithPrefix() == null) ? "" : vcw.getLocalNameWithPrefix()), results, numCols); // column 2
+                numCols = addColToResults(((vcw.getPickListName() == null) ? "" : vcw.getPickListName()), results, numCols); // column 2
             }
             numCols = addColToResults(((vcw.getShortDef() == null) ? "" : vcw.getShortDef()), results, numCols); // column 3
             numCols = addColToResults(((vcw.getExample() == null) ? "" : vcw.getExample()), results, numCols); // column 4

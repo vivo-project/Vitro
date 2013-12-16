@@ -12,6 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractDataPropertyStatementAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyStatementAction;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
 /**
  * Is the user authorized to edit properties that are marked as restricted to a
@@ -78,9 +79,9 @@ public class EditByRolePermission extends Permission {
 	 */
 	private boolean isAuthorized(AbstractDataPropertyStatementAction action) {
 		String subjectUri = action.getSubjectUri();
-		String predicateUri = action.getPredicateUri();
+		Property predicate = action.getPredicate();
 		return canModifyResource(subjectUri)
-				&& canModifyPredicate(predicateUri);
+				&& canModifyPredicate(predicate);
 	}
 
 	/**
@@ -89,10 +90,10 @@ public class EditByRolePermission extends Permission {
 	 */
 	private boolean isAuthorized(AbstractObjectPropertyStatementAction action) {
 		String subjectUri = action.getSubjectUri();
-		String predicateUri = action.getPredicateUri();
+		Property predicate = action.getPredicate();
 		String objectUri = action.getObjectUri();
 		return canModifyResource(subjectUri)
-				&& canModifyPredicate(predicateUri)
+				&& canModifyPredicate(predicate)
 				&& canModifyResource(objectUri);
 	}
 
@@ -101,9 +102,9 @@ public class EditByRolePermission extends Permission {
 				resourceUri, roleLevel);
 	}
 
-	private boolean canModifyPredicate(String predicateUri) {
+	private boolean canModifyPredicate(Property predicate) {
 		return PropertyRestrictionPolicyHelper.getBean(ctx).canModifyPredicate(
-				predicateUri, roleLevel);
+				predicate, roleLevel);
 	}
 
 	@Override

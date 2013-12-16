@@ -27,14 +27,12 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
 public class OntologyController extends VitroHttpServlet{
     private static final Log log = LogFactory.getLog(OntologyController.class.getName());
-    
-    private String default_jsp      = Controllers.BASIC_JSP;
-    private ApplicationBean appBean;
     
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 	throws ServletException,IOException{
@@ -130,12 +128,7 @@ public class OntologyController extends VitroHttpServlet{
 	     String url = ontology;
 	     
 	    		
-		OntModel ontModel = null;
-		HttpSession session = vreq.getSession(false);
-		if( session != null )
-			ontModel =(OntModel)session.getAttribute("jenaOntModel");		
-		if( ontModel == null)
-			ontModel = (OntModel)getServletContext().getAttribute("jenaOntModel");
+		OntModel ontModel = ModelAccess.on(vreq.getSession()).getJenaOntModel();
 
         boolean found = false;
         Model newModel = ModelFactory.createDefaultModel();			
@@ -242,7 +235,7 @@ public class OntologyController extends VitroHttpServlet{
     throws IOException, ServletException {
         VitroRequest vreq = new VitroRequest(req);
         
-        ApplicationBean appBean = ApplicationBean.getAppBean(getServletContext());
+        ApplicationBean appBean = vreq.getAppBean();
 
         //set title before we do the highlighting so we don't get markup in it.
         req.setAttribute("title","not found");

@@ -1,8 +1,9 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.ModelAccess"%>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
@@ -21,7 +22,7 @@
     		"    FILTER(afn:bnode(?bnode) = \"" + conceptIdStr + "\")\n" +
     	    "}";
     	    
-    	OntModel ontModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+    	OntModel ontModel = ModelAccess.on(getServletContext()).getBaseOntModel();
     	Model conceptDescription = ModelFactory.createDefaultModel();
     	try {
     		ontModel.enterCriticalSection(Lock.READ);

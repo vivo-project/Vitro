@@ -6,6 +6,7 @@ import javax.servlet.ServletContext;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundleFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -24,16 +25,7 @@ public abstract class BaseIdentifierBundleFactory implements
 			throw new NullPointerException("ctx may not be null.");
 		}
 		this.ctx = ctx;
-
-		Object wdfObject = ctx.getAttribute("webappDaoFactory");
-		if (wdfObject instanceof WebappDaoFactory) {
-			this.wdf = (WebappDaoFactory) wdfObject;
-		} else {
-			throw new IllegalStateException(
-					"Didn't find a WebappDaoFactory in the context. Found '"
-							+ wdfObject + "' instead.");
-		}
-
+		this.wdf = ModelAccess.on(ctx).getWebappDaoFactory();
 		this.uaDao = wdf.getUserAccountsDao();
 		this.indDao = wdf.getIndividualDao();
 	}

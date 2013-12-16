@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
@@ -58,7 +59,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             postprocess(statementData);
             
             /* Collate the data */
-           subclasses = collate(subjectUri, propertyUri, statementData, editing);
+           subclasses = collate(subjectUri, op, statementData, editing);
             
            for (SubclassTemplateModel subclass : subclasses) {
                List<ObjectPropertyStatementTemplateModel> list = subclass.getStatements();
@@ -188,7 +189,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
     }
     
     // Collate the statements by subclass. 
-    private List<SubclassTemplateModel> collate(String subjectUri, String propertyUri,
+    private List<SubclassTemplateModel> collate(String subjectUri, ObjectProperty property,
             List<Map<String, String>> statementData, boolean editing) {
   
         String objectKey = getObjectKey();
@@ -218,7 +219,7 @@ public class CollatedObjectPropertyTemplateModel extends ObjectPropertyTemplateM
             }
 
             listForThisSubclass.add(new ObjectPropertyStatementTemplateModel(subjectUri, 
-                    propertyUri, objectKey, map, getTemplateName(), vreq));
+                    property, objectKey, map, getTemplateName(), vreq));
 
         } 
         

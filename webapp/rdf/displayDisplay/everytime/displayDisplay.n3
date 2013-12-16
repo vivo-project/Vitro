@@ -1,0 +1,28 @@
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> .
+
+rdf:type 
+      a owl:ObjectProperty ;
+      rdfs:label "RDF Type"@en-US ;
+      rdfs:range owl:Class;                   
+      <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#customEntryFormAnnot>
+         "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RdfTypeGenerator"^^xsd:string ;                             
+      <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#offerCreateNewOptionAnnot>
+              "true"^^xsd:boolean ;
+      <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#selectFromExistingAnnot>
+              "true"^^xsd:boolean .  
+              
+              
+display:requiresAction
+      a owl:ObjectProperty ;
+      rdfs:label "Required Action"@en-US ;
+      rdfs:comment "Indicates that a resource has a required action that may need to be authorized" ;
+      rdfs:range display:RequiredAction ;
+      <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#offerCreateNewOptionAnnot>
+              "true"^^xsd:boolean ;
+      <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#selectFromExistingAnnot>
+              "true"^^xsd:boolean .
+      

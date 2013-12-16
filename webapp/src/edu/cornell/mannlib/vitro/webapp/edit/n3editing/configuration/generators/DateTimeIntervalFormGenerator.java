@@ -39,7 +39,17 @@ public class DateTimeIntervalFormGenerator extends
 	public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq,
 			HttpSession session) {
         EditConfigurationVTwo conf = new EditConfigurationVTwo();
+        this.setupEditConfiguration(conf, vreq, session);
+        //Prepare
+        prepare(vreq, conf);
+        return conf;
         
+	}
+	
+	//Enables refactoring by other generators, as this code can be used to partially setup an 
+	//edit configuration object which can then be extended - prepare can then be called independently
+	//enabling sparql queries to be evaluated using the final edit configuration object
+	public void setupEditConfiguration(EditConfigurationVTwo conf, VitroRequest vreq, HttpSession session) {
         initBasics(conf, vreq);
         initPropertyParameters(vreq, session, conf);
         initObjectPropForm(conf, vreq);               
@@ -48,11 +58,11 @@ public class DateTimeIntervalFormGenerator extends
         
         conf.setVarNameForSubject("subject");
         conf.setVarNameForPredicate("toDateTimeInterval");
-        conf.setVarNameForObject("intervalNode");
+        conf.setVarNameForObject(getNodeVar());
         
-        conf.setN3Optional(Arrays.asList(n3ForStart, n3ForEnd));
+        conf.setN3Optional(n3ForStart, n3ForEnd);
         
-        conf.addNewResource("intervalNode", DEFAULT_NS_FOR_NEW_RESOURCE);
+        conf.addNewResource(getNodeVar(), DEFAULT_NS_FOR_NEW_RESOURCE);
         conf.addNewResource("startNode", DEFAULT_NS_FOR_NEW_RESOURCE);
         conf.addNewResource("endNode", DEFAULT_NS_FOR_NEW_RESOURCE);
         
@@ -60,8 +70,7 @@ public class DateTimeIntervalFormGenerator extends
         		"startField-value", existingStartDateQuery);
         conf.addSparqlForExistingLiteral(
         		"endField-value", existingEndDateQuery);
-        conf.addSparqlForExistingUris(
-        		"intervalNode", existingIntervalNodeQuery);
+        
         conf.addSparqlForExistingUris("startNode", existingStartNodeQuery);
         conf.addSparqlForExistingUris("endNode", existingEndNodeQuery);
         conf.addSparqlForExistingUris(
@@ -82,82 +91,86 @@ public class DateTimeIntervalFormGenerator extends
         conf.addField(startField);
         conf.addField(endField);
         //Need to add validators
-        conf.addValidator(new DateTimeIntervalValidationVTwo("startField","endField"));
+        conf.addValidator(new DateTimeIntervalValidationVTwo("startField","endField","dateTimeIntervalForm.ftl"));
         //Adding additional data, specifically edit mode
         addFormSpecificData(conf, vreq);
-        //Prepare
-        prepare(vreq, conf);
-        return conf;
-        
 	}
 	
-	final static String n3ForStart = 
-	    "?subject <" + toDateTimeInterval + "> ?intervalNode . \n" +    
-	    "?intervalNode  a <" + intervalType + "> . \n" + 
-	    "?intervalNode <" + intervalToStart + "> ?startNode . \n" +    
+	final String n3ForStart = 
+	    "?subject <" + getToDateTimeIntervalPredicate() + "> " + getNodeN3Var() + " . \n" +    
+	    getNodeN3Var() + "  a <" + intervalType + "> . \n" + 
+	    getNodeN3Var() + " <" + intervalToStart + "> ?startNode . \n" +    
 	    "?startNode a <" + dateTimeValueType + "> . \n" +
 	    "?startNode  <" + dateTimeValue + "> ?startField-value . \n" +
 	    "?startNode  <" + dateTimePrecision + "> ?startField-precision . \n";
 	
-	final static String n3ForEnd = 
-        "?subject <" + toDateTimeInterval + "> ?intervalNode . \n" +       
-        "?intervalNode a <" + intervalType + "> . \n" +
-        "?intervalNode <" + intervalToEnd + "> ?endNode . \n" +
+	final  String n3ForEnd = 
+        "?subject <" + getToDateTimeIntervalPredicate() + "> " + getNodeN3Var() + " . \n" +       
+        getNodeN3Var() + " a <" + intervalType + "> . \n" +
+        getNodeN3Var() + " <" + intervalToEnd + "> ?endNode . \n" +
         "?endNode a <" + dateTimeValueType + "> . \n" +
         "?endNode  <" + dateTimeValue + "> ?endField-value . \n" +
         "?endNode  <" + dateTimePrecision + "> ?endField-precision .";
 	
-	final static String existingStartDateQuery =
+	final  String existingStartDateQuery =
         "SELECT ?existingDateStart WHERE { \n" +     
-        "?subject <" + toDateTimeInterval + "> ?existingIntervalNode . \n" +     
-        "?intervalNode a <" + intervalType + "> . \n" +
-        "?intervalNode <" + intervalToStart + "> ?startNode . \n" +
+        "?subject <" + getToDateTimeIntervalPredicate() + "> " + getNodeN3Var() + " . \n" +     
+        getNodeN3Var() + " a <" + intervalType + "> . \n" +
+        getNodeN3Var() + " <" + intervalToStart + "> ?startNode . \n" +
         "?startNode a <" + dateTimeValueType + "> . \n" +
         "?startNode <" + dateTimeValue + "> ?existingDateStart }";
 
-	final static String existingEndDateQuery = 
+	final  String existingEndDateQuery = 
         "SELECT ?existingEndDate WHERE { \n" +
-        "?subject <" + toDateTimeInterval + "> ?existingIntervalNode . \n" +
-        "?intervalNode a <" + intervalType + "> . \n" +
-        "?intervalNode <" + intervalToEnd + "> ?endNode . \n" +
+        "?subject <" + getToDateTimeIntervalPredicate() + "> " + getNodeN3Var() + " . \n" +
+        getNodeN3Var() + " a <" + intervalType + "> . \n" +
+        getNodeN3Var() + " <" + intervalToEnd + "> ?endNode . \n" +
         "?endNode a <" + dateTimeValueType + "> . \n " +
         "?endNode <" + dateTimeValue + "> ?existingEndDate . }";
 	
-	final static String existingIntervalNodeQuery = 
-        "SELECT ?existingIntervalNode WHERE { \n" +
-        "?subject <" + toDateTimeInterval + "> ?existingIntervalNode . \n" +
-        "?existingIntervalNode a <" + intervalType + "> . }";
 	
-	final static String existingStartNodeQuery =
+	final  String existingStartNodeQuery =
 		"SELECT ?existingStartNode WHERE { \n" +
-        "?subject <" + toDateTimeInterval + "> ?existingIntervalNode . \n" +
-        "?intervalNode a <" + intervalType + "> . \n" +
-        "?intervalNode <" + intervalToStart + "> ?existingStartNode . \n" + 
+        "?subject <" + getToDateTimeIntervalPredicate() + "> " + getNodeN3Var() + " . \n" +
+        getNodeN3Var() + " a <" + intervalType + "> . \n" +
+        getNodeN3Var() + " <" + intervalToStart + "> ?existingStartNode . \n" + 
         "?existingStartNode a <" + dateTimeValueType + "> .}  ";
 	
-	final static String existingEndNodeQuery = 
+	final  String existingEndNodeQuery = 
         "SELECT ?existingEndNode WHERE { \n" + 
-        "?subject <" + toDateTimeInterval + "> ?existingIntervalNode . \n" +
-        "?intervalNode a <" + intervalType + "> . \n" +
-        "?intervalNode <" + intervalToEnd + "> ?existingEndNode . \n" + 
+        "?subject <" + getToDateTimeIntervalPredicate() + "> " + getNodeN3Var() + " . \n" +
+        getNodeN3Var() + " a <" + intervalType + "> . \n" +
+        getNodeN3Var() + " <" + intervalToEnd + "> ?existingEndNode . \n" + 
         "?existingEndNode a <" + dateTimeValueType + "> .} ";
 	
-	final static String existingStartPrecisionQuery = 
+	final  String existingStartPrecisionQuery = 
         "SELECT ?existingStartPrecision WHERE { \n" +    
-        "?subject <" + toDateTimeInterval + "> ?existingIntervalNode . \n" +      
-        "?intervalNode a <" + intervalType + "> . \n" +
-        "?intervalNode <" + intervalToStart + "> ?startNode . \n" +
+        "?subject <" + getToDateTimeIntervalPredicate() + "> " + getNodeN3Var() + " . \n" +      
+        getNodeN3Var() + " a <" + intervalType + "> . \n" +
+        getNodeN3Var() + " <" + intervalToStart + "> ?startNode . \n" +
         "?startNode a <" + dateTimeValueType + "> . \n" +          
         "?startNode <" + dateTimePrecision + "> ?existingStartPrecision . }";
 	
-	final static String existingEndPrecisionQuery =
+	final  String existingEndPrecisionQuery =
 		"SELECT ?existingEndPrecision WHERE { \n" +
-        "?subject <" + toDateTimeInterval + "> ?existingIntervalNode . \n" +      
-        "?intervalNode a <" + intervalType + "> . \n" +
-        "?intervalNode <" + intervalToEnd + "> ?endNode . \n" +
+        "?subject <" + getToDateTimeIntervalPredicate() + "> " + getNodeN3Var() + " . \n" +      
+        getNodeN3Var() + " a <" + intervalType + "> . \n" +
+        getNodeN3Var() + " <" + intervalToEnd + "> ?endNode . \n" +
         "?endNode a <" + dateTimeValueType + "> . \n" +          
         "?endNode <" + dateTimePrecision + "> ?existingEndPrecision . }";
 
+	public  String getToDateTimeIntervalPredicate() {
+		return toDateTimeInterval;
+	}
+	
+	public  String getNodeVar() {
+		return "intervalNode";
+	}
+	
+	public  String getNodeN3Var() {
+		return "?" + getNodeVar();
+	}
+	
     //Adding form specific data such as edit mode
     public void addFormSpecificData(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
     	HashMap<String, Object> formSpecificData = new HashMap<String, Object>();

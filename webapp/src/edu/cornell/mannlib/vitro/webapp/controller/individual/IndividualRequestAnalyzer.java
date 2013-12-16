@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.individual;
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet.N3_MIMETYPE;
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet.RDFXML_MIMETYPE;
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet.TTL_MIMETYPE;
+import static edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet.JSON_MIMETYPE;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -27,10 +28,9 @@ public class IndividualRequestAnalyzer {
 			.getLog(IndividualRequestAnalyzer.class);
 	
 	
-	private static Pattern RDF_REQUEST = Pattern.compile("^/individual/([^/]+)/\\1\\.(rdf|n3|ttl)$");
+	private static Pattern RDF_REQUEST = Pattern.compile("^/individual/([^/]+)/\\1\\.(rdf|n3|ttl|jsonld)$");
     private static Pattern HTML_REQUEST = Pattern.compile("^/display/([^/]+)$");
 	private static Pattern LINKED_DATA_URL = Pattern.compile("^/individual/([^/]+)$");		
-	private static Pattern NS_PREFIX_URL = Pattern.compile("^/individual/([^/]*)/([^/]+)$");
 	
 	private final VitroRequest vreq;
 	private final IndividualRequestAnalysisContext analysisContext;
@@ -118,7 +118,9 @@ public class IndividualRequestAnalyzer {
 				return "/individual/" + m.group(1) + "/" + m.group(1) + ".n3";
 			} else if (TTL_MIMETYPE.equals(mediaType)) {
 				return "/individual/" + m.group(1) + "/" + m.group(1) + ".ttl";
-			}
+			} else if (JSON_MIMETYPE.equals(mediaType)){
+                return "/individual/" + m.group(1) + "/" + m.group(1) + ".jsonld";
+            }
 		}
 		// or redirect to the canonical URL for HTML representation.
 		return "/display/" + m.group(1);
@@ -130,10 +132,11 @@ public class IndividualRequestAnalyzer {
 	 * only provide a set of bytes.
 	 */
 	protected ContentType checkAcceptHeaderForLinkedDataRequest() {
-		String acceptHeader = vreq.getHeader("accept");
-		if (acceptHeader == null) {
-			return null;
-		}
+		String acceptHeader = vreq.getHeader("Accept");
+		if (acceptHeader == null) 
+		    acceptHeader = vreq.getHeader("accept");		   
+		if (acceptHeader == null)
+			return null;		
 	
 		try {
 			Map<String, Float> typesAndQ = ContentType
@@ -142,7 +145,7 @@ public class IndividualRequestAnalyzer {
 					IndividualController.ACCEPTED_CONTENT_TYPES);
 	
 			if (RDFXML_MIMETYPE.equals(ctStr) || N3_MIMETYPE.equals(ctStr)
-					|| TTL_MIMETYPE.equals(ctStr)) {
+					|| TTL_MIMETYPE.equals(ctStr) || JSON_MIMETYPE.equals(ctStr)) {
 				return new ContentType(ctStr);
 			}
 		} catch (Throwable th) {
@@ -164,7 +167,7 @@ public class IndividualRequestAnalyzer {
 	 *     /individual/localname/localname.rdf
 	 *     /individual/localname/localname.n3
 	 *     /individual/localname/localname.ttl
-	 *     /individual/nsprefix/localname
+	 *     /individual/localname/localname.jsonld
 	 * </pre>
 	 * 
 	 * @return null on failure.
@@ -200,14 +203,6 @@ public class IndividualRequestAnalyzer {
 			Matcher rdfMatch = RDF_REQUEST.matcher(url);
 			if (rdfMatch.matches() && rdfMatch.groupCount() == 2) {
 				return getIndividualByLocalname(rdfMatch.group(1));
-			}
-	
-			// Does the URL look like a namespace prefix followed by a local
-			// name?
-			Matcher prefix_match = NS_PREFIX_URL.matcher(url);
-			if (prefix_match.matches() && prefix_match.groupCount() == 2) {
-				return getIndividualByPrefixAndLocalname(prefix_match.group(1),
-						prefix_match.group(2));
 			}
 	
 			// Couldn't match it to anything.
@@ -254,12 +249,16 @@ public class IndividualRequestAnalyzer {
 		if (formatParam.contains("ttl")) {
 			return ContentType.TURTLE;
 		}
-
+        if (formatParam.contains("jsonld") || formatParam.contains("json")){
+            return ContentType.JSON;
+        }
+                
 		/*
 		 * Check for parts of URL that indicate request for RDF. Examples:
 		 * http://vivo.cornell.edu/individual/n23/n23.rdf
 		 * http://vivo.cornell.edu/individual/n23/n23.n3
 		 * http://vivo.cornell.edu/individual/n23/n23.ttl
+		 * http://vivo.cornell.edu/individual/n23/n23.jsonld
 		 */
 		Matcher rdfMatch = RDF_REQUEST.matcher(url);
 		if (rdfMatch.matches() && rdfMatch.groupCount() == 2) {
@@ -272,6 +271,9 @@ public class IndividualRequestAnalyzer {
 			}
 			if ("ttl".equals(rdfType)) {
 				return ContentType.TURTLE;
+			}
+			if ("jsonld".equals(rdfType)) {
+				return ContentType.JSON;
 			}
 		}
 
@@ -297,12 +299,6 @@ public class IndividualRequestAnalyzer {
 		String defaultNamespace = analysisContext.getDefaultNamespace();
 		String uri = defaultNamespace + localname;
 		return getIndividualByUri(uri);
-	}
-
-	private Individual getIndividualByPrefixAndLocalname(String prefix,
-			String localName) {
-		String ns = analysisContext.getNamespaceForPrefix(prefix);
-		return getIndividualByUri(ns + localName);
 	}
 
 	private Individual getIndividualByNetId(String netId) {

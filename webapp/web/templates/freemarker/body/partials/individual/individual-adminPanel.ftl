@@ -6,18 +6,18 @@
 
 <#if individual.showAdminPanel>
     <section id="admin">
-        <h3>Admin Panel</h3><a class="edit-individual" href="${individual.controlPanelUrl()}" title="edit this individual">Edit this individual</a>
+        <h3 id="adminPanel">${i18n().admin_panel}</h3><a class="edit-individual" href="${individual.controlPanelUrl()}" title="${i18n().edit_this_individual}">${i18n().edit_this_individual}</a>
         
         <section id = "verbose-mode">
         <#if verbosePropertySwitch?has_content>
             <#assign anchorId = "verbosePropertySwitch">
-            <#assign currentValue = verbosePropertySwitch.currentValue?string("on", "off")>
-            <#assign newValue = verbosePropertySwitch.currentValue?string("off", "on")>
-            <span>Verbose property display is <b>${currentValue}</b> | </span>
-            <a id="${anchorId}" class="verbose-toggle small" href="${verbosePropertySwitch.url}#${anchorId}" title="verbose control">Turn ${newValue}</a>
+            <#assign currentValue = verbosePropertySwitch.currentValue?string("${i18n().verbose_status_on}", "${i18n().verbose_status_off}")>
+            <#assign newValue = verbosePropertySwitch.currentValue?string("${i18n().verbose_status_off}", "${i18n().verbose_status_on}")>
+            <span>${i18n().verbose_property_status} <b>${currentValue}</b> | </span>
+            <a id="${anchorId}" class="verbose-toggle small" href="${verbosePropertySwitch.url}" title="${i18n().verbose_control}"><#if verbosePropertySwitch.currentValue!>${i18n().verbose_turn_off}<#else>${i18n().verbose_turn_on}</#if></a>
         </#if> 
         </section>
 
-        <p class="uri-link">Resource URI: <a href="${individual.uri}" target="_blank" title="resource uri">${individual.uri}</a></p>
+        <p class="uri-link">${i18n().resource_uri}: <a href="${individual.uri}" target="_blank" title="${i18n().resource_uri}">${individual.uri}</a></p>
     </section>
 </#if>

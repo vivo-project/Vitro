@@ -48,6 +48,7 @@ public class DisplayVocabulary {
     public static final String ITEM_TO_PAGE = NS + "toPage";
     public static final String HAS_ELEMENT = NS + "hasElement";
     public static final String USES_DATAGETTER_CLASS = NS + "usesDataGetterClass";
+    public static final String REQUIRES_ACTIONS = NS + "requiresAction";
 
     /**Data Getter object properties **/
     public static final String HAS_DATA_GETTER = NS + "hasDataGetter";
@@ -115,13 +116,6 @@ public class DisplayVocabulary {
     public static final String USE_TBOX_MODEL_PARAM = "useThisTboxModel";
     public static final String USE_DISPLAY_MODEL_PARAM = "useThisDisplayModel";
     
-    //Attribute values used to store display tbox/display display model in servlet context
-    public static final String CONTEXT_DISPLAY_TBOX = "displayOntModelTBOX";
-    public static final String CONTEXT_DISPLAY_DISPLAY = "displayOntModelDisplayModel";
-    
-    /** Key for display model in request, session or context attributes */
-    public static final String DISPLAY_ONT_MODEL = "displayOntModel";
-    
     //URL for menu management
     public static final String PROCESS_MENU_MANAGEMENT_URL = "/menuManagementEdit";
     public static final String REORDER_MENU_URL = PROCESS_MENU_MANAGEMENT_URL + "?cmd=Reorder&" + SWITCH_TO_DISPLAY_MODEL + "=true";
@@ -137,6 +131,11 @@ public class DisplayVocabulary {
     
     /* URI of property for Fixed HTML Generator */
     public static final String FIXED_HTML_VALUE = DISPLAY_NS + "htmlValue";
+    
+    
+    /* URI of property for Solr Query Generator */
+    public static final String VCLASSID = DISPLAY_NS + "hasVClassId";
+
     
     //public static final Individual EVENTS = m_model.createIndividual( NS + "Events", PAGE );
     

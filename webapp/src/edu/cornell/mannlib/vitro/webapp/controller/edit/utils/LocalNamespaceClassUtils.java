@@ -58,7 +58,7 @@ public class LocalNamespaceClassUtils {
     	//There's an APP for that!
         //defualt namespace pattern is null if the default namespace does not employ /individual
         if(defaultNamespacePattern != null) {
-	    	 OntologyDao dao = vreq.getFullWebappDaoFactory().getOntologyDao();
+	    	 OntologyDao dao = vreq.getUnfilteredWebappDaoFactory().getOntologyDao();
 	         List<Ontology> onts = dao.getAllOntologies();
 	         for(Ontology on: onts) {
 	        	String uri = on.getURI();

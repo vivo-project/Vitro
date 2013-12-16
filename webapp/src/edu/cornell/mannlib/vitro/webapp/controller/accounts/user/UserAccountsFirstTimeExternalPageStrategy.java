@@ -73,7 +73,7 @@ public abstract class UserAccountsFirstTimeExternalPageStrategy extends
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);
 			email.addRecipient(TO, ua.getEmailAddress());
-			email.setSubject("Your VIVO account has been created.");
+			email.setSubject(i18n.text("account_created_subject", getSiteName()));
 			email.setTemplate(EMAIL_TEMPLATE);
 			email.setBodyMap(body);
 			email.processTemplate();

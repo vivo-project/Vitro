@@ -16,6 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractDa
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyStatementAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource.AbstractResourceAction;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
 /**
  * Policy to use for Vivo Self-Editing based on NetId for use at Cornell. All
@@ -69,7 +70,7 @@ public class SelfEditingPolicy extends BaseSelfEditingPolicy implements
 	private PolicyDecision isAuthorizedForObjectPropertyAction(
 			List<String> userUris, AbstractObjectPropertyStatementAction action) {
 		String subject = action.getSubjectUri();
-		String predicate = action.getPredicateUri();
+		Property predicate = action.getPredicate();
 		String object = action.getObjectUri();
 
 		if (!canModifyResource(subject)) {
@@ -96,7 +97,7 @@ public class SelfEditingPolicy extends BaseSelfEditingPolicy implements
 	private PolicyDecision isAuthorizedForDataPropertyAction(
 			List<String> userUris, AbstractDataPropertyStatementAction action) {
 		String subject = action.getSubjectUri();
-		String predicate = action.getPredicateUri();
+		Property predicate = action.getPredicate();
 
 		if (!canModifyResource(subject)) {
 			return cantModifyResource(subject);

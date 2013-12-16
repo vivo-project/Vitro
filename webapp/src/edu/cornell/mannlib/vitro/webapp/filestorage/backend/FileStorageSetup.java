@@ -35,7 +35,7 @@ public class FileStorageSetup implements ServletContextListener {
 	 * {@link ConfigurationProperties} for the vivo home directory. The file
 	 * storage base directory is in a subdirectory below this one.
 	 */
-	public static final String PROPERTY_VITRO_HOME_DIR = "vitro.home.directory";
+	public static final String PROPERTY_VITRO_HOME_DIR = "vitro.home";
 	public static final String FILE_STORAGE_SUBDIRECTORY = "uploads";
 
 	/**
@@ -73,14 +73,14 @@ public class FileStorageSetup implements ServletContextListener {
 	 * For use by the constructor in implementations of {@link FileStorage}.
 	 */
 	private File figureBaseDir(ServletContextEvent sce) throws IOException {
-		String homeDirPath = ConfigurationProperties.getBean(sce)
-			.getProperty(PROPERTY_VITRO_HOME_DIR);
+		String homeDirPath = ConfigurationProperties.getBean(sce).getProperty(
+				PROPERTY_VITRO_HOME_DIR);
 		if (homeDirPath == null) {
 			throw new IllegalArgumentException(
 					"Configuration properties must contain a value for '"
 							+ PROPERTY_VITRO_HOME_DIR + "'");
 		}
-		
+
 		File homeDir = new File(homeDirPath);
 		if (!homeDir.exists()) {
 			throw new IllegalStateException("Vitro home directory '"
@@ -91,20 +91,16 @@ public class FileStorageSetup implements ServletContextListener {
 		if (!baseDir.exists()) {
 			boolean created = baseDir.mkdir();
 			if (!created) {
-				throw new IOException(
-						"Unable to create uploads directory at '"
-								+ baseDir + "'");
+				throw new IOException("Unable to create uploads directory at '"
+						+ baseDir + "'");
 			}
 		}
 		return baseDir;
 	}
 
 	/**
-	 * Get the configuration property for the default namespace, and confirm
-	 * that it is in the proper form. The default namespace is assumed to be in
-	 * this form: <code>http://vivo.mydomain.edu/individual/</code>
-	 * 
-	 * For use by the constructor in implementations of {@link FileStorage}.
+	 * Get the configuration property for the default namespace. For use by the
+	 * constructor in implementations of {@link FileStorage}.
 	 * 
 	 * @returns a collection containing the default namespace.
 	 */
@@ -115,14 +111,6 @@ public class FileStorageSetup implements ServletContextListener {
 			throw new IllegalArgumentException(
 					"Configuration properties must contain a value for '"
 							+ PROPERTY_DEFAULT_NAMESPACE + "'");
-		}
-
-		String defaultSuffix = "/individual/";
-
-		if (!defaultNamespace.endsWith(defaultSuffix)) {
-			log.warn("Default namespace does not match the expected form "
-					+ "(does not end with '" + defaultSuffix + "'): '"
-					+ defaultNamespace + "'");
 		}
 
 		return Collections.singleton(defaultNamespace);

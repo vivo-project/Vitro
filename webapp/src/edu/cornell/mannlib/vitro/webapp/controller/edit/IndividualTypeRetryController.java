@@ -51,8 +51,7 @@ public class IndividualTypeRetryController extends BaseEditController {
 		
         VitroRequest vreq = new VitroRequest(request);
         
-        WebappDaoFactory t;
-        WebappDaoFactory wadf = ((t = vreq.getAssertionsWebappDaoFactory()) != null) ? t : vreq.getFullWebappDaoFactory();
+        WebappDaoFactory wadf = vreq.getUnfilteredAssertionsWebappDaoFactory();
         IndividualDao iDao = wadf.getIndividualDao();
         VClassDao vcDao = wadf.getVClassDao();
         
@@ -65,27 +64,27 @@ public class IndividualTypeRetryController extends BaseEditController {
         request.setAttribute("individual", ind);
         
 		List<VClass> allVClasses = vcDao.getAllVclasses();
-		Set<String> allClassURISet = new HashSet<String>();
-		Map<String,String> classNameMap = new HashMap<String,String>();
-		for (Iterator allClassIt = allVClasses.iterator(); allClassIt.hasNext(); ) {
-			VClass vc = (VClass) allClassIt.next();
-			classNameMap.put(vc.getURI(),vc.getLocalNameWithPrefix());
-			allClassURISet.add(vc.getURI());
-		}
-
-		allVClasses = null;
+	    sortForPickList(allVClasses, vreq);
 			
+		Set<String> prohibitedURIset = new HashSet<String>();
 		for (Iterator<VClass> indClassIt = ind.getVClasses(false).iterator(); indClassIt.hasNext(); ) {
 			VClass vc = indClassIt.next();
-			allClassURISet.remove(vc.getURI());
+			if(vc.isAnonymous()) {
+			    continue;
+			}
+			prohibitedURIset.add(vc.getURI());
 			for (Iterator<String> djURIIt = vcDao.getDisjointWithClassURIs(vc.getURI()).iterator(); djURIIt.hasNext(); ) {
 				String djURI = djURIIt.next();
-				allClassURISet.remove(djURI);
+	            prohibitedURIset.add(djURI);
 			}
 		}
 		
-		List<String> classURIList = new LinkedList<String>();
-		classURIList.addAll(allClassURISet);
+		List<VClass> eligibleVClasses = new ArrayList<VClass>();
+		for (VClass vc : allVClasses) {
+		    if(vc.getURI() != null && !(prohibitedURIset.contains(vc.getURI()))) {
+		        eligibleVClasses.add(vc);
+		    }
+		}
 		
 		FormObject foo = new FormObject();
 		epo.setFormObject(foo);
@@ -93,13 +92,11 @@ public class IndividualTypeRetryController extends BaseEditController {
 		foo.setOptionLists(optionMap);
 
 		List<Option> typeOptionList = new ArrayList<Option>(); 
-		for (Iterator<String> classURIIt = classURIList.iterator(); classURIIt.hasNext();) {
-			String classURI = classURIIt.next();
-			Option opt = new Option(classURI,classNameMap.get(classURI));
+		for (VClass vc : eligibleVClasses) {
+			Option opt = new Option(vc.getURI(), vc.getPickListName());
 			typeOptionList.add(opt);
 		}
 		
-		Collections.sort(typeOptionList,new OptionCollator());
 		optionMap.put("types",typeOptionList);
 		
 	       RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
@@ -123,13 +120,6 @@ public class IndividualTypeRetryController extends BaseEditController {
 	
 	public void doPost (HttpServletRequest request, HttpServletResponse response) {
 		// shouldn't be posting to this controller
-	}
-	
-	private class OptionCollator implements Comparator {
-	    public int compare (Object o1, Object o2) {
-	        Collator collator = Collator.getInstance();
-	        return collator.compare( ((Option)o1).getBody().toString().substring(((Option)o1).getBody().toString().indexOf(":")) , ((Option)o2).getBody().toString().substring(((Option)o2).getBody().toString().indexOf(":")) );
-	    }
-	}
+	}	
 	
 }

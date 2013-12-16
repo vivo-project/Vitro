@@ -2,6 +2,7 @@
 
 var menuManagementEdit = {
     onLoad: function() {
+        $.extend(this, i18nStrings);
         this.initObjects();
         this.bindEventListeners();
         this.toggleClassSelection();
@@ -93,33 +94,33 @@ var menuManagementEdit = {
         
         // Check menu name
         if ($('input[type=text][name=menuName]').val() == "") {
-            validationError += "You must supply a name<br />";
+            validationError += menuManagementEdit.supplyName + "<br />";
             }
         // Check pretty url     
         if ($('input[type=text][name=prettyUrl]').val() == "") {
-            validationError += "You must supply a pretty URL<br />";
+            validationError += menuManagementEdit.supplyPrettyUrl + "<br />";
         }
         if ($('input[type=text][name=prettyUrl]').val().charAt(0) != "/") {
-            validationError += "The pretty URL must begin with a leading forward slash<br />";
+            validationError += menuManagementEdit.startUrlWithSlash + "<br />";
         }
         
         // Check custom template
         if ($('input:radio[name=selectedTemplate]:checked').val() == "custom") {
             if ($('input[name=customTemplate]').val() == "") {
-                validationError += "You must supply a template<br />"; 
+                validationError += menuManagementEdit.supplyTemplate + "<br />"; 
             }
         }
         
         // if no class group selected, this is an error
         if ($('#selectClassGroup').val() =='-1') {
-            validationError += "You must supply a content type<br />"; 
+            validationError += menuManagementEdit.supplyContentType + "<br />"; 
         } else {
             //class group has been selected, make sure there is at least one class selected
             var allSelected = $('input[name="allSelected"]:checked').length;
             var noClassesSelected = $('input[name="classInClassGroup"]:checked').length;
             if (allSelected == 0 && noClassesSelected == 0) {
                 //at least one class should be selected
-                validationError += "You must select the type of content to display<br />";
+                validationError += menuManagementEdit.selectContentType + "<br />";
             }
         }
       
@@ -149,7 +150,7 @@ var menuManagementEdit = {
               var selectedClassesList = menuManagementEdit.classesForClassGroup.children('ul#selectedClasses');
               
               selectedClassesList.empty();
-              selectedClassesList.append('<li class="ui-state-default"> <input type="checkbox" name="allSelected" id="allSelected" value="all" checked="checked" /> <label class="inline" for="All"> All</label> </li>');
+              selectedClassesList.append('<li class="ui-state-default"> <input type="checkbox" name="allSelected" id="allSelected" value="all" checked="checked" /> <label class="inline" for="All"> ' + menuManagementEdit.allCapitalized + '</label> </li>');
               
               $.each(results.classes, function(i, item) {
                   var thisClass = results.classes[i];

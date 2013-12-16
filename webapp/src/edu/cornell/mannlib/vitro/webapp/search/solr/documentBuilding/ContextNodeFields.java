@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.solr.common.SolrInputDocument;
@@ -57,7 +58,10 @@ public class ContextNodeFields implements DocumentModifier{
             return;
         
         log.debug( "processing context nodes for: " +  individual.getURI());
-        
+        log.debug( "queries are ");
+        for(String q:queries) {
+        	log.debug("Query: " + q);
+        }
         /* get text from the context nodes and add the to ALLTEXT */        
         StringBuffer values = executeQueryForValues(individual, queries);        
         
@@ -77,7 +81,7 @@ public class ContextNodeFields implements DocumentModifier{
      * @return StringBuffer with text values to add to ALLTEXT field of solr Document.
      */
     protected StringBuffer executeQueryForValues( Individual individual, Collection<String> queries){
-        /* execute all the queries on the list and concat the values to add to all text */        
+    	  /* execute all the queries on the list and concat the values to add to all text */        
     	RDFService rdfService = rdfServiceFactory.getRDFService();
         StringBuffer allValues = new StringBuffer("");                
 
@@ -86,18 +90,18 @@ public class ContextNodeFields implements DocumentModifier{
         	
             String subInUriQuery = 
         		query.replaceAll("\\?uri", "<" + individual.getURI() + "> ");
-        	
+        	log.debug("Subbed in URI query: " + subInUriQuery);
             try{
             	
             	ResultSet results = RDFServiceUtils.sparqlSelectQuery(subInUriQuery, rdfService);               
             	while(results.hasNext()){                                                                               
                     valuesForQuery.append( 
-                            getTextForRow( results.nextSolution() ) ) ; 
+                            getTextForRow( results.nextSolution(), true ) ) ; 
             	}
             	
             }catch(Throwable t){
-                if( ! shutdown ) 
-                    log.error(t,t);
+                if( ! shutdown )                    
+                    log.error("problem while running query '" + subInUriQuery + "'",t);                
             } 
             
             if(log.isDebugEnabled()){
@@ -108,10 +112,10 @@ public class ContextNodeFields implements DocumentModifier{
         }
         
         rdfService.close();
-        return allValues;        
+        return allValues;    
     }       
     
-    protected String getTextForRow( QuerySolution row){
+    protected String getTextForRow( QuerySolution row, boolean addSpace){
         if( row == null )
             return "";
 
@@ -121,14 +125,22 @@ public class ContextNodeFields implements DocumentModifier{
             String name = iter.next();
             RDFNode node = row.get( name );
             if( node != null ){
-                text.append(" ").append( node.toString() );
+            	String value = (node.isLiteral()) ? 
+            			node.asLiteral().getString(): 
+            			node.toString();
+            	if (StringUtils.isNotBlank(value)) {
+	            	if(addSpace) {
+	            		text.append(" ").append( value );
+	            	} else {
+	            		text.append(value);
+	            	}
+            	}
             }else{
                 log.debug(name + " is null");
             }                        
         }        
         return text.toString();
     }
-    
     
     public void shutdown(){
         shutdown=true;  

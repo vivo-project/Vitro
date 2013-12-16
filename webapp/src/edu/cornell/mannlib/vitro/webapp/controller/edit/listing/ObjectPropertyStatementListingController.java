@@ -91,19 +91,19 @@ public class ObjectPropertyStatementListingController extends
         
         ObjectPropertyStatementDao opsDao = null;
         if (assertedStatementsOnly){ // get only asserted, not inferred, object property statements
-            opsDao = vrequest.getAssertionsWebappDaoFactory().getObjectPropertyStatementDao();
+            opsDao = vrequest.getUnfilteredAssertionsWebappDaoFactory().getObjectPropertyStatementDao();
         } else {
-            opsDao = vrequest.getFullWebappDaoFactory().getObjectPropertyStatementDao();
+            opsDao = vrequest.getUnfilteredWebappDaoFactory().getObjectPropertyStatementDao();
         }
 
         // get all object properties -- no concept of asserted vs. inferred object properties
-        ObjectPropertyDao opDao = vrequest.getFullWebappDaoFactory().getObjectPropertyDao();
+        ObjectPropertyDao opDao = vrequest.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
         
         IndividualDao iDao = null;
         if (showVClasses) {
-            iDao = vrequest.getAssertionsWebappDaoFactory().getIndividualDao();
+            iDao = vrequest.getUnfilteredAssertionsWebappDaoFactory().getIndividualDao();
         } else {
-            iDao = vrequest.getFullWebappDaoFactory().getIndividualDao();
+            iDao = vrequest.getUnfilteredWebappDaoFactory().getIndividualDao();
         }
         
         String propURIStr = request.getParameter("propertyURI");
@@ -140,7 +140,7 @@ public class ObjectPropertyStatementListingController extends
         
         if (count == 0) {
         	results.add("XX");
-        	results.add("No statements found for property \""+op.getLocalNameWithPrefix()+"\"");
+        	results.add("No statements found for property \""+op.getPickListName()+"\"");
         	results.add("");
         	results.add("");
         	if (showVClasses) {

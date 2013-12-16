@@ -106,7 +106,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
             : ResourceFactory.createResource(vclassURI);
     
         if (theClass.isAnon() && theClass.canAs(UnionClass.class)) {
-        	UnionClass u = (UnionClass) theClass.as(UnionClass.class);
+        	UnionClass u = theClass.as(UnionClass.class);
         	for (OntClass operand : u.listOperands().toList()) {
         		VClass vc = new VClassJena(operand, getWebappDaoFactory());
         		ents.addAll(getIndividualsByVClass(vc));
@@ -320,12 +320,14 @@ public class IndividualDaoSDB extends IndividualDaoJena {
      */
     @Override
     public List<Individual> getIndividualsByDataProperty(String dataPropertyUri, 
-    	                                                 String value){        
+    	                                                 String value){  
+    	OntModel fullModel = getOntModelSelector().getFullModel();
+    	
         Property prop = null;
         if( RDFS.label.getURI().equals( dataPropertyUri )){
             prop = RDFS.label;
         }else{
-            prop = getOntModel().getProperty(dataPropertyUri);
+            prop = fullModel.getProperty(dataPropertyUri);
         }
 
         if( prop == null ) {            
@@ -340,20 +342,20 @@ public class IndividualDaoSDB extends IndividualDaoJena {
             return Collections.emptyList();
         }
         
-        Literal litv1 = getOntModel().createLiteral(value);        
-        Literal litv2 = getOntModel().createTypedLiteral(value);   
+        Literal litv1 = fullModel.createLiteral(value);        
+        Literal litv2 = fullModel.createTypedLiteral(value);   
         
         //warning: this assumes that any language tags will be EN
-        Literal litv3 = getOntModel().createLiteral(value,"EN");        
+        Literal litv3 = fullModel.createLiteral(value,"EN");        
         
         HashMap<String,Individual> individualsMap = 
         		new HashMap<String, Individual>();
                 
-        getOntModel().enterCriticalSection(Lock.READ);
+        fullModel.enterCriticalSection(Lock.READ);
         int count = 0;
         try{
             StmtIterator stmts
-                = getOntModel().listStatements((Resource)null, prop, litv1);                                           
+                = fullModel.listStatements((Resource)null, prop, litv1);                                           
             while(stmts.hasNext()){
                 count++;
                 Statement stmt = stmts.nextStatement();
@@ -377,7 +379,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                 }
             }
             
-            stmts = getOntModel().listStatements((Resource)null, prop, litv2);                                           
+            stmts = fullModel.listStatements((Resource)null, prop, litv2);                                           
             while(stmts.hasNext()){
                 count++;
                 Statement stmt = stmts.nextStatement();
@@ -401,7 +403,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                 }                
             }
             
-            stmts = getOntModel().listStatements((Resource)null, prop, litv3);                                           
+            stmts = fullModel.listStatements((Resource)null, prop, litv3);                                           
             while(stmts.hasNext()){
                 count++;
                 Statement stmt = stmts.nextStatement();
@@ -425,7 +427,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                 }                
             }
         } finally {
-            getOntModel().leaveCriticalSection();
+            fullModel.leaveCriticalSection();
         }
         
         List<Individual> rv = new ArrayList(individualsMap.size());
@@ -438,13 +440,17 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         final List<String> list = 
             new LinkedList<String>();
         
-        // get all labeled resources from any non-tbox and non-metadata graphs.
+        // get all labeled resources from any non-tbox and non-metadata graphs,
+        // as well as the unnamed graph (first pattern below)
         String query = "SELECT DISTINCT ?ind WHERE { \n" +
+                       " { ?ind <" + RDFS.label.getURI() + "> ?label } " +
+                       " UNION { " + 
                        "  GRAPH ?g { ?ind <" + RDFS.label.getURI() +
                                           "> ?label } \n" +
                        "  FILTER (?g != <" + JenaDataSourceSetupBase
                                .JENA_APPLICATION_METADATA_MODEL + "> " +
                        "          && !regex(str(?g),\"tbox\")) \n " +
+                       " } " +
                        "}";
               
 	    Query q = QueryFactory.create(query);
@@ -519,7 +525,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
             try {
 	            ResultSet results = qe.execSelect();
 	            while (results.hasNext()) {
-	                QuerySolution qs = (QuerySolution) results.next();
+	                QuerySolution qs = results.next();
 	                Resource res = (Resource) qs.get("?ent");
 	                if (res.getURI() != null) {
 	                	individualURIs.add(res.getURI());

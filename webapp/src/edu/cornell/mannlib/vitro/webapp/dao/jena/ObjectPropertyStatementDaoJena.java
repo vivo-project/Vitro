@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -33,7 +35,9 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
+import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -43,6 +47,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 
 public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements ObjectPropertyStatementDao {
 
@@ -89,7 +94,8 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         else {
         	Map<String, ObjectProperty> uriToObjectProperty = new HashMap<String,ObjectProperty>();
         	
-        	ObjectPropertyDaoJena opDaoJena = new ObjectPropertyDaoJena(dwf, getWebappDaoFactory());
+        	ObjectPropertyDaoJena opDaoJena = (ObjectPropertyDaoJena) getWebappDaoFactory().getObjectPropertyDao();
+        	//new ObjectPropertyDaoJena(rdfService, dwf, getWebappDaoFactory());
         	
         	OntModel ontModel = getOntModelSelector().getABoxModel();
         	ontModel.enterCriticalSection(Lock.READ);
@@ -99,7 +105,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 	            ClosableIterator<Statement> propIt = ind.listProperties();
 	            try {
 	                while (propIt.hasNext()) {
-	                    Statement st = (Statement) propIt.next();
+	                    Statement st = propIt.next();
 	                    
 	                    if (st.getObject().isResource() && !(NONUSER_NAMESPACES.contains(st.getPredicate().getNameSpace()))) {
 	                        try {
@@ -173,7 +179,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     		try {
     			int count = 0;
     			while ( (opsIt.hasNext()) && ((endIndex<0) || (count<endIndex)) ) {
-    				Statement stmt = (Statement) opsIt.next();
+    				Statement stmt = opsIt.next();
     				if (stmt.getObject().isResource()) {
 	    				++count;
 	    				if (startIndex<0 || startIndex<=count) {
@@ -270,103 +276,137 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
             String subjectUri, 
             String propertyUri,             
-            String objectKey, 
+            String objectKey, String domainUri, String rangeUri,
             String queryString, 
             Set<String> constructQueryStrings,
             String sortDirection) {    	        
     	
-        Model constructedModel = constructModelForSelectQueries(
-                subjectUri, propertyUri, constructQueryStrings);
-                    
-    	if("desc".equalsIgnoreCase( sortDirection ) ){
-    		queryString = queryString.replaceAll(" ASC\\(", " DESC(");
-    	}
-    	
-        log.debug("Query string for object property " + propertyUri + ": " + queryString);
+        List<Map<String, String>> list = new ArrayList<Map<String, String>>();
         
+        long start = System.currentTimeMillis();
+
+        try {
+            Model constructedModel = constructModelForSelectQueries(
+                    subjectUri, propertyUri, rangeUri, constructQueryStrings);
+
+            if(log.isDebugEnabled()) {
+                log.debug("Constructed model has " + constructedModel.size() + " statements.");
+            }
+
+            if("desc".equalsIgnoreCase( sortDirection ) ){
+                queryString = queryString.replaceAll(" ASC\\(", " DESC(");
+            }
+
+            ResultSet results = (constructedModel == null) ? selectFromRDFService(
+                    queryString, subjectUri, propertyUri, domainUri, rangeUri) : selectFromConstructedModel(
+                            queryString, subjectUri, propertyUri, domainUri, rangeUri, constructedModel);
+
+                    while (results.hasNext()) {
+                        QuerySolution soln = results.nextSolution();
+                        RDFNode node = soln.get(objectKey);
+                        if (node.isURIResource()) {
+                            list.add(QueryUtils.querySolutionToStringValueMap(soln));
+                        }
+                    }
+                    if(log.isDebugEnabled()) {
+                        long duration = System.currentTimeMillis() - start; 
+                        log.debug(duration + " to do list view for " + 
+                                propertyUri + " / " + domainUri + " / " + rangeUri);
+                    }
+        } catch (Exception e) {
+            log.error("Error getting object property values for subject " + subjectUri + " and property " + propertyUri, e);
+            return Collections.emptyList();
+        }
+        return list;
+    }
+    
+    private ResultSet selectFromRDFService(String queryString, String subjectUri,
+            String propertyUri, String domainUri, String rangeUri) {
+        String[] part = queryString.split("[Ww][Hh][Ee][Rr][Ee]");
+        part[1] = part[1].replace("?subject", "<" + subjectUri + ">");
+        part[1] = part[1].replace("?property", "<" + propertyUri + ">");
+        if (domainUri != null && !domainUri.startsWith(VitroVocabulary.PSEUDO_BNODE_NS)) {
+            part[1] = part[1].replace("?subjectType", "<" + domainUri + ">");
+        }
+        if (rangeUri != null && !rangeUri.startsWith(VitroVocabulary.PSEUDO_BNODE_NS)) {
+            part[1] = part[1].replace("?objectType", "<" + rangeUri + ">");
+        }
+        queryString = part[0] + "WHERE" + part[1];
+        try {
+            return ResultSetFactory.fromJSON(
+                    rdfService.sparqlSelectQuery(queryString, RDFService.ResultFormat.JSON));
+        } catch (RDFServiceException e) {
+            throw new RuntimeException(e);
+        }      
+    }
+
+    private ResultSet selectFromConstructedModel(String queryString, 
+            String subjectUri, String propertyUri, String domainUri, String rangeUri, 
+            Model constructedModel) {
         Query query = null;
         try {
             query = QueryFactory.create(queryString, Syntax.syntaxARQ);
         } catch(Throwable th){
             log.error("Could not create SPARQL query for query string. " + th.getMessage());
             log.error(queryString);
-            return Collections.emptyList();
+            throw new RuntimeException(th);
         } 
-        
+
         QuerySolutionMap initialBindings = new QuerySolutionMap();
         initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
         initialBindings.add("property", ResourceFactory.createResource(propertyUri));
-        
+        if (domainUri != null && !domainUri.startsWith(VitroVocabulary.PSEUDO_BNODE_NS)) {
+            initialBindings.add("subjectType", ResourceFactory.createResource(domainUri));
+        }
+        if (rangeUri != null && !rangeUri.startsWith(VitroVocabulary.PSEUDO_BNODE_NS)) {
+            initialBindings.add("objectType", ResourceFactory.createResource(rangeUri));
+        }
+
+        if(log.isDebugEnabled()) {
+            log.debug("Query string for object property " + propertyUri + ": " + queryString);
+        }
+
         // Run the SPARQL query to get the properties
-        List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-        DatasetWrapper w = dwf.getDatasetWrapper();
-        Dataset dataset = w.getDataset();
-        dataset.getLock().enterCriticalSection(Lock.READ);
+        
         QueryExecution qexec = null;
         try {
-
-            qexec = (constructedModel == null) 
-                    ? QueryExecutionFactory.create(
-                            query, dataset, initialBindings)
-                    : QueryExecutionFactory.create(
-                            query, constructedModel, initialBindings);
-            
-            ResultSet results = qexec.execSelect();
-
-            while (results.hasNext()) {
-                QuerySolution soln = results.nextSolution();
-                RDFNode node = soln.get(objectKey);
-                if (node.isURIResource()) {
-                    list.add(QueryUtils.querySolutionToStringValueMap(soln));
-                }
-            }
-            return list;
-            
-        } catch (Exception e) {
-            log.error("Error getting object property values for subject " + subjectUri + " and property " + propertyUri);
-            return Collections.emptyList();
+            qexec = QueryExecutionFactory.create(
+                    query, constructedModel, initialBindings);
+            return new ResultSetMem(qexec.execSelect());
         } finally {
-            dataset.getLock().leaveCriticalSection();
-            w.close();
             if (qexec != null) {
                 qexec.close();
             }
-        }
-       
+        } 
     }
     
     private Model constructModelForSelectQueries(String subjectUri,
-                                                 String propertyUri,                                                 
+                                                 String propertyUri,    
+                                                 String rangeUri,
                                                  Set<String> constructQueries) {
         
-        if (constructQueries == null) {
+        if (constructQueries.size() == 0 || constructQueries == null) {
             return null;
         }
         
-        Model constructedModel = ModelFactory.createDefaultModel();
+        Model constructedModel = ModelFactory.createDefaultModel();                        
         
         for (String queryString : constructQueries) {
-         
-            log.debug("CONSTRUCT query string for object property " + 
-                    propertyUri + ": " + queryString);
-            
+                     
             queryString = queryString.replace("?subject", "<" + subjectUri + ">");
             queryString = queryString.replace("?property", "<" + propertyUri + ">");
-                       
-            // we no longer need this query object, but we might want to do this
-            // query parse step to improve debugging, depending on the error returned
-            // through the RDF API
-//            try {
-//                QueryFactory.create(queryString, Syntax.syntaxARQ);
-//            } catch(Throwable th){
-//                log.error("Could not create CONSTRUCT SPARQL query for query " +
-//                          "string. " + th.getMessage());
-//                log.error(queryString);
-//                return constructedModel;
-//            } 
-          
+            if (rangeUri != null) {
+                queryString = queryString.replace("?objectType", "<" + rangeUri + ">");
+            }
+         
+            if (log.isDebugEnabled()) {
+                log.debug("CONSTRUCT query string for object property " + 
+                        propertyUri + ": " + queryString);
+            }
+            
             try {
-            	//If RDFService is null, will do what code used to do before, otherwise employ rdfservice
+            	//If RDFService is null, will do what code used to do before, 
+                //otherwise employ rdfservice
             	if(rdfService == null) {
                     log.debug("RDF Service null, Using CONSTRUCT query string for object property " + 
                             propertyUri + ": " + queryString);
@@ -389,7 +429,8 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                                 query, dataset);
                         qe.execConstruct(constructedModel);
                     } catch (Exception e) {
-                        log.error("Error getting constructed model for subject " + subjectUri + " and property " + propertyUri);
+                        log.error("Error getting constructed model for subject " 
+                            + subjectUri + " and property " + propertyUri);
                     } finally {
                         if (qe != null) {
                             qe.close();
@@ -398,18 +439,32 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                         w.close();
                     }	
             	} else {
-                constructedModel.read(
-                        rdfService.sparqlConstructQuery(
-                                queryString, RDFService.ModelSerializationFormat.N3), null, "N3");
-            
+            	    String parseFormat = "N3";
+            	    RDFService.ModelSerializationFormat resultFormat = RDFService
+            	            .ModelSerializationFormat.N3;
+            	    
+            	    /* If the test ObjectPropertyStatementDaoJenaTest.testN3WithSameAs() 
+            	     * fails this code can be removed: */
+            	    if( OWL.sameAs.getURI().equals( propertyUri )){
+            	        // VIVO-111: owl:sameAs can be represented as = in n3 but 
+            	        // Jena's parser does not recognize it. 
+            	        // Switch to rdf/xml only for sameAs since it seems like n3
+            	        // would be faster the rest of the time.            	        
+            	        parseFormat = "RDF/XML";
+                        resultFormat = RDFService.ModelSerializationFormat.RDFXML;
+            	    }
+            	    /* end of removal */
+            	    
+            	    InputStream is = rdfService.sparqlConstructQuery(
+            	            queryString, resultFormat);            	                	    
+            	    constructedModel.read( is,  null, parseFormat);            
             	}
-            } catch (Exception e) {
-                log.error("Error getting constructed model for subject " + subjectUri + " and property " + propertyUri);
+            } catch (Exception e) {                
+                log.error("Error getting constructed model for subject " 
+                    + subjectUri + " and property " + propertyUri, e);
             } 
         }
-        
-        return constructedModel;
-        
+        return constructedModel;        
     }
     
     protected static final String MOST_SPECIFIC_TYPE_QUERY = ""

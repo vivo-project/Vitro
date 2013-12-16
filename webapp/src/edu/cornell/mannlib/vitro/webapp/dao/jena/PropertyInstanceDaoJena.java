@@ -7,27 +7,19 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import com.hp.hpl.jena.ontology.ObjectProperty;
-import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
-import com.hp.hpl.jena.ontology.Restriction;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
@@ -35,21 +27,24 @@ import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstanceIface;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualDeletionEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 public class PropertyInstanceDaoJena extends PropertyDaoJena implements
         PropertyInstanceDao {
 
-    public PropertyInstanceDaoJena(DatasetWrapperFactory dwf, WebappDaoFactoryJena wadf) {
-        super(dwf, wadf);
+    public PropertyInstanceDaoJena(RDFService rdfService, 
+                                   DatasetWrapperFactory dwf, 
+                                   WebappDaoFactoryJena wadf) {
+        super(rdfService, dwf, wadf);
     }
 
     public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI) {
     	deleteObjectPropertyStatement(subjectURI, propertyURI, objectURI, getOntModelSelector());
     }
 
-    public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI, OntModelSelector ontModelSelector) {
+    public void deleteObjectPropertyStatement(String subjectURI, String propertyURI, String objectURI, 
+                                              OntModelSelector ontModelSelector) {
         OntModel ontModel = ontModelSelector.getABoxModel();
         OntModel tboxModel = ontModelSelector.getTBoxModel();
         ontModel.enterCriticalSection(Lock.WRITE);
@@ -58,32 +53,32 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
             Property pred = tboxModel.getProperty(propertyURI);
             OntProperty invPred = null;                        
             if (pred.canAs(OntProperty.class)) {
-            	invPred = ((OntProperty)pred.as(OntProperty.class)).getInverse();
+            	invPred = pred.as(OntProperty.class).getInverse();
             }
             Resource objRes = ontModel.getResource(objectURI);
+            Model baseModel = getOntModel().getBaseModel();
+            String userUri = getWebappDaoFactory().getUserURI();
             if ( (subjRes != null) && (pred != null) && (objRes != null) ) {            	
-            	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,subjectURI));
+            	baseModel.notifyEvent(new IndividualUpdateEvent(userUri,true,subjectURI));
             	try {
-            		ontModel.remove(subjRes,pred,objRes);
-            		
-            		updatePropertyDateTimeValue(subjRes,MODTIME,Calendar.getInstance().getTime(),getOntModel());
+            		ontModel.remove(subjRes,pred,objRes);            		
             	} finally {
-            		getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,subjectURI));
+            		baseModel.notifyEvent(new IndividualUpdateEvent(userUri,false,subjectURI));
             	}
             	try{            		
-            		getOntModel().getBaseModel().notifyEvent(new IndividualDeletionEvent(getWebappDaoFactory().getUserURI(),true,objectURI));            		
-            		List<Statement> depResStmts = DependentResourceDeleteJena.getDependentResourceDeleteList(ResourceFactory.createStatement(subjRes, pred, objRes),ontModel);
-            		getOntModel().remove(depResStmts);
+            		baseModel.notifyEvent(new IndividualDeletionEvent(userUri,true,objectURI));            		
+            		List<Statement> depResStmts = DependentResourceDeleteJena
+                        .getDependentResourceDeleteList(ResourceFactory.createStatement(subjRes, pred, objRes),ontModel);
+            		ontModel.remove(depResStmts);
             	} finally {
-            		getOntModel().getBaseModel().notifyEvent(new IndividualDeletionEvent(getWebappDaoFactory().getUserURI(),false,objectURI));
+            		baseModel.notifyEvent(new IndividualDeletionEvent(userUri,false,objectURI));
             	}
                 if (invPred != null) {
-                	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,objectURI));
+                	baseModel.notifyEvent(new IndividualUpdateEvent(userUri,true,objectURI));
                 	try {
                 		ontModel.remove(objRes,invPred,subjRes);
-                		updatePropertyDateTimeValue(objRes,MODTIME,Calendar.getInstance().getTime(),getOntModel());
                 	} finally {
-                		getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,subjectURI));
+                		baseModel.notifyEvent(new IndividualUpdateEvent(userUri,false,subjectURI));
                 	}
                 }
             }
@@ -218,7 +213,6 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
                 	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,prop.getSubjectEntURI()));
                 	try {
                 		ontModel.add(subjRes,pred,objRes);
-                    	updatePropertyDateTimeValue(subjRes,MODTIME,Calendar.getInstance().getTime(),getOntModel());
                 	} finally {
                 		getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,prop.getSubjectEntURI()));
                 	}
@@ -227,7 +221,6 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
                     	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,prop.getObjectEntURI()));
                         try {
                         	ontModel.add(objRes,invPred,subjRes);
-                        	updatePropertyDateTimeValue(objRes,MODTIME,Calendar.getInstance().getTime(),getOntModel());
                         } finally {
                         	getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),false,prop.getSubjectEntURI()));
                         }

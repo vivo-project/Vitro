@@ -7,6 +7,8 @@ import java.lang.Integer;
 import java.lang.String;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -31,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ExecuteDataRetrieval;
 import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
@@ -82,6 +85,7 @@ class IndividualResponseBuilder {
 		body.put("relatedSubject", getRelatedSubject());
 		body.put("namespaces", namespaces);
 		body.put("temporalVisualizationEnabled", getTemporalVisualizationFlag());
+		body.put("profilePageTypesEnabled", getprofilePageTypesFlag());
 		body.put("verbosePropertySwitch", getVerbosePropertyValues());
 		
 		//Execute data getters that might apply to this individual, e.g. because of the class of the individual
@@ -91,6 +95,13 @@ class IndividualResponseBuilder {
 			log.error("Data retrieval for individual lead to error", ex);
 		}
 		
+		// for quick profile view - users can toggle between the quick and the full views, 
+		// so the "destination" let's us know which view they are targeting. On normal
+		// page request, this string is empty and the default template is loaded.
+        String targetedView = "";
+		targetedView = vreq.getParameter("destination");
+		body.put("targetedView", targetedView);
+
 		//Individual template model
 		IndividualTemplateModel itm = getIndividualTemplateModel(individual);
 		/* We need to expose non-getters in displaying the individual's property list, 
@@ -100,6 +111,10 @@ class IndividualResponseBuilder {
 		 */
 		// body.put("individual", wrap(itm, BeansWrapper.EXPOSE_SAFE));
 	    body.put("labelCount", getLabelCount(itm.getUri(), vreq));
+	    body.put("languageCount", getLanguagesRepresentedCount(itm.getUri(), vreq));
+	    //We also need to know the number of available locales
+	    body.put("localesCount", SelectedLocale.getSelectableLocales(vreq).size());
+	    body.put("profileType", getProfileType(itm.getUri(), vreq));
 		body.put("individual", wrap(itm, new ReadOnlyBeansWrapper()));
 		
 		body.put("headContent", getRdfLinkTag(itm));	       
@@ -147,9 +162,7 @@ class IndividualResponseBuilder {
                 map = new HashMap<String, Object>();
                 map.put("name", relatedSubjectInd.getName());
 
-                // TODO find out which of these values is the correct one
                 map.put("url", UrlBuilder.getIndividualProfileUrl(relatedSubjectInd, vreq));
-                map.put("url", (new ListedIndividual(relatedSubjectInd, vreq)).getProfileUrl());
                 
                 String relatingPredicateUri = vreq.getParameter("relatingPredicateUri");
                 if (relatingPredicateUri != null) {
@@ -166,6 +179,12 @@ class IndividualResponseBuilder {
 	private boolean getTemporalVisualizationFlag() {
 		String property = ConfigurationProperties.getBean(vreq).getProperty(
 				"visualization.temporal");
+		return "enabled".equals(property);
+	}
+
+	private boolean getprofilePageTypesFlag() {
+		String property = ConfigurationProperties.getBean(vreq).getProperty(
+				"multiViews.profilePageTypes");
 		return "enabled".equals(property);
 	}
 
@@ -259,12 +278,21 @@ class IndividualResponseBuilder {
         + "    FILTER isLiteral(?label) \n"
         + "}" ;
            
+    private static String DISTINCT_LANGUAGE_QUERY = ""
+            + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
+            + "SELECT ( str(COUNT(DISTINCT lang(?label))) AS ?languageCount ) WHERE { \n"
+            + "    ?subject rdfs:label ?label \n"
+            + "    FILTER isLiteral(?label) \n"
+            + "}" ;
+    
     private static Integer getLabelCount(String subjectUri, VitroRequest vreq) {
         String queryStr = QueryUtils.subUriForQueryVar(LABEL_COUNT_QUERY, "subject", subjectUri);
         log.debug("queryStr = " + queryStr);
         int theCount = 0;
         try {
-            ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
+            //ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
+            //Get query results across all languages in order for template to show manage labels link correctly
+            ResultSet results = QueryUtils.getLanguageNeutralQueryResults(queryStr, vreq);
             if (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
                 String countStr = soln.get("labelCount").toString();
@@ -274,5 +302,49 @@ class IndividualResponseBuilder {
             log.error(e, e);
         }    
         return theCount;
+    }
+    
+    //what is the number of languages represented across the labels
+    private static Integer getLanguagesRepresentedCount(String subjectUri, VitroRequest vreq) {
+    	   String queryStr = QueryUtils.subUriForQueryVar(DISTINCT_LANGUAGE_QUERY, "subject", subjectUri);
+           log.debug("queryStr = " + queryStr);
+           int theCount = 0;
+           try {
+              
+               ResultSet results = QueryUtils.getLanguageNeutralQueryResults(queryStr, vreq);
+               if (results.hasNext()) {
+                   QuerySolution soln = results.nextSolution();
+                   String countStr = soln.get("languageCount").toString();
+                   theCount = Integer.parseInt(countStr);
+               }
+           } catch (Exception e) {
+               log.error(e, e);
+           }    
+           return theCount;
+    }
+
+    private static String PROFILE_TYPE_QUERY = ""
+        + "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#> \n"
+        + "SELECT ?profile WHERE { \n"
+        + "    ?subject display:hasDefaultProfilePageType ?profile \n"
+        + "}" ;
+           
+    private static String getProfileType(String subjectUri, VitroRequest vreq) {
+        String queryStr = QueryUtils.subUriForQueryVar(PROFILE_TYPE_QUERY, "subject", subjectUri);
+        log.debug("queryStr = " + queryStr);
+        String profileType = "none";
+        try {
+            ResultSet results = QueryUtils.getQueryResults(queryStr, vreq);
+            if (results.hasNext()) {
+                QuerySolution soln = results.nextSolution();
+                String profileStr = soln.get("profile").toString();
+                if ( profileStr.length() > 0 ) {
+                    profileType = profileStr.substring(profileStr.indexOf("#")+1,profileStr.length());
+                }
+            }
+        } catch (Exception e) {
+            log.error(e, e);
+        }    
+        return profileType;
     }
 }

@@ -13,7 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
+import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfigurationImpl;
 import freemarker.core.Environment;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -24,13 +25,9 @@ public class TemplateProcessingHelper {
     private static final Log log = LogFactory.getLog(TemplateProcessingHelper.class);
     
     private Configuration config = null;
-    private HttpServletRequest request = null;
-    private ServletContext context = null;
     
     public TemplateProcessingHelper(HttpServletRequest request, ServletContext context) {
-        this.config = FreemarkerConfigurationLoader.getConfig(new VitroRequest(request));
-        this.request = request;
-        this.context = context;
+        this.config = FreemarkerConfiguration.getConfig(request);
     }
     
     public StringWriter processTemplate(String templateName, Map<String, Object> map) 
@@ -46,10 +43,6 @@ public class TemplateProcessingHelper {
         
         try {
             Environment env = template.createProcessingEnvironment(map, writer);
-            // Add request and servlet context as custom attributes of the environment, so they
-            // can be used in directives.
-            env.setCustomAttribute("request", request);
-            env.setCustomAttribute("context", context);
             
             // Define a setup template to be included by every page template
             String templateType = (String) map.get("templateType");
@@ -57,6 +50,11 @@ public class TemplateProcessingHelper {
                 env.include(getTemplate("pageSetup.ftl"));
             }
             
+            // Apply any data-getters that are associated with this template.
+            // TODO clean this up VIVO-249
+            FreemarkerConfigurationImpl.retrieveAndRunDataGetters(env, template.getName());
+            
+            // Now process it.
             env.process();
         } catch (TemplateException e) {
             throw new TemplateProcessingException("TemplateException creating processing environment", e);

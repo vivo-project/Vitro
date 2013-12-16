@@ -11,12 +11,12 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
@@ -26,6 +26,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPro
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 
 /**
  * A collection of static methods to help determine whether requested actions
@@ -63,6 +65,54 @@ public class PolicyHelper {
 	}
 
 	/**
+	 * Is the email/password authorized for these actions? This should be used
+	 * when a controller or something needs allow actions if the user passes in
+	 * their email and password.
+	 * 
+	 * It may be better to check this as part of a servlet Filter and add an
+	 * identifier bundle.
+	 */
+	public static boolean isAuthorizedForActions(HttpServletRequest req,
+			String email, String password, Actions actions) {
+
+		if (password == null || email == null || password.isEmpty()
+				|| email.isEmpty()) {
+			return false;
+		}
+
+		try {
+			Authenticator auth = Authenticator.getInstance(req);
+			UserAccount user = auth.getAccountForInternalAuth(email);
+			if (user == null) {
+				log.debug("No account for '" + email + "'");
+				return false;
+			}
+
+			String uri = user.getUri();
+			log.debug("userAccount is '" + uri + "'");
+
+			if (!auth.isCurrentPassword(user, password)) {
+				log.debug(String.format("UNAUTHORIZED, password not accepted "
+						+ "for %s, account URI: %s", email, uri));
+				return false;
+			}
+			log.debug(String.format("password accepted for %s, "
+					+ "account URI: %s", email, uri));
+			
+			// figure out if that account can do the actions
+			IdentifierBundle ids = ActiveIdentifierBundleFactories
+					.getUserIdentifierBundle(req, user);
+			PolicyIface policy = ServletPolicyList.getPolicies(req);
+			return PolicyHelper.isAuthorizedForActions(ids, policy, actions);
+		} catch (Exception ex) {
+			log.error(
+					"Error while attempting to authorize actions "
+							+ actions.toString(), ex);
+			return false;
+		}
+	}
+
+	/**
 	 * Do the current policies authorize the current user to add this statement
 	 * to this model?
 	 * 
@@ -75,7 +125,8 @@ public class PolicyHelper {
 		}
 
 		Resource subject = stmt.getSubject();
-		Property predicate = stmt.getPredicate();
+		edu.cornell.mannlib.vitro.webapp.beans.Property predicate = new edu.cornell.mannlib.vitro.webapp.beans.Property(
+				stmt.getPredicate().getURI());
 		RDFNode objectNode = stmt.getObject();
 		if ((subject == null) || (predicate == null) || (objectNode == null)) {
 			return false;
@@ -84,11 +135,12 @@ public class PolicyHelper {
 		RequestedAction action;
 		if (objectNode.isResource()) {
 			action = new AddObjectPropertyStatement(modelToBeModified,
-					subject.getURI(), predicate.getURI(), objectNode
-							.asResource().getURI());
+					subject.getURI(), predicate, objectNode.asResource()
+							.getURI());
 		} else {
 			action = new AddDataPropertyStatement(modelToBeModified,
-					subject.getURI(), predicate.getURI());
+					subject.getURI(), predicate.getURI(), objectNode
+							.asLiteral().getString());
 		}
 		return isAuthorizedForActions(req, action);
 	}
@@ -106,7 +158,8 @@ public class PolicyHelper {
 		}
 
 		Resource subject = stmt.getSubject();
-		Property predicate = stmt.getPredicate();
+		edu.cornell.mannlib.vitro.webapp.beans.Property predicate = new edu.cornell.mannlib.vitro.webapp.beans.Property();
+		predicate.setURI(stmt.getPredicate().getURI());
 		RDFNode objectNode = stmt.getObject();
 		if ((subject == null) || (predicate == null) || (objectNode == null)) {
 			return false;
@@ -115,11 +168,12 @@ public class PolicyHelper {
 		RequestedAction action;
 		if (objectNode.isResource()) {
 			action = new DropObjectPropertyStatement(modelToBeModified,
-					subject.getURI(), predicate.getURI(), objectNode
-							.asResource().getURI());
+					subject.getURI(), predicate, objectNode.asResource()
+							.getURI());
 		} else {
 			action = new DropDataPropertyStatement(modelToBeModified,
-					subject.getURI(), predicate.getURI());
+					subject.getURI(), predicate.getURI(), objectNode
+							.asLiteral().getString());
 		}
 		return isAuthorizedForActions(req, action);
 	}

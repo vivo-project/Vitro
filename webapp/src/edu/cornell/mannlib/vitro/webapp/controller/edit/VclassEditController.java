@@ -24,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -44,11 +45,11 @@ public class VclassEditController extends BaseEditController {
         EditProcessObject epo = super.createEpo(request, FORCE_NEW);
         request.setAttribute("epoKey", epo.getKey());
 
-        VClassDao vcwDao = request.getFullWebappDaoFactory().getVClassDao();
+        VClassDao vcwDao = ModelAccess.on(getServletContext()).getBaseWebappDaoFactory().getVClassDao();
         VClass vcl = (VClass)vcwDao.getVClassByURI(request.getParameter("uri"));
         
         if (vcl == null) {
-        	vcl = request.getFullWebappDaoFactory()
+        	vcl = request.getUnfilteredWebappDaoFactory()
         	        .getVClassDao().getTopConcept();
         }
 
@@ -72,13 +73,13 @@ public class VclassEditController extends BaseEditController {
         
         String ontologyName = null;
         if (vcl.getNamespace() != null) {
-            Ontology ont = request.getFullWebappDaoFactory().getOntologyDao().getOntologyByURI(vcl.getNamespace());
+            Ontology ont = request.getUnfilteredWebappDaoFactory().getOntologyDao().getOntologyByURI(vcl.getNamespace());
             if ( (ont != null) && (ont.getName() != null) ) {
                 ontologyName = ont.getName();
             }
         }
 
-        WebappDaoFactory wadf = request.getFullWebappDaoFactory();
+        WebappDaoFactory wadf = request.getUnfilteredWebappDaoFactory();
         String groupURI = vcl.getGroupURI();
         String groupName = "none";
         if(groupURI != null) { 
@@ -95,7 +96,7 @@ public class VclassEditController extends BaseEditController {
         
         boolean foundComment = false;
         StringBuffer commSb = null;
-        for (Iterator<String> commIt = request.getFullWebappDaoFactory().getCommentsForResource(vcl.getURI()).iterator(); commIt.hasNext();) { 
+        for (Iterator<String> commIt = request.getUnfilteredWebappDaoFactory().getCommentsForResource(vcl.getURI()).iterator(); commIt.hasNext();) { 
             if (commSb==null) {
                 commSb = new StringBuffer();
                 foundComment=true;
@@ -115,7 +116,7 @@ public class VclassEditController extends BaseEditController {
         
         String uri = (vcl.getURI() == null) ? "" : vcl.getURI();
         
-        results.add(vcl.getLocalNameWithPrefix());                                // 1
+        results.add(vcl.getPickListName());                                // 1
         results.add(vcl.getName() == null ? "(no public label)" : vcl.getName()); // 2
         results.add(groupName);                                                   // 3
         results.add(ontologyName==null ? "(not identified)" : ontologyName);      // 4
@@ -140,76 +141,30 @@ public class VclassEditController extends BaseEditController {
         HashMap formSelect = new HashMap(); // tells the JSP what select lists are populated, and thus should be displayed
         request.setAttribute("formSelect",formSelect);
 
-        // if supported, we want to show only the asserted superclasses and subclasses.  Don't want to see anonymous classes, restrictions, etc.
-        VClassDao vcDao;
-        if (request.getAssertionsWebappDaoFactory() != null) {
-        	vcDao = request.getAssertionsWebappDaoFactory().getVClassDao();
-        } else {
-        	vcDao = request.getFullWebappDaoFactory().getVClassDao();
-        }
-        List superURIs = vcDao.getSuperClassURIs(vcl.getURI(),false);
-        List superVClasses = new ArrayList();
-        Iterator superURIit = superURIs.iterator();
-        while (superURIit.hasNext()) {
-            String superURI = (String) superURIit.next();
-            if (superURI != null) {
-                VClass superVClass = vcDao.getVClassByURI(superURI);
-                if (superVClass != null) {
-                    superVClasses.add(superVClass);
-                }
-            }
-        }
+        // if supported, we want to show only the asserted superclasses and subclasses.
+        VClassDao vcDao = ModelAccess.on(getServletContext()).getBaseWebappDaoFactory().getVClassDao();
+        VClassDao displayVcDao = ModelAccess.on(getServletContext()).getWebappDaoFactory().getVClassDao();
+        
+        List<VClass> superVClasses = getVClassesForURIList(
+                vcDao.getSuperClassURIs(vcl.getURI(),false), displayVcDao);
+        sortForPickList(superVClasses, request);
         request.setAttribute("superclasses",superVClasses);
 
-        List subURIs = vcDao.getSubClassURIs(vcl.getURI());
-        List subVClasses = new ArrayList();
-        Iterator subURIit = subURIs.iterator();
-        while (subURIit.hasNext()) {
-            String subURI = (String) subURIit.next();
-            VClass subVClass = vcDao.getVClassByURI(subURI);
-            if (subVClass != null) {
-                subVClasses.add(subVClass);
-            }
-        }
+        List<VClass> subVClasses = getVClassesForURIList(
+                vcDao.getSubClassURIs(vcl.getURI()), displayVcDao);
+        sortForPickList(subVClasses, request);
         request.setAttribute("subclasses",subVClasses);
-        
-        try {
-	        List djURIs = vcDao.getDisjointWithClassURIs(vcl.getURI());
-	        List djVClasses = new ArrayList();
-	        Iterator djURIit = djURIs.iterator();
-	        while (djURIit.hasNext()) {
-	            String djURI = (String) djURIit.next();
-	            try {
-		            VClass djVClass = vcDao.getVClassByURI(djURI);
-		            if (djVClass != null) {
-		                djVClasses.add(djVClass);
-		            }
-	            } catch (Exception e) { /* probably owl:Nothing or some other such nonsense */ }
-	        }
-	        request.setAttribute("disjointClasses",djVClasses);
-        } catch (Exception e) {
-        	log.error(e, e);
-        }
-        
-        try {
-	        List eqURIs = vcDao.getEquivalentClassURIs(vcl.getURI());
-	        List eqVClasses = new ArrayList();
-	        Iterator eqURIit = eqURIs.iterator();
-	        while (eqURIit.hasNext()) {
-	            String eqURI = (String) eqURIit.next();
-	            try {
-		            VClass eqVClass = vcDao.getVClassByURI(eqURI);
-		            if (eqVClass != null) {
-		                eqVClasses.add(eqVClass);
-		            }
-	            } catch (Exception e) { }
-	        }
-	        request.setAttribute("equivalentClasses",eqVClasses);
-        } catch (Exception e) {
-        	log.error("Couldn't get the equivalent classes: ");
-        	log.error(e, e);
-        }
+            
+        List<VClass> djVClasses = getVClassesForURIList(
+                vcDao.getDisjointWithClassURIs(vcl.getURI()), displayVcDao);
+        sortForPickList(djVClasses, request);
+        request.setAttribute("disjointClasses",djVClasses);
 
+        List<VClass> eqVClasses = getVClassesForURIList(
+                vcDao.getEquivalentClassURIs(vcl.getURI()), displayVcDao);
+        sortForPickList(eqVClasses, request);
+        request.setAttribute("equivalentClasses",eqVClasses);
+   
         // add the options
         foo.setOptionLists(OptionMap);
         epo.setFormObject(foo);
@@ -236,6 +191,19 @@ public class VclassEditController extends BaseEditController {
 
     public void doGet (HttpServletRequest request, HttpServletResponse response) {
         doPost(request,response);
+    }
+    
+    private List<VClass> getVClassesForURIList(List<String> vclassURIs, VClassDao vcDao) {
+        List<VClass> vclasses = new ArrayList<VClass>();
+        Iterator<String> urIt = vclassURIs.iterator();
+        while (urIt.hasNext()) {
+            String vclassURI = urIt.next();
+            VClass vclass = vcDao.getVClassByURI(vclassURI);
+            if (vclass != null) {
+                vclasses.add(vclass);
+            }
+        }
+        return vclasses;
     }
 
 }

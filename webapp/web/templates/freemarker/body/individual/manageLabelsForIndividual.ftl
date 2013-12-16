@@ -1,58 +1,104 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
-
+<#include "manageLabelsForIndividualTerms.ftl" >
 <#-- Custom form for managing labels for individuals -->
+<#--This is used both for editing and for viewLabelsServlet-->
+<#import "manageLabelsForIndividualMacros.ftl" as m >
+<#assign requiredHint = "<span class='requiredHint'> *</span>" />
+<#assign subjectUri = editConfiguration.subjectUri/>
 <#assign labelStr = "" >
 <#assign languageTag = "" >
 <#assign labelSeq = [] >
-<#if subjectName?? >
-<h2>Manage Labels for ${subjectName}</h2>
-<#else>
-<h2>Manage Labels</h2>
+<#assign submissionErrorsExist = "false"/>
+<#assign selectLocalesFullList = {} />
+<#assign editable = false/>
+<#if editConfiguration.pageData.editable?has_content>
+	<#assign editable = editConfiguration.pageData.editable />
 </#if>
-<p id="mngLabelsText">
-Multiple labels exist for this profile but there should only be one. Select the label you want displayed on the profile page, and the others will be deleted. 
-</p>
+<#assign displayRemoveLink = true/>
+<#if editConfiguration.pageData.displayRemoveLink?has_content>
+	<#assign displayRemoveLink = editConfiguration.pageData.displayRemoveLink/>
+</#if>
+<#if editSubmission?has_content && editSubmission.submissionExists = true && editSubmission.validationErrors?has_content>
+	<#assign submissionErrors = editSubmission.validationErrors/>
+	<#assign submissionErrorsExist = "true" />
+</#if>
+<#assign availableLocalesNumber = 0/>
+<#if editConfiguration.pageData.selectLocale?has_content>
+	<#assign availableLocalesNumber = editConfiguration.pageData.selectLocale?size />
+</#if>
+<#if editConfiguration.pageData.subjectName?? >
+<h2>${i18n().manage_labels_for} ${editConfiguration.pageData.subjectName}</h2>
+<#else>
+<h2>${i18n().manage_labels_capitalized}</h2>
+</#if>
+
+
+
+<p id="mngLabelsText">${i18n().manage_labels_intro}</p>
+
 
     <section id="rdfsLabels" role="container">
-        <ul>
-        <#list labels as label>
-            <#-- the query will return labels with their language tag or datatype, if any. So strip those out  -->
-            <#if label?? && ( label?index_of("@") > -1 ) >
-                <#assign labelStr = label?substring(0, label?index_of("@")) >
-                <#assign tagOrTypeStr = label?substring(label?index_of("@")) >
-            <#elseif label?? && ( label?index_of("^^") > -1 ) >
-                <#assign labelStr = label?substring(0, label?index_of("^^")) >
-                <#assign tagOrTypeStr = label?substring(label?index_of("^^")) >
-                <#assign tagOrTypeStr = tagOrTypeStr?replace("^^http","^^<http") >
-                <#assign tagOrTypeStr = tagOrTypeStr?replace("#string","#string>") >
-            <#else>
-                <#assign labelStr = label >
-                <#assign tagOrTypeStr = "" >
-            </#if>
-            <li>
-            <input type="radio" class="labelCheckbox" name="labelCheckbox" id="${labelStr}" tagOrType="${tagOrTypeStr!}" role="radio" />
-            <label class="inline">${labelStr}
-                <#if labelSeq?seq_contains(labelStr)>
-                    (duplicate value)
-                </#if>
-            </label>
-            </li>
-            <#assign labelSeq = labelSeq + [labelStr]>
-        </#list>
+    
+     <script type="text/javascript">
+        var existingLabelsData = [];
+    </script>
+    
+        <ul id="existingLabelsList" name="existingLabelsList">
+        <#if editConfiguration.pageData.labelsSortedByLanguageName?has_content>
+        	<#--List of labelInformation objects as value where key = language name -->
+        	<#assign labelsSorted = editConfiguration.pageData.labelsSortedByLanguageName />
+        	<#--Keys would be the actual names of languages-->
+        	<#assign labelLanguages = labelsSorted?keys?sort />
+        	<#assign editGenerator = "editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RDFSLabelGenerator" />
+        	
+        	<#--What we need here is printing out the labels by the language Name and not language code, starting with untyped first-->
+        	<@m.displayExistingLabelsForLanguage "untyped" labelsSorted editable editGenerator/>
+        	<@m.displayExistingTypedLabels  labelLanguages labelsSorted editable editGenerator/>
+        	
+        </#if>
         </ul>
 
         <br />   
-        <p>       
-            <input type="button" class="submit" id="submit" value="Save" role="button" role="input" />
-            <span class="or"> or </span>
-            <a href="${urls.referringPage}" class="cancel" title="cancel" >Cancel</a>
-        </p>
-    </section>
+        <p>      
+        
+	    <#if editable>   
+		    <#include "manageLabelsForIndividualSubmissionErrors.ftl">
+			<div id="showAddForm">
+				<input type="submit" value="${i18n().add_label}" id="showAddFormButton" name="showAddFormButton">  ${i18n().or} 
+				<a class="cancel" href="${cancelUrl}&url=/individual" title="${returnText}">${returnText}</a>
+			</div>  
+			<div id="showCancelOnly">
+				<a class="cancel" href="${cancelUrl}&url=/individual" title="${returnText}">${returnText}</a>
+			</div>
+		    <#include "manageLabelsForIndividualAddForm.ftl" >
+	    </#if>
+	    
+		</p>
+	</section>
+	    
 
 <script type="text/javascript">
+var selectLocalesFullList = [];
+<#if editConfiguration.pageData.selectLocaleFullList?has_content>
+	<#assign selectLocalesFullList = editConfiguration.pageData.selectLocaleFullList />
+	<#list selectLocalesFullList as localeInfo>
+		<#assign code = localeInfo["code"] />
+		<#assign label= localeInfo["label"] />
+		selectLocalesFullList.push({'code':'${code}', 'label':'${label}'});
+	</#list>
+	
+</#if>
+
 var customFormData = {
     processingUrl: '${urls.base}/edit/primitiveRdfEdit',
-    individualUri: '${subjectUri!}'
+    individualUri: '${subjectUri!}',
+    submissionErrorsExist: '${submissionErrorsExist}',
+    selectLocalesFullList: selectLocalesFullList,
+    numberAvailableLocales:${availableLocalesNumber}
+};
+var i18nStrings = {
+    errorProcessingLabels: '${i18n().error_processing_labels}',
+    selectLocaleOptionString : '${i18n().select_locale}'
 };
 </script>
 

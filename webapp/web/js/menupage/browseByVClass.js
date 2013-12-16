@@ -12,6 +12,7 @@ var browseByVClass = {
     // Add variables from menupage template
     mergeFromTemplate: function() {
         $.extend(this, menupageData);
+        $.extend(this, i18nStrings);
     },
     
     // Create references to frequently used elements for convenience
@@ -165,10 +166,12 @@ var browseByVClass = {
     // Print out the pagination nav if called
     pagination: function(pages, page) {
         var pagination = '<div class="pagination menupage">';
-        pagination += '<h3>page</h3>';
+        pagination += '<h3>' + browseByVClass.pageString + '</h3>';
         pagination += '<ul>';
         $.each(pages, function(i, item) {
-            var anchorOpen = '<a class="round" href="#" title="View page '+ pages[i].text +' of the results" data-page="'+ pages[i].index +'">';
+            var anchorOpen = '<a class="round" href="#" title="' + browseByVClass.viewPageString + ' ' 
+            + pages[i].text + ' '
+            + browseByVClass.ofTheResults + ' " data-page="'+ pages[i].index +'">';
             var anchorClose = '</a>';
             
             pagination += '<li class="round';
@@ -231,9 +234,9 @@ var browseByVClass = {
         var alpha = this.selectedAlpha(alpha);
         
         if ( alpha != "all" ) {
-            nothingToSeeHere = '<p class="no-individuals">There are no '+ vclass.name +' individuals whose name starts with <em>'+ alpha.toUpperCase() +'</em>.</p> <p class="no-individuals">Please try another letter or browse all.</p>';
+            nothingToSeeHere = '<p class="no-individuals">' + browseByVClass.thereAreNo + ' ' + vclass.name + ' ' + browseByVClass.indNamesStartWith + ' <em>'+ alpha.toUpperCase() +'</em>.</p> <p class="no-individuals">' + browseByVClass.tryAnotherLetter + '</p>';
         } else {
-            nothingToSeeHere = '<p class="no-individuals">There are no '+ vclass.name +' individuals in the system.</p> <p class="no-individuals">Please select another class from the list.</p>';
+            nothingToSeeHere = '<p class="no-individuals">' + browseByVClass.thereAreNo + ' ' + vclass.name + ' ' + browseByVClass.indsInSystem + '</p> <p class="no-individuals">' + browseByVClass.selectAnotherClass + '</p>';
         }
 
         browseByVClass.individualsContainer.prepend(nothingToSeeHere);   

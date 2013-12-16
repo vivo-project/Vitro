@@ -3,10 +3,9 @@
 <%@ page import="edu.cornell.mannlib.vitro.webapp.web.*" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory" %>
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page errorPage="/error.jsp"%>
 <%@ page contentType="text/html; charset=UTF-8"%>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.filters.VitroRequestPrep" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet" %>
 
 <%  /***********************************************
@@ -38,9 +37,6 @@
         if (request.getAttribute("css") == null){
             e+="basicPage.jsp expects that request parameter 'css' be set to css to include in page.\n";
         }
-        if( request.getAttribute("appBean") == null){
-            e+="basicPage.jsp expects that request attribute 'appBean' be set.\n";
-        }
         if( e.length() > 0 ){
             throw new JspException(e);
         }
@@ -62,7 +58,7 @@
     
     <body ${requestScope.bodyAttr}>
             ${ftl_identity}
-            
+            ${ftl_search}
             ${ftl_menu}
             
                 <c:import url="${bodyJsp}"/>

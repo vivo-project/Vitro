@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.search.solr;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -20,7 +19,6 @@ import org.apache.solr.common.SolrInputDocument;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
-import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualToSolrDocument;
 
 
@@ -163,7 +161,7 @@ public class SolrIndexer implements IndexerIface {
                  log.debug("could not remove documents from before build, " ,e);
         }
         try {
-           UpdateResponse res = server.commit();           
+           server.commit();           
         } catch (Throwable e) {
             if( ! shutdownRequested ){
                 log.debug("could not commit to solr server, " +

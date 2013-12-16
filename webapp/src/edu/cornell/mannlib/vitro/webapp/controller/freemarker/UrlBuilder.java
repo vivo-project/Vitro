@@ -5,14 +5,12 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
@@ -32,6 +30,7 @@ public class UrlBuilder {
         BROWSE("/browse"),
         CONTACT("/contact"),
         DATA_PROPERTY_EDIT("/datapropEdit"),
+        DISPLAY("/display"),
         INDIVIDUAL("/individual"),
         INDIVIDUAL_EDIT("/entityEdit"),
         INDIVIDUAL_LIST("/individuallist"),
@@ -129,7 +128,7 @@ public class UrlBuilder {
         return getUrl(Route.LOGOUT);
     }
     
-    public static class ParamMap extends HashMap<String, String> { 
+    public static class ParamMap extends LinkedHashMap<String, String> { 
         private static final long serialVersionUID = 1L;
         
         public ParamMap() { }
@@ -241,33 +240,22 @@ public class UrlBuilder {
     }
     
     public static String getIndividualProfileUrl(Individual individual, VitroRequest vreq) {
-        return getIndividualProfileUrl(individual, individual.getURI(),vreq);
-    }
-
-    public static String getIndividualProfileUrl(String individualUri, VitroRequest vreq) {
-        Individual individual = new IndividualImpl(individualUri);
-        return getIndividualProfileUrl(individual, individualUri, vreq);
-    }    
-    
-    private static String getIndividualProfileUrl(Individual individual, String individualUri, VitroRequest vreq) {
         WebappDaoFactory wadf = vreq.getWebappDaoFactory();
         String profileUrl = null;
         try {
-            URI uri = new URIImpl(individualUri); // throws exception if individualUri is invalid
-            String namespace = uri.getNamespace();
-            String defaultNamespace = wadf.getDefaultNamespace();
-    
             String localName = individual.getLocalName();
+            String namespace = individual.getNamespace();
+            String defaultNamespace = wadf.getDefaultNamespace();                
                     
             if (defaultNamespace.equals(namespace)) {
-                profileUrl = getUrl(Route.INDIVIDUAL.path() + "/" + localName);
+                profileUrl = getUrl(Route.DISPLAY.path() + "/" + localName);
             } else {
                 if (wadf.getApplicationDao().isExternallyLinkedNamespace(namespace)) {
                     log.debug("Found externally linked namespace " + namespace);
                     profileUrl = namespace + localName;
                 } else {
-                    ParamMap params = new ParamMap("uri", individualUri);
-                    profileUrl = getUrl("/individual", params);
+                    ParamMap params = new ParamMap("uri", individual.getURI());
+                    profileUrl = getUrl(Route.INDIVIDUAL.path(), params);
                 }
             }
         } catch (Exception e) {
@@ -275,25 +263,37 @@ public class UrlBuilder {
             return null;
         }        
 
-    	if (profileUrl != null) {
-    		HashMap<String, String> specialParams = getModelParams(vreq);
-    		if(specialParams.size() != 0) {
-    			profileUrl = addParams(profileUrl, new ParamMap(specialParams));
-    		}
-    	}
-    	
-    	return profileUrl;
+        if (profileUrl != null) {
+            LinkedHashMap<String, String> specialParams = getModelParams(vreq);
+            if(specialParams.size() != 0) {
+                profileUrl = addParams(profileUrl, new ParamMap(specialParams));
+            }
+        }
+        
+        return profileUrl;
     }
 
+    /**
+     * If you already have an Individual object around, 
+     * call getIndividualProfileUrl(Individual, VitroRequest) 
+     * instead of this method. 
+     */
+    public static String getIndividualProfileUrl(String individualUri, VitroRequest vreq) {        
+        return getIndividualProfileUrl(new IndividualImpl(individualUri),  vreq);
+    }    
+    
     public static boolean isUriInDefaultNamespace(String individualUri, VitroRequest vreq) {
         return isUriInDefaultNamespace(individualUri, vreq.getWebappDaoFactory());
     }
     
-    public static boolean isUriInDefaultNamespace(String individualUri, WebappDaoFactory wadf) {       
+    public static boolean isUriInDefaultNamespace(String individualUri, WebappDaoFactory wadf) {
+        return isUriInDefaultNamespace( individualUri, wadf.getDefaultNamespace());
+    }
+    
+    public static boolean isUriInDefaultNamespace(String individualUri, String defaultNamespace){
         try {
-            URI uri = new URIImpl(individualUri); // throws exception if individualUri is invalid
-            String namespace = uri.getNamespace();
-            String defaultNamespace = wadf.getDefaultNamespace();  
+            Individual ind = new IndividualImpl(individualUri); 
+            String namespace = ind.getNamespace();          
             return defaultNamespace.equals(namespace);
         } catch (Exception e) {
             log.warn(e);
@@ -302,7 +302,7 @@ public class UrlBuilder {
     }
     
     public static String urlEncode(String str) {
-        String encoding = "ISO-8859-1";
+        String encoding = "UTF-8";
         String encodedUrl = null;
         try {
             encodedUrl = URLEncoder.encode(str, encoding);
@@ -313,7 +313,7 @@ public class UrlBuilder {
     }
 
     public static String urlDecode(String str) {
-        String encoding = "ISO-8859-1";
+        String encoding = "UTF-8";
         String decodedUrl = null;
         try {
             decodedUrl = URLDecoder.decode(str, encoding);
@@ -325,9 +325,9 @@ public class UrlBuilder {
     
     //To be used in different property templates so placing method for reuse here
     //Check if special params included, specifically for menu management and other models
-    public static HashMap<String,String> getModelParams(VitroRequest vreq) {
+    public static LinkedHashMap<String,String> getModelParams(VitroRequest vreq) {
     	
-    	HashMap<String,String> specialParams = new HashMap<String, String>();
+    	LinkedHashMap<String,String> specialParams = new LinkedHashMap<String, String>();
     	if(vreq != null) {
     		//this parameter is sufficient to switch to menu model
     		String useMenuModelParam = vreq.getParameter(DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL);

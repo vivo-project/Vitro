@@ -11,10 +11,18 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import stubs.edu.cornell.mannlib.vitro.webapp.i18n.I18nStub;
+
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.search.controller.PagedSearchController.PagingLink;
 
 public class PagedSearchControllerTest {
+	
+	@SuppressWarnings("unused")
+	@Before
+	public void useI18nStubBundles() {
+		new I18nStub();
+	}
 
     @Test
     public void testGetPagingLinks() {
@@ -22,7 +30,7 @@ public class PagedSearchControllerTest {
         int hitsPerPage = 25;
         int totalHits = 500;
         int currentStartIndex = 0;
-        List<PagingLink> pageLinks = PagedSearchController.getPagingLinks(currentStartIndex, hitsPerPage, totalHits, "baseURL", pm);
+        List<PagingLink> pageLinks = PagedSearchController.getPagingLinks(currentStartIndex, hitsPerPage, totalHits, "baseURL", pm, null);
         Assert.assertNotNull(pageLinks);
         Assert.assertEquals(500 / 25, pageLinks.size());
         
@@ -30,7 +38,7 @@ public class PagedSearchControllerTest {
         hitsPerPage = 25;
         totalHits = 10;
         currentStartIndex = 0;
-        pageLinks = PagedSearchController.getPagingLinks(currentStartIndex, hitsPerPage, totalHits, "baseURL", pm);
+        pageLinks = PagedSearchController.getPagingLinks(currentStartIndex, hitsPerPage, totalHits, "baseURL", pm, null);
         Assert.assertNotNull(pageLinks);
         Assert.assertEquals(0, pageLinks.size());
     }
@@ -41,7 +49,7 @@ public class PagedSearchControllerTest {
         int hitsPerPage = 25;
         int totalHits = 349909;
         int currentStartIndex = 0;
-        List<PagingLink> pageLinks =  PagedSearchController.getPagingLinks(currentStartIndex, hitsPerPage, totalHits, "baseURL", pm);
+        List<PagingLink> pageLinks =  PagedSearchController.getPagingLinks(currentStartIndex, hitsPerPage, totalHits, "baseURL", pm, null);
         Assert.assertNotNull(pageLinks);
         Assert.assertEquals( PagedSearchController.DEFAULT_MAX_HIT_COUNT / hitsPerPage, pageLinks.size());
         
@@ -49,7 +57,7 @@ public class PagedSearchControllerTest {
         hitsPerPage = 25;
         totalHits = PagedSearchController.DEFAULT_MAX_HIT_COUNT + 20329;
         currentStartIndex = PagedSearchController.DEFAULT_MAX_HIT_COUNT + 5432;
-        pageLinks = PagedSearchController.getPagingLinks(currentStartIndex, hitsPerPage, totalHits, "baseURL", pm);
+        pageLinks = PagedSearchController.getPagingLinks(currentStartIndex, hitsPerPage, totalHits, "baseURL", pm, null);
         Assert.assertNotNull(pageLinks);
         Assert.assertEquals( 
                 (currentStartIndex / hitsPerPage) + //all the pages that are before the current page 

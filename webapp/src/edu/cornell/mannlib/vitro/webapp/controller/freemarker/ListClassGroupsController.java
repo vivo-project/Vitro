@@ -2,17 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import net.sf.json.util.JSONUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -26,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
+import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
 
 public class ListClassGroupsController extends FreemarkerHttpServlet {
@@ -48,7 +44,7 @@ public class ListClassGroupsController extends FreemarkerHttpServlet {
             body.put("displayOption", "group");
             body.put("pageTitle", "Class Groups");
 
-            VClassGroupDao dao = vreq.getFullWebappDaoFactory().getVClassGroupDao();
+            VClassGroupDao dao = vreq.getUnfilteredWebappDaoFactory().getVClassGroupDao();
 
             List<VClassGroup> groups = dao.getPublicGroupsWithVClasses(); 
 
@@ -67,9 +63,9 @@ public class ListClassGroupsController extends FreemarkerHttpServlet {
                     publicName = publicName.replace("\"","\\\"");
                     publicName = publicName.replace("\'","\\\'");
                     try {
-                        json += "{ \"name\": \"<a href='./editForm?uri="+URLEncoder.encode(vcg.getURI(),"UTF-8")+"&amp;controller=Classgroup'>"+publicName+"</a>\", ";
+                        json += "{ \"name\": " + JSONUtils.quote("<a href='./editForm?uri="+URLEncoder.encode(vcg.getURI())+"&amp;controller=Classgroup'>"+publicName+"</a>") + ", ";
                     } catch (Exception e) {
-                        json += "{ \"name\": \"" + publicName + "\", ";
+                        json += "{ \"name\": " + JSONUtils.quote(publicName) + ", ";
                     }
                     Integer t;
                     
@@ -83,18 +79,16 @@ public class ListClassGroupsController extends FreemarkerHttpServlet {
                             VClass vcw = classIt.next();
                             if (vcw.getName() != null && vcw.getURI() != null) {
                                 try {
-                                    json += "{ \"name\": \"<a href='vclassEdit?uri="+URLEncoder.encode(vcw.getURI(),"UTF-8")+"'>"+vcw.getName()+"</a>\", ";
+                                    json += "{ \"name\": " + JSONUtils.quote("<a href='vclassEdit?uri="+URLEncoder.encode(vcw.getURI())+"'>"+vcw.getName()+"</a>") + ", ";
                                 } catch (Exception e) {
-                                    json += "\"" + vcw.getName() + "\", ";
+                                    json += "" + JSONUtils.quote(vcw.getName()) + ", ";
                                 }
                             } else {
                                 json += "\"\", ";
                             }
 
                             String shortDefStr = (vcw.getShortDef() == null) ? "" : vcw.getShortDef();
-                            shortDefStr = shortDefStr.replace("\"","\\\"");
-                            shortDefStr = shortDefStr.replace("\'","\\\'");
-                            json += "\"data\": { \"shortDef\": \"" + shortDefStr + "\"}, \"children\": [] ";
+                            json += "\"data\": { \"shortDef\": " + JSONUtils.quote(shortDefStr) + "}, \"children\": [] ";
                             if (classIt.hasNext())
                                 json += "} , ";
                             else 

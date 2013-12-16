@@ -3,10 +3,10 @@
 <% /* For now, not using XML syntax because the output XHTML is not indented */ %>
 <% /* <?xml version="1.0" encoding="UTF-8"?> */ %>
 <% /* <jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" 
-          xmlns:c="http://java.sun.com/jstl/core"
+          xmlns:c="http://java.sun.com/jsp/jstl/core"
           xmlns:form="http://vitro.mannlib.cornell.edu/edit/tags"
           version="2.0"> */ %> 
-<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://vitro.mannlib.cornell.edu/edit/tags" %>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
@@ -37,9 +37,12 @@
                         SELECT   ?pred  ?predLabel ?obj ?objLabel ?graph
                         WHERE 
                         {
+                         { <${entity.URI}> ?pred ?obj 
+                           MINUS { GRAPH ?g { <${entity.URI}> ?pred ?obj } } } 
+                         UNION 
                          { GRAPH ?graph { <${entity.URI}> ?pred ?obj} } 
-                         OPTIONAL { GRAPH ?h { ?obj rdfs:label ?objLabel } }
-                         OPTIONAL { GRAPH ?i { ?pred rdfs:label ?predLabel } }
+                         OPTIONAL { ?obj rdfs:label ?objLabel }
+                         OPTIONAL { ?pred rdfs:label ?predLabel }
                         } ORDER BY ?graph ?pred
                         limit 10000"/>
           <form action="admin/sparqlquery" method="get">
@@ -54,9 +57,12 @@
                         SELECT ?sub ?subL  ?pred  ?predLabel ?graph
                         WHERE 
                         {
+                         { ?sub ?pred <${entity.URI}>  
+                           MINUS { GRAPH ?g { ?sub ?pred <${entity.URI}> } } } 
+                         UNION
                          { GRAPH ?graph { ?sub ?pred <${entity.URI}> } }
-                         OPTIONAL { GRAPH ?h { ?sub rdfs:label ?subL } }
-                         OPTIONAL { GRAPH ?i { ?pred rdfs:label ?predLabel } }
+                         OPTIONAL { ?sub rdfs:label ?subL }
+                         OPTIONAL { ?pred rdfs:label ?predLabel }
                         } ORDER BY ?graph ?pred
                         limit 10000"/>
           <form action="admin/sparqlquery" method="get">
@@ -93,11 +99,6 @@
             	<input type="hidden" name="controller" value="Entity"/>
         	</form>
         	<form action="editForm" method="get">
-            	<input type="submit" class="form-button" value="Add an External Identifier"/>
-            	<input type="hidden" name="IndividualURI" value="${individual.URI}"/>
-            	<input type="hidden" name="controller" value="ExternalId"/>
-        	</form>
-        	<form action="editForm" method="get">
             	<input type="submit" class="form-button" value="Change URI"/>
             	<input type="hidden" name="oldURI" value="${individual.URI}"/>
             	<input type="hidden" name="mode" value="renameResource"/>
@@ -121,7 +122,7 @@
 				<c:url var="typeURL" value="/vclassEdit">
 					<c:param name="uri" value="${type.URI}"/>
 				</c:url>
-				<li><input type="checkbox" name="TypeURI" value="${type.URI}" class="form-item"/><a href="${typeURL}"> ${type.localNameWithPrefix} </a></li>
+				<li><input type="checkbox" name="TypeURI" value="${type.URI}" class="form-item"/><a href="${typeURL}"> ${type.pickListName} </a></li>
 			</c:forEach>	
 			</ul>
 			<input type="hidden" name="individualURI" value="${individual.URI}"/>

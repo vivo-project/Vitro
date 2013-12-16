@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import freemarker.cache.WebappTemplateLoader;
 import freemarker.template.Configuration;
@@ -67,36 +69,36 @@ public class StartupStatusDisplayFilter implements Filter {
 		statusAlreadyDisplayed = true;
 	}
 
-	private void displayStartupStatus(ServletRequest req, ServletResponse resp) throws IOException,
-			ServletException {
-		HttpServletResponse hResp = (HttpServletResponse) resp;
+	private void displayStartupStatus(ServletRequest req, ServletResponse resp)
+			throws IOException, ServletException {
+		HttpServletResponse hresp = (HttpServletResponse) resp;
+		HttpServletRequest hreq = (HttpServletRequest) req;
 
 		try {
 			Map<String, Object> bodyMap = new HashMap<String, Object>();
 			bodyMap.put("status", ss);
 			bodyMap.put("showLink", !isFatal());
 			bodyMap.put("contextPath", getContextPath());
-			bodyMap.put("applicationName", getApplicationName());			
-						
-	        HttpServletRequest httpreq = (HttpServletRequest) req;
-	        String url = "";
-	        
-	        String path = httpreq.getRequestURI();
-	        if( path != null ){
-	        	url = path;
-	        }
-	        
-	        String query = httpreq.getQueryString();
-	        if( !StringUtils.isEmpty( query )){
-	        	url = url + "?" + query;
-	        }	
-	        
-			bodyMap.put("url", url );
+			bodyMap.put("applicationName", getApplicationName());
 
-			hResp.setContentType("text/html;charset=UTF-8");
-			hResp.setStatus(SC_INTERNAL_SERVER_ERROR);
+			String url = "";
+
+			String path = hreq.getRequestURI();
+			if (path != null) {
+				url = path;
+			}
+
+			String query = hreq.getQueryString();
+			if (!StringUtils.isEmpty(query)) {
+				url = url + "?" + query;
+			}
+
+			bodyMap.put("url", url);
+
+			hresp.setContentType("text/html;charset=UTF-8");
+			hresp.setStatus(SC_INTERNAL_SERVER_ERROR);
 			Template tpl = loadFreemarkerTemplate();
-			tpl.process(bodyMap, hResp.getWriter());
+			tpl.process(bodyMap, hresp.getWriter());
 		} catch (TemplateException e) {
 			throw new ServletException("Problem with Freemarker Template", e);
 		}
@@ -114,7 +116,8 @@ public class StartupStatusDisplayFilter implements Filter {
 	private Object getApplicationName() {
 		String name = "";
 		try {
-			ApplicationBean app = ApplicationBean.getAppBean(ctx);
+			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
+			ApplicationBean app = wadf.getApplicationDao().getApplicationBean();
 			name = app.getApplicationName();
 		} catch (Exception e) {
 			// deal with problems below

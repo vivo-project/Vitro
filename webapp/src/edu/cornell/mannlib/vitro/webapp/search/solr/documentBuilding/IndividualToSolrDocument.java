@@ -17,6 +17,7 @@ import org.apache.solr.common.SolrInputDocument;
 import org.joda.time.DateTime;
 import org.jsoup.Jsoup;
 
+import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -60,14 +61,18 @@ public class IndividualToSolrDocument {
             
             //vitro id
             doc.addField(term.URI, ind.getURI());
-                    
+            log.debug(ind.getURI() + " init boost: " + doc.getDocumentBoost());
+            
     		//get label from ind
     		addLabel(ind, doc);
     		
         	//add classes, classgroups get if prohibited because of its class
             StringBuffer classPublicNames = new StringBuffer("");
         	addClasses(ind, doc, classPublicNames);
-        	        	        	        	
+        	addMostSpecificTypeUris( ind, doc );
+        	
+        	log.debug(ind.getURI() + " post class boost: " + doc.getDocumentBoost());
+        	
         	// collecting URIs and rdfs:labels of objects of statements         	
         	StringBuffer objectNames = new StringBuffer("");        	
         	StringBuffer addUri = new StringBuffer("");           	
@@ -83,7 +88,11 @@ public class IndividualToSolrDocument {
                 doc.setDocumentBoost(ind.getSearchBoost());                    
             }    
             
+            log.debug(ind.getURI() + " pre mod boost: " + doc.getDocumentBoost());
+            
             runAdditionalDocModifers(ind,doc,addUri);            
+            
+            log.debug(ind.getURI() + " post mod boost: " + doc.getDocumentBoost());
             
             return doc;
         }catch(SkipIndividualException ex){
@@ -91,9 +100,7 @@ public class IndividualToSolrDocument {
             log.debug(ex);
             return null;
         }catch(Exception th){
-            //Odd exceptions can get thrown on shutdown
-            if( log != null )
-                log.error(th,th);
+            log.error(th,th);
             return null;
         }
     }
@@ -103,6 +110,9 @@ public class IndividualToSolrDocument {
         for( SearchIndexExcluder excluder : excludes){
             try{
                 String msg = excluder.checkForExclusion(ind);
+				log.debug("individual=" + ind.getURI() + " (" + ind.getLabel()
+						+ "), excluder=" + excluder + ", types="
+						+ ind.getMostSpecificTypeURIs() + ", msg=" + msg);
                 if( msg != DONT_EXCLUDE)
                     return msg;
             }catch (Exception e) {
@@ -153,23 +163,23 @@ public class IndividualToSolrDocument {
         //ALLTEXT, all of the 'full text'
         StringBuffer allTextValue = new StringBuffer();
 
-        //collecting data property statements
-        List<DataPropertyStatement> dataPropertyStatements = ind.getDataPropertyStatements();
-        if (dataPropertyStatements != null) {
-            Iterator<DataPropertyStatement> dataPropertyStmtIter = dataPropertyStatements.iterator();
-            while (dataPropertyStmtIter.hasNext()) {
-                DataPropertyStatement dataPropertyStmt =  dataPropertyStmtIter.next();
-                if(dataPropertyStmt.getDatapropURI().equals(label)){ // we don't want label to be added to alltext
-                    continue;
-                } else if(dataPropertyStmt.getDatapropURI().equals("http://vivoweb.org/ontology/core#preferredTitle")){
-                	//add the preferredTitle field
-                	String preferredTitle = null;
-                	doc.addField(term.PREFERRED_TITLE, ((preferredTitle=dataPropertyStmt.getData()) == null)?"":preferredTitle);
-                	log.debug("Preferred Title: " + dataPropertyStmt.getData());
+        try{
+            //collecting data property statements
+            List<DataPropertyStatement> dataPropertyStatements = ind.getDataPropertyStatements();
+            if (dataPropertyStatements != null) {
+                Iterator<DataPropertyStatement> dataPropertyStmtIter = dataPropertyStatements.iterator();
+                while (dataPropertyStmtIter.hasNext()) {
+                    DataPropertyStatement dataPropertyStmt =  dataPropertyStmtIter.next();
+                    if(dataPropertyStmt.getDatapropURI().equals(label)){ // we don't want label to be added to alltext
+                        continue;
+                    }
+                    allTextValue.append(" ");
+                    allTextValue.append(((t=dataPropertyStmt.getData()) == null)?"":t);
                 }
-                allTextValue.append(" ");
-                allTextValue.append(((t=dataPropertyStmt.getData()) == null)?"":t);
             }
+        }catch(JenaException je){
+            //VIVO-15 Trap for characters that cause search indexing to abort
+            log.error(String.format("Continuing to index %s but could not get all dataproperties because %s",ind.getURI(),je.getMessage()));            
         }
          
         allTextValue.append(objectNames.toString());
@@ -189,7 +199,6 @@ public class IndividualToSolrDocument {
         
         doc.addField(term.ALLTEXT, alltext);
         doc.addField(term.ALLTEXTUNSTEMMED, alltext);
-        doc.addField(term.ALLTEXT_PHONETIC, alltext);
     }
 
 
@@ -202,25 +211,31 @@ public class IndividualToSolrDocument {
      */
     protected void addObjectPropertyText(Individual ind, SolrInputDocument doc,
             StringBuffer objectNames, StringBuffer addUri) {
-        List<ObjectPropertyStatement> objectPropertyStatements = ind.getObjectPropertyStatements();
-        if (objectPropertyStatements != null) {
-            Iterator<ObjectPropertyStatement> objectPropertyStmtIter = objectPropertyStatements.iterator();
-            while (objectPropertyStmtIter.hasNext()) {
-                ObjectPropertyStatement objectPropertyStmt = objectPropertyStmtIter.next();
-                if( "http://www.w3.org/2002/07/owl#differentFrom".equals(objectPropertyStmt.getPropertyURI()) ){
-                    continue;
+        
+        try{
+            List<ObjectPropertyStatement> objectPropertyStatements = ind.getObjectPropertyStatements();
+            if (objectPropertyStatements != null) {
+                Iterator<ObjectPropertyStatement> objectPropertyStmtIter = objectPropertyStatements.iterator();
+                while (objectPropertyStmtIter.hasNext()) {
+                    ObjectPropertyStatement objectPropertyStmt = objectPropertyStmtIter.next();
+                    if( "http://www.w3.org/2002/07/owl#differentFrom".equals(objectPropertyStmt.getPropertyURI()) ){
+                        continue;
+                    }
+                    try {
+                        objectNames.append(" ");
+                        String t=null;
+                        objectNames.append(((t=objectPropertyStmt.getObject().getRdfsLabel()) == null)?"":t);   
+                        addUri.append(" ");
+                        addUri.append(((t=objectPropertyStmt.getObject().getURI()) == null)?"":t);
+                    } catch (Exception e) { 
+                         log.debug("could not index name of related object: " + e.getMessage());
+                    }
                 }
-                try {
-                    objectNames.append(" ");
-                    String t=null;
-                    objectNames.append(((t=objectPropertyStmt.getObject().getRdfsLabel()) == null)?"":t);   
-                    addUri.append(" ");
-                    addUri.append(((t=objectPropertyStmt.getObject().getURI()) == null)?"":t);
-                } catch (Exception e) { 
-                     log.debug("could not index name of related object: " + e.getMessage());
-                }
-            }
-        }        
+            }   
+        }catch(JenaException je){
+            //VIVO-15 Trap for characters that cause search indexing to abort
+            log.error(String.format("Continuing to index %s but could not get all object properties because %s",ind.getURI(),je.getMessage()));            
+        }
     }
 
     /**
@@ -237,7 +252,7 @@ public class IndividualToSolrDocument {
         if( vclasses == null || vclasses.isEmpty() ){
             throw new SkipIndividualException("Not indexing because individual has no classes");
         }        
-                
+                        
         for(VClass clz : vclasses){
             if(clz.getURI() == null){
                 continue;
@@ -251,11 +266,6 @@ public class IndividualToSolrDocument {
                 
                 doc.addField(term.RDFTYPE, clz.getURI());
                 
-                if(clz.getLocalName() != null){
-                    doc.addField(term.CLASSLOCALNAME, clz.getLocalName());
-                    doc.addField(term.CLASSLOCALNAMELOWERCASE, clz.getLocalName().toLowerCase());
-                }
-                
                 if(clz.getName() != null){
                     classPublicNames.append(" ");
                     classPublicNames.append(clz.getName());
@@ -267,6 +277,16 @@ public class IndividualToSolrDocument {
                 }               
             }
         }                                                
+    }
+    
+    protected void addMostSpecificTypeUris(Individual ind, SolrInputDocument doc){        
+        List<String> mstURIs = ind.getMostSpecificTypeURIs();
+        if( mstURIs != null ){
+            for( String typeURI : mstURIs ){
+                if( typeURI != null && ! typeURI.trim().isEmpty() )
+                    doc.addField(term.MOST_SPECIFIC_TYPE_URIS, typeURI);
+            }
+        }
     }
         
     protected void addLabel(Individual ind, SolrInputDocument doc) {

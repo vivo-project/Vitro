@@ -6,8 +6,12 @@
 <#if (rangeOptions?keys?size > 0)>
 	<#assign rangeOptionsExist = true/>
 </#if>
-
-<h2>${editConfiguration.formTitle}</h2>
+<#assign rangeUri = editConfiguration.objectPredicateProperty.rangeVClassURI!"" />
+<#assign formTitle = editConfiguration.formTitle />
+<#if rangeUri?contains("IAO_0000030")>
+    <#assign formTitle = "${i18n().select_an_existing_document}" + " ${i18n().for} " + editConfiguration.subjectName/>
+</#if>
+<h2>${formTitle}</h2>
 
 <#if editConfiguration.propertySelectFromExisting = true>
     <#if rangeOptionsExist  = true >
@@ -25,12 +29,12 @@
             
             <p>
                 <input type="submit" id="submit" value="${editConfiguration.submitLabel}" role="button "/>
-                <span class="or"> or </span>
-                <a title="Cancel" class="cancel" href="${cancelUrl}">Cancel</a>
+                <span class="or"> ${i18n().or} </span>
+                <a title="${i18n().cancel_title}" class="cancel" href="${cancelUrl}">${i18n().cancel_link}</a>
             </p>
         </form>
     <#else>
-        <p> There are no entries in the system from which to select.  </p>  
+        <p> ${i18n().there_are_no_entries_for_selection}  </p>  
     </#if>
 </#if>
 
@@ -40,11 +44,10 @@
 </#if>
 
 <#if editConfiguration.propertySelectFromExisting = false && editConfiguration.propertyOfferCreateNewOption = false>
-<p>This property is currently configured to prohibit editing. </p>
+<p>${i18n().editing_prohibited} </p>
 </#if>
 
 
 <#if editConfiguration.includeDeletionForm = true>
 <#include "defaultDeletePropertyForm.ftl">
 </#if>
-

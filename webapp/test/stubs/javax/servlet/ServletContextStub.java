@@ -21,6 +21,8 @@ import javax.servlet.ServletException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import stubs.edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettingsStub;
+
 /**
  * A simple stand-in for the {@link ServletContext}, for use in unit tests.
  */
@@ -36,6 +38,11 @@ public class ServletContextStub implements ServletContext {
 	private final Map<String, String> mockResources = new HashMap<String, String>();
 	private final Map<String, String> realPaths = new HashMap<String, String>();
 
+	public ServletContextStub() {
+		// Assume that unit tests won't want to use Developer mode.
+		DeveloperSettingsStub.set(this);
+	}
+	
 	public void setContextPath(String contextPath) {
 		if (contextPath == null) {
 			throw new NullPointerException("contextPath may not be null.");
@@ -200,6 +207,7 @@ public class ServletContextStub implements ServletContext {
 	}
 
 	@Override
+	@Deprecated
 	public Servlet getServlet(String arg0) throws ServletException {
 		throw new RuntimeException(
 				"ServletContextStub.getServlet() not implemented.");
@@ -213,6 +221,7 @@ public class ServletContextStub implements ServletContext {
 
 	@Override
 	@SuppressWarnings("rawtypes")
+	@Deprecated
 	public Enumeration getServletNames() {
 		throw new RuntimeException(
 				"ServletContextStub.getServletNames() not implemented.");
@@ -220,6 +229,7 @@ public class ServletContextStub implements ServletContext {
 
 	@Override
 	@SuppressWarnings("rawtypes")
+	@Deprecated
 	public Enumeration getServlets() {
 		throw new RuntimeException(
 				"ServletContextStub.getServlets() not implemented.");
@@ -231,6 +241,7 @@ public class ServletContextStub implements ServletContext {
 	}
 
 	@Override
+	@Deprecated
 	public void log(Exception arg0, String arg1) {
 		throw new RuntimeException("ServletContextStub.log() not implemented.");
 	}

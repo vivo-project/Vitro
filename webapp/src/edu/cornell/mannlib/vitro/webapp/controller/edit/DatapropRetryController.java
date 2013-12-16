@@ -34,8 +34,10 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 
 public class DatapropRetryController extends BaseEditController {
@@ -54,11 +56,12 @@ public class DatapropRetryController extends BaseEditController {
         
         VitroRequest vreq = new VitroRequest(request);
 
-        DatatypeDao dDao = vreq.getFullWebappDaoFactory().getDatatypeDao();
-        DataPropertyDao dpDao = vreq.getFullWebappDaoFactory().getDataPropertyDao();
+        WebappDaoFactory wadf = ModelAccess.on(getServletContext()).getWebappDaoFactory();
+        
+        DatatypeDao dDao = wadf.getDatatypeDao();
+        DataPropertyDao dpDao = wadf.getDataPropertyDao();
         epo.setDataAccessObject(dpDao);
-        OntologyDao ontDao = vreq.getFullWebappDaoFactory().getOntologyDao();
-        VClassDao vclassDao = vreq.getFullWebappDaoFactory().getVClassDao();
+        OntologyDao ontDao = wadf.getOntologyDao();
 
         DataProperty objectForEditing = null;
         String action = null;
@@ -135,10 +138,10 @@ public class DatapropRetryController extends BaseEditController {
         
         HashMap optionMap = new HashMap();
         List namespaceList = FormUtils.makeOptionListFromBeans(ontDao.getAllOntologies(),"URI","Name", ((objectForEditing.getNamespace()==null) ? "" : objectForEditing.getNamespace()), null, (objectForEditing.getNamespace()!=null));
-	    namespaceList.add(0, new Option(vreq.getFullWebappDaoFactory().getDefaultNamespace(),"default"));
+	    namespaceList.add(0, new Option(vreq.getUnfilteredWebappDaoFactory().getDefaultNamespace(),"default"));
         optionMap.put("Namespace", namespaceList);
         
-        List<Option> domainOptionList = FormUtils.makeVClassOptionList(vreq.getFullWebappDaoFactory(), objectForEditing.getDomainClassURI());
+        List<Option> domainOptionList = FormUtils.makeVClassOptionList(vreq.getUnfilteredWebappDaoFactory(), objectForEditing.getDomainClassURI());
         if (objectForEditing.getDomainClassURI() != null) {
         	VClass domain = vreq.getWebappDaoFactory().getVClassDao()
         	        .getVClassByURI(objectForEditing.getDomainClassURI());
@@ -157,7 +160,7 @@ public class DatapropRetryController extends BaseEditController {
         datatypeOptionList.add(0,new Option(null,"untyped (use if language tags desired)"));
         optionMap.put("RangeDatatypeURI", datatypeOptionList);
         
-        List groupOptList = FormUtils.makeOptionListFromBeans(vreq.getFullWebappDaoFactory().getPropertyGroupDao().getPublicGroups(true),"URI","Name", ((objectForEditing.getGroupURI()==null) ? "" : objectForEditing.getGroupURI()), null, (objectForEditing.getGroupURI()!=null));
+        List groupOptList = FormUtils.makeOptionListFromBeans(vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao().getPublicGroups(true),"URI","Name", ((objectForEditing.getGroupURI()==null) ? "" : objectForEditing.getGroupURI()), null, (objectForEditing.getGroupURI()!=null));
         groupOptList.add(0,new Option("","none"));
         optionMap.put("GroupURI", groupOptList);
 

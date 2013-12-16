@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
@@ -29,16 +30,22 @@ public class IndividualController extends FreemarkerHttpServlet {
 			.getLog(IndividualController.class);
 
 	private static final String TEMPLATE_HELP = "individual-help.ftl";
+	
+	@Deprecated
+	private static final String PROPERTY_EXTENDED_LOD = "serveExtendedLinkedData";
 
 	/**
 	 * Use this map to decide which MIME type is suited for the "accept" header.
 	 */
 	public static final Map<String, Float> ACCEPTED_CONTENT_TYPES = initializeContentTypes();
+
 	private static Map<String, Float> initializeContentTypes() {
 		HashMap<String, Float> map = new HashMap<String, Float>();
 		map.put(HTML_MIMETYPE, 0.5f);
 		map.put(XHTML_MIMETYPE, 0.5f);
 		map.put("application/xml", 0.5f);
+        map.put(JSON_MIMETYPE, 1.0f);
+		map.put(RDFXML_MIMETYPE, 1.0f);
 		map.put(RDFXML_MIMETYPE, 1.0f);
 		map.put(N3_MIMETYPE, 1.0f);
 		map.put(TTL_MIMETYPE, 1.0f);
@@ -80,9 +87,15 @@ public class IndividualController extends FreemarkerHttpServlet {
 				 * If they are asking for RDF using the preferred URL, give it
 				 * to them.
 				 */
-				return new IndividualRdfAssembler(vreq,
-						requestInfo.getIndividual(), requestInfo.getRdfFormat())
-						.assembleRdf();
+				if (useExtendedLOD(vreq)) {
+					return new ExtendedRdfAssembler(vreq,
+							requestInfo.getIndividual(),
+							requestInfo.getRdfFormat()).assembleRdf();
+				} else {
+					return new IndividualRdfAssembler(vreq,
+							requestInfo.getIndividual().getURI(),
+							requestInfo.getRdfFormat()).assembleRdf();
+				}
 			default:
 				/*
 				 * Otherwise, prepare an HTML response for the requested
@@ -109,6 +122,11 @@ public class IndividualController extends FreemarkerHttpServlet {
 
 		return new TemplateResponseValues(TEMPLATE_HELP, body,
 				HttpServletResponse.SC_NOT_FOUND);
+	}
+
+	private boolean useExtendedLOD(HttpServletRequest req) {
+		ConfigurationProperties props = ConfigurationProperties.getBean(req);
+		return Boolean.valueOf(props.getProperty(PROPERTY_EXTENDED_LOD));
 	}
 
 	@Override

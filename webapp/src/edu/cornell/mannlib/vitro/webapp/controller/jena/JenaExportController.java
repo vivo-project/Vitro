@@ -5,8 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.jena;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,8 +28,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -121,8 +120,7 @@ public class JenaExportController extends BaseEditController {
 		if( "abox".equals(subgraphParam)){
 			model = ModelFactory.createDefaultModel();
 			if("inferred".equals(assertedOrInferredParam)){
-				model = ModelContext.getInferenceOntModelSelector(
-						getServletContext()).getABoxModel();
+				model = ModelAccess.on(getServletContext()).getOntModel(ModelID.INFERRED_ABOX);
 			}
 			else if("full".equals(assertedOrInferredParam)){
 			    outputSparqlConstruct(ABOX_FULL_CONSTRUCT, formatParam, response);
@@ -137,10 +135,9 @@ public class JenaExportController extends BaseEditController {
 		        // so we'll extract the whole ontology and then include
 		        // only those statements that are in the inferred graph
 		        Model tempModel = xutil.extractTBox(
-		                ModelContext.getUnionOntModelSelector(
-		                        getServletContext()).getTBoxModel(), ontologyURI);
-		        Model inferenceModel = ModelContext.getInferenceOntModelSelector(
-                        getServletContext()).getTBoxModel();
+		        		ModelAccess.on(getServletContext()).getOntModel(ModelID.UNION_TBOX),
+		                ontologyURI);
+		        Model inferenceModel = ModelAccess.on(getServletContext()).getOntModel(ModelID.INFERRED_TBOX);
 		        inferenceModel.enterCriticalSection(Lock.READ);
 		        try {
     		        model = tempModel.intersection(inferenceModel);
@@ -149,12 +146,11 @@ public class JenaExportController extends BaseEditController {
 		        }
 		    } else if ("full".equals(assertedOrInferredParam)) {
                 model = xutil.extractTBox(
-                        ModelContext.getUnionOntModelSelector(
-                                getServletContext()).getTBoxModel(), ontologyURI);		        
+                		ModelAccess.on(getServletContext()).getOntModel(ModelID.UNION_TBOX),
+                        ontologyURI);		        
 		    } else {
                 model = xutil.extractTBox(
-                        ModelContext.getBaseOntModelSelector(
-                                getServletContext()).getTBoxModel(), ontologyURI);              		        
+                        ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_TBOX), ontologyURI);              		        
 		    }
 			
 		}
@@ -162,10 +158,8 @@ public class JenaExportController extends BaseEditController {
 			if("inferred".equals(assertedOrInferredParam)){
 				ontModel = xutil.extractTBox(
 						dataset, ontologyURI, INFERENCE_GRAPH);
-				ontModel.addSubModel(ModelContext.getInferenceOntModelSelector(
-						getServletContext()).getABoxModel());
-				ontModel.addSubModel(ModelContext.getInferenceOntModelSelector(
-						getServletContext()).getTBoxModel());
+				ontModel.addSubModel(ModelAccess.on(getServletContext()).getOntModel(ModelID.INFERRED_ABOX));
+				ontModel.addSubModel(ModelAccess.on(getServletContext()).getOntModel(ModelID.INFERRED_TBOX));
 			}
 			else if("full".equals(assertedOrInferredParam)){
 			    outputSparqlConstruct(FULL_FULL_CONSTRUCT, formatParam, response);
@@ -283,9 +277,6 @@ public class JenaExportController extends BaseEditController {
 		}
 	}
 	
-	static final String FULL_ONT_MODEL_ATTR = "jenaOntModel";
-	static final String ASSERTIONS_ONT_MODEL_ATTR = "baseOntModel";
-	static final String INFERENCES_ONT_MODEL_ATTR = "inferenceOntModel";
 	static final String FULL_GRAPH = "?g";
 	static final String ASSERTIONS_GRAPH = "<http://vitro.mannlib.cornell.edu/default/vitro-kb-2>";
 	static final String INFERENCE_GRAPH = "<http://vitro.mannlib.cornell.edu/default/vitro-kb-inf>";

@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
 /**
  * Should we allow the user to edit this ObjectPropertyStatement in this model?
@@ -12,8 +13,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 public class EditObjectPropertyStatement extends
 		AbstractObjectPropertyStatementAction {
 	public EditObjectPropertyStatement(OntModel ontModel, String subjectUri,
-			String keywordPredUri, String objectUri) {
-		super(ontModel, subjectUri, keywordPredUri, objectUri);
+			Property keywordPred, String objectUri) {
+		super(ontModel, subjectUri, keywordPred, objectUri);
 	}
 
 	public EditObjectPropertyStatement(OntModel ontModel,

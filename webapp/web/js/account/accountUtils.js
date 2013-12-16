@@ -45,7 +45,7 @@ $(document).ready(function(){
         if (countAccount == 0){
             return false;
         }else{
-            var answer = confirm( 'Are you sure you want to delete ' + ((countAccount > 1) ? 'these accounts' : 'this account') +'?');
+            var answer = confirm( ((countAccount > 1) ? confirm_delete_account_plural : confirm_delete_account_singular) +'?');
             return answer;
         }
     });

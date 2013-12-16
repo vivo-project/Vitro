@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.utils.menuManagement;
 
 import java.util.Map;
 
-import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,19 +28,21 @@ public class ProcessClassGroup implements ProcessDataGetter{
 
   //template data represents what needs to be modified and returned to template
 	//page data is data retrieved from data getter
-    public void populateTemplate(ServletContext context, Map<String, Object> pageData, Map<String, Object> templateData) {
+    @Override
+	public void populateTemplate(HttpServletRequest req, Map<String, Object> pageData, Map<String, Object> templateData) {
 		//This is a class group page so 
 		templateData.put("isClassGroupPage", true);
 		templateData.put("includeAllClasses", true);
 		
 		//Get the class group from VClassGroup
-		DataGetterUtils.getClassGroupForDataGetter(context, pageData, templateData);
+		DataGetterUtils.getClassGroupForDataGetter(req, pageData, templateData);
 	}
     
     
     //Process submission
     
-    public  Model processSubmission(VitroRequest vreq, Resource dataGetterResource) {
+    @Override
+	public  Model processSubmission(VitroRequest vreq, Resource dataGetterResource) {
 		Model dgModel = ModelFactory.createDefaultModel();
 		String dataGetterTypeUri = DataGetterUtils.generateDataGetterTypeURI(ClassGroupPageData.class.getName());
 		dgModel.add(dgModel.createStatement(dataGetterResource, 

@@ -55,6 +55,15 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
             return new RedirectResponseValues( UrlBuilder.getHomeUrl() );
         }
         
+        //In some cases, a generator/form may have a regular URL to return to but the same generator
+        //may be used from different pages, so a parameter allowing the form to return to a specific page
+        //would be useful
+        
+        String returnURLParameter = vreq.getParameter("returnURL");
+        if(returnURLParameter != null) {
+            return new DirectRedirectResponseValues( returnURLParameter );
+        }
+        
         // If there is a urlToReturnTo that takes precedence 
         if( editConfig.getUrlToReturnTo() != null && ! editConfig.getUrlToReturnTo().trim().isEmpty()){
             //this does not get value substitution or the predicate anchor

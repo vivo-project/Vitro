@@ -35,13 +35,9 @@ public interface OntModelSelector {
 	 * @return OntModel containing all TBox axioms
 	 */
 	public OntModel getTBoxModel();
-
+	
 	/**
-	 * @param ontologyURI
-	 * @return OntModel containing TBox axioms for the specified ontology
+	 * @return OntModel containing all RDF statements in the Display model.
 	 */
-	public OntModel getTBoxModel(String ontologyURI);
-	
 	public OntModel getDisplayModel();
-	
 }

@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 
@@ -21,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
@@ -54,7 +56,10 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 	public static boolean isCreateNewIndividual(VitroRequest vreq, HttpSession session) {
 		String command = vreq.getParameter("cmd");
 		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
-		ObjectProperty objProp = vreq.getWebappDaoFactory().getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
+		//This method also looks at domain and range uris and so is different than just getting the
+		//object property based on predicate uri alone
+		ObjectProperty objProp = EditConfigurationUtils.getObjectPropertyForPredicate(vreq, 
+	            predicateUri);
 		if(objProp != null) {
 			return(objProp.getOfferCreateNewOption() && 
 					(
@@ -350,7 +355,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 
 	private void prepareForUpdate(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
     	//Here, retrieve model from 
-    	Model model = (Model) session.getServletContext().getAttribute("jenaOntModel");
+		OntModel model = ModelAccess.on(session.getServletContext()).getJenaOntModel();
     	//if object property
     	if(EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)){
 	    	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);

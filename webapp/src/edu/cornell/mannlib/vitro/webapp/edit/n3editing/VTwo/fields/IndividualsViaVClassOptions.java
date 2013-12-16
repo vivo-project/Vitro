@@ -3,6 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +18,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTw
 public class IndividualsViaVClassOptions implements FieldOptions {
 
     public static final String LEFT_BLANK = "";
-    private List<String> vclassURIs;    
-    private String defaultOptionLabel;    
+    protected List<String> vclassURIs;    
+    protected String defaultOptionLabel;    
 
     public IndividualsViaVClassOptions(String ... vclassURIs) throws Exception {
         super();
@@ -126,6 +127,10 @@ public class IndividualsViaVClassOptions implements FieldOptions {
         }
         return individualMap;   
     }    
+    
+    public Comparator<String[]> getCustomComparator() {
+    	return null;
+    }
 }
 
 

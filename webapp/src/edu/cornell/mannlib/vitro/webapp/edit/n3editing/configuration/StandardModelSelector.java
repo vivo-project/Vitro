@@ -10,35 +10,15 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 
 public class StandardModelSelector implements ModelSelector {
 
     private static final Log log = LogFactory.getLog(StandardModelSelector.class);
     
     public OntModel getModel(HttpServletRequest request, ServletContext context) {
-        VitroRequest vreq = new VitroRequest( request );        
-        
-        Object sessionOntModel = null;
-        if( vreq.getSession() != null) {
-            OntModelSelector oms = (OntModelSelector) vreq.getSession()
-            							.getAttribute("unionOntModelSelector");
-            if (oms != null) {
-            	sessionOntModel = oms.getABoxModel();
-            }
-        }
-        if(sessionOntModel != null && sessionOntModel instanceof OntModel ) {
-            log.debug("using OntModelSelector from session");
-            return (OntModel)sessionOntModel;
-        } else if (vreq.getOntModelSelector() != null) {
-            log.debug("using OntModelSelector from request");
-            return vreq.getOntModelSelector().getABoxModel();
-        } else {
-            log.debug("using OntModelSelector from context");
-            return ((OntModelSelector) context
-            			.getAttribute("unionOntModelSelector")).getABoxModel();
-        }
+    	return ModelAccess.on(request.getSession()).getOntModel(ModelID.UNION_ABOX);
     }
     
     public static final ModelSelector selector = new StandardModelSelector();

@@ -8,31 +8,31 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
  * A RequestedAction that can be recognized by a SimplePermission.
  */
 public class SimpleRequestedAction extends RequestedAction {
-	private final String localName;
+	private final String uri;
 
-	public SimpleRequestedAction(String localName) {
-		if (localName == null) {
-			throw new NullPointerException("localName may not be null.");
+	public SimpleRequestedAction(String uri) {
+		if (uri == null) {
+			throw new NullPointerException("uri may not be null.");
 		}
 
-		this.localName = localName;
+		this.uri = uri;
 	}
 
 	@Override
 	public String getURI() {
-		return "java:" + this.getClass().getName() + "#" + localName;
+		return uri;
 	}
 
 	@Override
 	public int hashCode() {
-		return (localName == null) ? 0 : localName.hashCode();
+		return uri.hashCode();
 	}
 
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof SimpleRequestedAction) {
 			SimpleRequestedAction that = (SimpleRequestedAction) o;
-			return equivalent(this.localName, that.localName);
+			return equivalent(this.uri, that.uri);
 		}
 		return false;
 	}
@@ -43,7 +43,7 @@ public class SimpleRequestedAction extends RequestedAction {
 
 	@Override
 	public String toString() {
-		return "SimpleRequestedAction['" + localName + "']";
+		return "SimpleRequestedAction['" + uri + "']";
 	}
 
 }

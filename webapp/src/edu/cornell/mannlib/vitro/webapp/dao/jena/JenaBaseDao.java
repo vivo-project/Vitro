@@ -12,7 +12,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -23,7 +22,6 @@ import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.iri.IRI;
 import com.hp.hpl.jena.iri.IRIFactory;
-import com.hp.hpl.jena.iri.Violation;
 import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntClass;
@@ -55,10 +53,6 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 
 	public static final boolean KEEP_ONLY_IF_TRUE = true; //used for updatePropertyBooleanValue()
     public static final boolean KEEP_ONLY_IF_FALSE = false; //used for updatePropertyBooleanValue()
-    
-    public static final String JENA_ONT_MODEL_ATTRIBUTE_NAME = "jenaOntModel";
-    public static final String ASSERTIONS_ONT_MODEL_ATTRIBUTE_NAME = "baseOntModel";
-    public static final String INFERENCE_ONT_MODEL_ATTRIBUTE_NAME = "inferenceOntModel";
     
     protected static final Log log = LogFactory.getLog(JenaBaseDao.class.getName());
     
@@ -749,10 +743,10 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     	
     	if (label != null && label.length() > 0) {
     		
-    		String existingValue = ontRes.getLabel((String) getDefaultLanguage());
+    		String existingValue = ontRes.getLabel(getDefaultLanguage());
     	    
     		if (existingValue == null || !existingValue.equals(label)) {
-    			ontRes.setLabel(label, (String) getDefaultLanguage());	
+    			ontRes.setLabel(label, getDefaultLanguage());	
     	    }
     	} else {
     		ontRes.removeAll(RDFS.label);
@@ -840,7 +834,11 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         try {                       
             String localName = r.getLocalName();
             if (localName != null) {
-                label = localName;
+                if(localName.trim().length() > 0) {
+                    label = localName;
+                } else {
+                    label = r.getURI();
+                }
             } else if (r.isAnon()) {
                 label = r.getId().toString();
             } else {
@@ -910,7 +908,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         if (iri.hasViolation(false) ) {
         	String errorStr = ("Bad URI: "+ uri +
         	"\nOnly well-formed absolute URIrefs can be included in RDF/XML output: "
-                 + ((Violation)iri.violations(false).next()).getShortMessage());
+                 + (iri.violations(false).next()).getShortMessage());
         	return errorStr;
         } else {
         	return null;
@@ -931,9 +929,11 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     			return null;
     		if (vitroURIStr.indexOf(PSEUDO_BNODE_NS)==0) {
     			String idStr = vitroURIStr.split("#")[1];
+    			log.debug("Trying to get bnode " + idStr);
     			RDFNode rdfNode = ontModel.getRDFNode(Node.createAnon(AnonId.create(idStr)));
     			if ( (rdfNode != null) && (rdfNode.canAs(OntClass.class)) ) {
-    				cls = (OntClass) rdfNode.as(OntClass.class);
+    			    log.debug("found it");
+    				cls = rdfNode.as(OntClass.class);
     			}
 			} else {
 				try {
@@ -1006,7 +1006,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     	StmtIterator stmtIt = getOntModel().listStatements((Resource)null, prop, value);
     	while (stmtIt.hasNext()) {
     		Statement stmt = stmtIt.nextStatement();
-    		possibleSubjectSet.add((Resource)stmt.getSubject());
+    		possibleSubjectSet.add(stmt.getSubject());
     		
     	}
     	Iterator<Resource> possibleSubjectIt = possibleSubjectSet.iterator();
@@ -1016,7 +1016,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     		boolean hasAlternatePath = false;
         	while (stmtIt.hasNext()) {
         		Statement stmt = stmtIt.nextStatement();
-        		if (stmt.getObject().isResource() && possibleSubjectSet.contains((Resource)stmt.getObject())) {
+        		if (stmt.getObject().isResource() && possibleSubjectSet.contains(stmt.getObject())) {
         			hasAlternatePath = true;
         			break;
         		}

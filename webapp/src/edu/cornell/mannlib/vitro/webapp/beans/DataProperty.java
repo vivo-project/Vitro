@@ -12,7 +12,7 @@ import java.util.LinkedList;
  * @author bjl23
  *
  */
-public class DataProperty extends Property implements Comparable<DataProperty> {
+public class DataProperty extends Property implements Comparable<DataProperty>, ResourceBean {
 
     private String name = null;
     private String publicName = null;
@@ -62,8 +62,17 @@ public class DataProperty extends Property implements Comparable<DataProperty> {
     public void setPublicName(String publicName) {
         this.publicName = publicName;
     }
+    
+    public String getLabel() {
+        return getPublicName();
+    }
 
     public String getDomainClassURI() {
+        return domainClassURI;
+    }
+    
+    @Override
+    public String getDomainVClassURI() {
         return domainClassURI;
     }
 

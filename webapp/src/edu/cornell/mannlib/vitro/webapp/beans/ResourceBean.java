@@ -10,6 +10,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
  * Time: 3:41:23 PM
  */
 public interface ResourceBean {
+    
     String getURI();
     
     boolean isAnonymous();
@@ -24,28 +25,20 @@ public interface ResourceBean {
 
     void setLocalName(String localName);
     
+    String getLabel();
+    
     public RoleLevel getHiddenFromDisplayBelowRoleLevel() ;
     
     public void setHiddenFromDisplayBelowRoleLevel(RoleLevel eR) ;
     
     public void setHiddenFromDisplayBelowRoleLevelUsingRoleUri(String roleUri) ;
-    /*
-    public RoleLevel getProhibitedFromCreateBelowRoleLevel() ;
-    
-    public void setProhibitedFromCreateBelowRoleLevel(RoleLevel eR) ;
-    
-    public void setProhibitedFromCreateBelowRoleLevelUsingRoleUri(String roleUri) ;
-    */
+
     public RoleLevel getProhibitedFromUpdateBelowRoleLevel() ;
     
     public void setProhibitedFromUpdateBelowRoleLevel(RoleLevel eR) ;
     
     public void setProhibitedFromUpdateBelowRoleLevelUsingRoleUri(String roleUri) ;
-    /*
-    public RoleLevel getProhibitedFromDeleteBelowRoleLevel() ;
+  
+    public String getPickListName();
     
-    public void setProhibitedFromDeleteBelowRoleLevel(RoleLevel eR) ;
-    
-    public void setProhibitedFromDeleteBelowRoleLevelUsingRoleUri(String roleUri) ;
-    */
 }

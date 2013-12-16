@@ -13,15 +13,15 @@
         <p>
             ${userAccount.firstName} ${userAccount.lastName}
         </p>
-        
+
         <p>
             <strong>Congratulations!</strong>
         </p>
-        
+
         <p>
             We have created your new VIVO account associated with ${userAccount.emailAddress}.
         </p>
-        
+
         <p>
             Thanks!
         </p>

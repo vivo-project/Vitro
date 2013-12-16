@@ -4,16 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.controller.individual;
 
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
-import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
-import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
 
 /**
  * Implement all of the fiddly-bits that we need for analyzing the request for
@@ -21,14 +17,13 @@ import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapperFactory;
  */
 public class IndividualRequestAnalysisContextImpl implements
 		IndividualRequestAnalysisContext {
-	private final VitroRequest vreq;
-	private final ServletContext ctx;
+		
+	private final VitroRequest vreq;	
 	private final WebappDaoFactory wadf;
 	private final IndividualDao iDao;
 
 	public IndividualRequestAnalysisContextImpl(VitroRequest vreq) {
-		this.vreq = vreq;
-		this.ctx = vreq.getSession().getServletContext();
+		this.vreq = vreq;	
 		this.wadf = vreq.getWebappDaoFactory();
 		this.iDao = wadf.getIndividualDao();
 	}
@@ -36,19 +31,6 @@ public class IndividualRequestAnalysisContextImpl implements
 	@Override
 	public String getDefaultNamespace() {
 		return wadf.getDefaultNamespace();
-	}
-
-	@Override
-	public String getNamespaceForPrefix(String prefix) {
-		if (prefix == null) {
-			return "";
-		}
-
-		NamespaceMapper namespaceMapper = NamespaceMapperFactory
-				.getNamespaceMapper(ctx);
-		String ns = namespaceMapper.getNamespaceForPrefix(prefix);
-
-		return (ns == null) ? "" : ns;
 	}
 
 	@Override

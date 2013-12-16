@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 
 public class PropertyGroupRetryController extends BaseEditController {
@@ -50,7 +51,8 @@ public class PropertyGroupRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        PropertyGroupDao pgDao = request.getFullWebappDaoFactory().getPropertyGroupDao();
+        PropertyGroupDao pgDao = ModelAccess.on(
+                getServletContext()).getWebappDaoFactory().getPropertyGroupDao();
 
         epo.setDataAccessObject(pgDao);
 
@@ -65,12 +67,9 @@ public class PropertyGroupRetryController extends BaseEditController {
                     log.error("Need to implement 'record not found' error message.");
                 }
                 if (propertyGroupForEditing == null) {
-                    try {
-                        String uriToFind = new String(request.getParameter("uri").getBytes("ISO-8859-1"),"UTF-8");
-                        propertyGroupForEditing = (PropertyGroup)pgDao.getGroupByURI(uriToFind);
-                    } catch (java.io.UnsupportedEncodingException uee) {
-                        // forget it
-                    }
+                    // UTF-8 expected due to URIEncoding on Connector element in server.xml
+                    String uriToFind = new String(request.getParameter("uri"));
+                    propertyGroupForEditing = (PropertyGroup)pgDao.getGroupByURI(uriToFind);
                 }
             } else {
                 propertyGroupForEditing = new PropertyGroup();

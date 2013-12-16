@@ -50,7 +50,7 @@ public class SolrSmokeTest implements ServletContextListener {
 				.getProperty("vitro.local.solr.url", "");
 		if (solrUrlString.isEmpty()) {
 			ss.fatal(this, "Can't connect to Solr search engine. "
-					+ "deploy.properties must contain a value for "
+					+ "runtime.properties must contain a value for "
 					+ "vitro.local.solr.url");
 			return;
 		}
@@ -62,7 +62,7 @@ public class SolrSmokeTest implements ServletContextListener {
 		} catch (MalformedURLException e) {
 			ss.fatal(this, "Can't connect to Solr search engine. "
 					+ "The value for vitro.local.solr.url "
-					+ "in deploy.properties is not a valid URL: '"
+					+ "in runtime.properties is not a valid URL: '"
 					+ solrUrlString + "'", e);
 		}
 
@@ -124,9 +124,7 @@ public class SolrSmokeTest implements ServletContextListener {
 			int status = e.getStatusCode();
 			Throwable cause = e.getCause();
 
-			if (status == HttpStatus.SC_FORBIDDEN) {
-				warnForbidden();
-			} else if (status == SOCKET_TIMEOUT_STATUS) {
+			if (status == SOCKET_TIMEOUT_STATUS) {
 				warnSocketTimeout();
 			} else if (status != 0) {
 				warnBadHttpStatus(status);
@@ -151,23 +149,14 @@ public class SolrSmokeTest implements ServletContextListener {
 			ss.warning(listener, "Can't connect to the Solr search engine. "
 					+ "The socket connection has repeatedly timed out. "
 					+ "Check the value of vitro.local.solr.url in "
-					+ "deploy.properties. Is Solr responding at that URL?");
-		}
-
-		private void warnForbidden() {
-			ss.warning(listener, "Can't connect to the Solr search engine. "
-					+ "The Solr server will not accept connections from this "
-					+ "host. Check the value of "
-					+ "vitro.local.solr.ipaddress.mask in "
-					+ "deploy.properties -- "
-					+ "does it authorize access from this IP address?");
+					+ "runtime.properties. Is Solr responding at that URL?");
 		}
 
 		private void warnBadHttpStatus(int status) {
 			ss.warning(listener, "Can't connect to the Solr search engine. "
 					+ "The Solr server returned a status code of " + status
 					+ ". Check the value of vitro.local.solr.url in "
-					+ "deploy.properties.");
+					+ "runtime.properties.");
 		}
 
 		private void warnProtocolViolation(HttpException e) {
@@ -179,7 +168,7 @@ public class SolrSmokeTest implements ServletContextListener {
 			ss.warning(listener, "Can't connect to the Solr search engine. '"
 					+ e.getMessage() + "' is an unknown host."
 					+ "Check the value of vitro.local.solr.url in "
-					+ "deploy.properties.", e);
+					+ "runtime.properties.", e);
 		}
 
 		private void warnConnectionRefused(ConnectException e) {
@@ -187,7 +176,7 @@ public class SolrSmokeTest implements ServletContextListener {
 					+ "The host refused the connection. "
 					+ "Is it possible that the port number is incorrect? "
 					+ "Check the value of vitro.local.solr.url in "
-					+ "deploy.properties.", e);
+					+ "runtime.properties.", e);
 		}
 
 		private void warnTransportError(IOException e) {

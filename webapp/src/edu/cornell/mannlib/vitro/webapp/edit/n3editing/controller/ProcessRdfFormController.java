@@ -37,8 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditSubmissionUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.RdfLiteralHash;
 
 /**
  * This servlet will convert a request to an EditSubmission, 
@@ -62,7 +61,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		//get the EditConfiguration 
 		EditConfigurationVTwo configuration = EditConfigurationUtils.getEditConfiguration(vreq);
         if(configuration == null)
-            throw new Error("No edit configuration found.");        
+            return handleMissingConfiguration(vreq);
 
         //get the EditSubmission
         MultiValueEditSubmission submission = new MultiValueEditSubmission(vreq.getParameterMap(), configuration);        	
@@ -91,7 +90,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 
             ProcessRdfForm prf = 
                 new ProcessRdfForm(configuration, new NewURIMakerVitro(vreq.getWebappDaoFactory()));        
-            changes = prf.process(configuration, submission);  
+            changes = prf.process(configuration, submission, vreq);  
             
         } catch (Exception e) {
             throw new Error(e);
@@ -102,7 +101,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		
 		N3EditUtils.preprocessModels(changes, configuration, vreq);		
 		
-		ProcessRdfForm.applyChangesToWriteModel(changes, queryModel, writeModel, EditN3Utils.getEditorUri(vreq) );
+		ProcessRdfForm.applyChangesToWriteModel(changes, queryModel, writeModel, N3EditUtils.getEditorUri(vreq) );
 		
 		//Here we are trying to get the entity to return to URL,  
 		//More involved processing for data property apparently
@@ -178,6 +177,17 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		}
 		return null; //no errors		
 	}
+
+    /**
+     * If the edit configuration cannot be found in the Session,
+     * show a message and display any request parameters so that the user's
+     * efforts  won't be lost.
+     */
+    protected ResponseValues handleMissingConfiguration(VitroRequest vreq){
+        Map<String,Object> map = new HashMap<String,Object>();
+        map.put("params",vreq.getParameterMap());
+        return new TemplateResponseValues( "missingEditConfig.ftl", map );
+    }
 	
 	//Move to EditN3Utils but keep make new uris here
 	public static class Utilities {
@@ -314,4 +324,5 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 
 			
 	}
+
 }

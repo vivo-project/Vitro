@@ -32,7 +32,7 @@
 /* <------ INDIVIDUAL INTRO FOR ANY CLASS*/
 #individual-intro {
     margin-top: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 0;
     position: relative;
     overflow: hidden;
 }
@@ -63,7 +63,7 @@ img#uriIcon {
     width: 166px;
     float: left;
     padding-right: 1.5em;
-    margin-bottom: 20px;
+    margin-bottom: 0;
 }
 #share-contact h3 {
     margin-top: 15px;
@@ -89,7 +89,7 @@ img.individual-photo {
 h2#mainImage, #share-contact h2 {
     font-size: 1em;
     line-height: 1em;
-    padding-bottom: 0.3em
+    padding-bottom: 0.6em
 }
 #photo-wrapper {
     position: relative;
@@ -106,7 +106,8 @@ h1.fn .display-title {
     margin-left: 10px;
 }
 #individual-info h2 {
-    padding-bottom: 10px;
+    padding-bottom: 6px;
+    padding-top: 18px;
 }
 #individual-info nav {
     float: left;
@@ -268,11 +269,6 @@ input#uriLink {
     width: 350px;
     font-size: .8em;
 }
-a.close {
-    float: right;
-    margin-right: .3em;
-    font-size: .8em;
-}
 .rdf-url {
     display: block;
     padding-top: 0.8em;
@@ -280,6 +276,10 @@ a.close {
 /* <---- Manage Prop Link, individual-properties.ftl -----*/
 a.manageLinks {
     display:none;
+}
+a#manageLabels { 
+    margin-left:20px;
+    font-size:0.7em;
 }
 /* <---- OpenSocial -----*/
 div#openSocial {

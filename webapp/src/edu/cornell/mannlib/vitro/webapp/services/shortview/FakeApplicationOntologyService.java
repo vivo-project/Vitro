@@ -380,6 +380,12 @@ public class FakeApplicationOntologyService {
 			return dataGetters;
 		}
 
+		@Override
+		public String toString() {
+			return "[template=" + templateName + ", dataGetters=" + dataGetters
+					+ "]";
+		}
+
 	}
 
 	/** The view specifications that we read from the config file. */
@@ -439,9 +445,13 @@ public class FakeApplicationOntologyService {
 	 * "display model". The query finds a preferred title for the individual.
 	 */
 	private static class FakeVivoPeopleDataGetter extends SparqlQueryDataGetter {
-		private static final String QUERY_STRING = "SELECT ?uri ?pt WHERE {\n"
-				+ "   ?uri <http://vivoweb.org/ontology/core#preferredTitle> ?pt\n"
-				+ "} LIMIT 1";
+		private static String QUERY_STRING = ""
+				+ "PREFIX obo: <http://purl.obolibrary.org/obo/> \n"
+				+ "PREFIX vcard: <http://www.w3.org/2006/vcard/ns#>  \n"
+				+ "SELECT ?pt  \n" + "WHERE {  \n"
+				+ "    ?uri obo:ARG_2000028 ?vIndividual .  \n"
+				+ "    ?vIndividual vcard:hasTitle ?vTitle . \n"
+				+ "    ?vTitle vcard:title ?pt . \n" + "} LIMIT 1";
 
 		private static final String FAKE_VIVO_PEOPLE_DATA_GETTER_URI = "http://FakeVivoPeopleDataGetter";
 
@@ -475,10 +485,10 @@ public class FakeApplicationOntologyService {
 
 		@Override
 		public Map<String, Object> getData(Map<String, Object> pageData) {
-			Map<String, String[]> parms = new HashMap<String, String[]>();
-			parms.put("uri", new String[] { individualUri });
+			Map<String, Object> parms = new HashMap<>();
+			parms.put("uri", individualUri);
 
-			return doQuery(parms, getModel(ctx, vreq, null));
+			return super.getData(parms);
 		}
 
 	}

@@ -1,10 +1,10 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<#-- 
-    Template for the raw page that displays the StartupStatus if there 
+<#--
+    Template for the raw page that displays the StartupStatus if there
     are warnings or errors.
     
-    "raw" because this template works outside of the usual framework, in 
+    "raw" because this template works outside of the usual framework, in
     case the Freemarker context didn't initialize properly.
     
     This file can't even include a reference to an external CSS file, in case
@@ -63,7 +63,7 @@
                background-color: #FFDDDD;
            }
            #startup-trace li.warning{
-               background-color: #FFFFDD; 
+               background-color: #FFFFDD;
            }
            #startup-trace li.info {
                background-color: #DDFFDD;
@@ -72,7 +72,7 @@
                background-color: #F3F3F0;
            }
            
-        </style> 
+        </style>
     </head>
 
     <body>
@@ -101,7 +101,7 @@
             <#-- If there were no fatal errors, let them go forward from here. -->
             <#if showLink>
                 <p><a href="${url}" title="continue">Continue</a></p>
-    	    </#if>
+     </#if>
             
         </#if>
 

@@ -52,15 +52,6 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 	private static final String URL_BYTESTREAM_ALIAS = URL_HOME_PAGE + "/file/"
 			+ ID_FILE_BYTESTREAM + "/" + BYTESTREAM_FILENAME;
 
-	/**
-	 * Info about an individual that appears in a different namespace.
-	 */
-	private static final String SOME_PREFIX = "somePrefix";
-	private static final String SOME_NAMESPACE = "http://some.namespace/";
-	private static final String ID_INDIVIDUAL_FOREIGN = "foreignId";
-	private static final String URI_INDIVIDUAL_FOREIGN = SOME_NAMESPACE
-			+ ID_INDIVIDUAL_FOREIGN;
-
 	private IndividualRequestAnalyzer analyzer;
 	private IndividualRequestAnalysisContextStub analysisContext;
 	private HttpServletRequestStub req;
@@ -69,7 +60,6 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 
 	private IndividualStub testIndividual;
 	private IndividualStub bytestreamIndividual;
-	private IndividualStub foreignIndividual;
 
 	@Before
 	public void setup() {
@@ -83,10 +73,6 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 		bytestreamIndividual = new IndividualStub(URI_FILE_BYTESTREAM);
 		analysisContext.addIndividual(bytestreamIndividual);
 		analysisContext.setAliasUrl(URI_FILE_BYTESTREAM, URL_BYTESTREAM_ALIAS);
-
-		foreignIndividual = new IndividualStub(URI_INDIVIDUAL_FOREIGN);
-		analysisContext.addIndividual(foreignIndividual);
-		analysisContext.setNamespacePrefix(SOME_PREFIX, SOME_NAMESPACE);
 	}
 
 	// ----------------------------------------------------------------------
@@ -130,16 +116,6 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 		req.setRequestUrl(url(URL_HOME_PAGE + "/display/" + ID_INDIVIDUAL_TEST));
 		analyzeIt();
 		assertDefaultRequestInfo("find by display path", URI_INDIVIDUAL_TEST);
-	}
-
-	/** /individual/nsPrefix/localname */
-	@Test
-	public void findByPrefixAndLocalname() {
-		req.setRequestUrl(url(DEFAULT_NAMESPACE + SOME_PREFIX + "/"
-				+ ID_INDIVIDUAL_FOREIGN));
-		analyzeIt();
-		assertDefaultRequestInfo("find by prefix and localname",
-				URI_INDIVIDUAL_FOREIGN);
 	}
 
 	/** /individual/a/b/c fails. */
@@ -220,7 +196,7 @@ public class IndividualRequestAnalyzerTest extends AbstractTestClass {
 	@Test
 	public void redirectFromLinkedDataPathAcceptStrange() {
 		req.setRequestUrl(url(DEFAULT_NAMESPACE + ID_INDIVIDUAL_TEST));
-		req.setHeader("accept", "application/json");
+		req.setHeader("accept", "image/jpg");
 		analyzeIt();
 		assertRdfRedirectRequestInfo(
 				"by linked data path, accept a strange content type",

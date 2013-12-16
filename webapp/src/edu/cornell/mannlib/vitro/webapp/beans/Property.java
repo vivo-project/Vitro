@@ -7,7 +7,7 @@ import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class Property extends BaseResourceBean {
+public class Property extends BaseResourceBean implements ResourceBean {
     
     private static Log log = LogFactory.getLog( Property.class );
 
@@ -15,10 +15,19 @@ public class Property extends BaseResourceBean {
     private String  groupURI              = null;
     private String  label                 = null; // keep so can set in a context-specific way
     private final boolean subjectSide     = true; // only relevant to ObjectProperty
+    private String domainVClassURI        = null;
+    private String rangeVClassURI         = null;
+    private boolean editLinkSuppressed    = false;
+    private boolean addLinkSuppressed     = false;
+    private boolean deleteLinkSuppressed  = false;
     
     public Property() {
         this.groupURI = null;
         this.label = null;
+    }
+    
+    public Property(String URI) {
+        this.setURI(URI);
     }
 
     public String getCustomEntryForm() {
@@ -43,8 +52,51 @@ public class Property extends BaseResourceBean {
         this.label = label;
     }
     
+    public String getDomainVClassURI() {
+        return this.domainVClassURI;
+    }
+    
+    public void setDomainVClassURI(String domainVClassURI) {
+        this.domainVClassURI = domainVClassURI;
+    }
+    
+    public String getRangeVClassURI() {
+        return this.rangeVClassURI;
+    }
+    
+    public void setRangeVClassURI(String rangeVClassURI) {
+        this.rangeVClassURI = rangeVClassURI;
+    }
+    
     public boolean isSubjectSide() {
         return subjectSide;
+    }
+    
+    public boolean isEditLinkSuppressed() {
+        return editLinkSuppressed;
+    }
+    
+    public boolean isAddLinkSuppressed() {
+        return addLinkSuppressed;
+    }
+    
+    public boolean isDeleteLinkSuppressed() {
+        return deleteLinkSuppressed;
+    }
+    
+    public void setEditLinkSuppressed(boolean editLinkSuppressed) {
+        this.editLinkSuppressed = editLinkSuppressed;
+    }
+    
+    public void setAddLinkSuppressed(boolean addLinkSuppressed) {
+        if (this.addLinkSuppressed) {
+            throw new RuntimeException("addLinkSuppressed already true");
+        }
+        this.addLinkSuppressed = addLinkSuppressed;
+    }
+    
+    public void setDeleteLinkSuppressed(boolean deleteLinkSuppressed) {
+        this.deleteLinkSuppressed = deleteLinkSuppressed;
     }
     
     /**

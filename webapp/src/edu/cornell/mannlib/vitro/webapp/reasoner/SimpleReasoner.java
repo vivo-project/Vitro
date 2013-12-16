@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
+import static edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.WorkLevel.WORKING;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -42,6 +44,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
+import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 /**
  * Allows for real-time incremental materialization or retraction of RDFS-
@@ -60,8 +63,11 @@ public class SimpleReasoner extends StatementListener {
 	private OntModel fullModel;             // contains at least the 
 	                                        // asserted and inferred ABox
 	
-	private static final String mostSpecificTypePropertyURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType";	
-	private static final AnnotationProperty mostSpecificType = (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM)).createAnnotationProperty(mostSpecificTypePropertyURI);
+	private static final String mostSpecificTypePropertyURI = 
+        "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType";	
+	private static final AnnotationProperty mostSpecificType = 
+        (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM))
+        .createAnnotationProperty(mostSpecificTypePropertyURI);
 	
 	// DeltaComputer
 	private CumulativeDeltaModeler aBoxDeltaModeler1 = null;
@@ -74,13 +80,18 @@ public class SimpleReasoner extends StatementListener {
 	private boolean stopRequested = false;
 	
 	private List<ReasonerPlugin> pluginList = new CopyOnWriteArrayList<ReasonerPlugin>();
+    
+    private boolean doSameAs = true;
 
 	/**
 	 * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
 	 * @param aboxModel - input.  This model contains asserted ABox statements
-	 * @param inferenceModel - output. This is the model in which inferred (materialized) ABox statements are maintained (added or retracted).
-	 * @param inferenceRebuildModel - output. This the model is temporarily used when the whole ABox inference model is rebuilt
-	 * @param inferenceScratchpadModel - output. This the model is temporarily used when the whole ABox inference model is rebuilt
+	 * @param inferenceModel - output. This is the model in which inferred (materialized) 
+     *  ABox statements are maintained (added or retracted).
+	 * @param inferenceRebuildModel - output. This the model is temporarily used when the 
+     *  whole ABox inference model is rebuilt
+	 * @param inferenceScratchpadModel - output. This the model is temporarily used when 
+     *  the whole ABox inference model is rebuilt
  	 */
 	public SimpleReasoner(OntModel tboxModel, 
 			              RDFService rdfService, 
@@ -122,7 +133,8 @@ public class SimpleReasoner extends StatementListener {
 	 * 
 	 * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
 	 * @param aboxModel - input.  This model contains asserted ABox statements
-	 * @param inferenceModel - output. This is the model in which inferred (materialized) ABox statements are maintained (added or retracted).
+	 * @param inferenceModel - output. This is the model in which inferred (materialized)
+     *  ABox statements are maintained (added or retracted).
  	 */
 	public SimpleReasoner(OntModel tboxModel, OntModel aboxModel, Model inferenceModel) {
 		this.tboxModel = tboxModel;
@@ -145,7 +157,15 @@ public class SimpleReasoner extends StatementListener {
 	public List<ReasonerPlugin> getPluginList() {
 		return this.pluginList;
 	}
-	
+
+    public void setSameAsEnabled( boolean tf){
+        this.doSameAs = tf;
+    }
+    
+    public boolean getSameAsEnabled() {
+        return this.doSameAs;
+    }
+
 	/*
 	 * Performs incremental ABox reasoning based
 	 * on the addition of a new statement
@@ -155,9 +175,9 @@ public class SimpleReasoner extends StatementListener {
 	public void addedStatement(Statement stmt) {
 		try {
 			if (stmt.getPredicate().equals(RDF.type)) {
-			     addedABoxTypeAssertion(stmt, inferenceModel, new HashSet<String>());
+			     addedABoxTypeAssertion(stmt, inferenceModel, new HashSet<String>()); 
 			     setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
-			} else if (stmt.getPredicate().equals(OWL.sameAs)) {  
+			} else if ( doSameAs && stmt.getPredicate().equals(OWL.sameAs)) {  
                  addedABoxSameAsAssertion(stmt, inferenceModel); 
 			} else {
 				 addedABoxAssertion(stmt, inferenceModel);
@@ -165,8 +185,7 @@ public class SimpleReasoner extends StatementListener {
 			
 			doPlugins(ModelUpdate.Operation.ADD,stmt);
 
-		} catch (Exception e) {
-			// don't stop the edit if there's an exception
+		} catch (Exception e) { // don't stop the edit if there's an exception
 			log.error("Exception while computing inferences: " + e.getMessage());
 		}
 	}
@@ -177,20 +196,16 @@ public class SimpleReasoner extends StatementListener {
 	 * from the ABox. 
 	 */
 	@Override
-	public void removedStatement(Statement stmt) {
-	
+	public void removedStatement(Statement stmt) {	
 		try {
-            handleRemovedStatement(stmt);
-            
-		} catch (Exception e) {
-			// don't stop the edit if there's an exception
+            handleRemovedStatement(stmt);            
+		} catch (Exception e) { // don't stop the edit if there's an exception
 			log.error("Exception while retracting inferences: ", e);
 		}
 	}
 	
 	/*
-	 * Synchronized part of removedStatement. Interacts
-	 * with DeltaComputer.
+	 * Synchronized part of removedStatement. Interacts with DeltaComputer.
 	 */
 	protected synchronized void handleRemovedStatement(Statement stmt) {    
 		if (batchMode == 1) {
@@ -201,7 +216,7 @@ public class SimpleReasoner extends StatementListener {
 			if (stmt.getPredicate().equals(RDF.type)) {
 				removedABoxTypeAssertion(stmt, inferenceModel);
 				setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
-			} else if (stmt.getPredicate().equals(OWL.sameAs)) {
+			} else if ( doSameAs && stmt.getPredicate().equals(OWL.sameAs)) {
                 removedABoxSameAsAssertion(stmt, inferenceModel); 	
 			} else {
 				removedABoxAssertion(stmt, inferenceModel);
@@ -209,16 +224,21 @@ public class SimpleReasoner extends StatementListener {
 			doPlugins(ModelUpdate.Operation.RETRACT,stmt);
 		}
 	}
-	
-	/*
+
+    /**
 	 * Performs incremental ABox reasoning based
 	 * on changes to the class hierarchy.
-	 * 
-	 * Handles rdfs:subclassOf, owl:equivalentClass, and owl:inverseOf
-	 */	
-	public void addedTBoxStatement(Statement stmt) {
-		try {		
-			if (!(stmt.getPredicate().equals(RDFS.subClassOf) || stmt.getPredicate().equals(OWL.equivalentClass) || stmt.getPredicate().equals(OWL.inverseOf))) {
+     *
+     * addedTBoxStatement and removedTBoxStatement use the
+     * same tests so the are merged into this method.
+     *
+	 * Handles rdfs:subclassOf, owl:equivalentClass, and owl:inverseOf 
+	 */
+    protected void changedTBoxStatement( Statement stmt , boolean add){
+        try {		
+			if (!(stmt.getPredicate().equals(RDFS.subClassOf) 
+                  || stmt.getPredicate().equals(OWL.equivalentClass) 
+                  || stmt.getPredicate().equals(OWL.inverseOf))) {
 				return;
 			}
 
@@ -227,30 +247,49 @@ public class SimpleReasoner extends StatementListener {
 				return;
 			}
 						
-			if (stmt.getPredicate().equals(RDFS.subClassOf) || stmt.getPredicate().equals(OWL.equivalentClass)) {
+			if (stmt.getPredicate().equals(RDFS.subClassOf) 
+                || stmt.getPredicate().equals(OWL.equivalentClass)) {
+
 				// ignore anonymous classes
 				if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
 				    return;
 				}
 			
-				OntClass subject = tboxModel.getOntClass((stmt.getSubject()).getURI());
-				if (subject == null) {
-					log.debug("didn't find subject class in the tbox: " + (stmt.getSubject()).getURI());
-					return;
-				}
-				
-				OntClass object = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
-				if (object == null) {
-					log.debug("didn't find object class in the tbox: " + ((Resource)stmt.getObject()).getURI());
-					return;
+				OntClass subject, object;
+				tboxModel.enterCriticalSection(Lock.READ);
+				try {
+    				subject = tboxModel.getOntClass((stmt.getSubject()).getURI());
+    				if (subject == null) {
+    					log.debug("didn't find subject class in the tbox: " 
+                                  + (stmt.getSubject()).getURI());
+    					return;
+    				}
+    				
+    				object = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
+    				if (object == null) {
+    					log.debug("didn't find object class in the tbox: " 
+                                  + ((Resource)stmt.getObject()).getURI());
+    					return;
+    				}
+				} finally {
+				    tboxModel.leaveCriticalSection();
 				}
 				
 				if (stmt.getPredicate().equals(RDFS.subClassOf)) {
+                    if( add ){
 					 addedSubClass(subject,object,inferenceModel);
+                    }else{
+                        removedSubClass( subject,object,inferenceModel);
+                    }
 				} else {
 					 // equivalent class is the same as subclass in both directions
-					 addedSubClass(subject,object,inferenceModel);
-					 addedSubClass(object,subject,inferenceModel);
+                    if(add){
+                        addedSubClass(subject,object,inferenceModel);
+                        addedSubClass(object,subject,inferenceModel);
+                    }else{
+                        removedSubClass( subject,object,inferenceModel);
+                        removedSubClass(object,subject,inferenceModel);
+                    }
 				} 
 			} else {	
 				if ( stmt.getObject().asResource().getURI() == null ) {
@@ -265,99 +304,56 @@ public class SimpleReasoner extends StatementListener {
 				
 				OntProperty prop1 = tboxModel.getOntProperty((stmt.getSubject()).getURI());
 				if (prop1 == null) {
-					log.debug("didn't find subject property in the tbox: " + (stmt.getSubject()).getURI());
+					log.debug("didn't find subject property in the tbox: " 
+                              + (stmt.getSubject()).getURI());
 					return;
 					}
 					
 				OntProperty prop2 = tboxModel.getOntProperty(((Resource)stmt.getObject()).getURI()); 
 				if (prop2 == null) {
-					log.debug("didn't find object property in the tbox: " + ((Resource)stmt.getObject()).getURI());
+					log.debug("didn't find object property in the tbox: " 
+                              + ((Resource)stmt.getObject()).getURI());
 					return;
 				}
 				
-				addedInverseProperty(prop1, prop2, inferenceModel);	
+                if( add ){
+                    addedInverseProperty(prop1, prop2, inferenceModel);	
+                } else {
+                    removedInverseProperty(prop1,prop2,inferenceModel);
+                }
 			}
-		} catch (Exception e) {
-			// don't stop the edit if there's an exception
-			log.error("Exception while adding inference(s)",e);
-		}
+		} catch (Exception e) { // don't stop the edit if there's an exception
+			log.error("Exception while " + (add?"adding":"removing") + " inference(s)",e);
+		}        
+    }
+
+	/**
+	 * Performs incremental ABox reasoning based
+	 * on changes to the class hierarchy.
+	 * 
+	 * Handles rdfs:subclassOf, owl:equivalentClass, and owl:inverseOf
+	 */	
+	public void addedTBoxStatement(Statement stmt) {
+        changedTBoxStatement( stmt, true);
 	}
 
-	/*
+	/**
 	 * Performs incremental ABox reasoning based
 	 * on changes to the class hierarchy.
 	 * 
 	 * Handles rdfs:subclassOf, owl:equivalentClass, and owl:inverseOf 
 	 */
 	public void removedTBoxStatement(Statement stmt) {	
-		try {
-			if (!(stmt.getPredicate().equals(RDFS.subClassOf) || stmt.getPredicate().equals(OWL.equivalentClass) || stmt.getPredicate().equals(OWL.inverseOf))) {
-				return;
-			}
-			
-			if (!stmt.getObject().isResource()) {
-				log.warn("The object of this assertion is not a resource: " + stmtString(stmt));
-				return;
-			}
-									
-			if ( stmt.getPredicate().equals(RDFS.subClassOf) || stmt.getPredicate().equals(OWL.equivalentClass) ) {
-				
-				// ignore anonymous classes
-				if (stmt.getSubject().isAnon() || stmt.getObject().isAnon()) {
-				    return;
-				}
-				
-				OntClass subject = tboxModel.getOntClass((stmt.getSubject()).getURI());
-				if (subject == null) {
-					log.debug("didn't find subject class in the tbox: " + (stmt.getSubject()).getURI());
-					return;
-				}
-				
-				OntClass object = tboxModel.getOntClass(((Resource)stmt.getObject()).getURI()); 
-				if (object == null) {
-					log.debug("didn't find object class in the tbox: " + ((Resource)stmt.getObject()).getURI());
-					return;
-				}
-				
-				if (stmt.getPredicate().equals(RDFS.subClassOf)) {
-				   removedSubClass(subject,object,inferenceModel);
-				} else {
-					// equivalent class is the same as subclass in both directions
-				   removedSubClass(subject,object,inferenceModel);
-				   removedSubClass(object,subject,inferenceModel);
-				}
-			} else {
-				if ( stmt.getObject().asResource().getURI() == null ) {
-					log.warn("The object of this assertion has a null URI: " + stmtString(stmt));
-					return;
-				}
+        changedTBoxStatement(stmt, false);
+	}
 
-				if ( stmt.getSubject().getURI() == null ) {
-					log.warn("The subject of this assertion has a null URI: " + stmtString(stmt));
-					return;
-				}
-				
-				OntProperty prop1 = tboxModel.getOntProperty((stmt.getSubject()).getURI());
-				if (prop1 == null) {
-					log.debug("didn't find subject property in the tbox: " + (stmt.getSubject()).getURI());
-					return;
-				}
-				
-				OntProperty prop2 = tboxModel.getOntProperty(((Resource)stmt.getObject()).getURI()); 
-				if (prop2 == null) {
-					log.debug("didn't find object property in the tbox: " + ((Resource)stmt.getObject()).getURI());
-					return;
-				}
-				
-				removedInverseProperty(prop1, prop2, inferenceModel);					
-			}
-		} catch (Exception e) {
-			// don't stop the edit if there's an exception
-			log.error("Exception while removing inference(s)",e);
-		}
+	protected void addedABoxTypeAssertion(Statement stmt, 
+	        Model inferenceModel, 
+	        HashSet<String> unknownTypes) {
+	    addedABoxTypeAssertion(stmt, inferenceModel, unknownTypes, true);
 	}
 	
-	/*
+	/**
 	 * Performs incremental reasoning based on a new type assertion
 	 * added to the ABox (assertion that an individual is of a certain
 	 * type).
@@ -365,7 +361,10 @@ public class SimpleReasoner extends StatementListener {
 	 * If it is added that B is of type A, then for each superclass of
 	 * A assert that B is of that type.
 	 */
-	protected void addedABoxTypeAssertion(Statement stmt, Model inferenceModel, HashSet<String> unknownTypes) {
+	protected void addedABoxTypeAssertion(Statement stmt, 
+                                          Model inferenceModel, 
+                                          HashSet<String> unknownTypes,
+                                          boolean checkRedundancy) {
 				
 	    tboxModel.enterCriticalSection(Lock.READ);
 		try {
@@ -388,21 +387,27 @@ public class SimpleReasoner extends StatementListener {
 							// of classes not individuals.
 							if (parentClass.isAnon()) continue;
 							
-							Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), RDF.type, parentClass);
-							addInference(infStmt,inferenceModel,true);
+							Statement infStmt = 
+                                ResourceFactory.createStatement(stmt.getSubject(), 
+                                                                RDF.type, parentClass);
+							addInference(infStmt, inferenceModel, true, checkRedundancy);
 						}						
 					}					
 				} else {
 					if ( !(stmt.getObject().asResource().getNameSpace()).equals(OWL.NS)) {
 						if (!unknownTypes.contains(stmt.getObject().asResource().getURI())) {
 							unknownTypes.add(stmt.getObject().asResource().getURI());
-					        log.warn("Didn't find the target class (the object of an added rdf:type statement) in the TBox: " +
-						          	 (stmt.getObject().asResource()).getURI() + ". No class subsumption reasoning will be done based on type assertions of this type.");
+					        log.warn("Didn't find the target class (the object of an added " +
+                                     "rdf:type statement) in the TBox: " +
+						          	 (stmt.getObject().asResource()).getURI() + 
+                                     ". No class subsumption reasoning will be done " +
+                                     "based on type assertions of this type.");
 						}
 					}
 				}
 			} else {
-				log.debug("The object of this rdf:type assertion has a null URI, no reasoning will be done based on this assertion: " + stmtString(stmt));
+				log.debug("The object of this rdf:type assertion has a null URI, no reasoning"
+                          + " will be done based on this assertion: " + stmtString(stmt));
 				return;
 			}
 		} finally {
@@ -419,7 +424,7 @@ public class SimpleReasoner extends StatementListener {
 		}	
 	}
 
-	/*
+	/**
      * If it is removed that B is of type A, then for each superclass of A remove
      * the inferred statement that B is of that type UNLESS it is otherwise entailed
      * that B is of that type.
@@ -429,7 +434,7 @@ public class SimpleReasoner extends StatementListener {
 	    removedABoxTypeAssertion(stmt, inferenceModel, null);
 	}
 	
-	/*
+	/**
 	 * If it is removed that B is of type A, then for each superclass of A remove
 	 * the inferred statement that B is of that type UNLESS it is otherwise entailed
 	 * that B is of that type.
@@ -439,7 +444,9 @@ public class SimpleReasoner extends StatementListener {
      * improvement when this method is called repeatedly for the same subject.  
 	 * 
 	 */
-	protected void removedABoxTypeAssertion(Statement stmt, Model inferenceModel, List<String> remainingTypeURIs) {
+	protected void removedABoxTypeAssertion(Statement stmt, 
+                                            Model inferenceModel, 
+                                            List<String> remainingTypeURIs) {
 		tboxModel.enterCriticalSection(Lock.READ);
 		try {		
 			Resource cls = null;
@@ -466,22 +473,27 @@ public class SimpleReasoner extends StatementListener {
 						// of classes not individuals.
 						if (parentClass.isAnon()) continue;  
 						
-						List<String> typeURIs = (remainingTypeURIs == null) ? getRemainingAssertedTypeURIs(stmt.getSubject()) : remainingTypeURIs;
+						List<String> typeURIs = (remainingTypeURIs == null) 
+                            ? getRemainingAssertedTypeURIs(stmt.getSubject()) : remainingTypeURIs;
 						if (entailedType(stmt.getSubject(),parentClass, typeURIs)) {
 						    continue;    // if a type is still entailed without the
 						}
-						                                                              // removed statement, then don't remove it
-						                                                              // from the inferences
+                        // removed statement, then don't remove it
+                        // from the inferences
 						
-						Statement infStmt = ResourceFactory.createStatement(stmt.getSubject(), RDF.type, parentClass);
+						Statement infStmt = 
+                            ResourceFactory.createStatement(stmt.getSubject(), RDF.type, parentClass);
                         removeInference(infStmt,inferenceModel,true,false);							
 					}
 				} else {
-					log.warn("Didn't find target class (the object of the removed rdf:type statement) in the TBox: "
-							+ ((Resource)stmt.getObject()).getURI() + ". No class subsumption reasoning will be performed based on the removal of this assertion.");
+					log.warn("Didn't find target class (the object of the removed rdf:type"
+                             + "statement) in the TBox: "
+							+ ((Resource)stmt.getObject()).getURI() + ". No class subsumption"
+                             +" reasoning will be performed based on the removal of this assertion.");
 				}
 			} else {
-				log.warn("The object of this rdf:type assertion has a null URI: " + stmtString(stmt));
+				log.warn("The object of this rdf:type assertion has a null URI: " 
+                         + stmtString(stmt));
 			}		
 		} catch (Exception e) {
 			log.warn("exception while removing abox type assertions: " + e.getMessage());
@@ -490,7 +502,206 @@ public class SimpleReasoner extends StatementListener {
 		}
 	}
 
-	/*
+	/**
+	 * Performs incremental property-based reasoning.
+	 * 
+	 * Retracts inferences based on the owl:inverseOf relationship.
+	 * 
+	 * If it is removed that x prop1 y, and prop2 is an inverseOf prop1
+	 * then remove y prop2 x from the inference graph, unless it is 
+	 * otherwise entailed by the assertions graph independently of
+	 * this removed statement.
+	 */
+	protected void removedABoxAssertion(Statement stmt, Model inferenceModel) {
+		
+	    if (!stmt.getObject().isLiteral()) {
+    		List<OntProperty> inverseProperties = getInverseProperties(stmt);	
+    	    Iterator<OntProperty> inverseIter = inverseProperties.iterator();
+    		
+    	    while (inverseIter.hasNext()) {
+    	        OntProperty inverseProp = inverseIter.next();
+    	        Statement infStmt = ResourceFactory.createStatement(
+    	                stmt.getObject().asResource(), inverseProp, stmt.getSubject());
+    	        removeInference(infStmt,inferenceModel);
+    	    }	   
+	    }
+
+        if( doSameAs )
+            doSameAsForRemovedABoxAssertion( stmt, inferenceModel );
+
+		 // if a statement has been removed that is otherwise entailed,
+		 // add it to the inference graph.
+	    inferenceModel.enterCriticalSection(Lock.WRITE);
+	    try {
+			 if (entailedStatement(stmt) && !inferenceModel.contains(stmt)) {
+				inferenceModel.add(stmt);
+			 }			 
+	    } finally {
+	    	inferenceModel.leaveCriticalSection();
+	    }	      
+	}
+
+
+	/**
+	 * If it is added that B is a subClass of A, then for each
+	 * individual that is typed as B, either in the ABox or in the
+	 * inferred model, infer that it is of type A.
+	 */
+	protected void addedSubClass(OntClass subClass, OntClass superClass, Model inferenceModel) {
+		//log.debug("subClass = " + subClass.getURI() + " superClass = " + superClass.getURI());
+		OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		unionModel.addSubModel(aboxModel);
+		unionModel.addSubModel(inferenceModel);
+	    List<Resource> subjectList = new ArrayList<Resource>();
+		aboxModel.enterCriticalSection(Lock.READ);
+		try {
+			StmtIterator iter = unionModel.listStatements((Resource) null, RDF.type, subClass);
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+	            subjectList.add(stmt.getSubject());
+	        }
+		} finally {
+			aboxModel.leaveCriticalSection();
+		}
+		
+	    for (Resource subject : subjectList) {
+			Statement infStmt = ResourceFactory.createStatement(subject, RDF.type, superClass);	
+		    addInference(infStmt, inferenceModel, true);	
+			setMostSpecificTypes(infStmt.getSubject(), inferenceModel, new HashSet<String>());
+	    }
+	}
+
+	/**
+	 * If removed that B is a subclass of A, then for each individual
+	 * that is of type B, either inferred or in the ABox, remove the
+	 * assertion that it is of type A from the inferred model,
+	 * UNLESS the individual is of some type C that is a subClass 
+	 * of A (including A itself)
+	 */
+	protected void removedSubClass(OntClass subClass, OntClass superClass, Model inferenceModel) {
+		OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		unionModel.addSubModel(aboxModel);
+		unionModel.addSubModel(inferenceModel);
+		List<Resource> subjectList = new ArrayList<Resource>();
+	    aboxModel.enterCriticalSection(Lock.READ);
+	    try {		
+		    StmtIterator iter = unionModel.listStatements((Resource) null, RDF.type, subClass);
+		    while (iter.hasNext()) {
+			    Statement stmt = iter.next();
+			    subjectList.add(stmt.getSubject());	
+	        }
+	    } finally {
+	        aboxModel.leaveCriticalSection();
+	    }
+	    
+	    for (Resource ind : subjectList) {
+			if (entailedType(ind,superClass)) {
+				continue;
+			}
+			Statement infStmt = ResourceFactory.createStatement(ind, RDF.type, superClass);
+			inferenceModel.enterCriticalSection(Lock.WRITE);
+			try {
+			    if (inferenceModel.contains(infStmt)) {
+				    inferenceModel.remove(infStmt);
+			    } 
+			    
+	        } finally {
+	            inferenceModel.leaveCriticalSection();
+	        }
+			
+			setMostSpecificTypes(ind, inferenceModel, new HashSet<String>());
+		}
+	}
+
+	/**
+	 * If it is added that P is an inverse of Q, then:
+	 *  1. For each statement involving predicate P in
+	 *     the assertions model add the inverse statement
+	 *     to the inference model if that inverse is
+	 *     in the assertions model.
+	 *      	      
+	 *  2. Repeat the same for predicate Q.
+	 *  
+	 */
+	protected void addedInverseProperty(OntProperty prop1, OntProperty prop2, Model inferenceModel) {
+		
+		if ( !prop1.isObjectProperty() || !prop2.isObjectProperty() ) {
+		   log.warn("The subject and object of the inverseOf statement are not both object properties. No inferencing will be performed. property 1: " + prop1.getURI() + " property 2:" + prop2.getURI());
+		   return;
+		}
+		
+		Model inferences = ModelFactory.createDefaultModel();		
+	    inferences.add(generateInverseInferences(prop1, prop2));
+	    inferences.add(generateInverseInferences(prop2, prop1));
+	    
+		if (inferences.isEmpty()) return;
+				
+		StmtIterator iter = inferences.listStatements();
+		
+		while (iter.hasNext()) {
+			Statement infStmt = iter.next();
+			addInference(infStmt, inferenceModel, true);
+		}
+	}
+
+	/**
+	 * If it is removed that P is an inverse of Q, then:
+	 *  1. For each statement involving predicate P in 
+	 *     the abox assertions model remove the inverse
+	 *     statement from the inference model unless
+	 *     that statement is otherwise entailed.
+	 *      	      
+	 *  2. Repeat the same for predicate Q.
+	 */
+	protected void removedInverseProperty(OntProperty prop1, OntProperty prop2, Model inferenceModel) {
+		
+		if ( !prop1.isObjectProperty() || !prop2.isObjectProperty() ) {
+		   log.warn("The subject and object of the inverseOf statement are not both object properties. No inferencing will be performed. property 1: " + prop1.getURI() + " property 2:" + prop2.getURI());
+		   return;
+		}
+				
+		Model inferences = ModelFactory.createDefaultModel();
+	    inferences.add(generateInverseInferences(prop1, prop2));
+	    inferences.add(generateInverseInferences(prop2, prop1));
+				
+		if (inferences.isEmpty()) return;
+					
+		StmtIterator iter = inferences.listStatements();
+			
+		while (iter.hasNext()) {
+			Statement infStmt = iter.next();
+					
+			if (entailedStatement(infStmt)) {
+				continue;
+			}
+			
+			removeInference(infStmt,inferenceModel);
+		}
+	}
+
+	/**
+	 * Get a list of individuals the same as the given individual
+	 */
+	protected List<Resource> getSameIndividuals(Resource ind, Model inferenceModel) {	
+		ArrayList<Resource> sameIndividuals = new ArrayList<Resource>();
+		fullModel.enterCriticalSection(Lock.READ);
+		try {
+			Iterator<Statement> iter = fullModel.listStatements(ind, OWL.sameAs, (RDFNode) null);	
+			while (iter.hasNext()) {
+				Statement stmt = iter.next();
+				if (stmt.getObject() != null 
+                    && stmt.getObject().isResource() 
+                    && stmt.getObject().asResource().getURI() != null) {
+                    sameIndividuals.add(stmt.getObject().asResource());
+                }
+			}
+		} finally {
+			fullModel.leaveCriticalSection();
+		}		
+		return sameIndividuals;
+	}
+
+	/**
 	 * Materializes inferences based on the owl:sameAs relationship.
 	 *  
 	 * If it is added that x owl:sameAs y, then all asserted and inferred
@@ -539,12 +750,13 @@ public class SimpleReasoner extends StatementListener {
 		generateSameAsInferences(object, subject, inferenceModel);		
 	}	
 
-	/*
+	/**
 	 * Materializes inferences based on the owl:sameAs relationship.
 	 *  
 	 * If it is removed	that x is sameAs y, then remove y sameAs x from 
 	 * the inference graph and then recompute the inferences for x and
-	 * y based on their respective assertions.																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																														 that x owl:sameAs y, then all asserted and inferred
+	 * y based on their respective assertions.
+     * that x owl:sameAs y, then all asserted and inferred
 	 */
 	protected void removedABoxSameAsAssertion(Statement stmt, Model inferenceModel) {
 		Resource subject = null;
@@ -585,9 +797,30 @@ public class SimpleReasoner extends StatementListener {
 		    computeInferencesForIndividual(sIter2.next(), inferenceModel);			
 		}
 	}
+    protected void doSameAsForAddedABoxAssertion(Statement stmt, Model inferenceModel){
+        List<Resource> sameIndividuals = 
+            getSameIndividuals(stmt.getSubject().asResource(), inferenceModel);
 
-	/*
-	 * 
+		Iterator<Resource> sameIter = sameIndividuals.iterator();
+		while (sameIter.hasNext()) {
+			Resource subject = sameIter.next();
+			Statement sameStmt = 
+                ResourceFactory.createStatement(subject,stmt.getPredicate(),stmt.getObject());
+			addInference(sameStmt,inferenceModel,false);
+		}	    
+
+		inferenceModel.enterCriticalSection(Lock.WRITE);
+		try {
+			if (inferenceModel.contains(stmt)) {
+				inferenceModel.remove(stmt);
+			}
+		} finally {
+			inferenceModel.leaveCriticalSection();
+		}
+    }
+
+
+	/**
 	 * Materializes inferences based on the owl:inverseOf relationship.
 	 * and owl:sameAs
 	 *  
@@ -609,223 +842,22 @@ public class SimpleReasoner extends StatementListener {
     	       addInference(infStmt,inferenceModel,true);
     	    }	
 	    }
-	    
-        List<Resource> sameIndividuals = getSameIndividuals(stmt.getSubject().asResource(), inferenceModel);
-		Iterator<Resource> sameIter = sameIndividuals.iterator();
-		while (sameIter.hasNext()) {
-			Resource subject = sameIter.next();
-			Statement sameStmt = ResourceFactory.createStatement(subject,stmt.getPredicate(),stmt.getObject());
-			addInference(sameStmt,inferenceModel,false);
-		}	    
 
-		inferenceModel.enterCriticalSection(Lock.WRITE);
-		try {
-			if (inferenceModel.contains(stmt)) {
-				inferenceModel.remove(stmt);
-			}
-		} finally {
-			inferenceModel.leaveCriticalSection();
-		}
+        doSameAsForAddedABoxAssertion( stmt, inferenceModel);
 	}	
-			
-	/*
-	 * Performs incremental property-based reasoning.
-	 * 
-	 * Retracts inferences based on the owl:inverseOf relationship.
-	 * 
-	 * If it is removed that x prop1 y, and prop2 is an inverseOf prop1
-	 * then remove y prop2 x from the inference graph, unless it is 
-	 * otherwise entailed by the assertions graph independently of
-	 * this removed statement.
-	 */
-	protected void removedABoxAssertion(Statement stmt, Model inferenceModel) {
-		
-	    if (!stmt.getObject().isLiteral()) {
-    		List<OntProperty> inverseProperties = getInverseProperties(stmt);	
-    	    Iterator<OntProperty> inverseIter = inverseProperties.iterator();
-    		
-    	    while (inverseIter.hasNext()) {
-    	        OntProperty inverseProp = inverseIter.next();
-    	        Statement infStmt = ResourceFactory.createStatement(
-    	                stmt.getObject().asResource(), inverseProp, stmt.getSubject());
-    	        removeInference(infStmt,inferenceModel);
-    	    }	   
-	    }
-	
-	    List<Resource> sameIndividuals = getSameIndividuals(stmt.getSubject().asResource(), inferenceModel);
+
+    void doSameAsForRemovedABoxAssertion(Statement stmt, Model inferenceModel){
+	    List<Resource> sameIndividuals = 
+            getSameIndividuals(stmt.getSubject().asResource(), inferenceModel);
 		Iterator<Resource> sameIter = sameIndividuals.iterator();	 
 		while (sameIter.hasNext()) {
-			 Statement stmtSame = ResourceFactory.createStatement(sameIter.next(), stmt.getPredicate(), stmt.getObject());
+			 Statement stmtSame = 
+                 ResourceFactory.createStatement(sameIter.next(), 
+                                                 stmt.getPredicate(), 
+                                                 stmt.getObject());
 			 removeInference(stmtSame,inferenceModel,false,true);
-		}		 
-	    	    
-		 // if a statement has been removed that is otherwise entailed,
-		 // add it to the inference graph.
-	    inferenceModel.enterCriticalSection(Lock.WRITE);
-	    try {
-			 if (entailedStatement(stmt) && !inferenceModel.contains(stmt)) {
-				inferenceModel.add(stmt);
-			 }			 
-	    } finally {
-	    	inferenceModel.leaveCriticalSection();
-	    }	    
-	}
-
-	/*
-	 * If it is added that B is a subClass of A, then for each
-	 * individual that is typed as B, either in the ABox or in the
-	 * inferred model, infer that it is of type A.
-	 */
-	protected void addedSubClass(OntClass subClass, OntClass superClass, Model inferenceModel) {
-		//log.debug("subClass = " + subClass.getURI() + " superClass = " + superClass.getURI());
-		OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-		unionModel.addSubModel(aboxModel);
-		unionModel.addSubModel(inferenceModel);
-	    List<Resource> subjectList = new ArrayList<Resource>();
-		aboxModel.enterCriticalSection(Lock.READ);
-		try {
-			StmtIterator iter = unionModel.listStatements((Resource) null, RDF.type, subClass);
-			while (iter.hasNext()) {
-				Statement stmt = iter.next();
-	            subjectList.add(stmt.getSubject());
-	        }
-		} finally {
-			aboxModel.leaveCriticalSection();
-		}
-		
-	    for (Resource subject : subjectList) {
-			Statement infStmt = ResourceFactory.createStatement(subject, RDF.type, superClass);	
-		    addInference(infStmt, inferenceModel, true);	
-			setMostSpecificTypes(infStmt.getSubject(), inferenceModel, new HashSet<String>());
-	    }
-	}
-
-	/*
-	 * If removed that B is a subclass of A, then for each individual
-	 * that is of type B, either inferred or in the ABox, remove the
-	 * assertion that it is of type A from the inferred model,
-	 * UNLESS the individual is of some type C that is a subClass 
-	 * of A (including A itself)
-	 */
-	protected void removedSubClass(OntClass subClass, OntClass superClass, Model inferenceModel) {
-		OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
-		unionModel.addSubModel(aboxModel);
-		unionModel.addSubModel(inferenceModel);
-		List<Resource> subjectList = new ArrayList<Resource>();
-	    aboxModel.enterCriticalSection(Lock.READ);
-	    try {		
-		    StmtIterator iter = unionModel.listStatements((Resource) null, RDF.type, subClass);
-		    while (iter.hasNext()) {
-			    Statement stmt = iter.next();
-			    subjectList.add(stmt.getSubject());	
-	        }
-	    } finally {
-	        aboxModel.leaveCriticalSection();
-	    }
-	    
-	    for (Resource ind : subjectList) {
-			if (entailedType(ind,superClass)) {
-				continue;
-			}
-			Statement infStmt = ResourceFactory.createStatement(ind, RDF.type, superClass);
-			inferenceModel.enterCriticalSection(Lock.WRITE);
-			try {
-			    if (inferenceModel.contains(infStmt)) {
-				    inferenceModel.remove(infStmt);
-			    } 
-			    
-	        } finally {
-	            inferenceModel.leaveCriticalSection();
-	        }
-			
-			setMostSpecificTypes(ind, inferenceModel, new HashSet<String>());
-		}
-	}
-
-	/*
-	 * If it is added that P is an inverse of Q, then:
-	 *  1. For each statement involving predicate P in
-	 *     the assertions model add the inverse statement
-	 *     to the inference model if that inverse is
-	 *     in the assertions model.
-	 *      	      
-	 *  2. Repeat the same for predicate Q.
-	 *  
-	 */
-	protected void addedInverseProperty(OntProperty prop1, OntProperty prop2, Model inferenceModel) {
-		
-		if ( !prop1.isObjectProperty() || !prop2.isObjectProperty() ) {
-		   log.warn("The subject and object of the inverseOf statement are not both object properties. No inferencing will be performed. property 1: " + prop1.getURI() + " property 2:" + prop2.getURI());
-		   return;
-		}
-		
-		Model inferences = ModelFactory.createDefaultModel();		
-	    inferences.add(generateInverseInferences(prop1, prop2));
-	    inferences.add(generateInverseInferences(prop2, prop1));
-	    
-		if (inferences.isEmpty()) return;
-				
-		StmtIterator iter = inferences.listStatements();
-		
-		while (iter.hasNext()) {
-			Statement infStmt = iter.next();
-			addInference(infStmt, inferenceModel, true);
-		}
-	}
-
-	/*
-	 * If it is removed that P is an inverse of Q, then:
-	 *  1. For each statement involving predicate P in 
-	 *     the abox assertions model remove the inverse
-	 *     statement from the inference model unless
-	 *     that statement is otherwise entailed.
-	 *      	      
-	 *  2. Repeat the same for predicate Q.
-	 */
-	protected void removedInverseProperty(OntProperty prop1, OntProperty prop2, Model inferenceModel) {
-		
-		if ( !prop1.isObjectProperty() || !prop2.isObjectProperty() ) {
-		   log.warn("The subject and object of the inverseOf statement are not both object properties. No inferencing will be performed. property 1: " + prop1.getURI() + " property 2:" + prop2.getURI());
-		   return;
-		}
-				
-		Model inferences = ModelFactory.createDefaultModel();
-	    inferences.add(generateInverseInferences(prop1, prop2));
-	    inferences.add(generateInverseInferences(prop2, prop1));
-				
-		if (inferences.isEmpty()) return;
-					
-		StmtIterator iter = inferences.listStatements();
-			
-		while (iter.hasNext()) {
-			Statement infStmt = iter.next();
-					
-			if (entailedStatement(infStmt)) {
-				continue;
-			}
-			
-			removeInference(infStmt,inferenceModel);
-		}
-	}
-
-	/*
-	 * Get a list of individuals the same as the given individual
-	 */
-	protected List<Resource> getSameIndividuals(Resource ind, Model inferenceModel) {	
-		ArrayList<Resource> sameIndividuals = new ArrayList<Resource>();
-		fullModel.enterCriticalSection(Lock.READ);
-		try {
-			Iterator<Statement> iter = fullModel.listStatements(ind, OWL.sameAs, (RDFNode) null);	
-			while (iter.hasNext()) {
-				Statement stmt = iter.next();
-				if (stmt.getObject() == null || !stmt.getObject().isResource() || stmt.getObject().asResource().getURI() == null) continue;
-				sameIndividuals.add(stmt.getObject().asResource());
-			}
-		} finally {
-			fullModel.leaveCriticalSection();
-		}		
-		return sameIndividuals;
-	}
+		}		 	    	    
+    }
 
 	protected void generateSameAsInferences(Resource ind1, Resource ind2, Model inferenceModel) {	
 		
@@ -835,11 +867,13 @@ public class SimpleReasoner extends StatementListener {
 		
 			aboxModel.enterCriticalSection(Lock.READ);
 			try {
-				Iterator<Statement> iter = unionModel.listStatements(ind1, (Property) null, (RDFNode) null);
+				Iterator<Statement> iter = 
+                    unionModel.listStatements(ind1, (Property) null, (RDFNode) null);
 				while (iter.hasNext()) {
 					Statement stmt = iter.next();
 					if (stmt.getObject() == null) continue;
-					Statement infStmt = ResourceFactory.createStatement(ind2,stmt.getPredicate(),stmt.getObject());
+					Statement infStmt = 
+                        ResourceFactory.createStatement(ind2,stmt.getPredicate(),stmt.getObject());
 					addInference(infStmt, inferenceModel,true);
 				}
 			} finally {
@@ -849,7 +883,7 @@ public class SimpleReasoner extends StatementListener {
 		return;
 	}
 
-	/*
+	/**
 	 * Remove inferences for individual
 	 */
 	protected void removeInferencesForIndividual(Resource ind, Model inferenceModel) {	
@@ -858,7 +892,8 @@ public class SimpleReasoner extends StatementListener {
 		
 		inferenceModel.enterCriticalSection(Lock.READ);
 		try {
-			Iterator<Statement> iter = inferenceModel.listStatements(ind, (Property) null, (RDFNode) null);
+			Iterator<Statement> iter = 
+                inferenceModel.listStatements(ind, (Property) null, (RDFNode) null);
 			
 			while (iter.hasNext()) {
 				individualInferences.add(iter.next());
@@ -877,7 +912,7 @@ public class SimpleReasoner extends StatementListener {
 		return;
 	}
 
-	/*
+	/**
 	 * compute inferences for individual
 	 */
 	protected void computeInferencesForIndividual(Resource ind, Model inferenceModel) {	
@@ -898,17 +933,21 @@ public class SimpleReasoner extends StatementListener {
 		return;
 	}
 
-	// Returns true if it is entailed by class subsumption that
-    // subject is of type cls; otherwise returns false.
+	/**
+     * Returns true if it is entailed by class subsumption that
+     * subject is of type cls; otherwise returns false.
+     */
 	protected boolean entailedType(Resource subject, Resource cls) {
 	    return entailedType(subject, cls, null);
 	}
 	
-	// Returns true if it is entailed by class subsumption that
-	// subject is of type cls; otherwise returns false.
-	// remainingTypeURIs is an optional list of asserted type URIs for the subject 
-	// resource, and may be null.  Supplying a precompiled list can yield performance 
-	// improvement when this method is called repeatedly for the same subject. 
+	/**
+     * Returns true if it is entailed by class subsumption that
+	 * subject is of type cls; otherwise returns false.
+	 * remainingTypeURIs is an optional list of asserted type URIs for the subject 
+	 * resource, and may be null.  Supplying a precompiled list can yield performance 
+	 * improvement when this method is called repeatedly for the same subject. 
+     */
 	protected boolean entailedType(Resource subject, Resource cls, List<String> remainingTypeURIs) {
 				
 		List<Resource> subClasses = getSubClasses(cls);
@@ -919,7 +958,8 @@ public class SimpleReasoner extends StatementListener {
 	        }
 	    }
 	    
-	    List<String> typeURIs = (remainingTypeURIs == null) ? getRemainingAssertedTypeURIs(subject) : remainingTypeURIs;
+	    List<String> typeURIs = (remainingTypeURIs == null) ? 
+            getRemainingAssertedTypeURIs(subject) : remainingTypeURIs;
 	    
 	    for (String typeURI : typeURIs) {
             if (!typeURI.equals(cls.getURI()) && subClassURIs.contains(typeURI)) {
@@ -963,10 +1003,12 @@ public class SimpleReasoner extends StatementListener {
 		List<Resource> subClasses = new ArrayList<Resource>();
 		tboxModel.enterCriticalSection(Lock.READ);
 		try {
-			Iterator<Statement> iter = tboxModel.listStatements((Resource) null, RDFS.subClassOf, cls);
+			Iterator<Statement> iter = 
+                tboxModel.listStatements((Resource) null, RDFS.subClassOf, cls);
 			while (iter.hasNext()) {
 				Statement stmt = iter.next();
-				if (stmt.getSubject() == null || stmt.getSubject().asResource().getURI() == null) continue;
+				if (stmt.getSubject() == null 
+                    || stmt.getSubject().asResource().getURI() == null) continue;
 				if (!subClasses.contains(stmt.getSubject())) {
 					subClasses.add(stmt.getSubject());
 				}
@@ -1008,7 +1050,8 @@ public class SimpleReasoner extends StatementListener {
 			iter = tboxModel.listStatements((Resource) null, OWL.equivalentClass, cls);
 			while (iter.hasNext()) {
 				Statement stmt = iter.next();
-				if (stmt.getSubject() == null || stmt.getSubject().asResource().getURI() == null) continue;
+				if (stmt.getSubject() == null 
+                    || stmt.getSubject().asResource().getURI() == null) continue;
 				if (!superClasses.contains(stmt.getSubject())) {
 					superClasses.add(stmt.getSubject());
 				}
@@ -1019,8 +1062,10 @@ public class SimpleReasoner extends StatementListener {
 		}	
 	}
 	
-	// Returns true if the triple is entailed by inverse property
-	// reasoning or sameAs reasoning; otherwise returns false.
+	/**
+     * Returns true if the triple is entailed by inverse property
+	 * reasoning or sameAs reasoning; otherwise returns false.
+     */
 	protected boolean entailedStatement(Statement stmt) {	
 		//TODO think about checking class subsumption here (for convenience)
 		
@@ -1032,8 +1077,9 @@ public class SimpleReasoner extends StatementListener {
 			try {						
 				while (iIter.hasNext()) {		
 					Property invProp = iIter.next();
-
-					Statement invStmt = ResourceFactory.createStatement(stmt.getObject().asResource(), invProp, stmt.getSubject());
+					Statement invStmt = 
+                        ResourceFactory.createStatement(stmt.getObject().asResource(), 
+                                                        invProp, stmt.getSubject());
 					if (aboxModel.contains(invStmt)) {
 						return true;
 					}
@@ -1044,27 +1090,30 @@ public class SimpleReasoner extends StatementListener {
 		}
 		
 		// individuals sameAs each other
-		List<Resource> sameIndividuals = getSameIndividuals(stmt.getSubject().asResource(),inferenceModel);
-		Iterator<Resource> rIter = sameIndividuals.iterator();
-		if (rIter.hasNext()) {
-			aboxModel.enterCriticalSection(Lock.READ);
-			try {						
-				while (rIter.hasNext()) {		
-					Resource subject = rIter.next();
+        if( doSameAs ){
+            List<Resource> sameIndividuals = 
+                getSameIndividuals(stmt.getSubject().asResource(),inferenceModel);
+            Iterator<Resource> rIter = sameIndividuals.iterator();
+            if (rIter.hasNext()) {
+                aboxModel.enterCriticalSection(Lock.READ);
+                try {						
+                    while (rIter.hasNext()) {		
+                        Resource subject = rIter.next();
 	
-					if (aboxModel.contains(subject, stmt.getPredicate(), stmt.getObject())) {
-						return true;
-					}
-				}
-			} finally { 
-				aboxModel.leaveCriticalSection();
-			}	
-		}
+                        if (aboxModel.contains(subject, stmt.getPredicate(), stmt.getObject())) {
+                            return true;
+                        }
+                    }
+                } finally { 
+                    aboxModel.leaveCriticalSection();
+                }	
+            }
+        }
 		
 		return false;
 	}
 	
-	/*
+	/**
 	 * Returns a list of properties that are inverses of the property
 	 * in the given statement. 
 	 */
@@ -1087,7 +1136,8 @@ public class SimpleReasoner extends StatementListener {
 				}
 				
 				if (!stmt.getObject().isResource()) {
-					log.debug("The predicate of this statement is an object property, but the object is not a resource.");
+					log.debug("The predicate of this statement is an object property, "
+                              +"but the object is not a resource.");
 					return inverses;
 				}
 				
@@ -1127,7 +1177,9 @@ public class SimpleReasoner extends StatementListener {
 			while (iter.hasNext()) {		
 				Statement stmt = iter.next();		
 				if (!stmt.getObject().isResource()) continue;
-				Statement infStmt = ResourceFactory.createStatement(stmt.getObject().asResource(), inverseProp, stmt.getSubject());
+				Statement infStmt = 
+                    ResourceFactory.createStatement(stmt.getObject().asResource(), 
+                                                    inverseProp, stmt.getSubject());
 				inferences.add(infStmt);
 			}				
 	    } finally {
@@ -1137,7 +1189,7 @@ public class SimpleReasoner extends StatementListener {
 	    return inferences;	
 	}
 
-	/*
+	/**
 	 * Add an inference from the inference model
 	 * 
 	 * Adds the inference to the inference model if it is not already in
@@ -1148,28 +1200,40 @@ public class SimpleReasoner extends StatementListener {
         addInference(infStmt,inferenceModel,true);
 	}
 	
-	protected void addInference(Statement infStmt, Model inferenceModel, boolean handleSameAs) {
+	protected void addInference(Statement infStmt, Model inferenceModel, 
+	        boolean handleSameAs) {
+	    addInference(infStmt, inferenceModel, handleSameAs, true);
+	}
+	
+	protected void addInference(Statement infStmt, Model inferenceModel, 
+	        boolean handleSameAs, boolean checkRedundancy) {
 		
 		aboxModel.enterCriticalSection(Lock.READ);
 		try {
 			inferenceModel.enterCriticalSection(Lock.WRITE);
 			try {
-				if (!inferenceModel.contains(infStmt) && !aboxModel.contains(infStmt))  {
+				if (!checkRedundancy 
+				        || (!inferenceModel.contains(infStmt) && !aboxModel.contains(infStmt)))  {
 					inferenceModel.add(infStmt);
 			    }
 		
 				if (handleSameAs) {
-					List<Resource> sameIndividuals = getSameIndividuals(infStmt.getSubject().asResource(), inferenceModel);
+					List<Resource> sameIndividuals = 
+                        getSameIndividuals(infStmt.getSubject().asResource(), inferenceModel);
 					Iterator<Resource> sameIter = sameIndividuals.iterator();
 					while (sameIter.hasNext()) {
 						Resource subject = sameIter.next();
 						
-						Statement sameStmt = ResourceFactory.createStatement(subject,infStmt.getPredicate(),infStmt.getObject());
-						if (subject.equals(infStmt.getObject()) && OWL.sameAs.equals(infStmt.getPredicate())) {
+						Statement sameStmt = 
+                            ResourceFactory.createStatement(subject,infStmt.getPredicate(),
+                                                            infStmt.getObject());
+						if (subject.equals(infStmt.getObject()) 
+                            && OWL.sameAs.equals(infStmt.getPredicate())) {
 							continue;
 						}
 						
-						if (!inferenceModel.contains(sameStmt) && !aboxModel.contains(sameStmt)) {
+						if (!inferenceModel.contains(sameStmt) 
+                            && !aboxModel.contains(sameStmt)) {
 							inferenceModel.add(sameStmt);
 						}
 					}				
@@ -1182,7 +1246,7 @@ public class SimpleReasoner extends StatementListener {
 		}	
 	}
 
-	/*
+	/**
 	 * Remove an inference from the inference model
 	 * 
 	 * Removes the inference if it is not entailed by the abox model
@@ -1199,7 +1263,9 @@ public class SimpleReasoner extends StatementListener {
 		
 		inferenceModel.enterCriticalSection(Lock.WRITE);		
 		try {	
-		   if ( (!checkEntailment || !entailedStatement(infStmt)) && inferenceModel.contains(infStmt)) {
+		   if ( (!checkEntailment 
+                 || !entailedStatement(infStmt)) 
+                && inferenceModel.contains(infStmt)) {
 			   inferenceModel.remove(infStmt);
 		   } 		   
         } finally {
@@ -1209,12 +1275,17 @@ public class SimpleReasoner extends StatementListener {
 		if (handleSameAs) {
 			inferenceModel.enterCriticalSection(Lock.WRITE);		
 			try {	
-			    List<Resource> sameIndividuals = getSameIndividuals(infStmt.getSubject().asResource(), inferenceModel);
+			    List<Resource> sameIndividuals = 
+                    getSameIndividuals(infStmt.getSubject().asResource(), inferenceModel);
 			   
 			    Iterator<Resource> sameIter = sameIndividuals.iterator();	 
 			    while (sameIter.hasNext()) {
-				  Statement infStmtSame = ResourceFactory.createStatement(sameIter.next(), infStmt.getPredicate(), infStmt.getObject());
-				  if ((!checkEntailment || !entailedStatement(infStmtSame)) && inferenceModel.contains(infStmtSame)) { 
+				  Statement infStmtSame = 
+                      ResourceFactory.createStatement(sameIter.next(), 
+                                                      infStmt.getPredicate(), infStmt.getObject());
+				  if ((!checkEntailment 
+                       || !entailedStatement(infStmtSame)) 
+                      && inferenceModel.contains(infStmtSame)) { 
 					inferenceModel.remove(infStmtSame);
 				  }					 		   
 			    }
@@ -1224,7 +1295,8 @@ public class SimpleReasoner extends StatementListener {
 		}	
 	}
 
-	/*
+    
+	/**
      * Find the most specific types (classes) of an individual and
      * infer them for the individual with the mostSpecificType
      * annotation.
@@ -1477,18 +1549,10 @@ public class SimpleReasoner extends StatementListener {
 	    this.stopRequested = true;
 	}
 	
-	/*
-	 * Utility method for logging
-	 */
-    public static String stmtString(Statement statement) {
-    	return  " [subject = " + statement.getSubject().getURI() +
-    			"] [property = " + statement.getPredicate().getURI() +
-                "] [object = " + (statement.getObject().isLiteral() ? ((Literal)statement.getObject()).getLexicalForm() + " (Literal)"
-                		                                          : ((Resource)statement.getObject()).getURI() + " (Resource)") + "]";	
-    }  
+
 	  
     // DeltaComputer    
-	/*
+	/**
 	 * Asynchronous reasoning mode (DeltaComputer) is used in the case of batch removals. 
 	 */
 	public boolean isABoxReasoningAsynchronous() {
@@ -1536,7 +1600,10 @@ public class SimpleReasoner extends StatementListener {
 	    		log.info("received a bulk update end event");
 	    		if (!deltaComputerProcessing) {
 	    		    deltaComputerProcessing = true;
-	    		    new Thread(new DeltaComputer(),"DeltaComputer").start();
+					VitroBackgroundThread thread = new VitroBackgroundThread(new DeltaComputer(), 
+							"SimpleReasoner.DeltaComputer");
+	    		    thread.setWorkLevel(WORKING);
+					thread.start();
 	    		} else {
 	    			eventCount--;
 	    			log.info("received a bulk update end event while currently processing in aynchronous mode. Event count = " + eventCount);
@@ -1629,6 +1696,10 @@ public class SimpleReasoner extends StatementListener {
                                             typeURIs = getRemainingAssertedTypeURIs(stmt.getSubject());
                                         }
                                         removedABoxTypeAssertion(stmt, inferenceModel, typeURIs);
+                                    } else if (doSameAs && stmt.getPredicate().equals(OWL.sameAs)) {
+                                        removedABoxSameAsAssertion(stmt, inferenceModel);   
+                                    } else {
+                                        removedABoxAssertion(stmt, inferenceModel);
                                     }
                                     doPlugins(ModelUpdate.Operation.RETRACT,stmt);
                                 } catch (NullPointerException npe) {
@@ -1677,5 +1748,17 @@ public class SimpleReasoner extends StatementListener {
         	
         	log.info("ending DeltaComputer.run. batchMode = " + batchMode);
         }        
-    }   
+    } 
+
+	/**
+	 * Utility method for logging
+	 */
+    public static String stmtString(Statement statement) {
+    	return  " [subject = " + statement.getSubject().getURI() +
+    			"] [property = " + statement.getPredicate().getURI() +
+                "] [object = " + (statement.getObject().isLiteral() 
+                                  ? ((Literal)statement.getObject()).getLexicalForm() + " (Literal)"
+                                  : ((Resource)statement.getObject()).getURI() + " (Resource)") + "]";
+    }  
+
 }

@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.json.JsonServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.utils.JsonToFmModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
@@ -120,7 +121,7 @@ public class BrowseDataGetter extends DataGetterBase implements DataGetter {
     private Map<String,Object> getCommonValues( ServletContext context, VitroRequest vreq){
         Map<String,Object> values = new HashMap<String,Object>();              
                 
-        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+        VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
         List<VClassGroup> cgList = vcgc.getGroups();        
         LinkedList<VClassGroupTemplateModel> cgtmList = new LinkedList<VClassGroupTemplateModel>();
         for( VClassGroup classGroup : cgList){
@@ -194,7 +195,7 @@ public class BrowseDataGetter extends DataGetterBase implements DataGetter {
         String vcgUri = getParam(Mode.CLASS_GROUP, request, params);
         VitroRequest vreq = new VitroRequest(request);        
         
-        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+        VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(request);
         VClassGroup vcg = vcgc.getGroup(vcgUri);        
         
         ArrayList<VClassTemplateModel> classes = new ArrayList<VClassTemplateModel>(vcg.size());

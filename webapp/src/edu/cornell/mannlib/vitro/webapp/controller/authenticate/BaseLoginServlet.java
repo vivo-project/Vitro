@@ -12,6 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
+import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.MLevel;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.Message;
 
 /**
@@ -21,14 +22,15 @@ public class BaseLoginServlet extends HttpServlet {
 	private static final Log log = LogFactory.getLog(BaseLoginServlet.class);
 
 	/** A general purpose error message for the user to see. */
-	protected static final Message MESSAGE_LOGIN_FAILED = new LoginProcessBean.Message(
-			"External login failed.", LoginProcessBean.MLevel.ERROR);
-
+	protected static Message messageLoginFailed(HttpServletRequest req) {
+		return new LoginProcessBean.Message(req, MLevel.ERROR, "external_login_failed");
+	}
+	
 	/** Tell the user that it's nothing personal, they just aren't allowed in. */
-	protected static final Message MESSAGE_LOGIN_DISABLED = new LoginProcessBean.Message(
-			"User logins are temporarily disabled while the system is being maintained.",
-			LoginProcessBean.MLevel.ERROR);
-
+	protected static Message messageLoginDisabled(HttpServletRequest req) {
+		return new LoginProcessBean.Message(req, MLevel.ERROR, "logins_temporarily_disabled");
+	}
+	
 	protected Authenticator getAuthenticator(HttpServletRequest req) {
 		return Authenticator.getInstance(req);
 	}
@@ -40,10 +42,9 @@ public class BaseLoginServlet extends HttpServlet {
 	 */
 	protected void complainAndReturnToReferrer(HttpServletRequest req,
 			HttpServletResponse resp, String sessionAttributeForReferrer,
-			Message message, Object... args) throws IOException {
-		log.debug(message.getMessageLevel() + ": "
-				+ message.formatMessage(args));
-		LoginProcessBean.getBean(req).setMessage(message, args);
+			Message message) throws IOException {
+		log.debug(message);
+		LoginProcessBean.getBean(req).setMessage(message);
 
 		String referrer = (String) req.getSession().getAttribute(
 				sessionAttributeForReferrer);

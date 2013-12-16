@@ -14,6 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAct
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
@@ -21,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.RdfLiteralHash;
 
 /**
  * This allows the template to treat an rdfs:label like a data property statement, and thus
@@ -37,7 +38,7 @@ public class NameStatementTemplateModel extends PropertyStatementTemplateModel {
     private final String editUrl;
 
     NameStatementTemplateModel(String subjectUri, VitroRequest vreq) {
-        super(subjectUri, VitroVocabulary.LABEL, vreq);
+        super(subjectUri, new Property(VitroVocabulary.LABEL), vreq);
 
         // NIHVIVO-2466 Use the same methods to get the label that are used elsewhere in the 
         // application, to guarantee consistent results for individuals with multiple labels
@@ -69,7 +70,7 @@ public class NameStatementTemplateModel extends PropertyStatementTemplateModel {
         
         ParamMap params = new ParamMap(
                 "subjectUri", subjectUri,
-                "predicateUri", propertyUri,
+                "predicateUri", property.getURI(),
                 "datapropKey", makeHash(dps),
                 "deleteProhibited", "prohibited");
         
@@ -80,7 +81,7 @@ public class NameStatementTemplateModel extends PropertyStatementTemplateModel {
         
 	private DataPropertyStatement makeStatement(Literal literalValue) {
 		DataPropertyStatement dps = new DataPropertyStatementImpl(subjectUri,
-				propertyUri, literalValue.getLexicalForm());
+				property.getURI(), literalValue.getLexicalForm());
 		// Language and datatype are needed to get the correct hash value
 		dps.setLanguage(literalValue.getLanguage());
 		dps.setDatatypeURI(literalValue.getDatatypeURI());

@@ -31,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
@@ -64,10 +65,12 @@ public class VclassRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        VClassDao vcwDao = request.getAssertionsWebappDaoFactory().getVClassDao();
+        WebappDaoFactory wadf = ModelAccess.on(getServletContext()).getWebappDaoFactory();
+        
+        VClassDao vcwDao = wadf.getVClassDao();
         epo.setDataAccessObject(vcwDao);
-        VClassGroupDao cgDao = request.getFullWebappDaoFactory().getVClassGroupDao();
-        OntologyDao oDao = request.getFullWebappDaoFactory().getOntologyDao();
+        VClassGroupDao cgDao = wadf.getVClassGroupDao();
+        OntologyDao oDao = wadf.getOntologyDao();
 
         VClass vclassForEditing = null;
         if (!epo.getUseRecycledBean()){
@@ -82,18 +85,12 @@ public class VclassRetryController extends BaseEditController {
             } else {
                 vclassForEditing = new VClass();
                 if (request.getParameter("GroupId") != null) {
-                    try {
-                        vclassForEditing.setGroupURI(request.getParameter("GroupURI"));
-                    } catch (NumberFormatException e) {
-                        // too bad
-                    }
+                    vclassForEditing.setGroupURI(request.getParameter("GroupURI"));
                 }
             }
             epo.setOriginalBean(vclassForEditing);
         } else {
             vclassForEditing = (VClass) epo.getNewBean();
-            // action = "update";
-            // log.error("using newBean");
         }
 
         //make a simple mask for the class's id
@@ -110,7 +107,7 @@ public class VclassRetryController extends BaseEditController {
         //set up any listeners
         List changeListenerList = new LinkedList();
         if (request.getParameter("superclassUri") != null) {
-            changeListenerList.add(new SubclassListener(request.getParameter("superclassUri"), request.getFullWebappDaoFactory()));
+            changeListenerList.add(new SubclassListener(request.getParameter("superclassUri"), request.getUnfilteredWebappDaoFactory()));
         }
         epo.setChangeListenerList(changeListenerList);
 
@@ -130,7 +127,7 @@ public class VclassRetryController extends BaseEditController {
 
         HashMap<String, List<Option>> optionMap = new HashMap<String,List<Option>>();
         try {
-            VClassGroupDao vcgDao = request.getFullWebappDaoFactory().getVClassGroupDao();
+            VClassGroupDao vcgDao = request.getUnfilteredWebappDaoFactory().getVClassGroupDao();
             List classGroupOptionList = FormUtils.makeOptionListFromBeans(vcgDao.getPublicGroupsWithVClasses(),"URI","PublicName",vclassForEditing.getGroupURI(),null,(vclassForEditing.getGroupURI()!=null && !(vclassForEditing.getGroupURI().equals(""))));
             classGroupOptionList.add(0,new Option("", "none", ("update".equals(action) && (vclassForEditing.getGroupURI()==null || vclassForEditing.getGroupURI().equals("")))));
             optionMap.put("GroupURI", classGroupOptionList);
@@ -142,7 +139,7 @@ public class VclassRetryController extends BaseEditController {
             List namespaceIdList = (action.equals("insert"))
                     ? FormUtils.makeOptionListFromBeans(oDao.getAllOntologies(),"URI","Name", ((vclassForEditing.getNamespace()==null) ? "" : vclassForEditing.getNamespace()), null, false)
                     : FormUtils.makeOptionListFromBeans(oDao.getAllOntologies(),"URI","Name", ((vclassForEditing.getNamespace()==null) ? "" : vclassForEditing.getNamespace()), null, true);
-	        namespaceIdList.add(0, new Option(request.getFullWebappDaoFactory().getDefaultNamespace(),"default"));
+	        namespaceIdList.add(0, new Option(request.getUnfilteredWebappDaoFactory().getDefaultNamespace(),"default"));
             optionMap.put("Namespace", namespaceIdList);
         } catch (Exception e) {
             log.error(this.getClass().getName() + "unable to create Namespace option list");

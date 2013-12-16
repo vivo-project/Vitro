@@ -53,7 +53,7 @@ public class GetClazzDataProperties extends BaseEditController {
 				+ "http://www.w3.org/2000/01/rdf-schema#label" + "</value>"
 				+ "</option>";
 
-		DataPropertyDao ddao = vreq.getFullWebappDaoFactory()
+		DataPropertyDao ddao = vreq.getUnfilteredWebappDaoFactory()
 				.getDataPropertyDao();
 
 		Collection<DataProperty> dataProps = ddao

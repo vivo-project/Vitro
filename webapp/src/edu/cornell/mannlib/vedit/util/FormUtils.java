@@ -239,28 +239,11 @@ public class FormUtils {
         for (VClass vclass : wadf.getVClassDao().getAllVclasses()) {
         	Option option = new Option();
         	option.setValue(vclass.getURI());
-        	if ( (selectedVClassURI != null) 
-        			&& (vclass.getURI() != null) 
-        			&& (selectedVClassURI.equals(vclass.getURI())) ) {
-        		option.setSelected(true);
-        	}
-        	String ontologyPrefix = null;
-        	if (vclass.getNamespace() != null) {
-        		Ontology ont = wadf.getOntologyDao().getOntologyByURI(
-        				vclass.getNamespace());
-        		if ( (ont != null) && (ont.getPrefix() != null) ) {
-        			ontologyPrefix = ont.getPrefix();
-        		}
-        	}
-        	StringBuffer classNameBuffer = new StringBuffer();
-        	if (ontologyPrefix != null) {
-        		classNameBuffer.append(ontologyPrefix).append(":");
-        	}
-        	if (vclass.getName() != null) {
-        		classNameBuffer.append(vclass.getName());
-        	}
-        	option.setBody(classNameBuffer.toString());
+        	option.setBody(vclass.getPickListName());
         	vclassOptionList.add(option);
+        	if(selectedVClassURI != null && selectedVClassURI.equals(vclass.getURI())) {
+        	    option.setSelected(true);
+        	}
         }
         return vclassOptionList;
     }

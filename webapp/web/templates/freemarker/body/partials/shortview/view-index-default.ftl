@@ -4,6 +4,6 @@
 
 <#import "lib-properties.ftl" as p>
 
-<a href="${individual.profileUrl}" title="name">${individual.name}</a>
+<a href="${individual.profileUrl}" title="${i18n().name}">${individual.name}</a>
 
 <@p.mostSpecificTypes individual  />

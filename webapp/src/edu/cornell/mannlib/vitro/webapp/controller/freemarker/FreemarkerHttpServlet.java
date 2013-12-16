@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import static javax.mail.Message.RecipientType.TO;
+import static javax.mail.Message.RecipientType.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,6 +19,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.github.jsonldjava.core.JSONLD;
+import com.github.jsonldjava.core.JSONLDProcessingError;
+import com.github.jsonldjava.impl.JenaRDFParser;
+import com.github.jsonldjava.utils.JSONUtils;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
@@ -37,16 +42,19 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
+import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
 import freemarker.ext.beans.BeansWrapper;
+import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 import freemarker.template.utility.DeepUnwrap;
 
-public class FreemarkerHttpServlet extends VitroHttpServlet {
+public class FreemarkerHttpServlet extends VitroHttpServlet  {
 
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(FreemarkerHttpServlet.class);
@@ -201,7 +209,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
      * NB This method can't be static, because then the superclass method gets called rather than
      * the subclass method. For the same reason, it can't refer to a static or instance field
      * REQUIRED_ACTIONS which is overridden in the subclass.
-     */
+     * 
+     */    
     protected Actions requiredActions(VitroRequest vreq) {
         return Actions.AUTHORIZED;
     }
@@ -304,17 +313,29 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         
         String mediaType = values.getContentType().getMediaType();
         response.setContentType(mediaType);
-        
-        String format = ""; 
-        if ( RDFXML_MIMETYPE.equals(mediaType)) {
-            format = "RDF/XML";
-        } else if( N3_MIMETYPE.equals(mediaType)) {
-            format = "N3";
-        } else if ( TTL_MIMETYPE.equals(mediaType)) {
-            format ="TTL";
+                
+        if (   JSON_MIMETYPE.equals(mediaType)){
+            //json-ld is not supported by jena v2.6.4
+            try {   
+                JenaRDFParser parser = new JenaRDFParser();
+                Object json = JSONLD.fromRDF( values.getModel() , parser);
+                JSONUtils.write(response.getWriter(), json);
+            } catch (JSONLDProcessingError e) {
+               throw new IOException("Could not convert from Jena model to JSON-LD", e);
+            }           
+        }else{
+            String format = "";
+            if ( RDFXML_MIMETYPE.equals(mediaType)) {
+                format = "RDF/XML";
+            } else if( N3_MIMETYPE.equals(mediaType)) {
+                format = "N3";
+            } else if ( TTL_MIMETYPE.equals(mediaType)) {
+                format ="TTL";
+            }
+            values.getModel().write( response.getOutputStream(), format );
         }
         
-        values.getModel().write( response.getOutputStream(), format );      
+              
     }
 
     protected void doException(VitroRequest vreq, HttpServletResponse response, 
@@ -336,7 +357,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
     private Map<String, Object> buildRequestUrls(VitroRequest vreq) {
         Map<String, Object> requestUrls = new HashMap<String, Object>();
     	
-        FreemarkerConfiguration config = FreemarkerConfigurationLoader.getConfig(vreq);
+        Configuration config = FreemarkerConfiguration.getConfig(vreq);
         TemplateModel urlModel = config.getSharedVariable("urls");
         
         try {
@@ -426,10 +447,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet {
         // NIHVIVO-3307: we need this here instead of FreemarkerConfiguration.java so that updates to
         // the copyright text can be viewed with having to restart Tomcat
         map.put("copyright", getCopyrightInfo(appBean));    
-        
-        map.put("url", new edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective()); 
-        map.put("widget", new edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective());
-        map.putAll( FreemarkerConfiguration.getDirectives() );
         
         // Add these accumulator objects. They will collect tags so the template can write them 
         // at the appropriate location.

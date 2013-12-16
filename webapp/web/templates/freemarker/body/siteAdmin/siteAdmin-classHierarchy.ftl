@@ -8,23 +8,23 @@
         <#assign displayOption = "asserted">
     </#if>
     <form name="classHierarchyForm" id="classHierarchyForm" action="showClassHierarchy" method="post" role="classHierarchy">
-        <label id="displayOptionLabel" class="inline">Display Options</label>
+        <label id="displayOptionLabel" class="inline">${i18n().display_options}</label>
         <select id="displayOption" name="displayOption">
-            <option value="asserted" <#if displayOption == "asserted">selected</#if> >Asserted Class Hierarchy</option>
-            <option  value="inferred" <#if displayOption == "inferred">selected</#if> >Inferred Class Hierarchy</option>
-            <option value="all" <#if displayOption == "all">selected</#if> >All Classes</option>
-            <option value="group" <#if displayOption == "group">selected</#if> >Classes by Class Group</option>
+            <option value="asserted" <#if displayOption == "asserted">selected</#if> >${i18n().asserted_class_hierarchy}</option>
+            <option  value="inferred" <#if displayOption == "inferred">selected</#if> >${i18n().inferred_class_hierarchy}</option>
+            <option value="all" <#if displayOption == "all">selected</#if> >${i18n().all_classes}</option>
+            <option value="group" <#if displayOption == "group">selected</#if> >${i18n().classes_by_classgroup}</option>
         </select>
-        <input id="addClass" value="Add New Class" class="form-button" type="submit" />
+        <input id="addClass" value="${i18n().add_new_classes}" class="form-button" type="submit" />
         <#if displayOption == "group">
-                <input type="submit" id="addGroup" class="form-button" value="Add New Group"/>
+                <input type="submit" id="addGroup" class="form-button" value="${i18n().add_new_group}"/>
         </#if>
     </form>
         
     <#if displayOption == "group">
-        <div id="expandLink"><span id="expandAll" ><a href="javascript:" title="hide/show subclasses">hide subclasses</a></span></div>
+        <div id="expandLink"><span id="expandAll" ><a href="javascript:" title="${i18n().hide_show_subclasses}">${i18n().hide_subclasses}</a></span></div>
     <#else>
-        <div id="expandLink"><span id="expandAll" ><a href="#" title="expand all">expand all</a></span></div>
+        <div id="expandLink"><span id="expandAll" ><a href="#" title="${i18n().expand_all}">${i18n().expand_all}</a></span></div>
     </#if>
     <section id="container">
 
@@ -32,6 +32,17 @@
 </section>
 <script language="javascript" type="text/javascript" >
     var json = [${jsonTree!}];
+    var i18nStrings = {
+        hideSubclasses: '${i18n().hide_subclasses}',
+        showSubclasses: '${i18n().show_subclasses}',
+        classGroup: '${i18n().class_group_all_caps}',
+        ontologyString: '${i18n().ontology_capitalized}',
+        subclassesString: '${i18n().subclasses_capitalized}',
+        expandAll: '${i18n().expand_all}',
+        collapseAll: '${i18n().collapse_all}',
+        classesString: '${i18n().classes_capitalized}',
+        displayRank: '${i18n().display_rank}'
+    };
 </script>
 
 <script language="javascript" type="text/javascript" >

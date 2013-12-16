@@ -72,8 +72,8 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 				// *******
 				// methodology adopted from DatatypePropertiesListingController and ClassHierarchyListingController
 				// *******
-				VClassDao vcDao = vreq.getFullWebappDaoFactory().getVClassDao();
-				DataPropertyDao dao = vreq.getFullWebappDaoFactory().getDataPropertyDao();
+				VClassDao vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
+				DataPropertyDao dao = vreq.getUnfilteredWebappDaoFactory().getDataPropertyDao();
 				String topUri = vreq.getParameter("type");
 				VClass topClass = vcDao.getVClassByURI(topUri);
 				HashSet<String> propURIs = new HashSet<String>();
@@ -137,7 +137,7 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 			                VClass root = (VClass) rootIt.next();
 				            if (root != null) {
 				            	List<VClass> lvl2ChildClasses = new ArrayList<VClass>();
-				                addChildren(vcDao, vreq.getFullWebappDaoFactory(), root, lvl2ChildClasses, 0, ontologyUri);
+				                addChildren(vcDao, vreq.getUnfilteredWebappDaoFactory(), root, lvl2ChildClasses, 0, ontologyUri);
 				                lvl2Classes.addAll(lvl2ChildClasses);
 			                }
 			            }

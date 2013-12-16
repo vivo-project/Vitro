@@ -23,6 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectP
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
@@ -36,6 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil;
 
 /**
@@ -47,6 +49,9 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			.getLog(ImageUploadController.class);
 
 	private static final String ATTRIBUTE_REFERRING_PAGE = "ImageUploadController.referringPage";
+
+	private static final String ERROR_CODE_UNRECOGNIZED_URI = "imageUpload.errorUnrecognizedURI";
+	private static final String ERROR_CODE_NO_URI = "imageUpload.errorNoURI";
 
 	/** Limit file size to 6 megabytes. */
 	public static final int MAXIMUM_FILE_SIZE = 6 * 1024 * 1024;
@@ -97,6 +102,13 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 
 	private static final String URL_HERE = UrlBuilder.getUrl("/uploadImages");
 
+	private static final String TEXT_STRING_UPLOAD_TITLE = "upload_page_title";
+	private static final String TEXT_STRING_UPLOAD_TITLE_WITH_NAME = "upload_page_title_with_name";
+	private static final String TEXT_STRING_REPLACE_TITLE = "replace_page_title";
+	private static final String TEXT_STRING_REPLACE_TITLE_WITH_NAME = "replace_page_title_with_name";
+	private static final String TEXT_STRING_CROP_TITLE = "crop_page_title";
+	private static final String TEXT_STRING_CROP_TITLE_WITH_NAME = "crop_page_title_with_name";
+
 	private FileStorage fileStorage;
 
 	/**
@@ -134,20 +146,23 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			String action = vreq.getParameter(PARAMETER_ACTION);
 			Individual entity = validateEntityUri(vreq);
 			String imageUri = entity.getMainImageUri();
+			
+			Property indMainImage = new Property();
+			indMainImage.setURI(VitroVocabulary.IND_MAIN_IMAGE);
 
 			RequestedAction ra;
 			if (ACTION_DELETE.equals(action)
 					|| ACTION_DELETE_EDIT.equals(action)) {
 				ra = new DropObjectPropertyStatement(vreq.getJenaOntModel(),
-						entity.getURI(), VitroVocabulary.IND_MAIN_IMAGE,
+						entity.getURI(), indMainImage,
 						imageUri);
 			} else if (imageUri != null) {
 				ra = new EditObjectPropertyStatement(vreq.getJenaOntModel(),
-						entity.getURI(), VitroVocabulary.IND_MAIN_IMAGE,
+						entity.getURI(), indMainImage,
 						imageUri);
 			} else {
 				ra = new AddObjectPropertyStatement(vreq.getJenaOntModel(),
-						entity.getURI(), VitroVocabulary.IND_MAIN_IMAGE,
+						entity.getURI(), indMainImage,
 						RequestActionConstants.SOME_URI);
 			}
 			return new Actions(ra);
@@ -218,7 +233,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			}
 		} catch (UserMistakeException e) {
 			// Can't find the entity? Complain.
-			return showAddImagePageWithError(vreq, null, e.getMessage());
+			return showAddImagePageWithError(vreq, null, e.formatMessage(vreq));
 		} catch (Exception e) {
 			// We weren't expecting this - log it, and apologize to the user.
 			return new ExceptionResponseValues(e);
@@ -244,7 +259,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues doIntroScreen(VitroRequest vreq, Individual entity) {
 		ImageInfo imageInfo = ImageInfo.instanceFromEntityUri(
-				vreq.getFullWebappDaoFactory(), entity);
+				vreq.getUnfilteredWebappDaoFactory(), entity);
 		if (imageInfo == null) {
 			return showAddImagePage(vreq, entity);
 		} else {
@@ -258,7 +273,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues doUploadImage(VitroRequest vreq, Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory(), getServletContext());
+				vreq.getUnfilteredWebappDaoFactory(), getServletContext());
 
 		try {
 			// Did they provide a file to upload? If not, show an error.
@@ -274,7 +289,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			return showCropImagePage(vreq, entity,
 					fileInfo.getBytestreamAliasUrl(), size);
 		} catch (UserMistakeException e) {
-			return showErrorMessage(vreq, entity, e.getMessage());
+			return showErrorMessage(vreq, entity, e.formatMessage(vreq));
 		}
 	}
 
@@ -284,8 +299,9 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues showErrorMessage(VitroRequest vreq,
 			Individual entity, String message) {
+
 		ImageInfo imageInfo = ImageInfo.instanceFromEntityUri(
-				vreq.getFullWebappDaoFactory(), entity);
+				vreq.getUnfilteredWebappDaoFactory(), entity);
 		if (imageInfo == null) {
 			return showAddImagePageWithError(vreq, entity, message);
 		} else {
@@ -301,7 +317,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	private ResponseValues doCreateThumbnail(VitroRequest vreq,
 			Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory(), getServletContext());
+				vreq.getUnfilteredWebappDaoFactory(), getServletContext());
 
 		try {
 			CropRectangle crop = validateCropCoordinates(vreq);
@@ -313,7 +329,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 
 			return showExitPage(vreq, entity);
 		} catch (UserMistakeException e) {
-			return showErrorMessage(vreq, entity, e.getMessage());
+			return showErrorMessage(vreq, entity, e.formatMessage(vreq));
 		}
 	}
 
@@ -323,7 +339,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues doDeleteImage(VitroRequest vreq, Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory(), getServletContext());
+				vreq.getUnfilteredWebappDaoFactory(), getServletContext());
 
 		helper.removeExistingImage(entity);
 
@@ -336,7 +352,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues doDeleteThenEdit(VitroRequest vreq, Individual entity) {
 		ImageUploadHelper helper = new ImageUploadHelper(fileStorage,
-				vreq.getFullWebappDaoFactory(), getServletContext());
+				vreq.getUnfilteredWebappDaoFactory(), getServletContext());
 
 		helper.removeExistingImage(entity);
 
@@ -350,15 +366,14 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			throws UserMistakeException {
 		String entityUri = vreq.getParameter(PARAMETER_ENTITY_URI);
 		if (entityUri == null) {
-			throw new UserMistakeException("No entity URI was provided");
+			throw new UserMistakeException(ERROR_CODE_NO_URI);
 		}
 
-		Individual entity = vreq.getFullWebappDaoFactory().getIndividualDao()
+		Individual entity = vreq.getUnfilteredWebappDaoFactory().getIndividualDao()
 				.getIndividualByURI(entityUri);
 		if (entity == null) {
-			throw new UserMistakeException(
-					"This URI is not recognized as belonging to anyone: '"
-							+ entityUri + "'");
+			throw new UserMistakeException(ERROR_CODE_UNRECOGNIZED_URI,
+					entityUri);
 		}
 		return entity;
 	}
@@ -416,7 +431,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 		rv.put(BODY_THUMBNAIL_URL, placeholderUrl);
 		rv.put(BODY_FORM_ACTION, formAction);
 		rv.put(BODY_CANCEL_URL, cancelUrl);
-		rv.put(BODY_TITLE, "Upload image" + forName(entity));
+		rv.put(BODY_TITLE, figureUploadPageTitle(vreq, entity));
 		rv.put(BODY_MAX_FILE_SIZE, MAXIMUM_FILE_SIZE / (1024 * 1024));
 		rv.put(BODY_THUMBNAIL_HEIGHT, THUMBNAIL_HEIGHT);
 		rv.put(BODY_THUMBNAIL_WIDTH, THUMBNAIL_WIDTH);
@@ -442,7 +457,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 		rv.put(BODY_DELETE_URL, formAction(entity.getURI(), ACTION_DELETE_EDIT));
 		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_UPLOAD));
 		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
-		rv.put(BODY_TITLE, "Replace image" + forName(entity));
+		rv.put(BODY_TITLE, figureReplacePageTitle(vreq, entity));
 		rv.put(BODY_MAX_FILE_SIZE, MAXIMUM_FILE_SIZE / (1024 * 1024));
 		rv.put(BODY_THUMBNAIL_HEIGHT, THUMBNAIL_HEIGHT);
 		rv.put(BODY_THUMBNAIL_WIDTH, THUMBNAIL_WIDTH);
@@ -472,7 +487,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 		rv.put(BODY_MAIN_IMAGE_WIDTH, dimensions.width);
 		rv.put(BODY_FORM_ACTION, formAction(entity.getURI(), ACTION_SAVE));
 		rv.put(BODY_CANCEL_URL, exitPageUrl(vreq, entity.getURI()));
-		rv.put(BODY_TITLE, "Crop Photo" + forName(entity));
+		rv.put(BODY_TITLE, figureCropPageTitle(vreq, entity));
 		return rv;
 	}
 
@@ -522,24 +537,59 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	}
 
 	/**
-	 * Format the entity's name for display as part of the page title.
+	 * Format the title for the Upload page.
 	 */
-	private String forName(Individual entity) {
+	private String figureUploadPageTitle(HttpServletRequest req,
+			Individual entity) {
+		return figurePageTitle(req, entity, TEXT_STRING_UPLOAD_TITLE,
+				TEXT_STRING_UPLOAD_TITLE_WITH_NAME);
+	}
+
+	/**
+	 * Format the title for the Replace page.
+	 */
+	private String figureReplacePageTitle(HttpServletRequest req,
+			Individual entity) {
+		return figurePageTitle(req, entity, TEXT_STRING_REPLACE_TITLE,
+				TEXT_STRING_REPLACE_TITLE_WITH_NAME);
+	}
+
+	/**
+	 * Format the title for the Crop page.
+	 */
+	private String figureCropPageTitle(HttpServletRequest req, Individual entity) {
+		return figurePageTitle(req, entity, TEXT_STRING_CROP_TITLE,
+				TEXT_STRING_CROP_TITLE_WITH_NAME);
+	}
+
+	/**
+	 * Format one of two page titles, depending on whether the entity has a
+	 * name.
+	 */
+	private String figurePageTitle(HttpServletRequest req, Individual entity,
+			String noNameTitleKey, String nameTitleKey) {
 		if (entity != null) {
 			String name = entity.getName();
 			if (name != null) {
-				return " for " + name;
+				return I18n.text(req, nameTitleKey, name);
 			}
 		}
-		return "";
+		return I18n.text(req, noNameTitleKey);
 	}
 
 	/**
 	 * Holds an error message to use as a complaint to the user.
 	 */
 	static class UserMistakeException extends Exception {
-		UserMistakeException(String message) {
+		private final Object[] parameters;
+
+		UserMistakeException(String message, Object... parameters) {
 			super(message);
+			this.parameters = parameters;
+		}
+
+		public String formatMessage(HttpServletRequest req) {
+			return I18n.text(req, getMessage(), parameters);
 		}
 	}
 

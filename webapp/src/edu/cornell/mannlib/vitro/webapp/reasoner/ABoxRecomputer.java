@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -106,6 +107,9 @@ public class ABoxRecomputer {
 	    }
 	}
 
+	// don't check for existing inferences in the rebuild model
+	private boolean DO_CHECK = true;
+	
 	/*
 	 * Recompute the entire ABox inference graph. The new 
 	 * inference graph is built in a separate model and
@@ -131,11 +135,13 @@ public class ABoxRecomputer {
 			
 			log.info("Recomputing inferences for " + individuals.size() + " individuals");
 			
+            long start = System.currentTimeMillis();
+			
 			for (String individualURI : individuals) {			
 				Resource individual = ResourceFactory.createResource(individualURI);
 				
 				try {
-					addedABoxTypeAssertion(individual, inferenceRebuildModel, unknownTypes);
+					addedABoxTypeAssertion(individual, inferenceRebuildModel, unknownTypes, DO_CHECK);
 					simpleReasoner.setMostSpecificTypes(individual, inferenceRebuildModel, unknownTypes);
 					List<ReasonerPlugin> pluginList = simpleReasoner.getPluginList();
 					if (pluginList.size() > 0) {
@@ -164,8 +170,11 @@ public class ABoxRecomputer {
 				}
 				
 				numStmts++;
-	            if ((numStmts % 10000) == 0) {
-	                log.info("Still computing class subsumption ABox inferences...");
+	            if ((numStmts % 1000) == 0) {
+	                log.info("Still computing class subsumption ABox inferences (" 
+	                        + numStmts + "/" + individuals.size() + " individuals)");
+	                log.info((System.currentTimeMillis() - start) / 1000 + " ms per individual");
+	                start = System.currentTimeMillis();
 	            }
 	            
 	            if (stopRequested) {
@@ -274,7 +283,7 @@ public class ABoxRecomputer {
 			log.info("Finished computing sameAs ABox inferences");	
 			
 			try {
-				if (updateInferenceModel(inferenceRebuildModel)) {
+				if (updateInferenceModel(inferenceRebuildModel, individuals)) {
 		        	log.info("a stopRequested signal was received during updateInferenceModel. Halting Processing.");
 		        	return;
 				}
@@ -295,13 +304,35 @@ public class ABoxRecomputer {
 	 */
 	protected Collection<String> getAllIndividualURIs() {
 	    
-		String queryString = "select ?s where {?s a ?type}";
-	    return getIndividualURIs(queryString);
+	    HashSet<String> individualURIs = new HashSet<String>();
+	    
+	    List<String> classList = new ArrayList<String>();
+	    
+	    tboxModel.enterCriticalSection(Lock.READ);
+	    try {
+	        StmtIterator classIt = tboxModel.listStatements(
+	                (Resource) null, RDF.type, OWL.Class);
+	        while(classIt.hasNext()) {
+	            Statement stmt = classIt.nextStatement();
+	            if(stmt.getSubject().isURIResource() 
+	                    && stmt.getSubject().getURI() != null 
+	                    && !stmt.getSubject().getURI().isEmpty()) {
+	                classList.add(stmt.getSubject().getURI());
+	            }
+	        }
+	    } finally {
+	        tboxModel.leaveCriticalSection();
+	    }
+	    
+	    for (String classURI : classList) {
+		    String queryString = "SELECT ?s WHERE { ?s a <" + classURI + "> } ";
+	        getIndividualURIs(queryString, individualURIs);
+	    }
+	    
+	    return individualURIs;
 	}
 
-	protected Collection<String> getIndividualURIs(String queryString) {
-	    
-		Set<String> individuals = new HashSet<String>();
+	protected void getIndividualURIs(String queryString, Set<String> individuals) {
 
 		int batchSize = 50000;
 		int offset = 0;
@@ -341,10 +372,15 @@ public class ABoxRecomputer {
     		offset += batchSize;
 		}
 				
-		return individuals;
 	}
-
-	protected void addedABoxTypeAssertion(Resource individual, Model inferenceModel, HashSet<String> unknownTypes) {
+	
+   protected void addedABoxTypeAssertion(Resource individual, Model inferenceModel,
+           HashSet<String> unknownTypes) {
+       addedABoxTypeAssertion(individual, inferenceModel, unknownTypes, true);
+   }
+	   
+	protected void addedABoxTypeAssertion(Resource individual, Model inferenceModel, 
+	        HashSet<String> unknownTypes, boolean checkRedundancy) {
 
 		StmtIterator iter = null;
 		
@@ -354,7 +390,8 @@ public class ABoxRecomputer {
 			
 			while (iter.hasNext()) {	
 				Statement stmt = iter.next();
-				simpleReasoner.addedABoxTypeAssertion(stmt, inferenceModel, unknownTypes);
+				simpleReasoner.addedABoxTypeAssertion(
+				        stmt, inferenceModel, unknownTypes, checkRedundancy);
 			}
 		} finally {
 		    if (iter != null) {
@@ -366,120 +403,72 @@ public class ABoxRecomputer {
 	/*
 	 * reconcile a set of inferences into the application inference model
 	 */
-	protected boolean updateInferenceModel(Model inferenceRebuildModel) {
+	protected boolean updateInferenceModel(Model inferenceRebuildModel, 
+	        Collection<String> individuals) {
+
+	    log.info("Updating ABox inference model");
+
+	    // Remove everything from the current inference model that is not
+	    // in the recomputed inference model	
+	    int num = 0;
+	    scratchpadModel.enterCriticalSection(Lock.WRITE);
+	    scratchpadModel.removeAll();	
+	    Model rebuild = ModelFactory.createDefaultModel();
+	    Model existing = ModelFactory.createDefaultModel();
 	    
-    log.info("Updating ABox inference model");
-	Iterator<Statement> iter = null;
- 
-	// Remove everything from the current inference model that is not
-	// in the recomputed inference model	
-    int num = 0;
-	scratchpadModel.enterCriticalSection(Lock.WRITE);
-	scratchpadModel.removeAll();
-	log.info("Updating ABox inference model (checking for outdated inferences)");
-	try {
-		inferenceModel.enterCriticalSection(Lock.READ);
-	
-		try {
-			iter = listModelStatements(inferenceModel, JenaDataSourceSetupBase.JENA_INF_MODEL);
-			while (iter.hasNext()) {				
-				Statement stmt = iter.next();
-				if (!inferenceRebuildModel.contains(stmt)) {
-				   scratchpadModel.add(stmt);  
-				}
-				
-				num++;
-                if ((num % 10000) == 0) {
-                    log.info("Still updating ABox inference model (checking for outdated inferences)...");
-                }
-                
-                if (stopRequested) {
-                	return true;
-                }
-			}
-		} finally {
-//		    if (iter != null) {
-//			    iter.close();
-//		    }
-            inferenceModel.leaveCriticalSection();
-		}
-		
-		try {
-			iter = listModelStatements(scratchpadModel, SimpleReasonerSetup.JENA_INF_MODEL_SCRATCHPAD);
-			while (iter.hasNext()) {
-				Statement stmt = iter.next();
-				
-				inferenceModel.enterCriticalSection(Lock.WRITE);
-				try {
-					inferenceModel.remove(stmt);
-				} finally {
-					inferenceModel.leaveCriticalSection();
-				}
-			}
-		} finally {
-//		    if (iter != null) {
-//		        iter.close();    
-//		    }
-		}
-					
-		// Add everything from the recomputed inference model that is not already
-		// in the current inference model to the current inference model.	
-		try {
-			scratchpadModel.removeAll();
-			log.info("Updating ABox inference model (adding any new inferences)");
-			iter = listModelStatements(inferenceRebuildModel, SimpleReasonerSetup.JENA_INF_MODEL_REBUILD); 
-			
-			while (iter.hasNext()) {				
-				Statement stmt = iter.next();
-				
-				inferenceModel.enterCriticalSection(Lock.READ);
-				try {
-					if (!inferenceModel.contains(stmt)) {
-						 scratchpadModel.add(stmt);
-					}
-				} finally {
-				     inferenceModel.leaveCriticalSection();	
-				}
-									
-				num++;
-                if ((num % 10000) == 0) {
-                    log.info("Still updating ABox inference model (adding any new inferences)...");
-                }
-                
-                if (stopRequested) {
-                	return true;
-                }
-			}
-		} finally {
-//		    if (iter != null) {
-//			    iter.close();	
-//		    }
-		}
-					
-		iter = listModelStatements(scratchpadModel, SimpleReasonerSetup.JENA_INF_MODEL_SCRATCHPAD);
-		try {
-    		while (iter.hasNext()) {
-    			Statement stmt = iter.next();
-    			
-    			inferenceModel.enterCriticalSection(Lock.WRITE);
-    			try {
-    				inferenceModel.add(stmt);
-    			} finally {
-    				inferenceModel.leaveCriticalSection();
-    			}
-    		}
-		} finally {
-//		    if (iter != null) {
-//		        iter.close();
-//		    }
-		}
-	} finally {
-		scratchpadModel.removeAll();
-		scratchpadModel.leaveCriticalSection();			
-	}
-	
-	log.info("ABox inference model updated");
-	return false;
+	    long start = System.currentTimeMillis();
+	    
+	    for (String individualURI : individuals) {
+	        rebuild.removeAll();
+	        existing.removeAll();
+	        Resource subjInd = ResourceFactory.createResource(individualURI); 
+	        inferenceModel.enterCriticalSection(Lock.READ);		
+	        try {
+	            existing.add(inferenceModel.listStatements(subjInd, null, (RDFNode) null));
+	        } finally {
+	            inferenceModel.leaveCriticalSection();
+	        }
+	        inferenceRebuildModel.enterCriticalSection(Lock.READ);        
+            try {
+                rebuild.add(inferenceRebuildModel.listStatements(subjInd, null, (RDFNode) null));
+            } finally {
+                inferenceRebuildModel.leaveCriticalSection();
+            }
+            
+            Model retractions = existing.difference(rebuild);
+	        Model additions = rebuild.difference(existing);
+
+	        inferenceModel.enterCriticalSection(Lock.WRITE);
+	        try {
+	            inferenceModel.remove(retractions);
+	            inferenceModel.add(additions);
+	        } finally {
+	            inferenceModel.leaveCriticalSection();
+	        }
+	        
+	        inferenceRebuildModel.enterCriticalSection(Lock.WRITE);
+            try {
+                inferenceRebuildModel.remove(rebuild);
+            } finally {
+                inferenceRebuildModel.leaveCriticalSection();
+            }
+
+	        num++;
+	        if ((num % 1000) == 0) {
+	            log.info("Still updating ABox inference model (" + 
+                        + num + "/" + individuals.size() + " individuals)");
+                log.info((System.currentTimeMillis() - start) / 1000 + " ms per individual");
+                start = System.currentTimeMillis();
+	        }
+
+	        if (stopRequested) {
+	            return true;
+	        }
+
+	    }
+
+    	log.info("ABox inference model updated");
+    	return false;
 	}
 	
 	private Iterator<Statement> listModelStatements(Model model, String graphURI) {

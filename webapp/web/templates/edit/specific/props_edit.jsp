@@ -3,7 +3,7 @@
 <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <jsp:root xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0"
-          xmlns:c  ="http://java.sun.com/jstl/core"
+          xmlns:c  ="http://java.sun.com/jsp/jstl/core"
           xmlns:fn ="http://java.sun.com/jsp/jstl/functions">
 
 <div class="editingForm">
@@ -103,7 +103,7 @@
 				<c:param name="uri" value="${superproperty.URI}"/>
 			</c:url>
 				<li><input type="checkbox" name="SuperpropertyURI" value="${superproperty.URI}" class="form-item"/>
-					<a href="${superpropertyURL}">${superproperty.localNameWithPrefix}</a>
+					<a href="${superpropertyURL}">${superproperty.pickListName}</a>
 				</li>
 			</c:forEach>
 			</ul>
@@ -135,7 +135,7 @@
 					<c:param name="uri" value="${subproperty.URI}"/>
 				</c:url>
 				<li><input type="checkbox" name="SubpropertyURI" value="${subproperty.URI}" class="form-item"/>
-					 <a href="${subpropertyURL}"> ${subproperty.localNameWithPrefix} </a>
+					 <a href="${subpropertyURL}"> ${subproperty.pickListName} </a>
 				</li>						
 			</c:forEach>	
 			</ul>
@@ -172,7 +172,7 @@
                     <c:param name="uri" value="${eqproperty.URI}"/>
                 </c:url>
                 <li><input type="checkbox" name="SubpropertyURI" value="${eqproperty.URI}" class="form-item"/>
-                     <a href="${eqpropertyURL}"> ${eqproperty.localNameWithPrefix} </a>
+                     <a href="${eqpropertyURL}"> ${eqproperty.pickListName} </a>
                 </li>                       
             </c:forEach>    
             </ul>

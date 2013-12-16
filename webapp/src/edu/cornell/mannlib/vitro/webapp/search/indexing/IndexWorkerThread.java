@@ -12,8 +12,10 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
 import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualToSolrDocument;
+import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
-class IndexWorkerThread extends Thread{
+class IndexWorkerThread extends VitroBackgroundThread{
+	private static final Log log = LogFactory.getLog(IndexWorkerThread.class);
 	
     protected final int threadNum;
 	protected IndividualToSolrDocument individualToSolrDoc;
@@ -21,7 +23,6 @@ class IndexWorkerThread extends Thread{
 	protected final Iterator<Individual> individualsToIndex;
 	protected boolean stopRequested = false;
 	
-	private Log log = LogFactory.getLog(IndexWorkerThread.class);
 	private static AtomicLong countCompleted= new AtomicLong();		
 	private static AtomicLong countToIndex= new AtomicLong();		
 	private static long starttime = 0;		
@@ -38,7 +39,8 @@ class IndexWorkerThread extends Thread{
 	}
 	
 	public void run(){	    
-	    
+    	setWorkLevel(WorkLevel.WORKING, "indexing " + individualsToIndex + " individuals");
+
 	    while( ! stopRequested ){	        	       
 	        
             //do the actual indexing work
@@ -48,7 +50,9 @@ class IndexWorkerThread extends Thread{
             // done so shut this thread down.
             stopRequested = true;            	          
 	    }  			    
-		log.debug("Worker number " + threadNum + " exiting.");
+    	setWorkLevel(WorkLevel.IDLE);
+
+    	log.debug("Worker number " + threadNum + " exiting.");
 	}
 	
 	protected void addDocsToIndex() {
@@ -82,8 +86,8 @@ class IndexWorkerThread extends Thread{
 					}                
 				} 
 		    }catch(Throwable th){
-		        //on tomcat shutdown odd exceptions get thrown and log can be null
-		        if( log != null && ! stopRequested )
+		        //on tomcat shutdown odd exceptions get thrown
+		        if( ! stopRequested )
 		            log.error("Exception during index building",th);		            
 		    }
 		}

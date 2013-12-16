@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
@@ -51,11 +52,11 @@ public class RestrictionsListingController extends BaseEditController {
 
         epo = super.createEpo(request);
         
-        OntModel ontModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
-        
-        ObjectPropertyDao opDao = vrequest.getFullWebappDaoFactory().getObjectPropertyDao();
-        VClassDao vcDao = vrequest.getFullWebappDaoFactory().getVClassDao();
-        IndividualDao iDao = vrequest.getFullWebappDaoFactory().getIndividualDao();
+		OntModel ontModel = ModelAccess.on(getServletContext()).getJenaOntModel();
+
+        ObjectPropertyDao opDao = vrequest.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
+        VClassDao vcDao = vrequest.getUnfilteredWebappDaoFactory().getVClassDao();
+        IndividualDao iDao = vrequest.getUnfilteredWebappDaoFactory().getIndividualDao();
         
         ArrayList results = new ArrayList();
         request.setAttribute("results",results);
@@ -123,7 +124,7 @@ public class RestrictionsListingController extends BaseEditController {
 				results.add("XX");
 				Property onProperty = rest.getOnProperty();
 				ObjectProperty op = opDao.getObjectPropertyByURI(onProperty.getURI());
-				results.add(op.getLocalNameWithPrefix());
+				results.add(op.getPickListName());
 				if (rest.isAllValuesFromRestriction()) {
 					results.add("all values from");
 					AllValuesFromRestriction avfrest = (AllValuesFromRestriction) rest.as(AllValuesFromRestriction.class);

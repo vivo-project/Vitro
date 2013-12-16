@@ -21,20 +21,22 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/uploadImages.cs
 </#macro>-->
 
 
+<#assign i18n = i18n() >
+
 <section id="photoCroppingContainer" role="region">
-    <h2>Photo Upload</h2>
+    <h2>${i18n.upload_heading}</h2>
     
     <!-- This is the image we're attaching Jcrop to -->
     <section id="photoCroppingPreview" role="region">
         
-        <p class="photoCroppingTitleBody">Your profile photo will look like the image below. </p>
+        <p class="photoCroppingTitleBody">${i18n.cropping_caption}</p>
         
         <section class="photoCroppedPreview" role="region">
-            <img src="${imageUrl}" id="preview" alt="Image to be cropped"/>
+            <img src="${imageUrl}" id="preview" alt="${i18n.alt_image_to_crop}"/>
         </section>
         
         <section id="photoCroppingHowTo" role="region">
-            <p class="photoCroppingNote">To make adjustments, you can drag around and resize the photo to the right. When you are happy with your photo click the "Save Photo" button. </p>
+            <p class="photoCroppingNote">${i18n.cropping_note}</p>
             
             <form id="cropImage" action="${formAction}"  method="post" role="form">
                 <!-- Javascript will populate these values -->
@@ -43,15 +45,15 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/uploadImages.cs
                 <input type="hidden" name="w" value="" />
                 <input type="hidden" name="h" value="" />
                                       
-                <input  class="submit" type="submit" value="Save photo">
+                <input  class="submit" type="submit" value="${i18n.submit_save}">
                 
-                <span class="or"> or <a class="cancel"  href="${cancelUrl}" title="cancel">Cancel</a></span>
+                <span class="or"> ${i18n.or} <a class="cancel"  href="${cancelUrl}" title="${i18n.cancel_title}">${i18n.cancel_link}</a></span>
             </form>
        </section>
     </section>
     
     <section id="photoCropping" role="region">
-        <img src="${imageUrl}" id="cropbox" alt="Preview of photo cropped" />
+        <img src="${imageUrl}" id="cropbox" alt="${i18n.alt_preview_crop}" />
     </section
 </section>
 

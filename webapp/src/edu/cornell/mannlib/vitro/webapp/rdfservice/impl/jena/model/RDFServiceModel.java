@@ -9,11 +9,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.query.DataSource;
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.sparql.core.DatasetImpl;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
@@ -28,14 +29,25 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
     private final static Log log = LogFactory.getLog(RDFServiceModel.class);
     
     private Model model;
+    private String modelName;
     
+    /**
+     * Create an RDFService to access a single default graph
+     * @param model
+     */
     public RDFServiceModel(Model model) {
         this.model = model;
     }
-  
+      
     @Override
     protected DatasetWrapper getDatasetWrapper() {
-      DatasetWrapper datasetWrapper = new DatasetWrapper(new DatasetImpl(model));
+      DataSource d = DatasetFactory.create();
+      if (modelName == null) {
+          d.setDefaultModel(this.model);
+      } else {
+          d.addNamedModel(this.modelName, model);
+      }
+      DatasetWrapper datasetWrapper = new DatasetWrapper(d);
       return datasetWrapper;
     }
     
@@ -50,7 +62,7 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
             return false;
         }
             
-        Dataset dataset = getDatasetWrapper().getDataset();
+        //Dataset dataset = getDatasetWrapper().getDataset();
         		        
         try {                   
             for (Object o : changeSet.getPreChangeEvents()) {
@@ -65,15 +77,7 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
                     modelChange.setSerializedModel(new ByteArrayInputStream(bytes));
                 }
                 modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
-                dataset.getLock().enterCriticalSection(Lock.WRITE);
-                try {
-                    Model model = (modelChange.getGraphURI() == null)
-                            ? dataset.getDefaultModel() 
-                            : dataset.getNamedModel(modelChange.getGraphURI());
-                    operateOnModel(model, modelChange, dataset);
-                } finally {
-                    dataset.getLock().leaveCriticalSection();
-                }
+                operateOnModel(model, modelChange, null);
             }
                         
             // notify listeners of triple changes

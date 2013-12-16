@@ -8,6 +8,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPoli
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
 /**
  * A base class with utility methods for policies involving self-editing.
@@ -26,9 +27,9 @@ public abstract class BaseSelfEditingPolicy {
 				uri, roleLevel);
 	}
 
-	protected boolean canModifyPredicate(String uri) {
+	protected boolean canModifyPredicate(Property predicate) {
 		return PropertyRestrictionPolicyHelper.getBean(ctx).canModifyPredicate(
-				uri, roleLevel);
+				predicate, roleLevel);
 	}
 
 	protected PolicyDecision cantModifyResource(String uri) {
@@ -36,9 +37,9 @@ public abstract class BaseSelfEditingPolicy {
 				+ uri);
 	}
 
-	protected PolicyDecision cantModifyPredicate(String uri) {
+	protected PolicyDecision cantModifyPredicate(Property predicate) {
 		return inconclusiveDecision("No access to admin predicates; cannot modify "
-				+ uri);
+				+ predicate.getURI());
 	}
 
 	protected PolicyDecision userNotAuthorizedToStatement() {

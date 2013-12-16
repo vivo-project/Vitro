@@ -27,7 +27,7 @@ public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
         implements EditConfigurationGenerator {
 	
 	final static String vivoCore = "http://vivoweb.org/ontology/core#";
-	final static String toDateTimeValue = vivoCore + "dateTimeValue";
+	final  String toDateTimeValue = vivoCore + "dateTimeValue";
 	final static String valueType = vivoCore + "DateTimeValue";
 	final static String dateTimeValue = vivoCore + "dateTime";
 	final static String dateTimePrecision = vivoCore + "dateTimePrecision";
@@ -39,25 +39,24 @@ public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
         
         initBasics(conf, vreq);
         initPropertyParameters(vreq, session, conf);
-        initObjectPropForm(conf, vreq);               
+        initObjectPropForm(conf, vreq); 
         
-        conf.setTemplate("dateTimeValueForm.ftl");
+        conf.setTemplate(this.getTemplate());
         
         conf.setVarNameForSubject("subject");
         conf.setVarNameForPredicate("toDateTimeValue");
         conf.setVarNameForObject("valueNode");
-        
-        conf.setN3Optional(Arrays.asList(n3ForValue));
+        //Value node value will be in scope if we have an object uri that exists for editing
+        conf.setN3Optional(Arrays.asList(getN3ForValue()));
         
         conf.addNewResource("valueNode", DEFAULT_NS_FOR_NEW_RESOURCE);
         
         conf.addSparqlForExistingLiteral(
-        		"dateTimeField-value", existingDateTimeValueQuery);
+        		"dateTimeField-value", getExistingDateTimeValueQuery());
         conf.addSparqlForExistingUris(
-        		"dateTimeField-precision", existingPrecisionQuery);
-        conf.addSparqlForExistingUris("valueNode", existingNodeQuery);
+        		"dateTimeField-precision", getExistingPrecisionQuery());
         
-        FieldVTwo dateTimeField = new FieldVTwo().setName("dateTimeField");
+        FieldVTwo dateTimeField = new FieldVTwo().setName(this.getDateTimeFieldName());
         		dateTimeField.setEditElement(new DateTimeWithPrecisionVTwo(dateTimeField, 
         				VitroVocabulary.Precision.SECOND.uri(), 
         				VitroVocabulary.Precision.NONE.uri()));
@@ -67,38 +66,61 @@ public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
         //Adding additional data, specifically edit mode
         addFormSpecificData(conf, vreq);
         //prepare
-        prepare(vreq, conf);
-        return conf;
-	}
+        prepare(vreq, conf); 
+        return conf; 
+	} 
 	
-	final static String n3ForValue = 
-        "?subject <" + toDateTimeValue + "> ?valueNode . \n" +
+	
+	//Writing these as methods instead of static strings allows the method getToDateTimeValuePredicate
+	//to be called after the class has been initialized - this is important for subclasses of this generator
+	//that rely on vreq for predicate 
+	protected String getN3ForValue() {
+        return "?subject <" + this.getToDateTimeValuePredicate() + "> ?valueNode . \n" +
         "?valueNode a <" + valueType + "> . \n" +
         "?valueNode  <" + dateTimeValue + "> ?dateTimeField-value . \n" +
-        "?valueNode  <" + dateTimePrecision + "> ?dateTimeField-precision .";
+        "?valueNode  <" + dateTimePrecision + "> ?dateTimeField-precision ."; 
+	}
 	
-	final static String existingDateTimeValueQuery = 
-        "SELECT ?existingDateTimeValue WHERE { \n" +
-        "?subject <" + toDateTimeValue + "> ?existingValueNode . \n" +
-        "?existingValueNode a <" + valueType + "> . \n" +
-        "?existingValueNode <" + dateTimeValue + "> ?existingDateTimeValue }";
+	protected String getExistingDateTimeValueQuery () {
+        return "SELECT ?existingDateTimeValue WHERE { \n" +
+        "?subject <" + this.getToDateTimeValuePredicate() + "> ?valueNode . \n" +
+        "?valueNode a <" + valueType + "> . \n" +
+        "?valueNode <" + dateTimeValue + "> ?existingDateTimeValue }";
+	}
 	
-	final static String existingPrecisionQuery = 
-        "SELECT ?existingPrecision WHERE { \n" +
-        "?subject <" + toDateTimeValue + "> ?existingValueNode . \n" +
-        "?existingValueNode a <" + valueType + "> . \n" +
-        "?existingValueNode <"  + dateTimePrecision + "> ?existingPrecision }";
+	protected String getExistingPrecisionQuery() {
+        return "SELECT ?existingPrecision WHERE { \n" +
+        "?subject <" + this.getToDateTimeValuePredicate() + "> ?valueNode . \n" +
+        "?valueNode a <" + valueType + "> . \n" +
+        "?valueNode <"  + dateTimePrecision + "> ?existingPrecision }";
+	}
 	
-	final static String existingNodeQuery =
-        "SELECT ?existingNode WHERE { \n" +
-        "?subject <" + toDateTimeValue + "> ?existingNode . \n" +
-        "?existingNode a <" + valueType + "> }";
+	public static String getNodeVar() {
+		return "valueNode";
+	}
+	
+	public static String getNodeN3Var() {
+		return "?" + getNodeVar();
+	}
 
-
+	//isolating the predicate in this fashion allows this class to be subclassed for other date time value
+	//properties
+	protected String getToDateTimeValuePredicate() {
+		return this.toDateTimeValue;
+	}
+	
+	protected String getDateTimeFieldName() {
+		return "dateTimeField";
+	}
+	
+	protected String getTemplate() {
+		return "dateTimeValueForm.ftl";
+	}
 //Adding form specific data such as edit mode
 	public void addFormSpecificData(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
 		HashMap<String, Object> formSpecificData = new HashMap<String, Object>();
 		formSpecificData.put("editMode", getEditMode(vreq).name().toLowerCase());
+		formSpecificData.put("domainUri", getDomainUri(vreq));
 		editConfiguration.setFormSpecificData(formSpecificData);
 	}
 	
@@ -112,5 +134,11 @@ public class DateTimeValueFormGenerator extends BaseEditConfigurationGenerator
 			
 		}
 		return editMode;
+	}
+
+	private String getDomainUri(VitroRequest vreq) {
+        String domainUri = vreq.getParameter("domainUri"); 
+        
+		return domainUri;
 	}
 }

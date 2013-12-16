@@ -43,10 +43,10 @@ public class DatatypePropertiesListingController extends BaseEditController {
 
         String ontologyUri = request.getParameter("ontologyUri");
 
-        DataPropertyDao dao = vrequest.getFullWebappDaoFactory().getDataPropertyDao();
-        VClassDao vcDao = vrequest.getFullWebappDaoFactory().getVClassDao();
-        DatatypeDao dDao = vrequest.getFullWebappDaoFactory().getDatatypeDao();
-        PropertyGroupDao pgDao = vrequest.getFullWebappDaoFactory().getPropertyGroupDao();
+        DataPropertyDao dao = vrequest.getUnfilteredWebappDaoFactory().getDataPropertyDao();
+        VClassDao vcDao = vrequest.getUnfilteredWebappDaoFactory().getVClassDao();
+        DatatypeDao dDao = vrequest.getUnfilteredWebappDaoFactory().getDatatypeDao();
+        PropertyGroupDao pgDao = vrequest.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 
         List<DataProperty> props = new ArrayList<DataProperty>();
 
@@ -111,9 +111,9 @@ public class DatatypePropertiesListingController extends BaseEditController {
                     results.add("XX"); // column 1
                     String nameStr = prop.getPublicName()==null ? prop.getName()==null ? prop.getURI()==null ? "(no name)" : prop.getURI() : prop.getName() : prop.getPublicName();
                     try {
-                        results.add("<a href=\"datapropEdit?uri="+URLEncoder.encode(prop.getURI(),"UTF-8")+"\">"+nameStr+"</a> <span style='font-style:italic; color:\"grey\";'>"+prop.getLocalNameWithPrefix()+"</span>"); // column 2
+                        results.add("<a href=\"datapropEdit?uri="+URLEncoder.encode(prop.getURI(),"UTF-8")+"\">"+nameStr+"</a> <span style='font-style:italic; color:\"grey\";'>"+prop.getPickListName()+"</span>"); // column 2
                     } catch (Exception e) {
-                        results.add(nameStr + " <span style='font-style:italic; color:\"grey\";'>" + prop.getLocalNameWithPrefix() + "</span>"); // column 2
+                        results.add(nameStr + " <span style='font-style:italic; color:\"grey\";'>" + prop.getPickListName() + "</span>"); // column 2
                     }
                     VClass vc = null;
                     String domainStr="";
@@ -169,20 +169,5 @@ public class DatatypePropertiesListingController extends BaseEditController {
             t.printStackTrace();
         }
     }
-
-    /*
-    private class DatatypePropertyAlphaComparator implements Comparator {
-        public int compare (Object o1, Object o2) {
-            Collator collator = Collator.getInstance();
-            DataProperty dp1 = (DataProperty) o1;
-            DataProperty dp2 = (DataProperty) o2;
-            String dp1Str = (dp1.getPublicName()==null) ? dp1.getName() : dp1.getPublicName();
-            dp1Str = (dp1Str == null) ? "" : dp1Str;
-            String dp2Str = (dp2.getPublicName()==null) ? dp2.getName() : dp2.getPublicName();
-            dp2Str = (dp2Str == null) ? "" : dp2Str;
-            return collator.compare(dp1Str,dp2Str);
-        }
-    }
-    */
 
 }

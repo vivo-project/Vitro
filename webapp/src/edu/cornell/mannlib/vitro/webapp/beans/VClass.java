@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.beans;
 
 import java.text.Collator;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.openrdf.model.impl.URIImpl;
 
@@ -91,6 +93,9 @@ public class VClass extends BaseResourceBean implements Comparable<VClass>
     public Float getSearchBoost() { return searchBoost; }
     public void setSearchBoost( Float boost ){ searchBoost = boost;}
     
+    public boolean isUnion() { return false; }
+    public List<VClass> getUnionComponents() { return new ArrayList<VClass>(); }
+    
     /**
      * Default constructor
      */
@@ -127,6 +132,29 @@ public class VClass extends BaseResourceBean implements Comparable<VClass>
         URI = uriString;
         namespace = uri.getNamespace();
         localName = uri.getLocalName();
+    }
+    
+    /**
+	 * Constructs the VClass as a deep copy of an existing VClass. 
+	 */
+    public VClass( VClass vc) {
+    	this.URI = vc.URI;
+    	this.namespace = vc.namespace;
+    	this.localName = vc.localName;
+    	this.myName = vc.myName;
+    	this.myExample = vc.myExample;
+    	this.myDescription = vc.myDescription;
+    	this.myShortDefinition = vc.myShortDefinition;
+    	this.myEntityCount = vc.myEntityCount;
+    	this.displayLimit = vc.displayLimit;
+    	this.displayRank = vc.displayRank;
+    	this.quickEditJsp = vc.quickEditJsp;
+    	this.groupURI = vc.groupURI;
+    	this.group = (vc.group == null) ? null : new VClassGroup(vc.group);
+    	this.customEntryForm = vc.customEntryForm;
+    	this.customDisplayView = vc.customDisplayView;
+    	this.customShortView = vc.customShortView;
+    	this.customSearchView = vc.customSearchView;
     }
     
     /**

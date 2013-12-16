@@ -5,13 +5,20 @@ package edu.cornell.mannlib.vitro.webapp.dao;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import org.openjena.atlas.lib.Pair;
+
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 
 public class WebappDaoFactoryConfig {
 	
 	private List<String> preferredLanguages;
 	private String defaultNamespace;
 	private Set<String> nonUserNamespaces;
+	private boolean isUnderlyingStoreReasoned = false;
+	public Map<Pair<String,Pair<ObjectProperty, String>>, String> customListViewConfigFileMap;
 	
 	public WebappDaoFactoryConfig() {
 	    preferredLanguages = Arrays.asList("en-US", "en", "EN");
@@ -43,5 +50,22 @@ public class WebappDaoFactoryConfig {
 	public void setNonUserNamespaces(Set<String> nonUserNamespaces) {
 		this.nonUserNamespaces = nonUserNamespaces;
 	}
+	
+	public void setUnderlyingStoreReasoned(boolean isReasoned) {
+	    this.isUnderlyingStoreReasoned = isReasoned;
+	}
+	
+	public boolean isUnderlyingStoreReasoned() {
+	    return this.isUnderlyingStoreReasoned;
+	}
+	
+	public Map<Pair<String,Pair<ObjectProperty, String>>, String> getCustomListViewConfigFileMap() {
+	    return this.getCustomListViewConfigFileMap();    
+	}
+	
+    public void setCustomListViewConfigFileMap(
+            Map<Pair<String,Pair<ObjectProperty, String>>, String> map) {
+        this.customListViewConfigFileMap = map;    
+    }
 	
 }

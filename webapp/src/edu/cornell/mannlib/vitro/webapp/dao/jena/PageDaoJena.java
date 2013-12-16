@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -78,7 +78,14 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         "    ?pageUri display:hasDataGetter ?dg .\n"+    
         " 	 ?dg rdf:type ?dataGetterType . \n" +
         "} \n" ;
-    
+
+    //Get the required actions directly associated with a page
+    static final protected String requiredActionsQuery =
+        prefixes + "\n" +
+        "SELECT ?requiredAction WHERE{\n" +
+        "    ?pageUri <" + DisplayVocabulary.REQUIRES_ACTIONS + ">  ?requiredAction .\n"+
+        "}";
+
     //Get data getter URIs
     static final protected String dataGetterURIsQueryString = 
         prefixes + "\n" +
@@ -520,10 +527,55 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
          return dataGetterClasses;
     }
 
-   
+
+    /** 
+     * Gets the requiredActions directly associated with page.
+     */
+    public List<String> getRequiredActions(String pageUri){
+        QuerySolutionMap initialBindings = new QuerySolutionMap();
+        initialBindings.add("pageUri", ResourceFactory.createResource(pageUri));
+        List<String> actions = new ArrayList<String>();
+        
+        Model dModel = getOntModelSelector().getDisplayModel();
+        dModel.enterCriticalSection(false);
+        try{
+            QueryExecution qe = 
+                QueryExecutionFactory.create( requiredActionsQuery, dModel, initialBindings);
+            actions = executeQueryToList( qe );
+            qe.close();
+        }finally{
+            dModel.leaveCriticalSection();
+        }
+        return actions;            
+    }
     
     /* *************************** Utility methods ********************************* */
-    
+
+    /**
+     * Assumes single bound variable in solution.
+     */
+    protected List<String> executeQueryToList(QueryExecution qex){
+        List<String> rv = new LinkedList<String>();
+        ResultSet results = qex.execSelect();
+        while (results.hasNext()) {
+            rv.add(querySolutionToString( results.nextSolution() ));
+        }
+        return rv;
+    }
+
+    /**
+     * Assumes single bound variable in solution.
+     */
+    protected String querySolutionToString( QuerySolution soln ){
+        Iterator<String> varNames = soln.varNames();
+        if(varNames.hasNext()){
+            String name = varNames.next();
+            return nodeToString( soln.get(name) );
+        }else{
+            return "";
+        }
+    }
+                                                  
     /**
      * Converts a sparql query that returns a multiple rows to a list of maps.
      * The maps will have column names as keys to the values.
@@ -549,7 +601,9 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
         }
         return map;
     }
-    
+
+
+
     static protected Object nodeToObject( RDFNode node ){
         if( node == null ){
             return "";
@@ -583,11 +637,6 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
             return "";
         }
     }
-    protected Map<String,Object> resultsToMap(){
-        return null;
-    }
-
-
     
 
 }

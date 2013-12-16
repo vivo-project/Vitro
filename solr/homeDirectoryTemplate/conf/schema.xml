@@ -191,10 +191,10 @@
   
   <field name="type" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
   
-  <field name="classLocalName" type="text" indexed="true" stored="true" multiValued="true"/>
-  <field name="classLocalNameLowerCase" type="text" indexed="true" stored="false" multiValued="true"/>
-  
   <field name="classgroup" type="string" indexed="true" stored="true" multiValued="true"/>
+
+  <field name="mostSpecificTypeURIs" type="string" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
+
   <field name="PROHIBITED_FROM_TEXT_RESULTS" type="string" indexed="true" stored="false" omitNorms="true" multiValued="true"/>
   <field name="URI" type="string" indexed="true" stored="true" multiValued="false" omitNorms="true"/>
   
@@ -218,16 +218,10 @@
   
   <field name="ALLTEXT" type="text" indexed="true" stored="true" multiValued="true"/>
   <field name="ALLTEXTUNSTEMMED" type="textgen" indexed="true" stored="false" multiValued="true"/>
-  <field name="ALLTEXT_PHONETIC" type="phonetic" indexed="true" stored="false" multiValued="true"/>
   
   <field name="THUMBNAIL" type="string" indexed="true" stored="true"/>
     
   <field name="BETA" type="float" indexed="true" stored="true" multiValued="false"/>
-  <!-- <field name="PHI" type="float" indexed="true" stored="true" multiValued="false"/>
-  <field name="ADJACENT_NODES" type="string" indexed="true" stored="true" multiValued="true"/> -->
-  
-  <field name="modType" type="ignored"/>
-  <field name="JCLASS" type="ignored"/>
   
   <!-- field for storing locations of thumbnails -->
   <field name="THUMBNAIL_URL" type="string" indexed="false" stored="true"/>
@@ -239,7 +233,7 @@
   <field name="siteName" type="string" indexed="true" stored="true"/>
   
   <!--  field for preferred title -->
-  <field name="PREFERRED_TITLE" type="string" indexed="true" stored="true"/>
+  <field name="PREFERRED_TITLE" type="string" indexed="true" stored="true" multiValued="true"/>
   
   <!-- Copy nameRaw into several other fields -->  
   <copyField source="nameRaw" dest="nameStemmed" />
@@ -250,8 +244,17 @@
   <copyField source="nameRaw" dest="acNameStemmed" /> 
   <copyField source="nameRaw" dest="nameText" />
   <!--  nameLowercaseSingleValued is not copied from nameRaw becasue nameRaw might have multiple values -->
+  
+  <!-- field for hash signature, used for comparing to versions from external caches -->
+  <field name="etag" type="string" stored="true" indexed="false" multiValued="false" />
+
+  
      
   <!-- ****************************  End Vitro Fields *************************** -->
+  <!-- ****************************  Dynamic Fields *************************** -->
+  <dynamicField name="*_string" type="string" indexed="true" stored="true" multiValued="true"/>
+   <!-- ****************************  End Dynamic Fields *************************** -->
+  
    
    <field name="timestamp" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>     
  </fields>

@@ -1,7 +1,7 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <header id="branding" role="banner">
-    <h1 class="vitro-logo"><a title="VITRO | web-based ontology & instance editor" href="${urls.home}"><span class="displace">${siteName}</span></a></h1>
+    <h1 class="vitro-logo"><a title="${siteName}" href="${urls.home}"><span class="displace">${siteName}</span></a></h1>
     <#-- Since we are using a graphic text for the tagline, we won't render ${siteTagline}
     <#if siteTagline?has_content>
         <em>${siteTagline}</em>
@@ -9,19 +9,20 @@
 
     <nav role="navigation">
         <ul id="header-nav" role="list">
-            <li role="listitem"><a href="${urls.index}" title="index">Index</a></li>
+            <#include "languageSelector.ftl">
+            <li role="listitem"><a href="${urls.index}" title="${i18n().index}">${i18n().index}</a></li>
             <#if user.loggedIn>
                 <#if user.hasSiteAdminAccess>
-                    <li role="listitem"><a href="${urls.siteAdmin}" title="site admin">Site Admin</a></li>
+                    <li role="listitem"><a href="${urls.siteAdmin}" title="${i18n().site_admin}">${i18n().site_admin}</a></li>
                 </#if>
                     <li>
                         <ul class="dropdown">
-                            <li id="user-menu"><a href="#" title="user">${user.loginName}</a>
+                            <li id="user-menu"><a href="#" title="${i18n().current_user}">${user.loginName}</a>
                                 <ul class="sub_menu">
                                      <#if urls.myAccount??>
-                                         <li role="listitem"><a href="${urls.myAccount}" title="my account">My account</a></li>
+                                         <li role="listitem"><a href="${urls.myAccount}" title="${i18n().myAccount_heading}">${i18n().myAccount_heading}</a></li>
                                      </#if>
-                                     <li role="listitem"><a href="${urls.logout}" title="log out">Log out</a></li>
+                                     <li role="listitem"><a href="${urls.logout}" title="${i18n().log_out}">${i18n().log_out}</a></li>
                                 </ul>
                             </li>
                          </ul>
@@ -30,22 +31,8 @@
                 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/userMenu/userMenuUtils.js"></script>')}
                 
             <#else>
-                <li role="listitem"><a class="log-out" title="log in to manage this site" href="${urls.login}">Log in</a></li>
+                <li role="listitem"><a class="log-out" title="${i18n().login_to_manage_site}" href="${urls.login}">${i18n().login_button}</a></li>
             </#if>
         </ul>
         
     </nav>
-    
-    <section id="search" role="region">
-        <fieldset>
-            <legend>Search form</legend>
-            
-            <form id="search-form" action="${urls.search}" name="search" role="search" accept-charset="UTF-8" method="POST"> 
-                <div id="search-field">
-                    <input type="text" name="querytext" class="search-vitro" value="${querytext!}" autocapitalize="off" />
-                    <input type="submit" value="Search" class="search">
-                </div>
-            </form>
-        </fieldset>
-    </section>
-</header>

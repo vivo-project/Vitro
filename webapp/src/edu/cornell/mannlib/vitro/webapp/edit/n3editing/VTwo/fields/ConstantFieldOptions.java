@@ -2,6 +2,7 @@
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -71,6 +72,10 @@ public class ConstantFieldOptions implements FieldOptions {
         }
         
         return optionsMap;
+    }
+    
+    public Comparator<String[]> getCustomComparator() {
+    	return null;
     }
 
 }

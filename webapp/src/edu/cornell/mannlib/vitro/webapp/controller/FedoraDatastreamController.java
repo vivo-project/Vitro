@@ -42,6 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
@@ -101,7 +102,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
             log.debug("In doGet");
             
             VitroRequest vreq = new VitroRequest(req);
-            OntModel sessionOntModel = (OntModel)vreq.getSession().getAttribute("jenaOntModel");
+    		OntModel sessionOntModel = ModelAccess.on(vreq.getSession()).getJenaOntModel();
             
             synchronized (FedoraDatastreamController.class) {
                 if( fedoraUrl == null ){
@@ -231,7 +232,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
         	}
         	
             //check if fedora is on line
-            OntModel sessionOntModel = (OntModel)rawRequest.getSession().getAttribute("jenaOntModel");
+    		OntModel sessionOntModel = ModelAccess.on(rawRequest.getSession()).getJenaOntModel();
             synchronized (FedoraDatastreamController.class) {
                 if( fedoraUrl == null ){
                     setup( sessionOntModel, getServletContext() );

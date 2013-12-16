@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 
 
@@ -51,7 +52,8 @@ public class ClassgroupRetryController extends BaseEditController {
             action = epo.getAction();
         }
 
-        VClassGroupDao cgDao = request.getFullWebappDaoFactory().getVClassGroupDao();
+        VClassGroupDao cgDao = ModelAccess.on(
+                getServletContext()).getWebappDaoFactory().getVClassGroupDao();
 
         epo.setDataAccessObject(cgDao);
 
@@ -65,13 +67,10 @@ public class ClassgroupRetryController extends BaseEditController {
                 } catch (NullPointerException e) {
                     log.error("Need to implement 'record not found' error message.");
                 }
-                if (vclassGroupForEditing == null) {
-                    try {
-                        String uriToFind = new String(request.getParameter("uri").getBytes("ISO-8859-1"),"UTF-8");
-                        vclassGroupForEditing = (VClassGroup)cgDao.getGroupByURI(uriToFind);
-                    } catch (java.io.UnsupportedEncodingException uee) {
-                        // forget it
-                    }
+                if (vclassGroupForEditing == null) {                    
+                    //UTF-8 expected due to URIEncoding on Connector in server.xml
+                    String uriToFind = new String(request.getParameter("uri"));
+                    vclassGroupForEditing = (VClassGroup)cgDao.getGroupByURI(uriToFind);
                 }
             } else {
                 vclassGroupForEditing = new VClassGroup();

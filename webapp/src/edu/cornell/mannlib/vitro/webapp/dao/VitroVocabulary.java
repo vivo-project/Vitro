@@ -7,10 +7,13 @@ public class VitroVocabulary {
 
 	
     public static final String vitroURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#";
+    public static final String configURI= "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#";
     
     public static final String VITRO_AUTH = "http://vitro.mannlib.cornell.edu/ns/vitro/authorization#";
     public static final String VITRO_PUBLIC = "http://vitro.mannlib.cornell.edu/ns/vitro/public#";
     public static final String VITRO_PUBLIC_ONTOLOGY = "http://vitro.mannlib.cornell.edu/ns/vitro/public";
+    // TODO change the following before 1.6 release
+    public static final String PROPERTY_CONFIG_DATA = "http://vitro.mannlib.cornell.edu/ns/vitro/siteConfig/";
     
     
     /** BJL23 2008-02-25:
@@ -24,9 +27,7 @@ public class VitroVocabulary {
     public static final String RDF = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
     public static final String RDFS = "http://www.w3.org/2000/01/rdf-schema#";
     public static final String RDF_TYPE = RDF+"type";
-    public static final String LABEL = RDFS + "label";
-    
-    public static final String SUBCLASS_OF = RDFS+"subClassOf";
+    public static final String LABEL = RDFS + "label";   
 
     public static final String OWL = "http://www.w3.org/2002/07/owl#";
     public static final String OWL_ONTOLOGY = OWL+"Ontology";
@@ -45,9 +46,10 @@ public class VitroVocabulary {
     
     public static final String DESCRIPTION_ANNOT = vitroURI + "descriptionAnnot";
     public static final String PUBLIC_DESCRIPTION_ANNOT = vitroURI + "publicDescriptionAnnot";
-    public static final String SHORTDEF = vitroURI+"shortDef";
-    public static final String EXAMPLE_ANNOT = vitroURI+"exampleAnnot";
+    public static final String SHORTDEF = "http://purl.obolibrary.org/obo/IAO_0000115";
+    public static final String EXAMPLE_ANNOT = "http://purl.obolibrary.org/obo/IAO_0000112";
 
+    
     public static final String EXTERNALID = vitroURI+"externalId";
     public static final String DATAPROPERTY_ISEXTERNALID = vitroURI+"isExternalId";
         
@@ -97,6 +99,9 @@ public class VitroVocabulary {
     public static final String PROPERTY_CUSTOM_LIST_VIEW_ANNOT = vitroURI + "customListViewAnnot";
     public static final String PROPERTY_SELECTFROMEXISTINGANNOT = vitroURI+"selectFromExistingAnnot";
     public static final String PROPERTY_OFFERCREATENEWOPTIONANNOT = vitroURI+"offerCreateNewOptionAnnot";
+    public static final String PROPERTY_EDITLINKSUPPRESSED = configURI + "editLinkSuppressed";
+    public static final String PROPERTY_ADDLINKSUPPRESSED = configURI + "addLinkSuppressed";
+    public static final String PROPERTY_DELETELINKSUPPRESSED = configURI + "deleteLinkSuppressed";
     public static final String PROPERTY_INPROPERTYGROUPANNOT = vitroURI+"inPropertyGroupAnnot";
     public static final String PROPERTYGROUP = vitroURI + "PropertyGroup";
     public static final String MASKS_PROPERTY = vitroURI + "masksProperty";
@@ -123,23 +128,14 @@ public class VitroVocabulary {
     // ================== Vitro Portal vocabulary ===========================
 
     public static final String PORTAL = vitroURI+"Portal";
-    public static final String PORTAL_THEMEDIR = vitroURI+"themeDir";
-    public static final String PORTAL_BANNERIMAGE = vitroURI+"bannerImage";
+    public static final String PORTAL_THEMEDIR = vitroURI+"themeDir";   
     public static final String PORTAL_CONTACTMAIL = vitroURI+"contactMail";
-    public static final String PORTAL_CORRECTIONMAIL = vitroURI+"correctionMail";
-    public static final String PORTAL_SHORTHAND = vitroURI+"shortHand";
+    public static final String PORTAL_CORRECTIONMAIL = vitroURI+"correctionMail";    
     public static final String PORTAL_ABOUTTEXT = vitroURI+"aboutText";
-    public static final String PORTAL_ACKNOWLEGETEXT = vitroURI+"acknowledgeText";
-    public static final String PORTAL_BANNERWIDTH = vitroURI+"bannerWidth";
-    public static final String PORTAL_BANNERHEIGHT = vitroURI+"bannerHeight";
+    public static final String PORTAL_ACKNOWLEGETEXT = vitroURI+"acknowledgeText";       
     public static final String PORTAL_COPYRIGHTURL = vitroURI+"copyrightURL";
     public static final String PORTAL_COPYRIGHTANCHOR = vitroURI+"copyrightAnchor";
-    public static final String PORTAL_ROOTBREADCRUMBURL = vitroURI+"rootBreadCrumbURL";
-    public static final String PORTAL_ROOTBREADCRUMBANCHOR = vitroURI+"rootBreadCrumbAnchor";
-    public static final String PORTAL_LOGOTYPEIMAGE = vitroURI+"logotypeImage";
-    public static final String PORTAL_LOGOTYPEHEIGHT = vitroURI+"logotypeHeight";
-    public static final String PORTAL_LOGOTYPEWIDTH = vitroURI+"logotypeWidth";
-    public static final String PORTAL_IMAGETHUMBWIDTH = vitroURI+"imageThumbWidth";
+    
     // reusing displayRank property above
     public static final String PORTAL_URLPREFIX = vitroURI + "urlPrefix";
 

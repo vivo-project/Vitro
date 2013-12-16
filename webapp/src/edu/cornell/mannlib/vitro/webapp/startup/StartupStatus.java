@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 public class StartupStatus {
 	private static final Log log = LogFactory.getLog(StartupStatus.class);
 
-	private static final String ATTRIBUTE_NAME = "STARTUP_STATUS";
+	protected static final String ATTRIBUTE_NAME = "STARTUP_STATUS";
 
 	// ----------------------------------------------------------------------
 	// static methods

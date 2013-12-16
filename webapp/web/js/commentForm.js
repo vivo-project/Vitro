@@ -1,5 +1,7 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
+$.extend(this, i18nStrings);
+
 function ValidateForm(formName) {
     var x = 0; // counts form elements - used as array index
     var y = 0; // counts required fields - used as array index
@@ -8,7 +10,8 @@ function ValidateForm(formName) {
 
     // Check for Email formatting
     if (document.forms[formName].EmailFields) {
-        errorList = '\nPlease format your e-mail address as:\n \"userid@institution.edu\" or enter another complete and valid email address';
+        errorList = '\n' + i18nStrings.pleaseFormatEmail + '\n\n \"userid@institution.edu\" \n\n' 
+                    + i18nStrings.enterValidAddress;
         // build array of required fields
         emailStr = document.forms[formName].EmailFields.value;
         emailFields = emailStr.split(',');

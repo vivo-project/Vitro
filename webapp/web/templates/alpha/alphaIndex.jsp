@@ -2,7 +2,7 @@
 
 <%@ page import="org.apache.commons.logging.Log" %>
 <%@ page import="org.apache.commons.logging.LogFactory" %>
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %><%/* this odd thing points to something in web.xml */ %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %><%/* this odd thing points to something in web.xml */ %>
 <%@ page errorPage="/error.jsp"%>
 <%  /***********************************************
         alphaIndex.jsp will just display the just the index, no entites.

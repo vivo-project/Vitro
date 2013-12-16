@@ -56,7 +56,7 @@ public abstract class Widget {
     
     public String doMarkup(Environment env, Map params) {
         HttpServletRequest request = (HttpServletRequest) env.getCustomAttribute("request");
-        ServletContext context = (ServletContext) env.getCustomAttribute("context");
+        ServletContext context = request.getSession().getServletContext();
         
         WidgetTemplateValues values = null;
         
@@ -107,6 +107,7 @@ public abstract class Widget {
     
     private String processMacroToString(Environment env, String widgetName, Macro macro, Map<String, Object> map) {   
         StringWriter out = new StringWriter();
+        
         try {
             String templateString = macro.getChildNodes().get(0).toString();
             // NB Using this method of creating a template from a string does not allow the widget template to import
@@ -117,7 +118,7 @@ public abstract class Widget {
             // the same key, e.g., "widgetTemplate", since one putTemplate() call will clobber a previous one.
             // We need to give each widget macro template a unique key in the StringTemplateLoader, and check 
             // if it's already there or else add it. Leave this for later.
-            Template template = new Template("widget", new StringReader(templateString), env.getConfiguration());          
+            Template template = new Template("widget", new StringReader(templateString), env.getConfiguration());
             template.process(map, out);
         } catch (Exception e) {
             log.error("Could not process widget " + widgetName, e);

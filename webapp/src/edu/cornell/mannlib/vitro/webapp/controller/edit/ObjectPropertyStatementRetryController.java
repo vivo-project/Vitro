@@ -71,11 +71,11 @@ public class ObjectPropertyStatementRetryController extends BaseEditController {
                 
         String action = "insert";
 
-        PropertyInstanceDao piDao = vreq.getFullWebappDaoFactory().getPropertyInstanceDao();
+        PropertyInstanceDao piDao = vreq.getUnfilteredWebappDaoFactory().getPropertyInstanceDao();
         epo.setDataAccessObject(piDao);
-        ObjectPropertyDao pDao = vreq.getFullWebappDaoFactory().getObjectPropertyDao();
-        IndividualDao eDao = vreq.getFullWebappDaoFactory().getIndividualDao();
-        VClassDao vcDao = vreq.getFullWebappDaoFactory().getVClassDao();
+        ObjectPropertyDao pDao = vreq.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
+        IndividualDao eDao = vreq.getUnfilteredWebappDaoFactory().getIndividualDao();
+        VClassDao vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
 
         PropertyInstance objectForEditing = null;
         if (!epo.getUseRecycledBean()){
@@ -124,7 +124,7 @@ public class ObjectPropertyStatementRetryController extends BaseEditController {
         }
         List<Individual> indList = new LinkedList();
         indList.addAll(possIndSet);
-        Collections.sort(indList, new IndComparator());
+        sortForPickList(indList, vreq);
         List objectEntOptionList = new LinkedList();
         Iterator<Individual> indIt = indList.iterator();
         while (indIt.hasNext()) {
@@ -167,13 +167,5 @@ public class ObjectPropertyStatementRetryController extends BaseEditController {
     public void doGet (HttpServletRequest request, HttpServletResponse response) {
         doPost(request, response);
     }
-
-    private class IndComparator implements Comparator {
-        public int compare(Object o1, Object o2) {
-            Collator collator = Collator.getInstance();
-            return collator.compare(((Individual)o1).getName() , ((Individual)o2).getName());
-        }
-    }
-
 
 }

@@ -22,12 +22,12 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.InvalidConfigurationException;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.PropertyListConfig;
 import freemarker.cache.TemplateLoader;
@@ -89,6 +89,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         setName(op.getDomainPublic());
         
         sortDirection = op.getDomainEntitySortDirection();
+        domainUri = op.getDomainVClassURI();
+        rangeUri = op.getRangeVClassURI();
         
         // Get the config for this object property
         try {
@@ -108,24 +110,35 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
 
     protected void setAddUrl(Property property) {
     	// Is the add link suppressed for this property?
-    	if (new EditLinkSuppressor(vreq).isAddLinkSuppressed(propertyUri)) {
+    	if (property.isAddLinkSuppressed()) {
     		return;
     	}
         
         // Determine whether a new statement can be added
 		RequestedAction action = new AddObjectPropertyStatement(
-				vreq.getJenaOntModel(), subjectUri, propertyUri,
+				vreq.getJenaOntModel(), subjectUri, property,
 				RequestActionConstants.SOME_URI);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return;
         }
         
+        String rangeUri = (property instanceof ObjectProperty) 
+                ? ((ObjectProperty) property).getRangeVClassURI()
+                : "data";
+         
         if (propertyUri.equals(VitroVocabulary.IND_MAIN_IMAGE)) {
             addUrl = getImageUploadUrl(subjectUri, "add");
         } else {
             ParamMap params = new ParamMap(
                     "subjectUri", subjectUri,
-                    "predicateUri", propertyUri);  
+                    "predicateUri", propertyUri);
+            
+            if (domainUri != null) {
+                params.put("domainUri", domainUri);
+            }
+            if (rangeUri != null) {
+                params.put("rangeUri", rangeUri);
+            }
             
             params.putAll(UrlBuilder.getModelParams(vreq));
 
@@ -142,13 +155,12 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
      * This will do for now.
      */
 	protected TemplateLoader getFreemarkerTemplateLoader() {
-		return FreemarkerConfigurationLoader.getConfig(vreq).getTemplateLoader();
+		return FreemarkerConfiguration.getConfig(vreq).getTemplateLoader();
 	}
     
     protected List<Map<String, String>> getStatementData() {
         ObjectPropertyStatementDao opDao = vreq.getWebappDaoFactory().getObjectPropertyStatementDao();
-        
-        return opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, getSelectQuery(), getConstructQueries(), sortDirection);
+        return opDao.getObjectPropertyStatementsForIndividualByProperty(subjectUri, propertyUri, objectKey, domainUri, rangeUri, getSelectQuery(), getConstructQueries(), sortDirection);
     }
     
     protected abstract boolean isEmpty();

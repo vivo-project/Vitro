@@ -1,11 +1,23 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isErrorPage="true" %>
 <%@ page import="com.oreilly.servlet.ServletUtils,edu.cornell.mannlib.vitro.webapp.web.*" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean"%>
+<%@page import="org.apache.commons.logging.Log"%>
+<%@page import="org.apache.commons.logging.LogFactory"%>
 <%
+   // We have seen that this page can throw its own error. 
+   // Before it does so, be sure that we have written the original error to the log.
+    Object c = request.getAttribute("javax.servlet.jsp.jspException");
+    if (c instanceof Throwable) {
+      Throwable cause = (Throwable) c;
+      Log log = LogFactory.getLog(this.getClass());
+      log.error("Error: ", cause);
+    }
+   
+   
             VitroRequest vreq = new VitroRequest(request);
             ApplicationBean appBean = vreq.getAppBean();
             String themeDir = appBean.getThemeDir();                        
@@ -13,7 +25,6 @@
             request.setAttribute("bodyJsp", "/errorbody.jsp");
             request.setAttribute("title", "Error");
             request.setAttribute("css", "");
-            request.setAttribute("appBean", appBean);
             request.setAttribute("themeDir", themeDir);
             %>
 

@@ -21,8 +21,8 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.OWL;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
@@ -33,8 +33,8 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.reasoner.ReasonerPlugin;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasonerTBoxListener;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.TripleStoreType;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 public class SimpleReasonerSetup implements ServletContextListener {
 
@@ -48,15 +48,15 @@ public class SimpleReasonerSetup implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
+    	ServletContext ctx = sce.getServletContext();
         
         try {    
             // set up Pellet reasoning for the TBox    
-            
-            OntModelSelector assertionsOms = ModelContext.getBaseOntModelSelector(sce.getServletContext());
-            OntModelSelector inferencesOms = ModelContext.getInferenceOntModelSelector(sce.getServletContext());
-            OntModelSelector unionOms = ModelContext.getUnionOntModelSelector(sce.getServletContext());
+            OntModelSelector assertionsOms = ModelAccess.on(ctx).getBaseOntModelSelector();
+            OntModelSelector inferencesOms = ModelAccess.on(ctx).getInferenceOntModelSelector();
+            OntModelSelector unionOms = ModelAccess.on(ctx).getUnionOntModelSelector();
 
-            WebappDaoFactoryJena wadf = (WebappDaoFactoryJena) sce.getServletContext().getAttribute("webappDaoFactory");
+			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
             
             if (!assertionsOms.getTBoxModel().getProfile().NAMESPACE().equals(OWL.NAMESPACE.getNameSpace())) {        
                 log.error("Not connecting Pellet reasoner - the TBox assertions model is not an OWL model");
@@ -75,29 +75,26 @@ public class SimpleReasonerSetup implements ServletContextListener {
             sce.getServletContext().setAttribute("pelletListener",pelletListener);
             sce.getServletContext().setAttribute("pelletOntModel", pelletListener.getPelletModel());
             
-            if (wadf != null) {
-                wadf.setPelletListener(pelletListener);
+            if (wadf instanceof WebappDaoFactoryJena) {
+                ((WebappDaoFactoryJena) wadf).setPelletListener(pelletListener);
             }
             
             log.info("Pellet reasoner connected for the TBox");
      
-           // set up simple reasoning for the ABox
-                    
-            ServletContext ctx = sce.getServletContext();
-            DataSource bds = JenaDataSourceSetupBase
-                                    .getApplicationDataSource(ctx);
-            String dbType = ConfigurationProperties.getBean(ctx).getProperty( // database type
-                    "VitroConnection.DataSource.dbtype","MySQL");
+            waitForTBoxReasoning(sce); 
             
+            // set up simple reasoning for the ABox
+                                
             RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService();            
             Dataset dataset = new RDFServiceDataset(rdfService);
             
             Model rebuildModel = dataset.getNamedModel(JENA_INF_MODEL_REBUILD); 
-            Model scratchModel = dataset.getNamedModel(JENA_INF_MODEL_SCRATCHPAD); 
+            Model scratchModel = dataset.getNamedModel(JENA_INF_MODEL_SCRATCHPAD);
+            Model inferenceModel = dataset.getNamedModel(JenaDataSourceSetupBase.JENA_INF_MODEL);
 
             // the simple reasoner will register itself as a listener to the ABox assertions
             SimpleReasoner simpleReasoner = new SimpleReasoner(
-                    unionOms.getTBoxModel(), rdfService, inferencesOms.getABoxModel(), rebuildModel, scratchModel);
+                    unionOms.getTBoxModel(), rdfService, inferenceModel, rebuildModel, scratchModel);
             sce.getServletContext().setAttribute(SimpleReasoner.class.getName(),simpleReasoner);
             
             StartupStatus ss = StartupStatus.getBean(ctx);
@@ -108,48 +105,52 @@ public class SimpleReasonerSetup implements ServletContextListener {
                     ReasonerPlugin plugin = (ReasonerPlugin) Class.forName(
                             classname).getConstructors()[0].newInstance();
                     plugin.setSimpleReasoner(simpleReasoner);
-                    pluginList.add(plugin);
+                    if (!plugin.isConfigurationOnlyPlugin()) {
+                        pluginList.add(plugin);
+                        log.info("adding reasoner plugin " + plugin.getClass().getName());
+                    }
                 } catch(Throwable t) {              
                     ss.info(this, "Could not instantiate reasoner plugin " + classname);
                 }
             }
             simpleReasoner.setPluginList(pluginList);
             
-            
-            if (isRecomputeRequired(sce.getServletContext())) {   
-                log.info("ABox inference recompute required.");
-                waitForTBoxReasoning(pelletListener);  
-                if (JenaDataSourceSetupBase.isFirstStartup()) {
-                    simpleReasoner.recompute();
-                } else {
-                    log.info("starting ABox inference recompute in a separate thread.");
-                    new Thread(new ABoxRecomputer(simpleReasoner),"ABoxRecomputer").start();
-                }
-                
-            } 
-
             SimpleReasonerTBoxListener simpleReasonerTBoxListener = new SimpleReasonerTBoxListener(simpleReasoner);
             sce.getServletContext().setAttribute(SimpleReasonerTBoxListener.class.getName(),simpleReasonerTBoxListener);
             assertionsOms.getTBoxModel().register(simpleReasonerTBoxListener);
             inferencesOms.getTBoxModel().register(simpleReasonerTBoxListener);
             
-            log.info("Simple reasoner connected for the ABox");
+            RecomputeMode mode = getRecomputeRequired(ctx);
+            if (RecomputeMode.FOREGROUND.equals(mode)) {
+                log.info("ABox inference recompute required.");
+                simpleReasoner.recompute();
+            } else if (RecomputeMode.BACKGROUND.equals(mode)) {
+                log.info("starting ABox inference recompute in a separate thread.");
+                new VitroBackgroundThread(
+                        new ABoxRecomputer(
+                                simpleReasoner),"ABoxRecomputer").start();
+            }    
             
         } catch (Throwable t) {
             t.printStackTrace();
         }        
     }
     
-    private void waitForTBoxReasoning(PelletListener pelletListener) 
+    public static void waitForTBoxReasoning(ServletContextEvent sce) 
         throws InterruptedException {
-      int sleeps = 0;
-      while (sleeps < 1000 && pelletListener.isReasoning()) {
-          if ((sleeps % 10) == 0) { // print message at 10 second intervals
-              log.info("Waiting for initial TBox reasoning to complete");
-          }
-          Thread.sleep(1000);   
-          sleeps++;
-      }
+        PelletListener pelletListener = (PelletListener) sce.getServletContext().getAttribute("pelletListener");
+        if (pelletListener == null) {
+            return ;
+        }
+        int sleeps = 0;
+        // sleep at least once to make sure the TBox reasoning gets started
+        while ((0 == sleeps) || ((sleeps < 1000) && pelletListener.isReasoning())) {
+            if (((sleeps - 1) % 10) == 0) { // print message at 10 second intervals
+                log.info("Waiting for initial TBox reasoning to complete");
+            }
+            Thread.sleep(1000);   
+            sleeps++;
+        }
     }
     
     @Override
@@ -190,15 +191,19 @@ public class SimpleReasonerSetup implements ServletContextListener {
         }
     }
     
+    public enum RecomputeMode {
+        FOREGROUND, BACKGROUND
+    }
+    
     private static final String RECOMPUTE_REQUIRED_ATTR = 
             SimpleReasonerSetup.class.getName() + ".recomputeRequired";
     
-    public static void setRecomputeRequired(ServletContext ctx) {
-        ctx.setAttribute(RECOMPUTE_REQUIRED_ATTR, true);
+    public static void setRecomputeRequired(ServletContext ctx, RecomputeMode mode) {
+        ctx.setAttribute(RECOMPUTE_REQUIRED_ATTR, mode);
     }
     
-    private static boolean isRecomputeRequired(ServletContext ctx) {
-        return (ctx.getAttribute(RECOMPUTE_REQUIRED_ATTR) != null);
+    public static RecomputeMode getRecomputeRequired(ServletContext ctx) {
+        return (RecomputeMode) ctx.getAttribute(RECOMPUTE_REQUIRED_ATTR);
     }
   
     private static final String MSTCOMPUTE_REQUIRED_ATTR = 
@@ -210,19 +215,6 @@ public class SimpleReasonerSetup implements ServletContextListener {
     
     private static boolean isMSTComputeRequired(ServletContext ctx) {
         return (ctx.getAttribute(MSTCOMPUTE_REQUIRED_ATTR) != null);
-    }
-    
-    private class ABoxRecomputer implements Runnable {
-        
-        private SimpleReasoner simpleReasoner;
-        
-        public ABoxRecomputer(SimpleReasoner simpleReasoner) {
-            this.simpleReasoner = simpleReasoner;
-        }
-        
-        public void run() {
-            simpleReasoner.recompute();
-        }
     }
         
     /**
@@ -273,6 +265,18 @@ public class SimpleReasonerSetup implements ServletContextListener {
         
         log.debug("Classnames of reasoner plugins = " + list);
         return list;
-        
+    }
+    
+    private class ABoxRecomputer implements Runnable {
+
+        private SimpleReasoner simpleReasoner;
+
+        public ABoxRecomputer(SimpleReasoner simpleReasoner) {
+            this.simpleReasoner = simpleReasoner;
+        }
+
+        public void run() {
+            simpleReasoner.recompute();
+        }
     }
 }

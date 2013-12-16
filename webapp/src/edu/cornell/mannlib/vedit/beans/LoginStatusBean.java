@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
@@ -101,13 +102,7 @@ public class LoginStatusBean {
 		}
 
 		ServletContext ctx = session.getServletContext();
-		WebappDaoFactory wadf = (WebappDaoFactory) ctx
-				.getAttribute("webappDaoFactory");
-		if (wadf == null) {
-			log.error("No WebappDaoFactory");
-			return null;
-		}
-
+		WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
 		UserAccountsDao userAccountsDao = wadf.getUserAccountsDao();
 		if (userAccountsDao == null) {
 			log.error("No UserAccountsDao");

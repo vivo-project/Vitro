@@ -18,13 +18,13 @@ import edu.cornell.mannlib.vitro.utilities.revisioninfo.ProcessRunner.ProcessExc
  * Get release and revision information to display on screen. Put this
  * information into a single line and append it to the specified file.
  * 
- * Ask Subversion for the information. If Subversion is available, and if this
- * is a working directory, then we can build the info from the responses we get
- * from "svn info" and "svnversion".
+ * Ask Git for the information. If Git is available, and if this is a working
+ * directory, then we can build the info from the responses we get from
+ * "git describe", "git symbolic-ref" and "git log".
  * 
  * If that doesn't work, read the information from the "revisionInfo" file in
  * the product directory. Presumably, that file was created when the source was
- * exported from Subversion.
+ * exported from Git.
  * 
  * If that doesn't work either, return something like this:
  * "productName ~ unknown ~ unknown"
@@ -53,14 +53,18 @@ public class RevisionInfoBuilder {
 			this.infoLine = infoLine;
 		}
 
+		@Override
 		public String toString() {
 			return message + ": " + infoLine;
 		}
 	}
 
-	private static final String SVN_DIRECTORY_NAME = ".svn";
-	private static final String[] SVNVERSION_COMMAND = { "svnversion", "." };
-	private static final String[] SVN_INFO_COMMAND = { "svn", "info" };
+	private static final String GIT_DIRECTORY_NAME = ".git";
+	private static final String[] GIT_DESCRIBE_COMMAND = { "git", "describe" };
+	private static final String[] GIT_SREF_COMMAND = { "git", "symbolic-ref",
+			"HEAD" };
+	private static final String[] GIT_LOG_COMMAND = { "git", "log",
+			"--pretty=format:%h", "-1" };
 	private static final String INFO_LINE_DELIMITER = " ~ ";
 	private static final String REVISION_INFO_FILENAME = "revisionInfo";
 
@@ -95,7 +99,7 @@ public class RevisionInfoBuilder {
 	}
 
 	private void buildInfo() {
-		results = buildInfoFromSubversion();
+		results = buildInfoFromGit();
 		if (results == null) {
 			results = buildInfoFromFile();
 		}
@@ -104,40 +108,58 @@ public class RevisionInfoBuilder {
 		}
 	}
 
-	private Results buildInfoFromSubversion() {
-		if (!isThisASubversionWorkspace()) {
-			System.out.println("Not a Subversion workspace");
+	private Results buildInfoFromGit() {
+		if (!isThisAGitWorkspace()) {
+			System.out.println("Not a git workspace");
 			return null;
 		}
 
-		String release = assembleReleaseNameFromSubversion();
+		String release = assembleReleaseNameFromGit();
 		if (release == null) {
-			System.out.println("Couldn't get release name from Subversion");
-			return null;
+			System.out.println("Couldn't get release name from Git");
 		}
 
-		String revision = obtainRevisionLevelFromSubversion();
+		String revision = obtainCommitIdFromGit();
 		if (revision == null) {
-			System.out.println("Couldn't get revision level from Subversion");
+			System.out.println("Couldn't get commit ID from Git");
+		}
+		
+		if ((revision == null) && (release == null)) {
 			return null;
 		}
 
-		return new Results("Info from Subversion", buildLine(release, revision));
+		return new Results("Info from Git", buildLine(release, revision));
 	}
 
-	private boolean isThisASubversionWorkspace() {
-		File svnDirectory = new File(productDirectory, SVN_DIRECTORY_NAME);
-		return svnDirectory.isDirectory();
+	private boolean isThisAGitWorkspace() {
+		File gitDirectory = new File(productDirectory, GIT_DIRECTORY_NAME);
+		return gitDirectory.isDirectory();
 	}
 
-	private String assembleReleaseNameFromSubversion() {
-		String infoResponse = runSubProcess(SVN_INFO_COMMAND);
-		return new InfoResponseParser(infoResponse).parse();
+	private String assembleReleaseNameFromGit() {
+		String describeResponse = runSubProcess(GIT_DESCRIBE_COMMAND);
+		String srefResponse = runSubProcess(GIT_SREF_COMMAND);
+		return parseReleaseName(describeResponse, srefResponse);
 	}
 
-	private String obtainRevisionLevelFromSubversion() {
-		String response = runSubProcess(SVNVERSION_COMMAND);
-		return (response == null) ? null : response.trim();
+	private String obtainCommitIdFromGit() {
+		String logResponse = runSubProcess(GIT_LOG_COMMAND);
+		return parseLogResponse(logResponse);
+	}
+
+	private String parseReleaseName(String describeResponse, String srefResponse) {
+		if (describeResponse != null) {
+			return describeResponse.trim() + " tag";
+		} else if (srefResponse != null) {
+			return srefResponse.substring(srefResponse.lastIndexOf('/') + 1)
+					.trim() + " branch";
+		} else {
+			return null;
+		}
+	}
+
+	private String parseLogResponse(String logResponse) {
+		return logResponse;
 	}
 
 	private String runSubProcess(String[] cmdArray) {
@@ -155,9 +177,10 @@ public class RevisionInfoBuilder {
 			}
 
 			String output = runner.getStdOut();
-			// System.err.println(command + " response was '" + output + "'");
+//			System.err.println(command + " response was '" + output + "'");
 			return output;
 		} catch (ProcessException e) {
+//			System.out.println(e);
 			return null;
 		}
 	}

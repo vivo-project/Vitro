@@ -9,216 +9,355 @@
      ====================================================================== -->
 
 <project name="vitroCore" default="describe">
+	<property environment="env" />
 
-	<!-- - - - - - - - - - - - - - - - - - 
-          properties                      
-      - - - - - - - - - - - - - - - - -->
-	<dirname property="corebase.dir" file="${ant.file.vitroCore}" />
+	<!-- We must be using a suitable version of Java. -->
+	<fail>
+		<condition>
+			<not>
+				<or>
+					<equals arg1="1.7" arg2="${ant.java.version}" />
+					<equals arg1="1.8" arg2="${ant.java.version}" />
+				</or>
+			</not>
+		</condition>
+		The Vitro build script requires Java 7 or later.
+		Ant property ant.java.version = ${ant.java.version}
+		Java system property java.version = ${java.version}
+		Java system property java.home = ${java.home}
+		JAVA_HOME environment variable = ${env.JAVA_HOME}
+	</fail>
+
+	<!-- We must be using a suitable version of Ant. -->
+	<fail>
+		<condition>
+			<not>
+				<antversion atleast="1.8" />
+			</not>
+		</condition>
+		The Vitro build script requires Ant 1.8 or later.
+		Ant property ant.version = ${ant.version}
+		Ant property ant.home = ${ant.home}
+		ANT_HOME environment variable = ${env.ANT_HOME}
+	</fail>
 
 	<!-- A product script will override appbase.dir, but not corebase.dir -->
+	<dirname property="corebase.dir" file="${ant.file.vitroCore}" />
 	<property name="appbase.dir" location="${corebase.dir}" />
 
+	<property name="build.properties.file" location="config/build.properties" />
+
 	<property name="build.dir" location=".build" />
-	<property name="deploy.properties.file" location="config/deploy.properties" />
 
-	<property name="utilities.base.dir" location="${corebase.dir}/../utilities/buildutils" />
-	<property name="utilities.source.dir" location="${utilities.base.dir}/src" />
-	<property name="utilities.lib.dir" location="${utilities.base.dir}/lib" />
+	<property name="buildtools.dir" location="${corebase.dir}/../utilities/buildutils" />
+	<property name="buildtools.source.dir" location="${buildtools.dir}/src" />
+	<property name="buildtools.lib.dir" location="${buildtools.dir}/lib" />
+	<property name="buildtools.compiled.dir" location="${build.dir}/buildTools" />
 
-	<property name="war.dir" location="${build.dir}/war" />
-	<property name="war.webinf.dir" location="${war.dir}/WEB-INF" />
-	<property name="war.classes.dir" location="${war.webinf.dir}/classes" />
-	<property name="war.resources.dir" location="${war.webinf.dir}/resources" />
-	<property name="revisionInfo.build.file" location="${war.resources.dir}/revisionInfo.txt" />
+	<property name="main.build.dir" location="${build.dir}/main"/>
+	<property name="main.webapp.dir" location="${main.build.dir}/webapp" />
+	<property name="main.webinf.dir" location="${main.webapp.dir}/WEB-INF" />
+	<property name="main.compiled.dir" location="${main.webinf.dir}/classes" />
+	<property name="main.resources.dir" location="${main.webinf.dir}/resources" />
+	<property name="main.revisioninfo.file" location="${main.resources.dir}/revisionInfo.txt" />
 
-	<property name="test.classes.dir" location="${build.dir}/testClasses" />
-	<property name="utility.classes.dir" location="${build.dir}/utilityClasses" />
+	<property name="unittests.compiled.dir" location="${main.build.dir}/testClasses" />
+
+	<property name="solr.template.dir" location="${corebase.dir}/../solr" />
+	<property name="solr.template.context.file" location="${solr.template.dir}/template.context.xml" />
 
 	<property name="solr.build.dir" location="${build.dir}/solr" />
+	<property name="solr.webapp.dir" location="${solr.build.dir}/webapp" />
+	<property name="solr.homeimage.dir" location="${solr.build.dir}/homeimage" />
 
-	<property name="javac.deprecation" value="true" />
+	<property name="vitrohome.build.dir" location="${build.dir}/vitrohome" />
+	<property name="vitrohome.image.dir" location="${vitrohome.build.dir}/image" />
 
-	<!-- - - - - - - - - - - - - - - - - - 
-          paths: for compiling and running                      
-         - - - - - - - - - - - - - - - - - -->
-	<path id="compile.classpath">
-		<fileset dir="${appbase.dir}/lib" includes="*.jar" />
-	</path>
+	<property name="distribution.dir" location="${build.dir}/distribution" />
+	<property name="distribution.tar.gz.file" location="${build.dir}/distribution.tar.gz" />
 
-	<path id="utility.compile.classpath">
-		<fileset dir="${utilities.lib.dir}" includes="*.jar" />
-	</path>
-
-	<path id="utility.run.classpath">
-		<pathelement location="${utility.classes.dir}" />
-		<path refid="utility.compile.classpath" />
-	</path>
-
-	<path id="test.compile.classpath">
-		<pathelement location="${war.classes.dir}" />
-		<path refid="compile.classpath" />
-	</path>
-
-	<path id="test.run.classpath">
-		<pathelement location="${appbase.dir}/test" />
-		<pathelement location="${test.classes.dir}" />
-		<path refid="test.compile.classpath" />
-		<path refid="utility.run.classpath" />
-	</path>
-
-	<!-- ================================= 
-          target: describe              
-         ================================= -->
-	<target name="describe" description="--> Describe the targets (this is the default).">
-		<echo>
-all      - Runs "clean", then "deploy".
-clean    - Delete all artifacts so the next build will be from scratch.
-compile  - Compile the Java source files.
-orng     - Configure and deploy the ORNG Shindig application.
-test     - Compile and run the JUnit tests.
-war      - Create a WAR file to be deployed in a servlet container.
-deploy   - Deploy the application directly into the Tomcat webapps directory.
-	    </echo>
-	</target>
-
-	<!-- ================================= 
-          target: all              
-         ================================= -->
-	<target name="all" depends="clean, deploy" description="--> Run 'clean', then 'deploy'" />
+	<property name="option.javac.deprecation" value="true" />
 
 	<!-- - - - - - - - - - - - - - - - - - 
-          target: properties                      
+          target: buildProperties                      
          - - - - - - - - - - - - - - - - - -->
-	<target name="properties">
-		<fail message="You must create a &quot;${deploy.properties.file}&quot; file.">
+	<target name="buildProperties">
+		<fail message="You must create a &quot;${build.properties.file}&quot; file.">
 			<condition>
 				<not>
-					<available file="${deploy.properties.file}" />
+					<available file="${build.properties.file}" />
 				</not>
 			</condition>
 		</fail>
 
-		<property file="${deploy.properties.file}" />
+		<property file="${build.properties.file}" />
 
-		<fail unless="tomcat.home" message="${deploy.properties.file} must contain a value for tomcat.home" />
-		<fail unless="webapp.name" message="${deploy.properties.file} must contain a value for webapp.name" />
-		<fail unless="vitro.home.directory" message="${deploy.properties.file} must contain a value for vitro.home.directory" />
-		<fail unless="Vitro.defaultNamespace" message="${deploy.properties.file} must contain a value for Vitro.defaultNamespace" />
-		<fail unless="VitroConnection.DataSource.url" message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.url" />
-		<fail unless="VitroConnection.DataSource.username" message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.username" />
-		<fail unless="VitroConnection.DataSource.password" message="${deploy.properties.file} must contain a value for VitroConnection.DataSource.password" />
-		<fail unless="rootUser.emailAddress" message="${deploy.properties.file} must contain a value for rootUser.emailAddress" />
-
-		<fail message="The vitro.home.directory &quot;${vitro.home.directory}&quot; does not exist.">
-			<condition>
-				<not>
-					<available file="${vitro.home.directory}" />
-				</not>
-			</condition>
-		</fail>
-
-		<fail message="The vitro.home.directory &quot;${vitro.home.directory}&quot; is not writable.">
-			<condition>
-				<not>
-					<isfileselected file="${vitro.home.directory}">
-						<writable />
-					</isfileselected>
-				</not>
-			</condition>
-		</fail>
-
-		<property name="solr.home.dir" location="${vitro.home.directory}/solr" />
-	</target>
-
-	<!-- ================================= 
-          target: clean              
-         ================================= -->
-	<target name="clean" depends="properties" description="--> Delete all artifacts.">
-		<delete dir="${build.dir}" />
-		<delete dir="${solr.home.dir}" excludes="data/**/*" includeemptydirs="true" />
+		<fail unless="webapp.name" message="${build.properties.file} must contain a value for webapp.name" />
+		<property name="solr.app.name" value="${webapp.name}solr" />
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
-          target: compileUtilities                      
+          target: deployProperties                      
          - - - - - - - - - - - - - - - - - -->
-	<target name="compileUtilities">
-		<mkdir dir="${utility.classes.dir}" />
-		<javac srcdir="${utilities.source.dir}" destdir="${utility.classes.dir}" debug="true" deprecation="${javac.deprecation}" encoding="UTF8" includeantruntime="false" optimize="false" source="1.6">
+	<target name="deployProperties" depends="buildProperties">
+		<fail unless="vitro.home" message="${build.properties.file} must contain a value for vitro.home" />
+		<fail unless="tomcat.home" message="${build.properties.file} must contain a value for tomcat.home" />
+		<fail>
+			<condition>
+				<not>
+					<available file="${tomcat.home}" />
+				</not>
+			</condition>
+            Tomcat home directory '${tomcat.home}' does not exist. 
+            Check the value of 'tomcat.home' in your build.properties file.
+		</fail>
+		<fail>
+			<condition>
+				<not>
+					<available file="${tomcat.home}/webapps" />
+				</not>
+			</condition>
+            '${tomcat.home}' does not refer to a valid Tomcat instance: it has no 'webapps' sub-directory. 
+            Check the value of 'tomcat.home' in your build.properties file."
+		</fail>
+
+		<property name="solr.home.dir" location="${vitro.home}/solr" />
+
+		<property name="tomcat.context.filename" value="META-INF/context.xml" />
+		<property name="main.tomcat.webapp.dir" value="${tomcat.home}/webapps/${webapp.name}" />
+		<property name="main.tomcat.context.file" value="${main.tomcat.webapp.dir}/${tomcat.context.filename}" />
+		<property name="solr.tomcat.webapp.dir" value="${tomcat.home}/webapps/${solr.app.name}" />
+		<property name="solr.tomcat.context.file" value="${solr.tomcat.webapp.dir}/${tomcat.context.filename}" />
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: compileBuildtools                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="compileBuildtools">
+		<path id="utility.compile.classpath">
+			<fileset dir="${buildtools.lib.dir}" includes="*.jar" />
+			<fileset dir="${appbase.dir}/lib">
+				<include name="commons-io-2.0.1.jar" />
+				<include name="commons-lang-2.6.jar" />
+				<include name="servlet-api.jar" />
+			</fileset>
+		</path>
+
+		<mkdir dir="${buildtools.compiled.dir}" />
+		<javac srcdir="${buildtools.source.dir}"
+		       destdir="${buildtools.compiled.dir}"
+		       debug="true"
+		       deprecation="${option.javac.deprecation}"
+		       encoding="UTF8"
+		       includeantruntime="false"
+		       optimize="false"
+		       source="1.7">
 			<classpath refid="utility.compile.classpath" />
 		</javac>
+
+		<path id="utility.run.classpath">
+			<pathelement location="${buildtools.compiled.dir}" />
+			<path refid="utility.compile.classpath" />
+		</path>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
           target: prepare                      
          - - - - - - - - - - - - - - - - - -->
-	<target name="prepare" depends="properties, compileUtilities">
+	<target name="prepare">
 		<mkdir dir="${build.dir}" />
-		<mkdir dir="${war.classes.dir}" />
-		<mkdir dir="${war.resources.dir}" />
-		<mkdir dir="${test.classes.dir}" />
+		
+		<!-- Get ready to copy language files. 
+			Use JavaScript functions to add "includes" to this PatternSet, 
+			depending on which languages are selected. -->
+		<patternset id="language_files" />
+	    
+		<script language="javascript"> <![CDATA[
+	        function echo(e, message) {
+	            e.setMessage(message);
+	            e.perform();
+	        }
 
-		<!-- copy all sorts of web stuff into the war directory. -->
-		<copy todir="${war.dir}">
+	        prop = project.getProperty("languages.addToBuild");
+	        ps = project.getReference("language_files");
+	        e = project.createTask("echo"); 
+
+	        if (prop != null) {
+	            languages = prop.trim().split(",");
+	            for (var i=0; i < languages.length; i++) {
+	                ps.setIncludes([languages[i] + "/**/*"])
+	                echo(e, "Adding language: " + languages[i])
+	            }
+	        } else {
+	            ps.setExcludes(["**/*"])
+	        }
+	    ]]> </script>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: prepareWebappDir                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="prepareWebappDir" depends="prepare">
+		<!-- copy all sorts of web stuff into the webapp directory. -->
+		<copy todir="${main.webapp.dir}">
 			<fileset dir="${appbase.dir}/web" />
 			<fileset dir="${appbase.dir}" includes="themes/**/*" />
 		</copy>
 
-		<copy todir="${war.webinf.dir}">
+		<copy todir="${main.webinf.dir}">
 			<fileset dir="${appbase.dir}">
 				<!-- copy the JARs into the war directory -->
 				<include name="lib/*" />
-				<!-- these are already in Tomcat: we mustn't conflict. -->
+				<!-- these will be in the servlet container: we mustn't conflict. -->
 				<exclude name="lib/jsp-api.jar" />
 				<exclude name="lib/servlet-api.jar" />
 			</fileset>
 		</copy>
 
 		<!-- use the production Log4J properties, unless a debug version exists. -->
-		<available file="${appbase.dir}/config/debug.log4j.properties" property="debug.log4j.exists" />
-		<copy tofile="${war.classes.dir}/log4j.properties" filtering="true" overwrite="true">
-			<fileset dir="${appbase.dir}/config">
-				<include name="default.log4j.properties" unless="debug.log4j.exists" />
-				<include name="debug.log4j.properties" if="debug.log4j.exists" />
-			</fileset>
+		<condition property="log4j.properties.file" value="debug.log4j.properties" else="log4j.properties">
+			<available file="${appbase.dir}/config/debug.log4j.properties" />
+		</condition>
+		<copy file="${appbase.dir}/config/${log4j.properties.file}" 
+		      tofile="${main.build.dir}/log4j.properties" 
+		      filtering="true" 
+		      overwrite="true">
 			<filterchain>
 				<expandproperties />
 			</filterchain>
 		</copy>
-
-		<copy todir="${war.classes.dir}">
-			<!-- copy the deploy.properties into the war directory -->
-			<fileset file="${deploy.properties.file}" />
-
-			<!-- copy any xml files from source tree to the war directory -->
-			<fileset dir="${appbase.dir}/src" includes="**/*.xml" />
+		<copy todir="${main.compiled.dir}">
+			<fileset dir="${main.build.dir}">
+				<filename name="log4j.properties"/>
+				<different targetdir="${main.compiled.dir}" ignorefiletimes="true"/>
+			</fileset>
 		</copy>
 
-		<!-- copy the context file into the war directory -->
-		<copy file="${appbase.dir}/context.xml" tofile="${war.dir}/META-INF/context.xml" />
+		<!-- Copy the build.properties file to the resources directory. -->
+		<copy todir="${main.resources.dir}" file="${build.properties.file}" />
 
+
+		<!-- copy any xml files from source tree to the war directory -->
+		<copy todir="${main.compiled.dir}">
+			<fileset dir="${appbase.dir}/src" includes="**/*.xml" />
+		</copy>
+		
+		<!-- Copy any requested language files to the webapp directory. -->
+		<!-- Use a mapper to remove the language directory name when copying. -->
+	    <copy todir="${main.webapp.dir}/">
+	        <fileset dir="${appbase.dir}/languages" >
+	        	<patternset refid="language_files" />
+	        	<or>
+		    		<filename name="*/i18n/**/*" />
+		    		<filename name="*/templates/**/*" />
+		    		<filename name="*/themes/**/*" />
+	        	</or>
+	        </fileset>
+	        <regexpmapper from="^[^/]+/(.*)$$" to="\1" handledirsep="true" />
+	    </copy>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: prepareVitroHomeDir                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="prepareVitroHomeDir" depends="prepare">
+		<mkdir dir="${vitrohome.build.dir}" />
+		<mkdir dir="${vitrohome.image.dir}" />
+		<copy todir="${vitrohome.image.dir}" >
+			<fileset dir="${appbase.dir}/config" >
+				<include name="example.runtime.properties" />
+				<include name="example.developer.properties" />
+			</fileset>
+		</copy>
+		<copy todir="${vitrohome.image.dir}" >
+			<fileset dir="${appbase.dir}" >
+				<include name="rdf/**/*" />
+			</fileset>
+		</copy>
+	
+		<!-- Copy any requested language files to the webapp directory. -->
+		<!-- Use a mapper to remove the language directory name when copying. -->
+	    <copy todir="${vitrohome.image.dir}" >
+	        <fileset dir="${appbase.dir}/languages" >
+	        	<patternset refid="language_files" />
+		    	<filename name="*/rdf/**/*" />
+	        </fileset>
+	        <regexpmapper from="^[^/]+/(.*)$$" to="\1" handledirsep="true" />
+	    </copy>
+</target>
+
+
+	<!-- ================================= 
+          target: clean              
+         ================================= -->
+	<target name="clean" description="--> Delete all artifacts.">
+		<delete dir="${build.dir}" />
+		<!-- delete the rdf files, removing any unused languages, for example. -->
+		<delete dir="${vitro.home}/rdf" />
 	</target>
 
 	<!-- ================================= 
           target: compile              
          ================================= -->
-	<target name="compile" depends="prepare" description="--> Compile Java sources">
+	<target name="compile" depends="prepareWebappDir" description="--> Compile Java sources">
+		<path id="main.compile.classpath">
+			<fileset dir="${appbase.dir}/lib" includes="*.jar" />
+		</path>
+
 		<!-- deletes all files that depend on changed .java files -->
-		<depend srcdir="${appbase.dir}/src" destdir="${war.classes.dir}" closure="false" cache="${build.dir}/.depcache">
-			<classpath refid="compile.classpath" />
+		<depend srcdir="${appbase.dir}/src" 
+		        destdir="${main.compiled.dir}" 
+		        closure="false" 
+		        cache="${main.build.dir}/compileDependencyCache">
+			<classpath refid="main.compile.classpath" />
 		</depend>
 
-		<javac srcdir="${appbase.dir}/src" destdir="${war.classes.dir}" debug="true" deprecation="${javac.deprecation}" encoding="UTF8" includeantruntime="false" optimize="true" source="1.6">
-			<classpath refid="compile.classpath" />
+		<javac srcdir="${appbase.dir}/src" 
+		       destdir="${main.compiled.dir}" 
+		       debug="true" 
+		       deprecation="${option.javac.deprecation}" 
+		       encoding="UTF8" 
+		       includeantruntime="false" 
+		       optimize="true" 
+		       source="1.7">
+			<classpath refid="main.compile.classpath" />
 		</javac>
 	</target>
 
 	<!-- ================================= 
           target: test              
          ================================= -->
-	<target name="test" depends="compile" unless="skiptests" description="--> Run JUnit tests">
-		<javac srcdir="${appbase.dir}/test" destdir="${test.classes.dir}" debug="true" deprecation="${javac.deprecation}" encoding="UTF8" includeantruntime="false" optimize="false" source="1.6">
+	<target name="test" depends="compile, compileBuildtools, prepareSolr" unless="skiptests" description="--> Run JUnit tests">
+		<path id="test.compile.classpath">
+			<pathelement location="${main.compiled.dir}" />
+			<path refid="main.compile.classpath" />
+            <!-- need the solr runtime becuase we do a test where a solr server is started -->
+            <fileset dir="${solr.webapp.dir}/WEB-INF/lib">
+              <include name="*.jar"/>
+            </fileset>
+		</path>
+
+		<mkdir dir="${unittests.compiled.dir}" />
+		<javac srcdir="${appbase.dir}/test" 
+		       destdir="${unittests.compiled.dir}" 
+		       debug="true" 
+		       deprecation="${option.javac.deprecation}" 
+		       encoding="UTF8" 
+		       includeantruntime="false" 
+		       optimize="false" 
+		       source="1.7">
 			<classpath refid="test.compile.classpath" />
 		</javac>
+
+		<path id="test.run.classpath">
+			<pathelement location="${appbase.dir}/test" />
+			<pathelement location="${unittests.compiled.dir}" />
+			<path refid="test.compile.classpath" />
+			<path refid="utility.run.classpath" />
+            <fileset dir="${solr.webapp.dir}/WEB-INF/lib">
+              <include name="*.jar"/>
+            </fileset>
+		</path>
 
 		<java classname="edu.cornell.mannlib.vitro.utilities.testing.VitroTestRunner" fork="yes" failonerror="true">
 			<classpath refid="test.run.classpath" />
@@ -228,111 +367,170 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	</target>
 
 	<!-- ================================= 
-          target: jar              
-         ================================= -->
-	<target name="jar" depends="test" description="--> Compile the Java, and build a JAR file">
-		<jar basedir="${war.classes.dir}" destfile="${build.dir}/${ant.project.name}.jar" />
-	</target>
-
-	<!-- ================================= 
           target: revisionInfo              
          ================================= -->
 	<target name="revisionInfo" depends="test" unless="skipinfo" description="--> Store revision info in build">
+		<mkdir dir="${main.resources.dir}" />
 		<tstamp>
 			<format property="revisionInfo.timestamp" pattern="yyyy-MM-dd HH:mm:ss" />
 		</tstamp>
-		<echo file="${revisionInfo.build.file}">${revisionInfo.timestamp}
+		<echo file="${main.revisioninfo.file}">${revisionInfo.timestamp}
 </echo>
 
 		<addRevisionInfoLine productName="vitroCore" productCheckoutDir="${corebase.dir}/.." />
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
-          target: prepareSolr                      
+          target: deployWebapp                      
          - - - - - - - - - - - - - - - - - -->
-	<target name="prepareSolr" depends="properties" unless="skipsolr">
-		<mkdir dir="${solr.home.dir}" />
-		<mkdir dir="${solr.build.dir}" />
+	<target name="deployWebapp" depends="deployProperties, revisionInfo">
+		<mkdir dir="${main.tomcat.webapp.dir}" />
 
-		<property name="solr.distrib.dir" location="${corebase.dir}/../solr" />
-		<property name="solr.home.template.dir" location="${solr.distrib.dir}/homeDirectoryTemplate" />
-		<property name="solr.context.template.file" location="${solr.distrib.dir}/template.context.xml" />
-		<property name="solr.distrib.war" location="${solr.distrib.dir}/apache-solr-3.1.0.war" />
+		<sync todir="${main.tomcat.webapp.dir}" includeemptydirs="true">
+			<fileset dir="${main.webapp.dir}" />
+			<preserveintarget>
+				<include name="${tomcat.context.filename}"/>
+			</preserveintarget>
+		</sync>
 
-		<property name="solr.context.file" location="${solr.build.dir}/context.xml" />
-		<property name="solr.context.temp.file" location="${solr.build.dir}/context.temp.xml" />
-		<property name="solr.build.war" location="${solr.build.dir}/solr.war" />
-
-		<property name="solr.context.name" value="${webapp.name}solr" />
-		<property name="solr.deployed.war" value="${tomcat.home}/webapps/${solr.context.name}.war" />
-
-		<!-- if no mask is defined, leave Solr unsecured. -->
-		<property name="vitro.local.solr.ipaddress.mask" value=".*" />
-
-		<!-- Create and copy the example directory to the solr.home.dir directory. -->
-		<copy todir="${solr.home.dir}">
-			<fileset dir="${solr.home.template.dir}" includes="**/*" />
-		</copy>
-
-		<!-- Create the context configuration XML with expanded properties. Store it in a temp file for now. -->
-		<copy tofile="${solr.context.temp.file}" filtering="true" overwrite="true">
-			<fileset file="${solr.context.template.file}" />
+		<!-- Create the context XML with expanded properties. Store it in a temp file for now. -->
+		<copy tofile="${main.build.dir}/context.xml" filtering="true" overwrite="true">
+			<fileset file="${appbase.dir}/context.xml" />
 			<filterchain>
 				<expandproperties />
 			</filterchain>
 		</copy>
 
-		<!-- If the WAR is up to date and the context file hasn't changed, we can skip the deploy. -->
-		<condition property="skipsolr">
-			<and>
-				<uptodate targetfile="${solr.build.war}">
-					<srcfiles file="${solr.distrib.war}" />
-					<srcfiles dir="${appbase.dir}/config/solr/" />
-				</uptodate>
-				<filesmatch file1="${solr.context.temp.file}" file2="${solr.context.file}" />
-				<filesmatch file1="${solr.context.temp.file}" file2="${tomcat.home}/webapps/${solr.context.name}/META-INF/context.xml" />
-			</and>
-		</condition>
+		<!-- Copy the new context XML only if it differs from the existing one. -->
+		<copy todir="${main.tomcat.webapp.dir}/META-INF">
+			<fileset dir="${main.build.dir}">
+				<filename name="context.xml"/>
+				<different targetdir="${main.tomcat.webapp.dir}/META-INF" ignorefiletimes="true"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: prepareSolr                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="prepareSolr" depends="prepare, buildProperties">
+		<!-- create an image of the Solr home directory -->
+		<copy todir="${solr.homeimage.dir}">
+			<fileset dir="${solr.template.dir}/homeDirectoryTemplate" />
+		</copy>
+
+		<!-- create an unpacked image of the Solr WAR, with our config options -->
+		<unwar src="${solr.template.dir}/apache-solr-3.6.2.war" dest="${solr.webapp.dir}" />
+		<copy todir="${solr.webapp.dir}/WEB-INF/classes">
+			<fileset dir="${appbase.dir}/config/solr/" />
+		</copy>
 	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - 
           target: deploySolr                      
          - - - - - - - - - - - - - - - - - -->
-	<target name="deploySolr" depends="prepareSolr" unless="skipsolr">
-		<!-- save the new context file, so we can compare against it next time. -->
-		<copy file="${solr.context.temp.file}" tofile="${solr.context.file}" />
-
-		<war destfile="${solr.build.war}" needxmlfile="false">
-			<zipfileset src="${solr.distrib.war}" />
-			<classes dir="${appbase.dir}/config/solr" />
-			<metainf file="${solr.context.file}" />
-		</war>
-
-		<!-- deploy the new WAR -->
-		<unwar src="${solr.build.war}" dest="${tomcat.home}/webapps/${solr.context.name}" />
-	</target>
-
-	<!-- ================================= 
-          target: deploy              
-         ================================= -->
-	<target name="deploy" depends="revisionInfo, deploySolr" description="--> Build the app and install in Tomcat">
-		<property name="webapp.deploy.home" value="${tomcat.home}/webapps/${webapp.name}" />
-
-		<mkdir dir="${webapp.deploy.home}" />
-
-		<sync todir="${webapp.deploy.home}" includeemptydirs="true">
-			<fileset dir="${build.dir}/war" />
+	<target name="deploySolr" depends="deployProperties, prepareSolr">
+		<!-- Deploy to the Solr home directory. -->
+		<mkdir dir="${solr.home.dir}" />
+		<sync todir="${solr.home.dir}" includeemptydirs="true">
+			<fileset dir="${solr.homeimage.dir}" />
+			<preserveintarget>
+				<include name="data/**/*"/>
+			</preserveintarget>
 		</sync>
+
+		<!-- Deploy to Tomcat. -->
+		<mkdir dir="${solr.tomcat.webapp.dir}" />
+		<sync todir="${solr.tomcat.webapp.dir}" includeemptydirs="true">
+			<fileset dir="${solr.webapp.dir}" />
+			<preserveintarget>
+				<include name="${tomcat.context.filename}"/>
+			</preserveintarget>
+		</sync>
+
+		<!-- Create the context XML with expanded properties. Store it in a temp file for now. -->
+		<copy tofile="${solr.build.dir}/context.xml" filtering="true" overwrite="true">
+			<fileset file="${solr.template.context.file}" />
+			<filterchain>
+				<expandproperties />
+			</filterchain>
+		</copy>
+
+		<!-- Copy the new context XML only if it differs from the existing one. -->
+		<copy todir="${solr.tomcat.webapp.dir}/META-INF">
+			<fileset dir="${solr.build.dir}">
+				<filename name="context.xml"/>
+				<different targetdir="${solr.tomcat.webapp.dir}/META-INF" ignorefiletimes="true"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: deployVitroHome                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="deployVitroHome" depends="deployProperties, prepareVitroHomeDir">
+    	<copy toDir="${vitro.home}" >
+    		<fileset dir="${vitrohome.image.dir}" />
+    	</copy>
+    </target>
+
+
+	<!-- ================================= 
+      target: deploy              
+     ================================= -->
+	<target name="deploy" 
+	        depends="deployWebapp, deploySolr, deployVitroHome" 
+	        description="--> Build the app and install in Tomcat">
 	</target>
 
 	<!-- ================================= 
-          target: war              
+          target: all              
          ================================= -->
-	<target name="war" depends="revisionInfo" description="--> Build the app and create a WAR file">
-		<jar basedir="${build.dir}/war" destfile="${build.dir}/${webapp.name}.war" />
+	<target name="all" depends="clean, deploy" description="--> Run 'clean', then 'deploy'" />
+
+
+	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	     OUTSIDE THE MAIN BUILD SEQUENCE
+         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+	<!-- ================================= 
+          target: distribute              
+         ================================= -->
+	<target name="distribute" 
+	        depends="revisionInfo, prepareSolr" 
+	        description="--> Build the app and create a distribution bundle">
+		<mkdir dir="${distribution.dir}" />
+
+		<jar basedir="${main.webapp.dir}" destfile="${distribution.dir}/${webapp.name}.war" />
+		<jar basedir="${solr.webapp.dir}" destfile="${distribution.dir}/${solr.app.name}.war" />
+		<tar basedir="${solr.homeimage.dir}" destfile="${distribution.dir}/solrhome.tar" />
+		<tar basedir="${vitrohome.image.dir}" destfile="${distribution.dir}/vitrohome.tar" />
+
+		<tar basedir="${distribution.dir}" destfile="${distribution.tar.gz.file}" compression="gzip" />
 	</target>
 
+	<!-- ================================= 
+          target: describe              
+         ================================= -->
+	<target name="describe" 
+	        description="--> Describe the targets (this is the default).">
+		<echo>
+all        - Runs "clean", then "deploy".
+clean      - Delete all artifacts so the next build will be from scratch.
+compile    - Compile the Java source files.
+orng       - Configure and deploy the ORNG Shindig application.
+test       - Compile and run the JUnit tests.
+distribute - Create WAR files to be deployed in a servlet container.
+deploy     - Deploy the application directly into the Tomcat webapps directory.
+	    </echo>
+	</target>
 
+	<!-- ================================= 
+          target: jar              
+         ================================= -->
+	<target name="jar" depends="test" description="--> Compile the Java, and build a JAR file">
+		<jar basedir="${main.compiled.dir}" destfile="${build.dir}/${ant.project.name}.jar" />
+	</target>
 
 	<!-- ================================= 
           target: licenser             
@@ -348,7 +546,7 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 	<!-- ================================= 
           target: jarlist              
          ================================= -->
-	<target name="jarlist" depends="jar" description="Figure out what JARs are not needed">
+	<target name="jarlist" depends="compileBuildtools, jar" description="Figure out what JARs are not needed">
 		<java classname="edu.cornell.mannlib.vitro.utilities.jarlist.JarLister" fork="no" failonerror="true">
 			<classpath refid="utility.run.classpath" />
 			<arg value="${build.dir}/${ant.project.name}.jar" />
@@ -364,6 +562,21 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<ant dir="${corebase.dir}/../opensocial" antfile="build_orng.xml" target="all" />
 	</target>
 
+	<!-- ================================= 
+          target: checkContainerNeutrality              
+         ================================= -->
+	<target name="checkContainerNeutrality" depends="compile, compileBuildtools" description="Look for things that Tomcat tolerates but shouldn't">
+		<junit haltonfailure="true">
+			<test name="edu.cornell.mannlib.vitro.utilities.containerneutral.CheckContainerNeutrality" />
+			<sysproperty key="CheckContainerNeutrality.webapp.dir" value="${main.webapp.dir}"/>
+			<classpath>
+				<path refid="utility.run.classpath" />
+				<path refid="main.compile.classpath" />
+				<pathelement location="${main.compiled.dir}" />
+			</classpath>
+			<formatter type="plain" usefile="false"/>
+		</junit>
+	</target>
 
 	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	     MACROS
@@ -393,11 +606,13 @@ deploy   - Deploy the application directly into the Tomcat webapps directory.
 		<attribute name="productName" />
 		<attribute name="productCheckoutDir" />
 		<sequential>
-			<java classname="edu.cornell.mannlib.vitro.utilities.revisioninfo.RevisionInfoBuilder" fork="no" failonerror="true">
+			<java classname="edu.cornell.mannlib.vitro.utilities.revisioninfo.RevisionInfoBuilder" 
+			      fork="no" 
+			      failonerror="true">
 				<classpath refid="utility.run.classpath" />
 				<arg value="@{productName}" />
 				<arg file="@{productCheckoutDir}" />
-				<arg file="${revisionInfo.build.file}" />
+				<arg file="${main.revisioninfo.file}" />
 			</java>
 		</sequential>
 	</macrodef>

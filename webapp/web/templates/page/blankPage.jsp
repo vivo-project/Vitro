@@ -1,6 +1,6 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%  /***********************************************
          Display a single Page  in the most basic fashion.
@@ -31,9 +31,6 @@
         if (request.getAttribute("css") == null){
             e+="basicPage.jsp expects that request parameter 'css' be set to css to include in page.\n";            
         }         
-        if( request.getAttribute("appBean") == null){
-            e+="basicPage.jsp expects that request attribute 'appBean' be set.\n";          
-        }
         if( e.length() > 0 ){
             throw new JspException(e);
         }

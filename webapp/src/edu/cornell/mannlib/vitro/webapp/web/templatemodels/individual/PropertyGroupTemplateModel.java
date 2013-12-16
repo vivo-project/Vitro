@@ -8,6 +8,10 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataProperty;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -22,10 +26,13 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
     
     private final String name;
     private final List<PropertyTemplateModel> properties;
-      
+
+
+
     PropertyGroupTemplateModel(VitroRequest vreq, PropertyGroup group, 
             Individual subject, boolean editing, 
-            List<DataProperty> populatedDataPropertyList, List<ObjectProperty> populatedObjectPropertyList) {
+            List<DataProperty> populatedDataPropertyList, 
+            List<ObjectProperty> populatedObjectPropertyList) {
 
         this.name = group.getName();
         
@@ -33,10 +40,26 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
         properties = new ArrayList<PropertyTemplateModel>(propertyList.size());
         for (Property p : propertyList)  {
             if (p instanceof ObjectProperty) {
-                ObjectProperty op = (ObjectProperty)p;
-                properties.add(ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(op, subject, vreq, editing, populatedObjectPropertyList));
+                ObjectProperty op = (ObjectProperty) p;
+                RequestedAction dop = new DisplayObjectProperty(op);
+                if (!PolicyHelper.isAuthorizedForActions(vreq, dop)) {
+                    continue;
+                }
+                ObjectPropertyTemplateModel tm = ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(
+                        op, subject, vreq, editing, populatedObjectPropertyList);
+                if (!tm.isEmpty() || (editing && !tm.getAddUrl().isEmpty())) {
+                    properties.add(tm);                    
+                }
+
+            } else if (p instanceof DataProperty){
+                DataProperty dp = (DataProperty) p;
+                RequestedAction dop = new DisplayDataProperty(dp);
+                if (!PolicyHelper.isAuthorizedForActions(vreq, dop)) {
+                    continue;
+                }
+                properties.add(new DataPropertyTemplateModel(dp, subject, vreq, editing, populatedDataPropertyList));
             } else {
-                properties.add(new DataPropertyTemplateModel((DataProperty)p, subject, vreq, editing, populatedDataPropertyList));
+                log.debug(p.getURI() + " is neither an ObjectProperty nor a DataProperty; skipping display");
             }
         }
     }
@@ -49,6 +72,17 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
         properties.remove(ptm);
     }
     
+
+    public String toString(){
+        String ptmStr ="";
+        for( int i=0; i < properties.size() ; i ++ ){
+            PropertyTemplateModel ptm = properties.get(i);
+            String spacer = "\n  ";
+            if( ptm != null )
+                ptmStr = ptmStr + spacer + ptm.toString();
+        }
+        return String.format("\nPropertyGroupTemplateModel %s[%s] ",name, ptmStr );
+    }
     
     /* Accessor methods for templates */
     // Add this so it's included in dumps for debugging. The templates will want to display
@@ -58,18 +92,14 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
     }
     
     public String getName(String otherGroupName) {
-        String displayName = name;
-        if (displayName == null) {
-            displayName = "";
-        } else if (displayName.isEmpty()) {
-            displayName = otherGroupName;
-        } 
-        return displayName;
+        if (name == null || name.isEmpty()) {
+            return otherGroupName;
+        } else {
+            return name;
+        }
     }
     
     public List<PropertyTemplateModel> getProperties() {
         return properties;
-    }
-    
-
+    }    
 }

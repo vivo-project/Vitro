@@ -14,19 +14,20 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
+import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
 import freemarker.template.Configuration;
 
 public class EditConfigurationUtils {
@@ -50,6 +51,24 @@ public class EditConfigurationUtils {
     
     public static String getObjectUri(VitroRequest vreq) {
     	return vreq.getParameter("objectUri");
+    }
+    
+    public static String getDomainUri(VitroRequest vreq) {
+        return vreq.getParameter("domainUri");
+    }
+    
+    public static String getRangeUri(VitroRequest vreq) {
+        return vreq.getParameter("rangeUri");
+    }
+    
+    public static VClass getRangeVClass(VitroRequest vreq) {
+        // This needs a WebappDaoFactory with no filtering/RDFService
+        // funny business because it needs to be able to retrieve anonymous union
+        // classes by their "pseudo-bnode URIs".
+        // Someday we'll need to figure out a different way of doing this.
+        WebappDaoFactory ctxDaoFact = ModelAccess.on(
+                vreq.getSession().getServletContext()).getWebappDaoFactory();
+        return ctxDaoFact.getVClassDao().getVClassByURI(getRangeUri(vreq));
     }
     
     //get individual
@@ -86,9 +105,7 @@ public class EditConfigurationUtils {
    
     
     public static ObjectProperty getObjectProperty(VitroRequest vreq) {
-    	//gets the predicate uri from the request
-    	String predicateUri = getPredicateUri(vreq);
-    	return getObjectPropertyForPredicate(vreq, predicateUri);
+    	return getObjectPropertyForPredicate(vreq, getPredicateUri(vreq));
     }
     
     public static DataProperty getDataProperty(VitroRequest vreq) {
@@ -96,9 +113,18 @@ public class EditConfigurationUtils {
     	return getDataPropertyForPredicate(vreq, predicateUri);
     }
     
-    public static ObjectProperty getObjectPropertyForPredicate(VitroRequest vreq, String predicateUri) {
+    public static ObjectProperty getObjectPropertyForPredicate(VitroRequest vreq, 
+            String predicateUri) {
+        String domainUri = getDomainUri(vreq);
+        String rangeUri = getRangeUri(vreq);
+        return getObjectPropertyForPredicate(vreq, predicateUri, domainUri, rangeUri);
+    }
+    
+    public static ObjectProperty getObjectPropertyForPredicate(VitroRequest vreq, 
+            String predicateUri, String domainUri, String rangeUri) {
     	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
-    	ObjectProperty objectProp = wdf.getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
+    	ObjectProperty objectProp = wdf.getObjectPropertyDao().getObjectPropertyByURIs(
+    	        predicateUri, domainUri, rangeUri);
     	return objectProp;
     }
     
@@ -189,7 +215,7 @@ public class EditConfigurationUtils {
     public static DataPropertyStatement getDataPropertyStatement(VitroRequest vreq, HttpSession session, Integer dataHash, String predicateUri) {
     	DataPropertyStatement dps = null;
    	    if( dataHash != 0) {
-   	        Model model = (Model)session.getServletContext().getAttribute("jenaOntModel");
+   			OntModel model = ModelAccess.on(session.getServletContext()).getJenaOntModel();
    	        dps = RdfLiteralHash.getPropertyStmtByHash(EditConfigurationUtils.getSubjectUri(vreq), predicateUri, dataHash, model);   	        
    	    }
    	    return dps;
@@ -254,7 +280,7 @@ public class EditConfigurationUtils {
 	//Generate HTML for a specific field name given 
 	public static String generateHTMLForElement(VitroRequest vreq, String fieldName, EditConfigurationVTwo editConfig) {
 		String html = "";
-        Configuration fmConfig = FreemarkerConfigurationLoader.getConfig(vreq);
+        Configuration fmConfig = FreemarkerConfiguration.getConfig(vreq);
 
         FieldVTwo field = editConfig == null ? null : editConfig.getField(fieldName);
         MultiValueEditSubmission editSub = EditSubmissionUtils.getEditSubmissionFromSession(vreq.getSession(), editConfig);

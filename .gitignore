@@ -1,0 +1,10 @@
+/webapp/.build/
+/.classpath
+/.project
+/.settings
+/bin/
+/webapp/config/deploy.properties
+/webapp/config/build.properties
+/webapp/config/runtime.properties
+/webapp/config/debug.log4j.properties
+.build

@@ -622,6 +622,12 @@ body.login #login {
     padding-top: 18px;
     border-bottom: none;
 }
+h3.internal-auth {
+    color: #5E6363;
+}
+h3.internal-auth:hover {
+    color: #47B6D0;
+}
 #error-alert {
     margin: 0 12px;
     margin-bottom: 12px;
@@ -742,6 +748,51 @@ p.password-note {
     margin-right:-10px;
     height:34px;
 }
+
+/* SEARCH HOME------>  */ 
+
+#search-home-field {
+		background: url(../images/search-field-and-button.gif) 0 0 no-repeat;
+}
+#search-home-field input.search {
+	 	background-color: transparent;
+	 	color: #fff;
+		border: none;
+}
+
+input.search-homepage {
+		border: 0;
+		background-color: #f9fafa;
+		background: url('../images/limit-search.png') no-repeat;
+		background-position: right;
+		opacity: .7;
+}
+
+.filter-default {
+		background: url(../images/filteredSearch.gif) 0 0 no-repeat;
+}
+.filter-active {
+		background: url(../images/filteredSearchActive.gif) 0 0 no-repeat;
+}
+#filter-search-nav {
+		background-color: #2d3535;
+		color: #fff;
+		background-color: #2d3535;
+		color: #fff;
+}
+#filter-search-nav li {
+		background-image: none;
+		padding-left: 0;
+		margin-left: 0;
+}
+#filter-search-nav a.active {
+   color: #fff; 
+}
+#filter-search-nav a {
+		border-bottom: 1px dotted #4f5656;
+		color: #1483A4;
+}
+
 /* BROWSE ------>  */
 #browse {
     background-color: #f7f5f0;
@@ -801,6 +852,41 @@ ul#browse-classgroups a.selected span.count-classes,
 ul#browse-classgroups a:hover span.count-classes {
     color: #fff;
 }
+
+/* HOME STATS----->  */
+#home-stats {
+		border-top: 1px dotted #dbe3e3; /* stroke */
+		border-bottom: 1px dotted #dbe3e3; /* stroke */
+		background-color: #fff; /* layer fill content */
+}
+#home-stats h4 {
+		border-top: 1px solid rgba(220,228,227,.42); /* stroke */
+		border-bottom: 1px solid rgba(220,228,227,.42); /* stroke */
+		background-color: #395d7f; /* layer fill content */
+		border-bottom: 2px solid #62b6d7;
+		color: #fff;
+}
+#stats li {
+		-moz-border-radius: 6px;
+		-webkit-border-radius: 6px;
+		border-radius: 6px; /* border radius */
+		-moz-background-clip: padding;
+		-webkit-background-clip: padding-box;
+		background-clip: padding-box; /* prevents bg color from leaking outside the border */
+		background: #5e6363 url(../images/stats-bg.png) repeat-x 0 0;
+		color: #fff;
+}
+#stats p {
+		color: #fff;
+}
+#stats li a:hover {
+		opacity: .5;
+}
+#stats .stats-count span {
+		color: #fff;
+		opacity: .5;
+}
+
 /* FOOTER------>  */
 footer {
     clear: both;

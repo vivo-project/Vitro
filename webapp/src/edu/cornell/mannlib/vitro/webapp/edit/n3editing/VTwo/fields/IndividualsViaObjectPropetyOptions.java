@@ -2,6 +2,7 @@
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -13,22 +14,27 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
+import edu.cornell.mannlib.vitro.webapp.utils.fields.FieldUtils;
 
 public class IndividualsViaObjectPropetyOptions implements FieldOptions {
+    
+    private static final Log log = LogFactory.getLog(IndividualsViaObjectPropetyOptions.class);
+    
     private static final String LEFT_BLANK = "";
     private String subjectUri;
     private String predicateUri;    
+    private List<VClass> rangeTypes;
     private String objectUri;
     
     private String defaultOptionLabel;
     
     public IndividualsViaObjectPropetyOptions(String subjectUri,
-            String predicateUri, String objectUri) throws Exception {
+            String predicateUri, List<VClass> rangeTypes, String objectUri) throws Exception {
         super();
         
         if (subjectUri == null || subjectUri.equals("")) {
@@ -40,7 +46,13 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
 
         this.subjectUri = subjectUri;
         this.predicateUri = predicateUri;
+        this.rangeTypes = rangeTypes;
         this.objectUri = objectUri;
+    }
+    
+    public IndividualsViaObjectPropetyOptions(String subjectUri,
+            String predicateUri, String objectUri) throws Exception {
+        this (subjectUri, predicateUri, null, objectUri);
     }
 
     public IndividualsViaObjectPropetyOptions setDefaultOptionLabel(String label){
@@ -63,17 +75,22 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
         }
         
         Individual subject = wDaoFact.getIndividualDao().getIndividualByURI(subjectUri);                    
-        ObjectProperty objProp = wDaoFact.getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
-        List<VClass> vclasses = wDaoFact.getVClassDao().getVClassesForProperty(subject.getVClassURI(), predicateUri);
+
+        //get all vclasses applicable to the individual subject
+        HashSet<String> vclassesURIs = getApplicableVClassURIs(subject, wDaoFact);
+        
+        if (!rangeTypes.isEmpty()) {
+            vclassesURIs = filterToSubclassesOfRange(vclassesURIs, rangeTypes, wDaoFact);
+        }
                 
-        if (vclasses == null || vclasses.size() == 0) {           
+        if (vclassesURIs.size() == 0) {           
             return optionsMap;
         }
         
         List<Individual> individuals = new ArrayList<Individual>();
         HashSet<String> uriSet = new HashSet<String>();        
-        for (VClass vclass : vclasses) {
-            List<Individual> inds = wDaoFact.getIndividualDao().getIndividualsByVClassURI(vclass.getURI(), -1, -1);
+        for (String vclassURI: vclassesURIs) {
+            List<Individual> inds = wDaoFact.getIndividualDao().getIndividualsByVClassURI(vclassURI, -1, -1);
             for (Individual ind : inds) {
                 if (!uriSet.contains(ind.getURI())) {
                     uriSet.add(ind.getURI());
@@ -84,9 +101,9 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
 
         List<ObjectPropertyStatement> stmts = subject.getObjectPropertyStatements();
 
-        individuals = removeIndividualsAlreadyInRange(
+        individuals = FieldUtils.removeIndividualsAlreadyInRange(
                 individuals, stmts, predicateUri, objectUri);
-        // Collections.sort(individuals,new compareIndividualsByName());
+        // Collections.sort(individuals,new compareIndividualsByName());a
 
         for (Individual ind : individuals) {
             String uri = ind.getURI();
@@ -99,27 +116,58 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
         return optionsMap;
     }
 
-    
-    // copied from OptionsForPropertyTag.java in the thought that class may be deprecated
-    private static List<Individual> removeIndividualsAlreadyInRange(List<Individual> individuals,
-            List<ObjectPropertyStatement> stmts, String predicateUri, String objectUriBeingEdited){        
-        HashSet<String>  range = new HashSet<String>();
-
-        for(ObjectPropertyStatement ops : stmts){
-            if( ops.getPropertyURI().equals(predicateUri))
-                range.add( ops.getObjectURI() );
-        }
-
-        int removeCount=0;
-        ListIterator<Individual> it = individuals.listIterator();
-        while(it.hasNext()){
-            Individual ind = it.next();
-            if( range.contains( ind.getURI()) && !(ind.getURI().equals(objectUriBeingEdited)) ) {
-                it.remove();
-                ++removeCount;
+    private HashSet<String> getApplicableVClassURIs(Individual subject, WebappDaoFactory wDaoFact) {
+        HashSet<String> vclassesURIs = new HashSet<String>();
+        if (!rangeTypes.isEmpty()) {
+            StringBuffer rangeBuff = new StringBuffer();
+            for (VClass rangeType : rangeTypes) {
+                vclassesURIs.add(rangeType.getURI());
+                rangeBuff.append(rangeType.getURI()).append(", ");
+            }
+            log.debug("individualsViaObjectProperty using rangeUri " + rangeBuff.toString());            
+            return vclassesURIs;
+        } 
+        
+        log.debug("individualsViaObjectProperty not using any rangeUri");
+        
+        List<VClass> subjectVClasses = subject.getVClasses();
+        
+        //using hashset to prevent duplicates
+        
+        //Get the range vclasses applicable for the property and each vclass for the subject
+        for(VClass subjectVClass: subjectVClasses) {
+            List<VClass> vclasses = wDaoFact.getVClassDao().getVClassesForProperty(subjectVClass.getURI(), predicateUri);
+            //add range vclass to hash
+            if(vclasses != null) {
+                for(VClass v: vclasses) {
+                    vclassesURIs.add(v.getURI());
+                }
             }
         }
         
-        return individuals;
+        return vclassesURIs;
     }
+    
+    private HashSet<String> filterToSubclassesOfRange(HashSet<String> vclassesURIs, 
+                                              List<VClass> rangeTypes, 
+                                              WebappDaoFactory wDaoFact) {
+        HashSet<String> filteredVClassesURIs = new HashSet<String>();
+        VClassDao vcDao = wDaoFact.getVClassDao();
+        for (String vclass : vclassesURIs) {
+            for (VClass rangeType : rangeTypes) {
+                if (vclass.equals(rangeType.getURI()) || vcDao.isSubClassOf(vclass, rangeType.getURI())) {
+                    filteredVClassesURIs.add(vclass);
+                }
+            }
+        }
+        return filteredVClassesURIs;
+    }
+    
+   
+    
+    public Comparator<String[]> getCustomComparator() {
+    	return null;
+    }
+    
+    
 }

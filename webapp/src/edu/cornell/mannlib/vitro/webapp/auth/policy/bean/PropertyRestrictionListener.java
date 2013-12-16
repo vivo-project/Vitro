@@ -8,11 +8,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 
 /**
  * Add this ChangeListener to your EditProcessObject when modifying the
@@ -90,9 +92,10 @@ public class PropertyRestrictionListener implements ChangeListener {
 	}
 
 	private void createAndSetBean() {
-		OntModel model = (OntModel) ctx.getAttribute("jenaOntModel");
+		OntModel model = ModelAccess.on(ctx).getJenaOntModel();
+		Model displayModel = ModelAccess.on(ctx).getDisplayModel();
 		PropertyRestrictionPolicyHelper bean = PropertyRestrictionPolicyHelper
-				.createBean(model);
+				.createBean(model, displayModel);
 		PropertyRestrictionPolicyHelper.setBean(ctx, bean);
 	}
 }

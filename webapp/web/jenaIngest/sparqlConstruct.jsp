@@ -3,12 +3,13 @@
 <%@ page import="com.hp.hpl.jena.ontology.Individual"%>
 <%@ page import="com.hp.hpl.jena.ontology.OntModel"%>
 <%@ page import="com.hp.hpl.jena.rdf.model.ModelMaker"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.ModelAccess"%>
 <%@ page import="com.hp.hpl.jena.shared.Lock"%>
 <%@ page import="java.util.Iterator"%>
 <%@ page import="java.util.List"%>
 <%@ page import="java.net.URLEncoder"%>
 
-<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
@@ -46,7 +47,7 @@
 <h3>SPARQL Query <select name="savedQuery">
 	<option value="">select saved query</option>
 	<%
-              OntModel jenaOntModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
+              OntModel jenaOntModel = ModelAccess.on(getServletContext()).getJenaOntModel();
               jenaOntModel.enterCriticalSection(Lock.READ);
               try {
                   List savedQueries = (List) request.getAttribute("savedQueries");

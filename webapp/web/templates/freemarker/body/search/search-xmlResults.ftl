@@ -14,6 +14,7 @@
         <doc>
           <str name="uri">${individual.uri?xml}</str>                      
           <str name="name">${individual.name?xml}</str>
+          <str name="vivo-url">${individual.profileUrl?xml}"</str>
         </doc>
     </#list>
   </result>

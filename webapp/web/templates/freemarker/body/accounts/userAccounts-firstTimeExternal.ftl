@@ -2,59 +2,55 @@
 
 <#-- Template for creating an account for the first time an external user logs in. -->
 
-<h3>First time log in</h3>
+<#assign strings = i18n() />
+
+<h3>${strings.first_time_login}</h3>
 
     <#if errorEmailIsEmpty??>
-        <#assign errorMessage = "You must supply an email address." />
+        <#assign errorMessage = strings.error_no_email />
+    <#elseif errorEmailInUse??>
+        <#assign errorMessage = strings.error_email_already_exists />
+    <#elseif errorEmailInvalidFormat??>
+        <#assign errorMessage = strings.error_invalid_email(emailAddress) />
+    <#elseif errorFirstNameIsEmpty??>
+        <#assign errorMessage = strings.error_no_first_name />
+    <#elseif errorLastNameIsEmpty??>
+        <#assign errorMessage = strings.error_no_last_name />
     </#if>
-    
-    <#if errorEmailInUse??>
-        <#assign errorMessage = "An account with that email address already exists." />
-    </#if>
-    
-    <#if errorEmailInvalidFormat??>
-        <#assign errorMessage = "'${emailAddress}' is not a valid email address." />
-    </#if>
-    
-    <#if errorFirstNameIsEmpty??>
-        <#assign errorMessage = "You must supply a first name." />
-    </#if>
-    
-    <#if errorLastNameIsEmpty??>
-        <#assign errorMessage = "You must supply a last name." />
-    </#if>
-    
+
     <#if errorMessage?has_content>
         <section id="error-alert" role="alert">
-            <img src="${urls.images}/iconAlert.png" width="24" height="24" alert="Error alert icon"/>
+            <img src="${urls.images}/iconAlert.png" width="24" height="24" alt="${strings.alt_error_alert}" />
             <p>${errorMessage}</p>
         </section>
     </#if>
 
 <section id="first-time-login" role="region">
-    <p>Please provide your contact information to finish creating your account.</p>
+    <p>${strings.please_provide_contact_information}</p>
 
     <form method="POST" action="${formUrls.firstTimeExternal}" class="customForm" role="my account">
         <input type="hidden" name="externalAuthId" value="${externalAuthId}" role="input" />
         <input type="hidden" name="afterLoginUrl" value="${afterLoginUrl}" role="input" />
     
-        <label for="first-name">First name<span class="requiredHint"> *</span></label> 
+        <label for="first-name">${strings.first_name}<span class="requiredHint"> *</span></label> 
         <input type="text" name="firstName" value="${firstName}" id="first-name" role="input" />
 
-        <label for="last-name">Last name<span class="requiredHint"> *</span></label> 
+        <label for="last-name">${strings.last_name}<span class="requiredHint"> *</span></label> 
         <input type="text" name="lastName" value="${lastName}" id="last-name" role="input" />
 
-        <label for="email-address">Email address<span class="requiredHint"> *</span></label>
+        <label for="email-address">${strings.email_address}<span class="requiredHint"> *</span></label>
         <input type="text" name="emailAddress" value="${emailAddress}" id="email-address" role="input" />
 
         <#if emailIsEnabled??>
-            <p class="note">
-                Note: An email will be sent to the address entered above notifying 
-                that an account has been created.
-            </p>
+            <p class="note">${strings.first_time_login_note}</p>
         </#if>
 
-        <p><input type="submit" name="submit" value="Create account" class="submit"/> or <a class="cancel" href="${urls.home}" title="cancel">Cancel</a></p>
+        <p><input type="submit" name="submit" value="${strings.create_account}" class="submit"/>
+            ${strings.or} 
+            <a class="cancel" href="${urls.home}" title="${strings.cancel_title}">${strings.cancel_link}</a>
+        </p>
+
+        <p class="requiredHint">* ${strings.required_fields}</p>
     </form>
 </section>
 

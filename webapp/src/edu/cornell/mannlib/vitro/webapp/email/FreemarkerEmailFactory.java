@@ -25,9 +25,9 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfiguration;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerConfigurationLoader;
+import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import freemarker.template.Configuration;
 
 /**
  * A factory that creates Freemarker-based email messages.
@@ -59,10 +59,9 @@ public class FreemarkerEmailFactory {
 		}
 
 		FreemarkerEmailFactory factory = getFactory(vreq);
-		FreemarkerConfiguration fConfig = FreemarkerConfigurationLoader
-				.getConfig(vreq);
-		return new FreemarkerEmailMessage(fConfig, factory.getEmailSession(),
-				factory.getReplyToAddress());
+		Configuration fConfig = FreemarkerConfiguration.getConfig(vreq);
+		return new FreemarkerEmailMessage(vreq, fConfig,
+				factory.getEmailSession(), factory.getReplyToAddress());
 	}
 
 	/**

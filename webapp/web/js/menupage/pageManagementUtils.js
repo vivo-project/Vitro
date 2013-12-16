@@ -93,6 +93,8 @@ var pageManagementUtils = {
         $.extend(this, vitro.customFormUtils);
         // Get the custom form data from the page
         $.extend(this, customFormData);
+        $.extend(this, i18nStrings);
+        
     },
 	initObjects:function(){
 		this.counter = 0;
@@ -102,6 +104,7 @@ var pageManagementUtils = {
 		this.classGroupSection = $("section#browseClassGroup");
 		this.sparqlQuerySection = $("section#sparqlQuery");
 		this.fixedHTMLSection = $("section#fixedHtml");
+		this.solrIndividualsSection = $("section#solrIndividuals");
 		//From original menu management edit
 		this.defaultTemplateRadio = $('input.default-template');
         this.customTemplateRadio = $('input.custom-template');
@@ -115,6 +118,7 @@ var pageManagementUtils = {
         this.classesForClassGroup = $('section#classesInSelectedGroup');
         this.selectedGroupForPage = $('#selectedContentTypeValue');
         this.allClassesSelectedCheckbox = $('#allSelected');
+        
         this.displayInternalMessage = $('#internal-class label em');
         this.pageContentSubmissionInputs = $("#pageContentSubmissionInputs");
         this.headerBar = $("section#headerBar");
@@ -129,6 +133,8 @@ var pageManagementUtils = {
         this.rightSideDiv = $("div#rightSide");
         //contentDivs container where content added/existing placed
         this.savedContentDivs = $("section#contentDivs");
+    	//for solr individuals data getter
+        this.solrAllClassesDropdown = $("select#vclassUri");
 	},
 	initDisplay: function(){
 		//right side components
@@ -141,6 +147,7 @@ var pageManagementUtils = {
 	    this.classGroupSection.hide();
 	    this.sparqlQuerySection.hide();
 	    this.fixedHTMLSection.hide();
+	    this.solrIndividualsSection.hide();
 	    this.classesForClassGroup.addClass('hidden');
 	    //left side components
 	    //These depend on whether or not this is an existing item or not
@@ -153,8 +160,44 @@ var pageManagementUtils = {
 		    	this.menuSection.hide();
 	    	}
 	    }
-	
+	    //populates the dropdown of classes for the solr individuals template
+	    //dropdown now populated in template/from form specific data instead of ajax request
+	    //this.populateClassForSolrDropdown();
 	},
+	//this method can be utilized if using an ajax request to get the vclasses
+	/*
+	//for solr individuals - remember this populates the template class dropdown
+	populateClassForSolrDropdown:function() {
+	
+        //Run ajax query
+        var url = "dataservice?getAllVClasses=1";
+       
+        //Make ajax call to retrieve vclasses
+        $.getJSON(url, function(results) {
+        	//Moved the function to processClassGroupDataGetterContent
+        	//Should probably remove this entire method and copy there
+        	pageManagementUtils.displayAllClassesForSolrDropdown(results);
+        });
+	},
+	displayAllClassesForSolrDropdown:function(results) {
+		 if ( results.classes.length == 0 ) {
+	            
+        } else {
+        	var appendHtml = "";
+            $.each(results.classes, function(i, item) {
+                var thisClass = results.classes[i];
+                var thisClassName = thisClass.name;
+                //Create options for the dropdown
+                appendHtml += "<option value='" + thisClass.URI + "'>" + thisClassName + "</option>";
+            });
+        
+            //if there are options to add
+            if(appendHtml != "") {
+            	pageManagementUtils.solrAllClassesDropdown.html(appendHtml);
+            }
+         
+        }
+	},*/
 	bindEventListeners:function(){
 		
 	    this.defaultTemplateRadio.click( function() {
@@ -162,13 +205,15 @@ var pageManagementUtils = {
 	            //Also clear custom template value so as not to submit it
 	            pageManagementUtils.clearInputs(pageManagementUtils.customTemplate);
 	            pageManagementUtils.rightSideDiv.show(); 
-	            pageManagementUtils.disablePageSave();           
+	            //Check to see if there is already content on page, in which case save should be enabled
+	        	var pageContentSections = $("section[class='pageContent']");
+	        	if(pageContentSections.length == 0) {
+	        		pageManagementUtils.disablePageSave();
+	        	} 
 	    });
 
 	    this.customTemplateRadio.click( function() {
-	            pageManagementUtils.customTemplate.removeClass('hidden');            
-	            pageManagementUtils.rightSideDiv.show();
-	            pageManagementUtils.disablePageSave();            
+	            pageManagementUtils.handleSelectCustomTemplate();  
 	    });
 	
 	    this.selfContainedTemplateRadio.click( function() {
@@ -204,9 +249,12 @@ var pageManagementUtils = {
             pageManagementUtils.checkSelfContainedRadio();
 	    });
 	    //replacing with menu management edit version which is extended with some of the logic below
+	    //This is technically content specific and should be moved into the individual processor classes somehow
 	    this.selectClassGroupDropdown.change(function() {
             pageManagementUtils.chooseClassGroup();
         });
+	    
+	    
 	    
 	    this.contentTypeSelect.change( function() {
 	    	pageManagementUtils.handleContentTypeSelect();
@@ -219,6 +267,16 @@ var pageManagementUtils = {
          });
     
 	},
+	handleSelectCustomTemplate: function() {
+		pageManagementUtils.customTemplate.removeClass('hidden');            
+        pageManagementUtils.rightSideDiv.show();
+        //Check to see if there is already content on page, in which case save should be enabled
+        var pageContentSections = $("section[class='pageContent']");
+    	if(pageContentSections.length == 0) {
+    		pageManagementUtils.disablePageSave();
+    	}          
+	},
+	
 	handleClickDone:function() {
 		var selectedType = pageManagementUtils.contentTypeSelect.val();
 		var selectedTypeText = $("#typeSelect option:selected").text();
@@ -227,6 +285,7 @@ var pageManagementUtils = {
 		pageManagementUtils.classGroupSection.hide();
 		pageManagementUtils.fixedHTMLSection.hide();
 		pageManagementUtils.sparqlQuerySection.hide();
+		pageManagementUtils.solrIndividualsSection.hide();
 		//Reset main content type drop-down
 		pageManagementUtils.contentTypeSelectOptions.eq(0).attr('selected', 'selected');
 		if ( pageManagementUtils.leftSideDiv.css("height") != undefined ) {
@@ -289,7 +348,8 @@ var pageManagementUtils = {
 		}
 	},
 	
-	//Select content type
+	//Select content type - this is content type specific
+	//TODO: Find better way to refactor this and/or see if any of this display functionality can be moved into content type processing
 	handleContentTypeSelect:function() {
 		_this = pageManagementUtils;
     	pageManagementUtils.clearSourceTemplateValues();
@@ -297,22 +357,31 @@ var pageManagementUtils = {
             pageManagementUtils.classGroupSection.show();
             pageManagementUtils.fixedHTMLSection.hide();
             pageManagementUtils.sparqlQuerySection.hide();
-            pageManagementUtils.headerBar.text("Browse Class Group - ");
+            pageManagementUtils.solrIndividualsSection.hide();
+            pageManagementUtils.headerBar.text(pageManagementUtils.browseClassGroup + " - ");
             pageManagementUtils.headerBar.show();
             $('div#selfContainedDiv').hide();
         }
-        if ( _this.contentTypeSelect.val() == "fixedHtml" || _this.contentTypeSelect.val() == "sparqlQuery" ) {
+        if ( _this.contentTypeSelect.val() == "fixedHtml" || _this.contentTypeSelect.val() == "sparqlQuery" || _this.contentTypeSelect.val() == "solrIndividuals") {
         	 pageManagementUtils.classGroupSection.hide();
         	 //if fixed html show that, otherwise show sparql results
             if ( _this.contentTypeSelect.val() == "fixedHtml" ) {
-                pageManagementUtils.headerBar.text("Fixed HTML - ");
+                pageManagementUtils.headerBar.text(pageManagementUtils.fixedHtml + " - ");
                 pageManagementUtils.fixedHTMLSection.show();
             	pageManagementUtils.sparqlQuerySection.hide();
+            	pageManagementUtils.solrIndividualsSection.hide();
             }
-            else {
-                pageManagementUtils.headerBar.text("SPARQL Query Results - ");
+            else if (_this.contentTypeSelect.val() == "sparqlQuery"){
+                pageManagementUtils.headerBar.text(pageManagementUtils.sparqlResults + " - ");
                 pageManagementUtils.sparqlQuerySection.show();
             	pageManagementUtils.fixedHTMLSection.hide();
+            	pageManagementUtils.solrIndividualsSection.hide();
+            } else {
+            	//solr individuals
+            	pageManagementUtils.headerBar.text(pageManagementUtils.solrIndividuals + " - ");
+                pageManagementUtils.sparqlQuerySection.hide();
+            	pageManagementUtils.fixedHTMLSection.hide();
+            	pageManagementUtils.solrIndividualsSection.show();
             }
            
             pageManagementUtils.headerBar.show();
@@ -323,6 +392,7 @@ var pageManagementUtils = {
         	pageManagementUtils.classGroupSection.hide();
         	pageManagementUtils.fixedHTMLSection.hide();
         	pageManagementUtils.sparqlQuerySection.hide();
+        	pageManagementUtils.solrIndividualsSection.hide();
             pageManagementUtils.classesForClassGroup.addClass('hidden');
             pageManagementUtils.headerBar.hide();
             pageManagementUtils.headerBar.text("");
@@ -334,6 +404,9 @@ var pageManagementUtils = {
         pageManagementUtils.adjustSaveButtonHeight();
         //Disable save button until the user has clicked done or cancel from the addition
         pageManagementUtils.disablePageSave();
+        //If the default template is selected, there is already content on the page, and the user is selecting new content
+        //display alert message that they must select a custom template and select 
+        pageManagementUtils.checkTemplateForMultipleContent(_this.contentTypeSelect.val());
 	},
 	disablePageSave:function() {
         pageManagementUtils.pageSaveButton.attr("disabled", "disabled");
@@ -357,6 +430,7 @@ var pageManagementUtils = {
 		pageManagementUtils.clearInputs(pageManagementUtils.fixedHTMLSection);
 		pageManagementUtils.clearInputs(pageManagementUtils.sparqlQuerySection);
 		pageManagementUtils.clearInputs(pageManagementUtils.classGroupSection);
+		pageManagementUtils.clearInputs(pageManagementUtils.solrIndividualsSection);
 
 	},
 	clearInputs:function($el) {
@@ -370,6 +444,21 @@ var pageManagementUtils = {
 		//resetting class group section as well so selection is reset if type changes
 		$el.find("select option:eq(0)").attr("selected", "selected");
 		
+	},
+	checkTemplateForMultipleContent:function(contentTypeSelected) {
+		if(contentTypeSelected != "") {
+	    	var pageContentSections = $("section[class='pageContent']");
+            var selectedTemplateValue = $('input:radio[name=selectedTemplate]:checked').val();
+	    	//A new section hasn't been added yet so check to see if there is at least one content type already on page
+	    	if(selectedTemplateValue == "default" && pageContentSections.length >= 1) {
+	    		//alert the user that they should be picking custom template instead
+	    		alert(pageManagementUtils.multipleContentWithDefaultTemplateError);
+	    		//pick custom template
+	    		 $('input:radio[name=selectedTemplate][value="custom"]').attr("checked", true);
+	    		 pageManagementUtils.handleSelectCustomTemplate();  
+
+	    	}
+		}
 	},
 	//Clone content area
 	//When adding a new content type, this function will copy the values from the new content form and generate
@@ -385,7 +474,7 @@ var pageManagementUtils = {
         // Get rid of the cancel link; it'll be replaced by a delete link
         $newContentObj.find('span#cancelContent' + counter).html('');
         
-        if ( contentType == "sparqlQuery" || contentType == "fixedHtml") {
+        if ( contentType == "sparqlQuery" || contentType == "fixedHtml" || contentType == "solrIndividuals") {
         	varOrClass = $newContentObj.find('input[name="saveToVar"]').val();
         } 
         else if ( contentType == "browseClassGroup" ) {
@@ -420,8 +509,8 @@ var pageManagementUtils = {
             html: "<span class='pageContentTypeLabel'>" + contentTypeLabel + " - " + varOrClass 
                         + "</span><span id='clickable" + counter 
                         + "' class='pageContentExpand'><div id='woof' class='arrow expandArrow'></div></span><div id='innerContainer" + counter 
-                        + "' class='pageContentWrapper'><span class='deleteLinkContainer'>&nbsp;or&nbsp;<a id='remove" + counter   // changed button to a link
-                        + "' href='' >delete</a></span></div>"
+                        + "' class='pageContentWrapper'><span class='deleteLinkContainer'>&nbsp;" + pageManagementUtils.orString + "&nbsp;<a id='remove" + counter   // changed button to a link
+                        + "' href='' >" + pageManagementUtils.deleteString + "</a></span></div>"
         });
         //Hide inner div
         var $innerDiv = $newDivContainer.children('div#innerContainer' + counter);
@@ -638,7 +727,7 @@ var pageManagementUtils = {
             var selectedClassesList =  pageManagementUtils.classesForClassGroup.children('ul#selectedClasses');
             
             selectedClassesList.empty();
-            selectedClassesList.append('<li class="ui-state-default"> <input type="checkbox" name="allSelected" id="allSelected" value="all" checked="checked" /> <label class="inline" for="All"> All</label> </li>');
+            selectedClassesList.append('<li class="ui-state-default"> <input type="checkbox" name="allSelected" id="allSelected" value="all" checked="checked" /> <label class="inline" for="All"> ' + pageManagementUtils.allCapitalized + '</label> </li>');
             
             $.each(results.classes, function(i, item) {
                 var thisClass = results.classes[i];
@@ -740,11 +829,11 @@ var pageManagementUtils = {
 				return jsonObject;
 			} else {
 				//ERROR handling
-		    	alert("An error has occurred and the map of processors for this content is missing. Please contact the administrator");
+		    	alert(pageManagementUtils.mapProcessorError);
 				return null;
 			} 
 		}
-    	alert("An error has occurred and the code for processing this content is missing a component. Please contact the administrator.");
+    	alert(pageManagementUtils.codeProcessingError);
     	//Error handling here
     	return null;
     },
@@ -785,21 +874,21 @@ var pageManagementUtils = {
         
         // Check menu name
         if ($('input[type=text][name=pageName]').val() == "") {
-            validationError += "You must supply a name<br />";
+            validationError += pageManagementUtils.supplyName + "<br />";
             }
         // Check pretty url     
         if ($('input[type=text][name=prettyUrl]').val() == "") {
-            validationError += "You must supply a pretty URL<br />";
+            validationError += pageManagementUtils.supplyPrettyUrl + "<br />";
         }
         if ($('input[type=text][name=prettyUrl]').val().charAt(0) != "/") {
-            validationError += "The pretty URL must begin with a leading forward slash<br />";
+            validationError += pageManagementUtils.startUrlWithSlash + "<br />";
         }
         
         // Check custom template and self contained template
         var selectedTemplateValue = $('input:radio[name=selectedTemplate]:checked').val();
         if (selectedTemplateValue == "custom" || selectedTemplateValue == "selfContained") {
             if ($('input[name=customTemplate]').val() == "") {
-                validationError += "You must supply a template<br />"; 
+                validationError += pageManagementUtils.supplyTemplate + "<br />"; 
             }
         }
         
@@ -813,9 +902,16 @@ var pageManagementUtils = {
     	var validationErrorMsg = "";
     	//If there ARE not contents selected, then error message should indicate user needs to add them
     	if(pageContentSections.length == 0) {
-    		validationErrorMsg = "You must select content to be included on the page <br /> ";
+    		validationErrorMsg = pageManagementUtils.selectContentType + " <br /> ";
     	} else {
-	    	//For each, based on type, validate if a validation function exists
+    		//If there are multiple content types, and the default template option is selected, then display error message
+            if(pageContentSections.length > 1) {
+	    		var selectedTemplateValue = $('input:radio[name=selectedTemplate]:checked').val();
+	            if(selectedTemplateValue == "default") {
+	            	validationErrorMsg += pageManagementUtils.multipleContentWithDefaultTemplateError + "<br/>";
+	            }
+            }
+    		//For each, based on type, validate if a validation function exists
 	    	$.each(pageContentSections, function(i) {
 	    		if(pageManagementUtils.processDataGetterUtils != null) {
 	    			var dataGetterType = pageManagementUtils.processDataGetterUtils.selectDataGetterType($(this));

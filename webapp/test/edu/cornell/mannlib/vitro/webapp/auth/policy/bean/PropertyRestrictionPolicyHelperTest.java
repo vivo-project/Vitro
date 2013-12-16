@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Level;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,6 +26,8 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.sdb.util.Pair;
+import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
@@ -58,22 +59,30 @@ public class PropertyRestrictionPolicyHelperTest extends AbstractTestClass {
 //		setLoggerLevel(PropertyRestrictionPolicyHelper.class, Level.DEBUG);
 	}
 
+	private void mapPut(String predicateURI, RoleLevel roleLevel, 
+	                    Map<Pair<String, Pair<String,String>>, RoleLevel> map) { 
+	    map.put(new Pair<String, Pair<String,String>>(
+	            OWL.Thing.getURI(), new Pair<String, String>(
+	                    predicateURI, OWL.Thing.getURI())), roleLevel);
+	}
+	
 	@Before
 	public void createTheBean() {
-		Map<String, RoleLevel> displayLevels = new HashMap<String, BaseResourceBean.RoleLevel>();
-		displayLevels.put("http://predicates#display_self", SELF);
-		displayLevels.put("http://predicates#display_curator", CURATOR);
-		displayLevels.put("http://predicates#display_hidden", NOBODY);
+		Map<Pair<String, Pair<String,String>>, RoleLevel> displayLevels = 
+		        new HashMap<Pair<String, Pair<String,String>>, RoleLevel>();
+		mapPut("http://predicates#display_curator", CURATOR, displayLevels);
+		mapPut("http://predicates#display_hidden", NOBODY, displayLevels);
 
-		Map<String, RoleLevel> modifyLevels = new HashMap<String, BaseResourceBean.RoleLevel>();
-		modifyLevels.put("http://predicates#modify_self", SELF);
-		modifyLevels.put("http://predicates#modify_curator", CURATOR);
-		modifyLevels.put("http://predicates#modify_hidden", NOBODY);
+		Map<Pair<String, Pair<String,String>>, RoleLevel> modifyLevels = 
+		        new HashMap<Pair<String, Pair<String,String>>, RoleLevel>();
+		mapPut("http://predicates#modify_self", SELF, modifyLevels);
+		mapPut("http://predicates#modify_curator", CURATOR, modifyLevels);
+		mapPut("http://predicates#modify_hidden", NOBODY, modifyLevels);
 
 		bean = new PropertyRestrictionPolicyHelper(
 				Arrays.asList(PROHIBITED_NAMESPACES),
 				Arrays.asList(PERMITTED_EXCEPTIONS), displayLevels,
-				modifyLevels);
+				modifyLevels, ModelFactory.createDefaultModel());
 	}
 
 	@Before
@@ -125,68 +134,75 @@ public class PropertyRestrictionPolicyHelperTest extends AbstractTestClass {
 	@Test
 	public void displayPredicateNoRestriction() {
 		assertEquals("displayPredicate: open", true,
-				bean.canDisplayPredicate("http://predicates#open", PUBLIC));
+				bean.canDisplayPredicate(createVitroProperty(
+				        "http://predicates#open"), PUBLIC));
 	}
 
 	@Test
 	public void displayPredicateRestrictionLower() {
 		assertEquals("displayPredicate: lower restriction", true,
-				bean.canDisplayPredicate("http://predicates#display_self",
-						CURATOR));
+				bean.canDisplayPredicate(createVitroProperty(
+				        "http://predicates#display_self"), CURATOR));
 	}
 
 	@Test
 	public void displayPredicateRestrictionEqual() {
 		assertEquals("displayPredicate: equal restriction", true,
-				bean.canDisplayPredicate("http://predicates#display_curator",
-						CURATOR));
+				bean.canDisplayPredicate(createVitroProperty(
+				        "http://predicates#display_curator"), CURATOR));
 	}
 
 	@Test
 	public void displayPredicateRestrictionHigher() {
 		assertEquals("displayPredicate: higher restriction", false,
-				bean.canDisplayPredicate("http://predicates#display_hidden",
-						CURATOR));
+				bean.canDisplayPredicate(createVitroProperty(
+				        "http://predicates#display_hidden"), CURATOR));
 	}
 
 	@Test
 	public void modifyPredicateNoRestriction() {
 		assertEquals("modifyPredicate: open", true,
-				bean.canModifyPredicate("http://predicates#open", PUBLIC));
+				bean.canModifyPredicate(new edu.cornell.mannlib.vitro.webapp.beans.Property(
+				        "http://predicates#open"), PUBLIC));
 	}
 
 	@Test
 	public void modifyPredicateRestrictionLower() {
 		assertEquals("modifyPredicate: lower restriction", true,
-				bean.canModifyPredicate("http://predicates#modify_self",
+				bean.canModifyPredicate(new edu.cornell.mannlib.vitro.webapp.beans.Property(
+				        "http://predicates#modify_self"),
 						CURATOR));
 	}
 
 	@Test
 	public void modifyPredicateRestrictionEqual() {
 		assertEquals("modifyPredicate: equal restriction", true,
-				bean.canModifyPredicate("http://predicates#modify_curator",
+				bean.canModifyPredicate(new edu.cornell.mannlib.vitro.webapp.beans.Property(
+				        "http://predicates#modify_curator"),
 						CURATOR));
 	}
 
 	@Test
 	public void modifyPredicateRestrictionHigher() {
 		assertEquals("modifyPredicate: higher restriction", false,
-				bean.canModifyPredicate("http://predicates#modify_hidden",
+				bean.canModifyPredicate(new edu.cornell.mannlib.vitro.webapp.beans.Property(
+				        "http://predicates#modify_hidden"),
 						CURATOR));
 	}
 
 	@Test
 	public void modifyPredicateProhibitedNamespace() {
 		assertEquals("modifyPredicate: prohibited namespace", false,
-				bean.canModifyPredicate(PROHIBITED_NAMESPACES[0] + "randoom",
+				bean.canModifyPredicate(new edu.cornell.mannlib.vitro.webapp.beans.Property(
+				        PROHIBITED_NAMESPACES[0] + "randoom"),
 						DB_ADMIN));
 	}
 
 	@Test
 	public void modifyPredicatePermittedException() {
 		assertEquals("modifyPredicate: permitted exception", true,
-				bean.canModifyPredicate(PERMITTED_EXCEPTIONS[0], DB_ADMIN));
+				bean.canModifyPredicate(new edu.cornell.mannlib.vitro.webapp.beans.Property(
+				        PERMITTED_EXCEPTIONS[0]), DB_ADMIN));
 	}
 
 	// ----------------------------------------------------------------------
@@ -195,9 +211,10 @@ public class PropertyRestrictionPolicyHelperTest extends AbstractTestClass {
 
 	@Test
 	public void buildDisplayThresholds() {
-		Map<String, RoleLevel> expectedMap = new HashMap<String, BaseResourceBean.RoleLevel>();
-		expectedMap.put("http://thresholds#display_public", PUBLIC);
-		expectedMap.put("http://thresholds#display_hidden", NOBODY);
+		Map<Pair<String, Pair<String,String>>, BaseResourceBean.RoleLevel> expectedMap = 
+		        new HashMap<Pair<String, Pair<String,String>>, BaseResourceBean.RoleLevel>();
+		mapPut("http://thresholds#display_public", PUBLIC, expectedMap);
+		mapPut("http://thresholds#display_hidden", NOBODY, expectedMap);
 
 		Map<String, RoleLevel> actualMap = populateThresholdMap(PROPERTY_DISPLAY_THRESHOLD);
 		assertEquals("display thresholds", expectedMap, actualMap);
@@ -205,9 +222,10 @@ public class PropertyRestrictionPolicyHelperTest extends AbstractTestClass {
 
 	@Test
 	public void buildModifyThresholds() {
-		Map<String, RoleLevel> expectedMap = new HashMap<String, BaseResourceBean.RoleLevel>();
-		expectedMap.put("http://thresholds#modify_editor", EDITOR);
-		expectedMap.put("http://thresholds#modify_curator", CURATOR);
+	    Map<Pair<String, Pair<String,String>>, BaseResourceBean.RoleLevel> expectedMap = 
+                new HashMap<Pair<String, Pair<String,String>>, BaseResourceBean.RoleLevel>();
+		mapPut("http://thresholds#modify_editor", EDITOR, expectedMap);
+		mapPut("http://thresholds#modify_curator", CURATOR, expectedMap);
 
 		Map<String, RoleLevel> actualMap = populateThresholdMap(PROPERTY_MODIFY_THRESHOLD);
 		assertEquals("modify thresholds", expectedMap, actualMap);
@@ -243,5 +261,10 @@ public class PropertyRestrictionPolicyHelperTest extends AbstractTestClass {
 			Resource object = model.getResource(objectUri);
 			model.add(subject, property, object);
 		}
+	}
+	
+	private edu.cornell.mannlib.vitro.webapp.beans.Property createVitroProperty(
+	        String propertyURI) {
+	    return new edu.cornell.mannlib.vitro.webapp.beans.Property(propertyURI);
 	}
 }

@@ -22,6 +22,7 @@ import javax.servlet.ServletContextListener;
 
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -99,8 +100,7 @@ public class UpdatePermissionSetUris implements ServletContextListener {
 			this.ctx = ctx;
 			this.stats = stats;
 
-			WebappDaoFactory wadf = (WebappDaoFactory) ctx
-					.getAttribute("webappDaoFactory");
+			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
 			userAccountsDao = wadf.getUserAccountsDao();
 		}
 
@@ -182,15 +182,15 @@ public class UpdatePermissionSetUris implements ServletContextListener {
 
 		Journal(ServletContext ctx) throws IOException {
 			String homeDirectoryPath = ConfigurationProperties.getBean(ctx)
-					.getProperty("vitro.home.directory");
+					.getProperty("vitro.home");
 			if (homeDirectoryPath == null) {
 				throw new IllegalStateException(
-						"No value found for vitro.home.directory");
+						"No value found for vitro.home");
 			}
 			File homeDirectory = new File(homeDirectoryPath);
 			confirmIsDirectory(homeDirectory);
 
-			File upgradeDirectory = createDirectory(homeDirectory, "upgrade");
+			File upgradeDirectory = createDirectory(homeDirectory, "upgrade/permissions");
 			String filename = timestampedFilename("UpgradePermissionSetUris",
 					".txt");
 			this.file = new File(upgradeDirectory, filename);

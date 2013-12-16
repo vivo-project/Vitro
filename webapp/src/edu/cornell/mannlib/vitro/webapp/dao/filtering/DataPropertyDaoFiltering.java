@@ -8,12 +8,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import net.sf.jga.fn.UnaryFunctor;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
@@ -31,21 +28,12 @@ class DataPropertyDaoFiltering extends BaseFiltering implements DataPropertyDao{
         this.filters = filters;
     }
 
-    public void deleteDataProperty(DataProperty dataProperty) {
-        innerDataPropertyDao.deleteDataProperty(dataProperty);
-    }
+    // ----------------------------------------------------------------------
+	// Filtered operations
+	// ----------------------------------------------------------------------
 
-
-    public void deleteDataProperty(String dataPropertyURI) {
-        innerDataPropertyDao.deleteDataProperty(dataPropertyURI);
-    }
-
-    public boolean annotateDataPropertyAsExternalIdentifier(String dataPropertyURI) {
-        return innerDataPropertyDao.annotateDataPropertyAsExternalIdentifier(dataPropertyURI);
-    }
-
-
-    public void fillDataPropertiesForIndividual(Individual individual) {
+    @Override
+	public void fillDataPropertiesForIndividual(Individual individual) {
         innerDataPropertyDao.fillDataPropertiesForIndividual(individual);
         List<DataProperty> props = individual.getDataPropertyList();
         if(props != null && props.size() > 0){
@@ -53,21 +41,23 @@ class DataPropertyDaoFiltering extends BaseFiltering implements DataPropertyDao{
         }
     }
 
-
-    public List getAllDataProperties() {
+    @Override
+    public List<DataProperty> getAllDataProperties() {
         return filter(innerDataPropertyDao.getAllDataProperties(), filters.getDataPropertyFilter());
     }
 
-    public List getAllExternalIdDataProperties() {
+    @Override
+    public List<DataProperty> getAllExternalIdDataProperties() {
         return filter(innerDataPropertyDao.getAllDataProperties(), filters.getDataPropertyFilter());
     }
 
-
+    @Override
     public List<DataProperty> getDataPropertiesForVClass(String classURI) {
         return filter(innerDataPropertyDao.getDataPropertiesForVClass(classURI),
                 filters.getDataPropertyFilter());
     }
 
+    @Override
     public Collection<DataProperty> getAllPossibleDatapropsForIndividual(String individualURI) {
         List<DataProperty> filteredProps = new ArrayList<DataProperty>();
         for (DataProperty dp: innerDataPropertyDao.getAllPossibleDatapropsForIndividual(individualURI)) {
@@ -79,125 +69,137 @@ class DataPropertyDaoFiltering extends BaseFiltering implements DataPropertyDao{
         return filteredProps;
     }
     
+	// ----------------------------------------------------------------------
+	// Unfiltered operations
+	// ----------------------------------------------------------------------
+	
+    @Override
+    public void deleteDataProperty(DataProperty dataProperty) {
+        innerDataPropertyDao.deleteDataProperty(dataProperty);
+    }
+
+    @Override
+    public void deleteDataProperty(String dataPropertyURI) {
+        innerDataPropertyDao.deleteDataProperty(dataPropertyURI);
+    }
+
+    @Override
+    public boolean annotateDataPropertyAsExternalIdentifier(String dataPropertyURI) {
+        return innerDataPropertyDao.annotateDataPropertyAsExternalIdentifier(dataPropertyURI);
+    }
+
+    @Override
     public String getRequiredDatatypeURI(Individual individual, DataProperty dataProperty) {
     	return innerDataPropertyDao.getRequiredDatatypeURI(individual, dataProperty);
     }
     
+    @Override
     public DataProperty getDataPropertyByURI(String dataPropertyURI) {
-        DataProperty prop = innerDataPropertyDao.getDataPropertyByURI(dataPropertyURI);
-        if( prop != null ){
-            Boolean acceptable = filters.getDataPropertyFilter().fn(prop);
-            if( acceptable == Boolean.TRUE )
-                return prop;
-            else
-                return null;
-        }
-        return null;
+        return innerDataPropertyDao.getDataPropertyByURI(dataPropertyURI);
     }
 
-
+    @Override
     public String insertDataProperty(DataProperty dataProperty) throws InsertException {
         return innerDataPropertyDao.insertDataProperty(dataProperty);
     }
 
-
+    @Override
     public void updateDataProperty(DataProperty dataProperty) {
         innerDataPropertyDao.updateDataProperty(dataProperty);
     }
     
-    public void addSuperproperty(ObjectProperty property, ObjectProperty superproperty) {
-    	innerDataPropertyDao.addSuperproperty(property, superproperty);
-    }
-    
+    @Override
     public void addSuperproperty(String propertyURI, String superpropertyURI) {
     	innerDataPropertyDao.addSuperproperty(propertyURI, superpropertyURI);
     }
     
-    public void removeSuperproperty(ObjectProperty property, ObjectProperty superproperty) {
-    	innerDataPropertyDao.removeSuperproperty(property, superproperty);
-    }
-    
+    @Override
     public void removeSuperproperty(String propertyURI, String superpropertyURI) {
     	innerDataPropertyDao.removeSuperproperty(propertyURI, superpropertyURI);
     }
     
-    public void addSubproperty(ObjectProperty property, ObjectProperty subproperty) {
-    	innerDataPropertyDao.addSubproperty(property, subproperty);
-    }
-    
+    @Override
     public void addSubproperty(String propertyURI, String subpropertyURI) {
     	innerDataPropertyDao.addSubproperty(propertyURI, subpropertyURI);
     }
     
-    public void removeSubproperty(ObjectProperty property, ObjectProperty subproperty) {
-    	innerDataPropertyDao.removeSubproperty(property, subproperty);
-    }
-    
+    @Override
     public void removeSubproperty(String propertyURI, String subpropertyURI) {
     	innerDataPropertyDao.removeSubproperty(propertyURI, subpropertyURI);
     }
     
+    @Override
     public List <String> getSubPropertyURIs(String propertyURI) {
     	return innerDataPropertyDao.getSubPropertyURIs(propertyURI);
     }
 
+    @Override
     public List <String> getAllSubPropertyURIs(String propertyURI) {
     	return innerDataPropertyDao.getAllSubPropertyURIs(propertyURI);
     }
 
+    @Override
     public List <String> getSuperPropertyURIs(String propertyURI, boolean direct) {
     	return innerDataPropertyDao.getSuperPropertyURIs(propertyURI, direct);
     }
 
+    @Override
     public List <String> getAllSuperPropertyURIs(String propertyURI) {
     	return innerDataPropertyDao.getAllSuperPropertyURIs(propertyURI);
     }
     
+    @Override
     public List<DataProperty> getRootDataProperties() {
     	return innerDataPropertyDao.getRootDataProperties();
     }
 
+    @Override
 	public void addSubproperty(Property property, Property subproperty) {
 		innerDataPropertyDao.addSubproperty(property, subproperty);
 	}
 
+    @Override
 	public void addSuperproperty(Property property, Property superproperty) {
 		innerDataPropertyDao.addSuperproperty(property, superproperty);	
 	}
 
+    @Override
 	public void removeSubproperty(Property property, Property subproperty) {
 		innerDataPropertyDao.removeSubproperty(property, subproperty);
 	}
 
+    @Override
 	public void removeSuperproperty(Property property, Property superproperty) {
 		innerDataPropertyDao.removeSuperproperty(property, superproperty);
 	}
 
-	public void addEquivalentProperty(String propertyURI,
-			String equivalentPropertyURI) {
+    @Override
+	public void addEquivalentProperty(String propertyURI, String equivalentPropertyURI) {
 		innerDataPropertyDao.addEquivalentProperty(propertyURI, equivalentPropertyURI);
 	}
 
-	public void addEquivalentProperty(Property property,
-			Property equivalentProperty) {
+    @Override
+	public void addEquivalentProperty(Property property, Property equivalentProperty) {
 		innerDataPropertyDao.addEquivalentProperty(property, equivalentProperty);
 	}
 
+    @Override
 	public List<String> getEquivalentPropertyURIs(String propertyURI) {
 		return innerDataPropertyDao.getEquivalentPropertyURIs(propertyURI);
 	}
 
-	public void removeEquivalentProperty(String propertyURI,
-			String equivalentPropertyURI) {
+    @Override
+	public void removeEquivalentProperty(String propertyURI, String equivalentPropertyURI) {
 		innerDataPropertyDao.removeEquivalentProperty(propertyURI, equivalentPropertyURI);
 	}
 
-	public void removeEquivalentProperty(Property property,
-			Property equivalentProperty) {
+    @Override
+	public void removeEquivalentProperty(Property property, Property equivalentProperty) {
 		innerDataPropertyDao.removeEquivalentProperty(property, equivalentProperty);
 	}
 	
-    public List <VClass> getClassesWithRestrictionOnProperty(String propertyURI) {
+    @Override
+   public List <VClass> getClassesWithRestrictionOnProperty(String propertyURI) {
     	return innerDataPropertyDao.getClassesWithRestrictionOnProperty(propertyURI);
     }
     

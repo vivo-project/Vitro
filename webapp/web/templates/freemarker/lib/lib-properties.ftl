@@ -22,6 +22,24 @@
     </#if>
 </#function>
 
+<#-- Return true iff there are statements for this property -->
+<#function hasVisualizationStatements propertyGroups propertyName rangeUri>
+
+    <#local property = propertyGroups.getProperty(propertyName, rangeUri)!>
+    
+        <#-- First ensure that the property is defined
+        (an unpopulated property while logged out is undefined) -->
+        <#if ! property?has_content>
+            <#return false>
+        </#if>
+    
+        <#if property.collatedBySubclass!false> <#-- collated object property-->
+            <#return property.subclasses?has_content>
+        <#else>
+            <#return property.statements?has_content> <#-- data property or uncollated object property -->
+        </#if>
+
+</#function>
 
 <#-----------------------------------------------------------------------------
     Macros for generating property lists
@@ -74,7 +92,7 @@
 Assumes property is non-null. -->
 <#macro objectPropertyListing property editable template=property.template>
     <#local localName = property.localName>
-    <h2 id="${localName}">${property.name?capitalize} <@addLink property editable /> <@verboseDisplay property /></h2>    
+    <h2 id="${localName}" class="mainPropGroup">${property.name?capitalize} <@addLink property editable /> <@verboseDisplay property /></h2>    
     <ul id="individual-${localName}" role="list">
         <@objectProperty property editable />
     </ul>
@@ -100,26 +118,36 @@ name will be used as the label. -->
     </#if>
     -->
     <#if editable> 
-        <h2 id="${property.localName}">${label} ${addLink!} ${verboseDisplay!}</h2>         
+        <h2 id="${property.localName!}">${label} ${addLink!} ${verboseDisplay!}</h2>         
     </#if>
 </#macro>
 
-<#macro addLink property editable label="${property.name}">
+<#macro addLink property editable label="${property.name}">    
+    <#if property.rangeUri?? >
+        <#local rangeUri = property.rangeUri /> 
+    <#else>
+        <#local rangeUri = "" /> 
+    </#if>
+    <#if property.domainUri?? >
+        <#local domainUri = property.domainUri /> 
+    <#else>
+        <#local domainUri = "" /> 
+    </#if>
     <#if editable>
-        <#local url = property.addUrl>
-        <#if url?has_content>
-            <@showAddLink property.localName label url />
+        <#if property.addUrl?has_content>
+        	<#local url = property.addUrl>
+            <@showAddLink property.localName label url rangeUri domainUri/>
         </#if>
     </#if>
 </#macro>
 
-<#macro showAddLink propertyLocalName label url>
-    <#if propertyLocalName == "informationResourceInAuthorship" || propertyLocalName == "webpage" || propertyLocalName == "hasResearchArea">
-        <a class="add-${propertyLocalName}" href="${url}" title="Manage list of ${label?lower_case}">
-        <img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="manage" /></a>
+<#macro showAddLink propertyLocalName label url rangeUri domainUri="">
+    <#if (rangeUri?contains("Authorship") && domainUri?contains("IAO_0000030")) || (rangeUri?contains("Editorship") && domainUri?contains("IAO_0000030"))|| rangeUri?contains("URL") || propertyLocalName == "hasResearchArea">
+        <a class="add-${propertyLocalName}" href="${url}" title="${i18n().manage_list_of} ${label?lower_case}">
+        <img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="${i18n().manage}" /></a>
     <#else>
-        <a class="add-${propertyLocalName}" href="${url}" title="Add new ${label?lower_case} entry">
-        <img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="add" /></a>
+        <a class="add-${propertyLocalName}" href="${url}" title="${i18n().add_new} ${label?lower_case} ${i18n().entry}">
+        <img class="add-individual" src="${urls.images}/individual/addIcon.gif" alt="${i18n().add}" /></a>
     </#if>
 </#macro>
 
@@ -129,47 +157,84 @@ name will be used as the label. -->
 
 
 <#macro propertyListItem property statement editable >
+    <#if property.rangeUri?? >
+        <#local rangeUri = property.rangeUri /> 
+    <#else>
+        <#local rangeUri = "" /> 
+    </#if>
     <li role="listitem">    
         <#nested>       
-        <@editingLinks "${property.localName}" statement editable/>
+        <@editingLinks "${property.localName}" "${property.name}" statement editable rangeUri/>
     </li>
 </#macro>
 
-<#macro editingLinks propertyLocalName statement editable>
-    <#if editable && (propertyLocalName != "informationResourceInAuthorship" && propertyLocalName != "webpage" && propertyLocalName != "hasResearchArea")>
-        <@editLink propertyLocalName statement />
-        <@deleteLink propertyLocalName statement />
-     
+<#macro editingLinks propertyLocalName propertyName statement editable rangeUri="">
+    <#if editable >
+        <#if (!rangeUri?contains("Authorship") && !rangeUri?contains("URL") && !rangeUri?contains("Editorship") && propertyLocalName != "hasResearchArea")>
+            <@editLink propertyLocalName propertyName statement rangeUri/>
+            <@deleteLink propertyLocalName propertyName statement rangeUri/>
+        </#if>    
     </#if>
 </#macro>
-
-<#macro editLink propertyLocalName statement>
+<#macro editLink propertyLocalName propertyName statement rangeUri="">
+<#if propertyLocalName?contains("ARG_2000028")>
+    <#if rangeUri?contains("Address")>
+        <#local url = statement.editUrl + "&addressUri=" + "${statement.address!}">
+    <#elseif rangeUri?contains("Telephone") || rangeUri?contains("Fax")>
+        <#local url = statement.editUrl + "&phoneUri=" + "${statement.phone!}">
+    <#elseif rangeUri?contains("Work") || rangeUri?contains("Email")>
+        <#local url = statement.editUrl + "&emailUri=" + "${statement.email!}">
+    <#elseif rangeUri?contains("Name")>
+        <#local url = statement.editUrl + "&fullNameUri=" + "${statement.fullName!}">
+    <#elseif rangeUri?contains("Title")>
+        <#local url = statement.editUrl + "&titleUri=" + "${statement.title!}">
+    </#if>
+<#else>
     <#local url = statement.editUrl>
+</#if>
     <#if url?has_content>
         <@showEditLink propertyLocalName url />
     </#if>
+
 </#macro>
 
 <#macro showEditLink propertyLocalName url>
-    <a class="edit-${propertyLocalName}" href="${url}" title="edit this entry"><img class="edit-individual" src="${urls.images}/individual/editIcon.gif" alt="edit" /></a>
+    <a class="edit-${propertyLocalName}" href="${url}" title="${i18n().edit_entry}"><img class="edit-individual" src="${urls.images}/individual/editIcon.gif" alt="${i18n().edit_entry}" /></a>
 </#macro>
 
-<#macro deleteLink propertyLocalName statement> 
+<#macro deleteLink propertyLocalName propertyName statement rangeUri=""> 
     <#local url = statement.deleteUrl>
     <#if url?has_content>
+    	<#--We need to specify the actual object to be deleted as it is different from the object uri-->
+	    <#if propertyLocalName?contains("ARG_2000028")>
+		    <#if rangeUri?contains("Address")>
+		        <#local url = url + "&deleteObjectUri=" + "${statement.address!}">
+		    <#elseif rangeUri?contains("Telephone") || rangeUri?contains("Fax")>
+		        <#local url = url + "&deleteObjectUri=" + "${statement.phone!}">
+		    <#elseif rangeUri?contains("Work") || rangeUri?contains("Email")>
+		        <#local url = url + "&deleteObjectUri=" + "${statement.email!}">
+		    <#elseif rangeUri?contains("Name")>
+		        <#local url = url + "&deleteObjectUri=" + "${statement.fullName!}">
+		    <#elseif rangeUri?contains("Title")>
+		        <#local url = url + "&deleteObjectUri=" + "${statement.title!}">
+		    </#if>
+		</#if>
         <@showDeleteLink propertyLocalName url />
     </#if>
 </#macro>
 
 <#macro showDeleteLink propertyLocalName url>
-    <a class="delete-${propertyLocalName}" href="${url}" title="delete this entry"><img  class="delete-individual" src="${urls.images}/individual/deleteIcon.gif" alt="delete" /></a>
+    <a class="delete-${propertyLocalName}" href="${url}" title="${i18n().delete_entry}"><img  class="delete-individual" src="${urls.images}/individual/deleteIcon.gif" alt="${i18n().delete_entry}" /></a>
 </#macro>
 
 <#macro verboseDisplay property>
     <#local verboseDisplay = property.verboseDisplay!>
     <#if verboseDisplay?has_content>       
         <section class="verbosePropertyListing">
-            <a class="propertyLink" href="${verboseDisplay.propertyEditUrl}" title="name">${verboseDisplay.localName}</a> 
+            <#if verboseDisplay.fauxProperty??>
+                 a faux property of
+            </#if>
+            <a class="propertyLink" href="${verboseDisplay.propertyEditUrl}" title="${i18n().name}">${verboseDisplay.localName}</a> 
             (<span>${property.type?lower_case}</span> property);
             order in group: <span>${verboseDisplay.displayRank};</span> 
             display level: <span>${verboseDisplay.displayLevel};</span>
@@ -188,44 +253,79 @@ name will be used as the label. -->
      
      Note that this macro has a side-effect in the call to propertyGroups.pullProperty().
 -->
-<#macro image individual propertyGroups namespaces editable showPlaceholder="never">
+<#macro image individual propertyGroups namespaces editable showPlaceholder="never" imageWidth=160 >
     <#local mainImage = propertyGroups.pullProperty("${namespaces.vitroPublic}mainImage")!>
     <#local thumbUrl = individual.thumbUrl!>
     <#-- Don't assume that if the mainImage property is populated, there is a thumbnail image (though that is the general case).
          If there's a mainImage statement but no thumbnail image, treat it as if there is no image. -->
     <#if (mainImage.statements)?has_content && thumbUrl?has_content>
-        <a href="${individual.imageUrl}" title="individual photo">
-        	<img class="individual-photo" src="${thumbUrl}" title="click to view larger image" alt="${individual.name}" width="160" />
+        <a href="${individual.imageUrl}" title="${i18n().alt_thumbnail_photo}">
+        	<img class="individual-photo" src="${thumbUrl}" title="${i18n().click_to_view_larger}" alt="${individual.name}" width="${imageWidth!}" />
         </a>
-        <@editingLinks "${mainImage.localName}" mainImage.first() editable />
+        <@editingLinks "${mainImage.localName}" "" mainImage.first() editable />
     <#else>
-        <#local imageLabel><@addLinkWithLabel mainImage editable "Photo" /></#local>
+        <#local imageLabel><@addLinkWithLabel mainImage editable "${i18n().photo}" /></#local>
         ${imageLabel}
         <#if showPlaceholder == "always" || (showPlaceholder="with_add_link" && imageLabel?has_content)>
-            <img class="individual-photo" src="${placeholderImageUrl(individual.uri)}" title = "no image" alt="placeholder image" width="160" />
+            <img class="individual-photo" src="${placeholderImageUrl(individual.uri)}" title = "${i18n().no_image}" alt="${i18n().placeholder_image}" width="${imageWidth!}" />
         </#if>
     </#if>
 </#macro>
 
 <#-- Label -->
-<#macro label individual editable labelCount>
+<#macro label individual editable labelCount localesCount=1 languageCount=1>
+	<#assign labelPropertyUri = ("http://www.w3.org/2000/01/rdf-schema#label"?url) />
+	<#assign useEditLink = false />
+	<#--edit link used if in edit mode and only one label and one language-->
+	<#--locales count may be 0 in case where no languages/selectable locales are specified-->
+	<#if labelCount = 1 &&  editable && (localesCount >= 0) >
+		<#assign useEditLink = true/>
+	</#if>
     <#local label = individual.nameStatement>
     ${label.value}
-    <#if (labelCount > 1)  && editable >
+    <#if useEditLink>
+    	<@editingLinks "label" "" label editable ""/>
+    <#elseif (editable && (labelCount > 0)) || (languageCount > 1)>
+    	<#--We display the link even when the user is not logged in case of multiple labels with different languages-->
+    	<#assign labelLink = ""/>
+    	<#-- Manage labels now goes to generator -->
+    	<#assign individualUri = individual.uri!""/>
+    	<#assign individualUri = (individualUri?url)/>
+    	<#assign individualProfileUrl = individual.profileUrl />
+    	<#assign profileParameters = individualProfileUrl?substring(individualProfileUrl?index_of("?") + 1)/>
+    	<#assign extraParameters = ""/>
+    	<#if profileParameters?contains("uri=")>
+    		<#assign extraParameters = profileParameters?replace("uri=" + individualUri, "") />
+    	</#if>
+    	<#--IF there are special parameters, then get those-->
+    	<#if editable>
+    		<#assign imageAlt = "${i18n().manage}" />
+    		<#assign linkTitle = "${i18n().manage_list_of_labels}">
+    		<#assign labelLink= "${urls.base}/editRequestDispatch?subjectUri=${individualUri}&editForm=edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManageLabelsGenerator&predicateUri=${labelPropertyUri}${extraParameters}">
+    	<#else>
+			<#assign linkTitle = "${i18n().view_list_of_labels}">
+			<#assign imageAlt = "${i18n().view}" /> 
+			<#assign labelLink= "${urls.base}/viewLabels?subjectUri=${individualUri}${extraParameters}">
+    	</#if>
+    	
         <span class="inline">
-            <a id="manageLabels" href="${urls.base}/manageLabels?subjectUri=${individual.uri!}" style="margin-left:20px;font-size:0.7em">
-                manage labels
-            </a>
+            <a class="add-label" href="${labelLink}"
+             title="${linkTitle}">
+        	<img class="add-individual" src="${urls.images}/individual/manage-icon.png" alt="${imageAlt}" /></a>
         </span>
-    <#else>
-        <@editingLinks "label" label editable />
     </#if>
 </#macro>
 
 <#-- Most specific types -->
-<#macro mostSpecificTypes individual>
+<#macro mostSpecificTypes individual >
     <#list individual.mostSpecificTypes as type>
         <span class="display-title">${type}</span>
+    </#list>
+</#macro>
+
+<#macro mostSpecificTypesPerson individual editable>
+    <#list individual.mostSpecificTypes as type>
+        <div id="titleContainer"><span class="<#if editable>display-title-editable<#else>display-title-not-editable</#if>">${type}</span></div>
     </#list>
 </#macro>
 

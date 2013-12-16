@@ -2,6 +2,7 @@
   
     var objectPropHierarchyUtils = {
     onLoad: function(urlBase,displayOption,type) {
+        $.extend(this, i18nStrings);
         this.imagePath = urlBase + "/images/";
         this.propType = type;
         this.initObjects();
@@ -89,13 +90,13 @@
         if ( this.propType == "group" ) {
             this.expandAll.click(function() {
             
-                if ( objectPropHierarchyUtils.expandAll.text() == "hide properties" ) { 
+                if ( objectPropHierarchyUtils.expandAll.text() == i18nStrings.hideProperties ) { 
                     $('td.subclassCell').parent('tr').hide();
-                    objectPropHierarchyUtils.expandAll.text("show properties");
+                    objectPropHierarchyUtils.expandAll.text(i18nStrings.showProperties);
                 }
                 else {
                     $('td.subclassCell').parent('tr').show();
-                    objectPropHierarchyUtils.expandAll.text("hide properties");
+                    objectPropHierarchyUtils.expandAll.text(i18nStrings.hideProperties);
                 }
             });
         }
@@ -138,16 +139,16 @@
             objectPropHierarchyUtils.classHtml += "<div>" + this.name + headerSpan + "</div>" + "<table class='classHierarchy' id='classHierarchy" 
                                       + objectPropHierarchyUtils.classCounter + "'>" ;
 
-            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>Local Name:</td><td>" 
+            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.localNameString + ":</td><td>" 
                                                + (this.data.internalName.length > 0 ? this.data.internalName : "none" ) + "</td></tr>";
 
-            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>Group:</td><td>" 
+            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.groupString + ":</td><td>" 
                                                + (this.data.group.length > 0 ? this.data.group : "unspecified" ) + "</td></tr>";
 
-            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>Domain Class:</td><td>" 
+            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.domainClass + ":</td><td>" 
                                                + (this.data.domainVClass.length > 0 ? this.data.domainVClass : "none" ) + " ";
 
-            objectPropHierarchyUtils.classHtml += "<span class='rangeClass'>Range Class:</span>" 
+            objectPropHierarchyUtils.classHtml += "<span class='rangeClass'>" + i18nStrings.rangeClass + ":</span>" 
                                                + (this.data.rangeVClass.length > 0 ? this.data.rangeVClass : "none" ) + "</td></tr>";
 
             if ( descendants.length > 1 ) {
@@ -174,7 +175,7 @@
         var ctr = 0
         $.each(node.children, function() {
             if ( ctr == 0 ) {
-                childDetails += "<tr><td class='classDetail'>Subproperties:</td>";
+                childDetails += "<tr><td class='classDetail'>" + i18nStrings.subProperties + ":</td>";
                 ctr = ctr + 1;
             }
             else {
@@ -182,10 +183,10 @@
             }
 
             if ( this.children.length == 1 ) {
-                subclassString += "<span style='font-size:0.8em'> (1 subproperty)</span>"; 
+                subclassString += "<span style='font-size:0.8em'> (1 " + i18nStrings.subProperty + ")</span>"; 
             }
             else if ( this.children.length > 1 ) {
-                subclassString += "<span style='font-size:0.8em'> (" + this.children.length + " subproperties)</span>";
+                subclassString += "<span style='font-size:0.8em'> (" + this.children.length + " " + i18nStrings.subProperties + ")</span>";
             }
 
             childDetails += "<td class='subclassCell' colspan='2'><span class='subclassExpandPlus' id='subclassExpand" 
@@ -199,16 +200,16 @@
             
             objectPropHierarchyUtils.expandCounter += 1;
             
-            childDetails += "<tr><td class='classDetail'>Local Name:</td><td>" 
+            childDetails += "<tr><td class='classDetail'>" + i18nStrings.localNameString + ":</td><td>" 
                                                + (this.data.internalName.length > 0 ? this.data.internalName : "none" ) + "</td></tr>";
 
-            childDetails += "<tr><td class='classDetail'>Group:</td><td>" 
+            childDetails += "<tr><td class='classDetail'>" + i18nStrings.groupString + ":</td><td>" 
                                                + (this.data.group.length > 0 ? this.data.group : "unspecified" ) + "</td></tr>";
 
-            childDetails += "<tr><td class='classDetail'>Domain Class:</td><td>" 
+            childDetails += "<tr><td class='classDetail'>" + i18nStrings.domainClass + ":</td><td>" 
                                                + (this.data.domainVClass.length > 0 ? this.data.domainVClass : "none" ) + " ";
 
-            childDetails += "<span class='rangeClass'>Range Class:</span>" 
+            childDetails += "<span class='rangeClass'>" + i18nStrings.rangeClass + ":</span>" 
                                                + (this.data.rangeVClass.length > 0 ? this.data.rangeVClass : "none" ) + "</td></tr>";
 
             if ( this.children ) {
@@ -263,15 +264,15 @@
     
     wireExpandLink: function() {
         this.expandAll.click(function() {
-            if ( objectPropHierarchyUtils.expandAll.text() == "expand all" ) {
-                objectPropHierarchyUtils.expandAll.text("collapse all");
+            if ( objectPropHierarchyUtils.expandAll.text() == i18nStrings.expandAll ) {
+                objectPropHierarchyUtils.expandAll.text(i18nStrings.collapseAll);
                 $('span.headerSpanPlus').addClass("headerSpanMinus");
                 $('table.classHierarchy').find('span.subclassExpandPlus').addClass("subclassExpandMinus");
                 $('table.classHierarchy').find('table.subclassTable').show();
                 $('section#container').find('span.headerSpanPlus').attr('view','more');
             }
             else {
-                objectPropHierarchyUtils.expandAll.text("expand all");
+                objectPropHierarchyUtils.expandAll.text(i18nStrings.expandAll);
                 $('span.headerSpanPlus').removeClass("headerSpanMinus");
                 $('table.classHierarchy').find('span.subclassExpandPlus').removeClass("subclassExpandMinus");
                 $('table.classHierarchy').find('table.subclassTable').hide();
@@ -290,16 +291,16 @@
             objectPropHierarchyUtils.classHtml += "<div>" + this.name + "</div>" + "<table class='classHierarchy' id='classHierarchy" 
                                       + objectPropHierarchyUtils.classCounter + "'>" ;
 
-            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>Local Name:</td><td>" 
+            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.localNameString + ":</td><td>" 
                                          + (this.data.internalName.length > 0 ? this.data.internalName : "none" ) + "</td></tr>";
 
-            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>Group:</td><td>" 
+            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.groupString + ":</td><td>" 
                                          + (this.data.group.length > 0 ? this.data.group : "unspecified" ) + "</td></tr>";
 
-            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>Domain Class:</td><td>" 
+            objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.domainClass + ":</td><td>" 
                                          + (this.data.domainVClass.length > 0 ? this.data.domainVClass : "none" ) + " ";
 
-            objectPropHierarchyUtils.classHtml += "<span class='rangeClass'>Range Class:</span>" 
+            objectPropHierarchyUtils.classHtml += "<span class='rangeClass'>" + i18nStrings.rangeClass + ":</span>" 
                                          + (this.data.rangeVClass.length > 0 ? this.data.rangeVClass : "none" ) + "</td></tr>";
 
             objectPropHierarchyUtils.classHtml += "</table>";
@@ -337,7 +338,7 @@
                 var ctr = 0;
                 $.each(this.children, function() {
                     if ( ctr == 0 ) {
-                        descendants += "<tr><td class='classDetail'>Properties:</td>";
+                        descendants += "<tr><td class='classDetail'>" + i18nStrings.propertiesString + ":</td>";
                         ctr = ctr + 1;
                     }
                     else {
@@ -355,7 +356,7 @@
                                                + objectPropHierarchyUtils.classCounter + "'>" ;
 
             if ( this.data.displayRank.length > 0 ) {
-                objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>Display Rank:</td><td>" + this.data.displayRank + "</td></tr>"
+                objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.displayRank + ":</td><td>" + this.data.displayRank + "</td></tr>"
             }
             
             objectPropHierarchyUtils.classHtml += descendants;

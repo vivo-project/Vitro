@@ -29,19 +29,24 @@ import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
 
-public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{    
+public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
+	private final static Log log = LogFactory.getLog(SparqlQueryDataGetter.class);
+	
+    private static final String queryPropertyURI = "<" + DisplayVocabulary.QUERY + ">";
+    private static final String saveToVarPropertyURI= "<" + DisplayVocabulary.SAVE_TO_VAR+ ">";
+    private static final String queryModelPropertyURI= "<" + DisplayVocabulary.QUERY_MODEL+ ">";
+
+    public static final String defaultVarNameForResults = "results";
+    private static final String defaultTemplate = "menupage--defaultSparql.ftl";
+
     String dataGetterURI;
     String queryText;
     String saveToVar;
     String modelURI;
     VitroRequest vreq;
     ServletContext context;
-    
-    
-    final static Log log = LogFactory.getLog(SparqlQueryDataGetter.class);
-    //default template
-    private final static String defaultTemplate = "menupage--defaultSparql.ftl";
     
     /**
      * Constructor with display model and data getter URI that will be called by reflection.
@@ -50,21 +55,11 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
         this.configure(vreq, displayModel,dataGetterURI);
     }        
     
-    @Override
-    public Map<String, Object> getData(Map<String, Object> pageData) { 
-    	// Merge the pageData with the request parameters. PageData overrides
-    	Map<String, String[]> merged = new HashMap<String, String[]>();
-    	merged.putAll(vreq.getParameterMap());
-    	for (String key: pageData.keySet()) {
-    		merged.put(key, new String[] {String.valueOf(pageData.get(key))});
-    	}
-        return doQuery( merged, getModel(context, vreq, modelURI));
-    }
-
-    /**
+	/**
      * Configure this instance based on the URI and display model.
      */
-    protected void configure(VitroRequest vreq, Model displayModel, String dataGetterURI) {
+    @SuppressWarnings("hiding")
+	protected void configure(VitroRequest vreq, Model displayModel, String dataGetterURI) {
     	if( vreq == null ) 
     		throw new IllegalArgumentException("VitroRequest  may not be null.");
         if( displayModel == null ) 
@@ -79,7 +74,6 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
         QuerySolutionMap initBindings = new QuerySolutionMap();
         initBindings.add("dataGetterURI", ResourceFactory.createResource(this.dataGetterURI));
         
-        int count = 0;
         Query dataGetterConfigurationQuery = QueryFactory.create(dataGetterQuery) ;               
         displayModel.enterCriticalSection(Lock.READ);
         try{
@@ -88,7 +82,6 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
             ResultSet res = qexec.execSelect();
             try{                
                 while( res.hasNext() ){
-                    count++;
                     QuerySolution soln = res.next();
                     
                     //query is NOT OPTIONAL
@@ -121,56 +114,128 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
     }
     
     /**
-     * Do the query and return a result. This is in its own method 
-     * to make testing easy.
+     * Query to get the definition of the SparqlDataGetter for a given URI.
      */
-    protected Map<String, Object> doQuery(Map<String, String[]>parameterMap, Model queryModel){
+    private static final String dataGetterQuery =
+        "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS +"> \n" +
+        "SELECT ?query ?saveToVar ?queryModel WHERE { \n" +
+        "  ?dataGetterURI "+queryPropertyURI+" ?query . \n" +
+        "  OPTIONAL{ ?dataGetterURI "+saveToVarPropertyURI+" ?saveToVar } \n " +
+        "  OPTIONAL{ ?dataGetterURI "+queryModelPropertyURI+" ?queryModel } \n" +
+        "}";      
 
-        if( this.queryText == null ){            
-            log.error("no SPARQL query defined for page " + this.dataGetterURI);
+   
+    @Override
+    public Map<String, Object> getData(Map<String, Object> pageData) { 
+    	Map<String, String> merged = mergeParameters(vreq.getParameterMap(), pageData);
+    	
+    	String boundQueryText = bindParameters(queryText, merged);
+
+    	if (modelURI != null) {
+    		return doQueryOnModel(boundQueryText, getModel(context, vreq, modelURI));
+    	} else {
+    		return doQueryOnRDFService(boundQueryText);
+    	}
+    }
+
+    /** Merge the pageData with the request parameters. PageData overrides. */
+	private Map<String, String> mergeParameters(
+			Map<String, String[]> parameterMap, Map<String, Object> pageData) {
+		Map<String, String> merged = new HashMap<>();
+		for (String key: parameterMap.keySet()) {
+			merged.put(key, parameterMap.get(key)[0]);
+		}
+		for (String key: pageData.keySet()) {
+			merged.put(key, String.valueOf(pageData.get(key)));
+		}
+		if (log.isDebugEnabled()) {
+			log.debug("Merging request parameters " + parameterMap
+					+ " with page data " + pageData + " results in " + merged);
+		}
+		return merged;
+	}
+
+	/**
+	 * InitialBindings don't always work, and besides, RDFService doesn't accept
+	 * them. So do a text-based substitution.
+	 * 
+	 * This assumes that every parameter is a URI. What if we want to substitute
+	 * a string value?
+	 */
+	private String bindParameters(String text, Map<String, String> merged) {
+		String bound = text;
+		for (String key : merged.keySet()) {
+			bound = bound.replace('?' + key, '<' + merged.get(key) + '>');
+		}
+		if (log.isDebugEnabled()) {
+			log.debug("parameters: " + merged);
+			log.debug("query before binding parameters:" + text);
+			log.debug("query after binding parameters: " + bound);
+		}
+		return bound;
+	}
+
+	/**
+	 * Do the query and return a result. This is in its own method, with
+	 * protected access, to make testing easy.
+	 */
+	protected Map<String, Object> doQueryOnRDFService(String  q) {
+		log.debug("Going to RDFService with " + q);
+        ResultSet results = QueryUtils.getQueryResults(q, vreq);
+        return assembleMap(parseResults(results));
+	}
+
+    /**
+	 * Do the query and return a result. This is in its own method, with
+	 * protected access, to make testing easy.
+	 */
+    protected Map<String, Object> doQueryOnModel(String q, Model queryModel){
+		log.debug("Going to model " + modelURI + " with " + q);
+    	if (q == null) {
+            return Collections.emptyMap();
+        }
+
+		Query query = makeQuery(q);
+    	if (query == null) {
             return Collections.emptyMap();
         }
         
-        //this may throw a SPARQL syntax error 
-        Query query = QueryFactory.create( this.queryText );                
-
-        //build query bindings
-        QuerySolutionMap initialBindings = createBindings( parameterMap);                 
-        
-        //execute query
-        List<Map<String,String>> results = executeQuery( query, queryModel, initialBindings);
-        
-        //put results in page data, what key to use for results?
-        Map<String, Object> rmap = new HashMap<String,Object>();
-        //also store the variable name within which results will be returned
-        rmap.put("variableName", this.saveToVar);
-        rmap.put(this.saveToVar, results);  
-        //This will be overridden at page level in display model if template specified there
-        rmap.put("bodyTemplate", defaultTemplate);
-        return rmap;        
+        return assembleMap(executeQuery( query, queryModel));
     }
     
-    private List<Map<String, String>> executeQuery(Query query, Model model,
-            QuerySolutionMap initialBindings) {
-        
-        List<Map<String,String>> rows = new ArrayList<Map<String,String>>();
-                
+	private Query makeQuery(String q) {
+		try {
+			return QueryFactory.create(q);
+		} catch (Exception e) {
+			log.error("Failed to build a query from ''", e);
+			return null;
+		}
+	}
+
+	private List<Map<String, String>> executeQuery(Query query, Model model) {
         model.enterCriticalSection(Lock.READ);        
         try{            
-            QueryExecution qexec= QueryExecutionFactory.create(query, model,initialBindings );
+            QueryExecution qexec= QueryExecutionFactory.create(query, model );
             ResultSet results = qexec.execSelect();
             try{                
-                while (results.hasNext()) {
-                    QuerySolution soln = results.nextSolution();
-                    rows.add( toRow( soln ) );
-                }                   
+            	return parseResults(results);
             }finally{ qexec.close(); }
         }finally{ model.leaveCriticalSection(); }
-        
-        return rows;        
     }
 
     /**
+     * Converts a ResultSet into a List of Maps.
+	 */
+	private List<Map<String, String>> parseResults(ResultSet results) {
+        List<Map<String,String>> rows = new ArrayList<Map<String,String>>();
+        while (results.hasNext()) {
+            QuerySolution soln = results.nextSolution();
+            rows.add( toRow( soln ) );
+        }                   
+        return rows;        
+	}
+
+	/**
      * Converts a row from a QuerySolution to a Map<String,String> 
      */
     private Map<String, String> toRow(QuerySolution soln) {
@@ -186,8 +251,8 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
     private String toCell(RDFNode rdfNode) {
         if( rdfNode == null){
             return "";
-        }else if( rdfNode.canAs( Literal.class )){
-            return ((Literal)rdfNode.as(Literal.class)).getLexicalForm();
+        }else if( rdfNode.isLiteral() ){
+            return rdfNode.asLiteral().getLexicalForm();
         }else if( rdfNode.isResource() ){
             Resource resource = (Resource)rdfNode;
             if( ! resource.isAnon() ){
@@ -200,40 +265,17 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
         }   
     }
 
-
-
-    private QuerySolutionMap createBindings(Map<String, String[]>parameterMap) {        
-        QuerySolutionMap initBindings = new QuerySolutionMap();
-
-        //could have bindings from HTTP parameters
-        for( String var : parameterMap.keySet() ) {           
-            String[] values =  parameterMap.get(var);
-            if( values != null && values.length == 1 ){
-                //what do do when we don't want a Resource?
-                initBindings.add(var, ResourceFactory.createResource(values[0]) );
-            }else if( values.length > 1){
-                log.error("more than 1 http parameter for " + var);                
-            }
-        }        
-        return initBindings;
-    }
-
-    private static final String queryPropertyURI = "<" + DisplayVocabulary.QUERY + ">";
-    private static final String saveToVarPropertyURI= "<" + DisplayVocabulary.SAVE_TO_VAR+ ">";
-    private static final String queryModelPropertyURI= "<" + DisplayVocabulary.QUERY_MODEL+ ">";
-
-    public static final String defaultVarNameForResults = "results";
-    
-    /**
-     * Query to get the definition of the SparqlDataGetter for a given URI.
-     */
-    private static final String dataGetterQuery =
-        "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS +"> \n" +
-        "SELECT ?query ?saveToVar ?queryModel WHERE { \n" +
-        "  ?dataGetterURI "+queryPropertyURI+" ?query . \n" +
-        "  OPTIONAL{ ?dataGetterURI "+saveToVarPropertyURI+" ?saveToVar } \n " +
-        "  OPTIONAL{ ?dataGetterURI "+queryModelPropertyURI+" ?queryModel } \n" +
-        "}";      
-
-   
+	private Map<String, Object> assembleMap(List<Map<String, String>> results) {
+		Map<String, Object> rmap = new HashMap<String,Object>();
+        
+        //put results in page data
+        rmap.put(this.saveToVar, results);  
+        //also store the variable name within which results will be returned
+        rmap.put("variableName", this.saveToVar);
+        //This will be overridden at page level in display model if template specified there
+        rmap.put("bodyTemplate", defaultTemplate);
+        
+        return rmap;        
+	}
+	
 }

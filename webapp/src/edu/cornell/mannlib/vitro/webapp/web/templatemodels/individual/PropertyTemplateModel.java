@@ -11,11 +11,14 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
@@ -28,7 +31,10 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     protected final VitroRequest vreq;
     protected final String subjectUri;
+    protected final Property property;
     protected final String propertyUri;
+    protected String domainUri;
+    protected String rangeUri;
     private final String localName;
 
     protected Map<String, Object> verboseDisplay;
@@ -36,12 +42,14 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     private String name;
 
+
+       
     PropertyTemplateModel(Property property, Individual subject, VitroRequest vreq) {
         this.vreq = vreq;
         subjectUri = subject.getURI(); 
+        this.property = property;
         propertyUri = property.getURI();
-        localName = property.getLocalName();        
-        log.debug("Local name for property " + propertyUri + ": " + localName);
+        localName = property.getLocalName();
         setVerboseDisplayValues(property);
         addUrl = "";
         
@@ -53,14 +61,18 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     protected void setVerboseDisplayValues(Property property) {  
         
         // No verbose display for vitro and vitro public properties.
-        // This models previous behavior. In theory the verbose display can be provided, but we may not want
-        // to give anyone access to these properties, since the application is dependent on them.
+        // This models previous behavior. In theory the verbose display can be provided, 
+        // but we may not want to give anyone access to these properties, since the
+        // application is dependent on them.
         String namespace = property.getNamespace();        
-        if (VitroVocabulary.vitroURI.equals(namespace) || VitroVocabulary.VITRO_PUBLIC.equals(namespace)) {
+        if (VitroVocabulary.vitroURI.equals(namespace) 
+            || VitroVocabulary.VITRO_PUBLIC.equals(namespace)) {
             return;
         }
         
-        Boolean verboseDisplayValue = (Boolean) vreq.getSession().getAttribute("verbosePropertyDisplay");
+        Boolean verboseDisplayValue = 
+            (Boolean) vreq.getSession().getAttribute("verbosePropertyDisplay");
+
         if ( ! Boolean.TRUE.equals(verboseDisplayValue))  {
             return;
         }
@@ -85,6 +97,27 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
        
         String editUrl = UrlBuilder.getUrl(getPropertyEditRoute(), "uri", property.getURI());
         verboseDisplay.put("propertyEditUrl", editUrl);
+        
+        if(isFauxProperty(property)) {
+            verboseDisplay.put("fauxProperty", "true");
+        } 
+    }
+    
+    private boolean isFauxProperty(Property prop) {
+        if(!(prop instanceof ObjectProperty)) {
+            return false;
+        }
+        ObjectPropertyDao opDao = vreq.getWebappDaoFactory().getObjectPropertyDao();
+        ObjectProperty baseProp = opDao.getObjectPropertyByURI(prop.getURI());
+        if(baseProp == null) {
+            return false;
+        }
+        ObjectProperty possibleFaux = (ObjectProperty) prop;
+        if (possibleFaux.getDomainPublic() == null) {
+            return (baseProp.getDomainPublic() != null);            
+        } else {
+            return !possibleFaux.getDomainPublic().equals(baseProp.getDomainPublic());
+        }
     }
     
     protected abstract int getPropertyDisplayTier(Property p);
@@ -94,6 +127,12 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         this.name = name;
     }
     
+    public String toString() {
+        return String.format("%s on %s",
+                             propertyUri != null ? propertyUri : "null Prop URI",
+                             subjectUri != null ? subjectUri : "null Sub URI" );
+    }
+
     /* Template properties */
     
     public abstract String getType();
@@ -110,6 +149,14 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         return propertyUri;
     }
     
+    public String getRangeUri() {
+        return rangeUri;
+    }
+    
+    public String getDomainUri() {
+        return domainUri;
+    }
+    
     public String getAddUrl() {
         //log.info("addUrl=" + addUrl);
         return (addUrl != null) ? addUrl : "";
@@ -117,6 +164,5 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     public Map<String, Object> getVerboseDisplay() {
         return verboseDisplay;
-    }
- 
+    } 
 }

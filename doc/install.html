@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="content-type" content="text/html; charset=UTF-8">
         <meta charset="utf-8">
-        <title>Vitro Version 1.4 Installation Guide</title>
+        <title>Vitro Version 1.6 Installation Guide</title>
         <link rel="stylesheet" href="./css/doc.css" media="screen">
     </head>
     <body>
@@ -12,9 +12,9 @@
         </div>
         <!-- Start of content -->
         <div id="wrapper-content" role="main">
-            <h1>Vitro Version 1.4 Installation Guide</h1>
+            <h1>Vitro Version 1.6. Installation Guide</h1>
             <small>
-                November 15, 2011 
+                October 9, 2013
             </small>
             <toc>
                 <ul>
@@ -22,7 +22,7 @@
                         <a href="#introduction">Introduction to the Vitro installation</a>
                     </li>
                     <li>
-                        <a href="#installation">Installation process for Version 1.4</a>
+                        <a href="#installation">Installation process for Version 1.6</a>
                     </li>
                 </ul>
             </toc>
@@ -38,8 +38,13 @@
                 If you are upgrading a previous installation of Vitro, 
                 you may need to adjust your procedure accordingly.
             </p>
-            <br>
-            <hr><!-- Page break --><!-- Introduction to the Vitro installation --><h2 id="introduction">Introduction to the Vitro installation</h2>
+            <p>
+              Other servlet containers: If you want to use a servlet container 
+              other than Tomcat, please consult <a href="other_servlet_containers.html">
+              instructions for other servlet containers</a> in this directory.
+            </p>
+            
+            <hr><h2 id="introduction">Introduction to the Vitro installation</h2>
    
             <p>
                 Before beginning the installation, 
@@ -54,32 +59,34 @@
             <p>
                 This is created when you checkout the Vitro source code 
                 (see <a href="#checkout_code">installation step III</a>, below). 
-                This is where you will create your deploy.properties file 
-                (see <a href="#deploy_properties">installation step V</a>, below), 
+                This is where you will create your build.properties file 
+                (see <a href="#build_properties">installation step IV</a>, below), 
                 and where you will make any modifications to the Vitro 
                 theme or code. You can create this wherever you choose. 
             </p>
             <h4>Vitro inside Tomcat</h4>
             <p>
                 When you run the build script to compile and deploy Vitro 
-                (see <a href="#deploy">installation step VI</a>, below), 
+                (see <a href="#deploy">installation step V</a>, below), 
                 the files will be deployed to a
                 directory inside Tomcat. This is the actual executing code for Vitro, 
                 but you won’t need to look at it or change it. If you need to change 
                 Vitro, make the changes in the distribution directory, and run the build  
                 script again. Tell the build script where to find Tomcat by setting <code>tomcat.home</code>
-                in the deploy.properties file (see <a href="#deploy_properties">installation step V</a>,
+                in the build.properties file (see <a href="#build_properties">installation step IV</a>,
                 below).
             </p>
             <h4>The Vitro home directory</h4>
             <p>
-                Vitro will use this area to store some of the data it uses. Uploaded 
-                image files are stored here, and the search index is stored here also. 
+                This directory contains the runtime configuration properties for Vitro.
+                Vitro will also use this area to store some of the data it uses. Uploaded 
+                image files are stored here, and the Solr home directory is stored here also. 
                 You can create this wherever you choose. Tell Vitro where to find the  
-                home directory by setting <code>vitro.home.directory</code>
-                in the 
-                deploy.properties file (see <a href="#deploy_properties">installation step V</a>, 
-                below). You must create this directory before starting Vitro, and you 
+                home directory by setting <code>vitro.home</code> in the 
+                build.properties file (see <a href="#build_properties">installation step IV</a>, 
+                below). You must create this directory before starting Vitro, 
+                you must create the <code>runtime.properties</code> file in this directory
+                (see <a href="#runtime_properties">Step VI</a>, below), and you 
                 must ensure that Tomcat has permission to read and write to this  
                 directory when it runs. 
             </p>
@@ -154,12 +161,12 @@
             <h4>Release schedule and names</h4>
             <p>
                 Currently, the Vitro release schedule is coordinated with the VIVO releases, 
-                so version 1.4 of Vitro forms the basis of version 1.4 of VIVO. 
+                so version 1.6 of Vitro forms the basis of version 1.6 of VIVO. 
                 In the Vitro code repository, the release tags illustrate this relationship. 
-                For example, the Vitro revision that was tagged for version 1.4 of VIVO is named “rel-vivo-1.4”
+                For example, the Vitro revision that was tagged for version 1.6 of VIVO is named “rel-vivo-1.6”
             </p>
 
-            <hr><!-- Page break --><!-- Installation process for Version 1.4 --><h2 id="installation">Installation process for Version 1.4</h2>
+            <hr><!-- Page break --><!-- Installation process for Version 1.6 --><h2 id="installation">Installation process for Version 1.6</h2>
             <p>
                 This document is a summary of the Vitro installation process. 
             </p>
@@ -176,10 +183,13 @@
                         <a href="#checkout_code">Check out the Vitro Source Code</a>
                     </li>
                     <li>
-                        <a href="#deploy_properties">Specify deployment properties</a>
+                        <a href="#build_properties">Specify build properties</a>
                     </li>
                     <li>
                         <a href="#deploy">Compile and deploy</a>
+                    </li>
+                    <li>
+                        <a href="#runtime_properties">Specify runtime properties</a>
                     </li>
                     <li>
                         <a href="#tomcat_settings">Configure Tomcat</a>
@@ -195,7 +205,7 @@
                             using "Contact Us" form)</a>
                     </li>
                     <li>
-                        <a href="#tomcat_connector">Setup Apache Tomcat Connector</a>
+                        <a href="#httpd">Set up Apache HTTPD</a>
                     </li>
                     <li>
                         <a href="#external_auth">Using an External Authentication
@@ -216,20 +226,19 @@
             </p>
             <ul>
                 <li>
-                    Java (SE) 1.6 or higher, <a href="http://java.sun.com">http://java.sun.com</a>
-                    (Not OpenJDK) 
+                    Java (SE) 1.7.x <a href="http://java.sun.com">http://java.sun.com</a>
+                    <ul>
+                    	<li>VIVO has not been tested with OpenJDK</li>
+                    </ul>
                 </li>
                 <li>
-                    Apache Tomcat 6.x or higher, <a href="http://tomcat.apache.org">http://tomcat.apache.org</a>
+                    Apache Tomcat 6.x or 7.x <a href="http://tomcat.apache.org">http://tomcat.apache.org</a>
                 </li>
                 <li>
-                    Apache Ant 1.7 or higher, <a href="http://ant.apache.org">http://ant.apache.org</a>
+                    Apache Ant 1.8 or higher, <a href="http://ant.apache.org">http://ant.apache.org</a>
                 </li>
                 <li>
-                    MySQL 5.1 or higher*, <a href="http://www.mysql.com">http://www.mysql.com</a>
-                </li>
-                <li>
-                    Apache Subversion 1.6.x or higher*, <a href="http://subversion.apache.org/">http://subversion.apache.org/</a>
+                    MySQL 5.1 or higher, <a href="http://www.mysql.com">http://www.mysql.com</a>
                 </li>
             </ul>
             <p>
@@ -239,6 +248,30 @@
                 your operating system and installation directions from the software  
                 support websites. 
             </p>
+
+            <p>
+                The following browsers are supported for this release
+            </p>
+    	    <ul>
+    	    	<li>
+    	    		Mac:
+		 	        <ul>
+		 	            <li>Chrome 30.0.1599.69 and above</li>
+		 	            <li>FireFox 3.6.28, 10.0.12, 24</li>
+		 	            <li>Opera 12.02</li>
+		 	            <li>Safari 5.0.3</li>
+		 	        </ul>
+    	    	</li>
+    	    	<li>
+		            PC:
+		 	        <ul>
+		 	            <li>Chrome 25.1364.2 and above</li>
+		 	            <li>FireFox 10.0.12, 24</li>
+		 	            <li>Internet Explorer 8, 9, 10</li>
+		 	            <li>Opera 12.02</li>
+		 	        </ul>
+		 	    </li>
+    	    </ul>
 
             <h3 id="create_database">II. Create an empty MySQL database </h3>
             <p>
@@ -269,18 +302,155 @@
                 Download the latest stable release of Vitro from SourceForge: 
                 go to 
                 <pre>      http://sourceforge.net/projects/vivo/files/Vitro%20Application%20Source/</pre>
-                and download either <code>vitro-rel-1.4.zip</code> or <code>vitro-rel-1.4.tar.gz</code>
+                and download either <code>vitro-rel-1.6.zip</code> or <code>vitro-rel-1.6.tar.gz</code>
             </p>
             <p>
                 If you want the very latest Vitro source, you can use subversion to check it out from SourceForge:
                 <pre>         svn checkout svn://svn.code.sf.net/p/vivo/vitro/code/trunk</code> <em>[Vitro_distribution_dir]</em></pre>
             </p>
-            <h3 id="deploy_properties">IV. Specify deployment properties </h3>
+
+            <h3 id="build_properties">IV. Specify build properties </h3>
             <p>
                 In the <code>webapp/config</code> directory of the Vitro distribution, 
-                copy the file <code>example.deploy.properties</code>
-                to a file named simply <code>deploy.properties</code>. This file sets 
-                several properties used in compilation and deployment. 
+                copy the file <code>example.build.properties</code>
+                to a file named simply <code>build.properties</code>. 
+                Edit the file to suit your installation, as described in the following table. 
+            </p>
+            <p>
+            	These properties are used in compilation and deployment. 
+            	They will be incorporated into Vitro when it is compiled in
+            	<a href="#deploy">Step V</a>. If you want to change these properties at
+            	a later date, you will need to stop Tomcat, repeat <a href="#deploy">Step V</a>, 
+            	and restart Tomcat.
+            </p>
+            <p>
+                <em>Windows:</em>
+                For those installing on Windows operating 
+                system, include the windows drive and use the forward slash "/" and not  
+                the back slash "\" in the directory locations, e.g. <code>c:/tomcat</code>.
+            </p>
+            <table border='1' bordercolor="#CCCCCC" cellspacing="5">
+                <tbody>
+                    <tr>
+                        <td colspan="2">
+                            Directory where tomcat is installed. 
+                        </td>
+                    </tr>
+                    <tr class="odd_row">
+                        <td>
+                            tomcat.home 
+                        </td>
+                        <td>
+                            /usr/local/tomcat 
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            Name of your Vitro application. 
+                        </td>
+                    </tr>
+                    <tr class="odd_row">
+                        <td>
+                            webapp.name 
+                        </td>
+                        <td>
+                            vitro 
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            Directory where the Vitro application will store 
+                            the data that it creates. This includes uploaded files (usually images) 
+                            and the Solr search index. Be sure this directory exists and is  
+                            writable by the user who the Tomcat service is running as. 
+                        </td>
+                    </tr>
+                    <tr class="odd_row">
+                        <td>
+                            vitro.home 
+                        </td>
+                        <td>
+                            /usr/local/vitro/home
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            Languages (in addition to American English) that will be built into your 
+                            Vitro site. The languages must be found in the
+                            <code>languages</code> directory of the Vitro distribution.
+                            See <a href="https://wiki.duraspace.org/display/VIVO/Building+a+multi-language+VIVO+instance">
+                            the VIVO Wiki</a> for more information.
+                        </td>
+                    </tr>
+                    <tr class="odd_row">
+                        <td>
+                            languages.addToBuild
+                        </td>
+                        <td>
+                            es_MX
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 id="deploy">V. Compile and deploy</h3>
+            <p>
+                In <a href="#build_properties">Step IV</a>, you defined the location of the VIVO home directory, 
+                by specifying <code>vitro.home</code> in the <code>build.properties</code> file.
+                Create that directory now.
+            </p>
+            <p>
+                At the command line, change to the <code>webapp</code> directory inside the Vitro distribution 
+                directory. Then type: 
+            </p>
+            <pre>    ant all<br>            </pre>
+            <p>
+                to build Vitro and deploy to Tomcat's webapps directory. 
+            </p>
+            <p>
+                The build script may run for as much as five minutes, 
+                and creates more than 100 lines of output. 
+                The process comprises several steps:
+                <ul>
+                   <li>collecting the source files from the distribution directory,</li>
+                   <li>compiling the Java source code,</li>
+                   <li>compiling and running unit tests,</li>
+                   <li>preparing the Solr search engine,</li>
+                   <li>deploying Vitro and Solr to Tomcat.</li>
+                </ul> 
+            </p>
+            <p>
+                The output of the build may include a variety of warning messages.
+                The Java compiler may warn of code that is outdated.
+                Unit tests may produce warning messages, 
+                and some tests may be ignored if they do not produce consistent results.  
+            </p>
+            <table align="center"><tr><td>
+                BUILD SUCCESSFUL<br>Total time: 1 minute 49 seconds
+            </td></tr></table>
+            <p>
+                If the output ends with a success message, the build was successful. 
+                Proceed to the next step.
+            </p>
+            <table align="center"><tr><td>
+                BUILD FAILED<br>Total time: 35 seconds
+            </td></tr></table>
+            <p>
+                If the output ends with a failure message, the build has failed. 
+                Find the cause of the failure, fix the problem, and run the script again.
+            </p>
+
+            <h3 id="runtime_properties">VI. Specify runtime properties </h3>
+            <p>
+                The build process in <a href="deploy">Step V</a> created a file called <code>example.runtime.properties</code>
+                in your Vitro home directory (<code>vitro.home</code> in the <code>build.properties</code> file).
+                Rename this file to  <code>runtime.properties</code>, and  
+                edit the file to suit your installation, as described in the following table. 
+            </p>
+            <p>
+                These properties are loaded when Vitro starts up. If you want to change these 
+                properties at a later date, you will need to restart Tomcat for them to take 
+                effect. You will not need to repeat <a href="#deploy">Step V</a>.
             </p>
             <p>
                 <em>Windows:</em>
@@ -292,7 +462,7 @@
                 <em>External authentication:</em>
                 If you want to use an external 
                 authentication system like Shibboleth or CUWebAuth, you will need to 
-                set two additional properties in this file. See the section below  
+                set an additional property in this file. See the section below  
                 entitled <a href="#external_auth">Using an External Authentication System with Vitro</a>. 
             </p>
             <table border='1' bordercolor="#CCCCCC" cellspacing="5">
@@ -331,32 +501,6 @@
                     </tr>
                     <tr>
                         <td colspan="2">
-                            Directory where tomcat is installed. 
-                        </td>
-                    </tr>
-                    <tr class="odd_row">
-                        <td>
-                            tomcat.home 
-                        </td>
-                        <td>
-                            /usr/local/tomcat 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            Name of your Vitro application. 
-                        </td>
-                    </tr>
-                    <tr class="odd_row">
-                        <td>
-                            webapp.name 
-                        </td>
-                        <td>
-                            vitro 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
                             URL of Solr context used in local Vitro search.
                             Should consist of:<pre>    scheme + servername + port + vitro_webapp_name + "solr"</pre>
                             In the standard installation, the Solr context will be on the same 
@@ -370,53 +514,6 @@
                         </td>
                         <td>
                             http://localhost:8080/vitrosolr 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            Restricts access to the Solr search platform. 
-                            The value is a regular expression. When a request is
-                            made to Solr, the IP address of the requestor must the expression, 
-                            or the request will be rejected.
-                            <br>
-                            Examples:<code>
-                                <ul>
-                                    <li>
-                                        vitro.local.solr.ipaddress.mask = 127\.0\.0\.1
-                                    </li>
-                                    <li>
-                                        vitro.local.solr.ipaddress.mask =
-                                        127\.0\.0\.1|0:0:0:0:0:0:0:1
-                                    </li>
-                                    <li>
-                                        vitro.local.solr.ipaddress.mask = 169.254.*
-                                    </li>
-                                </ul>
-                            </code>
-                        </td>
-                    </tr>
-                    <tr class="odd_row">
-                        <td>
-                            vitro.local.solr.ipaddress.mask 
-                        </td>
-                        <td>
-                            127\.0\.0\.1|[0:]+:1 
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            Directory where the Vitro application will store 
-                            the data that it creates. This includes uploaded files (usually images) 
-                            and the Solr search index. Be sure this directory exists and is  
-                            writable by the user who the Tomcat service is running as. 
-                        </td>
-                    </tr>
-                    <tr class="odd_row">
-                        <td>
-                            vitro.home.directory 
-                        </td>
-                        <td>
-                            /usr/local/vitro/data 
                         </td>
                     </tr>
                     <tr>
@@ -615,42 +712,93 @@
                     <tr>
                         <td colspan="2">
                             If an external authentication system like Shibboleth or CUWebAuth is to be 
-                            used, these properties say how the login button should be labeled, and which  
-                            HTTP header will contain the user ID from the authentication system. If such 
-                            a system is not to be used, leave these commented out. Consult the installation  
-                            instructions for more details. 
+                            used, this property says which HTTP header will contain the user ID from 
+                            the authentication system. If such a system is not to be used, 
+                            leave this commented out.
                         </td>
                     </tr>
                     <tr class="odd_row">
                         <td>
-                            externalAuth.buttonText
-                            <br/>
                             externalAuth.netIdHeaderName
                         </td>
                         <td>
-                            Log in using BearCat Shibboleth
-                            <br/>
                             remote_userID 
                         </td>
                     </tr>
+                    
                     <tr>
                         <td colspan="2">
-                            An absolute file path, pointing to the root directory of the Harvester utility.
-                            You must include the final slash.
+                            Tell Vitro to generate HTTP headers on its responses to facilitate caching the 
+                            profile pages that it creates. This can improve performance, but it can also
+                            result in serving stale data. Default is false if not set.
+                            For more information, see the VIVO wiki page: 
+                            <a href="https://wiki.duraspace.org/display/VIVO/Use+HTTP+caching+to+improve+performance">
+                            Use HTTP caching to improve performance </a>
                         </td>
                     </tr>
+                    <tr class="odd_row">
+                        <td>
+                          http.createCacheHeaders
+                        </td>
+                        <td>
+                           true
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td colspan="2">
+							Show only the most appropriate data values based on the Accept-Language 
+							header supplied by the browser.  Default is false if not set.
+                        </td>
+                    </tr>
+                    <tr class="odd_row">
+                        <td>
+                          RDFService.languageFilter
+                        </td>
+                        <td>
+                           false
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2">
+                          Force VIVO to use a specific language or Locale instead of those 
+                          specified by the browser. 
+                          This affects RDF data retrieved from the model, if RDFService.languageFilter is true.  
+                          This also affects the text of pages that have been modified to support multiple languages. 
+                        </td>
+                    </tr>
+                    <tr class="odd_row">
+                        <td>
+                          languages.forceLocale
+                        </td>
+                        <td>
+                          en_US
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2">
+                          A list of supported languages or Locales that the user may choose to
+                          use instead of the one specified by the browser. Selection images must
+                          be available in the i18n/images directory of the theme.
+                          This affects RDF data retrieved from the model, if RDFService.languageFilter is true.  
+                          This also affects the text of pages that have been modified to support multiple languages. 
+                        </td>
+                    </tr>
+                    <tr class="odd_row">
+                        <td>
+                          languages.selectableLocales
+                        </td>
+                        <td>
+                           en, es, fr_FR
+                        </td>
+                    </tr>
+
                 </tbody>
             </table>
-            <h3 id="deploy">V. Compile and deploy</h3>
-            <p>
-                At the command line, change to the <code>webapp</code> directory inside the Vitro distribution 
-                directory. Then type: 
-            </p>
-            <pre>                ant all<br>            </pre>
-            <p>
-                to build Vitro and deploy to Tomcat's webapps directory. 
-            </p>
-            <h3 id="tomcat_settings">VI. Configure Tomcat</h3>
+
+            <h3 id="tomcat_settings">VII. Configure Tomcat</h3>
             <h4>Set JVM parameters</h4>
             <p>
                 Vitro may require more memory than that allocated to Tomcat by 
@@ -661,7 +809,7 @@
                 <br>
                 For example: 
             </p>
-            <pre>                    export CATALINA_OPTS="-Xms512m -Xmx512m -XX:MaxPermSize=128m"<br>                </pre>
+            <pre>    export CATALINA_OPTS="-Xms512m -Xmx512m -XX:MaxPermSize=128m"<br>                </pre>
             <p>
                 This sets Tomcat to allocate an initial heap of 512 megabytes, a
                 maximum heap of 512 megabytes, and a PermGen space of 128 megs. Lower 
@@ -686,7 +834,7 @@
                 accepting percent-encoded UTF-8.
             </p>
             <p>
-                Edit Tomcat's conf/server.xml and add the following attribute to each of the 
+                Edit Tomcat's <code>conf/server.xml</code> and add the following attribute to each of the 
                 Connector elements: URIEncoding="UTF-8".
             </p>
             <pre>
@@ -699,6 +847,9 @@
                     &lt;/Server&gt;
             </pre>
             <p>
+                Note: some versions of Tomcat already include this attribute as the default.
+            </p>
+
             <h4>Take care when creating Context elements</h4>
             <p>
                 Each of the webapps in the Vitro distribution (Vitro and Solr) includes a "context fragment" file,
@@ -710,22 +861,35 @@
                 deployment parameters from the overridden context fragment.
             </p>
             <p>
-                See <a href="#tomcat_connector">Section X</a> below, 
+                See <a href="#httpd">Section XI</a> below, 
                 for an example of overriding the Vitro context fragment.
             </p>
 
-            <h3 id="start_tomcat">VII. Start Tomcat </h3>
+            <h3 id="start_tomcat">VIII. Start Tomcat </h3>
             <p>
                 Most Tomcat installations can be started by running <code>startup.sh</code>
                 or <code>startup.bat</code>
                 in Tomcat's bin directory. Point your
-                browser to "http://localhost:8080/vitro/" to test the application. If 
-                Tomcat does not start up, or the Vitro application is not visible, check 
-                the files in Tomcat's logs directory. Error messages are commonly found  
+                browser to "http://localhost:8080/vitro/" to test the application.
+            </p>
+            <p>
+               On start up Vitro will run some diagnostic tests. If a
+               problem is detected, the normal Vitro pages will redirect
+               to a startup status page describing the problem. You
+               can stop tomcat, attempt to fix the problem and
+               proceed from <a href="#deploy">Step V</a>. If the problem is not serious, the
+               startup status page may offer a <code>continue</code> link which
+               will allow you to use VIVO in spite of the problems.
+           </p>
+            <p>
+                If Tomcat does not start up, or the Vitro application is not visible, check 
+                the files in Tomcat's <code>logs</code> directory. Error messages are commonly found  
                 in <code>catalina.out</code>
                 or <code>localhost.log</code>
             </p>
-            <h3 id="add_rdf">VIII. Log in and add RDF data </h3>
+                
+            </p>
+            <h3 id="add_rdf">IX. Log in and add RDF data </h3>
             <p>
                 If the startup was successful, you will see a welcome message 
                 informing you that you have successfully installed Vitro. Click the "Log  
@@ -759,7 +923,7 @@
                 the page will show a simple index of the knowledge base. 
             </p>
 
-            <h3 id="contact_email">IX. Set the Contact Email Address (if using
+            <h3 id="contact_email">X. Set the Contact Email Address (if using
                 "Contact Us" form)</h3>
             <p>
                 If you have configured your application to use the "Contact Us"
@@ -781,43 +945,22 @@
                 provide an email address in this step, your users will receive a java  
                 error in the interface. 
             </p>
-            <h3 id="tomcat_connector">X. Set up Apache Tomcat Connector </h3>
+            <h3 id="httpd">XI. Set up Apache HTTPD </h3>
             <p>
-                It is recommended that a Tomcat Connector such as mod_jk be used to 
-                ensure that the site address does not include the port number (e.g. 
-                8080) and an additional reference to the Tomcat context name (e.g.  
-                /vitro). 
+                It is recommended to run an Apache HTTPD web server to accept requests
+                and then proxy them to the VIVO Tomcat context. This will make Vitro
+                available at "http://example.com" instead of "http://example.com:8080/vitro".
+                It will also allow the use of external authentication.
             </p>
             <p>
-                This will make Vitro available at "http://example.com" instead of 
-                "http://example.com:8080/vitro" 
+                Setup HTTPD to send all of the requests that it receives to Tomcat's AJP
+                connector. This can be done in HTTPD 2.x with a simple directive in httpd.conf:
             </p>
+            <pre>     ProxyPass / ajp://localhost:8009/ <br><br></pre>
             <p>
-                Using the mod_jk connector allows for communication between Tomcat 
-                and the primary web server. The <a href="http://tomcat.apache.org/connectors-doc/generic_howto/quick.html">Quick
-                    Start HowTo</a>
-                on the Apache site describes the minimum server 
-                configurations for several popular web servers. 
-            </p>
-            <p>
-                After setting up the mod_jk connector above, you will need to 
-                modify the Tomcat's server.xml (located in <code>[tomcat root]/conf/</code>)
-                to
-                respond 
-                to 
-                requests from Apache via the connector. Look for the  
-                &lt;connector&gt; directive and add the following properties: 
-            </p>
-            <pre>                connectionTimeout="20000" maxThreads="320" keepAliveTimeout="20000"&nbsp; <br>            </pre>
-            <p>
-                Note: the value for maxThreads (320) is equal to the value for 
-                MaxClients in the apache's <code>httpd.conf</code>
-                file. 
-            </p>
-            <p>
-                Locate the <code>&lt;Host name="localhost"...&gt;</code>
-                directive 
-                and update as follows: 
+                Modify the &lt;Host&gt; in Tomcat server.xml (located in <code>[tomcat root]/conf/</code>)
+                so that the context path is empty to allow VIVO to be servred from the root path.
+                Locate the <code>&lt;Host name="localhost"...&gt;</code> directive and update as follows: 
             </p>
             <pre>              &lt;Host name="localhost" appBase="webapps"
                        DeployOnStartup="false"
@@ -832,16 +975,22 @@
                            cookies="true" &gt;
                    
                        &lt;Manager pathname="" /&gt;
-                   
-                       &lt;Environment type="java.lang.String" override="false"
-                               name="path.configuration"
-                               value="deploy.properties"
-                       /&gt;
                    &lt;/Context&gt;
                   
                    ...
             </pre>
-            <h3 id="external_auth">XI. Using an External Authentication System 
+            <p>
+                After setting up the above, it is recommended that you modify the Tomcat AJP connector
+                parameters in server.xml. Look for the &lt;connector&gt; directive and add the
+                following properties: 
+            </p>
+            <pre>    connectionTimeout="20000" maxThreads="320" keepAliveTimeout="20000"&nbsp;<br><br></pre>
+            <p>
+                Note: the value for maxThreads (320) is equal or greater than the value for 
+                MaxClients in the apache's <code>httpd.conf</code> file. 
+            </p>
+
+            <h3 id="external_auth">XII. Using an External Authentication System 
                 with Vitro </h3>
             <p>
             </p>
@@ -878,7 +1027,7 @@
             <h4>Configuring Vitro</h4>
             <p>
                 To enable external authentication, Vitro requires three values in 
-                the <code>deploy.properties</code>
+                the <code>runtime.properties</code>
                 file. 
             </p>
             <ul>
@@ -893,7 +1042,7 @@
                     </p>
                     <p>
                         You need to tell Vitro the name of that HTTP header. Insert a 
-                        line like this in the deploy.properties file: 
+                        line like this in the runtime.properties file: 
                     </p>
                     <pre>externalAuth.netIdHeaderName = [the header name]</pre>
                     <p>
@@ -907,13 +1056,18 @@
                     the Vitro login form. You need to tell Vitro what text should appear in
                     that button.
                     <p>
-                        Put a line like this in the deploy.properties file:
-                        externalAuth.buttonText = [the text for your login button] For example:
-                    </p>
-                    <pre>externalAuth.buttonText = Log in using BearCat Shibboleth</pre>
-                    <p>
+                        In your theme, add a line to the <code>all.properties</code> file,
+                        like this one: 
+                        <pre>external_login_text = <em>[the text for your login button]</em></pre>
+                        For example:
+                        <pre>external_login_text = Log in using BearCat Shibboleth</pre>
                         The Vitro login form will display a button labelled "Log in 
                         using BearCat Shibboleth". 
+                    </p>
+                    <p>
+                    	If your site supports additional languages, add lines to the corresponding files.
+                    	For example, <code>all_es.properties</code> might contain this line:
+                    	<pre>external_login_text = Entrar usando Shibboleth GatoOso</pre>
                     </p>
                 </li>
                 <li>
@@ -924,7 +1078,7 @@
                         data model for a person with a property that matches the User’s network 
                         ID (the value of the property must be either a String literal or an 
                         untyped literal). You need to tell Vitro what property should be used  
-                        for matching. Insert a line like this in the deploy.properties file: 
+                        for matching. Insert a line like this in the runtime.properties file: 
                     </p>
                     <pre>selfEditing.idMatchingProperty = [the URI of the property]</pre>
                     <p>
@@ -933,46 +1087,52 @@
                     <pre>selfEditing.idMatchingProperty = http://vitro.mydomain.edu/ns#networkId</pre>
                 </li>
             </ul>
-            <h3 id="installation_check">XII. Was the installation successful? </h3>
+            <h3 id="installation_check">XIII. Was the installation successful? </h3>
             <p>
                 If you have completed the previous steps, you have good indications 
                 that the installation was successful. 
             </p>
             <ul>
                 <li>
-                    Step VII showed that Tomcat recognized the webapp, and that the 
+                    Step VIII showed that Tomcat recognized the webapp, and that the 
                     webapp was able to present the initial page. 
                 </li>
                 <li>
-                    Step VIII verified that you can log in to the administrator 
+                    Step IX verified that you can log in to the administrator 
                     account. 
                 </li>
             </ul>
             <p>
-                Step VII also shows that the Vitro self-tests ran successfully. 
+                Step VIII also shows that the Vitro self-tests ran successfully. 
                 When Tomcat starts the Vitro webapp, it runs several tests.
                 If any of these tests produce warnings or error message, 
                 you would see them instead of the Vitro home page. 
             </p>
             <p>
             	Among other things, the self-tests check
-            </p>
-            <ul>
-                <li>The Vitro home directory exists and Vitro can write to it.</li>
-                <li>Vitro can connect to the database.</li>
-                <li>Vitro can connect to the Solr search application.</li>
-            </ul>
-            <p>
+	            <ul>
+	                <li>The Vitro home directory exists and Vitro can write to it.</li>
+	                <li>Vitro can connect to the database.</li>
+	                <li>Vitro can connect to the Solr search application.</li>
+	            </ul>
                 If you saw the Vitro home page in Step VII, you know that your installation passed all of these tests.
             </p>
 
-            <h3 id="termsofuse">XIII. Review the Vitro Terms of Use</h3>
+            <h3 id="termsofuse">XIV. Review the Vitro Terms of Use</h3>
             <p>
                 Vitro comes with a "Terms of Use" statement linked from the footer. 
                 The "Site Name" you assign in the "Site Information" form under the <strong>Site Admin</strong>
                 area will be inserted into the "Terms of Use" 
                 statement.  If you want to edit the text content more than just  the 
-                "Site Name", the file can be found here:<pre>[vitro_source_dir]/webapp/web/templates/freemarker/body/termsOfUse.ftl</pre>
+                "Site Name", the file can be found here:
+                <pre>[vitro_source_dir]/webapp/web/templates/freemarker/body/termsOfUse.ftl</pre>
+            </p>
+            <p>
+            	Your "Terms of Use" statement is also referenced in the Linked Open Data (RDF) 
+            	that your site produces, so you should be sure that it accurately reflects 
+            	the way that your data may be used.
+            </p>
+            <p>
                 Be sure to make the changes in your source files and deploy them to your 
                 tomcat so you don't lose your changes next time you deploy for another reason.
             </p>
@@ -992,7 +1152,7 @@
         <div id="footer" role="contentinfo">
             <p class="copyright">
                 <small>
-                    ©2011 All Rights Reserved
+                    ©2013 All Rights Reserved
                 </small>
             </p>
         </div>

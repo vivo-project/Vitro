@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_LITERAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.*;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -15,6 +15,8 @@ import java.util.Map;
 
 import net.sf.jga.algorithms.Filter;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,7 +31,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
  * A Individual object that will delegate to an inner Individual
@@ -42,6 +43,8 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 public class IndividualFiltering implements Individual {
     private final Individual _innerIndividual;
     private final VitroFilters _filters;
+    
+    private static final Log log = LogFactory.getLog(IndividualFiltering.class);
 
     public IndividualFiltering(Individual individual, VitroFilters filters) {
         super();
@@ -55,6 +58,8 @@ public class IndividualFiltering implements Individual {
 	public List<DataProperty> getDataPropertyList() {
         List<DataProperty> dprops =  _innerIndividual.getDataPropertyList();
         LinkedList<DataProperty> outdProps = new LinkedList<DataProperty>();
+        if( dprops == null ) 
+            return outdProps;
         Filter.filter(dprops,_filters.getDataPropertyFilter(), outdProps);
         
         ListIterator<DataProperty> it = outdProps.listIterator();
@@ -80,6 +85,8 @@ public class IndividualFiltering implements Individual {
 		// the DataProperty with statements. - jblake
         List<DataProperty> outdProps = new ArrayList<DataProperty>();
         List<DataProperty> dprops = _innerIndividual.getPopulatedDataPropertyList();
+        if( dprops == null ) 
+            return outdProps;
 		for (DataProperty dp: dprops) {
 			if (_filters.getDataPropertyStatementFilter().fn(
 					new DataPropertyStatementImpl(this._innerIndividual.getURI(), dp.getURI(), SOME_LITERAL))) {
@@ -103,6 +110,8 @@ public class IndividualFiltering implements Individual {
     
     private List<DataPropertyStatement> filterDataPropertyStatements(List<DataPropertyStatement> dStmts) {
         List<DataPropertyStatement> outDstmts = new LinkedList<DataPropertyStatement>();
+        if( dStmts == null ) 
+            return outDstmts;
         Filter.filter(dStmts,_filters.getDataPropertyStatementFilter(), outDstmts);
         return outDstmts;          
     }    
@@ -111,7 +120,7 @@ public class IndividualFiltering implements Individual {
     public Map<String, DataProperty> getDataPropertyMap() {
         Map<String,DataProperty> innerMap = _innerIndividual.getDataPropertyMap();
         if( innerMap == null )
-            return null;
+            return Collections.emptyMap();
                 
         Map<String,DataProperty> returnMap = new HashMap<String,DataProperty>();
         for( String key : innerMap.keySet() ){
@@ -133,8 +142,6 @@ public class IndividualFiltering implements Individual {
     @Override
     public List<ObjectProperty> getObjectPropertyList() {
         List <ObjectProperty> oprops = _innerIndividual.getObjectPropertyList();
-//        List<ObjectProperty> outOProps = new LinkedList<ObjectProperty>();
-//        Filter.filter(oprops, _filters.getObjectPropertyFilter(), outOProps);
         return ObjectPropertyDaoFiltering.filterAndWrap(oprops, _filters);
     }
     
@@ -143,10 +150,18 @@ public class IndividualFiltering implements Individual {
 		// I'd rather filter on the actual ObjectPropertyStatements here, but
 		// Individual.getPopulatedObjectPropertyList doesn't actually populate
 		// the ObjectProperty with statements. - jblake
+        
+        // bjl23:  disabling this filtering because the individual statements are
+        // filtered later, and we need to allow for the possibility that a particular
+        // predicate + range class combination is allowed even if the predicate is
+        // hidden on its own.
+        
+        // Will revisit filtering at this level if it turns out to be truly necessary.
+        
         List<ObjectProperty> outOProps = new ArrayList<ObjectProperty>();
         List<ObjectProperty> oProps = _innerIndividual.getPopulatedObjectPropertyList();
 		for (ObjectProperty op: oProps) {
-			if (_filters.getObjectPropertyStatementFilter().fn(
+			if (true || _filters.getObjectPropertyStatementFilter().fn(
 					new ObjectPropertyStatementImpl(this._innerIndividual.getURI(), op.getURI(), SOME_LITERAL))) {
 				outOProps.add(op);
 			}
@@ -242,6 +257,16 @@ public class IndividualFiltering implements Individual {
     @Override
     public String getName() {
         return _innerIndividual.getName();
+    }
+    
+    @Override
+    public String getLabel() {
+        return _innerIndividual.getLabel();
+    }
+    
+    @Override 
+    public String getPickListName() {
+        return getName();
     }
 
     @Override
@@ -452,6 +477,9 @@ public class IndividualFiltering implements Individual {
     @Override
     public List<String> getDataValues(String propertyUri) {
         List<DataPropertyStatement> stmts = getDataPropertyStatements(propertyUri);
+        if( stmts == null )
+            return Collections.emptyList();
+
         // Since the statements have been filtered, we can just take the data values without filtering.
         List<String> dataValues = new ArrayList<String>(stmts.size());
         for (DataPropertyStatement stmt : stmts) {
@@ -463,6 +491,9 @@ public class IndividualFiltering implements Individual {
     @Override
     public String getDataValue(String propertyUri) {
         List<DataPropertyStatement> stmts = getDataPropertyStatements(propertyUri);
+        if( stmts == null)
+            return null;
+
         // Since the statements have been filtered, we can just take the first data value without filtering.
         return stmts.isEmpty() ? null : stmts.get(0).getData();
     }
@@ -470,6 +501,9 @@ public class IndividualFiltering implements Individual {
     @Override
     public DataPropertyStatement getDataPropertyStatement(String propertyUri) {
         List<DataPropertyStatement> stmts = getDataPropertyStatements(propertyUri);
+        if( stmts == null )
+            return null;
+
         // Since the statements have been filtered, we can just take the first data value without filtering.
         return stmts.isEmpty() ? null : stmts.get(0);       
     }
@@ -477,6 +511,9 @@ public class IndividualFiltering implements Individual {
     @Override
     public List<Individual> getRelatedIndividuals(String propertyUri) {
         List<ObjectPropertyStatement> stmts = getObjectPropertyStatements(propertyUri);
+        if( stmts == null)
+            return Collections.emptyList();
+
         // Since the statements have been filtered, we can just take the individuals without filtering.
         List<Individual> relatedIndividuals = new ArrayList<Individual>(stmts.size());
         for (ObjectPropertyStatement stmt : stmts) {
@@ -488,6 +525,9 @@ public class IndividualFiltering implements Individual {
     @Override
     public Individual getRelatedIndividual(String propertyUri) {
         List<ObjectPropertyStatement> stmts = getObjectPropertyStatements(propertyUri); 
+        if( stmts == null )
+            return null;
+
         // Since the statements have been filtered, we can just take the first individual without filtering.
         return stmts.isEmpty() ? null : stmts.get(0).getObject();
     }

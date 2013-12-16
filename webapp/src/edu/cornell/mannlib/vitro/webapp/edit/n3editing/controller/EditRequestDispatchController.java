@@ -155,12 +155,30 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 	private EditConfigurationVTwo setupEditConfiguration(String editConfGeneratorName,
 			VitroRequest vreq) throws Exception {	    	    	    
     	HttpSession session = vreq.getSession();
-    	EditConfigurationVTwo editConfig = 
-    	    makeEditConfigurationVTwo( editConfGeneratorName, vreq, session);
-
-        //edit key is set here, NOT in the generator class
-    	String editKey = EditConfigurationUtils.getEditKey(vreq);  
-        editConfig.setEditKey(editKey);        
+    	//Originally, this code called makeEditConfiguration before checking for/setting the edit key
+    	//which meant that in the case of page reload on an error, you would recreate an edit configuration
+    	//using the generator
+    	//Given recent updates enabling modification of edit configuration dynamically through AJAX,
+    	//we will first check whether the edit key exists and if there is already an edit configuration
+    	//in the session - and then will utilize the edit configuration that already exists
+    	//edit key is set here, NOT in the generator class
+    	EditConfigurationVTwo editConfig = null;
+    	EditConfigurationVTwo existingConfig = EditConfigurationVTwo.getConfigFromSession(session, vreq);
+    	//if delete form from the editing page, then edit configuration already exists and the 
+    	//delete generator wouldn't be used, we need to make sure that it is used if it's a delete option
+    	if(existingConfig != null && !isDeleteForm(vreq)) {
+    		editConfig = existingConfig;
+    	} else {
+    		editConfig = 
+    	    	    makeEditConfigurationVTwo( editConfGeneratorName, vreq, session);
+    	}
+    	 
+    	if(editConfig == null) {
+    	    log.error("editConfig is null! How did this happen?");
+    	}
+    	String editKey = EditConfigurationUtils.getEditKey(vreq); 
+    	editConfig.setEditKey(editKey);        
+        
 
         //put edit configuration in session so it can be accessed on form submit.
         EditConfigurationVTwo.putConfigInSession(editConfig, session);
@@ -186,6 +204,8 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 	    String editConfGeneratorName = null;
 	    
 	    String predicateUri =  getPredicateUri(vreq);
+	    String domainUri = EditConfigurationUtils.getDomainUri(vreq);
+	    String rangeUri = EditConfigurationUtils.getRangeUri(vreq);
 	    
         // *** handle the case where the form is specified as a request parameter ***	    
         String formParam = getFormParam(vreq);
@@ -201,8 +221,10 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 
       	// *** check for a predicate URI in the request        	
         }else if( predicateUri != null && !predicateUri.isEmpty() ){                      
-            Property prop = getProperty( predicateUri, vreq);
-            if( prop != null && prop.getCustomEntryForm() != null ){
+            Property prop = getProperty( predicateUri, domainUri, rangeUri, vreq);
+            if (prop != null && rangeUri != null) {
+                editConfGeneratorName = getCustomEntryForm(prop);
+            } else if( prop != null && prop.getCustomEntryForm() != null ){
                 //there is a custom form, great! let's use it.
                 editConfGeneratorName = prop.getCustomEntryForm();
                 
@@ -231,10 +253,19 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
         return editConfGeneratorName;
 	}
 
-	private Property getProperty(String predicateUri, VitroRequest vreq) {	    
+	private String getCustomEntryForm(Property prop){
+	    if (prop.getCustomEntryForm() == null) {
+	        return DEFAULT_OBJ_FORM;
+	    } else {
+	        return prop.getCustomEntryForm();
+	    }
+	}
+	
+	private Property getProperty(String predicateUri, String domainUri, String rangeUri, VitroRequest vreq) {	   
 		Property p = null;
 		try{
-    		p = vreq.getWebappDaoFactory().getObjectPropertyDao().getObjectPropertyByURI(predicateUri);
+    		p = vreq.getWebappDaoFactory().getObjectPropertyDao().getObjectPropertyByURIs(
+    		        predicateUri, domainUri, rangeUri);
     		if(p == null) {
     			p = vreq.getWebappDaoFactory().getDataPropertyDao().getDataPropertyByURI(predicateUri);
     		}

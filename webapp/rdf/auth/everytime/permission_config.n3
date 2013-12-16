@@ -1,0 +1,174 @@
+# $This file is distributed under the terms of the license in /doc/license.txt$ 
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> .
+@prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
+@prefix displayByRole: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.DisplayByRolePermission#> .
+@prefix editByRole: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.EditByRolePermission#> .
+
+auth:ADMIN 
+    a auth:PermissionSet ;
+    rdfs:label "Site Admin" ;
+    
+    # ADMIN-only permissions
+    auth:hasPermission simplePermission:AccessSpecialDataModels ;
+   	auth:hasPermission simplePermission:EnableDeveloperPanel ;    
+    auth:hasPermission simplePermission:LoginDuringMaintenance ;
+    auth:hasPermission simplePermission:ManageMenus ;
+    auth:hasPermission simplePermission:ManageProxies ;
+    auth:hasPermission simplePermission:ManageSearchIndex ;
+    auth:hasPermission simplePermission:ManageUserAccounts ;
+    auth:hasPermission simplePermission:RebuildVClassGroupCache ;
+    auth:hasPermission simplePermission:RefreshVisualizationCache ;
+    auth:hasPermission simplePermission:SeeConfiguration ;
+    auth:hasPermission simplePermission:SeeStartupStatus ;
+    auth:hasPermission simplePermission:UseAdvancedDataToolsPages ;
+    auth:hasPermission simplePermission:UseMiscellaneousAdminPages ;
+    auth:hasPermission simplePermission:UseSparqlQueryPage ;
+   	auth:hasPermission simplePermission:PageViewableAdmin ;  
+   	
+		# Uncomment the following permission line to enable the SPARQL update API. 
+		# Before enabling, be sure that the URL api/sparqlUpdate is secured by SSH, 
+		# so passwords will not be sent in clear text.   	  
+#  	auth:hasPermission simplePermission:UseSparqlUpdateApi ;    
+    
+    # permissions for CURATOR and above.
+    auth:hasPermission simplePermission:EditOntology ;
+    auth:hasPermission simplePermission:EditSiteInformation ;
+    auth:hasPermission simplePermission:ManagePortals ;
+    auth:hasPermission simplePermission:ManageTabs ;
+    auth:hasPermission simplePermission:SeeVerbosePropertyInformation ;
+    auth:hasPermission simplePermission:UseMiscellaneousCuratorPages ;
+	auth:hasPermission simplePermission:PageViewableCurator ;
+    
+    # permissions for EDITOR and above.
+    auth:hasPermission simplePermission:DoBackEndEditing ;
+    auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
+    auth:hasPermission simplePermission:SeeRevisionInfo ;
+    auth:hasPermission simplePermission:SeeSiteAdminPage ;
+    auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+    auth:hasPermission simplePermission:PageViewableEditor ;
+
+    # permissions for ANY logged-in user.
+    auth:hasPermission simplePermission:DoFrontEndEditing ;
+    auth:hasPermission simplePermission:EditOwnAccount ;
+    auth:hasPermission simplePermission:ManageOwnProxies ;
+    auth:hasPermission simplePermission:QueryUserAccountsModel ;
+    auth:hasPermission simplePermission:UseBasicAjaxControllers ;
+    auth:hasPermission simplePermission:UseMiscellaneousPages ;
+  	auth:hasPermission simplePermission:PageViewableLoggedIn ;
+    
+    # permissions for ANY user, even if they are not logged in.
+    auth:hasPermission simplePermission:QueryFullModel ;
+	auth:hasPermission simplePermission:PageViewablePublic ;
+    
+    # role-based permissions for ADMIN
+    auth:hasPermission displayByRole:Admin ;
+    auth:hasPermission editByRole:Admin ;
+    .
+
+auth:CURATOR 
+    a auth:PermissionSet ;
+    rdfs:label "Curator" ;
+    
+    # permissions for CURATOR and above.
+    auth:hasPermission simplePermission:EditOntology ;
+    auth:hasPermission simplePermission:EditSiteInformation ;
+    auth:hasPermission simplePermission:ManagePortals ;
+    auth:hasPermission simplePermission:ManageTabs ;
+    auth:hasPermission simplePermission:SeeVerbosePropertyInformation ;
+    auth:hasPermission simplePermission:UseMiscellaneousCuratorPages ;
+    auth:hasPermission simplePermission:PageViewableCurator ;
+    
+    # permissions for EDITOR and above.
+    auth:hasPermission simplePermission:DoBackEndEditing ;
+    auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
+    auth:hasPermission simplePermission:SeeRevisionInfo ;
+    auth:hasPermission simplePermission:SeeSiteAdminPage ;
+    auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+    auth:hasPermission simplePermission:PageViewableEditor ;
+
+    # permissions for ANY logged-in user.
+    auth:hasPermission simplePermission:DoFrontEndEditing ;
+    auth:hasPermission simplePermission:EditOwnAccount ;
+    auth:hasPermission simplePermission:ManageOwnProxies ;
+    auth:hasPermission simplePermission:QueryUserAccountsModel ;
+    auth:hasPermission simplePermission:UseBasicAjaxControllers ;
+    auth:hasPermission simplePermission:UseMiscellaneousPages ;
+   	auth:hasPermission simplePermission:PageViewableLoggedIn ;
+    
+    # permissions for ANY user, even if they are not logged in.
+    auth:hasPermission simplePermission:QueryFullModel ;
+    auth:hasPermission simplePermission:PageViewablePublic ;
+    
+    # role-based permissions for CURATOR
+    auth:hasPermission displayByRole:Curator ;
+    auth:hasPermission editByRole:Curator ;
+    .
+
+auth:EDITOR 
+    a auth:PermissionSet ;
+    rdfs:label "Editor" ;
+    
+    # permissions for EDITOR and above.
+    auth:hasPermission simplePermission:DoBackEndEditing ;
+    auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
+    auth:hasPermission simplePermission:SeeRevisionInfo ;
+    auth:hasPermission simplePermission:SeeSiteAdminPage ;
+    auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+    auth:hasPermission simplePermission:PageViewableEditor ;
+
+    # permissions for ANY logged-in user.
+    auth:hasPermission simplePermission:DoFrontEndEditing ;
+    auth:hasPermission simplePermission:EditOwnAccount ;
+    auth:hasPermission simplePermission:ManageOwnProxies ;
+    auth:hasPermission simplePermission:QueryUserAccountsModel ;
+    auth:hasPermission simplePermission:UseBasicAjaxControllers ;
+    auth:hasPermission simplePermission:UseMiscellaneousPages ;
+    auth:hasPermission simplePermission:PageViewableLoggedIn ;
+    
+    # permissions for ANY user, even if they are not logged in.
+    auth:hasPermission simplePermission:QueryFullModel ;
+   	auth:hasPermission simplePermission:PageViewablePublic ;
+    
+    # role-based permissions for EDITOR
+    auth:hasPermission displayByRole:Editor ;
+    auth:hasPermission editByRole:Editor ;
+    .
+
+auth:SELF_EDITOR
+    a auth:PermissionSet ;
+    a auth:PermissionSetForNewUsers ;
+    rdfs:label "Self Editor" ;
+
+    # permissions for ANY logged-in user.
+    auth:hasPermission simplePermission:DoFrontEndEditing ;
+    auth:hasPermission simplePermission:EditOwnAccount ;
+    auth:hasPermission simplePermission:ManageOwnProxies ;
+    auth:hasPermission simplePermission:QueryUserAccountsModel ;
+    auth:hasPermission simplePermission:UseBasicAjaxControllers ;
+    auth:hasPermission simplePermission:UseMiscellaneousPages ;
+    auth:hasPermission simplePermission:PageViewableLoggedIn ;
+    
+    # permissions for ANY user, even if they are not logged in.
+    auth:hasPermission simplePermission:QueryFullModel ;
+	auth:hasPermission simplePermission:PageViewablePublic ;
+
+    # role-based permissions for SELF_EDITOR
+    #     For role-based display and editing, SelfEditor is like Public. 
+    #     SelfEditor uses its special permissions to edit/display its own values.
+    auth:hasPermission displayByRole:Public ; 
+    .
+
+auth:PUBLIC
+    a auth:PermissionSet ;
+    a auth:PermissionSetForPublic ;
+    rdfs:label "Public" ;
+    
+    # permissions for ANY user, even if they are not logged in.
+    auth:hasPermission simplePermission:QueryFullModel ;
+	auth:hasPermission simplePermission:PageViewablePublic ;
+
+    # role-based permissions for PUBLIC
+    auth:hasPermission displayByRole:Public ;
+    .

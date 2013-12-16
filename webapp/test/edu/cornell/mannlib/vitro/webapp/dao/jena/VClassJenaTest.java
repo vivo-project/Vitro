@@ -113,6 +113,7 @@ public class VClassJenaTest {
 		
 		Assert.assertEquals(vClassJena.getName(), vClass.getName());  
 		Assert.assertEquals(vClassJena.getLocalNameWithPrefix(), vClass.getLocalNameWithPrefix()); 
+
 		Assert.assertEquals(vClassJena.getPickListName(), vClass.getPickListName());  
 		Assert.assertEquals(vClassJena.getExample(), vClass.getExample());  
 		Assert.assertEquals(vClassJena.getDescription(), vClass.getDescription());  
@@ -162,7 +163,7 @@ public class VClassJenaTest {
         VClass vcw = new VClass();
         cls.getModel().enterCriticalSection(Lock.READ);
 		vcw.setName(getLabelForClass(cls,false,false,wadf));
-		vcw.setLocalNameWithPrefix(getLabelForClass(cls,true,false,wadf));
+		vcw.setLocalNameWithPrefix(wadf.makeLocalNameWithPrefix(vcw));
 		vcw.setPickListName(getLabelForClass(cls,false,true,wadf));
         try {
         	if (cls.isAnon()) {
@@ -232,18 +233,6 @@ public class VClassJenaTest {
                 }
             }            
             vcw.setProhibitedFromUpdateBelowRoleLevel(prohibitedRoleLevel);//this might get set to null
-
-            // We need a better way of caching the counts.  For now I'm only setting 0 for the empty classes, to hide them from the DWR editing
-            
-            //ClosableIterator typeIt = getOntModel().listStatements(null,RDF.type,cls);
-            //try {
-            //    if (!typeIt.hasNext()) {
-            //    	vcw.setEntityCount(0);
-            //    }
-            //} finally {
-            //	typeIt.close();
-            //}
-            
             
         } finally {
             cls.getModel().leaveCriticalSection();

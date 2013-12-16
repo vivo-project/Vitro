@@ -55,11 +55,11 @@ public class GetClazzObjectProperties extends BaseEditController {
 		String respo = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 		respo += "<options>";
 
-		ObjectPropertyDao odao = vreq.getFullWebappDaoFactory()
+		ObjectPropertyDao odao = vreq.getUnfilteredWebappDaoFactory()
 				.getObjectPropertyDao();
-		PropertyInstanceDao piDao = vreq.getFullWebappDaoFactory()
+		PropertyInstanceDao piDao = vreq.getUnfilteredWebappDaoFactory()
 				.getPropertyInstanceDao();
-		VClassDao vcDao = vreq.getFullWebappDaoFactory().getVClassDao();
+		VClassDao vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
 
 		// incomplete list of classes to check, but better than before
 		List<String> superclassURIs = vcDao.getAllSuperClassURIs(vClassURI);

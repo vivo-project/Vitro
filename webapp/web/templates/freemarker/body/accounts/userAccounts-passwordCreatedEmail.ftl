@@ -13,15 +13,15 @@
         <p>
             ${userAccount.firstName} ${userAccount.lastName}
         </p>
-        
+
         <p>
             <strong>Password successfully created.</strong>
         </p>
-        
+
         <p>
             Your new password associated with ${userAccount.emailAddress} has been created.
         </p>
-        
+
         <p>
             Thank you.
         </p>

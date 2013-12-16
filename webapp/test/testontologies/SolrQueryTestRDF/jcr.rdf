@@ -1,0 +1,504 @@
+<rdfsyn:RDF
+    xmlns:hr="http://vivo.cornell.edu/ns/hr/0.9/hr.owl#"
+    xmlns:c4o="http://purl.org/spar/c4o/"
+    xmlns:vitro-public="http://vitro.mannlib.cornell.edu/ns/vitro/public#"
+    xmlns:ero="http://purl.obolibrary.org/obo/"
+    xmlns:pvs="http://vivoweb.org/ontology/provenance-support#"
+    xmlns:vivo="http://vivoweb.org/ontology/core#"
+    xmlns:j.0="http://vivoweb.org/ontology/newhr#"
+    xmlns:stars="http://vitro.mannlib.cornell.edu/ns/cornell/stars/classes#"
+    xmlns:aka="http://vivoweb.org/ontology/aka#"
+    xmlns:far="http://vitro.mannlib.cornell.edu/ns/reporting#"
+    xmlns:rdfsyn="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:bibo="http://purl.org/ontology/bibo/"
+    xmlns:foaf="http://xmlns.com/foaf/0.1/"
+    xmlns:local="http://vivo.cornell.edu/ontology/local#"
+    xmlns:dcterms="http://purl.org/dc/terms/"
+    xmlns:scires="http://vivoweb.org/ontology/scientific-research#"
+    xmlns:acti="http://vivoweb.org/ontology/activity-insight#"
+    xmlns:aktp="http://www.aktors.org/ontology/portal#"
+    xmlns:geo="http://aims.fao.org/aos/geopolitical.owl#"
+    xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+    xmlns:event="http://purl.org/NET/c4dm/event.owl#"
+    xmlns:socsci="http://vivo.library.cornell.edu/ns/vivo/socsci/0.1#"
+    xmlns:dcelem="http://purl.org/dc/elements/1.1/"
+    xmlns:ospcu="http://vivoweb.org/ontology/cu-vivo-osp#"
+    xmlns:sce="http://vivoweb.org/ontology/SchoolOfContinuingEducation#"
+    xmlns:vitro="http://vitro.mannlib.cornell.edu/ns/vitro/0.7#"
+    xmlns:vivoc="http://vivo.library.cornell.edu/ns/0.1#"
+    xmlns:pubmed="http://vitro.mannlib.cornell.edu/ns/pubmed#"
+    xmlns:cce="http://vivoweb.org/ontology/cornell-cooperative-extension#"
+    xmlns:mann="http://vivo.cornell.edu/ns/mannadditions/0.1#"
+    xmlns:owl="http://www.w3.org/2002/07/owl#"
+    xmlns:fabio="http://purl.org/spar/fabio/"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" > 
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n56282">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">AgriVIVO: an Ontology-based Store of URIs and Relations between Entities in Agricultural Research</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n122000">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n60089"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">7</vivo:authorRank>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://link.informatics.stonybrook.edu/umls/CUI/C1518584">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">ontology</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/CornellsVIVOconceptwillexpandtoconnectresearchersnationwide">
+    <rdfs:label xml:lang="en-US">Cornell's VIVO concept will expand to connect researchers nationwide</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n36325">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#DateTimeValue"/>
+    <vivo:dateTimePrecision rdfsyn:resource="http://vivoweb.org/ontology/core#yearPrecision"/>
+    <vivo:dateTime rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-01-01T05:00:00Z</vivo:dateTime>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n25439">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n15280"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">4</vivo:authorRank>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n59276">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">The Future of VIVO: Growing the Community</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n52538">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#DateTimeValue"/>
+    <vivo:dateTimePrecision rdfsyn:resource="http://vivoweb.org/ontology/core#yearPrecision"/>
+    <vivo:dateTime rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-01-01T00:00:00</vivo:dateTime>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n154727">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">Polygon Overlay to Support Point Sample Mapping: the National Resources Inventory</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n237958">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">DataStaR: Using the Semantic Web Approach for Data Curation</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivoweb.org/ontology/core#yearMonthDayPrecision">
+    <rdfs:label xml:lang="en-US">yearMonthDayPrecision</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n4805850">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#DateTimeValue"/>
+    <vivo:dateTimePrecision rdfsyn:resource="http://vivoweb.org/ontology/core#yearPrecision"/>
+    <vivo:dateTime rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-01-01T00:00:00</vivo:dateTime>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/individual1">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">Albert R. Mann Library</rdfs:label>
+    <rdfs:label>Albert R. Mann Library</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n24980">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">Digital Research Data Curation: Overview of Issues, Current Activities, and Opportunities for the Cornell University Library</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n518934">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">Report of the Workshop on Rendering, Perception, and Measurement</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n51088">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n59526"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">3</vivo:authorRank>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n39639">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">Searching Interoperability Between Linguistic Coding and Ontologies for Language Description</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n60828">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n24126"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">1</vivo:authorRank>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n59311">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Role"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#PresenterRole"/>
+    <vivo:roleRealizedIn rdfsyn:resource="http://vivo.cornell.edu/individual/n32881"/>
+    <vivo:dateTimeInterval rdfsyn:resource="http://vivo.cornell.edu/individual/n7857854"/>
+    <vivo:presenterRoleOf rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">co-Presenter</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n117568">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n39639"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">4</vivo:authorRank>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n264175">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#DateTimeValue"/>
+    <vivo:dateTimePrecision rdfsyn:resource="http://vivoweb.org/ontology/core#yearPrecision"/>
+    <vivo:dateTime rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-01-01T00:00:00</vivo:dateTime>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://link.informatics.stonybrook.edu/umls/CUI/C0036612">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">semantic</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n208204">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">AgriVIVO for enabling global networking for agriculture. Concept Note</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n36342">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n237958"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">3</vivo:authorRank>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivoweb.org/ontology/core#yearPrecision">
+    <rdfs:label xml:lang="en-US">yearPrecision</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n1560309">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#DateTimeInterval"/>
+    <vivo:start rdfsyn:resource="http://vivo.cornell.edu/individual/n6654066"/>
+    <vivo:end rdfsyn:resource="http://vivo.cornell.edu/individual/n930701"/>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n9051023">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#DateTimeValue"/>
+    <vivo:dateTimePrecision rdfsyn:resource="http://vivoweb.org/ontology/core#yearPrecision"/>
+    <vivo:dateTime rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2003-01-01T00:00:00</vivo:dateTime>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n24126">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">VIVO: Connecting People, Creating a Virtual Life Sciences Community</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n137627">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#DateTimeInterval"/>
+    <vivo:start rdfsyn:resource="http://vivo.cornell.edu/individual/n52538"/>
+    <vivo:end rdfsyn:resource="http://vivo.cornell.edu/individual/n264175"/>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n213074">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#AwardReceipt"/>
+    <vivo:dateTimeValue rdfsyn:resource="http://vivo.cornell.edu/individual/n247617"/>
+    <vivo:receiptOf rdfsyn:resource="http://vivo.cornell.edu/individual/n92124"/>
+    <vivo:awardOrHonorFor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">SUNY Chancellor's Award for Excellence in Professional Service (Corson-Rikert, Jonathan - 2012)</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n247617">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#DateTimeValue"/>
+    <vivo:dateTimePrecision rdfsyn:resource="http://vivoweb.org/ontology/core#yearPrecision"/>
+    <vivo:dateTime rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2012-01-01T00:00:00</vivo:dateTime>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n54810">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">Extending VIVO</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n220050">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">Act: An Easy-to-use and Dynamically Extensible 3D Graphics Library</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n153441">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n168471"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">1</vivo:authorRank>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n14786">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n518934"/>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n32881">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">VIVO Researcher Networking Update</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://www.eionet.europa.eu/gemet/concept/3645">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">geographic information system</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n118473">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Role"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#MemberRole"/>
+    <vivo:memberRoleOf rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:dateTimeInterval rdfsyn:resource="http://vivo.cornell.edu/individual/n32759"/>
+    <vivo:roleContributesTo rdfsyn:resource="http://vivo.cornell.edu/individual/n20618"/>
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">member</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n59132">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#AwardReceipt"/>
+    <vivo:dateTimeValue rdfsyn:resource="http://vivo.cornell.edu/individual/n9051023"/>
+    <vivo:awardOrHonorFor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:awardConferredBy rdfsyn:resource="http://vivo.cornell.edu/individual/individual1"/>
+    <rdfs:label>Ans van Tienhoven Award</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n213009">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">VIVO: A Semantic Network of Researchers and Research Information as Linked Open Data</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n7857854">
+    <vivo:dateTimeIntervalFor rdfsyn:resource="http://vivo.cornell.edu/individual/n59311"/>
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#DateTimeInterval"/>
+    <vivo:start rdfsyn:resource="http://vivo.cornell.edu/individual/n4805850"/>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n46303">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n56282"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">3</vivo:authorRank>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n20618">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">CUL Discovery and Access Committee</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n318104">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n213009"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">1</vivo:authorRank>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n930701">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#DateTimeValue"/>
+    <vivo:dateTimePrecision rdfsyn:resource="http://vivoweb.org/ontology/core#yearMonthDayPrecision"/>
+    <vivo:dateTime rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-05-18T00:00:00</vivo:dateTime>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n467508">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">VIVO Development Roadmap: Enhancing an Ontology-Based University Research Portal with OWL and Rules</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n226968">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">N.Y.'s climate change clearinghouse to offer info to all</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://link.informatics.stonybrook.edu/umls/CUI/C0599807">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">informatics</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n188191">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">DataStaR: Using the Semantic Web approach for Data Curation</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://link.informatics.stonybrook.edu/umls/CUI/C0872261">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">repository</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/individual22972">
+    <vivo:hasResearchArea rdfsyn:resource="http://link.informatics.stonybrook.edu/umls/CUI/C0599807"/>
+    <vivo:awardOrHonor rdfsyn:resource="http://vivo.cornell.edu/individual/n59132"/>
+    <hr:primaryJobcodeLdesc>Info Tech Asst Dir II</hr:primaryJobcodeLdesc>
+    <vivo:preferredTitle>Head of Information Technology Services, Mann Library, Cornell University</vivo:preferredTitle>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n415309"/>
+    <vivo:editorOf rdfsyn:resource="http://vivo.cornell.edu/individual/n60089"/>
+    <hr:netId>jc55</hr:netId>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n318104"/>
+    <vivo:hasResearchArea rdfsyn:resource="http://www.eionet.europa.eu/gemet/concept/3645"/>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n31799"/>
+    <vivo:orcidId>0000-0002-2017-9998</vivo:orcidId>
+    <vivo:hasResearchArea rdfsyn:resource="http://link.informatics.stonybrook.edu/umls/CUI/C1518584"/>
+    <vivo:advisorIn rdfsyn:resource="http://vivo.cornell.edu/individual/n14460"/>
+    <vivo:webpage rdfsyn:resource="http://vivo.cornell.edu/individual/n120085"/>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n77544"/>
+    <rdfsyn:type rdfsyn:resource="http://vivo.library.cornell.edu/ns/0.1#CornellAffiliatedPerson"/>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n60828"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#NonAcademic"/>
+    <hr:emplId>1012111</hr:emplId>
+    <vitro:moniker>Head of Information Technology Services</vitro:moniker>
+    <vivo:hasResearchArea rdfsyn:resource="http://link.informatics.stonybrook.edu/umls/CUI/C0872261"/>
+    <vivoc:CornellemailnetId>jc55@cornell.edu</vivoc:CornellemailnetId>
+    <vivo:personInPosition rdfsyn:resource="http://vivo.cornell.edu/individual/empl1012111-position0"/>
+    <vivo:overview>&lt;p&gt;I am active in Semantic Web research for research information discovery and library projects.&lt;/p&gt;</vivo:overview>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/activity-insight#ActivityInsightReporter"/>
+    <vivoc:professionalBackground>&lt;ul&gt;&#xD;
+&lt;li&gt;Programmer Analyst, Mann Library 2001-2006&lt;/li&gt;&#xD;
+&lt;li&gt;Lab Manager, Program of Computer Graphics, Cornell University, 1992-2001&lt;/li&gt;&#xD;
+&lt;li&gt;Programmer, Harvard Lab for Computer Graphics, Cambridge, Massachusetts 1983-1992&lt;/li&gt;&#xD;
+&lt;li&gt;Cartographer, Dane County Regional Planning Commission, Madison, Wisconsin, 1978-1982&lt;/li&gt;&#xD;
+&lt;/ul&gt;</vivoc:professionalBackground>
+    <vivo:webpage rdfsyn:resource="http://vivo.cornell.edu/individual/n172791"/>
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <vitro-public:mainImage rdfsyn:resource="http://vivo.cornell.edu/individual/n32203"/>
+    <vivo:featuredIn rdfsyn:resource="http://vivo.cornell.edu/individual/CornellsVIVOconceptwillexpandtoconnectresearchersnationwide"/>
+    <vivo:webpage rdfsyn:resource="http://vivo.cornell.edu/individual/n19652"/>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n117568"/>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n148480"/>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n36342"/>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n122000"/>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n51088"/>
+    <vivo:scopusId>20336816000</vivo:scopusId>
+    <vivo:hasMemberRole rdfsyn:resource="http://vivo.cornell.edu/individual/n118473"/>
+    <foaf:lastName>Corson-Rikert</foaf:lastName>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n37724"/>
+    <vivo:featuredIn rdfsyn:resource="http://vivo.cornell.edu/individual/n226968"/>
+    <rdfsyn:type rdfsyn:resource="http://vivo.library.cornell.edu/ns/0.1#CornellEmployee"/>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n25298"/>
+    <foaf:firstName>Jonathan</foaf:firstName>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n153441"/>
+    <vivo:middleName></vivo:middleName>
+    <rdfsyn:type rdfsyn:resource="http://xmlns.com/foaf/0.1/Person"/>
+    <vivo:awardOrHonor rdfsyn:resource="http://vivo.cornell.edu/individual/n213074"/>
+    <rdfs:label>Corson-Rikert, Jonathan</rdfs:label>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n66205"/>
+    <rdfsyn:type rdfsyn:resource="http://vivo.cornell.edu/ns/mannadditions/0.1#CornellNonAcademicStaff"/>
+    <vivo:webpage rdfsyn:resource="http://vivo.cornell.edu/individual/n200243"/>
+    <hr:primaryWorkingTitle>Info Tech Assistant Dir II</hr:primaryWorkingTitle>
+    <vivo:researchOverview>My research is focused on semantic web development for networked scholarship.</vivo:researchOverview>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n14786"/>
+    <rdfsyn:type rdfsyn:resource="http://xmlns.com/foaf/0.1/Agent"/>
+    <vivo:hasPresenterRole rdfsyn:resource="http://vivo.cornell.edu/individual/n110772"/>
+    <acti:aiUser>509729</acti:aiUser>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n113565"/>
+    <vivo:hasPresenterRole rdfsyn:resource="http://vivo.cornell.edu/individual/n59311"/>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n46303"/>
+    <vivo:researcherId>B-3301-2009</vivo:researcherId>
+    <hr:PrefName>Corson-Rikert, Jon</hr:PrefName>
+    <rdfsyn:type rdfsyn:resource="http://vivo.cornell.edu/ontology/local#InternalThing"/>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n63093"/>
+    <vivo:hasResearchArea rdfsyn:resource="http://link.informatics.stonybrook.edu/umls/CUI/C0036612"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/activity-insight#ActivityInsightPerson"/>
+    <vivo:authorInAuthorship rdfsyn:resource="http://vivo.cornell.edu/individual/n25439"/>
+    <vivo:webpage rdfsyn:resource="http://www.mannlib.cornell.edu"/>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n110772">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Role"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#PresenterRole"/>
+    <vivo:roleRealizedIn rdfsyn:resource="http://vivo.cornell.edu/individual/n34834"/>
+    <vivo:dateTimeInterval rdfsyn:resource="http://vivo.cornell.edu/individual/n137627"/>
+    <vivo:presenterRoleOf rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">Presenter</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n148480">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n54810"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">6</vivo:authorRank>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n92124">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">SUNY Chancellor's Award for Excellence in Professional Service</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n60089">
+    <rdfs:label xml:lang="en-US">VIVO: A Semantic Approach to Scholarly Networking and Discovery</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n31799">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n467508"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">2</vivo:authorRank>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n112752">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#DateTimeValue"/>
+    <vivo:dateTimePrecision rdfsyn:resource="http://vivoweb.org/ontology/core#yearPrecision"/>
+    <vivo:dateTime rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2011-01-01T05:00:00Z</vivo:dateTime>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n6654066">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#DateTimeValue"/>
+    <vivo:dateTimePrecision rdfsyn:resource="http://vivoweb.org/ontology/core#yearMonthDayPrecision"/>
+    <vivo:dateTime rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-01-05T00:00:00</vivo:dateTime>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n37724">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n220050"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">2</vivo:authorRank>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n59526">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">VIVO: Case Study of an Ontology-Based Web Site</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n15280">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">VIVO: Enabling National Networking of Scientists</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n66205">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n154727"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">4</vivo:authorRank>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n14460">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#AdvisingRelationship"/>
+    <vivo:advisor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:dateTimeInterval rdfsyn:resource="http://vivo.cornell.edu/individual/n1560309"/>
+    <rdfs:label>Web development intern</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n34834">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">DataStaR: An Ontology-Based Approach to Representing Metadata for Research Datasets</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n168471">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">The VIVO Ontology</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/empl1012111-position0">
+    <vivo:positionInOrganization rdfsyn:resource="http://vivo.cornell.edu/individual/individual1"/>
+    <vivo:positionForPerson rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#NonAcademicPosition"/>
+    <hr:LDAPJobNumber>0</hr:LDAPJobNumber>
+    <j.0:headInd>P</j.0:headInd>
+    <j.0:company>STA</j.0:company>
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Position"/>
+    <rdfs:label>Info Tech Assistant Dir II</rdfs:label>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#PrimaryPosition"/>
+    <vivo:hrJobTitle>Info Tech Asst Dir II</vivo:hrJobTitle>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n77544">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n208204"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">1</vivo:authorRank>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n25354">
+    <rdfs:label rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#string">WYSIWYG Map Digitizing: Real Time Geometric Correction and Topological Encoding</rdfs:label>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n63093">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n59276"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">3</vivo:authorRank>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n25298">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n24980"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">8</vivo:authorRank>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n113565">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n188191"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">4</vivo:authorRank>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n32759">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#DateTimeInterval"/>
+    <vivo:start rdfsyn:resource="http://vivo.cornell.edu/individual/n112752"/>
+    <vivo:end rdfsyn:resource="http://vivo.cornell.edu/individual/n36325"/>
+  </rdfsyn:Description>
+  <rdfsyn:Description rdfsyn:about="http://vivo.cornell.edu/individual/n415309">
+    <rdfsyn:type rdfsyn:resource="http://www.w3.org/2002/07/owl#Thing"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Relationship"/>
+    <rdfsyn:type rdfsyn:resource="http://vivoweb.org/ontology/core#Authorship"/>
+    <vivo:linkedAuthor rdfsyn:resource="http://vivo.cornell.edu/individual/individual22972"/>
+    <vivo:linkedInformationResource rdfsyn:resource="http://vivo.cornell.edu/individual/n25354"/>
+    <vivo:authorRank rdfsyn:datatype="http://www.w3.org/2001/XMLSchema#int">2</vivo:authorRank>
+  </rdfsyn:Description>
+</rdfsyn:RDF>

@@ -13,12 +13,12 @@
         <p>
             Hi, ${userAccount.firstName} ${userAccount.lastName}
         </p>
-        
+
         <p>
             You recently changed the email address associated with 
             ${userAccount.firstName} ${userAccount.lastName}
         </p>
-        
+
         <p>
             Thank you.
         </p>

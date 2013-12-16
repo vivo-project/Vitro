@@ -19,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 
@@ -65,7 +66,7 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
     	  HashMap<String, Object> data = new HashMap<String,Object>();
           data.put("classGroupUri", this.classGroupUri);
 
-          VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+          VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
           List<VClassGroup> vcgList = vcgc.getGroups();
           VClassGroup group = null;
           for( VClassGroup vcg : vcgList){
@@ -119,7 +120,7 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
     
     public static VClassGroupTemplateModel getClassGroup(String classGroupUri, ServletContext context, VitroRequest vreq){
         
-        VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
+        VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
         List<VClassGroup> vcgList = vcgc.getGroups();
         VClassGroup group = null;
         for( VClassGroup vcg : vcgList){

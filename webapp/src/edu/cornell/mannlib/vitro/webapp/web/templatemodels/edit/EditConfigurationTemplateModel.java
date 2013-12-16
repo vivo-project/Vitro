@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,8 +101,8 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		    	//empty options if none were set
 		    	field.setOptions(new ConstantFieldOptions());
 		    }
-		    Map<String, String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, fieldName, wdf);		    
-		    optionsMap = SelectListGeneratorVTwo.getSortedMap(optionsMap);
+		    Map<String, String> optionsMap = SelectListGeneratorVTwo.getOptions(editConfig, fieldName, wdf);	
+		    optionsMap = SelectListGeneratorVTwo.getSortedMap(optionsMap, field.getFieldOptions().getCustomComparator(), vreq);
 		    if(pageData.containsKey(fieldName)) {
 		    	log.error("Check the edit configuration setup as pageData already contains " + fieldName + " and this will be overwritten now with empty collection");
 		    }
@@ -173,10 +174,12 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     
     //Also used above and can be used in object auto complete form
     public String getObjectPropertyNameForDisplay() {
+        // TODO modify this to get prop/class combo
     	String propertyTitle = null;
     	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);
     	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
     	Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
+    	VClass rangeClass = EditConfigurationUtils.getRangeVClass(vreq);
     	if(objectIndividual != null) {
     		propertyTitle = prop.getDomainPublic();
     	}  else {
@@ -184,8 +187,9 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
             if ( prop.getOfferCreateNewOption() ) {
             	//Try to get the name of the class to select from
            	  	VClass classOfObjectFillers = null;
-        
-    		    if( prop.getRangeVClassURI() == null ) {    	
+           	  	if (rangeClass != null) {
+           	  	    classOfObjectFillers = rangeClass;
+           	  	} else if( prop.getRangeVClassURI() == null ) {    	
     		    	// If property has no explicit range, try to get classes 
     		    	List<VClass> classes = wdf.getVClassDao().getVClassesForProperty(subject.getVClassURI(), prop.getURI());
     		    	if( classes == null || classes.size() == 0 || classes.get(0) == null ){	    	
@@ -362,6 +366,14 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	return editConfig.getObject();
     }
     
+    public String getDomainUri() {
+        return EditConfigurationUtils.getDomainUri(vreq);
+    }
+    
+    public String getRangeUri() {
+        return EditConfigurationUtils.getRangeUri(vreq);
+    }
+    
     
     //data literal
     //Thus would depend on the literals on the form
@@ -448,10 +460,13 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		String objectKey = vreq.getParameter("objectKey");
 		statementDisplay.put(objectKey, objectUri);
 		
+		ObjectProperty predicate = new ObjectProperty();
+		predicate.setURI(predicateUri);
+		
 		//Using object property statement template model here
 		ObjectPropertyStatementTemplateModel osm = new ObjectPropertyStatementTemplateModel(
 				subjectUri, 
-				predicateUri, 
+				predicate, 
 				objectKey, 
 		        statementDisplay, 
 		        null, vreq);
@@ -475,6 +490,10 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	return getDataLiteralValuesFromParameter();
     }
     
+    //Get a custom object uri for deletion if one exists, i.e. not the object uri for the property
+    public String getCustomDeleteObjectUri() {
+    	return (String) vreq.getParameter("deleteObjectUri");
+    }
     //Used for deletion in case there's a specific template to be employed
     public String getDeleteTemplate() {
     	String templateName = vreq.getParameter("templateName");
@@ -503,6 +522,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
    
 
 	//TODO:Check where this logic should actually go, copied from input element formatting tag
+    //Updating to enable multiple vclasses applicable to subject to be analyzed to understand possible range of types
     public Map<String, String> getOfferTypesCreateNew() {
 		WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     	ObjectProperty op = 
@@ -511,14 +531,67 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	Individual sub = 
     		wdf.getIndividualDao().getIndividualByURI(editConfig.getSubjectUri());
     	
+    	VClass rangeClass = EditConfigurationUtils.getRangeVClass(vreq);
+    	
     	List<VClass> vclasses = null;
-    	vclasses = wdf.getVClassDao().getVClassesForProperty(sub.getVClassURI(), op.getURI());    	
-    	if( vclasses == null )
+    	List<VClass> subjectVClasses = sub.getVClasses();
+    	if( subjectVClasses == null ) {
     		vclasses = wdf.getVClassDao().getAllVclasses();
+    	} else if (rangeClass != null) {
+    	    List<VClass> rangeVClasses = new ArrayList<VClass>();
+    	    vclasses = new ArrayList<VClass>();
+    	    if (!rangeClass.isUnion()) {    	        
+    	        rangeVClasses.add(rangeClass);
+    	    } else {
+    	        rangeVClasses.addAll(rangeClass.getUnionComponents());
+    	    }
+            for(VClass rangeVClass : rangeVClasses) {	
+            	if(rangeVClass.getGroupURI() != null) {
+            		vclasses.add(rangeVClass);
+            	}
+        	    List<String> subURIs = wdf.getVClassDao().getAllSubClassURIs(rangeVClass.getURI());
+        	    for (String subClassURI : subURIs) {
+        	        VClass subClass = wdf.getVClassDao().getVClassByURI(subClassURI);
+        	        //if the subclass exists and also belongs to a particular class group
+        	        if (subClass != null && subClass.getGroupURI() != null) {
+        	            vclasses.add(subClass);
+        	        }
+        	    }
+            }
+    	} else {
+    		//this hash is used to make sure there are no duplicates in the vclasses
+    		//a more elegant method may look at overriding equals/hashcode to enable a single hashset of VClass objects
+	    	HashSet<String> vclassesURIs = new HashSet<String>();
+	    	vclasses = new ArrayList<VClass>();
+	        //Get the range vclasses applicable for the property and each vclass for the subject
+	        for(VClass subjectVClass: subjectVClasses) {
+	        	List<VClass> rangeVclasses = wdf.getVClassDao().getVClassesForProperty(subjectVClass.getURI(), op.getURI());
+	        	//add range vclass to hash
+	        	if(rangeVclasses != null) {
+	        		for(VClass v: rangeVclasses) {
+	        			//Need to make sure any class added will belong to a class group
+	        			if(!vclassesURIs.contains(v.getURI()) && v.getGroupURI() != null) {
+	        				vclassesURIs.add(v.getURI());
+	        				vclasses.add(v);
+	        			}
+	        		}
+	        	}
+	        }
+    	}
+    	//if each subject vclass resulted in null being returned for range vclasses, then size of vclasses would be zero
+    	if(vclasses.size() == 0) {
+    		List<VClass> allVClasses  = wdf.getVClassDao().getAllVclasses();
+    		//Since these are all vclasses, we should check whether vclasses included are in a class group
+    		for(VClass v:allVClasses) {
+    			if(v.getGroupURI() != null) {
+    				vclasses.add(v);
+    			}
+    		}
+    	}
+    	
     	
     	HashMap<String,String> types = new HashMap<String, String>();
     	for( VClass vclass : vclasses ){
-    		
     		String name = null;
     		if( vclass.getPickListName() != null && vclass.getPickListName().length() > 0){
     			name = vclass.getPickListName();
@@ -614,7 +687,13 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     //this url is for canceling
     public String getCancelUrl() {
     	String editKey = editConfig.getEditKey();
-    	return EditConfigurationUtils.getCancelUrlBase(vreq) + "?editKey=" + editKey + "&cancel=true";
+    	String cancelURL = EditConfigurationUtils.getCancelUrlBase(vreq) + "?editKey=" + editKey + "&cancel=true";
+    	//Check for special return url parameter
+    	String returnURLParameter = vreq.getParameter("returnURL");
+    	if(returnURLParameter !=  null && !returnURLParameter.isEmpty() ) {
+    		cancelURL += "&returnURL=" + returnURLParameter;
+    	}
+    	return cancelURL;
     }
     
     //Get confirm deletion url

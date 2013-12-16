@@ -39,7 +39,7 @@ public class OntologyEditController extends BaseEditController {
         EditProcessObject epo = super.createEpo(request);
         request.setAttribute("epoKey", epo.getKey());
 
-        OntologyDao oDao = request.getFullWebappDaoFactory().getOntologyDao();
+        OntologyDao oDao = request.getUnfilteredWebappDaoFactory().getOntologyDao();
         Ontology o = null;
         if (request.getParameter("uri")==null){
             log.error("doPost() expects non-null uri parameter");

@@ -2,19 +2,17 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import java.net.URLEncoder;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import net.sf.json.util.JSONUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,9 +21,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
@@ -33,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
 public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
 
@@ -42,7 +41,9 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
     private int MAXDEPTH = 5;
 
     private DataPropertyDao dpDao = null;
+    private DataPropertyDao dpDaoLangNeut = null;
     private VClassDao vcDao = null;
+    private VClassDao vcDaoLangNeut = null;
     private PropertyGroupDao pgDao = null;
     private DatatypeDao dDao = null;
 
@@ -78,10 +79,12 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
             
             body.put("propertyType", "data");
             
-            dpDao = vreq.getAssertionsWebappDaoFactory().getDataPropertyDao();
-            vcDao = vreq.getAssertionsWebappDaoFactory().getVClassDao();
-            pgDao = vreq.getAssertionsWebappDaoFactory().getPropertyGroupDao();
-            dDao = vreq.getAssertionsWebappDaoFactory().getDatatypeDao();
+            dpDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getDataPropertyDao();
+            dpDaoLangNeut = vreq.getLanguageNeutralWebappDaoFactory().getDataPropertyDao();
+            vcDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getVClassDao();
+            vcDaoLangNeut = vreq.getLanguageNeutralWebappDaoFactory().getVClassDao();
+            pgDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getPropertyGroupDao();
+            dDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getDatatypeDao();
 
             String json = new String();
 
@@ -96,7 +99,7 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
             } else {
                 roots = dpDao.getRootDataProperties();
                 if (roots!=null){
-                    Collections.sort(roots);
+                    sortForPickList(roots, vreq);
                 }
             }
 
@@ -106,7 +109,7 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
                 Iterator<DataProperty> rootIt = roots.iterator();
                 if (!rootIt.hasNext()) {
                     DataProperty dp = new DataProperty();
-                    dp.setURI(ontologyUri+"fake");
+                    dp.setURI(ontologyUri + "fake");
                     String notFoundMessage = "<strong>No data properties found.</strong>"; 
                     dp.setName(notFoundMessage);
                     dp.setName(notFoundMessage);
@@ -115,7 +118,7 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
                     while (rootIt.hasNext()) {
                         DataProperty root = rootIt.next();
                         if ( (ontologyUri==null) || ( (ontologyUri!=null) && (root.getNamespace()!=null) && (ontologyUri.equals(root.getNamespace())) ) ) {
-                    	    json += addChildren(root, 0, ontologyUri, counter);
+                    	    json += addChildren(root, 0, ontologyUri, counter, vreq);
                     	    counter += 1;
                 	    }
                     }	
@@ -134,7 +137,8 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
         return new TemplateResponseValues(TEMPLATE_NAME, body);
     }
 
-    private String addChildren(DataProperty parent, int position, String ontologyUri, int counter) {
+    private String addChildren(DataProperty parent, int position, String ontologyUri,
+            int counter, VitroRequest vreq) {
     	if (parent == null) {
     		return "";
     	}
@@ -142,20 +146,20 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
         int length = details.length();
         String leaves = "";
         leaves += details;
-        List childURIstrs = dpDao.getSubPropertyURIs(parent.getURI());
-        if ((childURIstrs.size()>0) && position<MAXDEPTH) {
-            List childProps = new ArrayList();
-            Iterator childURIstrIt = childURIstrs.iterator();
+        List<String> childURIstrs = dpDao.getSubPropertyURIs(parent.getURI());
+        if ( (childURIstrs.size() > 0) && (position < MAXDEPTH) ) {
+            List<DataProperty> childProps = new ArrayList<DataProperty>();
+            Iterator<String> childURIstrIt = childURIstrs.iterator();
             while (childURIstrIt.hasNext()) {
-                String URIstr = (String) childURIstrIt.next();
-                DataProperty child = (DataProperty) dpDao.getDataPropertyByURI(URIstr);
+                String URIstr = childURIstrIt.next();
+                DataProperty child = dpDao.getDataPropertyByURI(URIstr);
                 childProps.add(child);
             }
-            Collections.sort(childProps);
-            Iterator childPropIt = childProps.iterator();
+            sortForPickList(childProps, vreq);
+            Iterator<DataProperty> childPropIt = childProps.iterator();
             while (childPropIt.hasNext()) {
-                DataProperty child = (DataProperty) childPropIt.next();
-                leaves += addChildren(child, position+1, ontologyUri, counter);
+                DataProperty child = childPropIt.next();
+                leaves += addChildren(child, position+1, ontologyUri, counter, vreq);
                 if (!childPropIt.hasNext()) {
                     if ( ontologyUri == null ) {
                         leaves += " }] ";
@@ -206,34 +210,39 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
                 tempString += "}, { \"name\": ";
             }
 
-            String nameStr = dp.getPublicName()==null ? dp.getName()==null ? dp.getURI()==null ? "(no name)" : dp.getURI() : dp.getName() : dp.getPublicName();
-            nameStr = nameStr.replace("\"","\\\"");
-            nameStr = nameStr.replace("\'","\\\'");
-            try {
-                tempString += "\"<a href='datapropEdit?uri="+URLEncoder.encode(dp.getURI(),"UTF-8")+"'>" + nameStr + "</a>\", ";                 
-            } catch (Exception e) {
-                tempString += "\"" + nameStr + "\", "; 
-                log.error("Unsupported: URLEncoder.encode() with UTF-8");
+            String nameStr = dp.getPickListName() == null 
+                    ? dp.getName() == null 
+                            ? dp.getURI() == null 
+                                    ? "(no name)" : dp.getURI() : dp.getName() : dp.getPickListName();
+  
+            tempString += JSONUtils.quote(
+                    "<a href='datapropEdit?uri=" + URLEncoder.encode(
+                            dp.getURI()) + "'>" + nameStr + "</a>") + ", ";                 
+
+            tempString += "\"data\": { \"internalName\": " + JSONUtils.quote(
+                    dp.getPickListName()) + ", ";
+
+            DataProperty dpLangNeut = dpDaoLangNeut.getDataPropertyByURI(dp.getURI());
+            if(dpLangNeut == null) {
+                dpLangNeut = dp;
             }
-
-            tempString += "\"data\": { \"internalName\": \"" + dp.getLocalNameWithPrefix() + "\", ";
-
-            VClass tmp = null;
+            String domainStr = getVClassNameFromURI(dpLangNeut.getDomainVClassURI(), vcDao, vcDaoLangNeut);
+            
             try {
-            	tempString += "\"domainVClass\": \"" + (((tmp = vcDao.getVClassByURI(dp.getDomainClassURI())) != null && (tmp.getLocalNameWithPrefix() == null)) ? "" : vcDao.getVClassByURI(dp.getDomainClassURI()).getLocalNameWithPrefix()) + "\", " ;
+            	tempString += "\"domainVClass\": " + JSONUtils.quote(domainStr) + ", " ;
             } catch (NullPointerException e) {
             	tempString += "\"domainVClass\": \"\",";
             }
             try {
             	Datatype rangeDatatype = dDao.getDatatypeByURI(dp.getRangeDatatypeURI());
                 String rangeDatatypeStr = (rangeDatatype==null)?dp.getRangeDatatypeURI():rangeDatatype.getName();
-            	tempString += "\"rangeVClass\": \"" + ((rangeDatatypeStr != null) ? rangeDatatypeStr : "") + "\", " ; 
+            	tempString += "\"rangeVClass\": " + JSONUtils.quote((rangeDatatypeStr != null) ? rangeDatatypeStr : "") + ", " ; 
             } catch (NullPointerException e) {
             	tempString += "\"rangeVClass\": \"\",";
             }
             if (dp.getGroupURI() != null) {
                 PropertyGroup pGroup = pgDao.getGroupByURI(dp.getGroupURI());
-                tempString += "\"group\": \"" + ((pGroup == null) ? "unknown group" : pGroup.getName()) + "\" " ; 
+                tempString += "\"group\": " + JSONUtils.quote((pGroup == null) ? "unknown group" : pGroup.getName()); 
             } else {
                 tempString += "\"group\": \"unspecified\"";
             }
@@ -244,10 +253,20 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
         return tempString;
     }
 
-    private class DataPropertyAlphaComparator implements Comparator {
-        public int compare(Object o1, Object o2) {
-        	return Collator.getInstance().compare( ((DataProperty)o1).getName(), ((DataProperty)o2).getName());
+    private String getVClassNameFromURI(String vclassURI, VClassDao vcDao, VClassDao vcDaoLangNeut) {
+        if(vclassURI == null) {
+            return "";
+        }
+        VClass vclass = vcDaoLangNeut.getVClassByURI(vclassURI);
+        if(vclass == null) {
+            return ""; 
+        }
+        if(vclass.isAnonymous()) {
+            return vclass.getPickListName();
+        } else {
+            VClass vclassWLang = vcDao.getVClassByURI(vclassURI);
+            return (vclassWLang != null) ? vclassWLang.getPickListName() : vclass.getPickListName();
         }
     }
-	
+    
 }

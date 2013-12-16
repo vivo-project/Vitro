@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
 /**
  * A base class for requested actions that involve adding, editing, or deleting
@@ -27,5 +28,7 @@ public abstract class AbstractPropertyStatementAction extends RequestedAction {
 	 */
 	public abstract String[] getResourceUris();
 
+	public abstract Property getPredicate();
+	
 	public abstract String getPredicateUri();
 }

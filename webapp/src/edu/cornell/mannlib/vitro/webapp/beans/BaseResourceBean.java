@@ -13,7 +13,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
-import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsLoader;
+import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSets;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class BaseResourceBean implements ResourceBean {
@@ -80,13 +80,13 @@ public class BaseResourceBean implements ResourceBean {
 			}
 			
 			Set<String> roles = u.getPermissionSetUris();
-			if (roles.contains(PermissionSetsLoader.URI_DBA)) {
+			if (roles.contains(PermissionSets.URI_DBA)) {
 				return  DB_ADMIN;
-			} else if (roles.contains(PermissionSetsLoader.URI_CURATOR)) {
+			} else if (roles.contains(PermissionSets.URI_CURATOR)) {
 				return CURATOR;
-			} else if (roles.contains(PermissionSetsLoader.URI_EDITOR)) {
+			} else if (roles.contains(PermissionSets.URI_EDITOR)) {
 				return EDITOR;
-			} else if (roles.contains(PermissionSetsLoader.URI_SELF_EDITOR)) {
+			} else if (roles.contains(PermissionSets.URI_SELF_EDITOR)) {
 				return SELF;
 			} else {
 				// Logged in but with no recognized role? Make them SELF
@@ -133,6 +133,10 @@ public class BaseResourceBean implements ResourceBean {
             this.URI = namespace + localName;
         }
     }
+    
+    public String getLabel() {
+        return getLocalName();
+    }
 
     public String getLocalName() {
         if( localName == null && this.URI != null)
@@ -148,8 +152,9 @@ public class BaseResourceBean implements ResourceBean {
     }
 
     public String getLocalNameWithPrefix() {
-        return localNameWithPrefix==null ? getLocalName()==null ? 
-                (URI==null ? "(no name)" : URI ): getLocalName() : localNameWithPrefix;
+        return localNameWithPrefix != null ? localNameWithPrefix : 
+                    getLocalName() != null ?  getLocalName() :
+                        URI != null ? URI : "(no name)" ;
     }
     public void setLocalNameWithPrefix(String prefixedLocalName) {
         this.localNameWithPrefix = prefixedLocalName;

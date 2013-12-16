@@ -46,14 +46,12 @@ public class UserAccountsCreatePasswordPage extends
 
 	@Override
 	protected String alreadyLoggedInMessage(String currentUserEmail) {
-		return "You may not activate the account for " + userEmail
-				+ " while you are logged in as " + currentUserEmail
-				+ ". Please log out and try again.";
+		return i18n.text("cant_activate_while_logged_in", userEmail, currentUserEmail);
 	}
 
 	@Override
 	protected String passwordChangeNotPendingMessage() {
-		return "The account for " + userEmail + " has already been activated.";
+		return i18n.text("account_already_activated", userEmail);
 	}
 
 	@Override
@@ -69,7 +67,7 @@ public class UserAccountsCreatePasswordPage extends
 		FreemarkerEmailMessage email = FreemarkerEmailFactory
 				.createNewMessage(vreq);
 		email.addRecipient(TO, userAccount.getEmailAddress());
-		email.setSubject("Password successfully created.");
+		email.setSubject(i18n.text("password_created_subject", getSiteName()));
 		email.setTemplate(EMAIL_TEMPLATE);
 		email.setBodyMap(body);
 		email.processTemplate();

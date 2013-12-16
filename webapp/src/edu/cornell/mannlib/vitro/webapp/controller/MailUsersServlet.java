@@ -208,8 +208,7 @@ public class MailUsersServlet extends VitroHttpServlet {
     }
     
 	private List<String> getEmailsForAllUserAccounts(VitroRequest vreq) {
-		UserAccountsDao uaDao = vreq.getFullWebappDaoFactory()
-				.getUserAccountsDao();
+		UserAccountsDao uaDao = vreq.getWebappDaoFactory().getUserAccountsDao();
 		
 		List<String> emails = new ArrayList<String>();
 		for (UserAccount user : uaDao.getAllUserAccounts()) {

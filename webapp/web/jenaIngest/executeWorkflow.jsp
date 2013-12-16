@@ -3,6 +3,7 @@
 <%@ page import="com.hp.hpl.jena.ontology.Individual" %>
 <%@ page import="com.hp.hpl.jena.ontology.OntModel" %>
 <%@ page import="com.hp.hpl.jena.rdf.model.ModelMaker" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.ModelAccess"%>
 <%@ page import="com.hp.hpl.jena.shared.Lock" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.List" %>
@@ -23,7 +24,7 @@
         <select name="workflowURI">
              
         <%
-              OntModel jenaOntModel = (OntModel) getServletContext().getAttribute("jenaOntModel");
+              OntModel jenaOntModel = ModelAccess.on(getServletContext()).getJenaOntModel();
               jenaOntModel.enterCriticalSection(Lock.READ);
               try {
                   List savedQueries = (List) request.getAttribute("workflows");

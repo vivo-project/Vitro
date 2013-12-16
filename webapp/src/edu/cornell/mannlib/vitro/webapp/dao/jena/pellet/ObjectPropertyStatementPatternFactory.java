@@ -2,14 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena.pellet;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
-
-import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.ObjectPropertyStatementPattern;
 
 public class ObjectPropertyStatementPatternFactory {
 

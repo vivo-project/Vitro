@@ -523,6 +523,36 @@ public class ObjectPropertyFiltering extends ObjectProperty {
 	public void setCollateBySubclass(boolean collate) {		
 		innerObjectProperty.setCollateBySubclass(collate);
 	}
+	
+	@Override
+	public boolean isEditLinkSuppressed() {
+	    return innerObjectProperty.isEditLinkSuppressed();
+	}
+	
+	@Override 
+	public boolean isAddLinkSuppressed() {
+	    return innerObjectProperty.isAddLinkSuppressed();
+	}
+	
+	@Override 
+	public boolean isDeleteLinkSuppressed() {
+	    return innerObjectProperty.isDeleteLinkSuppressed();
+	}
+	
+	@Override
+    public void setEditLinkSuppressed(boolean editLinkSuppressed) {
+        innerObjectProperty.setEditLinkSuppressed(editLinkSuppressed);
+    }
+    
+    @Override 
+    public void setAddLinkSuppressed(boolean addLinkSuppressed) {
+        innerObjectProperty.setAddLinkSuppressed(addLinkSuppressed);
+    }
+    
+    @Override 
+    public void setDeleteLinkSuppressed(boolean deleteLinkSuppressed) {
+        innerObjectProperty.setDeleteLinkSuppressed(deleteLinkSuppressed);
+    }
 
     
 }

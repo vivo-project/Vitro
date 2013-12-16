@@ -60,8 +60,8 @@ public class HttpServletRequestStub implements HttpServletRequest {
 
 	/**
 	 * Supply the request URL as a single URL. We will parse it on the
-	 * assumption that the contextPath and the pathInfo are empty. 
-	 * Don't include a query string. Instead, set parameters.
+	 * assumption that the contextPath and the pathInfo are empty. Don't include
+	 * a query string. Instead, set parameters.
 	 */
 	public void setRequestUrl(URL url) {
 		this.contextPath = "";
@@ -81,8 +81,7 @@ public class HttpServletRequestStub implements HttpServletRequest {
 
 	/**
 	 * Supply the pieces of the request URL, so we can respond correctly when
-	 * asked for a piece.
-	 * Don't include a query string. Instead, set parameters.
+	 * asked for a piece. Don't include a query string. Instead, set parameters.
 	 */
 	public void setRequestUrlByParts(String shemeHostPort, String contextPath,
 			String servletPath, String pathInfo) {
@@ -102,8 +101,9 @@ public class HttpServletRequestStub implements HttpServletRequest {
 		}
 		this.servletPath = servletPath;
 
-		this.requestUri = contextPath + servletPath + ((pathInfo == null) ? "" : pathInfo);
-		
+		this.requestUri = contextPath + servletPath
+				+ ((pathInfo == null) ? "" : pathInfo);
+
 		if (shemeHostPort == null) {
 			throw new NullPointerException("shemeHostPort may not be null.");
 		}
@@ -183,21 +183,21 @@ public class HttpServletRequestStub implements HttpServletRequest {
 	public String getServletPath() {
 		return servletPath;
 	}
-	
+
 	@Override
 	public String getPathInfo() {
 		return pathInfo;
 	}
-	
+
 	@Override
 	public String getQueryString() {
 		if (parameters.isEmpty()) {
 			return null;
 		}
-		
+
 		String qs = "";
-		for (String key:parameters.keySet()) {
-			for (String value: parameters.get(key)) {
+		for (String key : parameters.keySet()) {
+			for (String value : parameters.get(key)) {
 				qs += "&" + key + "=" + URLEncoder.encode(value);
 			}
 		}
@@ -302,167 +302,202 @@ public class HttpServletRequestStub implements HttpServletRequest {
 	// Un-implemented methods
 	// ----------------------------------------------------------------------
 
+	@Override
 	public String getAuthType() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getAuthType() not implemented.");
 	}
 
+	@Override
 	public Cookie[] getCookies() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getCookies() not implemented.");
 	}
 
+	@Override
 	public long getDateHeader(String arg0) {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getDateHeader() not implemented.");
 	}
 
+	@Override
 	public int getIntHeader(String arg0) {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getIntHeader() not implemented.");
 	}
 
+	@Override
 	public String getPathTranslated() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getPathTranslated() not implemented.");
 	}
 
+	@Override
 	public String getRemoteUser() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getRemoteUser() not implemented.");
 	}
 
+	@Override
 	public String getRequestedSessionId() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getRequestedSessionId() not implemented.");
 	}
 
+	@Override
 	public Principal getUserPrincipal() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getUserPrincipal() not implemented.");
 	}
 
+	@Override
 	public boolean isRequestedSessionIdFromCookie() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.isRequestedSessionIdFromCookie() not implemented.");
 	}
 
+	@Override
 	public boolean isRequestedSessionIdFromURL() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.isRequestedSessionIdFromURL() not implemented.");
 	}
 
+	@Override
+	@Deprecated
 	public boolean isRequestedSessionIdFromUrl() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.isRequestedSessionIdFromUrl() not implemented.");
 	}
 
+	@Override
 	public boolean isRequestedSessionIdValid() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.isRequestedSessionIdValid() not implemented.");
 	}
 
+	@Override
 	public boolean isUserInRole(String arg0) {
 		throw new RuntimeException(
 				"HttpServletRequestStub.isUserInRole() not implemented.");
 	}
 
+	@Override
 	public String getCharacterEncoding() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getCharacterEncoding() not implemented.");
 	}
 
+	@Override
 	public int getContentLength() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getContentLength() not implemented.");
 	}
 
+	@Override
 	public String getContentType() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getContentType() not implemented.");
 	}
 
+	@Override
 	public ServletInputStream getInputStream() throws IOException {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getInputStream() not implemented.");
 	}
 
+	@Override
 	public String getLocalAddr() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getLocalAddr() not implemented.");
 	}
 
+	@Override
 	public String getLocalName() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getLocalName() not implemented.");
 	}
 
+	@Override
 	public int getLocalPort() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getLocalPort() not implemented.");
 	}
 
+	@Override
 	public Locale getLocale() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getLocale() not implemented.");
 	}
 
+	@Override
 	@SuppressWarnings("rawtypes")
 	public Enumeration getLocales() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getLocales() not implemented.");
 	}
 
+	@Override
 	public String getProtocol() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getProtocol() not implemented.");
 	}
 
+	@Override
 	public BufferedReader getReader() throws IOException {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getReader() not implemented.");
 	}
 
+	@Override
+	@Deprecated
 	public String getRealPath(String arg0) {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getRealPath() not implemented.");
 	}
 
+	@Override
 	public String getRemoteHost() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getRemoteHost() not implemented.");
 	}
 
+	@Override
 	public int getRemotePort() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getRemotePort() not implemented.");
 	}
 
+	@Override
 	public RequestDispatcher getRequestDispatcher(String arg0) {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getRequestDispatcher() not implemented.");
 	}
 
+	@Override
 	public String getScheme() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getScheme() not implemented.");
 	}
 
+	@Override
 	public String getServerName() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getServerName() not implemented.");
 	}
 
+	@Override
 	public int getServerPort() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.getServerPort() not implemented.");
 	}
 
+	@Override
 	public boolean isSecure() {
 		throw new RuntimeException(
 				"HttpServletRequestStub.isSecure() not implemented.");
 	}
 
+	@Override
 	public void setCharacterEncoding(String arg0)
 			throws UnsupportedEncodingException {
 		throw new RuntimeException(

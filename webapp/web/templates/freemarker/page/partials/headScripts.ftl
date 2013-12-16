@@ -1,7 +1,11 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
 <#-- Template for scripts that must be loaded in the head -->
-
+<script>
+var i18nStrings = {
+    allCapitalized: '${i18n().all_capitalized}',
+};
+</script>
 <script type="text/javascript" src="${urls.base}/js/jquery.js"></script>
 <script type="text/javascript" src="${urls.base}/js/vitroUtils.js"></script>
 

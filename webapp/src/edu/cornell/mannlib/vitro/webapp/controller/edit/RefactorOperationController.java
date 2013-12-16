@@ -7,7 +7,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +39,6 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.InvalidPropertyURIException;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.ResourceUtils;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
@@ -50,7 +48,8 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.FileGraphSetup;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
@@ -74,7 +73,7 @@ public class RefactorOperationController extends BaseEditController {
         request.setAttribute("title","Check Datatype Properties");
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
         
-		OntModel ontModel = (OntModel) getServletContext().getAttribute("baseOntModel");
+        OntModel ontModel = ModelAccess.on(getServletContext()).getBaseOntModel();
 		ontModel.enterCriticalSection(Lock.WRITE);
 		ArrayList<String> results = new ArrayList<String>();
 				
@@ -189,7 +188,7 @@ public class RefactorOperationController extends BaseEditController {
 		// validateURI
 		String errorMsg = null;
 		try {
-			request.getFullWebappDaoFactory().checkURI(newURIStr);
+			request.getUnfilteredWebappDaoFactory().checkURI(newURIStr);
 		} catch (InvalidPropertyURIException ipue) {
 			// TODO We don't know if we're editing a property's URI or not here!
 		}
@@ -236,10 +235,10 @@ public class RefactorOperationController extends BaseEditController {
     			Model model = null;
     			
     			if (JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL.equals(graphURI)) {
-    				model = ModelContext.getBaseOntModelSelector(getServletContext()).getTBoxModel();
+    				model = ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_TBOX);
     				doNotify = true;
     			} else if (JenaDataSourceSetupBase.JENA_DB_MODEL.equals(graphURI)) {
-					model = ModelContext.getBaseOntModelSelector(getServletContext()).getABoxModel();
+					model = ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_ABOX);
 					doNotify = true;
     			} else {
     			    model = dataset.getNamedModel(graphURI);
@@ -252,12 +251,11 @@ public class RefactorOperationController extends BaseEditController {
     		dataset.getLock().leaveCriticalSection();
     	}
 		
-		renameResourceInModel(ModelContext.getOntModelSelector(
-				getServletContext()).getUserAccountsModel(), 
+		renameResourceInModel(ModelAccess.on(getServletContext()).getUserAccountsModel(), 
 				        userURI, oldURIStr, newURIStr, !NOTIFY);
     	
 		// there are no statements to delete, but we want indexes updated appropriately
-		request.getFullWebappDaoFactory().getIndividualDao().deleteIndividual(oldURIStr);
+		request.getUnfilteredWebappDaoFactory().getIndividualDao().deleteIndividual(oldURIStr);
 		
 		String redirectStr = null;
 		
@@ -330,7 +328,7 @@ public class RefactorOperationController extends BaseEditController {
 	private void doMovePropertyStatements(VitroRequest request, HttpServletResponse response, EditProcessObject epo) {
 		String userURI = LoginStatusBean.getBean(request).getUserURI();
 		
-		OntModel ontModel = ModelContext.getBaseOntModel(getServletContext());
+		OntModel ontModel = ModelAccess.on(getServletContext()).getBaseOntModel();
 		
 		Model tempRetractModel = ModelFactory.createDefaultModel();
 		Model tempAddModel = ModelFactory.createDefaultModel();
@@ -414,7 +412,7 @@ public class RefactorOperationController extends BaseEditController {
 	private void doMoveInstances(VitroRequest request, HttpServletResponse response, EditProcessObject epo) {
 		String userURI = LoginStatusBean.getBean(request).getUserURI();
 		
-		OntModel ontModel = ModelContext.getBaseOntModel(getServletContext());
+		OntModel ontModel = ModelAccess.on(getServletContext()).getBaseOntModel();
 		
 		String oldClassURIStr = (String) epo.getAttribute("VClassURI");
 		String newClassURIStr = (String) request.getParameter("NewVClassURI");

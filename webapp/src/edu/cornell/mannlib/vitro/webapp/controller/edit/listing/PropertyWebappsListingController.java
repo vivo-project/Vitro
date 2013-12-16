@@ -51,10 +51,10 @@ public class PropertyWebappsListingController extends BaseEditController {
 
         String ontologyUri = request.getParameter("ontologyUri");
 
-        ObjectPropertyDao dao = vrequest.getFullWebappDaoFactory().getObjectPropertyDao();
-        PropertyInstanceDao piDao = vrequest.getFullWebappDaoFactory().getPropertyInstanceDao();
-        VClassDao vcDao = vrequest.getFullWebappDaoFactory().getVClassDao();
-        PropertyGroupDao pgDao = vrequest.getFullWebappDaoFactory().getPropertyGroupDao();
+        ObjectPropertyDao dao = vrequest.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
+        PropertyInstanceDao piDao = vrequest.getUnfilteredWebappDaoFactory().getPropertyInstanceDao();
+        VClassDao vcDao = vrequest.getUnfilteredWebappDaoFactory().getVClassDao();
+        PropertyGroupDao pgDao = vrequest.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 
         String vclassURI = request.getParameter("vclassUri");
         
@@ -96,7 +96,7 @@ public class PropertyWebappsListingController extends BaseEditController {
             : dao.getAllObjectProperties();
         }
         
-        OntologyDao oDao = vrequest.getFullWebappDaoFactory().getOntologyDao();
+        OntologyDao oDao = vrequest.getUnfilteredWebappDaoFactory().getOntologyDao();
         HashMap<String,String> ontologyHash = new HashMap<String,String>();
 
         Iterator propIt = props.iterator();
@@ -125,7 +125,9 @@ public class PropertyWebappsListingController extends BaseEditController {
         }
 
         if (props != null) {
-        	Collections.sort(props, new ObjectPropertyHierarchyListingController.ObjectPropertyAlphaComparator());
+        	Collections.sort(
+        	        props, new ObjectPropertyHierarchyListingController
+        	                .ObjectPropertyAlphaComparator(vrequest.getCollator()));
         }
 
         ArrayList results = new ArrayList();
@@ -163,16 +165,16 @@ public class PropertyWebappsListingController extends BaseEditController {
                         results.add(propNameStr); // column 2
                     }
                     
-                    results.add(prop.getLocalNameWithPrefix()); // column 3
+                    results.add(prop.getPickListName()); // column 3
                     
                     VClass vc = (prop.getDomainVClassURI() != null) ?
                         vcDao.getVClassByURI(prop.getDomainVClassURI()) : null;
-                    String domainStr = (vc != null) ? vc.getLocalNameWithPrefix() : ""; 
+                    String domainStr = (vc != null) ? vc.getPickListName() : ""; 
                     results.add(domainStr); // column 4
                     
                     vc = (prop.getRangeVClassURI() != null) ?
                         vcDao.getVClassByURI(prop.getRangeVClassURI()) : null;
-                    String rangeStr = (vc != null) ? vc.getLocalNameWithPrefix() : ""; 
+                    String rangeStr = (vc != null) ? vc.getPickListName() : ""; 
                     results.add(rangeStr); // column 5
                     
                     if (prop.getGroupURI() != null) {

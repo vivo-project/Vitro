@@ -1,0 +1,48 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+/* Styles for the developer panel. */
+
+div.developer {
+	background-color: #f7dd8a; 
+	padding: 0px 10px 0px 10px;
+	font-variant: small-caps;
+}
+
+div.developer #developerPanelBody {
+	display: none;
+	line-height: 1em;
+	font-size: small;
+}
+
+div.developer div.devleft {
+	width: 49%
+}
+
+div.developer div.devright {
+	float: right;
+	width: 49%
+}
+
+div.developer div.container {
+	border: thin groove black;
+	padding: 3px 10px 3px 10px;
+	margin: 3px 0px 3px 0px;
+}
+
+div.developer div.within {
+	padding-left: 1.5em;
+}
+
+div.developer input[type="text"] { 
+	padding: 2px 10px 2px 10px; 
+	line-height: 1em;
+	margin: 2px 2px 2px 2px; 
+}
+	
+div.developer input[type="text"]:disabled {
+	background-color: #f8eeae;
+}
+
+div.developer a {
+	margin: 3px;
+}

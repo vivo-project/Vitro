@@ -33,7 +33,7 @@ public class AllClassGroupsListingController extends BaseEditController {
     	
         VitroRequest vreq = new VitroRequest(request);
 
-        VClassGroupDao dao = vreq.getFullWebappDaoFactory().getVClassGroupDao();
+        VClassGroupDao dao = vreq.getUnfilteredWebappDaoFactory().getVClassGroupDao();
 
         List<VClassGroup> groups = dao.getPublicGroupsWithVClasses(); 
         // uses an unfiltered dao so will see all classes

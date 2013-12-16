@@ -77,10 +77,10 @@ public class IndividualShortViewDirective extends BaseTemplateDirectiveModel {
 	private void renderShortView(Individual individual,
 			ShortViewContext svContext) {
 		Environment env = Environment.getCurrentEnvironment();
+		HttpServletRequest request = (HttpServletRequest) env
+				.getCustomAttribute("request");
+        ServletContext ctx = request.getSession().getServletContext();
 
-		ServletContext ctx = (ServletContext) env.getCustomAttribute("context");
-		VitroRequest vreq = new VitroRequest(
-				(HttpServletRequest) env.getCustomAttribute("request"));
 		ShortViewService svs = ShortViewServiceSetup.getService(ctx);
 		if (svs == null) {
 			log.warn("ShortViewService was not initialized properly.");
@@ -88,7 +88,7 @@ public class IndividualShortViewDirective extends BaseTemplateDirectiveModel {
 		}
 		
 		TemplateAndSupplementalData svInfo = svs.getShortViewInfo(individual,
-				svContext, vreq);
+				svContext, new VitroRequest(request));
 
 		ObjectWrapper objectWrapper = env.getConfiguration().getObjectWrapper();
 

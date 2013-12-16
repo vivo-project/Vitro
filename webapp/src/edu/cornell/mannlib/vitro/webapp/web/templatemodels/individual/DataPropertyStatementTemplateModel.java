@@ -13,11 +13,13 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropDataPr
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.RdfLiteralHash;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.RdfLiteralHash;
+
 
 public class DataPropertyStatementTemplateModel extends PropertyStatementTemplateModel {
     private static final Log log = LogFactory.getLog(DataPropertyStatementTemplateModel.class); 
@@ -28,9 +30,10 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
     private final String templateName;
 
     //Extended to include vitro request to check for special parameters
-    public DataPropertyStatementTemplateModel(String subjectUri, String propertyUri, Literal literal,
+    public DataPropertyStatementTemplateModel(String subjectUri, Property property, Literal literal,
             String templateName, VitroRequest vreq) {
-        super(subjectUri, propertyUri, vreq);
+        
+        super(subjectUri, property, vreq);
         
         this.literalValue = literal;
         this.templateName = templateName;
@@ -50,7 +53,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
         
         ParamMap params = new ParamMap(
                 "subjectUri", subjectUri,
-                "predicateUri", propertyUri,
+                "predicateUri", property.getURI(),
                 "datapropKey", makeHash(dps),
                 "cmd", "delete");
         
@@ -63,7 +66,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
 	private String makeEditUrl() {
         // vitro:moniker is deprecated. We display existing data values so editors can 
         // move them to other properties and delete, but don't allow editing.
-        if ( propertyUri.equals(VitroVocabulary.MONIKER) ) {
+        if ( VitroVocabulary.MONIKER.equals(property.getURI()) ) {
             return "";           
         }
         
@@ -76,7 +79,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
         
         ParamMap params = new ParamMap(
                 "subjectUri", subjectUri,
-                "predicateUri", propertyUri,
+                "predicateUri", property.getURI(),
                 "datapropKey", makeHash(dps));
         
         if ( deleteUrl.isEmpty() ) {
@@ -89,7 +92,7 @@ public class DataPropertyStatementTemplateModel extends PropertyStatementTemplat
 	}
         
 	private DataPropertyStatement makeStatement() {
-		DataPropertyStatement dps = new DataPropertyStatementImpl(subjectUri, propertyUri, literalValue.getLexicalForm());
+		DataPropertyStatement dps = new DataPropertyStatementImpl(subjectUri, property.getURI(), literalValue.getLexicalForm());
 		// Language and datatype are needed to get the correct hash value
 		dps.setLanguage(literalValue.getLanguage());
 		dps.setDatatypeURI(literalValue.getDatatypeURI());

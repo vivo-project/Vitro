@@ -37,7 +37,6 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardWDF
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.WDFSelector;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDataPropertyFormGenerator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ModelChangePreprocessor;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.processEdit.EditN3Utils;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 
@@ -299,7 +298,7 @@ public class EditConfigurationVTwo {
                 throw new Error("EditConfiguration.addSystemValues() needs a session");
 
             /* ********** Get URI of a logged in user ************** */
-            String userUri = EditN3Utils.getEditorUri(request);
+            String userUri = N3EditUtils.getEditorUri(request);
            	log.debug("EditConfiguration.java - checking system value for User URI " + userUri);
            	List<String> userUriList = new ArrayList<String>();
            	userUriList.add(userUri);

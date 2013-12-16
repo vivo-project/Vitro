@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vedit.validator.Validator;
 import edu.cornell.mannlib.vedit.validator.impl.RequiredFieldValidator;
+import edu.cornell.mannlib.vedit.validator.impl.UrlValidator;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
@@ -47,9 +48,15 @@ public class OntologyRetryController extends BaseEditController {
         epo.setBeanClass(Ontology.class);
         epo.setBeanMask(testMask);
 
-        String action = "insert";
+        String action = null;
+        if (epo.getAction() == null) {
+            action = "insert";
+            epo.setAction("insert");
+        } else {
+            action = epo.getAction();
+        }
 
-        OntologyDao oDao = request.getFullWebappDaoFactory().getOntologyDao();
+        OntologyDao oDao = request.getUnfilteredWebappDaoFactory().getOntologyDao();
         epo.setDataAccessObject(oDao);
 
         Ontology ontologyForEditing = null;
@@ -67,13 +74,12 @@ public class OntologyRetryController extends BaseEditController {
             epo.setOriginalBean(ontologyForEditing);
         } else {
             ontologyForEditing = (Ontology) epo.getNewBean();
-            action = "update";
-            log.error("using newBean");
         }
         
         //validators
         List<Validator> validatorList = new ArrayList<Validator>();
         validatorList.add(new RequiredFieldValidator());
+        validatorList.add(new UrlValidator());
         epo.getValidatorMap().put("URI", validatorList);
 
         //make a simple mask for the class's id

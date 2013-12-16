@@ -27,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
@@ -46,11 +47,13 @@ public class PropertyEditController extends BaseEditController {
 
         VitroRequest vreq = new VitroRequest(request);
         
-        ObjectPropertyDao propDao = vreq.getFullWebappDaoFactory().getObjectPropertyDao();
-        VClassDao vcDao = vreq.getFullWebappDaoFactory().getVClassDao();
-        PropertyGroupDao pgDao = vreq.getFullWebappDaoFactory().getPropertyGroupDao();
-        DataPropertyDao dpDao = vreq.getFullWebappDaoFactory().getDataPropertyDao();
-        ObjectProperty p = (ObjectProperty)propDao.getObjectPropertyByURI(request.getParameter("uri"));
+        ObjectPropertyDao propDao = vreq.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
+        ObjectPropertyDao propDaoLangNeut = vreq.getLanguageNeutralWebappDaoFactory().getObjectPropertyDao();
+        VClassDao vcDao = vreq.getLanguageNeutralWebappDaoFactory().getVClassDao();
+        VClassDao vcDaoWLang = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
+        PropertyGroupDao pgDao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
+        ObjectProperty p = propDao.getObjectPropertyByURI(request.getParameter("uri"));
+        ObjectProperty pLangNeut = propDaoLangNeut.getObjectPropertyByURI(request.getParameter("uri"));
         request.setAttribute("property",p);
 
         ArrayList<String> results = new ArrayList<String>();
@@ -79,14 +82,14 @@ public class PropertyEditController extends BaseEditController {
         results.add("sort direction");        // column 23
         results.add("URI");                   // column 24
 
-        results.add(p.getLocalNameWithPrefix()); // column 1
+        results.add(p.getPickListName()); // column 1
         
         String parentPropertyStr = "";
         if (p.getParentURI() != null) {
         	ObjectProperty parent = propDao.getObjectPropertyByURI(p.getParentURI());
         	if (parent != null && parent.getURI() != null) {
         		try {
-        			parentPropertyStr = "<a href=\"propertyEdit?uri="+URLEncoder.encode(parent.getURI(),"UTF-8")+"\">"+parent.getLocalNameWithPrefix()+"</a>";
+        			parentPropertyStr = "<a href=\"propertyEdit?uri="+URLEncoder.encode(parent.getURI(),"UTF-8")+"\">"+parent.getPickListName()+"</a>";
         		} catch (UnsupportedEncodingException e) {
         		    log.error(e, e);
         		}
@@ -107,7 +110,7 @@ public class PropertyEditController extends BaseEditController {
         
         String ontologyName = null;
         if (p.getNamespace() != null) {
-            Ontology ont = vreq.getFullWebappDaoFactory().getOntologyDao().getOntologyByURI(p.getNamespace());
+            Ontology ont = vreq.getUnfilteredWebappDaoFactory().getOntologyDao().getOntologyByURI(p.getNamespace());
             if ( (ont != null) && (ont.getName() != null) ) {
                 ontologyName = ont.getName();
             }
@@ -119,14 +122,15 @@ public class PropertyEditController extends BaseEditController {
         results.add(p.getDomainPublic() == null ? "(no public label)" : p.getDomainPublic()); // column 6
         
         String domainStr = ""; 
-        if (p.getDomainVClassURI() != null) {
-        	VClass domainClass = vcDao.getVClassByURI(p.getDomainVClassURI());
-        	if (domainClass != null && domainClass.getURI() != null && domainClass.getLocalNameWithPrefix() != null) {
+        if (pLangNeut.getDomainVClassURI() != null) {
+        	VClass domainClass = vcDao.getVClassByURI(pLangNeut.getDomainVClassURI());
+        	VClass domainWLang = vcDaoWLang.getVClassByURI(pLangNeut.getDomainVClassURI()); 
+        	if (domainClass != null && domainClass.getURI() != null && domainClass.getPickListName() != null) {
         		try {
         			if (domainClass.isAnonymous()) {
-        				domainStr = domainClass.getLocalNameWithPrefix();
+        				domainStr = domainClass.getPickListName();
         			} else {
-        				domainStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(domainClass.getURI(),"UTF-8")+"\">"+domainClass.getLocalNameWithPrefix()+"</a>";
+        				domainStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(domainClass.getURI(),"UTF-8")+"\">"+domainWLang.getPickListName()+"</a>";
         			}
         		} catch (UnsupportedEncodingException e) {
         		    log.error(e, e);
@@ -136,14 +140,15 @@ public class PropertyEditController extends BaseEditController {
         results.add(domainStr); // column 7
         
         String rangeStr = ""; 
-        if (p.getRangeVClassURI() != null) {
-        	VClass rangeClass = vcDao.getVClassByURI(p.getRangeVClassURI());
-        	if (rangeClass != null && rangeClass.getURI() != null && rangeClass.getLocalNameWithPrefix() != null) {
+        if (pLangNeut.getRangeVClassURI() != null) {
+        	VClass rangeClass = vcDao.getVClassByURI(pLangNeut.getRangeVClassURI());
+        	VClass rangeWLang = vcDaoWLang.getVClassByURI(pLangNeut.getRangeVClassURI()); 
+        	if (rangeClass != null && rangeClass.getURI() != null && rangeClass.getPickListName() != null) {
         		try {
         			if (rangeClass.isAnonymous()) {
-        				rangeStr = rangeClass.getLocalNameWithPrefix();
+        				rangeStr = rangeClass.getPickListName();
         			} else {
-        				rangeStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(rangeClass.getURI(),"UTF-8")+"\">"+rangeClass.getLocalNameWithPrefix()+"</a>";
+        				rangeStr = "<a href=\"vclassEdit?uri="+URLEncoder.encode(rangeClass.getURI(),"UTF-8")+"\">"+rangeWLang.getPickListName()+"</a>";
         			}
         		} catch (UnsupportedEncodingException e) {
         		    log.error(e, e);
@@ -175,22 +180,6 @@ public class PropertyEditController extends BaseEditController {
         results.add(p.getSelectFromExisting() ? "true" : "false");   // column 21
         results.add(p.getOfferCreateNewOption() ? "true" : "false"); // column 22
         
-        /*
-        String datapropStr = ""; 
-        if (p.getObjectIndividualSortPropertyURI() != null) {
-            DataProperty dProp = dpDao.getDataPropertyByURI(p.getObjectIndividualSortPropertyURI());
-            if (dProp != null && dProp.getURI() != null && dProp.getLocalNameWithPrefix() != null) {
-                try {
-                    datapropStr = "<a href=\"datapropEdit?uri="+URLEncoder.encode(dProp.getURI(),"UTF-8")+"\">"+dProp.getLocalNameWithPrefix()+"</a>";
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
-            }
-            results.add(datapropStr); // column 16
-        } else {
-            results.add("name (rdfs:label)"); // column 16
-        }
-        */
         results.add(p.getDomainEntitySortDirection() == null ? "ascending" : p.getDomainEntitySortDirection()); // column 23
 
         results.add(p.getURI()); // column 24
@@ -209,49 +198,21 @@ public class PropertyEditController extends BaseEditController {
 
         // superproperties and subproperties
         
-        ObjectPropertyDao opDao;
-        if (vreq.getAssertionsWebappDaoFactory() != null) {
-        	opDao = vreq.getAssertionsWebappDaoFactory().getObjectPropertyDao();
-        } else {
-        	opDao = vreq.getFullWebappDaoFactory().getObjectPropertyDao();
-        }
-        List superURIs = opDao.getSuperPropertyURIs(p.getURI(),false);
-        List superProperties = new ArrayList();
-        Iterator superURIit = superURIs.iterator();
-        while (superURIit.hasNext()) {
-            String superURI = (String) superURIit.next();
-            if (superURI != null) {
-                ObjectProperty superProperty = opDao.getObjectPropertyByURI(superURI);
-                if (superProperty != null) {
-                    superProperties.add(superProperty);
-                }
-            }
-        }
-        request.setAttribute("superproperties",superProperties);
+        ObjectPropertyDao opDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getObjectPropertyDao();
+        List<ObjectProperty> superProps = getObjectPropertiesForURIList(
+                opDao.getSuperPropertyURIs(p.getURI(), false), opDao);
+        sortForPickList(superProps, vreq);
+        request.setAttribute("superproperties", superProps);
 
-        List subURIs = opDao.getSubPropertyURIs(p.getURI());
-        List subProperties = new ArrayList();
-        Iterator subURIit = subURIs.iterator();
-        while (subURIit.hasNext()) {
-            String subURI = (String) subURIit.next();
-            ObjectProperty subProperty = opDao.getObjectPropertyByURI(subURI);
-            if (subProperty != null) {
-                subProperties.add(subProperty);
-            }
-        }
-        request.setAttribute("subproperties",subProperties);
+        List<ObjectProperty> subProps = getObjectPropertiesForURIList(
+                opDao.getSubPropertyURIs(p.getURI()), opDao);
+        sortForPickList(subProps, vreq);
+        request.setAttribute("subproperties", subProps);
         
-        List eqURIs = opDao.getEquivalentPropertyURIs(p.getURI());
-        List eqProperties = new ArrayList();
-        Iterator eqURIit = eqURIs.iterator();
-        while (eqURIit.hasNext()) {
-            String eqURI = (String) eqURIit.next();
-            ObjectProperty eqProperty = opDao.getObjectPropertyByURI(eqURI);
-            if (eqProperty != null) {
-                eqProperties.add(eqProperty);
-            }
-        }
-        request.setAttribute("equivalentProperties", eqProperties);
+        List<ObjectProperty> eqProps = getObjectPropertiesForURIList(
+                opDao.getEquivalentPropertyURIs(p.getURI()), opDao);
+        sortForPickList(eqProps, vreq);
+        request.setAttribute("equivalentProperties", eqProps);
         
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("epoKey",epo.getKey());
@@ -272,6 +233,18 @@ public class PropertyEditController extends BaseEditController {
 
     public void doGet (HttpServletRequest request, HttpServletResponse response) {
         doPost(request,response);
+    }
+    
+    private List<ObjectProperty> getObjectPropertiesForURIList(List<String> propertyURIs, 
+            ObjectPropertyDao opDao) {
+        List<ObjectProperty> properties = new ArrayList<ObjectProperty>();
+        for (String propertyURI : propertyURIs) {
+            ObjectProperty property = opDao.getObjectPropertyByURI(propertyURI);
+            if (property != null) {
+                properties.add(property);
+            }
+        }
+        return properties;
     }
 
 }

@@ -29,4 +29,10 @@ public interface PageDao {
     
     List<String> getDataGetterClass(String pageUri);
 
+    /**
+     * Gets the required actions directly associated with a page.
+     * Does not get required actions for any data getters that are
+     * related to the page.
+     */
+    List<String> getRequiredActions(String pageUri);
 }

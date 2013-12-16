@@ -43,10 +43,10 @@ public class VClassWebappsListingController extends BaseEditController {
         List<VClass> classes = null;
         
         if (request.getParameter("showPropertyRestrictions") != null) {
-        	PropertyDao pdao = vrequest.getFullWebappDaoFactory().getObjectPropertyDao();
+        	PropertyDao pdao = vrequest.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
         	classes = pdao.getClassesWithRestrictionOnProperty(request.getParameter("propertyURI"));
         } else {
-        	VClassDao vcdao = vrequest.getFullWebappDaoFactory().getVClassDao();
+        	VClassDao vcdao = vrequest.getUnfilteredWebappDaoFactory().getVClassDao();
         	
         	if (request.getParameter("iffRoot") != null) {
                 classes = vcdao.getRootClasses();
@@ -79,21 +79,21 @@ public class VClassWebappsListingController extends BaseEditController {
 	                if (cls.getName() != null)
 	                    try {
 	                        //String className = (cls.getName()==null || cls.getName().length()==0) ? cls.getURI() : cls.getName();
-	                        results.add("<a href=\"./vclassEdit?uri="+URLEncoder.encode(cls.getURI(),"UTF-8")+"\">"+cls.getLocalNameWithPrefix()+"</a>");
+	                        results.add("<a href=\"./vclassEdit?uri="+URLEncoder.encode(cls.getURI(),"UTF-8")+"\">"+cls.getPickListName()+"</a>");
 	                    } catch (Exception e) {
-	                        results.add(cls.getLocalNameWithPrefix());
+	                        results.add(cls.getPickListName());
 	                    }
 	                else
 	                    results.add("");
 	                String shortDef = (cls.getShortDef()==null) ? "" : cls.getShortDef();
 	                String example = (cls.getExample()==null) ? "" : cls.getExample();
 	                StringBuffer commSb = new StringBuffer();
-	                for (Iterator<String> commIt = vrequest.getFullWebappDaoFactory().getCommentsForResource(cls.getURI()).iterator(); commIt.hasNext();) { 
+	                for (Iterator<String> commIt = vrequest.getUnfilteredWebappDaoFactory().getCommentsForResource(cls.getURI()).iterator(); commIt.hasNext();) { 
 	                	commSb.append(commIt.next()).append(" ");
 	                }
 	                
 	                // get group name
-	                WebappDaoFactory wadf = vrequest.getFullWebappDaoFactory();
+	                WebappDaoFactory wadf = vrequest.getUnfilteredWebappDaoFactory();
 	                VClassGroupDao groupDao= wadf.getVClassGroupDao();
 	                String groupURI = cls.getGroupURI();                
 	                String groupName = "";

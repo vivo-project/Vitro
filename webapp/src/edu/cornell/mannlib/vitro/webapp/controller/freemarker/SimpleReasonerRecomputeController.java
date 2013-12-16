@@ -1,6 +1,8 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
+import static edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.WorkLevel.WORKING;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Exc
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
+import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
 
@@ -49,8 +52,11 @@ public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
                 } else {
                     String submit = (String)vreq.getParameter("submit");
                     if (submit != null) {
-                        new Thread(new Recomputer((simpleReasoner))).start();
-                        messageStr = "Recompute of inferences started. See vivo log for further details.";                       
+                    	VitroBackgroundThread thread = new VitroBackgroundThread(new Recomputer((simpleReasoner)),
+								"SimpleReasonerRecomputController.Recomputer");
+						thread.setWorkLevel(WORKING);
+						thread.start();
+                        messageStr = "Recompute of inferences started. See log for further details.";                       
                     } else {
                         body.put("formAction", UrlBuilder.getUrl("/RecomputeInferences"));
                     } 

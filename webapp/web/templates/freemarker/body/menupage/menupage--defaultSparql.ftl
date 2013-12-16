@@ -10,7 +10,7 @@
 	<#assign sparqlResults = .globals[variableName]/>
 </#if>
 
-<h3>Sparql Query Results</h3>
+<h3>${i18n().sparql_query_results}</h3>
 <#if resultsExist>
 	<#assign numberRows = sparqlResults?size/>
 	<#assign firstRow = false/>
@@ -31,7 +31,7 @@
 		</div>
 	</#list>
 <#else>
-	No results were returned.  
+	${i18n().no_results_returned} 
 </#if>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/menupage/sparqlresults.css" />')}

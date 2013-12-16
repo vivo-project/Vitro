@@ -12,6 +12,8 @@ public interface ReasonerPlugin {
 	
 	public boolean isInterestedInRemovedStatement(Statement stmt);
 	
+	public boolean isConfigurationOnlyPlugin();
+	
 	public void addedABoxStatement(Statement stmt, 
 			                       Model aboxAssertionsModel, 
 			                       Model aboxInferencesModel, 

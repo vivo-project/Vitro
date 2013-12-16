@@ -49,6 +49,18 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServ
 public class ImageUploadHelper {
 	private static final Log log = LogFactory.getLog(ImageUploadHelper.class);
 
+	/*
+	 * Keys to text strings for error messages.
+	 */
+	private static final String ERROR_CODE_NO_IMAGE_TO_CROP = "imageUpload.errorNoImageForCropping";
+	private static final String ERROR_CODE_IMAGE_TOO_SMALL = "imageUpload.errorImageTooSmall";
+	private static final String ERROR_CODE_UNKNOWN = "imageUpload.errorUnknown";
+	private static final String ERROR_CODE_FILE_TOO_BIG = "imageUpload.errorFileTooBig";
+	private static final String ERROR_CODE_UNRECOGNIZED_FILE_TYPE = "imageUpload.errorUnrecognizedFileType";
+	private static final String ERROR_CODE_NO_PHOTO_SELECTED = "imageUpload.errorNoPhotoSelected";
+	private static final String ERROR_CODE_BAD_MULTIPART_REQUEST = "imageUpload.errorBadMultipartRequest";
+	private static final String ERROR_CODE_FORM_FIELD_MISSING = "imageUpload.errorFormFieldMissing";
+
 	/**
 	 * When they upload a new image, store it as this session attribute until
 	 * we're ready to attach it to the Individual.
@@ -127,35 +139,31 @@ public class ImageUploadHelper {
 		Object exception = request.getAttribute(FILE_UPLOAD_EXCEPTION);
 		if (exception != null) {
 			int limit = MAXIMUM_FILE_SIZE / (1024 * 1024);
-			throw new UserMistakeException(
-					"Please upload an image smaller than " + limit
-							+ " megabytes");
+			throw new UserMistakeException(ERROR_CODE_FILE_TOO_BIG, limit);
 		}
 
 		Map<String, List<FileItem>> map = (Map<String, List<FileItem>>) request
 				.getAttribute(FILE_ITEM_MAP);
 		if (map == null) {
-			throw new IllegalStateException("Failed to parse the "
-					+ "multi-part request for uploading an image.");
+			throw new IllegalStateException(ERROR_CODE_BAD_MULTIPART_REQUEST);
 		}
 		List<FileItem> list = map.get(PARAMETER_UPLOADED_FILE);
 		if ((list == null) || list.isEmpty()) {
-			throw new UserMistakeException("The form did not contain a '"
-					+ PARAMETER_UPLOADED_FILE + "' field.");
+			throw new UserMistakeException(ERROR_CODE_FORM_FIELD_MISSING,
+					PARAMETER_UPLOADED_FILE);
 		}
 
 		FileItem file = list.get(0);
 		if (file.getSize() == 0) {
-			throw new UserMistakeException("Please browse and select a photo.");
+			throw new UserMistakeException(ERROR_CODE_NO_PHOTO_SELECTED);
 		}
 
 		String filename = getSimpleFilename(file);
 		String mimeType = getMimeType(file);
 		if (!RECOGNIZED_FILE_TYPES.containsValue(mimeType)) {
 			log.debug("Unrecognized MIME type: '" + mimeType + "'");
-			throw new UserMistakeException("'" + filename
-					+ "' is not a recognized image file type. "
-					+ "Please upload JPEG, GIF, or PNG files only.");
+			throw new UserMistakeException(ERROR_CODE_UNRECOGNIZED_FILE_TYPE,
+					filename);
 		}
 
 		return file;
@@ -221,10 +229,8 @@ public class ImageUploadHelper {
 
 			if ((size.height < THUMBNAIL_HEIGHT)
 					|| (size.width < THUMBNAIL_WIDTH)) {
-				throw new UserMistakeException(
-						"The uploaded image should be at least "
-								+ THUMBNAIL_HEIGHT + " pixels high and "
-								+ THUMBNAIL_WIDTH + " pixels wide.");
+				throw new UserMistakeException(ERROR_CODE_IMAGE_TOO_SMALL,
+						THUMBNAIL_HEIGHT, THUMBNAIL_WIDTH);
 			}
 
 			return size;
@@ -237,8 +243,7 @@ public class ImageUploadHelper {
 			throw e;
 		} catch (Exception e) {
 			log.warn("Unexpected exception in image handling", e);
-			throw new UserMistakeException("Sorry, we were unable to process "
-					+ "the photo you provided. Please try another photo.");
+			throw new UserMistakeException(ERROR_CODE_UNKNOWN);
 		} finally {
 			if (source != null) {
 				try {
@@ -261,8 +266,7 @@ public class ImageUploadHelper {
 				ATTRIBUTE_TEMP_FILE);
 
 		if (fileInfo == null) {
-			throw new UserMistakeException(
-					"There is no image file to be cropped.");
+			throw new UserMistakeException(ERROR_CODE_NO_IMAGE_TO_CROP);
 		}
 
 		return fileInfo;

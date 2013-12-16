@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_LITERAL;
+
 import java.io.InputStream;
 
 import org.apache.commons.logging.Log;
@@ -32,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPr
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class SelfEditingPolicy_2_Test extends AbstractTestClass {
@@ -123,7 +126,7 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 	@Test
 	public void nullIdentifierBundle() {
 		AddObjectPropertyStatement whatToAuth = new AddObjectPropertyStatement(
-				ontModel, SELFEDITOR_URI, SAFE_PREDICATE, SAFE_RESOURCE);
+				ontModel, SELFEDITOR_URI, new Property(SAFE_PREDICATE), SAFE_RESOURCE);
 		PolicyDecision dec = policy.isAuthorized(null, whatToAuth);
 		Assert.assertNotNull(dec);
 		Assert.assertEquals(Authorization.INCONCLUSIVE, dec.getAuthorized());
@@ -277,7 +280,7 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 	private void assertAddObjectPropStmt(String uriOfSub, String uriOfPred,
 			String uriOfObj, Authorization expectedAuthorization) {
 		AddObjectPropertyStatement whatToAuth = new AddObjectPropertyStatement(
-				ontModel, uriOfSub, uriOfPred, uriOfObj);
+				ontModel, uriOfSub, new Property(uriOfPred), uriOfObj);
 		PolicyDecision dec = policy.isAuthorized(ids, whatToAuth);
 		log.debug(dec);
 		Assert.assertNotNull(dec);
@@ -291,7 +294,7 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 	private void assertEditObjPropStmt(String uriOfSub, String uriOfPred,
 			String uriOfObj, Authorization expectedAuthorization) {
 		EditObjectPropertyStatement whatToAuth = new EditObjectPropertyStatement(
-				ontModel, uriOfSub, uriOfPred, uriOfObj);
+				ontModel, uriOfSub, new Property(uriOfPred), uriOfObj);
 		PolicyDecision dec = policy.isAuthorized(ids, whatToAuth);
 		log.debug(dec);
 		Assert.assertNotNull(dec);
@@ -305,7 +308,7 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 	private void assertEditDataPropStmt(String individualURI,
 			String datapropURI, String data, Authorization expectedAuthorization) {
 		EditDataPropertyStatement whatToAuth = new EditDataPropertyStatement(
-				ontModel, individualURI, datapropURI);
+				ontModel, individualURI, datapropURI, SOME_LITERAL);
 		PolicyDecision dec = policy.isAuthorized(ids, whatToAuth);
 		log.debug(dec);
 		Assert.assertNotNull(dec);

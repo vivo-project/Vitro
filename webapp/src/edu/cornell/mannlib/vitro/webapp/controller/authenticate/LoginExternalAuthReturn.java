@@ -37,7 +37,7 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 	 * the header will contain the name of the user who just logged in.
 	 * 
 	 * Deal with these possibilities: 
-	 * - The header name was not configured in deploy.properties. Complain.
+	 * - The header name was not configured in runtime.properties. Complain.
 	 * - No username: the login failed. Complain 
 	 * - User corresponds to a User acocunt. Record the login. 
 	 * - User corresponds to an Individual (self-editor). 
@@ -71,7 +71,7 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 
 		if (externalAuthId == null) {
 			complainAndReturnToReferrer(req, resp, ATTRIBUTE_REFERRER,
-					MESSAGE_LOGIN_FAILED);
+					messageLoginFailed(req));
 			return;
 		}
 
@@ -84,7 +84,7 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 		if (!getAuthenticator(req).isUserPermittedToLogin(userAccount)) {
 			log.debug("Logins disabled for " + userAccount);
 			complainAndReturnToReferrer(req, resp, ATTRIBUTE_REFERRER,
-					MESSAGE_LOGIN_DISABLED);
+					messageLoginDisabled(req));
 			return;
 		}
 
@@ -107,7 +107,7 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 			// should have been caught by isUserPermittedToLogin()
 			log.debug("Logins disabled for " + userAccount);
 			complainAndReturnToReferrer(req, resp, ATTRIBUTE_REFERRER,
-					MESSAGE_LOGIN_DISABLED);
+					messageLoginDisabled(req));
 			return;
 		}
 	}
@@ -115,10 +115,10 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 	@Override
 	protected void complainAndReturnToReferrer(HttpServletRequest req,
 			HttpServletResponse resp, String sessionAttributeForReferrer,
-			Message message, Object... args) throws IOException {
-		DisplayMessage.setMessage(req, message.formatMessage(args));
+			Message message) throws IOException {
+		DisplayMessage.setMessage(req, message.getText());
 		super.complainAndReturnToReferrer(req, resp,
-				sessionAttributeForReferrer, message, args);
+				sessionAttributeForReferrer, message);
 	}
 
 	private void removeLoginProcessArtifacts(HttpServletRequest req) {

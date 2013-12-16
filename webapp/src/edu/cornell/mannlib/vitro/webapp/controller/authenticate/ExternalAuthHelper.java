@@ -117,7 +117,7 @@ public class ExternalAuthHelper {
 		}
 
 		if (externalAuthServerUrl == null) {
-			log.debug("deploy.properties doesn't contain a value for '"
+			log.debug("runtime.properties doesn't contain a value for '"
 					+ PROPERTY_EXTERNAL_AUTH_SERVER_URL
 					+ "' -- sending directly to '" + returnUrl + "'");
 			return returnUrl;
@@ -142,7 +142,7 @@ public class ExternalAuthHelper {
 
 		if (externalAuthHeaderName == null) {
 			log.error("User asked for external authentication, "
-					+ "but deploy.properties doesn't contain a value for '"
+					+ "but runtime.properties doesn't contain a value for '"
 					+ PROPERTY_EXTERNAL_AUTH_ID_HEADER + "'");
 			return null;
 		}

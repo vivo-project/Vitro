@@ -4,16 +4,20 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sparql;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,6 +41,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
@@ -56,8 +61,8 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.ListeningGraph;
 public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	
 	private static final Log log = LogFactory.getLog(RDFServiceImpl.class);
-	private String readEndpointURI;	
-	private String updateEndpointURI;
+	protected String readEndpointURI;	
+	protected String updateEndpointURI;
 	private HTTPRepository readRepository;
 	private HTTPRepository updateRepository;
     private HttpClient httpClient;
@@ -83,6 +88,10 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         this.readRepository = new HTTPRepository(readEndpointURI);
         this.updateRepository = new HTTPRepository(updateEndpointURI);
 
+        MultiThreadedHttpConnectionManager mgr = new MultiThreadedHttpConnectionManager();
+        mgr.getParams().setDefaultMaxConnectionsPerHost(50);
+        this.httpClient = new HttpClient(mgr);
+        
         testConnection();
 
         MultiThreadedHttpConnectionManager mgr = new MultiThreadedHttpConnectionManager();
@@ -277,13 +286,28 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	 */
 	@Override
 	public InputStream sparqlSelectQuery(String queryStr, RDFService.ResultFormat resultFormat) throws RDFServiceException {
-		
-        Query query = createQuery(queryStr);
-        QueryExecution qe = QueryExecutionFactory.sparqlService(readEndpointURI, query);
-        
+			    
+        //QueryEngineHTTP qh = new QueryEngineHTTP(readEndpointURI, queryStr);
+
+        GetMethod meth = new GetMethod(readEndpointURI);
         try {
-        	ResultSet resultSet = qe.execSelect();
-        	ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
+            meth.addRequestHeader("Accept", "application/sparql-results+xml");
+            NameValuePair param = new NameValuePair();
+            param.setName("query");
+            param.setValue(queryStr);
+            NameValuePair[] params = new NameValuePair[1];
+            params[0] = param;
+            meth.setQueryString(params);           
+            int response = httpClient.executeMethod(meth);
+            if (response > 399) {
+                log.error("response " + response + " to query. \n");
+                log.debug("update string: \n" + queryStr);
+                throw new RDFServiceException("Unable to perform SPARQL UPDATE");
+            }
+        
+            InputStream in = meth.getResponseBodyAsStream();
+            ResultSet resultSet = ResultSetFactory.fromXML(in);
+        	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         	
         	switch (resultFormat) {
         	   case CSV:
@@ -300,12 +324,14 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         		  break;
         	   default: 
         		  throw new RDFServiceException("unrecognized result format");
-        	}
-        	
+        	}     	
         	InputStream result = new ByteArrayInputStream(outputStream.toByteArray());
         	return result;
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
         } finally {
-            qe.close();
+            //qh.close();
+            meth.releaseConnection();
         }
 	}
 	
@@ -473,7 +499,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
                 int response = httpClient.executeMethod(meth);
                 if (response > 399) {
                     log.error("response " + response + " to update. \n");
-                    log.debug("update string: \n" + updateString);
+                    //log.debug("update string: \n" + updateString);
                     throw new RDFServiceException("Unable to perform SPARQL UPDATE");
                 }
             } finally {
@@ -715,7 +741,9 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         if (graphURI != null) {
             queryBuff.append("    GRAPH <" + graphURI + "> { \n");
         }
-        addStatementPatterns(stmtIt, queryBuff, !WHERE_CLAUSE);
+        List<Statement> stmts = stmtIt.toList();
+        sort(stmts);
+        addStatementPatterns(stmts, queryBuff, !WHERE_CLAUSE);
         if (graphURI != null) {
             queryBuff.append("    } \n");
         }
@@ -724,7 +752,9 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
             queryBuff.append("    GRAPH <" + graphURI + "> { \n");
         }
         stmtIt = model.listStatements();
-        addStatementPatterns(stmtIt, queryBuff, WHERE_CLAUSE);
+        stmts = stmtIt.toList();
+        sort(stmts);
+        addStatementPatterns(stmts, queryBuff, WHERE_CLAUSE);
         if (graphURI != null) {
             queryBuff.append("    } \n");
         }
@@ -736,11 +766,55 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         executeUpdate(queryBuff.toString());
     }
     
+    private List<Statement> sort(List<Statement> stmts) {
+        List<Statement> output = new ArrayList<Statement>();
+        int originalSize = stmts.size();
+        if (originalSize == 1) 
+            return stmts;
+        List <Statement> remaining = stmts;
+        ConcurrentLinkedQueue<com.hp.hpl.jena.rdf.model.Resource> subjQueue = 
+                new ConcurrentLinkedQueue<com.hp.hpl.jena.rdf.model.Resource>();
+        for(Statement stmt : remaining) {
+            if(stmt.getSubject().isURIResource()) {
+                subjQueue.add(stmt.getSubject());
+                break;
+            }
+        }
+        if (subjQueue.isEmpty()) {
+            throw new RuntimeException("No named subject in statement patterns");
+        }
+        while(remaining.size() > 0) {
+            if(subjQueue.isEmpty()) {
+                subjQueue.add(remaining.get(0).getSubject());
+            }
+            while(!subjQueue.isEmpty()) {
+                com.hp.hpl.jena.rdf.model.Resource subj = subjQueue.poll();
+                List<Statement> temp = new ArrayList<Statement>();
+                for (Statement stmt : remaining) {
+                    if(stmt.getSubject().equals(subj)) {
+                        output.add(stmt);
+                        if (stmt.getObject().isResource()) {
+                            subjQueue.add((com.hp.hpl.jena.rdf.model.Resource) stmt.getObject()); 
+                        }
+                    } else {
+                        temp.add(stmt);
+                    }
+                }
+                remaining = temp;
+            }
+        }
+        if(output.size() != originalSize) {
+            throw new RuntimeException("original list size was " + originalSize + 
+                    " but sorted size is " + output.size());      
+        }
+        return output;
+    }
+    
     private static final boolean WHERE_CLAUSE = true;
     
-    private void addStatementPatterns(StmtIterator stmtIt, StringBuffer patternBuff, boolean whereClause) {
-        while(stmtIt.hasNext()) {
-            Triple t = stmtIt.next().asTriple();
+    private void addStatementPatterns(List<Statement> stmts, StringBuffer patternBuff, boolean whereClause) {
+        for(Statement stmt : stmts) {
+            Triple t = stmt.asTriple();
             patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getSubject(), null));
             patternBuff.append(" ");
             patternBuff.append(SparqlGraph.sparqlNodeDelete(t.getPredicate(), null));

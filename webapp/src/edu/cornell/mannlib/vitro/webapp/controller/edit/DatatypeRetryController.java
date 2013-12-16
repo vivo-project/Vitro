@@ -37,7 +37,7 @@ public class DatatypeRetryController extends BaseEditController {
         //create an EditProcessObject for this and put it in the session
         EditProcessObject epo = super.createEpo(request);
 
-        DatatypeDao dDao = request.getFullWebappDaoFactory().getDatatypeDao();
+        DatatypeDao dDao = request.getUnfilteredWebappDaoFactory().getDatatypeDao();
         epo.setDataAccessObject(dDao);
         Datatype objectForEditing = null;
         String action = "";

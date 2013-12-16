@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
-import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -89,14 +88,13 @@ public class DependentResourceDeleteJena {
 	 * Find all statements where for a given statement in the assertions, 
 	 * there is at least one statement in the retractions that has 
 	 * the same predicate and object. */	 
-	@SuppressWarnings("unchecked")
 	private static List<Statement> getChangedStmts(Model assertions, Model retractions){
 		List<Statement> changedStmts = new LinkedList<Statement>();		
 		StmtIterator it = assertions.listStatements();
 		while(it.hasNext()){
 			Statement assertionStmtStatement = it.nextStatement();
 			if( assertionStmtStatement.getObject().canAs( Resource.class )){
-				Resource asserObj = (Resource) assertionStmtStatement.getObject().as(Resource.class);			
+				Resource asserObj = assertionStmtStatement.getObject().as(Resource.class);			
 				StmtIterator retractionStmts = 
 					retractions.listStatements(
 							(Resource)null, 
@@ -138,7 +136,7 @@ public class DependentResourceDeleteJena {
 
         if( ( obj.canAs(Resource.class) && isPredicateDependencyRelation(stmt.getPredicate(), model) )
         	|| ( obj.isAnon() && perviousWasDependentResource ) ){                	
-    		Resource res = (Resource)obj.as(Resource.class);
+    		Resource res = obj.as(Resource.class);
     		String id = res.isAnon()?res.getId().toString():res.getURI();
                                 
     		if( !visitedUris.contains(id) ){

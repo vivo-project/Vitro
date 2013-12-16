@@ -103,7 +103,7 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 			FreemarkerEmailMessage email = FreemarkerEmailFactory
 					.createNewMessage(vreq);
 			email.addRecipient(TO, page.getAddedAccount().getEmailAddress());
-			email.setSubject("Your VIVO account has been created.");
+			email.setSubject(i18n.text("account_created_subject", getSiteName()));
 			if (page.isExternalAuthOnly()) {
 				email.setTemplate(EMAIL_TEMPLATE_NO_PASSWORD);
 			} else {

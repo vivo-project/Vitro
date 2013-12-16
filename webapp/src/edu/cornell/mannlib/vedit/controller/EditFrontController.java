@@ -25,7 +25,7 @@ public class EditFrontController extends VitroHttpServlet {
     private static final Log log = LogFactory.getLog(EditFrontController.class.getName());
     private static final String CONTROLLER_PKG = "edu.cornell.mannlib.vitro.webapp.controller.edit";
 
-    public void doPost(HttpServletRequest request, 
+    public void doPost(HttpServletRequest request,
     		           HttpServletResponse response) throws IOException, ServletException {
         String controllerName = request.getParameter("controller")+"RetryController";
         if (controllerName==null || controllerName.length()==0) {
@@ -46,7 +46,7 @@ public class EditFrontController extends VitroHttpServlet {
                 throw new RuntimeException(errMsg, e);
             }
         } catch (ClassNotFoundException e){
-        	String errMsg = "doPost() could not find controller " + 
+        	String errMsg = "doPost() could not find controller " +
         	        CONTROLLER_PKG + "." + controllerName; 
             log.error(errMsg);
             throw new RuntimeException(errMsg);
@@ -79,7 +79,7 @@ public class EditFrontController extends VitroHttpServlet {
         }
     }
 
-    public void doGet(HttpServletRequest request, 
+    public void doGet(HttpServletRequest request,
     		          HttpServletResponse response) throws IOException, ServletException {
         doPost(request,response);
     }

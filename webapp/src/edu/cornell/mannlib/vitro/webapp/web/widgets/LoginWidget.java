@@ -2,16 +2,17 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.widgets;
 
-import java.io.IOException;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginInProcessFlag;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -56,7 +57,8 @@ public class LoginWidget extends Widget {
         EXTERNAL_AUTH_NAME("externalAuthName"),
         EXTERNAL_AUTH_URL("externalAuthUrl"),
         CANCEL_URL("cancelUrl"),
-        SITE_NAME("siteName");
+        SITE_NAME("siteName"),
+        MINIMUM_PASSWORD_LENGTH("minimumPasswordLength");
 
         private final String variableName;
         
@@ -124,8 +126,7 @@ public class LoginWidget extends Widget {
     /**
      * User is starting the login process. Show them the login screen.
      */
-    private WidgetTemplateValues showLoginScreen(HttpServletRequest request, String siteName)
-            throws IOException {
+    private WidgetTemplateValues showLoginScreen(HttpServletRequest request, String siteName) {
         LoginProcessBean bean = LoginProcessBean.getBean(request);
         log.trace("Going to login screen: " + bean);
 
@@ -133,13 +134,12 @@ public class LoginWidget extends Widget {
         values.put(TemplateVariable.FORM_ACTION.toString(), getAuthenticateUrl(request));
         values.put(TemplateVariable.LOGIN_NAME.toString(), bean.getUsername());
         
-		String externalAuthDisplayName = ConfigurationProperties.getBean(
-				request).getProperty("externalAuth.buttonText");
-		if (externalAuthDisplayName != null) {
+		boolean showExternalAuth = StringUtils.isNotBlank(
+				ConfigurationProperties.getBean(request).getProperty(
+						"externalAuth.netIdHeaderName"));
+		if (showExternalAuth) {
 			values.put(TemplateVariable.EXTERNAL_AUTH_URL.toString(),
 					UrlBuilder.getUrl(EXTERNAL_AUTH_SETUP_URL));
-			values.put(TemplateVariable.EXTERNAL_AUTH_NAME.toString(),
-					externalAuthDisplayName);
 		}
 
         String infoMessage = bean.getInfoMessageAndClear();
@@ -172,6 +172,7 @@ public class LoginWidget extends Widget {
                 Macro.FORCE_PASSWORD_CHANGE.toString());
         values.put(TemplateVariable.FORM_ACTION.toString(), getAuthenticateUrl(request));
         values.put(TemplateVariable.CANCEL_URL.toString(), getCancelUrl(request));
+        values.put(TemplateVariable.MINIMUM_PASSWORD_LENGTH.toString(), UserAccount.MIN_PASSWORD_LENGTH);
 
         String errorMessage = bean.getErrorMessageAndClear();
         if (!errorMessage.isEmpty()) {
