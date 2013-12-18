@@ -40,6 +40,7 @@ function DeveloperPanel(developerAjaxUrl) {
 	
 	function updateDisabledFields() {
 		var developerEnabled = document.getElementById("developerEnabled").checked;
+		document.getElementById("developerPermitAnonymousControl").disabled = !developerEnabled;
 		document.getElementById("developerDefeatFreemarkerCache").disabled = !developerEnabled;
 		document.getElementById("developerInsertFreemarkerDelimiters").disabled = !developerEnabled;
 		document.getElementById("developerPageContentsLogCustomListView").disabled = !developerEnabled;
@@ -57,6 +58,7 @@ function DeveloperPanel(developerAjaxUrl) {
 	function collectFormData() {
 		var data = new Object();
 		getCheckbox("developerEnabled", data);
+		getCheckbox("developerPermitAnonymousControl", data);
 		getCheckbox("developerDefeatFreemarkerCache", data);
 		getCheckbox("developerInsertFreemarkerDelimiters", data);
 		getCheckbox("developerPageContentsLogCustomListView", data);

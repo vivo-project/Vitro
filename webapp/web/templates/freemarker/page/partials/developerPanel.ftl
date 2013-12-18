@@ -25,6 +25,10 @@
 					<@showCheckbox "developerEnabled" />
 					Enable developer mode
 				</label>
+				<label>
+					<@showCheckbox "developerPermitAnonymousControl" />
+					Allow anonymous user to see and modify developer settings
+				</label>
 			</div>
 			
 			<div class="devright">
