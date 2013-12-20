@@ -2,12 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
@@ -36,7 +30,6 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
-import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil;
 
@@ -52,6 +45,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 
 	private static final String ERROR_CODE_UNRECOGNIZED_URI = "imageUpload.errorUnrecognizedURI";
 	private static final String ERROR_CODE_NO_URI = "imageUpload.errorNoURI";
+	private static final String ERROR_CODE_FILE_TOO_BIG = "imageUpload.errorFileTooBig";
 
 	/** Limit file size to 6 megabytes. */
 	public static final int MAXIMUM_FILE_SIZE = 6 * 1024 * 1024;
@@ -136,6 +130,22 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 					+ FileStorage.class.getName() + "'");
 		}
 	}
+	
+	/**
+	 * How large an image file will we accept?
+	 */
+	@Override
+	public long maximumMultipartFileSize() {
+		return MAXIMUM_FILE_SIZE;
+	}
+
+	/**
+	 * What will we do if there is a problem parsing the request?
+	 */
+	@Override
+	public boolean stashFileSizeException() {
+		return true;
+	}
 
 	/**
 	 * The required action depends on what we are trying to do.
@@ -172,51 +182,16 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	}
 
 	/**
-	 * <p>
-	 * Parse the multi-part request, process the request, and produce the
-	 * output.
-	 * </p>
-	 * <p>
-	 * If the request was a multi-part file upload, it will parse to a
-	 * normal-looking request with a "file_item_map" attribute.
-	 * </p>
-	 * <p>
-	 * The processing will produce a {@link ResponseValues} object, which
-	 * represents either a request for a FreeMarker template or a forwarding
-	 * operation.
-	 * <ul>
-	 * <li>If a FreeMarker template, we emulate the actions that
-	 * FreeMarkerHttpServlet would have taken to produce the output.</li>
-	 * <li>If a forwarding operation, we create a {@link RequestDispatcher} to
-	 * do the forwarding.</li>
-	 * </ul>
-	 * </p>
-	 */
-
-	@Override
-	protected ResponseValues processRequest(VitroRequest vreq) {
-		try {
-			// Parse the multi-part request.
-			FileUploadServletRequest.parseRequest(vreq, MAXIMUM_FILE_SIZE);
-			if (log.isTraceEnabled()) {
-				dumpRequestDetails(vreq);
-			}
-
-			return buildTheResponse(vreq);
-		} catch (Exception e) {
-			// log.error("Could not produce response page", e);
-			return new ExceptionResponseValues(e);
-		}
-	}
-
-	/**
 	 * Handle the different actions. If not specified, the default action is to
 	 * show the intro screen.
 	 */
-	private ResponseValues buildTheResponse(VitroRequest vreq) {
-		String action = vreq.getParameter(PARAMETER_ACTION);
-
+	@Override
+	protected ResponseValues processRequest(VitroRequest vreq) {
 		try {
+			checkForFileTooBigException(vreq);
+			
+			String action = vreq.getParameter(PARAMETER_ACTION);
+
 			Individual entity = validateEntityUri(vreq);
 			if (ACTION_UPLOAD.equals(action)) {
 				return doUploadImage(vreq, entity);
@@ -237,6 +212,19 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 		} catch (Exception e) {
 			// We weren't expecting this - log it, and apologize to the user.
 			return new ExceptionResponseValues(e);
+		}
+	}
+
+	/**
+	 * If our exception handler caught a "file too big" exception, we need to
+	 * deal with it before anything else, since we can't trust the other
+	 * parameters.
+	 */
+	private void checkForFileTooBigException(VitroRequest vreq)
+			throws UserMistakeException {
+		if (vreq.hasFileSizeException()) {
+			int limit = MAXIMUM_FILE_SIZE / (1024 * 1024);
+			throw new UserMistakeException(ERROR_CODE_FILE_TOO_BIG, limit);
 		}
 	}
 
@@ -624,31 +612,6 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 					+ ", h=" + height + "]";
 		}
 
-	}
-
-	/**
-	 * For debugging, dump all sorts of information about the request.
-	 * 
-	 * WARNING: if "req" represents a Multi-part request which has not yet been
-	 * parsed, then reading these parameters will consume them.
-	 */
-	@SuppressWarnings("unchecked")
-	private void dumpRequestDetails(HttpServletRequest req) {
-		log.trace("Request is " + req.getClass().getName());
-
-		Map<String, String[]> parms = req.getParameterMap();
-		for (Entry<String, String[]> entry : parms.entrySet()) {
-			log.trace("Parameter '" + entry.getKey() + "'="
-					+ Arrays.deepToString(entry.getValue()));
-		}
-
-		Enumeration<String> attrs = req.getAttributeNames();
-		while (attrs.hasMoreElements()) {
-			String key = attrs.nextElement();
-			String valueString = String.valueOf(req.getAttribute(key));
-			String valueOneLine = valueString.replace("\n", " | ");
-			log.trace("Attribute '" + key + "'=" + valueOneLine);
-		}
 	}
 
 	static class Dimensions {

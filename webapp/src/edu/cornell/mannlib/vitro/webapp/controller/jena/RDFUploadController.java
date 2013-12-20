@@ -42,7 +42,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -56,31 +55,39 @@ public class RDFUploadController extends JenaIngestController {
     private static FileItem fileStream = null; 
     private static final String LOAD_RDF_DATA_JSP="/jenaIngest/loadRDFData.jsp";
     
-    public void doPost(HttpServletRequest rawRequest,
+	@Override
+	public long maximumMultipartFileSize() {
+		return maxFileSizeInBytes;
+	}
+
+	@Override
+	public boolean stashFileSizeException() {
+		return true;
+	}
+	
+    public void doPost(HttpServletRequest req,
             HttpServletResponse response) throws ServletException, IOException {
-		if (!isAuthorizedToDisplayPage(rawRequest, response,
+		if (!isAuthorizedToDisplayPage(req, response,
 				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTIONS)) {
             return;
         }
 
-        FileUploadServletRequest req = FileUploadServletRequest.parseRequest(
-                rawRequest, maxFileSizeInBytes);
-        if (req.hasFileUploadException()) {
+		VitroRequest request = new VitroRequest(req);        
+        if (request.hasFileSizeException()) {
             forwardToFileUploadError(
-                    req.getFileUploadException().getLocalizedMessage(), 
+                    request.getFileSizeException().getLocalizedMessage(), 
                             req, response);
             return;
         }
 
-        Map<String, List<FileItem>> fileStreams = req.getFiles();
+        Map<String, List<FileItem>> fileStreams = request.getFiles();
         
-        VitroRequest request = new VitroRequest(req);        
         LoginStatusBean loginBean = LoginStatusBean.getBean(request);
         
         try {
             String modelName = req.getParameter("modelName");
             if(modelName!=null){
-                loadRDF(req,request,response);
+                loadRDF(request,response);
                 return;
             }    
         } catch (Exception e) {
@@ -234,15 +241,13 @@ public class RDFUploadController extends JenaIngestController {
         }
     }
     
-    public void loadRDF(FileUploadServletRequest req,
-                        VitroRequest request,
-                        HttpServletResponse response) 
-                                throws ServletException, IOException {
-        Map<String, List<FileItem>> fileStreams = req.getFiles();
+    public void loadRDF(VitroRequest request, HttpServletResponse response) 
+                                throws ServletException {
+        Map<String, List<FileItem>> fileStreams = request.getFiles();
         String filePath = fileStreams.get("filePath").get(0).getName();
         fileStream = fileStreams.get("filePath").get(0);
-        String modelName = req.getParameter("modelName");
-        String docLoc = req.getParameter("docLoc");
+        String modelName = request.getParameter("modelName");
+        String docLoc = request.getParameter("docLoc");
         String languageStr = request.getParameter("language");
         ModelMaker maker = getVitroJenaModelMaker(request);
         
