@@ -63,11 +63,6 @@ action:ManageSearchIndex
     rdfs:label "MANAGE_SEARCH_INDEX" .
 
 
-action:ManageTabs
-    a display:RequiredAction ;
-    rdfs:label "MANAGE_TABS" .
-
-
 action:ManageUserAccounts
     a display:RequiredAction ;
     rdfs:label "MANAGE_USER_ACCOUNTS" .

@@ -35,7 +35,6 @@ auth:ADMIN
     # permissions for CURATOR and above.
     auth:hasPermission simplePermission:EditOntology ;
     auth:hasPermission simplePermission:EditSiteInformation ;
-    auth:hasPermission simplePermission:ManageTabs ;
     auth:hasPermission simplePermission:SeeVerbosePropertyInformation ;
     auth:hasPermission simplePermission:UseMiscellaneousCuratorPages ;
 	auth:hasPermission simplePermission:PageViewableCurator ;
@@ -73,7 +72,6 @@ auth:CURATOR
     # permissions for CURATOR and above.
     auth:hasPermission simplePermission:EditOntology ;
     auth:hasPermission simplePermission:EditSiteInformation ;
-    auth:hasPermission simplePermission:ManageTabs ;
     auth:hasPermission simplePermission:SeeVerbosePropertyInformation ;
     auth:hasPermission simplePermission:UseMiscellaneousCuratorPages ;
     auth:hasPermission simplePermission:PageViewableCurator ;

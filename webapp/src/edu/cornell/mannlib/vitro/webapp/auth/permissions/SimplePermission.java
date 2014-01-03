@@ -50,8 +50,6 @@ public class SimplePermission extends Permission {
 		NAMESPACE + "ManageProxies");
 	public static final SimplePermission MANAGE_SEARCH_INDEX = new SimplePermission(
 		NAMESPACE + "ManageSearchIndex");
-	public static final SimplePermission MANAGE_TABS = new SimplePermission(
-		NAMESPACE + "ManageTabs");
 	public static final SimplePermission MANAGE_USER_ACCOUNTS = new SimplePermission(
 		NAMESPACE + "ManageUserAccounts");
 	public static final SimplePermission QUERY_FULL_MODEL = new SimplePermission(
