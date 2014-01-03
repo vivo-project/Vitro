@@ -53,11 +53,6 @@ action:ManageOwnProxies
     rdfs:label "MANAGE_OWN_PROXIES" .
 
 
-action:ManagePortals
-    a display:RequiredAction ;
-    rdfs:label "MANAGE_PORTALS" .
-
-
 action:ManageProxies
     a display:RequiredAction ;
     rdfs:label "MANAGE_PROXIES" .

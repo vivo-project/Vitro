@@ -7,7 +7,7 @@
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
-<% request.setAttribute("requestedActions", SimplePermission.MANAGE_PORTALS.ACTION); %>
+<% request.setAttribute("requestedActions", SimplePermission.EDIT_SITE_INFORMATION.ACTION); %>
 <vitro:confirmAuthorization />
 
 <c:set var="appNameLabel" value="Site name"/> 

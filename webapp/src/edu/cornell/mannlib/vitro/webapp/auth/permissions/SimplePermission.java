@@ -46,8 +46,6 @@ public class SimplePermission extends Permission {
 		NAMESPACE + "ManageMenus");
 	public static final SimplePermission MANAGE_OWN_PROXIES = new SimplePermission(
 		NAMESPACE + "ManageOwnProxies");
-	public static final SimplePermission MANAGE_PORTALS = new SimplePermission(
-		NAMESPACE + "ManagePortals");
 	public static final SimplePermission MANAGE_PROXIES = new SimplePermission(
 		NAMESPACE + "ManageProxies");
 	public static final SimplePermission MANAGE_SEARCH_INDEX = new SimplePermission(
