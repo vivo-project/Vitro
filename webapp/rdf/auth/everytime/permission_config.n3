@@ -18,7 +18,6 @@ auth:ADMIN
     auth:hasPermission simplePermission:ManageProxies ;
     auth:hasPermission simplePermission:ManageSearchIndex ;
     auth:hasPermission simplePermission:ManageUserAccounts ;
-    auth:hasPermission simplePermission:RebuildVClassGroupCache ;
     auth:hasPermission simplePermission:RefreshVisualizationCache ;
     auth:hasPermission simplePermission:SeeConfiguration ;
     auth:hasPermission simplePermission:SeeStartupStatus ;

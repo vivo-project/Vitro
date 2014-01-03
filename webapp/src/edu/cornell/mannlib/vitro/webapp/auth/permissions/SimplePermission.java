@@ -56,8 +56,6 @@ public class SimplePermission extends Permission {
 		NAMESPACE + "QueryFullModel");
 	public static final SimplePermission QUERY_USER_ACCOUNTS_MODEL = new SimplePermission(
 		NAMESPACE + "QueryUserAccountsModel");
-	public static final SimplePermission REBUILD_VCLASS_GROUP_CACHE = new SimplePermission(
-		NAMESPACE + "RebuildVClassGroupCache");
 	public static final SimplePermission REFRESH_VISUALIZATION_CACHE = new SimplePermission(
 		NAMESPACE + "RefreshVisualizationCache");
 	public static final SimplePermission SEE_CONFIGURATION = new SimplePermission(

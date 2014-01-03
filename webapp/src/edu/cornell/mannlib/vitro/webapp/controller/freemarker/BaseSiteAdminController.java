@@ -66,7 +66,6 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
         if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTIONS)) {
             urls.put("recomputeInferences", UrlBuilder.getUrl("/RecomputeInferences"));     
-            urls.put("rebuildClassGroupCache", UrlBuilder.getUrl("/browse?clearcache=1"));
         }
         
 		if (PolicyHelper.isAuthorizedForActions(vreq, IndexController.REQUIRED_ACTIONS)) {

@@ -78,11 +78,6 @@ action:QueryUserAccountsModel
     rdfs:label "QUERY_USER_ACCOUNTS_MODEL" .
 
 
-action:RebuildVClassGroupCache
-    a display:RequiredAction ;
-    rdfs:label "REBUILD_VCLASS_GROUP_CACHE" .
-
-
 action:RefreshVisualizationCache
     a display:RequiredAction ;
     rdfs:label "REFRESH_VISUALIZATION_CACHE" .
