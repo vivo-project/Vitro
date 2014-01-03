@@ -43,7 +43,7 @@ auth:ADMIN
     auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
     auth:hasPermission simplePermission:SeeRevisionInfo ;
     auth:hasPermission simplePermission:SeeSiteAdminPage ;
-    auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+    auth:hasPermission simplePermission:UseIndividualControlPanel ;
     auth:hasPermission simplePermission:PageViewableEditor ;
 
     # permissions for ANY logged-in user.
@@ -80,7 +80,7 @@ auth:CURATOR
     auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
     auth:hasPermission simplePermission:SeeRevisionInfo ;
     auth:hasPermission simplePermission:SeeSiteAdminPage ;
-    auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+    auth:hasPermission simplePermission:UseIndividualControlPanel ;
     auth:hasPermission simplePermission:PageViewableEditor ;
 
     # permissions for ANY logged-in user.
@@ -110,7 +110,7 @@ auth:EDITOR
     auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
     auth:hasPermission simplePermission:SeeRevisionInfo ;
     auth:hasPermission simplePermission:SeeSiteAdminPage ;
-    auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+    auth:hasPermission simplePermission:UseIndividualControlPanel ;
     auth:hasPermission simplePermission:PageViewableEditor ;
 
     # permissions for ANY logged-in user.

@@ -133,9 +133,9 @@ action:UseMiscellaneousCuratorPages
     rdfs:label "USE_MISCELLANEOUS_CURATOR_PAGES" .
 
 
-action:UseMiscellaneousEditorPages
+action:UseIndividualControlPanel
     a display:RequiredAction ;
-    rdfs:label "USE_MISCELLANEOUS_EDITOR_PAGES" .
+    rdfs:label "USE_INDIVIDUAL_CONTROL_PANEL" .
 
 
 action:UseMiscellaneousPages

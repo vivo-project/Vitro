@@ -72,6 +72,8 @@ public class SimplePermission extends Permission {
 		NAMESPACE + "SeeVerbosePropertyInformation");
 	public static final SimplePermission USE_ADVANCED_DATA_TOOLS_PAGES = new SimplePermission(
 		NAMESPACE + "UseAdvancedDataToolsPages");
+	public static final SimplePermission USE_INDIVIDUAL_CONTROL_PANEL = new SimplePermission(
+		NAMESPACE + "UseIndividualControlPanel");
 	public static final SimplePermission USE_SPARQL_QUERY_PAGE = new SimplePermission(
 		NAMESPACE + "UseSparqlQueryPage");
 	public static final SimplePermission USE_SPARQL_UPDATE_API = new SimplePermission(
@@ -89,8 +91,6 @@ public class SimplePermission extends Permission {
 		NAMESPACE + "UseMiscellaneousAdminPages");
 	public static final SimplePermission USE_MISCELLANEOUS_CURATOR_PAGES = new SimplePermission(
 		NAMESPACE + "UseMiscellaneousCuratorPages");
-	public static final SimplePermission USE_MISCELLANEOUS_EDITOR_PAGES = new SimplePermission(
-		NAMESPACE + "UseMiscellaneousEditorPages");
 	public static final SimplePermission USE_MISCELLANEOUS_PAGES = new SimplePermission(
 		NAMESPACE + "UseMiscellaneousPages");
 
