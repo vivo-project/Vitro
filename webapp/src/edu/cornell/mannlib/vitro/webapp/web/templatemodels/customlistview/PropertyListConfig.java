@@ -21,7 +21,6 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectProp
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyTemplateModel.ConfigError;
 import freemarker.cache.TemplateLoader;
-import freemarker.template.Configuration;
 
 public class PropertyListConfig {  
     private static final Log log = LogFactory.getLog(PropertyListConfig.class);
@@ -62,7 +61,7 @@ public class PropertyListConfig {
         if (configFileName == null) { // no custom config; use default config
             configFileName = DEFAULT_CONFIG_FILE_NAME;
         } else {
-        	CustomListViewLogger.log(vreq, op, configFileName);
+        	CustomListViewLogger.log(op, configFileName);
         }
         log.debug("Using list view config file " + configFileName + " for object property " + op.getURI());
         

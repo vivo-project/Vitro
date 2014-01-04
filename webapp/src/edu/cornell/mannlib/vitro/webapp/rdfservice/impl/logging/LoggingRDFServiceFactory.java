@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging;
 
-import javax.servlet.ServletContext;
-
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -14,23 +12,20 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
  * wrapped in a LoggingRDFService.
  */
 public class LoggingRDFServiceFactory implements RDFServiceFactory {
-	private final ServletContext ctx;
 	private final RDFServiceFactory factory;
 
-	public LoggingRDFServiceFactory(ServletContext ctx,
-			RDFServiceFactory factory) {
-		this.ctx = ctx;
+	public LoggingRDFServiceFactory(RDFServiceFactory factory) {
 		this.factory = factory;
 	}
 
 	@Override
 	public RDFService getRDFService() {
-		return new LoggingRDFService(ctx, factory.getRDFService());
+		return new LoggingRDFService(factory.getRDFService());
 	}
 
 	@Override
 	public RDFService getShortTermRDFService() {
-		return new LoggingRDFService(ctx, factory.getShortTermRDFService());
+		return new LoggingRDFService(factory.getShortTermRDFService());
 	}
 
 	@Override

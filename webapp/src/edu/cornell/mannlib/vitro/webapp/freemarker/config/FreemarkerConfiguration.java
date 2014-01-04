@@ -26,7 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.freemarker.loader.FreemarkerTemplateLoad
 import edu.cornell.mannlib.vitro.webapp.i18n.freemarker.I18nMethodModel;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
-import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings.Keys;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
 import edu.cornell.mannlib.vitro.webapp.web.directives.IndividualShortViewDirective;
 import edu.cornell.mannlib.vitro.webapp.web.directives.UrlDirective;
 import edu.cornell.mannlib.vitro.webapp.web.directives.WidgetDirective;
@@ -70,7 +70,7 @@ public abstract class FreemarkerConfiguration {
 		confirmInstanceIsSet();
 
 		synchronized (instance) {
-			clearTemplateCacheIfRequested(req);
+			clearTemplateCacheIfRequested();
 			keepTemplateLoaderCurrentWithThemeDirectory(req);
 			setThreadLocalsForRequest(req);
 			return instance;
@@ -84,19 +84,12 @@ public abstract class FreemarkerConfiguration {
 		}
 	}
 
-	private static void clearTemplateCacheIfRequested(HttpServletRequest req) {
-		if (isTemplateCacheInvalid(req)) {
+	/** If the developer doesn't want the cache, clear it every time. */
+	private static void clearTemplateCacheIfRequested() {
+		DeveloperSettings settings = DeveloperSettings.getInstance();
+		if (settings.getBoolean(Key.DEFEAT_FREEMARKER_CACHE)) {
 			instance.clearTemplateCache();
 		}
-	}
-
-	/** If the developer doesn't want the cache, it's invalid. */
-	private static boolean isTemplateCacheInvalid(HttpServletRequest req) {
-		DeveloperSettings settings = DeveloperSettings.getBean(req);
-		if (settings.getBoolean(Keys.DEFEAT_FREEMARKER_CACHE)) {
-			return true;
-		}
-		return false;
 	}
 
 	/**
@@ -110,7 +103,7 @@ public abstract class FreemarkerConfiguration {
 			HttpServletRequest req) {
 		String themeDir = getThemeDirectory(req);
 		if (hasThemeDirectoryChanged(themeDir)
-				|| haveDeveloperSettingsChanged(req)) {
+				|| haveDeveloperSettingsChanged()) {
 			TemplateLoader tl = createTemplateLoader(req, themeDir);
 			instance.setTemplateLoader(tl);
 		}
@@ -131,9 +124,9 @@ public abstract class FreemarkerConfiguration {
 		}
 	}
 
-	private static boolean haveDeveloperSettingsChanged(HttpServletRequest req) {
-		Map<String, Object> settingsMap = DeveloperSettings.getBean(req)
-				.getSettingsMap();
+	private static boolean haveDeveloperSettingsChanged() {
+		Map<String, Object> settingsMap = DeveloperSettings.getInstance()
+				.getRawSettingsMap();
 		if (settingsMap.equals(previousSettingsMap)) {
 			return false;
 		} else {
@@ -167,8 +160,8 @@ public abstract class FreemarkerConfiguration {
 		TemplateLoader tl = new MultiTemplateLoader(loaderArray);
 
 		// If requested, add delimiters to the templates.
-		DeveloperSettings settings = DeveloperSettings.getBean(req);
-		if (settings.getBoolean(Keys.INSERT_FREEMARKER_DELIMITERS)) {
+		DeveloperSettings settings = DeveloperSettings.getInstance();
+		if (settings.getBoolean(Key.INSERT_FREEMARKER_DELIMITERS)) {
 			tl =  new DelimitingTemplateLoader(tl);
 		}
 		

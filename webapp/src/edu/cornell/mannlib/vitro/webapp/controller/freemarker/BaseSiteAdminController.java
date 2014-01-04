@@ -77,7 +77,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
         }
         
 		if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.ENABLE_DEVELOPER_PANEL.ACTIONS)) {
-			urls.put("activateDeveloperPanel", "javascript:new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel({developerEnabled: true});");
+			urls.put("activateDeveloperPanel", "javascript:new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel({developer_enabled: true});");
 		}
 		
         return urls;

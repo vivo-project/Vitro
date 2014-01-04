@@ -9,7 +9,7 @@
 	<input type="text" id="${key}" size="30" value="${settings[key]}" >
 </#macro>
 
-<#if !settings.developerEnabled>
+<#if !settings.developer_enabled>
 <#elseif !settings.mayControl>
 	<div class="developer">
 		<h1>${siteName} is running in developer mode.</h1>
@@ -22,11 +22,11 @@
 		<div id="developerPanelBody">
 			<div>
 				<label>
-					<@showCheckbox "developerEnabled" />
+					<@showCheckbox "developer_enabled" />
 					Enable developer mode
 				</label>
 				<label>
-					<@showCheckbox "developerPermitAnonymousControl" />
+					<@showCheckbox "developer_permitAnonymousControl" />
 					Allow anonymous user to see and modify developer settings
 				</label>
 			</div>
@@ -35,11 +35,11 @@
 				<div class="container">
 					Page configuration
 					<label>
-						<@showCheckbox "developerPageContentsLogCustomListView" />
+						<@showCheckbox "developer_pageContents_logCustomListView" />
 						Log the use of custom list view XML files.
 					</label>
 					<label>
-						<@showCheckbox "developerPageContentsLogCustomShortView" />
+						<@showCheckbox "developer_pageContents_logCustomShortView" />
 						Log the use of custom short views in search, index and browse pages.
 					</label>
 				</div>
@@ -47,11 +47,11 @@
 				<div class="container">
 					Language support
 					<label>
-						<@showCheckbox "developerI18nDefeatCache" />
+						<@showCheckbox "developer_i18n_defeatCache" />
 						Defeat the cache of language property files
 					</label>
 					<label>
-						<@showCheckbox "developerI18nLogStringRequests" />
+						<@showCheckbox "developer_i18n_logStringRequests" />
 						Log the retrieval of language strings
 					</label>
 				</div>
@@ -71,11 +71,11 @@
 				<div class="container">
 					Freemarker templates
 					<label>
-						<@showCheckbox "developerDefeatFreemarkerCache" />
+						<@showCheckbox "developer_defeatFreemarkerCache" />
 						Defeat the template cache
 					</label>
 					<label>
-						<@showCheckbox "developerInsertFreemarkerDelimiters" />
+						<@showCheckbox "developer_insertFreemarkerDelimiters" />
 						Insert HTML comments at start and end of templates
 					</label>
 				</div>
@@ -83,21 +83,21 @@
 				<div class="container">
 					SPARQL Queries
 					<label>
-						<@showCheckbox "developerLoggingRDFServiceEnable" />
+						<@showCheckbox "developer_loggingRDFService_enable" />
 						Log each query 
 					</label>
 					<div class="within">
 						<label>
-							<@showCheckbox "developerLoggingRDFServiceStackTrace" />
+							<@showCheckbox "developer_loggingRDFService_stackTrace" />
 							Add stack trace
 						</label>
 						<label>
 							Restrict by query string
-							<@showTextbox "developerLoggingRDFServiceQueryRestriction" />
+							<@showTextbox "developer_loggingRDFService_queryRestriction" />
 						</label>
 						<label>
 							Restrict by calling stack
-							<@showTextbox "developerLoggingRDFServiceStackRestriction" />
+							<@showTextbox "developer_loggingRDFService_stackRestriction" />
 						</label>
 					</div>
 				</div>

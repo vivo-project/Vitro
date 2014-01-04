@@ -5,8 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -19,11 +17,9 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
  * For the other methods, it just delegates to the inner RDFService.
  */
 public class LoggingRDFService implements RDFService {
-	private final ServletContext ctx;
 	private final RDFService innerService;
 
-	LoggingRDFService(ServletContext ctx, RDFService innerService) {
-		this.ctx = ctx;
+	LoggingRDFService(RDFService innerService) {
 		this.innerService = innerService;
 	}
 
@@ -34,7 +30,7 @@ public class LoggingRDFService implements RDFService {
 	@Override
 	public boolean changeSetUpdate(ChangeSet changeSet)
 			throws RDFServiceException {
-		try (RDFServiceLogger l = new RDFServiceLogger(ctx, changeSet)) {
+		try (RDFServiceLogger l = new RDFServiceLogger(changeSet)) {
 			return innerService.changeSetUpdate(changeSet);
 		}
 	}
@@ -42,7 +38,7 @@ public class LoggingRDFService implements RDFService {
 	@Override
 	public InputStream sparqlConstructQuery(String query,
 			ModelSerializationFormat resultFormat) throws RDFServiceException {
-		try (RDFServiceLogger l = new RDFServiceLogger(ctx, resultFormat, query)) {
+		try (RDFServiceLogger l = new RDFServiceLogger(resultFormat, query)) {
 			return innerService.sparqlConstructQuery(query, resultFormat);
 		}
 	}
@@ -50,7 +46,7 @@ public class LoggingRDFService implements RDFService {
 	@Override
 	public InputStream sparqlDescribeQuery(String query,
 			ModelSerializationFormat resultFormat) throws RDFServiceException {
-		try (RDFServiceLogger l = new RDFServiceLogger(ctx, resultFormat, query)) {
+		try (RDFServiceLogger l = new RDFServiceLogger(resultFormat, query)) {
 			return innerService.sparqlDescribeQuery(query, resultFormat);
 		}
 	}
@@ -58,14 +54,14 @@ public class LoggingRDFService implements RDFService {
 	@Override
 	public InputStream sparqlSelectQuery(String query, ResultFormat resultFormat)
 			throws RDFServiceException {
-		try (RDFServiceLogger l = new RDFServiceLogger(ctx, resultFormat, query)) {
+		try (RDFServiceLogger l = new RDFServiceLogger(resultFormat, query)) {
 			return innerService.sparqlSelectQuery(query, resultFormat);
 		}
 	}
 
 	@Override
 	public boolean sparqlAskQuery(String query) throws RDFServiceException {
-		try (RDFServiceLogger l = new RDFServiceLogger(ctx, query)) {
+		try (RDFServiceLogger l = new RDFServiceLogger(query)) {
 			return innerService.sparqlAskQuery(query);
 		}
 	}

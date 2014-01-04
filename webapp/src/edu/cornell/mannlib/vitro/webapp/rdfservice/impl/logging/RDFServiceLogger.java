@@ -9,14 +9,12 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.regex.Pattern;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
-import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings.Keys;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
 
 /**
  * Writes the log message for the LoggingRDFService.
@@ -45,7 +43,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings.Keys;
 public class RDFServiceLogger implements AutoCloseable {
 	private static final Log log = LogFactory.getLog(RDFServiceLogger.class);
 
-	private final ServletContext ctx;
 	private final Object[] args;
 
 	private boolean isEnabled;
@@ -58,31 +55,33 @@ public class RDFServiceLogger implements AutoCloseable {
 
 	private long startTime;
 
-	public RDFServiceLogger(ServletContext ctx, Object... args) {
-		this.ctx = ctx;
+	public RDFServiceLogger(Object... args) {
 		this.args = args;
 
-		getProperties();
-
-		if (isEnabled && log.isInfoEnabled()) {
-			loadStackTrace();
-			if (passesQueryRestriction() && passesStackRestriction()) {
-				this.startTime = System.currentTimeMillis();
+		try {
+			getProperties();
+			if (isEnabled && log.isInfoEnabled()) {
+				loadStackTrace();
+				if (passesQueryRestriction() && passesStackRestriction()) {
+					this.startTime = System.currentTimeMillis();
+				}
 			}
+		} catch (Exception e) {
+			log.error("Failed to create instance", e);
 		}
 	}
 
 	private void getProperties() {
-		DeveloperSettings settings = DeveloperSettings.getBean(ctx);
-		isEnabled = settings.getBoolean(Keys.LOGGING_RDF_ENABLE);
-		traceRequested = settings.getBoolean(Keys.LOGGING_RDF_STACK_TRACE);
+		DeveloperSettings settings = DeveloperSettings.getInstance();
+		isEnabled = settings.getBoolean(Key.LOGGING_RDF_ENABLE);
+		traceRequested = settings.getBoolean(Key.LOGGING_RDF_STACK_TRACE);
 		queryStringRestriction = patternFromSettings(settings,
-				Keys.LOGGING_RDF_QUERY_RESTRICTION);
+				Key.LOGGING_RDF_QUERY_RESTRICTION);
 		callStackRestriction = patternFromSettings(settings,
-				Keys.LOGGING_RDF_STACK_RESTRICTION);
+				Key.LOGGING_RDF_STACK_RESTRICTION);
 	}
 
-	private Pattern patternFromSettings(DeveloperSettings settings, Keys key) {
+	private Pattern patternFromSettings(DeveloperSettings settings, Key key) {
 		String patternString = settings.getString(key);
 		if (StringUtils.isBlank(patternString)) {
 			return null;
@@ -160,13 +159,13 @@ public class RDFServiceLogger implements AutoCloseable {
 	}
 
 	private String assembleQueryString() {
-		StringBuilder query = new StringBuilder();
+		List<String> stringArgs = new ArrayList<>();
 		for (Object arg : args) {
 			if (arg instanceof String) {
-				query.append((String) arg).append(" ");
+				stringArgs.add((String) arg);
 			}
 		}
-		return query.deleteCharAt(query.length() - 1).toString();
+		return StringUtils.join(stringArgs, " ");
 	}
 
 	private boolean passesStackRestriction() {
@@ -188,16 +187,20 @@ public class RDFServiceLogger implements AutoCloseable {
 
 	@Override
 	public void close() {
-		if (startTime != 0L) {
-			long endTime = System.currentTimeMillis();
+		try {
+			if (startTime != 0L) {
+				long endTime = System.currentTimeMillis();
 
-			float elapsedSeconds = (endTime - startTime) / 1000.0F;
-			String cleanArgs = Arrays.deepToString(args).replaceAll(
-					"[\\n\\r\\t]+", " ");
-			String formattedTrace = formatStackTrace();
+				float elapsedSeconds = (endTime - startTime) / 1000.0F;
+				String cleanArgs = Arrays.deepToString(args).replaceAll(
+						"[\\n\\r\\t]+", " ");
+				String formattedTrace = formatStackTrace();
 
-			log.info(String.format("%8.3f %s %s %s", elapsedSeconds,
-					methodName, cleanArgs, formattedTrace));
+				log.info(String.format("%8.3f %s %s %s", elapsedSeconds,
+						methodName, cleanArgs, formattedTrace));
+			}
+		} catch (Exception e) {
+			log.error("Failed to write log record", e);
 		}
 	}
 

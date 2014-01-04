@@ -22,7 +22,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
-import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings.Keys;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
 
 /**
  * Provides access to a bundle of text strings, based on the name of the bundle,
@@ -108,7 +108,7 @@ public class I18n {
 	protected I18nBundle getBundle(String bundleName, HttpServletRequest req) {
 		log.debug("Getting bundle '" + bundleName + "'");
 
-		I18nLogger i18nLogger = new I18nLogger(req);
+		I18nLogger i18nLogger = new I18nLogger();
 		try {
 			checkDevelopmentMode(req);
 			checkForChangeInThemeDirectory(req);
@@ -133,7 +133,7 @@ public class I18n {
 	 * If we are in development mode, clear the cache on each request.
 	 */
 	private void checkDevelopmentMode(HttpServletRequest req) {
-		if (DeveloperSettings.getBean(req).getBoolean(Keys.I18N_DEFEAT_CACHE)) {
+		if (DeveloperSettings.getInstance().getBoolean(Key.I18N_DEFEAT_CACHE)) {
 			log.debug("In development mode - clearing the cache.");
 			clearCacheOnRequest(req);
 		}

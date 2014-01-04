@@ -114,13 +114,13 @@ public class ShortViewServiceImpl implements ShortViewService {
 			TemplateAndDataGetters tdg = faker.getShortViewProperties(vreq,
 					individual, classUri, svContext.name());
 			if (tdg != null) {
-				ShortViewLogger.log(vreq, svContext.name(), individual, classUri, tdg);
+				ShortViewLogger.log(svContext.name(), individual, classUri, tdg);
 				return tdg;
 			}
 		}
 
 		// Didn't find one? Use the default values.
-		ShortViewLogger.log(vreq, svContext.name(), individual);
+		ShortViewLogger.log(svContext.name(), individual);
 		return new TemplateAndDataGetters(svContext.getDefaultTemplateName());
 	}
 
