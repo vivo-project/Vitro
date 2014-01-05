@@ -3,18 +3,17 @@
 function DeveloperPanel(developerAjaxUrl) {
 	this.setupDeveloperPanel = updateDeveloperPanel;
 	
-	function updateDeveloperPanel(data) {
+	function updateDeveloperPanel() {
 	    $.ajax({
 	        url: developerAjaxUrl,
 	        dataType: "json",
-	        data: data,
+	        data: collectFormData(),
 	        complete: function(xhr, status) {
 	        	updatePanelContents(xhr.responseText);
 	        	if (document.getElementById("developerPanelSaveButton")) {
-	        		enablePanelOpener();
+	        		initializeTabs();
 	        		addBehaviorToElements();
 	        		updateDisabledFields();
-	        		initializeTabs();
 	        	}
 	        }
 	    });
@@ -24,19 +23,19 @@ function DeveloperPanel(developerAjaxUrl) {
 		document.getElementById("developerPanel").innerHTML = contents;
 	}
 	
-	function enablePanelOpener() {
-		document.getElementById("developerPanelClickMe").onclick = function() {
-					document.getElementById("developerPanelClickText").style.display = "none";
-					document.getElementById("developerPanelBody").style.display = "block";
-				};
+    function initializeTabs() {
+        $("#developerTabs").tabs();
+    }
+    
+	function addBehaviorToElements() {
+		$( "#developerPanelClickMe" ).click(openPanel);
+	    $( "#developerPanelSaveButton" ).click(updateDeveloperPanel);
+	    $( "#developerPanelBody [type=checkbox]" ).change(updateDisabledFields);
 	}
 	
-	function addBehaviorToElements() {
-	    document.getElementById("developerPanelSaveButton").onclick = function() {
-			updateDeveloperPanel(collectFormData());
-	    }
-	    document.getElementById("developer_enabled").onchange = updateDisabledFields
-	    document.getElementById("developer_loggingRDFService_enable").onchange = updateDisabledFields
+	function openPanel() {
+		$( "#developerPanelClickText" ).hide();
+		$( "#developerPanelBody" ).css( "display", "block" );
 	}
 	
 	function updateDisabledFields() {
@@ -56,33 +55,15 @@ function DeveloperPanel(developerAjaxUrl) {
 		document.getElementById("developer_loggingRDFService_stackRestriction").disabled = !rdfServiceEnabled;
 	}
 
-    function initializeTabs() {
-        $("#developerTabs").tabs();
-    }
-    
 	function collectFormData() {
 		var data = new Object();
-		getCheckbox("developer_enabled", data);
-		getCheckbox("developer_permitAnonymousControl", data);
-		getCheckbox("developer_defeatFreemarkerCache", data);
-		getCheckbox("developer_insertFreemarkerDelimiters", data);
-		getCheckbox("developer_pageContents_logCustomListView", data);
-		getCheckbox("developer_pageContents_logCustomShortView", data);
-		getCheckbox("developer_i18n_defeatCache", data);
-		getCheckbox("developer_i18n_logStringRequests", data);
-		getCheckbox("developer_loggingRDFService_enable", data);
-		getCheckbox("developer_loggingRDFService_stackTrace", data);
-		getText("developer_loggingRDFService_queryRestriction", data);
-		getText("developer_loggingRDFService_stackRestriction", data);
+		$( "#developerPanelBody [type=checkbox]" ).each(function(i, element){
+				data[element.id] = element.checked;
+			});
+		$( "#developerPanelBody [type=text]" ).each(function(i, element){
+				data[element.id] = element.value;
+			});
 		return data;
-	}
-
-	function getCheckbox(key, dest) {
-		dest[key] = document.getElementById(key).checked;
-	}
-	
-	function getText(key, dest) {
-		dest[key] = document.getElementById(key).value;
 	}
 }	
 
@@ -95,6 +76,6 @@ $(document).ready(function() {
         $("head").append(cssLink); 
     });	
 
-	new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel({});	
+	new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel();	
 }); 
 
