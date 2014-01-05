@@ -31,75 +31,89 @@
 				</label>
 			</div>
 			
-			<div class="devright">
-				<div class="container">
-					Page configuration
-					<label>
-						<@showCheckbox "developer_pageContents_logCustomListView" />
-						Log the use of custom list view XML files.
-					</label>
-					<label>
-						<@showCheckbox "developer_pageContents_logCustomShortView" />
-						Log the use of custom short views in search, index and browse pages.
-					</label>
-				</div>
-				
-				<div class="container">
-					Language support
-					<label>
-						<@showCheckbox "developer_i18n_defeatCache" />
-						Defeat the cache of language property files
-					</label>
-					<label>
-						<@showCheckbox "developer_i18n_logStringRequests" />
-						Log the retrieval of language strings
-					</label>
-				</div>
-
-				<div class="container">
-					Links
-					<br/>
-					<a href="${urls.base}/admin/log4j.jsp">Set log levels</a>
-					<a href="${urls.base}/admin/showConfiguration">Show Configuration</a>
-					<br/>
-					<a href="${urls.base}/admin/showAuth">Show authorization info</a>
-					<a href="${urls.base}/admin/showThreads">Show background threads</a>
-				</div>
-			</div>
-				
-			<div class="devleft">
-				<div class="container">
-					Freemarker templates
-					<label>
-						<@showCheckbox "developer_defeatFreemarkerCache" />
-						Defeat the template cache
-					</label>
-					<label>
-						<@showCheckbox "developer_insertFreemarkerDelimiters" />
-						Insert HTML comments at start and end of templates
-					</label>
-				</div>
-
-				<div class="container">
-					SPARQL Queries
-					<label>
-						<@showCheckbox "developer_loggingRDFService_enable" />
-						Log each query 
-					</label>
-					<div class="within">
-						<label>
-							<@showCheckbox "developer_loggingRDFService_stackTrace" />
-							Add stack trace
-						</label>
-						<label>
-							Restrict by query string
-							<@showTextbox "developer_loggingRDFService_queryRestriction" />
-						</label>
-						<label>
-							Restrict by calling stack
-							<@showTextbox "developer_loggingRDFService_stackRestriction" />
-						</label>
+			<div id="developerTabs">
+				<ul>
+					<li><a href="#developerTabGeneral"><span>General</span></a></li>
+					<li><a href="#developerTabAuthorization"><span>Authorization</span></a></li>
+				</ul>
+			
+				<div id="developerTabGeneral">
+					<div class="devright">
+						<div class="container">
+							Page configuration
+							<label>
+								<@showCheckbox "developer_pageContents_logCustomListView" />
+								Log the use of custom list view XML files.
+							</label>
+							<label>
+								<@showCheckbox "developer_pageContents_logCustomShortView" />
+								Log the use of custom short views in search, index and browse pages.
+							</label>
+						</div>
+						
+						<div class="container">
+							Language support
+							<label>
+								<@showCheckbox "developer_i18n_defeatCache" />
+								Defeat the cache of language property files
+							</label>
+							<label>
+								<@showCheckbox "developer_i18n_logStringRequests" />
+								Log the retrieval of language strings
+							</label>
+						</div>
+		
+						<div class="container">
+							Links
+							<br/>
+							<a href="${urls.base}/admin/log4j.jsp">Set log levels</a>
+							<a href="${urls.base}/admin/showConfiguration">Show Configuration</a>
+							<br/>
+							<a href="${urls.base}/admin/showAuth">Show authorization info</a>
+							<a href="${urls.base}/admin/showThreads">Show background threads</a>
+						</div>
 					</div>
+						
+					<div class="devleft">
+						<div class="container">
+							Freemarker templates
+							<label>
+								<@showCheckbox "developer_defeatFreemarkerCache" />
+								Defeat the template cache
+							</label>
+							<label>
+								<@showCheckbox "developer_insertFreemarkerDelimiters" />
+								Insert HTML comments at start and end of templates
+							</label>
+						</div>
+		
+						<div class="container">
+							SPARQL Queries
+							<label>
+								<@showCheckbox "developer_loggingRDFService_enable" />
+								Log each query 
+							</label>
+							<div class="within">
+								<label>
+									<@showCheckbox "developer_loggingRDFService_stackTrace" />
+									Add stack trace
+								</label>
+								<label>
+									Restrict by query string
+									<@showTextbox "developer_loggingRDFService_queryRestriction" />
+								</label>
+								<label>
+									Restrict by calling stack
+									<@showTextbox "developer_loggingRDFService_stackRestriction" />
+								</label>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div id="developerTabAuthorization">
+					Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
+					Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
 				</div>
 			</div>
 

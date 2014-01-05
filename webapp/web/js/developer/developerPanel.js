@@ -14,6 +14,7 @@ function DeveloperPanel(developerAjaxUrl) {
 	        		enablePanelOpener();
 	        		addBehaviorToElements();
 	        		updateDisabledFields();
+	        		initializeTabs();
 	        	}
 	        }
 	    });
@@ -55,6 +56,10 @@ function DeveloperPanel(developerAjaxUrl) {
 		document.getElementById("developer_loggingRDFService_stackRestriction").disabled = !rdfServiceEnabled;
 	}
 
+    function initializeTabs() {
+        $("#developerTabs").tabs();
+    }
+    
 	function collectFormData() {
 		var data = new Object();
 		getCheckbox("developer_enabled", data);
@@ -82,9 +87,14 @@ function DeveloperPanel(developerAjaxUrl) {
 }	
 
 /*
- * Relies on the global variable for the AJAX URL.
+ * Relies on the global variables for the AJAX URL and the CSS files.
  */
 $(document).ready(function() {   
+	$.each(developerCssLinks, function(index, value){
+        var cssLink = $("<link rel='stylesheet' type='text/css' href='" + value + "'>");
+        $("head").append(cssLink); 
+    });	
+
 	new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel({});	
 }); 
 
