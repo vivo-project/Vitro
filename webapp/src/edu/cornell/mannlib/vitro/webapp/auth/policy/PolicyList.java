@@ -103,14 +103,16 @@ public class PolicyList extends ArrayList<PolicyIface> implements PolicyIface{
 
     protected PolicyDecision checkAgainstPolicys( IdentifierBundle whoToAuth, RequestedAction whatToAuth){
 	    PolicyDecision pd = null;
+	    PolicyDecisionLogger logger = new PolicyDecisionLogger(whoToAuth, whatToAuth);
 	    for(PolicyIface policy : this){ 
             try{
                 pd = policy.isAuthorized(whoToAuth, whatToAuth);
+                logger.log(policy, pd);
                 if( pd != null ){
                     if(  pd.getAuthorized() == Authorization.AUTHORIZED )
-                        break;
+                        return pd;
                     if( pd.getAuthorized() == Authorization.UNAUTHORIZED )
-                        break;
+                        return pd;
                     if( pd.getAuthorized() == Authorization.INCONCLUSIVE )
                         continue;
                 } else{
@@ -120,8 +122,11 @@ public class PolicyList extends ArrayList<PolicyIface> implements PolicyIface{
                 log.error("ignoring exception in policy " + policy.toString(), th );
             }
         }
-        log.debug("decision " + pd + " for " + whatToAuth);
-        return pd;
+	    
+		pd = new BasicPolicyDecision(Authorization.INCONCLUSIVE,
+				"No policy returned a conclusive decision on " + whatToAuth);
+		logger.logNoDecision(pd);
+		return pd;
 	}
 
 }

@@ -205,6 +205,7 @@ public class DeveloperSettings {
 				Properties dsProps = new Properties();
 				dsProps.load(reader);
 				devSettings.updateFromProperties(dsProps);
+				log.info(devSettings);
 				ss.info(this, "Loaded the 'developer.properties' file: "
 						+ devSettings);
 			} catch (FileNotFoundException e) {

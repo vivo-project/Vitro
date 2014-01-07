@@ -10,6 +10,9 @@ div.developer {
 
 div.developer #developerPanelBody {
 	display: none;
+}
+
+#developerPanelBody * {
 	line-height: 1em;
 	font-size: small;
 }

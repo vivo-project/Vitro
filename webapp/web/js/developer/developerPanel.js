@@ -48,11 +48,19 @@ function DeveloperPanel(developerAjaxUrl) {
 		document.getElementById("developer_i18n_defeatCache").disabled = !developerEnabled;
 		document.getElementById("developer_i18n_logStringRequests").disabled = !developerEnabled;
 		document.getElementById("developer_loggingRDFService_enable").disabled = !developerEnabled;
+		document.getElementById("developer_authorization_logDecisions_enable").disabled = !developerEnabled;
 	
 		var rdfServiceEnabled = developerEnabled && document.getElementById("developer_loggingRDFService_enable").checked;
 		document.getElementById("developer_loggingRDFService_stackTrace").disabled = !rdfServiceEnabled;
 		document.getElementById("developer_loggingRDFService_queryRestriction").disabled = !rdfServiceEnabled;
 		document.getElementById("developer_loggingRDFService_stackRestriction").disabled = !rdfServiceEnabled;
+		
+		var authLoggingEnabled = developerEnabled && document.getElementById("developer_authorization_logDecisions_enable").checked;
+		document.getElementById("developer_authorization_logDecisions_skipInconclusive").disabled = !authLoggingEnabled;
+		document.getElementById("developer_authorization_logDecisions_addIdentifiers").disabled = !authLoggingEnabled;
+		document.getElementById("developer_authorization_logDecisions_actionRestriction").disabled = !authLoggingEnabled;
+		document.getElementById("developer_authorization_logDecisions_policyRestriction").disabled = !authLoggingEnabled;
+		document.getElementById("developer_authorization_logDecisions_userRestriction").disabled = !authLoggingEnabled;
 	}
 
 	function collectFormData() {

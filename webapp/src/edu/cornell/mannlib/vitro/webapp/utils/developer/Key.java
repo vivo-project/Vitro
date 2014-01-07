@@ -24,7 +24,7 @@ public enum Key {
 	ENABLED("developer.enabled", true),
 
 	/**
-	 * If the developer panel is enabled, can a non-logged-in user change the
+	 * If the developer panel is enabled, may an anonymous user change the
 	 * settings?
 	 */
 	PERMIT_ANONYMOUS_CONTROL("developer.permitAnonymousControl", true),
@@ -84,7 +84,45 @@ public enum Key {
 	 * Tell the ShortViewLogger to note the use of non-default short views.
 	 */
 	PAGE_CONTENTS_LOG_CUSTOM_SHORT_VIEW(
-			"developer.pageContents.logCustomShortView", true);
+			"developer.pageContents.logCustomShortView", true),
+
+	/**
+	 * Enable the PolicyDecisionLogger.
+	 */
+	AUTHORIZATION_LOG_DECISIONS_ENABLE(
+			"developer.authorization.logDecisions.enable", true),
+
+	/**
+	 * Enable the PolicyDecisionLogger.
+	 */
+	AUTHORIZATION_LOG_DECISIONS_ADD_IDENTIFERS(
+			"developer.authorization.logDecisions.addIdentifiers", true),
+
+	/**
+	 * Enable the PolicyDecisionLogger.
+	 */
+	AUTHORIZATION_LOG_DECISIONS_SKIP_INCONCLUSIVE(
+			"developer.authorization.logDecisions.skipInconclusive", true),
+
+	/**
+	 * Don't log policy decisions unless the requested action meets this
+	 * restriction.
+	 */
+	AUTHORIZATION_LOG_DECISIONS_ACTION_RESTRICTION(
+			"developer.authorization.logDecisions.actionRestriction", false),
+
+	/**
+	 * Don't log policy decisions unless the identifier bundle meets this
+	 * restriction.
+	 */
+	AUTHORIZATION_LOG_DECISIONS_USER_RESTRICTION(
+			"developer.authorization.logDecisions.userRestriction", false),
+
+	/**
+	 * Don't log policy decisions unless the policy meets this restriction.
+	 */
+	AUTHORIZATION_LOG_DECISIONS_POLICY_RESTRICTION(
+			"developer.authorization.logDecisions.policyRestriction", false);
 
 	private static final Log log = LogFactory.getLog(Key.class);
 	private final String propertyName;
