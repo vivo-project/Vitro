@@ -51,7 +51,7 @@ public abstract class JsonObjectProducer extends JsonProducer {
 		try {
 			jsonObject = process();
 		} catch (Exception e) {
-			log.error("Failed to create JSON response" + e);
+			log.error("Failed to create JSON response", e);
 			errorMessage = e.toString();
 			resp.setStatus(500 /* HttpURLConnection.HTTP_SERVER_ERROR */);
 		}

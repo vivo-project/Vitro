@@ -80,7 +80,7 @@ public abstract class JsonProducer {
 		VClass vclass = vreq.getWebappDaoFactory().getVClassDao()
 				.getVClassByURI(uri);
 		if (vclass == null) {
-			log.error("Couldn't retrieve vclass ");
+			log.error("Couldn't retrieve vclass '" + uri + "'");
 			throw new IllegalStateException("Class " + uri + " not found");
 		}
 		return vclass;
