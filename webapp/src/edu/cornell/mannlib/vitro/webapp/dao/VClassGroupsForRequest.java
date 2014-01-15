@@ -37,8 +37,8 @@ public class VClassGroupsForRequest {
 		}
 		
 		if (log.isDebugEnabled()) {
-			log.debug("groups: " + groupMap);
-			log.debug("classes: " + classMap);
+			log.debug("groups: " + groupMap.values());
+			log.debug("classes: " + classMap.values());
 		}
 	}
 
@@ -59,7 +59,7 @@ public class VClassGroupsForRequest {
 	}
 
 	private void loadClass(VClass vc, VClassGroup newVcg) {
-		VClass newVc = new VClass(vc);
+		VClass newVc = vc.copy();
 		newVc.setName(getNameForVClass(vc));
 		newVc.setGroup(newVcg);
 		newVcg.add(newVc);

@@ -48,6 +48,16 @@ public class VClassJena extends VClass {
     }
     
     /**
+ 	 * Constructs the VClassJena as a deep copy of an existing VClassJena. 
+ 	 */
+     @Override
+	public VClassJena copy() {
+     	VClassJena that = new VClassJena(this.cls, this.webappDaoFactory);
+     	copyFields(that);
+     	return that;
+     }
+
+    /**
      * What this VClass is called
      */
     @Override

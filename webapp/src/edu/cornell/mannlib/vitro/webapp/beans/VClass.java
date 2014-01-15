@@ -137,25 +137,31 @@ public class VClass extends BaseResourceBean implements Comparable<VClass>
     /**
 	 * Constructs the VClass as a deep copy of an existing VClass. 
 	 */
-    public VClass( VClass vc) {
-    	this.URI = vc.URI;
-    	this.namespace = vc.namespace;
-    	this.localName = vc.localName;
-    	this.myName = vc.myName;
-    	this.myExample = vc.myExample;
-    	this.myDescription = vc.myDescription;
-    	this.myShortDefinition = vc.myShortDefinition;
-    	this.myEntityCount = vc.myEntityCount;
-    	this.displayLimit = vc.displayLimit;
-    	this.displayRank = vc.displayRank;
-    	this.quickEditJsp = vc.quickEditJsp;
-    	this.groupURI = vc.groupURI;
-    	this.group = (vc.group == null) ? null : new VClassGroup(vc.group);
-    	this.customEntryForm = vc.customEntryForm;
-    	this.customDisplayView = vc.customDisplayView;
-    	this.customShortView = vc.customShortView;
-    	this.customSearchView = vc.customSearchView;
+    public VClass copy() {
+    	VClass that = new VClass();
+    	copyFields(that);
+    	return that;
     }
+    
+	protected void copyFields(VClass that) {
+		that.myName = this.myName;
+    	that.namespace = this.namespace;
+    	that.localName = this.localName;
+    	that.URI = this.URI;
+    	that.myExample = this.myExample;
+    	that.myDescription = this.myDescription;
+    	that.myShortDefinition = this.myShortDefinition;
+    	that.myEntityCount = this.myEntityCount;
+    	that.displayLimit = this.displayLimit;
+    	that.displayRank = this.displayRank;
+    	that.quickEditJsp = this.quickEditJsp;
+    	that.groupURI = this.groupURI;
+    	that.group = this.group;
+    	that.customEntryForm = this.customEntryForm;
+    	that.customDisplayView = this.customDisplayView;
+    	that.customShortView = this.customShortView;
+    	that.customSearchView = this.customSearchView;
+	}
     
     /**
      * Sorts alphabetically by name
