@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.auth.permissions;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,14 +19,18 @@ import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
- * An immutable collection of Permission objects, keyed by URI. Resides in the
+ * A collection of Permission objects, keyed by URI. Resides in the
  * ServletContext.
  * 
- * This is not thread-safe, so all Permissions should be added during context
+ * This is not thread-safe, so Permissions should be added only during context
  * initialization.
  */
 public class PermissionRegistry {
 	private static final Log log = LogFactory.getLog(PermissionRegistry.class);
+
+	// ----------------------------------------------------------------------
+	// The factory
+	// ----------------------------------------------------------------------
 
 	private static final String ATTRIBUTE_NAME = PermissionRegistry.class
 			.getName();
@@ -55,7 +58,8 @@ public class PermissionRegistry {
 					"PermissionRegistry has already been set.");
 		}
 
-		PermissionRegistry registry = new PermissionRegistry(permissions);
+		PermissionRegistry registry = new PermissionRegistry();
+		registry.addPermissions(permissions);
 		ctx.setAttribute(ATTRIBUTE_NAME, registry);
 	}
 
@@ -80,26 +84,40 @@ public class PermissionRegistry {
 		return (PermissionRegistry) o;
 	}
 
-	private final Map<String, Permission> permissionsMap;
+	// ----------------------------------------------------------------------
+	// The instance
+	// ----------------------------------------------------------------------
 
-	public PermissionRegistry(Collection<? extends Permission> permissions) {
-		Map<String, Permission> map = new HashMap<String, Permission>();
+	private final Map<String, Permission> map = new HashMap<>();
+
+	/**
+	 * This class is not thread-safe, so permissions should be added only during
+	 * context initialization.
+	 */
+	public void addPermissions(Collection<? extends Permission> permissions) {
 		for (Permission p : permissions) {
-			String uri = p.getUri();
-			if (map.containsKey(uri)) {
-				throw new IllegalStateException("A Permission is already "
-						+ "registered with this URI: '" + uri + "'.");
-			}
-			map.put(uri, p);
+			addPermission(p);
 		}
-		this.permissionsMap = Collections.unmodifiableMap(map);
+	}
+
+	/**
+	 * This class is not thread-safe, so permissions should be added only during
+	 * context initialization.
+	 */
+	public void addPermission(Permission p) {
+		String uri = p.getUri();
+		if (map.containsKey(uri)) {
+			throw new IllegalStateException("A Permission is already "
+					+ "registered with this URI: '" + uri + "'.");
+		}
+		map.put(uri, p);
 	}
 
 	/**
 	 * Is there a Permission registered with this URI?
 	 */
 	public boolean isPermission(String uri) {
-		return permissionsMap.containsKey(uri);
+		return map.containsKey(uri);
 	}
 
 	/**
@@ -110,7 +128,7 @@ public class PermissionRegistry {
 	 * this URI, call isPermission() instead.
 	 */
 	public Permission getPermission(String uri) {
-		Permission p = permissionsMap.get(uri);
+		Permission p = map.get(uri);
 		if (p == null) {
 			log.warn("No Permission is registered for '" + uri + "'");
 			return new BrokenPermission(uri);
