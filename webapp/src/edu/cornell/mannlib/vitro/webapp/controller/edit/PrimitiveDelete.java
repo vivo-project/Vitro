@@ -2,9 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,7 +43,7 @@ public class PrimitiveDelete extends VitroAjaxController {
         
         if( !hasPermission ){
             //if not okay, send error message
-            doError(response,"Insufficent permissions.", HttpStatus.SC_UNAUTHORIZED);
+            doError(response,"Insufficent permissions.", SC_UNAUTHORIZED);
             return;
         }
 

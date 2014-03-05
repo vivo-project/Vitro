@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -11,9 +13,9 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpStatus;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -66,7 +68,7 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
         try {
             additions = parseRdfParam(vreq.getParameterValues("additions"),format);
         } catch (Exception e) {
-            doError(response,"Error reading RDF, set log level to debug for this class to get error messages in the server logs.",HttpStatus.SC_BAD_REQUEST);
+            doError(response,"Error reading RDF, set log level to debug for this class to get error messages in the server logs.",SC_BAD_REQUEST);
             return;
         }
                         
@@ -74,7 +76,7 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
         try {
             retractions = parseRdfParam(vreq.getParameterValues("retractions"),format);
         } catch (Exception e) {
-            doError(response,"Error reading RDF, set log level to debug for this class to get error messages in the server logs.",HttpStatus.SC_BAD_REQUEST);
+            doError(response,"Error reading RDF, set log level to debug for this class to get error messages in the server logs.",SC_BAD_REQUEST);
             return;
         }
 

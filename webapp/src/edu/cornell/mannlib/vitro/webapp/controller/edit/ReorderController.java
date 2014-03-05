@@ -2,9 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -57,7 +61,7 @@ public class ReorderController extends VitroAjaxController {
         if (rankPredicate == null) {
             errorMsg = "No rank parameter specified";
             log.error(errorMsg);
-            doError(response, errorMsg, HttpServletResponse.SC_BAD_REQUEST );
+            doError(response, errorMsg, SC_BAD_REQUEST );
             return;
         }
 
@@ -65,7 +69,7 @@ public class ReorderController extends VitroAjaxController {
         if (individualUris == null || individualUris.length == 0) {
             errorMsg = "No individuals specified";
             log.error(errorMsg);
-            doError(response, errorMsg, HttpServletResponse.SC_BAD_REQUEST);  
+            doError(response, errorMsg, SC_BAD_REQUEST);  
             return;
         }
 
@@ -73,7 +77,7 @@ public class ReorderController extends VitroAjaxController {
         if( vreq.getWebappDaoFactory() == null) {
             errorMsg = "No WebappDaoFactory available";
             log.error(errorMsg);
-            doError(response, errorMsg, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            doError(response, errorMsg, SC_INTERNAL_SERVER_ERROR);
             return;
         }  
 
@@ -81,7 +85,7 @@ public class ReorderController extends VitroAjaxController {
         if( dpsDao == null) {
             errorMsg = "No DataPropertyStatementDao available";
             log.error(errorMsg);
-            doError(response, errorMsg, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            doError(response, errorMsg, SC_INTERNAL_SERVER_ERROR);
             return;
         }  
 
@@ -91,7 +95,7 @@ public class ReorderController extends VitroAjaxController {
         boolean hasPermission = true;        
         if( !hasPermission ){
             //if not okay, send error message
-            doError(response,"Insufficent permissions", HttpStatus.SC_UNAUTHORIZED);
+            doError(response,"Insufficent permissions", SC_UNAUTHORIZED);
             return;
         }
 
@@ -100,7 +104,7 @@ public class ReorderController extends VitroAjaxController {
         reorderIndividuals(individualUris, vreq, rankPredicate);
        
         
-        response.setStatus(HttpServletResponse.SC_OK);
+        response.setStatus(SC_OK);
         
     }
     
