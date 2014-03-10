@@ -59,6 +59,10 @@ public abstract class AbstractDataPropertyStatementAction extends
 	public String[] getResourceUris() {
 		return new String[] {subjectUri};
 	}
+	
+	public String dataValue() {
+		return dataValue;
+	}
 
 	@Override
 	public String toString() {

@@ -81,6 +81,8 @@ public class EntityEditController extends BaseEditController {
         colCount++;
         results.add("URI");
         colCount++;
+        results.add("publish level");
+        colCount++;
         
         String rName = null;
         if (ent.getName() != null && ent.getName().length() > 0) {
@@ -116,12 +118,16 @@ public class EntityEditController extends BaseEditController {
         }
         results.add(classStr);
                 
-        results.add(ent.getHiddenFromDisplayBelowRoleLevel()  == null ? "unspecified" : ent.getHiddenFromDisplayBelowRoleLevel().getLabel());
-        results.add(ent.getProhibitedFromUpdateBelowRoleLevel() == null ? "unspecified" : ent.getProhibitedFromUpdateBelowRoleLevel().getLabel());
+		results.add(ent.getHiddenFromDisplayBelowRoleLevel() == null ? "unspecified"
+				: ent.getHiddenFromDisplayBelowRoleLevel().getDisplayLabel());
+		results.add(ent.getProhibitedFromUpdateBelowRoleLevel() == null ? "unspecified"
+				: ent.getProhibitedFromUpdateBelowRoleLevel().getUpdateLabel());
 
         String rModTime = (ent.getModTime()==null) ? "" : publicDateFormat.format(ent.getModTime());
         results.add(rModTime);
         results.add( (ent.getURI() == null) ? "[anonymous individual]" : ent.getURI() );
+		results.add(ent.getHiddenFromPublishBelowRoleLevel() == null ? "unspecified"
+				: ent.getHiddenFromPublishBelowRoleLevel().getDisplayLabel());
         request.setAttribute("results",results);
         request.setAttribute("columncount", colCount);
         request.setAttribute("suppressquery","true");

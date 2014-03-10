@@ -81,17 +81,17 @@ public class IndividualStub implements Individual {
 	public String getName() {
 		return name;
 	}
-	
-	@Override 
+
+	@Override
 	public String getLabel() {
-	    return getName();
+		return getName();
 	}
 
 	@Override
 	public String getPickListName() {
-	    return getName();
+		return getName();
 	}
-	
+
 	@Override
 	public List<DataPropertyStatement> getDataPropertyStatements() {
 		return new ArrayList<DataPropertyStatement>(dpsSet);
@@ -145,7 +145,6 @@ public class IndividualStub implements Individual {
 		}
 		return null;
 	}
-
 
 	@Override
 	public boolean isVClass(String vclassUri) {
@@ -264,6 +263,24 @@ public class IndividualStub implements Individual {
 	}
 
 	@Override
+	public RoleLevel getHiddenFromPublishBelowRoleLevel() {
+		throw new RuntimeException(
+				"IndividualStub.getHiddenFromPublishBelowRoleLevel() not implemented.");
+	}
+
+	@Override
+	public void setHiddenFromPublishBelowRoleLevel(RoleLevel eR) {
+		throw new RuntimeException(
+				"IndividualStub.setHiddenFromPublishBelowRoleLevel() not implemented.");
+	}
+
+	@Override
+	public void setHiddenFromPublishBelowRoleLevelUsingRoleUri(String roleUri) {
+		throw new RuntimeException(
+				"IndividualStub.setHiddenFromPublishBelowRoleLevelUsingRoleUri() not implemented.");
+	}
+
+	@Override
 	public int compareTo(Individual o) {
 		throw new RuntimeException(
 				"Comparable<Individual>.compareTo() not implemented.");
@@ -271,9 +288,10 @@ public class IndividualStub implements Individual {
 
 	@Override
 	public List<String> getMostSpecificTypeURIs() {
-	    throw new RuntimeException("Individual.getMostSpecificTypeURIs() not implemented.");
+		throw new RuntimeException(
+				"Individual.getMostSpecificTypeURIs() not implemented.");
 	}
-	
+
 	@Override
 	public String getRdfsLabel() {
 		throw new RuntimeException("Individual.getRdfsLabel() not implemented.");

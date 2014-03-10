@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.individual;
 
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
@@ -28,9 +29,9 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.publish.PublishDataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.publish.PublishObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
@@ -61,7 +62,7 @@ import edu.cornell.mannlib.vitro.webapp.web.ContentType;
  * Otherwise, show all triples, regardless of language.
  * 
  * Filter the result based on the policy, removing any triples that should not
- * be displayed to the public (or to the user, if logged in). Also remove any
+ * be published to the public (or to the user, if logged in). Also remove any
  * objects which can only be reached by excluded triples.
  * 
  * ----------------
@@ -104,7 +105,6 @@ public class IndividualRdfAssembler {
 
 		this.individualUri = individualUri;
 		this.rdfFormat = rdfFormat;
-
 		String[] includes = vreq.getParameterValues("include");
 		this.richExportIncludes = (includes == null) ? new String[0] : includes;
 
@@ -150,6 +150,11 @@ public class IndividualRdfAssembler {
 		m.add(runConstructQuery(String.format(
 				"CONSTRUCT { ?s ?predicate <%1$s> .	} "
 						+ "WHERE { ?s ?predicate <%1$s> } ", individualUri)));
+		if (log.isDebugEnabled()) {
+			StringWriter sw = new StringWriter();
+			m.write(sw);
+			log.debug("Statements about '" + individualUri + "': " + sw);
+		}
 		return m;
 	}
 
@@ -166,6 +171,15 @@ public class IndividualRdfAssembler {
 						+ "WHERE { <%1$s> ?predicate ?object ."
 						+ " ?object <%2$s> ?label . } ", individualUri,
 				RDFS.label)));
+		m.add(runConstructQuery(String
+				.format("CONSTRUCT { ?subject <%2$s> ?type .	} "
+						+ "WHERE { ?subject ?predicate <%1$s> ."
+						+ " ?subject <%2$s> ?type . } ", individualUri, RDF.type)));
+		m.add(runConstructQuery(String.format(
+				"CONSTRUCT { ?subject <%2$s> ?label .	} "
+						+ "WHERE { ?subject ?predicate <%1$s> ."
+						+ " ?subject <%2$s> ?label . } ", individualUri,
+						RDFS.label)));
 		return m;
 	}
 
@@ -192,18 +206,18 @@ public class IndividualRdfAssembler {
 				String value = stmt.getObject().asLiteral().getString();
 				DataPropertyStatement dps = new DataPropertyStatementImpl(
 						subjectUri, predicateUri, value);
-				RequestedAction ddps = new DisplayDataPropertyStatement(dps);
-				if (!PolicyHelper.isAuthorizedForActions(vreq, ddps)) {
-					log.debug("not authorized: " + ddps);
+				RequestedAction pdps = new PublishDataPropertyStatement(o, dps);
+				if (!PolicyHelper.isAuthorizedForActions(vreq, pdps)) {
+					log.debug("not authorized: " + pdps);
 					stmts.remove();
 				}
 			} else if (stmt.getObject().isURIResource()) {
 				String objectUri = stmt.getObject().asResource().getURI();
 				ObjectPropertyStatement ops = new ObjectPropertyStatementImpl(
 						subjectUri, predicateUri, objectUri);
-				RequestedAction dops = new DisplayObjectPropertyStatement(ops);
-				if (!PolicyHelper.isAuthorizedForActions(vreq, dops)) {
-					log.debug("not authorized: " + dops);
+				RequestedAction pops = new PublishObjectPropertyStatement(o, ops);
+				if (!PolicyHelper.isAuthorizedForActions(vreq, pops)) {
+					log.debug("not authorized: " + pops);
 					stmts.remove();
 				}
 			} else {

@@ -54,11 +54,9 @@ public class VitroVocabulary {
     public static final String DATAPROPERTY_ISEXTERNALID = vitroURI+"isExternalId";
         
     public static final String HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT = vitroURI+"hiddenFromDisplayBelowRoleLevelAnnot";
-    
-    //public static final String PROHIBITED_FROM_CREATE_BELOW_ROLE_LEVEL_ANNOT = vitroURI+"prohibitedFromCreateBelowRoleLevelAnnot";
     public static final String PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT = vitroURI+"prohibitedFromUpdateBelowRoleLevelAnnot";
-    //public static final String PROHIBITED_FROM_DELETE_BELOW_ROLE_LEVEL_ANNOT = vitroURI+"prohibitedFromDeleteBelowRoleLevelAnnot";
-    
+	public static final String HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT = vitroURI+"hiddenFromPublishBelowRoleLevelAnnot";
+
     public static final String MOST_SPECIFIC_TYPE = vitroURI + "mostSpecificType";
 
     // roles

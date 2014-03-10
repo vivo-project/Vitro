@@ -8,8 +8,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.sdb.util.Pair;
 import com.hp.hpl.jena.vocabulary.OWL;
 
@@ -27,7 +25,6 @@ public class PropertyRestrictionPolicyHelperStub extends
 		return getInstance(null, null);
 	}
 
-
 	/** Prohibit some namespaces. */
 	public static PropertyRestrictionPolicyHelperStub getInstance(
 			String[] restrictedNamespaces) {
@@ -44,30 +41,28 @@ public class PropertyRestrictionPolicyHelperStub extends
 		if (restrictedNamespaces != null) {
 			namespaceSet.addAll(Arrays.asList(restrictedNamespaces));
 		}
-		
-		Map<Pair<String, Pair<String,String>>, RoleLevel> thresholdMap = new HashMap<
-		        Pair<String, Pair<String,String>>, RoleLevel>();
+
+		Map<Pair<String, Pair<String, String>>, RoleLevel> thresholdMap = new HashMap<>();
 		if (restrictedProperties != null) {
 			for (String prop : restrictedProperties) {
-				thresholdMap.put(
-				        new Pair<String, Pair<String, String>>(
-				                OWL.Thing.getURI(), new Pair<String, String>(
-				                        prop, OWL.Thing.getURI())), 
-				                                RoleLevel.NOBODY);
+				thresholdMap.put(new Pair<String, Pair<String, String>>(
+						OWL.Thing.getURI(), new Pair<String, String>(prop,
+								OWL.Thing.getURI())), RoleLevel.NOBODY);
 			}
 		}
-		
+
 		return new PropertyRestrictionPolicyHelperStub(namespaceSet, null,
-				null, thresholdMap);
+				null, thresholdMap, null);
 	}
 
 	private PropertyRestrictionPolicyHelperStub(
 			Set<String> modifyRestrictedNamespaces,
 			Set<String> modifyPermittedExceptions,
-			Map<Pair<String, Pair<String,String>>, RoleLevel> displayThresholds,
-			Map<Pair<String, Pair<String,String>>, RoleLevel> modifyThresholds) {
+			Map<Pair<String, Pair<String, String>>, RoleLevel> displayThresholds,
+			Map<Pair<String, Pair<String, String>>, RoleLevel> modifyThresholds,
+			Map<Pair<String, Pair<String, String>>, RoleLevel> publishThresholds) {
 		super(modifyRestrictedNamespaces, modifyPermittedExceptions,
-				displayThresholds, modifyThresholds, ModelFactory.createDefaultModel());
+				displayThresholds, modifyThresholds, publishThresholds);
 	}
 
 }

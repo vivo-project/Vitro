@@ -984,6 +984,15 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
                 }
             }
 
+            ontCls.removeAll(HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT);
+            if (HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT != null && cls.getHiddenFromPublishBelowRoleLevel() != null) { // only need to add if present
+                try {
+                    ontCls.addProperty(HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT, ResourceFactory.createResource(cls.getHiddenFromPublishBelowRoleLevel().getURI()));
+                } catch (Exception e) {
+                    log.error("error adding HiddenFromPublishBelowRoleLevel annotation to class "+cls.getURI());
+                }
+            }
+
             /* OPTIONAL annotation properties */
             addPropertyStringValue(ontCls,PROPERTY_CUSTOMENTRYFORMANNOT,cls.getCustomEntryForm(),ontModel);
             addPropertyStringValue(ontCls,PROPERTY_CUSTOMDISPLAYVIEWANNOT,cls.getCustomDisplayView(),ontModel);
@@ -1023,6 +1032,10 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
 
                 if (cls.getProhibitedFromUpdateBelowRoleLevel() != null) {
                     updatePropertyResourceURIValue(ontCls,PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT,cls.getProhibitedFromUpdateBelowRoleLevel().getURI(),ontModel);
+                }
+
+                if (cls.getHiddenFromPublishBelowRoleLevel() != null) {
+                    updatePropertyResourceURIValue(ontCls,HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT,cls.getHiddenFromPublishBelowRoleLevel().getURI(),ontModel);
                 }
 
                 updatePropertyStringValue(ontCls,PROPERTY_CUSTOMENTRYFORMANNOT,cls.getCustomEntryForm(),ontModel);

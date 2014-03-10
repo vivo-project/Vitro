@@ -1,0 +1,154 @@
+@prefix ocresd:  <http://purl.org/net/OCRe/study_design.owl#> .
+@prefix geo:     <http://aims.fao.org/aos/geopolitical.owl#> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix scires:  <http://vivoweb.org/ontology/scientific-research#> .
+@prefix cito:    <http://purl.org/spar/cito/> .
+@prefix fabio:   <http://purl.org/spar/fabio/> .
+@prefix vcard:   <http://www.w3.org/2006/vcard/ns#> .
+@prefix obo:     <http://purl.obolibrary.org/obo/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ocrer:   <http://purl.org/net/OCRe/research.owl#> .
+@prefix vitro:   <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix event:   <http://purl.org/NET/c4dm/event.owl#> .
+@prefix bibo:    <http://purl.org/ontology/bibo/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix c4o:     <http://purl.org/spar/c4o/> .
+@prefix vitro-public:  <http://vitro.mannlib.cornell.edu/ns/vitro/public#> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+@prefix vivo:    <http://vivoweb.org/ontology/core#> .
+
+<http://vivo.mydomain.edu/individual/n3639>
+      a       vivo:FacultyMember , 
+              foaf:Person , 
+              owl:Thing , 
+              foaf:Agent , 
+              obo:BFO_0000002 , 
+              obo:BFO_0000001 , 
+              obo:BFO_0000004 ;
+      rdfs:label "Baker, Able "^^xsd:string ;
+      obo:ARG_2000028 <http://vivo.mydomain.edu/individual/n3972> ;
+      obo:RO_0000053 <http://vivo.mydomain.edu/individual/n475> , 
+                     <http://vivo.mydomain.edu/individual/n7850> ;
+      vitro:mostSpecificType
+              vivo:FacultyMember ;
+      vivo:freetextKeyword
+              "Potrezebie, Chattanooga" ;
+      vivo:hasCollaborator
+              <http://vivo.mydomain.edu/individual/n7429> ;
+      vivo:relatedBy <http://vivo.mydomain.edu/individual/n3401> , 
+                     <http://vivo.mydomain.edu/individual/n5855> , 
+                     <http://vivo.mydomain.edu/individual/n2421> ;
+      vivo:researchOverview
+              "Whatever strikes my fancy." ;
+      vivo:scopusId "abaker" .
+
+<http://vivo.mydomain.edu/individual/n3972>
+      a       vcard:Kind , 
+              obo:BFO_0000031 , 
+              owl:Thing , 
+              obo:ARG_2000379 , 
+              obo:IAO_0000030 , 
+              obo:BFO_0000002 , 
+              obo:BFO_0000001 , 
+              vcard:Individual ;
+      obo:ARG_2000029 <http://vivo.mydomain.edu/individual/n3639> .
+
+<http://vivo.mydomain.edu/individual/n475>
+      a       owl:Thing , 
+              obo:BFO_0000023 , 
+              vivo:InvestigatorRole , 
+              obo:BFO_0000002 , 
+              obo:BFO_0000017 , 
+              vivo:PrincipalInvestigatorRole , 
+              obo:BFO_0000020 , 
+              obo:BFO_0000001 , 
+              vivo:ResearcherRole ;
+      obo:RO_0000052 <http://vivo.mydomain.edu/individual/n3639> .
+
+<http://vivo.mydomain.edu/individual/n7850>
+      a       owl:Thing , 
+              obo:BFO_0000023 , 
+              obo:BFO_0000017 , 
+              obo:BFO_0000002 , 
+              obo:BFO_0000020 , 
+              obo:BFO_0000001 , 
+              vivo:LeaderRole ;
+      rdfs:label "Lead Guitarist"^^xsd:string ;
+      obo:RO_0000052 <http://vivo.mydomain.edu/individual/n3639> .
+
+<http://vivo.mydomain.edu/individual/n7429>
+      a       foaf:Person , 
+              vivo:FacultyMember , 
+              foaf:Agent , 
+              owl:Thing , 
+              obo:BFO_0000002 , 
+              obo:BFO_0000001 , 
+              obo:BFO_0000004 ;
+      rdfs:label "Yum, Yum " .
+
+<http://vivo.mydomain.edu/individual/n3401>
+      a       owl:Thing , 
+              vivo:Relationship , 
+              obo:BFO_0000002 , 
+              obo:BFO_0000020 , 
+              obo:BFO_0000001 , 
+              vivo:Authorship ;
+      vivo:relates <http://vivo.mydomain.edu/individual/n3639> .
+
+<http://vivo.mydomain.edu/individual/n5855>
+      a       vivo:FacultyPosition , 
+              owl:Thing , 
+              vivo:Relationship , 
+              obo:BFO_0000002 , 
+              obo:BFO_0000020 , 
+              obo:BFO_0000001 , 
+              vivo:Position ;
+      rdfs:label "Functionary"^^xsd:string ;
+      vivo:relates <http://vivo.mydomain.edu/individual/n3639> .
+
+<http://vivo.mydomain.edu/individual/n2421>
+      a       owl:Thing , 
+              vivo:Relationship , 
+              obo:BFO_0000002 , 
+              obo:BFO_0000020 , 
+              obo:BFO_0000001 , 
+              vivo:Grant ;
+      rdfs:label "Cosmogenic Lassitude in Plegmatic Axolotls" ;
+      vivo:relates <http://vivo.mydomain.edu/individual/n3639> .
+
+obo:BFO_0000001 
+      a       owl:Class ;
+      rdfs:label "Entity" .
+
+obo:BFO_0000002
+      a       owl:Class ;
+      rdfs:label "Continuant" .
+
+obo:BFO_0000004
+      a       owl:Class ;
+      rdfs:label "Independent Continuant"@en-US .
+
+vivo:FacultyMember
+      a       owl:Class ;
+      rdfs:label "Faculty Member"@en-US .
+
+foaf:Person
+      a       owl:Class ;
+      rdfs:label "Person"@en-US .
+
+foaf:Agent
+      a       owl:Class ;
+      rdfs:label "Agent"@en-US .
+
+owl:Thing
+      a       owl:Class .
+
+<http://vivo.mydomain.edu/individual/n3639/n3639.n3>
+      a       foaf:Document ;
+      rdfs:label "RDF description of Baker, Able  - http://vivo.mydomain.edu/individual/n3639" ;
+      <http://purl.org/dc/elements/1.1/date> "2014-03-10T11:08:39"^^xsd:dateTime ;
+      <http://purl.org/dc/elements/1.1/publisher> <http://vivo.mydomain.edu> ;
+      <http://purl.org/dc/elements/1.1/rights> <http://vivo.mydomain.edu/termsOfUse> .
+
