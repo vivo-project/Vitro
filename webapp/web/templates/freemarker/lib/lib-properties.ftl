@@ -238,7 +238,8 @@ name will be used as the label. -->
             (<span>${property.type?lower_case}</span> property);
             order in group: <span>${verboseDisplay.displayRank};</span> 
             display level: <span>${verboseDisplay.displayLevel};</span>
-            update level: <span>${verboseDisplay.updateLevel}</span>
+            update level: <span>${verboseDisplay.updateLevel};</span>
+            publish level: <span>${verboseDisplay.publishLevel}</span>
         </section>
     </#if>
 </#macro>

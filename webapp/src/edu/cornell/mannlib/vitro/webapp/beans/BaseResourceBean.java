@@ -25,63 +25,80 @@ public class BaseResourceBean implements ResourceBean {
     protected String localNameWithPrefix = null;
     protected String pickListName = null;
     
-    // these will be phased in and used in the filters Brian C. has been setting up,
-    // with hiddenFromDisplay to control the level at which any class, individual, object property, or data property is displayed
-    // and prohibitedFromEditing to control when a control for editing is made available
     protected RoleLevel hiddenFromDisplayBelowRoleLevel = null;
-    //protected RoleLevel prohibitedFromCreateBelowRoleLevel = null;
     protected RoleLevel prohibitedFromUpdateBelowRoleLevel = null;
-    //protected RoleLevel prohibitedFromDeleteBelowRoleLevel = null;
+    protected RoleLevel hiddenFromPublishBelowRoleLevel = null;
     
-    public enum RoleLevel { PUBLIC("http://vitro.mannlib.cornell.edu/ns/vitro/role#public","public","public"),
-                            SELF("http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor","self-authenticated","self"),
-                            EDITOR("http://vitro.mannlib.cornell.edu/ns/vitro/role#editor","editor, curator, site administrator","editor"),
-                            CURATOR("http://vitro.mannlib.cornell.edu/ns/vitro/role#curator","curator, site administrator","curator"),
-                            DB_ADMIN("http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin","site administrator","siteAdmin"),
-                            NOBODY("http://vitro.mannlib.cornell.edu/ns/vitro/role#nobody","root user","root");
-    
-        private final String uri;
-        private final String label;
-        private final String shorthand;
-        
-        RoleLevel(String uriStr,String labelStr, String shortStr) {
-            this.uri = uriStr;
-            this.label = labelStr;
-            this.shorthand = shortStr;
-        }
-        
-        public String getURI() {
-            return uri;
-        }
-        
-        public String getLabel() {
-            return label;
-        }
+	public enum RoleLevel {
+		PUBLIC("http://vitro.mannlib.cornell.edu/ns/vitro/role#public",
+				"all users, including public", "all users who can log in",
+				"public"),
 
-        public String getShorthand() {
-            return shorthand;
-        }
-        
-        public static RoleLevel getRoleByUri(String uri2) {
-            if( uri2 == null )
-                return RoleLevel.values()[0];
-           
-            for( RoleLevel role : RoleLevel.values() ){
-                if( role.uri.equals( uri2 ) )
-                    return role;
-            }
-            return RoleLevel.values()[0];            
-        }
-        
+		SELF("http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor",
+				"self-editor and above", "self-editor and above", "self"),
+
+		EDITOR("http://vitro.mannlib.cornell.edu/ns/vitro/role#editor",
+				"editor and above", "editor and above", "editor"),
+
+		CURATOR("http://vitro.mannlib.cornell.edu/ns/vitro/role#curator",
+				"curator and above", "curator and above", "curator"),
+
+		DB_ADMIN("http://vitro.mannlib.cornell.edu/ns/vitro/role#dbAdmin",
+				"site admin and root user", "site admin and root user",
+				"siteAdmin"),
+
+		NOBODY("http://vitro.mannlib.cornell.edu/ns/vitro/role#nobody",
+				"root user", "root user", "root");
+
+		private final String uri;
+		private final String displayLabel;
+		private final String updateLabel;
+		private final String shorthand;
+
+		private RoleLevel(String uri, String displayLabel, String updateLabel,
+				String shorthand) {
+			this.uri = uri;
+			this.displayLabel = displayLabel;
+			this.updateLabel = updateLabel;
+			this.shorthand = shorthand;
+		}
+
+		public String getURI() {
+			return uri;
+		}
+
+		public String getDisplayLabel() {
+			return displayLabel;
+		}
+
+		public String getUpdateLabel() {
+			return updateLabel;
+		}
+
+		public String getShorthand() {
+			return shorthand;
+		}
+
+		public static RoleLevel getRoleByUri(String uri2) {
+			if (uri2 == null)
+				return RoleLevel.values()[0];
+
+			for (RoleLevel role : RoleLevel.values()) {
+				if (role.uri.equals(uri2))
+					return role;
+			}
+			return RoleLevel.values()[0];
+		}
+
 		public static RoleLevel getRoleFromLoginStatus(HttpServletRequest req) {
 			UserAccount u = LoginStatusBean.getCurrentUser(req);
 			if (u == null) {
 				return PUBLIC;
 			}
-			
+
 			Set<String> roles = u.getPermissionSetUris();
 			if (roles.contains(PermissionSets.URI_DBA)) {
-				return  DB_ADMIN;
+				return DB_ADMIN;
 			} else if (roles.contains(PermissionSets.URI_CURATOR)) {
 				return CURATOR;
 			} else if (roles.contains(PermissionSets.URI_EDITOR)) {
@@ -93,16 +110,19 @@ public class BaseResourceBean implements ResourceBean {
 				return SELF;
 			}
 		}
-    }
+	}
 
-    public boolean isAnonymous() {        
+    @Override
+	public boolean isAnonymous() {        
     	return (this.URI==null || VitroVocabulary.PSEUDO_BNODE_NS.equals(this.getNamespace()));
     }
     
-    public String getURI() {
+    @Override
+	public String getURI() {
         return URI;
     }
-    public void setURI(String URI) {  
+    @Override
+	public void setURI(String URI) {  
         if( this.localName != null || this.namespace != null)
             buildLocalAndNS(URI);
         else
@@ -122,29 +142,34 @@ public class BaseResourceBean implements ResourceBean {
         }
     }
     
-    public String getNamespace() {
+    @Override
+	public String getNamespace() {
         if( namespace == null && this.URI != null)
             buildLocalAndNS(this.URI);        
         return namespace;
     }
-    public void setNamespace(String namespace) {
+    @Override
+	public void setNamespace(String namespace) {
         this.namespace = namespace;
         if (namespace != null && localName != null ) {
             this.URI = namespace + localName;
         }
     }
     
-    public String getLabel() {
+    @Override
+	public String getLabel() {
         return getLocalName();
     }
 
-    public String getLocalName() {
+    @Override
+	public String getLocalName() {
         if( localName == null && this.URI != null)
             buildLocalAndNS(this.URI);        
         return localName;
     }
     
-    public void setLocalName(String localName) {
+    @Override
+	public void setLocalName(String localName) {
         this.localName = localName;
         if (namespace != null && localName != null) {
             this.URI = namespace + localName;
@@ -160,7 +185,8 @@ public class BaseResourceBean implements ResourceBean {
         this.localNameWithPrefix = prefixedLocalName;
     }
     
-    public String getPickListName() {
+    @Override
+	public String getPickListName() {
         return pickListName==null ? getLocalName()==null ? 
                 (URI==null ? "(no name)" : URI ): getLocalName() : pickListName;
     }
@@ -168,57 +194,51 @@ public class BaseResourceBean implements ResourceBean {
         this.pickListName = pickListName;
     }
     
-    public RoleLevel getHiddenFromDisplayBelowRoleLevel() {
+    @Override
+	public RoleLevel getHiddenFromDisplayBelowRoleLevel() {
         return hiddenFromDisplayBelowRoleLevel;
     }
     
-    public void setHiddenFromDisplayBelowRoleLevel(RoleLevel eR) {
+    @Override
+	public void setHiddenFromDisplayBelowRoleLevel(RoleLevel eR) {
         hiddenFromDisplayBelowRoleLevel = eR;
     }
     
-    public void setHiddenFromDisplayBelowRoleLevelUsingRoleUri(String roleUri) {
+    @Override
+	public void setHiddenFromDisplayBelowRoleLevelUsingRoleUri(String roleUri) {
         hiddenFromDisplayBelowRoleLevel = BaseResourceBean.RoleLevel.getRoleByUri(roleUri);
     }
 
-    /*
-    public RoleLevel getProhibitedFromCreateBelowRoleLevel() {
-        return prohibitedFromCreateBelowRoleLevel;
-    }
-    
-    public void setProhibitedFromCreateBelowRoleLevel(RoleLevel eR) {
-        prohibitedFromCreateBelowRoleLevel = eR;
-    }
-    
-    public void setProhibitedFromCreateBelowRoleLevelUsingRoleUri(String roleUri) {
-        prohibitedFromCreateBelowRoleLevel = BaseResourceBean.RoleLevel.getRoleByUri(roleUri);
-    }
-    */
-    
-    public RoleLevel getProhibitedFromUpdateBelowRoleLevel() {
+    @Override
+	public RoleLevel getProhibitedFromUpdateBelowRoleLevel() {
         return prohibitedFromUpdateBelowRoleLevel;
     }
     
-    public void setProhibitedFromUpdateBelowRoleLevel(RoleLevel eR) {
+    @Override
+	public void setProhibitedFromUpdateBelowRoleLevel(RoleLevel eR) {
         prohibitedFromUpdateBelowRoleLevel = eR;
     }
     
-    public void setProhibitedFromUpdateBelowRoleLevelUsingRoleUri(String roleUri) {
+    @Override
+	public void setProhibitedFromUpdateBelowRoleLevelUsingRoleUri(String roleUri) {
         prohibitedFromUpdateBelowRoleLevel = BaseResourceBean.RoleLevel.getRoleByUri(roleUri);
     }
-    /*
-    public RoleLevel getProhibitedFromDeleteBelowRoleLevel() {
-        return prohibitedFromDeleteBelowRoleLevel;
-    }
-    
-    public void setProhibitedFromDeleteBelowRoleLevel(RoleLevel eR) {
-        prohibitedFromDeleteBelowRoleLevel = eR;
-    }
-    
-    public void setProhibitedFromDeleteBelowRoleLevelUsingRoleUri(String roleUri) {
-        prohibitedFromDeleteBelowRoleLevel = BaseResourceBean.RoleLevel.getRoleByUri(roleUri);
-    }
-    */
 
+	@Override
+	public RoleLevel getHiddenFromPublishBelowRoleLevel() {
+        return hiddenFromPublishBelowRoleLevel;
+	}
+    
+    @Override
+	public void setHiddenFromPublishBelowRoleLevel(RoleLevel eR) {
+        hiddenFromPublishBelowRoleLevel = eR;
+    }
+    
+    @Override
+	public void setHiddenFromPublishBelowRoleLevelUsingRoleUri(String roleUri) {
+    	hiddenFromPublishBelowRoleLevel = BaseResourceBean.RoleLevel.getRoleByUri(roleUri);
+    }
+    
 	@Override
 	public boolean equals(Object obj) {
 		if(obj == null ) 

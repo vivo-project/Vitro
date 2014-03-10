@@ -141,6 +141,11 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     }
 
     @Override
+    public RoleLevel getHiddenFromPublishBelowRoleLevel() {
+        return innerObjectProperty.getHiddenFromPublishBelowRoleLevel();
+    }
+    
+    @Override
     public boolean getInverseFunctional() {
         return innerObjectProperty.getInverseFunctional();
     }
@@ -366,6 +371,16 @@ public class ObjectPropertyFiltering extends ObjectProperty {
     @Override
     public void setProhibitedFromUpdateBelowRoleLevelUsingRoleUri(String roleUri) {
         innerObjectProperty.setProhibitedFromUpdateBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
+    }
+
+    @Override
+    public void setHiddenFromPublishBelowRoleLevel(RoleLevel eR) {
+        innerObjectProperty.setHiddenFromPublishBelowRoleLevel(eR);
+    }
+    
+    @Override
+    public void setHiddenFromPublishBelowRoleLevelUsingRoleUri(String roleUri) {
+        innerObjectProperty.setHiddenFromPublishBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
     }
 
     @Override

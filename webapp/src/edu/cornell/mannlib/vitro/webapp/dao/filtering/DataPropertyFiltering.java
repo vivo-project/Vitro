@@ -102,6 +102,11 @@ public class DataPropertyFiltering extends DataProperty {
     }
 
     @Override
+    public RoleLevel getHiddenFromPublishBelowRoleLevel() {
+        return innerDataProperty.getHiddenFromPublishBelowRoleLevel();
+    }
+    
+    @Override
     public String getLocalName() {
         return innerDataProperty.getLocalName();
     }
@@ -194,6 +199,16 @@ public class DataPropertyFiltering extends DataProperty {
     @Override
     public void setProhibitedFromUpdateBelowRoleLevelUsingRoleUri(String roleUri) {
         innerDataProperty.setProhibitedFromUpdateBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
+    }
+
+    @Override
+    public void setHiddenFromPublishBelowRoleLevel(RoleLevel eR) {
+        innerDataProperty.setHiddenFromPublishBelowRoleLevel(eR);
+    }
+    
+    @Override
+    public void setHiddenFromPublishBelowRoleLevelUsingRoleUri(String roleUri) {
+        innerDataProperty.setHiddenFromPublishBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
     }
 
     @Override

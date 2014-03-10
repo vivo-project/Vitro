@@ -48,7 +48,6 @@ public class ServletPolicyList {
 		PolicyList policies = getPolicyList(sc);
 		if (!policies.contains(policy)) {
 			policies.add(policy);
-			log.info("Added policy: " + policy.getClass().getSimpleName());
 			log.debug("Added policy: " + policy.toString());
 		} else {
 			log.warn("Ignored attempt to add redundant policy.");
@@ -67,7 +66,6 @@ public class ServletPolicyList {
 		PolicyList policies = getPolicyList(sc);
 		if (!policies.contains(policy)) {
 			policies.add(0, policy);
-			log.info("Added policy at front: " + policy.getClass().getSimpleName());
 			log.debug("Added policy at front: " + policy.toString());
 		} else {
 			log.warn("Ignored attempt to add redundant policy.");

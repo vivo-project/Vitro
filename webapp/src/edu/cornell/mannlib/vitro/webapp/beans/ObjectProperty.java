@@ -633,6 +633,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
         clone.setFunctional(this.getFunctional());
         clone.setGroupURI(this.getGroupURI());
         clone.setHiddenFromDisplayBelowRoleLevel(this.getHiddenFromDisplayBelowRoleLevel());
+        clone.setHiddenFromPublishBelowRoleLevel(this.getHiddenFromPublishBelowRoleLevel());
         clone.setInverseFunctional(this.getInverseFunctional());
         clone.setLabel(this.getLabel());
         clone.setLocalName(this.getLocalName());

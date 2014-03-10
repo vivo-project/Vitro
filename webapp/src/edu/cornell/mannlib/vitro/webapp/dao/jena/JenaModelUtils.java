@@ -190,7 +190,7 @@ public class JenaModelUtils {
         // Perform possibly-redundant extraction to try ensure we don't miss 
         // individual axioms floating around.  We still might miss things;
         // this approach isn't perfect.
-        if (mode = AGGRESSIVE) {
+        if (mode == AGGRESSIVE) {
             tboxModel.add(construct(dataset, namespace, graphURI, RDFS.subClassOf));
             tboxModel.add(construct(dataset, namespace, graphURI, RDFS.subPropertyOf));
             tboxModel.add(construct(dataset, namespace, graphURI, OWL.equivalentClass));
@@ -219,6 +219,8 @@ public class JenaModelUtils {
                                                                   VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT)));
             tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
                                                                   VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT)));
+            tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
+            		                                              VitroVocabulary.HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT)));
             tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(
                                                                   VitroVocabulary.DESCRIPTION_ANNOT)));
             tboxModel.add(construct(dataset, namespace, graphURI, ResourceFactory.createResource(

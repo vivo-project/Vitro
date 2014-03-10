@@ -47,6 +47,13 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+
+import edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ProxyRelationshipSelectorTest;
+
 /**
  * A collection of useful routines to help when testing.
  * <ul>
@@ -404,8 +411,22 @@ public abstract class AbstractTestClass {
 		assertEquals(message, expected, actual);
 	}
 
+	@SuppressWarnings("unchecked")
 	protected <T> Set<T> buildSet(T... array) {
 		return new HashSet<T>(Arrays.asList(array));
+	}
+
+	protected OntModel readModelFromFile(String relativePath, String rdfType) throws IOException {
+		InputStream stream = this.getClass()
+				.getResourceAsStream(relativePath);
+		Model model = ModelFactory.createDefaultModel();
+		model.read(stream, null, rdfType);
+		stream.close();
+
+		OntModel ontModel = ModelFactory.createOntologyModel(
+				OntModelSpec.OWL_DL_MEM, model);
+		ontModel.prepare();
+		return ontModel;
 	}
 
 }
