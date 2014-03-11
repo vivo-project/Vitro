@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_LITERAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_URI;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,12 +12,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataProperty;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -41,8 +47,13 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
         for (Property p : propertyList)  {
             if (p instanceof ObjectProperty) {
                 ObjectProperty op = (ObjectProperty) p;
-                RequestedAction dop = new DisplayObjectProperty(op);
-                if (!PolicyHelper.isAuthorizedForActions(vreq, dop)) {
+                ObjectPropertyStatement ops = new ObjectPropertyStatementImpl(subject.getURI(), op.getURI(), SOME_URI);
+				RequestedAction dops = new DisplayObjectPropertyStatement(ops);
+				/*
+				 * We can't test the ObjectProperty itself for authorization;
+				 * the self-editor policies need to know who the subject is.
+				 */
+                if (!PolicyHelper.isAuthorizedForActions(vreq, dops)) {
                     continue;
                 }
                 ObjectPropertyTemplateModel tm = ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(
@@ -53,8 +64,13 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 
             } else if (p instanceof DataProperty){
                 DataProperty dp = (DataProperty) p;
-                RequestedAction dop = new DisplayDataProperty(dp);
-                if (!PolicyHelper.isAuthorizedForActions(vreq, dop)) {
+                DataPropertyStatementImpl dps = new DataPropertyStatementImpl(subject.getURI(), dp.getURI(), SOME_LITERAL);
+				RequestedAction dops = new DisplayDataPropertyStatement(dps);
+				/*
+				 * We can't test the DataProperty itself for authorization; the
+				 * self-editor policies need to know who the subject is.
+				 */
+                if (!PolicyHelper.isAuthorizedForActions(vreq, dops)) {
                     continue;
                 }
                 properties.add(new DataPropertyTemplateModel(dp, subject, vreq, editing, populatedDataPropertyList));
