@@ -476,8 +476,8 @@
 
 
 	<!-- ================================= 
-      target: deploy              
-     ================================= -->
+          target: deploy              
+         ================================= -->
 	<target name="deploy" 
 	        depends="deployWebapp, deploySolr, deployVitroHome" 
 	        description="--> Build the app and install in Tomcat">
@@ -497,7 +497,7 @@
           target: distribute              
          ================================= -->
 	<target name="distribute" 
-	        depends="revisionInfo, prepareSolr" 
+	        depends="revisionInfo, prepareVitroHomeDir, prepareSolr" 
 	        description="--> Build the app and create a distribution bundle">
 		<mkdir dir="${distribution.dir}" />
 
