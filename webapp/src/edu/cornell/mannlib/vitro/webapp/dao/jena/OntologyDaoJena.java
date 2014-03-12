@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,10 +30,12 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
     }
     
     public static synchronized String adjustOntologyURI(String ontologyURI) { 
-    	if ( (ontologyURI.length()>1) && (ontologyURI.charAt(ontologyURI.length()-1)=='#') ) { 
-    		return ontologyURI.substring(0,ontologyURI.length()-1);
+    	String uri = ontologyURI.trim();
+    	int length = uri.length();
+		if ( (length>1) && (uri.charAt(length-1)=='#') ) { 
+    		return uri.substring(0,length-1);
     	} else {
-    		return ontologyURI;
+    		return uri;
     	}
     }
     
@@ -124,10 +128,14 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
     }
 
     public String insertNewOntology(Ontology ontology, OntModel ontModel) {
-        if (ontology != null && ontology.getURI() != null && ontology.getURI().length()>0) {
+    	if (ontology == null) {
+    		return null;
+    	} 
+    	try {
+    		String ontologyURI = adjustAndValidateOntologyURI(ontology.getURI());
             ontModel.enterCriticalSection(Lock.WRITE);
             try {
-                com.hp.hpl.jena.ontology.Ontology o = ontModel.createOntology(adjustOntologyURI(ontology.getURI()));
+                com.hp.hpl.jena.ontology.Ontology o = ontModel.createOntology(ontologyURI);
                 if (ontology.getName() != null && ontology.getName().length()>0) {
                     o.setLabel(ontology.getName(), getDefaultLanguage());
                 }
@@ -138,12 +146,21 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
             } finally {
                 ontModel.leaveCriticalSection();
             }
-        } else {
-            return null;
+    	} catch (URISyntaxException e) {
+    		log.warn("Failed to insert new ontology: " + ontology, e);
+    		throw new RuntimeException(e);
         }
     }
 
-    public void updateOntology(Ontology ontology) {
+	private String adjustAndValidateOntologyURI(String uri) throws URISyntaxException {
+		if (uri == null || uri.isEmpty()) {
+			throw new URISyntaxException(uri, "URI is empty");
+		}
+		String adjusted = adjustOntologyURI(uri);
+		return new URI(adjusted).toString();
+	}
+
+	public void updateOntology(Ontology ontology) {
     	updateOntology(ontology,getOntModel());
     }
     
