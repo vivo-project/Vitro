@@ -62,4 +62,13 @@ public class Ontology implements Comparable<Ontology>
         return collator.compare(this.getName(), o2.getName());
     }
     
+	@Override
+	public String toString() {
+		return "Ontology[myID=" + myID + ", myName=" + myName + ", myType="
+				+ myType + ", myPrefix=" + myPrefix + ", myNamespaceID="
+				+ myNamespaceID + ", myURI=" + myURI + ", myVClassesList="
+				+ myVClassesList + ", myPropsList=" + myPropsList
+				+ ", myEntitiesList=" + myEntitiesList + "]";
+	}
+    
 }
