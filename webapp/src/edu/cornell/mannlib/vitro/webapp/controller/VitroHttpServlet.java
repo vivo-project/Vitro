@@ -61,13 +61,15 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 			HttpServletRequest hreq = (HttpServletRequest) req;
 
 			hreq = MultipartRequestWrapper.parse(hreq, this);
-			
+
 			if (log.isTraceEnabled()) {
 				dumpRequestHeaders(hreq);
 			}
+	
+			super.service(hreq, resp);
+		} else {
+			super.service(req, resp);
 		}
-
-		super.service(req, resp);
 	}
 
 	/**
