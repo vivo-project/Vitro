@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
 /**
@@ -16,10 +15,5 @@ public class DropObjectPropertyStatement extends
 	public DropObjectPropertyStatement(OntModel ontModel, String sub,
 			Property pred, String obj) {
 		super(ontModel, sub, pred, obj);
-	}
-
-	public DropObjectPropertyStatement(OntModel ontModel,
-			ObjectPropertyStatement ops) {
-		super(ontModel, ops);
 	}
 }

@@ -2,7 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_URI;
 import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
@@ -82,12 +84,22 @@ public class IndividualFilteringByStatementTest extends AbstractTestClass {
 	private static final String URI_VISIBLE_OBJECT_ORDINARY = "object://visible_on_ordinary";
 	private static final String URI_MAYBE_OBJECT_ORDINARY = "object://maybe_on_ordinary";
 
+	private static final String FAUX_DOMAIN_VISIBLE = "faux://visibleDomain";
+	private static final String FAUX_RANGE_VISIBLE = "faux://visibleRange";
+	private static final String FAUX_DOMAIN_HIDDEN = "faux://hiddenDomain";
+	private static final String FAUX_RANGE_HIDDEN = "faux://hiddenRange";
+
+	private static final String URI_FAUX_VISIBLE_ORDINARY = "object://faux_visible_on_ordinary";
+	private static final String URI_FAUX_HIDDEN_ORDINARY = "object://faux_hidden_on_ordinary";
+
+	private IndividualStub indSpecial;
+	private IndividualStub indOrdinary;
 	private Individual filteredSpecial;
 	private Individual filteredOrdinary;
 
 	@Before
 	public void createIndividuals() {
-		IndividualStub indSpecial = new IndividualStub(URI_INDIVIDUAL_SPECIAL);
+		indSpecial = new IndividualStub(URI_INDIVIDUAL_SPECIAL);
 
 		indSpecial.addDataPropertyStatement(PROPERTY_DATA_HIDDEN,
 				VALUE_HIDDEN_DATA_SPECIAL);
@@ -96,17 +108,17 @@ public class IndividualFilteringByStatementTest extends AbstractTestClass {
 		indSpecial.addDataPropertyStatement(PROPERTY_DATA_MAYBE,
 				VALUE_MAYBE_DATA_SPECIAL);
 
-		indSpecial.addObjectPropertyStatement(PROPERTY_OBJECT_HIDDEN,
+		indSpecial.addObjectPropertyStatement(property(PROPERTY_OBJECT_HIDDEN),
 				URI_HIDDEN_OBJECT_SPECIAL);
-		indSpecial.addObjectPropertyStatement(PROPERTY_OBJECT_VISIBLE,
-				URI_VISIBLE_OBJECT_SPECIAL);
-		indSpecial.addObjectPropertyStatement(PROPERTY_OBJECT_MAYBE,
+		indSpecial.addObjectPropertyStatement(
+				property(PROPERTY_OBJECT_VISIBLE), URI_VISIBLE_OBJECT_SPECIAL);
+		indSpecial.addObjectPropertyStatement(property(PROPERTY_OBJECT_MAYBE),
 				URI_MAYBE_OBJECT_SPECIAL);
 
 		filteredSpecial = new IndividualFiltering(indSpecial,
 				new IndividualBasedFilter());
 
-		IndividualStub indOrdinary = new IndividualStub("someOtherUri");
+		indOrdinary = new IndividualStub("someOtherUri");
 
 		indOrdinary.addDataPropertyStatement(PROPERTY_DATA_HIDDEN,
 				VALUE_HIDDEN_DATA_ORDINARY);
@@ -115,15 +127,28 @@ public class IndividualFilteringByStatementTest extends AbstractTestClass {
 		indOrdinary.addDataPropertyStatement(PROPERTY_DATA_MAYBE,
 				VALUE_MAYBE_DATA_ORDINARY);
 
-		indOrdinary.addObjectPropertyStatement(PROPERTY_OBJECT_HIDDEN,
-				URI_HIDDEN_OBJECT_ORDINARY);
-		indOrdinary.addObjectPropertyStatement(PROPERTY_OBJECT_VISIBLE,
-				URI_VISIBLE_OBJECT_ORDINARY);
-		indOrdinary.addObjectPropertyStatement(PROPERTY_OBJECT_MAYBE,
+		indOrdinary.addObjectPropertyStatement(
+				property(PROPERTY_OBJECT_HIDDEN), URI_HIDDEN_OBJECT_ORDINARY);
+		indOrdinary.addObjectPropertyStatement(
+				property(PROPERTY_OBJECT_VISIBLE), URI_VISIBLE_OBJECT_ORDINARY);
+		indOrdinary.addObjectPropertyStatement(property(PROPERTY_OBJECT_MAYBE),
 				URI_MAYBE_OBJECT_ORDINARY);
 
 		filteredOrdinary = new IndividualFiltering(indOrdinary,
 				new IndividualBasedFilter());
+	}
+
+	private ObjectProperty property(String propertyUri) {
+		return property(propertyUri, SOME_URI, SOME_URI);
+	}
+
+	private ObjectProperty property(String propertyUri, String domainUri,
+			String rangeUri) {
+		ObjectProperty op = new ObjectProperty();
+		op.setURI(propertyUri);
+		op.setDomainVClassURI(domainUri);
+		op.setRangeVClassURI(rangeUri);
+		return op;
 	}
 
 	// ----------------------------------------------------------------------
@@ -361,6 +386,41 @@ public class IndividualFilteringByStatementTest extends AbstractTestClass {
 	@Test
 	public void onOrdinary_getPopulatedObjectPropertyList() {
 		fail("onOrdinary_getPopulatedObjectPropertyList not implemented");
+	}
+
+	// ----------------------------------------------------------------------
+	// Tests on Faux object properties
+	// ----------------------------------------------------------------------
+	@Test
+	public void hiddenFauxWithVisibleBase() {
+		indOrdinary.addObjectPropertyStatement(
+				property(PROPERTY_OBJECT_VISIBLE, FAUX_DOMAIN_HIDDEN,
+						FAUX_RANGE_HIDDEN), URI_FAUX_HIDDEN_ORDINARY);
+		filteredOrdinary = new IndividualFiltering(indOrdinary,
+				new IndividualBasedFilter());
+
+		List<ObjectPropertyStatement> expected = opsList(filteredOrdinary,
+				ops(PROPERTY_OBJECT_VISIBLE, URI_VISIBLE_OBJECT_ORDINARY));
+		List<ObjectPropertyStatement> actual = filteredOrdinary
+				.getObjectPropertyStatements();
+		assertEquivalentOpsList("hidden faux is not visible", expected, actual);
+	}
+
+	@Test
+	public void visibleFauxWithHiddenBase() {
+		indOrdinary.addObjectPropertyStatement(
+				property(PROPERTY_OBJECT_HIDDEN, FAUX_DOMAIN_VISIBLE,
+						FAUX_RANGE_VISIBLE), URI_FAUX_VISIBLE_ORDINARY);
+		filteredOrdinary = new IndividualFiltering(indOrdinary,
+				new IndividualBasedFilter());
+
+		List<ObjectPropertyStatement> expected = opsList(filteredOrdinary,
+				ops(PROPERTY_OBJECT_VISIBLE, URI_VISIBLE_OBJECT_ORDINARY),
+				ops(PROPERTY_OBJECT_HIDDEN, URI_FAUX_VISIBLE_ORDINARY));
+		List<ObjectPropertyStatement> actual = filteredOrdinary
+				.getObjectPropertyStatements();
+		assertEquivalentOpsList("visible faux even if base is hidden",
+				expected, actual);
 	}
 
 	// ----------------------------------------------------------------------
@@ -726,13 +786,32 @@ public class IndividualFilteringByStatementTest extends AbstractTestClass {
 			@Override
 			public Boolean fn(ObjectPropertyStatement ops) {
 				if (PROPERTY_OBJECT_VISIBLE.equals(ops.getPropertyURI())) {
-					return true;
+					if (isFauxHidden(ops)) {
+						return false;
+					} else {
+						return true;
+					}
 				}
 				if (PROPERTY_OBJECT_MAYBE.equals(ops.getPropertyURI())
 						&& URI_INDIVIDUAL_SPECIAL.equals(ops.getSubjectURI())) {
 					return true;
 				}
+				if (isFauxVisible(ops)) {
+					return true;
+				}
 				return false;
+			}
+
+			private boolean isFauxHidden(ObjectPropertyStatement ops) {
+				ObjectProperty prop = ops.getProperty();
+				return FAUX_DOMAIN_HIDDEN.equals(prop.getDomainVClassURI())
+						&& FAUX_RANGE_HIDDEN.equals(prop.getRangeVClassURI());
+			}
+
+			private boolean isFauxVisible(ObjectPropertyStatement ops) {
+				ObjectProperty prop = ops.getProperty();
+				return FAUX_DOMAIN_VISIBLE.equals(prop.getDomainVClassURI())
+						&& FAUX_RANGE_VISIBLE.equals(prop.getRangeVClassURI());
 			}
 		}
 
