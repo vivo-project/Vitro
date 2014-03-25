@@ -34,8 +34,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.publish.PublishData
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.publish.PublishObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RdfResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -171,15 +169,16 @@ public class IndividualRdfAssembler {
 						+ "WHERE { <%1$s> ?predicate ?object ."
 						+ " ?object <%2$s> ?label . } ", individualUri,
 				RDFS.label)));
-		m.add(runConstructQuery(String
-				.format("CONSTRUCT { ?subject <%2$s> ?type .	} "
+		m.add(runConstructQuery(String.format(
+				"CONSTRUCT { ?subject <%2$s> ?type .	} "
 						+ "WHERE { ?subject ?predicate <%1$s> ."
-						+ " ?subject <%2$s> ?type . } ", individualUri, RDF.type)));
+						+ " ?subject <%2$s> ?type . } ", individualUri,
+				RDF.type)));
 		m.add(runConstructQuery(String.format(
 				"CONSTRUCT { ?subject <%2$s> ?label .	} "
 						+ "WHERE { ?subject ?predicate <%1$s> ."
 						+ " ?subject <%2$s> ?label . } ", individualUri,
-						RDFS.label)));
+				RDFS.label)));
 		return m;
 	}
 
@@ -213,9 +212,8 @@ public class IndividualRdfAssembler {
 				}
 			} else if (stmt.getObject().isURIResource()) {
 				String objectUri = stmt.getObject().asResource().getURI();
-				ObjectPropertyStatement ops = new ObjectPropertyStatementImpl(
+				RequestedAction pops = new PublishObjectPropertyStatement(o,
 						subjectUri, predicateUri, objectUri);
-				RequestedAction pops = new PublishObjectPropertyStatement(o, ops);
 				if (!PolicyHelper.isAuthorizedForActions(vreq, pops)) {
 					log.debug("not authorized: " + pops);
 					stmts.remove();

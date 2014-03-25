@@ -209,7 +209,9 @@ public class PropertyRestrictionPolicyHelper {
                 	role = faux.getHiddenFromPublishBelowRoleLevel();
                 }
                 if (role != null) {
-                    log.debug("Putting D:" + faux.getDomainVClassURI() + " P:" + faux.getURI() + " R:" + faux.getRangeVClassURI() + " ==> L:" + role);
+					log.debug("Putting D:" + faux.getDomainVClassURI() + " P:"
+							+ faux.getURI() + " R:" + faux.getRangeVClassURI()
+							+ " ==> L:" + role);
                     map.put(new Pair<String,Pair<String,String>>(
                             faux.getDomainVClassURI(), new Pair<String,String>(
                                     faux.getURI(), faux.getRangeVClassURI())), role);

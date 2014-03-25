@@ -4,8 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
 /**
@@ -24,23 +22,6 @@ public abstract class AbstractObjectPropertyStatementAction extends
 		this.subjectUri = subjectUri;
 		this.predicate = predicate;
 		this.objectUri = objectUri;
-	}
-
-	public AbstractObjectPropertyStatementAction(OntModel ontModel,
-			ObjectPropertyStatement ops) {
-		super(ontModel);
-		this.subjectUri = (ops.getSubject() == null) ? ops.getSubjectURI()
-				: ops.getSubject().getURI();
-		this.predicate = (ops.getProperty() == null) ? createProperty(ops
-				.getPropertyURI()) : ops.getProperty();
-		this.objectUri = (ops.getObject() == null) ? ops.getObjectURI() : ops
-				.getObject().getURI();
-	}
-
-	private ObjectProperty createProperty(String propertyURI) {
-		ObjectProperty op = new ObjectProperty();
-		op.setURI(propertyURI);
-		return op;
 	}
 
 	public String getSubjectUri() {

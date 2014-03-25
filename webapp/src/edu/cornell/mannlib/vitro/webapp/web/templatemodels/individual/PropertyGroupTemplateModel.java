@@ -21,8 +21,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -82,9 +80,8 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 			return true;
 		}
 	
-		ObjectPropertyStatement ops = new ObjectPropertyStatementImpl(
-				subject.getURI(), op.getURI(), SOME_URI);
-		RequestedAction dops = new DisplayObjectPropertyStatement(ops);
+		RequestedAction dops = new DisplayObjectPropertyStatement(
+				subject.getURI(), op, SOME_URI);
 		if (PolicyHelper.isAuthorizedForActions(vreq, dops)) {
 			return true;
 		}
@@ -122,7 +119,8 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
     }
     
 
-    public String toString(){
+    @Override
+	public String toString(){
         String ptmStr ="";
         for( int i=0; i < properties.size() ; i ++ ){
             PropertyTemplateModel ptm = properties.get(i);

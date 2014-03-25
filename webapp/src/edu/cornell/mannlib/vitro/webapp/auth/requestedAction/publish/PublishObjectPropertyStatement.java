@@ -4,8 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.publish;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyStatementAction;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
 /**
@@ -20,9 +20,20 @@ public class PublishObjectPropertyStatement extends
 		super(ontModel, subjectUri, keywordPred, objectUri);
 	}
 
+	/**
+	 * We don't need to know range and domain because publishing never involves
+	 * faux properties.
+	 */
 	public PublishObjectPropertyStatement(OntModel ontModel,
-			ObjectPropertyStatement ops) {
-		super(ontModel, ops);
+			String subjectUri,
+			String predicateUri, String objectUri) {
+		this(ontModel, subjectUri, populateProperty(predicateUri), objectUri);
 	}
 
+	private static Property populateProperty(String predicateUri) {
+		Property prop = new Property(predicateUri);
+		prop.setDomainVClassURI(RequestActionConstants.SOME_URI);
+		prop.setRangeVClassURI(RequestActionConstants.SOME_URI);
+		return prop;
+	}
 }

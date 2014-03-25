@@ -14,6 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayData
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -88,7 +89,31 @@ public class HideFromDisplayByPolicyFilter extends VitroFiltersImpl {
 			UnaryFunctor<ObjectPropertyStatement, Boolean> {
 		@Override
 		public Boolean fn(ObjectPropertyStatement ops) {
-			return checkAuthorization(new DisplayObjectPropertyStatement(ops));
+			String subjectUri = ops.getSubjectURI();
+			ObjectProperty predicate = getOrCreateProperty(ops);
+			String objectUri = ops.getObjectURI();
+			return checkAuthorization(new DisplayObjectPropertyStatement(
+					subjectUri, predicate, objectUri));
 		}
+
+		/**
+		 * It would be nice if every ObjectPropertyStatement held a real
+		 * ObjectProperty. If it doesn't, we do the next best thing, but it
+		 * won't recognize any applicaable Faux properties.
+		 */
+		private ObjectProperty getOrCreateProperty(ObjectPropertyStatement ops) {
+			if (ops.getProperty() != null) {
+				return ops.getProperty();
+			}
+			if (ops.getPropertyURI() == null) {
+				return null;
+			}
+			ObjectProperty op = new ObjectProperty();
+			op.setURI(ops.getPropertyURI());
+			op.setDomainVClassURI(RequestActionConstants.SOME_URI);
+			op.setRangeVClassURI(RequestActionConstants.SOME_URI);
+			return op;
+		}
+
 	}
 }
