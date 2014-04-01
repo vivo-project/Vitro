@@ -202,6 +202,25 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             }            
             p.setProhibitedFromUpdateBelowRoleLevel(prohibitedRoleLevel); //this might get set to null
 
+            //There might be multiple HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT properties, only use the highest
+            it = op.listProperties(HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT);
+            BaseResourceBean.RoleLevel publishRoleLevel = null;
+            while( it.hasNext() ){
+                Statement stmt = it.nextStatement();
+                RDFNode obj;
+                if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
+                    Resource res = obj.as(Resource.class);
+                    if( res != null && res.getURI() != null ){
+                        BaseResourceBean.RoleLevel roleFromModel =  BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
+                        if( roleFromModel != null && 
+                            (publishRoleLevel == null || roleFromModel.compareTo(publishRoleLevel) > 0 )){
+                            publishRoleLevel = roleFromModel;                            
+                        }
+                    }
+                }
+            }            
+            p.setHiddenFromPublishBelowRoleLevel(publishRoleLevel); //this might get set to null
+
             p.setCustomEntryForm(getPropertyStringValue(op,PROPERTY_CUSTOMENTRYFORMANNOT));
             Boolean selectFromObj = getPropertyBooleanValue(op,PROPERTY_SELECTFROMEXISTINGANNOT);
             p.setSelectFromExisting(selectFromObj==null ? true : selectFromObj);
@@ -315,7 +334,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
                 "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
                 "SELECT ?range ?rangeRoot ?label ?group ?customForm ?displayRank ?displayLevel " +
-                "    ?updateLevel ?editLinkSuppressed ?addLinkSuppressed ?deleteLinkSuppressed \n" +
+                "    ?updateLevel ?publishLevel ?editLinkSuppressed ?addLinkSuppressed ?deleteLinkSuppressed \n" +
                 "    ?collateBySubclass ?displayLimit ?individualSortProperty \n" +
                 "    ?entitySortDirection ?selectFromExisting ?offerCreateNew \n" +
                 "    ?publicDescription ?stubDeletion \n" + 
@@ -341,6 +360,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 "    OPTIONAL { ?configuration vitro:customEntryFormAnnot ?customForm } \n" +
                 "    OPTIONAL { ?configuration vitro:hiddenFromDisplayBelowRoleLevelAnnot ?displayLevel } \n" +
                 "    OPTIONAL { ?configuration vitro:prohibitedFromUpdateBelowRoleLevelAnnot ?updateLevel } \n" +
+                "    OPTIONAL { ?configuration vitro:hiddenFromPublishBelowRoleLevelAnnot ?publishLevel } \n" +
                 "    OPTIONAL { ?configuration <" + PROPERTY_COLLATEBYSUBCLASSANNOT.getURI() + "> ?collateBySubclass } \n" +
                 "    OPTIONAL { ?configuration <" + DISPLAY_LIMIT.getURI() + "> ?displayLimit } \n" +
                 "    OPTIONAL { ?configuration <" + PROPERTY_OBJECTINDIVIDUALSORTPROPERTY.getURI() + "> ?individualSortProperty } \n " +
@@ -391,6 +411,12 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                     op.setProhibitedFromUpdateBelowRoleLevel(
                             BaseResourceBean.RoleLevel.getRoleByUri(
                                     updateLevelRes.getURI()));
+                }
+                Resource publishLevelRes = qsoln.getResource("publishLevel");
+                if (publishLevelRes != null) {
+                    op.setHiddenFromPublishBelowRoleLevel(
+                            BaseResourceBean.RoleLevel.getRoleByUri(
+                                    publishLevelRes.getURI()));
                 }
                 Literal labelLit = qsoln.getLiteral("label");
                 if (labelLit != null) {
@@ -737,6 +763,10 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 
         if (prop.getProhibitedFromUpdateBelowRoleLevel() != null) {
         	updatePropertyResourceURIValue(p, PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT, prop.getProhibitedFromUpdateBelowRoleLevel().getURI());
+        }
+
+        if (prop.getHiddenFromPublishBelowRoleLevel() != null) {
+        	updatePropertyResourceURIValue(p, HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT, prop.getHiddenFromPublishBelowRoleLevel().getURI());
         }
 
         updatePropertyStringValue(p,PROPERTY_CUSTOMENTRYFORMANNOT,prop.getCustomEntryForm(),ontModel);

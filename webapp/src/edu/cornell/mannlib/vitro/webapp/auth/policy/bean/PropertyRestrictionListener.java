@@ -37,8 +37,9 @@ public class PropertyRestrictionListener implements ChangeListener {
 	@Override
 	public void doDeleted(Object oldObj, EditProcessObject epo) {
 		Property p = (Property) oldObj;
-		if (eitherRoleChanged(p.getHiddenFromDisplayBelowRoleLevel(),
-				p.getProhibitedFromUpdateBelowRoleLevel(), null, null)) {
+		if (anyRoleChanged(p.getHiddenFromDisplayBelowRoleLevel(),
+				p.getProhibitedFromUpdateBelowRoleLevel(),
+				p.getHiddenFromPublishBelowRoleLevel(), null, null, null)) {
 			log.debug("rebuilding the PropertyRestrictionPolicyHelper after deletion");
 			createAndSetBean();
 		}
@@ -50,9 +51,10 @@ public class PropertyRestrictionListener implements ChangeListener {
 	@Override
 	public void doInserted(Object newObj, EditProcessObject epo) {
 		Property p = (Property) newObj;
-		if (eitherRoleChanged(null, null,
+		if (anyRoleChanged(null, null, null,
 				p.getHiddenFromDisplayBelowRoleLevel(),
-				p.getProhibitedFromUpdateBelowRoleLevel())) {
+				p.getProhibitedFromUpdateBelowRoleLevel(),
+				p.getHiddenFromPublishBelowRoleLevel())) {
 			log.debug("rebuilding the PropertyRestrictionPolicyHelper after insertion");
 			createAndSetBean();
 		}
@@ -65,20 +67,24 @@ public class PropertyRestrictionListener implements ChangeListener {
 	public void doUpdated(Object oldObj, Object newObj, EditProcessObject epo) {
 		Property oldP = (Property) oldObj;
 		Property newP = (Property) newObj;
-		if (eitherRoleChanged(oldP.getHiddenFromDisplayBelowRoleLevel(),
+		if (anyRoleChanged(oldP.getHiddenFromDisplayBelowRoleLevel(),
 				oldP.getProhibitedFromUpdateBelowRoleLevel(),
+				oldP.getHiddenFromPublishBelowRoleLevel(),
 				newP.getHiddenFromDisplayBelowRoleLevel(),
-				newP.getProhibitedFromUpdateBelowRoleLevel())) {
+				newP.getProhibitedFromUpdateBelowRoleLevel(),
+				newP.getHiddenFromPublishBelowRoleLevel())) {
 			log.debug("rebuilding the PropertyRestrictionPolicyHelper after update");
 			createAndSetBean();
 		}
 	}
 
-	private boolean eitherRoleChanged(RoleLevel oldDisplayRole,
-			RoleLevel oldUpdateRole, RoleLevel newDisplayRole,
-			RoleLevel newUpdateRole) {
+	private boolean anyRoleChanged(RoleLevel oldDisplayRole,
+			RoleLevel oldUpdateRole, RoleLevel oldPublishRole,
+			RoleLevel newDisplayRole, RoleLevel newUpdateRole,
+			RoleLevel newPublishRole) {
 		return (!isTheSame(oldDisplayRole, newDisplayRole))
-				|| (!isTheSame(oldUpdateRole, newUpdateRole));
+				|| (!isTheSame(oldUpdateRole, newUpdateRole))
+				|| (!isTheSame(oldPublishRole, newPublishRole));
 	}
 
 	private boolean isTheSame(RoleLevel oldRole, RoleLevel newRole) {

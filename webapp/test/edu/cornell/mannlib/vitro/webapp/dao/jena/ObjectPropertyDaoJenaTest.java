@@ -149,6 +149,7 @@ public class ObjectPropertyDaoJenaTest extends AbstractTestClass {
 		property1.setPropertyValue(subModel.createProperty(VitroVocabulary.PROPERTY_OBJECTINDIVIDUALSORTPROPERTY), subModel.createResource("http://thisIsTheObjectIndividualSortProperty"));
 		property1.setPropertyValue(subModel.createProperty(VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT), subModel.createResource("http://vitro.mannlib.cornell.edu/ns/vitro/role#curator"));
 		property1.setPropertyValue(subModel.createProperty(VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT), subModel.createResource("http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor"));
+		property1.setPropertyValue(subModel.createProperty(VitroVocabulary.HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT), subModel.createResource("http://vitro.mannlib.cornell.edu/ns/vitro/role#editor"));
 		property1.setPropertyValue(subModel.createProperty(VitroVocabulary.PROPERTY_INPROPERTYGROUPANNOT), subModel.createResource("http://thisIsTheInPropertyGroupURI"));
 		property1.setPropertyValue(subModel.createProperty(VitroVocabulary.PROPERTY_CUSTOMENTRYFORMANNOT), subModel.createResource("http://thisIsTheCustomFormEntryURI"));
 		property1.setPropertyValue(subModel.createProperty(VitroVocabulary.PROPERTY_SELECTFROMEXISTINGANNOT), subModel.createTypedLiteral(true));

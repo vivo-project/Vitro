@@ -92,6 +92,7 @@ public class VClassJenaTest {
 		class1.setPropertyValue(ontModel.createProperty(VitroVocabulary.SEARCH_BOOST_ANNOT), ontModel.createTypedLiteral(2.4f));
 		class1.setPropertyValue(ontModel.createProperty(VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT), ontModel.createResource("http://vitro.mannlib.cornell.edu/ns/vitro/role#curator"));
 		class1.setPropertyValue(ontModel.createProperty(VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT), ontModel.createResource("http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor"));
+		class1.setPropertyValue(ontModel.createProperty(VitroVocabulary.HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT), ontModel.createResource("http://vitro.mannlib.cornell.edu/ns/vitro/role#editor"));
 		class1.setPropertyValue(ontModel.createProperty(VitroVocabulary.PROPERTY_CUSTOMENTRYFORMANNOT), ontModel.createTypedLiteral("this is the custom entry form annotation"));
 		class1.setPropertyValue(ontModel.createProperty(VitroVocabulary.PROPERTY_CUSTOMDISPLAYVIEWANNOT), ontModel.createTypedLiteral("this is the custom display view annotation"));
 		class1.setPropertyValue(ontModel.createProperty(VitroVocabulary.PROPERTY_CUSTOMSHORTVIEWANNOT), ontModel.createTypedLiteral("this is the custom short view annotation"));
@@ -126,6 +127,7 @@ public class VClassJenaTest {
 		Assert.assertEquals(vClassJena.getSearchBoost(), vClass.getSearchBoost());  
 		Assert.assertEquals(vClassJena.getHiddenFromDisplayBelowRoleLevel(), vClass.getHiddenFromDisplayBelowRoleLevel());
 		Assert.assertEquals(vClassJena.getProhibitedFromUpdateBelowRoleLevel(), vClass.getProhibitedFromUpdateBelowRoleLevel());
+		Assert.assertEquals(vClassJena.getHiddenFromPublishBelowRoleLevel(), vClass.getHiddenFromPublishBelowRoleLevel());
     
 	}
 
@@ -156,6 +158,7 @@ public class VClassJenaTest {
     protected AnnotationProperty LOCAL_PROPERTY_CUSTOMSEARCHVIEWANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROPERTY_CUSTOMSEARCHVIEWANNOT);
     protected AnnotationProperty LOCAL_HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);    
     protected AnnotationProperty LOCAL_PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);    
+    protected AnnotationProperty LOCAL_HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT = _constModel.createAnnotationProperty(VitroVocabulary.HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT);    
     protected AnnotationProperty LOCAL_IN_CLASSGROUP = _constModel.createAnnotationProperty(VitroVocabulary.IN_CLASSGROUP);
 	
  
@@ -234,6 +237,25 @@ public class VClassJenaTest {
             }            
             vcw.setProhibitedFromUpdateBelowRoleLevel(prohibitedRoleLevel);//this might get set to null
             
+            //There might be multiple LOCAL_HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT properties, only use the highest
+            it = cls.listProperties(LOCAL_HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT);
+            BaseResourceBean.RoleLevel publishRoleLevel = null;
+            while( it.hasNext() ){
+                Statement stmt = it.nextStatement();
+                RDFNode obj;
+                if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
+                    Resource res = (Resource)obj.as(Resource.class);
+                    if( res != null && res.getURI() != null ){
+                        BaseResourceBean.RoleLevel roleFromModel = BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
+                        if( roleFromModel != null && 
+                            (publishRoleLevel == null || roleFromModel.compareTo(publishRoleLevel) > 0 )){
+                            publishRoleLevel = roleFromModel;                            
+                        }
+                    }
+                }
+            }            
+            vcw.setHiddenFromPublishBelowRoleLevel(publishRoleLevel);//this might get set to null
+
         } finally {
             cls.getModel().leaveCriticalSection();
         }

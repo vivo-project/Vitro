@@ -147,6 +147,7 @@ public class VclassRetryController extends BaseEditController {
 
         optionMap.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(vclassForEditing));    
         optionMap.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(vclassForEditing));
+        optionMap.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getPublishOptionsList(vclassForEditing));    
 
         FormObject foo = new FormObject();
         foo.setErrorMap(epo.getErrMsgMap());

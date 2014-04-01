@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_LITERAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_URI;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,9 +13,12 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataProperty;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -38,11 +44,11 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
         
         List<Property> propertyList = group.getPropertyList();
         properties = new ArrayList<PropertyTemplateModel>(propertyList.size());
+        
         for (Property p : propertyList)  {
             if (p instanceof ObjectProperty) {
                 ObjectProperty op = (ObjectProperty) p;
-                RequestedAction dop = new DisplayObjectProperty(op);
-                if (!PolicyHelper.isAuthorizedForActions(vreq, dop)) {
+                if (!allowedToDisplay(vreq, op, subject)) {
                     continue;
                 }
                 ObjectPropertyTemplateModel tm = ObjectPropertyTemplateModel.getObjectPropertyTemplateModel(
@@ -53,8 +59,7 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 
             } else if (p instanceof DataProperty){
                 DataProperty dp = (DataProperty) p;
-                RequestedAction dop = new DisplayDataProperty(dp);
-                if (!PolicyHelper.isAuthorizedForActions(vreq, dop)) {
+                if (!allowedToDisplay(vreq, dp, subject))  {
                     continue;
                 }
                 properties.add(new DataPropertyTemplateModel(dp, subject, vreq, editing, populatedDataPropertyList));
@@ -64,7 +69,48 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
         }
     }
 
-    protected boolean isEmpty() {
+	/**
+	 * See if the property is permitted in its own right. If not, the property
+	 * statement might still be permitted to a self-editor.
+	 */
+	private boolean allowedToDisplay(VitroRequest vreq, ObjectProperty op,
+			Individual subject) {
+		RequestedAction dop = new DisplayObjectProperty(op);
+		if (PolicyHelper.isAuthorizedForActions(vreq, dop)) {
+			return true;
+		}
+	
+		RequestedAction dops = new DisplayObjectPropertyStatement(
+				subject.getURI(), op, SOME_URI);
+		if (PolicyHelper.isAuthorizedForActions(vreq, dops)) {
+			return true;
+		}
+		
+		return false;
+	}
+
+	/**
+	 * See if the property is permitted in its own right. If not, the property
+	 * statement might still be permitted to a self-editor.
+	 */
+	private boolean allowedToDisplay(VitroRequest vreq, DataProperty dp,
+			Individual subject) {
+		RequestedAction dop = new DisplayDataProperty(dp);
+		if (PolicyHelper.isAuthorizedForActions(vreq, dop)) {
+			return true;
+		}
+
+		DataPropertyStatementImpl dps = new DataPropertyStatementImpl(
+				subject.getURI(), dp.getURI(), SOME_LITERAL);
+		RequestedAction dops = new DisplayDataPropertyStatement(dps);
+		if (PolicyHelper.isAuthorizedForActions(vreq, dops)) {
+			return true;
+		}
+	
+		return false;
+	}
+
+	protected boolean isEmpty() {
         return properties.isEmpty();
     }
     
@@ -73,7 +119,8 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
     }
     
 
-    public String toString(){
+    @Override
+	public String toString(){
         String ptmStr ="";
         for( int i=0; i < properties.size() ; i ++ ){
             PropertyTemplateModel ptm = properties.get(i);

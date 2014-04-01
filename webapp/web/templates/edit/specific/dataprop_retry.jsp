@@ -125,13 +125,23 @@
 <tr class="editformcell">
 	<td valign="top" colspan="2">
 		<b>Display level</b><br/>
-		<select name="HiddenFromDisplayBelowRoleLevelUsingRoleUri"><form:option name="HiddenFromDisplayBelowRoleLevelUsingRoleUri"/></select><br/>
-		<i>specify least restrictive level allowed</i><br/>
+		<select name="HiddenFromDisplayBelowRoleLevelUsingRoleUri">
+		    <form:option name="HiddenFromDisplayBelowRoleLevelUsingRoleUri"/>
+		</select>
 	</td>
 	<td valign="top" colspan="2">
 		<b>Update level</b><br />
-		<select name="ProhibitedFromUpdateBelowRoleLevelUsingRoleUri"><form:option name="ProhibitedFromUpdateBelowRoleLevelUsingRoleUri"/></select><br/>
-		<i>specify least restrictive level allowed</i><br/>
+		<select name="ProhibitedFromUpdateBelowRoleLevelUsingRoleUri">
+		    <form:option name="ProhibitedFromUpdateBelowRoleLevelUsingRoleUri"/>
+		</select>
+	</td>
+</tr>
+<tr class="editformcell">
+	<td valign="top" colspan="2">
+		<b>Publish level</b><br/>
+		<select name="HiddenFromPublishBelowRoleLevelUsingRoleUri">
+		    <form:option name="HiddenFromPublishBelowRoleLevelUsingRoleUri"/>
+		</select>
 	</td>
 </tr>
 <tr><td colspan="5"><hr class="formDivider"/></td></tr>

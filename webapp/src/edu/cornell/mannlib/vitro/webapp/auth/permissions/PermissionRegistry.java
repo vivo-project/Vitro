@@ -152,6 +152,7 @@ public class PermissionRegistry {
 				permissions.addAll(SimplePermission.getAllInstances());
 				permissions.addAll(createDisplayByRolePermissions(ctx));
 				permissions.addAll(createEditByRolePermissions(ctx));
+				permissions.addAll(createPublishByRolePermissions(ctx));
 
 				PermissionRegistry.createRegistry(ctx, permissions);
 
@@ -202,6 +203,25 @@ public class PermissionRegistry {
 		@Override
 		public void contextDestroyed(ServletContextEvent sce) {
 			sce.getServletContext().removeAttribute(ATTRIBUTE_NAME);
+		}
+
+		/**
+		 * There is no PublishByRolePermission for self-editors. They get the
+		 * same rights as PUBLIC. Other permissions give them their self-editing
+		 * privileges.
+		 */
+		private Collection<Permission> createPublishByRolePermissions(
+				ServletContext ctx) {
+			List<Permission> list = new ArrayList<Permission>();
+			list.add(new PublishByRolePermission("Admin", RoleLevel.DB_ADMIN,
+					ctx));
+			list.add(new PublishByRolePermission("Curator", RoleLevel.CURATOR,
+					ctx));
+			list.add(new PublishByRolePermission("Editor", RoleLevel.EDITOR,
+					ctx));
+			list.add(new PublishByRolePermission("Public", RoleLevel.PUBLIC,
+					ctx));
+			return list;
 		}
 	}
 }

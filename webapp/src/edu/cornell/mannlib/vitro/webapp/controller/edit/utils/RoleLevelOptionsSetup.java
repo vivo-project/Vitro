@@ -23,7 +23,7 @@ public class RoleLevelOptionsSetup {
             boolean someLevelSet=false;
             Option publicOption = null;
             for (BaseResourceBean.RoleLevel level : roles) {
-                Option option = new Option (level.getURI(),level.getLabel(),false);
+                Option option = new Option (level.getURI(),level.getDisplayLabel(),false);
                 if (level==BaseResourceBean.RoleLevel.PUBLIC) {
                     publicOption = option;
                 }
@@ -50,7 +50,7 @@ public class RoleLevelOptionsSetup {
             boolean someLevelSet=false;
             Option publicOption = null;
             for (BaseResourceBean.RoleLevel level : roles) {
-                Option option = new Option (level.getURI(),level.getLabel(),false);
+                Option option = new Option (level.getURI(),level.getUpdateLabel(),false);
                 if (level==BaseResourceBean.RoleLevel.PUBLIC) {
                     publicOption = option;
                 }
@@ -68,4 +68,33 @@ public class RoleLevelOptionsSetup {
         }
         return prohibitedFromUpdateList;
     }
+
+    public static List<Option> getPublishOptionsList(ResourceBean b) {
+        List<Option> hiddenFromPublishList = new LinkedList<Option>();
+        try {
+            BaseResourceBean.RoleLevel currentLevel = b.getHiddenFromPublishBelowRoleLevel();
+            BaseResourceBean.RoleLevel roles[] = BaseResourceBean.RoleLevel.values();
+            boolean someLevelSet=false;
+            Option publicOption = null;
+            for (BaseResourceBean.RoleLevel level : roles) {
+                Option option = new Option (level.getURI(),level.getDisplayLabel(),false);
+                if (level==BaseResourceBean.RoleLevel.PUBLIC) {
+                    publicOption = option;
+                }
+                if (level==currentLevel) {
+                    option.setSelected(true);
+                    someLevelSet=true;
+                }
+                hiddenFromPublishList.add(option);
+            }
+            if (!someLevelSet) {
+                publicOption.setSelected(true);
+            }
+        } catch (Exception ex) {
+            log.error("cannot create HiddenFromPublishBelowRoleLevel options");
+        }
+        return hiddenFromPublishList;
+    }
+    
+
 }

@@ -70,6 +70,7 @@ public class VClassDaoTest {
 		class1.setPropertyValue(subModel.createProperty(VitroVocabulary.SEARCH_BOOST_ANNOT), subModel.createTypedLiteral(2.4f));
 		class1.setPropertyValue(subModel.createProperty(VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT), subModel.createResource("http://vitro.mannlib.cornell.edu/ns/vitro/role#curator"));
 		class1.setPropertyValue(subModel.createProperty(VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT), subModel.createResource("http://vitro.mannlib.cornell.edu/ns/vitro/role#selfEditor"));
+		class1.setPropertyValue(subModel.createProperty(VitroVocabulary.HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT), subModel.createResource("http://vitro.mannlib.cornell.edu/ns/vitro/role#editor"));
 		class1.setPropertyValue(subModel.createProperty(VitroVocabulary.PROPERTY_CUSTOMENTRYFORMANNOT), subModel.createTypedLiteral("this is the custom entry form annotation"));
 		class1.setPropertyValue(subModel.createProperty(VitroVocabulary.PROPERTY_CUSTOMDISPLAYVIEWANNOT), subModel.createTypedLiteral("this is the custom display view annotation"));
 		class1.setPropertyValue(subModel.createProperty(VitroVocabulary.PROPERTY_CUSTOMSHORTVIEWANNOT), subModel.createTypedLiteral("this is the custom short view annotation"));

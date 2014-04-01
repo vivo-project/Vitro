@@ -95,7 +95,7 @@ public class DisplayRestrictedDataToSelfPolicy implements PolicyIface {
 		String subjectUri = stmt.getIndividualURI();
 		Property predicate = new Property(stmt.getDatapropURI());
 		if (canDisplayResource(subjectUri) && canDisplayPredicate(predicate)
-				&& isAboutAssociatedIndividual(individuals, stmt)) {
+				&& isAboutAssociatedIndividual(individuals, subjectUri)) {
 			return authorized("user may view DataPropertyStatement "
 					+ subjectUri + " ==> " + predicate.getURI());
 		} else {
@@ -112,19 +112,17 @@ public class DisplayRestrictedDataToSelfPolicy implements PolicyIface {
 	 */
 	private PolicyDecision isAuthorized(DisplayObjectPropertyStatement action,
 			Collection<String> individuals) {
-		ObjectPropertyStatement stmt = action.getObjectPropertyStatement();
-		String subjectUri = stmt.getSubjectURI();
-		String predicateUri = stmt.getPropertyURI();
-		String objectUri = stmt.getObjectURI();
-		if (canDisplayResource(subjectUri) && canDisplayPredicate(new Property
-		                (predicateUri))
+		String subjectUri = action.getSubjectUri();
+		Property predicate = action.getProperty();
+		String objectUri = action.getObjectUri();
+		if (canDisplayResource(subjectUri) && canDisplayPredicate(predicate)
 				&& canDisplayResource(objectUri)
-				&& isAboutAssociatedIndividual(individuals, stmt)) {
+				&& isAboutAssociatedIndividual(individuals, subjectUri, objectUri)) {
 			return authorized("user may view ObjectPropertyStatement "
-					+ subjectUri + " ==> " + predicateUri + " ==> " + objectUri);
+					+ subjectUri + " ==> " + predicate.getURI() + " ==> " + objectUri);
 		} else {
 			return defaultDecision("user may not view ObjectPropertyStatement "
-					+ subjectUri + " ==> " + predicateUri + " ==> " + objectUri);
+					+ subjectUri + " ==> " + predicate.getURI() + " ==> " + objectUri);
 		}
 	}
 
@@ -151,9 +149,9 @@ public class DisplayRestrictedDataToSelfPolicy implements PolicyIface {
 	}
 
 	private boolean isAboutAssociatedIndividual(Collection<String> selves,
-			DataPropertyStatement stmt) {
+			String subjectUri) {
 		for (String self : selves) {
-			if (self.equals(stmt.getIndividualURI())) {
+			if (self.equals(subjectUri)) {
 				return true;
 			}
 		}
@@ -161,10 +159,9 @@ public class DisplayRestrictedDataToSelfPolicy implements PolicyIface {
 	}
 
 	private boolean isAboutAssociatedIndividual(Collection<String> selves,
-			ObjectPropertyStatement stmt) {
+			String subjectUri, String objectUri) {
 		for (String self : selves) {
-			if (self.equals(stmt.getSubjectURI())
-					|| self.equals(stmt.getObjectURI())) {
+			if (self.equals(subjectUri) || self.equals(objectUri)) {
 				return true;
 			}
 		}
