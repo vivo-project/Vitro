@@ -45,7 +45,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 import fedora.client.FedoraClient;
 import fedora.common.Constants;
 import fedora.server.management.FedoraAPIM;
@@ -220,12 +219,22 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
     }
                 
     @Override
+	public long maximumMultipartFileSize() {
+    	return maxFileSize;
+	}
+
+	@Override
+	public boolean stashFileSizeException() {
+		return true;
+	}
+
+	@Override
 	public void doPost(HttpServletRequest rawRequest, HttpServletResponse res)
 			throws ServletException, IOException {
-        try{          
-        	FileUploadServletRequest req = FileUploadServletRequest.parseRequest(rawRequest, maxFileSize);
-       		if (req.hasFileUploadException()) {
-        		throw new FdcException("Size limit exceeded: " + req.getFileUploadException().getLocalizedMessage());
+        try{
+        	VitroRequest req = new VitroRequest(rawRequest);
+        	if (req.hasFileSizeException()) {
+        		throw new FdcException("Size limit exceeded: " + req.getFileSizeException().getLocalizedMessage());
         	}
         	if (!req.isMultipart()) {
         		throw new FdcException("Must POST a multipart encoded request");

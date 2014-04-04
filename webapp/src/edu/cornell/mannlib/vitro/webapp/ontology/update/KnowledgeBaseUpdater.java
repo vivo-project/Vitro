@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.ontology.update;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,15 +17,17 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openrdf.model.impl.URIImpl;
 
+import com.hp.hpl.jena.iri.IRI;
+import com.hp.hpl.jena.iri.IRIFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
@@ -234,6 +235,7 @@ public class KnowledgeBaseUpdater {
                 Model dedupeModel = dataset.getDefaultModel();
                 Model additions = jiu.renameBNodes(
                         anonModel, settings.getDefaultNamespace() + "n", dedupeModel);
+                additions = stripBadURIs(additions);
                 Model actualAdditions = ModelFactory.createDefaultModel();
                 StmtIterator stmtIt = additions.listStatements();      
                 while (stmtIt.hasNext()) {
@@ -249,7 +251,37 @@ public class KnowledgeBaseUpdater {
             
         }
     }
-	
+    
+    private Model stripBadURIs(Model additions) {
+        Model badURITriples = ModelFactory.createDefaultModel();
+        StmtIterator stmtIt = additions.listStatements();
+        while (stmtIt.hasNext()) {
+            String[] uris = new String[3];
+            Statement stmt = stmtIt.nextStatement();
+            if(stmt.getSubject().isURIResource()) {
+                uris[0] = stmt.getSubject().getURI();
+            }
+            uris[1] = stmt.getPredicate().getURI();
+            if(stmt.getObject().isURIResource()) {
+                uris[2] = ((Resource) stmt.getObject()).getURI();
+            }
+            for (int i = 0; i < 3; i++) {
+                String uri = uris[i];
+                if (uri != null) {
+                    IRIFactory factory = IRIFactory.jenaImplementation();
+                    IRI iri = factory.create(uri);
+                    if (iri.hasViolation(false)) {
+                        badURITriples.add(stmt);
+                        log.error("Discarding added triple " + stmt + " because " +
+                                  "it includes one or more invalid URIs.");
+                        break;
+                    } 
+                }
+            }
+        }
+        additions.remove(badURITriples);
+        return additions;
+    }
 	
 	private List<AtomicOntologyChange> getAtomicOntologyChanges() 
 			throws IOException {

@@ -42,7 +42,7 @@ public class RDFServiceUtils {
 			 * Every factory is wrapped in a logger, so we can dynamically
 			 * enable or disable logging.
 			 */
-        	return new LoggingRDFServiceFactory(context, factory);
+        	return new LoggingRDFServiceFactory(factory);
         } else {
         	log.error("Expecting an RDFServiceFactory on the context, but found " + o);
         	return null;

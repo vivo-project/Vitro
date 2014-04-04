@@ -3,15 +3,15 @@
 function DeveloperPanel(developerAjaxUrl) {
 	this.setupDeveloperPanel = updateDeveloperPanel;
 	
-	function updateDeveloperPanel(data) {
+	function updateDeveloperPanel() {
 	    $.ajax({
 	        url: developerAjaxUrl,
 	        dataType: "json",
-	        data: data,
+	        data: collectFormData(),
 	        complete: function(xhr, status) {
 	        	updatePanelContents(xhr.responseText);
 	        	if (document.getElementById("developerPanelSaveButton")) {
-	        		enablePanelOpener();
+	        		initializeTabs();
 	        		addBehaviorToElements();
 	        		updateDisabledFields();
 	        	}
@@ -23,66 +23,67 @@ function DeveloperPanel(developerAjaxUrl) {
 		document.getElementById("developerPanel").innerHTML = contents;
 	}
 	
-	function enablePanelOpener() {
-		document.getElementById("developerPanelClickMe").onclick = function() {
-					document.getElementById("developerPanelClickText").style.display = "none";
-					document.getElementById("developerPanelBody").style.display = "block";
-				};
+    function initializeTabs() {
+        $("#developerTabs").tabs();
+    }
+    
+	function addBehaviorToElements() {
+		$( "#developerPanelClickMe" ).click(openPanel);
+	    $( "#developerPanelSaveButton" ).click(updateDeveloperPanel);
+	    $( "#developerPanelBody [type=checkbox]" ).change(updateDisabledFields);
 	}
 	
-	function addBehaviorToElements() {
-	    document.getElementById("developerPanelSaveButton").onclick = function() {
-			updateDeveloperPanel(collectFormData());
-	    }
-	    document.getElementById("developerEnabled").onchange = updateDisabledFields
-	    document.getElementById("developerLoggingRDFServiceEnable").onchange = updateDisabledFields
+	function openPanel() {
+		$( "#developerPanelClickText" ).hide();
+		$( "#developerPanelBody" ).css( "display", "block" );
 	}
 	
 	function updateDisabledFields() {
-		var developerEnabled = document.getElementById("developerEnabled").checked;
-		document.getElementById("developerDefeatFreemarkerCache").disabled = !developerEnabled;
-		document.getElementById("developerInsertFreemarkerDelimiters").disabled = !developerEnabled;
-		document.getElementById("developerPageContentsLogCustomListView").disabled = !developerEnabled;
-		document.getElementById("developerPageContentsLogCustomShortView").disabled = !developerEnabled;
-		document.getElementById("developerI18nDefeatCache").disabled = !developerEnabled;
-		document.getElementById("developerI18nLogStringRequests").disabled = !developerEnabled;
-		document.getElementById("developerLoggingRDFServiceEnable").disabled = !developerEnabled;
+		var developerEnabled = document.getElementById("developer_enabled").checked;
+		document.getElementById("developer_permitAnonymousControl").disabled = !developerEnabled;
+		document.getElementById("developer_defeatFreemarkerCache").disabled = !developerEnabled;
+		document.getElementById("developer_insertFreemarkerDelimiters").disabled = !developerEnabled;
+		document.getElementById("developer_pageContents_logCustomListView").disabled = !developerEnabled;
+		document.getElementById("developer_pageContents_logCustomShortView").disabled = !developerEnabled;
+		document.getElementById("developer_i18n_defeatCache").disabled = !developerEnabled;
+		document.getElementById("developer_i18n_logStringRequests").disabled = !developerEnabled;
+		document.getElementById("developer_loggingRDFService_enable").disabled = !developerEnabled;
+		document.getElementById("developer_authorization_logDecisions_enable").disabled = !developerEnabled;
 	
-		var rdfServiceEnabled = developerEnabled && document.getElementById("developerLoggingRDFServiceEnable").checked;
-		document.getElementById("developerLoggingRDFServiceStackTrace").disabled = !rdfServiceEnabled;
-		document.getElementById("developerLoggingRDFServiceQueryRestriction").disabled = !rdfServiceEnabled;
-		document.getElementById("developerLoggingRDFServiceStackRestriction").disabled = !rdfServiceEnabled;
+		var rdfServiceEnabled = developerEnabled && document.getElementById("developer_loggingRDFService_enable").checked;
+		document.getElementById("developer_loggingRDFService_stackTrace").disabled = !rdfServiceEnabled;
+		document.getElementById("developer_loggingRDFService_queryRestriction").disabled = !rdfServiceEnabled;
+		document.getElementById("developer_loggingRDFService_stackRestriction").disabled = !rdfServiceEnabled;
+		
+		var authLoggingEnabled = developerEnabled && document.getElementById("developer_authorization_logDecisions_enable").checked;
+		document.getElementById("developer_authorization_logDecisions_skipInconclusive").disabled = !authLoggingEnabled;
+		document.getElementById("developer_authorization_logDecisions_addIdentifiers").disabled = !authLoggingEnabled;
+		document.getElementById("developer_authorization_logDecisions_actionRestriction").disabled = !authLoggingEnabled;
+		document.getElementById("developer_authorization_logDecisions_policyRestriction").disabled = !authLoggingEnabled;
+		document.getElementById("developer_authorization_logDecisions_userRestriction").disabled = !authLoggingEnabled;
 	}
 
 	function collectFormData() {
 		var data = new Object();
-		getCheckbox("developerEnabled", data);
-		getCheckbox("developerDefeatFreemarkerCache", data);
-		getCheckbox("developerInsertFreemarkerDelimiters", data);
-		getCheckbox("developerPageContentsLogCustomListView", data);
-		getCheckbox("developerPageContentsLogCustomShortView", data);
-		getCheckbox("developerI18nDefeatCache", data);
-		getCheckbox("developerI18nLogStringRequests", data);
-		getCheckbox("developerLoggingRDFServiceEnable", data);
-		getCheckbox("developerLoggingRDFServiceStackTrace", data);
-		getText("developerLoggingRDFServiceQueryRestriction", data);
-		getText("developerLoggingRDFServiceStackRestriction", data);
+		$( "#developerPanelBody [type=checkbox]" ).each(function(i, element){
+				data[element.id] = element.checked;
+			});
+		$( "#developerPanelBody [type=text]" ).each(function(i, element){
+				data[element.id] = element.value;
+			});
 		return data;
-	}
-
-	function getCheckbox(key, dest) {
-		dest[key] = document.getElementById(key).checked;
-	}
-	
-	function getText(key, dest) {
-		dest[key] = document.getElementById(key).value;
 	}
 }	
 
 /*
- * Relies on the global variable for the AJAX URL.
+ * Relies on the global variables for the AJAX URL and the CSS files.
  */
 $(document).ready(function() {   
-	new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel({});	
+	$.each(developerCssLinks, function(index, value){
+        var cssLink = $("<link rel='stylesheet' type='text/css' href='" + value + "'>");
+        $("head").append(cssLink); 
+    });	
+
+	new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel();	
 }); 
 

@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.developer;
 
-import static edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings.Keys.PERMIT_ANONYMOUS_CONTROL;
+import static edu.cornell.mannlib.vitro.webapp.utils.developer.Key.PERMIT_ANONYMOUS_CONTROL;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -42,7 +42,7 @@ public class DeveloperSettingsServlet extends VitroAjaxController {
 	@Override
 	protected void doRequest(VitroRequest vreq, HttpServletResponse resp)
 			throws ServletException, IOException {
-		DeveloperSettings settings = DeveloperSettings.getBean(vreq);
+		DeveloperSettings settings = DeveloperSettings.getInstance();
 
 		/*
 		 * Are they allowed to control the panel?
@@ -70,8 +70,9 @@ public class DeveloperSettingsServlet extends VitroAjaxController {
 	private Map<String, Object> buildBodyMap(boolean authorized,
 			DeveloperSettings settings) {
 		Map<String, Object> settingsMap = new HashMap<>();
-		settingsMap.putAll(settings.getSettingsMap());
+		settingsMap.putAll(settings.getRawSettingsMap());
 		settingsMap.put("mayControl", authorized);
+		
 		Map<String, Object> bodyMap = new HashMap<>();
 		bodyMap.put("settings", settingsMap);
 		return bodyMap;
@@ -84,7 +85,7 @@ public class DeveloperSettingsServlet extends VitroAjaxController {
 	}
 
 	private boolean isAuthorized(VitroRequest vreq) {
-		boolean authBySetting = DeveloperSettings.getBean(vreq).getBoolean(
+		boolean authBySetting = DeveloperSettings.getInstance().getBoolean(
 				PERMIT_ANONYMOUS_CONTROL);
 		boolean authByPolicy = PolicyHelper.isAuthorizedForActions(vreq,
 				SimplePermission.ENABLE_DEVELOPER_PANEL.ACTION);

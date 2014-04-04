@@ -52,6 +52,7 @@ public abstract class SelectedLocale {
 	 * <ul>
 	 * <li>The forced Locale in the servlet context</li>
 	 * <li>The selected Locale in the session</li>
+	 * <li>The first of the selectable Locales</li>
 	 * <li>null</li>
 	 * </ul>
 	 */
@@ -77,6 +78,17 @@ public abstract class SelectedLocale {
 				log.debug("Found selected locale in the session: "
 						+ selectedLocale);
 				return selectedLocale;
+			}
+		}
+
+		if (ctxInfo instanceof ContextSelectedLocale) {
+			List<Locale> selectableLocales = ((ContextSelectedLocale) ctxInfo)
+					.getSelectableLocales();
+			if (selectableLocales != null && !selectableLocales.isEmpty()) {
+				Locale defaultLocale = selectableLocales.get(0);
+				log.debug("Using first selectable locale as default: "
+						+ defaultLocale);
+				return defaultLocale;
 			}
 		}
 

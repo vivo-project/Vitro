@@ -21,8 +21,6 @@ import javax.servlet.ServletException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import stubs.edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettingsStub;
-
 /**
  * A simple stand-in for the {@link ServletContext}, for use in unit tests.
  */
@@ -38,11 +36,6 @@ public class ServletContextStub implements ServletContext {
 	private final Map<String, String> mockResources = new HashMap<String, String>();
 	private final Map<String, String> realPaths = new HashMap<String, String>();
 
-	public ServletContextStub() {
-		// Assume that unit tests won't want to use Developer mode.
-		DeveloperSettingsStub.set(this);
-	}
-	
 	public void setContextPath(String contextPath) {
 		if (contextPath == null) {
 			throw new NullPointerException("contextPath may not be null.");

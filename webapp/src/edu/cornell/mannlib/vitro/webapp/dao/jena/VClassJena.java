@@ -48,6 +48,16 @@ public class VClassJena extends VClass {
     }
     
     /**
+ 	 * Constructs the VClassJena as a deep copy of an existing VClassJena. 
+ 	 */
+     @Override
+	public VClassJena copy() {
+     	VClassJena that = new VClassJena(this.cls, this.webappDaoFactory);
+     	copyFields(that);
+     	return that;
+     }
+
+    /**
      * What this VClass is called
      */
     @Override
@@ -333,7 +343,7 @@ public class VClassJena extends VClass {
         } else {
             cls.getOntModel().enterCriticalSection(Lock.READ);
             try {            	
-                //There might be multiple PROHIBITED_FROM_UPDATE_DISPLAY_ANNOT properties, only use the highest
+                //There might be multiple PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT properties, only use the highest
             	StmtIterator it = cls.listProperties(webappDaoFactory.getJenaBaseDao().PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
                 BaseResourceBean.RoleLevel prohibitedRoleLevel = null;
                 while( it.hasNext() ){
@@ -357,6 +367,41 @@ public class VClassJena extends VClass {
                 cls.getOntModel().leaveCriticalSection();
             }
         }		 	                      
+    }
+    
+    @Override
+    public RoleLevel getHiddenFromPublishBelowRoleLevel() {
+       
+        if (this.hiddenFromPublishBelowRoleLevel != null) {
+            return this.hiddenFromPublishBelowRoleLevel;
+        } else {
+            cls.getOntModel().enterCriticalSection(Lock.READ);
+            try {            	
+                //There might be multiple HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT properties, only use the highest
+                StmtIterator it = cls.listProperties(webappDaoFactory.getJenaBaseDao().HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT);
+                BaseResourceBean.RoleLevel publishRoleLevel = null;
+            
+                while( it.hasNext() ){
+                    Statement stmt = it.nextStatement();
+                    RDFNode obj;
+                    if( stmt != null && (obj = stmt.getObject()) != null && obj.isURIResource() ){
+                        Resource res = obj.as(Resource.class);
+                        if( res != null && res.getURI() != null ){
+                            BaseResourceBean.RoleLevel roleFromModel = BaseResourceBean.RoleLevel.getRoleByUri(res.getURI());
+                            if( roleFromModel != null && 
+                                (publishRoleLevel == null || roleFromModel.compareTo(publishRoleLevel) > 0 )){
+                                publishRoleLevel = roleFromModel;                            
+                            }
+                        }
+                    }
+                }
+                
+                setHiddenFromPublishBelowRoleLevel(publishRoleLevel); //this might get set to null
+            	return this.hiddenFromPublishBelowRoleLevel;
+            } finally {
+                cls.getOntModel().leaveCriticalSection();
+            }
+        }		 	               
     }
     
     @Override

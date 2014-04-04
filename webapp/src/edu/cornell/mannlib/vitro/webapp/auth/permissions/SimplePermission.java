@@ -46,22 +46,16 @@ public class SimplePermission extends Permission {
 		NAMESPACE + "ManageMenus");
 	public static final SimplePermission MANAGE_OWN_PROXIES = new SimplePermission(
 		NAMESPACE + "ManageOwnProxies");
-	public static final SimplePermission MANAGE_PORTALS = new SimplePermission(
-		NAMESPACE + "ManagePortals");
 	public static final SimplePermission MANAGE_PROXIES = new SimplePermission(
 		NAMESPACE + "ManageProxies");
 	public static final SimplePermission MANAGE_SEARCH_INDEX = new SimplePermission(
 		NAMESPACE + "ManageSearchIndex");
-	public static final SimplePermission MANAGE_TABS = new SimplePermission(
-		NAMESPACE + "ManageTabs");
 	public static final SimplePermission MANAGE_USER_ACCOUNTS = new SimplePermission(
 		NAMESPACE + "ManageUserAccounts");
 	public static final SimplePermission QUERY_FULL_MODEL = new SimplePermission(
 		NAMESPACE + "QueryFullModel");
 	public static final SimplePermission QUERY_USER_ACCOUNTS_MODEL = new SimplePermission(
 		NAMESPACE + "QueryUserAccountsModel");
-	public static final SimplePermission REBUILD_VCLASS_GROUP_CACHE = new SimplePermission(
-		NAMESPACE + "RebuildVClassGroupCache");
 	public static final SimplePermission REFRESH_VISUALIZATION_CACHE = new SimplePermission(
 		NAMESPACE + "RefreshVisualizationCache");
 	public static final SimplePermission SEE_CONFIGURATION = new SimplePermission(
@@ -78,6 +72,8 @@ public class SimplePermission extends Permission {
 		NAMESPACE + "SeeVerbosePropertyInformation");
 	public static final SimplePermission USE_ADVANCED_DATA_TOOLS_PAGES = new SimplePermission(
 		NAMESPACE + "UseAdvancedDataToolsPages");
+	public static final SimplePermission USE_INDIVIDUAL_CONTROL_PANEL = new SimplePermission(
+		NAMESPACE + "UseIndividualControlPanel");
 	public static final SimplePermission USE_SPARQL_QUERY_PAGE = new SimplePermission(
 		NAMESPACE + "UseSparqlQueryPage");
 	public static final SimplePermission USE_SPARQL_UPDATE_API = new SimplePermission(
@@ -95,8 +91,6 @@ public class SimplePermission extends Permission {
 		NAMESPACE + "UseMiscellaneousAdminPages");
 	public static final SimplePermission USE_MISCELLANEOUS_CURATOR_PAGES = new SimplePermission(
 		NAMESPACE + "UseMiscellaneousCuratorPages");
-	public static final SimplePermission USE_MISCELLANEOUS_EDITOR_PAGES = new SimplePermission(
-		NAMESPACE + "UseMiscellaneousEditorPages");
 	public static final SimplePermission USE_MISCELLANEOUS_PAGES = new SimplePermission(
 		NAMESPACE + "UseMiscellaneousPages");
 

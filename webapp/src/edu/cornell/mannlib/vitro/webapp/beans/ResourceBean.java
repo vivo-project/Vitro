@@ -39,6 +39,12 @@ public interface ResourceBean {
     
     public void setProhibitedFromUpdateBelowRoleLevelUsingRoleUri(String roleUri) ;
   
+    public RoleLevel getHiddenFromPublishBelowRoleLevel() ;
+    
+    public void setHiddenFromPublishBelowRoleLevel(RoleLevel eR) ;
+    
+    public void setHiddenFromPublishBelowRoleLevelUsingRoleUri(String roleUri) ;
+    
     public String getPickListName();
     
 }

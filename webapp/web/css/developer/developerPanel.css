@@ -10,6 +10,9 @@ div.developer {
 
 div.developer #developerPanelBody {
 	display: none;
+}
+
+#developerPanelBody * {
 	line-height: 1em;
 	font-size: small;
 }
@@ -46,3 +49,28 @@ div.developer input[type="text"]:disabled {
 div.developer a {
 	margin: 3px;
 }
+
+#developerPanelBody ul.ui-tabs-nav li a {
+	padding: 0em 1em;
+}
+
+#developerPanelBody .ui-widget-header {
+	background-image: none;
+	background-color: #CC9900;
+}
+
+#developerPanelBody .ui-widget-content {
+	background-image: none;
+	background-color: #f7dd8a;
+}
+
+#developerPanelBody .ui-widget-header .ui-state-default {
+	background-image: none;
+	background-color: #f7cc33;
+}
+
+#developerPanelBody .ui-widget-header li.ui-state-active {
+	background-image: none;
+	background-color: #f7dd8a;
+}
+

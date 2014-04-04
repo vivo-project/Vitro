@@ -450,6 +450,21 @@ public class IndividualFiltering implements Individual {
     }
 
     @Override
+    public RoleLevel getHiddenFromPublishBelowRoleLevel() {
+        return _innerIndividual.getHiddenFromPublishBelowRoleLevel();
+    }
+    
+    @Override
+    public void setHiddenFromPublishBelowRoleLevel(RoleLevel eR) {
+        _innerIndividual.setHiddenFromPublishBelowRoleLevel(eR);
+    }
+    
+    @Override
+    public void setHiddenFromPublishBelowRoleLevelUsingRoleUri(String roleUri) {
+        _innerIndividual.setHiddenFromPublishBelowRoleLevel(BaseResourceBean.RoleLevel.getRoleByUri(roleUri));
+    }
+
+    @Override
     public boolean isAnonymous() {
         return _innerIndividual.isAnonymous();
     }

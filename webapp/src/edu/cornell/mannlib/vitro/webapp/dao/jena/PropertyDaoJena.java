@@ -193,7 +193,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
                 } catch (Exception cce) {}
             }
 	    } catch (Exception e) {
-	    	log.error(e, e); 
+	    	log.error("Failed to get super-properties for " + propertyURI, e); 
     	} finally {
     		getOntModel().leaveCriticalSection();
     	}

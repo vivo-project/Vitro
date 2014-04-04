@@ -120,11 +120,13 @@
     text-align: left;
 }
 .searchTOC ul li {
-    display: block;
     border-bottom: 1px solid #dde4e3;
+    display: block;
     font-size: 14px;
+    margin-left: 20px;
     padding-top: .5em;
     padding-bottom: .5em;
+    width: 150px;
 }
 .searchTOC ul li:hover {
     background-color:#f7f9f9;
@@ -134,7 +136,6 @@
 }
 .searchTOC ul a {
     display: inline;
-    padding-left: 25px;
 }
 
 .searchTOC ul span {

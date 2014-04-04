@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_URI;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
@@ -26,6 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPro
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
+import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 
@@ -125,8 +128,7 @@ public class PolicyHelper {
 		}
 
 		Resource subject = stmt.getSubject();
-		edu.cornell.mannlib.vitro.webapp.beans.Property predicate = new edu.cornell.mannlib.vitro.webapp.beans.Property(
-				stmt.getPredicate().getURI());
+		com.hp.hpl.jena.rdf.model.Property predicate = stmt.getPredicate();
 		RDFNode objectNode = stmt.getObject();
 		if ((subject == null) || (predicate == null) || (objectNode == null)) {
 			return false;
@@ -134,8 +136,11 @@ public class PolicyHelper {
 
 		RequestedAction action;
 		if (objectNode.isResource()) {
+			Property property = new Property(predicate.getURI());
+			property.setDomainVClassURI(SOME_URI);
+			property.setRangeVClassURI(SOME_URI);
 			action = new AddObjectPropertyStatement(modelToBeModified,
-					subject.getURI(), predicate, objectNode.asResource()
+					subject.getURI(), property, objectNode.asResource()
 							.getURI());
 		} else {
 			action = new AddDataPropertyStatement(modelToBeModified,
@@ -158,8 +163,7 @@ public class PolicyHelper {
 		}
 
 		Resource subject = stmt.getSubject();
-		edu.cornell.mannlib.vitro.webapp.beans.Property predicate = new edu.cornell.mannlib.vitro.webapp.beans.Property();
-		predicate.setURI(stmt.getPredicate().getURI());
+		com.hp.hpl.jena.rdf.model.Property predicate = stmt.getPredicate();
 		RDFNode objectNode = stmt.getObject();
 		if ((subject == null) || (predicate == null) || (objectNode == null)) {
 			return false;
@@ -167,8 +171,11 @@ public class PolicyHelper {
 
 		RequestedAction action;
 		if (objectNode.isResource()) {
+			Property property = new Property(predicate.getURI());
+			property.setDomainVClassURI(SOME_URI);
+			property.setRangeVClassURI(SOME_URI);
 			action = new DropObjectPropertyStatement(modelToBeModified,
-					subject.getURI(), predicate, objectNode.asResource()
+					subject.getURI(), property, objectNode.asResource()
 							.getURI());
 		} else {
 			action = new DropDataPropertyStatement(modelToBeModified,

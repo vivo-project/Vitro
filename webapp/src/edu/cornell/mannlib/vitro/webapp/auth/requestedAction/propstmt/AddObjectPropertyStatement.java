@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
 /**
@@ -17,8 +16,4 @@ public class AddObjectPropertyStatement extends
 		super(ontModel, uriOfSub, predicate, uriOfObj);
 	}
 
-	public AddObjectPropertyStatement(OntModel ontModel,
-			ObjectPropertyStatement ops) {
-		super(ontModel, ops);
-	}
 }

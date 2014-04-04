@@ -5,6 +5,7 @@
 @prefix simplePermission: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission#> .
 @prefix displayByRole: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.DisplayByRolePermission#> .
 @prefix editByRole: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.EditByRolePermission#> .
+@prefix publishByRole: <java:edu.cornell.mannlib.vitro.webapp.auth.permissions.PublishByRolePermission#> .
 
 auth:ADMIN 
     a auth:PermissionSet ;
@@ -18,7 +19,6 @@ auth:ADMIN
     auth:hasPermission simplePermission:ManageProxies ;
     auth:hasPermission simplePermission:ManageSearchIndex ;
     auth:hasPermission simplePermission:ManageUserAccounts ;
-    auth:hasPermission simplePermission:RebuildVClassGroupCache ;
     auth:hasPermission simplePermission:RefreshVisualizationCache ;
     auth:hasPermission simplePermission:SeeConfiguration ;
     auth:hasPermission simplePermission:SeeStartupStatus ;
@@ -35,8 +35,6 @@ auth:ADMIN
     # permissions for CURATOR and above.
     auth:hasPermission simplePermission:EditOntology ;
     auth:hasPermission simplePermission:EditSiteInformation ;
-    auth:hasPermission simplePermission:ManagePortals ;
-    auth:hasPermission simplePermission:ManageTabs ;
     auth:hasPermission simplePermission:SeeVerbosePropertyInformation ;
     auth:hasPermission simplePermission:UseMiscellaneousCuratorPages ;
 	auth:hasPermission simplePermission:PageViewableCurator ;
@@ -46,7 +44,7 @@ auth:ADMIN
     auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
     auth:hasPermission simplePermission:SeeRevisionInfo ;
     auth:hasPermission simplePermission:SeeSiteAdminPage ;
-    auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+    auth:hasPermission simplePermission:UseIndividualControlPanel ;
     auth:hasPermission simplePermission:PageViewableEditor ;
 
     # permissions for ANY logged-in user.
@@ -65,6 +63,7 @@ auth:ADMIN
     # role-based permissions for ADMIN
     auth:hasPermission displayByRole:Admin ;
     auth:hasPermission editByRole:Admin ;
+    auth:hasPermission publishByRole:Admin ;
     .
 
 auth:CURATOR 
@@ -74,8 +73,6 @@ auth:CURATOR
     # permissions for CURATOR and above.
     auth:hasPermission simplePermission:EditOntology ;
     auth:hasPermission simplePermission:EditSiteInformation ;
-    auth:hasPermission simplePermission:ManagePortals ;
-    auth:hasPermission simplePermission:ManageTabs ;
     auth:hasPermission simplePermission:SeeVerbosePropertyInformation ;
     auth:hasPermission simplePermission:UseMiscellaneousCuratorPages ;
     auth:hasPermission simplePermission:PageViewableCurator ;
@@ -85,7 +82,7 @@ auth:CURATOR
     auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
     auth:hasPermission simplePermission:SeeRevisionInfo ;
     auth:hasPermission simplePermission:SeeSiteAdminPage ;
-    auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+    auth:hasPermission simplePermission:UseIndividualControlPanel ;
     auth:hasPermission simplePermission:PageViewableEditor ;
 
     # permissions for ANY logged-in user.
@@ -104,6 +101,7 @@ auth:CURATOR
     # role-based permissions for CURATOR
     auth:hasPermission displayByRole:Curator ;
     auth:hasPermission editByRole:Curator ;
+    auth:hasPermission publishByRole:Curator ;
     .
 
 auth:EDITOR 
@@ -115,7 +113,7 @@ auth:EDITOR
     auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
     auth:hasPermission simplePermission:SeeRevisionInfo ;
     auth:hasPermission simplePermission:SeeSiteAdminPage ;
-    auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+    auth:hasPermission simplePermission:UseIndividualControlPanel ;
     auth:hasPermission simplePermission:PageViewableEditor ;
 
     # permissions for ANY logged-in user.
@@ -134,6 +132,7 @@ auth:EDITOR
     # role-based permissions for EDITOR
     auth:hasPermission displayByRole:Editor ;
     auth:hasPermission editByRole:Editor ;
+    auth:hasPermission publishByRole:Editor ;
     .
 
 auth:SELF_EDITOR
@@ -158,6 +157,7 @@ auth:SELF_EDITOR
     #     For role-based display and editing, SelfEditor is like Public. 
     #     SelfEditor uses its special permissions to edit/display its own values.
     auth:hasPermission displayByRole:Public ; 
+    auth:hasPermission publishByRole:Public ; 
     .
 
 auth:PUBLIC
@@ -171,4 +171,5 @@ auth:PUBLIC
 
     # role-based permissions for PUBLIC
     auth:hasPermission displayByRole:Public ;
+    auth:hasPermission publishByRole:Public ;
     .

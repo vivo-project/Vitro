@@ -66,7 +66,6 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
         if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTIONS)) {
             urls.put("recomputeInferences", UrlBuilder.getUrl("/RecomputeInferences"));     
-            urls.put("rebuildClassGroupCache", UrlBuilder.getUrl("/browse?clearcache=1"));
         }
         
 		if (PolicyHelper.isAuthorizedForActions(vreq, IndexController.REQUIRED_ACTIONS)) {
@@ -78,7 +77,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
         }
         
 		if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.ENABLE_DEVELOPER_PANEL.ACTIONS)) {
-			urls.put("activateDeveloperPanel", "javascript:new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel({developerEnabled: true});");
+			urls.put("activateDeveloperPanel", "javascript:new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel({developer_enabled: true});");
 		}
 		
         return urls;

@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
-import static edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest.FILE_ITEM_MAP;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -21,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 
 /**
@@ -41,9 +40,7 @@ public class UpdateUrisInIndex {
 	 */
 	protected int doUpdateUris(HttpServletRequest req, IndexBuilder builder)
 			throws ServletException, IOException {
-		@SuppressWarnings("unchecked")
-		Map<String, List<FileItem>> map = (Map<String, List<FileItem>>) req
-				.getAttribute(FILE_ITEM_MAP);
+		Map<String, List<FileItem>> map = new VitroRequest(req).getFiles();
 		if (map == null) {
 			throw new ServletException("Expected Multipart Content");
 		}
@@ -54,13 +51,13 @@ public class UpdateUrisInIndex {
 		for (String name : map.keySet()) {
 			for (FileItem item : map.get(name)) {
 				log.debug("Found " + item.getSize() + " byte file for '" + name + "'");
-				uriCount += processFileItem(builder, name, item, enc);
+				uriCount += processFileItem(builder, item, enc);
 			}
 		}
 		return uriCount;
 	}
 
-	private int processFileItem(IndexBuilder builder, String name,
+	private int processFileItem(IndexBuilder builder, 
 			FileItem item, Charset enc) throws IOException {
 		int count = 0;
 		Reader reader = new InputStreamReader(item.getInputStream(), enc.name());

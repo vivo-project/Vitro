@@ -19,12 +19,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
@@ -46,10 +40,10 @@ import edu.cornell.mannlib.vitro.webapp.utils.ApplicationConfigurationOntologyUt
 
 /**
  * Assists the role-based policies in determining whether a property or resource
- * may be displayed or modified.
+ * may be displayed, modified, or published in linked open data.
  * 
  * There is a bean in the context that holds the current threshold role levels
- * for displaying and modifying restricted properties.
+ * for displaying, modifying, or publishing restricted properties.
  * 
  * Create this bean after the Jena model is in place in the context.
  * 
@@ -119,6 +113,8 @@ public class PropertyRestrictionPolicyHelper {
 		        new HashMap<Pair<String, Pair<String,String>>, RoleLevel>();
 		Map<Pair<String, Pair<String,String>>, RoleLevel> modifyThresholdMap = 
 		        new HashMap<Pair<String, Pair<String,String>>, RoleLevel>();
+		Map<Pair<String, Pair<String,String>>, RoleLevel> publishThresholdMap = 
+				new HashMap<Pair<String, Pair<String,String>>, RoleLevel>();
 		
 		OntModel union = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
 		        ModelFactory.createUnion(displayModel, model));
@@ -126,15 +122,14 @@ public class PropertyRestrictionPolicyHelper {
 
 		populateThresholdMap(union, displayThresholdMap,
 				VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT);
-		populateThresholdMap(
-				union,
-				modifyThresholdMap,
+		populateThresholdMap(union, modifyThresholdMap,
 				VitroVocabulary.PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT);
-
+		populateThresholdMap(union, publishThresholdMap,
+				VitroVocabulary.HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT);
 
 		PropertyRestrictionPolicyHelper bean = new PropertyRestrictionPolicyHelper(
 				PROHIBITED_NAMESPACES, PERMITTED_EXCEPTIONS,
-				displayThresholdMap, modifyThresholdMap, displayModel);
+				displayThresholdMap, modifyThresholdMap, publishThresholdMap);
 
 		return bean;
 	}
@@ -209,9 +204,14 @@ public class PropertyRestrictionPolicyHelper {
                 } else if (VitroVocabulary.HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT
                         .equals(propertyUri)) {
                     role = faux.getHiddenFromDisplayBelowRoleLevel();
+                } else if (VitroVocabulary.HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT
+                		.equals(propertyUri)) {
+                	role = faux.getHiddenFromPublishBelowRoleLevel();
                 }
                 if (role != null) {
-                    log.debug("Putting D:" + faux.getDomainVClassURI() + " P:" + faux.getURI() + " R:" + faux.getRangeVClassURI() + " ==> L:" + role);
+					log.debug("Putting D:" + faux.getDomainVClassURI() + " P:"
+							+ faux.getURI() + " R:" + faux.getRangeVClassURI()
+							+ " ==> L:" + role);
                     map.put(new Pair<String,Pair<String,String>>(
                             faux.getDomainVClassURI(), new Pair<String,String>(
                                     faux.getURI(), faux.getRangeVClassURI())), role);
@@ -251,6 +251,12 @@ public class PropertyRestrictionPolicyHelper {
 	 */
 	private final Map<Pair<String, Pair<String,String>>, RoleLevel> modifyThresholdMap;
 	
+	/**
+	 * These URIs can be published only if the user's role is at least as high as
+	 * the threshold role.
+	 */
+	private final Map<Pair<String, Pair<String,String>>, RoleLevel> publishThresholdMap;
+	
 
 	/**
 	 * Store unmodifiable versions of the inputs.
@@ -263,19 +269,23 @@ public class PropertyRestrictionPolicyHelper {
 			Collection<String> modifyExceptionsAllowedUris,
 			Map<Pair<String, Pair<String,String>>, RoleLevel> displayThresholdMap,
 			Map<Pair<String, Pair<String,String>>, RoleLevel> modifyThresholdMap,
-			Model displayModel) {
+			Map<Pair<String, Pair<String,String>>, RoleLevel> publishThresholdMap) {
 		this.modifyProhibitedNamespaces = unmodifiable(modifyProhibitedNamespaces);
 		this.modifyExceptionsAllowedUris = unmodifiable(modifyExceptionsAllowedUris);
 		this.displayThresholdMap = displayThresholdMap;
 		this.modifyThresholdMap = modifyThresholdMap;
-//	    this.displayThresholdMap = unmodifiable(displayThresholdMap);
-//	    this.modifyThresholdMap = unmodifiable(modifyThresholdMap);
+		this.publishThresholdMap = publishThresholdMap;
+		// TODO: why are these no longer unmodifiable? Brian changed during the
+		// TODO: ISF integration.
+		// this.displayThresholdMap = unmodifiable(displayThresholdMap);
+		// this.modifyThresholdMap = unmodifiable(modifyThresholdMap);
 
 		if (log.isDebugEnabled()) {
 			log.debug("prohibited: " + this.modifyProhibitedNamespaces);
 			log.debug("exceptions: " + this.modifyExceptionsAllowedUris);
 			log.debug("display thresholds: " + this.displayThresholdMap);
 			log.debug("modify thresholds: " + this.modifyThresholdMap);
+			log.debug("publish thresholds: " + this.publishThresholdMap);
 		}
 	}
 
@@ -338,6 +348,22 @@ public class PropertyRestrictionPolicyHelper {
 		}
 
 		log.debug("can modify resource '" + resourceUri + "'");
+		return true;
+	}
+
+	/**
+	 * Any resource can be published.
+	 * 
+	 * (Someday we may want to implement publish restrictions based on VClass.)
+	 */
+	@SuppressWarnings("unused")
+	public boolean canPublishResource(String resourceUri, RoleLevel userRole) {
+		if (resourceUri == null) {
+			log.debug("can't publish resource: resourceUri was null");
+			return false;
+		}
+
+		log.debug("can publish resource '" + resourceUri + "'");
 		return true;
 	}
 
@@ -408,6 +434,33 @@ public class PropertyRestrictionPolicyHelper {
 		return false;
 	}
 
+	/**
+	 * If publishing of a predicate is restricted, the user's role must be at least
+	 * as high as the restriction level.
+	 */
+	public boolean canPublishPredicate(Property predicate, RoleLevel userRole) {	    
+		if (predicate == null) {
+			log.debug("can't publish predicate: predicate was null");
+			return false;
+		}
+		
+		RoleLevel publishThreshold = getThreshold(predicate, publishThresholdMap);		
+		       	        
+		if (isAuthorized(userRole, publishThreshold)) {
+            log.debug("can publish predicate: '" + predicate.getURI() + "', domain=" 
+                    + predicate.getDomainVClassURI() + ", range=" 
+                    + predicate.getRangeVClassURI() + ", userRole="
+                    + userRole + ", thresholdRole=" + publishThreshold);
+			return true;
+		}
+
+        log.debug("can't publish predicate: '" + predicate.getURI() + "', domain=" 
+                + predicate.getDomainVClassURI() + ", range=" 
+                + predicate.getRangeVClassURI() + ", userRole="
+                + userRole + ", thresholdRole=" + publishThreshold);
+		return false;
+	}
+	
 	private boolean isAuthorized(RoleLevel userRole, RoleLevel thresholdRole) {
 		if (userRole == null) {
 			return false;

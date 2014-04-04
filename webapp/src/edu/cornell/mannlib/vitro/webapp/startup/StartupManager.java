@@ -69,6 +69,9 @@ public class StartupManager implements ServletContextListener {
 		} catch (Exception e) {
 			ss.fatal(this, "Startup threw an unexpected exception.", e);
 			log.error("Startup threw an unexpected exception.", e);
+		} catch (Throwable t) {
+			log.fatal("Startup threw an unexpected error.", t);
+			throw t;
 		}
 	}
 
@@ -177,6 +180,9 @@ public class StartupManager implements ServletContextListener {
 			ss.listenerExecuted(listener);
 		} catch (Exception e) {
 			ss.fatal(listener, "Threw unexpected exception", e);
+		} catch (Throwable t) {
+			log.fatal(listener + " Threw unexpected error", t);
+			throw t;
 		}
 	}
 
@@ -214,6 +220,10 @@ public class StartupManager implements ServletContextListener {
 			} catch (Exception e) {
 				log.error("Unexpected exception from contextDestroyed() on '"
 						+ listener.getClass().getName() + "'", e);
+			} catch (Throwable t) {
+				log.fatal("Unexpected error from contextDestroyed() on '"
+						+ listener.getClass().getName() + "'", t);
+				throw t;
 			}
 		}
 		log.info("Called 'contextDestroyed' on all listeners.");
