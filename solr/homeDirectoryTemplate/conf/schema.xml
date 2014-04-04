@@ -15,7 +15,8 @@
     <fieldType name="float" class="solr.TrieFloatField" precisionStep="0" omitNorms="true" positionIncrementGap="0"/>
     <fieldType name="long" class="solr.TrieLongField" precisionStep="0" omitNorms="true" positionIncrementGap="0"/>
     <fieldType name="double" class="solr.TrieDoubleField" precisionStep="0" omitNorms="true" positionIncrementGap="0"/> 
-   
+    <!--  A Trie based int field -->
+    <fieldType name="tint" class="solr.TrieIntField" precisionStep="8" omitNorms="true" positionIncrementGap="0" sortMissingLast="true"/>
     <fieldType name="date" class="solr.TrieDateField" omitNorms="true" precisionStep="0" positionIncrementGap="0"/>
     <!-- A Trie based date field for faster date range queries and date faceting. -->
     <fieldType name="tdate" class="solr.TrieDateField" omitNorms="true" precisionStep="6" positionIncrementGap="0"/>
@@ -253,6 +254,10 @@
   <!-- ****************************  End Vitro Fields *************************** -->
   <!-- ****************************  Dynamic Fields *************************** -->
   <dynamicField name="*_string" type="string" indexed="true" stored="true" multiValued="true"/>
+  <dynamicField name="*_text" type="text" indexed="true" stored="true" multiValued="true"/>
+  <dynamicField name="*_tdate" type="tdate" indexed="true" stored="true" multiValued="true"/>
+  <dynamicField name="*_tint" type="tint" indexed="true" stored="true" multiValued="true"/>
+  
    <!-- ****************************  End Dynamic Fields *************************** -->
   
    
