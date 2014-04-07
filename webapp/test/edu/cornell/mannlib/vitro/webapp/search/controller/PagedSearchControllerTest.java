@@ -18,10 +18,9 @@ import edu.cornell.mannlib.vitro.webapp.search.controller.PagedSearchController.
 
 public class PagedSearchControllerTest {
 	
-	@SuppressWarnings("unused")
 	@Before
 	public void useI18nStubBundles() {
-		new I18nStub();
+		I18nStub.setup();
 	}
 
     @Test
