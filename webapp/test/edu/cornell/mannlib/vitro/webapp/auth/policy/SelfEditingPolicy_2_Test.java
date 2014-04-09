@@ -4,11 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
 import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_LITERAL;
 
-import java.io.InputStream;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,7 +16,6 @@ import stubs.javax.servlet.ServletContextStub;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.impl.RDFDefaultErrorHandler;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
@@ -81,19 +77,6 @@ public class SelfEditingPolicy_2_Test extends AbstractTestClass {
 	
 	@Before
 	public void setUp() throws Exception {
-		InputStream is = getClass().getResourceAsStream(
-				"./SelfEditingPolicy_2_Test.xml");
-		Assert.assertNotNull(is);
-
-		// suppress the warning messages from loading the model.
-		setLoggerLevel(RDFDefaultErrorHandler.class, Level.OFF);
-
-		// TODO This doesn't appear to be used for anything. Can it go away, along with the data file?
-		OntModel model = ModelFactory.createOntologyModel();
-		model.read(is, "");
-		Assert.assertNotNull(model);
-		Assert.assertTrue(model.size() > 0);
-
 		ServletContextStub ctx = new ServletContextStub();
 		PropertyRestrictionPolicyHelper.setBean(ctx,
 				PropertyRestrictionPolicyHelperStub

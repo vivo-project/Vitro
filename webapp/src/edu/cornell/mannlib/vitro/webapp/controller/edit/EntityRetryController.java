@@ -170,6 +170,7 @@ public class EntityRetryController extends BaseEditController {
         
         hash.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getDisplayOptionsList(individualForEditing));    
         hash.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(individualForEditing));
+        hash.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getPublishOptionsList(individualForEditing));    
 
         FormObject foo = new FormObject();
         foo.setOptionLists(hash);

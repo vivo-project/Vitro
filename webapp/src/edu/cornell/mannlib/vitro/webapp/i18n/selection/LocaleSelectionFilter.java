@@ -3,9 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.i18n.selection;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.Filter;
@@ -17,7 +17,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-import org.apache.commons.collections.EnumerationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -68,13 +67,12 @@ public class LocaleSelectionFilter implements Filter {
 	// ----------------------------------------------------------------------
 
 	/**
-	 * Uses the selected Locale as the preferred Locale of the request.
+	 * Uses the selected Locale as the only acceptable Locale of the request.
 	 */
 	private static class LocaleSelectionRequestWrapper extends
 			HttpServletRequestWrapper {
-		private final List<Locale> locales;
+		private final Locale selectedLocale;
 
-		@SuppressWarnings("unchecked")
 		public LocaleSelectionRequestWrapper(HttpServletRequest request,
 				Locale selectedLocale) {
 			super(request);
@@ -87,18 +85,12 @@ public class LocaleSelectionFilter implements Filter {
 						"selectedLocale may not be null.");
 			}
 			
-			Locale selectedLanguage = new Locale(selectedLocale.getLanguage());
-
-			locales = EnumerationUtils.toList(request.getLocales());
-			locales.remove(selectedLanguage);
-			locales.add(0, selectedLanguage);
-			locales.remove(selectedLocale);
-			locales.add(0, selectedLocale);
+			this.selectedLocale = selectedLocale;
 		}
 
 		@Override
 		public Locale getLocale() {
-			return locales.get(0);
+			return selectedLocale;
 		}
 
 		/**
@@ -107,7 +99,7 @@ public class LocaleSelectionFilter implements Filter {
 		@SuppressWarnings("rawtypes")
 		@Override
 		public Enumeration getLocales() {
-			return Collections.enumeration(locales);
+			return Collections.enumeration(Arrays.asList(selectedLocale));
 		}
 	}
 

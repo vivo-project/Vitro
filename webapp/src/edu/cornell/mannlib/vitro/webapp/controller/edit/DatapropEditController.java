@@ -41,7 +41,7 @@ public class DatapropEditController extends BaseEditController {
 
     	VitroRequest vreq = new VitroRequest(request);
     	
-        final int NUM_COLS=17;
+        final int NUM_COLS=18;
 
         String datapropURI = request.getParameter("uri");
 
@@ -73,6 +73,7 @@ public class DatapropEditController extends BaseEditController {
         results.add("display limit");         // column 15
         results.add("custom entry form");     // column 16
         results.add("URI");                   // column 17
+        results.add("publish level");         // column 18
 
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
 
@@ -135,12 +136,16 @@ public class DatapropEditController extends BaseEditController {
         String descriptionStr = (dp.getDescription() == null) ? "" : dp.getDescription();  // column 11
         results.add(descriptionStr);
         
-        results.add(dp.getHiddenFromDisplayBelowRoleLevel()  == null ? "(unspecified)" : dp.getHiddenFromDisplayBelowRoleLevel().getLabel()); // column 12
-        results.add(dp.getProhibitedFromUpdateBelowRoleLevel() == null ? "(unspecified)" : dp.getProhibitedFromUpdateBelowRoleLevel().getLabel()); // column 13
+		results.add(dp.getHiddenFromDisplayBelowRoleLevel() == null ? "(unspecified)"
+				: dp.getHiddenFromDisplayBelowRoleLevel().getDisplayLabel()); // column 12
+		results.add(dp.getProhibitedFromUpdateBelowRoleLevel() == null ? "(unspecified)"
+				: dp.getProhibitedFromUpdateBelowRoleLevel().getUpdateLabel()); // column 13
         results.add(String.valueOf(dp.getDisplayTier()));  // column 14
         results.add(String.valueOf(dp.getDisplayLimit()));  // column 15
         results.add(dp.getCustomEntryForm() == null ? "(unspecified)" : dp.getCustomEntryForm());  // column 16
         results.add(dp.getURI() == null ? "" : dp.getURI()); // column 17
+		results.add(dp.getHiddenFromPublishBelowRoleLevel() == null ? "(unspecified)"
+				: dp.getHiddenFromPublishBelowRoleLevel().getDisplayLabel()); // column 18
         request.setAttribute("results",results);
         request.setAttribute("columncount",NUM_COLS);
         request.setAttribute("suppressquery","true");

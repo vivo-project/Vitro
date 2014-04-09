@@ -134,7 +134,7 @@ public class SparqlQueryServlet extends BaseEditController {
             doSelect(response, queryParam, formatConf, rdfService);            
         }else if( query.isAskType()){
             doAsk( queryParam, rdfService, response ); 
-        }else if( query.isConstructType() ){
+        }else if( query.isConstructType() || query.isDescribeType() ){
             String format = contentType != null ? contentType : vreq.getParameter("rdfResultFormat");                        
             if (format== null) {
                 format= "RDF/XML-ABBREV";

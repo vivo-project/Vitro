@@ -12,6 +12,9 @@ import java.util.Set;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -21,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 /**
  * Mock the basic functions of Individual for unit tests.
@@ -31,6 +35,8 @@ public class IndividualStub implements Individual {
 	// ----------------------------------------------------------------------
 
 	private final String uri;
+	private final String namespace;
+	private final String localName;
 
 	private final Set<DataPropertyStatement> dpsSet = new HashSet<DataPropertyStatement>();
 	private final Set<ObjectPropertyStatement> opsSet = new HashSet<ObjectPropertyStatement>();
@@ -40,27 +46,25 @@ public class IndividualStub implements Individual {
 
 	public IndividualStub(String uri) {
 		this.uri = uri;
+        Resource r = ResourceFactory.createResource(uri);
+        this.namespace = r.getNameSpace();
+        this.localName = r.getLocalName();
 	}
 
 	public void addDataPropertyStatement(String predicateUri, String object) {
 		dpsSet.add(new DataPropertyStatementImpl(this.uri, predicateUri, object));
 	}
 
-	public void addObjectPropertyStatement(String predicateUri, String objectUri) {
-		opsSet.add(new ObjectPropertyStatementImpl(this.uri, predicateUri,
-				objectUri));
+	public void addObjectPropertyStatement(ObjectProperty property, String objectUri) {
+		ObjectPropertyStatementImpl ops = new ObjectPropertyStatementImpl();
+		ops.setSubject(this);
+		ops.setProperty(property);
+		ops.setObjectURI(objectUri);
+		opsSet.add(ops);
 	}
 
-	public void addPopulatedObjectPropertyStatement(String predicateUri,
-			String objectUri, Individual object) {
-		ObjectPropertyStatementImpl stmt = new ObjectPropertyStatementImpl(
-				this.uri, predicateUri, objectUri);
-		stmt.setObject(object);
-		opsSet.add(stmt);
-	}
-
-	public void addVclass(String namespace, String localname, String vClassName) {
-		vClasses.add(new VClass(namespace, localname, vClassName));
+	public void addVclass(String ns, String localname, String vClassName) {
+		vClasses.add(new VClass(ns, localname, vClassName));
 	}
 
 	// ----------------------------------------------------------------------
@@ -73,6 +77,22 @@ public class IndividualStub implements Individual {
 	}
 
 	@Override
+	public boolean isAnonymous() {
+		return (this.uri == null || VitroVocabulary.PSEUDO_BNODE_NS.equals(this
+				.getNamespace()));
+	}
+
+	@Override
+	public String getLocalName() {
+		return this.localName;
+	}
+
+	@Override
+	public String getNamespace() {
+		return this.namespace;
+	}
+
+	@Override
 	public void setName(String name) {
 		this.name = name;
 	}
@@ -81,17 +101,17 @@ public class IndividualStub implements Individual {
 	public String getName() {
 		return name;
 	}
-	
-	@Override 
+
+	@Override
 	public String getLabel() {
-	    return getName();
+		return getName();
 	}
 
 	@Override
 	public String getPickListName() {
-	    return getName();
+		return getName();
 	}
-	
+
 	@Override
 	public List<DataPropertyStatement> getDataPropertyStatements() {
 		return new ArrayList<DataPropertyStatement>(dpsSet);
@@ -146,7 +166,6 @@ public class IndividualStub implements Individual {
 		return null;
 	}
 
-
 	@Override
 	public boolean isVClass(String vclassUri) {
 		for (VClass vc : vClasses) {
@@ -165,12 +184,6 @@ public class IndividualStub implements Individual {
 	@Override
 	public void sortForDisplay() {
 		// does nothing.
-	}
-
-	@Override
-	public String getLocalName() {
-		// Useless for now.
-		return "BOGUS Local Name";
 	}
 
 	@Override
@@ -199,68 +212,74 @@ public class IndividualStub implements Individual {
 	// ----------------------------------------------------------------------
 
 	@Override
-	public boolean isAnonymous() {
-		throw new RuntimeException(
-				"ResourceBean.isAnonymous() not implemented.");
-	}
-
-	@Override
 	public void setURI(String URI) {
-		throw new RuntimeException("ResourceBean.setURI() not implemented.");
-	}
-
-	@Override
-	public String getNamespace() {
-		throw new RuntimeException(
-				"ResourceBean.getNamespace() not implemented.");
+		throw new RuntimeException("IndividualStub.setURI() not implemented.");
 	}
 
 	@Override
 	public void setNamespace(String namespace) {
 		throw new RuntimeException(
-				"ResourceBean.setNamespace() not implemented.");
+				"IndividualStub.setNamespace() not implemented.");
 	}
 
 	@Override
 	public void setLocalName(String localName) {
 		throw new RuntimeException(
-				"ResourceBean.setLocalName() not implemented.");
+				"IndividualStub.setLocalName() not implemented.");
 	}
 
 	@Override
 	public RoleLevel getHiddenFromDisplayBelowRoleLevel() {
 		throw new RuntimeException(
-				"ResourceBean.getHiddenFromDisplayBelowRoleLevel() not implemented.");
+				"IndividualStub.getHiddenFromDisplayBelowRoleLevel() not implemented.");
 	}
 
 	@Override
 	public void setHiddenFromDisplayBelowRoleLevel(RoleLevel eR) {
 		throw new RuntimeException(
-				"ResourceBean.setHiddenFromDisplayBelowRoleLevel() not implemented.");
+				"IndividualStub.setHiddenFromDisplayBelowRoleLevel() not implemented.");
 	}
 
 	@Override
 	public void setHiddenFromDisplayBelowRoleLevelUsingRoleUri(String roleUri) {
 		throw new RuntimeException(
-				"ResourceBean.setHiddenFromDisplayBelowRoleLevelUsingRoleUri() not implemented.");
+				"IndividualStub.setHiddenFromDisplayBelowRoleLevelUsingRoleUri() not implemented.");
 	}
 
 	@Override
 	public RoleLevel getProhibitedFromUpdateBelowRoleLevel() {
 		throw new RuntimeException(
-				"ResourceBean.getProhibitedFromUpdateBelowRoleLevel() not implemented.");
+				"IndividualStub.getProhibitedFromUpdateBelowRoleLevel() not implemented.");
 	}
 
 	@Override
 	public void setProhibitedFromUpdateBelowRoleLevel(RoleLevel eR) {
 		throw new RuntimeException(
-				"ResourceBean.setProhibitedFromUpdateBelowRoleLevel() not implemented.");
+				"IndividualStub.setProhibitedFromUpdateBelowRoleLevel() not implemented.");
 	}
 
 	@Override
 	public void setProhibitedFromUpdateBelowRoleLevelUsingRoleUri(String roleUri) {
 		throw new RuntimeException(
-				"ResourceBean.setProhibitedFromUpdateBelowRoleLevelUsingRoleUri() not implemented.");
+				"IndividualStub.setProhibitedFromUpdateBelowRoleLevelUsingRoleUri() not implemented.");
+	}
+
+	@Override
+	public RoleLevel getHiddenFromPublishBelowRoleLevel() {
+		throw new RuntimeException(
+				"IndividualStub.getHiddenFromPublishBelowRoleLevel() not implemented.");
+	}
+
+	@Override
+	public void setHiddenFromPublishBelowRoleLevel(RoleLevel eR) {
+		throw new RuntimeException(
+				"IndividualStub.setHiddenFromPublishBelowRoleLevel() not implemented.");
+	}
+
+	@Override
+	public void setHiddenFromPublishBelowRoleLevelUsingRoleUri(String roleUri) {
+		throw new RuntimeException(
+				"IndividualStub.setHiddenFromPublishBelowRoleLevelUsingRoleUri() not implemented.");
 	}
 
 	@Override
@@ -271,9 +290,10 @@ public class IndividualStub implements Individual {
 
 	@Override
 	public List<String> getMostSpecificTypeURIs() {
-	    throw new RuntimeException("Individual.getMostSpecificTypeURIs() not implemented.");
+		throw new RuntimeException(
+				"Individual.getMostSpecificTypeURIs() not implemented.");
 	}
-	
+
 	@Override
 	public String getRdfsLabel() {
 		throw new RuntimeException("Individual.getRdfsLabel() not implemented.");

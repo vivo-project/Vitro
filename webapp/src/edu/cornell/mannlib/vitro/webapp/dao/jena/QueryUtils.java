@@ -2,10 +2,14 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,6 +59,39 @@ public class QueryUtils {
         }
         return map;
     }
+    
+	/**
+	 * If any pair of maps in the list has the same (non-null) value for any of
+	 * these keys, call the maps duplicates and keep only the first of them.
+	 */
+	public static List<Map<String, String>> removeDuplicatesMapsFromList(
+			List<Map<String, String>> rawList, String... keys) {
+		List<Map<String, String>> filteredList = new ArrayList<>();
+		outerLoop: for (Map<String, String> rawMap : rawList) {
+			for (Map<String, String> filteredMap : filteredList) {
+				for (String key : keys) {
+					String rawValue = rawMap.get(key);
+					if (rawValue != null) {
+						if (rawValue.equals(filteredMap.get(key))) {
+							if (log.isDebugEnabled()) {
+								logDuplicateRows(rawMap, filteredMap, keys);
+							}
+							continue outerLoop;
+						}
+					}
+				}
+			}
+			filteredList.add(rawMap);
+		}
+		return filteredList;
+	}
+
+	private static void logDuplicateRows(Map<String, String> rawMap,
+			Map<String, String> filteredMap, String... keys) {
+		log.debug("Found duplicate rows, by at least one of these keys: "
+				+ Arrays.toString(keys) + ". Keeping " + filteredMap
+				+ ". Discarding " + rawMap + ".");
+	}
     
     public static Object nodeToObject( RDFNode node ){
         if( node == null ){

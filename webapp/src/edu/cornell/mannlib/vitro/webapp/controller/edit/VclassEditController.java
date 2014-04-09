@@ -33,7 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 public class VclassEditController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(VclassEditController.class.getName());
-	private static final int NUM_COLS = 13;
+	private static final int NUM_COLS = 14;
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
         if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
@@ -70,6 +70,7 @@ public class VclassEditController extends BaseEditController {
         results.add("display rank");         // 11
         results.add("custom entry form");    // 12
         results.add("URI");                  // 13
+        results.add("publish level");        // 14
         
         String ontologyName = null;
         if (vcl.getNamespace() != null) {
@@ -107,8 +108,13 @@ public class VclassEditController extends BaseEditController {
             commSb = new StringBuffer("no comments yet");
         }
                
-        String hiddenFromDisplay  = (vcl.getHiddenFromDisplayBelowRoleLevel()  == null ? "(unspecified)" : vcl.getHiddenFromDisplayBelowRoleLevel().getLabel());
-        String ProhibitedFromUpdate = (vcl.getProhibitedFromUpdateBelowRoleLevel() == null ? "(unspecified)" : vcl.getProhibitedFromUpdateBelowRoleLevel().getLabel());
+		String hiddenFromDisplay = (vcl.getHiddenFromDisplayBelowRoleLevel() == null ? "(unspecified)"
+				: vcl.getHiddenFromDisplayBelowRoleLevel().getDisplayLabel());
+		String ProhibitedFromUpdate = (vcl
+				.getProhibitedFromUpdateBelowRoleLevel() == null ? "(unspecified)"
+				: vcl.getProhibitedFromUpdateBelowRoleLevel().getUpdateLabel());
+		String hiddenFromPublish = (vcl.getHiddenFromPublishBelowRoleLevel() == null ? "(unspecified)"
+				: vcl.getHiddenFromPublishBelowRoleLevel().getDisplayLabel());
 
         String customEntryForm = (vcl.getCustomEntryForm() == null ? "(unspecified)" : vcl.getCustomEntryForm());
         
@@ -130,6 +136,7 @@ public class VclassEditController extends BaseEditController {
         results.add(String.valueOf(vcl.getDisplayRank())); // 11
         results.add(customEntryForm);        // 12
         results.add(uri);                    // 13
+        results.add(hiddenFromPublish);      // 14
         request.setAttribute("results", results);
         request.setAttribute("columncount", NUM_COLS);
         request.setAttribute("suppressquery", "true");

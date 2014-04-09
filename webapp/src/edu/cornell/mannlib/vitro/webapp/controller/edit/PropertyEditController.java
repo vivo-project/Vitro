@@ -6,7 +6,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -21,17 +20,14 @@ import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
-import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 
 public class PropertyEditController extends BaseEditController {
 
@@ -43,7 +39,7 @@ public class PropertyEditController extends BaseEditController {
         	return;
         }
 
-        final int NUM_COLS=24;
+        final int NUM_COLS=25;
 
         VitroRequest vreq = new VitroRequest(request);
         
@@ -81,6 +77,7 @@ public class PropertyEditController extends BaseEditController {
         results.add("offer create new");      // column 22
         results.add("sort direction");        // column 23
         results.add("URI");                   // column 24
+        results.add("publish level");         // column 25
 
         results.add(p.getPickListName()); // column 1
         
@@ -169,8 +166,10 @@ public class PropertyEditController extends BaseEditController {
         String descriptionStr = (p.getDescription() == null) ? "" : p.getDescription();
         results.add(descriptionStr);           // column 15
         
-        results.add(p.getHiddenFromDisplayBelowRoleLevel() == null ? "(unspecified)" : p.getHiddenFromDisplayBelowRoleLevel().getLabel()); // column 16
-        results.add(p.getProhibitedFromUpdateBelowRoleLevel() == null ? "(unspecified)" : p.getProhibitedFromUpdateBelowRoleLevel().getLabel()); // column 17
+		results.add(p.getHiddenFromDisplayBelowRoleLevel() == null ? "(unspecified)"
+				: p.getHiddenFromDisplayBelowRoleLevel().getDisplayLabel()); // column 16
+		results.add(p.getProhibitedFromUpdateBelowRoleLevel() == null ? "(unspecified)"
+				: p.getProhibitedFromUpdateBelowRoleLevel().getUpdateLabel()); // column 17
         
         results.add("property: "+p.getDomainDisplayTier() + ", inverse: "+p.getRangeDisplayTier()); // column 18
         
@@ -183,6 +182,8 @@ public class PropertyEditController extends BaseEditController {
         results.add(p.getDomainEntitySortDirection() == null ? "ascending" : p.getDomainEntitySortDirection()); // column 23
 
         results.add(p.getURI()); // column 24
+		results.add(p.getHiddenFromPublishBelowRoleLevel() == null ? "(unspecified)"
+				: p.getHiddenFromPublishBelowRoleLevel().getDisplayLabel()); // column 25
         request.setAttribute("results",results);
         request.setAttribute("columncount",NUM_COLS);
         request.setAttribute("suppressquery","true");

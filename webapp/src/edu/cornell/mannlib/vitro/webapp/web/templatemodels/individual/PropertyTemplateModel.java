@@ -85,12 +85,16 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         verboseDisplay = new HashMap<String, Object>();
         
         RoleLevel roleLevel = property.getHiddenFromDisplayBelowRoleLevel();
-        String roleLevelLabel = roleLevel != null ? roleLevel.getLabel() : "";
+        String roleLevelLabel = roleLevel != null ? roleLevel.getDisplayLabel() : "";
         verboseDisplay.put("displayLevel", roleLevelLabel);
 
         roleLevel = property.getProhibitedFromUpdateBelowRoleLevel();
-        roleLevelLabel = roleLevel != null ? roleLevel.getLabel() : "";
+        roleLevelLabel = roleLevel != null ? roleLevel.getUpdateLabel() : "";
         verboseDisplay.put("updateLevel", roleLevelLabel);   
+        
+        roleLevel = property.getHiddenFromPublishBelowRoleLevel();
+        roleLevelLabel = roleLevel != null ? roleLevel.getDisplayLabel() : "";
+        verboseDisplay.put("publishLevel", roleLevelLabel);   
         
         verboseDisplay.put("localName", property.getLocalNameWithPrefix());
         verboseDisplay.put("displayRank", getPropertyDisplayTier(property));
