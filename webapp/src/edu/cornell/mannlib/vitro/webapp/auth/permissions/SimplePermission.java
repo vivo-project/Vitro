@@ -59,7 +59,7 @@ public class SimplePermission extends Permission {
 	public static final SimplePermission REFRESH_VISUALIZATION_CACHE = new SimplePermission(
 		NAMESPACE + "RefreshVisualizationCache");
 	public static final SimplePermission SEE_CONFIGURATION = new SimplePermission(
-			NAMESPACE + "SeeConfiguration");
+		NAMESPACE + "SeeConfiguration");
 	public static final SimplePermission SEE_INDVIDUAL_EDITING_PANEL = new SimplePermission(
 		NAMESPACE + "SeeIndividualEditingPanel");
 	public static final SimplePermission SEE_REVISION_INFO = new SimplePermission(
@@ -76,6 +76,8 @@ public class SimplePermission extends Permission {
 		NAMESPACE + "UseIndividualControlPanel");
 	public static final SimplePermission USE_SPARQL_QUERY_PAGE = new SimplePermission(
 		NAMESPACE + "UseSparqlQueryPage");
+	public static final SimplePermission USE_SPARQL_QUERY_API = new SimplePermission(
+		NAMESPACE + "UseSparqlQueryApi");
 	public static final SimplePermission USE_SPARQL_UPDATE_API = new SimplePermission(
 		NAMESPACE + "UseSparqlUpdateApi");
 
