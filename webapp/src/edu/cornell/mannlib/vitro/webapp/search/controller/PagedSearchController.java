@@ -48,10 +48,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.search.IndexConstants;
-import edu.cornell.mannlib.vitro.webapp.search.SearchException;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQuery;
-import edu.cornell.mannlib.vitro.webapp.search.beans.VitroQueryFactory;
 import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.searchresult.IndividualSearchResult;
@@ -163,7 +160,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             int startIndex = getStartIndex(vreq);            
             int hitsPerPage = getHitsPerPage( vreq );           
 
-            String queryText = vreq.getParameter(VitroQuery.QUERY_PARAMETER_NAME);  
+            String queryText = vreq.getParameter(PARAM_QUERY_TEXT);  
             log.debug("Query text is \""+ queryText + "\""); 
 
 
@@ -672,15 +669,6 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     }
     
     public static final int MAX_QUERY_LENGTH = 500;
-
-    public VitroQueryFactory getQueryFactory() {
-        throw new Error("PagedSearchController.getQueryFactory() is unimplemented");
-    }
-
-    @SuppressWarnings("rawtypes")
-    public List search(VitroQuery query) throws SearchException {
-        throw new Error("PagedSearchController.search() is unimplemented");
-    }
 
     protected boolean isRequestedFormatXml(VitroRequest req){
         if( req != null ){
