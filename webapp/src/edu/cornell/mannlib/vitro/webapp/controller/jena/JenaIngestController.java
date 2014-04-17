@@ -622,7 +622,9 @@ public class JenaIngestController extends BaseEditController {
         String newModel = vreq.getParameter("newModel");
         String oldNamespace = vreq.getParameter("oldNamespace");
         String newNamespace = vreq.getParameter("newNamespace");
-        String dNamespace = vreq.getParameter("defaultNamespace");      
+        String dNamespace = vreq.getParameter("defaultNamespace");
+        newNamespace = (newNamespace == null || newNamespace.isEmpty()) ? oldNamespace : newNamespace;
+        newNamespace = (dNamespace != null) ? dNamespace : newNamespace;
         if(modelName!=null){
             Model m = maker.getModel(modelName);
             ArrayList namespaceList = new ArrayList();
@@ -645,7 +647,7 @@ public class JenaIngestController extends BaseEditController {
             vreq.setAttribute("bodyJsp",PERMANENT_URI);
         } else if(oldModel != null) {
             JenaIngestUtils utils = new JenaIngestUtils();
-            utils.doPermanentURI(oldModel,newModel,oldNamespace,newNamespace,dNamespace,maker,vreq);
+            utils.doPermanentURI(oldModel, newModel, oldNamespace, newNamespace, maker, vreq);
             vreq.setAttribute("title","Ingest Menu");
             vreq.setAttribute("bodyJsp",INGEST_MENU_JSP);
         }

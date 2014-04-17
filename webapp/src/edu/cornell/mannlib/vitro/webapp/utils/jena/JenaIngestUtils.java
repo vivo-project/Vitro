@@ -730,16 +730,19 @@ public class JenaIngestUtils {
     }
 
     public void doPermanentURI(String oldModel, String newModel, String oldNamespace,
-            String newNamespace, String dNamespace, ModelMaker maker, 
+            String newNamespace, ModelMaker maker, 
             VitroRequest vreq) {
 
+        if(newNamespace.isEmpty()){
+            throw new RuntimeException("new namespace must be specified");
+        }
+        
         WebappDaoFactory wdf = vreq.getUnfilteredWebappDaoFactory();
         Model m = maker.getModel(oldModel);
         Model saveModel = maker.getModel(newModel);
         Model tempModel = ModelFactory.createDefaultModel();
         ResIterator rsItr = null;
         ArrayList<String> urlCheck = new ArrayList<String>();
-        String changeNamespace = null;
         boolean urlFound = false;
         if(!oldModel.equals(newModel)){
             StmtIterator stmtItr = m.listStatements();
@@ -755,42 +758,20 @@ public class JenaIngestUtils {
         String uri = null;  
         while(rsItr.hasNext()){
             Resource res = rsItr.next();
-            if(oldNamespace.equals(res.getNameSpace())){
-                if(!newNamespace.equals("")){
-                    do{
-                        uri = getUnusedURI(newNamespace,wdf);
-                        if(!urlCheck.contains(uri)){
-                            urlCheck.add(uri);
-                            urlFound = true;
-                        }
-                    }while(!urlFound);
-                    urlFound = false;
-                }
-                else if(dNamespace.equals(vreq.getUnfilteredWebappDaoFactory().getDefaultNamespace())){
-                    try{
-                        do{
-                            uri = wdf.getIndividualDao().getUnusedURI(null);
-                            if(!urlCheck.contains(uri)){
-                                urlCheck.add(uri);
-                                urlFound = true;
-                            }
-                        }while(!urlFound);
-                        urlFound = false;
-                    }catch(InsertException ex){
-                        log.error("could not create uri");
-                    }           
-                }
+            if(res.getNameSpace().equals(oldNamespace)){
+                do{
+                    uri = getUnusedURI(newNamespace,wdf);
+                    if(!urlCheck.contains(uri)){
+                        urlCheck.add(uri);
+                        urlFound = true;
+                    }
+                }while(!urlFound);
+                urlFound = false;
                 ResourceUtils.renameResource(res, uri);                    
             }
 
         }
         boolean statementDone = false;
-        if(!newNamespace.equals("")){
-            changeNamespace = newNamespace;
-        }
-        else if(dNamespace.equals(vreq.getUnfilteredWebappDaoFactory().getDefaultNamespace())){
-            changeNamespace = dNamespace;
-        }
         if(!oldModel.equals(newModel)){
             StmtIterator stmtItr = tempModel.listStatements();
             while(stmtItr.hasNext()){
@@ -798,18 +779,17 @@ public class JenaIngestUtils {
                 Statement stmt = stmtItr.nextStatement();
                 Resource sRes = stmt.getSubject();
                 Resource oRes = null;
-                if(sRes.getNameSpace().equals(changeNamespace)){
+                if(sRes.getNameSpace().equals(newNamespace)){
                     saveModel.add(stmt);
                     statementDone = true;
                 }
                 try{
-                    oRes = (Resource)stmt.getObject();
-                    if(oRes.getNameSpace().equals(changeNamespace) && !statementDone){
+                    oRes = (Resource) stmt.getObject();
+                    if(oRes.getNameSpace().equals(newNamespace) && !statementDone){
                         saveModel.add(stmt);
                         statementDone = true;
                     }    
-                }
-                catch(Exception e){
+                } catch(Exception e){
                     continue;
                 }
             }
