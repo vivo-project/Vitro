@@ -25,5 +25,9 @@ public class ApplicationUtils {
 					"Called for Application before it was available", e);
 		}
 	}
+	
+	static void setInstance(Application application) {
+		instance = application;
+	}
 
 }

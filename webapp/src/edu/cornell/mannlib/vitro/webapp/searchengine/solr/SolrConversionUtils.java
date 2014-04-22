@@ -148,8 +148,11 @@ public class SolrConversionUtils {
 	private static Map<String, SearchFacetField> convertToSearchFacetFieldMap(
 			List<FacetField> facetFields) {
 		Map<String, SearchFacetField> map = new HashMap<>();
-		for (FacetField facetField : facetFields) {
-			map.put(facetField.getName(), convertToSearchFacetField(facetField));
+		if (facetFields != null) {
+			for (FacetField facetField : facetFields) {
+				map.put(facetField.getName(),
+						convertToSearchFacetField(facetField));
+			}
 		}
 		return map;
 	}
@@ -163,9 +166,11 @@ public class SolrConversionUtils {
 	private static List<BaseCount> convertToSearchFacetFieldCounts(
 			List<FacetField.Count> solrCounts) {
 		List<BaseCount> searchCounts = new ArrayList<>();
-		for (FacetField.Count solrCount : solrCounts) {
-			searchCounts.add(new BaseCount(solrCount.getName(), solrCount
-					.getCount()));
+		if (solrCounts != null) {
+			for (FacetField.Count solrCount : solrCounts) {
+				searchCounts.add(new BaseCount(solrCount.getName(), solrCount
+						.getCount()));
+			}
 		}
 		return searchCounts;
 	}

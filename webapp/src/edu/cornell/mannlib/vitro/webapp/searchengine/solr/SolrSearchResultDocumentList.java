@@ -21,7 +21,15 @@ public class SolrSearchResultDocumentList implements SearchResultDocumentList {
 	private SolrDocumentList solrDocs;
 
 	public SolrSearchResultDocumentList(SolrDocumentList solrDocs) {
-		this.solrDocs = solrDocs;
+		if (solrDocs == null) {
+			SolrDocumentList list = new SolrDocumentList();
+			list.setStart(0L);
+			list.setNumFound(0L);
+			list.setMaxScore(0.0F);
+			this.solrDocs = list;
+		} else {
+			this.solrDocs = solrDocs;
+		}
 	}
 
 	@Override
