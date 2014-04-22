@@ -26,16 +26,16 @@ import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.utils.fields.FieldUtils;
 
 /*
- * This runs a solr query to get individuals of a certain class instead of relying on the dao classes. 
+ * This runs a search query to get individuals of a certain class instead of relying on the dao classes. 
  * Also it gets individuals that belong to the most specific type(s) specified.
  */
-public class IndividualsViaSolrQueryOptions extends IndividualsViaVClassOptions implements FieldOptions {
-	private Log log = LogFactory.getLog(IndividualsViaSolrQueryOptions.class);	
+public class IndividualsViaSearchQueryOptions extends IndividualsViaVClassOptions implements FieldOptions {
+	private Log log = LogFactory.getLog(IndividualsViaSearchQueryOptions.class);	
 
     private String subjectUri;
     private String predicateUri;
     private String objectUri;
-    public IndividualsViaSolrQueryOptions(String inputSubjectUri, String inputPredicateUri, String inputObjectUri, String ... vclassURIs) throws Exception {
+    public IndividualsViaSearchQueryOptions(String inputSubjectUri, String inputPredicateUri, String inputObjectUri, String ... vclassURIs) throws Exception {
         super(vclassURIs);           
         this.subjectUri = inputSubjectUri;
         this.predicateUri  = inputPredicateUri;
@@ -46,10 +46,10 @@ public class IndividualsViaSolrQueryOptions extends IndividualsViaVClassOptions 
     protected Map<String,Individual> getIndividualsForClass(String vclassURI, WebappDaoFactory wDaoFact ){
     	Map<String, Individual> individualMap = new HashMap<String, Individual>();
     	try {
-			SearchEngine solrServer = ApplicationUtils.instance().getSearchEngine();
+			SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
 	
-			//solr query for type count.    		
-			SearchQuery query = solrServer.createQuery();
+			//search query for type count.    		
+			SearchQuery query = searchEngine.createQuery();
 			if( VitroVocabulary.OWL_THING.equals( vclassURI )){
 				query.setQuery( "*:*" );    			
 			}else{
@@ -59,7 +59,7 @@ public class IndividualsViaSolrQueryOptions extends IndividualsViaVClassOptions 
              .setRows(1000);
 	        query.addFields(VitroSearchTermNames.URI); // fields to retrieve
 
-			SearchResponse rsp = solrServer.query(query);
+			SearchResponse rsp = searchEngine.query(query);
 			SearchResultDocumentList docs = rsp.getResults();
 			long found = docs.getNumFound();
 			if(found > 0) {
@@ -75,13 +75,13 @@ public class IndividualsViaSolrQueryOptions extends IndividualsViaVClassOptions 
 						} 
 					}
 					catch(Exception ex) {
-						log.error("An error occurred retrieving the individual solr query resutls", ex);
+						log.error("An error occurred retrieving the individual search resutls", ex);
 					}
 				}
 			}
 
     	} catch(Exception ex) {
-    		log.error("Error occurred in executing solr query ", ex);
+    		log.error("Error occurred in executing search query ", ex);
     	}
         return individualMap;        
     }

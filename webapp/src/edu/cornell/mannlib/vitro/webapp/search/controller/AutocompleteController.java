@@ -74,8 +74,8 @@ public class AutocompleteController extends VitroAjaxController {
             }
             log.debug("query for '" + qtxt +"' is " + query.toString());
 
-			SearchEngine solr = ApplicationUtils.instance().getSearchEngine();
-            SearchResponse queryResponse = solr.query(query);
+			SearchEngine search = ApplicationUtils.instance().getSearchEngine();
+            SearchResponse queryResponse = search.query(query);
 
             if ( queryResponse == null) {
                 log.error("Query response for a search was null");
@@ -254,7 +254,7 @@ public class AutocompleteController extends VitroAjaxController {
     }
 
     private String escapeWhitespaceInQueryString(String queryStr) {
-        // Solr wants whitespace to be escaped with a backslash
+        // The search engine wants whitespace to be escaped with a backslash
         return queryStr.replaceAll("\\s+", "\\\\ ");
     }
        

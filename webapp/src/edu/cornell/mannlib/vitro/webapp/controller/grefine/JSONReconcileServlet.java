@@ -271,12 +271,11 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				// begin search
 				JSONArray resultJsonArr = new JSONArray();
 
-				// Solr
 	            SearchQuery query = getQuery(queryVal, searchType, limit, propertiesList);
 	            SearchResponse queryResponse = null;
 	            if (query != null) {
-	    			SearchEngine solr = ApplicationUtils.instance().getSearchEngine();
-	            	queryResponse = solr.query(query);
+	                SearchEngine search = ApplicationUtils.instance().getSearchEngine();
+	            	queryResponse = search.query(query);
 	            } else {
 	            	log.error("Query for a search was null");                
 	            }

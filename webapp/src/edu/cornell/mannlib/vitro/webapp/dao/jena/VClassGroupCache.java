@@ -56,15 +56,15 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
  * The cache is updated asynchronously by the thread RebuildGroupCacheThread. 
  * A synchronous rebuild can be performed with VClassGroupCache.doSynchronousRebuild() 
  * 
- * This class should handle the condition where Solr is not available.  
+ * This class should handle the condition where the search engine is not available.  
  * It will not throw an exception but it will return a empty list of classes
  * or class groups.
  * 
  * VClassGroupCache.doSynchronousRebuild() and the RebuildGroupCacheThread will try
- * to connect to the Solr server a couple of times and then give up.  
+ * to connect to the search engine a couple of times and then give up.  
  * 
- * As of VIVO release 1.4, the counts come from the Solr index. If the
- * solr index is not built or if there were problems building the index,
+ * As of VIVO release 1.4, the counts come from the search index. If the
+ * search index is not built or if there were problems building the index,
  * the class counts from VClassGroupCache will be incorrect.
  */
 public class VClassGroupCache implements IndexingEventListener {
@@ -185,7 +185,7 @@ public class VClassGroupCache implements IndexingEventListener {
     }
     
     public void doSynchronousRebuild(){
-        //try to rebuild a couple times since the Solr server may not yet be up.
+        //try to rebuild a couple times since the search engine may not yet be up.
         
         int attempts = 0;
         int maxTries = 3;
@@ -194,7 +194,7 @@ public class VClassGroupCache implements IndexingEventListener {
         while( attempts < maxTries ){
             try {
                 attempts++;
-                rebuildCacheUsingSolr(this);
+                rebuildCacheUsingSearch(this);
                 break;                
             } catch (SearchEngineException e) {
                 exception = e;
@@ -244,17 +244,15 @@ public class VClassGroupCache implements IndexingEventListener {
     
     /**
      * Method that rebuilds the cache. This will use a WebappDaoFactory, 
-     * a SolrSever and maybe a ProhibitedFromSearch from the cache.context.
+     * a SearchEngine and maybe a ProhibitedFromSearch from the cache.context.
      * 
      * If ProhibitedFromSearch is not found in the context, that will be skipped.
-     * 
-     * @throws SearchEngineException if there are problems with the Solr server. 
      */
-    protected static void rebuildCacheUsingSolr( VClassGroupCache cache ) throws SearchEngineException{                        
+    protected static void rebuildCacheUsingSearch( VClassGroupCache cache ) throws SearchEngineException{                        
         long start = System.currentTimeMillis();
 		WebappDaoFactory wdFactory = ModelAccess.on(cache.context).getWebappDaoFactory();
 
-		SearchEngine solrServer = ApplicationUtils.instance().getSearchEngine();
+		SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
         
         VitroFilters vFilters = VitroFilterUtils.getPublicFilter(cache.context);
         VClassGroupDao vcgDao = new WebappDaoFactoryFiltering(wdFactory, vFilters).getVClassGroupDao();
@@ -263,7 +261,7 @@ public class VClassGroupCache implements IndexingEventListener {
                 INCLUDE_UNINSTANTIATED, DONT_INCLUDE_INDIVIDUAL_COUNT);
                                 
         removeClassesHiddenFromSearch(groups, cache.context);
-        addCountsUsingSolr(groups, solrServer);        
+        addCountsUsingSearch(groups, searchEngine);        
         cache.setCache(groups, classMapForGroups(groups));
         
         log.debug("msec to build cache: " + (System.currentTimeMillis() - start));
@@ -310,23 +308,23 @@ public class VClassGroupCache implements IndexingEventListener {
      * Add the Individual count to classes in groups.
      * @throws SearchEngineException 
      */
-    protected static void addCountsUsingSolr(List<VClassGroup> groups, SearchEngine solrServer) 
+    protected static void addCountsUsingSearch(List<VClassGroup> groups, SearchEngine searchEngine) 
     throws SearchEngineException {        
-        if( groups == null || solrServer == null ) 
+        if( groups == null || searchEngine == null ) 
             return;       
         for( VClassGroup group : groups){            
-            addClassCountsToGroup(group, solrServer);            
+            addClassCountsToGroup(group, searchEngine);            
         }
     }    
     
-    protected static void addClassCountsToGroup(VClassGroup group, SearchEngine solrServer)
+    protected static void addClassCountsToGroup(VClassGroup group, SearchEngine searchEngine)
     throws SearchEngineException {
         if( group == null ) return;
         
         String groupUri = group.getURI();
         String facetOnField = VitroSearchTermNames.RDFTYPE;
         
-        SearchQuery query = ApplicationUtils.instance().getSearchEngine().createQuery().
+        SearchQuery query = searchEngine.createQuery().
             setRows(0).
             setQuery(VitroSearchTermNames.CLASSGROUP_URI + ":" + groupUri ).        
             setFaceting(true). //facet on type to get counts for classes in classgroup
@@ -335,7 +333,7 @@ public class VClassGroupCache implements IndexingEventListener {
         
         log.debug("query: " + query);
         
-        SearchResponse rsp = solrServer.query(query);
+        SearchResponse rsp = searchEngine.query(query);
 
         //Get individual count
         long individualCount = rsp.getResults().getNumFound();
@@ -419,7 +417,7 @@ public class VClassGroupCache implements IndexingEventListener {
                     setWorkLevel(WorkLevel.WORKING);
                     rebuildRequested = false;                    
                     try {
-                        rebuildCacheUsingSolr( cache );                        
+                        rebuildCacheUsingSearch( cache );                        
                         log.debug("rebuildGroupCacheThread.run() -- rebuilt cache ");
                         failedAttempts = 0;
                         delay = 100;
@@ -427,7 +425,7 @@ public class VClassGroupCache implements IndexingEventListener {
                         failedAttempts++;
                         if( failedAttempts >= maxFailedAttempts ){                                                        
                             log.error("Could not build VClassGroupCache. " +
-                            		  "Could not connect with Solr after " + 
+                            		  "Could not connect with the search engine after " + 
                             		   failedAttempts + " attempts.", e.getCause());
                             rebuildRequested = false;
                             failedAttempts = 0;
@@ -435,7 +433,7 @@ public class VClassGroupCache implements IndexingEventListener {
                         }else{
                             rebuildRequested = true;
                             delay = (int) (( Math.pow(2, failedAttempts) ) * 1000);
-                            log.debug("Could not connect with Solr, will attempt " +
+                            log.debug("Could not connect with the search engine, will attempt " +
                             		  "again in " + delay + " msec.");                            
                         }
                     }catch(Exception ex){

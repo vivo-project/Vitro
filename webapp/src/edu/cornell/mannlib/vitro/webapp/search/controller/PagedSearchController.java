@@ -55,10 +55,7 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.searchresult.Individu
 import edu.ucsf.vitro.opensocial.OpenSocialManager;
 
 /**
- * Paged search controller that uses Solr
- *  
- * @author bdc34, rjy7
- * 
+ * Paged search controller that uses the search engine
  */
 
 public class PagedSearchController extends FreemarkerHttpServlet {
@@ -170,14 +167,14 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             }
                 
             SearchQuery query = getQuery(queryText, hitsPerPage, startIndex, vreq);            
-            SearchEngine solr = ApplicationUtils.instance().getSearchEngine();
+            SearchEngine search = ApplicationUtils.instance().getSearchEngine();
             SearchResponse response = null;           
             
             try {
-                response = solr.query(query);
+                response = search.query(query);
             } catch (Exception ex) {                
                 String msg = makeBadSearchMessage(queryText, ex.getMessage(), vreq);
-                log.error("could not run Solr query",ex);
+                log.error("could not run search query",ex);
                 return doFailedSearch(msg, queryText, format, vreq);              
             }
             
@@ -467,7 +464,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     }       
 
     private SearchQuery getQuery(String queryText, int hitsPerPage, int startIndex, VitroRequest vreq) {
-        // Lowercase the search term to support wildcard searches: Solr applies no text
+        // Lowercase the search term to support wildcard searches: The search engine applies no text
         // processing to a wildcard search term.
         SearchQuery query = ApplicationUtils.instance().getSearchEngine().createQuery(queryText);
         

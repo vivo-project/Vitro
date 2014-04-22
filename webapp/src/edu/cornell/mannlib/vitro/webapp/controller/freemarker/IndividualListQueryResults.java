@@ -20,7 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumen
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 
 /**
- * Holds the Individuals that were found in a Solr search query.
+ * Holds the Individuals that were found in a search query.
  * 
  * Provides a convenience method to run the query and to find the Individuals.
  */
@@ -39,9 +39,8 @@ public class IndividualListQueryResults {
 			IndividualDao indDao)
 			throws SearchEngineException {
 
-		SearchEngine solr = ApplicationUtils.instance().getSearchEngine();
-		SearchResponse response = null;
-		response = solr.query(query);
+		SearchEngine search = ApplicationUtils.instance().getSearchEngine();
+		SearchResponse response = search.query(query);
 
 		if (response == null) {
 			log.debug("response from search query was null");

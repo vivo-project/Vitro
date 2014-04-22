@@ -1,13 +1,14 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ajax;
+
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.AC_NAME_STEMMED;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_LOWERCASE_SINGLE_VALUED;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_RAW;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_UNSTEMMED;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.RDFTYPE;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.URI;
-import static edu.cornell.mannlib.vitro.webapp.utils.solr.SolrQueryUtils.Conjunction.OR;
+import static edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils.Conjunction.OR;
 
 import java.io.IOException;
 import java.util.List;
@@ -29,9 +30,9 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineExcepti
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery.Order;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
-import edu.cornell.mannlib.vitro.webapp.utils.solr.AutoCompleteWords;
-import edu.cornell.mannlib.vitro.webapp.utils.solr.FieldMap;
-import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrQueryUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.searchengine.AutoCompleteWords;
+import edu.cornell.mannlib.vitro.webapp.utils.searchengine.FieldMap;
+import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils;
 
 /**
  * Get the basic auto-complete info for the profile selection.
@@ -41,7 +42,7 @@ public class BasicProfilesGetter extends AbstractAjaxResponder {
 	private static final Log log = LogFactory.getLog(BasicProfilesGetter.class);
 
 	private static final String WORD_DELIMITER = "[, ]+";
-	private static final FieldMap RESPONSE_FIELDS = SolrQueryUtils
+	private static final FieldMap RESPONSE_FIELDS = SearchQueryUtils
 			.fieldMap().put(URI, "uri").put(NAME_RAW, "label")
 			.put("bogus", "classLabel").put("bogus", "imageUrl");
 
@@ -58,7 +59,7 @@ public class BasicProfilesGetter extends AbstractAjaxResponder {
 		super(servlet, vreq, resp);
 
 		this.term = getStringParameter(PARAMETER_SEARCH_TERM, "");
-		this.searchWords = SolrQueryUtils.parseForAutoComplete(term,
+		this.searchWords = SearchQueryUtils.parseForAutoComplete(term,
 				WORD_DELIMITER);
 
 		this.profileTypes = figureProfileTypes();
@@ -69,7 +70,7 @@ public class BasicProfilesGetter extends AbstractAjaxResponder {
 	private List<String> figureProfileTypes() {
 		String typesString = ConfigurationProperties.getBean(vreq).getProperty(
 				PROPERTY_PROFILE_TYPES, DEFAULT_PROFILE_TYPES);
-		List<String> list = SolrQueryUtils.parseWords(typesString,
+		List<String> list = SearchQueryUtils.parseWords(typesString,
 				WORD_DELIMITER);
 		if (list.isEmpty()) {
 			log.error("No types configured for profile pages in "
@@ -86,11 +87,11 @@ public class BasicProfilesGetter extends AbstractAjaxResponder {
 		}
 
 		try {
-			SearchEngine solr = ApplicationUtils.instance().getSearchEngine();
+			SearchEngine search = ApplicationUtils.instance().getSearchEngine();
 			SearchQuery query = buildSearchQuery();
-			SearchResponse queryResponse = solr.query(query);
+			SearchResponse queryResponse = search.query(query);
 
-			List<Map<String, String>> parsed = SolrQueryUtils
+			List<Map<String, String>> parsed = SearchQueryUtils
 					.parseResponse(queryResponse, RESPONSE_FIELDS);
 
 			String response = assembleJsonResponse(parsed);
@@ -106,7 +107,7 @@ public class BasicProfilesGetter extends AbstractAjaxResponder {
 		SearchQuery q = ApplicationUtils.instance().getSearchEngine().createQuery();
 		q.addFields(NAME_RAW, URI);
 		q.addSortField(NAME_LOWERCASE_SINGLE_VALUED, Order.ASC);
-		q.addFilterQuery(SolrQueryUtils.assembleConjunctiveQuery(RDFTYPE, profileTypes, OR));
+		q.addFilterQuery(SearchQueryUtils.assembleConjunctiveQuery(RDFTYPE, profileTypes, OR));
 		q.setStart(0);
 		q.setRows(30);
 		q.setQuery(searchWords.assembleQuery(NAME_UNSTEMMED, AC_NAME_STEMMED));

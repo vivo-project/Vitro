@@ -24,11 +24,11 @@ import com.hp.hpl.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 //Returns the appropriate n3 based on data getter
-public  class ProcessSolrIndividualsDataGetterN3 extends ProcessDataGetterAbstract {
-	private static String classType = "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SolrIndividualsDataGetter";
+public  class ProcessSearchIndividualsDataGetterN3 extends ProcessDataGetterAbstract {
+	private static String classType = "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SearchIndividualsDataGetter";
 	private Log log = LogFactory.getLog(ProcessFixedHTMLN3.class);
 
-	public ProcessSolrIndividualsDataGetterN3(){
+	public ProcessSearchIndividualsDataGetterN3(){
 		
 	}
 	//Pass in variable that represents the counter 

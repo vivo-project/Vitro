@@ -35,7 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
  * TODO
  */
 public class JsonServletTest extends AbstractTestClass {
-	private static final String GET_SOLR_INDIVIDUALS_BY_VCLASS = "getSolrIndividualsByVClass";
+	private static final String GET_SEARCH_INDIVIDUALS_BY_VCLASS = "getSearchIndividualsByVClass";
 
 	private static final String GET_VCLASSES_FOR_VCLASS_GROUP = "getVClassesForVClassGroup";
 
@@ -51,16 +51,16 @@ public class JsonServletTest extends AbstractTestClass {
 	 * 		ents_edit_head.jsp
 	 *  (there is an ents_edit.jsp, invoked from EntityEditController, which does not seem to invoke ents_edit.js)
 	 * 
-	 * GetSolrIndividualsByVClass
-	 * 	Mock out SolrServer (from SolrSetup) and IndividualDao
+	 * GetSearchIndividualsByVClass
+	 * 	Mock out search engine and IndividualDao
 	 *  invoked by BrowseDataGetter.java
 	 *  	home page
 	 *  invoked by ClassGroupPageData.java
 	 *  	>>>> Bring up "People" tab.
 	 *  invoked by BrowseWidget.java
 	 * 
-	 * GetSolrIndividualsByVClasses
-	 * 	Mock out SolrServer (from SolrSetup) and IndividualDao
+	 * GetSearchIndividualsByVClasses
+	 * 	Mock out search engine and IndividualDao
 	 *  invoked by IndividualsForClassesDataGetter.java
 	 *  	ProcessIndividualsForClasses
 	 *  		extended in vivo by ProcessInternalClasses
@@ -85,7 +85,7 @@ public class JsonServletTest extends AbstractTestClass {
 	private WebappDaoFactoryStub wadf;
 	private VClassDaoStub vcDao;
 
-	private SearchEngineStub solr;
+	private SearchEngineStub search;
 
 	@Before
 	public void setup() throws ServletException {
@@ -112,8 +112,8 @@ public class JsonServletTest extends AbstractTestClass {
 		vcDao = new VClassDaoStub();
 		wadf.setVClassDao(vcDao);
 
-		solr = new SearchEngineStub();
-		ApplicationStub.setup(new ServletContextStub(), solr);
+		search = new SearchEngineStub();
+		ApplicationStub.setup(new ServletContextStub(), search);
 	}
 
 	@Test
@@ -163,7 +163,7 @@ public class JsonServletTest extends AbstractTestClass {
 			IOException {
 		setLoggerLevel(JsonServlet.class, Level.FATAL);
 		setLoggerLevel(JsonObjectProducer.class, Level.FATAL);
-		req.addParameter(GET_SOLR_INDIVIDUALS_BY_VCLASS, "true");
+		req.addParameter(GET_SEARCH_INDIVIDUALS_BY_VCLASS, "true");
 		servlet.service(req, resp);
 		assertFailureWithErrorMessage("java.lang.Exception: "
 				+ "parameter vclassId URI parameter expected ");
@@ -175,7 +175,7 @@ public class JsonServletTest extends AbstractTestClass {
 		setLoggerLevel(JsonServlet.class, Level.FATAL);
 		setLoggerLevel(JsonObjectProducer.class, Level.FATAL);
 		String vclassId = "http://bogusVclass";
-		req.addParameter(GET_SOLR_INDIVIDUALS_BY_VCLASS, "true");
+		req.addParameter(GET_SEARCH_INDIVIDUALS_BY_VCLASS, "true");
 		req.addParameter(VCLASS_ID, vclassId);
 
 		servlet.service(req, resp);
@@ -185,7 +185,8 @@ public class JsonServletTest extends AbstractTestClass {
 
 	/**
 	 * TODO test successful responses. This will require figuring out how to
-	 * stub SolrServer. It's an abstract class, so we just need to figure out
+	 * stub SearchEngine. Since we are no longer dealing with an abstract class 
+	 * (like SolrServer), so we just need to figure out
 	 * what sort of NamedList is required as a response to a request.
 	 */
 	@Test
@@ -195,7 +196,7 @@ public class JsonServletTest extends AbstractTestClass {
 		setLoggerLevel(ModelAccess.class, Level.ERROR);
 		String vclassId = "http://myVclass";
 		vcDao.setVClass(vclassId, new VClass(vclassId));
-		req.addParameter(GET_SOLR_INDIVIDUALS_BY_VCLASS, "true");
+		req.addParameter(GET_SEARCH_INDIVIDUALS_BY_VCLASS, "true");
 		req.addParameter(VCLASS_ID, vclassId);
 
 		servlet.service(req, resp);

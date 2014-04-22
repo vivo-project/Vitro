@@ -26,7 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.Individual
  * Does a Solr search for individuals, and uses the short view to render each of
  * the results.
  */
-public class GetRandomSolrIndividualsByVClass extends GetSolrIndividualsByVClass {
+public class GetRandomSolrIndividualsByVClass extends GetSearchIndividualsByVClass {
 	private static final Log log = LogFactory
 			.getLog(GetRandomSolrIndividualsByVClass.class);
 

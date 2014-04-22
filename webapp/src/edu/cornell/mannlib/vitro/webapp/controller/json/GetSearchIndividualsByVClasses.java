@@ -16,11 +16,11 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
  * Accepts multiple vclasses and returns individuals which correspond to the
  * intersection of those classes (i.e. have all those types)
  */
-public class GetSolrIndividualsByVClasses extends JsonObjectProducer {
+public class GetSearchIndividualsByVClasses extends JsonObjectProducer {
 	private static final Log log = LogFactory
-		.getLog(GetSolrIndividualsByVClasses.class);
+		.getLog(GetSearchIndividualsByVClasses.class);
 
-	public GetSolrIndividualsByVClasses(VitroRequest vreq) {
+	public GetSearchIndividualsByVClasses(VitroRequest vreq) {
 		super(vreq);
 	}
 
@@ -45,7 +45,7 @@ public class GetSolrIndividualsByVClasses extends JsonObjectProducer {
             throw new Exception("parameter vclassId URI parameter expected ");
         }
         List<String> vclassIds = Arrays.asList(vitroClassIdStr);
-        return JsonServlet.getSolrIndividualsByVClasses(vclassIds, vreq, ctx);
+        return JsonServlet.getSearchIndividualsByVClasses(vclassIds, vreq);
     }
 
 }

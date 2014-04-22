@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.utils.solr;
+package edu.cornell.mannlib.vitro.webapp.utils.searchengine;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,15 +27,16 @@ public class AutoCompleteWords {
 	private final String partialWord;
 
 	/**
-	 * Package-access. Use SolrQueryUtils.parseForAutoComplete() to create an
+	 * Package-access. Use SearchQueryUtils.parseForAutoComplete() to create an
 	 * instance.
 	 */
 	AutoCompleteWords(String searchTerm, String delimiterPattern) {
-		this.searchTerm = searchTerm;
+		this.searchTerm = (searchTerm == null) ? "" : searchTerm;
 		this.delimiterPattern = delimiterPattern;
 
 		List<String> termWords = figureTermWords();
-		if (termWords.isEmpty() || this.searchTerm.endsWith(" ")) {
+		if (termWords.isEmpty()
+				|| this.searchTerm.matches(".*" + delimiterPattern)) {
 			this.completeWords = termWords;
 			this.partialWord = null;
 		} else {

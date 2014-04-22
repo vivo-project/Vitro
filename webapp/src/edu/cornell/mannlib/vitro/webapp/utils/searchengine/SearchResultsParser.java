@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.utils.solr;
+package edu.cornell.mannlib.vitro.webapp.utils.searchengine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,18 +15,18 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumen
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumentList;
 
 /**
- * Parse this Solr response, creating a map of values for each document.
+ * Parse this search response, creating a map of values for each document.
  * 
- * The Solr field names in the document are replaced by json field names in the
- * parsed results, according to the fieldMap.
+ * The search response field names in the document are replaced by json field
+ * names in the parsed results, according to the fieldMap.
  */
-public class SolrResultsParser {
-	private static final Log log = LogFactory.getLog(SolrResultsParser.class);
+public class SearchResultsParser {
+	private static final Log log = LogFactory.getLog(SearchResultsParser.class);
 
 	private final SearchResponse queryResponse;
 	private final Map<String, String> fieldNameMapping;
 
-	public SolrResultsParser(SearchResponse queryResponse, FieldMap fieldMap) {
+	public SearchResultsParser(SearchResponse queryResponse, FieldMap fieldMap) {
 		this.queryResponse = queryResponse;
 		this.fieldNameMapping = fieldMap.map();
 	}
@@ -62,7 +62,7 @@ public class SolrResultsParser {
 	 * have parsed the entire response).
 	 */
 	public List<Map<String, String>> parseAndFilterResponse(
-			SolrResponseFilter filter, int maxNumberOfResults) {
+			SearchResponseFilter filter, int maxNumberOfResults) {
 		List<Map<String, String>> maps = new ArrayList<Map<String, String>>();
 
 		if (queryResponse == null) {
@@ -95,10 +95,10 @@ public class SolrResultsParser {
 	 */
 	private Map<String, String> parseSingleDocument(SearchResultDocument doc) {
 		Map<String, String> result = new HashMap<String, String>();
-		for (String solrFieldName : fieldNameMapping.keySet()) {
-			String jsonFieldName = fieldNameMapping.get(solrFieldName);
-
-			result.put(jsonFieldName, parseSingleValue(doc, solrFieldName));
+		for (String searchResultFieldName : fieldNameMapping.keySet()) {
+			String jsonFieldName = fieldNameMapping.get(searchResultFieldName);
+			result.put(jsonFieldName,
+					parseSingleValue(doc, searchResultFieldName));
 		}
 
 		return result;

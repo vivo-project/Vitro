@@ -11,14 +11,14 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
-import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualToSolrDocument;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualToSearchDocument;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 class IndexWorkerThread extends VitroBackgroundThread{
 	private static final Log log = LogFactory.getLog(IndexWorkerThread.class);
 	
     protected final int threadNum;
-	protected IndividualToSolrDocument individualToSolrDoc;
+	protected IndividualToSearchDocument individualToSolrDoc;
 	protected final IndexerIface indexer;
 	protected final Iterator<Individual> individualsToIndex;
 	protected boolean stopRequested = false;

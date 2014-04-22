@@ -37,7 +37,7 @@ public class ContextNodeFields implements DocumentModifier{
     protected RDFServiceFactory rdfServiceFactory;
        
     /**
-     * Construct this with a model to query when building Solr Documents and
+     * Construct this with a model to query when building search documents and
      * a list of the SPARQL queries to run.
      */
     protected ContextNodeFields(List<String> queries, RDFServiceFactory rdfServiceFactory){   
@@ -73,10 +73,10 @@ public class ContextNodeFields implements DocumentModifier{
     
     /**
      * this method gets values that will be added to ALLTEXT 
-     * field of solr Document for each individual.
+     * field of the search index Document for each individual.
      * 
      * @param individual
-     * @return StringBuffer with text values to add to ALLTEXT field of solr Document.
+     * @return StringBuffer with text values to add to ALLTEXT field of the search index Document.
      */
     protected StringBuffer executeQueryForValues( Individual individual, Collection<String> queries){
     	  /* execute all the queries on the list and concat the values to add to all text */        

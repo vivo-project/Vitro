@@ -267,10 +267,10 @@ public class DataGetterUtils {
      * For page data getter conversions
      */
     /**
-     * Get Individual count for Solr query for intersection of multiple classes
+     * Get Individual count for search query for intersection of multiple classes
      */
     public static long getIndividualCountForIntersection(VitroRequest vreq, List<String> classUris) {
-    	 return IndividualListController.getIndividualCount(classUris, vreq.getWebappDaoFactory().getIndividualDao());
+    	 return IndividualListController.getIndividualCount(classUris);
     }
     
     //Return data getter type to be employed in display model

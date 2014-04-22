@@ -29,13 +29,13 @@ import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalUriFinders;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.SearchReindexingListener;
-import edu.cornell.mannlib.vitro.webapp.search.solr.SolrIndexer;
+import edu.cornell.mannlib.vitro.webapp.search.solr.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.DocumentModifier;
 import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.ExcludeBasedOnNamespace;
 import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.ExcludeBasedOnType;
 import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.ExcludeBasedOnTypeNamespace;
 import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.ExcludeNonFlagVitro;
-import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualToSolrDocument;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualToSearchDocument;
 import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.NameBoost;
 import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.NameFields;
 import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.SearchIndexExcluder;
@@ -100,13 +100,13 @@ public class SearchIndexerSetup implements ServletContextListener {
 			List<SearchIndexExcluder> searchIndexExcludesFromContext = (List<SearchIndexExcluder>) context
 					.getAttribute("SearchIndexExcludes");
 
-			IndividualToSolrDocument indToSolrDoc = setupTransltion(
+			IndividualToSearchDocument indToSolrDoc = setupTransltion(
 					jenaOntModel, displayModel,
 					RDFServiceUtils.getRDFServiceFactory(context),
 					modifiersFromContext, searchIndexExcludesFromContext);
 
 			/* setup solr indexer */
-			SolrIndexer solrIndexer = new SolrIndexer(searchEngine, indToSolrDoc);
+			SearchIndexer solrIndexer = new SearchIndexer(searchEngine, indToSolrDoc);
 
 			// This is where the builder gets the list of places to try to
 			// get objects to index. It is filtered so that non-public text
@@ -151,7 +151,7 @@ public class SearchIndexerSetup implements ServletContextListener {
 
 	}
 
-	public static IndividualToSolrDocument setupTransltion(
+	public static IndividualToSearchDocument setupTransltion(
 			OntModel jenaOntModel, Model displayModel,
 			RDFServiceFactory rdfServiceFactory,
 			List<DocumentModifier> modifiersFromContext,
@@ -187,6 +187,6 @@ public class SearchIndexerSetup implements ServletContextListener {
 		excludes.add(new ExcludeNonFlagVitro());
 		excludes.add(new SyncingExcludeBasedOnType(displayModel));
 
-		return new IndividualToSolrDocument(excludes, modifiers);
+		return new IndividualToSearchDocument(excludes, modifiers);
 	}
 }

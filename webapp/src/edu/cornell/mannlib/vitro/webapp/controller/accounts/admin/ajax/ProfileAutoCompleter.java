@@ -1,14 +1,13 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.admin.ajax;
-
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.AC_NAME_STEMMED;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_LOWERCASE_SINGLE_VALUED;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_RAW;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_UNSTEMMED;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.RDFTYPE;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.URI;
-import static edu.cornell.mannlib.vitro.webapp.utils.solr.SolrQueryUtils.Conjunction.OR;
+import static edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils.Conjunction.OR;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -43,10 +42,10 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineExcepti
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery.Order;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
-import edu.cornell.mannlib.vitro.webapp.utils.solr.AutoCompleteWords;
-import edu.cornell.mannlib.vitro.webapp.utils.solr.FieldMap;
-import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrQueryUtils;
-import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrResponseFilter;
+import edu.cornell.mannlib.vitro.webapp.utils.searchengine.AutoCompleteWords;
+import edu.cornell.mannlib.vitro.webapp.utils.searchengine.FieldMap;
+import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchResponseFilter;
 
 /**
  * Get a list of Profiles with last names that begin with this search term, and
@@ -60,7 +59,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrResponseFilter;
  * if an error occurs, return an empty result.
  */
 class ProfileAutoCompleter extends AbstractAjaxResponder implements
-		SolrResponseFilter {
+		SearchResponseFilter {
 	private static final Log log = LogFactory
 			.getLog(ProfileAutoCompleter.class);
 
@@ -71,7 +70,7 @@ class ProfileAutoCompleter extends AbstractAjaxResponder implements
 			.singleton("http://xmlns.com/foaf/0.1/Person");
 
 	private static final String WORD_DELIMITER = "[, ]+";
-	private static final FieldMap RESPONSE_FIELDS = SolrQueryUtils.fieldMap()
+	private static final FieldMap RESPONSE_FIELDS = SearchQueryUtils.fieldMap()
 			.put(URI, "uri").put(NAME_RAW, "label");
 
 	private static final Syntax SYNTAX = Syntax.syntaxARQ;
@@ -96,7 +95,7 @@ class ProfileAutoCompleter extends AbstractAjaxResponder implements
 		this.externalAuthId = getStringParameter(PARAMETER_ETERNAL_AUTH_ID, "");
 
 		this.term = getStringParameter(PARAMETER_SEARCH_TERM, "");
-		this.searchWords = SolrQueryUtils.parseForAutoComplete(term,
+		this.searchWords = SearchQueryUtils.parseForAutoComplete(term,
 				WORD_DELIMITER);
 
 		// TODO This seems to expose the matching property and mechanism too
@@ -123,7 +122,7 @@ class ProfileAutoCompleter extends AbstractAjaxResponder implements
 			SearchQuery query = buildSearchQuery();
 			SearchResponse queryResponse = executeSearchQuery(query);
 
-			List<Map<String, String>> maps = SolrQueryUtils
+			List<Map<String, String>> maps = SearchQueryUtils
 					.parseAndFilterResponse(queryResponse, RESPONSE_FIELDS,
 							this, 30);
 
@@ -142,7 +141,7 @@ class ProfileAutoCompleter extends AbstractAjaxResponder implements
 		SearchQuery q = ApplicationUtils.instance().getSearchEngine().createQuery();
 		q.addFields(NAME_RAW, URI);
 		q.addSortField(NAME_LOWERCASE_SINGLE_VALUED, Order.ASC);
-		q.addFilterQuery(SolrQueryUtils.assembleConjunctiveQuery(RDFTYPE,
+		q.addFilterQuery(SearchQueryUtils.assembleConjunctiveQuery(RDFTYPE,
 				profileTypes, OR));
 		q.setStart(0);
 		q.setRows(10000);
@@ -152,8 +151,8 @@ class ProfileAutoCompleter extends AbstractAjaxResponder implements
 
 	private SearchResponse executeSearchQuery(SearchQuery query)
 			throws SearchEngineException {
-		SearchEngine solr = ApplicationUtils.instance().getSearchEngine();
-		return solr.query(query);
+		SearchEngine search = ApplicationUtils.instance().getSearchEngine();
+		return search.query(query);
 	}
 
 	/**

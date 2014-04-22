@@ -29,9 +29,9 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumen
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 
-public class IndividualToSolrDocument {
+public class IndividualToSearchDocument {
         
-    public static final Log log = LogFactory.getLog(IndividualToSolrDocument.class.getName());
+    public static final Log log = LogFactory.getLog(IndividualToSearchDocument.class.getName());
     
     public static VitroSearchTermNames term = new VitroSearchTermNames();              
     
@@ -41,7 +41,7 @@ public class IndividualToSolrDocument {
 
     protected List<SearchIndexExcluder> excludes;
         
-    public IndividualToSolrDocument(List<SearchIndexExcluder> excludes, List<DocumentModifier> docModifiers){
+    public IndividualToSearchDocument(List<SearchIndexExcluder> excludes, List<DocumentModifier> docModifiers){
         this.excludes = excludes;
         this.documentModifiers = docModifiers;
     }    
@@ -302,12 +302,12 @@ public class IndividualToSolrDocument {
         doc.addField(term.NAME_RAW, value);
         doc.addField(term.NAME_LOWERCASE_SINGLE_VALUED,value);
         
-        // NAME_RAW will be copied by solr into the following fields:
+        // NAME_RAW will be copied by the search engine into the following fields:
         // NAME_LOWERCASE, NAME_UNSTEMMED, NAME_STEMMED, NAME_PHONETIC, AC_NAME_UNTOKENIZED, AC_NAME_STEMMED
     }
     
     public Object getIndexId(Object obj) {
-        throw new Error("IndiviudalToSolrDocument.getIndexId() is unimplemented");        
+        throw new Error("IndiviudalToSearchDocument.getIndexId() is unimplemented");        
     }
     
     public String getIdForUri(String uri){

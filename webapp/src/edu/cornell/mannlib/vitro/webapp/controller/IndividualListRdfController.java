@@ -33,11 +33,12 @@ public class IndividualListRdfController extends VitroHttpServlet {
 	    
     @Override
 	public void doGet (HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+    	SearchEngine search = ApplicationUtils.instance().getSearchEngine();
     	    
     	// Make the query
     	String vclassUri = req.getParameter("vclass");
     	String queryStr = VitroSearchTermNames.RDFTYPE + ":\"" + vclassUri + "\"";
-    	SearchQuery query = ApplicationUtils.instance().getSearchEngine().createQuery(queryStr);
+    	SearchQuery query = search.createQuery(queryStr);
     	query.setStart(0)
     	     .setRows(ENTITY_LIST_CONTROLLER_MAX_RESULTS)
     	     .addFields(VitroSearchTermNames.URI);
@@ -45,11 +46,10 @@ public class IndividualListRdfController extends VitroHttpServlet {
     	     //.addSortField(VitroSearchTermNames.NAME_LOWERCASE_SINGLE_VALUED);
 
     	// Execute the query
-		SearchEngine solr = ApplicationUtils.instance().getSearchEngine();
         SearchResponse response = null;
         
         try {
-            response = solr.query(query);            
+            response = search.query(query);            
         } catch (Throwable t) {
             log.error(t, t);            
         }

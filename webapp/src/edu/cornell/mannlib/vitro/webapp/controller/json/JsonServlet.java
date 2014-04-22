@@ -3,12 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.controller.json;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,9 +19,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
-import edu.cornell.mannlib.vitro.webapp.controller.individuallist.IndividualListResultsUtils;
 import edu.cornell.mannlib.vitro.webapp.controller.individuallist.IndividualListResults;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
+import edu.cornell.mannlib.vitro.webapp.controller.individuallist.IndividualListResultsUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.log.LogUtils;
 
@@ -62,13 +58,13 @@ public class JsonServlet extends VitroHttpServlet {
         	throw new IllegalArgumentException("The call invoked deprecated classes " +
         			"and the parameter for this call appeared nowhere in the code base, " +
         			"so it was removed in May, 2012.");
-        }else if( vreq.getParameter("getSolrIndividualsByVClass") != null ){
-            new GetSolrIndividualsByVClass(vreq).process(resp);
+        }else if( vreq.getParameter("getSearchIndividualsByVClass") != null ){
+            new GetSearchIndividualsByVClass(vreq).process(resp);
         }else if( vreq.getParameter("getVClassesForVClassGroup") != null ){
             new GetVClassesForVClassGroup(vreq).process(resp);
-        } else if( vreq.getParameter("getSolrIndividualsByVClasses") != null ){
+        } else if( vreq.getParameter("getSearchIndividualsByVClasses") != null ){
         	log.debug("AJAX request to retrieve individuals by vclasses");
-        	new	GetSolrIndividualsByVClasses(vreq).process(resp);
+        	new	GetSearchIndividualsByVClasses(vreq).process(resp);
         } else if( vreq.getParameter("getDataForPage") != null ){
             throw new IllegalArgumentException("The call invoked deprecated classes " +
                     "and the parameter for this call appeared nowhere in the code base, " +
@@ -84,27 +80,27 @@ public class JsonServlet extends VitroHttpServlet {
     }
     
 
-    public static JSONObject getSolrIndividualsByVClass(String vclassURI, HttpServletRequest req, ServletContext context) throws Exception {
+    public static JSONObject getSearchIndividualsByVClass(String vclassURI, HttpServletRequest req) throws Exception {
         List<String> vclassURIs = Collections.singletonList(vclassURI);
         VitroRequest vreq = new VitroRequest(req);        
         
-        IndividualListResults vcResults = getSolrVClassIntersectionResults(vclassURIs, vreq, context);
+        IndividualListResults vcResults = getSearchVClassIntersectionResults(vclassURIs, vreq);
         //last parameter indicates single vclass instead of multiple vclasses
         return IndividualListResultsUtils.wrapIndividualListResultsInJson(vcResults, vreq, false);                    
     }
 
-    public static JSONObject getSolrIndividualsByVClasses(List<String> vclassURIs, HttpServletRequest req, ServletContext context) throws Exception {
+    public static JSONObject getSearchIndividualsByVClasses(List<String> vclassURIs, HttpServletRequest req) throws Exception {
    	 	VitroRequest vreq = new VitroRequest(req);   
-   	 	log.debug("Retrieve solr results for vclasses" + vclassURIs.toString());
-        IndividualListResults vcResults = getSolrVClassIntersectionResults(vclassURIs, vreq, context);
-        log.debug("Results returned from Solr for " + vclassURIs.toString() + " are of size " + vcResults.getTotalCount());
+   	 	log.debug("Retrieve search results for vclasses" + vclassURIs.toString());
+        IndividualListResults vcResults = getSearchVClassIntersectionResults(vclassURIs, vreq);
+        log.debug("Results returned from search engine for " + vclassURIs.toString() + " are of size " + vcResults.getTotalCount());
         
         return IndividualListResultsUtils.wrapIndividualListResultsInJson(vcResults, vreq, true);        
    }
     
-    //Including version for Solr query for Vclass Intersections
-    private static IndividualListResults getSolrVClassIntersectionResults(List<String> vclassURIs, VitroRequest vreq, ServletContext context){
-        log.debug("Retrieving Solr intersection results for " + vclassURIs.toString());
+    //Including version for search query for Vclass Intersections
+    private static IndividualListResults getSearchVClassIntersectionResults(List<String> vclassURIs, VitroRequest vreq){
+        log.debug("Retrieving search intersection results for " + vclassURIs.toString());
     	String alpha = IndividualListController.getAlphaParameter(vreq);
         int page = IndividualListController.getPageParameter(vreq);
         log.debug("Alpha and page parameters are " + alpha + " and " + page);
@@ -128,17 +124,17 @@ public class JsonServlet extends VitroHttpServlet {
             return value;            
     }
     
-    public static JSONObject getRandomSolrIndividualsByVClass(String vclassURI, HttpServletRequest req, ServletContext context) throws Exception {
+    public static JSONObject getRandomSearchIndividualsByVClass(String vclassURI, HttpServletRequest req) throws Exception {
         VitroRequest vreq = new VitroRequest(req);        
         
-        IndividualListResults vcResults = getRandomSolrVClassResults(vclassURI, vreq, context);
+        IndividualListResults vcResults = getRandomSearchVClassResults(vclassURI, vreq);
         //last parameter indicates single vclass instead of multiple vclasses
         return IndividualListResultsUtils.wrapIndividualListResultsInJson(vcResults, vreq, false);                            
     }
 
      //Including version for Random Solr query for Vclass Intersections
-     private static IndividualListResults getRandomSolrVClassResults(String vclassURI, VitroRequest vreq, ServletContext context){
-         log.debug("Retrieving random Solr intersection results for " + vclassURI);
+     private static IndividualListResults getRandomSearchVClassResults(String vclassURI, VitroRequest vreq){
+         log.debug("Retrieving random search intersection results for " + vclassURI);
 
          int page = IndividualListController.getPageParameter(vreq);
          int pageSize = Integer.parseInt(vreq.getParameter("pageSize"));

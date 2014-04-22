@@ -12,11 +12,11 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 /**
  * 
  */
-public class GetSolrIndividualsByVClass extends JsonObjectProducer {
+public class GetSearchIndividualsByVClass extends JsonObjectProducer {
 	private static final Log log = LogFactory
-			.getLog(GetSolrIndividualsByVClass.class);
+			.getLog(GetSearchIndividualsByVClass.class);
 	
-	protected GetSolrIndividualsByVClass(VitroRequest vreq) {
+	protected GetSearchIndividualsByVClass(VitroRequest vreq) {
 		super(vreq);
 	}
 
@@ -39,9 +39,9 @@ public class GetSolrIndividualsByVClass extends JsonObjectProducer {
         
         vreq.setAttribute("displayType", vitroClassIdStr);
         if ( queryType != null && queryType.equals("random")){
-            return JsonServlet.getRandomSolrIndividualsByVClass(vclass.getURI(), vreq, ctx);             
+            return JsonServlet.getRandomSearchIndividualsByVClass(vclass.getURI(), vreq);             
         } else {
-            return JsonServlet.getSolrIndividualsByVClass(vclass.getURI(), vreq, ctx);
+            return JsonServlet.getSearchIndividualsByVClass(vclass.getURI(), vreq);
         }
     }
 

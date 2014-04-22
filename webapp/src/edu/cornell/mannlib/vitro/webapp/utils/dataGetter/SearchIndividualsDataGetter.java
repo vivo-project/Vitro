@@ -34,10 +34,10 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListCont
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.individuallist.IndividualListResults;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
-import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrQueryUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
 
-public class SolrIndividualsDataGetter extends DataGetterBase implements DataGetter{    
+public class SearchIndividualsDataGetter extends DataGetterBase implements DataGetter{    
     String dataGetterURI;
     List<String> vclassUris = null;
     String saveToVar;
@@ -45,14 +45,14 @@ public class SolrIndividualsDataGetter extends DataGetterBase implements DataGet
     ServletContext context;
     
     
-    final static Log log = LogFactory.getLog(SolrIndividualsDataGetter.class);
+    final static Log log = LogFactory.getLog(SearchIndividualsDataGetter.class);
     //default template
     private final static String defaultTemplate = "menupage--defaultSolrIndividuals.ftl";
     
     /**
      * Constructor with display model and data getter URI that will be called by reflection.
      */
-    public SolrIndividualsDataGetter(VitroRequest vreq, Model displayModel, String dataGetterURI){
+    public SearchIndividualsDataGetter(VitroRequest vreq, Model displayModel, String dataGetterURI){
         this.configure(vreq, displayModel,dataGetterURI);
     }        
     
@@ -170,8 +170,8 @@ public class SolrIndividualsDataGetter extends DataGetterBase implements DataGet
 
     private void populateSolrQueryResults(VClass vclass, Map<String, Object> body) {
         try {
-	    	String alpha = SolrQueryUtils.getAlphaParameter(vreq);
-	        int page = SolrQueryUtils.getPageParameter(vreq);
+	    	String alpha = SearchQueryUtils.getAlphaParameter(vreq);
+	        int page = SearchQueryUtils.getPageParameter(vreq);
 	        IndividualListResults vcResults = IndividualListController.getResultsForVClass(
 	                vclass.getURI(), 
 	                page, 

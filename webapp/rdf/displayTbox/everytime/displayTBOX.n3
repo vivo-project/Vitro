@@ -41,7 +41,7 @@ display:RequiredAction a owl:Class ;
     a owl:Class ;
     rdfs:comment "Data getter for running a SPARQL query." .
     
-<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SolrIndividualsDataGetter>
+<java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SearchIndividualsDataGetter>
     a owl:Class ;
     rdfs:comment "A data getter for a Solr Class search, i.e. get individuals for VClass" .
     

@@ -175,7 +175,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 	
     private boolean tooManyRangeOptions(VitroRequest vreq, HttpSession session ) throws SearchEngineException {
     	List<VClass> rangeTypes = getRangeTypes(vreq);
-		SearchEngine solrServer = ApplicationUtils.instance().getSearchEngine();
+		SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
     	
     	List<String> types = new ArrayList<String>();
     	for (VClass vclass : rangeTypes) {
@@ -191,15 +191,15 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	
     	long count = 0;    		   
     	for( String type:types){
-    		//solr query for type count.    		
-    		SearchQuery query = solrServer.createQuery();
+    		//search query for type count.    		
+    		SearchQuery query = searchEngine.createQuery();
     		if( VitroVocabulary.OWL_THING.equals( type )){
     			query.setQuery( "*:*" );    			
     		}else{
     			query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type);
     		}
     		query.setRows(0);	
-    		SearchResponse rsp = solrServer.query(query);
+    		SearchResponse rsp = searchEngine.query(query);
     		SearchResultDocumentList docs = rsp.getResults();
     		long found = docs.getNumFound();
     		count = count + found;
@@ -552,7 +552,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 		}
 		
 		//TODO: find out if there are any individuals in the classes of objectTypes
-		formSpecificData.put("rangeIndividualsExist", rangeIndividualsExist(session,types) );
+		formSpecificData.put("rangeIndividualsExist", rangeIndividualsExist(types) );
 		
 		formSpecificData.put("sparqlForAcFilter", getSparqlForAcFilter(vreq));
 		if(customErrorMessages != null && !customErrorMessages.isEmpty()) {
@@ -562,18 +562,17 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 		editConfiguration.setFormSpecificData(formSpecificData);
 	}
 	
-	private Object rangeIndividualsExist(HttpSession session, List<VClass> types) throws SearchEngineException {		
-		SearchEngine solrServer = ApplicationUtils.instance().getSearchEngine();
+	private Object rangeIndividualsExist(List<VClass> types) throws SearchEngineException {		
+		SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
     	
     	boolean rangeIndividualsFound = false;
     	for( VClass type:types){
-    		//solr for type count.
-    		SearchQuery query =ApplicationUtils.instance().getSearchEngine().createQuery();   
-    		
+    		//search  for type count.
+    		SearchQuery query = searchEngine.createQuery();   
     		query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type.getURI());
     		query.setRows(0);
     		
-    		SearchResponse rsp = solrServer.query(query);
+    		SearchResponse rsp = searchEngine.query(query);
     		SearchResultDocumentList docs = rsp.getResults();
     		if( docs.getNumFound() > 0 ){
     			rangeIndividualsFound = true;

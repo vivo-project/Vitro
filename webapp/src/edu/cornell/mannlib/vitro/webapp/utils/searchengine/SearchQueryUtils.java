@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.utils.solr;
+package edu.cornell.mannlib.vitro.webapp.utils.searchengine;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,12 +23,12 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 
 /**
- * Some static method to help in constructing Solr queries and parsing the
+ * Some static methods to help in constructing search queries and parsing the
  * results.
  */
 
-public class SolrQueryUtils {
-	private static final Log log = LogFactory.getLog(SolrQueryUtils.class.getName());
+public class SearchQueryUtils {
+	private static final Log log = LogFactory.getLog(SearchQueryUtils.class.getName());
 
 	public enum Conjunction {
 		AND, OR;
@@ -48,8 +48,8 @@ public class SolrQueryUtils {
 	}
 
 	/**
-	 * Create a builder object that can assemble a map of Solr field names to
-	 * JSON field names.
+	 * Create a builder object that can assemble a map of search result field
+	 * names to JSON field names.
 	 */
 	public static FieldMap fieldMap() {
 		return new FieldMap();
@@ -58,25 +58,25 @@ public class SolrQueryUtils {
 	/**
 	 * Parse a response into a list of maps, one map for each document.
 	 * 
-	 * The Solr field names in the document are replaced by json field names in
-	 * the result, according to the fieldMap.
+	 * The search result field names in the document are replaced by json field
+	 * names in the result, according to the fieldMap.
 	 */
 	public static List<Map<String, String>> parseResponse(
 			SearchResponse queryResponse, FieldMap fieldMap) {
-		return new SolrResultsParser(queryResponse, fieldMap).parse();
+		return new SearchResultsParser(queryResponse, fieldMap).parse();
 	}
 
 	/**
 	 * Parse a response into a list of maps, accepting only those maps that pass
 	 * a filter, and only up to a maximum number of records.
 	 * 
-	 * The Solr field names in the document are replaced by json field names in
-	 * the result, according to the fieldMap.
+	 * The search result field names in the document are replaced by json field
+	 * names in the result, according to the fieldMap.
 	 */
 	public static List<Map<String, String>> parseAndFilterResponse(
 			SearchResponse queryResponse, FieldMap fieldMap,
-			SolrResponseFilter filter, int maxNumberOfResults) {
-		return new SolrResultsParser(queryResponse, fieldMap)
+			SearchResponseFilter filter, int maxNumberOfResults) {
+		return new SearchResultsParser(queryResponse, fieldMap)
 				.parseAndFilterResponse(filter, maxNumberOfResults);
 	}
 
@@ -107,8 +107,7 @@ public class SolrQueryUtils {
 		for (String word : words) {
 			terms.add(buildTerm(fieldName, word));
 		}
-		String q = StringUtils.join(terms, c.joiner());
-		return q;
+		return StringUtils.join(terms, c.joiner());
 	}
 
 	private static String buildTerm(String fieldName, String word) {
@@ -116,7 +115,8 @@ public class SolrQueryUtils {
 	}
 	
 	/**
-	 * Methods that can be used in multiple places, such as IndividualListController and SolrIndividualsDataGetter
+	 * Methods that can be used in multiple places, such as
+	 * IndividualListController and SearchIndividualsDataGetter
 	 */
 	
 	public static String getAlphaParameter(VitroRequest request){
@@ -138,13 +138,13 @@ public class SolrQueryUtils {
     }
 	
 	//Get count of individuals without actually getting the results
-    public static long getIndividualCount(List<String> vclassUris, IndividualDao indDao) {    	    	       
-       SearchEngine solr = ApplicationUtils.instance().getSearchEngine();
-       SearchQuery query = solr.createQuery(makeMultiClassQuery(vclassUris));
+    public static long getIndividualCount(List<String> vclassUris) {    	    	       
+       SearchEngine search = ApplicationUtils.instance().getSearchEngine();
+       SearchQuery query = search.createQuery(makeMultiClassQuery(vclassUris));
        query.setRows(0);
     	try {    	              
             SearchResponse response = null;                      
-            response = solr.query(query);            
+            response = search.query(query);            
             return response.getResults().getNumFound();                        
     	} catch(Exception ex) {
     		log.error("An error occured in retrieving individual count", ex);
@@ -181,7 +181,7 @@ public class SolrQueryUtils {
             return query;
             
         } catch (Exception ex){
-            log.error("Could not make Solr query",ex);
+            log.error("Could not make the search query",ex);
             return searchEngine.createQuery();        
         }      
     }    
@@ -202,7 +202,7 @@ public class SolrQueryUtils {
             return query;
             
         } catch (Exception ex){
-            log.error("Could not make the Solr query",ex);
+            log.error("Could not make the search query",ex);
             return searchEngine.createQuery();        
         }      
     }    
@@ -216,7 +216,7 @@ public class SolrQueryUtils {
             }           
 			return StringUtils.join(queryTypes, " AND ");
         } catch (Exception ex){
-            log.error("Could not make Solr query",ex);
+            log.error("Could not make the search query",ex);
             return "";
         }            
     }
@@ -224,9 +224,9 @@ public class SolrQueryUtils {
     public static IndividualListQueryResults buildAndExecuteVClassQuery(
 			List<String> vclassURIs, String alpha, int page, int pageSize, IndividualDao indDao)
 			throws SearchEngineException {
-		 SearchQuery query = SolrQueryUtils.getQuery(vclassURIs, alpha, page, pageSize);
+		 SearchQuery query = SearchQueryUtils.getQuery(vclassURIs, alpha, page, pageSize);
 		 IndividualListQueryResults results = IndividualListQueryResults.runQuery(query, indDao);
-		 log.debug("Executed solr query for " + vclassURIs);
+		 log.debug("Executed search query for " + vclassURIs);
 		 if (results.getIndividuals().isEmpty()) { 
 			 log.debug("entities list is null for vclass " + vclassURIs);
 		 }
@@ -236,9 +236,9 @@ public class SolrQueryUtils {
     public static IndividualListQueryResults buildAndExecuteRandomVClassQuery(
 			List<String> vclassURIs, int page, int pageSize, IndividualDao indDao)
 			throws SearchEngineException {
-		 SearchQuery query = SolrQueryUtils.getRandomQuery(vclassURIs, page, pageSize);
+		 SearchQuery query = SearchQueryUtils.getRandomQuery(vclassURIs, page, pageSize);
 		 IndividualListQueryResults results = IndividualListQueryResults.runQuery(query, indDao);
-		 log.debug("Executed solr query for " + vclassURIs);
+		 log.debug("Executed search query for " + vclassURIs);
 		 if (results.getIndividuals().isEmpty()) { 
 			 log.debug("entities list is null for vclass " + vclassURIs);
 		 }

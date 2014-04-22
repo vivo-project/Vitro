@@ -1,17 +1,17 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.utils.solr;
+package edu.cornell.mannlib.vitro.webapp.utils.searchengine;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A builder object that can assemble a map of Solr field names to JSON field
- * names.
+ * A builder object that can assemble a map of search result field names to JSON
+ * field names.
  * 
  * Use like this:
  * 
- * m = SolrQueryUtils.fieldMap().row("this", "that").row("2nd", "row").map();
+ * m = SearchQueryUtils.fieldMap().put("this", "that").put("2nd", "row").map();
  * 
  */
 public class FieldMap {
@@ -20,14 +20,15 @@ public class FieldMap {
 	/**
 	 * Add a row to the map
 	 */
-	public FieldMap put(String solrFieldName, String jsonFieldName) {
-		if (solrFieldName == null) {
-			throw new NullPointerException("solrFieldName may not be null.");
+	public FieldMap put(String searchResultFieldName, String jsonFieldName) {
+		if (searchResultFieldName == null) {
+			throw new NullPointerException(
+					"searchResultFieldName may not be null.");
 		}
 		if (jsonFieldName == null) {
 			throw new NullPointerException("jsonFieldName may not be null.");
 		}
-		m.put(solrFieldName, jsonFieldName);
+		m.put(searchResultFieldName, jsonFieldName);
 
 		return this;
 	}

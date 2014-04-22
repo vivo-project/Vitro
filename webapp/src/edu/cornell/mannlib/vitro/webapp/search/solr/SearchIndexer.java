@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.solr;
 
-import java.io.IOException;
 import java.util.HashSet;
 
 import org.apache.commons.logging.Log;
@@ -19,16 +18,16 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumentList;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
-import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualToSolrDocument;
+import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualToSearchDocument;
 
 
-public class SolrIndexer implements IndexerIface {
-    private final static Log log = LogFactory.getLog(SolrIndexer.class);
+public class SearchIndexer implements IndexerIface {
+    private final static Log log = LogFactory.getLog(SearchIndexer.class);
     
     protected SearchEngine server;
     protected boolean indexing;        
     protected HashSet<String> urisIndexed;    
-    protected IndividualToSolrDocument individualToSolrDoc;
+    protected IndividualToSearchDocument individualToSearchDoc;
     
     /**
      * System is shutting down if true.
@@ -37,7 +36,7 @@ public class SolrIndexer implements IndexerIface {
     
     /**
      * This records when a full re-index starts so that once it is done
-     * all the documents on the Solr service that are earlier than the
+     * all the documents in the search index that are earlier than the
      * reindexStart can be removed. 
      */
     protected long reindexStart = 0L;
@@ -49,15 +48,15 @@ public class SolrIndexer implements IndexerIface {
      */
     protected boolean doingFullIndexRebuild = false;
     
-    public SolrIndexer( SearchEngine server, IndividualToSolrDocument indToDoc){
+    public SearchIndexer( SearchEngine server, IndividualToSearchDocument indToDoc){
         this.server = server; 
-        this.individualToSolrDoc = indToDoc;        
+        this.individualToSearchDoc = indToDoc;        
     }
     
     @Override
     public void index(Individual ind) throws IndexingException {
         if( ! indexing )
-            throw new IndexingException("SolrIndexer: must call " +
+            throw new IndexingException("SearchIndexer: must call " +
                     "startIndexing() before index().");        
         
         if( ind == null ) {
@@ -70,20 +69,20 @@ public class SolrIndexer implements IndexerIface {
                 log.debug("already indexed " + ind.getURI() );
                 return;
             }else{
-            	SearchInputDocument solrDoc = null;
+            	SearchInputDocument doc = null;
             	synchronized(this){
             		urisIndexed.add(ind.getURI());
             	}
                 log.debug("indexing " + ind.getURI());      
-                solrDoc = individualToSolrDoc.translate(ind);
+                doc = individualToSearchDoc.translate(ind);
 
-                if( solrDoc != null){
+                if( doc != null){
                 	if( log.isDebugEnabled()){
-                		log.info("boost for " + ind.getName() + " is " + solrDoc.getDocumentBoost());
-                		log.debug( solrDoc.toString() );
+                		log.info("boost for " + ind.getName() + " is " + doc.getDocumentBoost());
+                		log.debug( doc.toString() );
                 	}                	                	                	
                 	
-                    server.add( solrDoc );
+                    server.add( doc );
                     log.debug("Added docs to server.");                
                 }else{
                     log.debug("removing from index " + ind.getURI());                    
@@ -110,7 +109,7 @@ public class SolrIndexer implements IndexerIface {
     public void removeFromIndex(String uri) throws IndexingException {
         if( uri != null ){            
             try {
-                server.deleteById(individualToSolrDoc.getIdForUri(uri));
+                server.deleteById(individualToSearchDoc.getIdForUri(uri));
                 log.debug("deleted " + " " + uri);                                       
             } catch (SearchEngineException e) {
                 log.error( "could not delete individual " + uri, e);
@@ -121,7 +120,7 @@ public class SolrIndexer implements IndexerIface {
     @Override
     public synchronized void startIndexing() throws IndexingException {
         if( indexing)
-            log.debug("SolrIndexer.startIndexing() Indexing in progress, waiting for completion...");
+            log.debug("SearchIndexer.startIndexing() Indexing in progress, waiting for completion...");
         while( indexing && ! shutdownRequested ){ //wait for indexing to end.            
             try{ wait( 250 ); } 
             catch(InterruptedException ex){}
@@ -137,7 +136,7 @@ public class SolrIndexer implements IndexerIface {
     public void abortIndexingAndCleanUp() {
         shutdownRequested = true;
         try{
-            individualToSolrDoc.shutdown();
+            individualToSearchDoc.shutdown();
         }catch(Exception e){
             if( log != null)
                 log.debug(e,e);
@@ -159,8 +158,8 @@ public class SolrIndexer implements IndexerIface {
            server.commit();           
         } catch (Throwable e) {
             if( ! shutdownRequested ){
-                log.debug("could not commit to solr server, " +
-                "this should not be a problem since solr will do autocommit");
+                log.debug("could not commit to the search engine, " +
+                "this should not be a problem since the search engine will do autocommit");
             }
         }                
         indexing = false;
@@ -213,7 +212,7 @@ public class SolrIndexer implements IndexerIface {
     			return true;
     		}
     	} catch (SearchEngineException e) {
-    		log.error("Could not connect to solr server" ,e.getCause());
+    		log.error("Could not connect to the search engine." ,e.getCause());
     	}
         return false;
     }
