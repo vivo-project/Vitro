@@ -2,7 +2,7 @@
 /**
  * 
  */
-package edu.cornell.mannlib.vitro.webapp.search.solr;
+package edu.cornell.mannlib.vitro.webapp.search.documentBuilding;
 
 import java.io.InputStream;
 
@@ -29,8 +29,8 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.SkipIndividualException;
-import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.ThumbnailImageURL;
+import edu.cornell.mannlib.vitro.webapp.search.documentBuilding.SkipIndividualException;
+import edu.cornell.mannlib.vitro.webapp.search.documentBuilding.ThumbnailImageURL;
 
 public class ThumbnailImageURLTest extends AbstractTestClass{
     RDFServiceFactory testRDF;
@@ -54,7 +54,7 @@ public class ThumbnailImageURLTest extends AbstractTestClass{
      * Test to see if ThumbnailImageURL gets the date it is suppose to gete
      * from a set of RDF.
      * 
-     * Test method for {@link edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.ThumbnailImageURL#modifyDocument(edu.cornell.mannlib.vitro.webapp.beans.Individual, org.apache.solr.common.SolrInputDocument, java.lang.StringBuffer)}.
+     * Test method for {@link edu.cornell.mannlib.vitro.webapp.search.documentBuilding.ThumbnailImageURL#modifyDocument(edu.cornell.mannlib.vitro.webapp.beans.Individual, org.apache.solr.common.SolrInputDocument, java.lang.StringBuffer)}.
      */
     @Test
     public void testThumbnailFieldCreatedInSolrDoc() {

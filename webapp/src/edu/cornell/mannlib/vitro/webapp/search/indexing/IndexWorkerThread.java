@@ -11,7 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
-import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualToSearchDocument;
+import edu.cornell.mannlib.vitro.webapp.search.documentBuilding.IndividualToSearchDocument;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 class IndexWorkerThread extends VitroBackgroundThread{

@@ -1,7 +1,7 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
-package edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding;
+package edu.cornell.mannlib.vitro.webapp.search.documentBuilding;
 
-import static edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualToSearchDocument.DONT_EXCLUDE;
+import static edu.cornell.mannlib.vitro.webapp.search.documentBuilding.IndividualToSearchDocument.DONT_EXCLUDE;
 
 import java.util.List;
 
