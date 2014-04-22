@@ -5,21 +5,19 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocument;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumentList;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 
 /**
  * Holds the Individuals that were found in a Solr search query.
@@ -37,12 +35,12 @@ public class IndividualListQueryResults {
 	// Convenience method
 	// ----------------------------------------------------------------------
 
-	public static IndividualListQueryResults runQuery(SolrQuery query,
-			IndividualDao indDao, ServletContext context)
-			throws SolrServerException {
+	public static IndividualListQueryResults runQuery(SearchQuery query,
+			IndividualDao indDao)
+			throws SearchEngineException {
 
-		SolrServer solr = SolrSetup.getSolrServer(context);
-		QueryResponse response = null;
+		SearchEngine solr = ApplicationUtils.instance().getSearchEngine();
+		SearchResponse response = null;
 		response = solr.query(query);
 
 		if (response == null) {
@@ -50,7 +48,7 @@ public class IndividualListQueryResults {
 			return EMPTY_RESULT;
 		}
 
-		SolrDocumentList docs = response.getResults();
+		SearchResultDocumentList docs = response.getResults();
 		if (docs == null) {
 			log.debug("results from search query response was null");
 			return EMPTY_RESULT;
@@ -61,8 +59,8 @@ public class IndividualListQueryResults {
 		log.debug("Number of search results: " + hitCount);
 
 		List<Individual> individuals = new ArrayList<Individual>(docs.size());
-		for (SolrDocument doc : docs) {
-			String uri = doc.get(VitroSearchTermNames.URI).toString();
+		for (SearchResultDocument doc : docs) {
+			String uri = doc.getStringValue(VitroSearchTermNames.URI);
 			Individual individual = indDao.getIndividualByURI(uri);
 			if (individual == null) {
 				log.debug("No individual for search document with uri = " + uri);

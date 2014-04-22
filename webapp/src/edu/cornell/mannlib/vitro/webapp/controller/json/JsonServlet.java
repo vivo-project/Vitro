@@ -113,8 +113,7 @@ public class JsonServlet extends VitroHttpServlet {
 	                 vclassURIs, 
 	                 page, INDIVIDUALS_PER_PAGE,
 	                 alpha, 
-	                 vreq.getWebappDaoFactory().getIndividualDao(), 
-	                 context);  
+	                 vreq.getWebappDaoFactory().getIndividualDao());  
         } catch(Exception ex) {
         	log.error("Error in retrieval of search results for VClass " + vclassURIs.toString(), ex);
         	return IndividualListResults.EMPTY;
@@ -149,8 +148,7 @@ public class JsonServlet extends VitroHttpServlet {
  	                 vclassURI, 
  	                 page, 
  	                 pageSize, 
- 	                 vreq.getWebappDaoFactory().getIndividualDao(), 
- 	                 context);  
+ 	                 vreq.getWebappDaoFactory().getIndividualDao());  
          } catch(Exception ex) {
          	log.error("Error in retrieval of search results for VClass " + vclassURI, ex);
          	return IndividualListResults.EMPTY;

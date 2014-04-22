@@ -7,21 +7,20 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListQueryResults;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery.Order;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 
 /**
  * Some static method to help in constructing Solr queries and parsing the
@@ -63,7 +62,7 @@ public class SolrQueryUtils {
 	 * the result, according to the fieldMap.
 	 */
 	public static List<Map<String, String>> parseResponse(
-			QueryResponse queryResponse, FieldMap fieldMap) {
+			SearchResponse queryResponse, FieldMap fieldMap) {
 		return new SolrResultsParser(queryResponse, fieldMap).parse();
 	}
 
@@ -75,7 +74,7 @@ public class SolrQueryUtils {
 	 * the result, according to the fieldMap.
 	 */
 	public static List<Map<String, String>> parseAndFilterResponse(
-			QueryResponse queryResponse, FieldMap fieldMap,
+			SearchResponse queryResponse, FieldMap fieldMap,
 			SolrResponseFilter filter, int maxNumberOfResults) {
 		return new SolrResultsParser(queryResponse, fieldMap)
 				.parseAndFilterResponse(filter, maxNumberOfResults);
@@ -139,12 +138,12 @@ public class SolrQueryUtils {
     }
 	
 	//Get count of individuals without actually getting the results
-    public static long getIndividualCount(List<String> vclassUris, IndividualDao indDao, ServletContext context) {    	    	       
-       SolrQuery query = new SolrQuery(makeMultiClassQuery(vclassUris));
+    public static long getIndividualCount(List<String> vclassUris, IndividualDao indDao) {    	    	       
+       SearchEngine solr = ApplicationUtils.instance().getSearchEngine();
+       SearchQuery query = solr.createQuery(makeMultiClassQuery(vclassUris));
        query.setRows(0);
     	try {    	              
-            SolrServer solr = SolrSetup.getSolrServer(context);
-            QueryResponse response = null;                      
+            SearchResponse response = null;                      
             response = solr.query(query);            
             return response.getResults().getNumFound();                        
     	} catch(Exception ex) {
@@ -157,8 +156,9 @@ public class SolrQueryUtils {
      * builds a query with a type clause for each type in vclassUris, NAME_LOWERCASE filetred by
      * alpha, and just the hits for the page for pageSize.
      */
-    public static SolrQuery getQuery(List<String> vclassUris, String alpha, int page, int pageSize){
+    public static SearchQuery getQuery(List<String> vclassUris, String alpha, int page, int pageSize){
         String queryText = "";
+        SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
         
         try {            
             queryText = makeMultiClassQuery(vclassUris);
@@ -168,31 +168,32 @@ public class SolrQueryUtils {
                 queryText += VitroSearchTermNames.NAME_LOWERCASE + ":" + alpha.toLowerCase() + "*";
             }     
             
-            SolrQuery query = new SolrQuery(queryText);
+            SearchQuery query = searchEngine.createQuery(queryText);
 
             //page count starts at 1, row count starts at 0
             int startRow = (page-1) * pageSize ;            
             query.setStart( startRow ).setRows( pageSize );
             
             // Need a single-valued field for sorting
-            query.setSortField(VitroSearchTermNames.NAME_LOWERCASE_SINGLE_VALUED, SolrQuery.ORDER.asc);
+            query.addSortField(VitroSearchTermNames.NAME_LOWERCASE_SINGLE_VALUED, Order.ASC);
 
             log.debug("Query is " + query.toString());
             return query;
             
         } catch (Exception ex){
             log.error("Could not make Solr query",ex);
-            return new SolrQuery();        
+            return searchEngine.createQuery();        
         }      
     }    
 
-    public static SolrQuery getRandomQuery(List<String> vclassUris, int page, int pageSize){
+    public static SearchQuery getRandomQuery(List<String> vclassUris, int page, int pageSize){
         String queryText = "";
+        SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
         
-        try {            
+		try {            
             queryText = makeMultiClassQuery(vclassUris);
             log.debug("queryText is " + queryText);
-            SolrQuery query = new SolrQuery(queryText);
+            SearchQuery query = searchEngine.createQuery(queryText);
 
             //page count starts at 1, row count starts at 0
             query.setStart( page ).setRows( pageSize );
@@ -202,7 +203,7 @@ public class SolrQueryUtils {
             
         } catch (Exception ex){
             log.error("Could not make the Solr query",ex);
-            return new SolrQuery();        
+            return searchEngine.createQuery();        
         }      
     }    
 
@@ -221,11 +222,10 @@ public class SolrQueryUtils {
     }
     
     public static IndividualListQueryResults buildAndExecuteVClassQuery(
-			List<String> vclassURIs, String alpha, int page, int pageSize,
-			ServletContext context, IndividualDao indDao)
-			throws SolrServerException {
-		 SolrQuery query = SolrQueryUtils.getQuery(vclassURIs, alpha, page, pageSize);
-		 IndividualListQueryResults results = IndividualListQueryResults.runQuery(query, indDao, context);
+			List<String> vclassURIs, String alpha, int page, int pageSize, IndividualDao indDao)
+			throws SearchEngineException {
+		 SearchQuery query = SolrQueryUtils.getQuery(vclassURIs, alpha, page, pageSize);
+		 IndividualListQueryResults results = IndividualListQueryResults.runQuery(query, indDao);
 		 log.debug("Executed solr query for " + vclassURIs);
 		 if (results.getIndividuals().isEmpty()) { 
 			 log.debug("entities list is null for vclass " + vclassURIs);
@@ -234,11 +234,10 @@ public class SolrQueryUtils {
 	}
 
     public static IndividualListQueryResults buildAndExecuteRandomVClassQuery(
-			List<String> vclassURIs, int page, int pageSize,
-			ServletContext context, IndividualDao indDao)
-			throws SolrServerException {
-		 SolrQuery query = SolrQueryUtils.getRandomQuery(vclassURIs, page, pageSize);
-		 IndividualListQueryResults results = IndividualListQueryResults.runQuery(query, indDao, context);
+			List<String> vclassURIs, int page, int pageSize, IndividualDao indDao)
+			throws SearchEngineException {
+		 SearchQuery query = SolrQueryUtils.getRandomQuery(vclassURIs, page, pageSize);
+		 IndividualListQueryResults results = IndividualListQueryResults.runQuery(query, indDao);
 		 log.debug("Executed solr query for " + vclassURIs);
 		 if (results.getIndividuals().isEmpty()) { 
 			 log.debug("entities list is null for vclass " + vclassURIs);

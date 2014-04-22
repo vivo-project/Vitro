@@ -20,16 +20,16 @@ import org.junit.Test;
 
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.VClassDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.modules.ApplicationStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineStub;
 import stubs.javax.servlet.ServletConfigStub;
 import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
 import stubs.javax.servlet.http.HttpServletResponseStub;
 import stubs.javax.servlet.http.HttpSessionStub;
-import stubs.org.apache.solr.client.solrj.SolrServerStub;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 
 /**
  * TODO
@@ -85,7 +85,7 @@ public class JsonServletTest extends AbstractTestClass {
 	private WebappDaoFactoryStub wadf;
 	private VClassDaoStub vcDao;
 
-	private SolrServerStub solr;
+	private SearchEngineStub solr;
 
 	@Before
 	public void setup() throws ServletException {
@@ -112,8 +112,8 @@ public class JsonServletTest extends AbstractTestClass {
 		vcDao = new VClassDaoStub();
 		wadf.setVClassDao(vcDao);
 
-		solr = new SolrServerStub();
-		ctx.setAttribute(SolrSetup.SOLR_SERVER, solr);
+		solr = new SearchEngineStub();
+		ApplicationStub.setup(new ServletContextStub(), solr);
 	}
 
 	@Test

@@ -3,7 +3,6 @@
 package stubs.edu.cornell.mannlib.vitro.webapp.modules.searchEngine;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineExcepti
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
+import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchInputDocument;
 
 /**
  * TODO
@@ -53,6 +53,11 @@ public class SearchEngineStub implements SearchEngine {
 		}
 	}
 
+	@Override
+	public SearchInputDocument createInputDocument() {
+		return new BaseSearchInputDocument();
+	}
+
 
 	// ----------------------------------------------------------------------
 	// Un-implemented methods
@@ -78,13 +83,6 @@ public class SearchEngineStub implements SearchEngine {
 	public void ping() throws SearchEngineException {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("SearchEngineStub.ping() not implemented.");
-	}
-
-	@Override
-	public SearchInputDocument createInputDocument() {
-		// TODO Auto-generated method stub
-		throw new RuntimeException(
-				"SearchEngineStub.createInputDocument() not implemented.");
 	}
 
 	@Override

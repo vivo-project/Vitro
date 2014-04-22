@@ -8,9 +8,9 @@ import java.io.InputStreamReader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.common.SolrInputDocument;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -31,7 +31,7 @@ public class NameFields implements DocumentModifier {
 	}
 	
 	@Override
-	public void modifyDocument(Individual ind, SolrInputDocument doc,
+	public void modifyDocument(Individual ind, SearchInputDocument doc,
 			StringBuffer addUri) throws SkipIndividualException {
 		if( ind == null || ind.getURI() == null ){
 			return;

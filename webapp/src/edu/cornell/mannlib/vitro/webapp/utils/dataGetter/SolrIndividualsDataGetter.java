@@ -176,8 +176,7 @@ public class SolrIndividualsDataGetter extends DataGetterBase implements DataGet
 	                vclass.getURI(), 
 	                page, 
 	                alpha, 
-	                vreq.getWebappDaoFactory().getIndividualDao(), 
-	                vreq.getSession().getServletContext());                                
+	                vreq.getWebappDaoFactory().getIndividualDao());                                
 	        body.putAll(vcResults.asFreemarkerMap());
 	
 	        List<Individual> inds = vcResults.getEntities();

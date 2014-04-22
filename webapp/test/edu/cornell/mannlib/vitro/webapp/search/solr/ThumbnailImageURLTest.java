@@ -7,19 +7,24 @@ package edu.cornell.mannlib.vitro.webapp.search.solr;
 import java.io.InputStream;
 
 import org.apache.log4j.Level;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrInputField;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import stubs.edu.cornell.mannlib.vitro.webapp.modules.ApplicationStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineStub;
+import stubs.javax.servlet.ServletContextStub;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.impl.RDFDefaultErrorHandler;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputField;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
@@ -37,6 +42,7 @@ public class ThumbnailImageURLTest extends AbstractTestClass{
     @Before
     public void setUp() throws Exception {
         setLoggerLevel(RDFDefaultErrorHandler.class, Level.OFF);
+        ApplicationStub.setup(new ServletContextStub(), new SearchEngineStub());
 
         Model model = ModelFactory.createDefaultModel();        
         InputStream in = ThumbnailImageURLTest.class.getResourceAsStream("testPerson.n3");
@@ -52,7 +58,7 @@ public class ThumbnailImageURLTest extends AbstractTestClass{
      */
     @Test
     public void testThumbnailFieldCreatedInSolrDoc() {
-        SolrInputDocument doc = new SolrInputDocument();
+        SearchInputDocument doc = ApplicationUtils.instance().getSearchEngine().createInputDocument();
         ThumbnailImageURL testMe = new ThumbnailImageURL( testRDF );
         Individual ind = new IndividualImpl();
         ind.setURI(personsURI);
@@ -66,11 +72,11 @@ public class ThumbnailImageURLTest extends AbstractTestClass{
 
         //make sure that a Solr document field got created for the thumbnail image
         
-        SolrInputField thumbnailField = doc.getField( VitroSearchTermNames.THUMBNAIL_URL );
+        SearchInputField thumbnailField = doc.getField( VitroSearchTermNames.THUMBNAIL_URL );
         Assert.assertNotNull(thumbnailField);
 
         Assert.assertNotNull( thumbnailField.getValues() );
-        Assert.assertEquals(1, thumbnailField.getValueCount());
+        Assert.assertEquals(1, thumbnailField.getValues().size());
         
         Assert.assertEquals("http://vivo.cornell.edu/individual/n54945", thumbnailField.getFirstValue());
     }

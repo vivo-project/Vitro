@@ -12,19 +12,20 @@ import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrInputDocument;
 import org.joda.time.DateTime;
 import org.jsoup.Jsoup;
 
 import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.vocabulary.OWL;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocument;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 
@@ -46,7 +47,7 @@ public class IndividualToSolrDocument {
     }    
 
 	@SuppressWarnings("static-access")
-    public SolrInputDocument translate(Individual ind) throws IndexingException{
+    public SearchInputDocument translate(Individual ind) throws IndexingException{
         try{    	            	      	        	        	
         	String excludeMsg = checkExcludes( ind );
         	if( excludeMsg != DONT_EXCLUDE){
@@ -54,7 +55,7 @@ public class IndividualToSolrDocument {
         	    return null;
         	}        	    
         		            
-        	SolrInputDocument doc = new SolrInputDocument();                    	
+        	SearchInputDocument doc = ApplicationUtils.instance().getSearchEngine().createInputDocument();                    	
         	
             //DocID
             doc.addField(term.DOCID, getIdForUri( ind.getURI() ) );
@@ -79,7 +80,7 @@ public class IndividualToSolrDocument {
         	addObjectPropertyText(ind, doc, objectNames, addUri);        	                 	                                           	     
                         
             //time of index in msec past epoch
-            doc.addField(term.INDEXEDTIME, new Long( (new DateTime()).getMillis() ) ); 
+            doc.addField(term.INDEXEDTIME, (Object) new DateTime().getMillis() ); 
                         
             addAllText( ind, doc, classPublicNames, objectNames );
                
@@ -125,7 +126,7 @@ public class IndividualToSolrDocument {
 	protected Map<String,Long> docModClassToTime = new HashMap<String,Long>();
 	protected long docModCount =0;
 	
-    protected void runAdditionalDocModifers( Individual ind, SolrInputDocument doc, StringBuffer addUri ) 
+    protected void runAdditionalDocModifers( Individual ind, SearchInputDocument doc, StringBuffer addUri ) 
     throws SkipIndividualException{
         //run the document modifiers
         if( documentModifiers != null && !documentModifiers.isEmpty()){
@@ -158,7 +159,7 @@ public class IndividualToSolrDocument {
         }        
     }
     
-    protected void addAllText(Individual ind, SolrInputDocument doc, StringBuffer classPublicNames, StringBuffer objectNames) {
+    protected void addAllText(Individual ind, SearchInputDocument doc, StringBuffer classPublicNames, StringBuffer objectNames) {
         String t=null;
         //ALLTEXT, all of the 'full text'
         StringBuffer allTextValue = new StringBuffer();
@@ -209,7 +210,7 @@ public class IndividualToSolrDocument {
      * Get the rdfs:labes for objects of statements and put in objectNames.
      *  Get the URIs for objects of statements and put in addUri.
      */
-    protected void addObjectPropertyText(Individual ind, SolrInputDocument doc,
+    protected void addObjectPropertyText(Individual ind, SearchInputDocument doc,
             StringBuffer objectNames, StringBuffer addUri) {
         
         try{
@@ -245,7 +246,7 @@ public class IndividualToSolrDocument {
      * @returns true if prohibited from search
      * @throws SkipIndividualException 
      */
-    protected void addClasses(Individual ind, SolrInputDocument doc, StringBuffer classPublicNames) throws SkipIndividualException{
+    protected void addClasses(Individual ind, SearchInputDocument doc, StringBuffer classPublicNames) throws SkipIndividualException{
         ArrayList<String> superClassNames = null;        
         
         List<VClass> vclasses = ind.getVClasses(false);
@@ -279,7 +280,7 @@ public class IndividualToSolrDocument {
         }                                                
     }
     
-    protected void addMostSpecificTypeUris(Individual ind, SolrInputDocument doc){        
+    protected void addMostSpecificTypeUris(Individual ind, SearchInputDocument doc){        
         List<String> mstURIs = ind.getMostSpecificTypeURIs();
         if( mstURIs != null ){
             for( String typeURI : mstURIs ){
@@ -289,7 +290,7 @@ public class IndividualToSolrDocument {
         }
     }
         
-    protected void addLabel(Individual ind, SolrInputDocument doc) {
+    protected void addLabel(Individual ind, SearchInputDocument doc) {
         String value = "";
         String label = ind.getRdfsLabel();
         if (label != null) {
@@ -324,8 +325,8 @@ public class IndividualToSolrDocument {
     public Individual unTranslate(Object result) {
         Individual ent = null;
 
-        if( result != null && result instanceof SolrDocument){
-            SolrDocument hit = (SolrDocument) result;
+        if( result instanceof SearchResultDocument){
+            SearchResultDocument hit = (SearchResultDocument) result;
             String uri= (String) hit.getFirstValue(term.URI);
 
             ent = new IndividualImpl();

@@ -9,16 +9,14 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrInputField;
 
 import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputField;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
@@ -53,7 +51,7 @@ public class ContextNodeFields implements DocumentModifier{
     }                
     
     @Override
-    public void modifyDocument(Individual individual, SolrInputDocument doc, StringBuffer addUri) {        
+    public void modifyDocument(Individual individual, SearchInputDocument doc, StringBuffer addUri) {        
         if( individual == null )
             return;
         
@@ -65,11 +63,11 @@ public class ContextNodeFields implements DocumentModifier{
         /* get text from the context nodes and add the to ALLTEXT */        
         StringBuffer values = executeQueryForValues(individual, queries);        
         
-        SolrInputField field = doc.getField(VitroSearchTermNames.ALLTEXT);
+        SearchInputField field = doc.getField(VitroSearchTermNames.ALLTEXT);
         if( field == null ){
             doc.addField(VitroSearchTermNames.ALLTEXT, values);           
         }else{
-            field.addValue(values, field.getBoost());
+            field.addValues(values, field.getBoost());
         }                                      
     }
     

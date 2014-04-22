@@ -18,23 +18,21 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocument;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumentList;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
-
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 
 /**
  * This servlet is for servicing JSON requests from Google Refine's
@@ -125,7 +123,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 
 		try {
 			for (int i = 0; i < queries.size(); i++) {
-				String queryStr = (String) queries.get(i);
+				String queryStr = queries.get(i);
 				JSONObject json = new JSONObject(queryStr);
 
 				if (json.has("query")) { // single query
@@ -138,7 +136,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				} else { // multiple queries
 					for (Iterator<String> iter = json.keys(); iter.hasNext();) {
 						ArrayList<JSONObject> jsonList = new ArrayList<JSONObject>();
-						String key = (String) iter.next();
+						String key = iter.next();
 						Object obj = json.get(key);
 						JSONObject jsonLvl2 = (JSONObject) obj;
 						if (jsonLvl2.has("query")) {
@@ -234,7 +232,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			for (Map.Entry<String, JSONObject> entry : currMap.entrySet()) {
 				JSONObject resultAllJson = new JSONObject();
 				String key = entry.getKey();
-				JSONObject json = (JSONObject) entry.getValue();
+				JSONObject json = entry.getValue();
 				String queryVal = json.getString("query");
 
 				// System.out.println("query: " + json.toString());
@@ -274,16 +272,16 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				JSONArray resultJsonArr = new JSONArray();
 
 				// Solr
-	            SolrQuery query = getQuery(queryVal, searchType, limit, propertiesList);
-	            QueryResponse queryResponse = null;
+	            SearchQuery query = getQuery(queryVal, searchType, limit, propertiesList);
+	            SearchResponse queryResponse = null;
 	            if (query != null) {
-	            	SolrServer solr = SolrSetup.getSolrServer(getServletContext());
+	    			SearchEngine solr = ApplicationUtils.instance().getSearchEngine();
 	            	queryResponse = solr.query(query);
 	            } else {
 	            	log.error("Query for a search was null");                
 	            }
 
-	            SolrDocumentList docs = null;
+	            SearchResultDocumentList docs = null;
 	            if (queryResponse != null) {
 	            	docs = queryResponse.getResults();
 	            } else {
@@ -293,29 +291,16 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 	            if (docs != null) {
 	            	
 	                List<SearchResult> results = new ArrayList<SearchResult>();
-	                for (SolrDocument doc : docs) {
+	                for (SearchResultDocument doc : docs) {
 	                    try {                         
-	                        String uri = doc.get(VitroSearchTermNames.URI).toString();
-	                        // RY 7/1/2011
-	                        // Comment was: VitroSearchTermNames.NAME_RAW is a multivalued field, so doc.get() returns a list.
-	                        // Changed to: VitroSearchTermNames.NAME_RAW is a multivalued field, so doc.get() could return a list
-	                        // But in fact: I'm no longer seeing any lists returned for individuals with multiple labels. Not sure
-	                        // if this is new behavior or what. ???
-	                        Object nameRaw = doc.get(VitroSearchTermNames.NAME_RAW);
-	                        String name = null;
-	                        if (nameRaw instanceof List<?>) {
-	                            @SuppressWarnings("unchecked")
-	                            List<String> nameRawList = (List<String>) nameRaw;
-	                            name = nameRawList.get(0);
-	                        } else {
-	                            name = (String) nameRaw;
-	                        }
+	                        String uri = doc.getStringValue(VitroSearchTermNames.URI);
+	                        String name = doc.getStringValue(VitroSearchTermNames.NAME_RAW);
 	                        
 	                        SearchResult result = new SearchResult(name, uri);
 	                        
 	                        // populate result for Google Refine
 							JSONObject resultJson = new JSONObject();
-							resultJson.put("score", doc.getFieldValue("score"));
+							resultJson.put("score", doc.getFirstValue("score"));
 							String modUri = result.getUri().replace("#", "%23");
 							resultJson.put("id", modUri);
 							resultJson.put("name", result.getLabel());
@@ -361,16 +346,16 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			log.error("JSONException: " + ex);
 			throw new ServletException("JSONReconcileServlet JSONException: "
 					+ ex);
-		} catch (SolrServerException ex) {
+		} catch (SearchEngineException ex) {
 			log.error("JSONException: " + ex);
-			throw new ServletException("JSONReconcileServlet SolrServerException: "
+			throw new ServletException("JSONReconcileServlet SearchEngineException: "
 					+ ex);
 		}
 
 		return qJson;
 	}
 
-    protected SolrQuery getQuery(String queryStr, String searchType, int limit, ArrayList<String[]> propertiesList) {
+    protected SearchQuery getQuery(String queryStr, String searchType, int limit, ArrayList<String[]> propertiesList) {
         
         if ( queryStr == null) {
             log.error("There was no parameter '"+ PARAM_QUERY            
@@ -383,10 +368,10 @@ public class JSONReconcileServlet extends VitroHttpServlet {
         }
                    
         /// original
-        ///SolrQuery query = new SolrQuery();
+        ///SearchQuery query = new SearchQuery();
         
         /// test
-        SolrQuery query = new SolrQuery(queryStr.toLowerCase());
+        SearchQuery query = ApplicationUtils.instance().getSearchEngine().createQuery(queryStr.toLowerCase());
 
         // original code:
         // query.setStart(0).setRows(DEFAULT_MAX_HIT_COUNT);  
@@ -403,17 +388,17 @@ public class JSONReconcileServlet extends VitroHttpServlet {
         }        
         
         // Added score to original code:
-        query.setFields(VitroSearchTermNames.NAME_RAW, VitroSearchTermNames.URI, "*", "score"); // fields to retrieve
+        query.addFields(VitroSearchTermNames.NAME_RAW, VitroSearchTermNames.URI, "*", "score"); // fields to retrieve
  
 		// if propertiesList has elements, add extra queries to query
 		Iterator<String[]> it = propertiesList.iterator();
 		while (it.hasNext()) {
 			String[] pvPair = it.next();
-			query.addFilterQuery(tokenizeNameQuery(pvPair[1]), VitroSearchTermNames.RDFTYPE + ":\"" + pvPair[0] + "\"");
+			query.addFilterQueries(tokenizeNameQuery(pvPair[1]), VitroSearchTermNames.RDFTYPE + ":\"" + pvPair[0] + "\"");
 		}       
 
         // Can't sort on multivalued field, so we sort the results in Java when we get them.
-        // query.setSortField(VitroSearchTermNames.NAME_LOWERCASE, SolrQuery.ORDER.asc);
+        // query.addSortField(VitroSearchTermNames.NAME_LOWERCASE, Order.ASC);
         
         return query;
     }

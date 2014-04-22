@@ -7,15 +7,16 @@ import java.util.HashSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.SolrInputDocument;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery.Order;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumentList;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
 import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualToSolrDocument;
@@ -24,7 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualT
 public class SolrIndexer implements IndexerIface {
     private final static Log log = LogFactory.getLog(SolrIndexer.class);
     
-    protected SolrServer server;
+    protected SearchEngine server;
     protected boolean indexing;        
     protected HashSet<String> urisIndexed;    
     protected IndividualToSolrDocument individualToSolrDoc;
@@ -48,7 +49,7 @@ public class SolrIndexer implements IndexerIface {
      */
     protected boolean doingFullIndexRebuild = false;
     
-    public SolrIndexer( SolrServer server, IndividualToSolrDocument indToDoc){
+    public SolrIndexer( SearchEngine server, IndividualToSolrDocument indToDoc){
         this.server = server; 
         this.individualToSolrDoc = indToDoc;        
     }
@@ -59,15 +60,17 @@ public class SolrIndexer implements IndexerIface {
             throw new IndexingException("SolrIndexer: must call " +
                     "startIndexing() before index().");        
         
-        if( ind == null )
+        if( ind == null ) {
             log.debug("Individual to index was null, ignoring.");
+            return;
+        }
         
         try{
             if( urisIndexed.contains(ind.getURI()) ){
                 log.debug("already indexed " + ind.getURI() );
                 return;
             }else{
-            	SolrInputDocument solrDoc = null;
+            	SearchInputDocument solrDoc = null;
             	synchronized(this){
             		urisIndexed.add(ind.getURI());
             	}
@@ -80,16 +83,14 @@ public class SolrIndexer implements IndexerIface {
                 		log.debug( solrDoc.toString() );
                 	}                	                	                	
                 	
-                    UpdateResponse res = server.add( solrDoc );
-                    log.debug("response after adding docs to server: "+ res);                
+                    server.add( solrDoc );
+                    log.debug("Added docs to server.");                
                 }else{
                     log.debug("removing from index " + ind.getURI());                    
                     removeFromIndex(ind.getURI());
                 }                            
             }
-        } catch (IOException ex) {
-            throw new IndexingException(ex.getMessage());
-        } catch (SolrServerException ex) {
+        } catch (SearchEngineException ex) {
             throw new IndexingException(ex.getMessage());
         }                 
     }
@@ -111,9 +112,7 @@ public class SolrIndexer implements IndexerIface {
             try {
                 server.deleteById(individualToSolrDoc.getIdForUri(uri));
                 log.debug("deleted " + " " + uri);                                       
-            } catch (SolrServerException e) {
-                log.error( "could not delete individual " + uri, e);
-            } catch (IOException e) {
+            } catch (SearchEngineException e) {
                 log.error( "could not delete individual " + uri, e);
             }
         }        
@@ -172,12 +171,9 @@ public class SolrIndexer implements IndexerIface {
         try {
             server.deleteByQuery("indexedTime:[ * TO " + reindexStart + " ]");
             server.commit();            
-        } catch (SolrServerException e) {
+        } catch (SearchEngineException e) {
             if( ! shutdownRequested )
                 log.error("could not delete documents from before rebuild.",e);            
-        } catch (IOException e) {
-            if( ! shutdownRequested )
-                log.error("could not delete documents from before rebuild.",e);
         }
     }
     
@@ -186,17 +182,17 @@ public class SolrIndexer implements IndexerIface {
     public long getModified() {
     	long modified = 0;
 
-    	SolrQuery query = new SolrQuery();
+    	SearchQuery query = ApplicationUtils.instance().getSearchEngine().createQuery();
     	query.setQuery("*:*");
-    	query.addSortField("indexedTime", SolrQuery.ORDER.desc);
+    	query.addSortField("indexedTime", Order.DESC);
 
     	try {
-    		QueryResponse rsp = server.query(query);
-    		SolrDocumentList docs = rsp.getResults();
+    		SearchResponse rsp = server.query(query);
+    		SearchResultDocumentList docs = rsp.getResults();
     		if(docs!=null){
-    			modified = (Long)docs.get(0).getFieldValue("indexedTime");	
+    			modified = (Long)docs.get(0).getFirstValue("indexedTime");	
     		}
-    	} catch (SolrServerException e) {
+    	} catch (SearchEngineException e) {
     		log.error(e,e);
     	}
 
@@ -208,16 +204,16 @@ public class SolrIndexer implements IndexerIface {
      * and returns false on failure to connect to server.
      */
     public boolean isIndexEmpty() {
-    	SolrQuery query = new SolrQuery();
+    	SearchQuery query = ApplicationUtils.instance().getSearchEngine().createQuery();
     	query.setQuery("*:*");
     	try {
-    		QueryResponse rsp = server.query(query);
-    		SolrDocumentList docs = rsp.getResults();
+    		SearchResponse rsp = server.query(query);
+    		SearchResultDocumentList docs = rsp.getResults();
     		if(docs==null || docs.size()==0){
     			return true;
     		}
-    	} catch (SolrServerException e) {
-    		log.error("Could not connect to solr server" ,e.getRootCause());
+    	} catch (SearchEngineException e) {
+    		log.error("Could not connect to solr server" ,e.getCause());
     	}
         return false;
     }

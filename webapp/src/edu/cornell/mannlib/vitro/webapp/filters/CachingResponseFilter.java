@@ -21,15 +21,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.collections.EnumerationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.utils.solr.FieldMap;
 import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrResultsParser;
@@ -244,13 +244,12 @@ public class CachingResponseFilter implements Filter {
 	 * Ask Solr whether it has an ETAG for this URI.
 	 */
 	private String findEtagForIndividual(String individualUri) {
-		SolrQuery query = new SolrQuery("URI:" + individualUri)
-				.setFields(ETAG_FIELD);
-
-		SolrServer solr = SolrSetup.getSolrServer(ctx);
+		SearchEngine solr = ApplicationUtils.instance().getSearchEngine();
+		SearchQuery query = solr.createQuery("URI:" + individualUri)
+				.addFields(ETAG_FIELD);
 
 		try {
-			QueryResponse response = solr.query(query);
+			SearchResponse response = solr.query(query);
 			List<Map<String, String>> maps = new SolrResultsParser(response,
 					parserFieldMap).parse();
 			log.debug("Solr response for '" + query.getQuery() + "' was "
@@ -261,7 +260,7 @@ public class CachingResponseFilter implements Filter {
 			} else {
 				return maps.get(0).get(ETAG_FIELD);
 			}
-		} catch (SolrServerException e) {
+		} catch (SearchEngineException e) {
 			log.warn(
 					"Solr query '" + query.getQuery() + "' threw an exception",
 					e);

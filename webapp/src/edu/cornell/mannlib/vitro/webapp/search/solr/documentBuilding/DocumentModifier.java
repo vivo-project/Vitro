@@ -2,14 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding;
 
-import org.apache.solr.common.SolrInputDocument;
-
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 /**
- * This interface represents an object that can add to a SolrInputDocument.
+ * This interface represents an object that can add to a SearchInputDocument.
  */
 public interface DocumentModifier {
-    public void modifyDocument(Individual individual, SolrInputDocument doc, StringBuffer addUri) throws SkipIndividualException;
+    public void modifyDocument(Individual individual, SearchInputDocument doc, StringBuffer addUri) throws SkipIndividualException;
     
     //called to inform the DocumentModifier that the system is shutting down
     public void shutdown();

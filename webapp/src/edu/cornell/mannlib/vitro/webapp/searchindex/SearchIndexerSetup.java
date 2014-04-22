@@ -9,8 +9,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
-
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.OWL;
@@ -23,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
@@ -75,7 +74,7 @@ public class SearchIndexerSetup implements ServletContextListener {
 	public void contextInitialized(ServletContextEvent sce) {
 		ServletContext context = sce.getServletContext();
 		StartupStatus ss = StartupStatus.getBean(context);
-		HttpSolrServer server = (HttpSolrServer) ApplicationUtils.instance().getSearchEngine();
+		SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
 
 		try {
 			/* set up the individual to solr doc translation */
@@ -107,7 +106,7 @@ public class SearchIndexerSetup implements ServletContextListener {
 					modifiersFromContext, searchIndexExcludesFromContext);
 
 			/* setup solr indexer */
-			SolrIndexer solrIndexer = new SolrIndexer(server, indToSolrDoc);
+			SolrIndexer solrIndexer = new SolrIndexer(searchEngine, indToSolrDoc);
 
 			// This is where the builder gets the list of places to try to
 			// get objects to index. It is filtered so that non-public text

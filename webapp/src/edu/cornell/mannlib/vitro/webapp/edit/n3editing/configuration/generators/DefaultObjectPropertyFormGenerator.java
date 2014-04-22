@@ -5,24 +5,18 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocumentList;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Literal;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -37,9 +31,13 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.IndividualsViaObjectPropetyOptions;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumentList;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.FrontEndEditingUtils.EditMode;
 
@@ -175,9 +173,9 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
         return types;
 	}	
 	
-    private boolean tooManyRangeOptions(VitroRequest vreq, HttpSession session ) throws SolrServerException {
+    private boolean tooManyRangeOptions(VitroRequest vreq, HttpSession session ) throws SearchEngineException {
     	List<VClass> rangeTypes = getRangeTypes(vreq);
-    	SolrServer solrServer = SolrSetup.getSolrServer(session.getServletContext());
+		SearchEngine solrServer = ApplicationUtils.instance().getSearchEngine();
     	
     	List<String> types = new ArrayList<String>();
     	for (VClass vclass : rangeTypes) {
@@ -194,15 +192,15 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	long count = 0;    		   
     	for( String type:types){
     		//solr query for type count.    		
-    		SolrQuery query = new SolrQuery();
+    		SearchQuery query = solrServer.createQuery();
     		if( VitroVocabulary.OWL_THING.equals( type )){
     			query.setQuery( "*:*" );    			
     		}else{
     			query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type);
     		}
     		query.setRows(0);	
-    		QueryResponse rsp = solrServer.query(query);
-    		SolrDocumentList docs = rsp.getResults();
+    		SearchResponse rsp = solrServer.query(query);
+    		SearchResultDocumentList docs = rsp.getResults();
     		long found = docs.getNumFound();
     		count = count + found;
     		if( count > maxNonACRangeIndividualCount )
@@ -524,7 +522,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 		editConfiguration.setFormSpecificData(formSpecificData);
 	}
         			
-	public void addFormSpecificDataForAC(EditConfigurationVTwo editConfiguration, VitroRequest vreq, HttpSession session) throws SolrServerException {
+	public void addFormSpecificDataForAC(EditConfigurationVTwo editConfiguration, VitroRequest vreq, HttpSession session) throws SearchEngineException {
 		HashMap<String, Object> formSpecificData = new HashMap<String, Object>();
 		//Get the edit mode
 		formSpecificData.put("editMode", getEditMode(vreq).toString().toLowerCase());
@@ -564,19 +562,19 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 		editConfiguration.setFormSpecificData(formSpecificData);
 	}
 	
-	private Object rangeIndividualsExist(HttpSession session, List<VClass> types) throws SolrServerException {		
-    	SolrServer solrServer = SolrSetup.getSolrServer(session.getServletContext());
+	private Object rangeIndividualsExist(HttpSession session, List<VClass> types) throws SearchEngineException {		
+		SearchEngine solrServer = ApplicationUtils.instance().getSearchEngine();
     	
     	boolean rangeIndividualsFound = false;
     	for( VClass type:types){
     		//solr for type count.
-    		SolrQuery query = new SolrQuery();   
+    		SearchQuery query =ApplicationUtils.instance().getSearchEngine().createQuery();   
     		
     		query.setQuery( VitroSearchTermNames.RDFTYPE + ":" + type.getURI());
     		query.setRows(0);
     		
-    		QueryResponse rsp = solrServer.query(query);
-    		SolrDocumentList docs = rsp.getResults();
+    		SearchResponse rsp = solrServer.query(query);
+    		SearchResultDocumentList docs = rsp.getResults();
     		if( docs.getNumFound() > 0 ){
     			rangeIndividualsFound = true;
     			break;

@@ -2,10 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding;
 
-import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrInputField;
-
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputField;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 
 public class NameBoost implements DocumentModifier {
@@ -27,11 +26,11 @@ public class NameBoost implements DocumentModifier {
     }
     
     @Override
-    public void modifyDocument(Individual individual, SolrInputDocument doc,
+    public void modifyDocument(Individual individual, SearchInputDocument doc,
             StringBuffer addUri) {
         
         for( String fieldName : fieldsToBoost){
-            SolrInputField field = doc.getField(fieldName);
+            SearchInputField field = doc.getField(fieldName);
             if( field != null ){                                
                 field.setBoost(field.getBoost() + boost);
             }

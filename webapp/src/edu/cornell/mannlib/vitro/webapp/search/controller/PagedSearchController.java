@@ -21,14 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.FacetField.Count;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -47,9 +41,15 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchFacetField;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchFacetField.Count;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocument;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumentList;
 import edu.cornell.mannlib.vitro.webapp.search.IndexConstants;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.searchresult.IndividualSearchResult;
 import edu.ucsf.vitro.opensocial.OpenSocialManager;
@@ -169,9 +169,9 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 return doFailedSearch(badQueryMsg, queryText, format, vreq);
             }
                 
-            SolrQuery query = getQuery(queryText, hitsPerPage, startIndex, vreq);            
-            SolrServer solr = SolrSetup.getSolrServer(getServletContext());
-            QueryResponse response = null;           
+            SearchQuery query = getQuery(queryText, hitsPerPage, startIndex, vreq);            
+            SearchEngine solr = ApplicationUtils.instance().getSearchEngine();
+            SearchResponse response = null;           
             
             try {
                 response = solr.query(query);
@@ -186,7 +186,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                 return doFailedSearch(I18n.text(vreq, "error_in_search_request"), queryText, format, vreq);
             }
             
-            SolrDocumentList docs = response.getResults();
+            SearchResultDocumentList docs = response.getResults();
             if (docs == null) {
                 log.error("Document list for a search was null");                
                 return doFailedSearch(I18n.text(vreq, "error_in_search_request"), queryText,format, vreq);
@@ -199,11 +199,11 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             }            
             
             List<Individual> individuals = new ArrayList<Individual>(docs.size());
-            Iterator<SolrDocument> docIter = docs.iterator();
+            Iterator<SearchResultDocument> docIter = docs.iterator();
             while( docIter.hasNext() ){
                 try {                                    
-                    SolrDocument doc = docIter.next();
-                    String uri = doc.get(VitroSearchTermNames.URI).toString();                    
+                    SearchResultDocument doc = docIter.next();
+                    String uri = doc.getStringValue(VitroSearchTermNames.URI);                    
                     Individual ind = iDao.getIndividualByURI(uri);
                     if(ind != null) {
                       ind.setSearchSnippet( getSnippet(doc, response) );
@@ -353,12 +353,12 @@ public class PagedSearchController extends FreemarkerHttpServlet {
      * Get the class groups represented for the individuals in the documents.
      * @param qtxt 
      */
-    private List<VClassGroupSearchLink> getClassGroupsLinks(VitroRequest vreq, VClassGroupDao grpDao, SolrDocumentList docs, QueryResponse rsp, String qtxt) {                                 
+    private List<VClassGroupSearchLink> getClassGroupsLinks(VitroRequest vreq, VClassGroupDao grpDao, SearchResultDocumentList docs, SearchResponse rsp, String qtxt) {                                 
         Map<String,Long> cgURItoCount = new HashMap<String,Long>();
         
         List<VClassGroup> classgroups = new ArrayList<VClassGroup>( );
-        List<FacetField> ffs = rsp.getFacetFields();
-        for(FacetField ff : ffs){
+        List<SearchFacetField> ffs = rsp.getFacetFields();
+        for(SearchFacetField ff : ffs){
             if(VitroSearchTermNames.CLASSGROUP_URI.equals(ff.getName())){
                 List<Count> counts = ff.getValues();
                 for( Count ct: counts){                    
@@ -388,13 +388,13 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return classGroupLinks;
     }
 
-    private List<VClassSearchLink> getVClassLinks(VClassDao vclassDao, SolrDocumentList docs, QueryResponse rsp, String qtxt){        
+    private List<VClassSearchLink> getVClassLinks(VClassDao vclassDao, SearchResultDocumentList docs, SearchResponse rsp, String qtxt){        
         HashSet<String> typesInHits = getVClassUrisForHits(docs);                                
         List<VClass> classes = new ArrayList<VClass>(typesInHits.size());
         Map<String,Long> typeURItoCount = new HashMap<String,Long>();        
         
-        List<FacetField> ffs = rsp.getFacetFields();
-        for(FacetField ff : ffs){
+        List<SearchFacetField> ffs = rsp.getFacetFields();
+        for(SearchFacetField ff : ffs){
             if(VitroSearchTermNames.RDFTYPE.equals(ff.getName())){
                 List<Count> counts = ff.getValues();
                 for( Count ct: counts){  
@@ -435,9 +435,9 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return vClassLinks;
     }       
         
-    private HashSet<String> getVClassUrisForHits(SolrDocumentList docs){
+    private HashSet<String> getVClassUrisForHits(SearchResultDocumentList docs){
         HashSet<String> typesInHits = new HashSet<String>();  
-        for (SolrDocument doc : docs) {
+        for (SearchResultDocument doc : docs) {
             try {
                 Collection<Object> types = doc.getFieldValues(VitroSearchTermNames.RDFTYPE);     
                 if (types != null) {
@@ -453,8 +453,8 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return typesInHits;
     }
     
-    private String getSnippet(SolrDocument doc, QueryResponse response) {
-        String docId = doc.get(VitroSearchTermNames.DOCID).toString();
+    private String getSnippet(SearchResultDocument doc, SearchResponse response) {
+        String docId = doc.getStringValue(VitroSearchTermNames.DOCID);
         StringBuffer text = new StringBuffer();
         Map<String, Map<String, List<String>>> highlights = response.getHighlighting();
         if (highlights != null && highlights.get(docId) != null) {
@@ -466,19 +466,19 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return text.toString();
     }       
 
-    private SolrQuery getQuery(String queryText, int hitsPerPage, int startIndex, VitroRequest vreq) {
+    private SearchQuery getQuery(String queryText, int hitsPerPage, int startIndex, VitroRequest vreq) {
         // Lowercase the search term to support wildcard searches: Solr applies no text
         // processing to a wildcard search term.
-        SolrQuery query = new SolrQuery( queryText );
+        SearchQuery query = ApplicationUtils.instance().getSearchEngine().createQuery(queryText);
         
         query.setStart( startIndex )
              .setRows(hitsPerPage);
 
         // ClassGroup filtering param
-        String classgroupParam = (String) vreq.getParameter(PARAM_CLASSGROUP);
+        String classgroupParam = vreq.getParameter(PARAM_CLASSGROUP);
         
         // rdf:type filtering param
-        String typeParam = (String) vreq.getParameter(PARAM_RDFTYPE);
+        String typeParam = vreq.getParameter(PARAM_RDFTYPE);
         
         if ( ! StringUtils.isBlank(classgroupParam) ) {
             // ClassGroup filtering
@@ -487,9 +487,9 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             query.addFilterQuery(VitroSearchTermNames.CLASSGROUP_URI + ":\"" + classgroupParam + "\"");
             
             //with ClassGroup filtering we want type facets
-            query.add("facet","true");
-            query.add("facet.limit","-1");
-            query.add("facet.field",VitroSearchTermNames.RDFTYPE);
+            query.addParameter("facet","true");
+            query.addParameter("facet.limit","-1");
+            query.addParameter("facet.field",VitroSearchTermNames.RDFTYPE);
             
         }else if (  ! StringUtils.isBlank(typeParam) ) {
             // rdf:type filtering
@@ -500,9 +500,9 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             //with type filtering we don't have facets.            
         }else{ 
             //When no filtering is set, we want ClassGroup facets
-            query.add("facet","true");
-            query.add("facet.limit","-1");
-            query.add("facet.field",VitroSearchTermNames.CLASSGROUP_URI);        
+            query.addParameter("facet","true");
+            query.addParameter("facet.limit","-1");
+            query.addParameter("facet.field",VitroSearchTermNames.CLASSGROUP_URI);        
         }                        
         
         log.debug("Query = " + query.toString());

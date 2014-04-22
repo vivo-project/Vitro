@@ -8,23 +8,21 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocument;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumentList;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.utils.fields.FieldUtils;
 
 /*
@@ -34,13 +32,11 @@ import edu.cornell.mannlib.vitro.webapp.utils.fields.FieldUtils;
 public class IndividualsViaSolrQueryOptions extends IndividualsViaVClassOptions implements FieldOptions {
 	private Log log = LogFactory.getLog(IndividualsViaSolrQueryOptions.class);	
 
-    private ServletContext servletContext;
     private String subjectUri;
     private String predicateUri;
     private String objectUri;
-    public IndividualsViaSolrQueryOptions(ServletContext context, String inputSubjectUri, String inputPredicateUri, String inputObjectUri, String ... vclassURIs) throws Exception {
+    public IndividualsViaSolrQueryOptions(String inputSubjectUri, String inputPredicateUri, String inputObjectUri, String ... vclassURIs) throws Exception {
         super(vclassURIs);           
-        this.servletContext = context;
         this.subjectUri = inputSubjectUri;
         this.predicateUri  = inputPredicateUri;
         this.objectUri = inputObjectUri;
@@ -50,10 +46,10 @@ public class IndividualsViaSolrQueryOptions extends IndividualsViaVClassOptions 
     protected Map<String,Individual> getIndividualsForClass(String vclassURI, WebappDaoFactory wDaoFact ){
     	Map<String, Individual> individualMap = new HashMap<String, Individual>();
     	try {
-	    	SolrServer solrServer = SolrSetup.getSolrServer(servletContext);
+			SearchEngine solrServer = ApplicationUtils.instance().getSearchEngine();
 	
 			//solr query for type count.    		
-			SolrQuery query = new SolrQuery();
+			SearchQuery query = solrServer.createQuery();
 			if( VitroVocabulary.OWL_THING.equals( vclassURI )){
 				query.setQuery( "*:*" );    			
 			}else{
@@ -61,15 +57,15 @@ public class IndividualsViaSolrQueryOptions extends IndividualsViaVClassOptions 
 			}
 			 query.setStart(0)
              .setRows(1000);
-	        query.setFields(VitroSearchTermNames.URI); // fields to retrieve
+	        query.addFields(VitroSearchTermNames.URI); // fields to retrieve
 
-			QueryResponse rsp = solrServer.query(query);
-			SolrDocumentList docs = rsp.getResults();
+			SearchResponse rsp = solrServer.query(query);
+			SearchResultDocumentList docs = rsp.getResults();
 			long found = docs.getNumFound();
 			if(found > 0) {
-				for (SolrDocument doc : docs) {
+				for (SearchResultDocument doc : docs) {
 					try {
-						String uri = doc.get(VitroSearchTermNames.URI).toString();
+						String uri = doc.getStringValue(VitroSearchTermNames.URI);
 						Individual individual = wDaoFact.getIndividualDao().getIndividualByURI(uri);
 						if (individual == null) {
 							log.debug("No individual for search document with uri = " + uri);

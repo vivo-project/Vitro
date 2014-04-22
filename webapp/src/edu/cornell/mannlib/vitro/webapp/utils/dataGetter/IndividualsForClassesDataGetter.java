@@ -163,7 +163,7 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
     protected void processClassesAndRestrictions(VitroRequest vreq, ServletContext context, 
     		HashMap<String, Object> data, List<String> classes, List<String> restrictClasses ) {
     	processClassesForDisplay(vreq, context, data, classes);
-    	processRestrictionClasses(vreq, context, data, restrictClasses);
+    	processRestrictionClasses(vreq, data, restrictClasses);
     	processIntersections(vreq, context, data);
     	
     }
@@ -217,7 +217,7 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
 		for(VClass r: restrictClasses) {
 			classUris.add(r.getURI());
 		}
-		long count =  DataGetterUtils.getIndividualCountForIntersection(vreq, context, classUris);
+		long count =  DataGetterUtils.getIndividualCountForIntersection(vreq, classUris);
 		return new Long(count).intValue();
 
 	}
@@ -254,7 +254,7 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
     	data.put("vClassGroup", classesGroup);
     }	
     
-    private void processRestrictionClasses(VitroRequest vreq, ServletContext context, 
+    private void processRestrictionClasses(VitroRequest vreq, 
     		HashMap<String, Object> data, List<String> restrictClasses) {
     	try {
 	    	VClassGroup restrictClassesGroup = new VClassGroup();
@@ -305,7 +305,7 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
     	}
     }
     
-    public static VClassGroupTemplateModel getClassGroup(String classGroupUri, ServletContext context, VitroRequest vreq){
+    public static VClassGroupTemplateModel getClassGroup(String classGroupUri, VitroRequest vreq){
         
         VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
         List<VClassGroup> vcgList = vcgc.getGroups();

@@ -9,9 +9,10 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
+
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocument;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumentList;
 
 /**
  * Parse this Solr response, creating a map of values for each document.
@@ -22,10 +23,10 @@ import org.apache.solr.common.SolrDocumentList;
 public class SolrResultsParser {
 	private static final Log log = LogFactory.getLog(SolrResultsParser.class);
 
-	private final QueryResponse queryResponse;
+	private final SearchResponse queryResponse;
 	private final Map<String, String> fieldNameMapping;
 
-	public SolrResultsParser(QueryResponse queryResponse, FieldMap fieldMap) {
+	public SolrResultsParser(SearchResponse queryResponse, FieldMap fieldMap) {
 		this.queryResponse = queryResponse;
 		this.fieldNameMapping = fieldMap.map();
 	}
@@ -41,14 +42,14 @@ public class SolrResultsParser {
 			return maps;
 		}
 
-		SolrDocumentList docs = queryResponse.getResults();
+		SearchResultDocumentList docs = queryResponse.getResults();
 		if (docs == null) {
 			log.debug("Docs for a search was null");
 			return maps;
 		}
 		log.debug("Total number of hits = " + docs.getNumFound());
 
-		for (SolrDocument doc : docs) {
+		for (SearchResultDocument doc : docs) {
 			maps.add(parseSingleDocument(doc));
 		}
 
@@ -69,14 +70,14 @@ public class SolrResultsParser {
 			return maps;
 		}
 
-		SolrDocumentList docs = queryResponse.getResults();
+		SearchResultDocumentList docs = queryResponse.getResults();
 		if (docs == null) {
 			log.debug("Docs for a search was null");
 			return maps;
 		}
 		log.debug("Total number of hits = " + docs.getNumFound());
 
-		for (SolrDocument doc : docs) {
+		for (SearchResultDocument doc : docs) {
 			Map<String, String> map = parseSingleDocument(doc);
 			if (filter.accept(map)) {
 				maps.add(map);
@@ -92,7 +93,7 @@ public class SolrResultsParser {
 	/**
 	 * Create a map from this document, applying translation on the field names.
 	 */
-	private Map<String, String> parseSingleDocument(SolrDocument doc) {
+	private Map<String, String> parseSingleDocument(SearchResultDocument doc) {
 		Map<String, String> result = new HashMap<String, String>();
 		for (String solrFieldName : fieldNameMapping.keySet()) {
 			String jsonFieldName = fieldNameMapping.get(solrFieldName);
@@ -106,8 +107,8 @@ public class SolrResultsParser {
 	/**
 	 * Find a single value in the document
 	 */
-	private String parseSingleValue(SolrDocument doc, String key) {
-		Object rawValue = getFirstValue(doc.get(key));
+	private String parseSingleValue(SearchResultDocument doc, String key) {
+		Object rawValue = doc.getFirstValue(key);
 
 		if (rawValue == null) {
 			return "";
@@ -116,22 +117,6 @@ public class SolrResultsParser {
 			return (String) rawValue;
 		}
 		return String.valueOf(rawValue);
-	}
-
-	/**
-	 * The result might be a list. If so, get the first element.
-	 */
-	private Object getFirstValue(Object rawValue) {
-		if (rawValue instanceof List<?>) {
-			List<?> list = (List<?>) rawValue;
-			if (list.isEmpty()) {
-				return null;
-			} else {
-				return list.get(0);
-			}
-		} else {
-			return rawValue;
-		}
 	}
 
 }

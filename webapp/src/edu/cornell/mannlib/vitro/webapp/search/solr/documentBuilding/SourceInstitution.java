@@ -2,9 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding;
 
-import org.apache.solr.common.SolrInputDocument;
-
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 
 public class SourceInstitution implements DocumentModifier {
@@ -22,7 +21,7 @@ public class SourceInstitution implements DocumentModifier {
 	}
 	
 	@Override
-	public void modifyDocument(Individual individual, SolrInputDocument doc,
+	public void modifyDocument(Individual individual, SearchInputDocument doc,
 			StringBuffer addUri) throws SkipIndividualException {
 		
 		doc.addField(VitroSearchTermNames.SITE_URL, siteURL);

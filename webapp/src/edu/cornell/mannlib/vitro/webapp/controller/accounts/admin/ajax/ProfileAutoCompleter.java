@@ -16,17 +16,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.json.JSONException;
 
 import com.hp.hpl.jena.ontology.OntModel;
@@ -39,11 +33,16 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.AbstractAjaxResponder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery.Order;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.utils.solr.AutoCompleteWords;
 import edu.cornell.mannlib.vitro.webapp.utils.solr.FieldMap;
 import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrQueryUtils;
@@ -121,8 +120,8 @@ class ProfileAutoCompleter extends AbstractAjaxResponder implements
 		}
 
 		try {
-			SolrQuery query = buildSolrQuery();
-			QueryResponse queryResponse = executeSolrQuery(query);
+			SearchQuery query = buildSearchQuery();
+			SearchResponse queryResponse = executeSearchQuery(query);
 
 			List<Map<String, String>> maps = SolrQueryUtils
 					.parseAndFilterResponse(queryResponse, RESPONSE_FIELDS,
@@ -133,17 +132,17 @@ class ProfileAutoCompleter extends AbstractAjaxResponder implements
 			String response = assembleJsonResponse(maps);
 			log.debug(response);
 			return response;
-		} catch (SolrServerException e) {
+		} catch (SearchEngineException e) {
 			log.error("Failed to get basic profile info", e);
 			return EMPTY_RESPONSE;
 		}
 	}
 
-	private SolrQuery buildSolrQuery() {
-		SolrQuery q = new SolrQuery();
-		q.setFields(NAME_RAW, URI);
-		q.setSortField(NAME_LOWERCASE_SINGLE_VALUED, ORDER.asc);
-		q.setFilterQueries(SolrQueryUtils.assembleConjunctiveQuery(RDFTYPE,
+	private SearchQuery buildSearchQuery() {
+		SearchQuery q = ApplicationUtils.instance().getSearchEngine().createQuery();
+		q.addFields(NAME_RAW, URI);
+		q.addSortField(NAME_LOWERCASE_SINGLE_VALUED, Order.ASC);
+		q.addFilterQuery(SolrQueryUtils.assembleConjunctiveQuery(RDFTYPE,
 				profileTypes, OR));
 		q.setStart(0);
 		q.setRows(10000);
@@ -151,10 +150,9 @@ class ProfileAutoCompleter extends AbstractAjaxResponder implements
 		return q;
 	}
 
-	private QueryResponse executeSolrQuery(SolrQuery query)
-			throws SolrServerException {
-		ServletContext ctx = servlet.getServletContext();
-		SolrServer solr = SolrSetup.getSolrServer(ctx);
+	private SearchResponse executeSearchQuery(SearchQuery query)
+			throws SearchEngineException {
+		SearchEngine solr = ApplicationUtils.instance().getSearchEngine();
 		return solr.query(query);
 	}
 

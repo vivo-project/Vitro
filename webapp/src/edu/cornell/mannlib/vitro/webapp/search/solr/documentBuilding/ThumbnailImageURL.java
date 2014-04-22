@@ -9,13 +9,13 @@ import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.common.SolrInputDocument;
 
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
@@ -45,7 +45,7 @@ public class ThumbnailImageURL implements DocumentModifier {
 	}
 	
 	@Override
-	public void modifyDocument(Individual individual, SolrInputDocument doc,
+	public void modifyDocument(Individual individual, SearchInputDocument doc,
 			StringBuffer addUri) throws SkipIndividualException {
 		
 		//add a field for storing the location of thumbnail for the individual.
@@ -56,7 +56,7 @@ public class ThumbnailImageURL implements DocumentModifier {
 	/**
      * Adds if the individual has a thumbnail image or not.
      */
-    protected void addThumbnailExistence(Individual ind, SolrInputDocument doc) {
+    protected void addThumbnailExistence(Individual ind, SearchInputDocument doc) {
         try{
             if(ind.hasThumb())
                 doc.addField(THUMBNAIL, "1");

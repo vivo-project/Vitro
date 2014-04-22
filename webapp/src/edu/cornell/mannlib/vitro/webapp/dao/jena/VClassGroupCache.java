@@ -14,12 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.response.FacetField.Count;
-import org.apache.solr.client.solrj.response.QueryResponse;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
@@ -30,6 +24,7 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
@@ -40,11 +35,17 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchFacetField;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchFacetField.Count;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexingEventListener;
-import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
+import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerSetup;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
@@ -188,14 +189,14 @@ public class VClassGroupCache implements IndexingEventListener {
         
         int attempts = 0;
         int maxTries = 3;
-        SolrServerException exception = null;
+        SearchEngineException exception = null;
         
         while( attempts < maxTries ){
             try {
                 attempts++;
                 rebuildCacheUsingSolr(this);
                 break;                
-            } catch (SolrServerException e) {
+            } catch (SearchEngineException e) {
                 exception = e;
                 try { Thread.sleep(250); }
                 catch (InterruptedException e1) {/*ignore interrupt*/}
@@ -203,7 +204,7 @@ public class VClassGroupCache implements IndexingEventListener {
         }
         
         if( exception != null )
-            log.error("Could not rebuild cache. " + exception.getRootCause().getMessage() );
+            log.error("Could not rebuild cache. " + exception.getCause().getMessage() );
     }
     
     /**
@@ -247,17 +248,13 @@ public class VClassGroupCache implements IndexingEventListener {
      * 
      * If ProhibitedFromSearch is not found in the context, that will be skipped.
      * 
-     * @throws SolrServerException if there are problems with the Solr server. 
+     * @throws SearchEngineException if there are problems with the Solr server. 
      */
-    protected static void rebuildCacheUsingSolr( VClassGroupCache cache ) throws SolrServerException{                        
+    protected static void rebuildCacheUsingSolr( VClassGroupCache cache ) throws SearchEngineException{                        
         long start = System.currentTimeMillis();
 		WebappDaoFactory wdFactory = ModelAccess.on(cache.context).getWebappDaoFactory();
 
-		SolrServer solrServer = (SolrServer)cache.context.getAttribute(SolrSetup.SOLR_SERVER);
-        if( solrServer == null){
-            log.error("Unable to rebuild cache: could not get solrServer from ServletContext");
-            return;
-        }                
+		SearchEngine solrServer = ApplicationUtils.instance().getSearchEngine();
         
         VitroFilters vFilters = VitroFilterUtils.getPublicFilter(cache.context);
         VClassGroupDao vcgDao = new WebappDaoFactoryFiltering(wdFactory, vFilters).getVClassGroupDao();
@@ -291,7 +288,7 @@ public class VClassGroupCache implements IndexingEventListener {
      * Removes classes from groups that are prohibited from search. 
      */
     protected static void removeClassesHiddenFromSearch(List<VClassGroup> groups, ServletContext context2) {
-        ProhibitedFromSearch pfs = (ProhibitedFromSearch)context2.getAttribute(SolrSetup.PROHIBITED_FROM_SEARCH);
+        ProhibitedFromSearch pfs = (ProhibitedFromSearch)context2.getAttribute(SearchIndexerSetup.PROHIBITED_FROM_SEARCH);
         if(pfs==null){
             log.debug("Could not get ProhibitedFromSearch from ServletContext");
             return;
@@ -311,10 +308,10 @@ public class VClassGroupCache implements IndexingEventListener {
     
     /**
      * Add the Individual count to classes in groups.
-     * @throws SolrServerException 
+     * @throws SearchEngineException 
      */
-    protected static void addCountsUsingSolr(List<VClassGroup> groups, SolrServer solrServer) 
-    throws SolrServerException {        
+    protected static void addCountsUsingSolr(List<VClassGroup> groups, SearchEngine solrServer) 
+    throws SearchEngineException {        
         if( groups == null || solrServer == null ) 
             return;       
         for( VClassGroup group : groups){            
@@ -322,23 +319,23 @@ public class VClassGroupCache implements IndexingEventListener {
         }
     }    
     
-    protected static void addClassCountsToGroup(VClassGroup group, SolrServer solrServer)
-    throws SolrServerException {
+    protected static void addClassCountsToGroup(VClassGroup group, SearchEngine solrServer)
+    throws SearchEngineException {
         if( group == null ) return;
         
         String groupUri = group.getURI();
         String facetOnField = VitroSearchTermNames.RDFTYPE;
         
-        SolrQuery query = new SolrQuery( ).
+        SearchQuery query = ApplicationUtils.instance().getSearchEngine().createQuery().
             setRows(0).
             setQuery(VitroSearchTermNames.CLASSGROUP_URI + ":" + groupUri ).        
-            setFacet(true). //facet on type to get counts for classes in classgroup
-            addFacetField( facetOnField ).
+            setFaceting(true). //facet on type to get counts for classes in classgroup
+            addFacetFields( facetOnField ).
             setFacetMinCount(0);
         
         log.debug("query: " + query);
         
-        QueryResponse rsp = solrServer.query(query);
+        SearchResponse rsp = solrServer.query(query);
 
         //Get individual count
         long individualCount = rsp.getResults().getNumFound();
@@ -346,7 +343,7 @@ public class VClassGroupCache implements IndexingEventListener {
         group.setIndividualCount((int) individualCount);
         
         //get counts for classes
-        FacetField ff = rsp.getFacetField( facetOnField );
+        SearchFacetField ff = rsp.getFacetField( facetOnField );
         if( ff != null ){
             List<Count> counts = ff.getValues();
             if( counts != null ){
@@ -407,7 +404,8 @@ public class VClassGroupCache implements IndexingEventListener {
             this.cache = cache;
         }
 
-        public void run() {
+        @Override
+		public void run() {
             while (!die) {
                 int delay;
 
@@ -425,12 +423,12 @@ public class VClassGroupCache implements IndexingEventListener {
                         log.debug("rebuildGroupCacheThread.run() -- rebuilt cache ");
                         failedAttempts = 0;
                         delay = 100;
-                    } catch (SolrServerException e) {                        
+                    } catch (SearchEngineException e) {                        
                         failedAttempts++;
                         if( failedAttempts >= maxFailedAttempts ){                                                        
                             log.error("Could not build VClassGroupCache. " +
                             		  "Could not connect with Solr after " + 
-                            		   failedAttempts + " attempts.", e.getRootCause());
+                            		   failedAttempts + " attempts.", e.getCause());
                             rebuildRequested = false;
                             failedAttempts = 0;
                             delay = 1000;
@@ -479,11 +477,13 @@ public class VClassGroupCache implements IndexingEventListener {
      * Listen for changes to what class group classes are in and their display rank.
      */
     protected class VClassGroupCacheChangeListener extends StatementListener {        
-        public void addedStatement(Statement stmt) {
+        @Override
+		public void addedStatement(Statement stmt) {
             checkAndDoUpdate(stmt);
         }
 
-        public void removedStatement(Statement stmt) {
+        @Override
+		public void removedStatement(Statement stmt) {
             checkAndDoUpdate(stmt);
         }
 
