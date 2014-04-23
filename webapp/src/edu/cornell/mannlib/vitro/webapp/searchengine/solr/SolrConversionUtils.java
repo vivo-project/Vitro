@@ -102,26 +102,22 @@ public class SolrConversionUtils {
 			solrQuery.addFilterQuery(filter);
 		}
 
-		solrQuery.setFacet(query.isFaceting());
+		if (!query.getFacetFields().isEmpty()) {
+			solrQuery.setFacet(true);
+		}
 
 		for (String facetField : query.getFacetFields()) {
 			solrQuery.addFacetField(facetField);
 		}
 
-		for (String facetQuery : query.getFacetQueries()) {
-			solrQuery.addFacetQuery(facetQuery);
+		int facetLimit = query.getFacetLimit();
+		if (facetLimit >= 0) {
+			solrQuery.setFacetLimit(facetLimit);
 		}
-
+		
 		int minCount = query.getFacetMinCount();
 		if (minCount >= 0) {
 			solrQuery.setFacetMinCount(minCount);
-		}
-
-		Map<String, List<String>> parameterMap = query.getParameterMap();
-		for (String parameterName : parameterMap.keySet()) {
-			String[] values = parameterMap.get(parameterName).toArray(
-					new String[0]);
-			solrQuery.add(parameterName, values);
 		}
 
 		return solrQuery;

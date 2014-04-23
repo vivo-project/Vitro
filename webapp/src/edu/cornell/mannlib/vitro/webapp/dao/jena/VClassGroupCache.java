@@ -327,8 +327,7 @@ public class VClassGroupCache implements IndexingEventListener {
         SearchQuery query = searchEngine.createQuery().
             setRows(0).
             setQuery(VitroSearchTermNames.CLASSGROUP_URI + ":" + groupUri ).        
-            setFaceting(true). //facet on type to get counts for classes in classgroup
-            addFacetFields( facetOnField ).
+            addFacetFields( facetOnField ). //facet on type to get counts for classes in classgroup
             setFacetMinCount(0);
         
         log.debug("query: " + query);

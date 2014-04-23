@@ -2,13 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchengine.base;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,12 +24,9 @@ public class BaseSearchQuery implements SearchQuery {
 	private final Map<String, SearchQuery.Order> sortFields = new HashMap<>();
 	private final Set<String> filters = new HashSet<>();
 
-	private boolean faceting;
 	private final Set<String> facetFields = new HashSet<>();
-	private final Set<String> facetQueries = new HashSet<>();
+	private int facetLimit = 100;
 	private int facetMinCount = -1;
-
-	private final Map<String, List<String>> parameterMap = new HashMap<>();
 
 	@Override
 	public SearchQuery setQuery(String query) {
@@ -81,33 +76,20 @@ public class BaseSearchQuery implements SearchQuery {
 	}
 
 	@Override
-	public SearchQuery setFaceting(boolean b) {
-		this.faceting = b;
-		return this;
-	}
-
-	@Override
 	public SearchQuery addFacetFields(String... fields) {
 		facetFields.addAll(Arrays.asList(fields));
 		return this;
 	}
 
 	@Override
-	public SearchQuery addFacetQueries(String... queries) {
-		facetQueries.addAll(Arrays.asList(queries));
+	public SearchQuery setFacetLimit(int cnt) {
+		facetLimit = cnt;
 		return this;
 	}
 
 	@Override
 	public SearchQuery setFacetMinCount(int cnt) {
 		facetMinCount = cnt;
-		return this;
-	}
-
-	@Override
-	public SearchQuery addParameter(String name, String... values) {
-		parameterMap.put(name, Collections.unmodifiableList(new ArrayList<>(
-				Arrays.asList(values))));
 		return this;
 	}
 
@@ -142,18 +124,13 @@ public class BaseSearchQuery implements SearchQuery {
 	}
 
 	@Override
-	public boolean isFaceting() {
-		return faceting;
-	}
-
-	@Override
 	public Set<String> getFacetFields() {
 		return Collections.unmodifiableSet(facetFields);
 	}
 
 	@Override
-	public Set<String> getFacetQueries() {
-		return Collections.unmodifiableSet(facetQueries);
+	public int getFacetLimit() {
+		return facetLimit;
 	}
 
 	@Override
@@ -162,18 +139,12 @@ public class BaseSearchQuery implements SearchQuery {
 	}
 
 	@Override
-	public Map<String, List<String>> getParameterMap() {
-		return Collections.unmodifiableMap(parameterMap);
-	}
-
-	@Override
 	public String toString() {
-		return "BaseSearchQuery [queryText=" + queryText + ", start=" + start
+		return "BaseSearchQuery[queryText=" + queryText + ", start=" + start
 				+ ", rows=" + rows + ", fieldsToReturn=" + fieldsToReturn
 				+ ", sortFields=" + sortFields + ", filters=" + filters
-				+ ", faceting=" + faceting + ", facetFields=" + facetFields
-				+ ", facetQueries=" + facetQueries + ", facetMinCount="
-				+ facetMinCount + ", parameterMap=" + parameterMap + "]";
+				+ ", facetFields=" + facetFields + ", facetLimit=" + facetLimit
+				+ ", facetMinCount=" + facetMinCount + "]";
 	}
 
 }

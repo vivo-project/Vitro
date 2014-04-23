@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.modules.searchEngine;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,118 +19,124 @@ public interface SearchQuery {
 
 	/**
 	 * Set the text of the query. This will be parsed using Lucene query syntax.
+	 * 
+	 * @return this query
 	 */
 	SearchQuery setQuery(String query);
 
 	/**
 	 * Where in the ordered list of result documents should the response begin?
 	 * That is, how many of the results should be skipped? (allows paging of
-	 * results)
+	 * results). The default is 0.
+	 * 
+	 * @return this query
 	 */
 	SearchQuery setStart(int start);
 
 	/**
 	 * What is the maximum number of documents that will be returned from the
-	 * query?
+	 * query? A negative value means no limit. The default is -1.
+	 * 
+	 * @return this query
 	 */
 	SearchQuery setRows(int rows);
 
 	/**
 	 * Which fields should be returned from the query?
+	 * 
+	 * @return this query
 	 */
 	SearchQuery addFields(String... names);
 
 	/**
 	 * Which fields should be returned from the query?
+	 * 
+	 * @return this query
 	 */
 	SearchQuery addFields(Collection<String> names);
 
 	/**
 	 * What field should be used to sort the results, and in what order?
+	 * 
+	 * @return this query
 	 */
 	SearchQuery addSortField(String name, Order order);
 
 	/**
-	 * Restrict the results by thisw query.
+	 * Restrict the results by this query.
+	 * 
+	 * @return this query
 	 */
 	SearchQuery addFilterQuery(String filterQuery);
 
 	/**
 	 * Restrict the results by these queries.
+	 * 
+	 * @return this query
 	 */
 	SearchQuery addFilterQueries(String... filterQueries);
 
 	/**
-	 * Should the results be faceted?
-	 */
-	SearchQuery setFaceting(boolean b);
-
-	/**
 	 * What fields should be used to facet the results?
+	 * 
+	 * @return this query
 	 */
 	SearchQuery addFacetFields(String... fields);
 
 	/**
-	 * Add queries that can be used to facet the results.
+	 * The maximum number of facet counts that will be returned from the query.
+	 * The default is 100. A negative value means no limit.
+	 * 
+	 * @return this query
 	 */
-	SearchQuery addFacetQueries(String... queries);
+	SearchQuery setFacetLimit(int cnt);
 
 	/**
-	 * Facet having fewer hits will be excluded from the list.
+	 * Facet having fewer hits will be excluded from the list. The default is 0.
+	 * 
+	 * @return this query
 	 */
 	SearchQuery setFacetMinCount(int cnt);
 
 	/**
-	 * Add a system-dependent parameter to the query.
-	 */
-	SearchQuery addParameter(String name, String... values);
-
-	/**
-	 * Get the text of the query.
+	 * @return The text of the query. May be empty, but never null.
 	 */
 	String getQuery();
 
 	int getStart();
 
 	/**
-	 * A value of -1 means that no limit has been specified.
+	 * @return A negative value means that no limit has been specified.
 	 */
 	int getRows();
 
 	/**
-	 * May return an empty set, but never null.
+	 * @return May return an empty set, but never null.
 	 */
 	Set<String> getFieldsToReturn();
 
 	/**
-	 * May return an empty map, but never null.
+	 * @return May return an empty map, but never null.
 	 */
 	Map<String, SearchQuery.Order> getSortFields();
 
 	/**
-	 * May return an empty set, but never null.
+	 * @return May return an empty set, but never null.
 	 */
 	Set<String> getFilters();
 
-	boolean isFaceting();
-
 	/**
-	 * May return an empty set, but never null.
+	 * @return May return an empty set, but never null.
 	 */
 	Set<String> getFacetFields();
 
 	/**
-	 * May return an empty set, but never null.
+	 * @return A negative value means that no limit has been specified.
 	 */
-	Set<String> getFacetQueries();
+	int getFacetLimit();
 
 	/**
-	 * A value of -1 means that no limit has been specified.
+	 * @return A negative value means that no limit has been specified.
 	 */
 	int getFacetMinCount();
-
-	/**
-	 * May return an empty map, but never null.
-	 */
-	Map<String, List<String>> getParameterMap();
 }

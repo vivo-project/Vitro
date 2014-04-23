@@ -77,7 +77,7 @@ public class SearchIndexerSetup implements ServletContextListener {
 		SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
 
 		try {
-			/* set up the individual to solr doc translation */
+			/* set up the individual to search doc translation */
 			OntModel jenaOntModel = ModelAccess.on(context).getJenaOntModel();
 			OntModel displayModel = ModelAccess.on(context).getDisplayModel();
 
@@ -100,13 +100,13 @@ public class SearchIndexerSetup implements ServletContextListener {
 			List<SearchIndexExcluder> searchIndexExcludesFromContext = (List<SearchIndexExcluder>) context
 					.getAttribute("SearchIndexExcludes");
 
-			IndividualToSearchDocument indToSolrDoc = setupTransltion(
+			IndividualToSearchDocument indToSearchDoc = setupTranslation(
 					jenaOntModel, displayModel,
 					RDFServiceUtils.getRDFServiceFactory(context),
 					modifiersFromContext, searchIndexExcludesFromContext);
 
-			/* setup solr indexer */
-			SearchIndexer solrIndexer = new SearchIndexer(searchEngine, indToSolrDoc);
+			/* setup search indexer */
+			SearchIndexer searchIndexer = new SearchIndexer(searchEngine, indToSearchDoc);
 
 			// This is where the builder gets the list of places to try to
 			// get objects to index. It is filtered so that non-public text
@@ -123,7 +123,7 @@ public class SearchIndexerSetup implements ServletContextListener {
 					.getList(rdfService, wadf.getIndividualDao());
 
 			// Make the IndexBuilder
-			IndexBuilder builder = new IndexBuilder(solrIndexer, wadf,
+			IndexBuilder builder = new IndexBuilder(searchIndexer, wadf,
 					uriFinders);
 			// Save it to the servlet context so we can access it later in the
 			// webapp.
@@ -135,9 +135,9 @@ public class SearchIndexerSetup implements ServletContextListener {
 			SearchReindexingListener srl = new SearchReindexingListener(builder);
 			ModelContext.registerListenerForChanges(ctx, srl);
 
-			ss.info(this, "Setup of Solr index completed.");
+			ss.info(this, "Setup of search indexer completed.");
 		} catch (Throwable e) {
-			ss.fatal(this, "could not setup local solr server", e);
+			ss.fatal(this, "could not setup search engine", e);
 		}
 
 	}
@@ -151,7 +151,7 @@ public class SearchIndexerSetup implements ServletContextListener {
 
 	}
 
-	public static IndividualToSearchDocument setupTransltion(
+	public static IndividualToSearchDocument setupTranslation(
 			OntModel jenaOntModel, Model displayModel,
 			RDFServiceFactory rdfServiceFactory,
 			List<DocumentModifier> modifiersFromContext,

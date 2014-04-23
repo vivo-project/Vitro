@@ -484,22 +484,17 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             query.addFilterQuery(VitroSearchTermNames.CLASSGROUP_URI + ":\"" + classgroupParam + "\"");
             
             //with ClassGroup filtering we want type facets
-            query.addParameter("facet","true");
-            query.addParameter("facet.limit","-1");
-            query.addParameter("facet.field",VitroSearchTermNames.RDFTYPE);
+            query.addFacetFields(VitroSearchTermNames.RDFTYPE).setFacetLimit(-1);
             
         }else if (  ! StringUtils.isBlank(typeParam) ) {
             // rdf:type filtering
             log.debug("Firing type query ");
             log.debug("request.getParameter(type) is "+ typeParam);   
             query.addFilterQuery(VitroSearchTermNames.RDFTYPE + ":\"" + typeParam + "\"");
-            
             //with type filtering we don't have facets.            
         }else{ 
             //When no filtering is set, we want ClassGroup facets
-            query.addParameter("facet","true");
-            query.addParameter("facet.limit","-1");
-            query.addParameter("facet.field",VitroSearchTermNames.CLASSGROUP_URI);        
+        	query.addFacetFields(VitroSearchTermNames.CLASSGROUP_URI).setFacetLimit(-1);
         }                        
         
         log.debug("Query = " + query.toString());
