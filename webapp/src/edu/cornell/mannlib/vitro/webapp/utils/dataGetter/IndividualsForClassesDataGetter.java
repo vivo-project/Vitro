@@ -210,7 +210,7 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
     
     //update class count based on restrict classes
 	private int retrieveCount(VitroRequest vreq, ServletContext context, VClass v, List<VClass> restrictClasses) {
-		//Execute solr query that returns only count of individuals
+		//Execute search query that returns only count of individuals
 		log.debug("Entity count is " + v.getEntityCount());
 		List<String> classUris = new ArrayList<String>();
 		classUris.add(v.getURI());
@@ -351,7 +351,7 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
     
     //Get data servuice
     public String getDataServiceUrl() {
-    	return UrlBuilder.getUrl("/dataservice?getRenderedSolrIndividualsByVClass=1&vclassId=");
+    	return UrlBuilder.getUrl("/dataservice?getRenderedSearchIndividualsByVClass=1&vclassId=");
     }
     
     /**

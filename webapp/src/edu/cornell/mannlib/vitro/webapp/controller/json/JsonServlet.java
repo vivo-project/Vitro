@@ -69,10 +69,10 @@ public class JsonServlet extends VitroHttpServlet {
             throw new IllegalArgumentException("The call invoked deprecated classes " +
                     "and the parameter for this call appeared nowhere in the code base, " +
                     "so it was removed in Aug 5th 2013.");                        
-        }else if( vreq.getParameter("getRenderedSolrIndividualsByVClass") != null ){
-            new GetRenderedSolrIndividualsByVClass(vreq).process(resp);
-        }else if( vreq.getParameter("getRandomSolrIndividualsByVClass") != null ){
-            new GetRandomSolrIndividualsByVClass(vreq).process(resp);
+        }else if( vreq.getParameter("getRenderedSearchIndividualsByVClass") != null ){
+            new GetRenderedSearchIndividualsByVClass(vreq).process(resp);
+        }else if( vreq.getParameter("getRandomSearchIndividualsByVClass") != null ){
+            new GetRandomSearchIndividualsByVClass(vreq).process(resp);
         } else if( vreq.getParameter("getAllVClasses") != null ){
             new GetAllVClasses(vreq).process(resp);
         }
@@ -132,7 +132,7 @@ public class JsonServlet extends VitroHttpServlet {
         return IndividualListResultsUtils.wrapIndividualListResultsInJson(vcResults, vreq, false);                            
     }
 
-     //Including version for Random Solr query for Vclass Intersections
+     //Including version for Random search query for Vclass Intersections
      private static IndividualListResults getRandomSearchVClassResults(String vclassURI, VitroRequest vreq){
          log.debug("Retrieving random search intersection results for " + vclassURI);
 

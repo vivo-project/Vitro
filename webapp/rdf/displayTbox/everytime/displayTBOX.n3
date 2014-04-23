@@ -43,7 +43,7 @@ display:RequiredAction a owl:Class ;
     
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SearchIndividualsDataGetter>
     a owl:Class ;
-    rdfs:comment "A data getter for a Solr Class search, i.e. get individuals for VClass" .
+    rdfs:comment "A data getter for a Class search, i.e. get individuals for VClass" .
     
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlUpdate>
     a owl:Class ;
@@ -141,7 +141,7 @@ owl:topObjectProperty
 
 display:hasVClassId
     a owl:ObjectProperty ;
-    rdfs:comment "Object property defining class for solr data getter" .
+    rdfs:comment "Object property defining class for search data getter" .
            
 ###Vitro properties without which individual templates throw errors as are required
 

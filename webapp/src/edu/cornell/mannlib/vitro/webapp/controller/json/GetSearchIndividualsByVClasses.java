@@ -28,7 +28,7 @@ public class GetSearchIndividualsByVClasses extends JsonObjectProducer {
 	protected JSONObject process() throws Exception {
     log.debug("Executing retrieval of individuals by vclasses");
         VClass vclass=null;
-        log.debug("Retrieving solr individuals by vclasses");
+        log.debug("Retrieving search individuals by vclasses");
         // Could have multiple vclass ids sent in
         String[] vitroClassIdStr = vreq.getParameterValues("vclassId");  
         if ( vitroClassIdStr != null && vitroClassIdStr.length > 0){    

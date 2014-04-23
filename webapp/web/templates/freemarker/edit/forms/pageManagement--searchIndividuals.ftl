@@ -3,7 +3,7 @@
 <#assign classGroup = pageData.classGroup />
 <#assign classGroups = pageData.classGroups />
 <#assign classes = pageData.classes />
-<section id="solrIndividuals" class="contentSectionContainer">
+<section id="searchIndividuals" class="contentSectionContainer">
     <label id="variableLabel" for="variable">${i18n().variable_name_all_caps}<span class="requiredHint"> *</span></label>
     <input type="text" name="saveToVar" size="20" value="" id="saveToVar" role="input" />
     <label id="vclassUriLabel" for="vclassUri">${i18n().select_vclass_uri}<span class="requiredHint"> *</span></label>
@@ -21,8 +21,8 @@
     </#if>
 </section>
 <script>
-    var i18nStringsSolrIndividuals = {
-        solrIndividuals: '${i18n().solr_individual_results}',
+    var i18nStringsSearchIndividuals = {
+        searchIndividuals: '${i18n().solr_individual_results}',
         supplyQueryVariable: '${i18n().supply_query_variable}',
         noApostrophes: '${i18n().apostrophe_not_allowed}',
         noDoubleQuotes: '${i18n().double_quote_note_allowed}',
@@ -30,4 +30,4 @@
         selectClass: '${i18n().select_class_for_solr}'
     };
 </script>
-${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/processSolrDataGetterContent.js"></script>')}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/processSearchDataGetterContent.js"></script>')}

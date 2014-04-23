@@ -13,7 +13,7 @@ scripts list.-->
       		"individualsForClasses": "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter",
       		"sparqlQuery":"java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter",
       		"fixedHtml":"java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.FixedHTMLDataGetter",
-      		"solrIndividuals":"java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SearchIndividualsDataGetter"
+      		"searchIndividuals":"java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SearchIndividualsDataGetter"
       }
     };
 </script>

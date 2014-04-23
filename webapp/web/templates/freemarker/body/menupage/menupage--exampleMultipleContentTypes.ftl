@@ -1,5 +1,6 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
-<#--This is an example of including multiple content types in the same template, this combines the default templates for Fixed HTML, Class groups and Solr Individuals in one template-->
+<#--This is an example of including multiple content types in the same template, 
+    this combines the default templates for Fixed HTML, Class groups and Search Individuals in one template-->
 <#include "menupage-checkForData.ftl">
 <#--Fixed HTML portion-->
 <#--Note that variableName is employed by both the fixed html and sparql query templates, this is used to store the
@@ -32,7 +33,7 @@ variableName is used below.-->
     ${noDataNotification}
 </#if>
 
-<#--Solr Individuals section-->
+<#--Search Individuals section-->
 <#import "lib-list.ftl" as l>
 
 <#include "individualList-checkForData.ftl">

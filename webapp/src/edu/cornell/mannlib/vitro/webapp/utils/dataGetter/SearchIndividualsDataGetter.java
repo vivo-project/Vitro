@@ -47,7 +47,7 @@ public class SearchIndividualsDataGetter extends DataGetterBase implements DataG
     
     final static Log log = LogFactory.getLog(SearchIndividualsDataGetter.class);
     //default template
-    private final static String defaultTemplate = "menupage--defaultSolrIndividuals.ftl";
+    private final static String defaultTemplate = "menupage--defaultSearchIndividuals.ftl";
     
     /**
      * Constructor with display model and data getter URI that will be called by reflection.
@@ -67,7 +67,7 @@ public class SearchIndividualsDataGetter extends DataGetterBase implements DataG
     		merged.put(key, new String[] {String.valueOf(pageData.get(key))});
     	}
     	
-        return doSolrQuery( merged);
+        return doSearchQuery( merged);
     }
 
     /**
@@ -125,12 +125,12 @@ public class SearchIndividualsDataGetter extends DataGetterBase implements DataG
     
 
     //Partially copied from IndividualListController
-    private  Map<String, Object> doSolrQuery( Map<String, String[]> merged) {
+    private  Map<String, Object> doSearchQuery( Map<String, String[]> merged) {
     	if(vclassUris.size() == 0) {
     		if(merged.containsKey("vclassuri")) {
     			this.vclassUris = Arrays.asList(merged.get("vclassuri"));
     		} else {
-    			log.error("No vclass uri found.  Solr query will not work");
+    			log.error("No vclass uri found.  Search query will not work");
     		}
     	}
     	
@@ -160,7 +160,7 @@ public class SearchIndividualsDataGetter extends DataGetterBase implements DataG
                  body.put("subtitle", vclass.getName());
              }
              body.put("title", title);
-             populateSolrQueryResults(vclass, body);
+             populateSearchQueryResults(vclass, body);
              body.put("bodyTemplate", this.defaultTemplate);
     	} else {
     		log.error("No VClass URIs found.  No query will be executed");
@@ -168,7 +168,7 @@ public class SearchIndividualsDataGetter extends DataGetterBase implements DataG
     	return body;
     }
 
-    private void populateSolrQueryResults(VClass vclass, Map<String, Object> body) {
+    private void populateSearchQueryResults(VClass vclass, Map<String, Object> body) {
         try {
 	    	String alpha = SearchQueryUtils.getAlphaParameter(vreq);
 	        int page = SearchQueryUtils.getPageParameter(vreq);
@@ -203,7 +203,7 @@ public class SearchIndividualsDataGetter extends DataGetterBase implements DataG
     public static final String defaultVarNameForResults = "results";
     
     /**
-     * Query to get the definition of the Solr individuals data getter for a given URI.
+     * Query to get the definition of the search individuals data getter for a given URI.
      */
     private static final String dataGetterQuery =
         "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS +"> \n" +

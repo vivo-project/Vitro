@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.json;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewService;
@@ -26,34 +24,26 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.Individual
  * Does a Solr search for individuals, and uses the short view to render each of
  * the results.
  */
-public class GetRenderedSolrIndividualsByVClass extends GetSearchIndividualsByVClasses {
+public class GetRandomSearchIndividualsByVClass extends GetSearchIndividualsByVClass {
 	private static final Log log = LogFactory
-			.getLog(GetRenderedSolrIndividualsByVClass.class);
+			.getLog(GetRandomSearchIndividualsByVClass.class);
 
-	protected GetRenderedSolrIndividualsByVClass(VitroRequest vreq) {
+	protected GetRandomSearchIndividualsByVClass(VitroRequest vreq) {
 		super(vreq);
 	}
 
 	/**
-	 * Search for individuals by VClass or VClasses in the case of multiple parameters. The class URI(s) and the paging
-	 * information are in the request parameters.
+	 * Search for individuals by VClass. 
 	 */
 	@Override
 	protected JSONObject process() throws Exception {
 		JSONObject rObj = null;
 		
-		//This gets the first vclass value and sets that as display type
+		//This gets the first vclass value and sets that as display type.
 		List<String> vclassIds = super.getVclassIds(vreq);
-		String vclassId = null;
-		if(vclassIds.size() > 1) {
-			//This ensures the second class instead of the first 
-			//This is a temporary fix in cases where institutional internal classes are being sent in
-			//and thus the second class is the actual class with display information associated
-			vclassId = vclassIds.get(1);
-		} else {
-			vclassId = vclassIds.get(0);
-		}
-		vreq.setAttribute("displayType", vclassId);
+		String vclassId = vclassIds.get(0);
+		vreq.setAttribute("queryType", "random");
+//		vreq.setAttribute("displayType", vclassId);
 		
 		//This will get all the solr individuals by VClass (if one value) or the intersection
 		//i.e. individuals that have all the types for the different vclasses entered
@@ -62,8 +52,6 @@ public class GetRenderedSolrIndividualsByVClass extends GetSearchIndividualsByVC
 		return rObj;
 	}
 	
-	//Get 
-
 	/**
 	 * Look through the return object. For each individual, render the short
 	 * view and insert the resulting HTML into the object.

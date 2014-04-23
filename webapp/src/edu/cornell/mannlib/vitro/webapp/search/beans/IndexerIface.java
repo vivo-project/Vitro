@@ -10,8 +10,8 @@ import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
  * IndexBuilder will manage getting lists of object to index and then use
  * an object that implements IndexerIface to stuff the backend index.
  *
- * An example is SolrIndexer which is set up and associated with a
- * IndexBuilder in SolrSetup.
+ * An example is SearchIndexer which is set up and associated with a
+ * IndexBuilder in SearchIndexerSetup.
  *
  * @author bdc34
  *

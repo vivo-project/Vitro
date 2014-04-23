@@ -454,7 +454,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
     }
 
     private String escapeWhitespaceInQueryString(String queryStr) {
-        // Solr wants whitespace to be escaped with a backslash
+        // The search engine wants whitespace to be escaped with a backslash
         return queryStr.replaceAll("\\s+", "\\\\ ");
     }
 

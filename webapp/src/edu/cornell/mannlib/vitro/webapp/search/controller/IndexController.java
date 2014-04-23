@@ -38,8 +38,8 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.Work
  * That IndexBuilder will be associated with a object that implements the
  * IndexerIface.
  * 
- * An example of the IndexerIface is SolrIndexer. An example of the IndexBuilder
- * and SolrIndexer setup is in SolrSetup.
+ * An example of the IndexerIface is SearchIndexer. An example of the IndexBuilder
+ * and SearchIndexer setup is in SearchIndexerSetup.
  * 
  * @author bdc34
  */
@@ -161,7 +161,7 @@ public class IndexController extends FreemarkerHttpServlet {
 			ApplicationUtils.instance().getSearchEngine().ping();
 			return Boolean.TRUE;
 		} catch (Exception e) {
-			log.error("Can't connect to the Solr server.", e);
+			log.error("Can't connect to the search engine.", e);
 			return Boolean.FALSE;
 		}
 	}

@@ -53,11 +53,9 @@ public class ThumbnailImageURLTest extends AbstractTestClass{
     /**
      * Test to see if ThumbnailImageURL gets the date it is suppose to gete
      * from a set of RDF.
-     * 
-     * Test method for {@link edu.cornell.mannlib.vitro.webapp.search.documentBuilding.ThumbnailImageURL#modifyDocument(edu.cornell.mannlib.vitro.webapp.beans.Individual, org.apache.solr.common.SolrInputDocument, java.lang.StringBuffer)}.
      */
     @Test
-    public void testThumbnailFieldCreatedInSolrDoc() {
+    public void testThumbnailFieldCreatedInSearchDoc() {
         SearchInputDocument doc = ApplicationUtils.instance().getSearchEngine().createInputDocument();
         ThumbnailImageURL testMe = new ThumbnailImageURL( testRDF );
         Individual ind = new IndividualImpl();
@@ -70,7 +68,7 @@ public class ThumbnailImageURLTest extends AbstractTestClass{
                 Assert.fail("Test individual was skipped by classes that build the search document: " + e.getMessage());
         }
 
-        //make sure that a Solr document field got created for the thumbnail image
+        //make sure that a search document field got created for the thumbnail image
         
         SearchInputField thumbnailField = doc.getField( VitroSearchTermNames.THUMBNAIL_URL );
         Assert.assertNotNull(thumbnailField);
