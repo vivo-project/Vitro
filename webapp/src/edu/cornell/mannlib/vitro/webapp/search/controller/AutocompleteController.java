@@ -16,20 +16,20 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocument;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumentList;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 
 /**
  * AutocompleteController generates autocomplete content
@@ -66,7 +66,7 @@ public class AutocompleteController extends VitroAjaxController {
 
             String qtxt = vreq.getParameter(PARAM_QUERY);
 
-            SolrQuery query = getQuery(qtxt, vreq);
+            SearchQuery query = getQuery(qtxt, vreq);
             if (query == null ) {
                 log.debug("query for '" + qtxt +"' is null.");
                 doNoQuery(response);
@@ -74,8 +74,8 @@ public class AutocompleteController extends VitroAjaxController {
             }
             log.debug("query for '" + qtxt +"' is " + query.toString());
 
-            SolrServer solr = SolrSetup.getSolrServer(getServletContext());
-            QueryResponse queryResponse = solr.query(query);
+			SearchEngine search = ApplicationUtils.instance().getSearchEngine();
+            SearchResponse queryResponse = search.query(query);
 
             if ( queryResponse == null) {
                 log.error("Query response for a search was null");
@@ -83,7 +83,7 @@ public class AutocompleteController extends VitroAjaxController {
                 return;
             }
 
-            SolrDocumentList docs = queryResponse.getResults();
+            SearchResultDocumentList docs = queryResponse.getResults();
 
             if ( docs == null) {
                 log.error("Docs for a search was null");
@@ -99,33 +99,11 @@ public class AutocompleteController extends VitroAjaxController {
             }  
 
             List<SearchResult> results = new ArrayList<SearchResult>();
-            for (SolrDocument doc : docs) {
+            for (SearchResultDocument doc : docs) {
                 try {                
-                    String uri = doc.get(VitroSearchTermNames.URI).toString();
-                    // RY 7/1/2011
-                    // Comment was: VitroSearchTermNames.NAME_RAW is a multivalued field, so doc.get() returns a list.
-                    // Changed to: VitroSearchTermNames.NAME_RAW is a multivalued field, so doc.get() could return a list
-                    // But in fact: I'm no longer seeing any lists returned for individuals with multiple labels. Not sure
-                    // if this is new behavior or what. ???
-                    Object nameRaw = doc.get(VitroSearchTermNames.NAME_RAW);
-                    String name = null;
-                    if (nameRaw instanceof List<?>) {
-                        @SuppressWarnings("unchecked")
-                        List<String> nameRawList = (List<String>) nameRaw;
-                        name = nameRawList.get(0);
-                    } else {
-                        name = (String) nameRaw;
-                    }
-
-                    Object mostSpecificType = doc.get(VitroSearchTermNames.MOST_SPECIFIC_TYPE_URIS);
-                    String mst = null;
-                    if (mostSpecificType instanceof List<?>) {
-                        @SuppressWarnings("unchecked")
-                        List<String> mstList = (List<String>) mostSpecificType;
-                        mst = mstList.get(0);
-                    } else {
-                        mst = (String) mostSpecificType;
-                    }
+                    String uri = doc.getStringValue(VitroSearchTermNames.URI);
+                    String name = doc.getStringValue(VitroSearchTermNames.NAME_RAW);
+                    String mst = doc.getStringValue(VitroSearchTermNames.MOST_SPECIFIC_TYPE_URIS);
 
                     SearchResult result = new SearchResult(name, uri, mst);
                     results.add(result);
@@ -150,7 +128,7 @@ public class AutocompleteController extends VitroAjaxController {
         }
     }
 
-    private SolrQuery getQuery(String queryStr, VitroRequest vreq) {
+    private SearchQuery getQuery(String queryStr, VitroRequest vreq) {
 
         if ( queryStr == null) {
             log.error("There was no parameter '"+ PARAM_QUERY
@@ -162,26 +140,26 @@ public class AutocompleteController extends VitroAjaxController {
             return null;
         }
           
-        SolrQuery query = new SolrQuery();
+        SearchQuery query = ApplicationUtils.instance().getSearchEngine().createQuery();
         query.setStart(0)
              .setRows(DEFAULT_MAX_HIT_COUNT);
         setNameQuery(query, queryStr, vreq);
         // Filter by type
-        String typeParam = (String) vreq.getParameter(PARAM_RDFTYPE);
-        String multipleTypesParam = (String) vreq.getParameter(PARAM_MULTIPLE_RDFTYPE);
+        String typeParam = vreq.getParameter(PARAM_RDFTYPE);
+        String multipleTypesParam = vreq.getParameter(PARAM_MULTIPLE_RDFTYPE);
         if (typeParam != null) {
         	addFilterQuery(query, typeParam,  multipleTypesParam);
         }
 
-        query.setFields(VitroSearchTermNames.NAME_RAW, VitroSearchTermNames.URI, VitroSearchTermNames.MOST_SPECIFIC_TYPE_URIS); // fields to retrieve
+        query.addFields(VitroSearchTermNames.NAME_RAW, VitroSearchTermNames.URI, VitroSearchTermNames.MOST_SPECIFIC_TYPE_URIS); // fields to retrieve
 
         // Can't sort on multivalued field, so we sort the results in Java when we get them.
-        // query.setSortField(VitroSearchTermNames.NAME_LOWERCASE, SolrQuery.ORDER.asc);
+        // query.addSortField(VitroSearchTermNames.NAME_LOWERCASE, Order.ASC);
 
         return query;
     }
 
-    private void addFilterQuery(SolrQuery query, String typeParam, String multipleTypesParam) {
+    private void addFilterQuery(SearchQuery query, String typeParam, String multipleTypesParam) {
     	if(multipleTypesParam == null || multipleTypesParam.equals("null") || multipleTypesParam.isEmpty()) {
     		//Single type parameter, process as usual
             query.addFilterQuery(VitroSearchTermNames.RDFTYPE + ":\"" + typeParam + "\"");
@@ -200,12 +178,12 @@ public class AutocompleteController extends VitroAjaxController {
     	}
 	}
 
-	private void setNameQuery(SolrQuery query, String queryStr, HttpServletRequest request) {
+	private void setNameQuery(SearchQuery query, String queryStr, HttpServletRequest request) {
 
         if (StringUtils.isBlank(queryStr)) {
             log.error("No query string");
         }
-        String tokenizeParam = (String) request.getParameter("tokenize");
+        String tokenizeParam = request.getParameter("tokenize");
         boolean tokenize = "true".equals(tokenizeParam);
 
         // Note: Stemming is only relevant if we are tokenizing: an untokenized name
@@ -218,7 +196,7 @@ public class AutocompleteController extends VitroAjaxController {
         }
     }
 
-    private void setTokenizedNameQuery(SolrQuery query, String queryStr, HttpServletRequest request) {
+    private void setTokenizedNameQuery(SearchQuery query, String queryStr, HttpServletRequest request) {
  
         /* We currently have no use case for a tokenized, unstemmed autocomplete search field, so the option
          * has been disabled. If needed in the future, will need to add a new field and field type which
@@ -262,7 +240,7 @@ public class AutocompleteController extends VitroAjaxController {
 
     }
 
-    private void setUntokenizedNameQuery(SolrQuery query, String queryStr) {
+    private void setUntokenizedNameQuery(SearchQuery query, String queryStr) {
         queryStr = queryStr.trim();
         queryStr = makeTermQuery(VitroSearchTermNames.AC_NAME_UNTOKENIZED, queryStr, true);
         query.setQuery(queryStr);
@@ -276,7 +254,7 @@ public class AutocompleteController extends VitroAjaxController {
     }
 
     private String escapeWhitespaceInQueryString(String queryStr) {
-        // Solr wants whitespace to be escaped with a backslash
+        // The search engine wants whitespace to be escaped with a backslash
         return queryStr.replaceAll("\\s+", "\\\\ ");
     }
        

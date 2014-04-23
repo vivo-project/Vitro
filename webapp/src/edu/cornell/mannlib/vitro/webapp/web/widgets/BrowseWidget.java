@@ -83,7 +83,7 @@ public class BrowseWidget extends Widget {
         VClass vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(classUri);
         map.put("class", new VClassTemplateModel(vclass));
         
-        JSONObject vclassRes = JsonServlet.getSolrIndividualsByVClass(vclass.getURI(), request, context);        
+        JSONObject vclassRes = JsonServlet.getSearchIndividualsByVClass(vclass.getURI(), request);        
         map.put("totalCount", JsonToFmModel.convertJSONObjectToMap( (String) vclassRes.get("totalCount") ));
         map.put("alpha", JsonToFmModel.convertJSONObjectToMap( (String) vclassRes.get("alpha") ));
         map.put("individuals", JsonToFmModel.convertJSONArrayToList( (JSONArray) vclassRes.get("individuals") ));

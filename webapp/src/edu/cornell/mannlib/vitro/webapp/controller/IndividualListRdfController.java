@@ -8,11 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -21,8 +16,13 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.RDF;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocument;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumentList;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 
 public class IndividualListRdfController extends VitroHttpServlet {
 
@@ -31,24 +31,25 @@ public class IndividualListRdfController extends VitroHttpServlet {
     
 	public static final int ENTITY_LIST_CONTROLLER_MAX_RESULTS = 30000;
 	    
-    public void doGet (HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+    @Override
+	public void doGet (HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+    	SearchEngine search = ApplicationUtils.instance().getSearchEngine();
     	    
     	// Make the query
     	String vclassUri = req.getParameter("vclass");
     	String queryStr = VitroSearchTermNames.RDFTYPE + ":\"" + vclassUri + "\"";
-    	SolrQuery query = new SolrQuery(queryStr);
+    	SearchQuery query = search.createQuery(queryStr);
     	query.setStart(0)
     	     .setRows(ENTITY_LIST_CONTROLLER_MAX_RESULTS)
-    	     .setFields(VitroSearchTermNames.URI);
+    	     .addFields(VitroSearchTermNames.URI);
     	     // For now, we're only displaying the url, so no need to sort.
-    	     //.setSortField(VitroSearchTermNames.NAME_LOWERCASE_SINGLE_VALUED);
+    	     //.addSortField(VitroSearchTermNames.NAME_LOWERCASE_SINGLE_VALUED);
 
     	// Execute the query
-        SolrServer solr = SolrSetup.getSolrServer(getServletContext());
-        QueryResponse response = null;
+        SearchResponse response = null;
         
         try {
-            response = solr.query(query);            
+            response = search.query(query);            
         } catch (Throwable t) {
             log.error(t, t);            
         }
@@ -57,17 +58,17 @@ public class IndividualListRdfController extends VitroHttpServlet {
             throw new ServletException("Could not run search in IndividualListRdfController");        
         }
 
-        SolrDocumentList docs = response.getResults();
+        SearchResultDocumentList docs = response.getResults();
         
         if (docs == null) {
             throw new ServletException("Could not run search in IndividualListRdfController");    
         }
 
         Model model = ModelFactory.createDefaultModel();
-        for (SolrDocument doc : docs) {
-            String uri = doc.get(VitroSearchTermNames.URI).toString();
+        for (SearchResultDocument doc : docs) {
+            String uri = doc.getStringValue(VitroSearchTermNames.URI);
             Resource resource = ResourceFactory.createResource(uri);
-            RDFNode node = (RDFNode) ResourceFactory.createResource(vclassUri);
+            RDFNode node = ResourceFactory.createResource(vclassUri);
             model.add(resource, RDF.type, node);
         }
 
@@ -75,7 +76,8 @@ public class IndividualListRdfController extends VitroHttpServlet {
     	model.write(res.getOutputStream(), "RDF/XML");
     }
     
-    public void doPost (HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException{
+    @Override
+	public void doPost (HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException{
     	doGet(req,res);
     }
     

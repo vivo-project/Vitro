@@ -1,9 +1,9 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-$.extend(this, i18nStringsSolrIndividuals);
+$.extend(this, i18nStringsSearchIndividuals);
 
 //Process sparql data getter and provide a json object with the necessary information
-var processSolrDataGetterContent = {
+var processSearchDataGetterContent = {
 	dataGetterClass:null,
 	//can use this if expect to initialize from elsewhere
 	initProcessor:function(dataGetterClass) {
@@ -30,13 +30,13 @@ var processSolrDataGetterContent = {
 		
 		//Now find and set value
 		pageContentSection.find("input[name='saveToVar']").val(saveToVarValue);
-		//set value of solr query
+		//set value of query
 		pageContentSection.find("select[name='vclassUri']").val(vclassUriValue);
 		
 	},
 	//For the label of the content section for editing, need to add additional value
 	retrieveContentLabel:function() {
-		return i18nStringsSolrIndividuals.solrIndividuals;
+		return i18nStringsSearchIndividuals.searchIndividuals;
 	},
 	//For the label of the content section for editing, need to add additional value
 	retrieveAdditionalLabelText:function(existingContentObject) {
@@ -49,20 +49,20 @@ var processSolrDataGetterContent = {
     	//Check that vclassuri and saveToVar have been input
     	var variableValue = pageContentSection.find("input[name='saveToVar']").val();
     	if(variableValue == "") {
-    		validationError += pageContentSectionLabel + ": " + i18nStringsSolrIndividuals.supplyQueryVariable + " <br />"
+    		validationError += pageContentSectionLabel + ": " + i18nStringsSearchIndividuals.supplyQueryVariable + " <br />"
     	}
-    	if(processSolrDataGetterContent.stringHasSingleQuote(variableValue)) {
-    		validationError += pageContentSectionLabel + ": " + i18nStringsSolrIndividuals.noApostrophes + " <br />";
+    	if(processSearchDataGetterContent.stringHasSingleQuote(variableValue)) {
+    		validationError += pageContentSectionLabel + ": " + i18nStringsSearchIndividuals.noApostrophes + " <br />";
     	}
-    	if(processSolrDataGetterContent.stringHasDoubleQuote(variableValue)) {
-    		validationError += pageContentSectionLabel + ": " + i18nStringsSolrIndividuals.noDoubleQuotes + " <br />";
+    	if(processSearchDataGetterContent.stringHasDoubleQuote(variableValue)) {
+    		validationError += pageContentSectionLabel + ": " + i18nStringsSearchIndividuals.noDoubleQuotes + " <br />";
     	}
     	
-    	//validation for solr individuals
+    	//validation for search individuals
     	
 		var vclassUriValue = pageContentSection.find("select[name='vclassUri']").val();
 		if(vclassUriValue == "") {
-			validationError += pageContentSectionLabel + ": " + i18nStringsSolrIndividuals.selectClass + " <br />";
+			validationError += pageContentSectionLabel + ": " + i18nStringsSearchIndividuals.selectClass + " <br />";
 		}
     	return validationError;
     },
