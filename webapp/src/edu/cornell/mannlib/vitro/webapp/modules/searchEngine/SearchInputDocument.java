@@ -22,33 +22,41 @@ public interface SearchInputDocument {
 	void addField(SearchInputField field);
 
 	/**
-	 * Create a field with this name and values, and put it into the document. If
-	 * a field with this name already exists in the document, it will be
-	 * replaced.
+	 * Create a field with this name and values, and put it into the document.
+	 *
+	 * If a field with this name already exists in the document, these values
+	 * will be added to the existing values on the field.
 	 */
 	void addField(String name, Object... values);
 
 	/**
-	 * Create a field with this name and values, and put it into the document. If
-	 * a field with this name already exists in the document, it will be
-	 * replaced.
+	 * Create a field with this name and values, and put it into the document.
+	 * 
+	 * If a field with this name already exists in the document, these values
+	 * will be added to the existing values on the field.
 	 */
 	void addField(String name, Collection<Object> values);
-	
+
 	/**
 	 * Create a field with this name, boost level and values, and put it into
-	 * the document. If a field with this name already exists in the document,
-	 * it will be replaced.
+	 * the document. 
+	 * 
+	 * If a field with this name already exists in the document,
+	 * these values will be added to the existing values on the field, and the
+	 * existing boost will be multipled by this boost.
 	 */
 	void addField(String name, float boost, Object... values);
 
 	/**
 	 * Create a field with this name, boost level and values, and put it into
-	 * the document. If a field with this name already exists in the document,
-	 * it will be replaced.
+	 * the document. 
+	 * 
+	 * If a field with this name already exists in the document,
+	 * these values will be added to the existing values on the field, and the
+	 * existing boost will be multipled by this boost.
 	 */
 	void addField(String name, float boost, Collection<Object> values);
-	
+
 	/**
 	 * Set a boost level for the document as a whole.
 	 */
