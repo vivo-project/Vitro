@@ -11,8 +11,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleRequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
 /**
  * A class of simple permissions. Each instance holds a RequestedAction, and

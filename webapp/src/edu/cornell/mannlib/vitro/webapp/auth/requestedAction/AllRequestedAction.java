@@ -6,8 +6,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-
 /**
  * This action should be authorized if all of its subActions are authorized.
  * @author bdc34 

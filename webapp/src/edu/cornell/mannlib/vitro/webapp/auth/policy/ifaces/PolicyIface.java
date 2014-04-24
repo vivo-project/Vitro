@@ -3,7 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 
 /**
  * Represents the process of mapping an identifier that represents a user or

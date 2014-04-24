@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces;
 
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
+
 /**
  * A base class for actions that involve a single URI.
  */

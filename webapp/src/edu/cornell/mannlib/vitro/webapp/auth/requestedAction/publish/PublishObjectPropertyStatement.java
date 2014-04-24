@@ -2,9 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.publish;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_URI;
+
 import com.hp.hpl.jena.ontology.OntModel;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyStatementAction;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
@@ -32,8 +34,8 @@ public class PublishObjectPropertyStatement extends
 
 	private static Property populateProperty(String predicateUri) {
 		Property prop = new Property(predicateUri);
-		prop.setDomainVClassURI(RequestActionConstants.SOME_URI);
-		prop.setRangeVClassURI(RequestActionConstants.SOME_URI);
+		prop.setDomainVClassURI(SOME_URI);
+		prop.setRangeVClassURI(SOME_URI);
 		return prop;
 	}
 }

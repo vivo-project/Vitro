@@ -2,9 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_URI;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_URI;
 import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.*;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;

@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.BasicPolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 
 /**
  * A policy where every type of action is authorized as INCONCLUSIVE by default.

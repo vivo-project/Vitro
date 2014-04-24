@@ -16,7 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AllRequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AnyRequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 
 /**
  * This is a List of Policy Objects that implements PolciyIface.  The intent

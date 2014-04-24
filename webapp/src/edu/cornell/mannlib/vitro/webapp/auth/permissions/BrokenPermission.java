@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.permissions;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 
 /**
  * This is what the PermissionRegistry hands out if you ask for a Permission

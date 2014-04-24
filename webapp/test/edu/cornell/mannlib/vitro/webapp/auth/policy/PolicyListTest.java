@@ -16,8 +16,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AllRequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AnyRequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.UnauthorizedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
 public class PolicyListTest {
 

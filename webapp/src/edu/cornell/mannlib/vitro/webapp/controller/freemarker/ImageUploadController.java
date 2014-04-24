@@ -11,8 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditObjectPropertyStatement;
@@ -173,7 +172,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 			} else {
 				ra = new AddObjectPropertyStatement(vreq.getJenaOntModel(),
 						entity.getURI(), indMainImage,
-						RequestActionConstants.SOME_URI);
+						RequestedAction.SOME_URI);
 			}
 			return new Actions(ra);
 		} catch (UserMistakeException e) {
