@@ -420,7 +420,7 @@
 		</copy>
 
 		<!-- create an unpacked image of the Solr WAR, with our config options -->
-		<unwar src="${solr.template.dir}/apache-solr-3.6.2.war" dest="${solr.webapp.dir}" />
+		<unwar src="${solr.template.dir}/solr-4.7.2.war" dest="${solr.webapp.dir}" />
 		<copy todir="${solr.webapp.dir}/WEB-INF/classes">
 			<fileset dir="${appbase.dir}/config/solr/" />
 		</copy>

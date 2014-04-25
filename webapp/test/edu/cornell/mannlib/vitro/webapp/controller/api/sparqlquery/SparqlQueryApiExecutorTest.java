@@ -40,12 +40,12 @@ public class SparqlQueryApiExecutorTest extends AbstractTestClass {
 			+ "| <http://here.edu/subject> | <http://here.edu/predicate> | <http://here.edu/object> |\n"
 			+ "| <http://here.edu/s2>      | <http://here.edu/p2>        | <http://here.edu/o2>     |\n"
 			+ "--------------------------------------------------------------------------------------\n";
-	private static final String SELECT_RESULT_CSV = "s,p,o\r\n"
-			+ "http://here.edu/subject,http://here.edu/predicate,http://here.edu/object\r\n"
-			+ "http://here.edu/s2,http://here.edu/p2,http://here.edu/o2\r\n";
-	private static final String SELECT_RESULT_TSV = "s\tp\to\r\n"
-			+ "http://here.edu/subject\thttp://here.edu/predicate\thttp://here.edu/object\r\n"
-			+ "http://here.edu/s2\thttp://here.edu/p2\thttp://here.edu/o2\r\n";
+	private static final String SELECT_RESULT_CSV = "s,p,o\n"
+			+ "http://here.edu/subject,http://here.edu/predicate,http://here.edu/object\n"
+			+ "http://here.edu/s2,http://here.edu/p2,http://here.edu/o2\n";
+	private static final String SELECT_RESULT_TSV = "s\tp\to\n"
+			+ "http://here.edu/subject\thttp://here.edu/predicate\thttp://here.edu/object\n"
+			+ "http://here.edu/s2\thttp://here.edu/p2\thttp://here.edu/o2\n";
 	private static final String SELECT_RESULT_XML = "" //
 			+ "<?xml version=\"1.0\"?>\n" //
 			+ "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">\n" //
@@ -424,7 +424,7 @@ public class SparqlQueryApiExecutorTest extends AbstractTestClass {
 				rdfService, queryString, acceptHeader);
 		executor.executeAndFormat(out);
 
-		assertEquals(message, expected, out.toString());
+		assertEquals(message, expected, out.toString().replace("\r", ""));
 	}
 
 	private void executeWithInvalidAcceptHeader(String message,
