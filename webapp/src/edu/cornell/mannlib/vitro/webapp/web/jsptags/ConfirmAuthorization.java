@@ -2,11 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.jsptags;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.AUTHORIZED;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 
@@ -51,38 +48,34 @@ public class ConfirmAuthorization extends BodyTagSupport {
 	 * authorized for the actions it contains.
 	 */
 	private boolean isAuthorized() {
-		Set<RequestedAction> actionSet = getActionsFromRequestAttribute();
-		return PolicyHelper.isAuthorizedForActions(getRequest(), actionSet);
+		return PolicyHelper.isAuthorizedForActions(getRequest(),
+				getActionsFromRequestAttribute());
 	}
 
 	/**
 	 * The attribute may be either a single RequestedAction or an array of
-	 * RequestedActions. It may also be empty, but in that case why call this
-	 * tag?
-	 * 
+	 * RequestedActions. 
+	 *
 	 * When we are done, clear the attribute, so any included or forwarded page
 	 * will not see it.
 	 */
-	private Set<RequestedAction> getActionsFromRequestAttribute() {
-		Set<RequestedAction> actionSet = new HashSet<RequestedAction>();
+	private AuthorizationRequest getActionsFromRequestAttribute() {
 		Object attribute = getRequest().getAttribute("requestedActions");
 		getRequest().removeAttribute("requestedActions");
 
 		if (attribute == null) {
-			log.warn("<vitro:confirmAuthorization /> was called, but nothing "
-					+ "was found at request.getAttribute(\"requestedActions\")");
+			return AUTHORIZED;
 		} else if (attribute instanceof RequestedAction) {
 			RequestedAction ra = (RequestedAction) attribute;
 			log.debug("requested action was " + ra.getClass().getSimpleName());
-			actionSet.add(ra);
+			return ra;
 		} else if (attribute instanceof RequestedAction[]) {
-			RequestedAction[] array = (RequestedAction[]) attribute;
-			List<RequestedAction> raList = Arrays.asList(array);
-			if (log.isDebugEnabled()) {
-				log.debug("requested actions were "
-						+ formatRequestedActions(raList));
+			AuthorizationRequest auth = AUTHORIZED;
+			for (RequestedAction ra : (RequestedAction[]) attribute) {
+				auth = auth.and(ra);
 			}
-			actionSet.addAll(raList);
+			log.debug("requested actions were " + auth);
+			return auth;
 		} else {
 			throw new IllegalStateException(
 					"Expected request.getAttribute(\"requestedActions\") "
@@ -90,20 +83,6 @@ public class ConfirmAuthorization extends BodyTagSupport {
 							+ "RequestedAction[], but found "
 							+ attribute.getClass().getCanonicalName());
 		}
-
-		return actionSet;
-	}
-
-	private String formatRequestedActions(List<RequestedAction> raList) {
-		StringBuffer buff = new StringBuffer();
-		for (Iterator<RequestedAction> it = raList.iterator(); it.hasNext();) {
-			buff.append("'").append(it.next().getClass().getSimpleName())
-					.append("'");
-			if (it.hasNext()) {
-				buff.append(", ");
-			}
-		}
-		return buff.toString();
 	}
 
 	private boolean isLoggedIn() {

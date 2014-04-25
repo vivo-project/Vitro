@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
 /**
@@ -31,6 +31,6 @@ public interface RequiresActions {
      * @return Should not be null. Return Actions.AUTHORIZED
      * if no authorization is required to do use the object.
      */
-    public Actions requiredActions(VitroRequest vreq) ;
+    public AuthorizationRequest requiredActions(VitroRequest vreq) ;
     
 }

@@ -12,7 +12,7 @@
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
 
 <%
-	if (PolicyHelper.isAuthorizedForActions(request, SimplePermission.USE_INDIVIDUAL_CONTROL_PANEL.ACTIONS)) {
+	if (PolicyHelper.isAuthorizedForActions(request, SimplePermission.USE_INDIVIDUAL_CONTROL_PANEL.ACTION)) {
 		request.setAttribute("isEditor", Boolean.TRUE);
 	}
 %>

@@ -114,18 +114,6 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 	 * Don't display a page that the user isn't authorized to see.
 	 * 
 	 * @param actions
-	 *            the RequestedActions that must be authorized.
-	 */
-	protected boolean isAuthorizedToDisplayPage(HttpServletRequest request,
-			HttpServletResponse response, AuthorizationRequest... actions) {
-		return isAuthorizedToDisplayPage(request, response,
-				AuthorizationRequest.and(actions));
-	}
-
-	/**
-	 * Don't display a page that the user isn't authorized to see.
-	 * 
-	 * @param actions
 	 *            the combination of RequestedActions that must be authorized.
 	 */
 	protected boolean isAuthorizedToDisplayPage(HttpServletRequest request,
