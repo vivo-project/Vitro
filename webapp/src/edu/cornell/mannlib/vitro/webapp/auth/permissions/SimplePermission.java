@@ -116,7 +116,6 @@ public class SimplePermission extends Permission {
 	}
 
 	//private final String localName;
-	private final String uri;
 	public final RequestedAction ACTION;
 
 	public SimplePermission(String uri) {
@@ -126,8 +125,6 @@ public class SimplePermission extends Permission {
 			throw new NullPointerException("uri may not be null.");
 		}
 
-		//this.localName = localName;
-		this.uri = uri;
 		this.ACTION = new SimpleRequestedAction(uri);
 
 		if (allInstances.containsKey(this.uri)) {
