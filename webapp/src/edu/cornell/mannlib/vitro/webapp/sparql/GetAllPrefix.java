@@ -3,7 +3,6 @@ package edu.cornell.mannlib.vitro.webapp.sparql;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -58,7 +57,7 @@ public class GetAllPrefix extends BaseEditController {
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		if (!isAuthorizedToDisplayPage(request, response,
-				SimplePermission.USE_MISCELLANEOUS_PAGES.ACTIONS)) {
+				SimplePermission.USE_MISCELLANEOUS_PAGES.ACTION)) {
         	return;
 		}
 

@@ -2,9 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-import java.text.Collator;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -42,7 +39,7 @@ public class ObjectPropertyStatementRetryController extends BaseEditController {
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
 		if (!isAuthorizedToDisplayPage(request, response,
-				SimplePermission.DO_BACK_END_EDITING.ACTIONS)) {
+				SimplePermission.DO_BACK_END_EDITING.ACTION)) {
         	return;
         }
 

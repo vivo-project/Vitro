@@ -2,7 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import static javax.mail.Message.RecipientType.*;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.AUTHORIZED;
+import static javax.mail.Message.RecipientType.TO;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -27,7 +28,7 @@ import com.github.jsonldjava.utils.JSONUtils;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
@@ -43,7 +44,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailMessage;
 import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.User;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
@@ -169,7 +169,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
             boolean sentEmail = false;
             
             // If the user is authorized, display the error data on the page
-            if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTIONS)) {                              
+            if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTION)) {                              
                 templateMap.put("adminErrorData", adminErrorData);   
                 
             // Else send the data to the site administrator
@@ -211,8 +211,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
      * REQUIRED_ACTIONS which is overridden in the subclass.
      * 
      */    
-    protected Actions requiredActions(VitroRequest vreq) {
-        return Actions.AUTHORIZED;
+    protected AuthorizationRequest requiredActions(VitroRequest vreq) {
+        return AUTHORIZED;
     }
     
     // Subclasses will override
@@ -374,7 +374,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
             requestUrls.put("currentPage", getCurrentPageUrl(vreq));
             requestUrls.put("referringPage", getReferringPageUrl(vreq));
             
-            if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.EDIT_OWN_ACCOUNT.ACTIONS)) {
+            if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.EDIT_OWN_ACCOUNT.ACTION)) {
             	requestUrls.put("myAccount", UrlBuilder.getUrl("/accounts/myAccount"));
             }
         } catch (TemplateModelException e) {

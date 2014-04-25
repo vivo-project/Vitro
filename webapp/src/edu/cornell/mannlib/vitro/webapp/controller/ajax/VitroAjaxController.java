@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.ajax;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.AUTHORIZED;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
@@ -15,7 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
 import freemarker.template.Configuration;
@@ -65,8 +67,8 @@ public abstract class VitroAjaxController extends HttpServlet {
 	 * In some cases, the choice of actions will depend on the contents of the request.
      */
     @SuppressWarnings("unused")
-	protected Actions requiredActions(VitroRequest vreq) {
-		return Actions.AUTHORIZED;
+	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
+		return AUTHORIZED;
 	}
 
 	/**

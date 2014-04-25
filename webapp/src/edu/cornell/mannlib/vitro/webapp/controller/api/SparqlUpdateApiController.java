@@ -26,7 +26,7 @@ import com.hp.hpl.jena.update.UpdateFactory;
 import com.hp.hpl.jena.update.UpdateRequest;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
@@ -50,7 +50,7 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 	private static final Log log = LogFactory
 			.getLog(SparqlUpdateApiController.class);
 
-	private static final Actions REQUIRED_ACTIONS = SimplePermission.USE_SPARQL_UPDATE_API.ACTIONS;
+	private static final AuthorizationRequest REQUIRED_ACTIONS = SimplePermission.USE_SPARQL_UPDATE_API.ACTION;
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)

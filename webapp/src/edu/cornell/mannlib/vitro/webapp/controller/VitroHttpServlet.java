@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.AUTHORIZED;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -28,8 +30,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.beans.ResourceBean;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
@@ -116,9 +117,9 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 	 *            the RequestedActions that must be authorized.
 	 */
 	protected boolean isAuthorizedToDisplayPage(HttpServletRequest request,
-			HttpServletResponse response, RequestedAction... actions) {
+			HttpServletResponse response, AuthorizationRequest... actions) {
 		return isAuthorizedToDisplayPage(request, response,
-				new Actions(Arrays.asList(actions)));
+				AuthorizationRequest.and(actions));
 	}
 
 	/**
@@ -128,9 +129,9 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 	 *            the combination of RequestedActions that must be authorized.
 	 */
 	protected boolean isAuthorizedToDisplayPage(HttpServletRequest request,
-			HttpServletResponse response, Actions actions) {
+			HttpServletResponse response, AuthorizationRequest actions) {
 		// Record restricted pages so we won't return to them on logout
-		if (!actions.isEmpty()) {
+		if (actions != AUTHORIZED) {
 			LogoutRedirector.recordRestrictedPageUri(request);
 		}
 

@@ -10,7 +10,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleRequestedAction;
 
@@ -119,7 +118,6 @@ public class SimplePermission extends Permission {
 	//private final String localName;
 	private final String uri;
 	public final RequestedAction ACTION;
-	public final Actions ACTIONS;
 
 	public SimplePermission(String uri) {
 		super(uri);
@@ -131,7 +129,6 @@ public class SimplePermission extends Permission {
 		//this.localName = localName;
 		this.uri = uri;
 		this.ACTION = new SimpleRequestedAction(uri);
-		this.ACTIONS = new Actions(this.ACTION);
 
 		if (allInstances.containsKey(this.uri)) {
 			throw new IllegalStateException("A SimplePermission named '"

@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.UNAUTHORIZED;
+
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
@@ -10,7 +12,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.DropObjectPropertyStatement;
@@ -150,7 +152,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 * The required action depends on what we are trying to do.
 	 */
 	@Override
-	protected Actions requiredActions(VitroRequest vreq) {
+	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
 		try {
 			String action = vreq.getParameter(PARAMETER_ACTION);
 			Individual entity = validateEntityUri(vreq);
@@ -174,9 +176,9 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 						entity.getURI(), indMainImage,
 						RequestedAction.SOME_URI);
 			}
-			return new Actions(ra);
+			return ra;
 		} catch (UserMistakeException e) {
-			return Actions.UNAUTHORIZED;
+			return UNAUTHORIZED;
 		}
 	}
 

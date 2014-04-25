@@ -18,7 +18,6 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 
@@ -53,8 +52,7 @@ public class ConfirmAuthorization extends BodyTagSupport {
 	 */
 	private boolean isAuthorized() {
 		Set<RequestedAction> actionSet = getActionsFromRequestAttribute();
-		return PolicyHelper.isAuthorizedForActions(getRequest(), new Actions(
-				actionSet));
+		return PolicyHelper.isAuthorizedForActions(getRequest(), actionSet);
 	}
 
 	/**

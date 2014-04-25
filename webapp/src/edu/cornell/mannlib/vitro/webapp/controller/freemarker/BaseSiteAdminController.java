@@ -17,7 +17,7 @@ import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
@@ -34,10 +34,10 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
     private static final Log log = LogFactory.getLog(BaseSiteAdminController.class);
     protected static final String TEMPLATE_DEFAULT = "siteAdmin-main.ftl";
 
-    public static final Actions REQUIRED_ACTIONS = SimplePermission.SEE_SITE_ADMIN_PAGE.ACTIONS;
+    public static final AuthorizationRequest REQUIRED_ACTIONS = SimplePermission.SEE_SITE_ADMIN_PAGE.ACTION;
     
     @Override
-	protected Actions requiredActions(VitroRequest vreq) {
+	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
     	return REQUIRED_ACTIONS;
 	}
 
@@ -64,7 +64,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
         
         Map<String, String> urls = new HashMap<String, String>();
 
-        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTIONS)) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTION)) {
             urls.put("recomputeInferences", UrlBuilder.getUrl("/RecomputeInferences"));     
         }
         
@@ -72,11 +72,11 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 			urls.put("rebuildSearchIndex", UrlBuilder.getUrl("/SearchIndex"));
 		}
 		
-        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.LOGIN_DURING_MAINTENANCE.ACTIONS)) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.LOGIN_DURING_MAINTENANCE.ACTION)) {
             urls.put("restrictLogins", UrlBuilder.getUrl("/admin/restrictLogins"));
         }
         
-		if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.ENABLE_DEVELOPER_PANEL.ACTIONS)) {
+		if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.ENABLE_DEVELOPER_PANEL.ACTION)) {
 			urls.put("activateDeveloperPanel", "javascript:new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel({developer_enabled: true});");
 		}
 		
@@ -88,7 +88,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
         Map<String, Object> map = new HashMap<String, Object>();
         
 		if (PolicyHelper.isAuthorizedForActions(vreq,
-				SimplePermission.DO_BACK_END_EDITING.ACTIONS)) {
+				SimplePermission.DO_BACK_END_EDITING.ACTION)) {
 
             map.put("formAction", UrlBuilder.getUrl("/editRequestDispatch"));
             
@@ -125,27 +125,27 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
         Map<String, Object> data = new HashMap<String, Object>();
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_USER_ACCOUNTS.ACTIONS)) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_USER_ACCOUNTS.ACTION)) {
         	data.put("userAccounts", UrlBuilder.getUrl("/accountsAdmin"));
         }
  
-        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_PROXIES.ACTIONS)) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_PROXIES.ACTION)) {
         	data.put("manageProxies", UrlBuilder.getUrl("/manageProxies"));
         }
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.EDIT_SITE_INFORMATION.ACTIONS)) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.EDIT_SITE_INFORMATION.ACTION)) {
             data.put("siteInfo", UrlBuilder.getUrl("/editForm", "controller", "ApplicationBean"));
         }
         
         //TODO: Add specific permissions for page management
-        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_MENUS.ACTIONS)) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_MENUS.ACTION)) {
             data.put("menuManagement", UrlBuilder.getUrl("/individual",
                     "uri", "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#DefaultMenu",
                     "switchToDisplayModel", "true"));
             data.put("pageManagement", UrlBuilder.getUrl("/pageList"));
         }
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.SEE_STARTUP_STATUS.ACTIONS)) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.SEE_STARTUP_STATUS.ACTION)) {
         	data.put("startupStatus", UrlBuilder.getUrl("/startupStatus"));
         	data.put("startupStatusAlert", !StartupStatus.getBean(getServletContext()).allClear());
         }
@@ -157,7 +157,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
         Map<String, Object> map = new HashMap<String, Object>();
  
-        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
             
             String pelletError = null;
             String pelletExplanation = null;
@@ -199,13 +199,13 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
         Map<String, String> urls = new HashMap<String, String>();
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTIONS)) {            
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION)) {            
             urls.put("ingest", UrlBuilder.getUrl("/ingest"));
             urls.put("rdfData", UrlBuilder.getUrl("/uploadRDFForm"));
             urls.put("rdfExport", UrlBuilder.getUrl("/export"));
             urls.put("sparqlQueryBuilder", UrlBuilder.getUrl("/admin/sparqlquerybuilder"));
         }
-        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_SPARQL_QUERY_PAGE.ACTIONS)) {            
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_SPARQL_QUERY_PAGE.ACTION)) {            
         	urls.put("sparqlQuery", UrlBuilder.getUrl("/admin/sparqlquery"));
         }
         

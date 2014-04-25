@@ -3,12 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.controller.individual;
 
 import java.io.IOException;
-import java.lang.Integer;
-import java.lang.String;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -29,15 +25,14 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
 import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ExecuteDataRetrieval;
 import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
 import edu.ucsf.vitro.opensocial.OpenSocialManager;
 import freemarker.ext.beans.BeansWrapper;
 import freemarker.template.TemplateModel;
@@ -191,7 +186,7 @@ class IndividualResponseBuilder {
     private Map<String, Object> getVerbosePropertyValues() {
         Map<String, Object> map = null;
         
-        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.SEE_VERBOSE_PROPERTY_INFORMATION.ACTIONS)) {
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.SEE_VERBOSE_PROPERTY_INFORMATION.ACTION)) {
             // Get current verbose property display value
             String verbose = vreq.getParameter("verbose");
             Boolean verboseValue;

@@ -43,9 +43,9 @@ public class ModelSwitcher {
 	 */
 	public static boolean authorizedForSpecialModel(HttpServletRequest req) {
 		if (isParameterPresent(req, SWITCH_TO_DISPLAY_MODEL)) {
-			return PolicyHelper.isAuthorizedForActions(req, SimplePermission.MANAGE_MENUS.ACTIONS);
+			return PolicyHelper.isAuthorizedForActions(req, SimplePermission.MANAGE_MENUS.ACTION);
 		} else if (anyOtherSpecialProperties(req)){
-			return PolicyHelper.isAuthorizedForActions(req, SimplePermission.ACCESS_SPECIAL_DATA_MODELS.ACTIONS);
+			return PolicyHelper.isAuthorizedForActions(req, SimplePermission.ACCESS_SPECIAL_DATA_MODELS.ACTION);
 		} else {
 			return true;
 		}

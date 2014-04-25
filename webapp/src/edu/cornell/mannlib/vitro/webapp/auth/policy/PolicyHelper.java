@@ -22,7 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFa
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
@@ -44,8 +44,8 @@ public class PolicyHelper {
 	 * policies?
 	 */
 	public static boolean isAuthorizedForActions(HttpServletRequest req,
-			RequestedAction... actions) {
-		return isAuthorizedForActions(req, new Actions(actions));
+			AuthorizationRequest... actions) {
+		return isAuthorizedForActions(req, AuthorizationRequest.and(actions));
 	}
 
 	/**
@@ -53,18 +53,27 @@ public class PolicyHelper {
 	 * policies?
 	 */
 	public static boolean isAuthorizedForActions(HttpServletRequest req,
-			Actions actions) {
+			Iterable<? extends AuthorizationRequest> actions) {
+		return isAuthorizedForActions(req, AuthorizationRequest.and(actions));
+	}
+	
+	/**
+	 * Are these actions authorized for the current user by the current
+	 * policies?
+	 */
+	public static boolean isAuthorizedForActions(HttpServletRequest req,
+			AuthorizationRequest ar) {
 		PolicyIface policy = ServletPolicyList.getPolicies(req);
 		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(req);
-		return isAuthorizedForActions(ids, policy, actions);
+		return ar.isAuthorized(ids, policy);
 	}
 
 	/**
 	 * Are these actions authorized for these identifiers by these policies?
 	 */
 	public static boolean isAuthorizedForActions(IdentifierBundle ids,
-			PolicyIface policy, Actions actions) {
-		return Actions.notNull(actions).isAuthorized(policy, ids);
+			PolicyIface policy, AuthorizationRequest ar) {
+		return ar.isAuthorized(ids, policy);
 	}
 
 	/**
@@ -76,8 +85,7 @@ public class PolicyHelper {
 	 * identifier bundle.
 	 */
 	public static boolean isAuthorizedForActions(HttpServletRequest req,
-			String email, String password, Actions actions) {
-
+			String email, String password, AuthorizationRequest ar) {
 		if (password == null || email == null || password.isEmpty()
 				|| email.isEmpty()) {
 			return false;
@@ -106,11 +114,9 @@ public class PolicyHelper {
 			IdentifierBundle ids = ActiveIdentifierBundleFactories
 					.getUserIdentifierBundle(req, user);
 			PolicyIface policy = ServletPolicyList.getPolicies(req);
-			return PolicyHelper.isAuthorizedForActions(ids, policy, actions);
+			return ar.isAuthorized(ids, policy);
 		} catch (Exception ex) {
-			log.error(
-					"Error while attempting to authorize actions "
-							+ actions.toString(), ex);
+			log.error("Error while attempting to authorize actions " + ar, ex);
 			return false;
 		}
 	}

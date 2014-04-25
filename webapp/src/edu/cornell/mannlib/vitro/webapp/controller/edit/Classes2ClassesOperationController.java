@@ -23,7 +23,7 @@ public class Classes2ClassesOperationController extends BaseEditController {
     private static final Log log = LogFactory.getLog(Classes2ClassesOperationController.class.getName());
 
     public void doGet(HttpServletRequest req, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
+        if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
         	return;
         }
 

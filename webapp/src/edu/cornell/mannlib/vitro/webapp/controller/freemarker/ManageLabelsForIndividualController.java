@@ -2,15 +2,8 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Enumeration;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,18 +11,14 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.datatypes.RDFDatatype ;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 
 public class ManageLabelsForIndividualController extends FreemarkerHttpServlet {
@@ -38,8 +27,8 @@ public class ManageLabelsForIndividualController extends FreemarkerHttpServlet {
     private static final String TEMPLATE_NAME = "manageLabelsForIndividual.ftl";
     
     @Override
-	protected Actions requiredActions(VitroRequest vreq) {
-		return SimplePermission.DO_FRONT_END_EDITING.ACTIONS;
+	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
+		return SimplePermission.DO_FRONT_END_EDITING.ACTION;
 	}
 
     @Override

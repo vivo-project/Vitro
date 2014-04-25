@@ -27,7 +27,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.InvalidQueryTypeException;
-import edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.ResultSetMediaType;
 import edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.SparqlQueryApiExecutor;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -92,7 +91,7 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException, ServletException {
 		if (!isAuthorizedToDisplayPage(req, resp,
-				SimplePermission.USE_SPARQL_QUERY_PAGE.ACTIONS)) {
+				SimplePermission.USE_SPARQL_QUERY_PAGE.ACTION)) {
 			return;
 		}
 		if (req.getParameterMap().containsKey("query")) {

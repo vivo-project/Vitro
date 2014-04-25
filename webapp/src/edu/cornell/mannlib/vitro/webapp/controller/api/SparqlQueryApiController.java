@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.hp.hpl.jena.query.QueryParseException;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.InvalidQueryTypeException;
 import edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.SparqlQueryApiExecutor;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -42,7 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.http.NotAcceptableException;
  */
 public class SparqlQueryApiController extends VitroApiServlet {
 
-	private static final Actions REQUIRED_ACTIONS = SimplePermission.USE_SPARQL_QUERY_API.ACTIONS;
+	private static final AuthorizationRequest REQUIRED_ACTIONS = SimplePermission.USE_SPARQL_QUERY_API.ACTION;
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)

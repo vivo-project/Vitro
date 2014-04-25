@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -58,8 +58,8 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     final String DEFAULT_DELETE_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDeleteGenerator";
 
     @Override
-	protected Actions requiredActions(VitroRequest vreq) {
-    	return SimplePermission.DO_FRONT_END_EDITING.ACTIONS;
+	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
+    	return SimplePermission.DO_FRONT_END_EDITING.ACTION;
 	}
 
 	@Override

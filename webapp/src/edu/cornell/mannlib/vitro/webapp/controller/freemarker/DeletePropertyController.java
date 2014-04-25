@@ -10,7 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -20,7 +20,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Red
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.FactoryID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
@@ -33,8 +32,8 @@ public class DeletePropertyController extends FreemarkerHttpServlet {
     private static final Log log = LogFactory.getLog(DeletePropertyController.class);
  
     @Override
-	protected Actions requiredActions(VitroRequest vreq) {
-    	return SimplePermission.DO_FRONT_END_EDITING.ACTIONS ;
+	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
+    	return SimplePermission.DO_FRONT_END_EDITING.ACTION ;
 	}
 
     @Override

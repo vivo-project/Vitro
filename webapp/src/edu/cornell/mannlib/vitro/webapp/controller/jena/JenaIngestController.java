@@ -127,7 +127,7 @@ public class JenaIngestController extends BaseEditController {
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
 		if (!isAuthorizedToDisplayPage(request, response,
-				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTIONS)) {
+				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION)) {
             return;
         }
         

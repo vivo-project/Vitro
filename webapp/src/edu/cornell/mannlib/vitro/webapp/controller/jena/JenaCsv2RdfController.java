@@ -51,7 +51,7 @@ public class JenaCsv2RdfController extends JenaIngestController {
 	public void doPost(HttpServletRequest rawRequest,
 			HttpServletResponse response) throws ServletException, IOException {
 		if (!isAuthorizedToDisplayPage(rawRequest, response,
-				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTIONS)) {
+				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION)) {
         	return;
         }
 

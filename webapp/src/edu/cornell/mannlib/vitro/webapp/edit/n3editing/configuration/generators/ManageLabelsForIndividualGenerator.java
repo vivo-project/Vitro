@@ -27,7 +27,6 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -277,7 +276,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 		AddObjectPropertyStatement aops = new AddObjectPropertyStatement(
 				vreq.getJenaOntModel(), individual.getURI(),
 				SOME_PREDICATE, SOME_URI);
-    	return PolicyHelper.isAuthorizedForActions(vreq, new Actions(adps).or(aops));
+    	return PolicyHelper.isAuthorizedForActions(vreq, adps.or(aops));
 	}
 
 

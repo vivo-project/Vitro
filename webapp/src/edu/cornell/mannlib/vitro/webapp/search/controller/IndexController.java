@@ -18,7 +18,8 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -82,10 +83,10 @@ public class IndexController extends FreemarkerHttpServlet {
 	private static final String PAGE_URL = "/SearchIndex";
 	private static final String TEMPLATE_NAME = "searchIndex.ftl";
 
-	public static final Actions REQUIRED_ACTIONS = SimplePermission.MANAGE_SEARCH_INDEX.ACTIONS;
+	public static final RequestedAction REQUIRED_ACTIONS = SimplePermission.MANAGE_SEARCH_INDEX.ACTION;
 
 	@Override
-	protected Actions requiredActions(VitroRequest vreq) {
+	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
 		return REQUIRED_ACTIONS;
 	}
 
