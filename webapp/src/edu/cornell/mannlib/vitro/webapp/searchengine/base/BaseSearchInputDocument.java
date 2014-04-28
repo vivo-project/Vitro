@@ -39,10 +39,13 @@ public class BaseSearchInputDocument implements SearchInputDocument {
 
 	@Override
 	public void addField(String name, float boost, Collection<Object> values) {
-		BaseSearchInputField field = new BaseSearchInputField(name);
-		field.setBoost(boost);
+		SearchInputField field = fieldMap.get(name);
+		if (field == null) {
+			field = new BaseSearchInputField(name);
+			fieldMap.put(name, field);
+		}
 		field.addValues(values);
-		fieldMap.put(name, field);
+		field.setBoost(boost * field.getBoost());
 	}
 
 	@Override

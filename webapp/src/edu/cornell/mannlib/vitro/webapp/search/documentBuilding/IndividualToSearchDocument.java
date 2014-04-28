@@ -2,6 +2,16 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 package edu.cornell.mannlib.vitro.webapp.search.documentBuilding;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.ALLTEXT;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.ALLTEXTUNSTEMMED;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.CLASSGROUP_URI;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.DOCID;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.INDEXEDTIME;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.MOST_SPECIFIC_TYPE_URIS;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_LOWERCASE_SINGLE_VALUED;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_RAW;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.RDFTYPE;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.URI;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,13 +37,10 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocument;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
-import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 
 public class IndividualToSearchDocument {
         
     public static final Log log = LogFactory.getLog(IndividualToSearchDocument.class.getName());
-    
-    public static VitroSearchTermNames term = new VitroSearchTermNames();              
     
     protected final String label = "http://www.w3.org/2000/01/rdf-schema#label";
     
@@ -46,7 +53,6 @@ public class IndividualToSearchDocument {
         this.documentModifiers = docModifiers;
     }    
 
-	@SuppressWarnings("static-access")
     public SearchInputDocument translate(Individual ind) throws IndexingException{
         try{    	            	      	        	        	
         	String excludeMsg = checkExcludes( ind );
@@ -58,10 +64,10 @@ public class IndividualToSearchDocument {
         	SearchInputDocument doc = ApplicationUtils.instance().getSearchEngine().createInputDocument();                    	
         	
             //DocID
-            doc.addField(term.DOCID, getIdForUri( ind.getURI() ) );
+            doc.addField(DOCID, getIdForUri( ind.getURI() ) );
             
             //vitro id
-            doc.addField(term.URI, ind.getURI());
+            doc.addField(URI, ind.getURI());
             log.debug(ind.getURI() + " init boost: " + doc.getDocumentBoost());
             
     		//get label from ind
@@ -80,7 +86,7 @@ public class IndividualToSearchDocument {
         	addObjectPropertyText(ind, doc, objectNames, addUri);        	                 	                                           	     
                         
             //time of index in msec past epoch
-            doc.addField(term.INDEXEDTIME, (Object) new DateTime().getMillis() ); 
+            doc.addField(INDEXEDTIME, (Object) new DateTime().getMillis() ); 
                         
             addAllText( ind, doc, classPublicNames, objectNames );
                
@@ -140,7 +146,7 @@ public class IndividualToSearchDocument {
                 if( log.isDebugEnabled()){                	
 	                long delta = System.currentTimeMillis() - start;
 	                synchronized(docModClassToTime){
-	                	Class clz = modifier.getClass();	                	
+	                	Class<?> clz = modifier.getClass();	                	
 	                	if( docModClassToTime.containsKey( clz.getName() )){
 	                		Long time = docModClassToTime.get(clz.getName() );
 	                		docModClassToTime.put(clz.getName(), time + delta);	                		
@@ -198,8 +204,8 @@ public class IndividualToSearchDocument {
                 
         String alltext = allTextValue.toString();
         
-        doc.addField(term.ALLTEXT, alltext);
-        doc.addField(term.ALLTEXTUNSTEMMED, alltext);
+        doc.addField(ALLTEXT, alltext);
+        doc.addField(ALLTEXTUNSTEMMED, alltext);
     }
 
 
@@ -247,8 +253,6 @@ public class IndividualToSearchDocument {
      * @throws SkipIndividualException 
      */
     protected void addClasses(Individual ind, SearchInputDocument doc, StringBuffer classPublicNames) throws SkipIndividualException{
-        ArrayList<String> superClassNames = null;        
-        
         List<VClass> vclasses = ind.getVClasses(false);
         if( vclasses == null || vclasses.isEmpty() ){
             throw new SkipIndividualException("Not indexing because individual has no classes");
@@ -265,7 +269,7 @@ public class IndividualToSearchDocument {
                     doc.setDocumentBoost(doc.getDocumentBoost() + clz.getSearchBoost());
                 }
                 
-                doc.addField(term.RDFTYPE, clz.getURI());
+                doc.addField(RDFTYPE, clz.getURI());
                 
                 if(clz.getName() != null){
                     classPublicNames.append(" ");
@@ -274,7 +278,7 @@ public class IndividualToSearchDocument {
                 
                 //Add the Classgroup URI to a field
                 if(clz.getGroupURI() != null){
-                    doc.addField(term.CLASSGROUP_URI,clz.getGroupURI());
+                    doc.addField(CLASSGROUP_URI,clz.getGroupURI());
                 }               
             }
         }                                                
@@ -285,7 +289,7 @@ public class IndividualToSearchDocument {
         if( mstURIs != null ){
             for( String typeURI : mstURIs ){
                 if( typeURI != null && ! typeURI.trim().isEmpty() )
-                    doc.addField(term.MOST_SPECIFIC_TYPE_URIS, typeURI);
+                    doc.addField(MOST_SPECIFIC_TYPE_URIS, typeURI);
             }
         }
     }
@@ -299,8 +303,8 @@ public class IndividualToSearchDocument {
             value = ind.getLocalName();
         }            
 
-        doc.addField(term.NAME_RAW, value);
-        doc.addField(term.NAME_LOWERCASE_SINGLE_VALUED,value);
+        doc.addField(NAME_RAW, value);
+        doc.addField(NAME_LOWERCASE_SINGLE_VALUED,value);
         
         // NAME_RAW will be copied by the search engine into the following fields:
         // NAME_LOWERCASE, NAME_UNSTEMMED, NAME_STEMMED, NAME_PHONETIC, AC_NAME_UNTOKENIZED, AC_NAME_STEMMED
@@ -319,7 +323,7 @@ public class IndividualToSearchDocument {
     }
     
     public String getQueryForId(String uri ){
-        return term.DOCID + ':' + getIdForUri(uri);
+        return DOCID + ':' + getIdForUri(uri);
     }
     
     public Individual unTranslate(Object result) {
@@ -327,7 +331,7 @@ public class IndividualToSearchDocument {
 
         if( result instanceof SearchResultDocument){
             SearchResultDocument hit = (SearchResultDocument) result;
-            String uri= (String) hit.getFirstValue(term.URI);
+            String uri= (String) hit.getFirstValue(URI);
 
             ent = new IndividualImpl();
             ent.setURI(uri);

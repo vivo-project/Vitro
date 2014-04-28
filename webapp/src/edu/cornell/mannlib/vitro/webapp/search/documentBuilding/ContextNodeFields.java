@@ -62,13 +62,7 @@ public class ContextNodeFields implements DocumentModifier{
         }
         /* get text from the context nodes and add the to ALLTEXT */        
         StringBuffer values = executeQueryForValues(individual, queries);        
-        
-        SearchInputField field = doc.getField(VitroSearchTermNames.ALLTEXT);
-        if( field == null ){
-            doc.addField(VitroSearchTermNames.ALLTEXT, values);           
-        }else{
-            field.addValues(values, field.getBoost());
-        }                                      
+        doc.addField(VitroSearchTermNames.ALLTEXT, values);
     }
     
     /**
