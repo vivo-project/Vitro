@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
+import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.VClassGroupTemplateModel;
 
 /**
@@ -217,7 +218,8 @@ public class IndividualsForClassesDataGetter extends DataGetterBase implements D
 		for(VClass r: restrictClasses) {
 			classUris.add(r.getURI());
 		}
-		long count =  DataGetterUtils.getIndividualCountForIntersection(vreq, classUris);
+		long count =  SearchQueryUtils.getIndividualCount(classUris);
+
 		return new Long(count).intValue();
 
 	}

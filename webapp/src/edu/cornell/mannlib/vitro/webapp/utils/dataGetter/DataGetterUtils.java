@@ -38,6 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
+import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils;
 
 
 public class DataGetterUtils {
@@ -260,19 +261,6 @@ public class DataGetterUtils {
         "PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#> \n" +
         "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS +"> \n";
 
-    //This query is used in more than one place, so can be placed here
-    //An alternative is to have individuals for classes data getter extend classgroupdatagetter
-    //This currently assumes one class group uri per data getter, but this can be extended
-    /**
-     * For page data getter conversions
-     */
-    /**
-     * Get Individual count for search query for intersection of multiple classes
-     */
-    public static long getIndividualCountForIntersection(VitroRequest vreq, List<String> classUris) {
-    	 return IndividualListController.getIndividualCount(classUris);
-    }
-    
     //Return data getter type to be employed in display model
     public static String generateDataGetterTypeURI(String dataGetterClassName) {
     	return "java:" + dataGetterClassName;

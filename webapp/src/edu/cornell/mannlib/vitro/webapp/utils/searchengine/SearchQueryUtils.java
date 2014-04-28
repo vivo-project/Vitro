@@ -221,27 +221,4 @@ public class SearchQueryUtils {
         }            
     }
     
-    public static IndividualListQueryResults buildAndExecuteVClassQuery(
-			List<String> vclassURIs, String alpha, int page, int pageSize, IndividualDao indDao)
-			throws SearchEngineException {
-		 SearchQuery query = SearchQueryUtils.getQuery(vclassURIs, alpha, page, pageSize);
-		 IndividualListQueryResults results = IndividualListQueryResults.runQuery(query, indDao);
-		 log.debug("Executed search query for " + vclassURIs);
-		 if (results.getIndividuals().isEmpty()) { 
-			 log.debug("entities list is null for vclass " + vclassURIs);
-		 }
-		return results;
-	}
-
-    public static IndividualListQueryResults buildAndExecuteRandomVClassQuery(
-			List<String> vclassURIs, int page, int pageSize, IndividualDao indDao)
-			throws SearchEngineException {
-		 SearchQuery query = SearchQueryUtils.getRandomQuery(vclassURIs, page, pageSize);
-		 IndividualListQueryResults results = IndividualListQueryResults.runQuery(query, indDao);
-		 log.debug("Executed search query for " + vclassURIs);
-		 if (results.getIndividuals().isEmpty()) { 
-			 log.debug("entities list is null for vclass " + vclassURIs);
-		 }
-		return results;
-	}
 }
