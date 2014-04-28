@@ -36,11 +36,11 @@ public abstract class AuthorizationRequest {
 	// Static convenience methods
 	// ----------------------------------------------------------------------
 
-	public static AuthorizationRequest and(AuthorizationRequest... ars) {
-		return and(Arrays.asList(ars));
+	public static AuthorizationRequest andAll(AuthorizationRequest... ars) {
+		return andAll(Arrays.asList(ars));
 	}
 
-	public static AuthorizationRequest and(
+	public static AuthorizationRequest andAll(
 			Iterable<? extends AuthorizationRequest> ars) {
 		AuthorizationRequest result = AUTHORIZED;
 		for (AuthorizationRequest ar : ars) {

@@ -22,8 +22,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
  *  and return the first AUTHORIZED or UNAUTHROIZED decision.  INCONCLUSIVE
  *  or null decisions will be ignored and the next policy on the list will
  *  be queried. 
- *   
- * @author bdc34
  */
 public class PolicyList extends ArrayList<PolicyIface> implements PolicyIface{
     private static final Log log = LogFactory.getLog(PolicyList.class.getName());

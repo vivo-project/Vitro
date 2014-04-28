@@ -45,7 +45,7 @@ public class PolicyHelper {
 	 */
 	public static boolean isAuthorizedForActions(HttpServletRequest req,
 			AuthorizationRequest... actions) {
-		return isAuthorizedForActions(req, AuthorizationRequest.and(actions));
+		return isAuthorizedForActions(req, AuthorizationRequest.andAll(actions));
 	}
 
 	/**
@@ -54,14 +54,14 @@ public class PolicyHelper {
 	 */
 	public static boolean isAuthorizedForActions(HttpServletRequest req,
 			Iterable<? extends AuthorizationRequest> actions) {
-		return isAuthorizedForActions(req, AuthorizationRequest.and(actions));
+		return isAuthorizedForActions(req, AuthorizationRequest.andAll(actions));
 	}
 	
 	/**
 	 * Are these actions authorized for the current user by the current
 	 * policies?
 	 */
-	public static boolean isAuthorizedForActions(HttpServletRequest req,
+	private static boolean isAuthorizedForActions(HttpServletRequest req,
 			AuthorizationRequest ar) {
 		PolicyIface policy = ServletPolicyList.getPolicies(req);
 		IdentifierBundle ids = RequestIdentifiers.getIdBundleForRequest(req);
