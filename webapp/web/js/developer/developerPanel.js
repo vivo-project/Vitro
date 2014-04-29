@@ -3,11 +3,11 @@
 function DeveloperPanel(developerAjaxUrl) {
 	this.setupDeveloperPanel = updateDeveloperPanel;
 	
-	function updateDeveloperPanel() {
+	function updateDeveloperPanel(data) {
 	    $.ajax({
 	        url: developerAjaxUrl,
-	        dataType: "json",
-	        data: collectFormData(),
+	        dataType: "html",
+	        data: data,
 	        complete: function(xhr, status) {
 	        	updatePanelContents(xhr.responseText);
 	        	if (document.getElementById("developerPanelSaveButton")) {
@@ -29,13 +29,18 @@ function DeveloperPanel(developerAjaxUrl) {
     
 	function addBehaviorToElements() {
 		$( "#developerPanelClickMe" ).click(openPanel);
-	    $( "#developerPanelSaveButton" ).click(updateDeveloperPanel);
-	    $( "#developerPanelBody [type=checkbox]" ).change(updateDisabledFields);
+	    $( "#developerPanelSaveButton" ).click(saveSettings);
+	    $( "#developerPanelBody input:checkbox" ).change(updateDisabledFields);
 	}
 	
 	function openPanel() {
 		$( "#developerPanelClickText" ).hide();
-		$( "#developerPanelBody" ).css( "display", "block" );
+		$( "#developerPanelBody" ).show();
+	}
+	
+	function saveSettings() {
+		$( "#developerPanelBody" ).hide();
+		updateDeveloperPanel(collectFormData());
 	}
 	
 	function updateDisabledFields() {
