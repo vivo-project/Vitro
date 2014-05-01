@@ -209,7 +209,7 @@ public class RDFServiceLogger implements AutoCloseable {
 
 		if (traceRequested) {
 			for (StackTraceElement ste : trace) {
-				sb.append(String.format("\n   line %d4, %s",
+				sb.append(String.format("\n   line %4d, %s",
 						ste.getLineNumber(), ste.getClassName()));
 			}
 			sb.append("\n   ...");
