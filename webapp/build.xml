@@ -419,10 +419,11 @@
 			<fileset dir="${solr.template.dir}/homeDirectoryTemplate" />
 		</copy>
 
-		<!-- create an unpacked image of the Solr WAR, with our config options -->
+		<!-- create an unpacked image of the Solr WAR -->
 		<unwar src="${solr.template.dir}/solr-4.7.2.war" dest="${solr.webapp.dir}" />
-		<copy todir="${solr.webapp.dir}/WEB-INF/classes">
-			<fileset dir="${appbase.dir}/config/solr/" />
+		<!-- add logging JARs and logging options that Solr doesn't include -->
+		<copy todir="${solr.webapp.dir}">
+			<fileset dir="${solr.template.dir}/additions-to-solr-war/" />
 		</copy>
 	</target>
 
