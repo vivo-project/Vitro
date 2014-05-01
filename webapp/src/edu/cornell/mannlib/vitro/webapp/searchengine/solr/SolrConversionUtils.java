@@ -66,8 +66,21 @@ public class SolrConversionUtils {
 			SearchInputField searchInputField) {
 		SolrInputField solrField = new SolrInputField(
 				searchInputField.getName());
-		solrField.addValue(searchInputField.getValues(),
+		Collection<Object> values = searchInputField.getValues();
+		//Check if single value or multiple, if single only add that one
+		//This is done in this way to ensure that if the field itself is single valued
+		//we are not passing an array of a single object but just the object itself to prevent errors
+		if(values.size() > 1) {
+			solrField.addValue(searchInputField.getValues(),
 				searchInputField.getBoost());
+		} else if(values.size() == 1){
+			Object value = values.iterator().next();
+			solrField.addValue(value, searchInputField.getBoost());
+		} else {
+			//in this case, values are empty? Just add null? Do nothing?
+			//solrField.addValue(null, searchInputField.getBoost());
+			//log.debug("Values empty so doing nothing for " + searchInputField.getName());
+		}
 		return solrField;
 	}
 
