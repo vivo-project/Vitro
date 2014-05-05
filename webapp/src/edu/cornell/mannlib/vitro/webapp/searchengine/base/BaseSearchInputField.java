@@ -61,4 +61,10 @@ public class BaseSearchInputField implements SearchInputField {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "BaseSearchInputField[name=" + name + ", valueList="
+				+ valueList + ", boost=" + boost + "]";
+	}
+
 }

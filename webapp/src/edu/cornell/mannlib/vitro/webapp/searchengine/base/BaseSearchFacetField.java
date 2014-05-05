@@ -29,6 +29,11 @@ public class BaseSearchFacetField implements SearchFacetField {
 		return values;
 	}
 
+	@Override
+	public String toString() {
+		return "BaseSearchFacetField[name=" + name + ", values=" + values + "]";
+	}
+
 	/**
 	 * A foundation class for implementing SearchFacetField.Count.
 	 */
@@ -49,6 +54,11 @@ public class BaseSearchFacetField implements SearchFacetField {
 		@Override
 		public long getCount() {
 			return count;
+		}
+
+		@Override
+		public String toString() {
+			return "BaseCount[name=" + name + ", count=" + count + "]";
 		}
 
 	}

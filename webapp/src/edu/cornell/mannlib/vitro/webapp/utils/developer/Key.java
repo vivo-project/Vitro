@@ -87,6 +87,63 @@ public enum Key {
 			"developer.pageContents.logCustomShortView", true),
 
 	/**
+	 * Tell the SearchEngineLogger to log all indexing operations.
+	 */
+	SEARCH_INDEX_ENABLE("developer.searchIndex.enable", true),
+
+	/**
+	 * Add the document contents to the log of indexing operations.
+	 */
+	SEARCH_INDEX_SHOW_DOCUMENTS("developer.searchIndex.showDocuments", true),
+
+	/**
+	 * Log indexing operations only if the document contents match this regular
+	 * expression.
+	 */
+	SEARCH_INDEX_URI_OR_NAME_RESTRICTION(
+			"developer.searchIndex.uriOrNameRestriction", false),
+			
+	/**
+	 * Log indexing operations only if the document contents match this regular
+	 * expression.
+	 */
+	SEARCH_INDEX_DOCUMENT_RESTRICTION(
+			"developer.searchIndex.documentRestriction", false),
+
+	/**
+	 * Tell the SearchEngineLogger to log all index deletions.
+	 */
+	SEARCH_DELETIONS_ENABLE("developer.searchDeletions.enable", true),
+
+	/**
+	 * Tell the SearchEngineLogger to log all search operations.
+	 */
+	SEARCH_ENGINE_ENABLE("developer.searchEngine.enable", true),
+
+	/**
+	 * Add the stack trace to the log of search operations.
+	 */
+	SEARCH_ENGINE_ADD_STACK_TRACE("developer.searchEngine.addStackTrace", true),
+
+	/**
+	 * Add the search results to the log of search operations.
+	 */
+	SEARCH_ENGINE_ADD_RESULTS("developer.searchEngine.addResults", true),
+
+	/**
+	 * Log search operations only if the query matches this regular expression.
+	 */
+	SEARCH_ENGINE_QUERY_RESTRICTION("developer.searchEngine.queryRestriction",
+			false),
+
+	/**
+	 * Log search operations only if the stack trace matches this regular
+	 * expression.
+	 */
+	SEARCH_ENGINE_STACK_RESTRICTION("developer.searchEngine.stackRestriction",
+			false),
+
+	/**
 	 * Enable the PolicyDecisionLogger.
 	 */
 	AUTHORIZATION_LOG_DECISIONS_ENABLE(

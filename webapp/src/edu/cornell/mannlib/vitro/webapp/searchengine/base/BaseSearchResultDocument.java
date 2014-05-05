@@ -72,4 +72,10 @@ public class BaseSearchResultDocument implements SearchResultDocument {
 		return fieldValuesMap;
 	}
 
+	@Override
+	public String toString() {
+		return "BaseSearchResultDocument [uniqueId=" + uniqueId
+				+ ", fieldValuesMap=" + fieldValuesMap + "]";
+	}
+
 }

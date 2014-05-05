@@ -77,4 +77,10 @@ public class BaseSearchInputDocument implements SearchInputDocument {
 		return new BaseSearchInputField(name);
 	}
 
+	@Override
+	public String toString() {
+		return "BaseSearchInputDocument[fieldMap=" + fieldMap
+				+ ", documentBoost=" + documentBoost + "]";
+	}
+	
 }

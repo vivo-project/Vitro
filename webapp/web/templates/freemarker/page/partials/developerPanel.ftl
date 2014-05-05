@@ -36,6 +36,7 @@
 			<div id="developerTabs">
 				<ul>
 					<li><a href="#developerTabGeneral"><span>General</span></a></li>
+					<li><a href="#developerTabSearch"><span>Search</span></a></li>
 					<li><a href="#developerTabAuthorization"><span>Authorization</span></a></li>
 				</ul>
 			
@@ -79,14 +80,52 @@
 		
 						<div class="container">
 							SPARQL Queries
-							<@showCheckbox "developer_loggingRDFService_enable", 
-									"Log each query" />
+							<@showCheckbox "developer_loggingRDFService_enable", "Log each query" />
 							<div class="within">
 								<@showCheckbox "developer_loggingRDFService_stackTrace", 
-										"Add stack trace" />
+										"Show stack trace" />
 								<@showTextbox "developer_loggingRDFService_queryRestriction", 
 										"Restrict by query string" />
 								<@showTextbox "developer_loggingRDFService_stackRestriction", 
+										"Restrict by calling stack" />
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<div id="developerTabSearch">
+					<div class="devright">
+						<div class="container">
+							Indexing
+							<@showCheckbox "developer_searchIndex_enable", "Log indexing." />
+							<div class="within">
+								<@showCheckbox "developer_searchIndex_showDocuments", 
+										"Show document contents" />
+								<@showTextbox "developer_searchIndex_uriOrNameRestriction", 
+										"Restrict by URI or name" />
+								<@showTextbox "developer_searchIndex_documentRestriction", 
+										"Restrict by document contents" />
+							</div>
+							<@showCheckbox "developer_searchDeletions_enable", "Log deletions." />
+						</div>
+						
+						<div class="container">
+							Links
+							<br/>
+							<a href="${urls.base}/SearchIndex">Rebuild search index</a>
+						</div>
+					</div>
+						
+					<div class="devleft">
+						<div class="container">
+							Searching
+							<@showCheckbox "developer_searchEngine_enable", "Log searches" />
+							<div class="within">
+								<@showCheckbox "developer_searchEngine_addStackTrace", "Show stack trace" />
+								<@showCheckbox "developer_searchEngine_addResults", "Show search results" />
+								<@showTextbox "developer_searchEngine_queryRestriction", 
+										"Restrict by query string" />
+								<@showTextbox "developer_searchEngine_stackRestriction", 
 										"Restrict by calling stack" />
 							</div>
 						</div>

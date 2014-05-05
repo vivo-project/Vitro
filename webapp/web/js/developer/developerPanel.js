@@ -53,12 +53,26 @@ function DeveloperPanel(developerAjaxUrl) {
 		document.getElementById("developer_i18n_defeatCache").disabled = !developerEnabled;
 		document.getElementById("developer_i18n_logStringRequests").disabled = !developerEnabled;
 		document.getElementById("developer_loggingRDFService_enable").disabled = !developerEnabled;
+		document.getElementById("developer_searchIndex_enable").disabled = !developerEnabled;
+		document.getElementById("developer_searchDeletions_enable").disabled = !developerEnabled;
+		document.getElementById("developer_searchEngine_enable").disabled = !developerEnabled;
 		document.getElementById("developer_authorization_logDecisions_enable").disabled = !developerEnabled;
 	
 		var rdfServiceEnabled = developerEnabled && document.getElementById("developer_loggingRDFService_enable").checked;
 		document.getElementById("developer_loggingRDFService_stackTrace").disabled = !rdfServiceEnabled;
 		document.getElementById("developer_loggingRDFService_queryRestriction").disabled = !rdfServiceEnabled;
 		document.getElementById("developer_loggingRDFService_stackRestriction").disabled = !rdfServiceEnabled;
+	
+		var searchIndexEnabled = developerEnabled && document.getElementById("developer_searchIndex_enable").checked;
+		document.getElementById("developer_searchIndex_showDocuments").disabled = !searchIndexEnabled;
+		document.getElementById("developer_searchIndex_uriOrNameRestriction").disabled = !searchIndexEnabled;
+		document.getElementById("developer_searchIndex_documentRestriction").disabled = !searchIndexEnabled;
+		
+		var searchEngineEnabled = developerEnabled && document.getElementById("developer_searchEngine_enable").checked;
+		document.getElementById("developer_searchEngine_addStackTrace").disabled = !searchEngineEnabled;
+		document.getElementById("developer_searchEngine_addResults").disabled = !searchEngineEnabled;
+		document.getElementById("developer_searchEngine_queryRestriction").disabled = !searchEngineEnabled;
+		document.getElementById("developer_searchEngine_stackRestriction").disabled = !searchEngineEnabled;
 		
 		var authLoggingEnabled = developerEnabled && document.getElementById("developer_authorization_logDecisions_enable").checked;
 		document.getElementById("developer_authorization_logDecisions_skipInconclusive").disabled = !authLoggingEnabled;

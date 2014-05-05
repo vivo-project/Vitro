@@ -116,15 +116,19 @@ public class SearchEngineWrapper implements SearchEngine {
 
 	@Override
 	public void add(SearchInputDocument... docs) throws SearchEngineException {
-		confirmActive();
-		innerEngine.add(docs);
+		try (SearchEngineLogger l = SearchEngineLogger.doAdd(docs)) {
+			confirmActive();
+			innerEngine.add(docs);
+		}
 	}
 
 	@Override
 	public void add(Collection<SearchInputDocument> docs)
 			throws SearchEngineException {
-		confirmActive();
-		innerEngine.add(docs);
+		try (SearchEngineLogger l = SearchEngineLogger.doAdd(docs)) {
+			confirmActive();
+			innerEngine.add(docs);
+		}
 	}
 
 	@Override
@@ -141,20 +145,26 @@ public class SearchEngineWrapper implements SearchEngine {
 
 	@Override
 	public void deleteById(String... ids) throws SearchEngineException {
-		confirmActive();
-		innerEngine.deleteById(ids);
+		try (SearchEngineLogger l = SearchEngineLogger.doDeleteById(ids)) {
+			confirmActive();
+			innerEngine.deleteById(ids);
+		}
 	}
 
 	@Override
 	public void deleteById(Collection<String> ids) throws SearchEngineException {
-		confirmActive();
-		innerEngine.deleteById(ids);
+		try (SearchEngineLogger l = SearchEngineLogger.doDeleteById(ids)) {
+			confirmActive();
+			innerEngine.deleteById(ids);
+		}
 	}
 
 	@Override
 	public void deleteByQuery(String query) throws SearchEngineException {
-		confirmActive();
-		innerEngine.deleteByQuery(query);
+		try (SearchEngineLogger l = SearchEngineLogger.doDeleteByQuery(query)) {
+			confirmActive();
+			innerEngine.deleteByQuery(query);
+		}
 	}
 
 	@Override
@@ -171,8 +181,12 @@ public class SearchEngineWrapper implements SearchEngine {
 
 	@Override
 	public SearchResponse query(SearchQuery query) throws SearchEngineException {
-		confirmActive();
-		return innerEngine.query(query);
+		try (SearchEngineLogger l = SearchEngineLogger.doQuery(query)) {
+			confirmActive();
+			SearchResponse response = innerEngine.query(query);
+			l.setSearchResponse(response);
+			return response;
+		}
 	}
 
 }

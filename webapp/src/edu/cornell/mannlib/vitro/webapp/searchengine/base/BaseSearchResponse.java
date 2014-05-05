@@ -48,4 +48,10 @@ public class BaseSearchResponse implements SearchResponse {
 		return new ArrayList<>(facetFields.values());
 	}
 
+	@Override
+	public String toString() {
+		return "BaseSearchResponse[highlighting=" + highlighting
+				+ ", facetFields=" + facetFields + ", results=" + results + "]";
+	}
+
 }
