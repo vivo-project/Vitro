@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.api;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +17,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
+import edu.cornell.mannlib.vitro.webapp.utils.http.AcceptHeaderParsingException;
+import edu.cornell.mannlib.vitro.webapp.utils.http.ContentTypeUtil;
+import edu.cornell.mannlib.vitro.webapp.utils.http.NotAcceptableException;
 
 /**
  * The base class for Vitro servlets that implement the API.
@@ -56,6 +60,17 @@ public class VitroApiServlet extends HttpServlet {
 		log.debug("Authorized for '" + email + "'");
 	}
 
+	protected String parseAcceptHeader(HttpServletRequest req,
+			Collection<String> availableTypes, String defaultType)
+			throws AcceptHeaderParsingException, NotAcceptableException {
+		String acceptHeader = req.getHeader("Accept");
+		if (acceptHeader == null) {
+			return defaultType;
+		}
+		acceptHeader += "," + defaultType + ";q=0.1";
+		return ContentTypeUtil.bestContentType(acceptHeader, availableTypes);
+	}
+
 	protected void sendShortResponse(int statusCode, String message,
 			HttpServletResponse resp) throws IOException {
 		resp.setStatus(statusCode);
@@ -63,8 +78,8 @@ public class VitroApiServlet extends HttpServlet {
 		writer.println("<H1>" + statusCode + " " + message + "</H1>");
 	}
 
-	protected void sendShortResponse(int statusCode, String message, Throwable e,
-			HttpServletResponse resp) throws IOException {
+	protected void sendShortResponse(int statusCode, String message,
+			Throwable e, HttpServletResponse resp) throws IOException {
 		sendShortResponse(statusCode, message, resp);
 		PrintWriter writer = resp.getWriter();
 		writer.println("<pre>");
@@ -77,15 +92,15 @@ public class VitroApiServlet extends HttpServlet {
 	// ----------------------------------------------------------------------
 
 	protected static class AuthException extends Exception {
-		protected AuthException(String message) {
+		public AuthException(String message) {
 			super(message);
 		}
 	}
 
 	protected static class BadParameterException extends Exception {
-		protected BadParameterException(String message) {
+		public BadParameterException(String message) {
 			super(message);
 		}
 	}
-	
+
 }

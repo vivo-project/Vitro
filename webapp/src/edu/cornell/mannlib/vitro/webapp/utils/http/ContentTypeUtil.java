@@ -62,8 +62,9 @@ public class ContentTypeUtil {
 
 		if (bestMatch == null) {
 			throw new NotAcceptableException(
-					"No available type matches the Accept header: "
-							+ acceptHeader);
+					"No available type matches the Accept header: '"
+							+ acceptHeader + "'; available types are "
+							+ availableTypeNames);
 		} else {
 			return bestMatch.getName();
 		}

@@ -12,11 +12,11 @@ import java.util.Map;
  * and DESCRIBE).
  */
 public enum RdfResultMediaType {
-	TEXT("text/plain", true, "NTRIPLE", null),
+	TEXT("text/plain", true, "NTRIPLE", "N-TRIPLE"),
 
-	RDF_XML("application/rdf+xml", true, "RDFXML", null),
+	RDF_XML("application/rdf+xml", true, "RDFXML", "RDF/XML"),
 
-	N3("text/n3", true, "N3", null),
+	N3("text/n3", true, "N3", "N3"),
 
 	TTL("text/turtle", false, "N3", "TTL"),
 
@@ -73,8 +73,7 @@ public enum RdfResultMediaType {
 	private final String serializationFormat;
 
 	/**
-	 * What format shall we ask the resulting OntModel to write? (Applies only
-	 * to non-native formats)
+	 * What format shall we ask the resulting OntModel to write? 
 	 */
 	private final String jenaResponseFormat;
 
