@@ -37,6 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessing
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ForwardResponseValues;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.NotAuthorizedResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RdfResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -229,17 +230,19 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
                 response.setStatus(statusCode);
             }
 
-            if (values instanceof ExceptionResponseValues) {
-                doException(vreq, response, values);
-            } else if (values instanceof TemplateResponseValues) {
-                doTemplate(vreq, response, values);
-            } else if (values instanceof RedirectResponseValues) {
-                doRedirect(vreq, response, values);
-            } else if (values instanceof ForwardResponseValues) {
-                doForward(vreq, response, values);
-            } else if (values instanceof RdfResponseValues) {
-                doRdf(vreq, response, values);
-            } 
+			if (values instanceof NotAuthorizedResponseValues) {
+				doNotAuthorized(vreq, response, (NotAuthorizedResponseValues)values);
+			} else if (values instanceof ExceptionResponseValues) {
+				doException(vreq, response, values);
+			} else if (values instanceof TemplateResponseValues) {
+				doTemplate(vreq, response, values);
+			} else if (values instanceof RedirectResponseValues) {
+				doRedirect(vreq, response, values);
+			} else if (values instanceof ForwardResponseValues) {
+				doForward(vreq, response, values);
+			} else if (values instanceof RdfResponseValues) {
+				doRdf(vreq, response, values);
+			}
         } catch (ServletException e) {
             log.error("ServletException in doResponse()", e);
         } catch (IOException e) {
@@ -247,7 +250,15 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         }
     }
 
-    protected void doTemplate(VitroRequest vreq, HttpServletResponse response, 
+	private void doNotAuthorized(VitroRequest vreq,
+			HttpServletResponse response, NotAuthorizedResponseValues values) {
+		// This method does a redirect if the required authorizations are 
+		// not met (and they won't be), so just return.
+		isAuthorizedToDisplayPage(vreq, response, values.getUnauthorizedAction());
+		return;
+	}
+
+	protected void doTemplate(VitroRequest vreq, HttpServletResponse response, 
             ResponseValues values) throws TemplateProcessingException {
      
         Map<String, Object> templateDataModel = new HashMap<String, Object>();        
@@ -548,4 +559,5 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         // to set up the data model.
         new FreemarkerComponentGenerator(request);
     }
+    
 }
