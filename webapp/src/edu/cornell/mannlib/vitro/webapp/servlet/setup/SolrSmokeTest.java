@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
@@ -13,12 +12,14 @@ import java.net.UnknownHostException;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpException;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -142,7 +143,10 @@ public class SolrSmokeTest implements ServletContextListener {
 		}
 
 		private void reportPingProblem(SolrProblemException e) {
-			ss.warning(listener, "The Solr search engine did not respond to a 'ping' request", e);
+			ss.warning(
+					listener,
+					"The Solr search engine did not respond to a 'ping' request",
+					e);
 		}
 
 		private void warnSocketTimeout() {
@@ -203,7 +207,8 @@ public class SolrSmokeTest implements ServletContextListener {
 		private static final long SLEEP_INTERVAL = 20000; // 20 seconds
 
 		private final URL solrUrl;
-		private final HttpClient httpClient = new HttpClient();
+		private final CloseableHttpClient httpClient = HttpClients
+				.createDefault();
 
 		private int statusCode;
 
@@ -230,23 +235,22 @@ public class SolrSmokeTest implements ServletContextListener {
 		}
 
 		private void tryToConnect() throws SolrProblemException {
-			GetMethod method = new GetMethod(solrUrl.toExternalForm());
 			try {
+				HttpGet method = new HttpGet(solrUrl.toExternalForm());
 				SolrSmokeTest.log.debug("Trying to connect to Solr");
-				statusCode = httpClient.executeMethod(method);
-				SolrSmokeTest.log.debug("HTTP status was " + statusCode);
-
-				// clear the buffer.
-				InputStream stream = method.getResponseBodyAsStream();
-				stream.close();
+				CloseableHttpResponse response = httpClient.execute(method);
+				try {
+					statusCode = response.getStatusLine().getStatusCode();
+					SolrSmokeTest.log.debug("HTTP status was " + statusCode);
+				} finally {
+					response.close();
+				}
 			} catch (SocketTimeoutException e) {
 				// Catch the exception so we can retry this.
 				// Save the status so we know why we failed.
 				statusCode = SolrSmokeTest.SOCKET_TIMEOUT_STATUS;
 			} catch (Exception e) {
 				throw new SolrProblemException(e);
-			} finally {
-				method.releaseConnection();
 			}
 		}
 
@@ -275,30 +279,30 @@ public class SolrSmokeTest implements ServletContextListener {
 	 */
 	private static class SolrPinger {
 		private final URL solrUrl;
-		private final HttpClient httpClient = new HttpClient();
+		private final CloseableHttpClient httpClient = HttpClients
+				.createDefault();
 
 		public SolrPinger(URL solrUrl) {
 			this.solrUrl = solrUrl;
 		}
 
 		public void ping() throws SolrProblemException {
-			GetMethod method = new GetMethod(solrUrl.toExternalForm() + "/admin/ping");
 			try {
+				HttpGet method = new HttpGet(solrUrl.toExternalForm()
+						+ "/admin/ping");
 				SolrSmokeTest.log.debug("Trying to ping Solr");
-				int statusCode = httpClient.executeMethod(method);
+				CloseableHttpResponse response = httpClient.execute(method);
 				SolrSmokeTest.log.debug("Finished pinging Solr");
-				
-				// clear the buffer.
-				InputStream stream = method.getResponseBodyAsStream();
-				stream.close();
-				
-				if (statusCode != HttpStatus.SC_OK) {
-					throw new SolrProblemException(statusCode);
+				try {
+					int statusCode = response.getStatusLine().getStatusCode();
+					if (statusCode != HttpStatus.SC_OK) {
+						throw new SolrProblemException(statusCode);
+					}
+				} finally {
+					response.close();
 				}
 			} catch (IOException e) {
 				throw new SolrProblemException(e);
-			} finally {
-				method.releaseConnection();
 			}
 		}
 	}
