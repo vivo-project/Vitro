@@ -142,7 +142,7 @@ public abstract class FreemarkerConfiguration {
 		List<TemplateLoader> loaders = new ArrayList<TemplateLoader>();
 
 		// Theme template loader - only if the theme has a template directory.
-		String themeTemplatePath = ctx.getRealPath(themeDir) + "/templates";
+		String themeTemplatePath = ctx.getRealPath("/" + themeDir) + "/templates";
 		File themeTemplateDir = new File(themeTemplatePath);
 		if (themeTemplateDir.exists()) {
 			loaders.add(new FreemarkerTemplateLoader(themeTemplateDir));
