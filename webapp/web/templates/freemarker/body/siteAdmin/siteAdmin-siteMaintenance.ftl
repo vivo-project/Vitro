@@ -19,6 +19,15 @@
                 <li role="listitem"><a href="${siteMaintenance.recomputeInferences}" title="${i18n().recompute_inferences}">${i18n().recompute_inferences_mixed_caps}</a></li>
             </#if>
             
+            <#if siteMaintenance.startupStatus?has_content>
+                <li role="listitem">
+                    <a href="${siteMaintenance.startupStatus}" title="${i18n().startup_status}">${i18n().startup_status}</a>
+                    <#if siteMaintenance.startupStatusAlert>
+                        <img id="alertIcon" src="${urls.images}/iconAlert.png" width="20" height="20" alt="${i18n().error_alert_icon}" />
+                    </#if>
+                </li>
+            </#if>   
+            
             <#if siteMaintenance.restrictLogins?has_content>
                 <li role="listitem"><a href="${siteMaintenance.restrictLogins}" title="${i18n().restrict_logins}">${i18n().restrict_logins_mixed_caps}</a></li>
             </#if>

@@ -60,9 +60,9 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
         return new TemplateResponseValues(TEMPLATE_DEFAULT, body);
     }
     
-    protected Map<String, String> getSiteMaintenanceUrls(VitroRequest vreq) {
+    protected Map<String, Object> getSiteMaintenanceUrls(VitroRequest vreq) {
         
-        Map<String, String> urls = new HashMap<String, String>();
+        Map<String, Object> urls = new HashMap<>();
 
         if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTION)) {
             urls.put("recomputeInferences", UrlBuilder.getUrl("/RecomputeInferences"));     
@@ -72,6 +72,11 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 			urls.put("rebuildSearchIndex", UrlBuilder.getUrl("/SearchIndex"));
 		}
 		
+        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.SEE_STARTUP_STATUS.ACTION)) {
+        	urls.put("startupStatus", UrlBuilder.getUrl("/startupStatus"));
+        	urls.put("startupStatusAlert", !StartupStatus.getBean(getServletContext()).allClear());
+        }
+        
         if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.LOGIN_DURING_MAINTENANCE.ACTION)) {
             urls.put("restrictLogins", UrlBuilder.getUrl("/admin/restrictLogins"));
         }
@@ -143,11 +148,6 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
                     "uri", "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#DefaultMenu",
                     "switchToDisplayModel", "true"));
             data.put("pageManagement", UrlBuilder.getUrl("/pageList"));
-        }
-        
-        if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.SEE_STARTUP_STATUS.ACTION)) {
-        	data.put("startupStatus", UrlBuilder.getUrl("/startupStatus"));
-        	data.put("startupStatusAlert", !StartupStatus.getBean(getServletContext()).allClear());
         }
         
         return data;
