@@ -12,14 +12,23 @@ For example, a directory of files for the French language (fr), as used in Belgi
 
     /vitro-1.6/fr_BE/
 
-All members of the core development team speak only American English, 
-so the first set of files is an example of broken Spanish, as produced by the Google Translate service.
-An imaginary locale has been invented to represent "Google Spanish":
+Available language files
+------------------------
 
-    /vitro-1.6/es_GO
-    
-These files probably are not a valid Spanish translation for Vitro. However, 
-they can be an example for anyone who will provide a more serious translation.
+All members of the core development team speak only American English, 
+so we have produced an example language set that holds the English-language strings
+in Vitro:
+
+    /vitro-1.6/en_US
+
+This set of files is provided as an example, so those who wish to produce a translation
+may have a template to copy.
+
+Our first translation is in Spanish, contributed by Federico Sancho, of IICA (http://iica.int),
+as part of a project with eScire (http://escire.mx/). We are very grateful to them for contributing 
+this translation to the VIVO/Vitro community.
+
+    /vitro-1.6/es
 
 Using the language files
 ------------------------
