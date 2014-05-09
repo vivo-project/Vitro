@@ -3,19 +3,12 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.Update;
-import org.openrdf.query.UpdateExecutionException;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.http.HTTPRepository;
 
 import com.hp.hpl.jena.graph.BulkUpdateHandler;
 import com.hp.hpl.jena.graph.Capabilities;
@@ -46,10 +39,23 @@ import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.SingletonIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.message.BasicNameValuePair;
+
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+
 public class SparqlGraph implements GraphWithPerform {
     
     private String endpointURI;
     private String graphURI;
+    private CloseableHttpClient httpClient;
     private static final Log log = LogFactory.getLog(SparqlGraph.class);
     
     private BulkUpdateHandler bulkUpdateHandler;
@@ -59,8 +65,6 @@ public class SparqlGraph implements GraphWithPerform {
     private GraphStatisticsHandler graphStatisticsHandler;
     private TransactionHandler transactionHandler;
     private QueryHandler queryHandler;
-    
-    private Repository repository;
     
     /**
      * Returns a SparqlGraph for the union of named graphs in a remote repository 
@@ -78,7 +82,10 @@ public class SparqlGraph implements GraphWithPerform {
     public SparqlGraph(String endpointURI, String graphURI) {
        this.endpointURI = endpointURI;
        this.graphURI = graphURI;
-       this.repository = new HTTPRepository(endpointURI);
+       
+       PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+       cm.setDefaultMaxPerRoute(50);
+       this.httpClient = HttpClients.custom().setConnectionManager(cm).build();
     }
     
     public String getEndpointURI() {
@@ -88,14 +95,6 @@ public class SparqlGraph implements GraphWithPerform {
     public String getGraphURI() {
         return graphURI;
     }
-    
-    public RepositoryConnection getConnection() {
-        try {
-            return this.repository.getConnection();
-        } catch (RepositoryException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     public void add(Triple arg0) throws AddDeniedException {
@@ -104,22 +103,24 @@ public class SparqlGraph implements GraphWithPerform {
 
     public void executeUpdate(String updateString) {    
         try {
-            RepositoryConnection conn = getConnection();
+            HttpPost meth = new HttpPost(endpointURI);
+            meth.addHeader("Content-Type", "application/x-www-form-urlencoded");
+            meth.setEntity(new UrlEncodedFormEntity(Arrays.asList(
+                    new BasicNameValuePair("update", updateString))));
+            CloseableHttpResponse response = httpClient.execute(meth);
             try {
-                Update u = conn.prepareUpdate(QueryLanguage.SPARQL, updateString);
-                u.execute();
-            } catch (MalformedQueryException e) {
-                throw new RuntimeException(e);
-            } catch (UpdateExecutionException e) {
-                log.error(e,e);
-                log.error("Update command: \n" + updateString);
-                throw new RuntimeException(e);
+                int statusCode = response.getStatusLine().getStatusCode();
+                if (statusCode > 399) {
+                    log.error("response " + statusCode + " to update. \n");
+                    throw new RuntimeException("Unable to perform SPARQL UPDATE: \n"
+                        + updateString);
+                }
             } finally {
-                conn.close();
-            }
-        } catch (RepositoryException re) {
-            throw new RuntimeException(re);
-        }
+                response.close();
+            } 
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to perform SPARQL UPDATE", e);
+        } 
     }
     
     @Override

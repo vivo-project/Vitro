@@ -26,11 +26,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
-import org.openrdf.model.Resource;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.RepositoryResult;
-import org.openrdf.repository.http.HTTPRepository;
 
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
@@ -44,6 +39,7 @@ import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
@@ -67,10 +63,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	private static final Log log = LogFactory.getLog(RDFServiceImpl.class);
 	protected String readEndpointURI;	
 	protected String updateEndpointURI;
-	private HTTPRepository readRepository;
-	private HTTPRepository updateRepository;
     private CloseableHttpClient httpClient;
-	private boolean useSesameContextQuery = true;
 	                                            // the number of triples to be 
 	private static final int CHUNK_SIZE = 1000; // added/removed in a single
 	                                            // SPARQL UPDATE
@@ -89,8 +82,6 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
     public RDFServiceSparql(String readEndpointURI, String updateEndpointURI, String defaultWriteGraphURI) {
         this.readEndpointURI = readEndpointURI;
         this.updateEndpointURI = updateEndpointURI;
-        this.readRepository = new HTTPRepository(readEndpointURI);
-        this.updateRepository = new HTTPRepository(updateEndpointURI);
 
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         cm.setDefaultMaxPerRoute(50);
@@ -135,12 +126,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
     }
     	
     public void close() {
-        try {
-            this.readRepository.shutDown();
-            this.updateRepository.shutDown();
-        } catch (RepositoryException re) {
-            log.error(re, re);
-        }
+        // nothing for now
     }
     
 	/**
@@ -234,6 +220,8 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		
 		try {
 			qe.execConstruct(model);
+		} catch (Exception e) {
+		    log.error("Error executing CONSTRUCT against remote endpoint: " + queryStr);
 		} finally {
 			qe.close();
 		}
@@ -359,47 +347,40 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	 * 
 	 * @return  List<String> - list of all the graph URIs in the RDF store 
 	 */
-	//TODO - need to verify that the sesame getContextIDs method is implemented
-	// in such a way that it works with all triple stores that support the
-	// graph update API
 	@Override
 	public List<String> getGraphURIs() throws RDFServiceException {
-        if (!this.useSesameContextQuery) {
-            return getGraphURIsFromSparqlQuery();
-        } else {
-            try {
-                return getGraphURIsFromSesameContexts();
-            } catch (RepositoryException re) {
-                this.useSesameContextQuery = false;
-                return getGraphURIsFromSparqlQuery();
-            }
-        } 
+        return getGraphURIsFromSparqlQuery();
 	}
 	
-	private List<String> getGraphURIsFromSesameContexts() throws RepositoryException {
-	    List<String> graphURIs = new ArrayList<String>();
-	    RepositoryConnection conn = getReadConnection();
-        try {
-            RepositoryResult<Resource> conResult = conn.getContextIDs();
-            while (conResult.hasNext()) {
-                Resource res = conResult.next();
-                graphURIs.add(res.stringValue());   
-            }
-        } finally {
-            conn.close();
-        }
-        return graphURIs;
-	}
-	
-	private List<String> getGraphURIsFromSparqlQuery() throws RDFServiceException {
+	private List<String> getGraphURIsFromSparqlQuery() throws RDFServiceException {	    
+	    String fastJenaQuery = "SELECT DISTINCT ?g WHERE { GRAPH ?g {} } ORDER BY ?g";
+	    String standardQuery = "SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } } ORDER BY ?g";
 	    List<String> graphURIs = new ArrayList<String>();
 	    try {
-            String graphURIString = "SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } } ORDER BY ?g";
+	        graphURIs = getGraphURIsFromSparqlQuery(fastJenaQuery);
+	    } catch (Exception e) {
+	        log.debug("Unable to use non-standard ARQ query for graph list", e);
+	    }
+	    if (graphURIs.isEmpty()) {
+	        graphURIs = getGraphURIsFromSparqlQuery(standardQuery);
+	    }
+	    return graphURIs;
+	}
+	
+	private List<String> getGraphURIsFromSparqlQuery(String queryString) throws RDFServiceException {
+	    List<String> graphURIs = new ArrayList<String>();
+	    try {
+            
             ResultSet rs = ResultSetFactory.fromJSON(
-                    sparqlSelectQuery(graphURIString, RDFService.ResultFormat.JSON));
+                    sparqlSelectQuery(queryString, RDFService.ResultFormat.JSON));
             while (rs.hasNext()) {
                 QuerySolution qs = rs.nextSolution();
-                graphURIs.add(qs.getResource("g").getURI());
+                if (qs != null) { // no idea how this happens, but it seems to 
+                    RDFNode n = qs.getResource("g");
+                    if (n != null && n.isResource()) {
+                        graphURIs.add(((Resource) n).getURI());
+                    }
+                }
             }
         } catch (Exception e) {
             throw new RDFServiceException("Unable to list graph URIs", e);
@@ -468,22 +449,6 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
     
     protected String getUpdateEndpointURI() {
         return updateEndpointURI;
-    }
-    
-    protected RepositoryConnection getReadConnection() {
-        try {
-            return this.readRepository.getConnection();
-        } catch (RepositoryException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    
-    protected RepositoryConnection getWriteConnection() {
-        try {
-            return this.updateRepository.getConnection();
-        } catch (RepositoryException e) {
-            throw new RuntimeException(e);
-        }
     }
     
     protected void executeUpdate(String updateString) throws RDFServiceException {  

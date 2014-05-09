@@ -112,6 +112,14 @@ public class BaseResourceBean implements ResourceBean {
 		}
 	}
 
+	public BaseResourceBean() {
+	    // default constructor
+	}
+	
+	public BaseResourceBean(String uri) {
+	    buildLocalAndNS(uri);
+	}
+	
     @Override
 	public boolean isAnonymous() {        
     	return (this.URI==null || VitroVocabulary.PSEUDO_BNODE_NS.equals(this.getNamespace()));
