@@ -8,3 +8,4 @@
 /webapp/config/runtime.properties
 /webapp/config/debug.log4j.properties
 .build
+utilities/solrtester/.work
