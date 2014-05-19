@@ -12,25 +12,31 @@
         
             <article class="property" role="article">
                 <#-- Property display name -->
-                <#if rangeClass == "Authorship" && individual.editable && (property.domainUri)?? && property.domainUri?contains("Person")>
+                <#if rangeClass == "Authorship" >
                     <h3 id="${property.localName}-${rangeClass}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
+                    <#if individual.editable && (property.domainUri)?? && property.domainUri?contains("Person") >
                         <a id="managePubLink" class="manageLinks" href="${urls.base}/managePublications?subjectUri=${subjectUri[1]!}" title="${i18n().manage_publications_link}" <#if verbose>style="padding-top:10px"</#if> >
                             ${i18n().manage_publications_link}
                         </a>
+                    </#if>
                     </h3>
-                <#elseif rangeClass == "ResearcherRole" && individual.editable  >
+                <#elseif rangeClass == "ResearcherRole">
                     <h3 id="${property.localName}-${rangeClass}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
+                    <#if individual.editable  >
                         <a id="manageGrantLink" class="manageLinks" href="${urls.base}/manageGrants?subjectUri=${subjectUri[1]!}" title="${i18n().manage_grants_and_projects_link}" <#if verbose>style="padding-top:10px"</#if> >
                             ${i18n().manage_grants_and_projects_link}
                         </a>
+                    </#if>
                     </h3>
-                <#elseif rangeClass == "Position" && individual.editable  >
+                <#elseif rangeClass == "Position" >
                     <h3 id="${property.localName}-${rangeClass}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> 
+                    <#if individual.editable  >
                         <a id="managePeopleLink" class="manageLinks" href="${urls.base}/managePeople?subjectUri=${subjectUri[1]!}" title="${i18n().manage_affiliated_people}" <#if verbose>style="padding-top:10px"</#if> >
                             ${i18n().manage_affiliated_people_link}
                         </a>
+                    </#if>
                     </h3>
-                <#elseif rangeClass == "Name" && property.statements?has_content && editable >
+                <#elseif rangeClass == "Name" && property.statements?has_content && editable>
                     <h3 id="${property.localName}">${property.name}  <@p.verboseDisplay property /> </h3>
                 <#elseif rangeClass == "Title" && property.statements?has_content && editable >
                     <h3 id="${property.localName}">${property.name}  <@p.verboseDisplay property /> </h3>
