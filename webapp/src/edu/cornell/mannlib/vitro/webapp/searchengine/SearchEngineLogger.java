@@ -2,10 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchengine;
 
+import static edu.cornell.mannlib.vitro.webapp.utils.developer.Key.SEARCH_DELETIONS_ENABLE;
+import static edu.cornell.mannlib.vitro.webapp.utils.developer.Key.SEARCH_ENGINE_ENABLE;
+import static edu.cornell.mannlib.vitro.webapp.utils.developer.Key.SEARCH_INDEX_ENABLE;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -30,28 +33,58 @@ public abstract class SearchEngineLogger implements AutoCloseable {
 	// ----------------------------------------------------------------------
 	// Factory
 	// ----------------------------------------------------------------------
+
 	public static SearchEngineLogger doAdd(SearchInputDocument[] docs) {
-		return new AddLogger(Arrays.asList(docs));
+		if (isEnabled(SEARCH_INDEX_ENABLE)) {
+			return new AddLogger(Arrays.asList(docs));
+		} else {
+			return new DisabledLogger();
+		}
 	}
 
 	public static SearchEngineLogger doAdd(Collection<SearchInputDocument> docs) {
-		return new AddLogger(docs);
+		if (isEnabled(SEARCH_INDEX_ENABLE)) {
+			return new AddLogger(docs);
+		} else {
+			return new DisabledLogger();
+		}
 	}
 
 	public static SearchEngineLogger doDeleteById(String[] ids) {
-		return new DeleteIdsLogger(Arrays.asList(ids));
+		if (isEnabled(SEARCH_DELETIONS_ENABLE)) {
+			return new DeleteIdsLogger(Arrays.asList(ids));
+		} else {
+			return new DisabledLogger();
+		}
 	}
 
 	public static SearchEngineLogger doDeleteById(Collection<String> ids) {
-		return new DeleteIdsLogger(ids);
+		if (isEnabled(SEARCH_DELETIONS_ENABLE)) {
+			return new DeleteIdsLogger(ids);
+		} else {
+			return new DisabledLogger();
+		}
 	}
 
 	public static SearchEngineLogger doDeleteByQuery(String query) {
-		return new DeleteQueryLogger(query);
+		if (isEnabled(SEARCH_DELETIONS_ENABLE)) {
+			return new DeleteQueryLogger(query);
+		} else {
+			return new DisabledLogger();
+		}
 	}
 
 	public static SearchEngineLogger doQuery(SearchQuery query) {
-		return new QueryLogger(query);
+		if (isEnabled(SEARCH_ENGINE_ENABLE)) {
+			return new QueryLogger(query);
+		} else {
+			return new DisabledLogger();
+		}
+	}
+
+	private static boolean isEnabled(Key enableKey) {
+		return log.isInfoEnabled()
+				&& DeveloperSettings.getInstance().getBoolean(enableKey);
 	}
 
 	// ----------------------------------------------------------------------
@@ -59,12 +92,9 @@ public abstract class SearchEngineLogger implements AutoCloseable {
 	// ----------------------------------------------------------------------
 
 	private final long startTime;
-	protected final boolean enabled;
 
-	public SearchEngineLogger(Key enableKey) {
+	public SearchEngineLogger() {
 		this.startTime = System.currentTimeMillis();
-		this.enabled = log.isInfoEnabled()
-				&& DeveloperSettings.getInstance().getBoolean(enableKey);
 	}
 
 	protected float elapsedSeconds() {
@@ -74,16 +104,14 @@ public abstract class SearchEngineLogger implements AutoCloseable {
 
 	@Override
 	public void close() {
-		if (enabled) {
-			try {
-				writeToLog();
-			} catch (Exception e) {
-				log.error("Failed to write log record", e);
-			}
+		try {
+			writeToLog();
+		} catch (Exception e) {
+			log.error("Failed to write log record", e);
 		}
-
 	}
 
+	@SuppressWarnings("unused")
 	public void setSearchResponse(SearchResponse response) {
 		throw new UnsupportedOperationException(this.getClass().getSimpleName()
 				+ " does not support setSearchResponse()");
@@ -100,20 +128,13 @@ public abstract class SearchEngineLogger implements AutoCloseable {
 		private final boolean passesRestrictions;
 
 		AddLogger(Collection<SearchInputDocument> docs) {
-			super(Key.SEARCH_INDEX_ENABLE);
-
 			this.docs = restrictDocsByUriOrName(docs);
-
-			this.passesRestrictions = enabled && passesDocumentRestriction()
+			this.passesRestrictions = passesDocumentRestriction()
 					&& this.docs.size() > 0;
 		}
 
 		private List<SearchInputDocument> restrictDocsByUriOrName(
 				Collection<SearchInputDocument> rawDocs) {
-			if (!enabled) {
-				return Collections.emptyList();
-			}
-
 			String restriction = DeveloperSettings.getInstance().getString(
 					Key.SEARCH_INDEX_URI_OR_NAME_RESTRICTION);
 			if (restriction.isEmpty()) {
@@ -198,14 +219,13 @@ public abstract class SearchEngineLogger implements AutoCloseable {
 		private final List<String> ids;
 
 		DeleteIdsLogger(Collection<String> ids) {
-			super(Key.SEARCH_DELETIONS_ENABLE);
 			this.ids = new ArrayList<>(ids);
 		}
 
 		@Override
 		public void writeToLog() {
 			log.info(String.format(
-					"%8.3f deleted these %d search documents: %s\n",
+					"%8.3f deleted these %d search documents: %s",
 					elapsedSeconds(), ids.size(), StringUtils.join(ids, ", ")));
 		}
 	}
@@ -214,7 +234,6 @@ public abstract class SearchEngineLogger implements AutoCloseable {
 		private final String query;
 
 		DeleteQueryLogger(String query) {
-			super(Key.SEARCH_DELETIONS_ENABLE);
 			this.query = query;
 		}
 
@@ -234,14 +253,13 @@ public abstract class SearchEngineLogger implements AutoCloseable {
 		private SearchResponse response;
 
 		QueryLogger(SearchQuery query) {
-			super(Key.SEARCH_ENGINE_ENABLE);
 			this.query = query;
 			this.stackTrace = new StackTraceUtility(SearchEngineWrapper.class,
-					enabled);
-			this.passesRestrictions = enabled && passesQueryRestriction()
+					true);
+			this.passesRestrictions = passesQueryRestriction()
 					&& passesStackRestriction();
-			log.debug("QueryLogger: enabled=" + enabled + ", query=" + query
-					+ ", passes=" + passesRestrictions);
+			log.debug("QueryLogger: query=" + query + ", passes="
+					+ passesRestrictions);
 		}
 
 		private boolean passesStackRestriction() {
@@ -294,4 +312,17 @@ public abstract class SearchEngineLogger implements AutoCloseable {
 		}
 	}
 
+	private static class DisabledLogger extends SearchEngineLogger {
+		
+		@Override
+		public void setSearchResponse(SearchResponse response) {
+			// Does nothing.
+		}
+
+		@Override
+		protected void writeToLog() {
+			// Does nothing.
+		}
+
+	}
 }
