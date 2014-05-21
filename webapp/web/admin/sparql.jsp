@@ -1,6 +1,8 @@
 <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 <%@page import="com.hp.hpl.jena.vocabulary.OWL"%>
 <%@page import="com.hp.hpl.jena.rdf.model.ModelMaker"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.ModelAccess"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID"%>
 <%@page import="java.util.Iterator"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="java.util.List"%>
@@ -136,24 +138,15 @@ td {
 					<ul class="clean">
 						<%
 							try {
-								if (request.getSession() != null
-										&& application.getAttribute("vitroJenaModelMaker") != null) {
-									ModelMaker maker = (ModelMaker) application
-											.getAttribute("vitroJenaModelMaker");
-									for (Iterator it = maker.listModels(); it.hasNext();) {
-										String modelName = (String) it.next();
+								ModelMaker maker = ModelAccess.on(application).getModelMaker(ModelMakerID.CONFIGURATION);
+								for (Iterator it = maker.listModels(); it.hasNext();) {
+									String modelName = (String) it.next();
 						%>
 						<li>
 							<input type="checkbox" name="sourceModelName"
 								value="<%=modelName%>" /><%=modelName%></li>
 						<%
-							}
-								} else {
-						%><li>
-							could not find named models in session
-						</li>
-						<%
-							}
+							    }
 							} catch (Exception ex) {
 						%><li>
 							could not find named models in ModelMaker

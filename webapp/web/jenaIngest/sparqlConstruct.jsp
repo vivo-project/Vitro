@@ -4,6 +4,7 @@
 <%@ page import="com.hp.hpl.jena.ontology.OntModel"%>
 <%@ page import="com.hp.hpl.jena.rdf.model.ModelMaker"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.dao.ModelAccess"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID"%>
 <%@ page import="com.hp.hpl.jena.shared.Lock"%>
 <%@ page import="java.util.Iterator"%>
 <%@ page import="java.util.List"%>
@@ -17,7 +18,7 @@
 <vitro:confirmAuthorization />
 
 <%
-    ModelMaker maker = (ModelMaker) request.getAttribute("vitroJenaModelMaker");
+    ModelMaker maker = ModelAccess.on(getServletContext()).getModelMaker(ModelMakerID.CONFIGURATION);
 %>
 
 

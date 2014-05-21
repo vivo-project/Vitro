@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID.CONFIGURATION;
+import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID.CONTENT;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,7 +13,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.sql.SQLException;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +31,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
@@ -55,10 +56,7 @@ import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.sdb.StoreDesc;
-import com.hp.hpl.jena.sdb.sql.JDBC;
 import com.hp.hpl.jena.sdb.store.DatabaseType;
-import com.hp.hpl.jena.sdb.store.LayoutType;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
@@ -72,7 +70,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSpecialModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
@@ -80,7 +77,6 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.ContentModelSetup;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
@@ -201,7 +197,7 @@ public class JenaIngestController extends BaseEditController {
         
         maker = getVitroJenaModelMaker(vreq); 
         request.setAttribute("modelNames", maker.listModels().toList());
-        request.setAttribute("vitroJenaModelMaker", maker);
+        request.setAttribute("jenaIngestModelMaker", maker);
    
         RequestDispatcher rd = request.getRequestDispatcher(
                 Controllers.BASIC_JSP);      
@@ -232,15 +228,15 @@ public class JenaIngestController extends BaseEditController {
     }
     
     private void processRDBModelsRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
-        ModelMaker vjmm = (ModelMaker) getServletContext().getAttribute("vitroJenaModelMaker");
-        vreq.getSession().setAttribute("vitroJenaModelMaker", vjmm);
+        ModelMaker vjmm = ModelAccess.on(getServletContext()).getModelMaker(CONFIGURATION);
+        vreq.getSession().setAttribute("jenaIngestModelMaker", vjmm);
         setUsingMainStoreForIngest(vreq, AUXILIARY_STORE_STATE);
         showModelList(vreq, vjmm, "rdb");
     }
     
     private void processSDBModelsRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
-        ModelMaker vsmm = (ModelMaker) getServletContext().getAttribute("vitroJenaSDBModelMaker");
-        vreq.getSession().setAttribute("vitroJenaModelMaker", vsmm);
+        ModelMaker vsmm = ModelAccess.on(getServletContext()).getModelMaker(CONTENT);
+        vreq.getSession().setAttribute("jenaIngestModelMaker", vsmm);
         setUsingMainStoreForIngest(vreq, MAIN_STORE_STATE);
         showModelList(vreq, vsmm, "sdb");
     }
@@ -353,8 +349,6 @@ public class JenaIngestController extends BaseEditController {
         if (modelName != null) {
             doDetachModel(modelName,maker);
         }
-        //request.setAttribute("title","Ingest Menu");
-        //request.setAttribute("bodyJsp",INGEST_MENU_JSP);
         showModelList(vreq, maker, modelType);
     }
     
@@ -430,11 +424,7 @@ public class JenaIngestController extends BaseEditController {
         String jdbcUrl = vreq.getParameter("jdbcUrl");
         String tripleStore = vreq.getParameter("tripleStore");
         if (jdbcUrl != null) {
-            try {
-                doConnectDB(vreq);
-            } catch (SQLException sqle) {
-                throw new RuntimeException("Unable to connect to DB", sqle);
-            }
+            doConnectDB(vreq);
             if ("SDB".equals(tripleStore)) {
                 getServletContext().setAttribute("modelT", "sdb");
                  getServletContext().setAttribute("info", "SDB models");
@@ -738,7 +728,7 @@ public class JenaIngestController extends BaseEditController {
     }
     
     protected ModelMaker getVitroJenaModelMaker(HttpServletRequest request){
-        return JenaIngestController.getVitroJenaModelMaker(request,getServletContext());
+        return getVitroJenaModelMaker(request,getServletContext());
     }
     
 
@@ -964,45 +954,18 @@ public class JenaIngestController extends BaseEditController {
         return tempModel.size();     
     }
     
-    public void doConnectDB(VitroRequest vreq) throws SQLException {
-        String jdbcUrl = vreq.getParameter("jdbcUrl");
-        String username = vreq.getParameter("username");
-        String password = vreq.getParameter("password");
-        String dbType = vreq.getParameter("dbType");
+    public void doConnectDB(VitroRequest vreq) {
         String tripleStore = vreq.getParameter("tripleStore");
-        DatabaseType dbTypeObj = null;
-        if ("MySQL".equals(dbType)) {
-            jdbcUrl += (jdbcUrl.contains("?")) ? "&" : "?";
-            jdbcUrl += "useUnicode=yes&characterEncoding=utf8";
-        }
-        dbTypeObj = DatabaseType.fetch(dbType);
-        String driver = loadDriver(dbTypeObj);
-        log.debug("Connecting to DB at "+jdbcUrl);
-        StoreDesc storeDesc = new StoreDesc(LayoutType.LayoutTripleNodesHash,dbTypeObj) ; 
-        ServletContext ctx = vreq.getSession().getServletContext();
-        DataSource bds = ContentModelSetup.makeBasicDataSource(
-                driver, jdbcUrl, username, password, ctx);
-        try {
-            VitroJenaSDBModelMaker vsmm = new VitroJenaSDBModelMaker(storeDesc, bds);
-              VitroJenaModelMaker vjmm = new VitroJenaModelMaker(jdbcUrl, username, password, dbType, ctx);
-            getServletContext().setAttribute("vitroJenaSDBModelMaker", vsmm);
-            getServletContext().setAttribute("vitroJenaModelMaker", vjmm);
-            if("SDB".equals(tripleStore))
-                vreq.getSession().setAttribute("vitroJenaModelMaker",vsmm);
-            else
-                vreq.getSession().setAttribute("vitroJenaModelMaker",vjmm);
-        } catch (SQLException sqle) {
-            throw new RuntimeException("Unable to create SDB ModelMaker", sqle);
+        ServletContext ctx = getServletContext();
+        ModelMaker vjmm = ModelAccess.on(ctx).getModelMaker(CONFIGURATION);
+        ModelMaker vsmm = ModelAccess.on(ctx).getModelMaker(CONTENT);
+        if("SDB".equals(tripleStore)) {
+            vreq.getSession().setAttribute("jenaIngestModelMaker",vsmm);
+        } else {
+            vreq.getSession().setAttribute("jenaIngestModelMaker",vjmm);
         }
     }
     
-    
-    private String loadDriver(DatabaseType dbType) {
-        String driverName = JDBC.getDriver(dbType);
-        JDBC.loadDriver(driverName);
-        return driverName;
-    }
-
     public void doSubtractModels(VitroRequest vreq) {
             String modela = vreq.getParameter("modela");
             String modelb = vreq.getParameter("modelb");
@@ -1322,8 +1285,8 @@ public class JenaIngestController extends BaseEditController {
     }
     
     protected static ModelMaker getVitroJenaModelMaker(HttpServletRequest request, ServletContext context) {
-        ModelMaker myVjmm = (ModelMaker) request.getSession().getAttribute("vitroJenaModelMaker");
-        myVjmm = (myVjmm == null) ? (ModelMaker) context.getAttribute("vitroJenaSDBModelMaker") : myVjmm;
+        ModelMaker myVjmm = (ModelMaker) request.getSession().getAttribute("jenaIngestModelMaker");
+        myVjmm = (myVjmm == null) ? ModelAccess.on(context).getModelMaker(CONTENT) : myVjmm;
         return new VitroJenaSpecialModelMaker(myVjmm, request);
     }
 }

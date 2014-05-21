@@ -2,12 +2,19 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID.CONFIGURATION;
+import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID.CONTENT;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -15,40 +22,44 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 /**
  * Sets up the content models, OntModelSelectors and webapp DAO factories.
  */
-public class ModelMakerSetup extends JenaDataSourceSetupBase 
-        implements javax.servlet.ServletContextListener {
-    
-    @Override
-    public void contextInitialized(ServletContextEvent sce) {
-        ServletContext ctx = sce.getServletContext();
-        StartupStatus ss = StartupStatus.getBean(ctx);
-        
-        long begin = System.currentTimeMillis();
-        
-        RDFServiceFactory rdfServiceFactory = RDFServiceUtils.getRDFServiceFactory(ctx);
-		makeModelMakerFromConnectionProperties(TripleStoreType.RDB, ctx);
-		VitroJenaModelMaker vjmm = getVitroJenaModelMaker();
-		setVitroJenaModelMaker(vjmm, ctx);
-		makeModelMakerFromConnectionProperties(TripleStoreType.SDB, ctx);
-		RDFServiceModelMaker vsmm = new RDFServiceModelMaker(rdfServiceFactory);
-		setVitroJenaSDBModelMaker(vsmm, ctx);
-		        
-		//bdc34: I have no reason for vsmm vs vjmm.  
-		//I don't know what are the implications of this choice.        
-		setVitroModelSource( new VitroModelSource(vsmm,ctx), ctx);
-        
-        ss.info(this, secondsSince(begin) + " seconds to set up models and DAO factories");  
-    } 
+public class ModelMakerSetup extends JenaDataSourceSetupBase implements
+		javax.servlet.ServletContextListener {
+	private static final Log log = LogFactory.getLog(ModelMakerSetup.class);
 
-    private long secondsSince(long startTime) {
-		return (System.currentTimeMillis() - startTime) / 1000;
+	@Override
+	public void contextInitialized(ServletContextEvent sce) {
+		ServletContext ctx = sce.getServletContext();
+		StartupStatus ss = StartupStatus.getBean(ctx);
+
+		createConfigurationModelMaker(ctx);
+		createContentModelMaker(ctx);
+
+		ss.info(this, "Created model makers and model source");
 	}
 
-    /* ===================================================================== */
-    
-    @Override
-    public void contextDestroyed(ServletContextEvent sce) {
-        // Nothing to do.
-    }    
- }
+	private void createConfigurationModelMaker(ServletContext ctx) {
+		String jdbcUrl = getJdbcUrl(ctx);
+		String dbtypeStr = ConfigurationProperties.getBean(ctx).getProperty(
+				"VitroConnection.DataSource.dbtype", "MySQL");
+		String username = ConfigurationProperties.getBean(ctx).getProperty(
+				"VitroConnection.DataSource.username");
+		String password = ConfigurationProperties.getBean(ctx).getProperty(
+				"VitroConnection.DataSource.password");
+		VitroJenaModelMaker vjmm = new VitroJenaModelMaker(jdbcUrl, username,
+				password, dbtypeStr, ctx);
+		ModelAccess.on(ctx).setModelMaker(CONFIGURATION, vjmm);
+	}
 
+	private void createContentModelMaker(ServletContext ctx) {
+		RDFServiceFactory rdfServiceFactory = RDFServiceUtils
+				.getRDFServiceFactory(ctx);
+		RDFServiceModelMaker vsmm = new RDFServiceModelMaker(rdfServiceFactory);
+		ModelAccess.on(ctx).setModelMaker(CONTENT, vsmm);
+	}
+
+	@Override
+	public void contextDestroyed(ServletContextEvent sce) {
+		// Nothing to do.
+	}
+
+}

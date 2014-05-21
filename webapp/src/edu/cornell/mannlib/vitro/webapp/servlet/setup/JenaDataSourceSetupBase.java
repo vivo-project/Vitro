@@ -2,8 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID.CONFIGURATION;
+import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID.CONTENT;
+
 import java.beans.PropertyVetoException;
-import java.sql.SQLException;
 
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
@@ -33,14 +35,12 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDBGraphGenerator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RegeneratingGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SDBGraphGenerator;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaSDBModelMaker;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 
 public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     private static final String VITRO_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
@@ -130,7 +130,7 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     static final OntModelSpec DB_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
     static final OntModelSpec MEM_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM; 
    
-    private String getJdbcUrl(ServletContext ctx) {
+    protected String getJdbcUrl(ServletContext ctx) {
         String jdbcUrl = ConfigurationProperties.getBean(ctx).getProperty(
                 "VitroConnection.DataSource.url");
 
@@ -376,76 +376,6 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
        return dbModel;
    }
 
-    private static String getRdfFormat(String filename){
-        String defaultformat = "RDF/XML";
-        if( filename == null )
-            return defaultformat;
-        else if( filename.endsWith("n3") )
-            return "N3";
-        else if( filename.endsWith("ttl") )
-            return "TURTLE";
-        else 
-            return defaultformat;
-    }
-    
-    private static VitroJenaModelMaker vjmm = null;
-    private static ModelMaker vsmm = null;
-    private static VitroModelSource vms = null;
-    private static final String sdbModelMaker = "vitroJenaSDBModelMaker";
-    private static final String rdbModelMaker = "vitroJenaModelMaker";
-    private static final String vitroModelSource = "vitroModelSource";
-    
-    //bdc34: is there any good reason that this doesn't just return the objects instead
-    //of oddly passing them around as static properties on this class?
-    protected void makeModelMakerFromConnectionProperties(TripleStoreType type, 
-                                                          ServletContext ctx) {
-        String jdbcUrl = getJdbcUrl(ctx);
-        String dbtypeStr = ConfigurationProperties.getBean(ctx).getProperty(
-                "VitroConnection.DataSource.dbtype","MySQL");
-        String username = ConfigurationProperties.getBean(ctx).getProperty(
-                "VitroConnection.DataSource.username");
-        String password = ConfigurationProperties.getBean(ctx).getProperty(
-                "VitroConnection.DataSource.password");
-        
-        if (TripleStoreType.RDB.equals(type)){
-            vjmm = new VitroJenaModelMaker(
-                    jdbcUrl, username, password, dbtypeStr, ctx);
-        } else if (TripleStoreType.SDB.equals(type)) {
-            StoreDesc storeDesc = new StoreDesc(
-                    LayoutType.LayoutTripleNodesHash, DatabaseType.fetch(dbtypeStr));
-            DataSource bds = ContentModelSetup.makeC3poDataSource(
-                    getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
-//            DataSource bds = WebappDaoSetup.makeBasicDataSource(
-//                    getDbDriverClassName(ctx), jdbcUrl, username, password, ctx);
-//            bds.setMaxActive(4); // for now, the SDB model makers should not use more
-//                                 // than a small handful of connections
-//            bds.setMaxIdle(2);
-            try {
-                vsmm = new VitroJenaSDBModelMaker(storeDesc, bds);
-            } catch (SQLException sqle) {
-                log.error("Unable to set up SDB ModelMaker", sqle);
-            }
-        }
-        
-        return;
-        
-    }
-    
-    public static void setVitroJenaModelMaker(VitroJenaModelMaker vjmm, 
-                                              ServletContext ctx){
-        ctx.setAttribute(rdbModelMaker, vjmm);
-    }
-    
-    public static void setVitroJenaSDBModelMaker(ModelMaker vsmm, 
-                                                 ServletContext ctx){
-        ctx.setAttribute(sdbModelMaker, vsmm);
-    }
-    
-    public static void setVitroModelSource(VitroModelSource vms,ServletContext ctx) {
-        ctx.setAttribute( vitroModelSource, vms);
-        
-    }
-    
     protected String getDefaultNamespace(ServletContext ctx) {
         String dns = ConfigurationProperties.getBean(ctx).getProperty(
                 VITRO_DEFAULT_NAMESPACE);
@@ -455,18 +385,6 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
             throw new IllegalStateException("runtime.properties does not "
                     + "contain a value for '" + VITRO_DEFAULT_NAMESPACE + "'");
         }
-    }
-    
-    protected VitroJenaModelMaker getVitroJenaModelMaker(){
-        return vjmm;
-    }
-    
-    protected ModelMaker getVitroJenaSDBModelMaker(){
-        return vsmm;
-    }
-
-    public static VitroModelSource getVitroModelSource(ServletContext ctx){
-        return (VitroModelSource)ctx.getAttribute(vitroModelSource);
     }
     
     private static String getDbType(ServletContext ctx) {
@@ -558,4 +476,5 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
     public static Store getApplicationStore(ServletContext ctx) {
         return (Store) ctx.getAttribute(STORE_ATTR);
     }
+    
 }

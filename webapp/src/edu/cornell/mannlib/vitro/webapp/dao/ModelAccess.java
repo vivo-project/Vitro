@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.rdf.model.ModelMaker;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 
@@ -70,6 +71,10 @@ public class ModelAccess {
 		BASE, UNION, UNFILTERED_BASE, UNFILTERED_UNION
 	}
 
+	public enum ModelMakerID {
+		CONTENT, CONFIGURATION
+	}
+
 	private enum Scope {
 		CONTEXT, SESSION, REQUEST
 	}
@@ -122,6 +127,8 @@ public class ModelAccess {
 	private final Map<ModelID, OntModel> modelMap = new EnumMap<>(ModelID.class);
 	private final Map<FactoryID, WebappDaoFactory> factoryMap = new EnumMap<>(
 			FactoryID.class);
+	private final Map<ModelMakerID, ModelMaker> modelMakerMap = new EnumMap<>(
+			ModelMakerID.class);
 
 	public ModelAccess(Scope scope, ModelAccess parent) {
 		this.scope = scope;
@@ -261,6 +268,30 @@ public class ModelAccess {
 	public OntModelSelector getUnionOntModelSelector() {
 		return new FacadeOntModelSelector(this, ModelID.UNION_ABOX,
 				ModelID.UNION_TBOX, ModelID.UNION_FULL);
+	}
+
+	// ----------------------------------------------------------------------
+	// Accessing the ModelMakers
+	// ----------------------------------------------------------------------
+
+	public ModelMaker getModelMaker(ModelMakerID id) {
+		if (modelMakerMap.containsKey(id)) {
+			log.debug("Using " + id + " modelMaker from " + scope);
+			return modelMakerMap.get(id);
+		} else if (parent != null) {
+			return parent.getModelMaker(id);
+		} else {
+			log.warn("No modelMaker found for " + id);
+			return null;
+		}
+	}
+
+	public void setModelMaker(ModelMakerID id, ModelMaker modelMaker) {
+		if (modelMaker == null) {
+			modelMakerMap.remove(id);
+		} else {
+			modelMakerMap.put(id, modelMaker);
+		}
 	}
 
 	// ----------------------------------------------------------------------

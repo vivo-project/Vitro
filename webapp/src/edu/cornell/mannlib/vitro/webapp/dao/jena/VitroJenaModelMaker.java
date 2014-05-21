@@ -70,22 +70,6 @@ public class VitroJenaModelMaker implements ModelMaker {
 		modelCache = new HashMap<String,Model>();
 	}
 	
-//	public VitroJenaModelMaker(ModelMaker mm,  HttpServletRequest request) {
-//		this.innerModelMaker = mm;
-//		if (mm instanceof VitroJenaModelMaker) { 
-//			log.debug("Using cache from inner model maker ");
-//			this.modelCache = ((VitroJenaModelMaker)mm).getCache();
-//		} else {
-//			log.debug("Creating new cache");
-//			this.modelCache = new HashMap<String,Model>();
-//		}
-//		this.request = request;
-//	}
-//	
-//	public ModelMaker getInnerModelMaker() {
-//		return this.innerModelMaker;
-//	}
-	
 	protected HashMap<String,Model> getCache() {
 		return this.modelCache;
 	}
