@@ -14,6 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroInterceptingModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
@@ -47,14 +48,18 @@ public class ModelMakerSetup extends JenaDataSourceSetupBase implements
 				"VitroConnection.DataSource.password");
 		VitroJenaModelMaker vjmm = new VitroJenaModelMaker(jdbcUrl, username,
 				password, dbtypeStr, ctx);
-		ModelAccess.on(ctx).setModelMaker(CONFIGURATION, vjmm);
+		VitroInterceptingModelMaker vimm = new VitroInterceptingModelMaker(
+				vjmm, ctx);
+		ModelAccess.on(ctx).setModelMaker(CONFIGURATION, vimm);
 	}
 
 	private void createContentModelMaker(ServletContext ctx) {
 		RDFServiceFactory rdfServiceFactory = RDFServiceUtils
 				.getRDFServiceFactory(ctx);
 		RDFServiceModelMaker vsmm = new RDFServiceModelMaker(rdfServiceFactory);
-		ModelAccess.on(ctx).setModelMaker(CONTENT, vsmm);
+		VitroInterceptingModelMaker vimm = new VitroInterceptingModelMaker(
+				vsmm, ctx);
+		ModelAccess.on(ctx).setModelMaker(CONTENT, vimm);
 	}
 
 	@Override

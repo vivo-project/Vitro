@@ -117,13 +117,13 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
    
     // This is Brian C's application.owl file. We may not have to be concerned 
     // with this for release 1.2.
-    static final String JENA_DISPLAY_METADATA_MODEL = 
+    public static final String JENA_DISPLAY_METADATA_MODEL = 
             "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadata";
     
     //TBox and display model related
-    static final String JENA_DISPLAY_TBOX_MODEL = 
+    public static final String JENA_DISPLAY_TBOX_MODEL = 
         DisplayVocabulary.DISPLAY_TBOX_MODEL_URI;
-    static final String JENA_DISPLAY_DISPLAY_MODEL = 
+    public static final String JENA_DISPLAY_DISPLAY_MODEL = 
         DisplayVocabulary.DISPLAY_DISPLAY_MODEL_URI;    
     
     // use OWL models with no reasoning

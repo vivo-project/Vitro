@@ -1228,17 +1228,9 @@ public class JenaIngestController extends BaseEditController {
         
     }
 
-    public static Model getModel(String name, HttpServletRequest request) {
-        if ("vitro:jenaOntModel".equals(name)) {
-            return ModelAccess.on(request.getSession()).getJenaOntModel();
-        } else if ("vitro:baseOntModel".equals(name)) {
-            return ModelAccess.on(request.getSession()).getBaseOntModel();
-        } else if ("vitro:inferenceOntModel".equals(name)) {
-        	return ModelAccess.on(request.getSession()).getInferenceOntModel();
-        } else {
-            return getVitroJenaModelMaker(request).getModel(name);
-        }
-    }
+	public static Model getModel(String name, HttpServletRequest request) {
+		return getVitroJenaModelMaker(request).getModel(name);
+	}
     
     protected static ModelMaker getVitroJenaModelMaker(HttpServletRequest req){
         ServletContext ctx = req.getSession().getServletContext();
