@@ -170,8 +170,6 @@ public class VitroInterceptingModelMaker implements ModelMaker {
 				ModelAccess.on(ctx).getOntModel(INFERRED_TBOX));
 		map.put(JENA_APPLICATION_METADATA_MODEL,
 				ModelAccess.on(ctx).getOntModel(APPLICATION_METADATA));
-		map.put(,
-				ModelAccess.on(ctx).getOntModel());
 	
 		return Collections.unmodifiableMap(map);
 	}
