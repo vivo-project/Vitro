@@ -29,11 +29,7 @@ function init(){
     <td>
      <form name="sdbform" action="ingest" method="get">
         <input type="hidden" name="action" value="sdbModels"/>
-<% if ("SDB models".equals(request.getAttribute("infoLine"))) { %>
-        <input type="submit" name="submit" value="SDB Models"/>
-<% } else { %>
         <input type="submit" name="submit" value="Main Store Models"/>
-<% } %>
     </form>
     </td>
     <td>

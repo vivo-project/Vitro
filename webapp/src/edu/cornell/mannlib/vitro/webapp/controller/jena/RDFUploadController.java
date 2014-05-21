@@ -261,7 +261,7 @@ public class RDFUploadController extends JenaIngestController {
             } finally {
                 rdfService.close();
             }
-            String modelType = getModelType(request, maker);
+            String modelType = getModelType(request);
             showModelList(request, maker, modelType);
         } 
         
