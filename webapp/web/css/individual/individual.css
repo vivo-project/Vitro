@@ -285,3 +285,19 @@ a#manageLabels {
 div#openSocial {
     display:inline-block;
 }
+/* MISC */
+ul.tinyMCEDisc {
+    list-style-type: disc;
+    margin-bottom: 10px;
+}
+ol.tinyMCENumeric {
+    list-style-type: decimal;
+}
+ul.tinyMCEDisc li {
+    padding: 0 !important;
+    margin-left: 30px;
+}
+ol.tinyMCENumeric li {
+    padding: 0 !important;
+    margin-left: 30px;
+}
