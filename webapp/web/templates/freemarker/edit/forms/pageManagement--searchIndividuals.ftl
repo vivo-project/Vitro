@@ -1,5 +1,5 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
-<#--This contains the template for the Solr Class individuals content type that is to be cloned and used in page management-->
+<#--This contains the template for the Search Index class individuals content type that is to be cloned and used in page management-->
 <#assign classGroup = pageData.classGroup />
 <#assign classGroups = pageData.classGroups />
 <#assign classes = pageData.classes />
@@ -22,12 +22,12 @@
 </section>
 <script>
     var i18nStringsSearchIndividuals = {
-        searchIndividuals: '${i18n().solr_individual_results}',
+        searchIndividuals: '${i18n().search_individual_results}',
         supplyQueryVariable: '${i18n().supply_query_variable}',
         noApostrophes: '${i18n().apostrophe_not_allowed}',
         noDoubleQuotes: '${i18n().double_quote_note_allowed}',
         supplyQuery: '${i18n().supply_sparql_query}',
-        selectClass: '${i18n().select_class_for_solr}'
+        selectClass: '${i18n().select_class_for_search}'
     };
 </script>
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/menupage/processSearchDataGetterContent.js"></script>')}

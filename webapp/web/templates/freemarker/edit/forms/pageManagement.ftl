@@ -81,7 +81,7 @@
                 <option value="browseClassGroup">${i18n().browse_class_group}</option>           
                 <option value="fixedHtml">${i18n().fixed_html}</option>           
                 <option value="sparqlQuery">${i18n().sparql_query_results}</option>   
-                <option value="searchIndividuals">${i18n().solr_individual_results}</option>                   
+                <option value="searchIndividuals">${i18n().search_individual_results}</option>                   
              </select>&nbsp;<span class="note">${i18n().add_types}</span>
             </section>
             <section id="contentDivs"></section>
@@ -179,7 +179,7 @@
         browseClassGroup: '${i18n().browse_class_group}',
         fixedHtml: '${i18n().fixed_html}',
         sparqlResults: '${i18n().sparql_query_results}',
-        searchIndividuals: '${i18n().solr_individual_results}',
+        searchIndividuals: '${i18n().search_individual_results}',
         orString: '${i18n().or}',
         deleteString: '${i18n().delete}',
         allCapitalized: '${i18n().all_capitalized}',
