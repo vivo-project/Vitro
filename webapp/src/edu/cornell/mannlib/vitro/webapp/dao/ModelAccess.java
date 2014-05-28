@@ -294,6 +294,18 @@ public class ModelAccess {
 	}
 
 	// ----------------------------------------------------------------------
+	// Close all locally stored models, WADFs, etc.
+	// ----------------------------------------------------------------------
+
+	public void close() {
+		if (this.scope == Scope.REQUEST) {
+			for (WebappDaoFactory wadf: factoryMap.values()) {
+				wadf.close();
+			}
+		}
+	}
+
+	// ----------------------------------------------------------------------
 	// Helper classes
 	// ----------------------------------------------------------------------
 
