@@ -272,9 +272,6 @@ public class ModelAccess {
 			for (WebappDaoFactory wadf: factoryMap.values()) {
 				wadf.close();
 			}
-			for (OntModel m: modelMap.values()) {
-				m.close();
-			}
 		}
 	}
 
