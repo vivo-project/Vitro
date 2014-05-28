@@ -7,14 +7,11 @@ import java.util.List;
 
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
@@ -29,12 +26,9 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
     
 	Integer portalCount = null;
 	List<String> externallyLinkedNamespaces = null;
-    ModelChangedListener externalNamespaceChangeListener = null;
 	
     public ApplicationDaoJena(WebappDaoFactoryJena wadf) {
         super(wadf);
-        externalNamespaceChangeListener = new ExternalNamespacesChangeListener();
-        getOntModelSelector().getDisplayModel().register(externalNamespaceChangeListener);
     }
     
     private String getApplicationResourceURI() {
@@ -119,9 +113,7 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
     }
     
     public void close() {
-        if (externalNamespaceChangeListener != null) {
-            getOntModelSelector().getDisplayModel().unregister(externalNamespaceChangeListener);
-        }
+            // nothing to do right now
     }
 
 	private static final boolean CLEAR_CACHE = true;
@@ -156,31 +148,6 @@ public class ApplicationDaoJena extends JenaBaseDao implements ApplicationDao {
     public boolean isExternallyLinkedNamespace(String namespace) {
         List<String> namespaces = getExternallyLinkedNamespaces();
         return namespaces.contains(namespace);
-    }
-    
-    private class ExternalNamespacesChangeListener extends StatementListener {
-        
-        @Override
-        public void addedStatement(Statement stmt) {
-            process(stmt);
-        }
-        
-        @Override
-        public void removedStatement(Statement stmt) {
-            process(stmt);
-        }
-        
-        //We could also listen for end-of-edit events,
-        //but there should be so few of these statments that
-        //it won't be very expensive to run this method multiple
-        //times when the model is updated.
-        
-        private void process(Statement stmt) {
-            if (stmt.getPredicate().equals(LINKED_NAMESPACE_PROP)) {
-                getExternallyLinkedNamespaces(CLEAR_CACHE);
-            }
-        }
-        
     }
     
 }
