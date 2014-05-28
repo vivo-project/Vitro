@@ -113,6 +113,7 @@ public class RequestModelsPrep implements Filter {
 			try {
 				setUpTheRequestModels(rdfService, req);
 				filterChain.doFilter(req, resp);
+				tearDownTheRequestModels(req);
 			} finally {
 				rdfService.close();
 			}
@@ -382,6 +383,10 @@ public class RequestModelsPrep implements Filter {
 	        ctx.setAttribute("customListViewConfigFileMap", map);
 	    }
 	    return map;
+	}
+
+	private void tearDownTheRequestModels(HttpServletRequest req) {
+		ModelAccess.on(req).close();
 	}
 
 	@Override
