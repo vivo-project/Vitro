@@ -169,7 +169,6 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
    		} else {
    			log.error("Subject individual was null for");
    		}
-		
         return types;
 	}	
 	
@@ -455,7 +454,8 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	        subjectUri, 
     	        predicateUri,
     	        rangeTypes,
-    	        objectUri));
+    	        objectUri,
+				vreq ));
     	}else{
     		field.setOptions(null);
     	}
@@ -617,7 +617,6 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 			"<" + subject + "> <" + predicate + "> ?objectVar .} ";
 		return query;
 	}
-	
-	
+		
 
 }
