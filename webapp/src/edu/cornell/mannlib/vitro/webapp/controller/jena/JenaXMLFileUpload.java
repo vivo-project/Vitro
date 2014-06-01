@@ -114,7 +114,7 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
         	return;
         }
 
-        ModelMaker modelMaker = getVitroJenaModelMaker(vreq);
+        ModelMaker modelMaker = getModelMaker(vreq);
         String targetModel = request.getParameter("targetModel");               
 		if (targetModel == null) {
 			throw new ServletException("targetModel not specified.");
@@ -172,7 +172,7 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 		request.setAttribute("title","Upload file and convert to RDF");
 		request.setAttribute("bodyJsp","/jenaIngest/xmlFileUpload.jsp");
 		
-		request.setAttribute("modelNames", getVitroJenaModelMaker(vreq).listModels().toList());
+		request.setAttribute("modelNames", getModelMaker(vreq).listModels().toList());
 		request.setAttribute("models", null);				
 
 		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      

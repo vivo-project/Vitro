@@ -67,6 +67,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
@@ -122,28 +123,28 @@ public class JenaIngestController extends BaseEditController {
         }
         
         VitroRequest vreq = new VitroRequest(request);   
-        ModelMaker maker = getVitroJenaModelMaker(vreq);
-        String modelType = getModelType(vreq);
+        ModelMaker maker = getModelMaker(vreq);
+        ModelMakerID modelType = getModelType(vreq);
         
         String actionStr = vreq.getParameter("action");
         actionStr = (actionStr != null) ? actionStr : "";
         
         if("listModels".equals(actionStr)) {
             processListModelsRequest(vreq, maker, modelType);
-        } else if("rdbModels".equals(actionStr)){
-            processRDBModelsRequest(vreq, maker, modelType);
-        } else if("sdbModels".equals(actionStr)){
-            processSDBModelsRequest(vreq, maker, modelType);
+        } else if("configModels".equals(actionStr)){
+            processConfigModelsRequest(vreq);
+        } else if("contentModels".equals(actionStr)){
+            processContentModelsRequest(vreq);
         } else if("createModel".equals(actionStr)) {
             processCreateModelRequest(vreq, maker, modelType);
         } else if("removeModel".equals(actionStr)) {
             processRemoveModelRequest(vreq, maker, modelType);
         } else if("loadRDFData".equals(actionStr)) {
-            processLoadRDFDataRequest(vreq, maker, modelType);
+            processLoadRDFDataRequest(vreq, maker);
         } else if("cleanLiterals".equals(actionStr)) {
-            processCleanLiteralsRequest(vreq, maker, modelType);
+            processCleanLiteralsRequest(vreq);
         } else if("outputModel".equals(actionStr)) {
-            processOutputModelRequest(vreq, response, maker, modelType);
+            processOutputModelRequest(vreq, response);
             return; // don't attempt to display a JSP
         } else if("clearModel".equals(actionStr)) {
             processClearModelRequest(vreq, maker, modelType);
@@ -152,35 +153,35 @@ public class JenaIngestController extends BaseEditController {
         } else if("detachModel".equals(actionStr)) {
             processDetachModelRequest(vreq, maker, modelType);
         } else if("renameBNodes".equals(actionStr)) {
-            processRenameBNodesRequest(vreq, maker, modelType);
+            processRenameBNodesRequest(vreq, maker);
         } else if("renameBNodesURISelect".equals(actionStr)){
-            processRenameBNodesURISelectRequest(vreq, maker, modelType);
+            processRenameBNodesURISelectRequest(vreq, maker);
         } else if("smushSingleModel".equals(actionStr)) {
-            processSmushSingleModelRequest(vreq, maker, modelType);
+            processSmushSingleModelRequest(vreq);
         } else if("connectDB".equals(actionStr)) {
-            processConnectDBRequest(vreq, maker, modelType);
+            processConnectDBRequest(vreq);
         } else if("csv2rdf".equals(actionStr)) {
-            processCsv2rdfRequest(vreq, maker, modelType);
+            processCsv2rdfRequest(vreq);
         } else if("processStrings".equals(actionStr)) {
-            processProcessStringsRequest(vreq, maker, modelType);
+            processProcessStringsRequest(vreq);
         } else if("splitPropertyValues".equals(actionStr)) {
-            processSplitPropertyValuesRequest(vreq, maker, modelType);
+            processSplitPropertyValuesRequest(vreq);
         } else if("subtractModels".equals(actionStr)) {
-            processSubtractModelRequest(vreq, maker, modelType);
+            processSubtractModelRequest(vreq);
         } else if("executeWorkflow".equals(actionStr)) {
-            processExecuteWorkflowRequest(vreq, maker, modelType);
+            processExecuteWorkflowRequest(vreq);
         } else if("executeSparql".equals(actionStr)) {
-            processExecuteSparqlRequest(vreq, maker, modelType);
+            processExecuteSparqlRequest(vreq);
         } else if ("generateTBox".equals(actionStr)) {
-            processGenerateTBoxRequest(vreq, maker, modelType);
+            processGenerateTBoxRequest(vreq);
         } else if("permanentURI".equals(actionStr)){
-            processPermanentURIRequest(vreq, maker, modelType);          
+            processPermanentURIRequest(vreq, maker);          
         } else if("mergeResources".equals(actionStr)){
-            processMergeResourceRequest(vreq, maker, modelType);
+            processMergeResourceRequest(vreq);
         } else if("renameResource".equals(actionStr)){
-            processRenameResourceRequest(vreq, response, maker, modelType);
+            processRenameResourceRequest(vreq);
         } else if("mergeResult".equals(actionStr)){
-            processMergeResultRequest(vreq, response, maker, modelType);
+            processMergeResultRequest(vreq, response);
             return;
         }
         
@@ -189,7 +190,7 @@ public class JenaIngestController extends BaseEditController {
             request.setAttribute("bodyJsp",INGEST_MENU_JSP);
         }
         
-        maker = getVitroJenaModelMaker(vreq); 
+        maker = getModelMaker(vreq); 
         request.setAttribute("modelNames", maker.listModels().toList());
    
         RequestDispatcher rd = request.getRequestDispatcher(
@@ -203,27 +204,27 @@ public class JenaIngestController extends BaseEditController {
         
     }
     
-    private void processListModelsRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processListModelsRequest(VitroRequest vreq, ModelMaker maker, ModelMakerID modelType) {
         showModelList(vreq, maker, modelType);
     }
     
-    public static boolean isUsingMainStoreForIngest(HttpServletRequest req) {
+    protected static boolean isUsingMainStoreForIngest(HttpServletRequest req) {
     	return CONFIGURATION != req.getSession().getAttribute(WHICH_MODEL_MAKER); 
     }
     
-    private void processRDBModelsRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processConfigModelsRequest(VitroRequest vreq) {
         ModelMaker vjmm = ModelAccess.on(getServletContext()).getModelMaker(CONFIGURATION);
         vreq.getSession().setAttribute(WHICH_MODEL_MAKER, CONFIGURATION);
-        showModelList(vreq, vjmm, "rdb");
+        showModelList(vreq, vjmm, CONFIGURATION);
     }
     
-    private void processSDBModelsRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processContentModelsRequest(VitroRequest vreq) {
         ModelMaker vsmm = ModelAccess.on(getServletContext()).getModelMaker(CONTENT);
         vreq.getSession().setAttribute(WHICH_MODEL_MAKER, CONTENT);
-        showModelList(vreq, vsmm, "sdb");
+        showModelList(vreq, vsmm, CONTENT);
     }
     
-    private void processCreateModelRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processCreateModelRequest(VitroRequest vreq, ModelMaker maker, ModelMakerID modelType) {
         String modelName = vreq.getParameter("modelName");
     	
         if (modelName != null) {
@@ -242,13 +243,13 @@ public class JenaIngestController extends BaseEditController {
         		throw new RuntimeException("the model name must be a valid URI");
         	}
         } else {
-            vreq.setAttribute("modelType", modelType);
+            vreq.setAttribute("modelType", modelType.toString());
             vreq.setAttribute("title","Create New Model");
             vreq.setAttribute("bodyJsp",CREATE_MODEL_JSP);
         }
     }
     
-    private void processRemoveModelRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processRemoveModelRequest(VitroRequest vreq, ModelMaker maker, ModelMakerID modelType) {
         String modelName = vreq.getParameter("modelName");
         if (modelName!=null) {
             doRemoveModel(modelName, maker);
@@ -256,7 +257,7 @@ public class JenaIngestController extends BaseEditController {
         showModelList(vreq, maker, modelType);
     }
     
-    private void processClearModelRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processClearModelRequest(VitroRequest vreq, ModelMaker maker, ModelMakerID modelType) {
         String modelName = vreq.getParameter("modelName");
         if (modelName != null) {
             doClearModel(modelName,maker);
@@ -264,7 +265,7 @@ public class JenaIngestController extends BaseEditController {
         showModelList(vreq, maker, modelType);
     }
     
-    private void processLoadRDFDataRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processLoadRDFDataRequest(VitroRequest vreq, ModelMaker maker) {
         String docLoc = vreq.getParameter("docLoc");
         String filePath = vreq.getParameter("filePath");
         String modelName = vreq.getParameter("modelName");
@@ -281,9 +282,7 @@ public class JenaIngestController extends BaseEditController {
     }
     
     private void processOutputModelRequest(VitroRequest vreq, 
-                                           HttpServletResponse response, 
-                                           ModelMaker maker, 
-                                           String modelType) {
+                                           HttpServletResponse response) {
         String modelNameStr = vreq.getParameter("modelName");
         Model model = getModel(modelNameStr,vreq);
         JenaOutputUtils.setNameSpacePrefixes(model,vreq.getWebappDaoFactory());
@@ -310,7 +309,7 @@ public class JenaIngestController extends BaseEditController {
         }
     }
     
-    private void processCleanLiteralsRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processCleanLiteralsRequest(VitroRequest vreq) {
         String modelNameStr = vreq.getParameter("modelName");
         Model model = getModel(modelNameStr,vreq);
         doCleanLiterals(model);
@@ -318,7 +317,7 @@ public class JenaIngestController extends BaseEditController {
         vreq.setAttribute("bodyJsp",INGEST_MENU_JSP);
     }
     
-    private void processAttachModelRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processAttachModelRequest(VitroRequest vreq, ModelMaker maker, ModelMakerID modelType) {
         String modelName = vreq.getParameter("modelName");
         if (modelName != null) {
             doAttachModel(modelName,maker);
@@ -326,15 +325,15 @@ public class JenaIngestController extends BaseEditController {
         showModelList(vreq, maker, modelType);
     }
     
-    private void processDetachModelRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processDetachModelRequest(VitroRequest vreq, ModelMaker maker, ModelMakerID modelType) {
         String modelName = vreq.getParameter("modelName");
         if (modelName != null) {
-            doDetachModel(modelName,maker);
+            doDetachModel(modelName);
         }
         showModelList(vreq, maker, modelType);
     }
     
-    private void processRenameBNodesRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processRenameBNodesRequest(VitroRequest vreq, ModelMaker maker) {
         String[] sourceModel = vreq.getParameterValues("sourceModelName");
         JenaIngestUtils utils = new JenaIngestUtils();
         if(sourceModel != null && sourceModel.length != 0) {
@@ -359,19 +358,19 @@ public class JenaIngestController extends BaseEditController {
         }
     }
     
-    private void processRenameBNodesURISelectRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processRenameBNodesURISelectRequest(VitroRequest vreq, ModelMaker maker) {
         String namespaceEtcStr = vreq.getParameter("namespaceEtcStr");
         String pattern = vreq.getParameter("pattern");
         String concatenate = vreq.getParameter("concatenate");
-        String[] sourceModel = (String[]) vreq.getParameterValues("sourceModelName");
+        String[] sourceModel = vreq.getParameterValues("sourceModelName");
         if(namespaceEtcStr != null) {
             if (namespaceEtcStr.isEmpty()) {
                 if ("true".equals(vreq.getParameter("csv2rdf"))) {
-                    processCsv2rdfRequest(vreq, maker, modelType);
+                    processCsv2rdfRequest(vreq);
                     return;
                 } else {
                     vreq.setAttribute("errorMsg", "Please enter a value.");
-                    processRenameBNodesRequest(vreq, maker, modelType);
+                    processRenameBNodesRequest(vreq, maker);
                     return;
                 }
             }
@@ -390,7 +389,7 @@ public class JenaIngestController extends BaseEditController {
         }
     }
     
-    private void processSmushSingleModelRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processSmushSingleModelRequest(VitroRequest vreq) {
         String propertyURIStr = vreq.getParameter("propertyURI");
         if (propertyURIStr != null) {
             doSmushSingleModel(vreq);
@@ -402,19 +401,15 @@ public class JenaIngestController extends BaseEditController {
         }
     }
     
-    private void processConnectDBRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processConnectDBRequest(VitroRequest vreq) {
         String jdbcUrl = vreq.getParameter("jdbcUrl");
         String tripleStore = vreq.getParameter("tripleStore");
         if (jdbcUrl != null) {
             doConnectDB(vreq);
             if ("SDB".equals(tripleStore)) {
-                getServletContext().setAttribute("modelT", "sdb");
-                getServletContext().setAttribute("info", "SDB models");
                 vreq.setAttribute("modelType", "sdb");
                 vreq.setAttribute("infoLine", "SDB models");
             } else {
-                getServletContext().setAttribute("modelT", "rdb");
-                getServletContext().setAttribute("info", "RDB models");
                 vreq.setAttribute("modelType", "rdb");
                 vreq.setAttribute("infoLine", "RDB models");
             }
@@ -429,7 +424,7 @@ public class JenaIngestController extends BaseEditController {
         }
     }
     
-    private void processCsv2rdfRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processCsv2rdfRequest(VitroRequest vreq) {
         String csvUrl = vreq.getParameter("csvUrl");
         if (csvUrl != null) {
             /*doExecuteCsv2Rdf(vreq);*/
@@ -441,7 +436,7 @@ public class JenaIngestController extends BaseEditController {
         }
     }
     
-    private void processProcessStringsRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processProcessStringsRequest(VitroRequest vreq) {
         String className = vreq.getParameter("className");
         if (className != null) {
             doProcessStrings(vreq);
@@ -453,7 +448,7 @@ public class JenaIngestController extends BaseEditController {
         }
     }
     
-    private void processSplitPropertyValuesRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processSplitPropertyValuesRequest(VitroRequest vreq) {
         String splitRegex = vreq.getParameter("splitRegex");
         if (splitRegex != null) {
             doSplitPropertyValues(vreq);
@@ -465,7 +460,7 @@ public class JenaIngestController extends BaseEditController {
         }
     }
     
-    private void processSubtractModelRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processSubtractModelRequest(VitroRequest vreq) {
         String modela = vreq.getParameter("modela");
         if (modela != null) {
             doSubtractModels(vreq);
@@ -477,7 +472,7 @@ public class JenaIngestController extends BaseEditController {
         }
     }
     
-    private void processExecuteWorkflowRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processExecuteWorkflowRequest(VitroRequest vreq) {
         String workflowURIStr = vreq.getParameter("workflowURI");
         String workflowStepURIStr = vreq.getParameter("workflowStepURI");
         if (workflowURIStr != null && workflowStepURIStr != null) {
@@ -489,7 +484,7 @@ public class JenaIngestController extends BaseEditController {
             OntModel jenaOntModel = (OntModel) getModel("vitro:jenaOntModel",vreq);
             vreq.setAttribute("workflowSteps", new JenaIngestWorkflowProcessor(
                     jenaOntModel.getIndividual(workflowURIStr),
-                    getVitroJenaModelMaker(vreq)).getWorkflowSteps(null));
+                    getModelMaker(vreq)).getWorkflowSteps(null));
             vreq.setAttribute("title", "Choose Workflow Step");
             vreq.setAttribute("bodyJsp", WORKFLOW_STEP_JSP);
         } else {
@@ -508,7 +503,7 @@ public class JenaIngestController extends BaseEditController {
         }
     }
     
-    private void processExecuteSparqlRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processExecuteSparqlRequest(VitroRequest vreq) {
         String sparqlQueryStr = vreq.getParameter("sparqlQueryStr");
 		OntModel jenaOntModel = ModelAccess.on(getServletContext()).getJenaOntModel();
         jenaOntModel.enterCriticalSection(Lock.READ);
@@ -521,12 +516,12 @@ public class JenaIngestController extends BaseEditController {
         }
         /*ass92*/
         OntologyDao daoObj = vreq.getUnfilteredWebappDaoFactory().getOntologyDao();
-        List ontologiesObj = daoObj.getAllOntologies();
-        ArrayList prefixList = new ArrayList();       
+        List<Ontology> ontologiesObj = daoObj.getAllOntologies();
+        List<String> prefixList = new ArrayList<>();       
         if(ontologiesObj !=null && ontologiesObj.size()>0){
-            Iterator ontItr = ontologiesObj.iterator();
+            Iterator<Ontology> ontItr = ontologiesObj.iterator();
             while(ontItr.hasNext()){
-                Ontology ont = (Ontology) ontItr.next();
+                Ontology ont = ontItr.next();
                 prefixList.add(ont.getPrefix() == null ? "(not yet specified)" : ont.getPrefix());
                 prefixList.add(ont.getURI() == null ? "" : ont.getURI());
             }
@@ -576,7 +571,7 @@ public class JenaIngestController extends BaseEditController {
         }
     }
     
-    private void processGenerateTBoxRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processGenerateTBoxRequest(VitroRequest vreq) {
         String testParam = vreq.getParameter("sourceModelName");
         if (testParam != null) {
             doGenerateTBox(vreq);
@@ -588,7 +583,7 @@ public class JenaIngestController extends BaseEditController {
         }    
     }
     
-    private void processPermanentURIRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processPermanentURIRequest(VitroRequest vreq, ModelMaker maker) {
         String modelName = vreq.getParameter("modelName");
         String oldModel = vreq.getParameter("oldModel");
         String newModel = vreq.getParameter("newModel");
@@ -599,7 +594,7 @@ public class JenaIngestController extends BaseEditController {
         newNamespace = (dNamespace != null) ? dNamespace : newNamespace;
         if(modelName!=null){
             Model m = maker.getModel(modelName);
-            ArrayList namespaceList = new ArrayList();
+            List<String> namespaceList = new ArrayList<>();
             ResIterator resItr = m.listResourcesWithProperty((Property)null);
             if(resItr!=null){
                 while(resItr.hasNext()){
@@ -625,7 +620,7 @@ public class JenaIngestController extends BaseEditController {
         }
     }
     
-    private void processMergeResourceRequest(VitroRequest vreq, ModelMaker maker, String modelType) {
+    private void processMergeResourceRequest(VitroRequest vreq) {
           String uri1 = vreq.getParameter("uri1"); // get primary uri
           String uri2 = vreq.getParameter("uri2"); // get secondary uri
           String usePrimaryLabelOnly = vreq.getParameter("usePrimaryLabelOnly");
@@ -655,10 +650,7 @@ public class JenaIngestController extends BaseEditController {
           }
     }
     
-    private void processRenameResourceRequest(VitroRequest vreq, 
-                                              HttpServletResponse response, 
-                                              ModelMaker maker, 
-                                              String modelType) {
+    private void processRenameResourceRequest(VitroRequest vreq) {
           String oldNamespace = vreq.getParameter("oldNamespace");
           String newNamespace = vreq.getParameter("newNamespace");
           String errorMsg = "";
@@ -679,7 +671,7 @@ public class JenaIngestController extends BaseEditController {
                   vreq.setAttribute("title","Rename Resource");
                   vreq.setAttribute("bodyJsp",RENAME_RESOURCE);                  
               } else {
-                  String result = doRename(oldNamespace, newNamespace, response);
+                  String result = doRename(oldNamespace, newNamespace);
                   vreq.setAttribute("result",result);
                   vreq.setAttribute("title","Rename Resources");
                   vreq.setAttribute("bodyJsp",RENAME_RESULT);               
@@ -691,9 +683,7 @@ public class JenaIngestController extends BaseEditController {
     }
     
     private void processMergeResultRequest(VitroRequest vreq, 
-                                           HttpServletResponse response, 
-                                           ModelMaker maker, 
-                                           String modelType) {
+                                           HttpServletResponse response) {
 
         Model lmodel = (Model) vreq.getSession().getAttribute("leftoverModel");
         response.setContentType("RDF/XML-ABBREV");
@@ -708,17 +698,24 @@ public class JenaIngestController extends BaseEditController {
             throw new RuntimeException(ioe);
         }
     }
-    
-    protected String getModelType(VitroRequest vreq) {
+
+    /**
+     * Get the model type from the request, or from the session.
+     */
+    protected ModelMakerID getModelType(VitroRequest vreq) {
         String modelType = vreq.getParameter("modelType");
-        if (modelType == null) {
-        	if (isUsingMainStoreForIngest(vreq)) {
-                modelType = "sdb";
-            } else {
-                modelType = "rdb";
-            }
-        }
-        return modelType;
+		if (modelType != null) {
+			if (modelType.equals(CONFIGURATION.toString())) {
+				return CONFIGURATION;
+			} else {
+				return CONTENT;
+			}
+		}
+		if (vreq.getSession().getAttribute(WHICH_MODEL_MAKER) == CONFIGURATION) {
+			return CONFIGURATION;
+		} else {
+			return CONTENT;
+		}
     }
     
     private void doCreateModel(String modelName, ModelMaker modelMaker) {
@@ -727,7 +724,7 @@ public class JenaIngestController extends BaseEditController {
     
     private void doRemoveModel(String modelName, ModelMaker modelMaker) {
         //Try to detach first since it cause problems to remove an attached model.        
-        doDetachModel(modelName, modelMaker);
+        doDetachModel(modelName);
         log.debug("Removing " + modelName + " from webapp");
         modelMaker.removeModel(modelName);        
     }
@@ -779,7 +776,7 @@ public class JenaIngestController extends BaseEditController {
     
     private void doAttachModel(String modelName, ModelMaker modelMaker) {
         if (attachedModels.containsKey(modelName)) {
-            doDetachModel(modelName, modelMaker);
+            doDetachModel(modelName);
         }
         Model m = ModelFactory.createDefaultModel();
         m.add(modelMaker.getModel(modelName));        
@@ -788,7 +785,7 @@ public class JenaIngestController extends BaseEditController {
         log.info("Attached " + modelName + " (" + m.hashCode() + ") to webapp");
     }
     
-    private void doDetachModel(String modelName, ModelMaker modelMaker) {
+    private void doDetachModel(String modelName) {
         Model m = attachedModels.get(modelName);
         if (m == null) {
             return;
@@ -804,7 +801,7 @@ public class JenaIngestController extends BaseEditController {
         
         Boolean csv2rdf = false;
         try {
-            csv2rdf = (Boolean) Boolean.parseBoolean(vreq.getParameter("csv2rdf"));
+            csv2rdf = Boolean.parseBoolean(vreq.getParameter("csv2rdf"));
         } catch (Exception e) {
             log.error(e, e);
         }
@@ -987,17 +984,17 @@ public class JenaIngestController extends BaseEditController {
             } 
             Model additionsModel = ModelFactory.createDefaultModel();
             Model retractionsModel = ModelFactory.createDefaultModel();
-            Class stringProcessorClass = Class.forName(className);
+            Class<?> stringProcessorClass = Class.forName(className);
             Object processor = stringProcessorClass.newInstance();
-            Class[] methArgs = {String.class};
+            Class<?>[] methArgs = {String.class};
             Method meth = stringProcessorClass.getMethod(methodName,methArgs);
             Property prop = ResourceFactory.createProperty(propertyName);
             Property newProp = ResourceFactory.createProperty(newPropertyName);
             destination.enterCriticalSection(Lock.READ);
             try {
-                ClosableIterator closeIt = destination.listStatements((Resource)null,prop,(RDFNode)null);
-                for (Iterator stmtIt = closeIt; stmtIt.hasNext(); ) {
-                    Statement stmt = (Statement) stmtIt.next();
+                ClosableIterator<Statement> closeIt = destination.listStatements((Resource)null,prop,(RDFNode)null);
+                for (Iterator<Statement> stmtIt = closeIt; stmtIt.hasNext(); ) {
+                    Statement stmt = stmtIt.next();
                     if (stmt.getObject().isLiteral()) {
                         Literal lit = (Literal) stmt.getObject();
                         String lex = lit.getLexicalForm();
@@ -1047,10 +1044,10 @@ public class JenaIngestController extends BaseEditController {
         Model additionsModel = ModelFactory.createDefaultModel();
         model.enterCriticalSection(Lock.WRITE);
         try {
-            ClosableIterator closeIt = model.listStatements();
+            ClosableIterator<Statement> closeIt = model.listStatements();
             try {
-                for (Iterator stmtIt = closeIt; stmtIt.hasNext();) {
-                    Statement stmt = (Statement) stmtIt.next();
+                for (Iterator<Statement> stmtIt = closeIt; stmtIt.hasNext();) {
+                    Statement stmt = stmtIt.next();
                     if (stmt.getObject().isLiteral()) {
                         Literal lit = (Literal) stmt.getObject();
                         String lex = lit.getLexicalForm();
@@ -1099,11 +1096,11 @@ public class JenaIngestController extends BaseEditController {
         String workflowStepURI = vreq.getParameter("workflowStepURI");
         OntModel jenaOntModel = (OntModel) getModel("vitro:jenaOntModel",vreq);
         new JenaIngestWorkflowProcessor(
-                jenaOntModel.getIndividual(workflowURI),getVitroJenaModelMaker(
+                jenaOntModel.getIndividual(workflowURI),getModelMaker(
                         vreq)).run(jenaOntModel.getIndividual(workflowStepURI));
     }
     
-    private String doRename(String oldNamespace,String newNamespace,HttpServletResponse response){    
+    private String doRename(String oldNamespace,String newNamespace){    
         String uri = null;
         String result = null;
         Integer counter = 0;
@@ -1200,13 +1197,12 @@ public class JenaIngestController extends BaseEditController {
         }
     }
     
-    protected void showModelList(VitroRequest vreq, ModelMaker maker, String modelType) {
-        if(modelType.equals("rdb")){
-            vreq.setAttribute("modelType", "rdb");
-            vreq.setAttribute("infoLine", "RDB models");
+    protected void showModelList(VitroRequest vreq, ModelMaker maker, ModelMakerID modelType) {
+    	vreq.setAttribute("modelType", modelType.toString());
+        if(modelType == CONTENT){
+        	vreq.setAttribute("infoLine", "Main Store models");            
         } else {
-            vreq.setAttribute("modelType", "sdb");
-            vreq.setAttribute("infoLine", "main store models");            
+        	vreq.setAttribute("infoLine", "Configuration models");
         }
         vreq.setAttribute("modelNames", maker.listModels().toList());
         vreq.setAttribute("bodyAttr", "onLoad=\"init()\"");
@@ -1222,17 +1218,18 @@ public class JenaIngestController extends BaseEditController {
              this.collator = vreq.getCollator();   
         }
         
-        public int compare(String s1, String s2) {
+        @Override
+		public int compare(String s1, String s2) {
             return collator.compare(s1, s2);
         }
         
     }
 
 	public static Model getModel(String name, HttpServletRequest request) {
-		return getVitroJenaModelMaker(request).getModel(name);
+		return getModelMaker(request).getModel(name);
 	}
     
-    protected static ModelMaker getVitroJenaModelMaker(HttpServletRequest req){
+    protected static ModelMaker getModelMaker(HttpServletRequest req){
         ServletContext ctx = req.getSession().getServletContext();
 		if (isUsingMainStoreForIngest(req)) {
 			return ModelAccess.on(ctx).getModelMaker(CONTENT);

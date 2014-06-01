@@ -14,7 +14,7 @@ import org.apache.commons.io.IOUtils;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.sparql.resultset.ResultSetFormat;
+import com.hp.hpl.jena.sparql.resultset.ResultsFormat;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -56,7 +56,7 @@ abstract class SparqlQueryApiResultSetProducer extends SparqlQueryApiExecutor {
 			pipeWithReplacement(rawResult, out);
 		} else {
 			ResultSet rs = ResultSetFactory.fromJSON(rawResult);
-			ResultSetFormat format = ResultSetFormat.lookup(mediaType
+			ResultsFormat format = ResultsFormat.lookup(mediaType
 					.getJenaResponseFormat());
 			ResultSetFormatter.output(out, rs, format);
 		}

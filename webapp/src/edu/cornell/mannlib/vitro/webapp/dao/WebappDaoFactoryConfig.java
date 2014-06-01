@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.openjena.atlas.lib.Pair;
+import org.apache.jena.atlas.lib.Pair;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 

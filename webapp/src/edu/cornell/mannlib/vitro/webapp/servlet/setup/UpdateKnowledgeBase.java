@@ -155,7 +155,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
     			    }
     			    // reload the display model since the TBoxUpdater may have 
     			    // modified it
-    			    new ApplicationModelSetup().contextInitialized(sce);				  
+    			    new ConfigurationModelsSetup().contextInitialized(sce);				  
     			} catch (Exception ioe) {
     			    ss.fatal(this, "Exception updating knowledge base for ontology changes: ", ioe);
     			}	

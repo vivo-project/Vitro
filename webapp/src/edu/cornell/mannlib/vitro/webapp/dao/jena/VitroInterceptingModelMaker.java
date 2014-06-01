@@ -2,21 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID.*;
-import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID.DISPLAY;
-import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID.INFERRED_FULL;
-import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID.UNION_FULL;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.*;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import javax.servlet.ServletContext;
+import java.util.TreeSet;
 
 import com.hp.hpl.jena.graph.GraphMaker;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -25,10 +17,6 @@ import com.hp.hpl.jena.rdf.model.ModelReader;
 import com.hp.hpl.jena.shared.AlreadyExistsException;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.NiceIterator;
-
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 /**
  * A decorator on top of a model maker. It looks for requests on particular
@@ -44,13 +32,11 @@ import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
  */
 public class VitroInterceptingModelMaker implements ModelMaker {
 	private final ModelMaker innerMM;
-	private final ServletContext ctx;
 	private final Map<String, Model> specialMap;
 
-	public VitroInterceptingModelMaker(ModelMaker innerMM, ServletContext ctx) {
+	public VitroInterceptingModelMaker(ModelMaker innerMM, Map<String, Model> specialMap) {
 		this.innerMM = innerMM;
-		this.ctx = ctx;
-		this.specialMap = populateSpecialMap();
+		this.specialMap = Collections.unmodifiableMap(new HashMap<>(specialMap));
 	}
 
 	@Override
@@ -147,33 +133,6 @@ public class VitroInterceptingModelMaker implements ModelMaker {
 	// Intercepting mechanism
 	// ----------------------------------------------------------------------
 
-	private Map<String, Model> populateSpecialMap() {
-		Map<String, Model> map = new HashMap<>();
-		
-		map.put("vitro:jenaOntModel",
-				ModelAccess.on(ctx).getOntModel(UNION_FULL));
-		map.put("vitro:baseOntModel", ModelAccess.on(ctx)
-				.getOntModel(BASE_FULL));
-		map.put("vitro:inferenceOntModel",
-				ModelAccess.on(ctx).getOntModel(INFERRED_FULL));
-		map.put(JENA_DISPLAY_METADATA_MODEL,
-				ModelAccess.on(ctx).getOntModel(DISPLAY));
-		map.put(JENA_DISPLAY_TBOX_MODEL,
-				ModelAccess.on(ctx).getOntModel(DISPLAY_TBOX));
-		map.put(JENA_DISPLAY_DISPLAY_MODEL,
-				ModelAccess.on(ctx).getOntModel(DISPLAY_DISPLAY));
-		map.put(JENA_USER_ACCOUNTS_MODEL,
-				ModelAccess.on(ctx).getOntModel(USER_ACCOUNTS));
-		map.put(JENA_TBOX_ASSERTIONS_MODEL,
-				ModelAccess.on(ctx).getOntModel(BASE_TBOX));
-		map.put(JENA_TBOX_INF_MODEL,
-				ModelAccess.on(ctx).getOntModel(INFERRED_TBOX));
-		map.put(JENA_APPLICATION_METADATA_MODEL,
-				ModelAccess.on(ctx).getOntModel(APPLICATION_METADATA));
-	
-		return Collections.unmodifiableMap(map);
-	}
-
 	private Collection<String> getSpecialNames() {
 		return specialMap.keySet();
 	}
@@ -191,7 +150,7 @@ public class VitroInterceptingModelMaker implements ModelMaker {
 
 		@SafeVarargs
 		public SetsExtendedIterator(Collection<String>... collections) {
-			Set<String> set = new HashSet<>();
+			Set<String> set = new TreeSet<>();
 			for (Collection<String> c : collections) {
 				set.addAll(c);
 			}

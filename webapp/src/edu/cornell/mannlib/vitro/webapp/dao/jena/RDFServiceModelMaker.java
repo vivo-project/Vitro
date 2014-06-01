@@ -34,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 
 public class RDFServiceModelMaker implements ModelMaker {
 
@@ -198,17 +199,14 @@ public class RDFServiceModelMaker implements ModelMaker {
         
         Graph bnodeFilteringGraph = new BlankNodeFilteringGraph(model.getGraph());
         Model bnodeFilteringModel = ModelFactory.createModelForGraph(bnodeFilteringGraph);
+        
+        Model specialUnionModel = VitroModelFactory.createUnion(bnodeFilteringModel, bnodeModel);
+		bnodeFilteringModel.register(new BlankNodeStatementListener(bnodeModel));
       
-        BulkUpdateHandler bulkUpdateHandler = model.getGraph().getBulkUpdateHandler();
-        Model unionModel = ModelFactory.createUnion(bnodeFilteringModel, bnodeModel);
-        Graph specialGraph = new SpecialBulkUpdateHandlerGraph(unionModel.getGraph(), bulkUpdateHandler);
-        Model specialUnionModel = ModelFactory.createModelForGraph(specialGraph);
-        bnodeFilteringModel.register(new BlankNodeStatementListener(bnodeModel));        
- 
         return specialUnionModel;
     }
-    
-    public void removeModel(String arg0) {
+
+	public void removeModel(String arg0) {
         Model m = getModel(arg0);
         m.removeAll(null,null,null);
         Model metadataModel = getMetadataModel();

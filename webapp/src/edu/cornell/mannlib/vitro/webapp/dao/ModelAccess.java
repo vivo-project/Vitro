@@ -39,7 +39,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
  * VitroModelSource.openModel(name)
  * VitroModelSource.openModelIfPresent(string)
  * ServletContext.getAttribute("pelletOntModel")
- * VitroJenaModelMaker
  * JenaDataSourceSetupBase.getApplicationDataSource(ctx)
  * JenaDataSourceSetupBase.getStartupDataset()
  * HttpSession.getAttribute("jenaAuditModel")

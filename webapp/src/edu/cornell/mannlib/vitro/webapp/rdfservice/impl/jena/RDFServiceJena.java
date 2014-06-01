@@ -4,20 +4,20 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.lf5.util.StreamUtils;
 
-import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.DataSource;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.query.Query;
@@ -49,11 +49,61 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         
     protected abstract DatasetWrapper getDatasetWrapper();
     
-    public abstract boolean changeSetUpdate(ChangeSet changeSet) throws RDFServiceException;
+    @Override
+	public abstract boolean changeSetUpdate(ChangeSet changeSet) throws RDFServiceException;
      
+    protected void notifyListenersOfPreChangeEvents(ChangeSet changeSet) {
+		for (Object o : changeSet.getPreChangeEvents()) {
+		    this.notifyListenersOfEvent(o);
+		}
+	}
+    
+    protected void insureThatInputStreamsAreResettable(ChangeSet changeSet) throws IOException {
+		for (ModelChange modelChange: changeSet.getModelChanges()) {
+            if (!modelChange.getSerializedModel().markSupported()) {
+                byte[] bytes = IOUtils.toByteArray(modelChange.getSerializedModel());
+                modelChange.setSerializedModel(new ByteArrayInputStream(bytes));
+            }
+            modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
+        }
+	}
+
+    protected void applyChangeSetToModel(ChangeSet changeSet, Dataset dataset) {
+		for (ModelChange modelChange: changeSet.getModelChanges()) {
+			dataset.getLock().enterCriticalSection(Lock.WRITE);
+			try {
+				Model model = (modelChange.getGraphURI() == null) ? 
+						dataset.getDefaultModel() : 
+						dataset.getNamedModel(modelChange.getGraphURI());
+				operateOnModel(model, modelChange, dataset);
+			} finally {
+				dataset.getLock().leaveCriticalSection();
+			}
+		}
+	}  
+
+    protected void notifyListenersOfChanges(ChangeSet changeSet)
+			throws IOException {
+		for (ModelChange modelChange: changeSet.getModelChanges()) {
+			modelChange.getSerializedModel().reset();
+			Model model = ModelFactory.createModelForGraph(
+					new ListeningGraph(modelChange.getGraphURI(), this));
+			operateOnModel(model, modelChange, null);
+		}
+	}
+
+    protected void notifyListenersOfPostChangeEvents(ChangeSet changeSet) {
+		for (Object o : changeSet.getPostChangeEvents()) {
+		    this.notifyListenersOfEvent(o);
+		}
+	}
+
     protected void operateOnModel(Model model, ModelChange modelChange, Dataset dataset) {
         model.enterCriticalSection(Lock.WRITE);
         try {
+			if (log.isDebugEnabled()) {
+				dumpOperation(model, modelChange);
+			}
             if (modelChange.getOperation() == ModelChange.Operation.ADD) {
                 model.read(modelChange.getSerializedModel(), null,
                         getSerializationFormatString(modelChange.getSerializationFormat()));  
@@ -71,7 +121,63 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         }
     }
     
-    private void removeBlankNodesWithSparqlUpdate(Dataset dataset, Model model, String graphURI) {
+	/**
+	 * As a debug statement, log info about the model change operation: add or
+	 * delete, model URI, model class, punctuation count, beginning of the
+	 * string.
+	 */
+	private void dumpOperation(Model model, ModelChange modelChange) {
+		String op = String.valueOf(modelChange.getOperation());
+
+		byte[] changeBytes = new byte[0];
+		try {
+			modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
+			changeBytes = StreamUtils
+					.getBytes(modelChange.getSerializedModel());
+			modelChange.getSerializedModel().reset();
+		} catch (IOException e) {
+			// leave it empty.
+		}
+
+		int puncCount = 0;
+		boolean inUri = false;
+		boolean inQuotes = false;
+		for (byte b : changeBytes) {
+			if (inQuotes) {
+				if (b == '"') {
+					inQuotes = false;
+				}
+			} else if (inUri) {
+				if (b == '>') {
+					inUri = false;
+				}
+			} else {
+				if (b == '"') {
+					inQuotes = true;
+				} else if (b == '<') {
+					inUri = true;
+				} else if ((b == ',') || (b == ';') || (b == '.')) {
+					puncCount++;
+				}
+			}
+		}
+
+		String changeString = new String(changeBytes).replace('\n', ' ');
+
+		String graphUri = modelChange.getGraphURI();
+		int delimHere = Math.max(graphUri.lastIndexOf('#'),
+				graphUri.lastIndexOf('/'));
+		String graphLocalName = graphUri.substring(delimHere + 1);
+
+		String modelClassName = model.getClass().getSimpleName();
+
+		log.debug(String
+				.format(">>>>OPERATION: %3.3s %03dpunc, name='%s', class=%s, start=%.200s",
+						op, puncCount, graphLocalName, modelClassName,
+						changeString));
+	}
+
+	private void removeBlankNodesWithSparqlUpdate(Dataset dataset, Model model, String graphURI) {
                
         List<Statement> blankNodeStatements = new ArrayList<Statement>();
         StmtIterator stmtIt = model.listStatements();
@@ -112,7 +218,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                 QueryExecution qee = QueryExecutionFactory.create(treeFinderQuery, blankNodeModel);
                 try {
                     Model tree = qee.execDescribe();
-                    DataSource ds = DatasetFactory.create();
+                    Dataset ds = DatasetFactory.createMem();
                     if (graphURI == null) {
                         ds.setDefaultModel(dataset.getDefaultModel());
                     } else {
@@ -195,7 +301,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         Query construct = QueryFactory.create(queryBuff.toString());
         // make a plain dataset to force the query to be run in a way that
         // won't overwhelm MySQL with too many joins
-        DataSource ds = DatasetFactory.create();
+        Dataset ds = DatasetFactory.createMem();
         if (graphURI == null) {
             ds.setDefaultModel(dataset.getDefaultModel());
         } else {
@@ -259,15 +365,6 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         return output;
     }
     
-    private String getHexString(Node node) {
-        String label = node.getBlankNodeLabel().replaceAll("\\W", "").toUpperCase();
-        if (label.length() > 7) {
-            return label.substring(label.length() - 7);
-        } else {
-            return label;
-        }
-    }
-    
     private static final boolean WHERE_CLAUSE = true;
     
     private void addStatementPatterns(List<Statement> stmts, StringBuffer patternBuff, boolean whereClause) {
@@ -298,7 +395,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     }
     
     private InputStream getRDFResultStream(String query, boolean construct, 
-            ModelSerializationFormat resultFormat) throws RDFServiceException {
+            ModelSerializationFormat resultFormat) {
         DatasetWrapper dw = getDatasetWrapper();
         try {
             Dataset d = dw.getDataset();
@@ -407,16 +504,12 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 
     @Override
     public void getGraphMetadata() throws RDFServiceException {
+    	// nothing to do
     }
     
     @Override
     public void close() {
         // nothing
-    }
-    
-    @Override
-    public void notifyListeners(Triple triple, ModelChange.Operation operation, String graphURI) {    			
-        super.notifyListeners(triple, operation, graphURI);
     }
     
     protected QueryExecution createQueryExecution(String queryString, Query q, Dataset d) {

@@ -9,6 +9,13 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.message.BasicNameValuePair;
 
 import com.hp.hpl.jena.graph.BulkUpdateHandler;
 import com.hp.hpl.jena.graph.Capabilities;
@@ -16,14 +23,11 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.GraphEventManager;
 import com.hp.hpl.jena.graph.GraphStatisticsHandler;
 import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Reifier;
 import com.hp.hpl.jena.graph.TransactionHandler;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.TripleMatch;
 import com.hp.hpl.jena.graph.impl.GraphWithPerform;
 import com.hp.hpl.jena.graph.impl.SimpleEventManager;
-import com.hp.hpl.jena.graph.query.QueryHandler;
-import com.hp.hpl.jena.graph.query.SimpleQueryHandler;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -39,18 +43,6 @@ import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.SingletonIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.message.BasicNameValuePair;
-
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-
 public class SparqlGraph implements GraphWithPerform {
     
     private String endpointURI;
@@ -61,10 +53,6 @@ public class SparqlGraph implements GraphWithPerform {
     private BulkUpdateHandler bulkUpdateHandler;
     private PrefixMapping prefixMapping = new PrefixMappingImpl();
     private GraphEventManager eventManager;
-    private Reifier reifier = new EmptyReifier(this);
-    private GraphStatisticsHandler graphStatisticsHandler;
-    private TransactionHandler transactionHandler;
-    private QueryHandler queryHandler;
     
     /**
      * Returns a SparqlGraph for the union of named graphs in a remote repository 
@@ -205,6 +193,18 @@ public class SparqlGraph implements GraphWithPerform {
         performDelete(arg0);
     }
 
+	@Override
+	public void clear() {
+		removeAll();
+	}
+
+	@Override
+	public void remove(Node subject, Node predicate, Node object) {
+		for (Triple t: find(subject, predicate, object).toList()) {
+			delete(t);
+		}
+	}
+
     @Override
     public boolean dependsOn(Graph arg0) {
         return false; // who knows?
@@ -261,9 +261,9 @@ public class SparqlGraph implements GraphWithPerform {
     public ExtendedIterator<Triple> find(Node subject, Node predicate, Node object) {
         if (!isVar(subject) && !isVar(predicate)  && !isVar(object)) {
             if (contains(subject, predicate, object)) {
-                return new SingletonIterator(new Triple(subject, predicate, object));
+                return new SingletonIterator<Triple>(new Triple(subject, predicate, object));
             } else {
-                return WrappedIterator.create(Collections.EMPTY_LIST.iterator());
+                return WrappedIterator.create(Collections.<Triple>emptyIterator());
             }
         }
         StringBuffer findQuery = new StringBuffer("SELECT * WHERE { \n");
@@ -336,14 +336,6 @@ public class SparqlGraph implements GraphWithPerform {
     }
 
     @Override
-    public Reifier getReifier() {
-        //if (reifier == null) {
-        //    reifier = new SimpleReifier(this, ReificationStyle.Standard);
-        //}
-        return reifier;
-    }
-
-    @Override
     public GraphStatisticsHandler getStatisticsHandler() {
         return null;
     }
@@ -373,14 +365,6 @@ public class SparqlGraph implements GraphWithPerform {
     }
 
     @Override
-    public QueryHandler queryHandler() {
-        if (queryHandler == null) {
-            queryHandler = new SimpleQueryHandler(this);
-        }
-        return queryHandler;
-    }
-
-    @Override
     public int size() {
         int size = find(null, null, null).toList().size();
         return size;
@@ -388,38 +372,47 @@ public class SparqlGraph implements GraphWithPerform {
     
     private final static Capabilities capabilities = new Capabilities() {
         
-        public boolean addAllowed() {
+        @Override
+		public boolean addAllowed() {
             return false;
         }
         
+        @Override
         public boolean addAllowed(boolean everyTriple) {
             return false;
         }
         
+        @Override
         public boolean canBeEmpty() {
             return true;
         }
         
+        @Override
         public boolean deleteAllowed() {
             return false;
         }
         
+        @Override
         public boolean deleteAllowed(boolean everyTriple) {
             return false;
         }
         
+        @Override
         public boolean findContractSafe() {
             return true;
         }
         
+        @Override
         public boolean handlesLiteralTyping() {
             return true;
         }
         
+        @Override
         public boolean iteratorRemoveAllowed() {
             return false;
         }
         
+        @Override
         public boolean sizeAccurate() {
             return true;
         }
@@ -455,13 +448,11 @@ public class SparqlGraph implements GraphWithPerform {
         
 //        log.info((System.currentTimeMillis() - startTime1) + " to execute via sesame");
         
-        long startTime = System.currentTimeMillis();
         Query askQuery = QueryFactory.create(queryStr);
         QueryExecution qe = QueryExecutionFactory.sparqlService(endpointURI, askQuery);
         try {
             return new ResultSetMem(qe.execSelect());
         } finally {
-            //log.info((System.currentTimeMillis() - startTime) + " to execute via Jena");
             qe.close();
         }
     }
@@ -505,5 +496,4 @@ public class SparqlGraph implements GraphWithPerform {
 //            sbuff.append(hexstr);
         }
     }
-    
 }

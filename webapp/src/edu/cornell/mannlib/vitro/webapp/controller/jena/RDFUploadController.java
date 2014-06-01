@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID.CONFIGURATION;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -36,6 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
@@ -65,7 +68,8 @@ public class RDFUploadController extends JenaIngestController {
 		return true;
 	}
 	
-    public void doPost(HttpServletRequest req,
+    @Override
+	public void doPost(HttpServletRequest req,
             HttpServletResponse response) throws ServletException, IOException {
 		if (!isAuthorizedToDisplayPage(req, response,
 				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION)) {
@@ -249,7 +253,7 @@ public class RDFUploadController extends JenaIngestController {
         String modelName = request.getParameter("modelName");
         String docLoc = request.getParameter("docLoc");
         String languageStr = request.getParameter("language");
-        ModelMaker maker = getVitroJenaModelMaker(request);
+        ModelMaker maker = getModelMaker(request);
         
         if (modelName == null) {
             request.setAttribute("title","Load RDF Data");
@@ -261,7 +265,7 @@ public class RDFUploadController extends JenaIngestController {
             } finally {
                 rdfService.close();
             }
-            String modelType = getModelType(request);
+            ModelMakerID modelType = getModelType(request);
             showModelList(request, maker, modelType);
         } 
         
@@ -279,7 +283,7 @@ public class RDFUploadController extends JenaIngestController {
     }
     
     private RDFService getRDFService(VitroRequest vreq, ModelMaker maker, String modelName) {
-        if (JenaIngestController.isUsingMainStoreForIngest(vreq)) {
+        if (isUsingMainStoreForIngest(vreq)) {
             log.debug("Using main RDFService");
             return RDFServiceUtils.getRDFServiceFactory(
                     getServletContext()).getRDFService();

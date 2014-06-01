@@ -81,7 +81,7 @@ public class JenaCsv2RdfController extends JenaIngestController {
 				    forwardToFileUploadError(ex.getMessage(),request,response);
 				    return;
 				}
-				ModelMaker maker = getVitroJenaModelMaker(request);
+				ModelMaker maker = getModelMaker(request);
 				Boolean csv2rdf = true;
 				JenaIngestUtils utils = new JenaIngestUtils();
 				List<Model> resultList = new ArrayList<Model>();

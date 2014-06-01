@@ -121,8 +121,8 @@ public class SparqlQueryApiExecutorTest extends AbstractTestClass {
 			+ "<http://here.edu/subject> <http://here.edu/predicate> <http://here.edu/object> .\n";
 	private static final String CONSTRUCT_RESULT_TURTLE = "" //
 			+ "@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .\n" //
-			+ "@prefix owl:     <http://www.w3.org/2002/07/owl#> .\n" //
 			+ "@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .\n" //
+			+ "@prefix owl:     <http://www.w3.org/2002/07/owl#> .\n" //
 			+ "@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n" //
 			+ "\n" //
 			+ "<http://here.edu/subject>\n" //
@@ -173,8 +173,8 @@ public class SparqlQueryApiExecutorTest extends AbstractTestClass {
 			+ "              <http://here.edu/object> .\n";
 	private static final String DESCRIBE_RESULT_TURTLE = "" //
 			+ "@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .\n" //
-			+ "@prefix owl:     <http://www.w3.org/2002/07/owl#> .\n" //
 			+ "@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .\n" //
+			+ "@prefix owl:     <http://www.w3.org/2002/07/owl#> .\n" //
 			+ "@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n" //
 			+ "\n" //
 			+ "<http://here.edu/subject>\n" //
@@ -424,7 +424,7 @@ public class SparqlQueryApiExecutorTest extends AbstractTestClass {
 				rdfService, queryString, acceptHeader);
 		executor.executeAndFormat(out);
 
-		assertEquals(message, expected, out.toString().replace("\r", ""));
+		assertEquals(message, expected.replaceAll("\\s+", " "), out.toString().replaceAll("\\s+", " "));
 	}
 
 	private void executeWithInvalidAcceptHeader(String message,

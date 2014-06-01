@@ -1,6 +1,10 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import static edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService.CONFIGURATION;
+
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 
 import javax.servlet.ServletContext;
@@ -25,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.sdb.RDFServiceFactorySDB;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.tdb.RDFServiceFactoryTDB;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sparql.RDFServiceSparql;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
@@ -56,12 +61,22 @@ implements javax.servlet.ServletContextListener {
             //RDFServiceFactory factory = RDFServiceUtils.getRDFServiceFactory(ctx);
             //RDFServiceUtils.setRDFServiceFactory(ctx, new SameAsFilteringRDFServiceFactory(factory));
             
-        } catch (SQLException e) {
+            useTDBForConfigurationModels(ctx);
+            
+        } catch (Exception e) {
             ss.fatal(this, "Exception in RDFServiceSetup", e);
         }        
     }
     
-    private void useEndpoint(String endpointURI, String updateEndpointURI, ServletContext ctx) {
+	private void useTDBForConfigurationModels(ServletContext ctx) throws IOException {
+        String vitroHome = ConfigurationProperties.getBean(ctx).getProperty(
+                "vitro.home") ;
+        String directoryPath = vitroHome + File.separatorChar + "tdbModels";
+		RDFServiceFactory factory = new RDFServiceFactoryTDB(directoryPath);
+        RDFServiceUtils.setRDFServiceFactory(ctx, factory, CONFIGURATION);
+	}
+
+	private void useEndpoint(String endpointURI, String updateEndpointURI, ServletContext ctx) {
     	
     	RDFService rdfService = null;
     	if (updateEndpointURI == null)  {

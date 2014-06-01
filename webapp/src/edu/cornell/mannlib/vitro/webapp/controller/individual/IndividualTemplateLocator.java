@@ -82,7 +82,7 @@ class IndividualTemplateLocator {
                     }
                 }
             }
-            // If still no custom template defined, and inferencing is asynchronous (under RDB), check
+            // If still no custom template defined and inferencing is asynchronous, check
             // the superclasses of the vclass for a custom template specification. 
             SimpleReasoner simpleReasoner = (SimpleReasoner) ctx.getAttribute(SimpleReasoner.class.getName());
             if (customTemplate == null && simpleReasoner != null && simpleReasoner.isABoxReasoningAsynchronous()) { 

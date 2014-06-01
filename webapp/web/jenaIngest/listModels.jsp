@@ -12,12 +12,12 @@
 
 <script type="text/javascript">
 function init(){
-	var infoLine = document.information.info.value;
-	if(infoLine == "RDB models"){
-		document.rdbform.submit.disabled="true";
+	var modelType = document.ingesting.modelType.value;
+	if(modelType == "CONFIGURATION"){
+		document.showConfigurationModelsForm.submit.disabled="true";
 	}
 	else{
-		document.sdbform.submit.disabled="true";
+		document.showContentModelsForm.submit.disabled="true";
 	}
 }
 </script>
@@ -27,26 +27,23 @@ function init(){
     <table>
     <tr>
     <td>
-     <form name="sdbform" action="ingest" method="get">
-        <input type="hidden" name="action" value="sdbModels"/>
+     <form name="showContentModelsForm" action="ingest" method="get">
+        <input type="hidden" name="action" value="contentModels"/>
         <input type="submit" name="submit" value="Main Store Models"/>
     </form>
     </td>
     <td>
-    <form name="rdbform" action="ingest" method="get">
-        <input type="hidden" name="action" value="rdbModels"/>
-        <input type="submit" name="submit" value="RDB Models"/>
+    <form name="showConfigurationModelsForm" action="ingest" method="get">
+        <input type="hidden" name="action" value="configModels"/>
+        <input type="submit" name="submit" value="Configuration Models"/>
     </form>
     </td>
     </tr>
     </table>
-    <form action="ingest" method="get">
+    <form name="ingesting" action="ingest" method="get">
         <input type="hidden" name="action" value="createModel"/>
         <input type="hidden" name="modelType" value="${modelType}"/>
         <input type="submit" name="submit" value="Create Model"/>
-    </form>
-    <form name="information">
-    <input type="hidden" name="info" value="${infoLine}"/>
     </form>
     
             Currently showing <font color="red">${infoLine}</font>

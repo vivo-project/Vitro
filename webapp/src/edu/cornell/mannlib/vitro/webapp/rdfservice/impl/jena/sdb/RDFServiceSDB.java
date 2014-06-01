@@ -2,16 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.sdb;
 
-import java.io.ByteArrayInputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -19,21 +16,16 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
 import com.hp.hpl.jena.sdb.sql.SDBConnection;
-import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.StaticDatasetFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.ListeningGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.RDFServiceJena;
 
 public class RDFServiceSDB extends RDFServiceJena implements RDFService {
@@ -63,8 +55,8 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
             if (staticDatasetFactory != null) {
                 return staticDatasetFactory.getDatasetWrapper();
             }
-            SDBConnection conn = new SDBConnection(ds.getConnection());
-            return new DatasetWrapper(getDataset(conn), conn);
+            SDBConnection sdbConn = new SDBConnection(ds.getConnection());
+            return new DatasetWrapper(getDataset(sdbConn), sdbConn);
         } catch (SQLException sqle) {
             log.error(sqle, sqle);
             throw new RuntimeException(sqle);
@@ -82,93 +74,72 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
             return false;
         }
             
-        SDBConnection conn = null;
-        try {
-            conn = new SDBConnection(getConnection());
-        } catch (SQLException sqle) {
-            log.error(sqle, sqle);
-            throw new RDFServiceException(sqle);
-        }
-        
-        Dataset dataset = getDataset(conn);
-        boolean transaction = conn.getTransactionHandler().transactionsSupported();
+        SDBConnection sdbConn = getSDBConnection();
+        Dataset dataset = getDataset(sdbConn);
         
         try {       
+        	insureThatInputStreamsAreResettable(changeSet);
             
-            if (transaction) {
-                conn.getTransactionHandler().begin();
-            }
-            
-            for (Object o : changeSet.getPreChangeEvents()) {
-                this.notifyListenersOfEvent(o);
-            }
+        	beginTransaction(sdbConn);
 
-            Iterator<ModelChange> csIt = changeSet.getModelChanges().iterator();
-            while (csIt.hasNext()) {
-                ModelChange modelChange = csIt.next();
-                if (!modelChange.getSerializedModel().markSupported()) {
-                    byte[] bytes = IOUtils.toByteArray(modelChange.getSerializedModel());
-                    modelChange.setSerializedModel(new ByteArrayInputStream(bytes));
-                }
-                modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
-                dataset.getLock().enterCriticalSection(Lock.WRITE);
-                try {
-                    Model model = (modelChange.getGraphURI() == null)
-                            ? dataset.getDefaultModel() 
-                            : dataset.getNamedModel(modelChange.getGraphURI());
-                    operateOnModel(model, modelChange, dataset);
-                } finally {
-                    dataset.getLock().leaveCriticalSection();
-                }
-            }
+        	notifyListenersOfPreChangeEvents(changeSet);
+            applyChangeSetToModel(changeSet, dataset);
             
-            if (transaction) {
-                conn.getTransactionHandler().commit();
-            }
+            commitTransaction(sdbConn);
             
-            // notify listeners of triple changes
-            csIt = changeSet.getModelChanges().iterator();
-            while (csIt.hasNext()) {
-                ModelChange modelChange = csIt.next();
-                modelChange.getSerializedModel().reset();
-                Model model = ModelFactory.createModelForGraph(
-                        new ListeningGraph(modelChange.getGraphURI(), this));
-                operateOnModel(model, modelChange, null);
-            }
+            notifyListenersOfChanges(changeSet);
+            notifyListenersOfPostChangeEvents(changeSet);
             
-            for (Object o : changeSet.getPostChangeEvents()) {
-                this.notifyListenersOfEvent(o);
-            }
-            
+            return true;
         } catch (Exception e) {
             log.error(e, e);
-            if (transaction) {
-                conn.getTransactionHandler().abort();
-            }
+            abortTransaction(sdbConn);
             throw new RDFServiceException(e);
         } finally {
-            close(conn);
+            close(sdbConn);
         }
-        
-        return true;
-    }  
+    }
     
-    protected Connection getConnection() throws SQLException {
-        return (conn != null) ? conn : ds.getConnection();
+	private SDBConnection getSDBConnection() throws RDFServiceException  {
+		try {
+			Connection c = (conn != null) ? conn : ds.getConnection();
+			return new SDBConnection(c);
+		} catch (SQLException sqle) {
+			log.error(sqle, sqle);
+			throw new RDFServiceException(sqle);
+		}        
     }
 
-    protected void close(SDBConnection sdbConn) {
+    private void close(SDBConnection sdbConn) {
         if (!sdbConn.getSqlConnection().equals(conn)) {
             sdbConn.close();
         }
     }
     
-    protected Dataset getDataset(SDBConnection conn) {
-        Store store = SDBFactory.connectStore(conn, storeDesc);
+    private Dataset getDataset(SDBConnection sdbConn) {
+        Store store = SDBFactory.connectStore(sdbConn, storeDesc);
         store.getLoader().setUseThreading(false);
         return SDBFactory.connectDataset(store);
     }
     
+	private void beginTransaction(SDBConnection sdbConn) {
+		if (sdbConn.getTransactionHandler().transactionsSupported()) {
+		    sdbConn.getTransactionHandler().begin();
+		}
+	}
+
+	private void commitTransaction(SDBConnection sdbConn) {
+		if (sdbConn.getTransactionHandler().transactionsSupported()) {
+			sdbConn.getTransactionHandler().commit();
+		}
+	}
+	
+	private void abortTransaction(SDBConnection sdbConn) {
+		if (sdbConn.getTransactionHandler().transactionsSupported()) {
+			sdbConn.getTransactionHandler().abort();
+		}
+	}
+	
     private static final Pattern OPTIONAL_PATTERN = Pattern.compile("optional", Pattern.CASE_INSENSITIVE);
     
     private static final Pattern GRAPH_PATTERN = Pattern.compile("graph", Pattern.CASE_INSENSITIVE);

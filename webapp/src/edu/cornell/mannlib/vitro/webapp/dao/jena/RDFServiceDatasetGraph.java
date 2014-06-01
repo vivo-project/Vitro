@@ -48,8 +48,13 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
         getGraphFor(arg0).add(new Triple(arg0.getSubject(), arg0.getPredicate(), arg0.getObject()));
     }
 
+	@Override
+	public void add(Node g, Node s, Node p, Node o) {
+		add(new Quad(g, s, p, o));
+	}
+
     @Override
-    public void addGraph(Node arg0, Graph arg1) {
+    public void addGraph(Node uri, Graph arg1) {
         // TODO Auto-generated method stub
     }
 
@@ -79,6 +84,11 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
         getGraphFor(arg0).delete(new Triple(arg0.getSubject(), arg0.getPredicate(), arg0.getObject()));
     }
 
+	@Override
+	public void delete(Node g, Node s, Node p, Node o) {
+		delete(new Quad(g, s, p, o));
+	}
+    
     @Override
     public void deleteAny(Node arg0, Node arg1, Node arg2, Node arg3) {
         // TODO check this
@@ -99,9 +109,9 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
     public Iterator<Quad> find(Node graph, Node subject, Node predicate, Node object) {
         if (!isVar(subject) && !isVar(predicate)  && !isVar(object) &&!isVar(graph)) {
             if (contains(subject, predicate, object, graph)) {
-                return new SingletonIterator(new Triple(subject, predicate, object));
+                return new SingletonIterator<Quad>(new Quad(subject, predicate, object, graph));
             } else {
-                return WrappedIterator.create(Collections.EMPTY_LIST.iterator());
+                return WrappedIterator.create(Collections.<Quad>emptyIterator());
             }
         }
         StringBuffer findQuery = new StringBuffer("SELECT * WHERE { \n");
@@ -153,7 +163,6 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
 
     @Override
     public Context getContext() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -212,7 +221,5 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
     private boolean isVar(Node node) {
         return (node == null || node.isVariable() || node == Node.ANY);
     }
-    
-
 
 }

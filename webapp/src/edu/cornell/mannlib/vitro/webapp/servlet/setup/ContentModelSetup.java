@@ -13,13 +13,9 @@ import javax.servlet.ServletContextEvent;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.graph.BulkUpdateHandler;
-import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.Lock;
@@ -36,10 +32,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SpecialBulkUpdateHandlerGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
@@ -77,8 +73,8 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         OntModel inferenceABoxModel = createNamedModelFromDataset(dataset, JENA_INF_MODEL);
         OntModel baseTBoxModel = createdMemoryMappedModel(dataset, JENA_TBOX_ASSERTIONS_MODEL, "tbox assertions");
         OntModel inferenceTBoxModel = createdMemoryMappedModel(dataset, JENA_TBOX_INF_MODEL, "tbox inferences");
-        OntModel unionABoxModel = createCombinedBulkUpdatingModel(baseABoxModel, inferenceABoxModel);
-        OntModel unionTBoxModel = createCombinedBulkUpdatingModel(baseTBoxModel, inferenceTBoxModel);
+        OntModel unionABoxModel = VitroModelFactory.createUnion(baseABoxModel, inferenceABoxModel);
+        OntModel unionTBoxModel = VitroModelFactory.createUnion(baseTBoxModel, inferenceTBoxModel);
 
 
         if (isFirstStartup()) {
@@ -92,9 +88,9 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
     	RDFFilesLoader.loadEveryTimeFiles(ctx, "tbox", baseTBoxModel);
         
         log.info("Setting up full models");
-        OntModel baseFullModel = createCombinedBulkUpdatingModel(baseABoxModel, baseTBoxModel);
-        OntModel inferenceFullModel = createCombinedModel(inferenceABoxModel, inferenceTBoxModel);
-        OntModel unionFullModel = ModelFactory.createOntologyModel(DB_ONT_MODEL_SPEC, dataset.getDefaultModel());
+        OntModel baseFullModel = VitroModelFactory.createUnion(baseABoxModel, baseTBoxModel);
+        OntModel inferenceFullModel = VitroModelFactory.createUnion(inferenceABoxModel, inferenceTBoxModel);
+        OntModel unionFullModel = VitroModelFactory.createOntologyModel(dataset.getDefaultModel());
 
         models.setOntModel(ModelID.APPLICATION_METADATA, applicationMetadataModel);
 
@@ -130,13 +126,13 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
     }
 
 	private OntModel createNamedModelFromDataset(Dataset dataset, String name) {
-    	return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, dataset.getNamedModel(name));
+    	return VitroModelFactory.createOntologyModel(dataset.getNamedModel(name));
     }
     
 	private OntModel createdMemoryMappedModel(Dataset dataset, String name, String label) {
 		try {
 			Model dbModel = dataset.getNamedModel(name);
-			OntModel memoryModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
+			OntModel memoryModel = VitroModelFactory.createOntologyModel();
 			
 			if (dbModel != null) {
 			    long begin = System.currentTimeMillis();
@@ -149,20 +145,6 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         } catch (Throwable e) {
             throw new RuntimeException("Unable to load " + label + " from DB", e);
         }
-	}
-
-	private OntModel createCombinedModel(OntModel oneModel, OntModel otherModel) {
-        return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, 
-        		ModelFactory.createUnion(oneModel, otherModel));
-	}
-
-	private OntModel createCombinedBulkUpdatingModel(OntModel baseModel,
-			OntModel otherModel) {
-		BulkUpdateHandler bulkUpdateHandler = baseModel.getGraph().getBulkUpdateHandler();
-		Graph unionGraph = ModelFactory.createUnion(baseModel, otherModel).getGraph();
-		Model unionModel = ModelFactory.createModelForGraph(
-				new SpecialBulkUpdateHandlerGraph(unionGraph, bulkUpdateHandler));
-		return ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC, unionModel);
 	}
 
 	private long secondsSince(long startTime) {
@@ -180,7 +162,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 	 */
 	private void initializeApplicationMetadata(ServletContext ctx,
 			OntModel applicationMetadataModel) {
-		OntModel temporaryAMModel = ModelFactory.createOntologyModel(MEM_ONT_MODEL_SPEC);
+		OntModel temporaryAMModel = VitroModelFactory.createOntologyModel();
     	RDFFilesLoader.loadFirstTimeFiles(ctx, "applicationMetadata", temporaryAMModel, true);
     	setPortalUriOnFirstTime(temporaryAMModel, ctx);
     	applicationMetadataModel.add(temporaryAMModel);
