@@ -94,7 +94,6 @@ public class JenaIngestController extends BaseEditController {
     private static final String RENAME_BNODES_JSP = "/jenaIngest/renameBNodes.jsp";
     private static final String RENAME_BNODES_URI_SELECT_JSP = "/jenaIngest/renameBNodesURISelect.jsp";
     private static final String SMUSH_JSP = "/jenaIngest/smushSingleModel.jsp";
-    private static final String CONNECT_DB_JSP = "/jenaIngest/connectDB.jsp";
     private static final String CSV2RDF_JSP = "/jenaIngest/csv2rdf.jsp";
     private static final String PROCESS_STRINGS_JSP = "/jenaIngest/processStrings.jsp";
     private static final String SUBTRACT_MODELS_JSP = "/jenaIngest/subtractModels.jsp";
@@ -158,8 +157,6 @@ public class JenaIngestController extends BaseEditController {
             processRenameBNodesURISelectRequest(vreq, maker);
         } else if("smushSingleModel".equals(actionStr)) {
             processSmushSingleModelRequest(vreq);
-        } else if("connectDB".equals(actionStr)) {
-            processConnectDBRequest(vreq);
         } else if("csv2rdf".equals(actionStr)) {
             processCsv2rdfRequest(vreq);
         } else if("processStrings".equals(actionStr)) {
@@ -398,29 +395,6 @@ public class JenaIngestController extends BaseEditController {
         } else {
             vreq.setAttribute("title","Smush Resources");
             vreq.setAttribute("bodyJsp",SMUSH_JSP);
-        }
-    }
-    
-    private void processConnectDBRequest(VitroRequest vreq) {
-        String jdbcUrl = vreq.getParameter("jdbcUrl");
-        String tripleStore = vreq.getParameter("tripleStore");
-        if (jdbcUrl != null) {
-            doConnectDB(vreq);
-            if ("SDB".equals(tripleStore)) {
-                vreq.setAttribute("modelType", "sdb");
-                vreq.setAttribute("infoLine", "SDB models");
-            } else {
-                vreq.setAttribute("modelType", "rdb");
-                vreq.setAttribute("infoLine", "RDB models");
-            }
-            vreq.setAttribute("title","Ingest Menu");
-            vreq.setAttribute("bodyJsp",INGEST_MENU_JSP);
-        } else {
-            List<String> dbTypes = DatabaseType.allNames();
-            Collections.sort(dbTypes, new CollationSort(vreq));
-            vreq.setAttribute("dbTypes", dbTypes);
-            vreq.setAttribute("title", "Connect Jena Database");
-            vreq.setAttribute("bodyJsp",CONNECT_DB_JSP);
         }
     }
     
@@ -914,15 +888,6 @@ public class JenaIngestController extends BaseEditController {
             destination.leaveCriticalSection();
         }
         return tempModel.size();     
-    }
-    
-    public void doConnectDB(VitroRequest vreq) {
-        String tripleStore = vreq.getParameter("tripleStore");
-        if("SDB".equals(tripleStore)) {
-            vreq.getSession().setAttribute(WHICH_MODEL_MAKER,CONTENT);
-        } else {
-            vreq.getSession().setAttribute(WHICH_MODEL_MAKER,CONFIGURATION);
-        }
     }
     
     public void doSubtractModels(VitroRequest vreq) {
