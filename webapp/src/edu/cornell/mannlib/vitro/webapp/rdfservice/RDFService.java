@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.rdfservice;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 /**
@@ -85,6 +86,21 @@ public interface RDFService {
 	 * 
 	 */
 	public InputStream sparqlDescribeQuery(String query, RDFService.ModelSerializationFormat resultFormat) throws RDFServiceException;
+	
+	/**
+	 * Performs a SPARQL select query against the knowledge base. The query may have
+	 * an embedded graph identifier. If the query does not contain a graph identifier
+	 * the query is executed against the union of all named and unnamed graphs in the 
+	 * store.
+	 * 
+	 * Preferred for streaming because it avoids in-memory buffering.
+	 * 
+	 * @param query - the SPARQL query to be executed against the RDF store
+	 * @param resultFormat - format for the result of the Select query
+	 * @param outputStream - receives the result of the query 
+	 * 
+	 */
+	public void sparqlSelectQuery(String query, RDFService.ResultFormat resultFormat, OutputStream outputStream) throws RDFServiceException;
 	
 	/**
 	 * Performs a SPARQL select query against the knowledge base. The query may have

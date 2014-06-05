@@ -6,13 +6,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.lf5.util.StreamUtils;
@@ -33,6 +33,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.sdb.SDB;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
@@ -432,41 +433,54 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         return getRDFResultStream(query, DESCRIBE, resultFormat);
     }
 
+	@Override
+	public void sparqlSelectQuery(String query, ResultFormat resultFormat,
+			OutputStream outputStream) throws RDFServiceException {
+		DatasetWrapper dw = getDatasetWrapper();
+		try {
+			Dataset d = dw.getDataset();
+			Query q = createQuery(query);
+			QueryExecution qe = createQueryExecution(query, q, d);
+			// These properties only help for SDB, but shouldn't hurt for TDB.
+			qe.getContext().set(SDB.jdbcFetchSize, Integer.MIN_VALUE);
+			qe.getContext().set(SDB.jdbcStream, true);
+			qe.getContext().set(SDB.streamGraphAPI, true);
+			try {
+				ResultSet resultSet = qe.execSelect();
+				switch (resultFormat) {
+				case CSV:
+					ResultSetFormatter.outputAsCSV(outputStream, resultSet);
+					break;
+				case TEXT:
+					ResultSetFormatter.out(outputStream, resultSet);
+					break;
+				case JSON:
+					ResultSetFormatter.outputAsJSON(outputStream, resultSet);
+					break;
+				case XML:
+					ResultSetFormatter.outputAsXML(outputStream, resultSet);
+					break;
+				default:
+					throw new RDFServiceException("unrecognized result format");
+				}
+			} finally {
+				qe.close();
+			}
+		} finally {
+			dw.close();
+		}
+
+	}
+
+	/**
+	 * TODO Is there a way to accomplish this without buffering the entire result?
+	 */
     @Override
     public InputStream sparqlSelectQuery(String query, ResultFormat resultFormat)
             throws RDFServiceException {
-        DatasetWrapper dw = getDatasetWrapper();
-        try {
-            Dataset d = dw.getDataset();
-            Query q = createQuery(query);
-            QueryExecution qe = createQueryExecution(query, q, d);
-            try {
-                ResultSet resultSet = qe.execSelect();
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
-                switch (resultFormat) {
-                   case CSV:
-                      ResultSetFormatter.outputAsCSV(outputStream,resultSet);
-                      break;
-                   case TEXT:
-                      ResultSetFormatter.out(outputStream,resultSet);
-                      break;
-                   case JSON:
-                      ResultSetFormatter.outputAsJSON(outputStream, resultSet);
-                      break;
-                   case XML:
-                      ResultSetFormatter.outputAsXML(outputStream, resultSet);
-                      break;
-                   default: 
-                      throw new RDFServiceException("unrecognized result format");
-                }              
-                InputStream result = new ByteArrayInputStream(outputStream.toByteArray());
-                return result;
-            } finally {
-                qe.close();
-            }
-        } finally {
-            dw.close();
-        }
+    	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    	sparqlSelectQuery(query, resultFormat, outputStream);
+    	return new ByteArrayInputStream(outputStream.toByteArray());
     }
 
     @Override

@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -262,6 +263,20 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		return result;
 	}
 
+	/**
+	 * TODO rewrite the query to use this form instead - avoid one level of
+	 * buffering.
+	 */
+	@Override
+	public void sparqlSelectQuery(String query, ResultFormat resultFormat,
+			OutputStream outputStream) throws RDFServiceException {
+		try (InputStream input = sparqlSelectQuery(query, resultFormat)) {
+			IOUtils.copy(input, outputStream);
+		} catch (IOException e) {
+			throw new RDFServiceException(e);
+		}
+	}
+	
 	/**
 	 * Performs a SPARQL select query against the knowledge base. The query may have
 	 * an embedded graph identifier.

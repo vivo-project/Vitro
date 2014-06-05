@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
@@ -51,6 +52,13 @@ public class LoggingRDFService implements RDFService {
 		}
 	}
 
+	@Override
+	public void sparqlSelectQuery(String query, ResultFormat resultFormat,
+			OutputStream outputStream) throws RDFServiceException {
+		innerService.sparqlSelectQuery(query, resultFormat,
+				outputStream);
+	}
+	
 	@Override
 	public InputStream sparqlSelectQuery(String query, ResultFormat resultFormat)
 			throws RDFServiceException {
