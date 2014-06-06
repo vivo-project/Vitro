@@ -3,31 +3,66 @@
 package edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore;
 
 import static edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.PARAMETER_FORMAT;
+import static edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.PARAMETER_PURGE;
 import static edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.PARAMETER_SOURCE_FILE;
+import static edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.PARAMETER_WHICH;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.BadRequestException;
 import edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.RestoreFormat;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService;
 
 /**
- * TODO
- * In progress.
+ * Load from a dump file of NQuads, or something equivalent.
+ * 
+ * We could process it all a line at a time, except for the blank nodes. If
+ * there are two references to the same blank node, they must be processed in
+ * the same method call to the RDFService.
+ * 
+ * So, process each line as it comes in, unless it contains a blank node. Lines
+ * with blank nodes get put into buckets, with one bucket for each model (and
+ * one for the default model). At the end, we'll empty each of the buckets.
+ * 
+ * And if they ask to purge the models before restoring, do that.
  */
 public class RestoreModelsAction extends AbstractDumpRestoreAction {
+	private static final Log log = LogFactory.getLog(RestoreModelsAction.class);
+
+	private static final String DEFAULT_GRAPH_URI = "__default__";
 
 	private final FileItem sourceFile;
 	private final RestoreFormat format;
+	private final WhichService which;
+	private final boolean purge;
+	private final TripleBuckets buckets = new TripleBuckets();
 
 	RestoreModelsAction(HttpServletRequest req, HttpServletResponse resp)
 			throws BadRequestException {
@@ -35,6 +70,9 @@ public class RestoreModelsAction extends AbstractDumpRestoreAction {
 		this.sourceFile = getFileItem(PARAMETER_SOURCE_FILE);
 		this.format = getEnumFromParameter(RestoreFormat.class,
 				PARAMETER_FORMAT);
+		this.which = getEnumFromParameter(WhichService.class, PARAMETER_WHICH);
+		this.purge = null != req.getParameter(PARAMETER_PURGE);
+		;
 	}
 
 	private FileItem getFileItem(String key) throws BadRequestException {
@@ -46,22 +84,99 @@ public class RestoreModelsAction extends AbstractDumpRestoreAction {
 		return fileItem;
 	}
 
-	long restoreModels() throws IOException {
+	long restoreModels() throws IOException, RDFServiceException {
+		purgeIfRequested();
+		return doTheRestore();
+	}
+
+	private void purgeIfRequested() throws RDFServiceException {
+		if (!purge) {
+			return;
+		}
+
+		RDFService rdfService = getRdfService(which);
+		RDFServiceDataset dataset = new RDFServiceDataset(rdfService);
+		for (String graphUri : rdfService.getGraphURIs()) {
+			Model m = dataset.getNamedModel(graphUri);
+			m.removeAll();
+		}
+	}
+
+	private long doTheRestore() throws IOException, RDFServiceException {
 		long lineCount = 0;
 		try (InputStream is = sourceFile.getInputStream();
-				Reader isr = new InputStreamReader(is, "UTF-8");
-				BufferedReader br = new BufferedReader(isr)) {
-			String line;
-			while (null != (line = br.readLine())) {
-				processLine(line);
+				DumpParser p = format.getParser(is)) {
+			for (DumpQuad line : p) {
+				bucketize(line);
 				lineCount++;
 			}
+			emptyBuckets();
 		}
 		return lineCount;
 	}
 
-	private void processLine(String line) {
-		System.out.println("TOTALLY BOGUS RESTORE");
+	private void bucketize(DumpQuad quad) throws IOException,
+			RDFServiceException {
+		DumpTriple triple = quad.getTriple();
+		if (triple.getS().isBlank() || triple.getO().isBlank()) {
+			buckets.add(quad.getG().getValue(), triple);
+		} else {
+			processTriples(quad.getG().getValue(),
+					Collections.singleton(triple));
+		}
 	}
 
+	private void emptyBuckets() throws IOException, RDFServiceException {
+		for (String key : buckets.getKeys()) {
+			processTriples(key, buckets.getTriples(key));
+		}
+	}
+
+	private void processTriples(String graphUri, Collection<DumpTriple> triples)
+			throws IOException, RDFServiceException {
+		if (graphUri.equals(DEFAULT_GRAPH_URI)) {
+			graphUri = null;
+		}
+		RDFService rdfService = getRdfService(which);
+		ChangeSet change = rdfService.manufactureChangeSet();
+		change.addAddition(serialize(triples),
+				ModelSerializationFormat.NTRIPLE, graphUri);
+
+		rdfService.changeSetUpdate(change);
+	}
+
+	private InputStream serialize(Collection<DumpTriple> triples)
+			throws IOException {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Writer w = new OutputStreamWriter(out, "UTF-8");
+		for (DumpTriple triple : triples) {
+			w.write(triple.toNtriples());
+		}
+		w.close();
+		return new ByteArrayInputStream(out.toByteArray());
+	}
+
+	private static class TripleBuckets {
+		private final Map<String, List<DumpTriple>> map = new HashMap<>();
+
+		public void add(String value, DumpTriple triple) {
+			String key = (value == null) ? DEFAULT_GRAPH_URI : value;
+			if (!map.containsKey(key)) {
+				map.put(key, new ArrayList<DumpTriple>());
+			}
+			map.get(key).add(triple);
+		}
+
+		public Set<String> getKeys() {
+			return map.keySet();
+		}
+
+		public List<DumpTriple> getTriples(String key) {
+			if (map.containsKey(key)) {
+				return map.get(key);
+			} else {
+				return Collections.emptyList();
+			}
+		}
+	}
 }

@@ -69,7 +69,7 @@
     </section>
 </#if>
 
-<form action="${restoreUrl}" method="post">
+<form action="${restoreUrl}" enctype="multipart/form-data" method="post">
     <table>
         <tr>
             <td>Select models</td>
@@ -96,6 +96,14 @@
             </td>
             <td>
                 <input type="submit" value="Restore" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <label>
+                    <input type="checkbox" value="purge" name="purge" />
+                    Purge the models before restoring.
+                </label>
             </td>
         </tr>
     </table>

@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 
 /**
  * Allow the user to dump the knowledge base from either RDFService, or restore
@@ -43,6 +45,7 @@ public class DumpRestoreController extends FreemarkerHttpServlet {
 	static final String PARAMETER_WHICH = "which";
 	static final String PARAMETER_FORMAT = "format";
 	static final String PARAMETER_SOURCE_FILE = "sourceFile";
+	static final String PARAMETER_PURGE = "purge";
 	static final String ATTRIBUTE_TRIPLE_COUNT = "tripleCount";
 
 	private static final String TEMPLATE_NAME = "datatools-dumpRestore.ftl";
@@ -53,7 +56,8 @@ public class DumpRestoreController extends FreemarkerHttpServlet {
 	 */
 	@Override
 	public long maximumMultipartFileSize() {
-		return 100L * 1024L * 1024L * 1024L; // allow really big uploads.
+		long gigabyte = 1024L * 1024L * 1024L;
+		return 100L * gigabyte; // permit really big uploads.
 	}
 
 	@Override
@@ -94,9 +98,8 @@ public class DumpRestoreController extends FreemarkerHttpServlet {
 			} else {
 				resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 			}
-		} catch (BadRequestException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (BadRequestException | RDFServiceException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -164,7 +167,14 @@ public class DumpRestoreController extends FreemarkerHttpServlet {
 	 * The formats that we will accept on a restore request.
 	 */
 	enum RestoreFormat {
-		NQUADS
+		NQUADS {
+			@Override
+			public DumpParser getParser(InputStream is) throws IOException {
+				return new NquadsParser(is);
+			}
+		};
+
+		public abstract DumpParser getParser(InputStream is) throws IOException;
 	}
 
 }
