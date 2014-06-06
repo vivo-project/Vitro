@@ -75,9 +75,10 @@ public class JsonToNquads extends OutputStream {
 		String text = buffer.toString("UTF-8");
 		boolean inQuotes = false;
 		int braceLevel = 0;
+		char previous = 0;
 		for (char c : text.toCharArray()) {
 			if (inQuotes) {
-				if (c == '"') {
+				if ((c == '"') && (previous != '\\')) {
 					inQuotes = false;
 				}
 			} else {
@@ -89,6 +90,7 @@ public class JsonToNquads extends OutputStream {
 					braceLevel--;
 				}
 			}
+			previous = c;
 		}
 		return (braceLevel == 0) && (text.endsWith(",") || text.endsWith("]"));
 	}
