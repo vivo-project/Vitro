@@ -62,7 +62,8 @@ public class RestoreModelsAction extends AbstractDumpRestoreAction {
 	private final RestoreFormat format;
 	private final WhichService which;
 	private final boolean purge;
-	private final TripleBuckets buckets = new TripleBuckets();
+	private final SelfLimitingTripleBuckets bnodeBuckets;
+	private final SelfLimitingTripleBuckets easyBuckets;
 
 	RestoreModelsAction(HttpServletRequest req, HttpServletResponse resp)
 			throws BadRequestException {
@@ -72,7 +73,9 @@ public class RestoreModelsAction extends AbstractDumpRestoreAction {
 				PARAMETER_FORMAT);
 		this.which = getEnumFromParameter(WhichService.class, PARAMETER_WHICH);
 		this.purge = null != req.getParameter(PARAMETER_PURGE);
-		;
+
+		this.bnodeBuckets = new SelfLimitingTripleBuckets(this, 1000000);
+		this.easyBuckets = new SelfLimitingTripleBuckets(this, 10000);
 	}
 
 	private FileItem getFileItem(String key) throws BadRequestException {
@@ -119,16 +122,18 @@ public class RestoreModelsAction extends AbstractDumpRestoreAction {
 			RDFServiceException {
 		DumpTriple triple = quad.getTriple();
 		if (triple.getS().isBlank() || triple.getO().isBlank()) {
-			buckets.add(quad.getG().getValue(), triple);
+			bnodeBuckets.add(quad.getG().getValue(), triple);
 		} else {
-			processTriples(quad.getG().getValue(),
-					Collections.singleton(triple));
+			easyBuckets.add(quad.getG().getValue(), triple);
 		}
 	}
 
 	private void emptyBuckets() throws IOException, RDFServiceException {
-		for (String key : buckets.getKeys()) {
-			processTriples(key, buckets.getTriples(key));
+		for (String key : easyBuckets.getKeys()) {
+			processTriples(key, easyBuckets.getTriples(key));
+		}
+		for (String key : bnodeBuckets.getKeys()) {
+			processTriples(key, bnodeBuckets.getTriples(key));
 		}
 	}
 
@@ -156,15 +161,28 @@ public class RestoreModelsAction extends AbstractDumpRestoreAction {
 		return new ByteArrayInputStream(out.toByteArray());
 	}
 
-	private static class TripleBuckets {
+	private static class SelfLimitingTripleBuckets {
+		private final RestoreModelsAction parent;
+		private final int sizeLimit;
 		private final Map<String, List<DumpTriple>> map = new HashMap<>();
 
-		public void add(String value, DumpTriple triple) {
-			String key = (value == null) ? DEFAULT_GRAPH_URI : value;
+		public SelfLimitingTripleBuckets(RestoreModelsAction parent,
+				int sizeLimit) {
+			this.parent = parent;
+			this.sizeLimit = sizeLimit;
+		}
+
+		public void add(String key, DumpTriple triple) throws IOException,
+				RDFServiceException {
+			key = nonNull(key, DEFAULT_GRAPH_URI);
 			if (!map.containsKey(key)) {
 				map.put(key, new ArrayList<DumpTriple>());
 			}
 			map.get(key).add(triple);
+
+			if (map.get(key).size() > sizeLimit) {
+				parent.processTriples(key, map.remove(key));
+			}
 		}
 
 		public Set<String> getKeys() {
@@ -172,11 +190,17 @@ public class RestoreModelsAction extends AbstractDumpRestoreAction {
 		}
 
 		public List<DumpTriple> getTriples(String key) {
+			key = nonNull(key, DEFAULT_GRAPH_URI);
 			if (map.containsKey(key)) {
 				return map.get(key);
 			} else {
 				return Collections.emptyList();
 			}
 		}
+
+		private String nonNull(String value, String defaultValue) {
+			return (value == null) ? defaultValue : value;
+		}
 	}
+
 }
