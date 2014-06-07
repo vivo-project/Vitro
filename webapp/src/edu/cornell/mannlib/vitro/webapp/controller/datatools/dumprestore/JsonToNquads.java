@@ -30,9 +30,11 @@ public class JsonToNquads extends OutputStream {
 	private final ByteArrayOutputStream header = new ByteArrayOutputStream();
 
 	private boolean headerIsComplete;
+	private long recordCount;
 
 	public JsonToNquads(OutputStream out) throws IOException {
 		this.writer = new OutputStreamWriter(out, "UTF-8");
+		log.info("Dump beginning.");
 	}
 
 	@Override
@@ -43,6 +45,7 @@ public class JsonToNquads extends OutputStream {
 	@Override
 	public void close() throws IOException {
 		writer.close();
+		log.info("Dump is complete: " + recordCount + " records.");
 		log.debug("Left over in the buffer: '" + buffer + "'");
 	}
 
@@ -111,6 +114,11 @@ public class JsonToNquads extends OutputStream {
 			} else {
 				writer.write(String.format("%s %s %s %s .\n", s.toNquad(),
 						p.toNquad(), o.toNquad(), g.toNquad()));
+			}
+
+			recordCount++;
+			if (recordCount % 10000 == 0) {
+				log.info("dumped " + recordCount + " records.");
 			}
 		} catch (Exception e) {
 			log.error("Failed to parse record: '" + text + "'", e);

@@ -65,6 +65,8 @@ public class RestoreModelsAction extends AbstractDumpRestoreAction {
 	private final SelfLimitingTripleBuckets bnodeBuckets;
 	private final SelfLimitingTripleBuckets easyBuckets;
 
+	private long tripleCount;
+
 	RestoreModelsAction(HttpServletRequest req, HttpServletResponse resp)
 			throws BadRequestException {
 		super(req);
@@ -97,24 +99,32 @@ public class RestoreModelsAction extends AbstractDumpRestoreAction {
 			return;
 		}
 
+		log.info("Purging the " + which + " models.");
 		RDFService rdfService = getRdfService(which);
 		RDFServiceDataset dataset = new RDFServiceDataset(rdfService);
 		for (String graphUri : rdfService.getGraphURIs()) {
 			Model m = dataset.getNamedModel(graphUri);
+			log.info("Remove " + m.size() + " triples from " + graphUri);
 			m.removeAll();
 		}
+		log.info("Purge is complete.");
 	}
 
 	private long doTheRestore() throws IOException, RDFServiceException {
+		log.info("Restoring the " + which + " models.");
 		long lineCount = 0;
 		try (InputStream is = sourceFile.getInputStream();
 				DumpParser p = format.getParser(is)) {
 			for (DumpQuad line : p) {
 				bucketize(line);
 				lineCount++;
+				if (lineCount % 10000 == 0) {
+					log.info("read " + lineCount + " lines.");
+				}
 			}
 			emptyBuckets();
 		}
+		log.info("Restore is complete.");
 		return lineCount;
 	}
 
@@ -148,6 +158,9 @@ public class RestoreModelsAction extends AbstractDumpRestoreAction {
 				ModelSerializationFormat.NTRIPLE, graphUri);
 
 		rdfService.changeSetUpdate(change);
+		
+		tripleCount += triples.size();
+		log.info("processed " + tripleCount  +" triples.");
 	}
 
 	private InputStream serialize(Collection<DumpTriple> triples)
