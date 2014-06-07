@@ -478,12 +478,41 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     @Override
     public InputStream sparqlSelectQuery(String query, ResultFormat resultFormat)
             throws RDFServiceException {
-    	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    	sparqlSelectQuery(query, resultFormat, outputStream);
-    	return new ByteArrayInputStream(outputStream.toByteArray());
+        DatasetWrapper dw = getDatasetWrapper();
+        try {
+            Dataset d = dw.getDataset();
+            Query q = createQuery(query);
+            QueryExecution qe = createQueryExecution(query, q, d);
+            try {
+                ResultSet resultSet = qe.execSelect();
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
+                switch (resultFormat) {
+                   case CSV:
+                      ResultSetFormatter.outputAsCSV(outputStream,resultSet);
+                      break;
+                   case TEXT:
+                      ResultSetFormatter.out(outputStream,resultSet);
+                      break;
+                   case JSON:
+                      ResultSetFormatter.outputAsJSON(outputStream, resultSet);
+                      break;
+                   case XML:
+                      ResultSetFormatter.outputAsXML(outputStream, resultSet);
+                      break;
+                   default: 
+                      throw new RDFServiceException("unrecognized result format");
+                }              
+                InputStream result = new ByteArrayInputStream(outputStream.toByteArray());
+                return result;
+            } finally {
+                qe.close();
+            }
+        } finally {
+            dw.close();
+        }
     }
 
-    @Override
+     @Override
     public boolean sparqlAskQuery(String query) throws RDFServiceException {
         DatasetWrapper dw = getDatasetWrapper();
         try {
