@@ -22,9 +22,6 @@
             <#if dataTools.sparqlQueryBuilder?has_content>
                 <li role="listitem"><a href="${dataTools.sparqlQueryBuilder}" title="${i18n().sparql_query_builder}">${i18n().sparql_query_builder}</a></li>
             </#if>     
-            <#if dataTools.dumpRestore?has_content>
-                <li role="listitem"><a href="${dataTools.dumpRestore}" title="${i18n().dump_restore}">${i18n().dump_restore}</a></li>
-            </#if>     
         </ul>
     </section>
 </#if>

@@ -65,6 +65,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID;
@@ -180,6 +181,9 @@ public class JenaIngestController extends BaseEditController {
         } else if("mergeResult".equals(actionStr)){
             processMergeResultRequest(vreq, response);
             return;
+        } else if ("dumpRestore".equals(actionStr)) {
+        	processDumpRestore(vreq, response);
+        	return;
         }
         
         else {
@@ -1175,7 +1179,12 @@ public class JenaIngestController extends BaseEditController {
         vreq.setAttribute("bodyJsp",LIST_MODELS_JSP);
     }
 
-    private class CollationSort implements Comparator<String> {
+	private void processDumpRestore(VitroRequest vreq,
+			HttpServletResponse response) throws ServletException, IOException {
+		vreq.getRequestDispatcher("/dumpRestore").forward(vreq, response);
+	}
+	
+	private class CollationSort implements Comparator<String> {
         
         Collator collator;
         
