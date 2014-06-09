@@ -147,10 +147,9 @@ public class ConfigurationPropertiesSmokeTests implements
 		connectionProps.put("user", username);
 		connectionProps.put("password", password);
 
-		Connection conn = null;
-		try {
-			conn = DriverManager.getConnection(url, connectionProps);
-			closeConnection(conn);
+		try (Connection conn = DriverManager
+				.getConnection(url, connectionProps)) {
+			// Just open the connection and close it.
 		} catch (SQLException e) {
 			ss.fatal(this, "Can't connect to the database: " + PROPERTY_DB_URL
 					+ "='" + url + "', " + PROPERTY_DB_USERNAME + "='"
@@ -167,26 +166,21 @@ public class ConfigurationPropertiesSmokeTests implements
 			Properties connectionProps, StartupStatus ss, String dbType) {
 		String testString = "ABC\u00CE\u0123";
 
-		Connection conn = null;
-		Statement stmt = null;
-		PreparedStatement pstmt = null;
-		try {
-			// Get the connection.
-			conn = DriverManager.getConnection(url, connectionProps);
+		try (Connection conn = DriverManager
+				.getConnection(url, connectionProps);
+				Statement stmt = conn.createStatement()) {
 
 			// Create the temporary table.
-			stmt = conn.createStatement();
 			stmt.executeUpdate("CREATE TEMPORARY TABLE smoke_test (contents varchar(100))");
 
 			// Write the test string, encoding in UTF-8 on the way in.
-			try {
-				pstmt = conn
-						.prepareStatement("INSERT INTO smoke_test values ( ? )");
+			try (PreparedStatement pstmt = conn
+					.prepareStatement("INSERT INTO smoke_test values ( ? )")) {
 				pstmt.setBytes(1, testString.getBytes("UTF-8"));
+				pstmt.executeUpdate();
 			} catch (UnsupportedEncodingException e1) {
 				e1.printStackTrace();
 			}
-			pstmt.executeUpdate();
 
 			// Read it back as a String. Does the database decode it properly?
 			ResultSet rs = stmt.executeQuery("SELECT * FROM smoke_test");
@@ -213,10 +207,6 @@ public class ConfigurationPropertiesSmokeTests implements
 			}
 		} catch (SQLException e) {
 			ss.fatal(this, "Failed to check handling of Unicode characters", e);
-		} finally {
-			closeStatement(pstmt);
-			closeStatement(stmt);
-			closeConnection(conn);
 		}
 	}
 
@@ -229,32 +219,6 @@ public class ConfigurationPropertiesSmokeTests implements
 			u.append(String.format("\\u%04x", c & 0x0000FFFF));
 		}
 		return u.toString();
-	}
-
-	/**
-	 * Close the statement, catching any exception.
-	 */
-	private void closeStatement(Statement stmt) {
-		if (stmt != null) {
-			try {
-				stmt.close();
-			} catch (SQLException e) {
-				log.error("Failed to close SQL statement", e);
-			}
-		}
-	}
-
-	/**
-	 * Close the connection, catching any exception.
-	 */
-	private void closeConnection(Connection conn) {
-		if (conn != null) {
-			try {
-				conn.close();
-			} catch (SQLException e) {
-				log.error("Failed to close database connection", e);
-			}
-		}
 	}
 
 	/**
