@@ -67,8 +67,10 @@ public class KnowledgeBaseUpdater {
         log.info("Performing any necessary data migration");
         logger.log("Started knowledge base migration");
 		
+        boolean changesPerformed = false;
+        
 		try {
-		     performUpdate(servletContext);
+		     changesPerformed = performUpdate(servletContext);
 		} catch (Exception e) {
 			 logger.logError(e.getMessage());
 			 log.error(e,e);
@@ -85,12 +87,20 @@ public class KnowledgeBaseUpdater {
 		long elapsedSecs = (System.currentTimeMillis() - startTime)/1000;		
 		log.info("Finished checking knowledge base in " + elapsedSecs + " second" + (elapsedSecs != 1 ? "s" : ""));
 		
-		return record.hasRecordedChanges();
+		// The following was removed because it forced a recompute even if only
+		// annotation values changed:
+		// return record.hasRecordedChanges();
+		
+		return changesPerformed;
 	}
 	
-	private void performUpdate(ServletContext servletContext) throws Exception {
+	// returns true if ontology changes were found
+	private boolean performUpdate(ServletContext servletContext) throws Exception {
 		
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
+		if (rawChanges.isEmpty()) {
+		    return false;
+		}
 		
 		AtomicOntologyChangeLists changes = new AtomicOntologyChangeLists(rawChanges,settings.getNewTBoxModel(),settings.getOldTBoxModel());
 	        	
@@ -121,9 +131,10 @@ public class KnowledgeBaseUpdater {
                 updateTBoxAnnotations();
             } catch (Exception e) {
                 log.error(e,e);
-            }
-            
+            }          
         }
+        
+        return true;
 
 	}
 	
