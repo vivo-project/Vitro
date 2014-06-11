@@ -97,12 +97,12 @@ public enum Key {
 	SEARCH_INDEX_SHOW_DOCUMENTS("developer.searchIndex.showDocuments", true),
 
 	/**
-	 * Log indexing operations only if the document contents match this regular
-	 * expression.
+	 * Log indexing operations only if one of the document identifiers match
+	 * this regular expression.
 	 */
 	SEARCH_INDEX_URI_OR_NAME_RESTRICTION(
 			"developer.searchIndex.uriOrNameRestriction", false),
-			
+
 	/**
 	 * Log indexing operations only if the document contents match this regular
 	 * expression.
@@ -150,13 +150,13 @@ public enum Key {
 			"developer.authorization.logDecisions.enable", true),
 
 	/**
-	 * Enable the PolicyDecisionLogger.
+	 * When logging policy decisions, add the identifier bundle.
 	 */
 	AUTHORIZATION_LOG_DECISIONS_ADD_IDENTIFERS(
 			"developer.authorization.logDecisions.addIdentifiers", true),
 
 	/**
-	 * Enable the PolicyDecisionLogger.
+	 * Don't log policy decisions if the decision is INCONCLUSIVE.
 	 */
 	AUTHORIZATION_LOG_DECISIONS_SKIP_INCONCLUSIVE(
 			"developer.authorization.logDecisions.skipInconclusive", true),
