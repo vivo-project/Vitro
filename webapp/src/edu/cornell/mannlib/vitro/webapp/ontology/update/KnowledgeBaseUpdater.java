@@ -98,9 +98,6 @@ public class KnowledgeBaseUpdater {
 	private boolean performUpdate(ServletContext servletContext) throws Exception {
 		
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
-		if (rawChanges.isEmpty()) {
-		    return false;
-		}
 		
 		AtomicOntologyChangeLists changes = new AtomicOntologyChangeLists(rawChanges,settings.getNewTBoxModel(),settings.getOldTBoxModel());
 	        	
@@ -134,7 +131,7 @@ public class KnowledgeBaseUpdater {
             }          
         }
         
-        return true;
+        return !rawChanges.isEmpty();
 
 	}
 	
