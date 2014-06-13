@@ -10,14 +10,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.hp.hpl.jena.graph.BulkUpdateHandler;
-import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFReaderF;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.rdf.model.impl.ModelCom;
 import com.hp.hpl.jena.rdf.model.impl.RDFReaderFImpl;
 import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
 import com.hp.hpl.jena.shared.WrappedIOException;
@@ -27,19 +25,13 @@ import com.hp.hpl.jena.util.iterator.Map1;
  * A model that still handles bulk updates in the old-fashioned way: with a
  * BulkUpdateHandler.
  */
-public class BulkUpdatingModel extends ModelCom {
+public class BulkUpdatingModel extends AbstractModelDecorator {
 	private static final RDFReaderF readerFactory = new RDFReaderFImpl();
 
 	private final BulkUpdateHandler buh;
 
-	@SuppressWarnings("deprecation")
-	public BulkUpdatingModel(Graph base) {
-		super(base);
-		this.buh = base.getBulkUpdateHandler();
-	}
-
-	public BulkUpdatingModel(Graph base, BulkUpdateHandler buh) {
-		super(base);
+	public BulkUpdatingModel(Model inner, BulkUpdateHandler buh) {
+		super(inner);
 		this.buh = buh;
 	}
 
