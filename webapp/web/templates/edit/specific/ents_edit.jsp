@@ -37,10 +37,7 @@
                         SELECT   ?pred ?obj ?graph
                         WHERE 
                         {
-                         { <${entity.URI}> ?pred ?obj 
-                           MINUS { GRAPH ?g { <${entity.URI}> ?pred ?obj } } } 
-                         UNION 
-                         { GRAPH ?graph { <${entity.URI}> ?pred ?obj} } 
+                          GRAPH ?graph { <${entity.URI}> ?pred ?obj} 
                         } ORDER BY ?graph ?pred
                         limit 10000"/>
           <form action="admin/sparqlquery" method="get">
@@ -55,10 +52,7 @@
                         SELECT ?sub ?pred ?graph
                         WHERE 
                         {
-                         { ?sub ?pred <${entity.URI}>  
-                           MINUS { GRAPH ?g { ?sub ?pred <${entity.URI}> } } } 
-                         UNION
-                         { GRAPH ?graph { ?sub ?pred <${entity.URI}> } }
+                          GRAPH ?graph { ?sub ?pred <${entity.URI}> }
                         } ORDER BY ?graph ?pred
                         limit 10000"/>
           <form action="admin/sparqlquery" method="get">
