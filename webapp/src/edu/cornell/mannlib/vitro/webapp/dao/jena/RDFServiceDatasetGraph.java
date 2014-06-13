@@ -28,7 +28,8 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
 
     private RDFService rdfService;
     private Lock lock = new LockMRSW();
-    
+    private Context context = new Context() ;
+
     public RDFServiceDatasetGraph(RDFService rdfService) {
         this.rdfService = rdfService;
     }
@@ -163,7 +164,7 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
 
     @Override
     public Context getContext() {
-        return null;
+        return context;
     }
 
     @Override
