@@ -188,7 +188,7 @@ public class VClassGroupCache implements IndexingEventListener {
         //try to rebuild a couple times since the search engine may not yet be up.
         
         int attempts = 0;
-        int maxTries = 3;
+        int maxTries = 5;
         SearchEngineException exception = null;
         
         while( attempts < maxTries ){
