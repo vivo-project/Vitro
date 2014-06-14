@@ -198,7 +198,7 @@ public class VClassGroupCache implements IndexingEventListener {
                 break;                
             } catch (SearchEngineException e) {
                 exception = e;
-                try { Thread.sleep(250); }
+                try { Thread.sleep(1000); }
                 catch (InterruptedException e1) {/*ignore interrupt*/}
             }
         }
