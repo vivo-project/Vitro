@@ -188,12 +188,13 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	 */
 	@Override
 	protected ResponseValues processRequest(VitroRequest vreq) {
+		Individual entity = null;
 		try {
+			entity = validateEntityUri(vreq);
+			
 			checkForFileTooBigException(vreq);
 			
 			String action = vreq.getParameter(PARAMETER_ACTION);
-
-			Individual entity = validateEntityUri(vreq);
 			if (ACTION_UPLOAD.equals(action)) {
 				return doUploadImage(vreq, entity);
 			} else if (ACTION_SAVE.equals(action)) {
@@ -208,8 +209,8 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 				return doIntroScreen(vreq, entity);
 			}
 		} catch (UserMistakeException e) {
-			// Can't find the entity? Complain.
-			return showAddImagePageWithError(vreq, null, e.formatMessage(vreq));
+			// Can't find the entity? Image too large? Complain.
+			return showAddImagePageWithError(vreq, entity, e.formatMessage(vreq));
 		} catch (Exception e) {
 			// We weren't expecting this - log it, and apologize to the user.
 			return new ExceptionResponseValues(e);

@@ -18,8 +18,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
+import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.logging.Log;
@@ -188,7 +189,7 @@ public class MultipartRequestWrapper extends HttpServletRequestWrapper {
 			ParsingStrategy strategy) throws IOException {
 		try {
 			return upload.parseRequest(req);
-		} catch (FileSizeLimitExceededException e) {
+		} catch (FileSizeLimitExceededException | SizeLimitExceededException e) {
 			if (strategy.stashFileSizeException()) {
 				req.setAttribute(ATTRIBUTE_FILE_SIZE_EXCEPTION, e);
 				return Collections.emptyList();
