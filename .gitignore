@@ -9,3 +9,4 @@
 /webapp/config/debug.log4j.properties
 .build
 utilities/solrtester/.work
+utilities/rdbmigration/.work
