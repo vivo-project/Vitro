@@ -129,13 +129,18 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
         for (Individual ind : individuals) {
             String uri = ind.getURI();
             if (uri != null) {
-				String label = ind.getName().trim();
-				List<String> msTypes = ind.getMostSpecificTypeURIs();
-				if ( hasSubclasses && msTypes.size() > 0 ) {
-					label += " (" + getMsTypeLocalName(msTypes.get(0), wDaoFact) + ")";
+                // The picklist should only display individuals with rdfs labels. 
+                // SO changing the following line  -- tlw72
+				// String label = ind.getName().trim();
+				String label = ind.getRdfsLabel();				
+				if ( label != null ) {
+					List<String> msTypes = ind.getMostSpecificTypeURIs();
+					if ( hasSubclasses && msTypes.size() > 0 ) {
+						label += " (" + getMsTypeLocalName(msTypes.get(0), wDaoFact) + ")";
+					}
+                	optionsMap.put(uri, label);
+                	++optionsCount;
 				}
-                optionsMap.put(uri, label);
-                ++optionsCount;
             }
         }
         return optionsMap;

@@ -278,6 +278,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                 this.dwf, datasetMode, wadf, 
                 SKIP_INITIALIZATION);
         ent.setName(label);
+		ent.setRdfsLabel(label);
         return ent;
     }
 	
