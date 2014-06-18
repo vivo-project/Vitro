@@ -579,6 +579,16 @@ deploy     - Deploy the application directly into the Tomcat webapps directory.
 		</junit>
 	</target>
 
+	<!-- ================================= 
+          target: migrateConfigurationModels              
+         ================================= -->
+    <target name="migrateConfigurationModels" description="copy the RDB models into TDB">
+    	<dirname property="corebase.dir" file="${ant.file.vitroCore}" />
+    	<property name="rdbmigration.dir" location="${corebase.dir}/../utilities/rdbmigration" />
+        <ant dir="${rdbmigration.dir}" target="all"></ant>
+    </target>
+
+
 	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	     MACROS
          - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
