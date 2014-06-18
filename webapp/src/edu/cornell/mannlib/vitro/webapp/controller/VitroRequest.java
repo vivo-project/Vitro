@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -285,10 +285,14 @@ public class VitroRequest extends HttpServletRequestWrapper {
 		return getFileSizeException() != null;
 	}
 	
-	public FileSizeLimitExceededException getFileSizeException() {
+	/**
+	 * Could be either FileSizeLimitExceededException or
+	 * SizeLimitExceededException, so return their common ancestor.
+	 */
+	public FileUploadException getFileSizeException() {
 		Object e = getAttribute(ATTRIBUTE_FILE_SIZE_EXCEPTION);
-		if (e instanceof FileSizeLimitExceededException) {
-			return (FileSizeLimitExceededException) e;
+		if (e instanceof FileUploadException) {
+			return (FileUploadException) e;
 		} else {
 			return null;
 		}

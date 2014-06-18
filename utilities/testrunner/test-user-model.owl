@@ -16,7 +16,7 @@
     <auth:status rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ACTIVE</auth:status>
     <auth:loginCount rdf:datatype="http://www.w3.org/2001/XMLSchema#int">1</auth:loginCount>  
     <auth:passwordLinkExpires rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</auth:passwordLinkExpires>  
-    <auth:hasPermissionSet rdf:resource="http://permissionSet-50"/>
+    <auth:hasPermissionSet rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/authorization#ADMIN"/>
 </auth:UserAccount>
 
 <auth:UserAccount rdf:about="http://vivo.mydomain.edu/individual/JohnCurator">
@@ -28,7 +28,7 @@
     <auth:status rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ACTIVE</auth:status>
     <auth:loginCount rdf:datatype="http://www.w3.org/2001/XMLSchema#int">1</auth:loginCount>  
     <auth:passwordLinkExpires rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</auth:passwordLinkExpires>  
-    <auth:hasPermissionSet rdf:resource="http://permissionSet-5"/>
+    <auth:hasPermissionSet rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/authorization#CURATOR"/>
 </auth:UserAccount>
 
 <auth:UserAccount rdf:about="http://vivo.mydomain.edu/individual/SallyEditor">
@@ -40,7 +40,7 @@
     <auth:status rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ACTIVE</auth:status>
     <auth:loginCount rdf:datatype="http://www.w3.org/2001/XMLSchema#int">1</auth:loginCount>  
     <auth:passwordLinkExpires rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</auth:passwordLinkExpires>  
-    <auth:hasPermissionSet rdf:resource="http://permissionSet-4"/>
+    <auth:hasPermissionSet rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/authorization#EDITOR"/>
 </auth:UserAccount>
 
 <auth:UserAccount rdf:about="http://vivo.mydomain.edu/individual/JoeUser">
@@ -52,7 +52,7 @@
     <auth:status rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ACTIVE</auth:status>
     <auth:loginCount rdf:datatype="http://www.w3.org/2001/XMLSchema#int">1</auth:loginCount>  
     <auth:passwordLinkExpires rdf:datatype="http://www.w3.org/2001/XMLSchema#long">0</auth:passwordLinkExpires>  
-    <auth:hasPermissionSet rdf:resource="http://permissionSet-1"/>
+    <auth:hasPermissionSet rdf:resource="http://vitro.mannlib.cornell.edu/ns/vitro/authorization#SELF_EDITOR"/>
 </auth:UserAccount>
 
 </rdf:RDF>
