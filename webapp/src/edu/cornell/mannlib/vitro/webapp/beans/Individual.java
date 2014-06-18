@@ -24,7 +24,8 @@ public interface Individual extends ResourceBean, Comparable<Individual> {
      * one of the labels will be returned, which one is undefined.  
      */
     String getRdfsLabel();
-    
+    void setRdfsLabel(String in);
+
     String getVClassURI();
     void setVClassURI(String in);
 

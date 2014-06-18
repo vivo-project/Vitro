@@ -346,6 +346,11 @@ public class IndividualFiltering implements Individual {
     }
 
     @Override
+    public void setRdfsLabel(String in) {
+        _innerIndividual.setRdfsLabel(in);
+    }
+
+    @Override
     public void setNamespace(String namespace) {
         _innerIndividual.setNamespace(namespace);
     }
