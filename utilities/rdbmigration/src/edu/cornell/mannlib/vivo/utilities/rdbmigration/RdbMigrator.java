@@ -33,6 +33,7 @@ import com.hp.hpl.jena.tdb.TDBFactory;
  * copying VIVO configuration data from RDB to TDB.
  */
 public class RdbMigrator {
+	private static final String DIRECTORY_TDB = "tdbModels";
 	private static final String TABLE_RDB = "jena_graph";
 	private static final String TABLE_MIGRATED = "vivo_rdb_migrated";
 	private static final List<String> EXPECTED_MODELS = Arrays
@@ -120,7 +121,7 @@ public class RdbMigrator {
 		if (!vivoHome.canWrite()) {
 			quit("Can't write to '" + vivoHome + "'.");
 		}
-		targetDir = new File(vivoHome, "tdbmodels");
+		targetDir = new File(vivoHome, DIRECTORY_TDB);
 	}
 
 	private boolean doesTdbExist() {

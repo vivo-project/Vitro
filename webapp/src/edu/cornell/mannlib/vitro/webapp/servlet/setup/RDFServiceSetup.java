@@ -35,7 +35,8 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 public class RDFServiceSetup extends JenaDataSourceSetupBase 
 implements javax.servlet.ServletContextListener {
-    private static final Log log = LogFactory.getLog(RDFServiceSetup.class);
+	private static final Log log = LogFactory.getLog(RDFServiceSetup.class);
+	private static final String DIRECTORY_TDB = "tdbModels";
 
     @Override
     public void contextDestroyed(ServletContextEvent arg0) {
@@ -71,7 +72,7 @@ implements javax.servlet.ServletContextListener {
 	private void useTDBForConfigurationModels(ServletContext ctx) throws IOException {
         String vitroHome = ConfigurationProperties.getBean(ctx).getProperty(
                 "vitro.home") ;
-        String directoryPath = vitroHome + File.separatorChar + "tdbModels";
+        String directoryPath = vitroHome + File.separatorChar + DIRECTORY_TDB;
 		RDFServiceFactory factory = new RDFServiceFactoryTDB(directoryPath);
         RDFServiceUtils.setRDFServiceFactory(ctx, factory, CONFIGURATION);
 	}
