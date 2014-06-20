@@ -15,7 +15,7 @@
     </#if>
     <#if adminErrorData.stackTrace?has_content>
         <p>
-            <strong>${i18n().stack_trace}</strong> (${i18n().trace_available}): ${adminErrorData.stackTrace?html}
+            <strong>${i18n().stack_trace}</strong> (${i18n().trace_available(siteName!)}): ${adminErrorData.stackTrace?html}
         </p>
                    
         <#if adminErrorData.cause?has_content>

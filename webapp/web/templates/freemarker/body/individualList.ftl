@@ -9,7 +9,7 @@
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseIndex.css" />')}
 
 <section class="individualList">
-    <h2>${title} 
+    <h2>${title!} 
         <#if rdfUrl?has_content>
             <span class="rdfLink"><a class="icon-rdf" href="${rdfUrl}" title="${i18n().view_list_in_rdf(title)}">${i18n().rdf}</a></span>
         </#if>

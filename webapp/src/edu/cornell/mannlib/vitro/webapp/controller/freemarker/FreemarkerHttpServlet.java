@@ -440,7 +440,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         
         ApplicationBean appBean = vreq.getAppBean();
         // This may be overridden by the body data model received from the subcontroller.
-        map.put("title", getTitle(vreq.getAppBean().getApplicationName(), vreq));
+        map.put("siteName", getTitle(vreq.getAppBean().getApplicationName(), vreq));
         
         map.put("urls", buildRequestUrls(vreq));
 

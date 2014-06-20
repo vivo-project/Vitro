@@ -9,7 +9,7 @@
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/browseIndex.css" />')}
 
 <section class="individualList">
-    <h2>${title} 
+    <h2>${title!} 
     </h2>
     <#if subtitle?has_content>
         <h4>${subtitle}</h4>

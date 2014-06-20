@@ -5,7 +5,7 @@
  ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/dump.css" />')}
 
 <div class="dump">
-    <h3>${title}</h3>
+    <h3>${title!}</h3>
     
     <#-- dump has been changed to dumpValue to avoid confusion 
     with the dump directive which is stored in the DataModel as 'dump' -->    
