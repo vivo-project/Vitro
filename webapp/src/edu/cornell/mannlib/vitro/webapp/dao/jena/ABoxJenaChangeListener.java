@@ -4,15 +4,15 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 
 public class ABoxJenaChangeListener extends JenaChangeListener {
 
     public ABoxJenaChangeListener(ModelChangedListener listener) {
         super(listener);
-        ignoredGraphs.add(JenaDataSourceSetupBase.JENA_INF_MODEL);
-        ignoredGraphs.add(JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);
-        ignoredGraphs.add(JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL);
+        ignoredGraphs.add(ModelNames.ABOX_INFERENCES);
+        ignoredGraphs.add(ModelNames.TBOX_ASSERTIONS);
+        ignoredGraphs.add(ModelNames.TBOX_INFERENCES);
     }
     
     @Override
@@ -31,7 +31,7 @@ public class ABoxJenaChangeListener extends JenaChangeListener {
     
     private boolean isABoxGraph(String graphURI) {
         return (graphURI == null || 
-                        JenaDataSourceSetupBase.JENA_DB_MODEL.equals(graphURI) 
+                        ModelNames.ABOX_ASSERTIONS.equals(graphURI) 
                                 || (!ignoredGraphs.contains(graphURI) 
                                         && !graphURI.contains("filegraph") 
                                                 && !graphURI.contains("tbox")));

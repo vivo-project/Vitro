@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
-import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID.CONFIGURATION;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -45,12 +43,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class RDFUploadController extends JenaIngestController {
     
@@ -236,7 +234,7 @@ public class RDFUploadController extends JenaIngestController {
                                 ? RDFService.ModelSerializationFormat.RDFXML
                                 : RDFService.ModelSerializationFormat.N3;
         changeSet.addAddition(in, format, 
-                JenaDataSourceSetupBase.JENA_DB_MODEL);
+                ModelNames.ABOX_ASSERTIONS);
         try {
             rdfService.changeSetUpdate(changeSet);
         } catch (RDFServiceException rdfse) {
@@ -437,7 +435,7 @@ public class RDFUploadController extends JenaIngestController {
      private OntModel getABoxModel(HttpSession session, ServletContext ctx) {   
          RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService();
          Model abox = RDFServiceGraph.createRDFServiceModel(
-                 new RDFServiceGraph(rdfService, JenaDataSourceSetupBase.JENA_DB_MODEL));
+                 new RDFServiceGraph(rdfService, ModelNames.ABOX_ASSERTIONS));
          return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, abox);
      }    
 

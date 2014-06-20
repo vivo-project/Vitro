@@ -19,8 +19,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.SimpleReasonerSetup;
 
 public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
@@ -117,10 +117,10 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	                        .append(")) || (")
 	                        .append(graphVars[i])
 	                        .append(" != <")
-	                        .append(JenaDataSourceSetupBase.JENA_INF_MODEL)
+	                        .append(ModelNames.ABOX_INFERENCES)
 	                        .append("> ")
 	                        .append("&& ").append(graphVars[i]).append(" != <")
-	                        .append(JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL)
+	                        .append(ModelNames.TBOX_INFERENCES)
 	                        .append(">")
 	                        .append("&& ").append(graphVars[i]).append(" != <")
                             .append(SimpleReasonerSetup.JENA_INF_MODEL_REBUILD)
@@ -136,10 +136,10 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
                         .append(")) || (")
                         .append(graphVars[i])
                         .append(" = <")
-                        .append(JenaDataSourceSetupBase.JENA_INF_MODEL)
+                        .append(ModelNames.ABOX_INFERENCES)
                         .append("> || ").append(graphVars[i])
                         .append(" = <")
-                        .append(JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL)
+                        .append(ModelNames.TBOX_INFERENCES)
                         .append(">) )\n");
                     break;
 	            default:

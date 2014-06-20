@@ -16,6 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
@@ -24,31 +25,26 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 /**
  * Set up the models that use the CONFIGURATION RDFService. They are all mapped
  * to memory-based models.
- * 
- * TODO This should be divorced from JenaDataSourceSetupBase, which it only uses
- * for constants.
  */
-public class ConfigurationModelsSetup extends JenaDataSourceSetupBase implements
-		ServletContextListener {
-
+public class ConfigurationModelsSetup implements ServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		ServletContext ctx = sce.getServletContext();
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
 		try {
-			setupModel(ctx, JENA_DISPLAY_METADATA_MODEL, "display",
+			setupModel(ctx, ModelNames.DISPLAY, "display",
 					ModelID.DISPLAY);
 
-			setupModel(ctx, JENA_DISPLAY_TBOX_MODEL, "displayTbox",
+			setupModel(ctx, ModelNames.DISPLAY_TBOX, "displayTbox",
 					ModelID.DISPLAY_TBOX);
 
-			setupModel(ctx, JENA_DISPLAY_DISPLAY_MODEL, "displayDisplay",
+			setupModel(ctx, ModelNames.DISPLAY_DISPLAY, "displayDisplay",
 					ModelID.DISPLAY_DISPLAY);
 
 			ss.info(this, "Set up the display models.");
 
-			setupModel(ctx, JENA_USER_ACCOUNTS_MODEL, "auth",
+			setupModel(ctx, ModelNames.USER_ACCOUNTS, "auth",
 					ModelID.USER_ACCOUNTS);
 
 			ss.info(this, "Set up the user accounts model.");

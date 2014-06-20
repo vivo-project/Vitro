@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
@@ -63,16 +64,16 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
     	Dataset dataset = new RDFServiceDataset(rdfService);
     	setStartupDataset(dataset, ctx);
     	
-    	OntModel applicationMetadataModel = createdMemoryMappedModel(dataset, JENA_APPLICATION_METADATA_MODEL, "application metadata model");
+    	OntModel applicationMetadataModel = createdMemoryMappedModel(dataset, ModelNames.APPLICATION_METADATA, "application metadata model");
 		if (applicationMetadataModel.size()== 0) {
 			JenaDataSourceSetupBase.thisIsFirstStartup();
 		}
 
     	ModelAccess models = ModelAccess.on(ctx);
-        OntModel baseABoxModel = createNamedModelFromDataset(dataset, JENA_DB_MODEL);
-        OntModel inferenceABoxModel = createNamedModelFromDataset(dataset, JENA_INF_MODEL);
-        OntModel baseTBoxModel = createdMemoryMappedModel(dataset, JENA_TBOX_ASSERTIONS_MODEL, "tbox assertions");
-        OntModel inferenceTBoxModel = createdMemoryMappedModel(dataset, JENA_TBOX_INF_MODEL, "tbox inferences");
+        OntModel baseABoxModel = createNamedModelFromDataset(dataset, ModelNames.ABOX_ASSERTIONS);
+        OntModel inferenceABoxModel = createNamedModelFromDataset(dataset, ModelNames.ABOX_INFERENCES);
+        OntModel baseTBoxModel = createdMemoryMappedModel(dataset, ModelNames.TBOX_ASSERTIONS, "tbox assertions");
+        OntModel inferenceTBoxModel = createdMemoryMappedModel(dataset, ModelNames.TBOX_INFERENCES, "tbox inferences");
         OntModel unionABoxModel = VitroModelFactory.createUnion(baseABoxModel, inferenceABoxModel);
         OntModel unionTBoxModel = VitroModelFactory.createUnion(baseTBoxModel, inferenceTBoxModel);
 

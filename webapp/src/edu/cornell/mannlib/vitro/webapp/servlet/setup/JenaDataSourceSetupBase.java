@@ -2,261 +2,25 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
-import java.beans.PropertyVetoException;
-
 import javax.servlet.ServletContext;
-import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.sdb.Store;
-import com.hp.hpl.jena.sdb.StoreDesc;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 
 public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
+	private static final Log log = LogFactory.getLog(
+			JenaDataSourceSetupBase.class);
+	
     private static final String VITRO_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
 
-    private static final Log log = LogFactory.getLog(
-            JenaDataSourceSetupBase.class);
-
-    protected final static String MAX_ACTIVE_PROPERTY = 
-        "VitroConnection.DataSource.pool.maxActive";
     
-    protected final static String MAX_IDLE_PROPERTY = 
-        "VitroConnection.DataSource.pool.maxIdle";
-    
-    protected final static int DEFAULT_MAXWAIT = 10000, // ms
-            DEFAULT_MAXACTIVE = 40,
-            MINIMUM_MAXACTIVE = 20,
-            DEFAULT_MAXIDLE = 10,
-            DEFAULT_TIMEBETWEENEVICTIONS =  180 * 1000, // ms
-            DEFAULT_TESTSPEREVICTION = DEFAULT_MAXACTIVE,
-            DEFAULT_MINEVICTIONIDLETIME = 180 * 1000; // ms
+    private static boolean firstStartup = false;
 
-    protected final static boolean DEFAULT_TESTONBORROW = true,
-            DEFAULT_TESTONRETURN = true, DEFAULT_TESTWHILEIDLE = true;
-
-    protected static boolean firstStartup = false;
-
-    String DB_USER =   "jenatest";                          // database user id
-    String DB_PASSWD = "jenatest";                          // database password
-     
-    // ABox assertions. These are stored in a database (Jena SDB) and the 
-    // application works (queries and updates) with the ABox data from the DB - 
-    // this model is not maintained in memory. For query performance reasons, 
-    // there won't be any submodels for the ABox data.
-   
-    public static final String JENA_DB_MODEL = 
-            "http://vitro.mannlib.cornell.edu/default/vitro-kb-2";
-   
-    // ABox inferences. This is ABox data that is inferred, using VIVO's native 
-    // simple, specific-purpose reasoning based on the combination of the ABox 
-    // (assertion and inferences) data and the TBox (assertions and inferences)
-    // data.
-    public static final String JENA_INF_MODEL = 
-           "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf";
-      
-    // TBox assertions. 
-    // Some of these (the local extensions) are stored and maintained in a Jena 
-    // database and are also maintained in memory while the application is 
-    // running. Other parts of the TBox, the 'VIVO Core,' are also backed by a 
-    // Jena DB, but they are read fresh from files each time the application 
-    // starts. While the application is running, they are kept in memory, as 
-    // submodels of the in memory copy of this named graph. 
-    public static final String JENA_TBOX_ASSERTIONS_MODEL = 
-            "http://vitro.mannlib.cornell.edu/default/asserted-tbox";
-
-   
-    // Inferred TBox. This is TBox data that is inferred from the combination of 
-    // VIVO core TBox and any local extension TBox assertions. Pellet computes 
-    // these inferences. These are stored in the DB.
-    public static final String JENA_TBOX_INF_MODEL = 
-            "http://vitro.mannlib.cornell.edu/default/inferred-tbox";
-   
-    // Model for tracking edit changes. Obsolete.
-    static final String JENA_AUDIT_MODEL = 
-            "http://vitro.mannlib.cornell.edu/ns/db/experimental/audit";
-
-    // User accounts data
-    public static final String JENA_USER_ACCOUNTS_MODEL = 
-            "http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts";
-   
-    // This model doesn't exist yet. It's a placeholder for the application 
-    // ontology.
-    public static final String JENA_APPLICATION_METADATA_MODEL = 
-        "http://vitro.mannlib.cornell.edu/default/vitro-kb-applicationMetadata";
-   
-    // This is Brian C's application.owl file. We may not have to be concerned 
-    // with this for release 1.2.
-    public static final String JENA_DISPLAY_METADATA_MODEL = 
-            "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadata";
-    
-    //TBox and display model related
-    public static final String JENA_DISPLAY_TBOX_MODEL = 
-        DisplayVocabulary.DISPLAY_TBOX_MODEL_URI;
-    public static final String JENA_DISPLAY_DISPLAY_MODEL = 
-        DisplayVocabulary.DISPLAY_DISPLAY_MODEL_URI;    
-    
-    // use OWL models with no reasoning
-    static final OntModelSpec DB_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM;
-    static final OntModelSpec MEM_ONT_MODEL_SPEC = OntModelSpec.OWL_MEM; 
-   
-    protected String getJdbcUrl(ServletContext ctx) {
-        String jdbcUrl = ConfigurationProperties.getBean(ctx).getProperty(
-                "VitroConnection.DataSource.url");
-
-        // Ensure that MySQL handles unicode properly, else all kinds of
-        // horrible nastiness ensues.
-        if ("MySQL".equals(getDbType(ctx)) && !jdbcUrl.contains("?")) {
-            jdbcUrl += "?useUnicode=yes&characterEncoding=utf8";
-        }
-        
-        return jdbcUrl;
-        
-    }
-   
-    /**
-    * Sets up a DataSource using values from
-    * a properties file.
-    */
-    protected final DataSource makeDataSourceFromConfigurationProperties(
-            ServletContext ctx) {
-        String dbDriverClassname = ConfigurationProperties.getBean(ctx)
-                .getProperty("VitroConnection.DataSource.driver",
-                        getDbDriverClassName(ctx));
-        String jdbcUrl = getJdbcUrl(ctx);
-        String username = ConfigurationProperties.getBean(ctx).getProperty(
-                "VitroConnection.DataSource.username");
-        String password = ConfigurationProperties.getBean(ctx).getProperty(
-                "VitroConnection.DataSource.password");
-        return makeC3poDataSource(
-                dbDriverClassname, jdbcUrl, username, password, ctx);
-//        makeBasicDataSource(
-//                dbDriverClassname, jdbcUrl, username, password, ctx);
-    }
-   
-   public void setApplicationDataSource(DataSource ds, 
-                                        ServletContext ctx) {
-       ctx.setAttribute(getDataSourceAttributeName(), ds);
-   }
-   
-   public static DataSource getApplicationDataSource(ServletContext ctx) {
-       return (DataSource) ctx.getAttribute(getDataSourceAttributeName());
-   }
-   
-   private static String getDataSourceAttributeName() {
-       return JenaDataSourceSetupBase.class.getName() + ".dataSource";
-   }
-   
-   public static DataSource makeC3poDataSource(String dbDriverClassname,
-                                                     String jdbcUrl,
-                                                     String username, 
-                                                     String password, 
-                                                     ServletContext ctx) {
-       
-       ComboPooledDataSource cpds = new ComboPooledDataSource();
-       try {
-           cpds.setDriverClass(dbDriverClassname);
-       } catch (PropertyVetoException pve) {
-           throw new RuntimeException(pve);
-       }
-       cpds.setJdbcUrl(jdbcUrl);
-       cpds.setUser(username);
-       cpds.setPassword(password);
-       int[] maxActiveAndIdle = getMaxActiveAndIdle(ctx);
-       cpds.setMaxPoolSize(maxActiveAndIdle[0]);
-       cpds.setMinPoolSize(maxActiveAndIdle[1]);
-       cpds.setMaxIdleTime(43200); // s
-       cpds.setMaxIdleTimeExcessConnections(300);
-       cpds.setAcquireIncrement(5);
-       cpds.setNumHelperThreads(6);
-       cpds.setTestConnectionOnCheckout(DEFAULT_TESTONBORROW);
-       cpds.setTestConnectionOnCheckin(DEFAULT_TESTONRETURN);
-       cpds.setPreferredTestQuery(getValidationQuery(ctx));
-       return cpds;
-   }
-
-   private static int[] getMaxActiveAndIdle(ServletContext ctx) {
-       int maxActiveInt = DEFAULT_MAXACTIVE;
-       String maxActiveStr = ConfigurationProperties.getBean(ctx).getProperty(
-                MAX_ACTIVE_PROPERTY);
-       if (!StringUtils.isEmpty(maxActiveStr)) {
-           try {
-               int maxActiveIntFromConfigProperties = Integer.parseInt(maxActiveStr);
-               if (maxActiveIntFromConfigProperties < MINIMUM_MAXACTIVE) {
-                   log.warn("Specified value for " + MAX_ACTIVE_PROPERTY + 
-                            " is too low. Using minimum value of " + 
-                            MINIMUM_MAXACTIVE);
-                   maxActiveInt = MINIMUM_MAXACTIVE;
-               } else {
-                   maxActiveInt = maxActiveIntFromConfigProperties;
-               }
-           } catch (NumberFormatException nfe) {
-               log.error("Unable to parse connection pool maxActive setting " 
-                       + maxActiveStr + " as an integer");
-           }
-       }
-       String maxIdleStr = ConfigurationProperties.getBean(ctx).getProperty(
-               MAX_IDLE_PROPERTY);
-       int maxIdleInt = (maxActiveInt > DEFAULT_MAXACTIVE) 
-               ? maxActiveInt / 4
-               : DEFAULT_MAXIDLE;
-       if (!StringUtils.isEmpty(maxIdleStr)) {
-           try {
-               maxIdleInt = Integer.parseInt(maxIdleStr);    
-           } catch (NumberFormatException nfe) {
-               log.error("Unable to parse connection pool maxIdle setting " 
-                       + maxIdleStr + " as an integer");
-           }
-       }       
-       int[] result = new int[2];
-       result[0] = maxActiveInt;
-       result[1] = maxIdleInt;
-       return result;
-   }
-   
-   public static DataSource makeBasicDataSource(String dbDriverClassname,
-                                                     String jdbcUrl,
-                                                     String username, 
-                                                     String password, 
-                                                     ServletContext ctx) {
-       log.debug("makeBasicDataSource('" + dbDriverClassname + "', '"
-            + jdbcUrl + "', '" + username + "', '" + password + "')");
-       BasicDataSource ds = new BasicDataSource();
-       ds.setDriverClassName(dbDriverClassname);
-       ds.setUrl(jdbcUrl);
-       ds.setUsername(username);
-       ds.setPassword(password);
-       int[] maxActiveAndIdle = getMaxActiveAndIdle(ctx);
-       ds.setMaxActive(maxActiveAndIdle[0]);
-       ds.setMaxIdle(maxActiveAndIdle[1]);
-       ds.setMaxWait(DEFAULT_MAXWAIT);
-       ds.setValidationQuery(getValidationQuery(ctx));
-       ds.setTestOnBorrow(DEFAULT_TESTONBORROW);
-       ds.setTestOnReturn(DEFAULT_TESTONRETURN);
-       ds.setMinEvictableIdleTimeMillis(DEFAULT_MINEVICTIONIDLETIME);
-       ds.setNumTestsPerEvictionRun(maxActiveAndIdle[0]);
-       ds.setTimeBetweenEvictionRunsMillis(DEFAULT_TIMEBETWEENEVICTIONS);
-       ds.setInitialSize(ds.getMaxActive() / 10);
-
-       try {
-           ds.getConnection().close();
-       } catch (Exception e) {
-           e.printStackTrace();
-       }
-
-       return ds;
-   }
-   
    public static boolean isFirstStartup() {
        return firstStartup;
    }
@@ -276,22 +40,6 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         }
     }
     
-    private static String getDbType(ServletContext ctx) {
-        return ConfigurationProperties.getBean(ctx).getProperty(
-                "VitroConnection.DataSource.dbtype", "MySQL");
-    }
-
-    private static String getDbDriverClassName(ServletContext ctx) {
-        return ConfigurationProperties.getBean(ctx).getProperty(
-                "VitroConnection.DataSource.driver", "com.mysql.jdbc.Driver");
-
-    }
-
-    private static String getValidationQuery(ServletContext ctx) {
-        return ConfigurationProperties.getBean(ctx).getProperty(
-                "VitroConnection.DataSource.validationQuery", "SELECT 1");
-    }
-    
     public static void setStartupDataset(Dataset dataset, ServletContext ctx) {
         ctx.setAttribute("startupDataset", dataset);
     }
@@ -301,25 +49,4 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         return (o instanceof Dataset) ? ((Dataset) o) : null;
     }
 
-    private static final String STOREDESC_ATTR = "storeDesc";
-    private static final String STORE_ATTR = "kbStore";
-    
-    public static void setApplicationStoreDesc(StoreDesc storeDesc, 
-                                          ServletContext ctx) {
-        ctx.setAttribute(STOREDESC_ATTR, storeDesc);
-    }
-   
-    public static StoreDesc getApplicationStoreDesc(ServletContext ctx) {
-        return (StoreDesc) ctx.getAttribute(STOREDESC_ATTR);
-    }
-    
-    public static void setApplicationStore(Store store,
-                                           ServletContext ctx) {
-        ctx.setAttribute(STORE_ATTR, store);
-    }
-    
-    public static Store getApplicationStore(ServletContext ctx) {
-        return (Store) ctx.getAttribute(STORE_ATTR);
-    }
-    
 }

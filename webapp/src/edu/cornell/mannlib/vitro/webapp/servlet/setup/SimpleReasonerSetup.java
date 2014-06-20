@@ -27,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.ReasonerConfiguration;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.reasoner.ReasonerPlugin;
@@ -89,7 +90,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
             
             Model rebuildModel = dataset.getNamedModel(JENA_INF_MODEL_REBUILD); 
             Model scratchModel = dataset.getNamedModel(JENA_INF_MODEL_SCRATCHPAD);
-            Model inferenceModel = dataset.getNamedModel(JenaDataSourceSetupBase.JENA_INF_MODEL);
+            Model inferenceModel = dataset.getNamedModel(ModelNames.ABOX_INFERENCES);
 
             // the simple reasoner will register itself as a listener to the ABox assertions
             SimpleReasoner simpleReasoner = new SimpleReasoner(

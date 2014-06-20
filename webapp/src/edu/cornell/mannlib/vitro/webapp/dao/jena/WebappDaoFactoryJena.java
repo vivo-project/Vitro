@@ -48,9 +48,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.URIUtils;
 
 public class WebappDaoFactoryJena implements WebappDaoFactory {
@@ -158,11 +158,11 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         OntModel union = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);        
         if (assertions != null) {
             dataset.addNamedModel(
-            		JenaDataSourceSetupBase.JENA_DB_MODEL, assertions);
+            		ModelNames.ABOX_ASSERTIONS, assertions);
             union.addSubModel(assertions);
         } 
         if (inferences != null) {
-            dataset.addNamedModel(JenaDataSourceSetupBase.JENA_INF_MODEL, 
+            dataset.addNamedModel(ModelNames.ABOX_INFERENCES, 
                     inferences);
             union.addSubModel(inferences);
         }

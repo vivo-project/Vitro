@@ -10,7 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Statement;
 
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 /**
@@ -50,14 +50,14 @@ public class SimpleReasonerTBoxListener extends StatementListener {
 	@Override
 	public void addedStatement(Statement statement) {
 		
-		ModelUpdate mu = new ModelUpdate(statement, ModelUpdate.Operation.ADD, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);
+		ModelUpdate mu = new ModelUpdate(statement, ModelUpdate.Operation.ADD, ModelNames.TBOX_ASSERTIONS);
 		processUpdate(mu);
 	}
 
 	@Override
 	public void removedStatement(Statement statement) {
 		
-		ModelUpdate mu = new ModelUpdate(statement, ModelUpdate.Operation.RETRACT, JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL);	
+		ModelUpdate mu = new ModelUpdate(statement, ModelUpdate.Operation.RETRACT, ModelNames.TBOX_ASSERTIONS);	
 		processUpdate(mu);
 	}
 	

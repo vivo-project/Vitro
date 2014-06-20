@@ -51,8 +51,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.FileGraphSetup;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class RefactorOperationController extends BaseEditController {
 	
@@ -234,10 +234,10 @@ public class RefactorOperationController extends BaseEditController {
     			boolean doNotify = false;
     			Model model = null;
     			
-    			if (JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL.equals(graphURI)) {
+    			if (ModelNames.TBOX_ASSERTIONS.equals(graphURI)) {
     				model = ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_TBOX);
     				doNotify = true;
-    			} else if (JenaDataSourceSetupBase.JENA_DB_MODEL.equals(graphURI)) {
+    			} else if (ModelNames.ABOX_ASSERTIONS.equals(graphURI)) {
 					model = ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_ABOX);
 					doNotify = true;
     			} else {

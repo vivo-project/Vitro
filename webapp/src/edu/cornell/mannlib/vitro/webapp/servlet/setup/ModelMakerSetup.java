@@ -14,15 +14,7 @@ import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID.UNION_FUL
 import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID.USER_ACCOUNTS;
 import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID.CONFIGURATION;
 import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID.CONTENT;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.JENA_DISPLAY_DISPLAY_MODEL;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.JENA_DISPLAY_METADATA_MODEL;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.JENA_DISPLAY_TBOX_MODEL;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.JENA_USER_ACCOUNTS_MODEL;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +29,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroInterceptingModelMaker;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService;
@@ -45,8 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 /**
  * Sets up the content models, OntModelSelectors and webapp DAO factories.
  */
-public class ModelMakerSetup extends JenaDataSourceSetupBase implements
-		javax.servlet.ServletContextListener {
+public class ModelMakerSetup implements javax.servlet.ServletContextListener {
 	private static final Log log = LogFactory.getLog(ModelMakerSetup.class);
 
 	@Override
@@ -85,13 +77,13 @@ public class ModelMakerSetup extends JenaDataSourceSetupBase implements
 	private Map<String, Model> populateConfigurationSpecialMap(
 			ServletContext ctx) {
 		Map<String, Model> map = new HashMap<>();
-		map.put(JENA_DISPLAY_METADATA_MODEL,
+		map.put(ModelNames.DISPLAY,
 				ModelAccess.on(ctx).getOntModel(DISPLAY));
-		map.put(JENA_DISPLAY_TBOX_MODEL,
+		map.put(ModelNames.DISPLAY_TBOX,
 				ModelAccess.on(ctx).getOntModel(DISPLAY_TBOX));
-		map.put(JENA_DISPLAY_DISPLAY_MODEL,
+		map.put(ModelNames.DISPLAY_DISPLAY,
 				ModelAccess.on(ctx).getOntModel(DISPLAY_DISPLAY));
-		map.put(JENA_USER_ACCOUNTS_MODEL,
+		map.put(ModelNames.USER_ACCOUNTS,
 				ModelAccess.on(ctx).getOntModel(USER_ACCOUNTS));
 		return map;
 	}
@@ -105,11 +97,11 @@ public class ModelMakerSetup extends JenaDataSourceSetupBase implements
 				.getOntModel(BASE_FULL));
 		map.put("vitro:inferenceOntModel",
 				ModelAccess.on(ctx).getOntModel(INFERRED_FULL));
-		map.put(JENA_TBOX_ASSERTIONS_MODEL,
+		map.put(ModelNames.TBOX_ASSERTIONS,
 				ModelAccess.on(ctx).getOntModel(BASE_TBOX));
-		map.put(JENA_TBOX_INF_MODEL,
+		map.put(ModelNames.TBOX_INFERENCES,
 				ModelAccess.on(ctx).getOntModel(INFERRED_TBOX));
-		map.put(JENA_APPLICATION_METADATA_MODEL, ModelAccess.on(ctx)
+		map.put(ModelNames.APPLICATION_METADATA, ModelAccess.on(ctx)
 				.getOntModel(APPLICATION_METADATA));
 
 		return map;

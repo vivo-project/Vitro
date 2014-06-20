@@ -2,9 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.filters;
 
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.JENA_DB_MODEL;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase.JENA_INF_MODEL;
-
 import java.io.IOException;
 import java.text.Collator;
 import java.util.Enumeration;
@@ -29,7 +26,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.jena.atlas.lib.Pair;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
 //import com.hp.hpl.jena.rdf.model.ModelFactory;
 
@@ -51,6 +47,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringRDFService;
@@ -195,9 +192,9 @@ public class RequestModelsPrep implements Filter {
 		// Anything derived from the ABOX is not memory-mapped, so create
 		// versions from the short-term RDF service.
 		OntModel baseABoxModel = VitroModelFactory.createOntologyModel(dataset
-				.getNamedModel(JENA_DB_MODEL));
+				.getNamedModel(ModelNames.ABOX_ASSERTIONS));
 		OntModel inferenceABoxModel = VitroModelFactory
-				.createOntologyModel(dataset.getNamedModel(JENA_INF_MODEL));
+				.createOntologyModel(dataset.getNamedModel(ModelNames.ABOX_INFERENCES));
 		OntModel unionABoxModel = VitroModelFactory.createUnion(
 				baseABoxModel, inferenceABoxModel);
 

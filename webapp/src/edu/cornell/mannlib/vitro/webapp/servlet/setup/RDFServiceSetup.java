@@ -24,6 +24,7 @@ import com.hp.hpl.jena.sdb.store.LayoutType;
 import com.hp.hpl.jena.sdb.util.StoreUtils;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
@@ -98,7 +99,7 @@ implements javax.servlet.ServletContextListener {
     }
 
     private void useSDB(ServletContext ctx, StartupStatus ss) throws SQLException {
-        DataSource ds = getApplicationDataSource(ctx);
+        DataSource ds = JenaPersistentDataSourceSetup.getApplicationDataSource();
         if( ds == null ){
             ss.fatal(this, "A DataSource must be setup before SDBSetup "+
                     "is run. Make sure that JenaPersistentDataSourceSetup runs before "+
@@ -110,13 +111,10 @@ implements javax.servlet.ServletContextListener {
         SDB.getContext().set(SDB.unionDefaultGraph, true) ;
 
         StoreDesc storeDesc = makeStoreDesc(ctx);
-        setApplicationStoreDesc(storeDesc, ctx);     
-        
         Store store = connectStore(ds, storeDesc);
-        setApplicationStore(store, ctx);
         
         if (!isSetUp(store)) {            
-            JenaPersistentDataSourceSetup.thisIsFirstStartup();
+            JenaDataSourceSetupBase.thisIsFirstStartup();
             setupSDB(ctx, store);
         }
         
@@ -146,7 +144,7 @@ implements javax.servlet.ServletContextListener {
         try {
             return (SDBFactory.connectNamedModel(
                     store, 
-                    JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL))
+                    ModelNames.TBOX_ASSERTIONS))
                             .size() > 0;    
         } catch (Exception e) { 
             return false;

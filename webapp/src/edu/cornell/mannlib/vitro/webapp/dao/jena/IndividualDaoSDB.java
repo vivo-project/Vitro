@@ -45,9 +45,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualSDB.IndividualNotFoundException;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class IndividualDaoSDB extends IndividualDaoJena {
 
@@ -448,8 +448,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                        " UNION { " + 
                        "  GRAPH ?g { ?ind <" + RDFS.label.getURI() +
                                           "> ?label } \n" +
-                       "  FILTER (?g != <" + JenaDataSourceSetupBase
-                               .JENA_APPLICATION_METADATA_MODEL + "> " +
+                       "  FILTER (?g != <" + ModelNames.APPLICATION_METADATA + "> " +
                        "          && !regex(str(?g),\"tbox\")) \n " +
                        " } " +
                        "}";

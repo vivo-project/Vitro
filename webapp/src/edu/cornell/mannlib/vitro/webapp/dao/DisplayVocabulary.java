@@ -15,10 +15,6 @@ public class DisplayVocabulary {
     /** <p>The ontology model that holds the vocabulary terms</p> */
     private static OntModel m_model = ModelFactory.createOntologyModel( OntModelSpec.OWL_MEM, null );
 
-    /*Uris for Models for Display*/
-    
-    public static final String DISPLAY_TBOX_MODEL_URI = "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadataTBOX";
-    public static final String DISPLAY_DISPLAY_MODEL_URI = "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadata-displayModel";
     /* Namespace for display vocabulary */
     public static final String DISPLAY_NS = "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#";
     private static final String NS = DISPLAY_NS;

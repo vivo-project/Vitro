@@ -16,7 +16,6 @@ import java.net.URISyntaxException;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -56,7 +55,6 @@ import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.sdb.store.DatabaseType;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
@@ -65,18 +63,17 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils.MergeResult;
@@ -1079,7 +1076,7 @@ public class JenaIngestController extends BaseEditController {
         try {
             Model baseOntModel = RDFServiceGraph.createRDFServiceModel
                     (new RDFServiceGraph(
-                            rdfService, JenaDataSourceSetupBase.JENA_DB_MODEL));
+                            rdfService, ModelNames.ABOX_ASSERTIONS));
     		OntModel ontModel = ModelAccess.on(getServletContext()).getJenaOntModel();
             List<String> urisToChange = new LinkedList<String>();        
             ontModel.enterCriticalSection(Lock.READ);
@@ -1118,7 +1115,7 @@ public class JenaIngestController extends BaseEditController {
                 log.debug("Renaming "+ oldURIStr + " to " + newURIStr);
          
                 String whereClause = "} WHERE { \n" +
-                        "  GRAPH <" + JenaDataSourceSetupBase.JENA_DB_MODEL + "> { \n" +  
+                        "  GRAPH <" + ModelNames.ABOX_ASSERTIONS + "> { \n" +  
                         "   { <" + oldURIStr + "> ?p <" + oldURIStr + "> } \n " +
                         "     UNION \n" +  
                         "   { <" + oldURIStr + "> ?q ?o } \n " +
@@ -1141,11 +1138,11 @@ public class JenaIngestController extends BaseEditController {
                     cs.addAddition(rdfService.sparqlConstructQuery(
                             addQuery, RDFService.ModelSerializationFormat.N3), 
                                     RDFService.ModelSerializationFormat.N3, 
-                                            JenaDataSourceSetupBase.JENA_DB_MODEL);
+                                            ModelNames.ABOX_ASSERTIONS);
                     cs.addRemoval(rdfService.sparqlConstructQuery(
                             removeQuery, RDFService.ModelSerializationFormat.N3), 
                                     RDFService.ModelSerializationFormat.N3, 
-                                            JenaDataSourceSetupBase.JENA_DB_MODEL); 
+                                            ModelNames.ABOX_ASSERTIONS); 
                     rdfService.changeSetUpdate(cs);
                 } catch (RDFServiceException e) {
                     throw new RuntimeException(e);

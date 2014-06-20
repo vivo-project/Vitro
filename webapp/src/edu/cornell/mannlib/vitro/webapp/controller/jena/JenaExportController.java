@@ -32,10 +32,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 
 public class JenaExportController extends BaseEditController {
@@ -157,7 +157,7 @@ public class JenaExportController extends BaseEditController {
 		else if("full".equals(subgraphParam)){
 			if("inferred".equals(assertedOrInferredParam)){
 				ontModel = xutil.extractTBox(
-						dataset, ontologyURI, INFERENCE_GRAPH);
+						dataset, ontologyURI, ModelNames.ABOX_INFERENCES);
 				ontModel.addSubModel(ModelAccess.on(getServletContext()).getOntModel(ModelID.INFERRED_ABOX));
 				ontModel.addSubModel(ModelAccess.on(getServletContext()).getOntModel(ModelID.INFERRED_TBOX));
 			}
@@ -278,9 +278,6 @@ public class JenaExportController extends BaseEditController {
 	}
 	
 	static final String FULL_GRAPH = "?g";
-	static final String ASSERTIONS_GRAPH = "<http://vitro.mannlib.cornell.edu/default/vitro-kb-2>";
-	static final String INFERENCE_GRAPH = "<http://vitro.mannlib.cornell.edu/default/vitro-kb-inf>";
-	
 	static Map<String,String> formatToExtension;
 	static Map<String,String> formatToMimetype;
 	
@@ -304,13 +301,13 @@ public class JenaExportController extends BaseEditController {
 	
 	private static final String ABOX_FULL_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
 	        "WHERE { GRAPH ?g { ?s ?p ?o } FILTER (!regex(str(?g), \"tbox\")) " +
-            "FILTER (?g != <" + JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL + ">) " +
+            "FILTER (?g != <" + ModelNames.APPLICATION_METADATA + ">) " +
             "FILTER (?g != <" + RDFServiceModelMaker.METADATA_MODEL_URI + ">) }";
 	
 	private static final String ABOX_ASSERTED_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
             "WHERE { GRAPH ?g { ?s ?p ?o } FILTER (!regex(str(?g), \"tbox\")) " + 
-	        "FILTER (?g != <" + JenaDataSourceSetupBase.JENA_INF_MODEL + ">) " +
-	        "FILTER (?g != <" + JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL + ">) " +
+	        "FILTER (?g != <" + ModelNames.ABOX_INFERENCES + ">) " +
+	        "FILTER (?g != <" + ModelNames.APPLICATION_METADATA + ">) " +
 	        "FILTER (?g != <" + RDFServiceModelMaker.METADATA_MODEL_URI + ">) }";
 	
 	private static final String FULL_FULL_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
@@ -318,7 +315,7 @@ public class JenaExportController extends BaseEditController {
 
     private static final String FULL_ASSERTED_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
             "WHERE { GRAPH ?g { ?s ?p ?o } " + 
-            "FILTER (?g != <" + JenaDataSourceSetupBase.JENA_INF_MODEL + ">) " +
-            "FILTER (?g != <" + JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL + ">) }";
+            "FILTER (?g != <" + ModelNames.ABOX_INFERENCES + ">) " +
+            "FILTER (?g != <" + ModelNames.TBOX_INFERENCES + ">) }";
     
 }
