@@ -71,6 +71,7 @@ public class SpecialBulkUpdatingGraph implements Graph {
 	}
 
 	@Override
+	@Deprecated
 	public BulkUpdateHandler getBulkUpdateHandler() {
 		return b;
 	}

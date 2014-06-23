@@ -13,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
@@ -69,7 +70,7 @@ public abstract class RDFServiceImpl implements RDFService {
        if (sparqlAskQuery(containsQuery.toString())) {
             throw new RDFServiceException("individual already exists");
        } else {
-            Triple triple = new Triple(Node.createURI(individualURI), RDF.type.asNode(), Node.createURI(individualTypeURI));
+            Triple triple = new Triple(NodeFactory.createURI(individualURI), RDF.type.asNode(), NodeFactory.createURI(individualTypeURI));
             //addTriple(triple, graphURI);
             ChangeSet cs = this.manufactureChangeSet();
             cs.addAddition(new ByteArrayInputStream(

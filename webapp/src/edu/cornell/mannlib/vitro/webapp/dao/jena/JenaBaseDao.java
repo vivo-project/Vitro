@@ -22,6 +22,7 @@ import org.mindswap.pellet.jena.vocabulary.SWRL;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntClass;
@@ -930,7 +931,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     		if (vitroURIStr.indexOf(PSEUDO_BNODE_NS)==0) {
     			String idStr = vitroURIStr.split("#")[1];
     			log.debug("Trying to get bnode " + idStr);
-    			RDFNode rdfNode = ontModel.getRDFNode(Node.createAnon(AnonId.create(idStr)));
+    			RDFNode rdfNode = ontModel.getRDFNode(NodeFactory.createAnon(AnonId.create(idStr)));
     			if ( (rdfNode != null) && (rdfNode.canAs(OntClass.class)) ) {
     			    log.debug("found it");
     				cls = rdfNode.as(OntClass.class);
@@ -958,9 +959,9 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 
     protected Node makeNodeForURI(String vitroURIStr) {
     	if (vitroURIStr.indexOf(PSEUDO_BNODE_NS)==0) {
-			return Node.createAnon(AnonId.create(vitroURIStr.split("#")[1]));
+			return NodeFactory.createAnon(AnonId.create(vitroURIStr.split("#")[1]));
     	} else {
-    		return Node.createURI(vitroURIStr);
+    		return NodeFactory.createURI(vitroURIStr);
     	}
     }
     

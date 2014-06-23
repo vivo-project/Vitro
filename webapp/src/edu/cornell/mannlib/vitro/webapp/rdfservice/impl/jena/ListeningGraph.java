@@ -119,6 +119,7 @@ public class ListeningGraph implements GraphWithPerform {
 	}
 
     @Override
+    @Deprecated
     public BulkUpdateHandler getBulkUpdateHandler() {
         if (this.bulkUpdateHandler == null) {
             this.bulkUpdateHandler = new SimpleBulkUpdateHandler(this);

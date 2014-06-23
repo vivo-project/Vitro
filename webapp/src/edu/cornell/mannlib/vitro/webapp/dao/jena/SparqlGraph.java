@@ -310,6 +310,7 @@ public class SparqlGraph implements GraphWithPerform {
     }
     
     @Override
+    @Deprecated
     public BulkUpdateHandler getBulkUpdateHandler() {
         if (this.bulkUpdateHandler == null) {
             this.bulkUpdateHandler = new SparqlGraphBulkUpdater(this);
