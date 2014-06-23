@@ -32,7 +32,6 @@ import com.hp.hpl.jena.rdf.model.RSIterator;
 import com.hp.hpl.jena.rdf.model.ReifiedStatement;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceF;
 import com.hp.hpl.jena.rdf.model.Selector;
 import com.hp.hpl.jena.rdf.model.Seq;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -40,7 +39,6 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Command;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.shared.PrefixMapping;
-import com.hp.hpl.jena.shared.ReificationStyle;
 
 /**
  * The base class for a delegating model decorator.
@@ -48,7 +46,6 @@ import com.hp.hpl.jena.shared.ReificationStyle;
  * As implemented, all methods simply delegate to the inner model. Subclasses
  * should override selected methods to provide functionality.
  */
-@SuppressWarnings("deprecation")
 public abstract class AbstractModelDecorator implements Model {
 	private final Model inner;
 
@@ -60,7 +57,8 @@ public abstract class AbstractModelDecorator implements Model {
 	}
 
 	@Override
-	public Resource getResource(String uri, ResourceF f) {
+	@Deprecated
+	public Resource getResource(String uri, com.hp.hpl.jena.rdf.model.ResourceF f) {
 		return inner.getResource(uri, f);
 	}
 
@@ -115,12 +113,14 @@ public abstract class AbstractModelDecorator implements Model {
 	}
 
 	@Override
-	public Resource createResource(ResourceF f) {
+	@Deprecated
+	public Resource createResource(com.hp.hpl.jena.rdf.model.ResourceF f) {
 		return inner.createResource(f);
 	}
 
 	@Override
-	public Resource createResource(String uri, ResourceF f) {
+	@Deprecated
+	public Resource createResource(String uri, com.hp.hpl.jena.rdf.model.ResourceF f) {
 		return inner.createResource(uri, f);
 	}
 
@@ -422,6 +422,7 @@ public abstract class AbstractModelDecorator implements Model {
 	}
 
 	@Override
+	@Deprecated
 	public Model addLiteral(Resource s, Property p, Object o) {
 		return inner.addLiteral(s, p, o);
 	}
@@ -467,6 +468,7 @@ public abstract class AbstractModelDecorator implements Model {
 	}
 
 	@Override
+	@Deprecated
 	public Model remove(Model m, boolean suppressReifications) {
 		return m.remove(m, suppressReifications);
 	}
@@ -739,6 +741,7 @@ public abstract class AbstractModelDecorator implements Model {
 	}
 
 	@Override
+	@Deprecated
 	public Model add(Model m, boolean suppressReifications) {
 		return m.add(m, suppressReifications);
 	}
@@ -954,7 +957,8 @@ public abstract class AbstractModelDecorator implements Model {
 	}
 
 	@Override
-	public ReificationStyle getReificationStyle() {
+	@Deprecated
+	public com.hp.hpl.jena.shared.ReificationStyle getReificationStyle() {
 		return inner.getReificationStyle();
 	}
 

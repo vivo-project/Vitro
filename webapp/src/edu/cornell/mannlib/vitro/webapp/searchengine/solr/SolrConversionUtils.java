@@ -92,6 +92,7 @@ public class SolrConversionUtils {
 	 * Convert from a SearchQuery to a SolrQuery, so the Solr server may execute
 	 * it.
 	 */
+	@SuppressWarnings("deprecation")
 	static SolrQuery convertToSolrQuery(SearchQuery query) {
 		SolrQuery solrQuery = new SolrQuery(query.getQuery());
 		solrQuery.setStart(query.getStart());

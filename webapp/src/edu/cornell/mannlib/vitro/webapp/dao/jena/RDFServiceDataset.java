@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.LabelExistsException;
 import com.hp.hpl.jena.query.ReadWrite;
@@ -40,7 +41,7 @@ public class RDFServiceDataset implements Dataset {
 
     @Override
     public boolean containsNamedModel(String arg0) {
-        return g.containsGraph(Node.createURI(arg0));
+        return g.containsGraph(NodeFactory.createURI(arg0));
     }
 
     @Override
@@ -55,7 +56,7 @@ public class RDFServiceDataset implements Dataset {
 
     @Override
     public Model getNamedModel(String arg0) {
-        return RDFServiceGraph.createRDFServiceModel(g.getGraph(Node.createURI(arg0)));
+        return RDFServiceGraph.createRDFServiceModel(g.getGraph(NodeFactory.createURI(arg0)));
     }
 
     @Override
@@ -80,7 +81,7 @@ public class RDFServiceDataset implements Dataset {
 						+ "': model already exists");
 			}
 		}
-		g.addGraph(Node.createURI(uri), model.getGraph());
+		g.addGraph(NodeFactory.createURI(uri), model.getGraph());
 	}
 
 	@Override
@@ -90,7 +91,7 @@ public class RDFServiceDataset implements Dataset {
 
 	@Override
 	public void removeNamedModel(String uri) {
-		g.removeGraph(Node.createURI(uri));
+		g.removeGraph(NodeFactory.createURI(uri));
 	}
 
 	@Override

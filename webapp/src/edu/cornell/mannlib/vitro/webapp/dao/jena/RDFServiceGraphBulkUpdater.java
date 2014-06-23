@@ -40,6 +40,7 @@ public class RDFServiceGraphBulkUpdater implements BulkUpdateHandler {
     }
     
     @Override
+    @Deprecated
     public void add(Triple[] arg0) {
         Graph g = GraphFactory.createPlainGraph();
         for (int i = 0 ; i < arg0.length ; i++) {
@@ -49,6 +50,7 @@ public class RDFServiceGraphBulkUpdater implements BulkUpdateHandler {
     }
 
     @Override
+    @Deprecated
     public void add(List<Triple> arg0) {
         Graph g = GraphFactory.createPlainGraph();
         for (Triple t : arg0) {
@@ -58,6 +60,7 @@ public class RDFServiceGraphBulkUpdater implements BulkUpdateHandler {
     }
 
     @Override
+    @Deprecated
     public void add(Iterator<Triple> arg0) {
         Graph g = GraphFactory.createPlainGraph();
         while (arg0.hasNext()) {
@@ -68,11 +71,13 @@ public class RDFServiceGraphBulkUpdater implements BulkUpdateHandler {
     }
 
     @Override
+    @Deprecated
     public void add(Graph arg0) {
         add(arg0, false);
     }
 
     @Override
+    @Deprecated
     public void add(Graph g, boolean arg1) {
         Model[] model = separateStatementsWithBlankNodes(g);
         addModel(model[1] /* nonBlankNodeModel */);
@@ -108,6 +113,7 @@ public class RDFServiceGraphBulkUpdater implements BulkUpdateHandler {
     
 
 	@Override
+    @Deprecated
 	public void delete(Triple[] arg0) {
         Graph g = GraphFactory.createPlainGraph();
         for (int i = 0 ; i < arg0.length ; i++) {
@@ -117,6 +123,7 @@ public class RDFServiceGraphBulkUpdater implements BulkUpdateHandler {
 	}
 
 	@Override
+    @Deprecated
 	public void delete(List<Triple> arg0) {
         Graph g = GraphFactory.createPlainGraph();
         for (Triple t : arg0) {
@@ -126,6 +133,7 @@ public class RDFServiceGraphBulkUpdater implements BulkUpdateHandler {
 	}
 
 	@Override
+    @Deprecated
 	public void delete(Iterator<Triple> arg0) {
         Graph g = GraphFactory.createPlainGraph();
         while (arg0.hasNext()) {
@@ -136,11 +144,13 @@ public class RDFServiceGraphBulkUpdater implements BulkUpdateHandler {
 	}
 
     @Override 
+    @Deprecated
     public void delete(Graph g, boolean withReifications) {
         delete(g);
     }
     
     @Override 
+    @Deprecated
     public void delete(Graph g) {
         deleteModel(ModelFactory.createModelForGraph(g));
     }
@@ -174,6 +184,7 @@ public class RDFServiceGraphBulkUpdater implements BulkUpdateHandler {
     }    
 
     @Override 
+    @Deprecated
     public void removeAll() {
         removeAll(graph, null, null, null);
         notifyRemoveAll(); 
@@ -184,6 +195,7 @@ public class RDFServiceGraphBulkUpdater implements BulkUpdateHandler {
     }
 
     @Override
+    @Deprecated
     public void remove(Node s, Node p, Node o) {
         removeAll(graph, s, p, o);
         manager.notifyEvent(graph, GraphEvents.remove(s, p, o));

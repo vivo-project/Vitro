@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
@@ -193,7 +194,7 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
         List<Node> graphNodeList = new ArrayList<Node>();
         try {
             for (String graphURI : rdfService.getGraphURIs()) {
-                graphNodeList.add(Node.createURI(graphURI));   
+                graphNodeList.add(NodeFactory.createURI(graphURI));   
             }
         } catch (RDFServiceException rdfse) {
             throw new RuntimeException(rdfse);
