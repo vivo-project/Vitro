@@ -160,6 +160,8 @@ public class DatapropRetryController extends BaseEditController {
         optionMap.put("RangeDatatypeURI", datatypeOptionList);
         
         List groupOptList = FormUtils.makeOptionListFromBeans(vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao().getPublicGroups(true),"URI","Name", ((objectForEditing.getGroupURI()==null) ? "" : objectForEditing.getGroupURI()), null, (objectForEditing.getGroupURI()!=null));
+        HashMap<String,Option> hashMap = new HashMap<String,Option>();
+        groupOptList = getSortedList(hashMap,groupOptList,vreq);
         groupOptList.add(0,new Option("","none"));
         optionMap.put("GroupURI", groupOptList);
 

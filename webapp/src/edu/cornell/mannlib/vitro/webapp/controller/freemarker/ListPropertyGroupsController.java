@@ -49,8 +49,6 @@ public class ListPropertyGroupsController extends FreemarkerHttpServlet {
             PropertyGroupDao dao = vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao();
 
             List<PropertyGroup> groups = dao.getPublicGroups(WITH_PROPERTIES);
-            sortForPickList(groups, vreq);
-
                 String json = new String();
                 int counter = 0;
 
