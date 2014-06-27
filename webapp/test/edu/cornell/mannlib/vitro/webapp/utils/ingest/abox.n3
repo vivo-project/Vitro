@@ -1,0 +1,12 @@
+@prefix ns: <http://example.com/ns/> .
+
+ns:n1 a ns:Duck .
+ns:n1 ns:duckCode "1" .
+ns:n1 ns:d "cheese"@en-US .
+ns:n1 ns:o ns:f .
+ns:n2 a ns:Duck .
+ns:n2 ns:upcCode "2" .
+ns:n2 ns:p ns:q .
+ns:n3 a ns:Duck .
+ns:n3 ns:productCode "3"^^<http://example.org/datatype> .
+ns:n3 ns:q ns:z .

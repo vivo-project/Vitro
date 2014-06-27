@@ -598,7 +598,8 @@ public class JenaIngestController extends BaseEditController {
     private void processMergeResourceRequest(VitroRequest vreq) {
           String uri1 = vreq.getParameter("uri1"); // get primary uri
           String uri2 = vreq.getParameter("uri2"); // get secondary uri
-          String usePrimaryLabelOnly = vreq.getParameter("usePrimaryLabelOnly");
+          String usePrimaryLabelOnlyStr = vreq.getParameter("usePrimaryLabelOnly");;
+          boolean usePrimaryLabelOnly = usePrimaryLabelOnlyStr != null && !usePrimaryLabelOnlyStr.isEmpty();
           
           if(uri1!=null){
               JenaIngestUtils utils = new JenaIngestUtils();

@@ -1,0 +1,14 @@
+@prefix ns: <http://example.com/ns/> .
+
+ns:n1 a ns:Duck .
+ns:n1 ns:duckCode "1" .
+ns:n1 ns:d "cheese" .
+ns:n5 a ns:Duck .
+ns:n5 ns:duckCode "2" .
+ns:n5 ns:d "strudel" .
+ns:n5 ns:d "pancake" .
+ns:n6 a ns:Duck .
+ns:n6 ns:duckCode "3" .
+ns:n6 ns:d "cake" .
+ns:n6 ns:d "bacon" .
+ns:n6 ns:d "corn" .

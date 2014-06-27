@@ -1,0 +1,11 @@
+@prefix ns: <http://example.com/ns/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+ns:Duck a owl:Class .
+ns:duckCode a owl:DatatypeProperty .
+ns:d a owl:DatatypeProperty .
+ns:o a owl:ObjectProperty .
+ns:upcCode a owl:DatatypeProperty .
+ns:p a owl:ObjectProperty .
+ns:productCode a owl:DatatypeProperty .
+ns:q a owl:ObjectProperty .
