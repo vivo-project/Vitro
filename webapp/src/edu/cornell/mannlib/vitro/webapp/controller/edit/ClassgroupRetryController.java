@@ -35,7 +35,7 @@ public class ClassgroupRetryController extends BaseEditController {
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
 		if (!isAuthorizedToDisplayPage(req, response,
-				SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTIONS)) {
+				SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTION)) {
         	return;
         }
 

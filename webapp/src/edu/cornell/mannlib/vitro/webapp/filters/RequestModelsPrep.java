@@ -26,15 +26,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openjena.atlas.lib.Pair;
+import org.apache.jena.atlas.lib.Pair;
 
-import com.hp.hpl.jena.graph.BulkUpdateHandler;
-import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
+//import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
@@ -52,10 +49,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HideFromDisplayByP
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.SpecialBulkUpdateHandlerGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringRDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
@@ -197,19 +194,20 @@ public class RequestModelsPrep implements Filter {
 
 		// Anything derived from the ABOX is not memory-mapped, so create
 		// versions from the short-term RDF service.
-		OntModel baseABoxModel = createNamedModelFromDataset(dataset,
-				JENA_DB_MODEL);
-		OntModel inferenceABoxModel = createNamedModelFromDataset(dataset,
-				JENA_INF_MODEL);
-		OntModel unionABoxModel = createCombinedBulkUpdatingModel(
+		OntModel baseABoxModel = VitroModelFactory.createOntologyModel(dataset
+				.getNamedModel(JENA_DB_MODEL));
+		OntModel inferenceABoxModel = VitroModelFactory
+				.createOntologyModel(dataset.getNamedModel(JENA_INF_MODEL));
+		OntModel unionABoxModel = VitroModelFactory.createUnion(
 				baseABoxModel, inferenceABoxModel);
 
-		OntModel baseFullModel = createCombinedBulkUpdatingModel(baseABoxModel,
+		OntModel baseFullModel = VitroModelFactory.createUnion(baseABoxModel,
 				ModelAccess.on(vreq).getOntModel(ModelID.BASE_TBOX));
-		OntModel inferenceFullModel = createCombinedModel(inferenceABoxModel,
+		OntModel inferenceFullModel = VitroModelFactory.createUnion(
+				inferenceABoxModel,
 				ModelAccess.on(vreq).getOntModel(ModelID.INFERRED_TBOX));
-		OntModel unionFullModel = ModelFactory.createOntologyModel(
-				OntModelSpec.OWL_MEM, dataset.getDefaultModel());
+		OntModel unionFullModel = VitroModelFactory.createOntologyModel(
+				dataset.getDefaultModel());
 
 		ModelAccess.on(vreq).setOntModel(ModelID.BASE_ABOX, baseABoxModel);
 		ModelAccess.on(vreq).setOntModel(ModelID.INFERRED_ABOX, inferenceABoxModel);
@@ -224,24 +222,6 @@ public class RequestModelsPrep implements Filter {
 		ModelAccess.on(vreq).setOntModel(modelId, contextModel);
 	}
 	
-	private OntModel createNamedModelFromDataset(Dataset dataset, String name) {
-    	return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, dataset.getNamedModel(name));
-    }
-
-	private OntModel createCombinedModel(OntModel oneModel, OntModel otherModel) {
-        return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, 
-        		ModelFactory.createUnion(oneModel, otherModel));
-	}
-
-	private OntModel createCombinedBulkUpdatingModel(OntModel baseModel,
-			OntModel otherModel) {
-		BulkUpdateHandler bulkUpdateHandler = baseModel.getGraph().getBulkUpdateHandler();
-		Graph unionGraph = ModelFactory.createUnion(baseModel, otherModel).getGraph();
-		Model unionModel = ModelFactory.createModelForGraph(
-				new SpecialBulkUpdateHandlerGraph(unionGraph, bulkUpdateHandler));
-		return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, unionModel);
-	}
-
 	/** Create an OntModelSelector that will hold the un-language-filtered models. */
 	private OntModelSelector createLanguageNeutralOntModelSelector(
 			VitroRequest vreq) {

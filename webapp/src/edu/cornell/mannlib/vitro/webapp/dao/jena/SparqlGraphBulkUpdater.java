@@ -19,7 +19,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.sparql.util.graph.GraphFactory;
+import com.hp.hpl.jena.sparql.graph.GraphFactory;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
 public class SparqlGraphBulkUpdater extends SimpleBulkUpdateHandler {
@@ -33,6 +33,7 @@ public class SparqlGraphBulkUpdater extends SimpleBulkUpdateHandler {
     }
     
     @Override
+    @Deprecated
     public void add(Triple[] arg0) {
         Graph g = GraphFactory.createPlainGraph();
         for (int i = 0 ; i < arg0.length ; i++) {
@@ -42,6 +43,7 @@ public class SparqlGraphBulkUpdater extends SimpleBulkUpdateHandler {
     }
 
     @Override
+    @Deprecated
     public void add(List<Triple> arg0) {
         Graph g = GraphFactory.createPlainGraph();
         for (Triple t : arg0) {
@@ -51,6 +53,7 @@ public class SparqlGraphBulkUpdater extends SimpleBulkUpdateHandler {
     }
 
     @Override
+    @Deprecated
     public void add(Iterator<Triple> arg0) {
         Graph g = GraphFactory.createPlainGraph();
         while (arg0.hasNext()) {
@@ -61,11 +64,13 @@ public class SparqlGraphBulkUpdater extends SimpleBulkUpdateHandler {
     }
 
     @Override
+    @Deprecated
     public void add(Graph arg0) {
         add(arg0, false);
     }
 
     @Override
+    @Deprecated
     public void add(Graph g, boolean arg1) {
         log.info("adding graph");
         Model[] model = separateStatementsWithBlankNodes(g);
@@ -102,11 +107,13 @@ public class SparqlGraphBulkUpdater extends SimpleBulkUpdateHandler {
     
 
     @Override 
+    @Deprecated
     public void delete(Graph g, boolean withReifications) {
         delete(g);
     }
     
     @Override 
+    @Deprecated
     public void delete(Graph g) {
         Model[] model = separateStatementsWithBlankNodes(g);
         deleteModel(model[1] /*statements without blank nodes*/);
@@ -189,16 +196,20 @@ public class SparqlGraphBulkUpdater extends SimpleBulkUpdateHandler {
     
 
     @Override 
+    @Deprecated
     public void removeAll() {
         removeAll(graph);
         notifyRemoveAll(); 
     }
 
-    protected void notifyRemoveAll() { 
+    @Override
+    @Deprecated
+	protected void notifyRemoveAll() { 
         manager.notifyEvent(graph, GraphEvents.removeAll);
     }
 
     @Override
+    @Deprecated
     public void remove(Node s, Node p, Node o) {
         removeAll(graph, s, p, o);
         manager.notifyEvent(graph, GraphEvents.remove(s, p, o));

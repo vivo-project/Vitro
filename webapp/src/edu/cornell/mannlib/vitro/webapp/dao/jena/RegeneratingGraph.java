@@ -11,16 +11,14 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.GraphEventManager;
 import com.hp.hpl.jena.graph.GraphStatisticsHandler;
 import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Reifier;
 import com.hp.hpl.jena.graph.TransactionHandler;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.TripleMatch;
-import com.hp.hpl.jena.graph.query.QueryHandler;
 import com.hp.hpl.jena.shared.AddDeniedException;
 import com.hp.hpl.jena.shared.DeleteDeniedException;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
-import com.hp.hpl.jena.vocabulary.DAML_OIL;
+import com.hp.hpl.jena.vocabulary.DCTerms;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 public class RegeneratingGraph implements Graph, Regenerable {
@@ -40,6 +38,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 		this.generator = graphGenerator;
 	}
 	
+	@Override
 	public void regenerate() {
 		this.g = generator.generateGraph();
 	}	
@@ -49,25 +48,25 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	 */
 	private void sendTestQuery() {
 		this.g.contains(
-				DAML_OIL.Thing.asNode(),RDF.type.asNode(),DAML_OIL.Thing.asNode());
+				DCTerms.Agent.asNode(),RDF.type.asNode(),DCTerms.Agent.asNode());
 	}
 
+	@Override
 	protected void finalize() {
 		close();
 	}
 	
+	@Override
 	public void close() {
         try {
             g.close();
-            if (generator instanceof RDBGraphGenerator) {
-        		((RDBGraphGenerator) generator).getConnection().close();
-        	}
         } catch (Exception e) {
             regenerate();
             g.close();
         }
 	}
 	
+	@Override
 	public boolean contains(Triple arg0) {
 		try {
 			regenerateIfClosed();
@@ -78,6 +77,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
         }
 	}
 	
+	@Override
 	public boolean contains(Node arg0, Node arg1, Node arg2) {
 		try {
 			regenerateIfClosed();
@@ -88,6 +88,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
         }
 	}
 	
+	@Override
 	public void delete(Triple arg0) throws DeleteDeniedException {
 		try {
 			regenerateIfClosed();			
@@ -98,6 +99,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
         }
 	}
 	
+	@Override
 	public boolean dependsOn(Graph arg0) {
 		try {
 			regenerateIfClosed();			
@@ -108,7 +110,8 @@ public class RegeneratingGraph implements Graph, Regenerable {
         }
 	}
 
-	public ExtendedIterator find(TripleMatch arg0) {
+	@Override
+	public ExtendedIterator<Triple> find(TripleMatch arg0) {
 		try {
 			regenerateIfClosed();
             return g.find(arg0);
@@ -118,7 +121,8 @@ public class RegeneratingGraph implements Graph, Regenerable {
         }
 	}
 
-	public ExtendedIterator find(Node arg0, Node arg1, Node arg2) {
+	@Override
+	public ExtendedIterator<Triple> find(Node arg0, Node arg1, Node arg2) {
 		try {
 			regenerateIfClosed();
             return g.find(arg0,arg1,arg2);
@@ -128,6 +132,8 @@ public class RegeneratingGraph implements Graph, Regenerable {
         }
 	}
 	
+	@Override
+	@Deprecated
 	public BulkUpdateHandler getBulkUpdateHandler() {
 		try {
 			regenerateIfClosed();
@@ -139,6 +145,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
         }
 	}
 
+	@Override
 	public Capabilities getCapabilities() {
 		try {
 			regenerateIfClosed();
@@ -151,6 +158,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	}
 
 	
+	@Override
 	public GraphEventManager getEventManager() {
 		try {
 			regenerateIfClosed();
@@ -163,6 +171,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	}
 
 	
+	@Override
 	public PrefixMapping getPrefixMapping() {
 		try {
 			regenerateIfClosed();
@@ -175,18 +184,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	}
 
 	
-	public Reifier getReifier() {
-		try {
-			regenerateIfClosed();
-			sendTestQuery();
-            return g.getReifier();
-        } catch (Exception e) {
-            regenerate();
-            return g.getReifier();
-        }
-	}
-
-	
+	@Override
 	public GraphStatisticsHandler getStatisticsHandler() {
 		try {
 			regenerateIfClosed();
@@ -199,6 +197,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	}
 
 	
+	@Override
 	public TransactionHandler getTransactionHandler() {
 		try {
 			regenerateIfClosed();
@@ -211,6 +210,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	}
 
 	
+	@Override
 	public boolean isClosed() {
 		try {
 			regenerateIfClosed();
@@ -222,6 +222,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	}
 
 	
+	@Override
 	public boolean isEmpty() {
 		try {
 			regenerateIfClosed();
@@ -233,6 +234,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	}
 
 	
+	@Override
 	public boolean isIsomorphicWith(Graph arg0) {
 		try {
 			regenerateIfClosed();
@@ -242,20 +244,8 @@ public class RegeneratingGraph implements Graph, Regenerable {
             return g.isIsomorphicWith(arg0);
         }
 	}
-
 	
-	public QueryHandler queryHandler() {
-		try {
-			regenerateIfClosed();
-			sendTestQuery();
-			return g.queryHandler();
-		} catch (Exception e) {
-			regenerate();
-			return g.queryHandler();
-		}
-	}
-
-	
+	@Override
 	public int size() {
 		try {
 			regenerateIfClosed();
@@ -267,6 +257,7 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	}
 
 	
+	@Override
 	public void add(Triple arg0) throws AddDeniedException {
 		try {
 			regenerateIfClosed();
@@ -277,6 +268,28 @@ public class RegeneratingGraph implements Graph, Regenerable {
         }
 	}
 	
+	@Override
+	public void clear() {
+		try {
+			regenerateIfClosed();
+            g.clear();
+        } catch (Exception e) {
+            regenerate();
+            g.clear();
+        }
+	}
+
+	@Override
+	public void remove(Node arg0, Node arg1, Node arg2) {
+		try {
+			regenerateIfClosed();
+            g.remove(arg0, arg1, arg2);
+        } catch (Exception e) {
+            regenerate();
+            g.remove(arg0, arg1, arg2);
+        }
+	}
+
 	private void regenerateIfClosed() {
 		if (generator.isGraphClosed()) {
 			regenerate();

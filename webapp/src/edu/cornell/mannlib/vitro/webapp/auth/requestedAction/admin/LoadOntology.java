@@ -2,8 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.admin;
 
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.AdminRequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 
 /** Should we allow the user to load an ontology? */
 public class LoadOntology extends RequestedAction implements AdminRequestedAction{

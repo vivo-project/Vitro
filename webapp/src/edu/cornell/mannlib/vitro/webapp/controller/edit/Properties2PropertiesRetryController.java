@@ -2,14 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
@@ -34,7 +28,7 @@ public class Properties2PropertiesRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(Properties2PropertiesRetryController.class.getName());
 
     public void doGet (HttpServletRequest req, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
+        if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
         	return;
         }
 

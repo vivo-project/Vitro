@@ -18,7 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -47,8 +47,8 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
     private int previous_posn = 0;
 
     @Override
-	protected Actions requiredActions(VitroRequest vreq) {
-		return SimplePermission.EDIT_ONTOLOGY.ACTIONS;
+	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
+		return SimplePermission.EDIT_ONTOLOGY.ACTION;
 	}
     
     @Override

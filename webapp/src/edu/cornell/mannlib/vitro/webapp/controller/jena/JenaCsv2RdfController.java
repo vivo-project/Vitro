@@ -25,7 +25,6 @@ import com.hp.hpl.jena.rdf.model.ModelMaker;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 import edu.cornell.mannlib.vitro.webapp.utils.Csv2Rdf;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 
@@ -37,23 +36,32 @@ public class JenaCsv2RdfController extends JenaIngestController {
 	private static final String CSV2RDF_SELECT_URI_JSP = "/jenaIngest/csv2rdfSelectUri.jsp";
 	private static int maxFileSizeInBytes = 1024 * 1024 * 2000; //2000mb 
 	
+	
+	@Override
+	public long maximumMultipartFileSize() {
+		return maxFileSizeInBytes;
+	}
+
+	@Override
+	public boolean stashFileSizeException() {
+		return true;
+	}
+
 	@Override
 	public void doPost(HttpServletRequest rawRequest,
 			HttpServletResponse response) throws ServletException, IOException {
 		if (!isAuthorizedToDisplayPage(rawRequest, response,
-				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTIONS)) {
+				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION)) {
         	return;
         }
 
-		FileUploadServletRequest req = FileUploadServletRequest.parseRequest(rawRequest,
-				maxFileSizeInBytes);
-		if (req.hasFileUploadException()) {
-			forwardToFileUploadError(req.getFileUploadException().getLocalizedMessage(), req, response);
+		VitroRequest request = new VitroRequest(rawRequest);		
+		if (request.hasFileSizeException()) {
+			forwardToFileUploadError(request.getFileSizeException().getLocalizedMessage(), request, response);
 			return;
 		}
 
-		VitroRequest request = new VitroRequest(req);		
-		Map<String, List<FileItem>> fileStreams = req.getFiles();
+		Map<String, List<FileItem>> fileStreams = request.getFiles();
 		FileItem fileStream = fileStreams.get("filePath").get(0);
 		String filePath = fileStreams.get("filePath").get(0).getName();
 		
@@ -70,10 +78,10 @@ public class JenaCsv2RdfController extends JenaIngestController {
     				csv2rdfResult = doExecuteCsv2Rdf(
     						request, fileStream, filePath);
 				}catch(Exception ex){
-				    forwardToFileUploadError(ex.getMessage(),req,response);
+				    forwardToFileUploadError(ex.getMessage(),request,response);
 				    return;
 				}
-				ModelMaker maker = getVitroJenaModelMaker(request);
+				ModelMaker maker = getModelMaker(request);
 				Boolean csv2rdf = true;
 				JenaIngestUtils utils = new JenaIngestUtils();
 				List<Model> resultList = new ArrayList<Model>();

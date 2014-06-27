@@ -8,7 +8,6 @@
 <h2>Ingest Menu</h2>
 
 <ul class="ingestMenu">
-    <li><a href="ingest?action=connectDB" title="Connect to a Jena database">Connect DB</a></li>
     <li><a href="ingest?action=listModels"title="Manage all available Jena models">Manage Jena Models</a></li>
     <li><a href="ingest?action=subtractModels" title="Subtract one model from another and save difference to new model">Subtract One Model from Another</a></li>
 </ul>
@@ -31,4 +30,8 @@
 
 <ul class="ingestMenu">
     <li><a href="ingest?action=executeWorkflow" title="Execute an RDF-encoded ingest workflow">Execute Workflow</a></li>
+</ul>
+
+<ul class="ingestMenu">
+    <li><a href="ingest?action=dumpRestore" title="Dump or Restore the knowledge base">Dump or Restore the knowledge base</a></li>
 </ul>

@@ -12,7 +12,7 @@
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
 
 <%
-	if (PolicyHelper.isAuthorizedForActions(request, SimplePermission.USE_MISCELLANEOUS_EDITOR_PAGES.ACTIONS)) {
+	if (PolicyHelper.isAuthorizedForActions(request, SimplePermission.USE_INDIVIDUAL_CONTROL_PANEL.ACTION)) {
 		request.setAttribute("isEditor", Boolean.TRUE);
 	}
 %>
@@ -34,40 +34,30 @@
         	<c:set var="query" 
                  value="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                        SELECT   ?pred  ?predLabel ?obj ?objLabel ?graph
+                        SELECT   ?pred ?obj ?graph
                         WHERE 
                         {
-                         { <${entity.URI}> ?pred ?obj 
-                           MINUS { GRAPH ?g { <${entity.URI}> ?pred ?obj } } } 
-                         UNION 
-                         { GRAPH ?graph { <${entity.URI}> ?pred ?obj} } 
-                         OPTIONAL { ?obj rdfs:label ?objLabel }
-                         OPTIONAL { ?pred rdfs:label ?predLabel }
+                          GRAPH ?graph { <${entity.URI}> ?pred ?obj} 
                         } ORDER BY ?graph ?pred
                         limit 10000"/>
           <form action="admin/sparqlquery" method="get">
             <input type="hidden" name="query" value="${query}"/>
-            <input type="hidden" name="resultFormat" value="RS_TEXT"/>
+            <input type="hidden" name="resultFormat" value="text/plain"/>
             <input type="submit" class="form-button" value="Raw Statements with This Resource as Subject"/>
           </form>
 
           <c:set var="query" 
                  value="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                        SELECT ?sub ?subL  ?pred  ?predLabel ?graph
+                        SELECT ?sub ?pred ?graph
                         WHERE 
                         {
-                         { ?sub ?pred <${entity.URI}>  
-                           MINUS { GRAPH ?g { ?sub ?pred <${entity.URI}> } } } 
-                         UNION
-                         { GRAPH ?graph { ?sub ?pred <${entity.URI}> } }
-                         OPTIONAL { ?sub rdfs:label ?subL }
-                         OPTIONAL { ?pred rdfs:label ?predLabel }
+                          GRAPH ?graph { ?sub ?pred <${entity.URI}> }
                         } ORDER BY ?graph ?pred
                         limit 10000"/>
           <form action="admin/sparqlquery" method="get">
             <input type="hidden" name="query" value="${query}"/>
-            <input type="hidden" name="resultFormat" value="RS_TEXT"/>
+            <input type="hidden" name="resultFormat" value="text/plain"/>
             <input type="submit" class="form-button" value="Raw Statements with This Resource as Object"/>
           </form>
         	

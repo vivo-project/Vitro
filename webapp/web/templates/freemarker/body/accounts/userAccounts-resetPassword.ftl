@@ -31,7 +31,7 @@
         <label for="new-password">${strings.new_password}<span class="requiredHint"> *</span></label>
         <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
             
-        <p class="note">${strings.minimum_password_length(minimumLength)}</p>
+        <p class="note">${strings.minimum_password_length(minimumLength, maximumLength)}</p>
 
         <label for="confirm-password">${strings.confirm_password}<span class="requiredHint"> *</span></label>
         <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />

@@ -29,22 +29,20 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.shared.Lock;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroJenaModelMaker;
-
 public class JenaIngestWorkflowProcessor {
     
     private static final Log log = LogFactory.getLog(JenaIngestWorkflowProcessor.class.getName());
 
 	private Individual workflowInd;
-	private ModelMaker vitroJenaModelMaker;
+	private ModelMaker modelMaker;
 	private Map<String,Literal> varMap;
 	private List<ActionHandler> actionHandlerList;
 	private JenaIngestUtils utils;
 	
-	public JenaIngestWorkflowProcessor(Individual workflowInd, ModelMaker vitroJenaModelMaker) {
+	public JenaIngestWorkflowProcessor(Individual workflowInd, ModelMaker modelMaker) {
 		this.varMap = new HashMap<String,Literal>();
 		this.workflowInd = workflowInd;
-		this.vitroJenaModelMaker = vitroJenaModelMaker;
+		this.modelMaker = modelMaker;
 		actionHandlerList = new LinkedList<ActionHandler>();
 		actionHandlerList.add(new ClearModelAction());
 		actionHandlerList.add(new AddModelsAction());
@@ -153,7 +151,7 @@ public class JenaIngestWorkflowProcessor {
 		String modelNameStr = ((Literal)modelInd.getPropertyValue(WorkflowOntology.modelName).as(Literal.class)).getLexicalForm();
 		// false = strict mode off, i.e., 
 		// if a model already exists of the given name, return it.  Otherwise, create a new one.
-		return vitroJenaModelMaker.createModel(modelNameStr,false);
+		return modelMaker.createModel(modelNameStr,false);
 	}
 	
 	private interface ActionResult {}

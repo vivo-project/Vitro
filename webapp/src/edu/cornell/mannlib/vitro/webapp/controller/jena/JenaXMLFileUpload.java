@@ -36,7 +36,6 @@ import com.hp.hpl.jena.shared.Lock;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 
 public class JenaXMLFileUpload  extends JenaIngestController  {	
 	Log log = LogFactory.getLog(JenaXMLFileUpload.class);
@@ -76,6 +75,16 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 		}		
 	}
 
+	@Override
+	public long maximumMultipartFileSize() {
+		return maxFileSize;
+	}
+
+	@Override
+	public boolean stashFileSizeException() {
+		return true;
+	}
+
 	/**
 	 * Each file will be converted to RDF/XML and loaded to the target model.
 	 * If any of the files fail, no data will be loaded.
@@ -86,14 +95,14 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 	 * 
 	 */
 	@Override
-	public void doPost(HttpServletRequest rawRequest, HttpServletResponse resp)
+	public void doPost(HttpServletRequest request, HttpServletResponse resp)
 	throws ServletException, IOException {
-		FileUploadServletRequest request = FileUploadServletRequest.parseRequest(rawRequest, maxFileSize);
-		if (request.hasFileUploadException()) {
+		VitroRequest vreq = new VitroRequest(request);        
+		if (vreq.hasFileSizeException()) {
 			throw new ServletException("Size limit exceeded: "
-					+ request.getFileUploadException().getLocalizedMessage());
+					+ vreq.getFileSizeException().getLocalizedMessage());
 		}
-        if (request.isMultipart()) {
+        if (vreq.isMultipart()) {
         	log.debug("multipart content detected");
         } else {
             // TODO: forward to error message
@@ -101,12 +110,11 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
         }
 
 		if (!isAuthorizedToDisplayPage(request, resp,
-				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTIONS)) {
+				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION)) {
         	return;
         }
 
-        VitroRequest vreq = new VitroRequest(request);        
-        ModelMaker modelMaker = getVitroJenaModelMaker(vreq);
+        ModelMaker modelMaker = getModelMaker(vreq);
         String targetModel = request.getParameter("targetModel");               
 		if (targetModel == null) {
 			throw new ServletException("targetModel not specified.");
@@ -117,7 +125,7 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
         	throw new ServletException("targetModel '" + targetModel + "' was not found.");
         request.setAttribute("targetModel", targetModel);
         
-        List<File> filesToLoad = saveFiles( request.getFiles() );    
+        List<File> filesToLoad = saveFiles( vreq.getFiles() );    
         List<File> rdfxmlToLoad = convertFiles( filesToLoad);
         List<Model> modelsToLoad = loadRdfXml( rdfxmlToLoad );
     
@@ -136,7 +144,7 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 		request.setAttribute("title","Uploaded files and converted to RDF");
 		request.setAttribute("bodyJsp","/jenaIngest/xmlFileUploadSuccess.jsp");
 		
-		request.setAttribute("fileItems",request.getFiles());				
+		request.setAttribute("fileItems",vreq.getFiles());				
 
 		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
@@ -154,7 +162,7 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 	public void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {		
 		if (!isAuthorizedToDisplayPage(request, response,
-				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTIONS)) {
+				SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION)) {
         	return;
         }
 
@@ -164,7 +172,7 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 		request.setAttribute("title","Upload file and convert to RDF");
 		request.setAttribute("bodyJsp","/jenaIngest/xmlFileUpload.jsp");
 		
-		request.setAttribute("modelNames", getVitroJenaModelMaker(vreq).listModels().toList());
+		request.setAttribute("modelNames", getModelMaker(vreq).listModels().toList());
 		request.setAttribute("models", null);				
 
 		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      

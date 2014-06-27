@@ -23,7 +23,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServ
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 
 /**
@@ -35,7 +34,10 @@ public class SearchServiceController extends FreemarkerHttpServlet {
 			.getLog(SearchServiceController.class);
 
 	/** Limit file size to 1 Gigabyte. */
-	public static final int MAXIMUM_FILE_SIZE = 1024 * 1024 * 1024;
+	@Override
+	public long maximumMultipartFileSize() {
+		return 1024 * 1024 * 1024;
+	}
 
 	/**
 	 * Handle the different actions. If not specified, the default action is to
@@ -44,9 +46,6 @@ public class SearchServiceController extends FreemarkerHttpServlet {
 	@Override
 	protected ResponseValues processRequest(VitroRequest req) {
 		try {
-			req = new VitroRequest(FileUploadServletRequest.parseRequest(req,
-					MAXIMUM_FILE_SIZE));
-
 			// Check the authorization here, because we don't want to redirect
 			// to the login page if they are not authorized. (The file upload
 			// would be lost.
@@ -99,7 +98,7 @@ public class SearchServiceController extends FreemarkerHttpServlet {
 		}
 		// For other functions, your credentials must have moxie.
 		if (PolicyHelper.isAuthorizedForActions(vreq, email, pw,
-				SimplePermission.MANAGE_SEARCH_INDEX.ACTIONS)) {
+				SimplePermission.MANAGE_SEARCH_INDEX.ACTION)) {
 			return;
 		}
 		// Otherwise, you can't do this.

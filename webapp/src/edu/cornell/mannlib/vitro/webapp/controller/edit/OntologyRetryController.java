@@ -34,7 +34,7 @@ public class OntologyRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(OntologyRetryController.class.getName());
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
+        if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
         	return;
         }
 

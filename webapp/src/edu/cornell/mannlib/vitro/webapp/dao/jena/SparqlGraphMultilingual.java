@@ -13,11 +13,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.TripleMatch;
 import com.hp.hpl.jena.graph.impl.GraphWithPerform;
 import com.hp.hpl.jena.shared.AddDeniedException;
-import com.hp.hpl.jena.sparql.util.NodeFactory;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
@@ -51,7 +51,7 @@ public class SparqlGraphMultilingual extends SparqlGraph implements GraphWithPer
                 && t.getObject().getLiteral().getDatatypeURI() == null) {
             log.info("adding language tag");
             super.performAdd(Triple.create(t.getSubject(), 
-                    t.getPredicate(), NodeFactory.createLiteralNode(
+                    t.getPredicate(), NodeFactory.createLiteral(
                             t.getObject().getLiteralLexicalForm(), langs.get(0), null)));
         } else {
             log.info("adding original triple " + t);

@@ -14,15 +14,12 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.GraphEventManager;
 import com.hp.hpl.jena.graph.GraphStatisticsHandler;
 import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Reifier;
 import com.hp.hpl.jena.graph.TransactionHandler;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.TripleMatch;
 import com.hp.hpl.jena.graph.impl.GraphWithPerform;
 import com.hp.hpl.jena.graph.impl.SimpleBulkUpdateHandler;
 import com.hp.hpl.jena.graph.impl.SimpleEventManager;
-import com.hp.hpl.jena.graph.query.QueryHandler;
-import com.hp.hpl.jena.graph.query.SimpleQueryHandler;
 import com.hp.hpl.jena.shared.AddDeniedException;
 import com.hp.hpl.jena.shared.DeleteDeniedException;
 import com.hp.hpl.jena.shared.PrefixMapping;
@@ -30,7 +27,6 @@ import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.EmptyReifier;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
 
@@ -44,8 +40,6 @@ public class ListeningGraph implements GraphWithPerform {
     private BulkUpdateHandler bulkUpdateHandler;
     private GraphEventManager eventManager;
     private PrefixMapping prefixMapping = new PrefixMappingImpl();
-    private Reifier reifier = new EmptyReifier(this);
-    private QueryHandler queryHandler;
     
     public ListeningGraph(String graphURI, RDFServiceImpl rdfServiceImpl) {
         this.graphURI = graphURI;
@@ -80,6 +74,7 @@ public class ListeningGraph implements GraphWithPerform {
       
     @Override
     public void close() {
+    	// Nothing to close.
     }
 
     @Override
@@ -109,7 +104,22 @@ public class ListeningGraph implements GraphWithPerform {
         return WrappedIterator.create(triplist.iterator());
     }
     
+	@Override
+	public void clear() {
+		for (Triple t: find(null, null, null).toList()) {
+			delete(t);
+		}
+	}
+
+	@Override
+	public void remove(Node subject, Node predicate, Node object) {
+		for (Triple t: find(subject, predicate, object).toList()) {
+			delete(t);
+		}
+	}
+
     @Override
+    @Deprecated
     public BulkUpdateHandler getBulkUpdateHandler() {
         if (this.bulkUpdateHandler == null) {
             this.bulkUpdateHandler = new SimpleBulkUpdateHandler(this);
@@ -136,24 +146,17 @@ public class ListeningGraph implements GraphWithPerform {
     }
 
     @Override
-    public Reifier getReifier() {
-        return reifier;
-    }
-
-    @Override
     public GraphStatisticsHandler getStatisticsHandler() {
         return null;
     }
 
     @Override
     public TransactionHandler getTransactionHandler() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public boolean isClosed() {
-        // TODO Auto-generated method stub
         return false;
     }
 
@@ -169,14 +172,6 @@ public class ListeningGraph implements GraphWithPerform {
     }
 
     @Override
-    public QueryHandler queryHandler() {
-        if (queryHandler == null) {
-            queryHandler = new SimpleQueryHandler(this);
-        }
-        return queryHandler;
-    }
-
-    @Override
     public int size() {
         int size = find(null, null, null).toList().size();
         return size;
@@ -184,41 +179,50 @@ public class ListeningGraph implements GraphWithPerform {
     
     private final static Capabilities capabilities = new Capabilities() {
         
-        public boolean addAllowed() {
+        @Override
+		public boolean addAllowed() {
             return false;
         }
         
+        @Override
         public boolean addAllowed(boolean everyTriple) {
             return false;
         }
         
+        @Override
         public boolean canBeEmpty() {
             return true;
         }
         
+        @Override
         public boolean deleteAllowed() {
             return false;
         }
         
+        @Override
         public boolean deleteAllowed(boolean everyTriple) {
             return false;
         }
         
+        @Override
         public boolean findContractSafe() {
             return true;
         }
         
+        @Override
         public boolean handlesLiteralTyping() {
             return true;
         }
         
+        @Override
         public boolean iteratorRemoveAllowed() {
             return false;
         }
         
+        @Override
         public boolean sizeAccurate() {
             return true;
         }
     };
-    
+
 }

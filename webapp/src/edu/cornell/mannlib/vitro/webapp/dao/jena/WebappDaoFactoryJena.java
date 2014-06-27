@@ -11,13 +11,12 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.iri.IRI;
+import org.apache.jena.iri.IRIFactory;
 
-import com.hp.hpl.jena.iri.IRI;
-import com.hp.hpl.jena.iri.IRIFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntResource;
-import com.hp.hpl.jena.query.DataSource;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -155,7 +154,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
        
     public static Dataset makeInMemoryDataset(Model assertions, 
                                               Model inferences) {
-        DataSource dataset = DatasetFactory.create();        
+        Dataset dataset = DatasetFactory.createMem();        
         OntModel union = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);        
         if (assertions != null) {
             dataset.addNamedModel(
@@ -177,20 +176,20 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 		return this.properties;
 	}
 
-    public String checkURI(String uriStr) {
+    @Override
+	public String checkURI(String uriStr) {
     	return checkURI(uriStr, true);
     }
     
-    public String checkURI(String uriStr, boolean checkUniqueness) {
+    @Override
+	public String checkURI(String uriStr, boolean checkUniqueness) {
         uriStr = (uriStr == null) ? " " : uriStr;
-		boolean validURI = true;
 		String errorMsg = "";
 		String duplicateMsg = "URI is already in use. " +
 		                      "Please enter another URI. ";
 		IRIFactory factory = IRIFactory.jenaImplementation();
 	    IRI iri = factory.create( uriStr );
 	    if (iri.hasViolation(false) ) {
-	    	validURI = false;
 	    	errorMsg += (iri.violations(false).next())
 	    	                    .getShortMessage() + " ";
 	    } else if (checkUniqueness) {
@@ -198,11 +197,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 	    	if(existingURI) {
 				errorMsg+="Not a valid URI.  Please enter another URI. ";
 				errorMsg+=duplicateMsg;
-				//the original code included an extra line "Not a valid URI.  Please enter another URI. "
-				//in the error message in addition to the duplicate error message in the case where the uri
-				//is in the subject position of any of the statements in the system - but not so where the
-				//uri was only in the object position or was a propery.  In this code, the same error message
-				//is returned for all duplicate uris
 	    	}
 	    }
 	    return (errorMsg.length()>0) ? errorMsg : null;
@@ -211,33 +205,36 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     
     
     //Check if URI already in use or not either as resource OR as property
-    public boolean hasExistingURI(String uriStr) {
+    @Override
+	public boolean hasExistingURI(String uriStr) {
     	OntModel ontModel = ontModelSelector.getFullModel(); 
 		return URIUtils.hasExistingURI(uriStr, ontModel);
     }
     
-   
-    
-    
-    public WebappDaoFactory getUserAwareDaoFactory(String userURI) {
+    @Override
+	public WebappDaoFactory getUserAwareDaoFactory(String userURI) {
         return new WebappDaoFactoryJena(this, userURI);
     }
 
-    public String getUserURI() {
+    @Override
+	public String getUserURI() {
         return userURI;
     }
 
     /* **************** accessors ***************** */
 
-    public String getDefaultNamespace() {
+    @Override
+	public String getDefaultNamespace() {
         return config.getDefaultNamespace();
     }
     
-    public List<String> getPreferredLanguages() {
+    @Override
+	public List<String> getPreferredLanguages() {
     	return config.getPreferredLanguages();
     }
     
-    public Set<String> getNonuserNamespaces() {
+    @Override
+	public Set<String> getNonuserNamespaces() {
     	return config.getNonUserNamespaces();
     }
     
@@ -253,7 +250,8 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     	return this.pelletListener;
     }
     
-    public List<String> getCommentsForResource(String resourceURI) {
+    @Override
+	public List<String> getCommentsForResource(String resourceURI) {
     	List<String> commentList = new LinkedList<String>();
     	OntModel ontModel = ontModelSelector.getFullModel();
     	ontModel.enterCriticalSection(Lock.READ);
@@ -276,14 +274,16 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     	return commentList;
     }
 
-    public IndividualDao getIndividualDao() {
+    @Override
+	public IndividualDao getIndividualDao() {
         if (entityWebappDao != null)
             return entityWebappDao;
         else
             return entityWebappDao = new IndividualDaoJena(this);
     }
     
-    public ApplicationDao getApplicationDao() {
+    @Override
+	public ApplicationDao getApplicationDao() {
     	if (applicationDao != null) {
     		return applicationDao;
     	} else {
@@ -291,21 +291,24 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     	}
     }
 
-    public VClassGroupDao getVClassGroupDao() {
+    @Override
+	public VClassGroupDao getVClassGroupDao() {
         if (vClassGroupDao != null)
             return vClassGroupDao;
         else
             return vClassGroupDao = new VClassGroupDaoJena(this);
     }
     
-    public PropertyGroupDao getPropertyGroupDao() {
+    @Override
+	public PropertyGroupDao getPropertyGroupDao() {
         if (propertyGroupDao != null)
             return propertyGroupDao;
         else
             return propertyGroupDao = new PropertyGroupDaoJena(this);
     }
 
-    public UserAccountsDao getUserAccountsDao() {
+    @Override
+	public UserAccountsDao getUserAccountsDao() {
     	if (userAccountsDao != null)
     		return userAccountsDao;
     	else
@@ -313,7 +316,8 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     }
 
     DataPropertyStatementDao dataPropertyStatementDao = null;
-    public DataPropertyStatementDao getDataPropertyStatementDao() {
+    @Override
+	public DataPropertyStatementDao getDataPropertyStatementDao() {
         if( dataPropertyStatementDao == null )
             dataPropertyStatementDao = new DataPropertyStatementDaoJena(
                     dwf, this);
@@ -321,14 +325,16 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     }
 
     DatatypeDao datatypeDao = null;
-    public DatatypeDao getDatatypeDao() {
+    @Override
+	public DatatypeDao getDatatypeDao() {
         if( datatypeDao == null )
             datatypeDao = new DatatypeDaoJena(this);
         return datatypeDao;
     }
 
     DataPropertyDao dataPropertyDao = null;
-    public DataPropertyDao getDataPropertyDao() {
+    @Override
+	public DataPropertyDao getDataPropertyDao() {
         if( dataPropertyDao == null )
             dataPropertyDao = new DataPropertyDaoJena(rdfService, dwf, this);
         return dataPropertyDao;
@@ -342,7 +348,8 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     }
 
     ObjectPropertyStatementDao objectPropertyStatementDao = null;
-    public ObjectPropertyStatementDao getObjectPropertyStatementDao() {
+    @Override
+	public ObjectPropertyStatementDao getObjectPropertyStatementDao() {
         if( objectPropertyStatementDao == null )
             // TODO supply a valid RDFService as the first argument if we keep this
             // implementation
@@ -352,14 +359,16 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     }
 
     private OntologyDao ontologyDao = null;
-    public OntologyDao getOntologyDao() {
+    @Override
+	public OntologyDao getOntologyDao() {
         if( ontologyDao == null )
             ontologyDao = new OntologyDaoJena(this);
         return ontologyDao;
     }
 
     private ObjectPropertyDao objectPropertyDao = null;
-    public ObjectPropertyDao getObjectPropertyDao() {
+    @Override
+	public ObjectPropertyDao getObjectPropertyDao() {
         if( objectPropertyDao == null )
             objectPropertyDao = new ObjectPropertyDaoJena(
                     rdfService, dwf, config.customListViewConfigFileMap, this);
@@ -367,14 +376,16 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     }
 
     private PropertyInstanceDao propertyInstanceDao = null;
-    public PropertyInstanceDao getPropertyInstanceDao() {
+    @Override
+	public PropertyInstanceDao getPropertyInstanceDao() {
         if( propertyInstanceDao == null )
             propertyInstanceDao = new PropertyInstanceDaoJena(rdfService, dwf, this);
         return propertyInstanceDao;
     }
 
     protected VClassDao vClassDao = null;
-    public VClassDao getVClassDao() {
+    @Override
+	public VClassDao getVClassDao() {
         if( vClassDao == null )
             vClassDao = new VClassDaoJena(this, config.isUnderlyingStoreReasoned());
         return vClassDao;

@@ -2,9 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_LITERAL;
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_PREDICATE;
-import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants.SOME_URI;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_LITERAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_PREDICATE;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_URI;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,7 +19,6 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -59,7 +58,7 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
     
     protected boolean isVClass(String vClassUri) {
         boolean isVClass = individual.isVClass(vClassUri);  
-        // If reasoning is asynchronous (under RDB), this inference may not have been made yet. 
+        // If reasoning is asynchronous, this inference may not have been made yet. 
         // Check the superclasses of the individual's vclass.
         SimpleReasoner simpleReasoner = (SimpleReasoner) ctx.getAttribute(SimpleReasoner.class.getName());
         if (!isVClass && simpleReasoner != null && simpleReasoner.isABoxReasoningAsynchronous()) { 
@@ -123,12 +122,12 @@ public abstract class BaseIndividualTemplateModel extends BaseTemplateModel {
 		AddObjectPropertyStatement aops = new AddObjectPropertyStatement(
 				vreq.getJenaOntModel(), individual.getURI(),
 				SOME_PREDICATE, SOME_URI);
-    	return PolicyHelper.isAuthorizedForActions(vreq, new Actions(adps).or(aops));
+    	return PolicyHelper.isAuthorizedForActions(vreq, adps.or(aops));
     }
     
     public boolean getShowAdminPanel() {
 		return PolicyHelper.isAuthorizedForActions(vreq,
-				SimplePermission.SEE_INDVIDUAL_EDITING_PANEL.ACTIONS);
+				SimplePermission.SEE_INDVIDUAL_EDITING_PANEL.ACTION);
     }
  
     /* rdfs:label needs special treatment, because it is not possible to construct a 

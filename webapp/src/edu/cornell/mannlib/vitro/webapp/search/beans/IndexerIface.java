@@ -2,19 +2,16 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.beans;
 
-import java.util.List;
-
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
-import edu.cornell.mannlib.vitro.webapp.search.docbuilder.Obj2DocIface;
 
 /**
  * IntexerIface is for objects that will be used by the IndexBuilder.  The
  * IndexBuilder will manage getting lists of object to index and then use
  * an object that implements IndexerIface to stuff the backend index.
  *
- * An example is SolrIndexer which is set up and associated with a
- * IndexBuilder in SolrSetup.
+ * An example is SearchIndexer which is set up and associated with a
+ * IndexBuilder in SearchIndexerSetup.
  *
  * @author bdc34
  *

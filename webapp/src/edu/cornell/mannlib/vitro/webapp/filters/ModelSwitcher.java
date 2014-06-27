@@ -7,10 +7,11 @@ import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.SWITCH_TO_D
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_DISPLAY_MODEL_PARAM;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_MODEL_PARAM;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_TBOX_MODEL_PARAM;
+import static edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService.CONFIGURATION;
+import static edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService.CONTENT;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -23,14 +24,16 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService;
 
 /**
  * Handle model switching, if requested for the editing framework.
@@ -43,9 +46,9 @@ public class ModelSwitcher {
 	 */
 	public static boolean authorizedForSpecialModel(HttpServletRequest req) {
 		if (isParameterPresent(req, SWITCH_TO_DISPLAY_MODEL)) {
-			return PolicyHelper.isAuthorizedForActions(req, SimplePermission.MANAGE_MENUS.ACTIONS);
+			return PolicyHelper.isAuthorizedForActions(req, SimplePermission.MANAGE_MENUS.ACTION);
 		} else if (anyOtherSpecialProperties(req)){
-			return PolicyHelper.isAuthorizedForActions(req, SimplePermission.ACCESS_SPECIAL_DATA_MODELS.ACTIONS);
+			return PolicyHelper.isAuthorizedForActions(req, SimplePermission.ACCESS_SPECIAL_DATA_MODELS.ACTION);
 		} else {
 			return true;
 		}
@@ -97,13 +100,9 @@ public class ModelSwitcher {
     	
 		// If they asked for other models by URI, set them.
 		if (anyOtherSpecialProperties(vreq)) {
-			DataSource bds = JenaDataSourceSetupBase.getApplicationDataSource(_context);
-			String dbType = ConfigurationProperties.getBean(_context)
-					.getProperty("VitroConnection.DataSource.dbtype", "MySQL");
-
-	    	OntModel mainOntModel = createSpecialModel(vreq, USE_MODEL_PARAM, bds, dbType);	    	
-	    	OntModel tboxOntModel = createSpecialModel(vreq, USE_TBOX_MODEL_PARAM, bds, dbType);
-	    	OntModel displayOntModel = createSpecialModel(vreq, USE_DISPLAY_MODEL_PARAM, bds, dbType);
+	    	OntModel mainOntModel = createSpecialModel(vreq, USE_MODEL_PARAM);	    	
+	    	OntModel tboxOntModel = createSpecialModel(vreq, USE_TBOX_MODEL_PARAM);
+	    	OntModel displayOntModel = createSpecialModel(vreq, USE_DISPLAY_MODEL_PARAM);
 	    	
 	    	vreq.setAttribute(VitroRequest.ID_FOR_ABOX_MODEL, vreq.getParameter(USE_MODEL_PARAM));
 	    	vreq.setAttribute(VitroRequest.ID_FOR_WRITE_MODEL, vreq.getParameter(USE_MODEL_PARAM));
@@ -160,22 +159,38 @@ public class ModelSwitcher {
 	 * @throws IllegalStateException
 	 *             if it's not found.
 	 */
-	private OntModel createSpecialModel(VitroRequest vreq, String key,
-			DataSource bds, String dbType) {
+	private OntModel createSpecialModel(VitroRequest vreq, String key) {
 		if (!isParameterPresent(vreq, key)) {
 			return null;
 		}
 		
 		String modelUri = vreq.getParameter(key);
-		Model model = JenaDataSourceSetupBase.makeDBModel(bds, modelUri,
-				OntModelSpec.OWL_MEM,
-				JenaDataSourceSetupBase.TripleStoreType.RDB, dbType, vreq.getSession().getServletContext());
-		if (model != null) {
-			return ModelFactory
-					.createOntologyModel(OntModelSpec.OWL_MEM, model);
-		} else {
+		
+		OntModel ont = findModelInRdfService(vreq, modelUri, CONFIGURATION);
+		if (ont == null) {
+			ont = findModelInRdfService(vreq, modelUri, CONTENT);
+		}
+		if (ont == null) {
 			throw new IllegalStateException("Main Model Uri " + modelUri
 					+ " did not retrieve model");
+		}
+		return ont;
+	}
+
+	private OntModel findModelInRdfService(VitroRequest vreq, String modelUri,
+			WhichService which) {
+		try {
+			RDFService rdfService = RDFServiceUtils.getRDFService(vreq, which);
+			if (!rdfService.getGraphURIs().contains(modelUri)) {
+				return null;
+			}
+			
+			Model m = new RDFServiceDataset(rdfService).getNamedModel(modelUri);
+			return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, m);
+		} catch (Exception e) {
+			log.error("failed to find model: '" + modelUri + "' in RDFService "
+					+ which, e);
+			return null;
 		}
 	}
 

@@ -2,12 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
-import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.MAXIMUM_FILE_SIZE;
 import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.PARAMETER_UPLOADED_FILE;
 import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.THUMBNAIL_HEIGHT;
 import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.THUMBNAIL_WIDTH;
-import static edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest.FILE_ITEM_MAP;
-import static edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest.FILE_UPLOAD_EXCEPTION;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -21,7 +18,6 @@ import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.util.ImagingListener;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.FilenameUtils;
@@ -41,7 +37,6 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.UploadedFileHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileAlreadyExistsException;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
-import edu.cornell.mannlib.vitro.webapp.filestorage.uploadrequest.FileUploadServletRequest;
 
 /**
  * Handle the mechanics of validating, storing, and deleting file images.
@@ -55,7 +50,6 @@ public class ImageUploadHelper {
 	private static final String ERROR_CODE_NO_IMAGE_TO_CROP = "imageUpload.errorNoImageForCropping";
 	private static final String ERROR_CODE_IMAGE_TOO_SMALL = "imageUpload.errorImageTooSmall";
 	private static final String ERROR_CODE_UNKNOWN = "imageUpload.errorUnknown";
-	private static final String ERROR_CODE_FILE_TOO_BIG = "imageUpload.errorFileTooBig";
 	private static final String ERROR_CODE_UNRECOGNIZED_FILE_TYPE = "imageUpload.errorUnrecognizedFileType";
 	private static final String ERROR_CODE_NO_PHOTO_SELECTED = "imageUpload.errorNoPhotoSelected";
 	private static final String ERROR_CODE_BAD_MULTIPART_REQUEST = "imageUpload.errorBadMultipartRequest";
@@ -133,20 +127,13 @@ public class ImageUploadHelper {
 	 *             if there is no file, if it is empty, or if it is not an image
 	 *             file.
 	 */
-	@SuppressWarnings("unchecked")
-	FileItem validateImageFromRequest(HttpServletRequest request)
+	FileItem validateImageFromRequest(VitroRequest vreq)
 			throws UserMistakeException {
-		Object exception = request.getAttribute(FILE_UPLOAD_EXCEPTION);
-		if (exception != null) {
-			int limit = MAXIMUM_FILE_SIZE / (1024 * 1024);
-			throw new UserMistakeException(ERROR_CODE_FILE_TOO_BIG, limit);
-		}
-
-		Map<String, List<FileItem>> map = (Map<String, List<FileItem>>) request
-				.getAttribute(FILE_ITEM_MAP);
+		Map<String, List<FileItem>> map = vreq.getFiles();
 		if (map == null) {
 			throw new IllegalStateException(ERROR_CODE_BAD_MULTIPART_REQUEST);
 		}
+		
 		List<FileItem> list = map.get(PARAMETER_UPLOADED_FILE);
 		if ((list == null) || list.isEmpty()) {
 			throw new UserMistakeException(ERROR_CODE_FORM_FIELD_MISSING,

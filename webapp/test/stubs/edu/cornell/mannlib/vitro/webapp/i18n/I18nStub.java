@@ -29,21 +29,25 @@ public class I18nStub extends I18n {
 	// Stub infrastructure
 	// ----------------------------------------------------------------------
 
-	public I18nStub() {
+	public static void setup() {
 		try {
 			Field instanceField = I18n.class.getDeclaredField("instance");
 			log.debug("Field is " + instanceField);
 			instanceField.setAccessible(true);
 			log.debug("Instance is " + instanceField.get(null));
-			instanceField.set(null, this);
+			instanceField.set(null, new I18nStub());
 			log.debug("Instance is " + instanceField.get(null));
 			log.debug("Created and inserted.");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-
 	}
-
+	
+	/** Make it private, so they will use the setup() method. */
+	private I18nStub() {
+		// Nothing to initialize.
+	}
+	
 	@Override
 	protected I18nBundle getBundle(String bundleName, HttpServletRequest req) {
 		return new I18nBundleStub(bundleName);

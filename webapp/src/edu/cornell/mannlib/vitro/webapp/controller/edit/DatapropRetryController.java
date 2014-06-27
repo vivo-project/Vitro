@@ -36,7 +36,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 
@@ -46,7 +45,7 @@ public class DatapropRetryController extends BaseEditController {
 
     @Override
 	public void doPost (HttpServletRequest request, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(request, response, SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
+        if (!isAuthorizedToDisplayPage(request, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
         	return;
         }
 
@@ -161,6 +160,8 @@ public class DatapropRetryController extends BaseEditController {
         optionMap.put("RangeDatatypeURI", datatypeOptionList);
         
         List groupOptList = FormUtils.makeOptionListFromBeans(vreq.getUnfilteredWebappDaoFactory().getPropertyGroupDao().getPublicGroups(true),"URI","Name", ((objectForEditing.getGroupURI()==null) ? "" : objectForEditing.getGroupURI()), null, (objectForEditing.getGroupURI()!=null));
+        HashMap<String,Option> hashMap = new HashMap<String,Option>();
+        groupOptList = getSortedList(hashMap,groupOptList,vreq);
         groupOptList.add(0,new Option("","none"));
         optionMap.put("GroupURI", groupOptList);
 

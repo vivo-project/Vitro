@@ -160,7 +160,7 @@ public class ClassGroupPageData extends DataGetterBase implements DataGetter{
     
   //Get data servuice
     public String getDataServiceUrl() {
-    	return UrlBuilder.getUrl("/dataservice?getRenderedSolrIndividualsByVClass=1&vclassId=");
+    	return UrlBuilder.getUrl("/dataservice?getRenderedSearchIndividualsByVClass=1&vclassId=");
     }
     
     /**

@@ -19,12 +19,14 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -70,7 +72,8 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 		configProps = ConfigurationProperties.getBean(ctx);
 
 		/*
-		 * If OpenSocial is not configured in runtime.properties, skip the tests.
+		 * If OpenSocial is not configured in runtime.properties, skip the
+		 * tests.
 		 */
 		if (!configurationPresent()) {
 			ss.info(this, "The OpenSocial connection is not configured.");
@@ -210,14 +213,15 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 	}
 
 	/**
-	 * Get the Token Service info from runtime.properties. It must be in the form
-	 * of host:port, and may not refer to localhost.
+	 * Get the Token Service info from runtime.properties. It must be in the
+	 * form of host:port, and may not refer to localhost.
 	 */
 	private void checkTokenServiceInfo() {
 		String tsInfo = configProps.getProperty(PROPERTY_SHINDIG_TOKEN_SERVICE);
 		if (StringUtils.isEmpty(tsInfo)) {
 			warnings.add(new Warning("There is no value for '"
-					+ PROPERTY_SHINDIG_TOKEN_SERVICE + "' in runtime.properties"));
+					+ PROPERTY_SHINDIG_TOKEN_SERVICE
+					+ "' in runtime.properties"));
 			return;
 		}
 
@@ -346,7 +350,8 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 
 		private final String shindigBaseUrl;
 		private final String shindigTestUrl;
-		private final HttpClient httpClient = new HttpClient();
+		private final CloseableHttpClient httpClient = HttpClients
+				.createDefault();
 
 		private int statusCode = Integer.MIN_VALUE;
 
@@ -375,15 +380,16 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 		}
 
 		private void testConnection() throws ShindigTesterException {
-			GetMethod method = new GetMethod(shindigTestUrl);
+			HttpGet method = new HttpGet(shindigTestUrl);
 			try {
 				log.debug("Trying to connect to Shindig");
-				statusCode = httpClient.executeMethod(method);
-				log.debug("HTTP status was " + statusCode);
-
-				// clear the buffer.
-				InputStream stream = method.getResponseBodyAsStream();
-				stream.close();
+				CloseableHttpResponse response = httpClient.execute(method);
+				try {
+					statusCode = response.getStatusLine().getStatusCode();
+					log.debug("HTTP status was " + statusCode);
+				} finally {
+					response.close();
+				}
 			} catch (SocketTimeoutException e) {
 				// Catch the exception so we can retry this.
 				// Save the status so we know why we failed.
@@ -391,8 +397,6 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 			} catch (Exception e) {
 				throw new ShindigTesterException(e, shindigBaseUrl,
 						shindigTestUrl);
-			} finally {
-				method.releaseConnection();
 			}
 		}
 
@@ -513,25 +517,28 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 			try {
 				log.debug("Connecting to the token service");
 				Socket s = new Socket(host, port);
+				try {
+					s.getOutputStream().write("c=default\n".getBytes());
 
-				s.getOutputStream().write("c=default\n".getBytes());
+					int byteCount = 0;
+					int totalBytecount = 0;
+					byte[] buffer = new byte[8192];
 
-				int byteCount = 0;
-				int totalBytecount = 0;
-				byte[] buffer = new byte[8192];
+					// The following will block until the page is transmitted.
+					InputStream inputStream = s.getInputStream();
+					while ((byteCount = inputStream.read(buffer)) > 0) {
+						totalBytecount += byteCount;
+					}
 
-				// The following will block until the page is transmitted.
-				InputStream inputStream = s.getInputStream();
-				while ((byteCount = inputStream.read(buffer)) > 0) {
-					totalBytecount += byteCount;
-				}
-
-				if (totalBytecount == 0) {
-					log.debug("Received an empty response.");
-					problem = "The Shindig security token service responded to a test, but the response was empty.";
-				} else {
-					log.debug("Recieved the token.");
-					problem = null;
+					if (totalBytecount == 0) {
+						log.debug("Received an empty response.");
+						problem = "The Shindig security token service responded to a test, but the response was empty.";
+					} else {
+						log.debug("Recieved the token.");
+						problem = null;
+					}
+				} finally {
+					s.close();
 				}
 			} catch (Exception e) {
 				log.debug("Problem with the token service", e);

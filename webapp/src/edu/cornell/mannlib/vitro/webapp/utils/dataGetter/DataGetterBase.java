@@ -27,7 +27,7 @@ public abstract class DataGetterBase implements DataGetter {
         }else if( CONTEXT_DISPLAY_MODEL.equals(modelName)){
         	return ModelAccess.on(context).getDisplayModel();
         }else if( ! StringUtils.isEmpty( modelName)){           
-            Model model = JenaIngestController.getModel( modelName, vreq, context);
+            Model model = JenaIngestController.getModel( modelName, vreq);
             if( model == null )
                 throw new IllegalAccessError("Cannot get model <" + modelName +"> for DataGetter.");
             else

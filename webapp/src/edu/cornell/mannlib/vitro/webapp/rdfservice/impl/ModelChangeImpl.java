@@ -2,7 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+
+import org.apache.commons.io.IOUtils;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -65,5 +69,27 @@ public class ModelChangeImpl implements ModelChange {
 	@Override
 	public void setGraphURI(String graphURI) {
 		this.graphURI = graphURI;
+	}
+
+	@Override
+	public String toString() {
+		return "ModelChangeImpl [serializedModel="
+				+ streamToString(serializedModel) + ", serializationFormat="
+				+ serializationFormat + ", operation=" + operation
+				+ ", graphURI=" + graphURI + "]";
+	}
+
+	private String streamToString(InputStream stream) {
+		if (!stream.markSupported()) {
+			return String.valueOf(stream);
+		}
+		try {
+			stream.mark(Integer.MAX_VALUE);
+			List<String> lines = IOUtils.readLines(stream);
+			stream.reset();
+			return String.valueOf(lines);
+		} catch (IOException e) {
+			return "Failed to read input stream: " + e;
+		}
 	}
 }

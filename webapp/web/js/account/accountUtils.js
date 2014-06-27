@@ -7,6 +7,20 @@ function changeAction(form, url) {
 } 
     
 $(document).ready(function(){
+    
+    // If filtering by role, make sure the role is included as a parameter (1) when the
+    // page count changes or (2) when the next or previous links are clicked.
+    if ( $('#roleFilterUri').val().length > 0 ) {
+        var roleURI = $('#roleFilterUri').val().substring($('#roleFilterUri').val().indexOf("=")+1);
+        roleURI = roleURI.replace("%3A%2F%2F","://").replace("%23","#").replace(/%2F/g,"/")
+        $('input#roleTypeContainer').val(roleURI);
+        var prevHref = $('a#previousPage').attr('href');
+        var nextHref = $('a#nextPage').attr('href');
+        prevHref += "&roleFilterUri=" + roleURI.replace("#","%23");
+        nextHref += "&roleFilterUri=" + roleURI.replace("#","%23");
+        $('a#previousPage').attr('href',prevHref);
+        $('a#nextPage').attr('href',nextHref);
+    }
 
     //Accounts per page
     //Hide if javascript is enabled

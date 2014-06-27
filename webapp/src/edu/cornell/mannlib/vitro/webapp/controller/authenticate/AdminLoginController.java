@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
 import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource.INTERNAL;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.AUTHORIZED;
 import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MAX_PASSWORD_LENGTH;
 import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MIN_PASSWORD_LENGTH;
 
@@ -12,7 +13,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator.LoginNotPermitted;
@@ -53,8 +54,8 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 	private static final String MESSAGE_NEW_PASSWORD_MATCHES_OLD = "errorNewPasswordMatchesOld";
 
 	@Override
-	protected Actions requiredActions(VitroRequest vreq) {
-		return Actions.AUTHORIZED; // No requirements to use this page.
+	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
+		return AUTHORIZED; // No requirements to use this page.
 	}
 
 	@Override

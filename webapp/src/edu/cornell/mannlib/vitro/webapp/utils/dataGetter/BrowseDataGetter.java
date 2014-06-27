@@ -91,7 +91,7 @@ public class BrowseDataGetter extends DataGetterBase implements DataGetter {
     
   //Get data servuice
     public String getDataServiceUrl() {
-    	return UrlBuilder.getUrl("/dataservice?getSolrIndividualsByVClass=1&vclassId=");
+    	return UrlBuilder.getUrl("/dataservice?getSearchIndividualsByVClass=1&vclassId=");
     }
     private Map<String, Object> doClassAlphaDisplay( Map params, VitroRequest request, ServletContext context) throws Exception {
         Map<String,Object> body = new HashMap<String,Object>();
@@ -108,7 +108,7 @@ public class BrowseDataGetter extends DataGetterBase implements DataGetter {
         VClass vclass = vreq.getWebappDaoFactory().getVClassDao().getVClassByURI(classUri);
         map.put("class", new VClassTemplateModel(vclass));
         
-        JSONObject vclassRes = JsonServlet.getSolrIndividualsByVClass(vclass.getURI(), request, context);        
+        JSONObject vclassRes = JsonServlet.getSearchIndividualsByVClass(vclass.getURI(), request);        
         map.put("totalCount", JsonToFmModel.convertJSONObjectToMap( (String) vclassRes.get("totalCount") ));
         map.put("alpha", JsonToFmModel.convertJSONObjectToMap( (String) vclassRes.get("alpha") ));
         map.put("individuals", JsonToFmModel.convertJSONArrayToList( (JSONArray) vclassRes.get("individuals") ));

@@ -46,16 +46,17 @@ public class IndividualStub implements Individual {
 
 	public IndividualStub(String uri) {
 		this.uri = uri;
-        Resource r = ResourceFactory.createResource(uri);
-        this.namespace = r.getNameSpace();
-        this.localName = r.getLocalName();
+		Resource r = ResourceFactory.createResource(uri);
+		this.namespace = r.getNameSpace();
+		this.localName = r.getLocalName();
 	}
 
 	public void addDataPropertyStatement(String predicateUri, String object) {
 		dpsSet.add(new DataPropertyStatementImpl(this.uri, predicateUri, object));
 	}
 
-	public void addObjectPropertyStatement(ObjectProperty property, String objectUri) {
+	public void addObjectPropertyStatement(ObjectProperty property,
+			String objectUri) {
 		ObjectPropertyStatementImpl ops = new ObjectPropertyStatementImpl();
 		ops.setSubject(this);
 		ops.setProperty(property);
@@ -492,5 +493,12 @@ public class IndividualStub implements Individual {
 	public void setSearchSnippet(String snippet) {
 		throw new RuntimeException(
 				"Individual.setSearchSnippet() not implemented.");
+	}
+
+	@Override
+	public void setRdfsLabel(String in) {
+		throw new RuntimeException(
+				"IndividualStub.setRdfsLabel() not implemented.");
+
 	}
 }

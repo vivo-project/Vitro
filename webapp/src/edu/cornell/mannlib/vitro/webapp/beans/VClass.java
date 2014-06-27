@@ -6,8 +6,6 @@ import java.text.Collator;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openrdf.model.impl.URIImpl;
-
 /**
  * A Java class representing an ontology ("Vitro") class
  *
@@ -124,14 +122,8 @@ public class VClass extends BaseResourceBean implements Comparable<VClass>
      */
     public VClass( String uriString )
     {
-        // The URIImpl class can be used to parse a URI string into its component parts
-        URIImpl uri = new URIImpl(uriString);
-
-        // Use the URIImpl to obtain parts of this URI for local storage
-        myName = uri.getLocalName();
-        URI = uriString;
-        namespace = uri.getNamespace();
-        localName = uri.getLocalName();
+        super(uriString);
+        myName = getLocalName();
     }
     
     /**

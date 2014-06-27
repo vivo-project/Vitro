@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -11,7 +14,6 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -20,7 +22,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
@@ -34,8 +36,8 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
 
     //Using the same setup as primitive delete
     @Override
-    protected Actions requiredActions(VitroRequest vreq) {
-    	return SimplePermission.USE_BASIC_AJAX_CONTROLLERS.ACTIONS;
+    protected AuthorizationRequest requiredActions(VitroRequest vreq) {
+    	return SimplePermission.USE_BASIC_AJAX_CONTROLLERS.ACTION;
     }
     
     @Override
@@ -66,7 +68,7 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
         try {
             additions = parseRdfParam(vreq.getParameterValues("additions"),format);
         } catch (Exception e) {
-            doError(response,"Error reading RDF, set log level to debug for this class to get error messages in the server logs.",HttpStatus.SC_BAD_REQUEST);
+            doError(response,"Error reading RDF, set log level to debug for this class to get error messages in the server logs.",SC_BAD_REQUEST);
             return;
         }
                         
@@ -74,7 +76,7 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
         try {
             retractions = parseRdfParam(vreq.getParameterValues("retractions"),format);
         } catch (Exception e) {
-            doError(response,"Error reading RDF, set log level to debug for this class to get error messages in the server logs.",HttpStatus.SC_BAD_REQUEST);
+            doError(response,"Error reading RDF, set log level to debug for this class to get error messages in the server logs.",SC_BAD_REQUEST);
             return;
         }
 
@@ -92,7 +94,7 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
 			toBeRetracted.add(depResRetractions);
         	processChanges(editorUri, getWriteModel(vreq), toBeAdded, toBeRetracted);
         } catch (Exception e) {
-            doError(response,e.getMessage(),HttpStatus.SC_INTERNAL_SERVER_ERROR);
+            doError(response,e.getMessage(),SC_INTERNAL_SERVER_ERROR);
         }           
         
     }

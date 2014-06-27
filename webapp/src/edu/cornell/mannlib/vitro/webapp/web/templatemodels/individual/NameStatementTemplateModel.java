@@ -4,16 +4,16 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
 
 import com.hp.hpl.jena.rdf.model.Literal;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.EditDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -51,7 +51,7 @@ public class NameStatementTemplateModel extends PropertyStatementTemplateModel {
         	// If the individual has no rdfs:label, use the local name. It will not be editable. (This replicates previous behavior;
         	// perhaps we would want to allow a label to be added. But such individuals do not usually have their profiles viewed or
         	// edited directly.)
-        	URI uri = new URIImpl(subjectUri);
+        	Individual uri = new IndividualImpl(subjectUri);
         	this.stringValue = uri.getLocalName();
         	this.editUrl = "";
         } else {

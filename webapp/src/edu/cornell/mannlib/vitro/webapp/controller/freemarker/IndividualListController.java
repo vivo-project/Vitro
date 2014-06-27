@@ -8,12 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.SolrServerException;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -24,7 +21,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.individuallist.IndividualListResults;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrQueryUtils;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
 
 /** 
@@ -94,8 +93,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
                         vclass.getURI(), 
                         page, 
                         alpha, 
-                        vreq.getWebappDaoFactory().getIndividualDao(), 
-                        getServletContext());                                
+                        vreq.getWebappDaoFactory().getIndividualDao());                                
                 body.putAll(vcResults.asFreemarkerMap());
 
                 List<Individual> inds = vcResults.getEntities();
@@ -141,21 +139,21 @@ public class IndividualListController extends FreemarkerHttpServlet {
     
     //TODO: Remove and update reference within JsonServlet
     public static String getAlphaParameter(VitroRequest request){
-        return SolrQueryUtils.getAlphaParameter(request);
+        return SearchQueryUtils.getAlphaParameter(request);
     }
     
   //TODO: Remove and update reference within JsonServlet
     public static int getPageParameter(VitroRequest request) {
-        return SolrQueryUtils.getPageParameter(request);
+        return SearchQueryUtils.getPageParameter(request);
     }
     
-    public static IndividualListResults getResultsForVClass(String vclassURI, int page, String alpha, IndividualDao indDao, ServletContext context) 
+    public static IndividualListResults getResultsForVClass(String vclassURI, int page, String alpha, IndividualDao indDao) 
     throws SearchException{
    	 	try{
             List<String> classUris = Collections.singletonList(vclassURI);
-			IndividualListQueryResults results = SolrQueryUtils.buildAndExecuteVClassQuery(classUris, alpha, page, INDIVIDUALS_PER_PAGE, context, indDao);
+			IndividualListQueryResults results = buildAndExecuteVClassQuery(classUris, alpha, page, INDIVIDUALS_PER_PAGE, indDao);
 	        return getResultsForVClassQuery(results, page, INDIVIDUALS_PER_PAGE, alpha);
-   	 	} catch (SolrServerException e) {
+   	 	} catch (SearchEngineException e) {
    	 	    String msg = "An error occurred retrieving results for vclass query";
    	 	    log.error(msg, e);
    	 	    // Throw this up to processRequest, so the template gets the error message.
@@ -166,9 +164,9 @@ public class IndividualListController extends FreemarkerHttpServlet {
 	    }
     }
     
-    public static IndividualListResults getResultsForVClassIntersections(List<String> vclassURIs, int page, int pageSize, String alpha, IndividualDao indDao, ServletContext context) {
+    public static IndividualListResults getResultsForVClassIntersections(List<String> vclassURIs, int page, int pageSize, String alpha, IndividualDao indDao) {
         try{
-            IndividualListQueryResults results = SolrQueryUtils.buildAndExecuteVClassQuery(vclassURIs, alpha, page, pageSize, context, indDao);
+            IndividualListQueryResults results = buildAndExecuteVClassQuery(vclassURIs, alpha, page, pageSize, indDao);
 	        return getResultsForVClassQuery(results, page, pageSize, alpha);
         } catch(Throwable th) {
        	    log.error("Error retrieving individuals corresponding to intersection multiple classes." + vclassURIs.toString(), th);
@@ -176,10 +174,10 @@ public class IndividualListController extends FreemarkerHttpServlet {
         }
     }
 	
-    public static IndividualListResults getRandomResultsForVClass(String vclassURI, int page, int pageSize, IndividualDao indDao, ServletContext context) {
+    public static IndividualListResults getRandomResultsForVClass(String vclassURI, int page, int pageSize, IndividualDao indDao) {
    	 	try{
             List<String> classUris = Collections.singletonList(vclassURI);
-			IndividualListQueryResults results = SolrQueryUtils.buildAndExecuteRandomVClassQuery(classUris, page, pageSize, context, indDao);
+			IndividualListQueryResults results = buildAndExecuteRandomVClassQuery(classUris, page, pageSize, indDao);
 	        return getResultsForVClassQuery(results, page, pageSize, "");
    	 	} catch(Throwable th) {
 	   		log.error("An error occurred retrieving random results for vclass query", th);
@@ -187,13 +185,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
 	    }
     }
 
-	//TODO: Get rid of this method and utilize SolrQueryUtils - currently appears to be referenced
-	//only within DataGetterUtils
-    public static long getIndividualCount(List<String> vclassUris, IndividualDao indDao, ServletContext context) {    	    	       
-    	return SolrQueryUtils.getIndividualCount(vclassUris, indDao, context);
-    }
-    
-    private static IndividualListResults getResultsForVClassQuery(IndividualListQueryResults results, int page, int pageSize, String alpha) {
+	private static IndividualListResults getResultsForVClassQuery(IndividualListQueryResults results, int page, int pageSize, String alpha) {
         long hitCount = results.getHitCount();
         if ( hitCount > pageSize ){
         	return new IndividualListResults(hitCount, results.getIndividuals(), alpha, true, makePagesList(hitCount, pageSize, page));
@@ -201,7 +193,32 @@ public class IndividualListController extends FreemarkerHttpServlet {
         	return new IndividualListResults(hitCount, results.getIndividuals(), alpha, false, Collections.<PageRecord>emptyList());
         }
     }
-         
+     
+    
+    private static IndividualListQueryResults buildAndExecuteVClassQuery(
+			List<String> vclassURIs, String alpha, int page, int pageSize, IndividualDao indDao)
+			throws SearchEngineException {
+		 SearchQuery query = SearchQueryUtils.getQuery(vclassURIs, alpha, page, pageSize);
+		 IndividualListQueryResults results = IndividualListQueryResults.runQuery(query, indDao);
+		 log.debug("Executed search query for " + vclassURIs);
+		 if (results.getIndividuals().isEmpty()) { 
+			 log.debug("entities list is null for vclass " + vclassURIs);
+		 }
+		return results;
+	}
+
+    private static IndividualListQueryResults buildAndExecuteRandomVClassQuery(
+			List<String> vclassURIs, int page, int pageSize, IndividualDao indDao)
+			throws SearchEngineException {
+		 SearchQuery query = SearchQueryUtils.getRandomQuery(vclassURIs, page, pageSize);
+		 IndividualListQueryResults results = IndividualListQueryResults.runQuery(query, indDao);
+		 log.debug("Executed search query for " + vclassURIs);
+		 if (results.getIndividuals().isEmpty()) { 
+			 log.debug("entities list is null for vclass " + vclassURIs);
+		 }
+		return results;
+	}
+
     
     public static List<PageRecord> makePagesList( long size, int pageSize,  int selectedPage ) {        
 

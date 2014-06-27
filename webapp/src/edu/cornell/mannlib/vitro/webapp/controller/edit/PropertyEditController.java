@@ -35,7 +35,7 @@ public class PropertyEditController extends BaseEditController {
 	
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
 		if (!isAuthorizedToDisplayPage(request, response,
-				SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
+				SimplePermission.EDIT_ONTOLOGY.ACTION)) {
         	return;
         }
 

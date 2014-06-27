@@ -12,7 +12,6 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openrdf.model.impl.URIImpl;
 
 public class VClassGroup extends LinkedList <VClass> implements Comparable<VClassGroup> {
 	
@@ -56,7 +55,7 @@ public class VClassGroup extends LinkedList <VClass> implements Comparable<VClas
     public VClassGroup(String uri, String name, int rank) {
         super();
         this.URI = uri;
-        URIImpl theURI = new URIImpl(uri);
+        BaseResourceBean theURI = new BaseResourceBean(uri);
         this.namespace = theURI.getNamespace();
         this.localName = theURI.getLocalName();
         this.displayRank = rank;

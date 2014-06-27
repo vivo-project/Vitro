@@ -30,7 +30,7 @@
         <textarea name="s34gfd88p9x1" rows="10" cols="90">${comments!}</textarea>
         
        
-    	<p><label class="realpersonLabel">${i18n().enter_in_security_field}:</label>
+    	<p><label class="realpersonLabel">${i18n().enter_in_security_field}:<span class="requiredHint"> *</span></label>
 
     		<input type="text" id="defaultReal" name="defaultReal"></p>
         

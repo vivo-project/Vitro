@@ -15,9 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.iri.IRI;
+import org.apache.jena.iri.IRIFactory;
 
-import com.hp.hpl.jena.iri.IRI;
-import com.hp.hpl.jena.iri.IRIFactory;
 import com.hp.hpl.jena.ontology.AllValuesFromRestriction;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -237,7 +237,7 @@ public class JenaAdminActions extends BaseEditController {
     
     @Override
 	public void doGet(HttpServletRequest req, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(req, response, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTIONS)) {
+        if (!isAuthorizedToDisplayPage(req, response, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTION)) {
         	return;
         }
 

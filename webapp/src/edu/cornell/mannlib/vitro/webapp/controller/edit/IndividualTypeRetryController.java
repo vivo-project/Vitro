@@ -2,17 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-import java.text.Collator;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
@@ -42,7 +36,7 @@ public class IndividualTypeRetryController extends BaseEditController {
 
 	public void doGet (HttpServletRequest request, HttpServletResponse response) {
 		if (!isAuthorizedToDisplayPage(request, response,
-				SimplePermission.DO_BACK_END_EDITING.ACTIONS)) {
+				SimplePermission.DO_BACK_END_EDITING.ACTION)) {
         	return;
         }
 

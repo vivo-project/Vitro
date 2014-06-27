@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 public class DataPropertyStatementListingController extends BaseEditController {
 
    public void doGet(HttpServletRequest request, HttpServletResponse response) {
-       if (!isAuthorizedToDisplayPage(request, response, SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
+       if (!isAuthorizedToDisplayPage(request, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
        	return;
        }
 

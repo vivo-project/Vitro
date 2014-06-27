@@ -10,7 +10,7 @@ var processDataGetterUtils = {
 								"sparqlQuery": processSparqlDataGetterContent, 
 								"fixedHtml":processFixedHTMLDataGetterContent,
 								"individualsForClasses":processIndividualsForClassesDataGetterContent,
-								"solrIndividuals":processSolrDataGetterContent},
+								"searchIndividuals":processSearchDataGetterContent},
 	    selectDataGetterType:function(pageContentSection) {
 			var contentType = pageContentSection.attr("contentType");
 			//The form can provide "browse class group" as content type but need to check

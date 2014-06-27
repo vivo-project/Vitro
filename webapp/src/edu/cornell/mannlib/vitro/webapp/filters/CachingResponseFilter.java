@@ -21,18 +21,18 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.collections.EnumerationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.response.QueryResponse;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
-import edu.cornell.mannlib.vitro.webapp.utils.solr.FieldMap;
-import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrQueryUtils;
-import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrResultsParser;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
+import edu.cornell.mannlib.vitro.webapp.utils.searchengine.FieldMap;
+import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchResultsParser;
 
 /**
  * Assist in cache management for individual profile pages.
@@ -41,7 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrResultsParser;
  * 
  * Only works for users who are not logged in.
  * 
- * The Solr index must be configured to keep an ETAG on each individual's
+ * The search index must be configured to keep an ETAG on each individual's
  * record. The ETAG is a hash of the record's content and is updated each time
  * the individual is re-indexed.
  * 
@@ -59,10 +59,10 @@ import edu.cornell.mannlib.vitro.webapp.utils.solr.SolrResultsParser;
  * generated, with a Cache-Control header that should prevent the cache from
  * storing that response.
  * 
- * If the requesting user is not logged in, this filter will ask Solr for the
- * ETAG on the requested individual. If it is the same as the ETAG supplied by
- * the cache in the request, then the response is 304 Not Modified. Otherwise, a
- * fresh response is generated.
+ * If the requesting user is not logged in, this filter will ask the search
+ * engine for the ETAG on the requested individual. If it is the same as the
+ * ETAG supplied by the cache in the request, then the response is 304 Not
+ * Modified. Otherwise, a fresh response is generated.
  * 
  * An unconditional request may mean that there is no external cache, or that
  * the cache doesn't have a copy of this particular page.
@@ -77,7 +77,7 @@ public class CachingResponseFilter implements Filter {
 	private static final String PROPERTY_ENABLE_CACHING = "http.createCacheHeaders";
 	private static final String ETAG_FIELD = "etag";
 
-	private static final FieldMap parserFieldMap = SolrQueryUtils.fieldMap()
+	private static final FieldMap parserFieldMap = SearchQueryUtils.fieldMap()
 			.put(ETAG_FIELD, ETAG_FIELD);
 
 	private ServletContext ctx;
@@ -241,19 +241,18 @@ public class CachingResponseFilter implements Filter {
 	}
 
 	/**
-	 * Ask Solr whether it has an ETAG for this URI.
+	 * Ask the search engine whether it has an ETAG for this URI.
 	 */
 	private String findEtagForIndividual(String individualUri) {
-		SolrQuery query = new SolrQuery("URI:" + individualUri)
-				.setFields(ETAG_FIELD);
-
-		SolrServer solr = SolrSetup.getSolrServer(ctx);
+		SearchEngine search = ApplicationUtils.instance().getSearchEngine();
+		SearchQuery query = search.createQuery("URI:" + individualUri).addFields(
+				ETAG_FIELD);
 
 		try {
-			QueryResponse response = solr.query(query);
-			List<Map<String, String>> maps = new SolrResultsParser(response,
+			SearchResponse response = search.query(query);
+			List<Map<String, String>> maps = new SearchResultsParser(response,
 					parserFieldMap).parse();
-			log.debug("Solr response for '" + query.getQuery() + "' was "
+			log.debug("Search response for '" + query.getQuery() + "' was "
 					+ maps);
 
 			if (maps.isEmpty()) {
@@ -261,16 +260,16 @@ public class CachingResponseFilter implements Filter {
 			} else {
 				return maps.get(0).get(ETAG_FIELD);
 			}
-		} catch (SolrServerException e) {
+		} catch (SearchEngineException e) {
 			log.warn(
-					"Solr query '" + query.getQuery() + "' threw an exception",
+					"Search query '" + query.getQuery() + "' threw an exception",
 					e);
 			return null;
 		}
 	}
 
 	/**
-	 * The ETAG from the Solr index is not specific enough, since we may have
+	 * The ETAG from the search index is not specific enough, since we may have
 	 * different versions for different languages. Add the Locales from the
 	 * request to make it unique.
 	 */

@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.requestedAction.resource;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 
 /**
  * A common base class for resource-related actions.

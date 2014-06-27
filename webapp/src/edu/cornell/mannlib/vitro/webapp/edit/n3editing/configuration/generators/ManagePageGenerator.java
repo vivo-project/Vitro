@@ -526,7 +526,7 @@ private String getExistingIsSelfContainedTemplateQuery() {
      	MenuManagementDataUtils.includeRequiredSystemData(vreq.getSession().getServletContext(), data);
     	data.put("classGroup", new ArrayList<String>());
     	data.put("classGroups", DataGetterUtils.getClassGroups(vreq));
-    	//for solr individuals data get getter
+    	//for search individuals data get getter
     	data.put("classes", this.getAllVClasses(vreq));
     	data.put("availablePermissions", this.getAvailablePermissions(vreq));
     	data.put("availablePermissionOrderedList", this.getAvailablePermissonsOrderedURIs());
@@ -671,9 +671,9 @@ private String getExistingIsSelfContainedTemplateQuery() {
 		return query;
 	}
 	
-	//Get all vclasses for the list of vclasses for solr
+	//Get all vclasses for the list of vclasses for search
 	//Originally considered using an ajax request to get the vclasses list which is fine for adding a new content type
-	//but for an existing solr content type, would need to make yet another ajax request which seems too much
+	//but for an existing search content type, would need to make yet another ajax request which seems too much
 	private List<HashMap<String, String>> getAllVClasses(VitroRequest vreq) {
 		List<VClass> vclasses = new ArrayList<VClass>();     
         VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);

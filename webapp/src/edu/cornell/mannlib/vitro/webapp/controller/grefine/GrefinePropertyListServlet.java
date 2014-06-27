@@ -69,9 +69,6 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 				ServletOutputStream out = resp.getOutputStream();
 
 		
-				// *******
-				// methodology adopted from DatatypePropertiesListingController and ClassHierarchyListingController
-				// *******
 				VClassDao vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
 				DataPropertyDao dao = vreq.getUnfilteredWebappDaoFactory().getDataPropertyDao();
 				String topUri = vreq.getParameter("type");

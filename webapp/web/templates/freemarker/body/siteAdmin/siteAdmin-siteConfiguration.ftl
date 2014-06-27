@@ -27,15 +27,6 @@
                 <li role="listitem"><a href="${siteConfig.siteInfo}" title="${i18n().site_information}">${i18n().site_information}</a></li>
             </#if>
             
-            <#if siteConfig.startupStatus?has_content>
-                <li role="listitem">
-                    <a href="${siteConfig.startupStatus}" title="${i18n().startup_status}">${i18n().startup_status}</a>
-                    <#if siteConfig.startupStatusAlert>
-                        <img id="alertIcon" src="${urls.images}/iconAlert.png" width="20" height="20" alt="${i18n().error_alert_icon}" />
-                    </#if>
-                </li>
-            </#if>   
-            
              <#if siteConfig.userAccounts?has_content>
                 <li role="listitem"><a href="${siteConfig.userAccounts}" title="${i18n().user_accounts}">${i18n().user_accounts}</a></li>
              </#if>        

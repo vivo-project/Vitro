@@ -11,17 +11,15 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
-import edu.cornell.mannlib.vitro.webapp.search.solr.documentBuilding.IndividualToSolrDocument;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 class IndexWorkerThread extends VitroBackgroundThread{
 	private static final Log log = LogFactory.getLog(IndexWorkerThread.class);
 	
     protected final int threadNum;
-	protected IndividualToSolrDocument individualToSolrDoc;
 	protected final IndexerIface indexer;
 	protected final Iterator<Individual> individualsToIndex;
-	protected boolean stopRequested = false;
+	protected volatile boolean stopRequested = false;
 	
 	private static AtomicLong countCompleted= new AtomicLong();		
 	private static AtomicLong countToIndex= new AtomicLong();		
@@ -38,13 +36,14 @@ class IndexWorkerThread extends VitroBackgroundThread{
 	    stopRequested = true;
 	}
 	
+	@Override
 	public void run(){	    
     	setWorkLevel(WorkLevel.WORKING, "indexing " + individualsToIndex + " individuals");
 
 	    while( ! stopRequested ){	        	       
 	        
             //do the actual indexing work
-            log.debug("work found for Woker number " + threadNum);	            
+            log.debug("work found for Worker number " + threadNum);	            
             addDocsToIndex();
                 
             // done so shut this thread down.

@@ -19,10 +19,9 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openrdf.model.impl.URIImpl;
+import org.apache.jena.iri.IRI;
+import org.apache.jena.iri.IRIFactory;
 
-import com.hp.hpl.jena.iri.IRI;
-import com.hp.hpl.jena.iri.IRIFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -68,8 +67,10 @@ public class KnowledgeBaseUpdater {
         log.info("Performing any necessary data migration");
         logger.log("Started knowledge base migration");
 		
+        boolean changesPerformed = false;
+        
 		try {
-		     performUpdate(servletContext);
+		     changesPerformed = performUpdate(servletContext);
 		} catch (Exception e) {
 			 logger.logError(e.getMessage());
 			 log.error(e,e);
@@ -86,10 +87,15 @@ public class KnowledgeBaseUpdater {
 		long elapsedSecs = (System.currentTimeMillis() - startTime)/1000;		
 		log.info("Finished checking knowledge base in " + elapsedSecs + " second" + (elapsedSecs != 1 ? "s" : ""));
 		
-		return record.hasRecordedChanges();
+		// The following was removed because it forced a recompute even if only
+		// annotation values changed:
+		// return record.hasRecordedChanges();
+		
+		return changesPerformed;
 	}
 	
-	private void performUpdate(ServletContext servletContext) throws Exception {
+	// returns true if ontology changes were found
+	private boolean performUpdate(ServletContext servletContext) throws Exception {
 		
 		List<AtomicOntologyChange> rawChanges = getAtomicOntologyChanges();
 		
@@ -122,9 +128,10 @@ public class KnowledgeBaseUpdater {
                 updateTBoxAnnotations();
             } catch (Exception e) {
                 log.error(e,e);
-            }
-            
+            }          
         }
+        
+        return !rawChanges.isEmpty();
 
 	}
 	

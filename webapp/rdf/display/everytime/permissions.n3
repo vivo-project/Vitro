@@ -53,11 +53,6 @@ action:ManageOwnProxies
     rdfs:label "MANAGE_OWN_PROXIES" .
 
 
-action:ManagePortals
-    a display:RequiredAction ;
-    rdfs:label "MANAGE_PORTALS" .
-
-
 action:ManageProxies
     a display:RequiredAction ;
     rdfs:label "MANAGE_PROXIES" .
@@ -66,11 +61,6 @@ action:ManageProxies
 action:ManageSearchIndex
     a display:RequiredAction ;
     rdfs:label "MANAGE_SEARCH_INDEX" .
-
-
-action:ManageTabs
-    a display:RequiredAction ;
-    rdfs:label "MANAGE_TABS" .
 
 
 action:ManageUserAccounts
@@ -86,11 +76,6 @@ action:QueryFullModel
 action:QueryUserAccountsModel
     a display:RequiredAction ;
     rdfs:label "QUERY_USER_ACCOUNTS_MODEL" .
-
-
-action:RebuildVClassGroupCache
-    a display:RequiredAction ;
-    rdfs:label "REBUILD_VCLASS_GROUP_CACHE" .
 
 
 action:RefreshVisualizationCache
@@ -148,9 +133,9 @@ action:UseMiscellaneousCuratorPages
     rdfs:label "USE_MISCELLANEOUS_CURATOR_PAGES" .
 
 
-action:UseMiscellaneousEditorPages
+action:UseIndividualControlPanel
     a display:RequiredAction ;
-    rdfs:label "USE_MISCELLANEOUS_EDITOR_PAGES" .
+    rdfs:label "USE_INDIVIDUAL_CONTROL_PANEL" .
 
 
 action:UseMiscellaneousPages

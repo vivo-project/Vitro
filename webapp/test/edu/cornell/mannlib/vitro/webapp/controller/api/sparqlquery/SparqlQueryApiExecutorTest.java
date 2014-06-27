@@ -1,0 +1,440 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+package edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery;
+
+import static org.junit.Assert.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.StringReader;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.query.QueryParseException;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+
+import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
+import edu.cornell.mannlib.vitro.webapp.utils.http.NotAcceptableException;
+
+/**
+ * Test that the SparqlQueryApiExecutor can handle all query types and all
+ * formats.
+ */
+public class SparqlQueryApiExecutorTest extends AbstractTestClass {
+	private static final String MODEL_CONTENTS_N3 = "" //
+			+ "<http://here.edu/subject> \n"
+			+ "    <http://here.edu/predicate> <http://here.edu/object> ."
+			+ "<http://here.edu/s2> \n"
+			+ "    <http://here.edu/p2> <http://here.edu/o2> .";
+	private static final String BASE_URI = "http://here.edu";
+
+	private static final String SELECT_ALL_QUERY = "SELECT ?s ?p ?o WHERE {?s ?p ?o} ORDER BY DESC(?s)";
+	private static final String SELECT_RESULT_TEXT = ""
+			+ "--------------------------------------------------------------------------------------\n"
+			+ "| s                         | p                           | o                        |\n"
+			+ "======================================================================================\n"
+			+ "| <http://here.edu/subject> | <http://here.edu/predicate> | <http://here.edu/object> |\n"
+			+ "| <http://here.edu/s2>      | <http://here.edu/p2>        | <http://here.edu/o2>     |\n"
+			+ "--------------------------------------------------------------------------------------\n";
+	private static final String SELECT_RESULT_CSV = "s,p,o\n"
+			+ "http://here.edu/subject,http://here.edu/predicate,http://here.edu/object\n"
+			+ "http://here.edu/s2,http://here.edu/p2,http://here.edu/o2\n";
+	private static final String SELECT_RESULT_TSV = "s\tp\to\n"
+			+ "http://here.edu/subject\thttp://here.edu/predicate\thttp://here.edu/object\n"
+			+ "http://here.edu/s2\thttp://here.edu/p2\thttp://here.edu/o2\n";
+	private static final String SELECT_RESULT_XML = "" //
+			+ "<?xml version=\"1.0\"?>\n" //
+			+ "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">\n" //
+			+ "  <head>\n" //
+			+ "    <variable name=\"s\"/>\n" //
+			+ "    <variable name=\"p\"/>\n" //
+			+ "    <variable name=\"o\"/>\n" //
+			+ "  </head>\n" //
+			+ "  <results>\n" //
+			+ "    <result>\n" //
+			+ "      <binding name=\"s\">\n" //
+			+ "        <uri>http://here.edu/subject</uri>\n" //
+			+ "      </binding>\n" //
+			+ "      <binding name=\"p\">\n" //
+			+ "        <uri>http://here.edu/predicate</uri>\n" //
+			+ "      </binding>\n" //
+			+ "      <binding name=\"o\">\n" //
+			+ "        <uri>http://here.edu/object</uri>\n" //
+			+ "      </binding>\n" //
+			+ "    </result>\n" //
+			+ "    <result>\n" //
+			+ "      <binding name=\"s\">\n" //
+			+ "        <uri>http://here.edu/s2</uri>\n" //
+			+ "      </binding>\n" //
+			+ "      <binding name=\"p\">\n" //
+			+ "        <uri>http://here.edu/p2</uri>\n" //
+			+ "      </binding>\n" //
+			+ "      <binding name=\"o\">\n" //
+			+ "        <uri>http://here.edu/o2</uri>\n" //
+			+ "      </binding>\n" //
+			+ "    </result>\n" //
+			+ "  </results>\n" //
+			+ "</sparql>\n";
+	private static final String SELECT_RESULT_JSON = "" //
+			+ "{\n" //
+			+ "  \"head\": {\n" //
+			+ "    \"vars\": [ \"s\" , \"p\" , \"o\" ]\n" //
+			+ "  } ,\n" //
+			+ "  \"results\": {\n" //
+			+ "    \"bindings\": [\n" //
+			+ "      {\n" //
+			+ "        \"s\": { \"type\": \"uri\" , \"value\": \"http://here.edu/subject\" } ,\n"
+			+ "        \"p\": { \"type\": \"uri\" , \"value\": \"http://here.edu/predicate\" } ,\n"
+			+ "        \"o\": { \"type\": \"uri\" , \"value\": \"http://here.edu/object\" }\n"
+			+ "      } ,\n" //
+			+ "      {\n" //
+			+ "        \"s\": { \"type\": \"uri\" , \"value\": \"http://here.edu/s2\" } ,\n"
+			+ "        \"p\": { \"type\": \"uri\" , \"value\": \"http://here.edu/p2\" } ,\n"
+			+ "        \"o\": { \"type\": \"uri\" , \"value\": \"http://here.edu/o2\" }\n"
+			+ "      }\n" //
+			+ "    ]\n" //
+			+ "  }\n" //
+			+ "}\n";
+
+	private static final String ASK_ALL_QUERY = "ASK WHERE {?s ?p ?o}";
+	private static final String ASK_RESULT_TEXT = "true";
+	private static final String ASK_RESULT_CSV = "true";
+	private static final String ASK_RESULT_TSV = "true";
+	private static final String ASK_RESULT_XML = "" //
+			+ "<?xml version=\"1.0\"?>\n" //
+			+ "<sparql xmlns=\"http://www.w3.org/2005/sparql-results#\">\n" //
+			+ "  <head></head>\n" //
+			+ "  <boolean>true</boolean>\n" //
+			+ "</sparql>";
+	private static final String ASK_RESULT_JSON = "" //
+			+ "{\n" //
+			+ "  \"head\" : { } ,\n" //
+			+ "  \"boolean\" : true\n" //
+			+ "}\n";
+
+	private static final String CONSTRUCT_ALL_QUERY = "CONSTRUCT {?s ?p ?o} WHERE { LET (?s := <http://here.edu/subject>) <http://here.edu/subject> ?p ?o}";
+	private static final String CONSTRUCT_RESULT_TEXT = "" //
+			+ "<http://here.edu/subject> <http://here.edu/predicate> <http://here.edu/object> .\n";
+	private static final String CONSTRUCT_RESULT_TURTLE = "" //
+			+ "@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .\n" //
+			+ "@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .\n" //
+			+ "@prefix owl:     <http://www.w3.org/2002/07/owl#> .\n" //
+			+ "@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n" //
+			+ "\n" //
+			+ "<http://here.edu/subject>\n" //
+			+ "      <http://here.edu/predicate>\n" //
+			+ "              <http://here.edu/object> .\n";
+	private static final String CONSTRUCT_RESULT_N3 = "@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .\n"
+			+ "@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .\n"
+			+ "@prefix owl:     <http://www.w3.org/2002/07/owl#> .\n"
+			+ "@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"
+			+ "\n"
+			+ "<http://here.edu/subject>\n"
+			+ "      <http://here.edu/predicate>\n"
+			+ "              <http://here.edu/object> .\n";
+	private static final String CONSTRUCT_RESULT_RDFXML = "<rdf:RDF\n"
+			+ "    xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n"
+			+ "    xmlns:owl=\"http://www.w3.org/2002/07/owl#\"\n"
+			+ "    xmlns:xsd=\"http://www.w3.org/2001/XMLSchema#\"\n"
+			+ "    xmlns:j.0=\"http://here.edu/\"\n"
+			+ "    xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" > \n"
+			+ "  <rdf:Description rdf:about=\"http://here.edu/subject\">\n"
+			+ "    <j.0:predicate rdf:resource=\"http://here.edu/object\"/>\n"
+			+ "  </rdf:Description>\n" //
+			+ "</rdf:RDF>\n";
+	private static final String CONSTRUCT_RESULT_JSONLD = "["
+			+ "{\"@id\":\"http://here.edu/object\"},"
+			+ "{\"@id\":\"http://here.edu/subject\",\"http://here.edu/predicate\":[{\"@id\":\"http://here.edu/object\"}]}"
+			+ "]";
+
+	private static final String DESCRIBE_ALL_QUERY = "DESCRIBE <http://here.edu/subject>";
+	private static final String DESCRIBE_RESULT_TEXT = "<http://here.edu/subject> "
+			+ "<http://here.edu/predicate> <http://here.edu/object> .\n";
+	private static final String DESCRIBE_RESULT_RDFXML = "<rdf:RDF\n"
+			+ "    xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"\n"
+			+ "    xmlns:owl=\"http://www.w3.org/2002/07/owl#\"\n"
+			+ "    xmlns:xsd=\"http://www.w3.org/2001/XMLSchema#\"\n"
+			+ "    xmlns:j.0=\"http://here.edu/\"\n"
+			+ "    xmlns:rdfs=\"http://www.w3.org/2000/01/rdf-schema#\" > \n"
+			+ "  <rdf:Description rdf:about=\"http://here.edu/subject\">\n"
+			+ "    <j.0:predicate rdf:resource=\"http://here.edu/object\"/>\n"
+			+ "  </rdf:Description>\n" + "</rdf:RDF>\n";
+	private static final String DESCRIBE_RESULT_N3 = "@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .\n"
+			+ "@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .\n"
+			+ "@prefix owl:     <http://www.w3.org/2002/07/owl#> .\n"
+			+ "@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n"
+			+ "\n"
+			+ "<http://here.edu/subject>\n"
+			+ "      <http://here.edu/predicate>\n"
+			+ "              <http://here.edu/object> .\n";
+	private static final String DESCRIBE_RESULT_TURTLE = "" //
+			+ "@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .\n" //
+			+ "@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .\n" //
+			+ "@prefix owl:     <http://www.w3.org/2002/07/owl#> .\n" //
+			+ "@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .\n" //
+			+ "\n" //
+			+ "<http://here.edu/subject>\n" //
+			+ "      <http://here.edu/predicate>\n" //
+			+ "              <http://here.edu/object> .\n";
+	private static final String DESCRIBE_RESULT_JSONLD = "["
+			+ "{\"@id\":\"http://here.edu/object\"},"
+			+ "{\"@id\":\"http://here.edu/subject\",\"http://here.edu/predicate\":[{\"@id\":\"http://here.edu/object\"}]}"
+			+ "]";
+
+	private OntModel model;
+	private RDFService rdfService;
+
+	@Before
+	public void setup() {
+		model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		model.read(new StringReader(MODEL_CONTENTS_N3), BASE_URI, "N3");
+		rdfService = new RDFServiceModel(model);
+	}
+
+	// ----------------------------------------------------------------------
+	// Tests
+	// ----------------------------------------------------------------------
+
+	@Test(expected = NullPointerException.class)
+	public void nullRdfService() throws Exception {
+		SparqlQueryApiExecutor.instance(null, SELECT_ALL_QUERY, "text/plain");
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void nullQuery() throws Exception {
+		SparqlQueryApiExecutor.instance(rdfService, null, "text/plain");
+		fail("nullQuery not implemented");
+	}
+
+	@Test(expected = QueryParseException.class)
+	public void emptyQuery() throws Exception {
+		SparqlQueryApiExecutor.instance(rdfService, "", "text/plain");
+		fail("emptyQuery not implemented");
+	}
+
+	@Test(expected = QueryParseException.class)
+	public void cantParseQuery() throws Exception {
+		SparqlQueryApiExecutor.instance(rdfService, "BOGUS", "text/plain");
+		fail("cantParseQuery not implemented");
+	}
+
+	// Can't figure out how to create a Query of a type other than SELECT, ASK,
+	// CONSTRUCT and DESCRIBE.
+
+	// Null accept header is treated as "*/*"
+
+	@Test(expected = NotAcceptableException.class)
+	public void noAcceptableContentType() throws Exception {
+		SparqlQueryApiExecutor.instance(rdfService, SELECT_ALL_QUERY, "bogus");
+		fail("noAcceptableContentType not implemented");
+	}
+
+	// ----------------------------------------------------------------------
+
+	@Test
+	public void selectToText() throws Exception {
+		executeQuery("select to text", SELECT_ALL_QUERY, "text/plain",
+				SELECT_RESULT_TEXT);
+	}
+
+	@Test
+	public void selectToCsv() throws Exception {
+		executeQuery("select to csv", SELECT_ALL_QUERY, "text/csv",
+				SELECT_RESULT_CSV);
+	}
+
+	@Test
+	public void selectToTsv() throws Exception {
+		executeQuery("select to tsv", SELECT_ALL_QUERY,
+				"text/tab-separated-values", SELECT_RESULT_TSV);
+	}
+
+	@Test
+	public void selectToXml() throws Exception {
+		executeQuery("select to xml", SELECT_ALL_QUERY,
+				"application/sparql-results+xml", SELECT_RESULT_XML);
+	}
+
+	@Test
+	public void selectToJson() throws Exception {
+		executeQuery("select to json", SELECT_ALL_QUERY,
+				"application/sparql-results+json", SELECT_RESULT_JSON);
+	}
+
+	@Test
+	public void selectWithInvalidContentType() throws Exception {
+		executeWithInvalidAcceptHeader("select with application/rdf+xml",
+				SELECT_ALL_QUERY, "application/rdf+xml");
+		executeWithInvalidAcceptHeader("select with text/n3", SELECT_ALL_QUERY,
+				"text/n3");
+		executeWithInvalidAcceptHeader("select with text/turtle",
+				SELECT_ALL_QUERY, "text/turtle");
+		executeWithInvalidAcceptHeader("select with application/json",
+				SELECT_ALL_QUERY, "application/json");
+	}
+
+	// ----------------------------------------------------------------------
+
+	@Test
+	public void askToText() throws Exception {
+		executeQuery("ask to text", ASK_ALL_QUERY, "text/plain",
+				ASK_RESULT_TEXT);
+	}
+
+	@Test
+	public void askToCsv() throws Exception {
+		executeQuery("ask to csv", ASK_ALL_QUERY, "text/csv", ASK_RESULT_CSV);
+	}
+
+	@Test
+	public void askToTsv() throws Exception {
+		executeQuery("ask to tsv", ASK_ALL_QUERY, "text/tab-separated-values",
+				ASK_RESULT_TSV);
+	}
+
+	@Test
+	public void askToXml() throws Exception {
+		executeQuery("ask to xml", ASK_ALL_QUERY,
+				"application/sparql-results+xml", ASK_RESULT_XML);
+	}
+
+	@Test
+	public void askToJson() throws Exception {
+		executeQuery("ask to json", ASK_ALL_QUERY,
+				"application/sparql-results+json", ASK_RESULT_JSON);
+	}
+
+	@Test
+	public void askWithInvalidAcceptHeader() throws Exception {
+		executeWithInvalidAcceptHeader("ask with application/rdf+xml",
+				ASK_ALL_QUERY, "application/rdf+xml");
+		executeWithInvalidAcceptHeader("ask with text/n3", ASK_ALL_QUERY,
+				"text/n3");
+		executeWithInvalidAcceptHeader("ask with text/turtle", ASK_ALL_QUERY,
+				"text/turtle");
+		executeWithInvalidAcceptHeader("ask with application/json",
+				ASK_ALL_QUERY, "application/json");
+	}
+
+	// ----------------------------------------------------------------------
+
+	@Test
+	public void constructToText() throws Exception {
+		executeQuery("construct to text", CONSTRUCT_ALL_QUERY, "text/plain",
+				CONSTRUCT_RESULT_TEXT);
+	}
+
+	@Test
+	public void constructToRdfXml() throws Exception {
+		executeQuery("construct to rdf/xml", CONSTRUCT_ALL_QUERY,
+				"application/rdf+xml", CONSTRUCT_RESULT_RDFXML);
+	}
+
+	@Test
+	public void constructToN3() throws Exception {
+		executeQuery("construct to n3", CONSTRUCT_ALL_QUERY, "text/n3",
+				CONSTRUCT_RESULT_N3);
+	}
+
+	@Test
+	public void constructToTurtle() throws Exception {
+		executeQuery("construct to turtle", CONSTRUCT_ALL_QUERY, "text/turtle",
+				CONSTRUCT_RESULT_TURTLE);
+	}
+
+	@Test
+	public void constructToJsonld() throws Exception {
+		executeQuery("construct to JSON-LD", CONSTRUCT_ALL_QUERY,
+				"application/json", CONSTRUCT_RESULT_JSONLD);
+	}
+
+	@Test
+	public void constructWithInvalidAcceptHeader() throws Exception {
+		executeWithInvalidAcceptHeader("construct with text/csv",
+				CONSTRUCT_ALL_QUERY, "text/csv");
+		executeWithInvalidAcceptHeader("construct with text/tsv",
+				CONSTRUCT_ALL_QUERY, "text/tsv");
+		executeWithInvalidAcceptHeader(
+				"construct with application/sparql-results+xml",
+				CONSTRUCT_ALL_QUERY, "application/sparql-results+xml");
+		executeWithInvalidAcceptHeader(
+				"construct with application/sparql-results+json",
+				CONSTRUCT_ALL_QUERY, "application/sparql-results+json");
+	}
+
+	// ----------------------------------------------------------------------
+
+	@Test
+	public void describeToText() throws Exception {
+		executeQuery("describe to text", DESCRIBE_ALL_QUERY, "text/plain",
+				DESCRIBE_RESULT_TEXT);
+	}
+
+	@Test
+	public void describeToRdfXml() throws Exception {
+		executeQuery("describe to rdf/xml", DESCRIBE_ALL_QUERY,
+				"application/rdf+xml", DESCRIBE_RESULT_RDFXML);
+	}
+
+	@Test
+	public void describeToN3() throws Exception {
+		executeQuery("describe to n3", DESCRIBE_ALL_QUERY, "text/n3",
+				DESCRIBE_RESULT_N3);
+	}
+
+	@Test
+	public void describeToTurtle() throws Exception {
+		executeQuery("describe to turtle", DESCRIBE_ALL_QUERY, "text/turtle",
+				DESCRIBE_RESULT_TURTLE);
+	}
+
+	@Test
+	public void describeToJsonld() throws Exception {
+		executeQuery("describe to JSON-LD", DESCRIBE_ALL_QUERY,
+				"application/json", DESCRIBE_RESULT_JSONLD);
+	}
+
+	@Test
+	public void describeWithInvalidAcceptHeader() throws Exception {
+		executeWithInvalidAcceptHeader("describe with text/csv",
+				DESCRIBE_ALL_QUERY, "text/csv");
+		executeWithInvalidAcceptHeader("describe with text/tsv",
+				DESCRIBE_ALL_QUERY, "text/tsv");
+		executeWithInvalidAcceptHeader(
+				"describe with application/sparql-results+xml",
+				DESCRIBE_ALL_QUERY, "application/sparql-results+xml");
+		executeWithInvalidAcceptHeader(
+				"describe with application/sparql-results+json",
+				DESCRIBE_ALL_QUERY, "application/sparql-results+json");
+	}
+
+	// ----------------------------------------------------------------------
+	// Helper methods
+	// ----------------------------------------------------------------------
+
+	private void executeQuery(String message, String queryString,
+			String acceptHeader, String expected) throws Exception {
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+		SparqlQueryApiExecutor executor = SparqlQueryApiExecutor.instance(
+				rdfService, queryString, acceptHeader);
+		executor.executeAndFormat(out);
+
+		assertEquals(message, expected.replaceAll("\\s+", " "), out.toString().replaceAll("\\s+", " "));
+	}
+
+	private void executeWithInvalidAcceptHeader(String message,
+			String queryString, String acceptHeader) throws Exception {
+		try {
+			SparqlQueryApiExecutor.instance(rdfService, queryString,
+					acceptHeader);
+			fail(message + " - Expected a NotAcceptableException");
+		} catch (NotAcceptableException e) {
+			// expected
+		}
+	}
+}

@@ -9,7 +9,17 @@
 <@showStatement statement />
 
 <#macro showStatement statement>
-    ${statement.value!}
+    <#assign theValue = statement.value />
+    <#if theValue?contains("<ul>") >
+        <#assign theValue = theValue?replace("<ul>","<ul class='tinyMCEDisc'>") />
+    </#if>
+    <#if theValue?contains("<ol>") >
+        <#assign theValue = theValue?replace("<ol>","<ol class='tinyMCENumeric'>") />
+    </#if>
+    <#if theValue?contains("<p>") >
+        <#assign theValue = theValue?replace("<p>","")?replace("</p>","") />
+    </#if>
+    ${theValue}
 </#macro>
 
 

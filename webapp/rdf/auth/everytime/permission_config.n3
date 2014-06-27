@@ -19,7 +19,6 @@ auth:ADMIN
     auth:hasPermission simplePermission:ManageProxies ;
     auth:hasPermission simplePermission:ManageSearchIndex ;
     auth:hasPermission simplePermission:ManageUserAccounts ;
-    auth:hasPermission simplePermission:RebuildVClassGroupCache ;
     auth:hasPermission simplePermission:RefreshVisualizationCache ;
     auth:hasPermission simplePermission:SeeConfiguration ;
     auth:hasPermission simplePermission:SeeStartupStatus ;
@@ -36,8 +35,6 @@ auth:ADMIN
     # permissions for CURATOR and above.
     auth:hasPermission simplePermission:EditOntology ;
     auth:hasPermission simplePermission:EditSiteInformation ;
-    auth:hasPermission simplePermission:ManagePortals ;
-    auth:hasPermission simplePermission:ManageTabs ;
     auth:hasPermission simplePermission:SeeVerbosePropertyInformation ;
     auth:hasPermission simplePermission:UseMiscellaneousCuratorPages ;
 	auth:hasPermission simplePermission:PageViewableCurator ;
@@ -47,7 +44,7 @@ auth:ADMIN
     auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
     auth:hasPermission simplePermission:SeeRevisionInfo ;
     auth:hasPermission simplePermission:SeeSiteAdminPage ;
-    auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+    auth:hasPermission simplePermission:UseIndividualControlPanel ;
     auth:hasPermission simplePermission:PageViewableEditor ;
 
     # permissions for ANY logged-in user.
@@ -76,8 +73,6 @@ auth:CURATOR
     # permissions for CURATOR and above.
     auth:hasPermission simplePermission:EditOntology ;
     auth:hasPermission simplePermission:EditSiteInformation ;
-    auth:hasPermission simplePermission:ManagePortals ;
-    auth:hasPermission simplePermission:ManageTabs ;
     auth:hasPermission simplePermission:SeeVerbosePropertyInformation ;
     auth:hasPermission simplePermission:UseMiscellaneousCuratorPages ;
     auth:hasPermission simplePermission:PageViewableCurator ;
@@ -87,7 +82,7 @@ auth:CURATOR
     auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
     auth:hasPermission simplePermission:SeeRevisionInfo ;
     auth:hasPermission simplePermission:SeeSiteAdminPage ;
-    auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+    auth:hasPermission simplePermission:UseIndividualControlPanel ;
     auth:hasPermission simplePermission:PageViewableEditor ;
 
     # permissions for ANY logged-in user.
@@ -118,7 +113,7 @@ auth:EDITOR
     auth:hasPermission simplePermission:SeeIndividualEditingPanel ;
     auth:hasPermission simplePermission:SeeRevisionInfo ;
     auth:hasPermission simplePermission:SeeSiteAdminPage ;
-    auth:hasPermission simplePermission:UseMiscellaneousEditorPages ;
+    auth:hasPermission simplePermission:UseIndividualControlPanel ;
     auth:hasPermission simplePermission:PageViewableEditor ;
 
     # permissions for ANY logged-in user.

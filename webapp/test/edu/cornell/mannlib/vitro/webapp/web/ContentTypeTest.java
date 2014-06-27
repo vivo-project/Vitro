@@ -45,12 +45,16 @@ public class ContentTypeTest {
         
         Assert.assertEquals("application/rdf+xml", ContentType.getBestContentType(clientAccepts, serverTypes)); 
     }
-    
+ 
+    /**
+     * Modified this, added q-factor to text/html, because otherwise the result is indeterminate, and the
+     * test fails in Java 8.
+     */ 
     @Test
     public void testWeightedBestContentTypeForFirefox(){
         //accept header from normal firefox
         Map<String,Float> clientAccepts = ContentType.getTypesAndQ(
-        "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+        "text/html;q=0.95,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
         
         Map<String,Float> serverTypes = IndividualController.ACCEPTED_CONTENT_TYPES;
         

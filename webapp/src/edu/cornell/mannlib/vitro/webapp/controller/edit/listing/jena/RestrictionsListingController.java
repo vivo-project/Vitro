@@ -44,7 +44,7 @@ public class RestrictionsListingController extends BaseEditController {
 	private EditProcessObject epo = null;
 	
     public void doGet(HttpServletRequest request, HttpServletResponse response) {    	
-        if (!isAuthorizedToDisplayPage(request, response, SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
+        if (!isAuthorizedToDisplayPage(request, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
         	return;
         }
 

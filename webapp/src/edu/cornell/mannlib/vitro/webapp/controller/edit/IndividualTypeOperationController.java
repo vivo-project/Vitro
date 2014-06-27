@@ -23,7 +23,7 @@ public class IndividualTypeOperationController extends BaseEditController {
 
     public void doGet(HttpServletRequest req, HttpServletResponse response) {
 		if (!isAuthorizedToDisplayPage(req, response,
-				SimplePermission.DO_BACK_END_EDITING.ACTIONS)) {
+				SimplePermission.DO_BACK_END_EDITING.ACTION)) {
         	return;
         }
 

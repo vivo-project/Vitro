@@ -42,7 +42,7 @@ public class VclassRetryController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(VclassRetryController.class.getName());
 
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
-        if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTIONS)) {
+        if (!isAuthorizedToDisplayPage(req, response, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
         	return;
         }
 

@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.AUTHORIZED;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -28,16 +30,14 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
-import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.beans.DisplayMessage;
 import edu.cornell.mannlib.vitro.webapp.beans.ResourceBean;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LogoutRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
-public class VitroHttpServlet extends HttpServlet {
+public class VitroHttpServlet extends HttpServlet implements MultipartRequestWrapper.ParsingStrategy {
 	private static final long serialVersionUID = 1L;
 
 	protected static DateFormat publicDateFormat = new SimpleDateFormat(
@@ -60,14 +60,36 @@ public class VitroHttpServlet extends HttpServlet {
 		if ((req instanceof HttpServletRequest)
 				&& (resp instanceof HttpServletResponse)) {
 			HttpServletRequest hreq = (HttpServletRequest) req;
-			HttpServletResponse hresp = (HttpServletResponse) resp;
+
+			hreq = MultipartRequestWrapper.parse(hreq, this);
 
 			if (log.isTraceEnabled()) {
 				dumpRequestHeaders(hreq);
 			}
+	
+			super.service(hreq, resp);
+		} else {
+			super.service(req, resp);
 		}
+	}
 
-		super.service(req, resp);
+	/**
+	 * Override this to change the maximum size of uploaded files in multipart
+	 * requests.
+	 */
+	@Override
+	public long maximumMultipartFileSize() {
+		return 50 * 1024 * 1024; // default is 50 megabytes
+	}
+	
+	/**
+	 * Override this to change the way that exceptions are handled when parsing
+	 * a multipart request. Be aware that multipart parameters have been lost,
+	 * and that may include form fields.
+	 */
+	@Override
+	public boolean stashFileSizeException() {
+		return false;
 	}
 
 	/**
@@ -92,24 +114,12 @@ public class VitroHttpServlet extends HttpServlet {
 	 * Don't display a page that the user isn't authorized to see.
 	 * 
 	 * @param actions
-	 *            the RequestedActions that must be authorized.
-	 */
-	protected boolean isAuthorizedToDisplayPage(HttpServletRequest request,
-			HttpServletResponse response, RequestedAction... actions) {
-		return isAuthorizedToDisplayPage(request, response,
-				new Actions(Arrays.asList(actions)));
-	}
-
-	/**
-	 * Don't display a page that the user isn't authorized to see.
-	 * 
-	 * @param actions
 	 *            the combination of RequestedActions that must be authorized.
 	 */
 	protected boolean isAuthorizedToDisplayPage(HttpServletRequest request,
-			HttpServletResponse response, Actions actions) {
+			HttpServletResponse response, AuthorizationRequest actions) {
 		// Record restricted pages so we won't return to them on logout
-		if (!actions.isEmpty()) {
+		if (actions != AUTHORIZED) {
 			LogoutRedirector.recordRestrictedPageUri(request);
 		}
 

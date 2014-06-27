@@ -29,7 +29,7 @@ public class NamespacesListingController extends BaseEditController {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) {    	
 		if (!isAuthorizedToDisplayPage(request, response,
-				SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTIONS)) {
+				SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTION)) {
         	return;
         }
 

@@ -133,7 +133,7 @@ public class DisplayVocabulary {
     public static final String FIXED_HTML_VALUE = DISPLAY_NS + "htmlValue";
     
     
-    /* URI of property for Solr Query Generator */
+    /* URI of property for Search Query Generator */
     public static final String VCLASSID = DISPLAY_NS + "hasVClassId";
 
     

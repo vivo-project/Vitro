@@ -2,20 +2,21 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering.filters;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_URI;
+import net.sf.jga.fn.UnaryFunctor;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import net.sf.jga.fn.UnaryFunctor;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataProperty;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -110,8 +111,8 @@ public class HideFromDisplayByPolicyFilter extends VitroFiltersImpl {
 			}
 			ObjectProperty op = new ObjectProperty();
 			op.setURI(ops.getPropertyURI());
-			op.setDomainVClassURI(RequestActionConstants.SOME_URI);
-			op.setRangeVClassURI(RequestActionConstants.SOME_URI);
+			op.setDomainVClassURI(SOME_URI);
+			op.setRangeVClassURI(SOME_URI);
 			return op;
 		}
 

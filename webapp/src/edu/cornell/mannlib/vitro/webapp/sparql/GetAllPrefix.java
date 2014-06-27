@@ -3,7 +3,6 @@ package edu.cornell.mannlib.vitro.webapp.sparql;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,9 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openrdf.model.vocabulary.OWL;
-import org.openrdf.model.vocabulary.RDF;
 
+import com.hp.hpl.jena.vocabulary.OWL;
+import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 import com.hp.hpl.jena.vocabulary.XSD;
 
@@ -58,7 +57,7 @@ public class GetAllPrefix extends BaseEditController {
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		if (!isAuthorizedToDisplayPage(request, response,
-				SimplePermission.USE_MISCELLANEOUS_PAGES.ACTIONS)) {
+				SimplePermission.USE_MISCELLANEOUS_PAGES.ACTION)) {
         	return;
 		}
 
@@ -100,8 +99,8 @@ public class GetAllPrefix extends BaseEditController {
 	    }
 	    
 	    // add standard namespaces
-	    addPrefixIfNecessary("owl", OWL.NAMESPACE, prefixMap);
-	    addPrefixIfNecessary("rdf", RDF.NAMESPACE, prefixMap);
+	    addPrefixIfNecessary("owl", OWL.getURI(), prefixMap);
+	    addPrefixIfNecessary("rdf", RDF.getURI(), prefixMap);
 	    addPrefixIfNecessary("rdfs", RDFS.getURI(), prefixMap);
 	    addPrefixIfNecessary("swrl", "http://www.w3.org/2003/11/swrl#", prefixMap);
 	    addPrefixIfNecessary("swrlb", "http://www.w3.org/2003/11/swrlb#", prefixMap);

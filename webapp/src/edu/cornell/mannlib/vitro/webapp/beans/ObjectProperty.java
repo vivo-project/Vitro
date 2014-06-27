@@ -14,7 +14,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
-import org.openrdf.model.impl.URIImpl;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 
@@ -184,7 +183,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
             this.localNameInverse = null;
         } else {
             this.URIInverse = URIInverse;
-            URIImpl uriInverse = new URIImpl(URIInverse);
+            BaseResourceBean uriInverse = new BaseResourceBean(URIInverse);
             this.namespaceInverse = uriInverse.getNamespace();
             this.localNameInverse = uriInverse.getLocalName();
         }

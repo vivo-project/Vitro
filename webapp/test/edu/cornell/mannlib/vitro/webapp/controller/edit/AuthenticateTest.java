@@ -121,10 +121,7 @@ public class AuthenticateTest extends AbstractTestClass {
 
 	@Before
 	public void setup() throws Exception {
-		// Create an I18n module that has a value for any key, but the value is
-		// the key itself.
-		@SuppressWarnings("unused")
-		I18nStub i18n = new I18nStub();
+		I18nStub.setup();
 
 		authenticatorFactory = new AuthenticatorStub.Factory();
 		authenticator = authenticatorFactory.getInstance(request);

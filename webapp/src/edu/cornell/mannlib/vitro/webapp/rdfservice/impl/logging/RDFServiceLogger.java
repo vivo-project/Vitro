@@ -4,19 +4,16 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.regex.Pattern;
-
-import javax.servlet.ServletContext;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
-import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings.Keys;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.loggers.StackTraceUtility;
 
 /**
  * Writes the log message for the LoggingRDFService.
@@ -45,44 +42,50 @@ import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings.Keys;
 public class RDFServiceLogger implements AutoCloseable {
 	private static final Log log = LogFactory.getLog(RDFServiceLogger.class);
 
-	private final ServletContext ctx;
-	private final Object[] args;
+	private static boolean isEnabled() {
+		return log.isInfoEnabled()
+				&& DeveloperSettings.getInstance().getBoolean(
+						Key.LOGGING_RDF_ENABLE);
+	}
 
-	private boolean isEnabled;
+	private final Object[] args;
+	private final StackTraceUtility stackTrace;
+
 	private boolean traceRequested;
 	private Pattern queryStringRestriction;
 	private Pattern callStackRestriction;
 
-	private String methodName;
-	private List<StackTraceElement> trace = Collections.emptyList();
-
 	private long startTime;
 
-	public RDFServiceLogger(ServletContext ctx, Object... args) {
-		this.ctx = ctx;
+	public RDFServiceLogger(Object... args) {
 		this.args = args;
+		this.stackTrace = new StackTraceUtility(LoggingRDFService.class,
+				isEnabled());
 
-		getProperties();
-
-		if (isEnabled && log.isInfoEnabled()) {
-			loadStackTrace();
-			if (passesQueryRestriction() && passesStackRestriction()) {
-				this.startTime = System.currentTimeMillis();
+		try {
+			getProperties();
+			if (isEnabled()) {
+				if (passesQueryRestriction()
+						&& stackTrace
+								.passesStackRestriction(callStackRestriction)) {
+					this.startTime = System.currentTimeMillis();
+				}
 			}
+		} catch (Exception e) {
+			log.error("Failed to create instance", e);
 		}
 	}
 
 	private void getProperties() {
-		DeveloperSettings settings = DeveloperSettings.getBean(ctx);
-		isEnabled = settings.getBoolean(Keys.LOGGING_RDF_ENABLE);
-		traceRequested = settings.getBoolean(Keys.LOGGING_RDF_STACK_TRACE);
+		DeveloperSettings settings = DeveloperSettings.getInstance();
+		traceRequested = settings.getBoolean(Key.LOGGING_RDF_STACK_TRACE);
 		queryStringRestriction = patternFromSettings(settings,
-				Keys.LOGGING_RDF_QUERY_RESTRICTION);
+				Key.LOGGING_RDF_QUERY_RESTRICTION);
 		callStackRestriction = patternFromSettings(settings,
-				Keys.LOGGING_RDF_STACK_RESTRICTION);
+				Key.LOGGING_RDF_STACK_RESTRICTION);
 	}
 
-	private Pattern patternFromSettings(DeveloperSettings settings, Keys key) {
+	private Pattern patternFromSettings(DeveloperSettings settings, Key key) {
 		String patternString = settings.getString(key);
 		if (StringUtils.isBlank(patternString)) {
 			return null;
@@ -96,61 +99,6 @@ public class RDFServiceLogger implements AutoCloseable {
 		}
 	}
 
-	private void loadStackTrace() {
-		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-		List<StackTraceElement> list = new ArrayList<StackTraceElement>(
-				Arrays.asList(stack));
-
-		trimStackTraceAtBeginning(list);
-		trimStackTraceAtEnd(list);
-		removeJenaClassesFromStackTrace(list);
-
-		if (list.isEmpty()) {
-			this.methodName = "UNKNOWN";
-		} else {
-			this.methodName = list.get(0).getMethodName();
-		}
-
-		this.trace = list;
-		log.debug("Stack array: " + Arrays.toString(stack));
-		log.debug("Stack trace: " + this.trace);
-	}
-
-	private void trimStackTraceAtBeginning(List<StackTraceElement> list) {
-		ListIterator<StackTraceElement> iter = list.listIterator();
-		while (iter.hasNext()) {
-			StackTraceElement ste = iter.next();
-			if (ste.getClassName().equals(LoggingRDFService.class.getName())) {
-				break;
-			} else {
-				iter.remove();
-			}
-		}
-	}
-
-	private void trimStackTraceAtEnd(List<StackTraceElement> list) {
-		ListIterator<StackTraceElement> iter = list.listIterator();
-		boolean trimming = false;
-		while (iter.hasNext()) {
-			StackTraceElement ste = iter.next();
-			if (trimming) {
-				iter.remove();
-			} else if (ste.getClassName().contains("ApplicationFilterChain")) {
-				trimming = true;
-			}
-		}
-	}
-
-	private void removeJenaClassesFromStackTrace(List<StackTraceElement> list) {
-		ListIterator<StackTraceElement> iter = list.listIterator();
-		while (iter.hasNext()) {
-			StackTraceElement ste = iter.next();
-			if (ste.getClassName().startsWith("com.hp.hpl.jena.")) {
-				iter.remove();
-			}
-		}
-	}
-
 	private boolean passesQueryRestriction() {
 		if (queryStringRestriction == null) {
 			return true;
@@ -160,59 +108,32 @@ public class RDFServiceLogger implements AutoCloseable {
 	}
 
 	private String assembleQueryString() {
-		StringBuilder query = new StringBuilder();
+		List<String> stringArgs = new ArrayList<>();
 		for (Object arg : args) {
 			if (arg instanceof String) {
-				query.append((String) arg).append(" ");
+				stringArgs.add((String) arg);
 			}
 		}
-		return query.deleteCharAt(query.length() - 1).toString();
-	}
-
-	private boolean passesStackRestriction() {
-		if (callStackRestriction == null) {
-			return true;
-		}
-		String q = assembleCallStackString();
-		return callStackRestriction.matcher(q).find();
-	}
-
-	private String assembleCallStackString() {
-		StringBuilder stack = new StringBuilder();
-		for (StackTraceElement ste : trace) {
-			stack.append(ste.getClassName()).append(" ")
-					.append(ste.getMethodName()).append(" ");
-		}
-		return stack.deleteCharAt(stack.length() - 1).toString();
+		return StringUtils.join(stringArgs, " ");
 	}
 
 	@Override
 	public void close() {
-		if (startTime != 0L) {
-			long endTime = System.currentTimeMillis();
+		try {
+			if (startTime != 0L) {
+				long endTime = System.currentTimeMillis();
 
-			float elapsedSeconds = (endTime - startTime) / 1000.0F;
-			String cleanArgs = Arrays.deepToString(args).replaceAll(
-					"[\\n\\r\\t]+", " ");
-			String formattedTrace = formatStackTrace();
+				float elapsedSeconds = (endTime - startTime) / 1000.0F;
+				String cleanArgs = Arrays.deepToString(args).replaceAll(
+						"[\\n\\r\\t]+", " ");
+				String formattedTrace = stackTrace.format(traceRequested);
 
-			log.info(String.format("%8.3f %s %s %s", elapsedSeconds,
-					methodName, cleanArgs, formattedTrace));
-		}
-	}
-
-	private String formatStackTrace() {
-		StringBuilder sb = new StringBuilder();
-
-		if (traceRequested) {
-			for (StackTraceElement ste : trace) {
-				sb.append(String.format("\n   line %d4, %s",
-						ste.getLineNumber(), ste.getClassName()));
+				log.info(String.format("%8.3f %s %s %s", elapsedSeconds,
+						stackTrace.getMethodName(), cleanArgs, formattedTrace));
 			}
-			sb.append("\n   ...");
+		} catch (Exception e) {
+			log.error("Failed to write log record", e);
 		}
-
-		return sb.toString();
 	}
 
 }

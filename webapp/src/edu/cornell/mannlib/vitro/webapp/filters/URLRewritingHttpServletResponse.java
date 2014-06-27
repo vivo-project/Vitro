@@ -14,9 +14,8 @@ import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openrdf.model.URI;
-import org.openrdf.model.impl.URIImpl;
 
+import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.NamespaceMapper;
@@ -136,7 +135,7 @@ public class URLRewritingHttpServletResponse extends HttpServletResponseWrapper/
 					qpIndex++;
 					if ( ("uri".equals(keyAndValue[0])) && (keyAndValue.length>1) && (keyAndValue[1] != null) ) {
 						try {
-							URI uri = new URIImpl(keyAndValue[1]);
+							IndividualImpl uri = new IndividualImpl(keyAndValue[1]);
 							String namespace = uri.getNamespace();
 							String localName = uri.getLocalName();
 							if ( (namespace != null) && (localName != null) ) { 

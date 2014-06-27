@@ -11,7 +11,7 @@
 <tr class="editformcell">
     <td>
         <br/>
-        <b>New URI</b>&nbsp;<span class="note"> (must begin with http:// or htts://)</span>
+        <b>New URI</b>&nbsp;<span class="note"> (must begin with http:// or https://)</span>
         <br/>
         <span class="warning"><strong>${epo.attributeMap['errorMsg']}</strong></span>
         <input type="text" size="95%" name="newURI" value='<%=request.getParameter("oldURI")%>'/>

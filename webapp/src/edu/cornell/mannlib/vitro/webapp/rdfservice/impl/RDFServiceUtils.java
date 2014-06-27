@@ -15,7 +15,7 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.sparql.resultset.ResultSetFormat;
+import com.hp.hpl.jena.sparql.resultset.ResultsFormat;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -26,32 +26,44 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging.LoggingRDFServiceFactory;
 
 public class RDFServiceUtils {
-
-	static Log log = LogFactory.getLog(RDFServiceUtils.class);
+	private static final Log log = LogFactory.getLog(RDFServiceUtils.class);
 	
     private static final String RDFSERVICEFACTORY_ATTR = 
             RDFServiceUtils.class.getName() + ".RDFServiceFactory";
     
+    public enum WhichService {CONTENT, CONFIGURATION}
        
     public static RDFServiceFactory getRDFServiceFactory(ServletContext context) {
-        Object o = context.getAttribute(RDFSERVICEFACTORY_ATTR);
-        if (o instanceof RDFServiceFactory) {
-        	RDFServiceFactory factory = (RDFServiceFactory) o;
-        	
-			/*
-			 * Every factory is wrapped in a logger, so we can dynamically
-			 * enable or disable logging.
-			 */
-        	return new LoggingRDFServiceFactory(context, factory);
-        } else {
-        	log.error("Expecting an RDFServiceFactory on the context, but found " + o);
-        	return null;
-        }
+    	return getRDFServiceFactory(context, WhichService.CONTENT);
+    }
+    
+	/*
+	 * Every factory is wrapped in a logger, so we can dynamically enable or
+	 * disable logging.
+	 */
+	public static RDFServiceFactory getRDFServiceFactory(
+			ServletContext context, WhichService which) {
+		String attribute = RDFSERVICEFACTORY_ATTR + "." + which.name();
+		Object o = context.getAttribute(attribute);
+		if (o instanceof RDFServiceFactory) {
+			RDFServiceFactory factory = (RDFServiceFactory) o;
+			return new LoggingRDFServiceFactory(factory);
+		} else {
+			throw new IllegalStateException(
+					"Expecting an RDFServiceFactory on the context at '"
+							+ attribute + "', but found " + o);
+		}
+	}
+    
+    public static void setRDFServiceFactory(ServletContext context, 
+    		RDFServiceFactory factory) {
+    	setRDFServiceFactory(context, factory, WhichService.CONTENT);
     }
     
     public static void setRDFServiceFactory(ServletContext context, 
-            RDFServiceFactory factory) {
-        context.setAttribute(RDFSERVICEFACTORY_ATTR, factory);
+    		RDFServiceFactory factory, WhichService which) {
+		String attribute = RDFSERVICEFACTORY_ATTR + "." + which.name();
+    	context.setAttribute(attribute, factory);
     }
     
     public static InputStream toInputStream(String serializedRDF) {
@@ -69,16 +81,16 @@ public class RDFServiceUtils {
         return model;
     }
     
-    public static ResultSetFormat getJenaResultSetFormat(ResultFormat resultFormat) {
+    public static ResultsFormat getJenaResultSetFormat(ResultFormat resultFormat) {
         switch(resultFormat) {
             case JSON:
-                return ResultSetFormat.syntaxJSON;
+                return ResultsFormat.FMT_RS_JSON;
             case CSV:
-                return ResultSetFormat.syntaxCSV;
+                return ResultsFormat.FMT_RS_CSV;
             case XML:
-                return ResultSetFormat.syntaxXML;
+                return ResultsFormat.FMT_RS_XML;
             case TEXT:
-                return ResultSetFormat.syntaxText;
+                return ResultsFormat.FMT_TEXT;
             default:
                 throw new RuntimeException("unsupported ResultFormat");
         }
@@ -112,10 +124,14 @@ public class RDFServiceUtils {
     }
     
     public static RDFService getRDFService(VitroRequest vreq) {
-        return getRDFServiceFactory(
-                vreq.getSession().getServletContext()).getRDFService();
+    	return getRDFService(vreq, WhichService.CONTENT);
     }
 
+    public static RDFService getRDFService(VitroRequest vreq, WhichService which) {
+    	return getRDFServiceFactory(
+    			vreq.getSession().getServletContext(), which).getRDFService();
+    }
+    
     public static ResultSet sparqlSelectQuery(String query, RDFService rdfService) {
     	
     	ResultSet resultSet = null;

@@ -16,19 +16,15 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.GraphEventManager;
 import com.hp.hpl.jena.graph.GraphStatisticsHandler;
 import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Reifier;
 import com.hp.hpl.jena.graph.TransactionHandler;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.TripleMatch;
 import com.hp.hpl.jena.graph.impl.GraphWithPerform;
 import com.hp.hpl.jena.graph.impl.SimpleEventManager;
-import com.hp.hpl.jena.graph.query.QueryHandler;
-import com.hp.hpl.jena.graph.query.SimpleQueryHandler;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.shared.AddDeniedException;
 import com.hp.hpl.jena.shared.DeleteDeniedException;
 import com.hp.hpl.jena.shared.PrefixMapping;
@@ -41,6 +37,7 @@ import com.hp.hpl.jena.util.iterator.WrappedIterator;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 public class RDFServiceGraph implements GraphWithPerform {
@@ -52,8 +49,6 @@ public class RDFServiceGraph implements GraphWithPerform {
     private BulkUpdateHandler bulkUpdateHandler;
     private PrefixMapping prefixMapping = new PrefixMappingImpl();
     private GraphEventManager eventManager;
-    private Reifier reifier = new EmptyReifier(this);
-    private QueryHandler queryHandler;
 
     /**
      * Returns a SparqlGraph for the union of named graphs in a remote repository 
@@ -174,6 +169,13 @@ public class RDFServiceGraph implements GraphWithPerform {
         performDelete(arg0);
     }
 
+	@Override
+	public void remove(Node subject, Node predicate, Node object) {
+		for (Triple t : find(subject, predicate, object).toList()) {
+			delete(t);
+		}
+	}
+
     @Override
     public boolean dependsOn(Graph arg0) {
         return false; // who knows?
@@ -230,9 +232,9 @@ public class RDFServiceGraph implements GraphWithPerform {
     public ExtendedIterator<Triple> find(Node subject, Node predicate, Node object) {
         if (!isVar(subject) && !isVar(predicate)  && !isVar(object)) {
             if (contains(subject, predicate, object)) {
-                return new SingletonIterator(new Triple(subject, predicate, object));
+                return new SingletonIterator<Triple>(new Triple(subject, predicate, object));
             } else {
-                return WrappedIterator.create(Collections.EMPTY_LIST.iterator());
+                return WrappedIterator.create(Collections.<Triple>emptyIterator());
             }
         }
         StringBuffer findQuery = new StringBuffer("SELECT * WHERE { \n");
@@ -271,6 +273,7 @@ public class RDFServiceGraph implements GraphWithPerform {
     }
     
     @Override
+    @Deprecated
     public BulkUpdateHandler getBulkUpdateHandler() {
         if (this.bulkUpdateHandler == null) {
             this.bulkUpdateHandler = new RDFServiceGraphBulkUpdater(this);
@@ -294,11 +297,6 @@ public class RDFServiceGraph implements GraphWithPerform {
     @Override
     public PrefixMapping getPrefixMapping() {
         return prefixMapping;
-    }
-
-    @Override
-    public Reifier getReifier() {
-        return reifier;
     }
 
     @Override
@@ -330,53 +328,59 @@ public class RDFServiceGraph implements GraphWithPerform {
     }
 
     @Override
-    public QueryHandler queryHandler() {
-        if (queryHandler == null) {
-            queryHandler = new SimpleQueryHandler(this);
-        }
-        return queryHandler;
-    }
-
-    @Override
     public int size() {
         int size = find(null, null, null).toList().size();
         return size;
     }
     
-    private final static Capabilities capabilities = new Capabilities() {
+    @Override
+	public void clear() {
+    	removeAll();
+	}
+
+	private final static Capabilities capabilities = new Capabilities() {
         
-        public boolean addAllowed() {
+        @Override
+		public boolean addAllowed() {
             return false;
         }
         
+        @Override
         public boolean addAllowed(boolean everyTriple) {
             return false;
         }
         
+        @Override
         public boolean canBeEmpty() {
             return true;
         }
         
+        @Override
         public boolean deleteAllowed() {
             return false;
         }
         
+        @Override
         public boolean deleteAllowed(boolean everyTriple) {
             return false;
         }
         
+        @Override
         public boolean findContractSafe() {
             return true;
         }
         
+        @Override
         public boolean handlesLiteralTyping() {
             return true;
         }
         
+        @Override
         public boolean iteratorRemoveAllowed() {
             return false;
         }
         
+        @Override
         public boolean sizeAccurate() {
             return true;
         }
@@ -440,7 +444,7 @@ public class RDFServiceGraph implements GraphWithPerform {
     }
     
     public static Model createRDFServiceModel(final RDFServiceGraph g) {
-        Model m = ModelFactory.createModelForGraph(g);
+        Model m = VitroModelFactory.createModelForGraph(g);
         m.register(new StatementListener() {
             @Override 
             public void notifyEvent(Model m, Object event) {

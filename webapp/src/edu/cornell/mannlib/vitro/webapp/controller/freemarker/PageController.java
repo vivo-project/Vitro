@@ -3,7 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
 
-import java.util.ArrayList;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.AUTHORIZED;
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.UNAUTHORIZED;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,9 +20,8 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.SimpleRequestedAction;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequiresActions;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -51,72 +52,49 @@ public class PageController extends FreemarkerHttpServlet{
      * AND them together.
      */
     @Override
-    protected Actions requiredActions(VitroRequest vreq) {
+    protected AuthorizationRequest requiredActions(VitroRequest vreq) {
         try {
-            Actions pageActs = getActionsForPage( vreq );
-            Actions dgActs = getActionsForDataGetters( vreq );
-
-            if( pageActs == null && dgActs == null){
-                return Actions.AUTHORIZED;
-            }else if( pageActs == null ){
-                return dgActs;
-            }else if( dgActs == null ){
-            	return pageActs;
-            }else{
-                return pageActs.and(dgActs);
-            }                
-            
+			return AUTHORIZED.and(getActionsForPage(vreq)).and(
+					getActionsForDataGetters(vreq));
         } catch (Exception e) {
             log.warn(e);
-            return Actions.UNAUTHORIZED;
+            return UNAUTHORIZED;
         }                
     }
 
     /**
      * Get all the required actions directly required for the page.
      */
-    private Actions getActionsForPage( VitroRequest vreq ) throws Exception{
+    private AuthorizationRequest getActionsForPage( VitroRequest vreq ) throws Exception{
         List<String> simplePremUris = vreq.getWebappDaoFactory().getPageDao()
             .getRequiredActions( getPageUri(vreq) );
-        
-        List<RequestedAction> actions = new ArrayList<RequestedAction>();
-        
+
+        AuthorizationRequest auth = AUTHORIZED;
         for( String uri : simplePremUris ){
-            actions.add( new SimpleRequestedAction(uri) );
+            auth = auth.and( new SimpleRequestedAction(uri) );
         }
-        
-        return new Actions( actions );
+        return auth;
     }
+    
     /**
      * Get Actions object for the data getters for the page.
      */
-    private Actions getActionsForDataGetters(VitroRequest vreq ){
+    private AuthorizationRequest getActionsForDataGetters(VitroRequest vreq ){
         try {
-            Actions dgActs = null;
-
             List<DataGetter> dgList = 
                 DataGetterUtils.getDataGettersForPage(
                     vreq, vreq.getDisplayModel(), getPageUri(vreq));
 
+            AuthorizationRequest auth = AUTHORIZED;
             for( DataGetter dg : dgList){
                 if( dg instanceof RequiresActions ){
-                    RequiresActions ra = (RequiresActions) dg;
-                    Actions newActions = ra.requiredActions(vreq);                        
-                    if( newActions != null ){
-                        if( dgActs != null ){
-                            dgActs = dgActs.and( newActions );
-                        }else{
-                            dgActs = newActions;
-                        }
-                    }
+                    auth = auth.and(((RequiresActions) dg).requiredActions(vreq));                        
                 }
             }
-            
-            return dgActs;
+            return auth;
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             log.debug(e);
-            return Actions.UNAUTHORIZED;
+            return UNAUTHORIZED;
         }
     }
     
@@ -181,7 +159,7 @@ public class PageController extends FreemarkerHttpServlet{
         
         //Add editing link for page if authorized        
         Map<String,Object> pageMap = (Map<String, Object>) mapForTemplate.get("page");        
-        if( PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_MENUS.ACTIONS) ){
+        if( PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.MANAGE_MENUS.ACTION) ){
             String editPageUrl = UrlBuilder.getIndividualProfileUrl(pageUri, vreq);            
             editPageUrl = UrlBuilder.addParams(editPageUrl, DisplayVocabulary.SWITCH_TO_DISPLAY_MODEL , "1");            
             pageMap.put("URLToEditPage", editPageUrl);
@@ -235,10 +213,6 @@ public class PageController extends FreemarkerHttpServlet{
      * @throws Exception 
      */
     private String getPageUri(VitroRequest vreq) throws Exception {
-        // get URL without hostname or servlet context
-        //bdc34: why are we getting this?
-        String url = vreq.getRequestURI().substring(vreq.getContextPath().length());
-        
         // Check if there is a page URI in the request.  
         // This would have been added by a servlet Filter.
         String pageURI = (String) vreq.getAttribute("pageURI");        

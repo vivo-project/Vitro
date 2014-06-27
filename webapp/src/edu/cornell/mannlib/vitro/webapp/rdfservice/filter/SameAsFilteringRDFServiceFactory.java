@@ -4,11 +4,14 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.filter;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -104,6 +107,20 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
             return new ByteArrayInputStream(out.toByteArray());
         }
               
+    	/**
+    	 * TODO rewrite the filtering to use this form instead - avoid one level of
+    	 * buffering.
+    	 */
+    	@Override
+    	public void sparqlSelectQuery(String query, ResultFormat resultFormat,
+    			OutputStream outputStream) throws RDFServiceException {
+    		try (InputStream input = sparqlSelectQuery(query, resultFormat)) {
+    			IOUtils.copy(input, outputStream);
+    		} catch (IOException e) {
+    			throw new RDFServiceException(e);
+    		}
+    	}
+    	
         @Override 
         public InputStream sparqlSelectQuery(String query, ResultFormat resultFormat) 
                 throws RDFServiceException {

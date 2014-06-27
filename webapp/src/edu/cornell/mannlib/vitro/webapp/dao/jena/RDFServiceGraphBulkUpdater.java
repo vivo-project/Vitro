@@ -10,16 +10,17 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.graph.BulkUpdateHandler;
 import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.graph.GraphEventManager;
 import com.hp.hpl.jena.graph.GraphEvents;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.graph.impl.SimpleBulkUpdateHandler;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.sparql.util.graph.GraphFactory;
+import com.hp.hpl.jena.sparql.graph.GraphFactory;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
@@ -27,17 +28,19 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
-public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
+public class RDFServiceGraphBulkUpdater implements BulkUpdateHandler {
+	private static final Log log = LogFactory.getLog(RDFServiceGraphBulkUpdater.class);
 
-    private static final Log log = LogFactory.getLog(RDFServiceGraphBulkUpdater.class);
-    private RDFServiceGraph graph;
+    private final RDFServiceGraph graph;
+    private final GraphEventManager manager;
     
     public RDFServiceGraphBulkUpdater(RDFServiceGraph graph) {
-        super(graph);
         this.graph = graph;
+        this.manager = graph.getEventManager();
     }
     
     @Override
+    @Deprecated
     public void add(Triple[] arg0) {
         Graph g = GraphFactory.createPlainGraph();
         for (int i = 0 ; i < arg0.length ; i++) {
@@ -47,6 +50,7 @@ public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
     }
 
     @Override
+    @Deprecated
     public void add(List<Triple> arg0) {
         Graph g = GraphFactory.createPlainGraph();
         for (Triple t : arg0) {
@@ -56,6 +60,7 @@ public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
     }
 
     @Override
+    @Deprecated
     public void add(Iterator<Triple> arg0) {
         Graph g = GraphFactory.createPlainGraph();
         while (arg0.hasNext()) {
@@ -66,11 +71,13 @@ public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
     }
 
     @Override
+    @Deprecated
     public void add(Graph arg0) {
         add(arg0, false);
     }
 
     @Override
+    @Deprecated
     public void add(Graph g, boolean arg1) {
         Model[] model = separateStatementsWithBlankNodes(g);
         addModel(model[1] /* nonBlankNodeModel */);
@@ -105,12 +112,45 @@ public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
     }
     
 
+	@Override
+    @Deprecated
+	public void delete(Triple[] arg0) {
+        Graph g = GraphFactory.createPlainGraph();
+        for (int i = 0 ; i < arg0.length ; i++) {
+            g.add(arg0[i]);
+        }
+        delete(g);
+	}
+
+	@Override
+    @Deprecated
+	public void delete(List<Triple> arg0) {
+        Graph g = GraphFactory.createPlainGraph();
+        for (Triple t : arg0) {
+            g.add(t);
+        }
+        delete(g);
+	}
+
+	@Override
+    @Deprecated
+	public void delete(Iterator<Triple> arg0) {
+        Graph g = GraphFactory.createPlainGraph();
+        while (arg0.hasNext()) {
+            Triple t = arg0.next();
+            g.add(t);
+        }
+        delete(g);
+	}
+
     @Override 
+    @Deprecated
     public void delete(Graph g, boolean withReifications) {
         delete(g);
     }
     
     @Override 
+    @Deprecated
     public void delete(Graph g) {
         deleteModel(ModelFactory.createModelForGraph(g));
     }
@@ -144,23 +184,26 @@ public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
     }    
 
     @Override 
+    @Deprecated
     public void removeAll() {
         removeAll(graph, null, null, null);
         notifyRemoveAll(); 
     }
 
-    protected void notifyRemoveAll() { 
+	protected void notifyRemoveAll() { 
         manager.notifyEvent(graph, GraphEvents.removeAll);
     }
 
     @Override
+    @Deprecated
     public void remove(Node s, Node p, Node o) {
         removeAll(graph, s, p, o);
         manager.notifyEvent(graph, GraphEvents.remove(s, p, o));
     }
 
-    public static void removeAll(Graph g, Node s, Node p, Node o)
-    {        
+    private static void removeAll(Graph g, Node s, Node p, Node o)
+    {    
+		log.debug("removeAll: g=" + g + ", s=" + s + ", p=" + p + ", o=" + o);
         if (!(g instanceof RDFServiceGraph)) {
             removeAllTripleByTriple(g, s, p, o);
             return;
@@ -245,7 +288,7 @@ public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
      * see http://www.python.org/doc/2.5.2/ref/strings.html
      * or see jena's n3 grammar jena/src/com/hp/hpl/jena/n3/n3.g
      */ 
-    protected static void pyString(StringBuffer sbuff, String s)
+    private static void pyString(StringBuffer sbuff, String s)
     {
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
@@ -280,7 +323,7 @@ public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
         }
     }
     
-    public static void removeAllTripleByTriple(Graph g, Node s, Node p, Node o)
+    private static void removeAllTripleByTriple(Graph g, Node s, Node p, Node o)
     {        
         ExtendedIterator<Triple> it = g.find( s, p, o );
         try { 
@@ -293,11 +336,6 @@ public class RDFServiceGraphBulkUpdater extends SimpleBulkUpdateHandler {
         finally {
             it.close();
         }
-    }
-
-    public static void removeAll( Graph g )
-    {
-        g.getBulkUpdateHandler().delete(g);
     }
 
 }

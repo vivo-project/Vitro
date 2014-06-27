@@ -10,11 +10,9 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.GraphEventManager;
 import com.hp.hpl.jena.graph.GraphStatisticsHandler;
 import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Reifier;
 import com.hp.hpl.jena.graph.TransactionHandler;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.TripleMatch;
-import com.hp.hpl.jena.graph.query.QueryHandler;
 import com.hp.hpl.jena.shared.AddDeniedException;
 import com.hp.hpl.jena.shared.DeleteDeniedException;
 import com.hp.hpl.jena.shared.PrefixMapping;
@@ -51,6 +49,11 @@ public class DifferenceGraph implements Graph {
         g.delete(arg0);
     }
 
+	@Override
+	public void remove(Node arg0, Node arg1, Node arg2) {
+		g.remove(arg0, arg1, arg2);
+	}
+
     @Override
     public boolean dependsOn(Graph arg0) {
         return g.dependsOn(arg0);
@@ -71,6 +74,7 @@ public class DifferenceGraph implements Graph {
     }
 
     @Override
+    @Deprecated
     public BulkUpdateHandler getBulkUpdateHandler() {
         return g.getBulkUpdateHandler();
     }
@@ -88,11 +92,6 @@ public class DifferenceGraph implements Graph {
     @Override
     public PrefixMapping getPrefixMapping() {
         return g.getPrefixMapping();
-    }
-
-    @Override
-    public Reifier getReifier() {
-        return g.getReifier();
     }
 
     @Override
@@ -121,11 +120,6 @@ public class DifferenceGraph implements Graph {
     }
 
     @Override
-    public QueryHandler queryHandler() {
-        return g.queryHandler();
-    }
-
-    @Override
     public int size() {
         return g.size() - subtract.size();
     }
@@ -134,5 +128,10 @@ public class DifferenceGraph implements Graph {
     public void add(Triple arg0) throws AddDeniedException {
         g.add(arg0);
     }
+
+	@Override
+	public void clear() {
+		g.clear();
+	}
 
 }

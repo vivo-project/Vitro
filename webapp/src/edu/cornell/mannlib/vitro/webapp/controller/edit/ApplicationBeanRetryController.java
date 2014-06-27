@@ -33,7 +33,7 @@ public class ApplicationBeanRetryController extends BaseEditController {
     public void doPost (HttpServletRequest req, HttpServletResponse response) {
 
 		if (!isAuthorizedToDisplayPage(req, response,
-				SimplePermission.EDIT_SITE_INFORMATION.ACTIONS)) {
+				SimplePermission.EDIT_SITE_INFORMATION.ACTION)) {
         	return;
         }
     	

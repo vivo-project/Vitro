@@ -4,13 +4,11 @@ package edu.cornell.mannlib.vitro.webapp.i18n;
 
 import java.util.Arrays;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
-import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings.Keys;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
 
 /**
  * If enabled in developer mode, write a message to the log each time someone
@@ -23,10 +21,9 @@ public class I18nLogger {
 
 	private final boolean isLogging;
 
-	public I18nLogger(HttpServletRequest req) {
-		DeveloperSettings settings = DeveloperSettings.getBean(req);
-		this.isLogging = settings.getBoolean(Keys.ENABLED)
-				&& settings.getBoolean(Keys.I18N_LOG_STRINGS)
+	public I18nLogger() {
+		DeveloperSettings settings = DeveloperSettings.getInstance();
+		this.isLogging = settings.getBoolean(Key.I18N_LOG_STRINGS)
 				&& log.isInfoEnabled();
 	}
 
@@ -36,11 +33,11 @@ public class I18nLogger {
 			String message = String.format(
 					"Retrieved from %s.%s with %s: '%s'", bundleName, key,
 					Arrays.toString(parameters), rawText);
-			
+
 			if (!rawText.equals(formattedText)) {
 				message += String.format(" --> '%s'", formattedText);
 			}
-			
+
 			log.info(message);
 		}
 	}

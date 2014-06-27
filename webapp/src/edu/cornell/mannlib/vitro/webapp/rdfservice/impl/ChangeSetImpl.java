@@ -89,5 +89,14 @@ public class ChangeSetImpl implements ChangeSet {
 	@Override
     public List<Object> getPostChangeEvents() {
         return this.postChangeEvents;
-    }	
+    }
+
+	@Override
+	public String toString() {
+		return "ChangeSetImpl [preconditionQuery=" + preconditionQuery
+				+ ", queryType=" + queryType + ", modelChanges=" + modelChanges
+				+ ", preChangeEvents=" + preChangeEvents
+				+ ", postChangeEvents=" + postChangeEvents + "]";
+	}	
+	
 }

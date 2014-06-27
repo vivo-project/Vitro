@@ -10,18 +10,19 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.ServletException;
 
-import org.apache.solr.client.solrj.SolrQuery;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import stubs.edu.cornell.mannlib.vitro.webapp.modules.ApplicationStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineStub;
+import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
 import stubs.javax.servlet.http.HttpServletResponseStub;
-
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 
 /**
  * Tests on various methods in the class.
@@ -36,6 +37,8 @@ public class JSONReconcileServletTest extends AbstractTestClass {
 
 	@Before
 	public void setup() throws Exception {
+		ApplicationStub.setup(new ServletContextStub(), new SearchEngineStub());
+		
 		request = new HttpServletRequestStub();
 		request.setRequestUrl(new URL("http://vivo.this.that/reconcile"));
 		request.setMethod("POST");
@@ -78,23 +81,17 @@ public class JSONReconcileServletTest extends AbstractTestClass {
 		propertiesList.add(properties);
 
 		// test getQuery
-		SolrQuery solrQuery = reconcile.getQuery(nameStr, nameType, rowNum, propertiesList);
+		SearchQuery searchQuery = reconcile.getQuery(nameStr, nameType, rowNum, propertiesList);
 		String messagePrefix = "Query should contain the text: ";
-		testAssertTrue(messagePrefix + orgStr, orgStr, solrQuery.toString());
-		testAssertTrue(messagePrefix + nameStr, nameStr, solrQuery.toString());
-		testAssertTrue(messagePrefix + orgType, orgType, solrQuery.toString());
-		testAssertTrue(messagePrefix + nameType, orgType, solrQuery.toString());
+		testAssertTrue(messagePrefix + orgStr, orgStr, searchQuery.toString());
+		testAssertTrue(messagePrefix + nameStr, nameStr, searchQuery.toString());
+		testAssertTrue(messagePrefix + orgType, orgType, searchQuery.toString());
+		testAssertTrue(messagePrefix + nameType, orgType, searchQuery.toString());
 	}
 	
 	private void testAssertTrue(String message, String inputStr, String resultStr) {
 		try {
-			String modStr = null;
-			if (inputStr.contains(":") && inputStr.contains("/")) { 
-				modStr = inputStr.replaceAll(":", "%3A").replaceAll("/", "%2F");
-			} else {
-				modStr = inputStr;
-			}
-		    Pattern regex = Pattern.compile(modStr, Pattern.CASE_INSENSITIVE);
+		    Pattern regex = Pattern.compile(inputStr, Pattern.CASE_INSENSITIVE);
 		    Matcher regexMatcher = regex.matcher(resultStr);
 		    Assert.assertTrue(message, regexMatcher.find());
 		} catch (PatternSyntaxException e) {

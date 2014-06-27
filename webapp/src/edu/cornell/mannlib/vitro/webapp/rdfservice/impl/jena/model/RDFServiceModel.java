@@ -9,12 +9,10 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.query.DataSource;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
@@ -41,7 +39,7 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
       
     @Override
     protected DatasetWrapper getDatasetWrapper() {
-      DataSource d = DatasetFactory.create();
+      Dataset d = DatasetFactory.createMem();
       if (modelName == null) {
           d.setDefaultModel(this.model);
       } else {

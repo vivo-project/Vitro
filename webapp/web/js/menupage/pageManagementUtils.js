@@ -104,7 +104,7 @@ var pageManagementUtils = {
 		this.classGroupSection = $("section#browseClassGroup");
 		this.sparqlQuerySection = $("section#sparqlQuery");
 		this.fixedHTMLSection = $("section#fixedHtml");
-		this.solrIndividualsSection = $("section#solrIndividuals");
+		this.searchIndividualsSection = $("section#searchIndividuals");
 		//From original menu management edit
 		this.defaultTemplateRadio = $('input.default-template');
         this.customTemplateRadio = $('input.custom-template');
@@ -133,8 +133,8 @@ var pageManagementUtils = {
         this.rightSideDiv = $("div#rightSide");
         //contentDivs container where content added/existing placed
         this.savedContentDivs = $("section#contentDivs");
-    	//for solr individuals data getter
-        this.solrAllClassesDropdown = $("select#vclassUri");
+    	//for search individuals data getter
+        this.searchAllClassesDropdown = $("select#vclassUri");
 	},
 	initDisplay: function(){
 		//right side components
@@ -147,7 +147,7 @@ var pageManagementUtils = {
 	    this.classGroupSection.hide();
 	    this.sparqlQuerySection.hide();
 	    this.fixedHTMLSection.hide();
-	    this.solrIndividualsSection.hide();
+	    this.searchIndividualsSection.hide();
 	    this.classesForClassGroup.addClass('hidden');
 	    //left side components
 	    //These depend on whether or not this is an existing item or not
@@ -160,14 +160,14 @@ var pageManagementUtils = {
 		    	this.menuSection.hide();
 	    	}
 	    }
-	    //populates the dropdown of classes for the solr individuals template
+	    //populates the dropdown of classes for the search individuals template
 	    //dropdown now populated in template/from form specific data instead of ajax request
-	    //this.populateClassForSolrDropdown();
+	    //this.populateClassForSearchDropdown();
 	},
 	//this method can be utilized if using an ajax request to get the vclasses
 	/*
-	//for solr individuals - remember this populates the template class dropdown
-	populateClassForSolrDropdown:function() {
+	//for search individuals - remember this populates the template class dropdown
+	populateClassForSearchDropdown:function() {
 	
         //Run ajax query
         var url = "dataservice?getAllVClasses=1";
@@ -176,10 +176,10 @@ var pageManagementUtils = {
         $.getJSON(url, function(results) {
         	//Moved the function to processClassGroupDataGetterContent
         	//Should probably remove this entire method and copy there
-        	pageManagementUtils.displayAllClassesForSolrDropdown(results);
+        	pageManagementUtils.displayAllClassesForSearchDropdown(results);
         });
 	},
-	displayAllClassesForSolrDropdown:function(results) {
+	displayAllClassesForSearchDropdown:function(results) {
 		 if ( results.classes.length == 0 ) {
 	            
         } else {
@@ -193,7 +193,7 @@ var pageManagementUtils = {
         
             //if there are options to add
             if(appendHtml != "") {
-            	pageManagementUtils.solrAllClassesDropdown.html(appendHtml);
+            	pageManagementUtils.searchAllClassesDropdown.html(appendHtml);
             }
          
         }
@@ -285,7 +285,7 @@ var pageManagementUtils = {
 		pageManagementUtils.classGroupSection.hide();
 		pageManagementUtils.fixedHTMLSection.hide();
 		pageManagementUtils.sparqlQuerySection.hide();
-		pageManagementUtils.solrIndividualsSection.hide();
+		pageManagementUtils.searchIndividualsSection.hide();
 		//Reset main content type drop-down
 		pageManagementUtils.contentTypeSelectOptions.eq(0).attr('selected', 'selected');
 		if ( pageManagementUtils.leftSideDiv.css("height") != undefined ) {
@@ -357,31 +357,31 @@ var pageManagementUtils = {
             pageManagementUtils.classGroupSection.show();
             pageManagementUtils.fixedHTMLSection.hide();
             pageManagementUtils.sparqlQuerySection.hide();
-            pageManagementUtils.solrIndividualsSection.hide();
+            pageManagementUtils.searchIndividualsSection.hide();
             pageManagementUtils.headerBar.text(pageManagementUtils.browseClassGroup + " - ");
             pageManagementUtils.headerBar.show();
             $('div#selfContainedDiv').hide();
         }
-        if ( _this.contentTypeSelect.val() == "fixedHtml" || _this.contentTypeSelect.val() == "sparqlQuery" || _this.contentTypeSelect.val() == "solrIndividuals") {
+        if ( _this.contentTypeSelect.val() == "fixedHtml" || _this.contentTypeSelect.val() == "sparqlQuery" || _this.contentTypeSelect.val() == "searchIndividuals") {
         	 pageManagementUtils.classGroupSection.hide();
         	 //if fixed html show that, otherwise show sparql results
             if ( _this.contentTypeSelect.val() == "fixedHtml" ) {
                 pageManagementUtils.headerBar.text(pageManagementUtils.fixedHtml + " - ");
                 pageManagementUtils.fixedHTMLSection.show();
             	pageManagementUtils.sparqlQuerySection.hide();
-            	pageManagementUtils.solrIndividualsSection.hide();
+            	pageManagementUtils.searchIndividualsSection.hide();
             }
             else if (_this.contentTypeSelect.val() == "sparqlQuery"){
                 pageManagementUtils.headerBar.text(pageManagementUtils.sparqlResults + " - ");
                 pageManagementUtils.sparqlQuerySection.show();
             	pageManagementUtils.fixedHTMLSection.hide();
-            	pageManagementUtils.solrIndividualsSection.hide();
+            	pageManagementUtils.searchIndividualsSection.hide();
             } else {
-            	//solr individuals
-            	pageManagementUtils.headerBar.text(pageManagementUtils.solrIndividuals + " - ");
+            	//search individuals
+            	pageManagementUtils.headerBar.text(pageManagementUtils.searchIndividuals + " - ");
                 pageManagementUtils.sparqlQuerySection.hide();
             	pageManagementUtils.fixedHTMLSection.hide();
-            	pageManagementUtils.solrIndividualsSection.show();
+            	pageManagementUtils.searchIndividualsSection.show();
             }
            
             pageManagementUtils.headerBar.show();
@@ -392,7 +392,7 @@ var pageManagementUtils = {
         	pageManagementUtils.classGroupSection.hide();
         	pageManagementUtils.fixedHTMLSection.hide();
         	pageManagementUtils.sparqlQuerySection.hide();
-        	pageManagementUtils.solrIndividualsSection.hide();
+        	pageManagementUtils.searchIndividualsSection.hide();
             pageManagementUtils.classesForClassGroup.addClass('hidden');
             pageManagementUtils.headerBar.hide();
             pageManagementUtils.headerBar.text("");
@@ -430,7 +430,7 @@ var pageManagementUtils = {
 		pageManagementUtils.clearInputs(pageManagementUtils.fixedHTMLSection);
 		pageManagementUtils.clearInputs(pageManagementUtils.sparqlQuerySection);
 		pageManagementUtils.clearInputs(pageManagementUtils.classGroupSection);
-		pageManagementUtils.clearInputs(pageManagementUtils.solrIndividualsSection);
+		pageManagementUtils.clearInputs(pageManagementUtils.searchIndividualsSection);
 
 	},
 	clearInputs:function($el) {
@@ -474,7 +474,7 @@ var pageManagementUtils = {
         // Get rid of the cancel link; it'll be replaced by a delete link
         $newContentObj.find('span#cancelContent' + counter).html('');
         
-        if ( contentType == "sparqlQuery" || contentType == "fixedHtml" || contentType == "solrIndividuals") {
+        if ( contentType == "sparqlQuery" || contentType == "fixedHtml" || contentType == "searchIndividuals") {
         	varOrClass = $newContentObj.find('input[name="saveToVar"]').val();
         } 
         else if ( contentType == "browseClassGroup" ) {

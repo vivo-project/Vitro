@@ -3,12 +3,20 @@
 package edu.cornell.mannlib.vitro.webapp.controller;
 
 
+import static edu.cornell.mannlib.vitro.webapp.controller.MultipartRequestWrapper.ATTRIBUTE_FILE_ITEM_MAP;
+import static edu.cornell.mannlib.vitro.webapp.controller.MultipartRequestWrapper.ATTRIBUTE_FILE_SIZE_EXCEPTION;
+import static edu.cornell.mannlib.vitro.webapp.controller.MultipartRequestWrapper.ATTRIBUTE_IS_MULTIPART;
+
 import java.text.Collator;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -231,4 +239,63 @@ public class VitroRequest extends HttpServletRequestWrapper {
     public WebappDaoFactory getLanguageNeutralWebappDaoFactory() {
     	return (WebappDaoFactory) getAttribute("languageNeutralWebappDaoFactory");
     }
+    
+    // ----------------------------------------------------------------------
+	// Deal with parsed multipart requests.
+	// ----------------------------------------------------------------------
+    
+	public boolean isMultipart() {
+		return getAttribute(ATTRIBUTE_IS_MULTIPART) != null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Map<String, List<FileItem>> getFiles() {
+		Map<String, List<FileItem>> map;
+		map = (Map<String, List<FileItem>>) getAttribute(ATTRIBUTE_FILE_ITEM_MAP);
+		if (map == null) {
+			return Collections.emptyMap();
+		} else {
+			return map;
+		}
+	}
+
+	/**
+	 * There may be more than one file item with the given name. If the first
+	 * one is empty (size is zero), keep looking for a non-empty one.
+	 */
+	public FileItem getFileItem(String name) {
+		Map<String, List<FileItem>> map = getFiles();
+		List<FileItem> items = map.get(name);
+		if (items == null) {
+			return null;
+		}
+		for (FileItem item : items) {
+			if (item.getSize() > 0L) {
+				return item;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * If the uploaded file exceeded the maximum size, and if the strategy said
+	 * to stash the exception, it will be stored as a request attribute.
+	 */
+	public boolean hasFileSizeException() {
+		return getFileSizeException() != null;
+	}
+	
+	/**
+	 * Could be either FileSizeLimitExceededException or
+	 * SizeLimitExceededException, so return their common ancestor.
+	 */
+	public FileUploadException getFileSizeException() {
+		Object e = getAttribute(ATTRIBUTE_FILE_SIZE_EXCEPTION);
+		if (e instanceof FileUploadException) {
+			return (FileUploadException) e;
+		} else {
+			return null;
+		}
+	}
+
 }

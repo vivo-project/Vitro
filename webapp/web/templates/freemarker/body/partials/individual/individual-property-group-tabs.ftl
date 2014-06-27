@@ -20,11 +20,11 @@
     	    <#assign groupNameHtmlId = "${i18n().properties}" >
         </#if>
         <#if tabCount = 1 >
-            <li class="selectedGroupTab clickable" groupName="${groupNameHtmlId}">${groupName?capitalize}</li>
+            <li class="selectedGroupTab clickable" groupName="${groupNameHtmlId?replace("/","-")}">${groupName?capitalize}</li>
             <li class="groupTabSpacer">&nbsp;</li>
             <#assign tabCount = 2>
         <#else>
-            <li class="nonSelectedGroupTab clickable" groupName="${groupNameHtmlId}">${groupName?capitalize}</li>
+            <li class="nonSelectedGroupTab clickable" groupName="${groupNameHtmlId?replace("/","-")}">${groupName?capitalize}</li>
             <li class="groupTabSpacer">&nbsp;</li>
         </#if>
     </#if>
@@ -39,7 +39,7 @@
         <#assign groupName = group.getName(nameForOtherGroup)>
         <#assign groupNameHtmlId = p.createPropertyGroupHtmlId(groupName) >
         <#assign verbose = (verbosePropertySwitch.currentValue)!false>
-        <section id="${groupNameHtmlId}" class="property-group" role="region" style="<#if (sectionCount > 1) >display:none<#else>display:block</#if>">
+        <section id="${groupNameHtmlId?replace("/","-")}" class="property-group" role="region" style="<#if (sectionCount > 1) >display:none<#else>display:block</#if>">
         <nav id="scroller" class="scroll-up hidden" role="navigation">
             <a href="#branding" title="${i18n().scroll_to_menus}" >
                 <img src="${urls.images}/individual/scroll-up.gif" alt="${i18n().scroll_to_menus}" />
@@ -50,11 +50,11 @@
         <#if groupName?has_content>
 		    <#--the function replaces spaces in the name with underscores, also called for the property group menu-->
     	    <#assign groupNameHtmlId = p.createPropertyGroupHtmlId(groupName) >
-            <h2 id="${groupNameHtmlId}" pgroup="tabs" class="hidden">${groupName?capitalize}</h2>
+            <h2 id="${groupNameHtmlId?replace("/","-")}" pgroup="tabs" class="hidden">${groupName?capitalize}</h2>
         <#else>
             <h2 id="properties" pgroup="tabs" class="hidden">${i18n().properties_capitalized}</h2>
         </#if>
-        <div id="${groupNameHtmlId}Group" >
+        <div id="${groupNameHtmlId?replace("/","-")}Group" >
             <#-- List the properties in the group   -->
             <#include "individual-properties.ftl">
         </div>

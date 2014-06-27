@@ -11,11 +11,9 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.GraphEventManager;
 import com.hp.hpl.jena.graph.GraphStatisticsHandler;
 import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Reifier;
 import com.hp.hpl.jena.graph.TransactionHandler;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.TripleMatch;
-import com.hp.hpl.jena.graph.query.QueryHandler;
 import com.hp.hpl.jena.shared.AddDeniedException;
 import com.hp.hpl.jena.shared.DeleteDeniedException;
 import com.hp.hpl.jena.shared.PrefixMapping;
@@ -84,6 +82,7 @@ public class BlankNodeFilteringGraph implements Graph {
 	}
 
 	@Override
+	@Deprecated
 	public BulkUpdateHandler getBulkUpdateHandler() {
 		return graph.getBulkUpdateHandler();
 	}
@@ -101,11 +100,6 @@ public class BlankNodeFilteringGraph implements Graph {
 	@Override
 	public PrefixMapping getPrefixMapping() {
 		return graph.getPrefixMapping();
-	}
-
-	@Override
-	public Reifier getReifier() {
-		return graph.getReifier();
 	}
 
 	@Override
@@ -134,12 +128,17 @@ public class BlankNodeFilteringGraph implements Graph {
 	}
 
 	@Override
-	public QueryHandler queryHandler() {
-		return graph.queryHandler();
+	public int size() {
+		return graph.size();
 	}
 
 	@Override
-	public int size() {
-		return graph.size();
+	public void clear() {
+		graph.clear();
+	}
+
+	@Override
+	public void remove(Node arg0, Node arg1, Node arg2) {
+		graph.remove(arg0, arg1, arg2);
 	}
 }

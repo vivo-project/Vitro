@@ -3,19 +3,19 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openrdf.query.MalformedQueryException;
-import org.openrdf.query.QueryLanguage;
-import org.openrdf.query.Update;
-import org.openrdf.query.UpdateExecutionException;
-import org.openrdf.repository.Repository;
-import org.openrdf.repository.RepositoryConnection;
-import org.openrdf.repository.RepositoryException;
-import org.openrdf.repository.http.HTTPRepository;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.message.BasicNameValuePair;
 
 import com.hp.hpl.jena.graph.BulkUpdateHandler;
 import com.hp.hpl.jena.graph.Capabilities;
@@ -23,14 +23,11 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.GraphEventManager;
 import com.hp.hpl.jena.graph.GraphStatisticsHandler;
 import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Reifier;
 import com.hp.hpl.jena.graph.TransactionHandler;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.TripleMatch;
 import com.hp.hpl.jena.graph.impl.GraphWithPerform;
 import com.hp.hpl.jena.graph.impl.SimpleEventManager;
-import com.hp.hpl.jena.graph.query.QueryHandler;
-import com.hp.hpl.jena.graph.query.SimpleQueryHandler;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -50,17 +47,12 @@ public class SparqlGraph implements GraphWithPerform {
     
     private String endpointURI;
     private String graphURI;
+    private CloseableHttpClient httpClient;
     private static final Log log = LogFactory.getLog(SparqlGraph.class);
     
     private BulkUpdateHandler bulkUpdateHandler;
     private PrefixMapping prefixMapping = new PrefixMappingImpl();
     private GraphEventManager eventManager;
-    private Reifier reifier = new EmptyReifier(this);
-    private GraphStatisticsHandler graphStatisticsHandler;
-    private TransactionHandler transactionHandler;
-    private QueryHandler queryHandler;
-    
-    private Repository repository;
     
     /**
      * Returns a SparqlGraph for the union of named graphs in a remote repository 
@@ -78,7 +70,10 @@ public class SparqlGraph implements GraphWithPerform {
     public SparqlGraph(String endpointURI, String graphURI) {
        this.endpointURI = endpointURI;
        this.graphURI = graphURI;
-       this.repository = new HTTPRepository(endpointURI);
+       
+       PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+       cm.setDefaultMaxPerRoute(50);
+       this.httpClient = HttpClients.custom().setConnectionManager(cm).build();
     }
     
     public String getEndpointURI() {
@@ -88,14 +83,6 @@ public class SparqlGraph implements GraphWithPerform {
     public String getGraphURI() {
         return graphURI;
     }
-    
-    public RepositoryConnection getConnection() {
-        try {
-            return this.repository.getConnection();
-        } catch (RepositoryException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     public void add(Triple arg0) throws AddDeniedException {
@@ -104,22 +91,24 @@ public class SparqlGraph implements GraphWithPerform {
 
     public void executeUpdate(String updateString) {    
         try {
-            RepositoryConnection conn = getConnection();
+            HttpPost meth = new HttpPost(endpointURI);
+            meth.addHeader("Content-Type", "application/x-www-form-urlencoded");
+            meth.setEntity(new UrlEncodedFormEntity(Arrays.asList(
+                    new BasicNameValuePair("update", updateString))));
+            CloseableHttpResponse response = httpClient.execute(meth);
             try {
-                Update u = conn.prepareUpdate(QueryLanguage.SPARQL, updateString);
-                u.execute();
-            } catch (MalformedQueryException e) {
-                throw new RuntimeException(e);
-            } catch (UpdateExecutionException e) {
-                log.error(e,e);
-                log.error("Update command: \n" + updateString);
-                throw new RuntimeException(e);
+                int statusCode = response.getStatusLine().getStatusCode();
+                if (statusCode > 399) {
+                    log.error("response " + statusCode + " to update. \n");
+                    throw new RuntimeException("Unable to perform SPARQL UPDATE: \n"
+                        + updateString);
+                }
             } finally {
-                conn.close();
-            }
-        } catch (RepositoryException re) {
-            throw new RuntimeException(re);
-        }
+                response.close();
+            } 
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to perform SPARQL UPDATE", e);
+        } 
     }
     
     @Override
@@ -204,6 +193,18 @@ public class SparqlGraph implements GraphWithPerform {
         performDelete(arg0);
     }
 
+	@Override
+	public void clear() {
+		removeAll();
+	}
+
+	@Override
+	public void remove(Node subject, Node predicate, Node object) {
+		for (Triple t: find(subject, predicate, object).toList()) {
+			delete(t);
+		}
+	}
+
     @Override
     public boolean dependsOn(Graph arg0) {
         return false; // who knows?
@@ -260,9 +261,9 @@ public class SparqlGraph implements GraphWithPerform {
     public ExtendedIterator<Triple> find(Node subject, Node predicate, Node object) {
         if (!isVar(subject) && !isVar(predicate)  && !isVar(object)) {
             if (contains(subject, predicate, object)) {
-                return new SingletonIterator(new Triple(subject, predicate, object));
+                return new SingletonIterator<Triple>(new Triple(subject, predicate, object));
             } else {
-                return WrappedIterator.create(Collections.EMPTY_LIST.iterator());
+                return WrappedIterator.create(Collections.<Triple>emptyIterator());
             }
         }
         StringBuffer findQuery = new StringBuffer("SELECT * WHERE { \n");
@@ -309,6 +310,7 @@ public class SparqlGraph implements GraphWithPerform {
     }
     
     @Override
+    @Deprecated
     public BulkUpdateHandler getBulkUpdateHandler() {
         if (this.bulkUpdateHandler == null) {
             this.bulkUpdateHandler = new SparqlGraphBulkUpdater(this);
@@ -332,14 +334,6 @@ public class SparqlGraph implements GraphWithPerform {
     @Override
     public PrefixMapping getPrefixMapping() {
         return prefixMapping;
-    }
-
-    @Override
-    public Reifier getReifier() {
-        //if (reifier == null) {
-        //    reifier = new SimpleReifier(this, ReificationStyle.Standard);
-        //}
-        return reifier;
     }
 
     @Override
@@ -372,14 +366,6 @@ public class SparqlGraph implements GraphWithPerform {
     }
 
     @Override
-    public QueryHandler queryHandler() {
-        if (queryHandler == null) {
-            queryHandler = new SimpleQueryHandler(this);
-        }
-        return queryHandler;
-    }
-
-    @Override
     public int size() {
         int size = find(null, null, null).toList().size();
         return size;
@@ -387,38 +373,47 @@ public class SparqlGraph implements GraphWithPerform {
     
     private final static Capabilities capabilities = new Capabilities() {
         
-        public boolean addAllowed() {
+        @Override
+		public boolean addAllowed() {
             return false;
         }
         
+        @Override
         public boolean addAllowed(boolean everyTriple) {
             return false;
         }
         
+        @Override
         public boolean canBeEmpty() {
             return true;
         }
         
+        @Override
         public boolean deleteAllowed() {
             return false;
         }
         
+        @Override
         public boolean deleteAllowed(boolean everyTriple) {
             return false;
         }
         
+        @Override
         public boolean findContractSafe() {
             return true;
         }
         
+        @Override
         public boolean handlesLiteralTyping() {
             return true;
         }
         
+        @Override
         public boolean iteratorRemoveAllowed() {
             return false;
         }
         
+        @Override
         public boolean sizeAccurate() {
             return true;
         }
@@ -454,13 +449,11 @@ public class SparqlGraph implements GraphWithPerform {
         
 //        log.info((System.currentTimeMillis() - startTime1) + " to execute via sesame");
         
-        long startTime = System.currentTimeMillis();
         Query askQuery = QueryFactory.create(queryStr);
         QueryExecution qe = QueryExecutionFactory.sparqlService(endpointURI, askQuery);
         try {
             return new ResultSetMem(qe.execSelect());
         } finally {
-            //log.info((System.currentTimeMillis() - startTime) + " to execute via Jena");
             qe.close();
         }
     }
@@ -504,5 +497,4 @@ public class SparqlGraph implements GraphWithPerform {
 //            sbuff.append(hexstr);
         }
     }
-    
 }

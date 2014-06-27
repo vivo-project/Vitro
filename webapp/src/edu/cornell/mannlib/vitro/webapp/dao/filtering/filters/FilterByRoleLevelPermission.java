@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering.filters;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_URI;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,17 +18,15 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasPermission;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.DisplayByRolePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.Permission;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionRegistry;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataProperty;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.Property;
 
 /**
  * Filter the properties depending on what DisplayByRolePermission is on the
@@ -140,8 +140,8 @@ public class FilterByRoleLevelPermission extends VitroFiltersImpl {
 			}
 			ObjectProperty op = new ObjectProperty();
 			op.setURI(ops.getPropertyURI());
-			op.setDomainVClassURI(RequestActionConstants.SOME_URI);
-			op.setRangeVClassURI(RequestActionConstants.SOME_URI);
+			op.setDomainVClassURI(SOME_URI);
+			op.setRangeVClassURI(SOME_URI);
 			return op;
 		}
 	}

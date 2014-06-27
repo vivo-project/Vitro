@@ -15,11 +15,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.Actions;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
@@ -28,7 +28,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Red
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
-import edu.cornell.mannlib.vitro.webapp.search.solr.SolrSetup;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.WorkLevel;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.WorkLevelStamp;
 
@@ -40,8 +39,8 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.Work
  * That IndexBuilder will be associated with a object that implements the
  * IndexerIface.
  * 
- * An example of the IndexerIface is SolrIndexer. An example of the IndexBuilder
- * and SolrIndexer setup is in SolrSetup.
+ * An example of the IndexerIface is SearchIndexer. An example of the IndexBuilder
+ * and SearchIndexer setup is in SearchIndexerSetup.
  * 
  * @author bdc34
  */
@@ -84,10 +83,10 @@ public class IndexController extends FreemarkerHttpServlet {
 	private static final String PAGE_URL = "/SearchIndex";
 	private static final String TEMPLATE_NAME = "searchIndex.ftl";
 
-	public static final Actions REQUIRED_ACTIONS = SimplePermission.MANAGE_SEARCH_INDEX.ACTIONS;
+	public static final RequestedAction REQUIRED_ACTIONS = SimplePermission.MANAGE_SEARCH_INDEX.ACTION;
 
 	@Override
-	protected Actions requiredActions(VitroRequest vreq) {
+	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
 		return REQUIRED_ACTIONS;
 	}
 
@@ -160,10 +159,10 @@ public class IndexController extends FreemarkerHttpServlet {
 
 	private Boolean testIndexConnection() {
 		try {
-			SolrSetup.getSolrServer(getServletContext()).ping();
+			ApplicationUtils.instance().getSearchEngine().ping();
 			return Boolean.TRUE;
 		} catch (Exception e) {
-			log.error("Can't connect to the Solr server.", e);
+			log.error("Can't connect to the search engine.", e);
 			return Boolean.FALSE;
 		}
 	}

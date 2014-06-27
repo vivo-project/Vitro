@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
+<!-- ====================================================================== 
+     Integration tests to be sure that the Solr configuration does what we 
+     want.
+     ====================================================================== -->
+
+<project name="solr-tester" default="describe">
+	<property name="src.dir" location="src" />
+	<property name="vitro.libs.dir" location="../../webapp/lib" />
+	<property name="solr.home.template"
+	          location="../../solr/homeDirectoryTemplate" />
+	<property name="solr.war.file" location="../../solr/solr-4.7.2.war" />
+
+	<property name="working.dir" location=".work" />
+	<property name="classes.dir" location="${working.dir}/classes" />
+	<property name="solr.working.dir" location="${working.dir}/solrHome" />
+	<property name="solr.libs.dir" location="${working.dir}/solrLibs" />
+
+	<path id="main.compile.classpath">
+		<fileset dir="${vitro.libs.dir}" includes="*.jar" />
+		<fileset dir="${solr.libs.dir}" includes="*.jar" />
+	</path>
+
+	<path id="test.run.classpath">
+		<pathelement location="${classes.dir}" />
+		<path refid="main.compile.classpath" />
+	</path>
+
+	<!-- ================================= 
+          target: describe              
+         ================================= -->
+	<target name="describe"
+	        description="--> Describe the targets (this is the default).">
+		<echo>
+all        - Runs "clean", then "test".
+clean      - Delete all artifacts so the next build will be from scratch.
+test       - Set up the Solr configuration, compile, and run the JUnit tests.
+	    </echo>
+	</target>
+
+	<!-- ================================= 
+          target: all              
+         ================================= -->
+	<target name="all"
+	        depends="clean,test"
+	        description="Build from scratch and run the tests.">
+	</target>
+
+	<!-- ================================= 
+          target: clean              
+         ================================= -->
+	<target name="clean"
+	        description="Delete the Solr configuration and the compiled clases.">
+		<delete dir="${working.dir}" />
+	</target>
+
+	<!-- ================================= 
+          target: test              
+         ================================= -->
+	<target name="test" depends="compile" description="Run the tests.">
+		<java classname="org.junit.runner.JUnitCore"
+		      fork="yes"
+		      failonerror="true">
+			<arg value="edu.cornell.mannlib.vitro.utilities.solrtest.SolrConfigTester" />
+			<classpath refid="test.run.classpath" />
+			<sysproperty key="test.solr.home" value="${solr.working.dir}" />
+		</java>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: setup                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="setup">
+		<mkdir dir="${working.dir}" />
+
+		<mkdir dir="${solr.working.dir}" />
+		<sync todir="${solr.working.dir}" includeemptydirs="true">
+			<fileset dir="${solr.home.template}" />
+		</sync>
+
+		<mkdir dir="${solr.libs.dir}" />
+		<unwar src="${solr.war.file}" dest="${solr.libs.dir}">
+			<patternset includes="WEB-INF/lib/*" />
+			<mapper type="flatten" />
+		</unwar>
+
+		<mkdir dir="${classes.dir}" />
+		<copy file="log4j.properties" todir="${classes.dir}" />
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: compile                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="compile" depends="setup">
+		<javac srcdir="${src.dir}"
+		       destdir="${classes.dir}"
+		       debug="true"
+		       deprecation="true"
+		       encoding="UTF8"
+		       includeantruntime="false"
+		       optimize="true"
+		       source="1.7">
+			<classpath refid="main.compile.classpath" />
+		</javac>
+	</target>
+
+</project>

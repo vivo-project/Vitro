@@ -68,7 +68,7 @@
             <label for="new-password">${strings.new_password}</label>
             <input type="password" name="newPassword" value="${newPassword}" id="new-password" role="input" />
 
-            <p class="note">${strings.minimum_password_length(minimumLength)}<br />${strings.leave_password_unchanged}</p>
+            <p class="note">${strings.minimum_password_length(minimumLength, maximumLength)}<br />${strings.leave_password_unchanged}</p>
 
             <label for="confirm-password">${strings.confirm_password}</label> 
             <input type="password" name="confirmPassword" value="${confirmPassword}" id="confirm-password" role="input" />

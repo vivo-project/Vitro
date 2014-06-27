@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_URI;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -15,8 +17,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestActionConstants;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.ifaces.RequestedAction;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -116,8 +117,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         
         // Determine whether a new statement can be added
 		RequestedAction action = new AddObjectPropertyStatement(
-				vreq.getJenaOntModel(), subjectUri, property,
-				RequestActionConstants.SOME_URI);
+				vreq.getJenaOntModel(), subjectUri, property, SOME_URI);
         if ( ! PolicyHelper.isAuthorizedForActions(vreq, action) ) {
             return;
         }

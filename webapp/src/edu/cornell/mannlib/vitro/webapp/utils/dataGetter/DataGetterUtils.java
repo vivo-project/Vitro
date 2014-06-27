@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
@@ -39,6 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
+import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils;
 
 
 public class DataGetterUtils {
@@ -56,7 +56,7 @@ public class DataGetterUtils {
      * exception if a page has PageDataGetters.  
      */
 	public static List<DataGetter> getDataGettersForPage(VitroRequest vreq, Model displayModel, String pageURI) 
-			throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException {
+			throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException {
 
 	    if( vreq.getAttribute(DATA_GETTERS_FOR_PAGE) != null){
 	        return (List<DataGetter>) vreq.getAttribute(DATA_GETTERS_FOR_PAGE);
@@ -74,7 +74,7 @@ public class DataGetterUtils {
      * This allows the individual profile for an individual of a specific class to be returned .  
      */
     public static List<DataGetter> getDataGettersForClass( VitroRequest vreq, Model displayModel, String classURI) 
-            throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException{
+            throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException {
         List<String> dgUris = getDataGetterURIsForAssociatedURI( displayModel, classURI);
         List<DataGetter> dgList = dataGettersForURIs(vreq, displayModel, dgUris);
         log.debug("getDataGettersForClass: " + dgList);
@@ -86,7 +86,7 @@ public class DataGetterUtils {
      * @param templateName a filename like "index.ftl", which will be used as a URI like "freemarker:index.ftl".
      */
     public static List<DataGetter> getDataGettersForTemplate( VitroRequest vreq, Model displayModel, String templateName) 
-    		throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException, NoSuchMethodException{
+    		throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, SecurityException, InvocationTargetException {
     	String templateUri = "freemarker:" + templateName;
     	List<String> dgUris = getDataGetterURIsForAssociatedURI( displayModel, templateUri);
     	List<DataGetter> dgList = dataGettersForURIs(vreq, displayModel, dgUris);
@@ -197,7 +197,7 @@ public class DataGetterUtils {
         }finally{ displayModel.leaveCriticalSection(); }
         
         
-        return chooseType( types, displayModel, dataGetterURI);
+        return chooseType( types, dataGetterURI);
     }
     
     
@@ -229,7 +229,7 @@ public class DataGetterUtils {
         return dgURIs;
     }
     
-    private static String chooseType(List<String> types, Model displayModel, String dataGetterURI) throws IllegalAccessException {
+    private static String chooseType(List<String> types, String dataGetterURI) throws IllegalAccessException {
         //currently just get the first one that is not owl:Thing
         for(String type : types){
             if( ! StringUtils.isEmpty( type ) && !type.equals( OWL.Thing.getURI() ))
@@ -261,19 +261,6 @@ public class DataGetterUtils {
         "PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#> \n" +
         "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS +"> \n";
 
-    //This query is used in more than one place, so can be placed here
-    //An alternative is to have individuals for classes data getter extend classgroupdatagetter
-    //This currently assumes one class group uri per data getter, but this can be extended
-    /**
-     * For page data getter conversions
-     */
-    /**
-     * Get Individual count for Solr query for intersection of multiple classes
-     */
-    public static long getIndividualCountForIntersection(VitroRequest vreq, ServletContext context, List<String> classUris) {
-    	 return IndividualListController.getIndividualCount(classUris, vreq.getWebappDaoFactory().getIndividualDao(), context);
-    }
-    
     //Return data getter type to be employed in display model
     public static String generateDataGetterTypeURI(String dataGetterClassName) {
     	return "java:" + dataGetterClassName;
@@ -410,7 +397,7 @@ public class DataGetterUtils {
     /*
      * Copied from JSONServlet as expect this to be related to VitroClassGroup
      */
-    public static JSONObject processVClassGroupJSON(VitroRequest vreq, ServletContext context, VClassGroup vcg) {
+    public static JSONObject processVClassGroupJSON(VClassGroup vcg) {
         JSONObject map = new JSONObject();           
         try {
             ArrayList<JSONObject> classes = new ArrayList<JSONObject>(vcg.size());
