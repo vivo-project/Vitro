@@ -234,7 +234,7 @@
 		</copy>
 
 		<!-- Copy the build.properties file to the resources directory. -->
-		<copy todir="${main.resources.dir}" file="${build.properties.file}" />
+		<copy tofile="${main.resources.dir}/build.properties" file="${build.properties.file}" />
 
 
 		<!-- copy any xml files from source tree to the war directory -->
