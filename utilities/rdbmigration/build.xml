@@ -119,7 +119,7 @@
 		</path>
 
 		<java classname="edu.cornell.mannlib.vivo.utilities.rdbmigration.RdbMigrator"
-		      fork="yes"
+		      fork="no"
 		      failonerror="true">
 			<arg value="${vitro.home}" />
 			<arg value="${VitroConnection.DataSource.url}" />
