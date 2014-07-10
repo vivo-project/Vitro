@@ -429,10 +429,28 @@ var customForm = {
         
     removeConceptSubclasses: function(array) {
        $(array).each(function(i) {
-          if(this["msType"] != "http://www.w3.org/2004/02/skos/core#Concept") {
+    	   var allMsTypes = this["allMsTypes"];
+    	   var removeElement = false;
+          if(allMsTypes.length == 1 && this["msType"] != "http://www.w3.org/2004/02/skos/core#Concept") {
               //Remove from array
-              array.splice(i, 1);
-          }    
+              removeElement = true;
+          }  else if(allMsTypes.length > 1) {
+        	  //If there are multiple most specific types returned, check if none of them equals concept
+        	  removeElement = true;
+        	  var j;
+        	  for(j = 0; j < allMsTypes.length; j++) {
+        		  //this refers to the element itself
+        		 if(allMsTypes[j] == "http://www.w3.org/2004/02/skos/core#Concept") {
+        			 //don't remove this element if one of the most specific types is a concept
+        			 removeElement = false;
+        			 break;
+        		 }
+        	  }
+          }
+          
+          if(removeElement) {
+        	  array.splice(i, 1);
+          }
        });
        return array;
     },

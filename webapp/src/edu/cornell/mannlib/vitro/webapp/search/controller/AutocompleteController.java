@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.search.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -121,9 +123,13 @@ public class AutocompleteController extends VitroAjaxController {
                 try {                
                     String uri = doc.getStringValue(VitroSearchTermNames.URI);
                     String name = doc.getStringValue(VitroSearchTermNames.NAME_RAW);
+                    //There may be multiple most specific types, sending them all back
                     String mst = doc.getStringValue(VitroSearchTermNames.MOST_SPECIFIC_TYPE_URIS);
-
-                    SearchResult result = new SearchResult(name, uri, mst, hasMultipleTypes, vreq);
+                    //Assuming these will get me string values
+                    Collection<Object> mstObjValues = doc.getFieldValues(VitroSearchTermNames.MOST_SPECIFIC_TYPE_URIS);
+                    String[] mstStringValues = mstObjValues.toArray(new String[mstObjValues.size()]);
+                    List<String> mstValues = Arrays.asList(mstStringValues);
+                    SearchResult result = new SearchResult(name, uri, mst, mstValues, hasMultipleTypes, vreq);
                     results.add(result);
                     log.debug("results = " + results.toString());
                 } catch(Exception e){
@@ -138,7 +144,8 @@ public class AutocompleteController extends VitroAjaxController {
 
             JSONArray jsonArray = new JSONArray();
             for (SearchResult result : results) {
-                jsonArray.put(result.toMap());
+                //jsonArray.put(result.toMap());
+            	jsonArray.put(result.toJSONObject());
             }
             response.getWriter().write(jsonArray.toString());
 
@@ -303,9 +310,10 @@ public class AutocompleteController extends VitroAjaxController {
         private String label;
         private String uri;
         private String msType;
+        private List<String> allMsTypes;
 		private boolean hasMultipleTypes;
 
-        SearchResult(String label, String uri, String msType, boolean hasMultipleTypes, VitroRequest vreq) {
+        SearchResult(String label, String uri, String msType, List<String> allMsTypes, boolean hasMultipleTypes, VitroRequest vreq) {
 			if ( hasMultipleTypes ) {
 	            this.label = label + " (" + getMsTypeLocalName(msType, vreq) + ")";
 			}
@@ -314,6 +322,7 @@ public class AutocompleteController extends VitroAjaxController {
 			}
             this.uri = uri;
             this.msType = msType;
+            this.allMsTypes = allMsTypes;
         }
 		
         public String getLabel() {
@@ -335,6 +344,10 @@ public class AutocompleteController extends VitroAjaxController {
         public String getMsType() {
             return msType;
         }
+        
+        public List<String> getAllMsTypes() {
+        	return allMsTypes;
+        }
 
 		public String getMsTypeLocalName(String theUri, VitroRequest vreq) {
 			VClassDao vcDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getVClassDao();
@@ -346,12 +359,25 @@ public class AutocompleteController extends VitroAjaxController {
         public String getJsonMsType() {
             return JSONObject.quote(msType);
         }
-        Map<String, String> toMap() {
-            Map<String, String> map = new HashMap<String, String>();
-            map.put("label", label);
-            map.put("uri", uri);
-            map.put("msType", msType);
-            return map;
+        
+        
+        //Simply passing in the array in the map converts it to a string and not to an array
+        //which is what we want so need to convert to an object instad
+        JSONObject toJSONObject() {
+        	JSONObject jsonObj = new JSONObject();
+        	try {
+        	 jsonObj.put("label", label);
+             jsonObj.put("uri", uri);
+             //Leaving this in for now, in case there is code out there that depends on this single string version
+             //But this should really be changed so that the entire array is all that should be returned
+             jsonObj.put("msType", msType);
+             //map.put("allMsTypes", allMsTypes);
+             JSONArray allMsTypesArray = new JSONArray(allMsTypes);
+             jsonObj.put("allMsTypes", allMsTypesArray);
+        	} catch(Exception ex) {
+        		log.error("Error occurred in converting values to JSON object", ex);
+        	}
+        	return jsonObj;
         }
 
         public int compareTo(Object o) throws ClassCastException {
