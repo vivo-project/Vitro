@@ -29,6 +29,9 @@ public class GuardAgainstUnmigratedRDB implements ServletContextListener {
 	private static final String PROPERTY_DB_URL = "VitroConnection.DataSource.url";
 	private static final String PROPERTY_DB_USERNAME = "VitroConnection.DataSource.username";
 	private static final String PROPERTY_DB_PASSWORD = "VitroConnection.DataSource.password";
+	private static final String PROPERTY_DB_DRIVER_CLASS_NAME = "VitroConnection.DataSource.driver";
+
+	private static final String DEFAULT_DRIVER_CLASS = "com.mysql.jdbc.Driver";
 
 	private static final String TABLE_NAME_RDB = "jena_graph";
 	private static final String TABLE_NAME_CONVERSION = "vivo_rdb_migrated";
@@ -54,25 +57,33 @@ public class GuardAgainstUnmigratedRDB implements ServletContextListener {
 		String url = props.getProperty(PROPERTY_DB_URL);
 		String username = props.getProperty(PROPERTY_DB_USERNAME);
 		String password = props.getProperty(PROPERTY_DB_PASSWORD);
+		String driverClassName = props.getProperty(
+				PROPERTY_DB_DRIVER_CLASS_NAME, DEFAULT_DRIVER_CLASS);
 
-		Properties connectionProps = new Properties();
-		connectionProps.put("user", username);
-		connectionProps.put("password", password);
+		try {
+			Class.forName(driverClassName).newInstance();
 
-		try (Connection conn = DriverManager
-				.getConnection(url, connectionProps)) {
-			boolean hasRdb = checkForRdbTables(conn);
-			boolean hasBeenConverted = checkForConversionTable(conn);
-			if (hasRdb && !hasBeenConverted) {
-				ss.fatal(this, String.format(MESSAGE_PROBLEM, url));
-				ss.fatal(this, String.format(MESSAGE_TECHNICAL, url));
-				ss.fatal(this, String.format(MESSAGE_WHAT_NOW, url));
+			Properties connectionProps = new Properties();
+			connectionProps.put("user", username);
+			connectionProps.put("password", password);
+
+			try (Connection conn = DriverManager.getConnection(url,
+					connectionProps)) {
+				boolean hasRdb = checkForRdbTables(conn);
+				boolean hasBeenConverted = checkForConversionTable(conn);
+				if (hasRdb && !hasBeenConverted) {
+					ss.fatal(this, String.format(MESSAGE_PROBLEM, url));
+					ss.fatal(this, String.format(MESSAGE_TECHNICAL, url));
+					ss.fatal(this, String.format(MESSAGE_WHAT_NOW, url));
+				}
+			} catch (SQLException e) {
+				ss.fatal(this, "Can't connect to the database: "
+						+ PROPERTY_DB_URL + "='" + url + "', "
+						+ PROPERTY_DB_USERNAME + "='" + username + "'", e);
 			}
-		} catch (SQLException e) {
-			ss.fatal(this, "Can't connect to the database: " + PROPERTY_DB_URL
-					+ "='" + url + "', " + PROPERTY_DB_USERNAME + "='"
-					+ username + "'", e);
-			return;
+		} catch (InstantiationException | IllegalAccessException
+				| ClassNotFoundException e) {
+			ss.fatal(this, "Can't load the database driver: " + driverClassName);
 		}
 	}
 
