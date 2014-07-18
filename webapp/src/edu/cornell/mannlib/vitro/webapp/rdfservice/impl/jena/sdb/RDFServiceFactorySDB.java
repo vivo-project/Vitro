@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.sdb;
 
-import java.sql.SQLException;
-
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;

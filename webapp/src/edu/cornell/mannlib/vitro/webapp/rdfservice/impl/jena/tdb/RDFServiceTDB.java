@@ -20,7 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.RDFServiceJena;
 
 /**
- * TODO
+ * An implementation that is based on Jena TDB.
  */
 public class RDFServiceTDB extends RDFServiceJena {
 	private static final Log log = LogFactory.getLog(RDFServiceTDB.class);
@@ -79,4 +79,10 @@ public class RDFServiceTDB extends RDFServiceJena {
 		}
 	}
 
+	@Override
+	public void close() {
+		if (this.dataset != null) {
+			dataset.close();
+		}
+	}
 }
