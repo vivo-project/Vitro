@@ -67,6 +67,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.BlankNodeFilteringModelMaker;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
@@ -74,6 +75,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils.MergeResult;
@@ -1204,9 +1206,15 @@ public class JenaIngestController extends BaseEditController {
     protected static ModelMaker getModelMaker(HttpServletRequest req){
         ServletContext ctx = req.getSession().getServletContext();
 		if (isUsingMainStoreForIngest(req)) {
-			return ModelAccess.on(ctx).getModelMaker(CONTENT);
+			RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx,
+					WhichService.CONTENT).getRDFService();
+			return new BlankNodeFilteringModelMaker(rdfService, ModelAccess.on(
+					ctx).getModelMaker(CONTENT));
 		} else {
-			return ModelAccess.on(ctx).getModelMaker(CONFIGURATION);
+			RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx,
+					WhichService.CONFIGURATION).getRDFService();
+			return new BlankNodeFilteringModelMaker(rdfService, ModelAccess.on(
+					ctx).getModelMaker(CONFIGURATION));
 		}
     }
     

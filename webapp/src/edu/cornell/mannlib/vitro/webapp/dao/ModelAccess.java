@@ -16,6 +16,8 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 
 /**
  * Hierarchical storage for models. TODO
@@ -140,32 +142,16 @@ public class ModelAccess {
 		return getOntModel(ModelID.APPLICATION_METADATA);
 	}
 
-	public void setUserAccountsModel(OntModel m) {
-		setOntModel(ModelID.USER_ACCOUNTS, m);
-	}
-
 	public OntModel getUserAccountsModel() {
 		return getOntModel(ModelID.USER_ACCOUNTS);
-	}
-
-	public void setDisplayModel(OntModel m) {
-		setOntModel(ModelID.DISPLAY, m);
 	}
 
 	public OntModel getDisplayModel() {
 		return getOntModel(ModelID.DISPLAY);
 	}
 
-	public void setJenaOntModel(OntModel m) {
-		setOntModel(ModelID.UNION_FULL, m);
-	}
-
 	public OntModel getJenaOntModel() {
 		return getOntModel(ModelID.UNION_FULL);
-	}
-
-	public void setBaseOntModel(OntModel m) {
-		setOntModel(ModelID.BASE_FULL, m);
 	}
 
 	public OntModel getBaseOntModel() {
@@ -182,10 +168,6 @@ public class ModelAccess {
 		} else {
 			modelMap.put(id, ontModel);
 		}
-	}
-
-	public void removeOntModel(ModelID id) {
-		setOntModel(id, null);
 	}
 
 	public OntModel getOntModel(ModelID id) {
@@ -284,11 +266,51 @@ public class ModelAccess {
 	}
 
 	public void setModelMaker(ModelMakerID id, ModelMaker modelMaker) {
-		if (modelMaker == null) {
-			modelMakerMap.remove(id);
+		modelMakerMap.put(id, modelMaker);
+		if (id == ModelMakerID.CONFIGURATION) {
+			setOntModel(ModelID.USER_ACCOUNTS, modelMaker,
+					ModelNames.USER_ACCOUNTS);
+			setOntModel(ModelID.DISPLAY, modelMaker, ModelNames.DISPLAY);
+			setOntModel(ModelID.DISPLAY_DISPLAY, modelMaker,
+					ModelNames.DISPLAY_DISPLAY);
+			setOntModel(ModelID.DISPLAY_TBOX, modelMaker,
+					ModelNames.DISPLAY_TBOX);
 		} else {
-			modelMakerMap.put(id, modelMaker);
+			setOntModel(ModelID.APPLICATION_METADATA, modelMaker,
+					ModelNames.APPLICATION_METADATA);
+			setOntModel(ModelID.BASE_TBOX, modelMaker,
+					ModelNames.TBOX_ASSERTIONS);
+			setOntModel(ModelID.INFERRED_TBOX, modelMaker,
+					ModelNames.TBOX_INFERENCES);
+			setOntModel(ModelID.UNION_TBOX, modelMaker, ModelNames.TBOX_UNION);
+			setOntModel(ModelID.BASE_ABOX, modelMaker,
+					ModelNames.ABOX_ASSERTIONS);
+			setOntModel(ModelID.INFERRED_ABOX, modelMaker,
+					ModelNames.ABOX_INFERENCES);
+			setOntModel(ModelID.UNION_ABOX, modelMaker, ModelNames.ABOX_UNION);
+			setOntModel(ModelID.BASE_FULL, modelMaker,
+					ModelNames.FULL_ASSERTIONS);
+			setOntModel(ModelID.INFERRED_FULL, modelMaker,
+					ModelNames.FULL_INFERENCES);
+			setOntModel(ModelID.UNION_FULL, modelMaker, ModelNames.FULL_UNION);
+			
+			/*
+			 * KLUGE
+			 * 
+			 * For some reason, the union of two OntModels (like this) works
+			 * fine as the UNION_TBOX, but an OntModel wrapped around the union
+			 * of two Models (from ModelMakers) does not work.
+			 * 
+			 * See also the Kluge in RequestModelsPrep.
+			 */
+			setOntModel(ModelID.UNION_TBOX, VitroModelFactory.createUnion(
+					getOntModel(ModelID.BASE_TBOX),
+					getOntModel(ModelID.INFERRED_TBOX)));
 		}
+	}
+
+	private void setOntModel(ModelID id, ModelMaker mm, String uri) {
+		setOntModel(id, VitroModelFactory.createOntologyModel(mm.getModel(uri)));
 	}
 
 	// ----------------------------------------------------------------------
@@ -297,7 +319,7 @@ public class ModelAccess {
 
 	public void close() {
 		if (this.scope == Scope.REQUEST) {
-			for (WebappDaoFactory wadf: factoryMap.values()) {
+			for (WebappDaoFactory wadf : factoryMap.values()) {
 				wadf.close();
 			}
 		}

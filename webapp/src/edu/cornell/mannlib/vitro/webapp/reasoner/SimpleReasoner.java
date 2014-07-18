@@ -43,6 +43,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
@@ -105,8 +106,8 @@ public class SimpleReasoner extends StatementListener {
                 OntModelSpec.OWL_MEM, ModelFactory.createModelForGraph(
                         new RDFServiceGraph(rdfService)));
 		
-        this.aboxModel = ModelFactory.createOntologyModel(
-                  OntModelSpec.OWL_MEM, ModelFactory.createModelForGraph(
+        this.aboxModel = VitroModelFactory.createOntologyModel(
+                  VitroModelFactory.createModelForGraph(
                         new DifferenceGraph(new DifferenceGraph(new RDFServiceGraph(rdfService),inferenceModel.getGraph()),
                         		tboxModel.getGraph())));
                         

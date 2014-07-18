@@ -121,7 +121,7 @@ public class ModelSwitcher {
 
 	private void setSpecialWriteModel(VitroRequest vreq, OntModel mainOntModel) {	    
 		if (mainOntModel != null) {    
-			ModelAccess.on(vreq).setJenaOntModel(mainOntModel);
+			ModelAccess.on(vreq).setOntModel(ModelID.UNION_FULL, mainOntModel);
 			vreq.setAttribute(SPECIAL_WRITE_MODEL, mainOntModel);
 		}
 	}

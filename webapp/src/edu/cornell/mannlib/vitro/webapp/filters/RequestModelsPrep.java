@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.filters;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID.CONFIGURATION;
+import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID.CONTENT;
+
 import java.io.IOException;
 import java.text.Collator;
 import java.util.Enumeration;
@@ -27,7 +30,7 @@ import org.apache.jena.atlas.lib.Pair;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
-//import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.ModelMaker;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ServletPolicyList;
@@ -47,12 +50,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelMakerUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringRDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService;
 
 /**
  * This sets up several objects in the Request scope for each incoming HTTP
@@ -142,22 +145,23 @@ public class RequestModelsPrep implements Filter {
 
 		setRdfServicesAndDatasets(rawRdfService, vreq);
 
+		setRawModels(vreq);
+
 		RDFService rdfService = vreq.getRDFService();
-		Dataset dataset = vreq.getDataset();
-		
-		setRawModels(vreq, dataset);
-		
-		// We need access to some language-neutral items - either because we need to see all
-		// contents regardless of language, or because we need to see the blank nodes that
-		// are removed during language filtering.
-		vreq.setLanguageNeutralUnionFullModel(ModelAccess.on(vreq).getOntModel(ModelID.UNION_FULL));
+
+		// We need access to some language-neutral items - either because we
+		// need to see all contents regardless of language, or because we need
+		// to see the blank nodes that are removed during language filtering.
+		vreq.setLanguageNeutralUnionFullModel(ModelAccess.on(vreq).getOntModel(
+				ModelID.UNION_FULL));
 		vreq.setLanguageNeutralWebappDaoFactory(new WebappDaoFactorySDB(
-				rdfService, createLanguageNeutralOntModelSelector(vreq), createWadfConfig(vreq)));
+				rdfService, createLanguageNeutralOntModelSelector(vreq),
+				createWadfConfig(vreq)));
 
 		wrapModelsWithLanguageAwareness(vreq);
-		
+
 		setCollator(vreq);
-		
+
 		setWebappDaoFactories(vreq, rdfService);
 	}
 
@@ -176,59 +180,61 @@ public class RequestModelsPrep implements Filter {
 		Dataset dataset = new RDFServiceDataset(rdfService);
 		vreq.setDataset(dataset);
 	}
-	
-	private void setRawModels(VitroRequest vreq, Dataset dataset) {
-		// These are memory-mapped (fast), and read-mostly (low contention), so
-		// just use the ones from the context.
-		useModelFromContext(vreq, ModelID.APPLICATION_METADATA);
-		useModelFromContext(vreq, ModelID.USER_ACCOUNTS);
-		useModelFromContext(vreq, ModelID.DISPLAY);
-		useModelFromContext(vreq, ModelID.DISPLAY_DISPLAY);
-		useModelFromContext(vreq, ModelID.DISPLAY_TBOX);
+
+	private void setRawModels(VitroRequest vreq) {
+		ModelAccess models = ModelAccess.on(vreq);
+		
+		RDFService shortTermConfigRdfService = RDFServiceUtils
+				.getRDFServiceFactory(ctx, WhichService.CONFIGURATION)
+				.getShortTermRDFService();
+		ModelMaker configMM = ModelMakerUtils.getShortTermModelMaker(ctx,
+				shortTermConfigRdfService, WhichService.CONFIGURATION);
+		models.setModelMaker(CONFIGURATION, configMM);
+		
+		RDFService shortTermContentRdfService = RDFServiceUtils
+				.getRDFServiceFactory(ctx, WhichService.CONTENT)
+				.getShortTermRDFService();
+		ModelMaker contentMM = ModelMakerUtils.getShortTermModelMaker(ctx,
+				shortTermContentRdfService, WhichService.CONTENT);
+		models.setModelMaker(CONTENT, contentMM);		
+		
+		/*
+		 * KLUGE
+		 * 
+		 * The BASE_TBOX in the context is wrapped by an OntModel with
+		 * sub-models (file-graph models). If we wrap a new OntModel around it,
+		 * we will lose those sub-models, so use the OntModel from the context.
+		 * 
+		 * Do we need to do the same with INFERRED_TBOX and UNION_TBOX? Maybe
+		 * not.
+		 * 
+		 * See also the Kluge in ModelAccess.
+		 */
 		useModelFromContext(vreq, ModelID.BASE_TBOX);
 		useModelFromContext(vreq, ModelID.INFERRED_TBOX);
 		useModelFromContext(vreq, ModelID.UNION_TBOX);
-
-		// Anything derived from the ABOX is not memory-mapped, so create
-		// versions from the short-term RDF service.
-		OntModel baseABoxModel = VitroModelFactory.createOntologyModel(dataset
-				.getNamedModel(ModelNames.ABOX_ASSERTIONS));
-		OntModel inferenceABoxModel = VitroModelFactory
-				.createOntologyModel(dataset.getNamedModel(ModelNames.ABOX_INFERENCES));
-		OntModel unionABoxModel = VitroModelFactory.createUnion(
-				baseABoxModel, inferenceABoxModel);
-
-		OntModel baseFullModel = VitroModelFactory.createUnion(baseABoxModel,
-				ModelAccess.on(vreq).getOntModel(ModelID.BASE_TBOX));
-		OntModel inferenceFullModel = VitroModelFactory.createUnion(
-				inferenceABoxModel,
-				ModelAccess.on(vreq).getOntModel(ModelID.INFERRED_TBOX));
-		OntModel unionFullModel = VitroModelFactory.createOntologyModel(
-				dataset.getDefaultModel());
-
-		ModelAccess.on(vreq).setOntModel(ModelID.BASE_ABOX, baseABoxModel);
-		ModelAccess.on(vreq).setOntModel(ModelID.INFERRED_ABOX, inferenceABoxModel);
-		ModelAccess.on(vreq).setOntModel(ModelID.UNION_ABOX, unionABoxModel);
-		ModelAccess.on(vreq).setOntModel(ModelID.BASE_FULL, baseFullModel);
-		ModelAccess.on(vreq).setOntModel(ModelID.INFERRED_FULL, inferenceFullModel);
-		ModelAccess.on(vreq).setOntModel(ModelID.UNION_FULL, unionFullModel);
 	}
 
 	private void useModelFromContext(VitroRequest vreq, ModelID modelId) {
 		OntModel contextModel = ModelAccess.on(ctx).getOntModel(modelId);
 		ModelAccess.on(vreq).setOntModel(modelId, contextModel);
 	}
-	
-	/** Create an OntModelSelector that will hold the un-language-filtered models. */
+
+	/**
+	 * Create an OntModelSelector that will hold the un-language-filtered
+	 * models.
+	 */
 	private OntModelSelector createLanguageNeutralOntModelSelector(
 			VitroRequest vreq) {
 		OntModelSelectorImpl oms = new OntModelSelectorImpl();
 		oms.setABoxModel(ModelAccess.on(vreq).getOntModel(ModelID.UNION_ABOX));
 		oms.setTBoxModel(ModelAccess.on(vreq).getOntModel(ModelID.UNION_TBOX));
 		oms.setFullModel(ModelAccess.on(vreq).getOntModel(ModelID.UNION_FULL));
-		oms.setApplicationMetadataModel(ModelAccess.on(vreq).getOntModel(ModelID.APPLICATION_METADATA));
+		oms.setApplicationMetadataModel(ModelAccess.on(vreq).getOntModel(
+				ModelID.APPLICATION_METADATA));
 		oms.setDisplayModel(ModelAccess.on(vreq).getOntModel(ModelID.DISPLAY));
-		oms.setUserAccountsModel(ModelAccess.on(vreq).getOntModel(ModelID.USER_ACCOUNTS));
+		oms.setUserAccountsModel(ModelAccess.on(vreq).getOntModel(
+				ModelID.USER_ACCOUNTS));
 		return oms;
 	}
 
@@ -250,15 +256,15 @@ public class RequestModelsPrep implements Filter {
 			ModelAccess.on(req).setOntModel(id, aware);
 		}
 	}
-	
+
 	private void setWebappDaoFactories(VitroRequest vreq, RDFService rdfService) {
 		WebappDaoFactoryConfig config = createWadfConfig(vreq);
-		
+
 		WebappDaoFactory unfilteredWadf = new WebappDaoFactorySDB(rdfService,
 				ModelAccess.on(vreq).getUnionOntModelSelector(), config);
 		ModelAccess.on(vreq).setWebappDaoFactory(FactoryID.UNFILTERED_UNION,
 				unfilteredWadf);
-		
+
 		WebappDaoFactory unfilteredAssertionsWadf = new WebappDaoFactorySDB(
 				rdfService, ModelAccess.on(vreq).getBaseOntModelSelector(),
 				config, SDBDatasetMode.ASSERTIONS_ONLY);
@@ -293,24 +299,26 @@ public class RequestModelsPrep implements Filter {
 		config.setDefaultNamespace(defaultNamespace);
 		config.setPreferredLanguages(langs);
 		config.setUnderlyingStoreReasoned(isStoreReasoned(req));
-		config.setCustomListViewConfigFileMap(getCustomListViewConfigFileMap(
-		        req.getSession().getServletContext()));
+		config.setCustomListViewConfigFileMap(getCustomListViewConfigFileMap(req
+				.getSession().getServletContext()));
 		return config;
 	}
 
 	/**
-	 * This method is also used by VitroHttpServlet to retrieve the right Collator
-	 * instance for picklist sorting
+	 * This method is also used by VitroHttpServlet to retrieve the right
+	 * Collator instance for picklist sorting
+	 * 
 	 * @param req
 	 * @return
 	 */
 	public static Enumeration<Locale> getPreferredLocales(HttpServletRequest req) {
-	    return req.getLocales();
+		return req.getLocales();
 	}
-	
+
 	private List<String> getPreferredLanguages(HttpServletRequest req) {
 		log.debug("Accept-Language: " + req.getHeader("Accept-Language"));
-		return LanguageFilteringUtils.localesToLanguages(getPreferredLocales(req));
+		return LanguageFilteringUtils
+				.localesToLanguages(getPreferredLocales(req));
 	}
 
 	/**
@@ -330,36 +338,36 @@ public class RequestModelsPrep implements Filter {
 			return rawRDFService;
 		}
 	}
-	
-   private void setCollator(VitroRequest vreq) {
-        Enumeration<Locale> locales = getPreferredLocales(vreq);
-        while(locales.hasMoreElements()) {
-            Locale locale = locales.nextElement();
-            Collator collator = Collator.getInstance(locale);
-            if(collator != null) {
-                vreq.setCollator(collator);
-                return;
-            }
-        }
-        vreq.setCollator(Collator.getInstance());
-    }
+
+	private void setCollator(VitroRequest vreq) {
+		Enumeration<Locale> locales = getPreferredLocales(vreq);
+		while (locales.hasMoreElements()) {
+			Locale locale = locales.nextElement();
+			Collator collator = Collator.getInstance(locale);
+			if (collator != null) {
+				vreq.setCollator(collator);
+				return;
+			}
+		}
+		vreq.setCollator(Collator.getInstance());
+	}
 
 	private boolean isStoreReasoned(ServletRequest req) {
-	    String isStoreReasoned = ConfigurationProperties.getBean(req).getProperty(
-	            "VitroConnection.DataSource.isStoreReasoned", "true");
-	    return ("true".equals(isStoreReasoned));
+		String isStoreReasoned = ConfigurationProperties.getBean(req)
+				.getProperty("VitroConnection.DataSource.isStoreReasoned",
+						"true");
+		return ("true".equals(isStoreReasoned));
 	}
-	
-	private Map<Pair<String,Pair<ObjectProperty, String>>, String> 
-	        getCustomListViewConfigFileMap(ServletContext ctx) {
-	    Map<Pair<String,Pair<ObjectProperty, String>>, String> map = 
-	            (Map<Pair<String,Pair<ObjectProperty, String>>, String>) 
-	                    ctx.getAttribute("customListViewConfigFileMap");
-	    if (map == null) {
-	        map = new ConcurrentHashMap<Pair<String,Pair<ObjectProperty, String>>, String>();
-	        ctx.setAttribute("customListViewConfigFileMap", map);
-	    }
-	    return map;
+
+	private Map<Pair<String, Pair<ObjectProperty, String>>, String> getCustomListViewConfigFileMap(
+			ServletContext ctx) {
+		Map<Pair<String, Pair<ObjectProperty, String>>, String> map = (Map<Pair<String, Pair<ObjectProperty, String>>, String>) ctx
+				.getAttribute("customListViewConfigFileMap");
+		if (map == null) {
+			map = new ConcurrentHashMap<Pair<String, Pair<ObjectProperty, String>>, String>();
+			ctx.setAttribute("customListViewConfigFileMap", map);
+		}
+		return map;
 	}
 
 	private void tearDownTheRequestModels(HttpServletRequest req) {

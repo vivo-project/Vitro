@@ -16,13 +16,14 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
@@ -52,13 +53,13 @@ public class SimpleReasonerSetup implements ServletContextListener {
         
         try {    
             // set up Pellet reasoning for the TBox    
-            OntModelSelector assertionsOms = ModelAccess.on(ctx).getBaseOntModelSelector();
-            OntModelSelector inferencesOms = ModelAccess.on(ctx).getInferenceOntModelSelector();
-            OntModelSelector unionOms = ModelAccess.on(ctx).getUnionOntModelSelector();
+        	OntModel tboxAssertionsModel = ModelAccess.on(ctx).getOntModel(ModelID.BASE_TBOX);
+        	OntModel tboxInferencesModel = ModelAccess.on(ctx).getOntModel(ModelID.INFERRED_TBOX);
+        	OntModel tboxUnionModel = ModelAccess.on(ctx).getOntModel(ModelID.UNION_TBOX);
 
 			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
             
-            if (!assertionsOms.getTBoxModel().getProfile().NAMESPACE().equals(OWL.NAMESPACE.getNameSpace())) {        
+            if (!tboxAssertionsModel.getProfile().NAMESPACE().equals(OWL.NAMESPACE.getNameSpace())) {        
                 log.error("Not connecting Pellet reasoner - the TBox assertions model is not an OWL model");
                 return;
             }
@@ -71,7 +72,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
             //PelletOptions.USE_INCREMENTAL_CONSISTENCY = true;
             //PelletOptions.USE_INCREMENTAL_DELETION = true;
              
-            PelletListener pelletListener = new PelletListener(unionOms.getTBoxModel(),assertionsOms.getTBoxModel(),inferencesOms.getTBoxModel(),ReasonerConfiguration.DEFAULT);
+            PelletListener pelletListener = new PelletListener(tboxUnionModel,tboxAssertionsModel,tboxInferencesModel,ReasonerConfiguration.DEFAULT);
             sce.getServletContext().setAttribute("pelletListener",pelletListener);
             sce.getServletContext().setAttribute("pelletOntModel", pelletListener.getPelletModel());
             
@@ -94,7 +95,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
 
             // the simple reasoner will register itself as a listener to the ABox assertions
             SimpleReasoner simpleReasoner = new SimpleReasoner(
-                    unionOms.getTBoxModel(), rdfService, inferenceModel, rebuildModel, scratchModel);
+                    tboxUnionModel, rdfService, inferenceModel, rebuildModel, scratchModel);
             sce.getServletContext().setAttribute(SimpleReasoner.class.getName(),simpleReasoner);
             
             StartupStatus ss = StartupStatus.getBean(ctx);
@@ -117,8 +118,8 @@ public class SimpleReasonerSetup implements ServletContextListener {
             
             SimpleReasonerTBoxListener simpleReasonerTBoxListener = new SimpleReasonerTBoxListener(simpleReasoner);
             sce.getServletContext().setAttribute(SimpleReasonerTBoxListener.class.getName(),simpleReasonerTBoxListener);
-            assertionsOms.getTBoxModel().register(simpleReasonerTBoxListener);
-            inferencesOms.getTBoxModel().register(simpleReasonerTBoxListener);
+            tboxAssertionsModel.register(simpleReasonerTBoxListener);
+            tboxInferencesModel.register(simpleReasonerTBoxListener);
             
             RecomputeMode mode = getRecomputeRequired(ctx);
             if (RecomputeMode.FOREGROUND.equals(mode)) {
