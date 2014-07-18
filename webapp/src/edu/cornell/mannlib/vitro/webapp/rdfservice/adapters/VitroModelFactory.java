@@ -4,16 +4,25 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.adapters;
 
 import static com.hp.hpl.jena.ontology.OntModelSpec.OWL_MEM;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.graph.BulkUpdateHandler;
 import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.graph.compose.Union;
+import com.hp.hpl.jena.graph.impl.WrappedBulkUpdateHandler;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.impl.OntModelImpl;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.impl.ModelCom;
 
 /**
  * Make models that will do proper bulk updates.
  */
 public class VitroModelFactory {
+	private static final Log log = LogFactory.getLog(VitroModelFactory.class);
+
 	public static Model createModel() {
 		return ModelFactory.createDefaultModel();
 	}
@@ -21,38 +30,54 @@ public class VitroModelFactory {
 	public static OntModel createOntologyModel() {
 		return ModelFactory.createOntologyModel(OWL_MEM);
 	}
-	
-	public static OntModel createOntologyModel(Model model) {
-		@SuppressWarnings("deprecation")
-		BulkUpdateHandler buh = model.getGraph().getBulkUpdateHandler();
 
-		OntModel ontModel = ModelFactory.createOntologyModel(OWL_MEM, model);
-		return new BulkUpdatingOntModel(ontModel, buh);
+	public static OntModel createOntologyModel(Model model) {
+		Graph graph = model.getGraph();
+		Model bareModel = new ModelCom(graph);
+		OntModel ontModel = new OntModelImpl(OWL_MEM, bareModel);
+		return new BulkUpdatingOntModel(ontModel);
 	}
 
-	public static Model createUnion(Model baseModel, Model otherModel) {
-		@SuppressWarnings("deprecation")
-		BulkUpdateHandler buh = baseModel.getGraph().getBulkUpdateHandler();
+	public static Model createUnion(Model baseModel, Model plusModel) {
+		Graph baseGraph = baseModel.getGraph();
+		Graph plusGraph = plusModel.getGraph();
+		BulkUpdatingUnion unionGraph = new BulkUpdatingUnion(baseGraph,
+				plusGraph);
 
-		Model unionModel = ModelFactory.createUnion(baseModel, otherModel);
+		BulkUpdateHandler buh = getBulkUpdateHandler(unionGraph);
+		Model unionModel = ModelFactory.createModelForGraph(unionGraph);
 		return new BulkUpdatingModel(unionModel, buh);
 	}
 
-	public static OntModel createUnion(OntModel baseModel, OntModel otherModel) {
-		@SuppressWarnings("deprecation")
-		BulkUpdateHandler buh = baseModel.getGraph().getBulkUpdateHandler();
+	public static OntModel createUnion(OntModel baseModel, OntModel plusModel) {
+		Graph baseGraph = baseModel.getGraph();
+		Graph plusGraph = plusModel.getGraph();
+		BulkUpdatingUnion unionGraph = new BulkUpdatingUnion(baseGraph,
+				plusGraph);
 
-		Model unionModel = createUnion((Model) baseModel, (Model) otherModel);
+		Model unionModel = ModelFactory.createModelForGraph(unionGraph);
 		OntModel unionOntModel = ModelFactory.createOntologyModel(OWL_MEM,
 				unionModel);
-		return new BulkUpdatingOntModel(unionOntModel, buh);
+		return new BulkUpdatingOntModel(unionOntModel);
 	}
 
 	public static Model createModelForGraph(Graph g) {
-		@SuppressWarnings("deprecation")
-		BulkUpdateHandler buh = g.getBulkUpdateHandler();
-
+		BulkUpdateHandler buh = getBulkUpdateHandler(g);
 		return new BulkUpdatingModel(ModelFactory.createModelForGraph(g), buh);
 	}
 
+	private static class BulkUpdatingUnion extends Union {
+		@SuppressWarnings("deprecation")
+		public BulkUpdatingUnion(Graph L, Graph R) {
+			super(L, R);
+			this.bulkHandler = new WrappedBulkUpdateHandler(this,
+					L.getBulkUpdateHandler());
+		}
+
+	}
+
+	@SuppressWarnings("deprecation")
+	private static BulkUpdateHandler getBulkUpdateHandler(Graph graph) {
+		return graph.getBulkUpdateHandler();
+	}
 }
