@@ -31,7 +31,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -262,21 +261,6 @@ public class JenaExportController extends BaseEditController {
 		}
 	}
 	
-	private OntModel getOntModelFromAttribute( String attributeName, VitroRequest vreq ) {
-		
-		Object o = vreq.getAttribute( attributeName );
-		if ( (o != null) && (o instanceof OntModel) ) {
-			return (OntModel) o;
-		} else {
-			o = getServletContext().getAttribute( attributeName );
-			if ( (o != null) && (o instanceof OntModel) ) {
-				return (OntModel) o;
-			} else {
-				throw new RuntimeException("Unable to find OntModel in request or context attribute "+attributeName);
-			}
-		}
-	}
-	
 	static final String FULL_GRAPH = "?g";
 	static Map<String,String> formatToExtension;
 	static Map<String,String> formatToMimetype;
@@ -301,14 +285,12 @@ public class JenaExportController extends BaseEditController {
 	
 	private static final String ABOX_FULL_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
 	        "WHERE { GRAPH ?g { ?s ?p ?o } FILTER (!regex(str(?g), \"tbox\")) " +
-            "FILTER (?g != <" + ModelNames.APPLICATION_METADATA + ">) " +
-            "FILTER (?g != <" + RDFServiceModelMaker.METADATA_MODEL_URI + ">) }";
+            "FILTER (?g != <" + ModelNames.APPLICATION_METADATA + ">) }";
 	
 	private static final String ABOX_ASSERTED_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
             "WHERE { GRAPH ?g { ?s ?p ?o } FILTER (!regex(str(?g), \"tbox\")) " + 
 	        "FILTER (?g != <" + ModelNames.ABOX_INFERENCES + ">) " +
-	        "FILTER (?g != <" + ModelNames.APPLICATION_METADATA + ">) " +
-	        "FILTER (?g != <" + RDFServiceModelMaker.METADATA_MODEL_URI + ">) }";
+	        "FILTER (?g != <" + ModelNames.APPLICATION_METADATA + ">) }";
 	
 	private static final String FULL_FULL_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
             "WHERE { ?s ?p ?o }";

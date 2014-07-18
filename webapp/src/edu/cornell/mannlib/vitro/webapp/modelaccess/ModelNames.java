@@ -8,11 +8,19 @@ package edu.cornell.mannlib.vitro.webapp.modelaccess;
 public class ModelNames {
 	public static final String ABOX_ASSERTIONS = "http://vitro.mannlib.cornell.edu/default/vitro-kb-2";
 	public static final String ABOX_INFERENCES = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf";
+	public static final String ABOX_UNION = "vitro:aboxOntModel";
+	
 	public static final String TBOX_ASSERTIONS = "http://vitro.mannlib.cornell.edu/default/asserted-tbox";
 	public static final String TBOX_INFERENCES = "http://vitro.mannlib.cornell.edu/default/inferred-tbox";
+	public static final String TBOX_UNION = "vitro:tboxOntModel";
+	
+	public static final String FULL_ASSERTIONS = "vitro:baseOntModel";
+	public static final String FULL_INFERENCES = "vitro:inferenceOntModel";
+	public static final String FULL_UNION = "vitro:jenaOntModel";
+	
+	public static final String APPLICATION_METADATA = "http://vitro.mannlib.cornell.edu/default/vitro-kb-applicationMetadata";
 	public static final String USER_ACCOUNTS = "http://vitro.mannlib.cornell.edu/default/vitro-kb-userAccounts";
 	public static final String DISPLAY = "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadata";
 	public static final String DISPLAY_TBOX = "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadataTBOX";
 	public static final String DISPLAY_DISPLAY = "http://vitro.mannlib.cornell.edu/default/vitro-kb-displayMetadata-displayModel";
-	public static final String APPLICATION_METADATA = "http://vitro.mannlib.cornell.edu/default/vitro-kb-applicationMetadata";
 }
