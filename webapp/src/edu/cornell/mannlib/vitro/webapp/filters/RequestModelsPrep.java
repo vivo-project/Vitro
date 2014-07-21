@@ -105,14 +105,19 @@ public class RequestModelsPrep implements Filter {
 		if (!thisRequestNeedsModels(req) || modelsAreAlreadySetUp(req)) {
 			filterChain.doFilter(req, resp);
 		} else {
-			RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx)
+			RDFService contentRdfService = RDFServiceUtils
+					.getRDFServiceFactory(ctx, WhichService.CONTENT)
+					.getShortTermRDFService();
+			RDFService configurationRdfService = RDFServiceUtils
+					.getRDFServiceFactory(ctx, WhichService.CONFIGURATION)
 					.getShortTermRDFService();
 			try {
-				setUpTheRequestModels(rdfService, req);
+				setUpTheRequestModels(contentRdfService, configurationRdfService, req);
 				filterChain.doFilter(req, resp);
 				tearDownTheRequestModels(req);
 			} finally {
-				rdfService.close();
+				contentRdfService.close();
+				configurationRdfService.close();
 			}
 		}
 	}
@@ -139,13 +144,13 @@ public class RequestModelsPrep implements Filter {
 		}
 	}
 
-	private void setUpTheRequestModels(RDFService rawRdfService,
+	private void setUpTheRequestModels(RDFService contentRdfService, RDFService configurationRdfService,
 			HttpServletRequest req) {
 		VitroRequest vreq = new VitroRequest(req);
 
-		setRdfServicesAndDatasets(rawRdfService, vreq);
+		setRdfServicesAndDatasets(contentRdfService, vreq);
 
-		setRawModels(vreq);
+		setRawModels(contentRdfService, configurationRdfService, vreq);
 
 		RDFService rdfService = vreq.getRDFService();
 
@@ -181,21 +186,15 @@ public class RequestModelsPrep implements Filter {
 		vreq.setDataset(dataset);
 	}
 
-	private void setRawModels(VitroRequest vreq) {
+	private void setRawModels(RDFService contentRdfService, RDFService configurationRdfService, VitroRequest vreq) {
 		ModelAccess models = ModelAccess.on(vreq);
 		
-		RDFService shortTermConfigRdfService = RDFServiceUtils
-				.getRDFServiceFactory(ctx, WhichService.CONFIGURATION)
-				.getShortTermRDFService();
 		ModelMaker configMM = ModelMakerUtils.getShortTermModelMaker(ctx,
-				shortTermConfigRdfService, WhichService.CONFIGURATION);
+				configurationRdfService, WhichService.CONFIGURATION);
 		models.setModelMaker(CONFIGURATION, configMM);
 		
-		RDFService shortTermContentRdfService = RDFServiceUtils
-				.getRDFServiceFactory(ctx, WhichService.CONTENT)
-				.getShortTermRDFService();
 		ModelMaker contentMM = ModelMakerUtils.getShortTermModelMaker(ctx,
-				shortTermContentRdfService, WhichService.CONTENT);
+				contentRdfService, WhichService.CONTENT);
 		models.setModelMaker(CONTENT, contentMM);		
 		
 		/*
