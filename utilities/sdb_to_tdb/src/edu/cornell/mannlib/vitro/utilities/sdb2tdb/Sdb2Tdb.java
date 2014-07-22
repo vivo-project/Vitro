@@ -3,7 +3,12 @@
 package edu.cornell.mannlib.vitro.utilities.sdb2tdb;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -12,8 +17,19 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.jena.riot.RDFDataMgr;
+
+import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.sdb.SDB;
 import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
 import com.hp.hpl.jena.sdb.StoreDesc;
@@ -22,13 +38,31 @@ import com.hp.hpl.jena.sdb.store.LayoutType;
 import com.hp.hpl.jena.tdb.TDBFactory;
 
 /**
+ * Copy all of the data from an SDB triple-store to a TDB triple-store. See
+ * README.txt for more details.
+ * 
+ * Examples of invoking it:
+ * 
  * <pre>
  *    java -jar sdb2tdb.jar \ 
  *    		'jdbc:mysql://localhost/vitrodb?user=vivoUser&password=vivoPass'\ 
  *    		/usr/local/my/tdb
+ *    
+ *    java -Xms2048m -Xmx2048m -jar .work/sdb2tdb.jar \
+ *          'jdbc:mysql://localhost/weill17?user=vivoUser&password=vivoPass' \
+ *          /Users/jeb228/Testing/instances/weill-develop/vivo_home/contentTdb \
+ *          force
  * </pre>
+ * 
+ * Each graph is copied separately. Small graphs are simply loaded into memory
+ * and transferred. Large graphs are read to produce a streaming result set
+ * which is written to a temporary file. That file is then read into a TDB
+ * model.
+ * 
+ * This has been tested with graphs up to 6 million triples without crashing.
  */
 public class Sdb2Tdb {
+	private static final int LARGE_MODEL_THRESHOLD = 500_000;
 	private final String driverClassName;
 	private final String jdbcUrl;
 	private final String destination;
@@ -74,10 +108,10 @@ public class Sdb2Tdb {
 	}
 
 	private void checkJdbcUrl() {
-		if ((!this.jdbcUrl.matches("\\busername\\b"))
+		if ((!this.jdbcUrl.matches("\\buser\\b"))
 				|| (!this.jdbcUrl.matches("\\bpassword\\b"))) {
 			System.out.println("\nWARNING: The JDBC url probably should "
-					+ "contain values for username and password.\n");
+					+ "contain values for user and password.\n");
 		}
 	}
 
@@ -112,7 +146,7 @@ public class Sdb2Tdb {
 		return Arrays.asList(filenames);
 	}
 
-	private void translate() throws SQLException {
+	private void translate() throws SQLException, IOException {
 		try {
 			sdbDataset = openSdbDataset();
 			tdbDataset = openTdbDataset();
@@ -130,6 +164,10 @@ public class Sdb2Tdb {
 	private Dataset openSdbDataset() throws SQLException {
 		Connection conn = DriverManager.getConnection(this.jdbcUrl);
 		Store store = SDBFactory.connectStore(conn, makeSdbStoreDesc());
+
+		SDB.getContext().set(SDB.jdbcStream, Boolean.TRUE);
+		SDB.getContext().set(SDB.jdbcFetchSize, Integer.MIN_VALUE);
+
 		return SDBFactory.connectDataset(store);
 	}
 
@@ -143,16 +181,42 @@ public class Sdb2Tdb {
 				.getAbsolutePath());
 	}
 
-	private void copyGraphs() {
+	private void copyGraphs() throws IOException {
 		for (Iterator<String> modelNames = sdbDataset.listNames(); modelNames
 				.hasNext();) {
 			String modelName = modelNames.next();
 			Model model = sdbDataset.getNamedModel(modelName);
-			System.out.println(String.format("Copying %6d triples: %s",
-					model.size(), modelName));
-			tdbDataset.addNamedModel(modelName, model);
-			model.close();
+			if (model.size() < LARGE_MODEL_THRESHOLD) {
+				copySmallModel(modelName, model);
+			} else {
+				copyLargeModel(modelName, model);
+			}
 		}
+	}
+
+	private void copySmallModel(String modelName, Model model) {
+		System.out.println(String.format("Copying %6d triples: %s",
+				model.size(), modelName));
+		tdbDataset.addNamedModel(modelName, model);
+	}
+
+	private void copyLargeModel(String modelName, Model model)
+			throws IOException {
+		File tempFile = File.createTempFile("sdb-", ".n3");
+		System.out.println(String.format("Copying %6d triples: %s %s",
+				model.size(), modelName, tempFile.getAbsolutePath()));
+		model.close();
+
+		try (OutputStream os = new FileOutputStream(tempFile);
+				GraphToTriples trips = new GraphToTriples(this, modelName)) {
+			RDFDataMgr.writeTriples(os, trips);
+		}
+		System.out.println("Wrote it.");
+
+		try (InputStream is = new FileInputStream(tempFile)) {
+			tdbDataset.getNamedModel(modelName).read(is, null, "N-TRIPLE");
+		}
+		System.out.println("Read it.");
 	}
 
 	public static void main(String[] args) {
@@ -165,7 +229,7 @@ public class Sdb2Tdb {
 			System.out.println(e.getMessage());
 			System.out.println(e.getProperUsage());
 			System.out.println();
-		} catch (SQLException e) {
+		} catch (SQLException | IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -177,6 +241,51 @@ public class Sdb2Tdb {
 
 		public String getProperUsage() {
 			return "Usage is: java -jar sdb2tdb [driver_class] <jdbcUrl> <destination_directory> [force]";
+		}
+	}
+
+	private static class GraphToTriples implements Iterator<Triple>,
+			AutoCloseable {
+		private static final String QUERY_TEMPLATE = "" //
+				+ "SELECT ?s ?p ?o \n" //
+				+ "WHERE { \n" //
+				+ "   GRAPH <%s> { \n" //
+				+ "      ?s ?p ?o . \n" //
+				+ "   } \n" //
+				+ "}";
+
+		private final QueryExecution qe;
+		private final ResultSet results;
+
+		GraphToTriples(Sdb2Tdb parent, String graphUri) {
+			String qStr = String.format(QUERY_TEMPLATE, graphUri);
+			Query q = QueryFactory.create(qStr);
+			qe = QueryExecutionFactory.create(q, parent.sdbDataset);
+			results = qe.execSelect();
+		}
+
+		@Override
+		public boolean hasNext() {
+			return results.hasNext();
+		}
+
+		@Override
+		public Triple next() {
+			QuerySolution solution = results.nextSolution();
+			Node s = solution.get("s").asNode();
+			Node p = solution.get("p").asNode();
+			Node o = solution.get("o").asNode();
+			return new Triple(s, p, o);
+		}
+
+		@Override
+		public void remove() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public void close() {
+			qe.close();
 		}
 	}
 }
