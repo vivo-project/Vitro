@@ -2,7 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup;
 
+import static edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService.CONFIGURATION;
+import static edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService.CONTENT;
 import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sparql.RDFSourceSPARQL.PROPERTY_SPARQL_ENDPOINT_URI;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.tdb.RDFSourceTDB.PROPERTY_CONTENT_TDB_PATH;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -70,15 +73,22 @@ public class RDFSetup implements ServletContextListener {
 	private void createRdfSources() {
 		if (isSparqlEndpointContentConfigured()) {
 			contentRdfSource = new RDFSourceSPARQL(ctx, this);
+		} else if (isTdbConfigured()) {
+			contentRdfSource = new RDFSourceTDB(ctx, this, CONTENT);
 		} else {
 			contentRdfSource = new RDFSourceSDB(ctx, this);
 		}
-		configurationRdfSource = new RDFSourceTDB(ctx, this);
+		configurationRdfSource = new RDFSourceTDB(ctx, this, CONFIGURATION);
 	}
 
 	private boolean isSparqlEndpointContentConfigured() {
 		return StringUtils.isNotBlank(configProps
 				.getProperty(PROPERTY_SPARQL_ENDPOINT_URI));
+	}
+
+	private boolean isTdbConfigured() {
+		return StringUtils.isNotBlank(configProps
+				.getProperty(PROPERTY_CONTENT_TDB_PATH));
 	}
 
 	@Override
