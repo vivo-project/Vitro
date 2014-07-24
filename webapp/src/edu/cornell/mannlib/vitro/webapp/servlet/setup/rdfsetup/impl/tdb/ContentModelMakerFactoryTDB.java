@@ -30,8 +30,7 @@ public class ContentModelMakerFactoryTDB extends ContentModelMakerFactory
 	}
 
 	/**
-	 * The small content models (tbox, app_metadata) are memory mapped, for
-	 * speed.
+	 * The small content models are memory mapped, for speed.
 	 */
 	@Override
 	public ModelMaker getModelMaker(RDFService longTermRdfService) {
@@ -39,12 +38,13 @@ public class ContentModelMakerFactoryTDB extends ContentModelMakerFactory
 	}
 
 	/**
-	 * There are no connections or connection pool, so short-term use is the
-	 * same as long-term use.
+	 * For short-term use, create an entirely new model-maker.
 	 */
 	@Override
 	public ModelMaker getShortTermModelMaker(RDFService shortTermRdfService) {
-		return addContentDecorators(longTermModelMaker);
+		return addContentDecorators(new ListCachingModelMaker(
+				new MemoryMappingModelMaker(new RDFServiceModelMaker(
+						shortTermRdfService), SMALL_CONTENT_MODELS)));
 	}
 
 }

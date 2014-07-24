@@ -24,9 +24,9 @@ public class ConfigurationModelMakerFactoryTDB extends
 	private final ModelMaker longTermModelMaker;
 
 	public ConfigurationModelMakerFactoryTDB(RDFService longTermRdfService) {
-		this.longTermModelMaker = new ListCachingModelMaker(new MemoryMappingModelMaker(
-				new RDFServiceModelMaker(longTermRdfService),
-				CONFIGURATION_MODELS));
+		this.longTermModelMaker = new ListCachingModelMaker(
+				new MemoryMappingModelMaker(new RDFServiceModelMaker(
+						longTermRdfService), CONFIGURATION_MODELS));
 	}
 
 	@Override
@@ -35,11 +35,13 @@ public class ConfigurationModelMakerFactoryTDB extends
 	}
 
 	/**
-	 * The long-term models are all memory-mapped, so use them.
+	 * Create an entirely new model-maker for short term use.
 	 */
 	@Override
 	public ModelMaker getShortTermModelMaker(RDFService shortTermRdfService) {
-		return addConfigurationDecorators(longTermModelMaker);
+		return addConfigurationDecorators(new ListCachingModelMaker(
+				new MemoryMappingModelMaker(new RDFServiceModelMaker(
+						shortTermRdfService), CONFIGURATION_MODELS)));
 	}
 
 }

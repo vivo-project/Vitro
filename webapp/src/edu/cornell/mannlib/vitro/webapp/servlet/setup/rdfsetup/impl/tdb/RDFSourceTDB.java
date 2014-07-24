@@ -18,11 +18,9 @@ import com.hp.hpl.jena.tdb.TDB;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelMakerFactory;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.tdb.RDFServiceTDB;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.tdb.RDFServiceFactoryTDB;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.RDFSource;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
@@ -42,15 +40,14 @@ public class RDFSourceTDB implements RDFSource {
 	private final StartupStatus ss;
 
 	private final WhichService which;
-	private final RDFService rdfService;
-	private final RDFServiceFactory rdfServiceFactory;
+	private final RDFServiceFactoryTDB rdfServiceFactory;
 
 	public RDFSourceTDB(ServletContext ctx, ServletContextListener parent,
 			WhichService which) {
 		this.props = ConfigurationProperties.getBean(ctx);
 		this.ss = StartupStatus.getBean(ctx);
 		this.which = which;
-		
+
 		configureTDB();
 
 		String tdbPath;
@@ -62,21 +59,22 @@ public class RDFSourceTDB implements RDFSource {
 		}
 
 		try {
-			this.rdfService = new RDFServiceTDB(tdbPath);
-			this.rdfServiceFactory = createRDFServiceFactory();
+			this.rdfServiceFactory = createRDFServiceFactory(tdbPath);
 			ss.info(parent, "Initialized the RDF source for TDB");
 		} catch (IOException e) {
 			throw new RuntimeException(
 					"Failed to set up the RDF source for TDB", e);
 		}
+
 	}
 
 	private void configureTDB() {
 		TDB.getContext().setTrue(TDB.symUnionDefaultGraph);
 	}
 
-	private RDFServiceFactory createRDFServiceFactory() {
-		return new RDFServiceFactorySingle(this.rdfService);
+	private RDFServiceFactoryTDB createRDFServiceFactory(String tdbPath)
+			throws IOException {
+		return new RDFServiceFactoryTDB(tdbPath);
 	}
 
 	@Override
@@ -87,7 +85,8 @@ public class RDFSourceTDB implements RDFSource {
 	@Override
 	public ModelMakerFactory getContentModelMakerFactory() {
 		if (CONTENT == which) {
-			return new ContentModelMakerFactoryTDB(this.rdfService);
+			return new ContentModelMakerFactoryTDB(
+					this.rdfServiceFactory.getRDFService());
 		} else {
 			throw new IllegalStateException("This RDFSource is for " + which);
 		}
@@ -96,7 +95,8 @@ public class RDFSourceTDB implements RDFSource {
 	@Override
 	public ModelMakerFactory getConfigurationModelMakerFactory() {
 		if (CONFIGURATION == which) {
-			return new ConfigurationModelMakerFactoryTDB(this.rdfService);
+			return new ConfigurationModelMakerFactoryTDB(
+					this.rdfServiceFactory.getRDFService());
 		} else {
 			throw new IllegalStateException("This RDFSource is for " + which);
 		}
@@ -104,9 +104,7 @@ public class RDFSourceTDB implements RDFSource {
 
 	@Override
 	public void close() {
-		if (this.rdfService != null) {
-			this.rdfService.close();
-		}
+		rdfServiceFactory.close();
 	}
 
 }
