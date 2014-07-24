@@ -21,6 +21,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -66,6 +67,8 @@ public class ApplicationConfigurationOntologyUtils {
         }
         log.debug(queryStr);
         Query q = QueryFactory.create(queryStr);
+        union.enterCriticalSection(Lock.READ);
+        try {
         QueryExecution qe = QueryExecutionFactory.create(q, union);
         WebappDaoFactory wadf = new WebappDaoFactoryJena(
                 ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, union));
@@ -93,6 +96,9 @@ public class ApplicationConfigurationOntologyUtils {
             }  
         } finally {
             qe.close();
+        }
+        } finally {
+        	union.leaveCriticalSection();
         }
         return additionalProps;
     }   
