@@ -469,7 +469,11 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 	                if (publicDescriptionLit != null) {
 	                    op.setPublicDescription(publicDescriptionLit.getLexicalForm());
 	                }        
-	             }  
+	             }
+	            while (rs.hasNext()) {
+	            	log.error("Another solution");
+	            	rs.next();
+	            }
 	        } finally {
 	            qe.close();
 	        }    
