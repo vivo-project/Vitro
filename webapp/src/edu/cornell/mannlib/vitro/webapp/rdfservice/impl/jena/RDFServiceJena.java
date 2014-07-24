@@ -481,6 +481,8 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         DatasetWrapper dw = getDatasetWrapper();
         try {
             Dataset d = dw.getDataset();
+            d.getLock().enterCriticalSection(Lock.READ);
+            try {
             Query q = createQuery(query);
             QueryExecution qe = createQueryExecution(query, q, d);
             try {
@@ -506,6 +508,9 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                 return result;
             } finally {
                 qe.close();
+            }
+            } finally {
+            	d.getLock().leaveCriticalSection();
             }
         } finally {
             dw.close();
