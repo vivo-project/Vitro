@@ -372,104 +372,110 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 "}"; 
       
         Query q = QueryFactory.create(propQuery);
-        QueryExecution qe = QueryExecutionFactory.create(q, getOntModelSelector().getDisplayModel());
+        OntModel displayModel = getOntModelSelector().getDisplayModel();
+        displayModel.enterCriticalSection(Lock.READ);
         try {
-            ResultSet rs = qe.execSelect();
-            if (rs.hasNext()) {
-                QuerySolution qsoln = rs.nextSolution();
-                // This is a bit of hack, used for things where the type of the 
-                // immediately-related object ("root," for lack of a better term)
-                // is important to record but not the type directly associated with
-                // a configuration
-                Resource rangeRootRes = qsoln.getResource("rangeRoot");
-                if (rangeRootRes != null) {
-                    // reusing this obsolete field for now
-                    op.setRangeEntityURI(rangeRootRes.getURI());
-                } 
-                Resource groupRes = qsoln.getResource("group");
-                if (groupRes != null) {
-                    op.setGroupURI(groupRes.getURI());
-                } 
-                Literal displayRankLit = qsoln.getLiteral("displayRank");
-                if(displayRankLit != null) {
-                    op.setDomainDisplayTier(
-                            Integer.parseInt(displayRankLit.getLexicalForm()));
-                } 
-                Literal displayLimitLit = qsoln.getLiteral("displayLimit");
-                if(displayLimitLit != null) {
-                    op.setDomainDisplayLimit(
-                            Integer.parseInt(displayLimitLit.getLexicalForm()));
-                } 
-                Resource displayLevelRes = qsoln.getResource("displayLevel");
-                if (displayLevelRes != null) {
-                    op.setHiddenFromDisplayBelowRoleLevel(
-                            BaseResourceBean.RoleLevel.getRoleByUri(
-                                    displayLevelRes.getURI()));
-                }
-                Resource updateLevelRes = qsoln.getResource("updateLevel");
-                if (updateLevelRes != null) {
-                    op.setProhibitedFromUpdateBelowRoleLevel(
-                            BaseResourceBean.RoleLevel.getRoleByUri(
-                                    updateLevelRes.getURI()));
-                }
-                Resource publishLevelRes = qsoln.getResource("publishLevel");
-                if (publishLevelRes != null) {
-                    op.setHiddenFromPublishBelowRoleLevel(
-                            BaseResourceBean.RoleLevel.getRoleByUri(
-                                    publishLevelRes.getURI()));
-                }
-                Literal labelLit = qsoln.getLiteral("label");
-                if (labelLit != null) {
-                    op.setDomainPublic(labelLit.getLexicalForm());
-                } 
-                Literal customFormLit = qsoln.getLiteral("customForm");
-                if (customFormLit != null) {
-                    op.setCustomEntryForm(customFormLit.getLexicalForm());
-                } 
-                Literal editLinkSuppressedLit = qsoln.getLiteral("editLinkSuppressed");
-                if (editLinkSuppressedLit != null ) {
-                    op.setEditLinkSuppressed(editLinkSuppressedLit.getBoolean());
-                }
-                Literal addLinkSuppressedLit = qsoln.getLiteral("addLinkSuppressed");
-                if (addLinkSuppressedLit != null ) {
-                    op.setAddLinkSuppressed(addLinkSuppressedLit.getBoolean());
-                }
-                Literal deleteLinkSuppressedLit = qsoln.getLiteral("deleteLinkSuppressed");
-                if (deleteLinkSuppressedLit != null ) {
-                    op.setDeleteLinkSuppressed(deleteLinkSuppressedLit.getBoolean());
-                }
-                Literal collateBySubclassLit = qsoln.getLiteral("collateBySubclass");
-                if (collateBySubclassLit != null) {
-                    op.setCollateBySubclass(collateBySubclassLit.getBoolean());
-                }
-                Resource individualSortPropertyRes = qsoln.getResource("individualSortProperty");
-                if (individualSortPropertyRes != null) {
-                    op.setObjectIndividualSortPropertyURI(individualSortPropertyRes.getURI());
-                } 
-                Literal entitySortDirectionLit = qsoln.getLiteral("entitySortDirection");
-                if (entitySortDirectionLit != null) {
-                    op.setDomainEntitySortDirection(entitySortDirectionLit.getLexicalForm());
-                }
-                Literal selectFromExistingLit = qsoln.getLiteral("selectFromExisting");
-                if (selectFromExistingLit != null) {
-                    op.setSelectFromExisting(selectFromExistingLit.getBoolean());
-                }
-                Literal offerCreateNewLit = qsoln.getLiteral("offerCreateNew");
-                if (offerCreateNewLit != null) {
-                    op.setOfferCreateNewOption(offerCreateNewLit.getBoolean());
-                }
-                Literal stubDeletionLit = qsoln.getLiteral("stubDeletion");
-                if (stubDeletionLit != null) {
-                    op.setStubObjectRelation(stubDeletionLit.getBoolean());
-                }
-                Literal publicDescriptionLit = qsoln.getLiteral("publicDescription");
-                if (publicDescriptionLit != null) {
-                    op.setPublicDescription(publicDescriptionLit.getLexicalForm());
-                }        
-             }  
+			QueryExecution qe = QueryExecutionFactory.create(q, displayModel);
+	        try {
+	            ResultSet rs = qe.execSelect();
+	            if (rs.hasNext()) {
+	                QuerySolution qsoln = rs.nextSolution();
+	                // This is a bit of hack, used for things where the type of the 
+	                // immediately-related object ("root," for lack of a better term)
+	                // is important to record but not the type directly associated with
+	                // a configuration
+	                Resource rangeRootRes = qsoln.getResource("rangeRoot");
+	                if (rangeRootRes != null) {
+	                    // reusing this obsolete field for now
+	                    op.setRangeEntityURI(rangeRootRes.getURI());
+	                } 
+	                Resource groupRes = qsoln.getResource("group");
+	                if (groupRes != null) {
+	                    op.setGroupURI(groupRes.getURI());
+	                } 
+	                Literal displayRankLit = qsoln.getLiteral("displayRank");
+	                if(displayRankLit != null) {
+	                    op.setDomainDisplayTier(
+	                            Integer.parseInt(displayRankLit.getLexicalForm()));
+	                } 
+	                Literal displayLimitLit = qsoln.getLiteral("displayLimit");
+	                if(displayLimitLit != null) {
+	                    op.setDomainDisplayLimit(
+	                            Integer.parseInt(displayLimitLit.getLexicalForm()));
+	                } 
+	                Resource displayLevelRes = qsoln.getResource("displayLevel");
+	                if (displayLevelRes != null) {
+	                    op.setHiddenFromDisplayBelowRoleLevel(
+	                            BaseResourceBean.RoleLevel.getRoleByUri(
+	                                    displayLevelRes.getURI()));
+	                }
+	                Resource updateLevelRes = qsoln.getResource("updateLevel");
+	                if (updateLevelRes != null) {
+	                    op.setProhibitedFromUpdateBelowRoleLevel(
+	                            BaseResourceBean.RoleLevel.getRoleByUri(
+	                                    updateLevelRes.getURI()));
+	                }
+	                Resource publishLevelRes = qsoln.getResource("publishLevel");
+	                if (publishLevelRes != null) {
+	                    op.setHiddenFromPublishBelowRoleLevel(
+	                            BaseResourceBean.RoleLevel.getRoleByUri(
+	                                    publishLevelRes.getURI()));
+	                }
+	                Literal labelLit = qsoln.getLiteral("label");
+	                if (labelLit != null) {
+	                    op.setDomainPublic(labelLit.getLexicalForm());
+	                } 
+	                Literal customFormLit = qsoln.getLiteral("customForm");
+	                if (customFormLit != null) {
+	                    op.setCustomEntryForm(customFormLit.getLexicalForm());
+	                } 
+	                Literal editLinkSuppressedLit = qsoln.getLiteral("editLinkSuppressed");
+	                if (editLinkSuppressedLit != null ) {
+	                    op.setEditLinkSuppressed(editLinkSuppressedLit.getBoolean());
+	                }
+	                Literal addLinkSuppressedLit = qsoln.getLiteral("addLinkSuppressed");
+	                if (addLinkSuppressedLit != null ) {
+	                    op.setAddLinkSuppressed(addLinkSuppressedLit.getBoolean());
+	                }
+	                Literal deleteLinkSuppressedLit = qsoln.getLiteral("deleteLinkSuppressed");
+	                if (deleteLinkSuppressedLit != null ) {
+	                    op.setDeleteLinkSuppressed(deleteLinkSuppressedLit.getBoolean());
+	                }
+	                Literal collateBySubclassLit = qsoln.getLiteral("collateBySubclass");
+	                if (collateBySubclassLit != null) {
+	                    op.setCollateBySubclass(collateBySubclassLit.getBoolean());
+	                }
+	                Resource individualSortPropertyRes = qsoln.getResource("individualSortProperty");
+	                if (individualSortPropertyRes != null) {
+	                    op.setObjectIndividualSortPropertyURI(individualSortPropertyRes.getURI());
+	                } 
+	                Literal entitySortDirectionLit = qsoln.getLiteral("entitySortDirection");
+	                if (entitySortDirectionLit != null) {
+	                    op.setDomainEntitySortDirection(entitySortDirectionLit.getLexicalForm());
+	                }
+	                Literal selectFromExistingLit = qsoln.getLiteral("selectFromExisting");
+	                if (selectFromExistingLit != null) {
+	                    op.setSelectFromExisting(selectFromExistingLit.getBoolean());
+	                }
+	                Literal offerCreateNewLit = qsoln.getLiteral("offerCreateNew");
+	                if (offerCreateNewLit != null) {
+	                    op.setOfferCreateNewOption(offerCreateNewLit.getBoolean());
+	                }
+	                Literal stubDeletionLit = qsoln.getLiteral("stubDeletion");
+	                if (stubDeletionLit != null) {
+	                    op.setStubObjectRelation(stubDeletionLit.getBoolean());
+	                }
+	                Literal publicDescriptionLit = qsoln.getLiteral("publicDescription");
+	                if (publicDescriptionLit != null) {
+	                    op.setPublicDescription(publicDescriptionLit.getLexicalForm());
+	                }        
+	             }  
+	        } finally {
+	            qe.close();
+	        }    
         } finally {
-            qe.close();
-        }    
+        	displayModel.leaveCriticalSection();
+        }
         return op;
     }
     
