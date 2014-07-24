@@ -91,6 +91,9 @@ public class QueryIteratorCheck extends QueryIteratorWrapper
 
     private static void warn(QueryIterator qIter, String str)
     {
+    	{
+    		Log.warn(QueryIteratorCheck.class, "warning from here:", new Throwable());
+    	}
         str = str + Utils.className(qIter) ;
 
         if ( qIter instanceof QueryIteratorBase )
