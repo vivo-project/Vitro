@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -153,4 +154,15 @@ public class RDFServiceTDB extends RDFServiceJena {
 			dataset.getLock().leaveCriticalSection();
 		}
 	}
+
+	@Override
+	public List<String> getGraphURIs() throws RDFServiceException {
+		dataset.getLock().enterCriticalSection(Lock.READ);
+		try {
+			return super.getGraphURIs();
+		} finally {
+			dataset.getLock().leaveCriticalSection();
+		}
+	}
+
 }
