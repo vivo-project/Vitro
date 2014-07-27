@@ -11,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.tdb.TDB;
 import com.hp.hpl.jena.tdb.TDBFactory;
 
@@ -65,10 +66,15 @@ public class RDFServiceTDB extends RDFServiceJena {
 				log.debug("Change Set: " + changeSet);
 			}
 			notifyListenersOfPreChangeEvents(changeSet);
-			
-			applyChangeSetToModel(changeSet, dataset);
-			TDB.sync(dataset);
-			
+
+			dataset.getLock().enterCriticalSection(Lock.WRITE);
+			try {
+				applyChangeSetToModel(changeSet, dataset);
+				TDB.sync(dataset);
+			} finally {
+				dataset.getLock().leaveCriticalSection();
+			}
+
 			notifyListenersOfChanges(changeSet);
 			notifyListenersOfPostChangeEvents(changeSet);
 
