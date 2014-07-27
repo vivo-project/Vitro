@@ -81,12 +81,14 @@ public class DatasetControlMRSW implements DatasetControl
             W = writeCounter.get() ;
         }
 
-        if ( R > 0 && W > 0 )
+        if ( R > 0 && W > 0 ) {
         	reportReadWithWriteError();
             policyError(R, W) ;
-        if ( W > 1 )
+        }
+        if ( W > 1 ){
         	reportMultipleWriteError();
             policyError(R, W) ;
+        }
     }
     
     
