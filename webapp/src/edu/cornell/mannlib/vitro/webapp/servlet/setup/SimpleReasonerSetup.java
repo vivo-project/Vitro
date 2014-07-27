@@ -86,7 +86,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
             
             // set up simple reasoning for the ABox
                                 
-            RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx).getShortTermRDFService();            
+            RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService();            
             Dataset dataset = new RDFServiceDataset(rdfService);
             
             Model rebuildModel = dataset.getNamedModel(JENA_INF_MODEL_REBUILD); 

@@ -38,13 +38,12 @@ public class ContentModelMakerFactoryTDB extends ContentModelMakerFactory
 	}
 
 	/**
-	 * For short-term use, create an entirely new model-maker.
+	 * There are no connections or connection pool, so short-term use is the
+	 * same as long-term use.
 	 */
 	@Override
 	public ModelMaker getShortTermModelMaker(RDFService shortTermRdfService) {
-		return addContentDecorators(new ListCachingModelMaker(
-				new MemoryMappingModelMaker(new RDFServiceModelMaker(
-						shortTermRdfService), SMALL_CONTENT_MODELS)));
+		return addContentDecorators(longTermModelMaker);
 	}
 
 }
