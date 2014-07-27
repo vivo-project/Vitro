@@ -91,7 +91,12 @@ public class RDFServiceTDB extends RDFServiceJena {
 	@Override
 	public void close() {
 		if (this.dataset != null) {
-			dataset.close();
+			dataset.getLock().enterCriticalSection(Lock.WRITE);
+			try {
+				dataset.close();
+			} finally {
+				dataset.getLock().leaveCriticalSection();
+			}
 		}
 	}
 
