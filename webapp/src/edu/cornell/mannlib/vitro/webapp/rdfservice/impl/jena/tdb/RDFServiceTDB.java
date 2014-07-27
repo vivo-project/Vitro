@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.tdb;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -67,9 +69,10 @@ public class RDFServiceTDB extends RDFServiceJena {
 			}
 			notifyListenersOfPreChangeEvents(changeSet);
 
+			applyChangeSetToModel(changeSet, dataset);
+
 			dataset.getLock().enterCriticalSection(Lock.WRITE);
 			try {
-				applyChangeSetToModel(changeSet, dataset);
 				TDB.sync(dataset);
 			} finally {
 				dataset.getLock().leaveCriticalSection();
@@ -89,6 +92,60 @@ public class RDFServiceTDB extends RDFServiceJena {
 	public void close() {
 		if (this.dataset != null) {
 			dataset.close();
+		}
+	}
+
+	@Override
+	public InputStream sparqlConstructQuery(String query,
+			ModelSerializationFormat resultFormat) throws RDFServiceException {
+		dataset.getLock().enterCriticalSection(Lock.READ);
+		try {
+			return super.sparqlConstructQuery(query, resultFormat);
+		} finally {
+			dataset.getLock().leaveCriticalSection();
+		}
+	}
+
+	@Override
+	public InputStream sparqlDescribeQuery(String query,
+			ModelSerializationFormat resultFormat) throws RDFServiceException {
+		dataset.getLock().enterCriticalSection(Lock.READ);
+		try {
+			return super.sparqlDescribeQuery(query, resultFormat);
+		} finally {
+			dataset.getLock().leaveCriticalSection();
+		}
+	}
+
+	@Override
+	public void sparqlSelectQuery(String query, ResultFormat resultFormat,
+			OutputStream outputStream) throws RDFServiceException {
+		dataset.getLock().enterCriticalSection(Lock.READ);
+		try {
+			super.sparqlSelectQuery(query, resultFormat, outputStream);
+		} finally {
+			dataset.getLock().leaveCriticalSection();
+		}
+	}
+
+	@Override
+	public InputStream sparqlSelectQuery(String query, ResultFormat resultFormat)
+			throws RDFServiceException {
+		dataset.getLock().enterCriticalSection(Lock.READ);
+		try {
+			return super.sparqlSelectQuery(query, resultFormat);
+		} finally {
+			dataset.getLock().leaveCriticalSection();
+		}
+	}
+
+	@Override
+	public boolean sparqlAskQuery(String query) throws RDFServiceException {
+		dataset.getLock().enterCriticalSection(Lock.READ);
+		try {
+			return super.sparqlAskQuery(query);
+		} finally {
+			dataset.getLock().leaveCriticalSection();
 		}
 	}
 }
