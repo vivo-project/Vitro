@@ -59,7 +59,7 @@ public class RDFServiceFactorySDB implements RDFServiceFactory {
     @Override
     public void unregisterListener(ChangeListener changeListener)
             throws RDFServiceException {
-        this.longTermRDFService.registerListener(changeListener);
+        this.longTermRDFService.unregisterListener(changeListener);
     }
 
 }
