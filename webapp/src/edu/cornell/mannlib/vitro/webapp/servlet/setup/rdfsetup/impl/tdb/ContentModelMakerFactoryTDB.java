@@ -9,16 +9,14 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ContentModelMakerFactory;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelMakerFactory;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ListCachingModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.MemoryMappingModelMaker;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ShadowingModelMaker;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 
 /**
  * In TDB, is there any difference between short-term and long-term connections?
+ * For now, use long-term connections for all models, memory-mapping the small
+ * ones.
  * 
- * Anyway, memory-map the small models, and use a short-term connection for the
- * others (when available).
- * 
- * RDFService doesn't support empty models, so support them with ListCaching
+ * RDFService doesn't support empty models, so support them with ListCaching.
  */
 public class ContentModelMakerFactoryTDB extends ContentModelMakerFactory
 		implements ModelMakerFactory {
@@ -26,14 +24,13 @@ public class ContentModelMakerFactoryTDB extends ContentModelMakerFactory
 	private final ModelMaker longTermModelMaker;
 
 	public ContentModelMakerFactoryTDB(RDFService longTermRdfService) {
-		this.longTermModelMaker =  new ListCachingModelMaker(new MemoryMappingModelMaker(
-				new RDFServiceModelMaker(longTermRdfService),
-				SMALL_CONTENT_MODELS));
+		this.longTermModelMaker = new ListCachingModelMaker(
+				new MemoryMappingModelMaker(new RDFServiceModelMaker(
+						longTermRdfService), SMALL_CONTENT_MODELS));
 	}
 
 	/**
-	 * The small content models (tbox, app_metadata) are memory mapped, for
-	 * speed.
+	 * The small content models are memory mapped, for speed.
 	 */
 	@Override
 	public ModelMaker getModelMaker(RDFService longTermRdfService) {
@@ -41,19 +38,12 @@ public class ContentModelMakerFactoryTDB extends ContentModelMakerFactory
 	}
 
 	/**
-	 * For short-term use, the large models (abox) will come from a short-term
-	 * service. The small models can be the memory-mapped ones that we created
-	 * for long-term use.
+	 * There are no connections or connection pool, so short-term use is the
+	 * same as long-term use.
 	 */
 	@Override
 	public ModelMaker getShortTermModelMaker(RDFService shortTermRdfService) {
-		ModelMaker shortTermModelMaker = new RDFServiceModelMaker(
-				shortTermRdfService);
-
-		// No need to create a fresh memory map of the small models: use the
-		// long-term ones.
-		return addContentDecorators(new ShadowingModelMaker(
-				shortTermModelMaker, longTermModelMaker, SMALL_CONTENT_MODELS));
+		return addContentDecorators(longTermModelMaker);
 	}
 
 }
