@@ -1,15 +1,28 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.xerces.util.XMLChar;
 
+import com.hp.hpl.jena.query.Query;
+import com.hp.hpl.jena.query.QueryExecution;
+import com.hp.hpl.jena.query.QueryExecutionFactory;
+import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.QuerySolutionMap;
+import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
@@ -18,9 +31,15 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsUser;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ModelChangePreprocessor;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
+import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
 
 public class N3EditUtils {
+    final static Log log = LogFactory.getLog(N3EditUtils.class);
 
     
     /**
@@ -32,15 +51,106 @@ public class N3EditUtils {
             VitroRequest request){
 
         List<ModelChangePreprocessor> modelChangePreprocessors = editConfiguration.getModelChangePreprocessors();
-        if ( modelChangePreprocessors != null ) {
+        //Check if there is a default set of preprocessors for the whole application
+        List<ModelChangePreprocessor> defaultPreprocessors = getDefaultModelChangePreprocessors(request, ModelAccess.on(request).getDisplayModel());
+        if(modelChangePreprocessors != null) {
+        	//if preprocessors exist for the configuration, add default preprocessors to the end
+        	modelChangePreprocessors.addAll(defaultPreprocessors);
+        } else {
+        	//if configuration specific preprocessors are null, use default preprocessors instead
+        	modelChangePreprocessors = defaultPreprocessors;
+        }
+        
+       if(modelChangePreprocessors != null) {
             for ( ModelChangePreprocessor pp : modelChangePreprocessors ) {
                 //these work by side effect
                 pp.preprocess( changes.getRetractions(), changes.getAdditions(), request );
             }
-        }                   
+       }                   
     }
     
-
+    /**
+     * Find which default model preprocessors are associated with the application.  These will 
+     * be run everytime an edit/addition occurs, i.e. whenever the preprocessModels method is called. 
+     */
+    
+    public static List<ModelChangePreprocessor> getDefaultModelChangePreprocessors(VitroRequest vreq, Model displayModel) {
+    	List<ModelChangePreprocessor> preprocessors = new ArrayList<ModelChangePreprocessor>();
+    	
+    	//From the display model, find which preprocessors have been declared
+    	String preprocessorOwlClass = "java:edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ModelChangePreprocessor";
+    	String prefixes =        "PREFIX rdf:   <" + VitroVocabulary.RDF +"> \n" +
+    	        "PREFIX rdfs:  <" + VitroVocabulary.RDFS +"> \n" + 
+    	        "PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#> \n" +
+    	        "PREFIX display: <" + DisplayVocabulary.DISPLAY_NS +"> \n";
+    	String query = prefixes + 
+                "SELECT ?modelChangePreprocessor  WHERE { ?modelChangePreprocessor a <" + preprocessorOwlClass + "> . }";
+        Query preprocessorQuery = QueryFactory.create(query);
+        displayModel.enterCriticalSection(false);
+           try{
+               QueryExecution qexec = QueryExecutionFactory.create(preprocessorQuery,displayModel );
+               try{                                                    
+                   ResultSet results = qexec.execSelect();                
+                   while (results.hasNext()) {
+                       QuerySolution soln = results.nextSolution();
+                       Resource modelChangePreprocessor = soln.getResource("modelChangePreprocessor");
+                       if( modelChangePreprocessor != null && modelChangePreprocessor.getURI() != null){
+                          String preprocessorClass = modelChangePreprocessor.getURI();
+                          //Get rid of the "java:"
+                          try {
+                        	  ModelChangePreprocessor p = preprocessorForURI(vreq, displayModel, preprocessorClass);
+                        	  if(p != null) {
+                        		  preprocessors.add(p);
+                        	  }
+                          
+                          } catch(Exception ex) {
+                        	  log.error("Retrieving model change preprocessor resulted in an error", ex);
+                          }
+                       }
+                   }
+               }finally{ qexec.close(); }
+           }finally{ displayModel.leaveCriticalSection(); }
+                   
+   	
+    	return preprocessors;
+    }
+    
+    //Copied this from DataGetterUtils - will need to refactor to put all of this in one place
+    /**
+     * Returns a DataGetter using information in the 
+     * displayModel for the individual with the URI given by dataGetterURI
+     * to configure it. 
+     * 
+     * May return null.
+     * This should not throw an exception if the URI exists and has a type
+     * that does not implement the DataGetter interface.
+     */
+    public static ModelChangePreprocessor preprocessorForURI(VitroRequest vreq, Model displayModel, String preprocessorURI) 
+    throws InstantiationException, IllegalAccessException, ClassNotFoundException, IllegalArgumentException, InvocationTargetException, SecurityException 
+    {
+        //get java class for dataGetterURI
+    	
+        String preprocessorClassName = DataGetterUtils.getClassNameFromUri(preprocessorURI);
+        
+        //figure out if it implements interface DataGetter
+        Class<?> clz = Class.forName(preprocessorClassName);
+        if( ! ModelChangePreprocessor.class.isAssignableFrom(clz) ){
+    		log.debug("Class doesn't implement ModelChangePreprocessor: '" + preprocessorClassName + "'");
+            return null;
+        }
+        
+       //We should get the arguments from the constructor from the display model as well
+        //So we don't need to check or constrain what can be passed here
+       //Right now, this supports a preprocessor with no arguments
+        //TO DO: Start populating with potential arguments based on n3 itself
+        /*
+        Object[] argList =  new Object[]{};
+       	for (Constructor<?> ct: clz.getConstructors()) {
+       		return (ModelChangePreprocessor) ct.newInstance(argList);
+        }
+        	*/
+        return (ModelChangePreprocessor) clz.newInstance();
+    }
 
     /** 
      * Process Entity to Return to - substituting uris etc. 
