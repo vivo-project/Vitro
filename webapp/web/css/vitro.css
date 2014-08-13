@@ -247,6 +247,85 @@ ul.dropdown ul ul {
 ul.dropdown li:hover > ul { 
     visibility: visible; 
 }
+/* ------------------------------------------------->  */
+/* DROP DOWN LANGUAGE MENU  ------------------------>  */
+/* ------------------------------------------------->  */
+ul.language-dropdown { 
+    position: relative; 
+}
+ul.language-dropdown li {  
+    float: left; 
+    zoom: 1; 
+    padding: 0 !important;
+}
+ul.language-dropdown li a { 
+    display: block; 
+    font-size: 1.4em;
+}
+ul.language-dropdown li#language-menu { 
+    background: url(../images/arrowDownOverAccount.gif) right 9px no-repeat;
+    min-width:110px;
+    position: relative;
+    margin-right: -10px !important;
+}
+ul.language-dropdown li#language-menu a { 
+    margin-right: 28px;
+    margin-left:10px;
+}
+ul.language-dropdown li#language-menu.hover,
+ul.language-dropdown li#language-menu:hover { 
+    color: #000 !important; 
+    position: relative; 
+    background: #fff url(../images/arrowDownAccount.gif) right 9px no-repeat;
+    border-bottom: 1px solid #cdcfcf;
+}
+ul.language-dropdown li.hover a,
+ul.language-dropdown li:hover a { 
+    color: #000 !important; 
+    margin-left:10px;
+}
+/* LEVEL TWO */
+ul.language-dropdown ul.sub_menu {  
+    font-size: 1.4em;
+    visibility: hidden; 
+    position: absolute; 
+    top: 100%; 
+    right: 0; 
+    z-index: 999;
+    color: #000;
+    width: 100%;
+}
+ul.language-dropdown ul.sub_menu li { 
+    float: none; 
+    clear: both;
+    padding-left: 14px !important;
+    width: 100%; 
+    border-right: none !important;
+    border-bottom: 1px solid #cdcfcf; 
+    background: #fff url('../images/arrowMenuAccount.gif') no-repeat scroll 7px 8px ;
+}
+/* IE 6 & 7 Needs Inline Block */
+/* ADD IN IE6.css and IE7.css*/
+ul.language-dropdown ul.sub_menu li a { 
+    width: 90%; 
+    display: inline-block; 
+    color: #000 !important;
+    background-color: #fff url('../images/arrowMenuAccount.gif') no-repeat scroll 7px 8px ;
+    padding: 0;
+    padding-left: 0;
+    height: 24px;
+}
+ul.language-dropdown ul.sub_menu li.inactive { 
+    color: #aab0ae !important;
+    font-size: 1em !important;
+    width: 88px;  */
+}
+ul.language-dropdown ul.sub_menu li a:hover,
+ul.language-dropdown ul.sub_menu li a.hover { 
+    color: #999 !important;
+	opacity: 0.6;
+	filter: alpha(opacity=60); /* For IE8 and earlier */
+}
 /* ------ MANAGE LABELS ------ */
 section#rdfsLabels {
     margin-left:20px;
