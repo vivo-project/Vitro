@@ -6,7 +6,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import edu.cornell.mannlib.vitro.webapp.imageprocessor.jai.JaiImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
+import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.searchengine.SearchEngineWrapper;
 import edu.cornell.mannlib.vitro.webapp.searchengine.solr.SolrSearchEngine;
@@ -22,6 +24,7 @@ public class ApplicationImpl implements Application {
 
 	private final ServletContext ctx;
 	private SearchEngine searchEngine;
+	private ImageProcessor imageProcessor;
 
 	public ApplicationImpl(ServletContext ctx) {
 		this.ctx = ctx;
@@ -41,10 +44,18 @@ public class ApplicationImpl implements Application {
 		this.searchEngine = searchEngine;
 	}
 
+	public ImageProcessor getImageProcessor() {
+		return imageProcessor;
+	}
+
+	public void setImageProcessor(ImageProcessor imageProcessor) {
+		this.imageProcessor = imageProcessor;
+	}
+
 	// ----------------------------------------------------------------------
 	// The Setup class.
 	// ----------------------------------------------------------------------
-
+	
 	public static class Setup implements ServletContextListener {
 
 		@Override
@@ -53,11 +64,15 @@ public class ApplicationImpl implements Application {
 			StartupStatus ss = StartupStatus.getBean(ctx);
 
 			try {
+				ApplicationImpl application = new ApplicationImpl(ctx);
+
 				SearchEngine searchEngine = new SearchEngineWrapper(
 						new SolrSearchEngine());
-
-				ApplicationImpl application = new ApplicationImpl(ctx);
 				application.setSearchEngine(searchEngine);
+
+				ImageProcessor imageProcessor = new JaiImageProcessor();
+				application.setImageProcessor(imageProcessor);
+
 				ApplicationUtils.setInstance(application);
 				ss.info(this, "Appliation is configured.");
 			} catch (Exception e) {

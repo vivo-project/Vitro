@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
+package edu.cornell.mannlib.vitro.webapp.imageprocessor.jai;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -12,16 +12,20 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.imageio.ImageIO;
+import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.BandSelectDescriptor;
 import javax.media.jai.operator.StreamDescriptor;
+import javax.media.jai.util.ImagingListener;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.CropRectangle;
+import edu.cornell.mannlib.vitro.webapp.modules.Application;
+import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
+import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 
 /**
  * Crop the main image as specified, and scale it to the correct size for a
@@ -41,30 +45,44 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadControl
  * 
  * Use the javax.imagio pacakge to write the thumbnail image as a JPEG file.
  */
-public class ImageUploadThumbnailer {
+public class JaiImageProcessor implements ImageProcessor {
+	private static final Log log = LogFactory.getLog(JaiImageProcessor.class);
+
 	/** If an image has 3 color bands and 1 alpha band, we want these. */
 	private static final int[] COLOR_BAND_INDEXES = new int[] { 0, 1, 2 };
 
-	private static final Log log = LogFactory
-			.getLog(ImageUploadThumbnailer.class);
+	/**
+	 * Prevent Java Advanced Imaging from complaining about the lack of
+	 * accelerator classes.
+	 */
+	@Override
+	public void startup(Application application, ComponentStartupStatus ss) {
+		JAI.getDefaultInstance().setImagingListener(
+				new NonNoisyImagingListener());
+	}
 
-	/** We won't let you crop to smaller than this many pixels wide or high. */
-	private static final int MINIMUM_CROP_SIZE = 5;
+	@Override
+	public void shutdown(Application application) {
+		// Nothing to tear down.
+	}
 
-	private final int thumbnailHeight;
-	private final int thumbnailWidth;
-
-	public ImageUploadThumbnailer(int thumbnailHeight, int thumbnailWidth) {
-		this.thumbnailHeight = thumbnailHeight;
-		this.thumbnailWidth = thumbnailWidth;
+	@Override
+	public Dimensions getDimensions(InputStream imageStream)
+			throws ImageProcessorException, IOException {
+		MemoryCacheSeekableStream stream = new MemoryCacheSeekableStream(
+				imageStream);
+		RenderedOp image = JAI.create("stream", stream);
+		return new Dimensions(image.getWidth(), image.getHeight());
 	}
 
 	/**
 	 * Crop the main image according to this rectangle, and scale it to the
 	 * correct size for a thumbnail.
 	 */
+	@Override
 	public InputStream cropAndScale(InputStream mainImageStream,
-			CropRectangle crop) {
+			CropRectangle crop, Dimensions limits)
+			throws ImageProcessorException, IOException {
 		try {
 			RenderedOp mainImage = loadImage(mainImageStream);
 			RenderedOp opaqueImage = makeImageOpaque(mainImage);
@@ -77,7 +95,7 @@ public class ImageUploadThumbnailer {
 					bufferedImage, crop);
 			log.debug("bounded crop: " + boundedCrop);
 
-			float scaleFactor = figureScaleFactor(boundedCrop);
+			float scaleFactor = figureScaleFactor(boundedCrop, limits);
 			log.debug("scale factor: " + scaleFactor);
 
 			BufferedImage scaledImage = scaleImage(bufferedImage, scaleFactor);
@@ -98,10 +116,6 @@ public class ImageUploadThumbnailer {
 		} catch (Exception e) {
 			throw new IllegalStateException("Failed to scale the image", e);
 		}
-	}
-
-	private String imageSize(BufferedImage image) {
-		return image.getWidth() + " by " + image.getHeight();
 	}
 
 	private RenderedOp loadImage(InputStream imageStream) {
@@ -127,6 +141,10 @@ public class ImageUploadThumbnailer {
 		return image;
 	}
 
+	private String imageSize(BufferedImage image) {
+		return image.getWidth() + " by " + image.getHeight();
+	}
+
 	private CropRectangle limitCropRectangleToImageBounds(BufferedImage image,
 			CropRectangle crop) {
 
@@ -150,16 +168,12 @@ public class ImageUploadThumbnailer {
 		return new CropRectangle(x, y, h, w);
 	}
 
-	private float figureScaleFactor(CropRectangle boundedCrop) {
-		float horizontalScale = ((float) thumbnailWidth)
+	private float figureScaleFactor(CropRectangle boundedCrop, Dimensions limits) {
+		float horizontalScale = ((float) limits.width)
 				/ ((float) boundedCrop.width);
-		float verticalScale = ((float) thumbnailHeight)
+		float verticalScale = ((float) limits.height)
 				/ ((float) boundedCrop.height);
 		return Math.min(horizontalScale, verticalScale);
-	}
-
-	private BufferedImage cropImage(BufferedImage image, CropRectangle crop) {
-		return image.getSubimage(crop.x, crop.y, crop.width, crop.height);
 	}
 
 	private BufferedImage scaleImage(BufferedImage image, float scaleFactor) {
@@ -178,9 +192,42 @@ public class ImageUploadThumbnailer {
 		return new CropRectangle(newX, newY, newHeight, newWidth);
 	}
 
+	private BufferedImage cropImage(BufferedImage image, CropRectangle crop) {
+		return image.getSubimage(crop.x, crop.y, crop.width, crop.height);
+	}
+
 	private byte[] encodeAsJpeg(BufferedImage image) throws IOException {
 		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 		ImageIO.write(image, "JPG", bytes);
 		return bytes.toByteArray();
 	}
+
+	/**
+	 * This ImagingListener means that Java Advanced Imaging won't dump an
+	 * exception log to System.out. It writes to the log, instead.
+	 * 
+	 * Further, since the lack of native accelerator classes isn't an error, it
+	 * is written as a simple log message.
+	 */
+	static class NonNoisyImagingListener implements ImagingListener {
+		@Override
+		public boolean errorOccurred(String message, Throwable thrown,
+				Object where, boolean isRetryable) throws RuntimeException {
+			if (thrown instanceof RuntimeException) {
+				throw (RuntimeException) thrown;
+			}
+			if ((thrown instanceof NoClassDefFoundError)
+					&& (thrown.getMessage()
+							.contains("com/sun/medialib/mlib/Image"))) {
+				log.info("Java Advanced Imaging: Could not find mediaLib "
+						+ "accelerator wrapper classes. "
+						+ "Continuing in pure Java mode.");
+				return false;
+			}
+			log.error(thrown, thrown);
+			return false;
+		}
+
+	}
+
 }

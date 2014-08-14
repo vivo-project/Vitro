@@ -14,9 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.util.ImagingListener;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.fileupload.FileItem;
@@ -24,12 +21,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.sun.media.jai.codec.MemoryCacheSeekableStream;
-
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.CropRectangle;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.Dimensions;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.UserMistakeException;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.filestorage.TempFileHolder;
@@ -37,6 +31,9 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.UploadedFileHelper;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileAlreadyExistsException;
 import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
+import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor.CropRectangle;
+import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor.Dimensions;
+import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor.ImageProcessorException;
 
 /**
  * Handle the mechanics of validating, storing, and deleting file images.
@@ -93,15 +90,6 @@ public class ImageUploadHelper {
 		map.put("image/x-png", "image/png");
 		map.put("image/pjpeg", "image/jpeg");
 		return Collections.unmodifiableMap(map);
-	}
-
-	/*
-	 * Prevent Java Advanced Imaging from complaining about the lack of
-	 * accelerator classes.
-	 */
-	static {
-		JAI.getDefaultInstance().setImagingListener(
-				new NonNoisyImagingListener());
 	}
 
 	private final FileStorage fileStorage;
@@ -206,12 +194,8 @@ public class ImageUploadHelper {
 			String filename = fileInfo.getFilename();
 
 			source = fileStorage.getInputStream(uri, filename);
-			MemoryCacheSeekableStream stream = new MemoryCacheSeekableStream(
-					source);
-			RenderedOp image = JAI.create("stream", stream);
-
-			Dimensions size = new Dimensions(image.getWidth(),
-					image.getHeight());
+			Dimensions size = ApplicationUtils.instance().getImageProcessor()
+					.getDimensions(source);
 			log.debug("new image size is " + size);
 
 			if ((size.height < THUMBNAIL_HEIGHT)
@@ -272,8 +256,11 @@ public class ImageUploadHelper {
 			mainStream = fileStorage.getInputStream(mainBytestreamUri,
 					mainFilename);
 
-			thumbStream = new ImageUploadThumbnailer(THUMBNAIL_HEIGHT,
-					THUMBNAIL_WIDTH).cropAndScale(mainStream, crop);
+			thumbStream = ApplicationUtils
+					.instance()
+					.getImageProcessor()
+					.cropAndScale(mainStream, crop,
+							new Dimensions(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT));
 
 			String mimeType = RECOGNIZED_FILE_TYPES.get(".jpg");
 			String filename = createThumbnailFilename(mainFilename);
@@ -288,6 +275,8 @@ public class ImageUploadHelper {
 		} catch (IOException e) {
 			throw new IllegalStateException("Can't create the thumbnail file",
 					e);
+		} catch (ImageProcessorException e) {
+			throw new IllegalStateException("Failed to scale the image", e);
 		} finally {
 			if (mainStream != null) {
 				try {
@@ -374,36 +363,5 @@ public class ImageUploadHelper {
 		} else {
 			return prefix + filename.substring(0, periodHere) + extension;
 		}
-	}
-
-	/**
-	 * <p>
-	 * This {@link ImagingListener} means that Java Advanced Imaging won't dump
-	 * an exception log to {@link System#out}. It writes to the log, instead.
-	 * </p>
-	 * <p>
-	 * Further, since the lack of native accelerator classes isn't an error, it
-	 * is written as a simple log message.
-	 * </p>
-	 */
-	static class NonNoisyImagingListener implements ImagingListener {
-		@Override
-		public boolean errorOccurred(String message, Throwable thrown,
-				Object where, boolean isRetryable) throws RuntimeException {
-			if (thrown instanceof RuntimeException) {
-				throw (RuntimeException) thrown;
-			}
-			if ((thrown instanceof NoClassDefFoundError)
-					&& (thrown.getMessage()
-							.contains("com/sun/medialib/mlib/Image"))) {
-				log.info("Java Advanced Imaging: Could not find mediaLib "
-						+ "accelerator wrapper classes. "
-						+ "Continuing in pure Java mode.");
-				return false;
-			}
-			log.error(thrown, thrown);
-			return false;
-		}
-
 	}
 }

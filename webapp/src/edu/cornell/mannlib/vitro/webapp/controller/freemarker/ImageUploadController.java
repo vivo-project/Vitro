@@ -32,6 +32,8 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
+import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor.CropRectangle;
+import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor.Dimensions;
 import edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil;
 
 /**
@@ -580,54 +582,6 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 
 		public String formatMessage(HttpServletRequest req) {
 			return I18n.text(req, getMessage(), parameters);
-		}
-	}
-
-	/**
-	 * Holds the coordinates that we use to crop the main image.
-	 */
-	public static class CropRectangle {
-		public final int x;
-		public final int y;
-		public final int height;
-		public final int width;
-
-		public CropRectangle(int x, int y, int height, int width) {
-			this.x = x;
-			this.y = y;
-			this.height = height;
-			this.width = width;
-		}
-
-		/** Produce a new crop rectangle that compensates for scaling. */
-		public CropRectangle unscale(float scale) {
-			int newX = (int) (x / scale);
-			int newY = (int) (y / scale);
-			int newHeight = (int) (height / scale);
-			int newWidth = (int) (width / scale);
-			return new CropRectangle(newX, newY, newHeight, newWidth);
-		}
-
-		@Override
-		public String toString() {
-			return "CropRectangle[x=" + x + ", y=" + y + ", w=" + width
-					+ ", h=" + height + "]";
-		}
-
-	}
-
-	static class Dimensions {
-		final int width;
-		final int height;
-
-		Dimensions(int width, int height) {
-			this.width = width;
-			this.height = height;
-		}
-
-		@Override
-		public String toString() {
-			return "Dimensions[width=" + width + ", height=" + height + "]";
 		}
 	}
 

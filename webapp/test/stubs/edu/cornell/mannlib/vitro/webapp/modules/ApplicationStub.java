@@ -8,6 +8,7 @@ import javax.servlet.ServletContext;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
+import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 
 /**
@@ -58,4 +59,11 @@ public class ApplicationStub implements Application {
 	// ----------------------------------------------------------------------
 	// Un-implemented methods
 	// ----------------------------------------------------------------------
+
+	@Override
+	public ImageProcessor getImageProcessor() {
+		throw new RuntimeException(
+				"ApplicationStub.getImageProcessor() not implemented.");
+
+	}
 }
