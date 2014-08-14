@@ -6,12 +6,16 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import edu.cornell.mannlib.vitro.webapp.filestorage.impl.FileStorageImplWrapper;
 import edu.cornell.mannlib.vitro.webapp.imageprocessor.jai.JaiImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
+import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
+import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.searchengine.SearchEngineWrapper;
 import edu.cornell.mannlib.vitro.webapp.searchengine.solr.SolrSearchEngine;
+import edu.cornell.mannlib.vitro.webapp.startup.ComponentStartupStatusImpl;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -25,6 +29,7 @@ public class ApplicationImpl implements Application {
 	private final ServletContext ctx;
 	private SearchEngine searchEngine;
 	private ImageProcessor imageProcessor;
+	private FileStorage fileStorage;
 
 	public ApplicationImpl(ServletContext ctx) {
 		this.ctx = ctx;
@@ -44,6 +49,7 @@ public class ApplicationImpl implements Application {
 		this.searchEngine = searchEngine;
 	}
 
+	@Override
 	public ImageProcessor getImageProcessor() {
 		return imageProcessor;
 	}
@@ -52,11 +58,21 @@ public class ApplicationImpl implements Application {
 		this.imageProcessor = imageProcessor;
 	}
 
+	@Override
+	public FileStorage getFileStorage() {
+		return fileStorage;
+	}
+
+	public void setFileStorage(FileStorage fileStorage) {
+		this.fileStorage = fileStorage;
+	}
+
 	// ----------------------------------------------------------------------
 	// The Setup class.
 	// ----------------------------------------------------------------------
-	
+
 	public static class Setup implements ServletContextListener {
+		private ApplicationImpl application;
 
 		@Override
 		public void contextInitialized(ServletContextEvent sce) {
@@ -64,14 +80,26 @@ public class ApplicationImpl implements Application {
 			StartupStatus ss = StartupStatus.getBean(ctx);
 
 			try {
-				ApplicationImpl application = new ApplicationImpl(ctx);
+				application = new ApplicationImpl(ctx);
+				
+				ComponentStartupStatus css = new ComponentStartupStatusImpl(
+						this, ss);
 
 				SearchEngine searchEngine = new SearchEngineWrapper(
 						new SolrSearchEngine());
+				searchEngine.startup(application, css);
 				application.setSearchEngine(searchEngine);
+				ss.info(this, "Started the searchEngine: " + searchEngine);
 
 				ImageProcessor imageProcessor = new JaiImageProcessor();
+				imageProcessor.startup(application, css);
 				application.setImageProcessor(imageProcessor);
+				ss.info(this, "Started the ImageProcessor: " + searchEngine);
+
+				FileStorage fileStorage = new FileStorageImplWrapper();
+				fileStorage.startup(application, css);
+				application.setFileStorage(fileStorage);
+				ss.info(this, "Started the FileStorage system: " + searchEngine);
 
 				ApplicationUtils.setInstance(application);
 				ss.info(this, "Appliation is configured.");
@@ -82,7 +110,9 @@ public class ApplicationImpl implements Application {
 
 		@Override
 		public void contextDestroyed(ServletContextEvent sce) {
-			// Nothing to tear down.
+			application.getFileStorage().shutdown(application);
+			application.getImageProcessor().shutdown(application);
+			application.getSearchEngine().shutdown(application);
 		}
 
 	}

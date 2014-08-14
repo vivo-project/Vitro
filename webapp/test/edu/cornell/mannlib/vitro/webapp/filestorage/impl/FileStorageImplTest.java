@@ -1,7 +1,9 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.filestorage.backend;
+package edu.cornell.mannlib.vitro.webapp.filestorage.impl;
 
+import static edu.cornell.mannlib.vitro.webapp.filestorage.impl.FileStorageImpl.FILE_STORAGE_NAMESPACES_PROPERTIES;
+import static edu.cornell.mannlib.vitro.webapp.filestorage.impl.FileStorageImpl.FILE_STORAGE_ROOT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -26,6 +28,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
+import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileAlreadyExistsException;
 
 /**
  * Test the FileStorage methods. The zero-argument constructor was tested in
@@ -55,26 +58,29 @@ public class FileStorageImplTest extends AbstractTestClass {
 	// tests
 	// ----------------------------------------------------------------------
 
+	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public void baseDirDoesntExist() throws IOException {
 		File baseDir = new File(tempDir, "doesntExist");
 		new FileStorageImpl(baseDir, EMPTY_NAMESPACES);
 	}
 
+	@SuppressWarnings("unused")
 	@Test(expected = IllegalStateException.class)
 	public void partialInitializationRoot() throws IOException {
 		File baseDir = new File(tempDir, "partialWithRoot");
 		baseDir.mkdir();
-		new File(baseDir, FileStorage.FILE_STORAGE_ROOT).mkdir();
+		new File(baseDir, FILE_STORAGE_ROOT).mkdir();
 
 		new FileStorageImpl(baseDir, EMPTY_NAMESPACES);
 	}
 
+	@SuppressWarnings("unused")
 	@Test(expected = IllegalStateException.class)
 	public void partialInitializationNamespaces() throws IOException {
 		File baseDir = new File(tempDir, "partialWithNamespaces");
 		baseDir.mkdir();
-		new File(baseDir, FileStorage.FILE_STORAGE_NAMESPACES_PROPERTIES)
+		new File(baseDir, FILE_STORAGE_NAMESPACES_PROPERTIES)
 				.createNewFile();
 
 		new FileStorageImpl(baseDir, EMPTY_NAMESPACES);
@@ -276,7 +282,7 @@ public class FileStorageImplTest extends AbstractTestClass {
 	 */
 	private void assertFileContents(FileStorageImpl fs, String id,
 			String filename, String expectedContents) throws IOException {
-		File rootDir = new File(fs.getBaseDir(), FileStorage.FILE_STORAGE_ROOT);
+		File rootDir = new File(fs.getBaseDir(), FILE_STORAGE_ROOT);
 		File path = FileStorageHelper.getFullPath(rootDir, id, filename,
 				fs.getNamespaces());
 

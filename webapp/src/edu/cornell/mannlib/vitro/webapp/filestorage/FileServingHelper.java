@@ -11,7 +11,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 
 /**
  * Static methods to help when serving uploaded files.
@@ -19,6 +18,8 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 public class FileServingHelper {
 	private static final Log log = LogFactory.getLog(FileServingHelper.class);
 
+	public static final String PROPERTY_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
+	
 	private static final String DEFAULT_PATH = "/individual/";
 	private static final String FILE_PATH = "/file/";
 	private static boolean warned; // Only issue the warning once.
@@ -29,11 +30,11 @@ public class FileServingHelper {
 	 */
 	private static String getDefaultNamespace(ServletContext ctx) {
 		String defaultNamespace = ConfigurationProperties.getBean(ctx)
-				.getProperty(FileStorageSetup.PROPERTY_DEFAULT_NAMESPACE);
+				.getProperty(PROPERTY_DEFAULT_NAMESPACE);
 		if (defaultNamespace == null) {
 			throw new IllegalArgumentException(
 					"Configuration properties must contain a value for '"
-							+ FileStorageSetup.PROPERTY_DEFAULT_NAMESPACE + "'");
+							+ PROPERTY_DEFAULT_NAMESPACE + "'");
 		}
 
 		if (!defaultNamespace.endsWith(DEFAULT_PATH)) {

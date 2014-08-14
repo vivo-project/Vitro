@@ -12,7 +12,6 @@ import stubs.edu.cornell.mannlib.vitro.webapp.config.ConfigurationPropertiesStub
 import stubs.javax.servlet.ServletContextStub;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 
 /**
  */
@@ -35,7 +34,7 @@ public class FileServingHelperTest extends AbstractTestClass {
 		ctx = new ServletContextStub();
 
 		ConfigurationPropertiesStub props = new ConfigurationPropertiesStub();
-		props.setProperty(FileStorageSetup.PROPERTY_DEFAULT_NAMESPACE,
+		props.setProperty(FileServingHelper.PROPERTY_DEFAULT_NAMESPACE,
 				DEFAULT_NAMESPACE);
 		props.setBean(ctx);
 	}

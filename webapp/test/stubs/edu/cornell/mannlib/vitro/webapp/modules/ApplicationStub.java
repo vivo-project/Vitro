@@ -8,6 +8,7 @@ import javax.servlet.ServletContext;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
+import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 
@@ -66,4 +67,11 @@ public class ApplicationStub implements Application {
 				"ApplicationStub.getImageProcessor() not implemented.");
 
 	}
+
+	@Override
+	public FileStorage getFileStorage() {
+		throw new RuntimeException(
+				"ApplicationStub.getFileStorage() not implemented.");
+	}
+
 }

@@ -5,13 +5,13 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.UNAUTHORIZED;
 
 import javax.servlet.ServletException;
-import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AddObjectPropertyStatement;
@@ -27,11 +27,10 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.For
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
+import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor.CropRectangle;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor.Dimensions;
 import edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil;
@@ -115,23 +114,7 @@ public class ImageUploadController extends FreemarkerHttpServlet {
 	@Override
 	public void init() throws ServletException {
 		super.init();
-		Object o = getServletContext().getAttribute(
-				FileStorageSetup.ATTRIBUTE_NAME);
-		if (o instanceof FileStorage) {
-			fileStorage = (FileStorage) o;
-		} else if (o == null) {
-			throw new UnavailableException(this.getClass().getSimpleName()
-					+ " could not initialize. Attribute '"
-					+ FileStorageSetup.ATTRIBUTE_NAME
-					+ "' was not set in the servlet context.");
-		} else {
-			throw new UnavailableException(this.getClass().getSimpleName()
-					+ " could not initialize. Attribute '"
-					+ FileStorageSetup.ATTRIBUTE_NAME
-					+ "' in the servlet context contained an instance of '"
-					+ o.getClass().getName() + "' instead of '"
-					+ FileStorage.class.getName() + "'");
-		}
+		fileStorage = ApplicationUtils.instance().getFileStorage();
 	}
 	
 	/**
