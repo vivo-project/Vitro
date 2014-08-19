@@ -37,6 +37,8 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditElementVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.ConstantFieldOptions;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.SelectListGeneratorVTwo;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
 import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.ObjectPropertyStatementTemplateModel;
@@ -49,10 +51,12 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     HashMap<String, Object> pageData = new HashMap<String, Object>();
     VitroRequest vreq;
 	private Log log = LogFactory.getLog(EditConfigurationTemplateModel.class);
+	private final I18nBundle i18n;
 
     public EditConfigurationTemplateModel( EditConfigurationVTwo editConfig, VitroRequest vreq) throws Exception{
         this.editConfig = editConfig;
         this.vreq = vreq;
+		this.i18n = I18n.bundle(vreq);
         //get additional data that may be required to generate template
         this.retrieveEditData();
     }    
@@ -141,9 +145,9 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 	    DataProperty  prop = EditConfigurationUtils.getDataProperty(vreq);
 	    if(prop != null) {
 	        if( editConfig.isDataPropertyUpdate() ) {
-	            formTitle   = "Change text for: <em>"+prop.getPublicName()+"</em>";		        
+	            formTitle   = i18n.text("change_text_for") + " " + prop.getPublicName();		        
 	        } else {
-	            formTitle   ="Add new entry for: <em>"+prop.getPublicName()+"</em>";
+	            formTitle   = i18n.text("add_new_entry_for") + " " + prop.getPublicName();
 	        }
 	    }		
 		pageData.put("formTitle", formTitle);
@@ -159,15 +163,15 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	Individual subject = EditConfigurationUtils.getSubjectIndividual(vreq);
     	String propertyTitle = getObjectPropertyNameForDisplay();
     	if(objectIndividual != null) {
-    		formTitle = "Change entry for: <em>" + propertyTitle + " </em>";
+    		formTitle = i18n.text("change_entry_for") + " " + propertyTitle ;
     	}  else {
             if ( prop.getOfferCreateNewOption() ) {
             	
                 log.debug("property set to offer \"create new\" option; custom form: ["+prop.getCustomEntryForm()+"]");
-                formTitle   = "Select an existing "+propertyTitle+" for "+subject.getName();
+                formTitle   = i18n.text("add_an_entry_to") + " " + propertyTitle + " " + i18n.text("for") + " " + subject.getName();
                
             } else {
-                formTitle   = "Add an entry to: <em>"+propertyTitle+"</em>";
+                formTitle   = i18n.text("add_an_entry_to") + " " + propertyTitle ;
             }
         }
     	pageData.put("formTitle", formTitle);
@@ -226,19 +230,19 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
 		    	ObjectProperty prop = EditConfigurationUtils.getObjectProperty(vreq);
 		    	
 		    	if(objectIndividual != null) {
-		    		submitLabel = "Save change";
+		    		submitLabel = i18n.text("save_changes");
 		    	}  else {
 		            if ( prop.getOfferCreateNewOption() ) {
-		                submitLabel = "Select existing";
+		                submitLabel = i18n.text("select_existing");
 		            } else {
-		                submitLabel = "Save entry";
+		                submitLabel = i18n.text("save_entry");
 		            }
 		        }
 			} else {
 				if(editConfig.isDataPropertyUpdate()) {
-					submitLabel = "Save change";
+					submitLabel = i18n.text("save_changes");
 				} else {
-					submitLabel = "Save entry";
+					submitLabel = i18n.text("save_entry");
 				}
 			}
     	}
