@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
+package edu.cornell.mannlib.vitro.webapp.imageprocessor.jai;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -35,9 +35,10 @@ import org.apache.log4j.PatternLayout;
 
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.CropRectangle;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadHelper.NonNoisyImagingListener;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploaderThumbnailerTester_2.CropDataSet.CropData;
+import edu.cornell.mannlib.vitro.webapp.imageprocessor.jai.JaiImageProcessorTester2.CropDataSet.CropData;
+import edu.cornell.mannlib.vitro.webapp.imageprocessor.jai.JaiImageProcessor.NonNoisyImagingListener;
+import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor.CropRectangle;
+import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor.Dimensions;
 
 /**
  * This is not a unit test, so it is not named BlahBlahTest.
@@ -49,14 +50,16 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploaderThumb
  * one or more black edges on the thumbnails.
  */
 @SuppressWarnings("deprecation")
-public class ImageUploaderThumbnailerTester_2 extends Frame {
+public class JaiImageProcessorTester2 extends Frame {
 	private static final Log log = LogFactory
-			.getLog(ImageUploaderThumbnailerTester_2.class);
+			.getLog(JaiImageProcessorTester2.class);
 
 	private static final int ROWS = 6;
 	private static final int COLUMNS = 9;
 
 	private static final int EDGE_THRESHOLD = 6000;
+	
+	private static final Dimensions THUMBNAIL_SIZE = new Dimensions(200, 200);
 
 	/** Keep things quiet. */
 	static {
@@ -65,12 +68,12 @@ public class ImageUploaderThumbnailerTester_2 extends Frame {
 	}
 
 	private final String imagePath;
-	private final ImageUploadThumbnailer thumbnailer;
+	private final JaiImageProcessor thumbnailer;
 
-	public ImageUploaderThumbnailerTester_2(String imagePath,
+	public JaiImageProcessorTester2(String imagePath,
 			CropDataSet cropDataSet) {
 		this.imagePath = imagePath;
-		this.thumbnailer = new ImageUploadThumbnailer(200, 200);
+		this.thumbnailer = new JaiImageProcessor();
 
 		setTitle("Cropping edging test");
 		addWindowListener(new CloseWindowListener());
@@ -119,7 +122,7 @@ public class ImageUploaderThumbnailerTester_2 extends Frame {
 			CropRectangle rectangle = new CropRectangle(cropData.left,
 					cropData.top, cropData.size, cropData.size);
 			InputStream thumbnailStream = thumbnailer.cropAndScale(mainStream,
-					rectangle);
+					rectangle, THUMBNAIL_SIZE);
 
 			return StreamDescriptor.create(new MemoryCacheSeekableStream(
 					thumbnailStream), null, null);
@@ -200,8 +203,8 @@ public class ImageUploaderThumbnailerTester_2 extends Frame {
 				.nextElement();
 		appender.setLayout(new PatternLayout("%-5p [%c{1}] %m%n"));
 
-		Logger.getLogger(ImageUploadThumbnailer.class).setLevel(Level.DEBUG);
-		Logger.getLogger(ImageUploaderThumbnailerTester_2.class).setLevel(
+		Logger.getLogger(JaiImageProcessor.class).setLevel(Level.DEBUG);
+		Logger.getLogger(JaiImageProcessorTester2.class).setLevel(
 				Level.INFO);
 
 		CropDataSet cropDataSet = new CropDataSet();
@@ -210,7 +213,7 @@ public class ImageUploaderThumbnailerTester_2 extends Frame {
 			cropDataSet.add(0, 0, 201 + i);
 		}
 
-		new ImageUploaderThumbnailerTester_2(
+		new JaiImageProcessorTester2(
 				"C:/Users/jeb228/Pictures/wheel.png", cropDataSet);
 
 //		new ImageUploaderThumbnailerTester_2(

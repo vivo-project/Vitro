@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.filestorage.backend;
+package edu.cornell.mannlib.vitro.webapp.filestorage.impl;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -24,10 +24,29 @@ import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileAlreadyExistsException;
+import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
+
 /**
  * The default implementation of {@link FileStorage}.
  */
-public class FileStorageImpl implements FileStorage {
+public class FileStorageImpl {
+	/**
+	 * The name of the root directory, within the base directory.
+	 */
+	public static final String FILE_STORAGE_ROOT = "file_storage_root";
+
+	/**
+	 * The name of the file in the base directory that holds the namespace map.
+	 */
+	public static final String FILE_STORAGE_NAMESPACES_PROPERTIES = "file_storage_namespaces.properties";
+
+	/**
+	 * How often to we insert path separator characters?
+	 */
+	public static final int SHORTY_LENGTH = 3;
+	
+
 	private static final Log log = LogFactory.getLog(FileStorageImpl.class);
 
 	private final File baseDir;
@@ -240,7 +259,6 @@ public class FileStorageImpl implements FileStorage {
 	 * directories to put it in.
 	 * </p>
 	 */
-	@Override
 	public void createFile(String id, String filename, InputStream bytes)
 			throws FileAlreadyExistsException, IOException {
 		String existingFilename = getFilename(id);
@@ -291,7 +309,6 @@ public class FileStorageImpl implements FileStorage {
 	 * will be deleted. This repeats, up to (but not including) the root
 	 * directory.
 	 */
-	@Override
 	public boolean deleteFile(String id) throws IOException {
 		String existingFilename = getFilename(id);
 		if (existingFilename == null) {
@@ -356,14 +373,12 @@ public class FileStorageImpl implements FileStorage {
 	}
 
 	/**
-	 * {@inheritDoc}
 	 * <p>
 	 * For a non-null result, a directory must exist for the ID, and it must
 	 * contain a file (it may or may not contain other directories).
 	 * </p>
 	 */
-	@Override
-	public String getFilename(String id) throws IOException {
+	public String getFilename(String id) {
 		File dir = FileStorageHelper.getPathToIdDirectory(id,
 				this.namespacesMap, this.rootDir);
 		log.debug("ID '" + id + "' translates to this directory path: '" + dir
@@ -374,6 +389,7 @@ public class FileStorageImpl implements FileStorage {
 		}
 
 		File[] files = dir.listFiles(new FileFilter() {
+			@Override
 			public boolean accept(File pathname) {
 				return pathname.isFile();
 			}
@@ -395,7 +411,6 @@ public class FileStorageImpl implements FileStorage {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
 	public InputStream getInputStream(String id, String filename)
 			throws IOException {
 

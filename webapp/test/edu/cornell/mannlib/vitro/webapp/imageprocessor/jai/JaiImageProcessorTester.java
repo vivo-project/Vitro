@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
+package edu.cornell.mannlib.vitro.webapp.imageprocessor.jai;
 
 import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.THUMBNAIL_HEIGHT;
 import static edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadController.THUMBNAIL_WIDTH;
@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 import javax.media.jai.operator.StreamDescriptor;
 
@@ -26,7 +25,9 @@ import org.apache.log4j.Logger;
 
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadHelper.NonNoisyImagingListener;
+import edu.cornell.mannlib.vitro.webapp.imageprocessor.jai.JaiImageProcessor;
+import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor.CropRectangle;
+import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor.Dimensions;
 
 /**
  * This is not a unit test, so it is not named BlahBlahTest.
@@ -38,14 +39,13 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.ImageUploadHelper.
  * This is especially true because the images on the screen look color-correct,
  * but when viewed in the browser, they might not be.
  */
-public class ImageUploaderThumbnailerTester extends Frame {
-	static {
-		JAI.getDefaultInstance().setImagingListener(
-				new NonNoisyImagingListener());
-	}
+public class JaiImageProcessorTester extends Frame {
 
 	/** Big enough to hold the JPEG file, certainly. */
 	private final static int BUFFER_SIZE = 200 * 200 * 4;
+	
+	private final static Dimensions THUMBNAIL_SIZE = new Dimensions(
+			THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT);
 
 	private final static ImageCropData[] THUMBNAIL_DATA = new ImageCropData[] {
 			new ImageCropData("/Users/jeb228/Pictures/JimBlake_20010915.jpg",
@@ -56,11 +56,10 @@ public class ImageUploaderThumbnailerTester extends Frame {
 			new ImageCropData("/Users/jeb228/Pictures/DSC04203w-trans.gif",
 					400, 1200, 800) };
 
-	private final ImageUploadThumbnailer thumbnailer = new ImageUploadThumbnailer(
-			THUMBNAIL_HEIGHT, THUMBNAIL_WIDTH);
+	private final JaiImageProcessor thumbnailer = new JaiImageProcessor();
 
 	@SuppressWarnings("deprecation")
-	private ImageUploaderThumbnailerTester() {
+	private JaiImageProcessorTester() {
 		setTitle("Alpha Killer Test");
 		addWindowListener(new CloseWindowListener());
 		setLayout(createLayout());
@@ -68,7 +67,7 @@ public class ImageUploaderThumbnailerTester extends Frame {
 			try {
 				InputStream mainStream = new FileInputStream(icd.filename);
 				File thumbFile = writeToTempFile(thumbnailer.cropAndScale(
-						mainStream, icd.crop));
+						mainStream, icd.crop, THUMBNAIL_SIZE));
 				System.out.println(thumbFile.getAbsolutePath());
 
 				MemoryCacheSeekableStream thumbFileStream = new MemoryCacheSeekableStream(
@@ -108,18 +107,19 @@ public class ImageUploaderThumbnailerTester extends Frame {
 		return layout;
 	}
 
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
-		Logger.getLogger(ImageUploadThumbnailer.class).setLevel(Level.DEBUG);
-		new ImageUploaderThumbnailerTester();
+		Logger.getLogger(JaiImageProcessor.class).setLevel(Level.DEBUG);
+		new JaiImageProcessorTester();
 	}
 
 	private static class ImageCropData {
 		final String filename;
-		final ImageUploadController.CropRectangle crop;
+		final CropRectangle crop;
 
 		ImageCropData(String filename, int x, int y, int size) {
 			this.filename = filename;
-			this.crop = new ImageUploadController.CropRectangle(x, y, size,
+			this.crop = new CropRectangle(x, y, size,
 					size);
 		}
 	}

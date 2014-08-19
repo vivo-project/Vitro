@@ -4,6 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.modules;
 
 import javax.servlet.ServletContext;
 
+import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
+import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 
 /**
@@ -13,6 +15,10 @@ public interface Application {
 	ServletContext getServletContext();
 
 	SearchEngine getSearchEngine();
+
+	ImageProcessor getImageProcessor();
+	
+	FileStorage getFileStorage();
 
 	public interface Component {
 		enum LifecycleState {

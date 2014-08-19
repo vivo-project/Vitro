@@ -1,8 +1,8 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.filestorage.backend;
+package edu.cornell.mannlib.vitro.webapp.filestorage.impl;
 
-import static edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage.SHORTY_LENGTH;
+import static edu.cornell.mannlib.vitro.webapp.filestorage.impl.FileStorageImpl.SHORTY_LENGTH;
 
 import java.io.File;
 import java.util.Map;

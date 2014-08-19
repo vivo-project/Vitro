@@ -96,7 +96,7 @@ public class SearchEngineWrapper implements SearchEngine {
 			try {
 				throw new IllegalStateException();
 			} catch (Exception e) {
-				log.warn("startup called when state was " + lifecycleState, e);
+				log.warn("shutdown called when state was " + lifecycleState, e);
 			}
 			break;
 		}

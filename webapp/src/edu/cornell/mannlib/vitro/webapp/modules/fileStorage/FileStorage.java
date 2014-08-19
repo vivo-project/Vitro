@@ -1,30 +1,17 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.filestorage.backend;
+package edu.cornell.mannlib.vitro.webapp.modules.fileStorage;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import edu.cornell.mannlib.vitro.webapp.modules.Application;
+
 /**
  * The interface for the File Storage system.
  */
-public interface FileStorage {
-	/**
-	 * The name of the root directory, within the base directory.
-	 */
-	public static final String FILE_STORAGE_ROOT = "file_storage_root";
-
-	/**
-	 * The name of the file in the base directory that holds the namespace map.
-	 */
-	public static final String FILE_STORAGE_NAMESPACES_PROPERTIES = "file_storage_namespaces.properties";
-
-	/**
-	 * How often to we insert path separator characters?
-	 */
-	int SHORTY_LENGTH = 3;
-	
+public interface FileStorage extends Application.Module {
 	/**
 	 * Store the bytes from this stream as a file with the specified ID and
 	 * filename. If the file already exists, it is over-written.

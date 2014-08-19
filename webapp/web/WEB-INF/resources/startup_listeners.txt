@@ -2,7 +2,7 @@
 # ServletContextListeners for Vitro, to be instantiated and run by the StartupManager.
 # 
 # For more information, 
-#     https://sourceforge.net/apps/mediawiki/vivo/index.php?title=The_StartupManager
+#     https://wiki.duraspace.org/display/VIVO/The+StartupManager
 #
 
 edu.cornell.mannlib.vitro.webapp.servlet.setup.JvmSmokeTests
@@ -27,8 +27,6 @@ edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.RDFSetup
 
 edu.cornell.mannlib.vitro.webapp.servlet.setup.ConfigurationModelsSetup
 edu.cornell.mannlib.vitro.webapp.servlet.setup.ContentModelSetup
-
-edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup
 
 edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil$Setup
 
@@ -65,7 +63,6 @@ edu.cornell.mannlib.vitro.webapp.i18n.selection.LocaleSelectionSetup
 
 # The search indexer uses a "public" permission, so the PropertyRestrictionPolicyHelper 
 #   and the PermissionRegistry must already be set up.
-edu.cornell.mannlib.vitro.webapp.searchengine.SearchEngineSetup
 edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerSetup
 
 edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerSetup

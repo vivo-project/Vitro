@@ -189,9 +189,16 @@ public class RequestModelsPrep implements Filter {
 	private void setRawModels(RDFService contentRdfService, RDFService configurationRdfService, VitroRequest vreq) {
 		ModelAccess models = ModelAccess.on(vreq);
 		
-		ModelMaker configMM = ModelMakerUtils.getShortTermModelMaker(ctx,
-				configurationRdfService, WhichService.CONFIGURATION);
-		models.setModelMaker(CONFIGURATION, configMM);
+		/**
+		 * KLUGE -- VIVO-843
+		 * 
+		 * We happen to know that the short-term configuration models are the
+		 * same as the long-term ones. But if we wrap them in OntModels again,
+		 * we will lose the everytime sub-models. So for now, just skip that.
+		 */
+//		ModelMaker configMM = ModelMakerUtils.getShortTermModelMaker(ctx,
+//				configurationRdfService, WhichService.CONFIGURATION);
+//		models.setModelMaker(CONFIGURATION, configMM);
 		
 		ModelMaker contentMM = ModelMakerUtils.getShortTermModelMaker(ctx,
 				contentRdfService, WhichService.CONTENT);

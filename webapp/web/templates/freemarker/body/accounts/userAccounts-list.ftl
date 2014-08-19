@@ -154,7 +154,7 @@
                             <a ${disableDeleteAccount} href="${account.editUrl}"  title="${strings.click_to_view_account}">${account.emailAddress}</a>
                             <!-- when this link is clicked, editAccount is noticed and all other fields are ignored. -->
                         <#else>
-                            ${account.emailAddress}
+                            <span class="unlinkedAccount">${account.emailAddress}</span>
                         </#if>
                     </td>
                     <td>${account.firstName}</td>

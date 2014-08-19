@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.filestorage.backend;
+package edu.cornell.mannlib.vitro.webapp.filestorage.impl;
 
 /**
  * Indicates a PairTree path ("ppath" or "relative path") that is not correctly
