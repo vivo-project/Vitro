@@ -49,7 +49,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.FileGraphSetup;
@@ -235,10 +234,10 @@ public class RefactorOperationController extends BaseEditController {
     			Model model = null;
     			
     			if (ModelNames.TBOX_ASSERTIONS.equals(graphURI)) {
-    				model = ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_TBOX);
+    				model = ModelAccess.on(getServletContext()).getOntModel(ModelNames.TBOX_ASSERTIONS);
     				doNotify = true;
     			} else if (ModelNames.ABOX_ASSERTIONS.equals(graphURI)) {
-					model = ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_ABOX);
+					model = ModelAccess.on(getServletContext()).getOntModel(ModelNames.ABOX_ASSERTIONS);
 					doNotify = true;
     			} else {
     			    model = dataset.getNamedModel(graphURI);

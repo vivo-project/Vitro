@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.dao;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -16,6 +17,7 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelectorImpl;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 
@@ -51,20 +53,6 @@ public class ModelAccess {
 
 	/** These attributes should only be accessed through this class. */
 	private static final String ATTRIBUTE_NAME = ModelAccess.class.getName();
-
-	public enum ModelID {
-		APPLICATION_METADATA,
-
-		USER_ACCOUNTS,
-
-		DISPLAY, DISPLAY_DISPLAY, DISPLAY_TBOX,
-
-		BASE_ABOX, BASE_TBOX, BASE_FULL,
-
-		INFERRED_ABOX, INFERRED_TBOX, INFERRED_FULL,
-
-		UNION_ABOX, UNION_TBOX, UNION_FULL
-	}
 
 	public enum FactoryID {
 		BASE, UNION, UNFILTERED_BASE, UNFILTERED_UNION
@@ -123,7 +111,7 @@ public class ModelAccess {
 
 	private final Scope scope;
 	private final ModelAccess parent;
-	private final Map<ModelID, OntModel> modelMap = new EnumMap<>(ModelID.class);
+	private final Map<String, OntModel> modelMap = new HashMap<>();
 	private final Map<FactoryID, WebappDaoFactory> factoryMap = new EnumMap<>(
 			FactoryID.class);
 	private final Map<ModelMakerID, ModelMaker> modelMakerMap = new EnumMap<>(
@@ -139,30 +127,30 @@ public class ModelAccess {
 	// ----------------------------------------------------------------------
 
 	public OntModel getApplicationMetadataModel() {
-		return getOntModel(ModelID.APPLICATION_METADATA);
+		return getOntModel(ModelNames.APPLICATION_METADATA);
 	}
 
 	public OntModel getUserAccountsModel() {
-		return getOntModel(ModelID.USER_ACCOUNTS);
+		return getOntModel(ModelNames.USER_ACCOUNTS);
 	}
 
 	public OntModel getDisplayModel() {
-		return getOntModel(ModelID.DISPLAY);
+		return getOntModel(ModelNames.DISPLAY);
 	}
 
 	public OntModel getJenaOntModel() {
-		return getOntModel(ModelID.UNION_FULL);
+		return getOntModel(ModelNames.FULL_UNION);
 	}
 
 	public OntModel getBaseOntModel() {
-		return getOntModel(ModelID.BASE_FULL);
+		return getOntModel(ModelNames.FULL_ASSERTIONS);
 	}
 
 	public OntModel getInferenceOntModel() {
-		return getOntModel(ModelID.INFERRED_FULL);
+		return getOntModel(ModelNames.FULL_INFERENCES);
 	}
 
-	public void setOntModel(ModelID id, OntModel ontModel) {
+	public void setOntModel(String id, OntModel ontModel) {
 		if (ontModel == null) {
 			modelMap.remove(id);
 		} else {
@@ -170,7 +158,7 @@ public class ModelAccess {
 		}
 	}
 
-	public OntModel getOntModel(ModelID id) {
+	public OntModel getOntModel(String id) {
 		if (modelMap.containsKey(id)) {
 			log.debug("Using " + id + " model from " + scope);
 			return modelMap.get(id);
@@ -235,18 +223,18 @@ public class ModelAccess {
 	}
 
 	public OntModelSelector getBaseOntModelSelector() {
-		return new FacadeOntModelSelector(this, ModelID.BASE_ABOX,
-				ModelID.BASE_TBOX, ModelID.BASE_FULL);
+		return createOntModelSelector(ModelNames.ABOX_ASSERTIONS,
+				ModelNames.TBOX_ASSERTIONS, ModelNames.FULL_ASSERTIONS);
 	}
 
 	public OntModelSelector getInferenceOntModelSelector() {
-		return new FacadeOntModelSelector(this, ModelID.INFERRED_ABOX,
-				ModelID.INFERRED_TBOX, ModelID.INFERRED_FULL);
+		return createOntModelSelector(ModelNames.ABOX_INFERENCES,
+				ModelNames.TBOX_INFERENCES, ModelNames.FULL_INFERENCES);
 	}
 
 	public OntModelSelector getUnionOntModelSelector() {
-		return new FacadeOntModelSelector(this, ModelID.UNION_ABOX,
-				ModelID.UNION_TBOX, ModelID.UNION_FULL);
+		return createOntModelSelector(ModelNames.ABOX_UNION,
+				ModelNames.TBOX_UNION, ModelNames.FULL_UNION);
 	}
 
 	// ----------------------------------------------------------------------
@@ -268,49 +256,55 @@ public class ModelAccess {
 	public void setModelMaker(ModelMakerID id, ModelMaker modelMaker) {
 		modelMakerMap.put(id, modelMaker);
 		if (id == ModelMakerID.CONFIGURATION) {
-			setOntModel(ModelID.USER_ACCOUNTS, modelMaker,
-					ModelNames.USER_ACCOUNTS);
-			setOntModel(ModelID.DISPLAY, modelMaker, ModelNames.DISPLAY);
-			setOntModel(ModelID.DISPLAY_DISPLAY, modelMaker,
-					ModelNames.DISPLAY_DISPLAY);
-			setOntModel(ModelID.DISPLAY_TBOX, modelMaker,
-					ModelNames.DISPLAY_TBOX);
+			setOntModel(modelMaker, ModelNames.USER_ACCOUNTS);
+			setOntModel(modelMaker, ModelNames.DISPLAY);
+			setOntModel(modelMaker, ModelNames.DISPLAY_DISPLAY);
+			setOntModel(modelMaker, ModelNames.DISPLAY_TBOX);
 		} else {
-			setOntModel(ModelID.APPLICATION_METADATA, modelMaker,
-					ModelNames.APPLICATION_METADATA);
-			setOntModel(ModelID.BASE_TBOX, modelMaker,
-					ModelNames.TBOX_ASSERTIONS);
-			setOntModel(ModelID.INFERRED_TBOX, modelMaker,
-					ModelNames.TBOX_INFERENCES);
-			setOntModel(ModelID.UNION_TBOX, modelMaker, ModelNames.TBOX_UNION);
-			setOntModel(ModelID.BASE_ABOX, modelMaker,
-					ModelNames.ABOX_ASSERTIONS);
-			setOntModel(ModelID.INFERRED_ABOX, modelMaker,
-					ModelNames.ABOX_INFERENCES);
-			setOntModel(ModelID.UNION_ABOX, modelMaker, ModelNames.ABOX_UNION);
-			setOntModel(ModelID.BASE_FULL, modelMaker,
-					ModelNames.FULL_ASSERTIONS);
-			setOntModel(ModelID.INFERRED_FULL, modelMaker,
-					ModelNames.FULL_INFERENCES);
-			setOntModel(ModelID.UNION_FULL, modelMaker, ModelNames.FULL_UNION);
-			
+			setOntModel(modelMaker, ModelNames.APPLICATION_METADATA);
+			setOntModel(modelMaker, ModelNames.TBOX_ASSERTIONS);
+			setOntModel(modelMaker, ModelNames.TBOX_INFERENCES);
+			setOntModel(modelMaker, ModelNames.TBOX_UNION);
+			setOntModel(modelMaker, ModelNames.ABOX_ASSERTIONS);
+			setOntModel(modelMaker, ModelNames.ABOX_INFERENCES);
+			setOntModel(modelMaker, ModelNames.ABOX_UNION);
+			setOntModel(modelMaker, ModelNames.FULL_ASSERTIONS);
+			setOntModel(modelMaker, ModelNames.FULL_INFERENCES);
+			setOntModel(modelMaker, ModelNames.FULL_UNION);
+
 			/*
 			 * KLUGE
 			 * 
 			 * For some reason, the union of two OntModels (like this) works
-			 * fine as the UNION_TBOX, but an OntModel wrapped around the union
+			 * fine as the TBOX_UNION, but an OntModel wrapped around the union
 			 * of two Models (from ModelMakers) does not work.
 			 * 
 			 * See also the Kluge in RequestModelsPrep.
 			 */
-			setOntModel(ModelID.UNION_TBOX, VitroModelFactory.createUnion(
-					getOntModel(ModelID.BASE_TBOX),
-					getOntModel(ModelID.INFERRED_TBOX)));
+			setOntModel(ModelNames.TBOX_UNION, VitroModelFactory.createUnion(
+					getOntModel(ModelNames.TBOX_ASSERTIONS),
+					getOntModel(ModelNames.TBOX_INFERENCES)));
 		}
 	}
 
-	private void setOntModel(ModelID id, ModelMaker mm, String uri) {
-		setOntModel(id, VitroModelFactory.createOntologyModel(mm.getModel(uri)));
+	private void setOntModel(ModelMaker mm, String name) {
+		setOntModel(name,
+				VitroModelFactory.createOntologyModel(mm.getModel(name)));
+	}
+
+	private OntModelSelector createOntModelSelector(String aboxName,
+			String tboxName, String fullName) {
+		OntModelSelectorImpl oms = new OntModelSelectorImpl();
+
+		oms.setApplicationMetadataModel(getOntModel(ModelNames.APPLICATION_METADATA));
+		oms.setDisplayModel(getOntModel(ModelNames.DISPLAY));
+		oms.setUserAccountsModel(getOntModel(ModelNames.USER_ACCOUNTS));
+
+		oms.setABoxModel(getOntModel(aboxName));
+		oms.setTBoxModel(getOntModel(tboxName));
+		oms.setFullModel(getOntModel(fullName));
+
+		return oms;
 	}
 
 	// ----------------------------------------------------------------------
@@ -322,61 +316,6 @@ public class ModelAccess {
 			for (WebappDaoFactory wadf : factoryMap.values()) {
 				wadf.close();
 			}
-		}
-	}
-
-	// ----------------------------------------------------------------------
-	// Helper classes
-	// ----------------------------------------------------------------------
-
-	/**
-	 * This OntModelSelector doesn't actually hold any OntModels. Instead, it
-	 * links back to the ModelAccess that it was created from. So, if you change
-	 * a model on the ModelAccess, it will change on the OntModelSelector also.
-	 * Even if the OntModelSelector was created first.
-	 */
-	private static class FacadeOntModelSelector implements OntModelSelector {
-		private final ModelAccess parent;
-		private final ModelID aboxID;
-		private final ModelID tboxID;
-		private final ModelID fullID;
-
-		public FacadeOntModelSelector(ModelAccess parent, ModelID aboxID,
-				ModelID tboxID, ModelID fullID) {
-			this.parent = parent;
-			this.aboxID = aboxID;
-			this.tboxID = tboxID;
-			this.fullID = fullID;
-		}
-
-		@Override
-		public OntModel getABoxModel() {
-			return parent.getOntModel(aboxID);
-		}
-
-		@Override
-		public OntModel getTBoxModel() {
-			return parent.getOntModel(tboxID);
-		}
-
-		@Override
-		public OntModel getFullModel() {
-			return parent.getOntModel(fullID);
-		}
-
-		@Override
-		public OntModel getApplicationMetadataModel() {
-			return parent.getOntModel(ModelID.APPLICATION_METADATA);
-		}
-
-		@Override
-		public OntModel getUserAccountsModel() {
-			return parent.getOntModel(ModelID.USER_ACCOUNTS);
-		}
-
-		@Override
-		public OntModel getDisplayModel() {
-			return parent.getOntModel(ModelID.DISPLAY);
 		}
 	}
 

@@ -33,9 +33,9 @@ import com.hp.hpl.jena.rdf.model.ModelMaker;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.BlankNodeFilteringModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelMakerUtils;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService;
@@ -92,7 +92,7 @@ public class FileGraphSetup implements ServletContextListener {
 
             cleanupDB(dataset, pathsToURIs(paths, TBOX),TBOX);
 
-            OntModel tboxBaseModel = ModelAccess.on(ctx).getOntModel(ModelID.BASE_TBOX);
+            OntModel tboxBaseModel = ModelAccess.on(ctx).getOntModel(ModelNames.TBOX_ASSERTIONS);
             tboxChanged = readGraphs(paths, modelMaker, TBOX, tboxBaseModel);
         } catch (ClassCastException cce) {
             String errMsg = "Unable to cast servlet context attribute to the appropriate type " + cce.getLocalizedMessage();

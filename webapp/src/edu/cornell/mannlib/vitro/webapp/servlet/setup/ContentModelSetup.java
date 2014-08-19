@@ -25,13 +25,13 @@ import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.FactoryID;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
@@ -61,14 +61,14 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
     	RDFService rdfService = createRdfService(ctx);
     	createStartupDataset(ctx, rdfService);
     	
-    	Model applicationMetadataModel = models.getOntModel(ModelID.APPLICATION_METADATA);
+    	Model applicationMetadataModel = models.getOntModel(ModelNames.APPLICATION_METADATA);
 		if (applicationMetadataModel.size()== 0) {
 			thisIsFirstStartup();
 		}
 
 
-        OntModel baseABoxModel = models.getOntModel(ModelID.BASE_ABOX);
-        OntModel baseTBoxModel = models.getOntModel(ModelID.BASE_TBOX);
+        OntModel baseABoxModel = models.getOntModel(ModelNames.ABOX_ASSERTIONS);
+        OntModel baseTBoxModel = models.getOntModel(ModelNames.TBOX_ASSERTIONS);
         
         if (isFirstStartup()) {
         	initializeApplicationMetadata(ctx, applicationMetadataModel);

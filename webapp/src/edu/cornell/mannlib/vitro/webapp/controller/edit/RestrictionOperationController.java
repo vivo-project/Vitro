@@ -29,8 +29,8 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 
 public class RestrictionOperationController extends BaseEditController {
 
@@ -47,7 +47,7 @@ public class RestrictionOperationController extends BaseEditController {
 	    try {
 	    	
 	    	OntModel ontModel = ModelAccess.on(
-	    	        getServletContext()).getOntModel(ModelID.BASE_TBOX);
+	    	        getServletContext()).getOntModel(ModelNames.TBOX_ASSERTIONS);
 		    
             HashMap epoHash = null;
             EditProcessObject epo = null;

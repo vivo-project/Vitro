@@ -64,7 +64,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.BlankNodeFilteringModelMaker;
@@ -609,7 +608,7 @@ public class JenaIngestController extends BaseEditController {
                * get baseOnt and infOnt models
                */
               OntModel baseOntModel = ModelAccess.on(getServletContext()).getBaseOntModel();
-              OntModel tboxOntModel = ModelAccess.on(getServletContext()).getOntModel(ModelID.UNION_TBOX);
+              OntModel tboxOntModel = ModelAccess.on(getServletContext()).getOntModel(ModelNames.TBOX_UNION);
               
               /*
                * calling method that does the merge operation.
@@ -758,7 +757,7 @@ public class JenaIngestController extends BaseEditController {
         }
         Model m = ModelFactory.createDefaultModel();
         m.add(modelMaker.getModel(modelName));        
-        ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_TBOX).addSubModel(m);
+        ModelAccess.on(getServletContext()).getOntModel(ModelNames.TBOX_ASSERTIONS).addSubModel(m);
         attachedModels.put(modelName, m);
         log.info("Attached " + modelName + " (" + m.hashCode() + ") to webapp");
     }
@@ -768,7 +767,7 @@ public class JenaIngestController extends BaseEditController {
         if (m == null) {
             return;
         }
-        ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_TBOX).removeSubModel(m);
+        ModelAccess.on(getServletContext()).getOntModel(ModelNames.TBOX_ASSERTIONS).removeSubModel(m);
         attachedModels.remove(modelName);
         log.info("Detached " + modelName + " (" + m.hashCode() + ") from webapp");
     }

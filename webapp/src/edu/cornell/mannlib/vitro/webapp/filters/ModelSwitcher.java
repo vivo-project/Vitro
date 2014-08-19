@@ -26,11 +26,11 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService;
@@ -87,7 +87,7 @@ public class ModelSwitcher {
     	// If they asked for the display model, give it to them.
 		if (isParameterPresent(vreq, SWITCH_TO_DISPLAY_MODEL)) {
 			OntModel mainOntModel = ModelAccess.on(_context).getDisplayModel();
-			OntModel tboxOntModel = ModelAccess.on(_context).getOntModel(ModelID.DISPLAY_TBOX);
+			OntModel tboxOntModel = ModelAccess.on(_context).getOntModel(ModelNames.DISPLAY_TBOX);
 	   		setSpecialWriteModel(vreq, mainOntModel);
 	   		
 	   		vreq.setAttribute(VitroRequest.ID_FOR_ABOX_MODEL, VitroModelSource.ModelName.DISPLAY.toString());
@@ -121,7 +121,7 @@ public class ModelSwitcher {
 
 	private void setSpecialWriteModel(VitroRequest vreq, OntModel mainOntModel) {	    
 		if (mainOntModel != null) {    
-			ModelAccess.on(vreq).setOntModel(ModelID.UNION_FULL, mainOntModel);
+			ModelAccess.on(vreq).setOntModel(ModelNames.FULL_UNION, mainOntModel);
 			vreq.setAttribute(SPECIAL_WRITE_MODEL, mainOntModel);
 		}
 	}

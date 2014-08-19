@@ -9,7 +9,6 @@ import javax.servlet.ServletContextListener;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
@@ -24,17 +23,10 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
 		try {
-			setupModel(ctx, ModelNames.DISPLAY, "display", ModelID.DISPLAY);
-
-			setupModel(ctx, ModelNames.DISPLAY_TBOX, "displayTbox",
-					ModelID.DISPLAY_TBOX);
-
-			setupModel(ctx, ModelNames.DISPLAY_DISPLAY, "displayDisplay",
-					ModelID.DISPLAY_DISPLAY);
-
-			setupModel(ctx, ModelNames.USER_ACCOUNTS, "auth",
-					ModelID.USER_ACCOUNTS);
-
+			setupModel(ctx, ModelNames.DISPLAY, "display");
+			setupModel(ctx, ModelNames.DISPLAY_TBOX, "displayTbox");
+			setupModel(ctx, ModelNames.DISPLAY_DISPLAY, "displayDisplay");
+			setupModel(ctx, ModelNames.USER_ACCOUNTS, "auth");
 			ss.info(this,
 					"Set up the display models and the user accounts model.");
 		} catch (Exception e) {
@@ -43,9 +35,9 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 	}
 
 	private void setupModel(ServletContext ctx, String modelUri,
-			String modelPath, ModelID modelId) {
+			String modelPath) {
 		try {
-			OntModel ontModel = ModelAccess.on(ctx).getOntModel(modelId);
+			OntModel ontModel = ModelAccess.on(ctx).getOntModel(modelUri);
 			loadFirstTimeFiles(ctx, modelPath, ontModel);
 			loadEveryTimeFiles(ctx, modelPath, ontModel);
 		} catch (Exception e) {
@@ -66,7 +58,7 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 	}
 
 	@Override
-	public void contextDestroyed(ServletContextEvent arg0) {
+	public void contextDestroyed(ServletContextEvent sce) {
 		// Nothing to tear down.
 	}
 

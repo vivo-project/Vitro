@@ -11,14 +11,14 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 
 public class StandardModelSelector implements ModelSelector {
 
     private static final Log log = LogFactory.getLog(StandardModelSelector.class);
     
     public OntModel getModel(HttpServletRequest request, ServletContext context) {
-    	return ModelAccess.on(request.getSession()).getOntModel(ModelID.UNION_ABOX);
+    	return ModelAccess.on(request.getSession()).getOntModel(ModelNames.ABOX_UNION);
     }
     
     public static final ModelSelector selector = new StandardModelSelector();

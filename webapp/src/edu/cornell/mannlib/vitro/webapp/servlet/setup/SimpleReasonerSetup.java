@@ -22,7 +22,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
@@ -53,9 +52,9 @@ public class SimpleReasonerSetup implements ServletContextListener {
         
         try {    
             // set up Pellet reasoning for the TBox    
-        	OntModel tboxAssertionsModel = ModelAccess.on(ctx).getOntModel(ModelID.BASE_TBOX);
-        	OntModel tboxInferencesModel = ModelAccess.on(ctx).getOntModel(ModelID.INFERRED_TBOX);
-        	OntModel tboxUnionModel = ModelAccess.on(ctx).getOntModel(ModelID.UNION_TBOX);
+        	OntModel tboxAssertionsModel = ModelAccess.on(ctx).getOntModel(ModelNames.TBOX_ASSERTIONS);
+        	OntModel tboxInferencesModel = ModelAccess.on(ctx).getOntModel(ModelNames.TBOX_INFERENCES);
+        	OntModel tboxUnionModel = ModelAccess.on(ctx).getOntModel(ModelNames.TBOX_UNION);
 
 			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
             

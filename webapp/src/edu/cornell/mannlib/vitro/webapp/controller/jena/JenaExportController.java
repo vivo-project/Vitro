@@ -29,7 +29,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationReques
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -119,7 +118,7 @@ public class JenaExportController extends BaseEditController {
 		if( "abox".equals(subgraphParam)){
 			model = ModelFactory.createDefaultModel();
 			if("inferred".equals(assertedOrInferredParam)){
-				model = ModelAccess.on(getServletContext()).getOntModel(ModelID.INFERRED_ABOX);
+				model = ModelAccess.on(getServletContext()).getOntModel(ModelNames.ABOX_INFERENCES);
 			}
 			else if("full".equals(assertedOrInferredParam)){
 			    outputSparqlConstruct(ABOX_FULL_CONSTRUCT, formatParam, response);
@@ -134,9 +133,9 @@ public class JenaExportController extends BaseEditController {
 		        // so we'll extract the whole ontology and then include
 		        // only those statements that are in the inferred graph
 		        Model tempModel = xutil.extractTBox(
-		        		ModelAccess.on(getServletContext()).getOntModel(ModelID.UNION_TBOX),
+		        		ModelAccess.on(getServletContext()).getOntModel(ModelNames.TBOX_UNION),
 		                ontologyURI);
-		        Model inferenceModel = ModelAccess.on(getServletContext()).getOntModel(ModelID.INFERRED_TBOX);
+		        Model inferenceModel = ModelAccess.on(getServletContext()).getOntModel(ModelNames.TBOX_INFERENCES);
 		        inferenceModel.enterCriticalSection(Lock.READ);
 		        try {
     		        model = tempModel.intersection(inferenceModel);
@@ -145,11 +144,11 @@ public class JenaExportController extends BaseEditController {
 		        }
 		    } else if ("full".equals(assertedOrInferredParam)) {
                 model = xutil.extractTBox(
-                		ModelAccess.on(getServletContext()).getOntModel(ModelID.UNION_TBOX),
+                		ModelAccess.on(getServletContext()).getOntModel(ModelNames.TBOX_UNION),
                         ontologyURI);		        
 		    } else {
                 model = xutil.extractTBox(
-                        ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_TBOX), ontologyURI);              		        
+                        ModelAccess.on(getServletContext()).getOntModel(ModelNames.TBOX_ASSERTIONS), ontologyURI);              		        
 		    }
 			
 		}
@@ -157,8 +156,8 @@ public class JenaExportController extends BaseEditController {
 			if("inferred".equals(assertedOrInferredParam)){
 				ontModel = xutil.extractTBox(
 						dataset, ontologyURI, ModelNames.ABOX_INFERENCES);
-				ontModel.addSubModel(ModelAccess.on(getServletContext()).getOntModel(ModelID.INFERRED_ABOX));
-				ontModel.addSubModel(ModelAccess.on(getServletContext()).getOntModel(ModelID.INFERRED_TBOX));
+				ontModel.addSubModel(ModelAccess.on(getServletContext()).getOntModel(ModelNames.ABOX_INFERENCES));
+				ontModel.addSubModel(ModelAccess.on(getServletContext()).getOntModel(ModelNames.TBOX_INFERENCES));
 			}
 			else if("full".equals(assertedOrInferredParam)){
 			    outputSparqlConstruct(FULL_FULL_CONSTRUCT, formatParam, response);

@@ -25,24 +25,25 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
 import stubs.freemarker.cache.TemplateLoaderStub;
 import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
 import stubs.javax.servlet.http.HttpSessionStub;
+
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.InvalidConfigurationException;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.PropertyListConfig;
 import freemarker.cache.TemplateLoader;
@@ -279,7 +280,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	@Test
 	public void constructQueryNodeMissing()
 			throws InvalidConfigurationException {
-		ModelAccess.on(vreq).setOntModel(ModelID.UNION_FULL, emptyOntModel());
+		ModelAccess.on(vreq).setOntModel(ModelNames.FULL_UNION, emptyOntModel());
 		op = buildOperation("constructQueryMissing");
 		optm = new NonCollatingOPTM(op, subject, vreq, true);
 		// Not an error.
@@ -288,7 +289,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 	@Test
 	public void constructQueryMultipleValues()
 			throws InvalidConfigurationException {
-		ModelAccess.on(vreq).setOntModel(ModelID.UNION_FULL, emptyOntModel());
+		ModelAccess.on(vreq).setOntModel(ModelNames.FULL_UNION, emptyOntModel());
 		op = buildOperation("constructQueryMultiple");
 		optm = new NonCollatingOPTM(op, subject, vreq, true);
 		assertConstructQueries("multiple construct queries", "ONE", "TWO",

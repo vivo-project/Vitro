@@ -35,7 +35,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
@@ -440,7 +439,7 @@ public class RDFUploadController extends JenaIngestController {
      }    
 
      private OntModel getTBoxModel(HttpSession session) { 
-    	 return ModelAccess.on(session).getOntModel(ModelID.BASE_TBOX);
+    	 return ModelAccess.on(session).getOntModel(ModelNames.TBOX_ASSERTIONS);
      }    
      
     private static final Log log = LogFactory.getLog(

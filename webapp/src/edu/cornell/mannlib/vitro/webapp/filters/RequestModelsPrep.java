@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.filters;
 
-import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID.CONFIGURATION;
 import static edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID.CONTENT;
 
 import java.io.IOException;
@@ -40,7 +39,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.FactoryID;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
@@ -51,6 +49,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelMakerUtils;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringRDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringUtils;
@@ -158,7 +157,7 @@ public class RequestModelsPrep implements Filter {
 		// need to see all contents regardless of language, or because we need
 		// to see the blank nodes that are removed during language filtering.
 		vreq.setLanguageNeutralUnionFullModel(ModelAccess.on(vreq).getOntModel(
-				ModelID.UNION_FULL));
+				ModelNames.FULL_UNION));
 		vreq.setLanguageNeutralWebappDaoFactory(new WebappDaoFactorySDB(
 				rdfService, createLanguageNeutralOntModelSelector(vreq),
 				createWadfConfig(vreq)));
@@ -207,21 +206,21 @@ public class RequestModelsPrep implements Filter {
 		/*
 		 * KLUGE
 		 * 
-		 * The BASE_TBOX in the context is wrapped by an OntModel with
+		 * The TBOX_ASSERTIONS in the context is wrapped by an OntModel with
 		 * sub-models (file-graph models). If we wrap a new OntModel around it,
 		 * we will lose those sub-models, so use the OntModel from the context.
 		 * 
-		 * Do we need to do the same with INFERRED_TBOX and UNION_TBOX? Maybe
+		 * Do we need to do the same with TBOX_INFERENCES and TBOX_UNION? Maybe
 		 * not.
 		 * 
 		 * See also the Kluge in ModelAccess.
 		 */
-		useModelFromContext(vreq, ModelID.BASE_TBOX);
-		useModelFromContext(vreq, ModelID.INFERRED_TBOX);
-		useModelFromContext(vreq, ModelID.UNION_TBOX);
+		useModelFromContext(vreq, ModelNames.TBOX_ASSERTIONS);
+		useModelFromContext(vreq, ModelNames.TBOX_INFERENCES);
+		useModelFromContext(vreq, ModelNames.TBOX_UNION);
 	}
 
-	private void useModelFromContext(VitroRequest vreq, ModelID modelId) {
+	private void useModelFromContext(VitroRequest vreq, String modelId) {
 		OntModel contextModel = ModelAccess.on(ctx).getOntModel(modelId);
 		ModelAccess.on(vreq).setOntModel(modelId, contextModel);
 	}
@@ -233,33 +232,33 @@ public class RequestModelsPrep implements Filter {
 	private OntModelSelector createLanguageNeutralOntModelSelector(
 			VitroRequest vreq) {
 		OntModelSelectorImpl oms = new OntModelSelectorImpl();
-		oms.setABoxModel(ModelAccess.on(vreq).getOntModel(ModelID.UNION_ABOX));
-		oms.setTBoxModel(ModelAccess.on(vreq).getOntModel(ModelID.UNION_TBOX));
-		oms.setFullModel(ModelAccess.on(vreq).getOntModel(ModelID.UNION_FULL));
+		oms.setABoxModel(ModelAccess.on(vreq).getOntModel(ModelNames.ABOX_UNION));
+		oms.setTBoxModel(ModelAccess.on(vreq).getOntModel(ModelNames.TBOX_UNION));
+		oms.setFullModel(ModelAccess.on(vreq).getOntModel(ModelNames.FULL_UNION));
 		oms.setApplicationMetadataModel(ModelAccess.on(vreq).getOntModel(
-				ModelID.APPLICATION_METADATA));
-		oms.setDisplayModel(ModelAccess.on(vreq).getOntModel(ModelID.DISPLAY));
+				ModelNames.APPLICATION_METADATA));
+		oms.setDisplayModel(ModelAccess.on(vreq).getOntModel(ModelNames.DISPLAY));
 		oms.setUserAccountsModel(ModelAccess.on(vreq).getOntModel(
-				ModelID.USER_ACCOUNTS));
+				ModelNames.USER_ACCOUNTS));
 		return oms;
 	}
 
 	private void wrapModelsWithLanguageAwareness(VitroRequest vreq) {
-		wrapModelWithLanguageAwareness(vreq, ModelID.DISPLAY);
-		wrapModelWithLanguageAwareness(vreq, ModelID.APPLICATION_METADATA);
-		wrapModelWithLanguageAwareness(vreq, ModelID.BASE_TBOX);
-		wrapModelWithLanguageAwareness(vreq, ModelID.UNION_TBOX);
-		wrapModelWithLanguageAwareness(vreq, ModelID.UNION_FULL);
-		wrapModelWithLanguageAwareness(vreq, ModelID.BASE_FULL);
+		wrapModelWithLanguageAwareness(vreq, ModelNames.DISPLAY);
+		wrapModelWithLanguageAwareness(vreq, ModelNames.APPLICATION_METADATA);
+		wrapModelWithLanguageAwareness(vreq, ModelNames.TBOX_ASSERTIONS);
+		wrapModelWithLanguageAwareness(vreq, ModelNames.TBOX_UNION);
+		wrapModelWithLanguageAwareness(vreq, ModelNames.FULL_UNION);
+		wrapModelWithLanguageAwareness(vreq, ModelNames.FULL_ASSERTIONS);
 	}
 
 	private void wrapModelWithLanguageAwareness(HttpServletRequest req,
-			ModelID id) {
+			String name) {
 		if (isLanguageAwarenessEnabled()) {
-			OntModel unaware = ModelAccess.on(req).getOntModel(id);
+			OntModel unaware = ModelAccess.on(req).getOntModel(name);
 			OntModel aware = LanguageFilteringUtils
 					.wrapOntModelInALanguageFilter(unaware, req);
-			ModelAccess.on(req).setOntModel(id, aware);
+			ModelAccess.on(req).setOntModel(name, aware);
 		}
 	}
 
