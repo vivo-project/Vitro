@@ -79,6 +79,8 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
+import edu.cornell.mannlib.vitro.webapp.utils.ToString;
+
 /**
  * The base class for a delegating ontology model decorator.
  * 
@@ -93,6 +95,12 @@ public abstract class AbstractOntModelDecorator implements OntModel {
 			throw new NullPointerException("m may not be null.");
 		}
 		this.inner = m;
+	}
+	
+	@Override
+	public String toString() {
+		return ToString.simpleName(this) + "[" + ToString.hashHex(this) + ", "
+				+ ToString.ontModelToString(inner) + "]";
 	}
 
 	@Override

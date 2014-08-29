@@ -55,6 +55,9 @@ public class SimpleReasonerSetup implements ServletContextListener {
         	OntModel tboxAssertionsModel = ModelAccess.on(ctx).getOntModel(ModelNames.TBOX_ASSERTIONS);
         	OntModel tboxInferencesModel = ModelAccess.on(ctx).getOntModel(ModelNames.TBOX_INFERENCES);
         	OntModel tboxUnionModel = ModelAccess.on(ctx).getOntModel(ModelNames.TBOX_UNION);
+        	log.debug("tboxAssertionsModel=" + tboxAssertionsModel);
+        	log.debug("tboxInferencesModel=" + tboxInferencesModel);
+        	log.debug("tboxUnionModel=" + tboxUnionModel);
 
 			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
             

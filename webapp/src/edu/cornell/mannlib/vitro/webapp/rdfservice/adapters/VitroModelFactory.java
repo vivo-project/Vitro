@@ -17,6 +17,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.impl.ModelCom;
 
+import edu.cornell.mannlib.vitro.webapp.utils.ToString;
+
 /**
  * Make models that will do proper bulk updates.
  */
@@ -74,6 +76,14 @@ public class VitroModelFactory {
 					L.getBulkUpdateHandler());
 		}
 
+		@Override
+		public String toString() {
+			return "BulkUpdatingUnion[" + ToString.hashHex(this) + ", L="
+					+ ToString.graphToString(L) + ", R="
+					+ ToString.graphToString(R) + "]";
+		}
+
+		
 	}
 
 	@SuppressWarnings("deprecation")

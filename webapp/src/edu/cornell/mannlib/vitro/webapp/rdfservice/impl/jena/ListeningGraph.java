@@ -29,6 +29,7 @@ import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
+import edu.cornell.mannlib.vitro.webapp.utils.ToString;
 
 public class ListeningGraph implements GraphWithPerform {
     
@@ -224,5 +225,12 @@ public class ListeningGraph implements GraphWithPerform {
             return true;
         }
     };
+
+	@Override
+	public String toString() {
+		return "ListeningGraph["+ToString.hashHex(this)
+				+ ", " + rdfServiceImpl
+				+ ", " + ToString.modelName(graphURI) + "]";
+	}
 
 }
