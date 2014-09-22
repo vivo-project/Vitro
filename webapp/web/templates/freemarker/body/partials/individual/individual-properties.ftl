@@ -34,8 +34,12 @@
                     <h3 id="${property.localName}">${property.name}  <@p.verboseDisplay property /> </h3>
                 <#elseif rangeClass == "Title" && property.statements?has_content && editable >
                     <h3 id="${property.localName}">${property.name}  <@p.verboseDisplay property /> </h3>
-                <#else>
-                    <h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> </h3>
+				<#elseif rangeClass == "Authorship" && !individual.editable && (property.domainUri)?? && property.domainUri?contains("Person")>
+					<h3 id="${property.localName}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> </h3>
+				<#elseif rangeClass == "ResearcherRole" && !individual.editable>
+					<h3 id="${property.localName}-${rangeClass}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> </h3>
+				<#else>
+                    <h3 id="${property.localName}-${rangeClass}">${property.name} <@p.addLink property editable /> <@p.verboseDisplay property /> </h3>
                 </#if>
                 <#-- List the statements for each property -->
                 <ul class="property-list" role="list" id="${property.localName}-${rangeClass}-List">
