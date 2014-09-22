@@ -7,7 +7,7 @@
 
 
 <#if pages?has_content >  
-<table id="pageList" style="margin-bottom:2px">  <caption>${i18n().page_management}</caption>
+<table id="table-listing" style="margin-bottom:2px">  <caption>${i18n().page_management}</caption>
   
     <thead>
       <tr>

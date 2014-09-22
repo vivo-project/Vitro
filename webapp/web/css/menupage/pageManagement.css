@@ -144,8 +144,3 @@ form#managePage textarea {
     margin-bottom: .8em;
     width: 65%;
 }
-.disabledSubmit {
-    color: #ede ! important;
-    background-color: #b2d15a ! important;
-    cursor: default ! important;
-}

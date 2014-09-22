@@ -4,14 +4,16 @@ label {
     display: block; 
     margin-top: .5em; 
 }
-label.inline {
+label.inline,
+div.sparqlform label {
     display: inline;
     font-weight: normal;
 }
 input.block {
     display: block;
 }
-textarea {
+textarea,
+div.sparqlform div {
     margin-bottom: 1.5em;
 }
 form {
@@ -44,9 +46,7 @@ form dl dt, form dl dd {
   font-weight: bold;
   color: #cc0000;
 }
-.inlineForm input {
-  display: inline;
-}
+.inlineForm input, 
 .inlineForm label {
   display: inline;
 }
@@ -205,14 +205,8 @@ td.editformcell {
 td.editformcell select {
     margin: 0;
 }
-.header {
-    background-color: #B0C4DE;
-    color: #000;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 10pt;
-    font-style: normal;
-    text-align: left;
-}
+.header,
+.database_upperleftcorner,
 .database_header {
     background-color: #B0C4DE;
     color: #000;
@@ -221,22 +215,7 @@ td.editformcell select {
     font-style: normal;
     text-align: left;
 }
-.database_upperleftcorner {
-    background-color: #B0C4DE;
-    color: #000;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 10pt;
-    font-style: normal;
-    text-align: left;
-}
-.database_upperleftcenter {
-    background-color: #B0C4DE;
-    color: #000;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 10pt;
-    font-style: normal;
-    text-align: center;
-}
+.database_upperleftcenter,
 .rownumheader {
     background-color: #B0C4DE;
     color: #000;
@@ -253,14 +232,7 @@ td.editformcell select {
     font-style: normal;
     text-align: center;
 }
-.postheader {
-    background-color: #E6E6FA;
-    color: #777;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 10pt;
-    font-style: normal;
-    text-align: left;
-}
+.postheader,
 .database_postheader {
     background-color: #E6E6FA;
     color: #777;
@@ -334,13 +306,6 @@ span.entityRelationsSpan {
     font-size: 90%;
     color: #2E440C;
     text-align: center;
-}
-div.sparqlform label {
-    display: inline;
-    font-weight: normal;
-}
-div.sparqlform div {
-    margin-bottom: 1.5em;
 }
 div.sparqlform .parenthetical {
     font-style: italic;

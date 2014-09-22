@@ -81,7 +81,7 @@
 <form method="POST" action="${formUrls.list}" id="account-display" class="customForm" role="accounts display">
     <@p.accountsNav />
     
-    <table id="account">
+    <table id="table-listing">
         <caption>${strings.account_management}</caption>
 
         <thead>

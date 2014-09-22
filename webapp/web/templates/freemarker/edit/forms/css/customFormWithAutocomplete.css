@@ -28,9 +28,6 @@ form.customForm h4 {
     background: none;
     color: #000;
 }
-.disabledSubmit {
-    cursor: default ! important;
-}
 span.readOnly {
     color: #000;
 }
@@ -39,12 +36,10 @@ span.readOnly {
 label.vniLabels {
     padding-left: 50px;
 }
-input.vniInputs {
+input.vniInputs,
+input.sepInputs {
     margin-left: 57px;
 }
 label.sepLabels {
     padding-left: 31px;
-}
-input.sepInputs {
-    margin-left: 57px;
 }

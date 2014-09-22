@@ -33,9 +33,6 @@ ul#vgraph-classes li {
     height: 35px;
     line-height: 35px;
 }
-ul#vgraph-classes li:last-child {
-    border-bottom: 0;
-}
 ul#vgraph-classes a {
     display: block;
     padding-left: 15px;
@@ -123,9 +120,6 @@ ul#find-filters a {
     height: 115px;
     float: left;
 }
-#profile-photo-display ul {    
-    display: block;
-}
 #profile-photo-display li {
     display: block;
     width: 90px;
@@ -181,9 +175,6 @@ ul#browse-classes li {
     padding-top: 10px;
     padding-bottom: 10px;
 }
-ul#browse-classes li:last-child {    
-    border-bottom: 0;
-}
 ul#browse-classes a {
     display: block;
     padding-left: 20px;
@@ -203,7 +194,9 @@ ul#alpha-browse-individuals li {
 ul#alpha-browse-individuals li:first-child {
     padding-left: 1px;
 }
-ul#alpha-browse-individuals li:last-child {
+ul#alpha-browse-individuals li:last-child,
+ul#vgraph-classes li:last-child,
+ul#browse-classes li:last-child {
     border-bottom: 0;
 }
 ul#alpha-browse-individuals a {
@@ -258,7 +251,8 @@ li.individual h1.thumb {
     font-size: .8em;
     line-height: 1;
 }
-#individuals-in-class span.org {
+#individuals-in-class span.org,
+#profile-photo-display ul {
     display: block;
 }
 ul.mostSpecificTypes li {

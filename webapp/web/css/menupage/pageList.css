@@ -5,49 +5,9 @@
 	height:18px;
 	background: url("../../images/checkMark.png") no-repeat left center;  
 }
-table#pageList {
-    table-layout: auto;
-    width: 930px;
-    text-align: left;
-    margin: 0 auto; 
-    border-collapse: collapse;
-    empty-cells: show;
-    caption-side: top;
-    margin: 20px 0 20px 0;
-}
-table#pageList caption {
-    display: none;
-}
-table#pageList th {
-    background-color: #F7F9F9;
-    height: 40px;
-    color: #064D68;
-    padding-top: 7px;
-    border: 1px solid #d9e4ea;
-    border-bottom: none;
-    padding-left: 6px;
-    font-size: .9em;
-}
-table#pageList th {
-    text-align: left;
-} /*Fix for IE8 and 9, force text in a cell to be aligned to the left*/
 th#isMenuPage {
     width: 86px;
 }
 th#iconColumns {
     width: 90px;
-}
-table#pageList td {
-    vertical-align: top;
-    padding: .5em;
-    border: 1px solid #d9e4ea; 
-    font-size: .825em;
-    padding-top: .5em;
-    padding-bottom: .5em;
-}  
-table#pageList td  a {
-   word-wrap: break-word;
-}
-table#pageList tr:nth-child(2n) {
-    background-color: rgba(200, 200, 180,.25);
 }

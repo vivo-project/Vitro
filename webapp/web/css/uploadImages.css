@@ -77,12 +77,6 @@
     margin-bottom: 5px;
     height: 30px;
 }
-#error-alert img {
-    float: left;
-    margin: 0;
-    padding: 0;
-    vertical-align: middle;
-}
 #error-alert  p {
     padding-left: 35px;
     font-size: .9em;
