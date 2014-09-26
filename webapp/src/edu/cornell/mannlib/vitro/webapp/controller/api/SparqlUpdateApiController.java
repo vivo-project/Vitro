@@ -55,6 +55,7 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		log.debug("Starting update");
 		try {
 			confirmAuthorization(req, REQUIRED_ACTIONS);
 			UpdateRequest parsed = parseUpdateString(req);
@@ -67,6 +68,7 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 		} catch (Exception e) {
 			do500response(resp, e);
 		}
+		log.debug("Update complete");
 	}
 
 	private UpdateRequest parseUpdateString(HttpServletRequest req)
