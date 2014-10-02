@@ -42,6 +42,8 @@ import edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalUriFinders;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.listeners.DeveloperDisabledModelChangeListener;
 
 /**
  * TODO
@@ -129,11 +131,12 @@ public class SearchIndexerSetup implements ServletContextListener {
 			// webapp.
 			context.setAttribute(IndexBuilder.class.getName(), builder);
 
-			// set up listeners so search index builder is notified of changes
-			// to model
-			ServletContext ctx = sce.getServletContext();
-			SearchReindexingListener srl = new SearchReindexingListener(builder);
-			ModelContext.registerListenerForChanges(ctx, srl);
+			// Create listener to notify index builder of changes to model
+			// (can be disabled by developer setting.)
+			ModelContext.registerListenerForChanges(context,
+					new DeveloperDisabledModelChangeListener(
+							new SearchReindexingListener(builder),
+							Key.SEARCH_INDEX_SUPPRESS_MODEL_CHANGE_LISTENER));
 
 			ss.info(this, "Setup of search indexer completed.");
 		} catch (Throwable e) {

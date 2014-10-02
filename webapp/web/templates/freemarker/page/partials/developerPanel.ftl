@@ -96,17 +96,16 @@
 				<div id="developerTabSearch">
 					<div class="devright">
 						<div class="container">
-							Indexing
-							<@showCheckbox "developer_searchIndex_enable", "Log indexing." />
+							Searching
+							<@showCheckbox "developer_searchEngine_enable", "Log searches" />
 							<div class="within">
-								<@showCheckbox "developer_searchIndex_showDocuments", 
-										"Show document contents" />
-								<@showTextbox "developer_searchIndex_uriOrNameRestriction", 
-										"Restrict by URI or name" />
-								<@showTextbox "developer_searchIndex_documentRestriction", 
-										"Restrict by document contents" />
+								<@showCheckbox "developer_searchEngine_addStackTrace", "Show stack trace" />
+								<@showCheckbox "developer_searchEngine_addResults", "Show search results" />
+								<@showTextbox "developer_searchEngine_queryRestriction", 
+										"Restrict by query string" />
+								<@showTextbox "developer_searchEngine_stackRestriction", 
+										"Restrict by calling stack" />
 							</div>
-							<@showCheckbox "developer_searchDeletions_enable", "Log deletions." />
 						</div>
 						
 						<div class="container">
@@ -118,16 +117,19 @@
 						
 					<div class="devleft">
 						<div class="container">
-							Searching
-							<@showCheckbox "developer_searchEngine_enable", "Log searches" />
+							Indexing
+							<@showCheckbox "developer_searchIndex_enable", "Log indexing." />
 							<div class="within">
-								<@showCheckbox "developer_searchEngine_addStackTrace", "Show stack trace" />
-								<@showCheckbox "developer_searchEngine_addResults", "Show search results" />
-								<@showTextbox "developer_searchEngine_queryRestriction", 
-										"Restrict by query string" />
-								<@showTextbox "developer_searchEngine_stackRestriction", 
-										"Restrict by calling stack" />
+								<@showCheckbox "developer_searchIndex_showDocuments", 
+										"Show document contents" />
+								<@showTextbox "developer_searchIndex_uriOrNameRestriction", 
+										"Restrict by URI or name" />
+								<@showTextbox "developer_searchIndex_documentRestriction", 
+										"Restrict by document contents" />
 							</div>
+							<@showCheckbox "developer_searchDeletions_enable", "Log deletions." />
+							<@showCheckbox "developer_searchIndex_suppressModelChangeListener", 
+									"Suppress the automatic indexing of changed triples." />
 						</div>
 					</div>
 				</div>
