@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.forwarder.impl.UrlForwarder;
+import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vedit.validator.Validator;
 import edu.cornell.mannlib.vedit.validator.impl.IntValidator;
@@ -29,14 +30,12 @@ import edu.cornell.mannlib.vedit.validator.impl.XMLNameValidator;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionListener;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
 import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
 public class PropertyRetryController extends BaseEditController {
     
@@ -67,10 +66,8 @@ public class PropertyRetryController extends BaseEditController {
         }
 
         ObjectPropertyDao propDao = ModelAccess.on(getServletContext()).getWebappDaoFactory().getObjectPropertyDao();
-                //getUnfilteredWebappDaoFactory().getObjectPropertyDao();
         epo.setDataAccessObject(propDao);
         OntologyDao ontDao = request.getUnfilteredWebappDaoFactory().getOntologyDao();
-        VClassDao vclassDao = request.getUnfilteredWebappDaoFactory().getVClassDao();
 
         ObjectProperty propertyForEditing = null;
         if (!epo.getUseRecycledBean()){
@@ -82,6 +79,7 @@ public class PropertyRetryController extends BaseEditController {
                     epo.setAction("update");
                 } catch (NullPointerException e) {
                     log.error("Need to implement 'record not found' error message.");
+                    throw(e);
                 }
             } else {
                 propertyForEditing = new ObjectProperty();
@@ -105,9 +103,9 @@ public class PropertyRetryController extends BaseEditController {
 
 
         //set any validators
-        List localNameValidatorList = new ArrayList();
+        List<Validator> localNameValidatorList = new ArrayList<>();
         localNameValidatorList.add(new XMLNameValidator());
-        List localNameInverseValidatorList = new ArrayList();
+        List<Validator> localNameInverseValidatorList = new ArrayList<>();
         localNameInverseValidatorList.add(new XMLNameValidator(true));
         epo.getValidatorMap().put("LocalName", localNameValidatorList);
         epo.getValidatorMap().put("LocalNameInverse", localNameInverseValidatorList);
@@ -116,7 +114,7 @@ public class PropertyRetryController extends BaseEditController {
         epo.getValidatorMap().put("DisplayRank", displayRankValidatorList);
 
         //set up any listeners
-        List changeListenerList = new ArrayList();
+        List<ChangeListener> changeListenerList = new ArrayList<>();
         changeListenerList.add(new PropertyRestrictionListener(getServletContext()));
         epo.setChangeListenerList(changeListenerList);
 
@@ -127,7 +125,7 @@ public class PropertyRetryController extends BaseEditController {
 
         //set the getMethod so we can retrieve a new bean after we've inserted it
         try {
-            Class[] args = new Class[1];
+            Class<?>[] args = new Class[1];
             args[0] = String.class;
             epo.setGetMethod(propDao.getClass().getDeclaredMethod("getObjectPropertyByURI",args));
         } catch (NoSuchMethodException e) {
@@ -149,7 +147,7 @@ public class PropertyRetryController extends BaseEditController {
         optionMap.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getUpdateOptionsList(propertyForEditing));
         optionMap.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",RoleLevelOptionsSetup.getPublishOptionsList(propertyForEditing));    
 
-        List groupOptList = FormUtils.makeOptionListFromBeans(request.getUnfilteredWebappDaoFactory().getPropertyGroupDao().getPublicGroups(true),"URI","Name", ((propertyForEditing.getGroupURI()==null) ? "" : propertyForEditing.getGroupURI()), null, (propertyForEditing.getGroupURI()!=null));
+        List<Option> groupOptList = FormUtils.makeOptionListFromBeans(request.getUnfilteredWebappDaoFactory().getPropertyGroupDao().getPublicGroups(true),"URI","Name", ((propertyForEditing.getGroupURI()==null) ? "" : propertyForEditing.getGroupURI()), null, (propertyForEditing.getGroupURI()!=null));
         HashMap<String,Option> hashMap = new HashMap<String,Option>();
         groupOptList = getSortedList(hashMap,groupOptList,request);
         groupOptList.add(0,new Option("","none"));
@@ -163,7 +161,6 @@ public class PropertyRetryController extends BaseEditController {
         request.setAttribute("inverseFunctional",propertyForEditing.getInverseFunctional());
         request.setAttribute("selectFromExisting",propertyForEditing.getSelectFromExisting());
         request.setAttribute("offerCreateNewOption", propertyForEditing.getOfferCreateNewOption());
-        //request.setAttribute("stubObjectRelation", propertyForEditing.getStubObjectRelation());
         request.setAttribute("objectIndividualSortPropertyURI", propertyForEditing.getObjectIndividualSortPropertyURI());
         request.setAttribute("domainEntitySortDirection", propertyForEditing.getDomainEntitySortDirection());
         request.setAttribute("collateBySubclass", propertyForEditing.getCollateBySubclass());
@@ -203,7 +200,8 @@ public class PropertyRetryController extends BaseEditController {
 
     }
 
-    public void doGet (HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doGet (HttpServletRequest request, HttpServletResponse response) {
         doPost(request, response);
     }
 
@@ -269,21 +267,9 @@ public class PropertyRetryController extends BaseEditController {
         optionMap.put("RangeVClassURI", rangeOptionList);
     }
     
-    private List<VClass> makeVClassListForOptions(String VClassURI, List<VClass> allClassBeanList, VClassDao vclassDao) {
-        List<VClass> currentClassList = new ArrayList<VClass>();
-        VClass currentVClass = vclassDao.getVClassByURI(VClassURI);
-        if (currentVClass != null && currentVClass.isAnonymous()) {
-            currentClassList.addAll(allClassBeanList);
-            currentClassList.add(0,currentVClass);
-        } else {
-            currentClassList = allClassBeanList; 
-        }
-        return currentClassList;
-    }
-    
-    class PropertyInsertPageForwarder implements PageForwarder {
-
-        public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
+    private static class PropertyInsertPageForwarder implements PageForwarder {
+        @Override
+		public void doForward(HttpServletRequest request, HttpServletResponse response, EditProcessObject epo){
             String newPropertyUrl = "propertyEdit?uri=";
             ObjectProperty p = (ObjectProperty) epo.getNewBean();
             try {
