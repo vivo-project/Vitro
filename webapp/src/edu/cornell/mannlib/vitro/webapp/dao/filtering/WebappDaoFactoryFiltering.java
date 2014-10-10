@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
@@ -73,9 +72,15 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
         this.innerWebappDaoFactory = innerDao;
     }
 
+    @Override
+	public String toString() {
+		return "WebappDaoFactoryFiltering[inner=" + innerWebappDaoFactory + "]";
+	}
+    
     /* ******************* filtering *********************** */
 
-    public String checkURI(String uriStr) {
+
+	public String checkURI(String uriStr) {
     	return innerWebappDaoFactory.checkURI(uriStr);
     }
     

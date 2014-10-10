@@ -2,14 +2,18 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_DISPLAY;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_TBOX;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import com.hp.hpl.jena.ontology.OntModel;
 
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -23,10 +27,10 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
 		try {
-			setupModel(ctx, ModelNames.DISPLAY, "display");
-			setupModel(ctx, ModelNames.DISPLAY_TBOX, "displayTbox");
-			setupModel(ctx, ModelNames.DISPLAY_DISPLAY, "displayDisplay");
-			setupModel(ctx, ModelNames.USER_ACCOUNTS, "auth");
+			setupModel(ctx, DISPLAY, "display");
+			setupModel(ctx, DISPLAY_TBOX, "displayTbox");
+			setupModel(ctx, DISPLAY_DISPLAY, "displayDisplay");
+			setupModel(ctx, USER_ACCOUNTS, "auth");
 			ss.info(this,
 					"Set up the display models and the user accounts model.");
 		} catch (Exception e) {

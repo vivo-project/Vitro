@@ -19,9 +19,9 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.InvalidQueryTypeException;
 import edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.SparqlQueryApiExecutor;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.http.AcceptHeaderParsingException;
 import edu.cornell.mannlib.vitro.webapp.utils.http.NotAcceptableException;
 
@@ -53,8 +53,8 @@ public class SparqlQueryApiController extends VitroApiServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
-		RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(
-				getServletContext()).getRDFService();
+		RDFService rdfService = ModelAccess.on(getServletContext())
+				.getRDFService();
 
 		String acceptHeader = req.getHeader("Accept");
 		String queryString = req.getParameter("query");

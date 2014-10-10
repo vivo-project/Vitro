@@ -1,10 +1,13 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.utils;
+package edu.cornell.mannlib.vitro.webapp.utils.logging;
+
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.FileGraphSetup.FILEGRAPH_URI_ROOT;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -13,6 +16,8 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.compose.Polyadic;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
+
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 
 /**
  * Some useful methods for printing out the contents of data structures:
@@ -88,13 +93,37 @@ public class ToString {
 	}
 
 	/**
-	 * If the string is found in ModelNames, return the name of the constant. If
-	 * not, use the string itself.
+	 * If the string is found in ModelNames, return the name of the constant.
 	 * 
-	 * TODO: Make it work.
+	 * If the name is a filegraph, convert it to filegraph:[suffix]
+	 * 
+	 * Otherwise, return the string itself.
 	 */
 	public static String modelName(String name) {
+		if (name == null) {
+			return "null";
+		}
+		for (Entry<String, String> entry : ModelNames.namesMap.entrySet()) {
+			if (name.equals(entry.getValue())) {
+				return entry.getKey();
+			}
+		}
+		if (name.startsWith(FILEGRAPH_URI_ROOT)) {
+			return "filegraph:" + name.substring(FILEGRAPH_URI_ROOT.length());
+		}
 		return name;
+	}
+
+	/**
+	 * Replace all Model URIs with their short names. If the filegraph URI root
+	 * is found, replace it with "filegraph:".
+	 */
+	public static String replaceModelNames(String raw) {
+		String s = raw;
+		for (Entry<String, String> entry : ModelNames.namesMap.entrySet()) {
+			s = s.replace(entry.getValue(), entry.getKey());
+		}
+		return s.replace(FILEGRAPH_URI_ROOT, "filegraph:");
 	}
 
 	public static boolean isVitroClass(Object o) {
@@ -107,7 +136,7 @@ public class ToString {
 	}
 
 	public static String hashHex(Object o) {
-		return (o == null) ? "00000000" : Integer.toString(o.hashCode(), 16);
+		return (o == null) ? "@00000000" : String.format("@%08x", o.hashCode());
 	}
 
 	/**
@@ -116,4 +145,5 @@ public class ToString {
 	private ToString() {
 		// Nothing to initialize.
 	}
+
 }

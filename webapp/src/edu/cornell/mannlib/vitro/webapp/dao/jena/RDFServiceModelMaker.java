@@ -160,4 +160,9 @@ public class RDFServiceModelMaker implements ModelMaker {
 		return dataset.getNamedModel(name);
 	}
 
+	@Override
+	public String toString() {
+		return "RDFServiceModelMaker[service=" + service + "]";
+	}
+
 }

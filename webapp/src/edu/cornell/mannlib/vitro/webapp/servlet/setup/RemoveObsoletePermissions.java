@@ -2,7 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
-import static edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService.CONFIGURATION;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONFIGURATION;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -19,10 +20,9 @@ import com.hp.hpl.jena.update.UpdateAction;
 import com.hp.hpl.jena.update.UpdateFactory;
 import com.hp.hpl.jena.update.UpdateRequest;
 
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -84,11 +84,11 @@ public class RemoveObsoletePermissions implements ServletContextListener {
 		}
 
 		public void update() {
-			OntModel model = ModelAccess.on(ctx).getUserAccountsModel();
+			OntModel model = ModelAccess.on(ctx).getOntModel(USER_ACCOUNTS);
 			long statementsAtStart = model.size();
 
-			RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx,
-					CONFIGURATION).getRDFService();
+			RDFService rdfService = ModelAccess.on(ctx).getRDFService(
+					CONFIGURATION);
 			for (String permissionUri : OBSOLETE_PERMISSIONS) {
 				removeStatements(rdfService, permissionUri);
 			}

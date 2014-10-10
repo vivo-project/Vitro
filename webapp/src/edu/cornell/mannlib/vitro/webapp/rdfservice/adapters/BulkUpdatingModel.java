@@ -182,11 +182,6 @@ public class BulkUpdatingModel extends AbstractModelDecorator {
 		return this;
 	}
 
-	@Override
-	public String toString() {
-		return "<" + this.getClass().getSimpleName() + "  " + getGraph() + ">";
-	}
-
 	private Iterator<Triple> asTriples(StmtIterator it) {
 		return it.mapWith(mapAsTriple);
 	}

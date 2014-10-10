@@ -3,7 +3,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <%@ page import="edu.cornell.mannlib.vitro.webapp.controller.Controllers" %>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.ModelAccess"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames"%>
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
@@ -22,7 +23,7 @@
     		"    FILTER(afn:bnode(?bnode) = \"" + conceptIdStr + "\")\n" +
     	    "}";
     	    
-    	OntModel ontModel = ModelAccess.on(getServletContext()).getBaseOntModel();
+    	OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel(ModelNames.FULL_ASSERTIONS);
     	Model conceptDescription = ModelFactory.createDefaultModel();
     	try {
     		ontModel.enterCriticalSection(Lock.READ);

@@ -6,6 +6,12 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 import static edu.cornell.mannlib.vitro.webapp.controller.MultipartRequestWrapper.ATTRIBUTE_FILE_ITEM_MAP;
 import static edu.cornell.mannlib.vitro.webapp.controller.MultipartRequestWrapper.ATTRIBUTE_FILE_SIZE_EXCEPTION;
 import static edu.cornell.mannlib.vitro.webapp.controller.MultipartRequestWrapper.ATTRIBUTE_IS_MULTIPART;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ASSERTIONS_ONLY;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.CONTENT;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LANGUAGE_NEUTRAL;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.POLICY_NEUTRAL;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_ASSERTIONS;
 
 import java.text.Collator;
 import java.util.Collections;
@@ -24,13 +30,12 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.FactoryID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource.ModelName;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 public class VitroRequest extends HttpServletRequestWrapper {
     
@@ -52,64 +57,34 @@ public class VitroRequest extends HttpServletRequestWrapper {
     }
 
     public RDFService getRDFService() {
-        Object o = getAttribute("rdfService");
-        if (o instanceof RDFService) {
-            return (RDFService) o;
-        } else {
-            RDFService rdfService = RDFServiceUtils.getRDFService(this);
-            setAttribute("rdfService", rdfService);
-            return rdfService;
-        }
+    	return ModelAccess.on(this).getRDFService();
     }
     
     public RDFService getUnfilteredRDFService() {
-        Object o = getAttribute("unfilteredRDFService");
-        if (o instanceof RDFService) {
-            return (RDFService) o;
-        } else {
-            RDFService rdfService = RDFServiceUtils.getRDFService(this);
-            setAttribute("unfilteredRDFService", rdfService);
-            return rdfService;
-        }
-    }
-    
-    public void setRDFService(RDFService rdfService) {
-        setAttribute("rdfService", rdfService);
-    }
-    
-    public void setUnfilteredRDFService(RDFService rdfService) {
-        setAttribute("unfilteredRDFService", rdfService);
+    	return ModelAccess.on(this).getRDFService(CONTENT, LANGUAGE_NEUTRAL);
     }
     
     /** Gets WebappDaoFactory with appropriate filtering for the request */
     public WebappDaoFactory getWebappDaoFactory(){
-    	return ModelAccess.on(this).getWebappDaoFactory(FactoryID.UNION);
+    	return ModelAccess.on(this).getWebappDaoFactory();
     }
     
     /** gets assertions+inference WebappDaoFactory with no policy filtering */
     public WebappDaoFactory getUnfilteredWebappDaoFactory() {
-    	return ModelAccess.on(this).getWebappDaoFactory(FactoryID.UNFILTERED_UNION);
+    	return ModelAccess.on(this).getWebappDaoFactory(POLICY_NEUTRAL);
     }
     
     /** gets assertions-only WebappDaoFactory with no policy filtering */
     public WebappDaoFactory getUnfilteredAssertionsWebappDaoFactory() {
-    	return ModelAccess.on(this).getWebappDaoFactory(FactoryID.UNFILTERED_BASE);
+    	return ModelAccess.on(this).getWebappDaoFactory(POLICY_NEUTRAL, ASSERTIONS_ONLY);
     }
     
     public Dataset getDataset() {
-    	return (Dataset) getAttribute("dataset");
-    }
-    
-    public void setDataset(Dataset dataset) {
-    	setAttribute("dataset", dataset);
+    	return ModelAccess.on(this).getDataset(CONTENT);
     }
     
     public Dataset getUnfilteredDataset() {
-    	return (Dataset) getAttribute("unfilteredDataset");
-    }
-    
-    public void setUnfilteredDataset(Dataset dataset) {
-    	setAttribute("unfilteredDataset", dataset);
+    	return ModelAccess.on(this).getDataset(CONTENT, LANGUAGE_NEUTRAL);
     }
     
     //Method that retrieves write model, returns special model in case of write model
@@ -127,21 +102,15 @@ public class VitroRequest extends HttpServletRequestWrapper {
     }
     
     public OntModel getJenaOntModel() {
-    	return ModelAccess.on(this).getJenaOntModel();
+    	return ModelAccess.on(this).getOntModel(ModelNames.FULL_UNION);
     }
     
-    /** JB - surprising that this comes from session. */
     public OntModel getAssertionsOntModel() {
-        return ModelAccess.on(this.getSession()).getBaseOntModel();
+        return ModelAccess.on(this).getOntModel(FULL_ASSERTIONS);
     }
     
-    /** JB - surprising that this comes from session. */
-    public OntModel getInferenceOntModel() {
-    	return ModelAccess.on(this.getSession()).getInferenceOntModel();
-    }
-
     public OntModel getDisplayModel(){
-    	return ModelAccess.on(this).getDisplayModel();
+    	return ModelAccess.on(this).getOntModel(DISPLAY);
     }
         
     /**
@@ -216,12 +185,8 @@ public class VitroRequest extends HttpServletRequestWrapper {
         return _req.getParameterValues(name);        
     }
 
-	public void setLanguageNeutralUnionFullModel(OntModel model) {
-		setAttribute("languageNeutralUnionFullModel", model);
-	}                
-            
 	public OntModel getLanguageNeutralUnionFullModel() {
-		return (OntModel) getAttribute("languageNeutralUnionFullModel");
+		return ModelAccess.on(this).getOntModel(ModelNames.FULL_UNION, LANGUAGE_NEUTRAL);
 	}           
 	
 	public void setCollator(Collator collator) {
@@ -232,12 +197,8 @@ public class VitroRequest extends HttpServletRequestWrapper {
 	    return (Collator) getAttribute("collator");
 	}
 	
-    public void setLanguageNeutralWebappDaoFactory(WebappDaoFactory wadf) {
-    	setAttribute("languageNeutralWebappDaoFactory", wadf);
-    }
-
     public WebappDaoFactory getLanguageNeutralWebappDaoFactory() {
-    	return (WebappDaoFactory) getAttribute("languageNeutralWebappDaoFactory");
+    	return edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.on(this).getWebappDaoFactory(LANGUAGE_NEUTRAL);
     }
     
     // ----------------------------------------------------------------------

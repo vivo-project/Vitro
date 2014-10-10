@@ -28,7 +28,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 /**
  * The current user is blacklisted for this reason.
@@ -153,7 +153,7 @@ public class IsBlacklisted extends AbstractCommonIdentifier implements
 			return NOT_BLACKLISTED;
 		}
 
-		OntModel model = ModelAccess.on(context).getJenaOntModel();
+		OntModel model = ModelAccess.on(context).getOntModel();
 
 		queryString = queryString.replaceAll("\\?individualURI",
 				"<" + ind.getURI() + ">");

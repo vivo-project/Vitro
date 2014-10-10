@@ -49,8 +49,14 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
             this.datasetMode = datasetMode;
         }
     }
-     
-    public WebappDaoFactorySDB(WebappDaoFactorySDB base, String userURI) {
+    
+	@Override
+	public String toString() {
+		return "WebappDaoFactorySDB[" + Integer.toString(hashCode(), 16) + ", "
+				+ datasetMode + "]";
+	}
+
+	public WebappDaoFactorySDB(WebappDaoFactorySDB base, String userURI) {
         super(base.ontModelSelector);
         this.ontModelSelector = base.ontModelSelector;
         this.config = base.config;
@@ -94,6 +100,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 			return vClassDao = new VClassDaoSDB(dwf, datasetMode, this, config.isUnderlyingStoreReasoned());
 	}
 	
+	@Override
 	public WebappDaoFactory getUserAwareDaoFactory(String userURI) {
         return new WebappDaoFactorySDB(this, userURI);
     }

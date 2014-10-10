@@ -11,6 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
  * An RDFServiceFactory that always returns the same RDFService object
@@ -140,7 +141,12 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
             // Don't close s.  It's being used by everybody.
         }
         
+		@Override
+		public String toString() {
+			return ToString.simpleName(this) + "[" + ToString.hashHex(this)
+					+ ", inner=" + s + "]";
+		}
+
     }
-    
 
 }

@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.RDFServiceJena;
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
  * An implementation that is based on Jena TDB.
@@ -165,4 +166,8 @@ public class RDFServiceTDB extends RDFServiceJena {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "RDFServiceTDB[" + ToString.hashHex(this) + "]";
+	}
 }

@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_ASSERTIONS;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_INFERENCES;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
@@ -43,8 +46,8 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 public class JenaAdminActions extends BaseEditController {
 	
@@ -88,7 +91,7 @@ public class JenaAdminActions extends BaseEditController {
      * This doesn't really print just the TBox.  It takes a copy of the model, removes all the individuals, and writes the result.
      */
     private void outputTbox(HttpServletResponse response) {
-        OntModel memoryModel = ModelAccess.on(getServletContext()).getBaseOntModel();
+        OntModel memoryModel = ModelAccess.on(getServletContext()).getOntModel(FULL_ASSERTIONS);
         try {
         	OntModel tempOntModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
         	memoryModel.enterCriticalSection(Lock.READ);
@@ -158,7 +161,7 @@ public class JenaAdminActions extends BaseEditController {
 	private String testWriteXML() {
 		StringBuffer output = new StringBuffer();
 		output.append("<html><head><title>Test Write XML</title></head><body><pre>\n");
-		OntModel model = ModelAccess.on(getServletContext()).getJenaOntModel();
+		OntModel model = ModelAccess.on(getServletContext()).getOntModel();
 		Model tmp = ModelFactory.createDefaultModel();
 		boolean valid = true;
 		for (Statement stmt : model.listStatements().toList() ) {
@@ -214,7 +217,7 @@ public class JenaAdminActions extends BaseEditController {
     }
     
     private void removeLongLiterals() {
-		OntModel memoryModel = ModelAccess.on(getServletContext()).getJenaOntModel();
+		OntModel memoryModel = ModelAccess.on(getServletContext()).getOntModel();
     	memoryModel.enterCriticalSection(Lock.WRITE);
     	try {
     		List<Statement> statementsToRemove = new LinkedList<Statement>();
@@ -257,7 +260,7 @@ public class JenaAdminActions extends BaseEditController {
 		}
         
         if (actionStr.equals("checkURIs")) { 
-    		OntModel memoryModel = ModelAccess.on(getServletContext()).getJenaOntModel();
+    		OntModel memoryModel = ModelAccess.on(getServletContext()).getOntModel();
         	StmtIterator stmtIt = memoryModel.listStatements();
         	try {
         		for (Statement stmt : stmtIt.toList() ) {
@@ -288,16 +291,16 @@ public class JenaAdminActions extends BaseEditController {
         if (actionStr.equals("output")) {
             OntModel memoryModel = null;
 	    if (request.getParameter("assertionsOnly") != null) {
-	        memoryModel = ModelAccess.on(getServletContext()).getBaseOntModel();
+	        memoryModel = ModelAccess.on(getServletContext()).getOntModel(FULL_ASSERTIONS);
 	    	System.out.println("baseOntModel");
 	    } else if (request.getParameter("inferences") != null) {
-	    	memoryModel = ModelAccess.on(getServletContext()).getInferenceOntModel();
+	    	memoryModel = ModelAccess.on(getServletContext()).getOntModel(FULL_INFERENCES);
 	    	System.out.println("inferenceOntModel");
 	    } else if (request.getParameter("pellet") != null) {
 	    	memoryModel = (OntModel) getServletContext().getAttribute("pelletOntModel");
 	    	System.out.println("pelletOntModel");
 	    } else {
-			memoryModel = ModelAccess.on(getServletContext()).getJenaOntModel();
+			memoryModel = ModelAccess.on(getServletContext()).getOntModel();
 	    	System.out.println("jenaOntModel");
 	    }  
 	    int subModelCount = memoryModel.listSubModels().toList().size();
@@ -319,7 +322,7 @@ public class JenaAdminActions extends BaseEditController {
         }
         
         if (actionStr.equals("outputTaxonomy")) {
-            OntModel ontModel = ModelAccess.on(getServletContext()).getBaseOntModel();
+            OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel(FULL_ASSERTIONS);
         	Model taxonomyModel = extractTaxonomy(ontModel);
         	try {
         		taxonomyModel.write(response.getOutputStream());

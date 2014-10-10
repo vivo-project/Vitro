@@ -4,13 +4,15 @@
 
 <%@taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission" %>
-<%@page import="edu.cornell.mannlib.vitro.webapp.dao.ModelAccess"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess"%>
+<%@page import="edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames"%>
+
 <% request.setAttribute("requestedActions", SimplePermission.USE_MISCELLANEOUS_CURATOR_PAGES.ACTION); %>
 <vitro:confirmAuthorization />
 
 <%
     if (request.getParameter("execute") != null) {
-     	OntModel ontModel = ModelAccess.on(getServletContext()).getBaseOntModel();
+     	OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel(ModelNames.FULL_ASSERTIONS);
     	int results = doRemoval(ontModel);
     	request.setAttribute("removalCount", results);
     }
@@ -67,7 +69,7 @@
             "    FILTER(afn:bnode(?bnode) = \"" + bnodeId + "\")\n" +
             "}";
             
-    	OntModel ontModel = ModelAccess.on(getServletContext()).getBaseOntModel();
+    	OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel(ModelNames.FULL_ASSERTIONS);
         Model conceptDescription = ModelFactory.createDefaultModel();
         try {
             ontModel.enterCriticalSection(Lock.READ);

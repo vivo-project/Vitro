@@ -42,9 +42,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import fedora.client.FedoraClient;
 import fedora.common.Constants;
 import fedora.server.management.FedoraAPIM;
@@ -101,7 +101,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
             log.debug("In doGet");
             
             VitroRequest vreq = new VitroRequest(req);
-    		OntModel sessionOntModel = ModelAccess.on(vreq.getSession()).getJenaOntModel();
+    		OntModel sessionOntModel = ModelAccess.on(getServletContext()).getOntModel();
             
             synchronized (FedoraDatastreamController.class) {
                 if( fedoraUrl == null ){
@@ -241,7 +241,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
         	}
         	
             //check if fedora is on line
-    		OntModel sessionOntModel = ModelAccess.on(rawRequest.getSession()).getJenaOntModel();
+    		OntModel sessionOntModel = ModelAccess.on(getServletContext()).getOntModel();
             synchronized (FedoraDatastreamController.class) {
                 if( fedoraUrl == null ){
                     setup( sessionOntModel, getServletContext() );

@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_ASSERTIONS;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -16,7 +19,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
@@ -34,15 +36,14 @@ import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -112,7 +113,7 @@ public class RDFUploadController extends JenaIngestController {
         String uploadDesc ="";        
                 
         OntModel uploadModel = (directRead) 
-            ? getABoxModel(request.getSession(), getServletContext())
+            ? getABoxModel(getServletContext())
             : ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
             
         /* ********************* GET RDF by URL ********************** */
@@ -184,9 +185,9 @@ public class RDFUploadController extends JenaIngestController {
 
             JenaModelUtils xutil = new JenaModelUtils();
             
-            OntModel tboxModel = getTBoxModel(request.getSession());
+            OntModel tboxModel = getTBoxModel();
             OntModel aboxModel = getABoxModel(
-                    request.getSession(), getServletContext());
+                    getServletContext());
             OntModel tboxChangeModel = null;
             Model aboxChangeModel = null;
             OntModelSelector ontModelSelector = ModelAccess.on(getServletContext()).getOntModelSelector();
@@ -233,7 +234,7 @@ public class RDFUploadController extends JenaIngestController {
                                 ? RDFService.ModelSerializationFormat.RDFXML
                                 : RDFService.ModelSerializationFormat.N3;
         changeSet.addAddition(in, format, 
-                ModelNames.ABOX_ASSERTIONS);
+                ABOX_ASSERTIONS);
         try {
             rdfService.changeSetUpdate(changeSet);
         } catch (RDFServiceException rdfse) {
@@ -262,7 +263,7 @@ public class RDFUploadController extends JenaIngestController {
             } finally {
                 rdfService.close();
             }
-            ModelMakerID modelType = getModelType(request);
+            WhichService modelType = getModelType(request);
             showModelList(request, maker, modelType);
         } 
         
@@ -282,8 +283,7 @@ public class RDFUploadController extends JenaIngestController {
     private RDFService getRDFService(VitroRequest vreq, ModelMaker maker, String modelName) {
         if (isUsingMainStoreForIngest(vreq)) {
             log.debug("Using main RDFService");
-            return RDFServiceUtils.getRDFServiceFactory(
-                    getServletContext()).getRDFService();
+			return ModelAccess.on(getServletContext()).getRDFService();
         } else {
             log.debug("Making RDFService for single model from ModelMaker");
             Model m = maker.getModel(modelName);
@@ -431,15 +431,15 @@ public class RDFUploadController extends JenaIngestController {
          return;
      }
      
-     private OntModel getABoxModel(HttpSession session, ServletContext ctx) {   
-         RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService();
+     private OntModel getABoxModel(ServletContext ctx) {   
+         RDFService rdfService = ModelAccess.on(ctx).getRDFService();
          Model abox = RDFServiceGraph.createRDFServiceModel(
-                 new RDFServiceGraph(rdfService, ModelNames.ABOX_ASSERTIONS));
+                 new RDFServiceGraph(rdfService, ABOX_ASSERTIONS));
          return ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM, abox);
      }    
 
-     private OntModel getTBoxModel(HttpSession session) { 
-    	 return ModelAccess.on(session).getOntModel(ModelNames.TBOX_ASSERTIONS);
+     private OntModel getTBoxModel() { 
+    	 return ModelAccess.on(getServletContext()).getOntModel(TBOX_ASSERTIONS);
      }    
      
     private static final Log log = LogFactory.getLog(

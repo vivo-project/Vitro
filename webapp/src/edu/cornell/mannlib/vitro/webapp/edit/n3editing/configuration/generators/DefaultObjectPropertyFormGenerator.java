@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
@@ -31,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.IndividualsViaObjectPropetyOptions;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
@@ -468,7 +470,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 
 	private void prepareForUpdate(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
     	//Here, retrieve model from 
-		OntModel model = ModelAccess.on(session.getServletContext()).getJenaOntModel();
+		OntModel model = ModelAccess.on(session.getServletContext()).getOntModel();
     	//if object property
     	if(EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)){
 	    	Individual objectIndividual = EditConfigurationUtils.getObjectIndividual(vreq);
@@ -499,7 +501,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     	if(isSelectFromExisting(vreq)) {
     		// set ProhibitedFromSearch object so picklist doesn't show
             // individuals from classes that should be hidden from list views
-            OntModel displayOntModel = ModelAccess.on(session.getServletContext()).getDisplayModel();
+            OntModel displayOntModel = ModelAccess.on(session.getServletContext()).getOntModel(DISPLAY);
             ProhibitedFromSearch pfs = new ProhibitedFromSearch(
                 DisplayVocabulary.SEARCH_INDEX_URI, displayOntModel);
             if( editConfig != null )

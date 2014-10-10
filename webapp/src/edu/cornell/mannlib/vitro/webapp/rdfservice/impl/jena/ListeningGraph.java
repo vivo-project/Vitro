@@ -29,7 +29,7 @@ import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
-import edu.cornell.mannlib.vitro.webapp.utils.ToString;
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 public class ListeningGraph implements GraphWithPerform {
     

@@ -17,12 +17,12 @@ import com.hp.hpl.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 /**
  * Generates the edit configuration for a default property form.
@@ -240,7 +240,7 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
 
 	private void prepareForUpdate(VitroRequest vreq, HttpSession session, EditConfigurationVTwo editConfiguration) {
     	//Here, retrieve model from 
-		OntModel model = ModelAccess.on(session.getServletContext()).getJenaOntModel();
+		OntModel model = ModelAccess.on(session.getServletContext()).getOntModel();
     	//This form is always doing a non-update
     	editConfiguration.prepareForNonUpdate( model );
 	      

@@ -17,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.AnnotationProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntProperty;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Literal;
@@ -66,9 +65,9 @@ public class SimpleReasoner extends StatementListener {
 	
 	private static final String mostSpecificTypePropertyURI = 
         "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType";	
-	private static final AnnotationProperty mostSpecificType = 
-        (ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM))
-        .createAnnotationProperty(mostSpecificTypePropertyURI);
+	private static final AnnotationProperty mostSpecificType = (
+			VitroModelFactory.createOntologyModel())
+				.createAnnotationProperty(mostSpecificTypePropertyURI);
 	
 	// DeltaComputer
 	private CumulativeDeltaModeler aBoxDeltaModeler1 = null;
@@ -102,8 +101,8 @@ public class SimpleReasoner extends StatementListener {
 
 		this.tboxModel = tboxModel;
 		
-		this.fullModel = ModelFactory.createOntologyModel(
-                OntModelSpec.OWL_MEM, ModelFactory.createModelForGraph(
+		this.fullModel = VitroModelFactory.createOntologyModel(
+                VitroModelFactory.createModelForGraph(
                         new RDFServiceGraph(rdfService)));
 		
         this.aboxModel = VitroModelFactory.createOntologyModel(
@@ -141,9 +140,8 @@ public class SimpleReasoner extends StatementListener {
 		this.tboxModel = tboxModel;
 		this.aboxModel = aboxModel; 
 		this.inferenceModel = inferenceModel;
-		this.fullModel = ModelFactory.createOntologyModel(
-		        OntModelSpec.OWL_MEM, ModelFactory.createUnion(
-		                aboxModel, inferenceModel));
+		this.fullModel = VitroModelFactory.createUnion(aboxModel, 
+				VitroModelFactory.createOntologyModel(inferenceModel));
 		aBoxDeltaModeler1 = new CumulativeDeltaModeler();
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
 		this.batchMode = 0;
@@ -550,7 +548,7 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	protected void addedSubClass(OntClass subClass, OntClass superClass, Model inferenceModel) {
 		//log.debug("subClass = " + subClass.getURI() + " superClass = " + superClass.getURI());
-		OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		OntModel unionModel = VitroModelFactory.createOntologyModel(); 
 		unionModel.addSubModel(aboxModel);
 		unionModel.addSubModel(inferenceModel);
 	    List<Resource> subjectList = new ArrayList<Resource>();
@@ -580,7 +578,7 @@ public class SimpleReasoner extends StatementListener {
 	 * of A (including A itself)
 	 */
 	protected void removedSubClass(OntClass subClass, OntClass superClass, Model inferenceModel) {
-		OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		OntModel unionModel = VitroModelFactory.createOntologyModel(); 
 		unionModel.addSubModel(aboxModel);
 		unionModel.addSubModel(inferenceModel);
 		List<Resource> subjectList = new ArrayList<Resource>();
@@ -862,7 +860,7 @@ public class SimpleReasoner extends StatementListener {
 
 	protected void generateSameAsInferences(Resource ind1, Resource ind2, Model inferenceModel) {	
 		
-		OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+		OntModel unionModel = VitroModelFactory.createOntologyModel(); 
 		unionModel.addSubModel(aboxModel);
 		unionModel.addSubModel(inferenceModel);
 		
@@ -1310,7 +1308,7 @@ public class SimpleReasoner extends StatementListener {
 		HashSet<String> typeURIs = new HashSet<String>();
 		
 		try {
-			OntModel unionModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
+			OntModel unionModel = VitroModelFactory.createOntologyModel(); 
 			unionModel.addSubModel(aboxModel);
 			unionModel.addSubModel(inferenceModel);
 					

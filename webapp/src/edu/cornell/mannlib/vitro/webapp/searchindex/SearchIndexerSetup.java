@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchindex;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,13 +16,13 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
@@ -80,8 +82,8 @@ public class SearchIndexerSetup implements ServletContextListener {
 
 		try {
 			/* set up the individual to search doc translation */
-			OntModel jenaOntModel = ModelAccess.on(context).getJenaOntModel();
-			OntModel displayModel = ModelAccess.on(context).getDisplayModel();
+			OntModel jenaOntModel = ModelAccess.on(context).getOntModel();
+			OntModel displayModel = ModelAccess.on(context).getOntModel(DISPLAY);
 
 			/*
 			 * try to get context attribute DocumentModifiers and use that as

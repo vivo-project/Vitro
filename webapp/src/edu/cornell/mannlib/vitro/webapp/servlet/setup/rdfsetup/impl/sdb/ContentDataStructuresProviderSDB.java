@@ -2,7 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb;
 
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.BasicDataStructuresProvider.CONTENT_UNIONS;
+
 import java.sql.SQLException;
+import java.util.Arrays;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextListener;
@@ -11,6 +14,8 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.sdb.SDB;
 import com.hp.hpl.jena.sdb.SDBFactory;
 import com.hp.hpl.jena.sdb.Store;
@@ -22,25 +27,33 @@ import com.hp.hpl.jena.sdb.util.StoreUtils;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelMakerFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ListCachingModelMaker;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.MemoryMappingModelMaker;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.MaskingOntModelCache;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.ModelMakerOntModelCache;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.UnionModelsOntModelsCache;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.sdb.RDFServiceFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.RDFSource;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.ContentDataStructuresProvider;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
  * Create the connection to the SDB triple-store.
  * 
  * Do some smoke-tests on the parameters, create the connection pool, and create
  * the RDFServiceFactory.
- * 
- * Create the ModelMakerFactories only if requested.
  */
-public class RDFSourceSDB implements RDFSource {
-	private static final Log log = LogFactory.getLog(RDFSourceSDB.class);
+public class ContentDataStructuresProviderSDB extends
+		ContentDataStructuresProvider {
+	private static final Log log = LogFactory
+			.getLog(ContentDataStructuresProviderSDB.class);
 
 	static final String PROPERTY_DB_URL = "VitroConnection.DataSource.url";
 	static final String PROPERTY_DB_USERNAME = "VitroConnection.DataSource.username";
@@ -69,24 +82,30 @@ public class RDFSourceSDB implements RDFSource {
 	private final ComboPooledDataSource ds;
 	private final RDFServiceFactory rdfServiceFactory;
 	private final RDFService rdfService;
+	private final Dataset dataset;
+	private final ModelMaker modelMaker;
 
-	public RDFSourceSDB(ServletContext ctx, ServletContextListener parent) {
+	public ContentDataStructuresProviderSDB(ServletContext ctx,
+			ServletContextListener ctxListener) {
 		try {
 			this.ctx = ctx;
 			this.ss = StartupStatus.getBean(ctx);
 
 			configureSDBContext();
 
-			new SDBConnectionSmokeTests(ctx, parent)
+			new SDBConnectionSmokeTests(ctx, ctxListener)
 					.checkDatabaseConnection();
 
 			this.ds = new SDBDataSource(ctx).getDataSource();
 			this.rdfServiceFactory = createRdfServiceFactory();
 			this.rdfService = rdfServiceFactory.getRDFService();
-			ss.info(parent, "Initialized the RDF source for SDB");
+			this.dataset = new RDFServiceDataset(this.rdfService);
+			this.modelMaker = createModelMaker();
+			ss.info(ctxListener,
+					"Initialized the content data structures for SDB");
 		} catch (SQLException e) {
 			throw new RuntimeException(
-					"Failed to set up the RDF source for SDB", e);
+					"Failed to set up the content data structures for SDB", e);
 		}
 	}
 
@@ -105,12 +124,9 @@ public class RDFSourceSDB implements RDFSource {
 
 		return new RDFServiceFactorySDB(ds, storeDesc);
 	}
-	
+
 	/**
 	 * Tests whether an SDB store has been formatted and populated for use.
-	 * 
-	 * @param store
-	 * @return
 	 */
 	private boolean isSetUp(Store store) throws SQLException {
 		if (!(StoreUtils.isFormatted(store))) {
@@ -118,7 +134,6 @@ public class RDFSourceSDB implements RDFSource {
 		}
 
 		// even if the store exists, it may be empty
-
 		try {
 			return (SDBFactory.connectNamedModel(store,
 					ModelNames.TBOX_ASSERTIONS)).size() > 0;
@@ -148,19 +163,49 @@ public class RDFSourceSDB implements RDFSource {
 		store.getTableFormatter().truncate();
 	}
 
+	private ModelMaker createModelMaker() {
+		return addContentDecorators(new ListCachingModelMaker(
+				new MemoryMappingModelMaker(new RDFServiceModelMaker(
+						this.rdfService), SMALL_CONTENT_MODELS)));
+	}
+
 	@Override
 	public RDFServiceFactory getRDFServiceFactory() {
 		return this.rdfServiceFactory;
 	}
 
 	@Override
-	public ModelMakerFactory getContentModelMakerFactory() {
-		return new ContentModelMakerFactorySDB(this.rdfService);
+	public RDFService getRDFService() {
+		return this.rdfService;
 	}
 
 	@Override
-	public ModelMakerFactory getConfigurationModelMakerFactory() {
-		return new ConfigurationModelMakerFactorySDB(this.rdfService);
+	public Dataset getDataset() {
+		return this.dataset;
+	}
+
+	@Override
+	public ModelMaker getModelMaker() {
+		return this.modelMaker;
+	}
+
+	/**
+	 * Use models from the short-term RDFService, since there is less contention
+	 * for the database connections that way. The exceptions are the
+	 * memory-mapped models. By keeping them, we also keep their sub-models.
+	 */
+	@Override
+	public OntModelCache getShortTermOntModels(RDFService shortTermRdfService,
+			OntModelCache longTermOntModelCache) {
+		ModelMakerOntModelCache shortCache = new ModelMakerOntModelCache(
+				addContentDecorators(new ListCachingModelMaker(
+						new RDFServiceModelMaker(shortTermRdfService))));
+
+		MaskingOntModelCache combinedCache = new MaskingOntModelCache(
+				shortCache, longTermOntModelCache,
+				Arrays.asList(MEMORY_MAPPED_CONTENT_MODELS));
+
+		return new UnionModelsOntModelsCache(combinedCache, CONTENT_UNIONS);
 	}
 
 	@Override
@@ -168,6 +213,12 @@ public class RDFSourceSDB implements RDFSource {
 		if (ds != null) {
 			ds.close();
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "ContentDataStructuresProviderSDB[" + ToString.hashHex(this)
+				+ "]";
 	}
 
 }

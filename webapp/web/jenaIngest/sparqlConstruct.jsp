@@ -3,8 +3,8 @@
 <%@ page import="com.hp.hpl.jena.ontology.Individual"%>
 <%@ page import="com.hp.hpl.jena.ontology.OntModel"%>
 <%@ page import="com.hp.hpl.jena.rdf.model.ModelMaker"%>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.ModelAccess"%>
-<%@ page import="edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess"%>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService"%>
 <%@ page import="com.hp.hpl.jena.shared.Lock"%>
 <%@ page import="java.util.Iterator"%>
 <%@ page import="java.util.List"%>
@@ -18,7 +18,7 @@
 <vitro:confirmAuthorization />
 
 <%
-    ModelMaker maker = ModelAccess.on(getServletContext()).getModelMaker(ModelMakerID.CONFIGURATION);
+    ModelMaker maker = ModelAccess.on(getServletContext()).getModelMaker(WhichService.CONFIGURATION);
 %>
 
 
@@ -48,7 +48,7 @@
 <h3>SPARQL Query <select name="savedQuery">
 	<option value="">select saved query</option>
 	<%
-              OntModel jenaOntModel = ModelAccess.on(getServletContext()).getJenaOntModel();
+              OntModel jenaOntModel = ModelAccess.on(getServletContext()).getOntModel();
               jenaOntModel.enterCriticalSection(Lock.READ);
               try {
                   List savedQueries = (List) request.getAttribute("savedQueries");

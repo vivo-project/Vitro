@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONTENT;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,13 +34,10 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.BlankNodeFilteringModelMaker;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelMakerUtils;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 // This ContextListener must run after the JenaDataSourceSetup ContextListener
@@ -72,12 +71,10 @@ public class FileGraphSetup implements ServletContextListener {
         
         try {
             OntDocumentManager.getInstance().setProcessImports(true);
-            Dataset dataset = JenaDataSourceSetupBase.getStartupDataset(ctx);
-			RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx,
-					WhichService.CONTENT).getRDFService();
+            Dataset dataset = ModelAccess.on(ctx).getDataset(); 
+			RDFService rdfService = ModelAccess.on(ctx).getRDFService(CONTENT);
 			ModelMaker modelMaker = new BlankNodeFilteringModelMaker(
-					rdfService, ModelMakerUtils.getModelMaker(ctx,
-							WhichService.CONTENT));
+					rdfService, ModelAccess.on(ctx).getModelMaker(CONTENT));
 
             // ABox files
             Set<Path> paths = getFilegraphPaths(ctx, RDF, ABOX, FILEGRAPH);

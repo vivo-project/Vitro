@@ -39,7 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginInProcessFl
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.LoginRedirector;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginLogoutEvent;
 
 public class Authenticate extends VitroHttpServlet {
@@ -559,7 +559,7 @@ public class Authenticate extends VitroHttpServlet {
 			return;
 		}
 
-		OntModel jenaOntModel = ModelAccess.on(session).getJenaOntModel();
+		OntModel jenaOntModel = ModelAccess.on(context).getOntModel();
 		jenaOntModel.getBaseModel().notifyEvent(event);
 	}
 

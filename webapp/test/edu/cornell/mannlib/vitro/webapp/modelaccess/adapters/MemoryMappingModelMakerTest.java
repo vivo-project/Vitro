@@ -31,7 +31,8 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 
 /**
- * TODO
+ * Checks the function of a MemoryMappingModelMaker, testing the difference in
+ * behavior between an mapped model and an unmapped model.
  */
 public class MemoryMappingModelMakerTest extends AbstractTestClass {
 	private static final String URI_MAPPED = "http://memory.mapped.model";

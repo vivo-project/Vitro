@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy.bean;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
+
 import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
@@ -14,7 +16,7 @@ import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 /**
  * Add this ChangeListener to your EditProcessObject when modifying the
@@ -98,8 +100,8 @@ public class PropertyRestrictionListener implements ChangeListener {
 	}
 
 	private void createAndSetBean() {
-		OntModel model = ModelAccess.on(ctx).getJenaOntModel();
-		Model displayModel = ModelAccess.on(ctx).getDisplayModel();
+		OntModel model = ModelAccess.on(ctx).getOntModel();
+		Model displayModel = ModelAccess.on(ctx).getOntModel(DISPLAY);
 		PropertyRestrictionPolicyHelper bean = PropertyRestrictionPolicyHelper
 				.createBean(model, displayModel);
 		PropertyRestrictionPolicyHelper.setBean(ctx, bean);

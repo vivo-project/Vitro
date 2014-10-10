@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.VClassDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.modules.ApplicationStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineStub;
 import stubs.javax.servlet.ServletConfigStub;
@@ -29,7 +30,7 @@ import stubs.javax.servlet.http.HttpServletResponseStub;
 import stubs.javax.servlet.http.HttpSessionStub;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 /**
  * TODO
@@ -107,7 +108,7 @@ public class JsonServletTest extends AbstractTestClass {
 		resp = new HttpServletResponseStub();
 
 		wadf = new WebappDaoFactoryStub();
-		ModelAccess.on(ctx).setWebappDaoFactory(wadf);
+		new ModelAccessFactoryStub().get(req).setWebappDaoFactory(wadf);
 
 		vcDao = new VClassDaoStub();
 		wadf.setVClassDao(vcDao);
@@ -185,9 +186,9 @@ public class JsonServletTest extends AbstractTestClass {
 
 	/**
 	 * TODO test successful responses. This will require figuring out how to
-	 * stub SearchEngine. Since we are no longer dealing with an abstract class 
-	 * (like SolrServer), so we just need to figure out
-	 * what sort of NamedList is required as a response to a request.
+	 * stub SearchEngine. Since we are no longer dealing with an abstract class
+	 * (like SolrServer), so we just need to figure out what sort of NamedList
+	 * is required as a response to a request.
 	 */
 	@Test
 	public void individualsByClassNoIndividuals() throws ServletException,
@@ -230,8 +231,10 @@ public class JsonServletTest extends AbstractTestClass {
 			assertEquals("count", count, getFieldValue(actual, "totalCount"));
 
 			JSONObject vclassObj = (JSONObject) getFieldValue(actual, "vclass");
-			assertEquals("vclass name", vclassId.split("://")[1], getFieldValue(vclassObj, "name"));
-			assertEquals("vclass uri", vclassId, getFieldValue(vclassObj,  "URI"));
+			assertEquals("vclass name", vclassId.split("://")[1],
+					getFieldValue(vclassObj, "name"));
+			assertEquals("vclass uri", vclassId,
+					getFieldValue(vclassObj, "URI"));
 
 			assertEquals("status", SC_OK, resp.getStatus());
 		} catch (JSONException e) {

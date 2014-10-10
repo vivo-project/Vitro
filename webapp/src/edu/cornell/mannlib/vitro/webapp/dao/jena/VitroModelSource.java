@@ -9,7 +9,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelReader;
 import com.hp.hpl.jena.rdf.model.ModelSource;
 
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 
 /** 
@@ -107,11 +107,11 @@ public class VitroModelSource implements ModelSource {
     private Model getNamedModel( ModelName pmn ){
         switch( pmn ){
             case ABOX: 
-            	return ModelAccess.on(context).getJenaOntModel();
+            	return ModelAccess.on(context).getOntModel();
             case TBOX:
                 return (Model) context.getAttribute("tboxmodel???");
             case DISPLAY:
-            	return ModelAccess.on(context).getDisplayModel();
+            	return ModelAccess.on(context).getOntModel(ModelNames.DISPLAY);
             case DISPLAY_TBOX:
                 return ModelAccess.on(context).getOntModel(ModelNames.DISPLAY_TBOX);
             case DISPLAY_DISPLAY:

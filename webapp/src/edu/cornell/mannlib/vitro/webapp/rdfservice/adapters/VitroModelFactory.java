@@ -17,7 +17,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.impl.ModelCom;
 
-import edu.cornell.mannlib.vitro.webapp.utils.ToString;
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
  * Make models that will do proper bulk updates.

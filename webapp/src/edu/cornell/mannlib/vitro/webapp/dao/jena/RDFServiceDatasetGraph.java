@@ -24,6 +24,7 @@ import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 public class RDFServiceDatasetGraph implements DatasetGraph {
 
@@ -224,4 +225,9 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
         return (node == null || node.isVariable() || node == Node.ANY);
     }
 
+	@Override
+	public String toString() {
+		return "RDFServiceDatasetGraph[" + ToString.hashHex(this)
+				+ ", " + rdfService + "]";
+	}
 }

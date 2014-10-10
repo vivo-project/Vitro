@@ -2,12 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb;
 
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.DEFAULT_DRIVER_CLASS;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.PROPERTY_DB_DRIVER_CLASS_NAME;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.PROPERTY_DB_PASSWORD;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.PROPERTY_DB_TYPE;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.PROPERTY_DB_URL;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.PROPERTY_DB_USERNAME;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.DEFAULT_DRIVER_CLASS;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_DRIVER_CLASS_NAME;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_PASSWORD;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_TYPE;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_URL;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_USERNAME;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.Connection;

@@ -21,6 +21,11 @@ public class AbstractModelMakerDecorator implements ModelMaker {
 		}
 		this.inner = inner;
 	}
+	
+	@Override public String toString() {
+		return this.getClass().getSimpleName() + "[inner="
+				+ String.valueOf(inner) + "]"; 
+	}
 
 	@Override
 	public Model createDefaultModel() {

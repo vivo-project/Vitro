@@ -39,7 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.utils.ToString;
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 public class RDFServiceGraph implements GraphWithPerform {
     

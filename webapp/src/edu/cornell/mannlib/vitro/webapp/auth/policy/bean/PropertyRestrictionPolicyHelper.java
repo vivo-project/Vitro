@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.policy.bean;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,8 +35,8 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.ApplicationConfigurationOntologyUtils;
 
@@ -489,12 +491,12 @@ public class PropertyRestrictionPolicyHelper {
 			StartupStatus ss = StartupStatus.getBean(ctx);
 
 			try {
-				OntModel model = ModelAccess.on(ctx).getJenaOntModel();
+				OntModel model = ModelAccess.on(ctx).getOntModel();
 				if (model == null) {
 					throw new NullPointerException(
 							"jenaOntModel has not been initialized.");
 				}
-                Model displayModel = ModelAccess.on(ctx).getDisplayModel();
+                Model displayModel = ModelAccess.on(ctx).getOntModel(DISPLAY);
                 if (displayModel == null) {
                     throw new NullPointerException(
                             "display model has not been initialized.");

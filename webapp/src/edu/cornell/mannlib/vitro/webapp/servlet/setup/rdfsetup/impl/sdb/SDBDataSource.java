@@ -2,22 +2,22 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb;
 
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.DEFAULT_DRIVER_CLASS;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.DEFAULT_MAXACTIVE;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.DEFAULT_MAXIDLE;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.DEFAULT_TESTONBORROW;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.DEFAULT_TESTONRETURN;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.DEFAULT_TYPE;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.DEFAULT_VALIDATION_QUERY;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.MINIMUM_MAXACTIVE;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.PROPERTY_DB_DRIVER_CLASS_NAME;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.PROPERTY_DB_MAX_ACTIVE;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.PROPERTY_DB_MAX_IDLE;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.PROPERTY_DB_PASSWORD;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.PROPERTY_DB_TYPE;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.PROPERTY_DB_URL;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.PROPERTY_DB_USERNAME;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB.PROPERTY_DB_VALIDATION_QUERY;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.DEFAULT_DRIVER_CLASS;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.DEFAULT_MAXACTIVE;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.DEFAULT_MAXIDLE;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.DEFAULT_TESTONBORROW;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.DEFAULT_TESTONRETURN;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.DEFAULT_TYPE;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.DEFAULT_VALIDATION_QUERY;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.MINIMUM_MAXACTIVE;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_DRIVER_CLASS_NAME;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_MAX_ACTIVE;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_MAX_IDLE;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_PASSWORD;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_TYPE;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_URL;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_USERNAME;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_VALIDATION_QUERY;
 
 import java.beans.PropertyVetoException;
 

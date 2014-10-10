@@ -1,7 +1,8 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
-import java.lang.reflect.Constructor;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +18,10 @@ import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
@@ -32,10 +31,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ModelChangePreprocessor;
-import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
 
 public class N3EditUtils {
@@ -52,7 +50,7 @@ public class N3EditUtils {
 
         List<ModelChangePreprocessor> modelChangePreprocessors = editConfiguration.getModelChangePreprocessors();
         //Check if there is a default set of preprocessors for the whole application
-        List<ModelChangePreprocessor> defaultPreprocessors = getDefaultModelChangePreprocessors(request, ModelAccess.on(request).getDisplayModel());
+        List<ModelChangePreprocessor> defaultPreprocessors = getDefaultModelChangePreprocessors(request, ModelAccess.on(request).getOntModel(DISPLAY));
         if(modelChangePreprocessors != null) {
         	//if preprocessors exist for the configuration, add default preprocessors to the end
         	modelChangePreprocessors.addAll(defaultPreprocessors);
