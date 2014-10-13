@@ -20,16 +20,18 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 
 /**
- * TODO
+ * Manages the life-cycle of the SearchEngine. Adds logging, controlled by
+ * DeveloperSettings.
  */
-public class SearchEngineWrapper implements SearchEngine {
-	private static final Log log = LogFactory.getLog(SearchEngineWrapper.class);
+public class InstrumentedSearchEngineWrapper implements SearchEngine {
+	private static final Log log = LogFactory
+			.getLog(InstrumentedSearchEngineWrapper.class);
 
 	private final SearchEngine innerEngine;
 
 	private volatile LifecycleState lifecycleState = NEW;
 
-	public SearchEngineWrapper(SearchEngine innerEngine) {
+	public InstrumentedSearchEngineWrapper(SearchEngine innerEngine) {
 		if (innerEngine == null) {
 			throw new NullPointerException("innerEngine may not be null.");
 		}
