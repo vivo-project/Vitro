@@ -28,8 +28,7 @@ public class NameBoost implements DocumentModifier {
     }
     
     @Override
-    public void modifyDocument(Individual individual, SearchInputDocument doc,
-            StringBuffer addUri) {
+    public void modifyDocument(Individual individual, SearchInputDocument doc) {
         
         for( String fieldName : fieldsToBoost){
             SearchInputField field = doc.getField(fieldName);

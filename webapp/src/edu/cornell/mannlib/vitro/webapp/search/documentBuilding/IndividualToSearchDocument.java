@@ -97,7 +97,7 @@ public class IndividualToSearchDocument {
             
             log.debug(ind.getURI() + " pre mod boost: " + doc.getDocumentBoost());
             
-            runAdditionalDocModifers(ind,doc,addUri);            
+            runAdditionalDocModifers(ind,doc);            
             
             log.debug(ind.getURI() + " post mod boost: " + doc.getDocumentBoost());
             
@@ -132,7 +132,7 @@ public class IndividualToSearchDocument {
 	protected Map<String,Long> docModClassToTime = new HashMap<String,Long>();
 	protected long docModCount =0;
 	
-    protected void runAdditionalDocModifers( Individual ind, SearchInputDocument doc, StringBuffer addUri ) 
+    protected void runAdditionalDocModifers( Individual ind, SearchInputDocument doc ) 
     throws SkipIndividualException{
         //run the document modifiers
         if( documentModifiers != null && !documentModifiers.isEmpty()){
@@ -141,7 +141,7 @@ public class IndividualToSearchDocument {
             	
             	long start = System.currentTimeMillis();
             	
-                modifier.modifyDocument(ind, doc, addUri);
+                modifier.modifyDocument(ind, doc);
                 
                 if( log.isDebugEnabled()){                	
 	                long delta = System.currentTimeMillis() - start;

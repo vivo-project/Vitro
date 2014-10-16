@@ -31,8 +31,7 @@ public class NameFields implements DocumentModifier {
 	}
 	
 	@Override
-	public void modifyDocument(Individual ind, SearchInputDocument doc,
-			StringBuffer addUri) throws SkipIndividualException {
+	public void modifyDocument(Individual ind, SearchInputDocument doc) {
 		if( ind == null || ind.getURI() == null ){
 			return;
 		}
