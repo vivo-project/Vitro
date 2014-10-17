@@ -104,41 +104,4 @@ public class NameFieldsTest {
 		nameFields.modifyDocument(ind, doc);
 		assertEquals(expected, doc);
 	}
-
-	/**
-	 * TODO Test plan
-	 * 
-	 * <pre>
-	 * // also run SPARQL query to get rdfs:label values
-	 * String query = &quot;SELECT ?label WHERE {  &quot; + &quot;&lt;&quot; + ind.getURI() + &quot;&gt; &quot;
-	 * 		+ &quot;&lt;http://www.w3.org/2000/01/rdf-schema#label&gt; ?label  }&quot;;
-	 * 
-	 * try {
-	 * 	RDFService rdfService = rsf.getRDFService();
-	 * 	BufferedReader stream = new BufferedReader(new InputStreamReader(
-	 * 			rdfService.sparqlSelectQuery(query, ResultFormat.CSV)));
-	 * 
-	 * 	StringBuffer buffer = new StringBuffer();
-	 * 	String line;
-	 * 
-	 * 	// throw out first line since it is just a header
-	 * 	stream.readLine();
-	 * 
-	 * 	while ((line = stream.readLine()) != null) {
-	 * 		buffer.append(line).append(' ');
-	 * 	}
-	 * 
-	 * 	log.debug(&quot;Adding labels for &quot; + ind.getURI() + &quot; \&quot;&quot; + buffer.toString()
-	 * 			+ &quot;\&quot;&quot;);
-	 * 	doc.addField(term.NAME_RAW, buffer.toString());
-	 * 
-	 * } catch (RDFServiceException e) {
-	 * 	log.error(&quot;could not get the rdfs:label for &quot; + ind.getURI(), e);
-	 * } catch (IOException e) {
-	 * 	log.error(&quot;could not get the rdfs:label for &quot; + ind.getURI(), e);
-	 * }
-	 * 
-	 * </pre>
-	 */
-
 }
