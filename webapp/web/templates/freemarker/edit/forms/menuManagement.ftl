@@ -45,7 +45,7 @@
         <section id="existingContentType" name="existingContentType" ${existingClassGroupStyle} role="region">
             <p>${i18n().selected_page_content_type}</p>
             <p>
-                <span id="selectedContentTypeValue" name="selectedContentTypeValue">${associatedPage}</span>
+                <span id="selectedContentTypeValue" name="selectedContentTypeValue">${associatedPage!}</span>
                 <a href="#" id="changeContentType" name="changeContentType" title="${i18n().change_content_type}">${i18n().change_content_type}</a>
             </p>
         </section>
@@ -57,7 +57,7 @@
            <select name="selectClassGroup" id="selectClassGroup" role="combobox">
                <option value="-1" role="option">${i18n().select_one}</option>
                <#list classGroups as aClassGroup>
-                    <option value="${aClassGroup.URI}" <#if aClassGroup.URI = associatedPageURI>selected</#if> role="option">${aClassGroup.publicName}</option>
+                    <option value="${aClassGroup.URI}" <#if aClassGroup.URI = associatedPageURI!"">selected</#if> role="option">${aClassGroup.publicName}</option>
                </#list>
            </select>
         </section> 
