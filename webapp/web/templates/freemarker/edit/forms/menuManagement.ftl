@@ -57,7 +57,7 @@
            <select name="selectClassGroup" id="selectClassGroup" role="combobox">
                <option value="-1" role="option">${i18n().select_one}</option>
                <#list classGroups as aClassGroup>
-                    <option value="${aClassGroup.URI}" <#if aClassGroup.URI = associatedPageURI!"">selected</#if> role="option">${aClassGroup.publicName}</option>
+                    <option value="${aClassGroup.URI}" <#if aClassGroup.URI = associatedPageURI>selected</#if> role="option">${aClassGroup.publicName}</option>
                </#list>
            </select>
         </section> 
