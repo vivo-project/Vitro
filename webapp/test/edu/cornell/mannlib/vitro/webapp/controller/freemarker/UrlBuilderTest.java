@@ -7,7 +7,7 @@ import static org.easymock.EasyMock.*;
 
 import javax.servlet.http.HttpServletRequest;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 

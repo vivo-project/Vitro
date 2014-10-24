@@ -6,7 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.StringReader;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 

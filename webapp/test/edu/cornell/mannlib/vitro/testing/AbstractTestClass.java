@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.testing;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.fail;
+import static org.hamcrest.Matchers.containsString;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -41,8 +42,12 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -51,8 +56,6 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-
-import edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ProxyRelationshipSelectorTest;
 
 /**
  * A collection of useful routines to help when testing.
@@ -265,6 +268,46 @@ public abstract class AbstractTestClass {
 	}
 
 	// ----------------------------------------------------------------------
+	// A better way of handling expected exceptions.
+	// ----------------------------------------------------------------------
+
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
+
+	protected void expectException(Class<? extends Throwable> type,
+			String messageSubstring) {
+		exception.expect(type);
+		exception.expectMessage(messageSubstring);
+	}
+
+	protected void expectException(Class<? extends Throwable> type,
+			Matcher<String> messageMatcher) {
+		exception.expect(type);
+		exception.expectMessage(messageMatcher);
+	}
+
+	protected void expectExceptionCause(Class<? extends Throwable> type,
+			String messageSubstring) {
+		exception.expectCause(Matchers.<Throwable> instanceOf(type));
+		exception.expectCause(Matchers.<Throwable> hasProperty("message",
+				containsString(messageSubstring)));
+	}
+
+	protected void expectExceptionCause(Class<? extends Throwable> type,
+			Matcher<String> messageMatcher) {
+		exception.expectCause(Matchers.<Throwable> instanceOf(type));
+		exception.expectCause(Matchers.<Throwable> hasProperty("message",
+				messageMatcher));
+	}
+
+	protected void expectException(Class<? extends Throwable> clazz,
+			String messageSubstring, Class<? extends Throwable> causeClazz,
+			String causeMessageSubstring) {
+		expectException(clazz, messageSubstring);
+		expectExceptionCause(causeClazz, causeMessageSubstring);
+	}
+
+	// ----------------------------------------------------------------------
 	// Other utilities.
 	// ----------------------------------------------------------------------
 
@@ -416,9 +459,9 @@ public abstract class AbstractTestClass {
 		return new HashSet<T>(Arrays.asList(array));
 	}
 
-	protected OntModel readModelFromFile(String relativePath, String rdfType) throws IOException {
-		InputStream stream = this.getClass()
-				.getResourceAsStream(relativePath);
+	protected OntModel readModelFromFile(String relativePath, String rdfType)
+			throws IOException {
+		InputStream stream = this.getClass().getResourceAsStream(relativePath);
 		Model model = ModelFactory.createDefaultModel();
 		model.read(stream, null, rdfType);
 		stream.close();
