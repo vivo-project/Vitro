@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.web;
 
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 

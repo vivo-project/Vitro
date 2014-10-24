@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.jena;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import org.junit.Test;
 
