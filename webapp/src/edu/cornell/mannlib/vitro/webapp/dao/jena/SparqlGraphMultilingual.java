@@ -21,7 +21,7 @@ import com.hp.hpl.jena.shared.AddDeniedException;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
-import edu.cornell.mannlib.vitro.webapp.utils.ToString;
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 public class SparqlGraphMultilingual extends SparqlGraph implements GraphWithPerform {
     

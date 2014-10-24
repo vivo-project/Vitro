@@ -254,7 +254,7 @@ public abstract class SearchEngineLogger implements AutoCloseable {
 
 		QueryLogger(SearchQuery query) {
 			this.query = query;
-			this.stackTrace = new StackTraceUtility(SearchEngineWrapper.class,
+			this.stackTrace = new StackTraceUtility(InstrumentedSearchEngineWrapper.class,
 					true);
 			this.passesRestrictions = passesQueryRestriction()
 					&& passesStackRestriction();

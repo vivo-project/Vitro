@@ -33,9 +33,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.http.AcceptHeaderParsingException;
 import edu.cornell.mannlib.vitro.webapp.utils.http.NotAcceptableException;
@@ -103,8 +103,8 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 
 	private void respondToQuery(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(
-				getServletContext()).getRDFService();
+		RDFService rdfService = ModelAccess.on(getServletContext())
+				.getRDFService();
 
 		String queryString = req.getParameter("query");
 		try {

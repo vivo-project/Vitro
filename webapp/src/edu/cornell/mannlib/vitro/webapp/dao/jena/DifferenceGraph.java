@@ -19,7 +19,7 @@ import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
-import edu.cornell.mannlib.vitro.webapp.utils.ToString;
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 public class DifferenceGraph implements Graph {
 

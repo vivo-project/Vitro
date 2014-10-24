@@ -14,8 +14,28 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputField;
  * A foundation class for implementing SearchInputDocument.
  */
 public class BaseSearchInputDocument implements SearchInputDocument {
-	private final Map<String, SearchInputField> fieldMap = new HashMap<>();
-	private float documentBoost = 1.0F;
+	private final Map<String, SearchInputField> fieldMap;
+	private float documentBoost;
+
+	/**
+	 * Default constructor.
+	 */
+	public BaseSearchInputDocument() {
+		this.fieldMap = new HashMap<>();
+		this.documentBoost = 1.0F;
+	}
+
+	/**
+	 * Create a deep copy, down to the value objects.
+	 */
+	public BaseSearchInputDocument(BaseSearchInputDocument doc) {
+		this.documentBoost = doc.documentBoost;
+		this.fieldMap = new HashMap<>();
+		for (String fieldName : doc.getFieldMap().keySet()) {
+			this.fieldMap.put(fieldName,
+					new BaseSearchInputField(doc.getField(fieldName)));
+		}
+	}
 
 	@Override
 	public void addField(SearchInputField field) {
@@ -78,9 +98,32 @@ public class BaseSearchInputDocument implements SearchInputDocument {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Float.floatToIntBits(documentBoost);
+		result = prime * result + fieldMap.hashCode();
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BaseSearchInputDocument other = (BaseSearchInputDocument) obj;
+		return (Float.floatToIntBits(documentBoost) == Float
+				.floatToIntBits(other.documentBoost))
+				&& fieldMap.equals(other.fieldMap);
+	}
+
+	@Override
 	public String toString() {
 		return "BaseSearchInputDocument[fieldMap=" + fieldMap
 				+ ", documentBoost=" + documentBoost + "]";
 	}
-	
+
 }

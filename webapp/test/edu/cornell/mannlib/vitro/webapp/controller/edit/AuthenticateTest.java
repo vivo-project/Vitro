@@ -27,6 +27,7 @@ import stubs.edu.cornell.mannlib.vitro.webapp.dao.IndividualDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.i18n.I18nStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
 import stubs.javax.servlet.ServletConfigStub;
 import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
@@ -48,7 +49,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator;
 import edu.cornell.mannlib.vitro.webapp.controller.authenticate.AuthenticatorStub;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean;
 import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 
 /**
  */
@@ -132,11 +132,15 @@ public class AuthenticateTest extends AbstractTestClass {
 		authenticator.setAssociatedUri(OLD_SELF.username,
 				"old_self_associated_uri");
 
+		servletContext = new ServletContextStub();
+		servletContext.setAttribute(AuthenticatorStub.FACTORY_ATTRIBUTE_NAME,
+				authenticatorFactory);
+
 		PermissionSet adminPermissionSet = new PermissionSet();
 		adminPermissionSet.setUri(URI_DBA);
 		adminPermissionSet.setPermissionUris(Collections
 				.singleton(SimplePermission.SEE_SITE_ADMIN_PAGE.getUri()));
-
+		
 		userAccountsDao = new UserAccountsDaoStub();
 		userAccountsDao.addPermissionSet(adminPermissionSet);
 		userAccountsDao.addUser(createUserFromUserInfo(NEW_DBA));
@@ -150,10 +154,8 @@ public class AuthenticateTest extends AbstractTestClass {
 		webappDaoFactory.setUserAccountsDao(userAccountsDao);
 		webappDaoFactory.setIndividualDao(individualDao);
 
-		servletContext = new ServletContextStub();
-		ModelAccess.on(servletContext).setWebappDaoFactory(webappDaoFactory);
-		servletContext.setAttribute(AuthenticatorStub.FACTORY_ATTRIBUTE_NAME,
-				authenticatorFactory);
+		ModelAccessFactoryStub mafs = new ModelAccessFactoryStub();
+		mafs.get(servletContext).setWebappDaoFactory(webappDaoFactory);
 
 		setLoggerLevel(ServletPolicyList.class, Level.WARN);
 		ServletPolicyList.addPolicy(servletContext, new PermissionsPolicy());

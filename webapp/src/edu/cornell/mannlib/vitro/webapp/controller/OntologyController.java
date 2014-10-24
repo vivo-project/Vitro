@@ -11,7 +11,6 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,7 +26,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
@@ -128,7 +127,7 @@ public class OntologyController extends VitroHttpServlet{
 	     String url = ontology;
 	     
 	    		
-		OntModel ontModel = ModelAccess.on(vreq.getSession()).getJenaOntModel();
+		OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel();
 
         boolean found = false;
         Model newModel = ModelFactory.createDefaultModel();			

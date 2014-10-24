@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.APPLICATION_METADATA;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,8 +25,8 @@ import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean.ThemeInfo;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 public class ThemeInfoSetup implements ServletContextListener {
@@ -91,7 +93,7 @@ public class ThemeInfoSetup implements ServletContextListener {
 	}
 
 	private String getCurrentThemeName(ServletContext ctx) {
-		OntModel ontModel = ModelAccess.on(ctx).getApplicationMetadataModel();
+		OntModel ontModel = ModelAccess.on(ctx).getOntModel(APPLICATION_METADATA);
 
 		ontModel.enterCriticalSection(Lock.READ);
 		try {

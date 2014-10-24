@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_INFERENCES;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,15 +23,13 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.vocabulary.OWL;
 
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.ReasonerConfiguration;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.reasoner.ReasonerPlugin;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasonerTBoxListener;
@@ -88,12 +88,12 @@ public class SimpleReasonerSetup implements ServletContextListener {
             
             // set up simple reasoning for the ABox
                                 
-            RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService();            
-            Dataset dataset = new RDFServiceDataset(rdfService);
+            RDFService rdfService = ModelAccess.on(ctx).getRDFService();            
+            Dataset dataset = ModelAccess.on(ctx).getDataset();
             
             Model rebuildModel = dataset.getNamedModel(JENA_INF_MODEL_REBUILD); 
             Model scratchModel = dataset.getNamedModel(JENA_INF_MODEL_SCRATCHPAD);
-            Model inferenceModel = dataset.getNamedModel(ModelNames.ABOX_INFERENCES);
+            Model inferenceModel = dataset.getNamedModel(ABOX_INFERENCES);
 
             // the simple reasoner will register itself as a listener to the ABox assertions
             SimpleReasoner simpleReasoner = new SimpleReasoner(

@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vedit.controller;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ReasoningOption.ASSERTIONS_ONLY;
+
 import java.text.Collator;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -29,7 +31,8 @@ import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ReasoningOption;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class BaseEditController extends VitroHttpServlet {
@@ -193,7 +196,7 @@ public class BaseEditController extends VitroHttpServlet {
    }
     
     protected WebappDaoFactory getWebappDaoFactory() {
-    	return ModelAccess.on(getServletContext()).getBaseWebappDaoFactory();
+    	return ModelAccess.on(getServletContext()).getWebappDaoFactory(ASSERTIONS_ONLY);
     }
     
     protected WebappDaoFactory getWebappDaoFactory(String userURI) {

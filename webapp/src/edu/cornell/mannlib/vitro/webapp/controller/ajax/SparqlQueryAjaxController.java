@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.ajax;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 
 import java.io.IOException;
@@ -20,7 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.SparqlUtils.AjaxControllerException;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 /**
  * Handle an AJAX request for a SPARQL query. On entry, the "query" parameter
@@ -78,9 +79,9 @@ public class SparqlQueryAjaxController extends VitroAjaxController {
 
 	private Model locateModel(VitroRequest vreq, String modelParam) {
 		if (OPTION_MODEL_USER_ACCOUNTS.equals(modelParam)) {
-			return ModelAccess.on(vreq).getUserAccountsModel();
+			return ModelAccess.on(vreq).getOntModel(USER_ACCOUNTS);
 		} else {
-			return ModelAccess.on(vreq).getJenaOntModel();
+			return ModelAccess.on(vreq).getOntModel();
 		}
 	}
 

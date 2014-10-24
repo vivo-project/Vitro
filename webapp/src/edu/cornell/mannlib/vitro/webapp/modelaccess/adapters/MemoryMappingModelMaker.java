@@ -10,8 +10,7 @@ import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.rdf.model.ModelReader;
 import com.hp.hpl.jena.shared.AlreadyExistsException;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.MemoryMappedModel;
 
 /**
  * Provides fast read access to small models, by creating a "mapped" model in
@@ -34,11 +33,7 @@ public class MemoryMappingModelMaker extends AbstractModelMakerDecorator {
 	}
 
 	private Model createMemoryMapping(String name) {
-		Model externalModel = super.openModel(name);
-		Model memoryModel = VitroModelFactory.createModel();
-		memoryModel.add(externalModel);
-		memoryModel.register(new ModelSynchronizer(externalModel, name));
-		return memoryModel;
+		return new MemoryMappedModel(super.openModel(name), name);
 	}
 
 	private boolean isMapped(String name) {

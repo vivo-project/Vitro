@@ -13,7 +13,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
-import edu.cornell.mannlib.vitro.webapp.searchengine.SearchEngineWrapper;
+import edu.cornell.mannlib.vitro.webapp.searchengine.InstrumentedSearchEngineWrapper;
 import edu.cornell.mannlib.vitro.webapp.searchengine.solr.SolrSearchEngine;
 import edu.cornell.mannlib.vitro.webapp.startup.ComponentStartupStatusImpl;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -85,7 +85,7 @@ public class ApplicationImpl implements Application {
 				ComponentStartupStatus css = new ComponentStartupStatusImpl(
 						this, ss);
 
-				SearchEngine searchEngine = new SearchEngineWrapper(
+				SearchEngine searchEngine = new InstrumentedSearchEngineWrapper(
 						new SolrSearchEngine());
 				searchEngine.startup(application, css);
 				application.setSearchEngine(searchEngine);

@@ -7,8 +7,6 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.query.Dataset;
-
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDaoCon;
 
@@ -40,13 +38,4 @@ public class JenaDataSourceSetupBase extends JenaBaseDaoCon {
         }
     }
     
-    public static void setStartupDataset(Dataset dataset, ServletContext ctx) {
-        ctx.setAttribute("startupDataset", dataset);
-    }
-    
-    public static Dataset getStartupDataset(ServletContext ctx) {
-        Object o = ctx.getAttribute("startupDataset");
-        return (o instanceof Dataset) ? ((Dataset) o) : null;
-    }
-
 }

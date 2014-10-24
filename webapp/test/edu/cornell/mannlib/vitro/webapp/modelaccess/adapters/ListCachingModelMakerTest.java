@@ -28,7 +28,8 @@ import com.hp.hpl.jena.shared.DoesNotExistException;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 
 /**
- * TODO
+ * Test the functions of a ListCachingModelMaker. Does it properly register the
+ * presence of a model with no triples?
  */
 public class ListCachingModelMakerTest extends AbstractTestClass {
 	private static final String URI_ONE = "http://model.one";

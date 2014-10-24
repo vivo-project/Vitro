@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_ASSERTIONS;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,8 +31,8 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.util.ResourceUtils;
 
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 public class RunSparqlConstructs implements ServletContextListener {
 
@@ -50,7 +52,7 @@ public class RunSparqlConstructs implements ServletContextListener {
 			String namespace = (wadf != null && wadf.getDefaultNamespace() != null) 
 				? wadf.getDefaultNamespace() : DEFAULT_DEFAULT_NAMESPACE;
 			
-		    OntModel baseOntModel = ModelAccess.on(ctx).getBaseOntModel();
+		    OntModel baseOntModel = ModelAccess.on(ctx).getOntModel(FULL_ASSERTIONS);
 			Model anonModel = ModelFactory.createDefaultModel();
 			Model namedModel = ModelFactory.createDefaultModel();
 			

@@ -22,8 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.PageController;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.PageDao;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 /**
  * This filter is intended to route requests to pages defined in the display model.
  * 

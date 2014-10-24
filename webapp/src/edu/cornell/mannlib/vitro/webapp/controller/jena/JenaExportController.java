@@ -2,6 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_INFERENCES;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.APPLICATION_METADATA;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_INFERENCES;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_UNION;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,9 +34,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
@@ -118,7 +123,7 @@ public class JenaExportController extends BaseEditController {
 		if( "abox".equals(subgraphParam)){
 			model = ModelFactory.createDefaultModel();
 			if("inferred".equals(assertedOrInferredParam)){
-				model = ModelAccess.on(getServletContext()).getOntModel(ModelNames.ABOX_INFERENCES);
+				model = ModelAccess.on(getServletContext()).getOntModel(ABOX_INFERENCES);
 			}
 			else if("full".equals(assertedOrInferredParam)){
 			    outputSparqlConstruct(ABOX_FULL_CONSTRUCT, formatParam, response);
@@ -133,9 +138,9 @@ public class JenaExportController extends BaseEditController {
 		        // so we'll extract the whole ontology and then include
 		        // only those statements that are in the inferred graph
 		        Model tempModel = xutil.extractTBox(
-		        		ModelAccess.on(getServletContext()).getOntModel(ModelNames.TBOX_UNION),
+		        		ModelAccess.on(getServletContext()).getOntModel(TBOX_UNION),
 		                ontologyURI);
-		        Model inferenceModel = ModelAccess.on(getServletContext()).getOntModel(ModelNames.TBOX_INFERENCES);
+		        Model inferenceModel = ModelAccess.on(getServletContext()).getOntModel(TBOX_INFERENCES);
 		        inferenceModel.enterCriticalSection(Lock.READ);
 		        try {
     		        model = tempModel.intersection(inferenceModel);
@@ -144,20 +149,20 @@ public class JenaExportController extends BaseEditController {
 		        }
 		    } else if ("full".equals(assertedOrInferredParam)) {
                 model = xutil.extractTBox(
-                		ModelAccess.on(getServletContext()).getOntModel(ModelNames.TBOX_UNION),
+                		ModelAccess.on(getServletContext()).getOntModel(TBOX_UNION),
                         ontologyURI);		        
 		    } else {
                 model = xutil.extractTBox(
-                        ModelAccess.on(getServletContext()).getOntModel(ModelNames.TBOX_ASSERTIONS), ontologyURI);              		        
+                        ModelAccess.on(getServletContext()).getOntModel(TBOX_ASSERTIONS), ontologyURI);              		        
 		    }
 			
 		}
 		else if("full".equals(subgraphParam)){
 			if("inferred".equals(assertedOrInferredParam)){
 				ontModel = xutil.extractTBox(
-						dataset, ontologyURI, ModelNames.ABOX_INFERENCES);
-				ontModel.addSubModel(ModelAccess.on(getServletContext()).getOntModel(ModelNames.ABOX_INFERENCES));
-				ontModel.addSubModel(ModelAccess.on(getServletContext()).getOntModel(ModelNames.TBOX_INFERENCES));
+						dataset, ontologyURI, ABOX_INFERENCES);
+				ontModel.addSubModel(ModelAccess.on(getServletContext()).getOntModel(ABOX_INFERENCES));
+				ontModel.addSubModel(ModelAccess.on(getServletContext()).getOntModel(TBOX_INFERENCES));
 			}
 			else if("full".equals(assertedOrInferredParam)){
 			    outputSparqlConstruct(FULL_FULL_CONSTRUCT, formatParam, response);
@@ -228,7 +233,7 @@ public class JenaExportController extends BaseEditController {
 	
 	private void outputSparqlConstruct(String queryStr, String formatParam, 
 	        HttpServletResponse response) {
-	    RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(getServletContext()).getRDFService();
+	    RDFService rdfService = ModelAccess.on(getServletContext()).getRDFService();
 	    try {
 	        setHeaders(response, formatParam);
 	        OutputStream out = response.getOutputStream();
@@ -284,19 +289,19 @@ public class JenaExportController extends BaseEditController {
 	
 	private static final String ABOX_FULL_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
 	        "WHERE { GRAPH ?g { ?s ?p ?o } FILTER (!regex(str(?g), \"tbox\")) " +
-            "FILTER (?g != <" + ModelNames.APPLICATION_METADATA + ">) }";
+            "FILTER (?g != <" + APPLICATION_METADATA + ">) }";
 	
 	private static final String ABOX_ASSERTED_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
             "WHERE { GRAPH ?g { ?s ?p ?o } FILTER (!regex(str(?g), \"tbox\")) " + 
-	        "FILTER (?g != <" + ModelNames.ABOX_INFERENCES + ">) " +
-	        "FILTER (?g != <" + ModelNames.APPLICATION_METADATA + ">) }";
+	        "FILTER (?g != <" + ABOX_INFERENCES + ">) " +
+	        "FILTER (?g != <" + APPLICATION_METADATA + ">) }";
 	
 	private static final String FULL_FULL_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
             "WHERE { ?s ?p ?o }";
 
     private static final String FULL_ASSERTED_CONSTRUCT = "CONSTRUCT { ?s ?p ?o } " +
             "WHERE { GRAPH ?g { ?s ?p ?o } " + 
-            "FILTER (?g != <" + ModelNames.ABOX_INFERENCES + ">) " +
-            "FILTER (?g != <" + ModelNames.TBOX_INFERENCES + ">) }";
+            "FILTER (?g != <" + ABOX_INFERENCES + ">) " +
+            "FILTER (?g != <" + TBOX_INFERENCES + ">) }";
     
 }

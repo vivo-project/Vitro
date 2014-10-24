@@ -1,0 +1,21 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+/* Styles for Freemarker template admin/showSources */
+
+#show-sources pre {
+    font-family: monospace;
+    line-height: 1.1em;
+}
+
+#show-sources table {
+    width: 100%;
+    border: solid black;
+}
+
+#show-sources th {
+    background-color: #EEEEEE;
+}
+
+#show-sources td {
+    border: 1px solid gray;
+}

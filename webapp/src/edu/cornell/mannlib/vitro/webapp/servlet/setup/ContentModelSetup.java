@@ -2,7 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
-import static edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_ASSERTIONS;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.APPLICATION_METADATA;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +16,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -23,18 +24,10 @@ import com.hp.hpl.jena.util.ResourceUtils;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.FactoryID;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -56,19 +49,16 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
     } 
 
     private void setUpJenaDataSource(ServletContext ctx) {
-        ModelAccess models = ModelAccess.on(ctx);
+        ContextModelAccess models = ModelAccess.on(ctx);
     	
-    	RDFService rdfService = createRdfService(ctx);
-    	createStartupDataset(ctx, rdfService);
-    	
-    	Model applicationMetadataModel = models.getOntModel(ModelNames.APPLICATION_METADATA);
+    	Model applicationMetadataModel = models.getOntModel(APPLICATION_METADATA);
 		if (applicationMetadataModel.size()== 0) {
 			thisIsFirstStartup();
 		}
 
 
-        OntModel baseABoxModel = models.getOntModel(ModelNames.ABOX_ASSERTIONS);
-        OntModel baseTBoxModel = models.getOntModel(ModelNames.TBOX_ASSERTIONS);
+        OntModel baseABoxModel = models.getOntModel(ABOX_ASSERTIONS);
+        OntModel baseTBoxModel = models.getOntModel(TBOX_ASSERTIONS);
         
         if (isFirstStartup()) {
         	initializeApplicationMetadata(ctx, applicationMetadataModel);
@@ -81,31 +71,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
     	RDFFilesLoader.loadEveryTimeFiles(ctx, "tbox", baseTBoxModel);
     	
 		log.info("Setting up DAO factories");
-		
-        WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
-        config.setDefaultNamespace(getDefaultNamespace(ctx));
-        
-        OntModelSelector baseOms = models.getBaseOntModelSelector();
-        WebappDaoFactory baseWadf = new WebappDaoFactorySDB(rdfService, baseOms, config, ASSERTIONS_ONLY);
-        ModelAccess.on(ctx).setWebappDaoFactory(FactoryID.BASE, baseWadf);
-        ModelAccess.on(ctx).setWebappDaoFactory(FactoryID.UNFILTERED_BASE, baseWadf);
-        
-        OntModelSelector unionOms = models.getUnionOntModelSelector();
-        WebappDaoFactory wadf = new WebappDaoFactorySDB(rdfService, unionOms, config);
-        ModelAccess.on(ctx).setWebappDaoFactory(FactoryID.UNION, wadf);
-        ModelAccess.on(ctx).setWebappDaoFactory(FactoryID.UNFILTERED_UNION, wadf);
-
-        ctx.setAttribute("defaultNamespace", getDefaultNamespace(ctx));
     }
-
-	private RDFService createRdfService(ServletContext ctx) {
-		return RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService();
-	}
-	
-	private void createStartupDataset(ServletContext ctx, RDFService rdfService) {
-    	Dataset dataset = new RDFServiceDataset(rdfService);
-    	setStartupDataset(dataset, ctx);
-	}
 
 	private long secondsSince(long startTime) {
 		return (System.currentTimeMillis() - startTime) / 1000;

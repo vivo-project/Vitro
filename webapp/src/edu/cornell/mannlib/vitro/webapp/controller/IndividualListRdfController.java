@@ -3,6 +3,7 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 
 import static edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.RdfResultMediaType.RDF_XML;
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.RDF_TYPE;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_ASSERTIONS;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_ACCEPTABLE;
@@ -29,7 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.api.VitroApiServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.InvalidQueryTypeException;
 import edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.RdfResultMediaType;
 import edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery.SparqlQueryApiExecutor;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
@@ -94,7 +95,7 @@ public class IndividualListRdfController extends VitroApiServlet {
 		ObjectProperty property = new ObjectProperty();
 		property.setURI(RDF_TYPE);
 		RequestedAction dops = new PublishObjectPropertyStatement(ModelAccess
-				.on(req).getBaseOntModel(), RequestedAction.SOME_URI, property,
+				.on(req).getOntModel(FULL_ASSERTIONS), RequestedAction.SOME_URI, property,
 				vclassUri);
 		return !PolicyHelper.isAuthorizedForActions(req, dops);
 	}

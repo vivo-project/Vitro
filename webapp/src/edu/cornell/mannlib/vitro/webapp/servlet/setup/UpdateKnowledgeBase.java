@@ -2,6 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ReasoningOption.ASSERTIONS_ONLY;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ReasoningOption.INFERENCES_ONLY;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -42,11 +46,10 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.KnowledgeBaseUpdater;
 import edu.cornell.mannlib.vitro.webapp.ontology.update.UpdateSettings;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -90,13 +93,13 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			
 			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());
-			settings.setAssertionOntModelSelector(ModelAccess.on(ctx).getBaseOntModelSelector());
-			settings.setInferenceOntModelSelector(ModelAccess.on(ctx).getInferenceOntModelSelector());
-			settings.setUnionOntModelSelector(ModelAccess.on(ctx).getUnionOntModelSelector());
+			settings.setAssertionOntModelSelector(ModelAccess.on(ctx).getOntModelSelector(ASSERTIONS_ONLY));
+			settings.setInferenceOntModelSelector(ModelAccess.on(ctx).getOntModelSelector(INFERENCES_ONLY));
+			settings.setUnionOntModelSelector(ModelAccess.on(ctx).getOntModelSelector());
 			
 		    ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
 		    Path homeDir = Paths.get(props.getProperty("vitro.home"));
-			settings.setDisplayModel(ModelAccess.on(ctx).getDisplayModel());
+			settings.setDisplayModel(ModelAccess.on(ctx).getOntModel(DISPLAY));
 			OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
 			settings.setOldTBoxModel(oldTBoxModel);
 			OntModel newTBoxModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "tbox", "filegraph").toString());
@@ -105,7 +108,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
 			OntModel newTBoxAnnotationsModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "tbox", "firsttime").toString());
 			settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
-			settings.setRDFService(RDFServiceUtils.getRDFServiceFactory(ctx).getRDFService());
+			settings.setRDFService(ModelAccess.on(ctx).getRDFService());
 
 			boolean tryMigrateDisplay = true;
 			try {

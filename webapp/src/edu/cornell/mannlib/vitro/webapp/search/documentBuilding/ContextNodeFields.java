@@ -51,7 +51,7 @@ public class ContextNodeFields implements DocumentModifier{
     }                
     
     @Override
-    public void modifyDocument(Individual individual, SearchInputDocument doc, StringBuffer addUri) {        
+    public void modifyDocument(Individual individual, SearchInputDocument doc) {        
         if( individual == null )
             return;
         

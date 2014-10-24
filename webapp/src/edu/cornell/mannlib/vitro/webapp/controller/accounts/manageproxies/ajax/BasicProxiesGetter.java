@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ajax;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,8 +22,8 @@ import com.hp.hpl.jena.query.QuerySolution;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.AbstractAjaxResponder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil;
@@ -58,7 +60,7 @@ public class BasicProxiesGetter extends AbstractAjaxResponder {
 		super(servlet, vreq, resp);
 		term = getStringParameter(PARAMETER_SEARCH_TERM, "");
 
-		userAccountsModel = ModelAccess.on(vreq).getUserAccountsModel();
+		userAccountsModel = ModelAccess.on(vreq).getOntModel(USER_ACCOUNTS);
 
 		placeholderImageUrl = UrlBuilder.getUrl(PlaceholderUtil
 				.getPlaceholderImagePathForType(vreq,

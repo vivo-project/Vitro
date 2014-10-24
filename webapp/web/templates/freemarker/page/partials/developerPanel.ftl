@@ -66,6 +66,8 @@
 							<br/>
 							<a href="${urls.base}/admin/showAuth">Show authorization info</a>
 							<a href="${urls.base}/admin/showThreads">Show background threads</a>
+							<br/>
+							<a href="${urls.base}/admin/showSources">Show RDF data sources</a>
 						</div>
 					</div>
 						

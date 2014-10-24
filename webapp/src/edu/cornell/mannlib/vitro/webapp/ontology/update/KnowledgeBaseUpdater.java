@@ -31,6 +31,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -333,7 +334,7 @@ public class KnowledgeBaseUpdater {
 			return required;
 		}
 		
-		RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(servletContext).getRDFService();
+		RDFService rdfService = ModelAccess.on(servletContext).getRDFService();
 
 		// if the ASK query DOES have a solution (i.e. the assertions exist
 		// showing that the update has already been performed), then the update
@@ -381,7 +382,7 @@ public class KnowledgeBaseUpdater {
 	
 	private void assertSuccess(ServletContext servletContext) throws FileNotFoundException, IOException {
 		try {				
-			RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(servletContext).getRDFService();
+			RDFService rdfService = ModelAccess.on(servletContext).getRDFService();
 			
 			ChangeSet changeSet = rdfService.manufactureChangeSet();
 		    File successAssertionsFile = new File(settings.getSuccessAssertionsFile()); 

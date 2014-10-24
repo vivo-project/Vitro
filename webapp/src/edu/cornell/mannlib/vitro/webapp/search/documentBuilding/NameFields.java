@@ -18,7 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 
 /**
- * Adds all labels to name fields, not just the one returned by Indivdiual.getName().
+ * Adds all labels to name fields, not just the one returned by Individual.getName().
  */
 public class NameFields implements DocumentModifier {
 	RDFServiceFactory rsf;
@@ -31,8 +31,7 @@ public class NameFields implements DocumentModifier {
 	}
 	
 	@Override
-	public void modifyDocument(Individual ind, SearchInputDocument doc,
-			StringBuffer addUri) throws SkipIndividualException {
+	public void modifyDocument(Individual ind, SearchInputDocument doc) {
 		if( ind == null || ind.getURI() == null ){
 			return;
 		}

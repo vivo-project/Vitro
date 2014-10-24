@@ -2,38 +2,43 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup;
 
-import static edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService.CONFIGURATION;
-import static edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService.CONTENT;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sparql.RDFSourceSPARQL.PROPERTY_SPARQL_ENDPOINT_URI;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.tdb.RDFSourceTDB.PROPERTY_CONTENT_TDB_PATH;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONFIGURATION;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sparql.ContentDataStructuresProviderSPARQL.PROPERTY_SPARQL_ENDPOINT_URI;
+import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.tdb.ContentDataStructuresProviderTDB.PROPERTY_CONTENT_TDB_PATH;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntDocumentManager;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelMakerID;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelMakerUtils;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.RDFSourceSDB;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sparql.RDFSourceSPARQL;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.tdb.RDFSourceTDB;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.BasicDataStructuresProvider;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.ConfigurationDataStructuresProvider;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.ContentDataStructuresProvider;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sparql.ContentDataStructuresProviderSPARQL;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.tdb.ConfigurationDataStructuresProviderTDB;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.tdb.ContentDataStructuresProviderTDB;
 
 /**
  * Create the RDFServiceFactories and ModelMakers for the application to use.
  */
 public class RDFSetup implements ServletContextListener {
+	private static final Log log = LogFactory.getLog(RDFSetup.class);
+
 	private ServletContext ctx;
 	private ConfigurationProperties configProps;
 
-	private RDFSource contentRdfSource;
-	private RDFSource configurationRdfSource;
+	private ContentDataStructuresProvider contentProvider;
+	private ConfigurationDataStructuresProvider configurationProvider;
+	private BasicDataStructuresProvider provider;
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -42,23 +47,14 @@ public class RDFSetup implements ServletContextListener {
 
 		configureJena();
 
-		createRdfSources();
+		createProviders();
 
 		RDFServiceUtils.setRDFServiceFactory(ctx,
-				contentRdfSource.getRDFServiceFactory(), WhichService.CONTENT);
-		ModelMakerUtils.setContentModelMakerFactory(ctx,
-				contentRdfSource.getContentModelMakerFactory());
-		ModelAccess.on(ctx).setModelMaker(ModelMakerID.CONTENT,
-				ModelMakerUtils.getModelMaker(ctx, WhichService.CONTENT));
-
+				contentProvider.getRDFServiceFactory());
 		RDFServiceUtils.setRDFServiceFactory(ctx,
-				configurationRdfSource.getRDFServiceFactory(),
-				WhichService.CONFIGURATION);
-		ModelMakerUtils.setConfigurationModelMakerFactory(ctx,
-				configurationRdfSource.getConfigurationModelMakerFactory());
-		ModelAccess.on(ctx).setModelMaker(ModelMakerID.CONFIGURATION,
-				ModelMakerUtils.getModelMaker(ctx, WhichService.CONFIGURATION));
+				configurationProvider.getRDFServiceFactory(), CONFIGURATION);
 
+		ModelAccess.setDataStructuresProvider(provider);
 	}
 
 	private void configureJena() {
@@ -70,15 +66,20 @@ public class RDFSetup implements ServletContextListener {
 	 * For now, these steps are hard-coded. They should be driven by a
 	 * configuration file.
 	 */
-	private void createRdfSources() {
+	private void createProviders() {
 		if (isSparqlEndpointContentConfigured()) {
-			contentRdfSource = new RDFSourceSPARQL(ctx, this);
+			contentProvider = new ContentDataStructuresProviderSPARQL(ctx, this);
 		} else if (isTdbConfigured()) {
-			contentRdfSource = new RDFSourceTDB(ctx, this, CONTENT);
+			contentProvider = new ContentDataStructuresProviderTDB(ctx, this);
 		} else {
-			contentRdfSource = new RDFSourceSDB(ctx, this);
+			contentProvider = new ContentDataStructuresProviderSDB(ctx, this);
 		}
-		configurationRdfSource = new RDFSourceTDB(ctx, this, CONFIGURATION);
+
+		configurationProvider = new ConfigurationDataStructuresProviderTDB(ctx,
+				this);
+
+		provider = new BasicDataStructuresProvider(contentProvider,
+				configurationProvider);
 	}
 
 	private boolean isSparqlEndpointContentConfigured() {
@@ -93,11 +94,19 @@ public class RDFSetup implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		if (configurationRdfSource != null) {
-			configurationRdfSource.close();
+		if (contentProvider != null) {
+			try {
+				contentProvider.close();
+			} catch (Exception e) {
+				log.error("Problem when closing content provider", e);
+			}
 		}
-		if (contentRdfSource != null) {
-			contentRdfSource.close();
+		if (configurationProvider != null) {
+			try {
+				configurationProvider.close();
+			} catch (Exception e) {
+				log.error("Problem when closing configuration provider", e);
+			}
 		}
 	}
 

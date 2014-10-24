@@ -33,9 +33,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 public class RestrictionsListingController extends BaseEditController {
 
@@ -52,7 +52,7 @@ public class RestrictionsListingController extends BaseEditController {
 
         epo = super.createEpo(request);
         
-		OntModel ontModel = ModelAccess.on(getServletContext()).getJenaOntModel();
+		OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel();
 
         ObjectPropertyDao opDao = vrequest.getUnfilteredWebappDaoFactory().getObjectPropertyDao();
         VClassDao vcDao = vrequest.getUnfilteredWebappDaoFactory().getVClassDao();

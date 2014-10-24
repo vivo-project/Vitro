@@ -45,10 +45,8 @@ public class ThumbnailImageURL implements DocumentModifier {
 	}
 	
 	@Override
-	public void modifyDocument(Individual individual, SearchInputDocument doc,
-			StringBuffer addUri) throws SkipIndividualException {
-		
-		//add a field for storing the location of thumbnail for the individual.
+	public void modifyDocument(Individual individual, SearchInputDocument doc) {
+		// add a field for storing the location of thumbnail for the individual.
 		doc.addField(THUMBNAIL_URL, runQueryForThumbnailLocation(individual));
 		addThumbnailExistence(individual, doc);
 	}

@@ -29,8 +29,6 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.documentBuilding.SkipIndividualException;
-import edu.cornell.mannlib.vitro.webapp.search.documentBuilding.ThumbnailImageURL;
 
 public class ThumbnailImageURLTest extends AbstractTestClass{
     RDFServiceFactory testRDF;
@@ -62,11 +60,7 @@ public class ThumbnailImageURLTest extends AbstractTestClass{
         ind.setURI(personsURI);
         
         //make sure that the person is in the RDF
-        try {
-            testMe.modifyDocument(ind, doc, null);
-        } catch (SkipIndividualException e) {
-                Assert.fail("Test individual was skipped by classes that build the search document: " + e.getMessage());
-        }
+        testMe.modifyDocument(ind, doc);
 
         //make sure that a search document field got created for the thumbnail image
         

@@ -36,7 +36,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
@@ -46,6 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocesso
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3Utils;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.menuManagement.MenuManagementDataUtils;
 
@@ -219,7 +219,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
 	  void prepare(VitroRequest vreq, EditConfigurationVTwo editConfig) {
 	        //setup the model selectors for query, write and display models on editConfig
 	        setupModelSelectorsFromVitroRequest(vreq, editConfig);         
-			OntModel queryModel = ModelAccess.on(vreq).getJenaOntModel();
+			OntModel queryModel = ModelAccess.on(vreq).getOntModel();
 	        if (editConfig.isParamUpdate()) { 
 	        	editConfig.prepareForParamUpdate(queryModel);
 	        	
@@ -236,7 +236,7 @@ public class ManagePageGenerator extends BaseEditConfigurationGenerator implemen
         if (editConfig.isParamUpdate()) { 
         	 //setup the model selectors for query, write and display models on editConfig
 	        setupModelSelectorsFromVitroRequest(vreq, editConfig);         
-			OntModel queryModel = ModelAccess.on(vreq).getJenaOntModel();
+			OntModel queryModel = ModelAccess.on(vreq).getOntModel();
         	retrieveExistingDataGetterInfo(context, editConfig, queryModel);
         }
 		
@@ -639,7 +639,7 @@ private String getExistingIsSelfContainedTemplateQuery() {
 		int maxMenuPosition = 0;
 		Literal menuPosition = null;
 		setupModelSelectorsFromVitroRequest(vreq, editConfig);         
-		OntModel queryModel = ModelAccess.on(vreq).getJenaOntModel();
+		OntModel queryModel = ModelAccess.on(vreq).getOntModel();
 
 		String maxMenuPositionQuery = getMaxMenuPositionQueryString();
     	QueryExecution qe = null;
