@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.commons.io.output.NullOutputStream;
 import org.junit.Test;

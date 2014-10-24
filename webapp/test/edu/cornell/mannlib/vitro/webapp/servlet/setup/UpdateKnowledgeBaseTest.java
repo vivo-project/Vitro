@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import java.io.StringReader;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;

@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.indexing;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.log4j.Level;
 import org.junit.Ignore;

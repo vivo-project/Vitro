@@ -5,9 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Level;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,7 +18,6 @@ import com.hp.hpl.jena.rdf.model.impl.RDFDefaultErrorHandler;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MainMenu;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.menu.MenuItem;
 
