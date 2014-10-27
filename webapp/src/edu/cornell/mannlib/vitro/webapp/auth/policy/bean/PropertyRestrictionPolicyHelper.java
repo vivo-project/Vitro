@@ -28,13 +28,12 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.rdf.model.impl.Util;
-import com.hp.hpl.jena.sdb.util.Pair;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao.FullPropertyKey;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -111,12 +110,12 @@ public class PropertyRestrictionPolicyHelper {
 	                                                         Model displayModel) {
 	    
 	    
-		Map<Pair<String, Pair<String,String>>, RoleLevel> displayThresholdMap = 
-		        new HashMap<Pair<String, Pair<String,String>>, RoleLevel>();
-		Map<Pair<String, Pair<String,String>>, RoleLevel> modifyThresholdMap = 
-		        new HashMap<Pair<String, Pair<String,String>>, RoleLevel>();
-		Map<Pair<String, Pair<String,String>>, RoleLevel> publishThresholdMap = 
-				new HashMap<Pair<String, Pair<String,String>>, RoleLevel>();
+		Map<FullPropertyKey, RoleLevel> displayThresholdMap = 
+		        new HashMap<FullPropertyKey, RoleLevel>();
+		Map<FullPropertyKey, RoleLevel> modifyThresholdMap = 
+		        new HashMap<FullPropertyKey, RoleLevel>();
+		Map<FullPropertyKey, RoleLevel> publishThresholdMap = 
+				new HashMap<FullPropertyKey, RoleLevel>();
 		
 		OntModel union = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,
 		        ModelFactory.createUnion(displayModel, model));
@@ -140,32 +139,17 @@ public class PropertyRestrictionPolicyHelper {
 	    return getThreshold(property, modifyThresholdMap);
 	}
 	
-	private RoleLevel getThreshold(Property property, 
-	                               Map<Pair<String, Pair<String,String>>, RoleLevel> 
-	                                       thresholdMap) {
+	private RoleLevel getThreshold(Property property,
+			Map<FullPropertyKey, RoleLevel> thresholdMap) {
 	    if (property.getURI() == null) {
 	        return RoleLevel.NOBODY;
 	    }
-	    RoleLevel roleLevel = getRoleLevelFromMap(
-	            property.getDomainVClassURI(), property.getURI(), 
-	                    property.getRangeVClassURI(), thresholdMap);
-	    if (roleLevel == null) {
-	        roleLevel = getRoleLevelFromMap(
-	                OWL.Thing.getURI(), property.getURI(), OWL.Thing.getURI(),
-	                        thresholdMap);
-	    }
+		RoleLevel roleLevel = thresholdMap.get(new FullPropertyKey(property));
+		if (roleLevel == null) {
+			roleLevel = thresholdMap
+					.get(new FullPropertyKey(property.getURI()));
+		}
 	    return roleLevel;
-	}
-	
-	private RoleLevel getRoleLevelFromMap(String domainURI, 
-	                                      String predicateURI, 
-	                                      String rangeURI,
-	                                      Map<Pair<String, Pair<String,String>>, 
-	                                              RoleLevel> map) {
-	    return map.get(
-                new Pair<String, Pair<String,String>>(
-                        domainURI, new Pair<String,String>(
-                                predicateURI, rangeURI)));
 	}
 	
 	/**
@@ -173,7 +157,7 @@ public class PropertyRestrictionPolicyHelper {
 	 * URI to the required RoleLevel.
 	 */
 	private static void populateThresholdMap(OntModel model,
-			Map<Pair<String,Pair<String,String>>, RoleLevel> map, String propertyUri) {
+			Map<FullPropertyKey, RoleLevel> map, String propertyUri) {
 		model.enterCriticalSection(Lock.READ);
 		try {
 		    com.hp.hpl.jena.rdf.model.Property property = model.getProperty(propertyUri);
@@ -189,9 +173,7 @@ public class PropertyRestrictionPolicyHelper {
     				}
     				Resource object = (Resource) objectNode;
     				RoleLevel role = RoleLevel.getRoleByUri(object.getURI());
-    				map.put(new Pair<String,Pair<String,String>>(
-    				        OWL.Thing.getURI(), new Pair<String,String>(
-    				                subject.getURI(), OWL.Thing.getURI())), role);
+					map.put(new FullPropertyKey(subject.getURI()), role);
     			} 
 			} finally {
 	            stmts.close();			    
@@ -211,12 +193,9 @@ public class PropertyRestrictionPolicyHelper {
                 	role = faux.getHiddenFromPublishBelowRoleLevel();
                 }
                 if (role != null) {
-					log.debug("Putting D:" + faux.getDomainVClassURI() + " P:"
-							+ faux.getURI() + " R:" + faux.getRangeVClassURI()
-							+ " ==> L:" + role);
-                    map.put(new Pair<String,Pair<String,String>>(
-                            faux.getDomainVClassURI(), new Pair<String,String>(
-                                    faux.getURI(), faux.getRangeVClassURI())), role);
+                	FullPropertyKey key = new FullPropertyKey(faux);
+					map.put(key, role);
+					log.debug("Putting key: " + key + " ==> L:" + role);
                 }
             }
 
@@ -245,19 +224,19 @@ public class PropertyRestrictionPolicyHelper {
 	 * These URIs can be displayed only if the user's role is at least as high
 	 * as the threshold role.
 	 */
-	private final Map<Pair<String, Pair<String,String>>, RoleLevel> displayThresholdMap;
+	private final Map<FullPropertyKey, RoleLevel> displayThresholdMap;
 
 	/**
 	 * These URIs can be modified only if the user's role is at least as high as
 	 * the threshold role.
 	 */
-	private final Map<Pair<String, Pair<String,String>>, RoleLevel> modifyThresholdMap;
+	private final Map<FullPropertyKey, RoleLevel> modifyThresholdMap;
 	
 	/**
 	 * These URIs can be published only if the user's role is at least as high as
 	 * the threshold role.
 	 */
-	private final Map<Pair<String, Pair<String,String>>, RoleLevel> publishThresholdMap;
+	private final Map<FullPropertyKey, RoleLevel> publishThresholdMap;
 	
 
 	/**
@@ -269,9 +248,9 @@ public class PropertyRestrictionPolicyHelper {
 	protected PropertyRestrictionPolicyHelper(
 			Collection<String> modifyProhibitedNamespaces,
 			Collection<String> modifyExceptionsAllowedUris,
-			Map<Pair<String, Pair<String,String>>, RoleLevel> displayThresholdMap,
-			Map<Pair<String, Pair<String,String>>, RoleLevel> modifyThresholdMap,
-			Map<Pair<String, Pair<String,String>>, RoleLevel> publishThresholdMap) {
+			Map<FullPropertyKey, RoleLevel> displayThresholdMap,
+			Map<FullPropertyKey, RoleLevel> modifyThresholdMap,
+			Map<FullPropertyKey, RoleLevel> publishThresholdMap) {
 		this.modifyProhibitedNamespaces = unmodifiable(modifyProhibitedNamespaces);
 		this.modifyExceptionsAllowedUris = unmodifiable(modifyExceptionsAllowedUris);
 		this.displayThresholdMap = displayThresholdMap;

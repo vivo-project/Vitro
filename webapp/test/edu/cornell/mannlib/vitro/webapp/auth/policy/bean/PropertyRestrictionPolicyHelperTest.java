@@ -26,12 +26,11 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.sdb.util.Pair;
-import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao.FullPropertyKey;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 /**
@@ -60,27 +59,24 @@ public class PropertyRestrictionPolicyHelperTest extends AbstractTestClass {
 		// setLoggerLevel(PropertyRestrictionPolicyHelper.class, Level.DEBUG);
 	}
 
-	private void mapPut(String predicateURI, RoleLevel roleLevel,
-			Map<Pair<String, Pair<String, String>>, RoleLevel> map) {
-		map.put(new Pair<String, Pair<String, String>>(OWL.Thing.getURI(),
-				new Pair<String, String>(predicateURI, OWL.Thing.getURI())),
-				roleLevel);
+	private FullPropertyKey key(String predicateURI) {
+		return new FullPropertyKey(predicateURI);
 	}
 
 	@Before
 	public void createTheBean() {
-		Map<Pair<String, Pair<String, String>>, RoleLevel> displayLevels = new HashMap<>();
-		mapPut("http://predicates#display_curator", CURATOR, displayLevels);
-		mapPut("http://predicates#display_hidden", NOBODY, displayLevels);
+		Map<FullPropertyKey, RoleLevel> displayLevels = new HashMap<>();
+		displayLevels.put(key("http://predicates#display_curator"), CURATOR);
+		displayLevels.put(key("http://predicates#display_hidden"), NOBODY);
 
-		Map<Pair<String, Pair<String, String>>, RoleLevel> modifyLevels = new HashMap<>();
-		mapPut("http://predicates#modify_self", SELF, modifyLevels);
-		mapPut("http://predicates#modify_curator", CURATOR, modifyLevels);
-		mapPut("http://predicates#modify_hidden", NOBODY, modifyLevels);
+		Map<FullPropertyKey, RoleLevel> modifyLevels = new HashMap<>();
+		modifyLevels.put(key("http://predicates#modify_self"), SELF);
+		modifyLevels.put(key("http://predicates#modify_curator"), CURATOR);
+		modifyLevels.put(key("http://predicates#modify_hidden"), NOBODY);
 
-		Map<Pair<String, Pair<String, String>>, RoleLevel> publishLevels = new HashMap<>();
-		mapPut("http://predicates#publish_curator", CURATOR, publishLevels);
-		mapPut("http://predicates#publish_hidden", NOBODY, publishLevels);
+		Map<FullPropertyKey, RoleLevel> publishLevels = new HashMap<>();
+		publishLevels.put(key("http://predicates#publish_curator"), CURATOR);
+		publishLevels.put(key("http://predicates#publish_hidden"), NOBODY);
 
 		bean = new PropertyRestrictionPolicyHelper(
 				Arrays.asList(PROHIBITED_NAMESPACES),
@@ -103,7 +99,7 @@ public class PropertyRestrictionPolicyHelperTest extends AbstractTestClass {
 				PROPERTY_MODIFY_THRESHOLD, EDITOR.getURI());
 		wrapper.add("http://thresholds#modify_curator",
 				PROPERTY_MODIFY_THRESHOLD, CURATOR.getURI());
-		
+
 		wrapper.add("http://thresholds#publish_public",
 				PROPERTY_PUBLISH_THRESHOLD, PUBLIC.getURI());
 		wrapper.add("http://thresholds#publish_hidden",
@@ -268,9 +264,9 @@ public class PropertyRestrictionPolicyHelperTest extends AbstractTestClass {
 
 	@Test
 	public void buildDisplayThresholds() {
-		Map<Pair<String, Pair<String, String>>, BaseResourceBean.RoleLevel> expectedMap = new HashMap<>();
-		mapPut("http://thresholds#display_public", PUBLIC, expectedMap);
-		mapPut("http://thresholds#display_hidden", NOBODY, expectedMap);
+		Map<FullPropertyKey, BaseResourceBean.RoleLevel> expectedMap = new HashMap<>();
+		expectedMap.put(key("http://thresholds#display_public"), PUBLIC);
+		expectedMap.put(key("http://thresholds#display_hidden"), NOBODY);
 
 		Map<String, RoleLevel> actualMap = populateThresholdMap(PROPERTY_DISPLAY_THRESHOLD);
 		assertEquals("display thresholds", expectedMap, actualMap);
@@ -278,9 +274,9 @@ public class PropertyRestrictionPolicyHelperTest extends AbstractTestClass {
 
 	@Test
 	public void buildModifyThresholds() {
-		Map<Pair<String, Pair<String, String>>, BaseResourceBean.RoleLevel> expectedMap = new HashMap<>();
-		mapPut("http://thresholds#modify_editor", EDITOR, expectedMap);
-		mapPut("http://thresholds#modify_curator", CURATOR, expectedMap);
+		Map<FullPropertyKey, BaseResourceBean.RoleLevel> expectedMap = new HashMap<>();
+		expectedMap.put(key("http://thresholds#modify_editor"), EDITOR);
+		expectedMap.put(key("http://thresholds#modify_curator"), CURATOR);
 
 		Map<String, RoleLevel> actualMap = populateThresholdMap(PROPERTY_MODIFY_THRESHOLD);
 		assertEquals("modify thresholds", expectedMap, actualMap);
@@ -288,9 +284,9 @@ public class PropertyRestrictionPolicyHelperTest extends AbstractTestClass {
 
 	@Test
 	public void buildPublishThresholds() {
-		Map<Pair<String, Pair<String, String>>, BaseResourceBean.RoleLevel> expectedMap = new HashMap<>();
-		mapPut("http://thresholds#publish_public", PUBLIC, expectedMap);
-		mapPut("http://thresholds#publish_hidden", NOBODY, expectedMap);
+		Map<FullPropertyKey, BaseResourceBean.RoleLevel> expectedMap = new HashMap<>();
+		expectedMap.put(key("http://thresholds#publish_public"), PUBLIC);
+		expectedMap.put(key("http://thresholds#publish_hidden"), NOBODY);
 
 		Map<String, RoleLevel> actualMap = populateThresholdMap(PROPERTY_PUBLISH_THRESHOLD);
 		assertEquals("publish thresholds", expectedMap, actualMap);
