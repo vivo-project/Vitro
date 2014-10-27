@@ -91,6 +91,11 @@ public interface WebappDaoFactory {
      * returns a Data Access Object for working with ontology class objects 
      */
     public VClassDao getVClassDao();
+    
+    /**
+     * returns a Data Access Object for working with "faux" ObjectProperties.
+     */
+    public FauxPropertyDao getFauxPropertyDao();
 
 
     /* ==================== DAOs for ABox manipulation ===================== */
