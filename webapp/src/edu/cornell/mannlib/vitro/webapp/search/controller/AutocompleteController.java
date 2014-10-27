@@ -84,6 +84,10 @@ public class AutocompleteController extends VitroAjaxController {
 						hasMultipleTypes = true;
 					}
 				}
+	        } else {
+	        	//if the type parameter is null, no range is specified and individuals of any class might be returned
+	        	//in this case, it would be useful to show the most specific type of the individual
+	        	hasMultipleTypes = true;
 	        }
 			
             SearchQuery query = getQuery(qtxt, vreq);
