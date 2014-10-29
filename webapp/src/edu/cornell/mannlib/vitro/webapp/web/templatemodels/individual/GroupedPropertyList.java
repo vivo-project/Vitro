@@ -91,8 +91,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
          
         if (log.isDebugEnabled()) {
             for (ObjectProperty t : additions) {
-                log.debug(t.getDomainPublic() + " " + t.getGroupURI() + " domain " +
-                        t.getDomainVClassURI());
+                log.debug("addition: " + t);
             }
             log.debug("Added " + additions.size() + 
                     " properties due to application configuration ontology");

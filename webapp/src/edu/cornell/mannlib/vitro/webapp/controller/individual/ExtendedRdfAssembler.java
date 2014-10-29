@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.individual;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_ASSERTIONS;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RdfResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.ExtendedLinkedDataUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
@@ -126,7 +129,8 @@ public class ExtendedRdfAssembler {
     	}
     	
     	newModel = getLabelAndTypes(entity, contextModel, newModel );
-        newModel = getStatementsWithUntypedProperties(subj, contextModel, vreq.getAssertionsOntModel(), newModel);
+		newModel = getStatementsWithUntypedProperties(subj, contextModel,
+				ModelAccess.on(vreq).getOntModel(FULL_ASSERTIONS), newModel);
     	
     	//bdc34: The following code adds all triples where entity is the Subject. 
 //    	contextModel.enterCriticalSection(Lock.READ);
