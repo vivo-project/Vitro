@@ -11,7 +11,6 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.CONTENT;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LANGUAGE_NEUTRAL;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.POLICY_NEUTRAL;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_ASSERTIONS;
 
 import java.text.Collator;
 import java.util.Collections;
@@ -105,10 +104,6 @@ public class VitroRequest extends HttpServletRequestWrapper {
     	return ModelAccess.on(this).getOntModel(ModelNames.FULL_UNION);
     }
     
-    public OntModel getAssertionsOntModel() {
-        return ModelAccess.on(this).getOntModel(FULL_ASSERTIONS);
-    }
-    
     public OntModel getDisplayModel(){
     	return ModelAccess.on(this).getOntModel(DISPLAY);
     }
@@ -198,7 +193,10 @@ public class VitroRequest extends HttpServletRequestWrapper {
 	}
 	
     public WebappDaoFactory getLanguageNeutralWebappDaoFactory() {
-    	return edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.on(this).getWebappDaoFactory(LANGUAGE_NEUTRAL);
+		// It is also policy neutral, because that's how it was originally
+		// implemented, and at least some of the client code expects it that
+		// way.
+    	return ModelAccess.on(this).getWebappDaoFactory(LANGUAGE_NEUTRAL, POLICY_NEUTRAL);
     }
     
     // ----------------------------------------------------------------------

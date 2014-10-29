@@ -72,10 +72,12 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
         this.innerWebappDaoFactory = innerDao;
     }
 
-    @Override
+	@Override
 	public String toString() {
-		return "WebappDaoFactoryFiltering[inner=" + innerWebappDaoFactory + "]";
+		return "WebappDaoFactoryFiltering[inner=" + innerWebappDaoFactory
+				+ ", filters=" + filters + "]";
 	}
+
     
     /* ******************* filtering *********************** */
 
