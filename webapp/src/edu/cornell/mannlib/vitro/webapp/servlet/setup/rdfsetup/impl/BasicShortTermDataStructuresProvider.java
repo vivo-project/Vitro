@@ -18,10 +18,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jena.atlas.lib.Pair;
 
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao.FullPropertyKey;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.JoinedOntModelCache;
@@ -123,11 +122,12 @@ public class BasicShortTermDataStructuresProvider implements
 		return ("true".equals(isStoreReasoned));
 	}
 
-	private Map<Pair<String, Pair<ObjectProperty, String>>, String> getCustomListViewConfigFileMap() {
-		Map<Pair<String, Pair<ObjectProperty, String>>, String> map = (Map<Pair<String, Pair<ObjectProperty, String>>, String>) ctx
+	private Map<FullPropertyKey, String> getCustomListViewConfigFileMap() {
+		@SuppressWarnings("unchecked")
+		Map<FullPropertyKey, String> map = (Map<FullPropertyKey, String>) ctx
 				.getAttribute("customListViewConfigFileMap");
 		if (map == null) {
-			map = new ConcurrentHashMap<Pair<String, Pair<ObjectProperty, String>>, String>();
+			map = new ConcurrentHashMap<FullPropertyKey, String>();
 			ctx.setAttribute("customListViewConfigFileMap", map);
 		}
 		return map;
