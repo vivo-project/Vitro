@@ -379,9 +379,9 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     private FauxPropertyDao fauxPropertyDao = null;
     @Override
     public FauxPropertyDao getFauxPropertyDao() {
-    	if( fauxPropertyDao == null )
-    		fauxPropertyDao = new FauxPropertyDaoJena(
-    				rdfService, dwf, config.customListViewConfigFileMap, this);
+    	if( fauxPropertyDao == null ) {
+			fauxPropertyDao = new FauxPropertyDaoJena(this);
+    	}
     	return fauxPropertyDao;
     }
     

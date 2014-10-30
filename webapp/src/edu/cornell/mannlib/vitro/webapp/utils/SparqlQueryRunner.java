@@ -15,6 +15,7 @@ import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 
 /**
  * Execute SPARQL queries against a model.
@@ -94,6 +95,15 @@ public class SparqlQueryRunner {
 		protected abstract T parseResults(String queryStr, ResultSet results);
 
 		protected abstract T defaultValue();
+
+		protected String ifResourcePresent(QuerySolution solution,
+				String variableName, String defaultValue) {
+			RDFNode node = solution.get(variableName);
+			if (node == null || !node.isURIResource()) {
+				return defaultValue;
+			}
+			return node.asResource().getURI();
+		}
 
 		protected String ifLiteralPresent(QuerySolution solution,
 				String variableName, String defaultValue) {
