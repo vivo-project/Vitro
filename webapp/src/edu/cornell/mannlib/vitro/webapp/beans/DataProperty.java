@@ -6,13 +6,15 @@ import java.text.Collator;
 import java.util.List;
 import java.util.LinkedList;
 
+import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.RoleRestrictedProperty;
+
 /**
  * class representing a property that relates an entity (object)
  * to a data literal
  * @author bjl23
  *
  */
-public class DataProperty extends Property implements Comparable<DataProperty>, ResourceBean {
+public class DataProperty extends Property implements Comparable<DataProperty>, ResourceBean, RoleRestrictedProperty {
 
     private String name = null;
     private String publicName = null;

@@ -17,11 +17,13 @@ import org.joda.time.DateTime;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 
+import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.RoleRestrictedProperty;
+
 /**
  * a class representing an object property
  *
  */
-public class ObjectProperty extends Property implements Comparable<ObjectProperty>, ResourceBean, Cloneable
+public class ObjectProperty extends Property implements Comparable<ObjectProperty>, ResourceBean, Cloneable, RoleRestrictedProperty
 {
 	private static final Log log = LogFactory.getLog(ObjectProperty.class.getName());
 	

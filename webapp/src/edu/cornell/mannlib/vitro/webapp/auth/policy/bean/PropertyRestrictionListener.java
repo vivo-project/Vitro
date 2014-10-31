@@ -15,7 +15,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.listener.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
-import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 /**
@@ -38,12 +37,16 @@ public class PropertyRestrictionListener implements ChangeListener {
 	 */
 	@Override
 	public void doDeleted(Object oldObj, EditProcessObject epo) {
-		Property p = (Property) oldObj;
-		if (anyRoleChanged(p.getHiddenFromDisplayBelowRoleLevel(),
-				p.getProhibitedFromUpdateBelowRoleLevel(),
-				p.getHiddenFromPublishBelowRoleLevel(), null, null, null)) {
-			log.debug("rebuilding the PropertyRestrictionPolicyHelper after deletion");
-			createAndSetBean();
+		if (oldObj instanceof RoleRestrictedProperty) {
+			RoleRestrictedProperty p = (RoleRestrictedProperty) oldObj;
+			if (anyRoleChanged(p.getHiddenFromDisplayBelowRoleLevel(),
+					p.getProhibitedFromUpdateBelowRoleLevel(),
+					p.getHiddenFromPublishBelowRoleLevel(), null, null, null)) {
+				log.debug("rebuilding the PropertyRestrictionPolicyHelper after deletion");
+				createAndSetBean();
+			}
+		} else {
+			log.warn("Not an instance of RoleRestrictedProperty: " + oldObj);
 		}
 	}
 
@@ -52,13 +55,17 @@ public class PropertyRestrictionListener implements ChangeListener {
 	 */
 	@Override
 	public void doInserted(Object newObj, EditProcessObject epo) {
-		Property p = (Property) newObj;
-		if (anyRoleChanged(null, null, null,
-				p.getHiddenFromDisplayBelowRoleLevel(),
-				p.getProhibitedFromUpdateBelowRoleLevel(),
-				p.getHiddenFromPublishBelowRoleLevel())) {
-			log.debug("rebuilding the PropertyRestrictionPolicyHelper after insertion");
-			createAndSetBean();
+		if (newObj instanceof RoleRestrictedProperty) {
+			RoleRestrictedProperty p = (RoleRestrictedProperty) newObj;
+			if (anyRoleChanged(null, null, null,
+					p.getHiddenFromDisplayBelowRoleLevel(),
+					p.getProhibitedFromUpdateBelowRoleLevel(),
+					p.getHiddenFromPublishBelowRoleLevel())) {
+				log.debug("rebuilding the PropertyRestrictionPolicyHelper after insertion");
+				createAndSetBean();
+			}
+		} else {
+			log.warn("Not an instance of RoleRestrictedProperty: " + newObj);
 		}
 	}
 
@@ -67,16 +74,22 @@ public class PropertyRestrictionListener implements ChangeListener {
 	 */
 	@Override
 	public void doUpdated(Object oldObj, Object newObj, EditProcessObject epo) {
-		Property oldP = (Property) oldObj;
-		Property newP = (Property) newObj;
-		if (anyRoleChanged(oldP.getHiddenFromDisplayBelowRoleLevel(),
-				oldP.getProhibitedFromUpdateBelowRoleLevel(),
-				oldP.getHiddenFromPublishBelowRoleLevel(),
-				newP.getHiddenFromDisplayBelowRoleLevel(),
-				newP.getProhibitedFromUpdateBelowRoleLevel(),
-				newP.getHiddenFromPublishBelowRoleLevel())) {
-			log.debug("rebuilding the PropertyRestrictionPolicyHelper after update");
-			createAndSetBean();
+		if (oldObj instanceof RoleRestrictedProperty
+				&& newObj instanceof RoleRestrictedProperty) {
+			RoleRestrictedProperty oldP = (RoleRestrictedProperty) oldObj;
+			RoleRestrictedProperty newP = (RoleRestrictedProperty) newObj;
+			if (anyRoleChanged(oldP.getHiddenFromDisplayBelowRoleLevel(),
+					oldP.getProhibitedFromUpdateBelowRoleLevel(),
+					oldP.getHiddenFromPublishBelowRoleLevel(),
+					newP.getHiddenFromDisplayBelowRoleLevel(),
+					newP.getProhibitedFromUpdateBelowRoleLevel(),
+					newP.getHiddenFromPublishBelowRoleLevel())) {
+				log.debug("rebuilding the PropertyRestrictionPolicyHelper after update");
+				createAndSetBean();
+			}
+		} else {
+			log.warn("Not instances of RoleRestrictedProperty: " + oldObj
+					+ ", " + newObj);
 		}
 	}
 
