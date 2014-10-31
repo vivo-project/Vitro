@@ -25,9 +25,9 @@ public class BaseResourceBean implements ResourceBean {
     protected String localNameWithPrefix = null;
     protected String pickListName = null;
     
-    protected RoleLevel hiddenFromDisplayBelowRoleLevel = RoleLevel.PUBLIC;
-    protected RoleLevel prohibitedFromUpdateBelowRoleLevel = RoleLevel.PUBLIC;
-    protected RoleLevel hiddenFromPublishBelowRoleLevel = RoleLevel.PUBLIC;
+    protected RoleLevel hiddenFromDisplayBelowRoleLevel = null;
+    protected RoleLevel prohibitedFromUpdateBelowRoleLevel = null;
+    protected RoleLevel hiddenFromPublishBelowRoleLevel = null;
     
 	public enum RoleLevel {
 		PUBLIC("http://vitro.mannlib.cornell.edu/ns/vitro/role#public",
@@ -79,10 +79,6 @@ public class BaseResourceBean implements ResourceBean {
 			return shorthand;
 		}
 		
-		public static RoleLevel notNull(RoleLevel level) {
-			return (level == null) ? RoleLevel.values()[0] : level;
-		}
-
 		public static RoleLevel getRoleByUri(String uri2) {
 			if (uri2 == null)
 				return RoleLevel.values()[0];
@@ -213,7 +209,7 @@ public class BaseResourceBean implements ResourceBean {
     
     @Override
 	public void setHiddenFromDisplayBelowRoleLevel(RoleLevel level) {
-        hiddenFromDisplayBelowRoleLevel = RoleLevel.notNull(level);
+        hiddenFromDisplayBelowRoleLevel = level;
     }
     
     @Override
@@ -228,7 +224,7 @@ public class BaseResourceBean implements ResourceBean {
     
     @Override
 	public void setProhibitedFromUpdateBelowRoleLevel(RoleLevel level) {
-        prohibitedFromUpdateBelowRoleLevel = RoleLevel.notNull(level);
+        prohibitedFromUpdateBelowRoleLevel = level;
     }
     
     @Override
@@ -243,7 +239,7 @@ public class BaseResourceBean implements ResourceBean {
     
     @Override
 	public void setHiddenFromPublishBelowRoleLevel(RoleLevel level) {
-        hiddenFromPublishBelowRoleLevel = RoleLevel.notNull(level);
+        hiddenFromPublishBelowRoleLevel = level;
     }
     
     @Override
