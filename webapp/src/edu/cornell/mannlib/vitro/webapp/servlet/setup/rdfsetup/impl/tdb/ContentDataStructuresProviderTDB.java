@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.tdb.RDFServiceTDB;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging.LoggingRDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.ContentDataStructuresProvider;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
@@ -74,7 +75,8 @@ public class ContentDataStructuresProviderTDB extends
 	}
 
 	private RDFServiceFactory createRDFServiceFactory() {
-		return new RDFServiceFactorySingle(this.rdfService);
+		return new LoggingRDFServiceFactory(new RDFServiceFactorySingle(
+				this.rdfService));
 	}
 
 	private ModelMaker createModelMaker() {

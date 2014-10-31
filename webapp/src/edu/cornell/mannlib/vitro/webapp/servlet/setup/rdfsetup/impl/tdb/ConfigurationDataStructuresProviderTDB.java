@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.tdb.RDFServiceTDB;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging.LoggingRDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.ConfigurationDataStructuresProvider;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
@@ -60,8 +61,8 @@ public class ConfigurationDataStructuresProviderTDB extends
 				+ DIRECTORY_TDB;
 
 		try {
-			this.rdfService = new RDFServiceTDB(tdbPath);
-			this.rdfServiceFactory = createRDFServiceFactory();
+			this.rdfServiceFactory = createRDFServiceFactory(tdbPath);
+			this.rdfService = this.rdfServiceFactory.getRDFService();
 			this.dataset = new RDFServiceDataset(this.rdfService);
 			this.modelMaker = createModelMaker();
 			ss.info(ctxListener, "Initialized the RDF source for TDB");
@@ -75,8 +76,10 @@ public class ConfigurationDataStructuresProviderTDB extends
 		TDB.getContext().setTrue(TDB.symUnionDefaultGraph);
 	}
 
-	private RDFServiceFactory createRDFServiceFactory() {
-		return new RDFServiceFactorySingle(this.rdfService);
+	private RDFServiceFactory createRDFServiceFactory(String tdbPath)
+			throws IOException {
+		return new LoggingRDFServiceFactory(new RDFServiceFactorySingle(
+				new RDFServiceTDB(tdbPath)));
 	}
 
 	private ModelMaker createModelMaker() {

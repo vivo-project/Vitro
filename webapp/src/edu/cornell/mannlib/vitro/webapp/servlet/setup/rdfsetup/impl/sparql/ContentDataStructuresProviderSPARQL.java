@@ -17,6 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging.LoggingRDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sparql.RDFServiceSparql;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.ContentDataStructuresProvider;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -58,8 +59,8 @@ public class ContentDataStructuresProviderSPARQL extends
 		this.updateEndpointURI = props
 				.getProperty(PROPERTY_SPARQL_UPDATE_ENDPOINT_URI);
 
-		this.rdfService = createRDFService();
-		this.rdfServiceFactory = createRDFServiceFactory();
+		this.rdfServiceFactory = createRDFServiceFactory(createRDFService());
+		this.rdfService = this.rdfServiceFactory.getRDFService();
 		this.dataset = createDataset();
 		this.modelMaker = createModelMaker();
 	}
@@ -75,8 +76,9 @@ public class ContentDataStructuresProviderSPARQL extends
 		}
 	}
 
-	private RDFServiceFactory createRDFServiceFactory() {
-		return new RDFServiceFactorySingle(this.rdfService);
+	private RDFServiceFactory createRDFServiceFactory(RDFService service) {
+		return new LoggingRDFServiceFactory(
+				new RDFServiceFactorySingle(service));
 	}
 
 	private Dataset createDataset() {
