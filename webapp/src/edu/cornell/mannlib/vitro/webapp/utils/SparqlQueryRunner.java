@@ -136,5 +136,36 @@ public class SparqlQueryRunner {
 		}
 
 	}
+	
+	public static String bindValues(String rawString, VariableValue... values) {
+		String queryString = rawString;
+		for (VariableValue value: values) {
+			queryString = value.bind(queryString);
+		}
+		return queryString;
+	}
+	
+	public static UriValue uriValue(String name, String uri) {
+		return new UriValue(name, uri);
+	}
 
+	public interface VariableValue {
+		String bind(String rawString);
+	}
+	
+	private static class UriValue implements VariableValue {
+		private final String name;
+		private final String uri;
+		
+		public UriValue(String name, String uri) {
+			this.name = name;
+			this.uri = uri;
+		}
+
+		@Override
+		public String bind(String rawString) {
+			return rawString.replaceAll("\\?" + name + "\\b", "<" + uri + ">");
+		}
+		
+	}
 }

@@ -48,4 +48,14 @@ public class FauxPropertyDaoFiltering extends BaseFiltering implements FauxPrope
 
 	}
 
+	/* (non-Javadoc)
+	 * @see edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao#deleteFauxProperty(edu.cornell.mannlib.vitro.webapp.beans.FauxProperty)
+	 */
+	@Override
+	public void deleteFauxProperty(FauxProperty fp) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("FauxPropertyDao.deleteFauxProperty() not implemented.");
+		
+	}
+
 }

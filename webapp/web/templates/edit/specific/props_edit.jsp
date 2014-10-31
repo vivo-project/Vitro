@@ -98,18 +98,25 @@
 	  <c:if test="${!empty fauxproperties}">
 		<c:forEach var="fauxproperty" items="${fauxproperties}">
 		  <ul style="list-style-type:none;">
-		    <c:url var="fauxpropertyURL" value="fauxpropertyEdit">
-			  <c:param name="property" value="${property.URI}"/>
-			  <c:param name="domain" value="${fauxproperty.domainURI}" />
-			  <c:param name="range" value="${fauxproperty.rangeURI}" />
-			</c:url>
 			<li>
-			  <a href="${fauxpropertyURL}">${fauxproperty.pickListName}</a>
 			  <c:choose>
 			    <c:when test="${empty fauxproperty.domainLabel}">
+		          <c:url var="fauxpropertyURL" value="editForm">
+			        <c:param name="controller" value="FauxProperty"/>
+			        <c:param name="baseUri" value="${property.URI}"/>
+			        <c:param name="rangeUri" value="${fauxproperty.rangeURI}" />
+			      </c:url>
+			      <a href="${fauxpropertyURL}">${fauxproperty.pickListName}</a>
 			      no domain,
 			    </c:when>
 			    <c:otherwise>
+		          <c:url var="fauxpropertyURL" value="editForm">
+			        <c:param name="controller" value="FauxProperty"/>
+			        <c:param name="baseUri" value="${property.URI}"/>
+			        <c:param name="domainUri" value="${fauxproperty.domainURI}" />
+			        <c:param name="rangeUri" value="${fauxproperty.rangeURI}" />
+			      </c:url>
+			      <a href="${fauxpropertyURL}">${fauxproperty.pickListName}</a>
 			      domain: ${fauxproperty.domainLabel},
 			    </c:otherwise>
 			  </c:choose> 
@@ -120,13 +127,16 @@
 	  </c:if>
 	</td>
 	<td>
-		<form action="editForm" method="get">
-			<input type="hidden" name="basepropertyURI" value="${property.URI}"/>
-			<input type="hidden" name="controller" value="FauxProperty"/>
-			<input type="submit" class="form-button" value="Create New Faux Property"/>
-		</form>
+	<form action="editForm" method="get">
+	  <input type="hidden" name="create" value="create"/>
+	  <input type="hidden" name="baseUri" value="${property.URI}"/>
+	  <input type="hidden" name="controller" value="FauxProperty"/>
+	  <input type="submit" class="form-button" value="Create New Faux Property"/>
+	</form>
 	</td>
 </tr>
+
+
 
 <tr><td colspan="3"><hr/></td></tr>
 <!-- _____________________________________________ superproperties __________________________________________ -->

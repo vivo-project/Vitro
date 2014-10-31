@@ -42,4 +42,17 @@ public interface FauxPropertyDao {
 	FauxProperty getFauxPropertyByUris(String domainUri, String baseUri,
 			String rangeUri);
 
+	/**
+	 * Delete this FauxProperty from the display model.
+	 * 
+	 * Delete any ConfigContext that is based on the constraints in this
+	 * FauxProperty, and any ObjectPropertyDisplayConfigs that depend on that
+	 * ConfigContext.
+	 * 
+	 * If no such ConfigContext is found, no error is raised.
+	 * 
+	 * No check is made to see whether the ObjectPropertyDisplayConfig matches
+	 * the settings on this FauxProperty.
+	 */
+	void deleteFauxProperty(FauxProperty fp);
 }

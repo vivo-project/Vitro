@@ -4,16 +4,21 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import static com.hp.hpl.jena.rdf.model.ResourceFactory.createProperty;
 import static com.hp.hpl.jena.rdf.model.ResourceFactory.createResource;
+import static edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner.bindValues;
+import static edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner.uriValue;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
@@ -23,6 +28,7 @@ import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.AbstractOntModelDecorator;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner.QueryParser;
@@ -51,48 +57,11 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 
 	private static final Property DISPLAY_NAME = createProperty(APPLICATION_CONTEXT_NS
 			+ "displayName");
+	private static final Property RDFS_LABEL = createProperty(VitroVocabulary.LABEL);
 
 	// ----------------------------------------------------------------------
 	// Queries and parsers
 	// ----------------------------------------------------------------------
-
-	private static final String QUERY_LOCATE_CONFIG_CONTEXT_WITH_DOMAIN = "" //
-			+ "PREFIX : <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" //
-			+ "\n" //
-			+ "SELECT DISTINCT ?context \n" //
-			+ "WHERE { \n" //
-			+ "    ?context a :ConfigContext ; \n" //
-			+ "        :configContextFor ?baseUri ; \n" //
-			+ "        :qualifiedByDomain ?domainUri ; \n" //
-			+ "        :qualifiedBy ?rangeUri . \n" //
-			+ "} \n"; //
-
-	// TODO Add a filter that will reject solutions that include qualifiedByDomain
-	private static final String QUERY_LOCATE_CONFIG_CONTEXT_WITH_NO_DOMAIN = "" //
-			+ "PREFIX : <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" //
-			+ "\n" //
-			+ "SELECT DISTINCT ?context \n" //
-			+ "WHERE { \n" //
-			+ "    ?context a :ConfigContext ; \n" //
-			+ "        :configContextFor ?baseUri ; \n" //
-			+ "        :qualifiedBy ?rangeUri . \n" //
-			+ "} \n"; //
-
-	private static final QueryParser<String> PARSER_LOCATE_CONFIG_CONTEXT = new QueryParser<String>() {
-		@Override
-		protected String defaultValue() {
-			return null;
-		}
-
-		@Override
-		protected String parseResults(String queryStr, ResultSet results) {
-			if (results.hasNext()) {
-				return ifResourcePresent(results.next(), "context", null);
-			} else {
-				return null;
-			}
-		}
-	};
 
 	// ----------------------------------------------------------------------
 	// The instance
@@ -164,7 +133,7 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 					QUALIFIED_BY_DOMAIN);
 
 			FauxProperty fp = new FauxProperty(domainUri, baseUri, rangeUri);
-			populateInstance(fp, displayModel, context);
+			populateInstance(fp, context);
 			return fp;
 		}
 	}
@@ -172,63 +141,74 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 	@Override
 	public FauxProperty getFauxPropertyByUris(String domainUri, String baseUri,
 			String rangeUri) {
-		try (LockedOntModel displayModel = models.getDisplayModel().read()) {
-			String queryString;
-			if (domainUri == null) {
-				queryString = substituteUri(
-						substituteUri(
-								QUERY_LOCATE_CONFIG_CONTEXT_WITH_NO_DOMAIN,
-								baseUri, "baseUri"), rangeUri, "rangeUri");
-			} else {
-				queryString = substituteUri(
-						substituteUri(
-								substituteUri(
-										QUERY_LOCATE_CONFIG_CONTEXT_WITH_DOMAIN,
-										baseUri, "baseUri"), rangeUri,
-								"rangeUri"), domainUri, "domainUri");
-			}
-
-			String contextUri = new SparqlQueryRunner(displayModel)
-					.executeSelect(PARSER_LOCATE_CONFIG_CONTEXT, queryString);
-
-			if (contextUri == null) {
-				log.debug("Can't find a ContextConfig for '" + domainUri
-						+ "', '" + baseUri + "', '" + rangeUri + "'");
-				return null;
-			}
-
+		Set<ConfigContext> contexts = ConfigContext.findByQualifiers(models,
+				domainUri, baseUri, rangeUri);
+		for (ConfigContext context : contexts) {
 			FauxProperty fp = new FauxProperty(domainUri, baseUri, rangeUri);
-			populateInstance(fp, displayModel, createResource(contextUri));
+			populateInstance(fp, createResource(context.getContextUri()));
 			return fp;
+		}
+		log.debug("Can't find a FauxProperty for '" + domainUri + "', '"
+				+ baseUri + "', '" + rangeUri + "'");
+		return null;
+	}
+
+	@Override
+	public void deleteFauxProperty(FauxProperty fp) {
+		Set<ConfigContext> contexts = ConfigContext.findByQualifiers(models,
+				fp.getDomainURI(), fp.getURI(), fp.getRangeURI());
+		try (LockedOntModel displayModel = models.getDisplayModel().write()) {
+			for (ConfigContext context : contexts) {
+				Resource configResource = createResource(context.getConfigUri());
+				displayModel.removeAll(configResource, null, null);
+				displayModel.removeAll(null, null, configResource);
+				Resource contextResource = createResource(context.getContextUri());
+				displayModel.removeAll(contextResource, null, null);
+				displayModel.removeAll(null, null, contextResource);
+			}
 		}
 	}
 
 	/**
 	 * Add labels, annotations, and whatever else we can find on the
-	 * ConfigContext.
+	 * ObjectPropertyDisplayConfig.
 	 */
-	private void populateInstance(FauxProperty fp, LockedOntModel model,
-			Resource context) {
-		String configUri = getUriValue(model, context, HAS_CONFIGURATION);
-		if (configUri == null) {
-			return;
-		}
-		Resource config = createResource(configUri);
+	private void populateInstance(FauxProperty fp, Resource context) {
+		// Range label and domain label.
+		try (LockedOntModel tboxModel = models.getTBoxModel().read()) {
+			String rangeLabel = getStringValue(tboxModel,
+					createProperty(fp.getRangeURI()), RDFS_LABEL);
+			if (rangeLabel != null) {
+				fp.setRangeLabel(rangeLabel);
+			}
 
-		String displayName = getStringValue(model, config, DISPLAY_NAME);
-		if (displayName != null) {
-			fp.setPickListName(displayName);
+			String domainLabel = getStringValue(tboxModel,
+					createProperty(fp.getDomainURI()), RDFS_LABEL);
+			if (domainLabel != null) {
+				fp.setDomainLabel(domainLabel);
+			}
+
 		}
-		
+
+		// Display name.
+		try (LockedOntModel displayModel = models.getDisplayModel().read()) {
+			String configUri = getUriValue(displayModel, context,
+					HAS_CONFIGURATION);
+			if (configUri == null) {
+				return;
+			}
+			Resource config = createResource(configUri);
+
+			String displayName = getStringValue(displayModel, config,
+					DISPLAY_NAME);
+			if (displayName != null) {
+				fp.setPickListName(displayName);
+			}
+		}
+
 		// TODO pull all sorts of things from the configuration.
-		// TODO pull labels for the domain and range classes.
 	}
 
-	private String substituteUri(String queryString, String variableName,
-			String uri) {
-		return queryString.replace("?" + variableName, "<" + uri + ">");
-	}
-	
 	/**
 	 * Returns a single URI that is the object of this subject and property.
 	 * Returns null if no valid statement is found.
@@ -284,6 +264,135 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 	}
 
 	// ----------------------------------------------------------------------
+	// ConfigContext
+	// ----------------------------------------------------------------------
+
+	private static final String QUERY_LOCATE_CONFIG_CONTEXT_WITH_DOMAIN = "" //
+			+ "PREFIX : <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" //
+			+ "\n" //
+			+ "SELECT DISTINCT ?context ?config \n" //
+			+ "WHERE { \n" //
+			+ "    ?context a :ConfigContext ; \n" //
+			+ "        :configContextFor ?baseUri ; \n" //
+			+ "        :qualifiedByDomain ?domainUri ; \n" //
+			+ "        :qualifiedBy ?rangeUri ; \n" //
+			+ "        :hasConfiguration ?config . \n" //
+			+ "} \n"; //
+
+	// TODO Add a filter that will reject solutions that include
+	// qualifiedByDomain
+	private static final String QUERY_LOCATE_CONFIG_CONTEXT_WITH_NO_DOMAIN = "" //
+			+ "PREFIX : <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" //
+			+ "\n" //
+			+ "SELECT DISTINCT ?context \n" //
+			+ "WHERE { \n" //
+			+ "    ?context a :ConfigContext ; \n" //
+			+ "        :configContextFor ?baseUri ; \n" //
+			+ "        :qualifiedBy ?rangeUri ; \n" //
+			+ "        :hasConfiguration ?config . \n" //
+			+ "} \n"; //
+
+	private static class ParserLocateConfigContext extends
+			QueryParser<Set<ConfigContext>> {
+		private final String domainUri;
+		private final String baseUri;
+		private final String rangeUri;
+
+		public ParserLocateConfigContext(String domainUri, String baseUri,
+				String rangeUri) {
+			this.domainUri = domainUri;
+			this.baseUri = baseUri;
+			this.rangeUri = rangeUri;
+		}
+
+		@Override
+		protected Set<ConfigContext> defaultValue() {
+			return Collections.emptySet();
+		}
+
+		@Override
+		protected Set<ConfigContext> parseResults(String queryStr,
+				ResultSet results) {
+			Set<ConfigContext> set = new HashSet<>();
+			while (results.hasNext()) {
+				QuerySolution row = results.next();
+				String contextUri = ifResourcePresent(row, "context", null);
+				String configUri = ifResourcePresent(row, "config", null);
+				if (contextUri != null && configUri != null) {
+					set.add(new ConfigContext(contextUri, configUri, domainUri,
+							baseUri, rangeUri));
+				}
+			}
+			return set;
+		}
+	}
+
+	private static class ConfigContext {
+		public static Set<ConfigContext> findByQualifiers(
+				LockingOntModelSelector models, String domainUri,
+				String baseUri, String rangeUri) {
+			try (LockedOntModel displayModel = models.getDisplayModel().read()) {
+
+				String queryString;
+				if (domainUri == null) {
+					queryString = bindValues(
+							QUERY_LOCATE_CONFIG_CONTEXT_WITH_NO_DOMAIN,
+							uriValue("baseUri", baseUri),
+							uriValue("rangeUri", rangeUri));
+				} else {
+					queryString = bindValues(
+							QUERY_LOCATE_CONFIG_CONTEXT_WITH_DOMAIN,
+							uriValue("baseUri", baseUri),
+							uriValue("rangeUri", rangeUri),
+							uriValue("domainUri", domainUri));
+				}
+
+				ParserLocateConfigContext parser = new ParserLocateConfigContext(
+						domainUri, baseUri, rangeUri);
+				return new SparqlQueryRunner(displayModel).executeSelect(
+						parser, queryString);
+			}
+
+		}
+
+		private final String contextUri;
+		private final String configUri;
+		private final String domainUri;
+		private final String baseUri;
+		private final String rangeUri;
+
+		public ConfigContext(String contextUri, String configUri,
+				String domainUri, String baseUri, String rangeUri) {
+			this.contextUri = contextUri;
+			this.configUri = configUri;
+			this.domainUri = domainUri;
+			this.baseUri = baseUri;
+			this.rangeUri = rangeUri;
+		}
+
+		public String getContextUri() {
+			return contextUri;
+		}
+
+		public String getConfigUri() {
+			return configUri;
+		}
+
+		public String getDomainUri() {
+			return domainUri;
+		}
+
+		public String getBaseUri() {
+			return baseUri;
+		}
+
+		public String getRangeUri() {
+			return rangeUri;
+		}
+
+	}
+
+	// ----------------------------------------------------------------------
 	// Helper classes. Are they worth it, just to use try-with-resources?
 	// ----------------------------------------------------------------------
 
@@ -297,6 +406,10 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 		public LockableOntModel getDisplayModel() {
 			return new LockableOntModel(oms.getDisplayModel());
 		}
+
+		public LockableOntModel getTBoxModel() {
+			return new LockableOntModel(oms.getTBoxModel());
+		}
 	}
 
 	private static class LockableOntModel {
@@ -308,6 +421,11 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 
 		public LockedOntModel read() {
 			ontModel.enterCriticalSection(Lock.READ);
+			return new LockedOntModel(ontModel);
+		}
+
+		public LockedOntModel write() {
+			ontModel.enterCriticalSection(Lock.WRITE);
 			return new LockedOntModel(ontModel);
 		}
 	}
@@ -328,4 +446,5 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 			super.leaveCriticalSection();
 		}
 	}
+
 }
