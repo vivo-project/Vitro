@@ -120,7 +120,7 @@ public class ConfigurationBeanLoader {
 	public <T> Set<T> loadAll(Class<T> resultClass)
 			throws ConfigurationBeanLoaderException {
 		Set<String> uris = new HashSet<>();
-		try (Critical section = Critical.read(model)) {
+		try (Critical.Section section = Critical.Section.read(model)) {
 			List<Resource> resources = model.listResourcesWithProperty(
 					RDF.type, createResource(toJavaUri(resultClass))).toList();
 			for (Resource r : resources) {

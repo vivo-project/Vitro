@@ -58,7 +58,7 @@ public class ConfigurationRdfParser {
 			throws InvalidConfigurationRdfException {
 		Selector s = new SimpleSelector(createResource(uri), null,
 				(RDFNode) null);
-		try (Critical section = Critical.read(model)) {
+		try (Critical.Section section = Critical.Section.read(model)) {
 			if (model.listStatements(s).toList().isEmpty()) {
 				throw individualDoesNotAppearInModel(uri);
 			}
@@ -70,7 +70,7 @@ public class ConfigurationRdfParser {
 			throws InvalidConfigurationRdfException {
 		Statement s = createStatement(createResource(uri), RDF.type,
 				createResource(toJavaUri(resultClass)));
-		try (Critical section = Critical.read(model)) {
+		try (Critical.Section section = Critical.Section.read(model)) {
 			if (!model.contains(s)) {
 				throw noTypeStatementForResultClass(s);
 			}
@@ -81,7 +81,7 @@ public class ConfigurationRdfParser {
 			throws InvalidConfigurationRdfException {
 		Set<PropertyStatement> set = new HashSet<>();
 
-		try (Critical section = Critical.read(model)) {
+		try (Critical.Section section = Critical.Section.read(model)) {
 			List<Statement> rawStatements = model.listStatements(
 					model.getResource(uri), (Property) null, (RDFNode) null)
 					.toList();
@@ -111,7 +111,7 @@ public class ConfigurationRdfParser {
 			throws InvalidConfigurationRdfException {
 		Set<Class<? extends T>> concreteClasses = new HashSet<>();
 
-		try (Critical section = Critical.read(model)) {
+		try (Critical.Section section = Critical.Section.read(model)) {
 			for (RDFNode node : model.listObjectsOfProperty(
 					createResource(uri), RDF.type).toSet()) {
 				if (!node.isURIResource()) {
