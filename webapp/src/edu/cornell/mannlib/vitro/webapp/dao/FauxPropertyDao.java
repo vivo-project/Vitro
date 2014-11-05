@@ -24,7 +24,7 @@ public interface FauxPropertyDao {
 	 * 
 	 * @return May return null.
 	 */
-	FauxProperty getFauxPropertyFromConfigContextUri(String contextUri);
+	FauxProperty getFauxPropertyFromContextUri(String contextUri);
 
 	/**
 	 * If the display model contains a ConfigContext based on these URIs, get
@@ -41,6 +41,36 @@ public interface FauxPropertyDao {
 	 */
 	FauxProperty getFauxPropertyByUris(String domainUri, String baseUri,
 			String rangeUri);
+
+	/**
+	 * Creates a new FauxProperty in the display model.
+	 * 
+	 * By "a new FauxProperty", we mean a new ConfigContext and a new
+	 * ObjectPropertyDisplayConfig linked to it.
+	 * 
+	 * @throws IllegalStateException
+	 *             if fp does not have null values for contextUri and configUri,
+	 *             or if a FauxProperty already exists with this combination of
+	 *             domain, base, and range URIs.
+	 * @throws IllegalArgumentException
+	 *             if fp is not internally consistent.
+	 */
+	void insertFauxProperty(FauxProperty fp);
+
+	/**
+	 * Updates the properties of this FauxProperty in the display model.
+	 * 
+	 * By "this FauxProperty", we mean the ConfigContext and
+	 * ObjectPropertyDisplayConfig whose URIs are stored in this FauxProperty.
+	 * 
+	 * @throws IllegalStateException
+	 *             if the display model contains no such individuals. If you
+	 *             want to create a new FauxProperty instance, you should be
+	 *             using insertFauxProperty() instead.
+	 * @throws IllegalArgumentException
+	 *             if fp is not internally consistent.
+	 */
+	void updateFauxProperty(FauxProperty fp);
 
 	/**
 	 * Delete this FauxProperty from the display model.

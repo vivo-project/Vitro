@@ -2,23 +2,28 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import static com.hp.hpl.jena.rdf.model.ResourceFactory.createProperty;
 import static com.hp.hpl.jena.rdf.model.ResourceFactory.createResource;
 import static edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner.bindValues;
 import static edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner.uriValue;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.ontology.OntResource;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.ResIterator;
@@ -28,15 +33,15 @@ import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.AbstractOntModelDecorator;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner.QueryParser;
 
 /**
  * TODO
  */
-public class FauxPropertyDaoJena implements FauxPropertyDao {
+public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao {
 	private static final Log log = LogFactory.getLog(FauxPropertyDaoJena.class);
 
 	// ----------------------------------------------------------------------
@@ -44,41 +49,53 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 	// ----------------------------------------------------------------------
 
 	private static final String APPLICATION_CONTEXT_NS = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#";
-	private static final Resource CONFIG_CONTEXT = createResource(APPLICATION_CONTEXT_NS
-			+ "ConfigContext");
-	private static final Property HAS_CONFIGURATION = createProperty(APPLICATION_CONTEXT_NS
-			+ "hasConfiguration");
-	private static final Property CONFIG_CONTEXT_FOR = createProperty(APPLICATION_CONTEXT_NS
-			+ "configContextFor");
-	private static final Property QUALIFIED_BY_RANGE = createProperty(APPLICATION_CONTEXT_NS
-			+ "qualifiedBy");
-	private static final Property QUALIFIED_BY_DOMAIN = createProperty(APPLICATION_CONTEXT_NS
-			+ "qualifiedByDomain");
+	private static OntModel _constModel = ModelFactory
+			.createOntologyModel(OntModelSpec.OWL_DL_MEM);
 
-	private static final Property DISPLAY_NAME = createProperty(APPLICATION_CONTEXT_NS
-			+ "displayName");
-	private static final Property RDFS_LABEL = createProperty(VitroVocabulary.LABEL);
+	private static final Resource CONFIG_CONTEXT = createResource(appContext("ConfigContext"));
+	private static final Resource OBJECT_PROPERTY_DISPLAY_CONFIG = createResource(appContext("ObjectPropertyDisplayConfig"));
+	private static final ObjectProperty HAS_CONFIGURATION = createProperty(appContext("hasConfiguration"));
+	private static final ObjectProperty CONFIG_CONTEXT_FOR = createProperty(appContext("configContextFor"));
 
-	// ----------------------------------------------------------------------
-	// Queries and parsers
-	// ----------------------------------------------------------------------
+	private static final ObjectProperty QUALIFIED_BY_RANGE = createProperty(appContext("qualifiedBy"));
+	private static final ObjectProperty QUALIFIED_BY_DOMAIN = createProperty(appContext("qualifiedByDomain"));
+	private static final ObjectProperty LIST_VIEW_FILE = createProperty(appContext("listViewConfigFile"));
+	private static final ObjectProperty DISPLAY_NAME = createProperty(appContext("displayName"));
+	private static final ObjectProperty PROPERTY_GROUP = createProperty(appContext("propertyGroup"));
+
+	private static final ObjectProperty RDFS_LABEL = createProperty(VitroVocabulary.LABEL);
+
+	private static final String SITE_CONFIG_NAMESPACE = "http://vitro.mannlib.cornell.edu/ns/vitro/siteConfig/";
+
+	private static String appContext(String localName) {
+		return APPLICATION_CONTEXT_NS + localName;
+	}
+
+	private static ObjectProperty createProperty(String uri) {
+		return _constModel.createObjectProperty(uri);
+	}
 
 	// ----------------------------------------------------------------------
 	// The instance
 	// ----------------------------------------------------------------------
 
-	private final LockingOntModelSelector models;
-
 	public FauxPropertyDaoJena(WebappDaoFactoryJena wadf) {
-		this.models = new LockingOntModelSelector(wadf.getOntModelSelector());
+		super(wadf);
+	}
+
+	@Override
+	protected OntModel getOntModel() {
+		return getOntModelSelector().getDisplayModel();
 	}
 
 	@Override
 	public List<FauxProperty> getFauxPropertiesForBaseUri(String uri) {
 		List<FauxProperty> list = new ArrayList<>();
-		try (LockedOntModel displayModel = models.getDisplayModel().read()) {
+
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
 			if (uri != null) {
-				ResIterator contextResources = displayModel
+				ResIterator contextResources = getOntModel()
 						.listSubjectsWithProperty(CONFIG_CONTEXT_FOR,
 								createResource(uri));
 				for (Resource context : contextResources.toList()) {
@@ -86,7 +103,7 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 						continue;
 					}
 
-					FauxProperty fp = getFauxPropertyFromConfigContextUri(context
+					FauxProperty fp = getFauxPropertyFromContextUri(context
 							.getURI());
 					if (fp == null) {
 						continue;
@@ -95,24 +112,27 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 					list.add(fp);
 				}
 			}
+		} finally {
+			getOntModel().leaveCriticalSection();
 		}
 		return list;
 	}
 
 	@Override
-	public FauxProperty getFauxPropertyFromConfigContextUri(String contextUri) {
-		try (LockedOntModel displayModel = models.getDisplayModel().read()) {
+	public FauxProperty getFauxPropertyFromContextUri(String contextUri) {
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
 			if (contextUri == null) {
 				return null;
 			}
 
 			Resource context = createResource(contextUri);
-			if (!displayModel.contains(context, RDF.type, CONFIG_CONTEXT)) {
+			if (!getOntModel().contains(context, RDF.type, CONFIG_CONTEXT)) {
 				log.debug("'" + contextUri + "' is not a CONFIG_CONTEXT");
 				return null;
 			}
 
-			String baseUri = getUriValue(displayModel, context,
+			String baseUri = getUriValue(getOntModel(), context,
 					CONFIG_CONTEXT_FOR);
 			if (baseUri == null) {
 				log.debug("'" + contextUri + "' has no value for '"
@@ -120,7 +140,7 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 				return null;
 			}
 
-			String rangeUri = getUriValue(displayModel, context,
+			String rangeUri = getUriValue(getOntModel(), context,
 					QUALIFIED_BY_RANGE);
 			if (rangeUri == null) {
 				log.debug("'" + contextUri + "' has no value for '"
@@ -129,20 +149,23 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 			}
 
 			// domainURI is optional.
-			String domainUri = getUriValue(displayModel, context,
+			String domainUri = getUriValue(getOntModel(), context,
 					QUALIFIED_BY_DOMAIN);
 
 			FauxProperty fp = new FauxProperty(domainUri, baseUri, rangeUri);
 			populateInstance(fp, context);
 			return fp;
+		} finally {
+			getOntModel().leaveCriticalSection();
 		}
 	}
 
 	@Override
 	public FauxProperty getFauxPropertyByUris(String domainUri, String baseUri,
 			String rangeUri) {
-		Set<ConfigContext> contexts = ConfigContext.findByQualifiers(models,
-				domainUri, baseUri, rangeUri);
+		Set<ConfigContext> contexts = ConfigContext.findByQualifiers(
+				getOntModelSelector().getDisplayModel(), domainUri, baseUri,
+				rangeUri);
 		for (ConfigContext context : contexts) {
 			FauxProperty fp = new FauxProperty(domainUri, baseUri, rangeUri);
 			populateInstance(fp, createResource(context.getContextUri()));
@@ -154,18 +177,191 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 	}
 
 	@Override
+	public void insertFauxProperty(FauxProperty fp) {
+		if ((fp.getContextUri() != null) || (fp.getConfigUri() == null)) {
+			throw new IllegalStateException(
+					"ContextUri and ConfigUri must be null on insert: contextUri="
+							+ fp.getContextUri() + ", configUri="
+							+ fp.getConfigUri());
+		}
+
+		Set<ConfigContext> existingcontexts = ConfigContext.findByQualifiers(
+				getOntModelSelector().getDisplayModel(), fp.getDomainURI(),
+				fp.getBaseURI(), fp.getRangeURI());
+		if (!existingcontexts.isEmpty()) {
+			throw new IllegalStateException(
+					"FauxProperty already exists with domainUri="
+							+ fp.getDomainURI() + ", baseUri="
+							+ fp.getBaseURI() + ", rangeUri="
+							+ fp.getRangeURI());
+		}
+
+		try {
+			fp.setContextUri(getUnusedURI());
+			fp.setConfigUri(getUnusedURI());
+		} catch (InsertException e) {
+			throw new RuntimeException(e);
+		}
+
+		getOntModel().enterCriticalSection(Lock.WRITE);
+		try {
+			OntResource context = getOntModel().createOntResource(
+					fp.getContextUri());
+			addPropertyResourceValue(context, RDF.type, CONFIG_CONTEXT);
+			addPropertyResourceURIValue(context, HAS_CONFIGURATION,
+					fp.getConfigUri());
+			addPropertyResourceURIValue(context, CONFIG_CONTEXT_FOR,
+					fp.getBaseURI());
+			addPropertyResourceURIValue(context, QUALIFIED_BY_RANGE,
+					fp.getRangeURI());
+			addPropertyResourceURIValue(context, QUALIFIED_BY_DOMAIN,
+					fp.getDomainURI());
+
+			OntResource config = getOntModel().createOntResource(
+					fp.getConfigUri());
+			addPropertyResourceValue(config, RDF.type,
+					OBJECT_PROPERTY_DISPLAY_CONFIG);
+			addPropertyResourceURIValue(config, PROPERTY_GROUP,
+					fp.getGroupURI());
+			addPropertyStringValue(config, DISPLAY_NAME, fp.getDisplayName(),
+					getOntModel());
+			addPropertyStringValue(config, PUBLIC_DESCRIPTION_ANNOT,
+					fp.getPublicDescription(), getOntModel());
+			addPropertyIntValue(config, DISPLAY_RANK_ANNOT,
+					fp.getDisplayTier(), getOntModel());
+			addPropertyIntValue(config, DISPLAY_LIMIT, fp.getDisplayLimit(),
+					getOntModel());
+			addPropertyBooleanValue(config, PROPERTY_COLLATEBYSUBCLASSANNOT,
+					fp.isCollateBySubclass(), getOntModel());
+			addPropertyBooleanValue(config, PROPERTY_SELECTFROMEXISTINGANNOT,
+					fp.isSelectFromExisting(), getOntModel());
+			addPropertyBooleanValue(config, PROPERTY_OFFERCREATENEWOPTIONANNOT,
+					fp.isOfferCreateNewOption(), getOntModel());
+			addPropertyStringValue(config, PROPERTY_CUSTOMENTRYFORMANNOT,
+					fp.getCustomEntryForm(), getOntModel());
+			addPropertyStringValue(config, LIST_VIEW_FILE,
+					fp.getCustomListView(), getOntModel());
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+	}
+
+	@Override
+	public void updateFauxProperty(FauxProperty fp) {
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			if (fp.getContextUri() == null) {
+				throw new IllegalStateException("ContextURI may not be null: "
+						+ fp);
+			}
+			Resource context = createResource(fp.getContextUri());
+
+			if (fp.getConfigUri() == null) {
+				throw new IllegalStateException("ConfigURI may not be null: "
+						+ fp);
+			}
+			Resource config = createResource(fp.getConfigUri());
+
+			if (!getOntModel().contains(context, RDF.type, CONFIG_CONTEXT)) {
+				throw new IllegalStateException("'" + context + "' is not a '"
+						+ CONFIG_CONTEXT + "'");
+			}
+			if (!getOntModel().contains(config, RDF.type,
+					OBJECT_PROPERTY_DISPLAY_CONFIG)) {
+				throw new IllegalStateException("'" + config + "' is not a '"
+						+ OBJECT_PROPERTY_DISPLAY_CONFIG + "'");
+			}
+			if (!getOntModel().contains(context, HAS_CONFIGURATION, config)) {
+				throw new IllegalStateException("'" + config
+						+ "' is not a configuration for '" + context + "'");
+			}
+
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+
+		getOntModel().enterCriticalSection(Lock.WRITE);
+		try {
+			OntResource context = getOntModel().createOntResource(
+					fp.getContextUri());
+			updatePropertyResourceURIValue(context, QUALIFIED_BY_RANGE,
+					fp.getRangeURI());
+			updatePropertyResourceURIValue(context, QUALIFIED_BY_DOMAIN,
+					fp.getDomainURI());
+
+			OntResource config = getOntModel().createOntResource(
+					fp.getConfigUri());
+			updatePropertyResourceURIValue(config, PROPERTY_GROUP,
+					fp.getGroupURI());
+			updatePropertyStringValue(config, DISPLAY_NAME, fp.getDisplayName(),
+					getOntModel());
+			updatePropertyStringValue(config, PUBLIC_DESCRIPTION_ANNOT,
+					fp.getPublicDescription(), getOntModel());
+			updatePropertyIntValue(config, DISPLAY_RANK_ANNOT,
+					fp.getDisplayTier(), getOntModel());
+			updatePropertyIntValue(config, DISPLAY_LIMIT, fp.getDisplayLimit(),
+					getOntModel());
+			updatePropertyBooleanValue(config, PROPERTY_COLLATEBYSUBCLASSANNOT,
+					fp.isCollateBySubclass(), getOntModel(), true);
+			updatePropertyBooleanValue(config, PROPERTY_SELECTFROMEXISTINGANNOT,
+					fp.isSelectFromExisting(), getOntModel(), true);
+			updatePropertyBooleanValue(config, PROPERTY_OFFERCREATENEWOPTIONANNOT,
+					fp.isOfferCreateNewOption(), getOntModel(), true);
+			updatePropertyStringValue(config, PROPERTY_CUSTOMENTRYFORMANNOT,
+					fp.getCustomEntryForm(), getOntModel());
+			updatePropertyStringValue(config, LIST_VIEW_FILE,
+					fp.getCustomListView(), getOntModel());
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+	}
+
+	@Override
 	public void deleteFauxProperty(FauxProperty fp) {
-		Set<ConfigContext> contexts = ConfigContext.findByQualifiers(models,
-				fp.getDomainURI(), fp.getURI(), fp.getRangeURI());
-		try (LockedOntModel displayModel = models.getDisplayModel().write()) {
+		Set<ConfigContext> contexts = ConfigContext.findByQualifiers(
+				getOntModelSelector().getDisplayModel(), fp.getDomainURI(),
+				fp.getURI(), fp.getRangeURI());
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
 			for (ConfigContext context : contexts) {
 				Resource configResource = createResource(context.getConfigUri());
-				displayModel.removeAll(configResource, null, null);
-				displayModel.removeAll(null, null, configResource);
-				Resource contextResource = createResource(context.getContextUri());
-				displayModel.removeAll(contextResource, null, null);
-				displayModel.removeAll(null, null, contextResource);
+				getOntModel().removeAll(configResource, null, null);
+				getOntModel().removeAll(null, null, configResource);
+				Resource contextResource = createResource(context
+						.getContextUri());
+				getOntModel().removeAll(contextResource, null, null);
+				getOntModel().removeAll(null, null, contextResource);
 			}
+		} finally {
+			getOntModel().leaveCriticalSection();
+		}
+	}
+
+	private String getUnusedURI() throws InsertException {
+		String errMsg = null;
+
+		String namespace = SITE_CONFIG_NAMESPACE;
+		String uri = null;
+
+		Random random = new Random(System.currentTimeMillis());
+		for (int attempts = 0; attempts < 30; attempts++) {
+			int upperBound = (int) Math.pow(2, attempts + 13);
+			uri = namespace + ("fp" + random.nextInt(upperBound));
+			if (!isUriUsed(uri)) {
+				return uri;
+			}
+		}
+
+		throw new InsertException("Could not create URI for individual: "
+				+ errMsg);
+	}
+
+	private boolean isUriUsed(String uri) {
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			return (getOntModel().getOntResource(uri) != null);
+		} finally {
+			getOntModel().leaveCriticalSection();
 		}
 	}
 
@@ -174,49 +370,94 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 	 * ObjectPropertyDisplayConfig.
 	 */
 	private void populateInstance(FauxProperty fp, Resource context) {
-		// Range label and domain label.
-		try (LockedOntModel tboxModel = models.getTBoxModel().read()) {
-			String rangeLabel = getStringValue(tboxModel,
-					createProperty(fp.getRangeURI()), RDFS_LABEL);
-			if (rangeLabel != null) {
-				fp.setRangeLabel(rangeLabel);
-			}
+		populateLabelsFromTBox(fp);
+		populateFieldsFromDisplayModel(fp, context);
+	}
 
-			String domainLabel = getStringValue(tboxModel,
-					createProperty(fp.getDomainURI()), RDFS_LABEL);
-			if (domainLabel != null) {
-				fp.setDomainLabel(domainLabel);
-			}
+	private void populateLabelsFromTBox(FauxProperty fp) {
+		fp.setRangeLabel(findLabelForClass(fp.getRangeURI()));
+		fp.setDomainLabel(findLabelForClass(fp.getDomainURI()));
+	}
 
+	private String findLabelForClass(String classUri) {
+		if (classUri == null) {
+			return null;
+		} else {
+			OntModel tboxModel = getOntModelSelector().getTBoxModel();
+			tboxModel.enterCriticalSection(Lock.READ);
+			try {
+				return getStringValue(tboxModel, createResource(classUri),
+						RDFS_LABEL);
+			} finally {
+				tboxModel.leaveCriticalSection();
+			}
 		}
+	}
 
-		// Display name.
-		try (LockedOntModel displayModel = models.getDisplayModel().read()) {
-			String configUri = getUriValue(displayModel, context,
+	private void populateFieldsFromDisplayModel(FauxProperty fp,
+			Resource context) {
+		OntResource config = locateConfigurationFromContext(context);
+		if (config != null) {
+			getOntModel().enterCriticalSection(Lock.READ);
+			try {
+				fp.setDisplayName(getPropertyStringValue(config, DISPLAY_NAME));
+				fp.setPublicDescription(getPropertyStringValue(config,
+						PUBLIC_DESCRIPTION_ANNOT));
+				fp.setGroupURI(getSingleResourceURIValue(config, PROPERTY_GROUP));
+				fp.setCustomListView(getPropertyStringValue(config,
+						LIST_VIEW_FILE));
+				fp.setDisplayTier(getPropertyIntValue(config,
+						DISPLAY_RANK_ANNOT));
+				fp.setDisplayLimit(getPropertyIntValue(config, DISPLAY_LIMIT));
+				fp.setCollateBySubclass(getPropertyBooleanValue(config,
+						PROPERTY_COLLATEBYSUBCLASSANNOT));
+				fp.setSelectFromExisting(getPropertyBooleanValue(config,
+						PROPERTY_SELECTFROMEXISTINGANNOT));
+				fp.setOfferCreateNewOption(getPropertyBooleanValue(config,
+						PROPERTY_OFFERCREATENEWOPTIONANNOT));
+				fp.setCustomEntryForm(getPropertyStringValue(config,
+						PROPERTY_CUSTOMENTRYFORMANNOT));
+			} finally {
+				getOntModel().leaveCriticalSection();
+			}
+		}
+	}
+
+	private OntResource locateConfigurationFromContext(Resource context) {
+		getOntModel().enterCriticalSection(Lock.READ);
+		try {
+			String configUri = getUriValue(getOntModel(), context,
 					HAS_CONFIGURATION);
 			if (configUri == null) {
-				return;
+				return null;
+			} else {
+				return getOntModel().createOntResource(configUri);
 			}
-			Resource config = createResource(configUri);
-
-			String displayName = getStringValue(displayModel, config,
-					DISPLAY_NAME);
-			if (displayName != null) {
-				fp.setPickListName(displayName);
-			}
+		} finally {
+			getOntModel().leaveCriticalSection();
 		}
+	}
 
-		// TODO pull all sorts of things from the configuration.
+	private String getSingleResourceURIValue(OntResource config,
+			ObjectProperty prop) {
+		Collection<String> values = getPropertyResourceURIValues(config, prop);
+		if (values.isEmpty()) {
+			return null;
+		} else {
+			return values.iterator().next();
+		}
 	}
 
 	/**
 	 * Returns a single URI that is the object of this subject and property.
 	 * Returns null if no valid statement is found.
+	 * 
+	 * The model should already be locked.
 	 */
-	private String getUriValue(LockedOntModel displayModel, Resource subject,
+	private String getUriValue(OntModel model, Resource subject,
 			Property property) {
-		List<RDFNode> nodeList = displayModel.listObjectsOfProperty(subject,
-				property).toList();
+		List<RDFNode> nodeList = model.listObjectsOfProperty(subject, property)
+				.toList();
 		if (nodeList.isEmpty()) {
 			log.warn("'" + subject.getURI() + "' has no value for '"
 					+ property.getURI() + "'.");
@@ -239,11 +480,13 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 	/**
 	 * Returns a single String value that is the object of this subject and
 	 * property. Returns null if no valid statement is found.
+	 * 
+	 * The model should already be locked.
 	 */
-	private String getStringValue(LockedOntModel displayModel,
-			Resource subject, Property property) {
-		List<RDFNode> nodeList = displayModel.listObjectsOfProperty(subject,
-				property).toList();
+	private String getStringValue(OntModel model, Resource subject,
+			Property property) {
+		List<RDFNode> nodeList = model.listObjectsOfProperty(subject, property)
+				.toList();
 		if (nodeList.isEmpty()) {
 			log.warn("'" + subject.getURI() + "' has no value for '"
 					+ property.getURI() + "'.");
@@ -329,10 +572,10 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 
 	private static class ConfigContext {
 		public static Set<ConfigContext> findByQualifiers(
-				LockingOntModelSelector models, String domainUri,
-				String baseUri, String rangeUri) {
-			try (LockedOntModel displayModel = models.getDisplayModel().read()) {
-
+				OntModel displayModel, String domainUri, String baseUri,
+				String rangeUri) {
+			displayModel.enterCriticalSection(Lock.READ);
+			try {
 				String queryString;
 				if (domainUri == null) {
 					queryString = bindValues(
@@ -351,8 +594,9 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 						domainUri, baseUri, rangeUri);
 				return new SparqlQueryRunner(displayModel).executeSelect(
 						parser, queryString);
+			} finally {
+				displayModel.leaveCriticalSection();
 			}
-
 		}
 
 		private final String contextUri;
@@ -390,61 +634,6 @@ public class FauxPropertyDaoJena implements FauxPropertyDao {
 			return rangeUri;
 		}
 
-	}
-
-	// ----------------------------------------------------------------------
-	// Helper classes. Are they worth it, just to use try-with-resources?
-	// ----------------------------------------------------------------------
-
-	private static class LockingOntModelSelector {
-		private final OntModelSelector oms;
-
-		public LockingOntModelSelector(OntModelSelector oms) {
-			this.oms = oms;
-		}
-
-		public LockableOntModel getDisplayModel() {
-			return new LockableOntModel(oms.getDisplayModel());
-		}
-
-		public LockableOntModel getTBoxModel() {
-			return new LockableOntModel(oms.getTBoxModel());
-		}
-	}
-
-	private static class LockableOntModel {
-		private final OntModel ontModel;
-
-		public LockableOntModel(OntModel ontModel) {
-			this.ontModel = ontModel;
-		}
-
-		public LockedOntModel read() {
-			ontModel.enterCriticalSection(Lock.READ);
-			return new LockedOntModel(ontModel);
-		}
-
-		public LockedOntModel write() {
-			ontModel.enterCriticalSection(Lock.WRITE);
-			return new LockedOntModel(ontModel);
-		}
-	}
-
-	private static class LockedOntModel extends AbstractOntModelDecorator
-			implements AutoCloseable {
-
-		protected LockedOntModel(OntModel m) {
-			super(m);
-		}
-
-		/**
-		 * Just unlocks the model. Doesn't actually close it, because we may
-		 * want to use it again.
-		 */
-		@Override
-		public void close() {
-			super.leaveCriticalSection();
-		}
 	}
 
 }

@@ -32,7 +32,7 @@ public class FauxPropertyDaoFiltering extends BaseFiltering implements FauxPrope
 	}
 
 	@Override
-	public FauxProperty getFauxPropertyFromConfigContextUri(String contextUri) {
+	public FauxProperty getFauxPropertyFromContextUri(String contextUri) {
 		// TODO Auto-generated method stub
 		throw new RuntimeException(
 				"FauxPropertyDaoFiltering.getFauxPropertyFromConfigContextUri() not implemented.");
@@ -48,13 +48,24 @@ public class FauxPropertyDaoFiltering extends BaseFiltering implements FauxPrope
 
 	}
 
-	/* (non-Javadoc)
-	 * @see edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao#deleteFauxProperty(edu.cornell.mannlib.vitro.webapp.beans.FauxProperty)
-	 */
+	@Override
+	public void updateFauxProperty(FauxProperty fp) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("FauxPropertyDaoFiltering.updateFauxProperty() not implemented.");
+		
+	}
+
 	@Override
 	public void deleteFauxProperty(FauxProperty fp) {
 		// TODO Auto-generated method stub
 		throw new RuntimeException("FauxPropertyDao.deleteFauxProperty() not implemented.");
+		
+	}
+
+	@Override
+	public void insertFauxProperty(FauxProperty fp) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("FauxPropertyDao.insertFauxProperty() not implemented.");
 		
 	}
 

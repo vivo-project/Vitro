@@ -2,8 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.POLICY_NEUTRAL;
+
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,12 +26,16 @@ import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vedit.validator.Validator;
+import edu.cornell.mannlib.vedit.validator.impl.RequiredFieldValidator;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionListener;
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
 import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -81,6 +90,8 @@ public class FauxPropertyRetryController extends BaseEditController {
 	private static class EpoPopulator {
 		private final VitroRequest req;
 		private final ServletContext ctx;
+		private final WebappDaoFactory wadf;
+
 		private final EditProcessObject epo;
 
 		private final FauxPropertyDao fpDao;
@@ -91,6 +102,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 		EpoPopulator(HttpServletRequest req, EditProcessObject epo) {
 			this.req = new VitroRequest(req);
 			this.ctx = req.getSession().getServletContext();
+			this.wadf = ModelAccess.on(req).getWebappDaoFactory(POLICY_NEUTRAL);
 
 			this.epo = epo;
 
@@ -113,6 +125,8 @@ public class FauxPropertyRetryController extends BaseEditController {
 			this.baseProperty = req.getUnfilteredWebappDaoFactory()
 					.getObjectPropertyDao()
 					.getObjectPropertyByURI(beanForEditing.getURI());
+
+			setFieldValidators();
 
 			doABunchOfOtherJunk();
 		}
@@ -141,10 +155,13 @@ public class FauxPropertyRetryController extends BaseEditController {
 			return bean;
 		}
 
-		private void doABunchOfOtherJunk() {
-			// set any validators
-			// TODO NONE YET
+		private void setFieldValidators() {
+			epo.getValidatorMap()
+					.put("RangeURI",
+							Arrays.asList(new Validator[] { new RequiredFieldValidator() }));
+		}
 
+		private void doABunchOfOtherJunk() {
 			// set up any listeners
 			epo.setChangeListenerList(Collections
 					.singletonList(new PropertyRestrictionListener(ctx)));
@@ -183,21 +200,52 @@ public class FauxPropertyRetryController extends BaseEditController {
 
 		private Map<String, List<Option>> createOptionsMap() {
 			Map<String, List<Option>> map = new HashMap<>();
-			map.put("DomainVClassURI",
+
+			map.put("GroupURI", createClassGroupOptionList());
+			
+			map.put("DomainURI",
 					createRootedVClassOptionList(
 							baseProperty.getDomainVClassURI(),
 							beanForEditing.getDomainURI()));
-			map.put("RangeVClassURI",
+			map.put("RangeURI",
 					createRootedVClassOptionList(
 							baseProperty.getRangeVClassURI(),
 							beanForEditing.getRangeURI()));
+			
+			map.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",
+					RoleLevelOptionsSetup.getDisplayOptionsList(beanForEditing));
+			map.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",
+					RoleLevelOptionsSetup.getUpdateOptionsList(beanForEditing));
+			map.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",
+					RoleLevelOptionsSetup.getPublishOptionsList(beanForEditing));
+
 			return map;
+		}
+
+		private List<Option> createClassGroupOptionList() {
+			List<Option> groupOptList = getGroupOptList(beanForEditing
+					.getGroupURI());
+			Collections.sort(groupOptList,
+					new OptionsBodyComparator(req.getCollator()));
+			groupOptList.add(0, new Option("", "none"));
+			return groupOptList;
+		}
+
+		private List<Option> getGroupOptList(String currentGroupURI) {
+			List<PropertyGroup> groups = wadf.getPropertyGroupDao()
+					.getPublicGroups(true);
+			if (currentGroupURI == null) {
+				return FormUtils.makeOptionListFromBeans(groups, "URI", "Name",
+						"", null, false);
+
+			} else {
+				return FormUtils.makeOptionListFromBeans(groups, "URI", "Name",
+						currentGroupURI, null, true);
+			}
 		}
 
 		private List<Option> createRootedVClassOptionList(String rootVClassUri,
 				String currentSelection) {
-			WebappDaoFactory wadf = req.getUnfilteredWebappDaoFactory();
-
 			List<Option> list = new ArrayList<>();
 			list.add(new Option("", "(none specified)"));
 
@@ -210,6 +258,20 @@ public class FauxPropertyRetryController extends BaseEditController {
 			}
 
 			return list;
+		}
+
+		private static class OptionsBodyComparator implements
+				Comparator<Option> {
+			private final Collator collator;
+
+			public OptionsBodyComparator(Collator collator) {
+				this.collator = collator;
+			}
+
+			@Override
+			public int compare(Option o1, Option o2) {
+				return collator.compare(o1.getBody(), o2.getBody());
+			}
 		}
 
 	}
