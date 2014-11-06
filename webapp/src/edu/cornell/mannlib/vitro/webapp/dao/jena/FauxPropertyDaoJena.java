@@ -86,6 +86,15 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 		this.models = new LockingOntModelSelector(wadf.getOntModelSelector());
 	}
 
+	/**
+	 * Need to override this, so the boolean convenience methods will work off
+	 * the correct model.
+	 */
+	@Override
+	protected OntModel getOntModel() {
+		return getOntModelSelector().getDisplayModel();
+	}
+
 	@Override
 	public List<FauxProperty> getFauxPropertiesForBaseUri(String uri) {
 		try (LockedOntModel displayModel = models.getDisplayModel().read()) {
@@ -110,6 +119,7 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 					fpList.add(fp);
 				}
 			}
+			log.debug("Located " + fpList.size() + " FauxProperties.");
 			return fpList;
 		}
 	}
@@ -157,6 +167,7 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 			FauxProperty fp = new FauxProperty(domainUri, baseUri, rangeUri);
 			fp.setContextUri(contextUri);
 			populateInstance(fp);
+			log.debug("Loaded FauxProperty: " + fp);
 			return fp;
 		}
 	}
@@ -174,6 +185,7 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 			FauxProperty fp = new FauxProperty(domainUri, baseUri, rangeUri);
 			fp.setContextUri(contexts.iterator().next().getContextUri());
 			populateInstance(fp);
+			log.debug("Loaded FauxProperty: " + fp);
 			return fp;
 		}
 	}
@@ -259,6 +271,8 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 
 	@Override
 	public void updateFauxProperty(FauxProperty fp) {
+		log.debug("Updating FauxProperty: " + fp);
+
 		try (LockedOntModel displayModel = models.getDisplayModel().read()) {
 			if (fp.getContextUri() == null) {
 				throw new IllegalStateException("ContextURI may not be null: "
@@ -319,7 +333,7 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 					fp.getCustomEntryForm(), displayModel);
 			updatePropertyStringValue(config, LIST_VIEW_FILE,
 					fp.getCustomListView(), displayModel);
-			
+
 			updatePropertyResourceURIValue(config,
 					HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT, fp
 							.getHiddenFromDisplayBelowRoleLevel().getURI());
@@ -385,6 +399,7 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 	}
 
 	private void populateLabelsFromTBox(FauxProperty fp) {
+		fp.setBaseLabel(findLabelForClass(fp.getBaseURI()));
 		fp.setRangeLabel(findLabelForClass(fp.getRangeURI()));
 		fp.setDomainLabel(findLabelForClass(fp.getDomainURI()));
 	}
@@ -426,7 +441,7 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 								PROPERTY_OFFERCREATENEWOPTIONANNOT)));
 				fp.setCustomEntryForm(getPropertyStringValue(config,
 						PROPERTY_CUSTOMENTRYFORMANNOT));
-				
+
 				fp.setHiddenFromDisplayBelowRoleLevel(getMostRestrictiveRoleLevel(
 						config, HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT));
 				fp.setHiddenFromPublishBelowRoleLevel(getMostRestrictiveRoleLevel(

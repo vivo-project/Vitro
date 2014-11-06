@@ -6,7 +6,7 @@
 <tr class="editformcell">
     <td valign="top" colspan="2">
         <b>Base property</b><br/>
-        <input type="text" class="fullWidthInput" name="Base property" value="<form:value name="BaseURI"/>" disabled="disabled" /></br>
+        <input type="text" class="fullWidthInput" name="Base property" value="<form:value name="BaseLabel"/>" disabled="disabled" /></br>
         <i>a specification of this property</i></br>
     </td>
     <td valign="top" colspan="2">

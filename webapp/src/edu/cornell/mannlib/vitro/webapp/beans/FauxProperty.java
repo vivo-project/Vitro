@@ -24,6 +24,7 @@ public class FauxProperty extends BaseResourceBean implements ResourceBean,
 	// May be null. Partial identifier on delete.
 	private String domainURI;
 
+	private String baseLabel;
 	private String rangeLabel;
 	private String domainLabel;
 
@@ -93,6 +94,14 @@ public class FauxProperty extends BaseResourceBean implements ResourceBean,
 
 	public void setRangeURI(String rangeURI) {
 		this.rangeURI = rangeURI;
+	}
+
+	public String getBaseLabel() {
+		return (baseLabel == null) ? localName(getBaseURI()) : baseLabel;
+	}
+
+	public void setBaseLabel(String baseLabel) {
+		this.baseLabel = baseLabel;
 	}
 
 	public String getRangeLabel() {
@@ -212,13 +221,13 @@ public class FauxProperty extends BaseResourceBean implements ResourceBean,
 	@Override
 	public String toString() {
 		return "FauxProperty[domainURI=" + domainURI + ", baseUri=" + getURI()
-				+ ", rangeURI=" + rangeURI + ", rangeLabel=" + rangeLabel
-				+ ", domainLabel=" + domainLabel + ", pickListName="
-				+ getPickListName() + ", contextUri=" + contextUri
-				+ ", configUri=" + configUri + ", groupURI=" + groupURI
-				+ "publicDescription=" + publicDescription + ", displayTier="
-				+ displayTier + ", displayLimit=" + displayLimit
-				+ ", collateBySubclass=" + collateBySubclass
+				+ ", baseLabel=" + baseLabel + ", rangeURI=" + rangeURI
+				+ ", rangeLabel=" + rangeLabel + ", domainLabel=" + domainLabel
+				+ ", pickListName=" + getPickListName() + ", contextUri="
+				+ contextUri + ", configUri=" + configUri + ", groupURI="
+				+ groupURI + "publicDescription=" + publicDescription
+				+ ", displayTier=" + displayTier + ", displayLimit="
+				+ displayLimit + ", collateBySubclass=" + collateBySubclass
 				+ ", selectFromExisting=" + selectFromExisting
 				+ ", offerCreateNewOption=" + offerCreateNewOption
 				+ ", customEntryForm=" + customEntryForm + ", customListView="

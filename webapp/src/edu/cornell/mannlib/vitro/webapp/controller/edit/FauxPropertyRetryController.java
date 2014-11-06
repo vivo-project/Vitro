@@ -127,11 +127,15 @@ public class FauxPropertyRetryController extends BaseEditController {
 			this.baseProperty = req.getUnfilteredWebappDaoFactory()
 					.getObjectPropertyDao()
 					.getObjectPropertyByURI(beanForEditing.getURI());
+			
+			addCheckboxValuesToTheRequest();
 
 			setFieldValidators();
 
 			doABunchOfOtherJunk();
 		}
+
+		
 
 		private String determineAction() {
 			return (req.getParameter("create") == null) ? "update" : "insert";
@@ -170,9 +174,25 @@ public class FauxPropertyRetryController extends BaseEditController {
 			fp.setHiddenFromDisplayBelowRoleLevel(base.getHiddenFromDisplayBelowRoleLevel());
 			fp.setHiddenFromPublishBelowRoleLevel(base.getHiddenFromPublishBelowRoleLevel());
 			fp.setProhibitedFromUpdateBelowRoleLevel(base.getProhibitedFromUpdateBelowRoleLevel());
+			log.debug("Created new FauxProperty: " + fp);
 			return fp;
 		}
 
+		private void addCheckboxValuesToTheRequest() {
+	        req.setAttribute("selectFromExisting",beanForEditing.isSelectFromExisting());
+	        req.setAttribute("offerCreateNewOption", beanForEditing.isOfferCreateNewOption());
+	        req.setAttribute("collateBySubclass", beanForEditing.isCollateBySubclass());
+	        
+			// checkboxes on HTML forms are pretty annoying : we don't know if
+			// someone *unchecked* a box, so we have to default to false on
+			// updates.
+	        if (beanForEditing.getURI() != null) {
+	            beanForEditing.setSelectFromExisting(false);
+	            beanForEditing.setOfferCreateNewOption(false);
+	            beanForEditing.setCollateBySubclass(false);
+	        }
+		}
+		
 		private void setFieldValidators() {
 			epo.getValidatorMap()
 					.put("RangeURI",
