@@ -214,7 +214,8 @@ public class FauxProperty extends BaseResourceBean implements ResourceBean,
 		return "FauxProperty[domainURI=" + domainURI + ", baseUri=" + getURI()
 				+ ", rangeURI=" + rangeURI + ", rangeLabel=" + rangeLabel
 				+ ", domainLabel=" + domainLabel + ", pickListName="
-				+ getPickListName() + ", groupURI=" + groupURI
+				+ getPickListName() + ", contextUri=" + contextUri
+				+ ", configUri=" + configUri + ", groupURI=" + groupURI
 				+ "publicDescription=" + publicDescription + ", displayTier="
 				+ displayTier + ", displayLimit=" + displayLimit
 				+ ", collateBySubclass=" + collateBySubclass

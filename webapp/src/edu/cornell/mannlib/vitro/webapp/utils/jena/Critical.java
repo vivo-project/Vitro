@@ -2,52 +2,25 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.jena;
 
-import static com.hp.hpl.jena.shared.Lock.READ;
-import static com.hp.hpl.jena.shared.Lock.WRITE;
-
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.AbstractModelDecorator;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.AbstractOntModelDecorator;
 
 /**
  * AutoCloseable helper classes for using models in a try-with-resources block.
+ * 
+ * TODO - create separate classes in criticalsection package
+ * Locked<? extends Model>
+ * LockerFor<? extends Model>
+ * Add to develop.
+ * Remove Critical and convert configurationBeanLoader
+ * Merge to faux.
  */
 public abstract class Critical {
-	/**
-	 * Use this when you have a bare model, and you want to control a critical
-	 * section.
-	 * 
-	 * <pre>
-	 * try (Critical.Section section = Critical.Section.read(model)) {
-	 *     ...
-	 * }
-	 * </pre>
-	 */
-	public static class Section implements AutoCloseable {
-		public static Section read(Model model) {
-			return new Section(model, READ);
-		}
-
-		public static Section write(Model model) {
-			return new Section(model, WRITE);
-		}
-
-		private final Model model;
-
-		private Section(Model model, boolean readLockRequested) {
-			this.model = model;
-			this.model.enterCriticalSection(readLockRequested);
-		}
-
-		@Override
-		public void close() {
-			this.model.leaveCriticalSection();
-		}
-	}
-
 	/**
 	 * Use this when you have a bare OntModelSelector. It returns
 	 * LockableOntModels, which can then be locked in a critical section.
@@ -74,7 +47,7 @@ public abstract class Critical {
 
 	/**
 	 * Returned by the LockingOntModelSelector, or it can be wrapped around a
-	 * bare OntModel.
+	 * bare OntModel. Cannot be used without locking.
 	 * 
 	 * <pre>
 	 * try (LockedOntModel m = lockingOms.getDisplayModel.read()) {
@@ -104,12 +77,62 @@ public abstract class Critical {
 	 * A simple OntModel, except that it can only be created by locking a
 	 * LockableOntModel. It is AutoCloseable, but the close method has been
 	 * hijacked to simply release the lock, and not to actually close the
-	 * wrapped model. 
+	 * wrapped model.
 	 */
 	public static class LockedOntModel extends AbstractOntModelDecorator
 			implements AutoCloseable {
 
 		private LockedOntModel(OntModel m) {
+			super(m);
+		}
+
+		/**
+		 * Just unlocks the model. Doesn't actually close it, because we may
+		 * want to use it again.
+		 */
+		@Override
+		public void close() {
+			super.leaveCriticalSection();
+		}
+	}
+
+	/**
+	 * Can be wrapped around a bare OntModel. Cannot be used without locking.
+	 * 
+	 * <pre>
+	 * try (LockedModel m = lockableModel.read()) {
+	 *    ...
+	 * }
+	 * </pre>
+	 */
+	public static class LockableModel {
+		private final Model model;
+
+		public LockableModel(Model model) {
+			this.model = model;
+		}
+
+		public LockedModel read() {
+			model.enterCriticalSection(Lock.READ);
+			return new LockedModel(model);
+		}
+
+		public LockedModel write() {
+			model.enterCriticalSection(Lock.WRITE);
+			return new LockedModel(model);
+		}
+	}
+
+	/**
+	 * A simple Model, except that it can only be created by locking a
+	 * LockableModel. It is AutoCloseable, but the close method has been
+	 * hijacked to simply release the lock, and not to actually close the
+	 * wrapped model.
+	 */
+	public static class LockedModel extends AbstractModelDecorator
+			implements AutoCloseable {
+
+		private LockedModel(Model m) {
 			super(m);
 		}
 

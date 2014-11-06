@@ -180,7 +180,7 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 
 	@Override
 	public void insertFauxProperty(FauxProperty fp) {
-		if ((fp.getContextUri() != null) || (fp.getConfigUri() == null)) {
+		if ((fp.getContextUri() != null) || (fp.getConfigUri() != null)) {
 			throw new IllegalStateException(
 					"ContextUri and ConfigUri must be null on insert: " + fp);
 		}
@@ -193,31 +193,28 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 					"FauxProperty with these qualifiers already exists: " + fp);
 		}
 
-		try {
-			fp.setContextUri(getUnusedURI());
-			fp.setConfigUri(getUnusedURI());
-		} catch (InsertException e) {
-			throw new RuntimeException(e);
-		}
-
 		try (LockedOntModel displayModel = models.getDisplayModel().write()) {
+			fp.setContextUri(getUnusedURI());
+
 			OntResource context = displayModel.createOntResource(fp
 					.getContextUri());
 			addPropertyResourceValue(context, RDF.type, CONFIG_CONTEXT);
-			addPropertyResourceURIValue(context, HAS_CONFIGURATION,
-					fp.getConfigUri());
 			addPropertyResourceURIValue(context, CONFIG_CONTEXT_FOR,
 					fp.getBaseURI());
 			addPropertyResourceURIValue(context, QUALIFIED_BY_RANGE,
 					fp.getRangeURI());
-			addPropertyResourceURIValue(context, QUALIFIED_BY_DOMAIN,
+			addPropertyResourceURINotEmpty(context, QUALIFIED_BY_DOMAIN,
 					fp.getDomainURI());
+
+			fp.setConfigUri(getUnusedURI());
+			addPropertyResourceURIValue(context, HAS_CONFIGURATION,
+					fp.getConfigUri());
 
 			OntResource config = displayModel.createOntResource(fp
 					.getConfigUri());
 			addPropertyResourceValue(config, RDF.type,
 					OBJECT_PROPERTY_DISPLAY_CONFIG);
-			addPropertyResourceURIValue(config, PROPERTY_GROUP,
+			addPropertyResourceURINotEmpty(config, PROPERTY_GROUP,
 					fp.getGroupURI());
 			addPropertyStringValue(config, DISPLAY_NAME, fp.getDisplayName(),
 					displayModel);
@@ -237,6 +234,26 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 					fp.getCustomEntryForm(), displayModel);
 			addPropertyStringValue(config, LIST_VIEW_FILE,
 					fp.getCustomListView(), displayModel);
+
+			updatePropertyResourceURIValue(config,
+					HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT, fp
+							.getHiddenFromDisplayBelowRoleLevel().getURI());
+			updatePropertyResourceURIValue(config,
+					HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT, fp
+							.getHiddenFromPublishBelowRoleLevel().getURI());
+			updatePropertyResourceURIValue(config,
+					PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT, fp
+							.getProhibitedFromUpdateBelowRoleLevel().getURI());
+
+		} catch (InsertException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private void addPropertyResourceURINotEmpty(OntResource context,
+			ObjectProperty prop, String uri) {
+		if (uri != null && !uri.isEmpty()) {
+			addPropertyResourceURIValue(context, prop, uri);
 		}
 	}
 
@@ -302,6 +319,16 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 					fp.getCustomEntryForm(), displayModel);
 			updatePropertyStringValue(config, LIST_VIEW_FILE,
 					fp.getCustomListView(), displayModel);
+			
+			updatePropertyResourceURIValue(config,
+					HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT, fp
+							.getHiddenFromDisplayBelowRoleLevel().getURI());
+			updatePropertyResourceURIValue(config,
+					HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT, fp
+							.getHiddenFromPublishBelowRoleLevel().getURI());
+			updatePropertyResourceURIValue(config,
+					PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT, fp
+							.getProhibitedFromUpdateBelowRoleLevel().getURI());
 		}
 	}
 
@@ -388,14 +415,24 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 				fp.setDisplayTier(getPropertyIntValue(config,
 						DISPLAY_RANK_ANNOT));
 				fp.setDisplayLimit(getPropertyIntValue(config, DISPLAY_LIMIT));
-				fp.setCollateBySubclass(getPropertyBooleanValue(config,
-						PROPERTY_COLLATEBYSUBCLASSANNOT));
-				fp.setSelectFromExisting(getPropertyBooleanValue(config,
-						PROPERTY_SELECTFROMEXISTINGANNOT));
-				fp.setOfferCreateNewOption(getPropertyBooleanValue(config,
-						PROPERTY_OFFERCREATENEWOPTIONANNOT));
+				fp.setCollateBySubclass(Boolean.TRUE
+						.equals(getPropertyBooleanValue(config,
+								PROPERTY_COLLATEBYSUBCLASSANNOT)));
+				fp.setSelectFromExisting(Boolean.TRUE
+						.equals(getPropertyBooleanValue(config,
+								PROPERTY_SELECTFROMEXISTINGANNOT)));
+				fp.setOfferCreateNewOption(Boolean.TRUE
+						.equals(getPropertyBooleanValue(config,
+								PROPERTY_OFFERCREATENEWOPTIONANNOT)));
 				fp.setCustomEntryForm(getPropertyStringValue(config,
 						PROPERTY_CUSTOMENTRYFORMANNOT));
+				
+				fp.setHiddenFromDisplayBelowRoleLevel(getMostRestrictiveRoleLevel(
+						config, HIDDEN_FROM_DISPLAY_BELOW_ROLE_LEVEL_ANNOT));
+				fp.setHiddenFromPublishBelowRoleLevel(getMostRestrictiveRoleLevel(
+						config, HIDDEN_FROM_PUBLISH_BELOW_ROLE_LEVEL_ANNOT));
+				fp.setProhibitedFromUpdateBelowRoleLevel(getMostRestrictiveRoleLevel(
+						config, PROHIBITED_FROM_UPDATE_BELOW_ROLE_LEVEL_ANNOT));
 			}
 		}
 	}
@@ -444,7 +481,7 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 	private static final String QUERY_LOCATE_CONFIG_CONTEXT_WITH_NO_DOMAIN = "" //
 			+ "PREFIX : <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" //
 			+ "\n" //
-			+ "SELECT DISTINCT ?context \n" //
+			+ "SELECT DISTINCT ?context ?config \n" //
 			+ "WHERE { \n" //
 			+ "    ?context a :ConfigContext ; \n" //
 			+ "        :configContextFor ?baseUri ; \n" //
@@ -493,7 +530,7 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 				String baseUri, String rangeUri) {
 			try (LockedOntModel displayModel = lockableDisplayModel.read()) {
 				String queryString;
-				if (domainUri == null) {
+				if (domainUri == null || domainUri.trim().isEmpty()) {
 					queryString = bindValues(
 							QUERY_LOCATE_CONFIG_CONTEXT_WITH_NO_DOMAIN,
 							uriValue("baseUri", baseUri),
@@ -505,11 +542,19 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 							uriValue("rangeUri", rangeUri),
 							uriValue("domainUri", domainUri));
 				}
+				if (log.isDebugEnabled()) {
+					log.debug("domainUri=" + domainUri + ", baseUri=" + baseUri
+							+ ", rangeUri=" + rangeUri + ", queryString="
+							+ queryString);
+				}
 
 				ParserLocateConfigContext parser = new ParserLocateConfigContext(
 						domainUri, baseUri, rangeUri);
-				return new SparqlQueryRunner(displayModel).executeSelect(
-						parser, queryString);
+				Set<ConfigContext> contexts = new SparqlQueryRunner(
+						displayModel).executeSelect(parser, queryString);
+
+				log.debug("found " + contexts.size() + " contexts: " + contexts);
+				return contexts;
 			}
 		}
 
@@ -546,6 +591,13 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 
 		public String getRangeUri() {
 			return rangeUri;
+		}
+
+		@Override
+		public String toString() {
+			return "ConfigContext[contextUri=" + contextUri + ", configUri="
+					+ configUri + ", domainUri=" + domainUri + ", baseUri="
+					+ baseUri + ", rangeUri=" + rangeUri + "]";
 		}
 
 	}

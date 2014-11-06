@@ -31,12 +31,14 @@ import edu.cornell.mannlib.vedit.validator.impl.RequiredFieldValidator;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionListener;
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
 import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
@@ -141,7 +143,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 			String domainUri = req.getParameter("domainUri");
 
 			if (epo.getAction().equals("insert")) {
-				return new FauxProperty(null, baseUri, null);
+				return newFauxProperty(baseUri);
 			}
 
 			FauxProperty bean = fpDao.getFauxPropertyByUris(domainUri, baseUri,
@@ -153,6 +155,22 @@ public class FauxPropertyRetryController extends BaseEditController {
 								+ ">");
 			}
 			return bean;
+		}
+
+		/**
+		 * Create a new FauxProperty object and let it inherit some values from its base property.
+		 */
+		private FauxProperty newFauxProperty(String baseUri) {
+			FauxProperty fp = new FauxProperty(null, baseUri, null);
+			ObjectPropertyDao opDao = wadf.getObjectPropertyDao();
+			ObjectProperty base = opDao.getObjectPropertyByURI(baseUri);
+			fp.setGroupURI(base.getGroupURI());
+			fp.setRangeURI(base.getRangeVClassURI());
+			fp.setDomainURI(base.getDomainVClassURI());
+			fp.setHiddenFromDisplayBelowRoleLevel(base.getHiddenFromDisplayBelowRoleLevel());
+			fp.setHiddenFromPublishBelowRoleLevel(base.getHiddenFromPublishBelowRoleLevel());
+			fp.setProhibitedFromUpdateBelowRoleLevel(base.getProhibitedFromUpdateBelowRoleLevel());
+			return fp;
 		}
 
 		private void setFieldValidators() {

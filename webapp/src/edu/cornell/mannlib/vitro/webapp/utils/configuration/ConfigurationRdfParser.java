@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Selector;
@@ -23,15 +22,17 @@ import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.PropertyType.PropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.PropertyType.PropertyTypeException;
-import edu.cornell.mannlib.vitro.webapp.utils.jena.Critical;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.Critical.LockableModel;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.Critical.LockedModel;
 
 /**
  * Parse the RDF for a single individual in the model to create a
  * ConfigurationRdf object.
  */
 public class ConfigurationRdfParser {
-	public static <T> ConfigurationRdf<T> parse(Model model, String uri,
-			Class<T> resultClass) throws InvalidConfigurationRdfException {
+	public static <T> ConfigurationRdf<T> parse(LockableModel model,
+			String uri, Class<T> resultClass)
+			throws InvalidConfigurationRdfException {
 		if (model == null) {
 			throw new NullPointerException("model may not be null.");
 		}
@@ -54,36 +55,36 @@ public class ConfigurationRdfParser {
 		return new ConfigurationRdf<T>(concreteClass, properties);
 	}
 
-	private static void confirmExistenceInModel(Model model, String uri)
+	private static void confirmExistenceInModel(LockableModel model, String uri)
 			throws InvalidConfigurationRdfException {
 		Selector s = new SimpleSelector(createResource(uri), null,
 				(RDFNode) null);
-		try (Critical.Section section = Critical.Section.read(model)) {
-			if (model.listStatements(s).toList().isEmpty()) {
+		try (LockedModel m = model.read()) {
+			if (m.listStatements(s).toList().isEmpty()) {
 				throw individualDoesNotAppearInModel(uri);
 			}
 		}
 	}
 
-	private static void confirmEligibilityForResultClass(Model model,
+	private static void confirmEligibilityForResultClass(LockableModel model,
 			String uri, Class<?> resultClass)
 			throws InvalidConfigurationRdfException {
 		Statement s = createStatement(createResource(uri), RDF.type,
 				createResource(toJavaUri(resultClass)));
-		try (Critical.Section section = Critical.Section.read(model)) {
-			if (!model.contains(s)) {
+		try (LockedModel m = model.read()) {
+			if (!m.contains(s)) {
 				throw noTypeStatementForResultClass(s);
 			}
 		}
 	}
 
-	private static Set<PropertyStatement> loadProperties(Model model, String uri)
-			throws InvalidConfigurationRdfException {
+	private static Set<PropertyStatement> loadProperties(LockableModel model,
+			String uri) throws InvalidConfigurationRdfException {
 		Set<PropertyStatement> set = new HashSet<>();
 
-		try (Critical.Section section = Critical.Section.read(model)) {
-			List<Statement> rawStatements = model.listStatements(
-					model.getResource(uri), (Property) null, (RDFNode) null)
+		try (LockedModel m = model.read()) {
+			List<Statement> rawStatements = m.listStatements(
+					m.getResource(uri), (Property) null, (RDFNode) null)
 					.toList();
 			if (rawStatements.isEmpty()) {
 				throw noRdfStatements(uri);
@@ -106,14 +107,14 @@ public class ConfigurationRdfParser {
 		}
 	}
 
-	private static <T> Class<? extends T> determineConcreteClass(Model model,
-			String uri, Class<T> resultClass)
+	private static <T> Class<? extends T> determineConcreteClass(
+			LockableModel model, String uri, Class<T> resultClass)
 			throws InvalidConfigurationRdfException {
 		Set<Class<? extends T>> concreteClasses = new HashSet<>();
 
-		try (Critical.Section section = Critical.Section.read(model)) {
-			for (RDFNode node : model.listObjectsOfProperty(
-					createResource(uri), RDF.type).toSet()) {
+		try (LockedModel m = model.read()) {
+			for (RDFNode node : m.listObjectsOfProperty(createResource(uri),
+					RDF.type).toSet()) {
 				if (!node.isURIResource()) {
 					throw typeMustBeUriResource(node);
 				}

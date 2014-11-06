@@ -79,6 +79,7 @@ public class BaseResourceBean implements ResourceBean {
 			return shorthand;
 		}
 		
+		// Never returns null.
 		public static RoleLevel getRoleByUri(String uri2) {
 			if (uri2 == null)
 				return RoleLevel.values()[0];

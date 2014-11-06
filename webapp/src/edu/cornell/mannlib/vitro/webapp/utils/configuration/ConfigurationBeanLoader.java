@@ -2,19 +2,21 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
+import static com.hp.hpl.jena.rdf.model.ResourceFactory.createResource;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import static com.hp.hpl.jena.rdf.model.ResourceFactory.*;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.utils.jena.Critical;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.Critical.LockableModel;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.Critical.LockedModel;
 
 /**
  * Load one or more Configuration beans from a specified model.
@@ -48,7 +50,7 @@ public class ConfigurationBeanLoader {
 	// ----------------------------------------------------------------------
 
 	/** Must not be null. */
-	private final Model model;
+	private final LockableModel model;
 
 	/**
 	 * May be null, but the loader will be unable to satisfy instances of
@@ -82,7 +84,7 @@ public class ConfigurationBeanLoader {
 			throw new NullPointerException("model may not be null.");
 		}
 
-		this.model = model;
+		this.model = new LockableModel(model);
 		this.req = req;
 		this.ctx = ctx;
 	}
@@ -120,9 +122,9 @@ public class ConfigurationBeanLoader {
 	public <T> Set<T> loadAll(Class<T> resultClass)
 			throws ConfigurationBeanLoaderException {
 		Set<String> uris = new HashSet<>();
-		try (Critical.Section section = Critical.Section.read(model)) {
-			List<Resource> resources = model.listResourcesWithProperty(
-					RDF.type, createResource(toJavaUri(resultClass))).toList();
+		try (LockedModel m = model.read()) {
+			List<Resource> resources = m.listResourcesWithProperty(RDF.type,
+					createResource(toJavaUri(resultClass))).toList();
 			for (Resource r : resources) {
 				if (r.isURIResource()) {
 					uris.add(r.getURI());
