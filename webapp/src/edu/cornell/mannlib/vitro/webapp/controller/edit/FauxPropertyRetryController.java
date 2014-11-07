@@ -10,8 +10,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -127,15 +129,15 @@ public class FauxPropertyRetryController extends BaseEditController {
 			this.baseProperty = req.getUnfilteredWebappDaoFactory()
 					.getObjectPropertyDao()
 					.getObjectPropertyByURI(beanForEditing.getURI());
-			
+
 			addCheckboxValuesToTheRequest();
 
 			setFieldValidators();
+			setListeners();
+			setForwarders();
 
-			doABunchOfOtherJunk();
+			assembleFormObjectAndConnectToEpo();
 		}
-
-		
 
 		private String determineAction() {
 			return (req.getParameter("create") == null) ? "update" : "insert";
@@ -162,7 +164,8 @@ public class FauxPropertyRetryController extends BaseEditController {
 		}
 
 		/**
-		 * Create a new FauxProperty object and let it inherit some values from its base property.
+		 * Create a new FauxProperty object and let it inherit some values from
+		 * its base property.
 		 */
 		private FauxProperty newFauxProperty(String baseUri) {
 			FauxProperty fp = new FauxProperty(null, baseUri, null);
@@ -171,92 +174,73 @@ public class FauxPropertyRetryController extends BaseEditController {
 			fp.setGroupURI(base.getGroupURI());
 			fp.setRangeURI(base.getRangeVClassURI());
 			fp.setDomainURI(base.getDomainVClassURI());
-			fp.setHiddenFromDisplayBelowRoleLevel(base.getHiddenFromDisplayBelowRoleLevel());
-			fp.setHiddenFromPublishBelowRoleLevel(base.getHiddenFromPublishBelowRoleLevel());
-			fp.setProhibitedFromUpdateBelowRoleLevel(base.getProhibitedFromUpdateBelowRoleLevel());
+			fp.setHiddenFromDisplayBelowRoleLevel(base
+					.getHiddenFromDisplayBelowRoleLevel());
+			fp.setHiddenFromPublishBelowRoleLevel(base
+					.getHiddenFromPublishBelowRoleLevel());
+			fp.setProhibitedFromUpdateBelowRoleLevel(base
+					.getProhibitedFromUpdateBelowRoleLevel());
 			log.debug("Created new FauxProperty: " + fp);
 			return fp;
 		}
 
 		private void addCheckboxValuesToTheRequest() {
-	        req.setAttribute("selectFromExisting",beanForEditing.isSelectFromExisting());
-	        req.setAttribute("offerCreateNewOption", beanForEditing.isOfferCreateNewOption());
-	        req.setAttribute("collateBySubclass", beanForEditing.isCollateBySubclass());
-	        
+			req.setAttribute("selectFromExisting",
+					beanForEditing.isSelectFromExisting());
+			req.setAttribute("offerCreateNewOption",
+					beanForEditing.isOfferCreateNewOption());
+			req.setAttribute("collateBySubclass",
+					beanForEditing.isCollateBySubclass());
+
 			// checkboxes on HTML forms are pretty annoying : we don't know if
 			// someone *unchecked* a box, so we have to default to false on
 			// updates.
-	        if (beanForEditing.getURI() != null) {
-	            beanForEditing.setSelectFromExisting(false);
-	            beanForEditing.setOfferCreateNewOption(false);
-	            beanForEditing.setCollateBySubclass(false);
-	        }
+			if (beanForEditing.getURI() != null) {
+				beanForEditing.setSelectFromExisting(false);
+				beanForEditing.setOfferCreateNewOption(false);
+				beanForEditing.setCollateBySubclass(false);
+			}
 		}
-		
+
 		private void setFieldValidators() {
 			epo.getValidatorMap()
 					.put("RangeURI",
 							Arrays.asList(new Validator[] { new RequiredFieldValidator() }));
 		}
 
-		private void doABunchOfOtherJunk() {
-			// set up any listeners
+		private void setListeners() {
 			epo.setChangeListenerList(Collections
 					.singletonList(new PropertyRestrictionListener(ctx)));
+		}
 
+		private void setForwarders() {
 			// where should the postinsert pageforwarder go?
 			// TODO
 			// make a postdelete pageforwarder that will send us to the control
 			// panel for the base property.
 			// TODO
+		}
 
+		private void assembleFormObjectAndConnectToEpo() {
 			FormObject foo = new FormObject();
 			foo.setErrorMap(epo.getErrMsgMap());
-
 			foo.setOptionLists(new HashMap<>(createOptionsMap()));
-
-			// We will need to set a lot of option lists and stuff.
-			// TODO
-
-			// Put attributes on the request so the JSP can populate the fields.
-			// request.setAttribute("transitive",propertyForEditing.getTransitive());
-			// request.setAttribute("objectIndividualSortPropertyURI",
-			// propertyForEditing.getObjectIndividualSortPropertyURI());
-			// TODO
-
-			// checkboxes are pretty annoying : we don't know if someone
-			// *unchecked*
-			// a box, so we have to default to false on updates.
-			// propertyForEditing.setSymmetric(false);
-			// TODO
-
 			epo.setFormObject(foo);
-
 			FormUtils.populateFormFromBean(beanForEditing, epo.getAction(),
 					foo, epo.getBadValueMap());
 		}
 
 		private Map<String, List<Option>> createOptionsMap() {
 			Map<String, List<Option>> map = new HashMap<>();
-
 			map.put("GroupURI", createClassGroupOptionList());
-			
-			map.put("DomainURI",
-					createRootedVClassOptionList(
-							baseProperty.getDomainVClassURI(),
-							beanForEditing.getDomainURI()));
-			map.put("RangeURI",
-					createRootedVClassOptionList(
-							baseProperty.getRangeVClassURI(),
-							beanForEditing.getRangeURI()));
-			
+			map.put("DomainURI", buildDomainOptionList());
+			map.put("RangeURI", buildRangeOptionList());
 			map.put("HiddenFromDisplayBelowRoleLevelUsingRoleUri",
 					RoleLevelOptionsSetup.getDisplayOptionsList(beanForEditing));
 			map.put("ProhibitedFromUpdateBelowRoleLevelUsingRoleUri",
 					RoleLevelOptionsSetup.getUpdateOptionsList(beanForEditing));
 			map.put("HiddenFromPublishBelowRoleLevelUsingRoleUri",
 					RoleLevelOptionsSetup.getPublishOptionsList(beanForEditing));
-
 			return map;
 		}
 
@@ -282,20 +266,71 @@ public class FauxPropertyRetryController extends BaseEditController {
 			}
 		}
 
-		private List<Option> createRootedVClassOptionList(String rootVClassUri,
-				String currentSelection) {
+		private List<Option> buildDomainOptionList() {
 			List<Option> list = new ArrayList<>();
-			list.add(new Option("", "(none specified)"));
-
-			if (rootVClassUri == null) {
+			if (baseProperty.getDomainVClassURI() == null) {
 				list.addAll(FormUtils.makeVClassOptionList(wadf,
-						currentSelection));
+						beanForEditing.getDomainURI()));
 			} else {
 				list.addAll(FormUtils.makeOptionListOfSubVClasses(wadf,
-						rootVClassUri, currentSelection));
+						baseProperty.getDomainVClassURI(),
+						beanForEditing.getDomainURI()));
 			}
-
+			list.add(0, new Option("", "(none specified)"));
 			return list;
+		}
+
+		private List<Option> buildRangeOptionList() {
+			List<Option> list = new ArrayList<>();
+			if (baseProperty.getRangeVClassURI() == null) {
+				list.addAll(FormUtils.makeVClassOptionList(wadf,
+						beanForEditing.getRangeURI()));
+			} else {
+				list.addAll(FormUtils.makeOptionListOfSubVClasses(wadf,
+						baseProperty.getRangeVClassURI(),
+						beanForEditing.getRangeURI()));
+				if (containsVCardKind(list)) {
+					mergeInAllVCardClasses(list);
+				}
+			}
+			list.add(0, new Option("", "(none specified)"));
+			return list;
+		}
+
+		private static final String VCARD_KIND_URI = "http://www.w3.org/2006/vcard/ns#Kind";
+		private static final String VCARD_NAMESPACE = "http://www.w3.org/2006/vcard/ns#";
+
+		private boolean containsVCardKind(List<Option> list) {
+			for (Option option : list) {
+				if (VCARD_KIND_URI.equals(option.getValue())) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/**
+		 * Add to the list any class that is in the vCard namespace and is not
+		 * already in the list. Sort the list.
+		 */
+		private void mergeInAllVCardClasses(List<Option> list) {
+			Set<String> existingUrls = new HashSet<>();
+			for (Option option : list) {
+				existingUrls.add(option.getValue());
+			}
+			for (Option option : FormUtils.makeVClassOptionList(wadf,
+					beanForEditing.getRangeURI())) {
+				if (option.getValue().startsWith(VCARD_NAMESPACE)
+						&& !existingUrls.contains(option.getValue())) {
+					list.add(option);
+				}
+			}
+			Collections.sort(list, new Comparator<Option>() {
+				@Override
+				public int compare(Option o1, Option o2) {
+					return o1.getBody().compareTo(o2.getBody());
+				}
+			});
 		}
 
 		private static class OptionsBodyComparator implements

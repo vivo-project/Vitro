@@ -11,12 +11,14 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
+import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
+import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
@@ -101,29 +103,30 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         String editUrl = UrlBuilder.getUrl(getPropertyEditRoute(), "uri", property.getURI());
         verboseDisplay.put("propertyEditUrl", editUrl);
         
-        if(isFauxProperty(property)) {
-            verboseDisplay.put("fauxProperty", "true");
+        FauxProperty fauxProperty = isFauxProperty(property);
+        if (fauxProperty != null) {
+        	verboseDisplay.put("fauxProperty", assembleFauxPropertyValues(fauxProperty));
         } 
     }
+
+	private FauxProperty isFauxProperty(Property prop) {
+		FauxPropertyDao fpDao = vreq.getUnfilteredWebappDaoFactory().getFauxPropertyDao();
+		return fpDao.getFauxPropertyByUris(prop.getDomainVClassURI(), prop.getURI(), prop.getRangeVClassURI());
+	}
     
-    private boolean isFauxProperty(Property prop) {
-        if(!(prop instanceof ObjectProperty)) {
-            return false;
-        }
-        ObjectPropertyDao opDao = vreq.getWebappDaoFactory().getObjectPropertyDao();
-        ObjectProperty baseProp = opDao.getObjectPropertyByURI(prop.getURI());
-        if(baseProp == null) {
-            return false;
-        }
-        ObjectProperty possibleFaux = (ObjectProperty) prop;
-        if (possibleFaux.getDomainPublic() == null) {
-            return (baseProp.getDomainPublic() != null);            
-        } else {
-            return !possibleFaux.getDomainPublic().equals(baseProp.getDomainPublic());
-        }
-    }
-    
-    protected abstract int getPropertyDisplayTier(Property p);
+	private Map<String, Object> assembleFauxPropertyValues(FauxProperty fp) {
+		Map<String, Object> map = new HashMap<>();
+		String editUrl = UrlBuilder.getUrl("/editForm", 
+				"controller", "FauxProperty", 
+				"baseUri", fp.getBaseURI(), 
+				"domainUri", fp.getDomainURI(), 
+				"rangeUri", fp.getRangeURI());
+		map.put("propertyEditUrl", editUrl);
+		map.put("displayName", fp.getDisplayName());
+		return map;
+	}
+
+	protected abstract int getPropertyDisplayTier(Property p);
     protected abstract Route getPropertyEditRoute();
     
     protected void setName(String name) {

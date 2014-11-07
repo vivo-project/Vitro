@@ -231,8 +231,10 @@ name will be used as the label. -->
     <#local verboseDisplay = property.verboseDisplay!>
     <#if verboseDisplay?has_content>       
         <section class="verbosePropertyListing">
-            <#if verboseDisplay.fauxProperty??>
-                 a faux property of
+            <#if verboseDisplay.fauxProperty?has_content>
+                 <a class="propertyLink" href="${verboseDisplay.fauxProperty.propertyEditUrl}" title="${i18n().name}">
+                 ${verboseDisplay.fauxProperty.displayName}
+                 </a>, a faux property of
             </#if>
             <a class="propertyLink" href="${verboseDisplay.propertyEditUrl}" title="${i18n().name}">${verboseDisplay.localName}</a> 
             (<span>${property.type?lower_case}</span> property);

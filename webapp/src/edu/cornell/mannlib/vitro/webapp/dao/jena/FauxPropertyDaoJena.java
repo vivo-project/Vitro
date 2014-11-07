@@ -59,6 +59,7 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 
 	private static final ObjectProperty QUALIFIED_BY_RANGE = createProperty(appContext("qualifiedBy"));
 	private static final ObjectProperty QUALIFIED_BY_DOMAIN = createProperty(appContext("qualifiedByDomain"));
+	private static final ObjectProperty QUALIFIED_BY_ROOT = createProperty(appContext("qualifiedByRoot"));
 	private static final ObjectProperty LIST_VIEW_FILE = createProperty(appContext("listViewConfigFile"));
 	private static final ObjectProperty DISPLAY_NAME = createProperty(appContext("displayName"));
 	private static final ObjectProperty PROPERTY_GROUP = createProperty(appContext("propertyGroup"));
@@ -217,6 +218,7 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 					fp.getRangeURI());
 			addPropertyResourceURINotEmpty(context, QUALIFIED_BY_DOMAIN,
 					fp.getDomainURI());
+			storeQualifiedByRoot(context, fp.getRangeURI());
 
 			fp.setConfigUri(getUnusedURI());
 			addPropertyResourceURIValue(context, HAS_CONFIGURATION,
@@ -269,6 +271,16 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 		}
 	}
 
+	private static final String VCARD_KIND_URI = "http://www.w3.org/2006/vcard/ns#Kind";
+	private static final String VCARD_NAMESPACE = "http://www.w3.org/2006/vcard/ns#";
+	private void storeQualifiedByRoot(OntResource context, String rangeURI) {
+		if (rangeURI.startsWith(VCARD_NAMESPACE)) {
+			updatePropertyResourceURIValue(context, QUALIFIED_BY_ROOT, VCARD_KIND_URI);
+		} else {
+			updatePropertyResourceURIValue(context, QUALIFIED_BY_ROOT, null);
+		}
+	}
+
 	@Override
 	public void updateFauxProperty(FauxProperty fp) {
 		log.debug("Updating FauxProperty: " + fp);
@@ -308,6 +320,7 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 					fp.getRangeURI());
 			updatePropertyResourceURIValue(context, QUALIFIED_BY_DOMAIN,
 					fp.getDomainURI());
+			storeQualifiedByRoot(context, fp.getRangeURI());
 
 			OntResource config = displayModel.createOntResource(fp
 					.getConfigUri());
