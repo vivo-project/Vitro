@@ -101,7 +101,7 @@ public class ConfigurationBeanLoaderTest extends AbstractTestClass {
 		expectException(NullPointerException.class, "model may not be null");
 
 		@SuppressWarnings("unused")
-		Object unused = new ConfigurationBeanLoader(null);
+		Object unused = new ConfigurationBeanLoader((Model) null);
 	}
 
 	// ----------------------------------------------------------------------

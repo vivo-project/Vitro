@@ -2,19 +2,22 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
+import static com.hp.hpl.jena.rdf.model.ResourceFactory.createResource;
+
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
-import static com.hp.hpl.jena.rdf.model.ResourceFactory.*;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.utils.jena.Critical;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableModel;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedModel;
 
 /**
  * Load one or more Configuration beans from a specified model.
@@ -48,7 +51,7 @@ public class ConfigurationBeanLoader {
 	// ----------------------------------------------------------------------
 
 	/** Must not be null. */
-	private final Model model;
+	private final LockableModel locking;
 
 	/**
 	 * May be null, but the loader will be unable to satisfy instances of
@@ -63,26 +66,34 @@ public class ConfigurationBeanLoader {
 	private final HttpServletRequest req;
 
 	public ConfigurationBeanLoader(Model model) {
-		this(model, null, null);
+		this(new LockableModel(model), null, null);
+	}
+
+	public ConfigurationBeanLoader(LockableModel locking) {
+		this(locking, null, null);
 	}
 
 	public ConfigurationBeanLoader(Model model, ServletContext ctx) {
-		this(model, ctx, null);
+		this(new LockableModel(model), ctx, null);
+	}
+
+	public ConfigurationBeanLoader(LockableModel locking, ServletContext ctx) {
+		this(locking, ctx, null);
 	}
 
 	public ConfigurationBeanLoader(Model model, HttpServletRequest req) {
-		this(model,
-				(req == null) ? null : req.getSession().getServletContext(),
-				req);
+		this(new LockableModel(model), req);
 	}
 
-	private ConfigurationBeanLoader(Model model, ServletContext ctx,
-			HttpServletRequest req) {
-		if (model == null) {
-			throw new NullPointerException("model may not be null.");
-		}
+	public ConfigurationBeanLoader(LockableModel locking, HttpServletRequest req) {
+		this(locking, (req == null) ? null : req.getSession()
+				.getServletContext(), req);
+	}
 
-		this.model = model;
+	private ConfigurationBeanLoader(LockableModel locking, ServletContext ctx,
+			HttpServletRequest req) {
+		this.locking = Objects.requireNonNull(locking,
+				"locking may not be null.");
 		this.req = req;
 		this.ctx = ctx;
 	}
@@ -100,8 +111,8 @@ public class ConfigurationBeanLoader {
 		}
 
 		try {
-			ConfigurationRdf<T> parsedRdf = ConfigurationRdfParser.parse(model,
-					uri, resultClass);
+			ConfigurationRdf<T> parsedRdf = ConfigurationRdfParser.parse(
+					locking, uri, resultClass);
 			WrappedInstance<T> wrapper = InstanceWrapper.wrap(parsedRdf
 					.getConcreteClass());
 			wrapper.satisfyInterfaces(ctx, req);
@@ -120,9 +131,9 @@ public class ConfigurationBeanLoader {
 	public <T> Set<T> loadAll(Class<T> resultClass)
 			throws ConfigurationBeanLoaderException {
 		Set<String> uris = new HashSet<>();
-		try (Critical section = Critical.read(model)) {
-			List<Resource> resources = model.listResourcesWithProperty(
-					RDF.type, createResource(toJavaUri(resultClass))).toList();
+		try (LockedModel m = locking.read()) {
+			List<Resource> resources = m.listResourcesWithProperty(RDF.type,
+					createResource(toJavaUri(resultClass))).toList();
 			for (Resource r : resources) {
 				if (r.isURIResource()) {
 					uris.add(r.getURI());
