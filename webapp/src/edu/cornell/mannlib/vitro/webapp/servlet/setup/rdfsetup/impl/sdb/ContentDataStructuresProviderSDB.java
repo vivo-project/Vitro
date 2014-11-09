@@ -39,6 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.UnionModelsOntMode
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.sdb.RDFServiceFactorySDB;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging.LoggingRDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.ContentDataStructuresProvider;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -122,7 +123,8 @@ public class ContentDataStructuresProviderSDB extends
 			setupSDB(store);
 		}
 
-		return new RDFServiceFactorySDB(ds, storeDesc);
+		return new LoggingRDFServiceFactory(new RDFServiceFactorySDB(ds,
+				storeDesc));
 	}
 
 	/**

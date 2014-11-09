@@ -126,4 +126,9 @@ public class LoggingRDFService implements RDFService {
 	public void close() {
 		innerService.close();
 	}
+
+	@Override
+	public String toString() {
+		return "LoggingRDFService[inner=" + innerService + "]";
+	}
 }

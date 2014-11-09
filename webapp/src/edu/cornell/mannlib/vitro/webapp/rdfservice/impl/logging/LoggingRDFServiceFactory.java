@@ -40,4 +40,9 @@ public class LoggingRDFServiceFactory implements RDFServiceFactory {
 		factory.unregisterListener(changeListener);
 	}
 
+	@Override
+	public String toString() {
+		return "LoggingRDFServiceFactory[factory=" + factory + "]";
+	}
+
 }

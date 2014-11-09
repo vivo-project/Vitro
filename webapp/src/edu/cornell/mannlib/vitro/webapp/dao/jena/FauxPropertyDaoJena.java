@@ -34,9 +34,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner.QueryParser;
-import edu.cornell.mannlib.vitro.webapp.utils.jena.Critical.LockableOntModel;
-import edu.cornell.mannlib.vitro.webapp.utils.jena.Critical.LockedOntModel;
-import edu.cornell.mannlib.vitro.webapp.utils.jena.Critical.LockingOntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableOntModel;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableOntModelSelector;
+import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedOntModel;
 
 /**
  * TODO
@@ -80,11 +80,11 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 	// The instance
 	// ----------------------------------------------------------------------
 
-	private final LockingOntModelSelector models;
+	private final LockableOntModelSelector models;
 
 	public FauxPropertyDaoJena(WebappDaoFactoryJena wadf) {
 		super(wadf);
-		this.models = new LockingOntModelSelector(wadf.getOntModelSelector());
+		this.models = new LockableOntModelSelector(wadf.getOntModelSelector());
 	}
 
 	/**
