@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.config;
 
 import static edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean.DUMMY_BEAN;
 import static edu.cornell.mannlib.vitro.webapp.config.RevisionInfoBean.LevelRevisionInfo.DUMMY_LEVEL;
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.Date;
