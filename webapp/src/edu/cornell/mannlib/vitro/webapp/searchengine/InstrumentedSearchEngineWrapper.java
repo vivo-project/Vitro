@@ -18,6 +18,8 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineExcepti
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
 
 /**
  * Manages the life-cycle of the SearchEngine. Adds logging, controlled by
@@ -27,16 +29,29 @@ public class InstrumentedSearchEngineWrapper implements SearchEngine {
 	private static final Log log = LogFactory
 			.getLog(InstrumentedSearchEngineWrapper.class);
 
-	private final SearchEngine innerEngine;
+	private SearchEngine innerEngine;
 
 	private volatile LifecycleState lifecycleState = NEW;
 
-	public InstrumentedSearchEngineWrapper(SearchEngine innerEngine) {
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#wraps")
+	public void setInnerEngine(SearchEngine inner) {
 		if (innerEngine == null) {
-			throw new NullPointerException("innerEngine may not be null.");
+			innerEngine = inner;
+		} else {
+			throw new IllegalStateException(
+					"Configuration includes multiple SearchEngine instancess: "
+							+ innerEngine + ", and " + inner);
 		}
-		this.innerEngine = innerEngine;
 	}
+
+	@Validation
+	public void validate() throws Exception {
+		if (innerEngine == null) {
+			throw new IllegalStateException(
+					"Configuration did not include a wrapped SearchEngine.");
+		}
+	}
+
 
 	/**
 	 * Complain unless ACTIVE.

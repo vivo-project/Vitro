@@ -5,7 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.utils.developer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -194,12 +194,10 @@ public class DeveloperSettings {
 		public void contextInitialized(ServletContextEvent sce) {
 			ServletContext ctx = sce.getServletContext();
 			StartupStatus ss = StartupStatus.getBean(ctx);
-			ConfigurationProperties props = ConfigurationProperties
-					.getBean(ctx);
 			DeveloperSettings devSettings = DeveloperSettings.getInstance();
 
-			String home = props.getProperty("vitro.home");
-			File dsFile = Paths.get(home, "developer.properties").toFile();
+			Path homeDir = ApplicationUtils.instance().getHomeDirectory().getPath();
+			File dsFile = homeDir.resolve("developer.properties").toFile();
 
 			try (FileReader reader = new FileReader(dsFile)) {
 				Properties dsProps = new Properties();

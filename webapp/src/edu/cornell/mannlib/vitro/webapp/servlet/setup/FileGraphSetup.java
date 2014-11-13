@@ -33,6 +33,7 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.BlankNodeFilteringModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -49,7 +50,6 @@ public class FileGraphSetup implements ServletContextListener {
     private static final String ABOX = "abox";
     private static final String TBOX = "tbox";
     private static final String FILEGRAPH = "filegraph";
-    private static final String PROPERTY_VITRO_HOME = "vitro.home";
 
     public static final String FILEGRAPH_URI_ROOT = "http://vitro.mannlib.cornell.edu/filegraph/";
     
@@ -119,7 +119,7 @@ public class FileGraphSetup implements ServletContextListener {
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
 		ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
-		String homeDirProperty = props.getProperty(PROPERTY_VITRO_HOME);
+		String homeDirProperty = ApplicationUtils.instance().getHomeDirectory().getPath().toString();
 		Path filegraphDir = Paths.get(homeDirProperty, strings);
 
 		Set<Path> paths = new TreeSet<>();

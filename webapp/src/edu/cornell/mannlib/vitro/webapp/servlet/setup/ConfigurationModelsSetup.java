@@ -52,13 +52,12 @@ public class ConfigurationModelsSetup implements ServletContextListener {
 
 	private void loadFirstTimeFiles(ServletContext ctx, String modelPath,
 			OntModel baseModel) {
-		RDFFilesLoader.loadFirstTimeFiles(ctx, modelPath, baseModel,
-				baseModel.isEmpty());
+		RDFFilesLoader.loadFirstTimeFiles(modelPath, baseModel, baseModel.isEmpty());
 	}
 
 	private void loadEveryTimeFiles(ServletContext ctx, String modelPath,
 			OntModel memoryModel) {
-		RDFFilesLoader.loadEveryTimeFiles(ctx, modelPath, memoryModel);
+		RDFFilesLoader.loadEveryTimeFiles(modelPath, memoryModel);
 	}
 
 	@Override
