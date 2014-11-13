@@ -1,13 +1,13 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb;
+package edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb;
 
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.DEFAULT_DRIVER_CLASS;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_DRIVER_CLASS_NAME;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_PASSWORD;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_TYPE;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_URL;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_USERNAME;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_DRIVER_CLASS;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_DRIVER_CLASS_NAME;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_PASSWORD;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_TYPE;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_URL;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_USERNAME;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
@@ -19,10 +19,9 @@ import java.sql.Statement;
 import java.util.Properties;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletContextListener;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 
 /**
  * Smoke tests for the database connection that SDB will use.
@@ -38,38 +37,31 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
  * encoding. Don't know how well this works.
  */
 public class SDBConnectionSmokeTests {
-	private final ServletContextListener parent;
 	private final ConfigurationProperties props;
-	private final StartupStatus ss;
+	private final ComponentStartupStatus ss;
 
-	public SDBConnectionSmokeTests(ServletContext ctx,
-			ServletContextListener parent) {
-		this.parent = parent;
+	public SDBConnectionSmokeTests(ServletContext ctx, ComponentStartupStatus ss) {
 		this.props = ConfigurationProperties.getBean(ctx);
-		this.ss = StartupStatus.getBean(ctx);
-
+		this.ss = ss;
 	}
 
 	public void checkDatabaseConnection() {
 		String url = props.getProperty(PROPERTY_DB_URL);
 		if (url == null || url.isEmpty()) {
-			ss.fatal(parent,
-					"runtime.properties does not contain a value for '"
-							+ PROPERTY_DB_URL + "'");
+			ss.fatal("runtime.properties does not contain a value for '"
+					+ PROPERTY_DB_URL + "'");
 			return;
 		}
 		String username = props.getProperty(PROPERTY_DB_USERNAME);
 		if (username == null || username.isEmpty()) {
-			ss.fatal(parent,
-					"runtime.properties does not contain a value for '"
-							+ PROPERTY_DB_USERNAME + "'");
+			ss.fatal("runtime.properties does not contain a value for '"
+					+ PROPERTY_DB_USERNAME + "'");
 			return;
 		}
 		String password = props.getProperty(PROPERTY_DB_PASSWORD);
 		if (password == null || password.isEmpty()) {
-			ss.fatal(parent,
-					"runtime.properties does not contain a value for '"
-							+ PROPERTY_DB_PASSWORD + "'");
+			ss.fatal("runtime.properties does not contain a value for '"
+					+ PROPERTY_DB_PASSWORD + "'");
 			return;
 		}
 
@@ -79,16 +71,16 @@ public class SDBConnectionSmokeTests {
 			try {
 				Class.forName(DEFAULT_DRIVER_CLASS).newInstance();
 			} catch (Exception e) {
-				ss.fatal(parent, "The default Database Driver failed to load. "
-						+ "The driver class is '" + DEFAULT_DRIVER_CLASS
-						+ "'", e);
+				ss.fatal("The default Database Driver failed to load. "
+						+ "The driver class is '" + DEFAULT_DRIVER_CLASS + "'",
+						e);
 				return;
 			}
 		} else {
 			try {
 				Class.forName(driverClassName).newInstance();
 			} catch (Exception e) {
-				ss.fatal(parent, "The Database Driver failed to load. "
+				ss.fatal("The Database Driver failed to load. "
 						+ "The driver class was set by "
 						+ PROPERTY_DB_DRIVER_CLASS_NAME + " to be '"
 						+ driverClassName + "'", e);
@@ -104,9 +96,9 @@ public class SDBConnectionSmokeTests {
 				.getConnection(url, connectionProps)) {
 			// Just open the connection and close it.
 		} catch (SQLException e) {
-			ss.fatal(parent, "Can't connect to the database: "
-					+ PROPERTY_DB_URL + "='" + url + "', "
-					+ PROPERTY_DB_USERNAME + "='" + username + "'", e);
+			ss.fatal("Can't connect to the database: " + PROPERTY_DB_URL + "='"
+					+ url + "', " + PROPERTY_DB_USERNAME + "='" + username
+					+ "'", e);
 			return;
 		}
 
@@ -151,15 +143,14 @@ public class SDBConnectionSmokeTests {
 						+ "set on the database?";
 				if ("MySQL".equals(dbType)) {
 					// For MySQL, we know that this is a configuration problem.
-					ss.fatal(parent, message);
+					ss.fatal(message);
 				} else {
 					// For other databases, it might not be.
-					ss.warning(parent, message);
+					ss.warning(message);
 				}
 			}
 		} catch (SQLException e) {
-			ss.fatal(parent, "Failed to check handling of Unicode characters",
-					e);
+			ss.fatal("Failed to check handling of Unicode characters", e);
 		}
 	}
 

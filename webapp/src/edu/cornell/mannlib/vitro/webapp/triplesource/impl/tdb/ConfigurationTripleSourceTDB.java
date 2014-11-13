@@ -1,30 +1,28 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.tdb;
+package edu.cornell.mannlib.vitro.webapp.triplesource.impl.tdb;
 
-import java.io.File;
 import java.io.IOException;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextListener;
+import java.nio.file.Path;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.tdb.TDB;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ListCachingModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.MemoryMappingModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
+import edu.cornell.mannlib.vitro.webapp.modules.Application;
+import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
+import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ConfigurationTripleSource;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.tdb.RDFServiceTDB;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging.LoggingRDFServiceFactory;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.ConfigurationDataStructuresProvider;
-import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
@@ -37,35 +35,29 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
  * 
  * Memory-map all of the configuration models, and add the standard decorators.
  */
-public class ConfigurationDataStructuresProviderTDB extends
-		ConfigurationDataStructuresProvider {
+public class ConfigurationTripleSourceTDB extends ConfigurationTripleSource {
 
 	private static final String DIRECTORY_TDB = "tdbModels";
 
-	private final ConfigurationProperties props;
-	private final StartupStatus ss;
+	private RDFServiceFactory rdfServiceFactory;
+	private RDFService rdfService;
+	private Dataset dataset;
+	private ModelMaker modelMaker;
 
-	private final RDFServiceFactory rdfServiceFactory;
-	private final RDFService rdfService;
-	private final Dataset dataset;
-	private final ModelMaker modelMaker;
-
-	public ConfigurationDataStructuresProviderTDB(ServletContext ctx,
-			ServletContextListener ctxListener) {
-		this.props = ConfigurationProperties.getBean(ctx);
-		this.ss = StartupStatus.getBean(ctx);
-
+	@Override
+	public void startup(Application application, ComponentStartupStatus ss) {
 		configureTDB();
 
-		String tdbPath = props.getProperty("vitro.home") + File.separatorChar
-				+ DIRECTORY_TDB;
+		Path vitroHome = ApplicationUtils.instance().getHomeDirectory()
+				.getPath();
+		String tdbPath = vitroHome.resolve(DIRECTORY_TDB).toString();
 
 		try {
 			this.rdfServiceFactory = createRDFServiceFactory(tdbPath);
 			this.rdfService = this.rdfServiceFactory.getRDFService();
 			this.dataset = new RDFServiceDataset(this.rdfService);
 			this.modelMaker = createModelMaker();
-			ss.info(ctxListener, "Initialized the RDF source for TDB");
+			ss.info("Initialized the RDF source for TDB");
 		} catch (IOException e) {
 			throw new RuntimeException(
 					"Failed to set up the RDF source for TDB", e);
@@ -117,15 +109,15 @@ public class ConfigurationDataStructuresProviderTDB extends
 	}
 
 	@Override
-	public void close() {
+	public String toString() {
+		return "ConfigurationTripleSourceTDB[" + ToString.hashHex(this) + "]";
+	}
+
+	@Override
+	public void shutdown(Application application) {
 		if (this.rdfService != null) {
 			this.rdfService.close();
 		}
 	}
 
-	@Override
-	public String toString() {
-		return "ConfigurationDataStructuresProviderTDB["
-				+ ToString.hashHex(this) + "]";
-	}
 }

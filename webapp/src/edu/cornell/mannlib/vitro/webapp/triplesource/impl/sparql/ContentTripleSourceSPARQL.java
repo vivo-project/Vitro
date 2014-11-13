@@ -1,26 +1,25 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sparql;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextListener;
+package edu.cornell.mannlib.vitro.webapp.triplesource.impl.sparql;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ListCachingModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.MemoryMappingModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
+import edu.cornell.mannlib.vitro.webapp.modules.Application;
+import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
+import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging.LoggingRDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sparql.RDFServiceSparql;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.ContentDataStructuresProvider;
-import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
@@ -33,44 +32,59 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
  * 
  * Memory-map the small content models, and add the standard decorators.
  */
-public class ContentDataStructuresProviderSPARQL extends
-		ContentDataStructuresProvider {
-	public static final String PROPERTY_SPARQL_ENDPOINT_URI = "VitroConnection.DataSource.endpointURI";
-	public static final String PROPERTY_SPARQL_UPDATE_ENDPOINT_URI = "VitroConnection.DataSource.updateEndpointURI";
+public class ContentTripleSourceSPARQL extends ContentTripleSource {
+	private String endpointURI;
+	private String updateEndpointURI; // Optional
 
-	private final ServletContextListener ctxListener;
-	private final ConfigurationProperties props;
-	private final StartupStatus ss;
-	private final String endpointURI;
-	private final String updateEndpointURI;
+	private RDFService rdfService;
+	private RDFServiceFactory rdfServiceFactory;
+	private Dataset dataset;
+	private ModelMaker modelMaker;
 
-	private final RDFService rdfService;
-	private final RDFServiceFactory rdfServiceFactory;
-	private final Dataset dataset;
-	private final ModelMaker modelMaker;
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasEndpointURI")
+	public void setEndpointURI(String eUri) {
+		if (endpointURI == null) {
+			endpointURI = eUri;
+		} else {
+			throw new IllegalStateException(
+					"Configuration includes multiple instances of EndpointURI: "
+							+ endpointURI + ", and " + eUri);
+		}
+	}
 
-	public ContentDataStructuresProviderSPARQL(ServletContext ctx,
-			ServletContextListener ctxListener) {
-		this.ctxListener = ctxListener;
-		this.props = ConfigurationProperties.getBean(ctx);
-		this.ss = StartupStatus.getBean(ctx);
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasUpdateEndpointURI")
+	public void setUpdateEndpointURI(String ueUri) {
+		if (updateEndpointURI == null) {
+			updateEndpointURI = ueUri;
+		} else {
+			throw new IllegalStateException(
+					"Configuration includes multiple instances of UpdateEndpointURI: "
+							+ updateEndpointURI + ", and " + ueUri);
+		}
+	}
 
-		this.endpointURI = props.getProperty(PROPERTY_SPARQL_ENDPOINT_URI);
-		this.updateEndpointURI = props
-				.getProperty(PROPERTY_SPARQL_UPDATE_ENDPOINT_URI);
+	@Validation
+	public void validate() throws Exception {
+		if (endpointURI == null) {
+			throw new IllegalStateException(
+					"Configuration did not include an EndpointURI.");
+		}
+	}
 
-		this.rdfServiceFactory = createRDFServiceFactory(createRDFService());
+	@Override
+	public void startup(Application application, ComponentStartupStatus ss) {
+		this.rdfServiceFactory = createRDFServiceFactory(createRDFService(ss));
 		this.rdfService = this.rdfServiceFactory.getRDFService();
 		this.dataset = createDataset();
 		this.modelMaker = createModelMaker();
 	}
 
-	private RDFService createRDFService() {
+	private RDFService createRDFService(ComponentStartupStatus ss) {
 		if (updateEndpointURI == null) {
-			ss.info(ctxListener, "Using endpoint at " + endpointURI);
+			ss.info("Using endpoint at " + endpointURI);
 			return new RDFServiceSparql(endpointURI);
 		} else {
-			ss.info(ctxListener, "Using read endpoint at " + endpointURI
+			ss.info("Using read endpoint at " + endpointURI
 					+ " and update endpoint at " + updateEndpointURI);
 			return new RDFServiceSparql(endpointURI, updateEndpointURI);
 		}
@@ -119,17 +133,17 @@ public class ContentDataStructuresProviderSPARQL extends
 	}
 
 	@Override
-	public void close() {
-		if (this.rdfService != null) {
-			this.rdfService.close();
-		}
+	public String toString() {
+		return "ContentTripleSourceSPARQL[" + ToString.hashHex(this)
+				+ ", endpointURI=" + endpointURI + ", updateEndpointURI="
+				+ updateEndpointURI + "]";
 	}
 
 	@Override
-	public String toString() {
-		return "ContentDataStructuresProviderSPARQL[" + ToString.hashHex(this)
-				+ ", endpointURI=" + endpointURI + ", updateEndpointURI="
-				+ updateEndpointURI + "]";
+	public void shutdown(Application application) {
+		if (this.rdfService != null) {
+			this.rdfService.close();
+		}
 	}
 
 }

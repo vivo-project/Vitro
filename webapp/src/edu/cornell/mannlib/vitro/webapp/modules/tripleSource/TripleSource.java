@@ -1,22 +1,19 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl;
+package edu.cornell.mannlib.vitro.webapp.modules.tripleSource;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
+import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 
 /**
- * An RDFSource that provides Content models or Configuration models, but not
- * both.
- * 
- * Repeated calls for the same data structure should yield the same instance,
- * except for the short-term OntModelCache.
+ * A provider of triples and the data structures by which they are accessed.
  */
-public interface SingleSourceDataStructuresProvider extends AutoCloseable {
+public interface TripleSource extends Application.Module{
 	RDFServiceFactory getRDFServiceFactory();
 
 	RDFService getRDFService();

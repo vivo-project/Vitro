@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl;
+package edu.cornell.mannlib.vitro.webapp.triplesource.impl;
 
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONFIGURATION;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONTENT;
@@ -25,39 +25,39 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.JoinedOntModelCache;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
+import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.TripleSource;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringUtils;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.ShortTermDataStructuresProvider;
+import edu.cornell.mannlib.vitro.webapp.triplesource.ShortTermCombinedTripleSource;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
- * The simple implementation of ShortTermDataStructuresProvider.
+ * The simple implementation of ShortTermCombinedTripleSource.
  * 
  * The short-term RDFServices are cached, lest we somehow create duplicates for
  * the same request. Similarly with the short-term OntModels.
  */
-public class BasicShortTermDataStructuresProvider implements
-		ShortTermDataStructuresProvider {
+public class BasicShortTermCombinedTripleSource implements
+		ShortTermCombinedTripleSource {
 	private static final Log log = LogFactory
-			.getLog(BasicShortTermDataStructuresProvider.class);
+			.getLog(BasicShortTermCombinedTripleSource.class);
 
 	private final HttpServletRequest req;
 	private final ServletContext ctx;
 	private final ConfigurationProperties props;
-	private final BasicDataStructuresProvider parent;
-	private final Map<WhichService, SingleSourceDataStructuresProvider> providers;
+	private final BasicCombinedTripleSource parent;
+	private final Map<WhichService, TripleSource> sources;
 	private final Map<WhichService, RDFService> rdfServices;
 	private final OntModelCache ontModelCache;
 
-	public BasicShortTermDataStructuresProvider(
-			HttpServletRequest req,
-			BasicDataStructuresProvider parent,
-			final Map<WhichService, SingleSourceDataStructuresProvider> providers) {
+	public BasicShortTermCombinedTripleSource(HttpServletRequest req,
+			BasicCombinedTripleSource parent,
+			final Map<WhichService, TripleSource> sources) {
 		this.req = req;
 		this.ctx = req.getSession().getServletContext();
 		this.props = ConfigurationProperties.getBean(ctx);
 		this.parent = parent;
-		this.providers = providers;
+		this.sources = sources;
 		this.rdfServices = populateRdfServicesMap();
 		this.ontModelCache = createOntModelCache();
 	}
@@ -77,12 +77,12 @@ public class BasicShortTermDataStructuresProvider implements
 	}
 
 	/**
-	 * Ask each provider what short-term models should mask their long-term
+	 * Ask each triple source what short-term models should mask their long-term
 	 * counterparts.
 	 */
 	private OntModelCache shortModels(WhichService which) {
-		return providers.get(which).getShortTermOntModels(
-				rdfServices.get(which), parent.getOntModels(which));
+		return sources.get(which).getShortTermOntModels(rdfServices.get(which),
+				parent.getOntModels(which));
 	}
 
 	@Override
@@ -142,8 +142,8 @@ public class BasicShortTermDataStructuresProvider implements
 
 	@Override
 	public String toString() {
-		return "BasicShortTermDataStructuresProvider[" + ToString.hashHex(this)
-				+ ", req=" + ToString.hashHex(req) + ", providers=" + providers
+		return "BasicShortTermCombinedTripleSource[" + ToString.hashHex(this)
+				+ ", req=" + ToString.hashHex(req) + ", sources=" + sources
 				+ ", ontModels=" + ontModelCache + "]";
 	}
 

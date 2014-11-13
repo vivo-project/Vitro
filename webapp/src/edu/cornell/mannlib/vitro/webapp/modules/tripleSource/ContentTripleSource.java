@@ -1,23 +1,20 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl;
+package edu.cornell.mannlib.vitro.webapp.modules.tripleSource;
 
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.APPLICATION_METADATA;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS;
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.*;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_INFERENCES;
 
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.NamedDefaultModelMaker;
 
 /**
- * The base class for a provider of content models. It just contains some useful
- * constants and utility methods.
+ * A triple source for content models.
  */
-public abstract class ContentDataStructuresProvider implements
-		SingleSourceDataStructuresProvider {
-
+public abstract class ContentTripleSource implements TripleSource {
 	/**
 	 * These are the small content models that we want to keep in memory.
 	 */

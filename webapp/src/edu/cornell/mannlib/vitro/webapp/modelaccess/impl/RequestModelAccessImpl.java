@@ -51,7 +51,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.impl.keys.WebappDaoFactoryKe
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringRDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.filter.LanguageFilteringUtils;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.ShortTermDataStructuresProvider;
+import edu.cornell.mannlib.vitro.webapp.triplesource.ShortTermCombinedTripleSource;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
@@ -89,14 +89,14 @@ public class RequestModelAccessImpl implements RequestModelAccess {
 	private final HttpServletRequest req;
 	private final ServletContext ctx;
 	private final ConfigurationProperties props;
-	private final ShortTermDataStructuresProvider provider;
+	private final ShortTermCombinedTripleSource source;
 
 	public RequestModelAccessImpl(HttpServletRequest req,
-			ShortTermDataStructuresProvider provider) {
+			ShortTermCombinedTripleSource source) {
 		this.req = req;
 		this.ctx = req.getSession().getServletContext();
 		this.props = ConfigurationProperties.getBean(req);
-		this.provider = provider;
+		this.source = source;
 	}
 
 	/**
@@ -113,13 +113,13 @@ public class RequestModelAccessImpl implements RequestModelAccess {
 
 	@Override
 	public void close() {
-		this.provider.close();
+		this.source.close();
 	}
 
 	@Override
 	public String toString() {
 		return "RequestModelAccessImpl[" + ToString.hashHex(this) + ", req="
-				+ ToString.hashHex(req) + ", provider=" + provider + "]";
+				+ ToString.hashHex(req) + ", source=" + source + "]";
 	}
 
 	// ----------------------------------------------------------------------
@@ -149,7 +149,7 @@ public class RequestModelAccessImpl implements RequestModelAccess {
 		if (key.getLanguageOption() == LANGUAGE_AWARE) {
 			return addLanguageAwareness(getRDFService(LANGUAGE_NEUTRAL));
 		} else {
-			return provider.getRDFService(key.getWhichService());
+			return source.getRDFService(key.getWhichService());
 		}
 	}
 
@@ -222,7 +222,7 @@ public class RequestModelAccessImpl implements RequestModelAccess {
 			return addLanguageAwareness(getOntModel(key.getName(),
 					LANGUAGE_NEUTRAL));
 		} else {
-			return provider.getOntModelCache().getOntModel(key.getName());
+			return source.getOntModelCache().getOntModel(key.getName());
 		}
 	}
 
@@ -313,7 +313,7 @@ public class RequestModelAccessImpl implements RequestModelAccess {
 		RDFService rdfService = getRDFService(key.rdfServiceKey());
 		OntModelSelector ontModelSelector = getOntModelSelector(key
 				.ontModelSelectorKey());
-		WebappDaoFactoryConfig config = provider.getWebappDaoFactoryConfig();
+		WebappDaoFactoryConfig config = source.getWebappDaoFactoryConfig();
 
 		switch (key.getReasoningOption()) {
 		case ASSERTIONS_ONLY:

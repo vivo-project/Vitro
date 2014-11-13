@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup;
+package edu.cornell.mannlib.vitro.webapp.triplesource;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -17,11 +17,11 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
  * 
  * Repeated calls for the same data structure should yield the same instance.
  * 
- * Repeated calls for the ShortTermDataStructuresProvider need not yield the
+ * Repeated calls for the ShortTermCombinedTripleSource need not yield the
  * same instance, but must yield an instance that will return the same
  * structures as any other instance for the same request.
  */
-public interface DataStructuresProvider {
+public interface CombinedTripleSource {
 	RDFService getRDFService(WhichService whichService);
 
 	Dataset getDataset(WhichService whichService);
@@ -30,6 +30,6 @@ public interface DataStructuresProvider {
 
 	OntModelCache getOntModelCache();
 
-	ShortTermDataStructuresProvider getShortTermDataStructuresProvider(
+	ShortTermCombinedTripleSource getShortTermCombinedTripleSource(
 			HttpServletRequest req);
 }

@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup;
+package edu.cornell.mannlib.vitro.webapp.triplesource;
 
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
@@ -16,7 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
  * Repeated calls for the WebappDaoFactoryConfig need not yield the same
  * instance.
  */
-public interface ShortTermDataStructuresProvider {
+public interface ShortTermCombinedTripleSource {
 	RDFService getRDFService(WhichService whichService);
 
 	OntModelCache getOntModelCache();

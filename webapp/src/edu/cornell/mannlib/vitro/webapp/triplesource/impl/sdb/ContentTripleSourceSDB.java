@@ -1,14 +1,13 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb;
+package edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb;
 
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.BasicDataStructuresProvider.CONTENT_UNIONS;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.BasicCombinedTripleSource.CONTENT_UNIONS;
 
 import java.sql.SQLException;
 import java.util.Arrays;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletContextListener;
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -36,13 +35,14 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.MaskingOntModelCac
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.ModelMakerOntModelCache;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.UnionModelsOntModelsCache;
+import edu.cornell.mannlib.vitro.webapp.modules.Application;
+import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
+import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.sdb.RDFServiceFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging.LoggingRDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.ContentDataStructuresProvider;
-import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
@@ -51,10 +51,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
  * Do some smoke-tests on the parameters, create the connection pool, and create
  * the RDFServiceFactory.
  */
-public class ContentDataStructuresProviderSDB extends
-		ContentDataStructuresProvider {
+public class ContentTripleSourceSDB extends ContentTripleSource {
 	private static final Log log = LogFactory
-			.getLog(ContentDataStructuresProviderSDB.class);
+			.getLog(ContentTripleSourceSDB.class);
 
 	static final String PROPERTY_DB_URL = "VitroConnection.DataSource.url";
 	static final String PROPERTY_DB_USERNAME = "VitroConnection.DataSource.username";
@@ -78,32 +77,28 @@ public class ContentDataStructuresProviderSDB extends
 	static final boolean DEFAULT_TESTONBORROW = true;
 	static final boolean DEFAULT_TESTONRETURN = true;
 
-	private final ServletContext ctx;
-	private final StartupStatus ss;
-	private final ComboPooledDataSource ds;
-	private final RDFServiceFactory rdfServiceFactory;
-	private final RDFService rdfService;
-	private final Dataset dataset;
-	private final ModelMaker modelMaker;
+	private ServletContext ctx;
+	private ComboPooledDataSource ds;
+	private RDFServiceFactory rdfServiceFactory;
+	private RDFService rdfService;
+	private Dataset dataset;
+	private ModelMaker modelMaker;
 
-	public ContentDataStructuresProviderSDB(ServletContext ctx,
-			ServletContextListener ctxListener) {
+	@Override
+	public void startup(Application application, ComponentStartupStatus ss) {
 		try {
-			this.ctx = ctx;
-			this.ss = StartupStatus.getBean(ctx);
+			this.ctx = application.getServletContext();
 
 			configureSDBContext();
 
-			new SDBConnectionSmokeTests(ctx, ctxListener)
-					.checkDatabaseConnection();
+			new SDBConnectionSmokeTests(ctx, ss).checkDatabaseConnection();
 
 			this.ds = new SDBDataSource(ctx).getDataSource();
 			this.rdfServiceFactory = createRdfServiceFactory();
 			this.rdfService = rdfServiceFactory.getRDFService();
 			this.dataset = new RDFServiceDataset(this.rdfService);
 			this.modelMaker = createModelMaker();
-			ss.info(ctxListener,
-					"Initialized the content data structures for SDB");
+			ss.info("Initialized the content data structures for SDB");
 		} catch (SQLException e) {
 			throw new RuntimeException(
 					"Failed to set up the content data structures for SDB", e);
@@ -211,16 +206,15 @@ public class ContentDataStructuresProviderSDB extends
 	}
 
 	@Override
-	public void close() {
-		if (ds != null) {
-			ds.close();
-		}
+	public String toString() {
+		return "ContentTripleSourceSDB[" + ToString.hashHex(this) + "]";
 	}
 
 	@Override
-	public String toString() {
-		return "ContentDataStructuresProviderSDB[" + ToString.hashHex(this)
-				+ "]";
+	public void shutdown(Application application) {
+		if (ds != null) {
+			ds.close();
+		}
 	}
 
 }

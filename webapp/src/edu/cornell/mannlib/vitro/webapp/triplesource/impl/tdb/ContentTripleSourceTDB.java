@@ -1,29 +1,28 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.tdb;
+package edu.cornell.mannlib.vitro.webapp.triplesource.impl.tdb;
 
 import java.io.IOException;
-
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextListener;
 
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.ModelMaker;
 import com.hp.hpl.jena.tdb.TDB;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ListCachingModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.MemoryMappingModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
+import edu.cornell.mannlib.vitro.webapp.modules.Application;
+import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
+import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.tdb.RDFServiceTDB;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging.LoggingRDFServiceFactory;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.ContentDataStructuresProvider;
-import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
@@ -36,34 +35,42 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
  * 
  * Memory-map the small content models, and add the standard decorators.
  */
-public class ContentDataStructuresProviderTDB extends
-		ContentDataStructuresProvider {
+public class ContentTripleSourceTDB extends ContentTripleSource {
+	private String tdbPath;
 
-	public static final String PROPERTY_CONTENT_TDB_PATH = "VitroConnection.DataSource.tdbDirectory";
+	private RDFServiceFactory rdfServiceFactory;
+	private RDFService rdfService;
+	private Dataset dataset;
+	private ModelMaker modelMaker;
 
-	private final ConfigurationProperties props;
-	private final StartupStatus ss;
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasTdbDirectory")
+	public void setTdbPath(String path) {
+		if (tdbPath == null) {
+			tdbPath = path;
+		} else {
+			throw new IllegalStateException(
+					"Configuration includes multiple instances of TdbDirectory: "
+							+ tdbPath + ", and " + path);
+		}
+	}
 
-	private final RDFServiceFactory rdfServiceFactory;
-	private final RDFService rdfService;
-	private final Dataset dataset;
-	private final ModelMaker modelMaker;
+	@Validation
+	public void validate() throws Exception {
+		if (tdbPath == null) {
+			throw new IllegalStateException(
+					"Configuration did not include a TdbDirectory.");
+		}
+	}
 
-	public ContentDataStructuresProviderTDB(ServletContext ctx,
-			ServletContextListener ctxListener) {
-		this.props = ConfigurationProperties.getBean(ctx);
-		this.ss = StartupStatus.getBean(ctx);
-
+	@Override
+	public void startup(Application application, ComponentStartupStatus ss) {
 		configureTDB();
-
-		String tdbPath = props.getProperty(PROPERTY_CONTENT_TDB_PATH);
-
 		try {
 			this.rdfService = new RDFServiceTDB(tdbPath);
 			this.rdfServiceFactory = createRDFServiceFactory();
 			this.dataset = new RDFServiceDataset(this.rdfService);
 			this.modelMaker = createModelMaker();
-			ss.info(ctxListener, "Initialized the RDF source for TDB");
+			ss.info("Initialized the RDF source for TDB");
 		} catch (IOException e) {
 			throw new RuntimeException(
 					"Failed to set up the RDF source for TDB", e);
@@ -113,16 +120,15 @@ public class ContentDataStructuresProviderTDB extends
 	}
 
 	@Override
-	public void close() {
-		if (this.rdfService != null) {
-			this.rdfService.close();
-		}
+	public String toString() {
+		return "ContentTripleSourceTDB[" + ToString.hashHex(this) + "]";
 	}
 
 	@Override
-	public String toString() {
-		return "ContentDataStructuresProviderTDB[" + ToString.hashHex(this)
-				+ "]";
+	public void shutdown(Application application) {
+		if (this.rdfService != null) {
+			this.rdfService.close();
+		}
 	}
 
 }

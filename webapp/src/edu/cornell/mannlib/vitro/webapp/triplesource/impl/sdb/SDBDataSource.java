@@ -1,23 +1,23 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb;
+package edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb;
 
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.DEFAULT_DRIVER_CLASS;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.DEFAULT_MAXACTIVE;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.DEFAULT_MAXIDLE;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.DEFAULT_TESTONBORROW;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.DEFAULT_TESTONRETURN;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.DEFAULT_TYPE;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.DEFAULT_VALIDATION_QUERY;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.MINIMUM_MAXACTIVE;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_DRIVER_CLASS_NAME;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_MAX_ACTIVE;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_MAX_IDLE;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_PASSWORD;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_TYPE;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_URL;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_USERNAME;
-import static edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.impl.sdb.ContentDataStructuresProviderSDB.PROPERTY_DB_VALIDATION_QUERY;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_DRIVER_CLASS;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_MAXACTIVE;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_MAXIDLE;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_TESTONBORROW;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_TESTONRETURN;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_TYPE;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_VALIDATION_QUERY;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.MINIMUM_MAXACTIVE;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_DRIVER_CLASS_NAME;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_MAX_ACTIVE;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_MAX_IDLE;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_PASSWORD;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_TYPE;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_URL;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_USERNAME;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_VALIDATION_QUERY;
 
 import java.beans.PropertyVetoException;
 
