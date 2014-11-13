@@ -10,26 +10,28 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.ContextModelsUser;
 
 /**
  * Adds all labels to name fields, not just the one returned by Individual.getName().
  */
-public class NameFields implements DocumentModifier {
-	RDFServiceFactory rsf;
+public class NameFields implements DocumentModifier, ContextModelsUser {
+	private RDFService rdfService;
 	
 	public static final VitroSearchTermNames term = new VitroSearchTermNames();
 	public static final Log log = LogFactory.getLog(NameFields.class.getName());
 	
-	public NameFields( RDFServiceFactory rsf){
-		this.rsf = rsf; 
+	@Override
+	public void setContextModels(ContextModelAccess models) {
+		this.rdfService = models.getRDFService();
 	}
-	
+
 	@Override
 	public void modifyDocument(Individual ind, SearchInputDocument doc) {
 		if( ind == null || ind.getURI() == null ){
@@ -43,7 +45,6 @@ public class NameFields implements DocumentModifier {
 			"<http://www.w3.org/2000/01/rdf-schema#label> ?label  }";
 
 		try {
-			RDFService rdfService = rsf.getRDFService();
 			BufferedReader stream = 
 				new BufferedReader(new InputStreamReader(rdfService.sparqlSelectQuery(query, ResultFormat.CSV)));
 			

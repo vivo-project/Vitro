@@ -350,5 +350,5 @@ public class IndividualToSearchDocument {
         }
     }
 
-    protected static final String DONT_EXCLUDE =null;
+    public static final String DONT_EXCLUDE =null;
 }

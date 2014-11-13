@@ -3,7 +3,9 @@
 package stubs.edu.cornell.mannlib.vitro.webapp.modelaccess;
 
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ReasoningOption.ASSERTIONS_AND_INFERENCES;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONTENT;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +32,7 @@ public class ContextModelAccessStub implements ContextModelAccess {
 	// ----------------------------------------------------------------------
 
 	private final Map<ReasoningOption, WebappDaoFactory> wadfMap = new HashMap<>();
+	private final Map<WhichService, RDFService> rdfServiceMap = new EnumMap<>(WhichService.class);
 
 	public void setWebappDaoFactory(WebappDaoFactory wadf) {
 		setWebappDaoFactory(wadf, ASSERTIONS_AND_INFERENCES);
@@ -38,6 +41,10 @@ public class ContextModelAccessStub implements ContextModelAccess {
 	public void setWebappDaoFactory(WebappDaoFactory wadf,
 			ReasoningOption option) {
 		wadfMap.put(option, wadf);
+	}
+	
+	public void setRDFService(WhichService which, RDFService rdfService) {
+		rdfServiceMap.put(which, rdfService);
 	}
 
 	// ----------------------------------------------------------------------
@@ -49,21 +56,19 @@ public class ContextModelAccessStub implements ContextModelAccess {
 		return wadfMap.get(ASSERTIONS_AND_INFERENCES);
 	}
 
+	@Override
+	public RDFService getRDFService() {
+		return getRDFService(CONTENT);
+	}
+	
+	@Override
+	public RDFService getRDFService(WhichService which) {
+		return rdfServiceMap.get(which);
+	}
+	
 	// ----------------------------------------------------------------------
 	// Un-implemented methods
 	// ----------------------------------------------------------------------
-
-	@Override
-	public RDFService getRDFService() {
-		throw new RuntimeException(
-				"ContextModelAccessStub.getRDFService() not implemented.");
-	}
-
-	@Override
-	public RDFService getRDFService(WhichService which) {
-		throw new RuntimeException(
-				"ContextModelAccessStub.getRDFService() not implemented.");
-	}
 
 	@Override
 	public Dataset getDataset() {
