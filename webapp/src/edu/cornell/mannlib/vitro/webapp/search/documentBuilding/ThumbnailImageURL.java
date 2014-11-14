@@ -89,8 +89,6 @@ public class ThumbnailImageURL implements DocumentModifier, ContextModelsUser {
 			}
 		}catch(Throwable t){                
 			log.error(t,t);
-		} finally{
-			rdf.close();
 		}				
 		return result.toString();
 	}

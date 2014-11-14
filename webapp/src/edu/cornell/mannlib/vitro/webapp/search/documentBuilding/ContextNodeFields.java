@@ -106,8 +106,6 @@ public class ContextNodeFields implements DocumentModifier, ContextModelsUser{
             }
             allValues.append(valuesForQuery);
         }
-        
-        rdfService.close();
         return allValues;    
     }       
     

@@ -33,13 +33,17 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
  * returns that single RDFService, a single instance of the Dataset and the
  * ModelMaker.
  * 
+ * We keep a copy of the RDFService wrapped in an Unclosable shell, and hand
+ * that out when requested. The inner RDFService is only closed on shutdown().
+ * 
  * Memory-map the small content models, and add the standard decorators.
  */
 public class ContentTripleSourceTDB extends ContentTripleSource {
 	private String tdbPath;
 
+	private volatile RDFService rdfService;
 	private RDFServiceFactory rdfServiceFactory;
-	private RDFService rdfService;
+	private RDFService unclosableRdfService;
 	private Dataset dataset;
 	private ModelMaker modelMaker;
 
@@ -68,7 +72,8 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 		try {
 			this.rdfService = new RDFServiceTDB(tdbPath);
 			this.rdfServiceFactory = createRDFServiceFactory();
-			this.dataset = new RDFServiceDataset(this.rdfService);
+			this.unclosableRdfService = this.rdfServiceFactory.getRDFService();
+			this.dataset = new RDFServiceDataset(this.unclosableRdfService);
 			this.modelMaker = createModelMaker();
 			ss.info("Initialized the RDF source for TDB");
 		} catch (IOException e) {
@@ -89,7 +94,7 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 	private ModelMaker createModelMaker() {
 		return addContentDecorators(new ListCachingModelMaker(
 				new MemoryMappingModelMaker(new RDFServiceModelMaker(
-						this.rdfService), SMALL_CONTENT_MODELS)));
+						this.unclosableRdfService), SMALL_CONTENT_MODELS)));
 	}
 
 	@Override
@@ -99,7 +104,7 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 
 	@Override
 	public RDFService getRDFService() {
-		return this.rdfService;
+		return this.unclosableRdfService;
 	}
 
 	@Override
@@ -126,9 +131,11 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 
 	@Override
 	public void shutdown(Application application) {
-		if (this.rdfService != null) {
-			this.rdfService.close();
+		synchronized (this) {
+			if (this.rdfService != null) {
+				this.rdfService.close();
+				this.rdfService = null;
+			}
 		}
 	}
-
 }

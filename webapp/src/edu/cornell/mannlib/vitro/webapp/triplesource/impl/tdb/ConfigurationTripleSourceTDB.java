@@ -33,14 +33,18 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
  * returns that single RDFService, a single instance of the Dataset and the
  * ModelMaker.
  * 
+ * We keep a copy of the RDFService wrapped in an Unclosable shell, and hand
+ * that out when requested. The inner RDFService is only closed on shutdown().
+ * 
  * Memory-map all of the configuration models, and add the standard decorators.
  */
 public class ConfigurationTripleSourceTDB extends ConfigurationTripleSource {
 
 	private static final String DIRECTORY_TDB = "tdbModels";
 
+	private volatile RDFService rdfService;
 	private RDFServiceFactory rdfServiceFactory;
-	private RDFService rdfService;
+	private RDFService unclosableRdfService;
 	private Dataset dataset;
 	private ModelMaker modelMaker;
 
@@ -53,9 +57,10 @@ public class ConfigurationTripleSourceTDB extends ConfigurationTripleSource {
 		String tdbPath = vitroHome.resolve(DIRECTORY_TDB).toString();
 
 		try {
-			this.rdfServiceFactory = createRDFServiceFactory(tdbPath);
-			this.rdfService = this.rdfServiceFactory.getRDFService();
-			this.dataset = new RDFServiceDataset(this.rdfService);
+			this.rdfService = new RDFServiceTDB(tdbPath);
+			this.rdfServiceFactory = createRDFServiceFactory();
+			this.unclosableRdfService = this.rdfServiceFactory.getRDFService();
+			this.dataset = new RDFServiceDataset(this.unclosableRdfService);
 			this.modelMaker = createModelMaker();
 			ss.info("Initialized the RDF source for TDB");
 		} catch (IOException e) {
@@ -68,16 +73,15 @@ public class ConfigurationTripleSourceTDB extends ConfigurationTripleSource {
 		TDB.getContext().setTrue(TDB.symUnionDefaultGraph);
 	}
 
-	private RDFServiceFactory createRDFServiceFactory(String tdbPath)
-			throws IOException {
+	private RDFServiceFactory createRDFServiceFactory() {
 		return new LoggingRDFServiceFactory(new RDFServiceFactorySingle(
-				new RDFServiceTDB(tdbPath)));
+				this.rdfService));
 	}
 
 	private ModelMaker createModelMaker() {
 		ModelMaker longTermModelMaker = new ListCachingModelMaker(
 				new MemoryMappingModelMaker(new RDFServiceModelMaker(
-						this.rdfService), CONFIGURATION_MODELS));
+						this.unclosableRdfService), CONFIGURATION_MODELS));
 		return addConfigurationDecorators(longTermModelMaker);
 	}
 
@@ -88,7 +92,7 @@ public class ConfigurationTripleSourceTDB extends ConfigurationTripleSource {
 
 	@Override
 	public RDFService getRDFService() {
-		return this.rdfService;
+		return this.unclosableRdfService;
 	}
 
 	@Override
@@ -115,8 +119,11 @@ public class ConfigurationTripleSourceTDB extends ConfigurationTripleSource {
 
 	@Override
 	public void shutdown(Application application) {
-		if (this.rdfService != null) {
-			this.rdfService.close();
+		synchronized (this) {
+			if (this.rdfService != null) {
+				this.rdfService.close();
+				this.rdfService = null;
+			}
 		}
 	}
 
