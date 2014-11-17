@@ -31,11 +31,9 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ModelMaker;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.BlankNodeFilteringModelMaker;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -73,8 +71,6 @@ public class FileGraphSetup implements ServletContextListener {
             OntDocumentManager.getInstance().setProcessImports(true);
             Dataset dataset = ModelAccess.on(ctx).getDataset(); 
 			RDFService rdfService = ModelAccess.on(ctx).getRDFService(CONTENT);
-			ModelMaker modelMaker = new BlankNodeFilteringModelMaker(
-					rdfService, ModelAccess.on(ctx).getModelMaker(CONTENT));
 
             // ABox files
             Set<Path> paths = getFilegraphPaths(ctx, RDF, ABOX, FILEGRAPH);
@@ -82,7 +78,7 @@ public class FileGraphSetup implements ServletContextListener {
             cleanupDB(dataset, pathsToURIs(paths, ABOX), ABOX);
 
             // Just update the ABox filegraphs in the DB; don't attach them to a base model.
-            aboxChanged = readGraphs(paths, modelMaker, ABOX, /* aboxBaseModel */ null);		
+            aboxChanged = readGraphs(paths, rdfService, ABOX, /* aboxBaseModel */ null);		
 
             // TBox files
             paths = getFilegraphPaths(ctx, RDF, TBOX, FILEGRAPH);
@@ -90,7 +86,7 @@ public class FileGraphSetup implements ServletContextListener {
             cleanupDB(dataset, pathsToURIs(paths, TBOX),TBOX);
 
             OntModel tboxBaseModel = ModelAccess.on(ctx).getOntModel(ModelNames.TBOX_ASSERTIONS);
-            tboxChanged = readGraphs(paths, modelMaker, TBOX, tboxBaseModel);
+            tboxChanged = readGraphs(paths, rdfService, TBOX, tboxBaseModel);
         } catch (ClassCastException cce) {
             String errMsg = "Unable to cast servlet context attribute to the appropriate type " + cce.getLocalizedMessage();
             log.error(errMsg);
@@ -118,7 +114,6 @@ public class FileGraphSetup implements ServletContextListener {
 	private Set<Path> getFilegraphPaths(ServletContext ctx, String... strings) {
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
-		ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
 		String homeDirProperty = ApplicationUtils.instance().getHomeDirectory().getPath().toString();
 		Path filegraphDir = Paths.get(homeDirProperty, strings);
 
@@ -151,7 +146,7 @@ public class FileGraphSetup implements ServletContextListener {
      * Note: no connection needs to be maintained between the in-memory copy of the
      * graph and the DB copy.
      */
-    private boolean readGraphs(Set<Path> pathSet, ModelMaker modelMaker, String type, OntModel baseModel) {
+    private boolean readGraphs(Set<Path> pathSet, RDFService rdfService, String type, OntModel baseModel) {
 
         int count = 0;
 
@@ -180,7 +175,7 @@ public class FileGraphSetup implements ServletContextListener {
                         log.debug("Attached file graph as " + type + " submodel " + p.getFileName());
                     } 
 
-                    modelChanged = modelChanged | updateGraphInDB(modelMaker, model, type, p);
+                    modelChanged = modelChanged | updateGraphInDB(rdfService, model, type, p);
 
                 } catch (Exception ioe) {
                     log.error("Unable to process file graph " + p, ioe);
@@ -214,9 +209,9 @@ public class FileGraphSetup implements ServletContextListener {
      * Otherwise, if a graph with the given name is in the DB and is isomorphic with
      * the graph that was read from the files system, then do nothing. 
      */
-    public boolean updateGraphInDB(ModelMaker modelMaker, Model fileModel, String type, Path path) {
+    public boolean updateGraphInDB(RDFService rdfService, Model fileModel, String type, Path path) {
         String graphURI = pathToURI(path,type);
-        Model dbModel = modelMaker.getModel(graphURI);
+        Model dbModel = new RDFServiceDataset(rdfService).getNamedModel(graphURI);
         boolean modelChanged = false;
 		log.debug(String.format(
 				"%s %s dbModel size is %d, fileModel size is %d", type,
