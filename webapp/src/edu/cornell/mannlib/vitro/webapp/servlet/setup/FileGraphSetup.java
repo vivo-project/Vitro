@@ -218,12 +218,15 @@ public class FileGraphSetup implements ServletContextListener {
 				path.getFileName(), dbModel.size(), fileModel.size()));
         
 
-        boolean isIsomorphic = dbModel.isIsomorphicWith(fileModel);
+		// Isomorphism has some quirky issues with TDB, and perhaps also with Virtuoso.
+		boolean isChanged = ApplicationUtils.instance()
+				.getContentTripleSource().getQuirks()
+				.hasFileGraphChanged(fileModel, dbModel, graphURI);
         
         if (dbModel.isEmpty()  && !fileModel.isEmpty()) {
             dbModel.add(fileModel);
             modelChanged = true;
-        } else if (!isIsomorphic) {
+        } else if (isChanged) {
             log.info("Updating " + path + " because graphs are not isomorphic");
             log.info("dbModel: " + dbModel.size() + " ; fileModel: " + fileModel.size());
             dbModel.removeAll();

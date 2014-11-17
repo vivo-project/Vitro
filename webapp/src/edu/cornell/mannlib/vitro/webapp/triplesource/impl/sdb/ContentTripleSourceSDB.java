@@ -38,11 +38,13 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.UnionModelsOntMode
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource;
+import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.TripleStoreQuirks;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.sdb.RDFServiceFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging.LoggingRDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
+import edu.cornell.mannlib.vitro.webapp.triplesource.impl.DefaultTripleStoreQuirks;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
@@ -76,6 +78,8 @@ public class ContentTripleSourceSDB extends ContentTripleSource {
 
 	static final boolean DEFAULT_TESTONBORROW = true;
 	static final boolean DEFAULT_TESTONRETURN = true;
+	
+	private final TripleStoreQuirks quirks = new DefaultTripleStoreQuirks();
 
 	private ServletContext ctx;
 	private ComboPooledDataSource ds;
@@ -203,6 +207,11 @@ public class ContentTripleSourceSDB extends ContentTripleSource {
 				Arrays.asList(MEMORY_MAPPED_CONTENT_MODELS));
 
 		return new UnionModelsOntModelsCache(combinedCache, CONTENT_UNIONS);
+	}
+
+	@Override
+	public TripleStoreQuirks getQuirks() {
+		return quirks;
 	}
 
 	@Override
