@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +43,7 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -98,7 +98,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setUnionOntModelSelector(ModelAccess.on(ctx).getOntModelSelector());
 			
 		    ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
-		    Path homeDir = Paths.get(props.getProperty("vitro.home"));
+		    Path homeDir = ApplicationUtils.instance().getHomeDirectory().getPath();
 			settings.setDisplayModel(ModelAccess.on(ctx).getOntModel(DISPLAY));
 			OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
 			settings.setOldTBoxModel(oldTBoxModel);
@@ -202,8 +202,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	 * Put the paths for the directories and files into the settings object.
 	 */
 	private void putReportingPathsIntoSettings(ServletContext ctx, UpdateSettings settings) throws IOException {
-		ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
-		Path homeDir = Paths.get(props.getProperty("vitro.home"));
+	    Path homeDir = ApplicationUtils.instance().getHomeDirectory().getPath();
 		
 		Path dataDir = createDirectory(homeDir, "upgrade", "knowledgeBase");
 		settings.setDataDir(dataDir.toString());

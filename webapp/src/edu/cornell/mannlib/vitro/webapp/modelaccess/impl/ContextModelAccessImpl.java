@@ -45,7 +45,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ReasoningOption;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.DataStructuresProvider;
+import edu.cornell.mannlib.vitro.webapp.triplesource.CombinedTripleSource;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
@@ -66,7 +66,7 @@ public class ContextModelAccessImpl implements ContextModelAccess {
 
 	private final ConfigurationProperties props;
 
-	private final DataStructuresProvider factory;
+	private final CombinedTripleSource factory;
 
 	private final Map<WhichService, RDFService> rdfServiceMap;
 	private final Map<WhichService, Dataset> datasetMap;
@@ -86,7 +86,7 @@ public class ContextModelAccessImpl implements ContextModelAccess {
 	 * requested.
 	 */
 	public ContextModelAccessImpl(ServletContext ctx,
-			DataStructuresProvider factory) {
+			CombinedTripleSource factory) {
 		this.props = ConfigurationProperties.getBean(ctx);
 		this.factory = factory;
 

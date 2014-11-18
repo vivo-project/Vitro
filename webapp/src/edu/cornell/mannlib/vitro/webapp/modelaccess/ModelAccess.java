@@ -10,7 +10,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.impl.ContextModelAccessImpl;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.impl.RequestModelAccessImpl;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.rdfsetup.DataStructuresProvider;
+import edu.cornell.mannlib.vitro.webapp.triplesource.CombinedTripleSource;
 
 /**
  * The root access point for the RDF data structures: RDFServices, Datasets,
@@ -136,18 +136,18 @@ public class ModelAccess {
 	// The factory
 	// ----------------------------------------------------------------------
 
-	private static volatile DataStructuresProvider dataStructuresProvider;
+	private static volatile CombinedTripleSource combinedTripleSource;
 	private static volatile ModelAccessFactory factory = new ModelAccessFactory();
 
 	/** These attributes should only be accessed through this class. */
 	private static final String ATTRIBUTE_NAME = ModelAccess.class.getName();
 
-	public static void setDataStructuresProvider(DataStructuresProvider provider) {
-		if (dataStructuresProvider != null) {
-			log.warn("Assigning DataStructuresProvider " + provider
-					+ ", but was already set to " + dataStructuresProvider);
+	public static void setCombinedTripleSource(CombinedTripleSource source) {
+		if (combinedTripleSource != null) {
+			log.warn("Assigning CombinedTripleSource " + source
+					+ ", but was already set to " + combinedTripleSource);
 		}
-		dataStructuresProvider = provider;
+		combinedTripleSource = source;
 	}
 
 	public static RequestModelAccess on(HttpServletRequest req) {
@@ -182,7 +182,7 @@ public class ModelAccess {
 
 	public static class ModelAccessFactory {
 		public ContextModelAccess buildContextModelAccess(ServletContext ctx) {
-			return new ContextModelAccessImpl(ctx, dataStructuresProvider);
+			return new ContextModelAccessImpl(ctx, combinedTripleSource);
 		}
 
 		/**
@@ -191,8 +191,7 @@ public class ModelAccess {
 		 */
 		public RequestModelAccess buildRequestModelAccess(HttpServletRequest req) {
 			return new RequestModelAccessImpl(req,
-					dataStructuresProvider
-							.getShortTermDataStructuresProvider(req));
+					combinedTripleSource.getShortTermCombinedTripleSource(req));
 		}
 	}
 }

@@ -12,7 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.Application;
  */
 public class ApplicationUtils {
 	private static final Log log = LogFactory.getLog(ApplicationUtils.class);
-	
+
 	private static volatile Application instance;
 
 	public static Application instance() {
@@ -25,9 +25,8 @@ public class ApplicationUtils {
 					"Called for Application before it was available", e);
 		}
 	}
-	
+
 	static void setInstance(Application application) {
 		instance = application;
 	}
-
 }

@@ -11,6 +11,7 @@ import java.util.Collections;
 
 import javax.servlet.ServletContext;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
@@ -22,7 +23,6 @@ import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
  */
 public class FileStorageImplWrapper implements FileStorage {
 	public static final String PROPERTY_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
-	public static final String PROPERTY_VITRO_HOME_DIR = "vitro.home";
 	public static final String FILE_STORAGE_SUBDIRECTORY = "uploads";
 
 	private FileStorageImpl fs;
@@ -35,7 +35,7 @@ public class FileStorageImplWrapper implements FileStorage {
 		ServletContext ctx = application.getServletContext();
 
 		try {
-			File baseDirectory = figureBaseDir(ctx);
+			File baseDirectory = figureBaseDir();
 			Collection<String> fileNamespace = confirmDefaultNamespace(ctx);
 			fs = new FileStorageImpl(baseDirectory, fileNamespace);
 		} catch (Exception e) {
@@ -47,21 +47,8 @@ public class FileStorageImplWrapper implements FileStorage {
 	 * Get the configuration property for the file storage base directory, and
 	 * check that it points to an existing, writeable directory.
 	 */
-	private File figureBaseDir(ServletContext ctx) throws IOException {
-		String homeDirPath = ConfigurationProperties.getBean(ctx).getProperty(
-				PROPERTY_VITRO_HOME_DIR);
-		if (homeDirPath == null) {
-			throw new IllegalArgumentException(
-					"Configuration properties must contain a value for '"
-							+ PROPERTY_VITRO_HOME_DIR + "'");
-		}
-
-		File homeDir = new File(homeDirPath);
-		if (!homeDir.exists()) {
-			throw new IllegalStateException("Vitro home directory '"
-					+ homeDir.getAbsolutePath() + "' does not exist.");
-		}
-
+	private File figureBaseDir() throws IOException {
+		File homeDir = ApplicationUtils.instance().getHomeDirectory().getPath().toFile();
 		File baseDir = new File(homeDir, FILE_STORAGE_SUBDIRECTORY);
 		if (!baseDir.exists()) {
 			boolean created = baseDir.mkdir();

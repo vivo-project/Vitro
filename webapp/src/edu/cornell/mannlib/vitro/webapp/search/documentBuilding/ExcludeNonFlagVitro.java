@@ -54,4 +54,9 @@ public class ExcludeNonFlagVitro implements SearchIndexExcluder {
 		return DONT_EXCLUDE;
 	}
 
+	@Override
+	public String toString() {
+		return "ExcludeNonFlagVitro []";
+	}
+
 }

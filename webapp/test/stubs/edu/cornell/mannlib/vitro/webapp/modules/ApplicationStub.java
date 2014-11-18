@@ -7,10 +7,13 @@ import java.lang.reflect.Field;
 import javax.servlet.ServletContext;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
+import edu.cornell.mannlib.vitro.webapp.application.VitroHomeDirectory;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ConfigurationTripleSource;
+import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource;
 
 /**
  * TODO
@@ -62,6 +65,12 @@ public class ApplicationStub implements Application {
 	// ----------------------------------------------------------------------
 
 	@Override
+	public VitroHomeDirectory getHomeDirectory() {
+		throw new RuntimeException(
+				"ApplicationStub.getHomeDirectory() not implemented.");
+	}
+
+	@Override
 	public ImageProcessor getImageProcessor() {
 		throw new RuntimeException(
 				"ApplicationStub.getImageProcessor() not implemented.");
@@ -72,6 +81,24 @@ public class ApplicationStub implements Application {
 	public FileStorage getFileStorage() {
 		throw new RuntimeException(
 				"ApplicationStub.getFileStorage() not implemented.");
+	}
+
+	@Override
+	public void shutdown() {
+		throw new RuntimeException(
+				"ApplicationStub.shutdown() not implemented.");
+	}
+
+	@Override
+	public ContentTripleSource getContentTripleSource() {
+		throw new RuntimeException(
+				"ApplicationStub.getContentTripleSource() not implemented.");
+	}
+
+	@Override
+	public ConfigurationTripleSource getConfigurationTripleSource() {
+		throw new RuntimeException(
+				"ApplicationStub.getConfigurationTripleSource() not implemented.");
 	}
 
 }

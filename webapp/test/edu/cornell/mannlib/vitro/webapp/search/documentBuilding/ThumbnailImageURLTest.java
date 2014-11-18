@@ -4,6 +4,8 @@
  */
 package edu.cornell.mannlib.vitro.webapp.search.documentBuilding;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONTENT;
+
 import java.io.InputStream;
 
 import org.apache.log4j.Level;
@@ -11,6 +13,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccessStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.modules.ApplicationStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineStub;
 import stubs.javax.servlet.ServletContextStub;
@@ -25,13 +28,11 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputField;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 
 public class ThumbnailImageURLTest extends AbstractTestClass{
-    RDFServiceFactory testRDF;
+	ContextModelAccessStub contextModels;
     String personsURI = "http://vivo.cornell.edu/individual/individual8803";
         
     /**
@@ -45,7 +46,8 @@ public class ThumbnailImageURLTest extends AbstractTestClass{
         Model model = ModelFactory.createDefaultModel();        
         InputStream in = ThumbnailImageURLTest.class.getResourceAsStream("testPerson.n3");
         model.read(in,"","N3");        
-        testRDF = new RDFServiceFactorySingle( new RDFServiceModel( model ) );            
+        contextModels = new ContextModelAccessStub();
+        contextModels.setRDFService(CONTENT, new RDFServiceModel( model ));
     }
 
     /**
@@ -55,7 +57,8 @@ public class ThumbnailImageURLTest extends AbstractTestClass{
     @Test
     public void testThumbnailFieldCreatedInSearchDoc() {
         SearchInputDocument doc = ApplicationUtils.instance().getSearchEngine().createInputDocument();
-        ThumbnailImageURL testMe = new ThumbnailImageURL( testRDF );
+        ThumbnailImageURL testMe = new ThumbnailImageURL();
+        testMe.setContextModels(contextModels);
         Individual ind = new IndividualImpl();
         ind.setURI(personsURI);
         

@@ -6,9 +6,14 @@ import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_RAW;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_STEMMED;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_UNSTEMMED;
+
+import java.util.Arrays;
+
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputField;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
 
 public class NameBoost implements DocumentModifier {
 
@@ -18,13 +23,22 @@ public class NameBoost implements DocumentModifier {
      * please consider if you need to change this list
      * of name fields to boost. 
      */
-    String[] fieldsToBoost = {NAME_RAW,NAME_LOWERCASE,NAME_UNSTEMMED,NAME_STEMMED};
+    private String[] fieldsToBoost = {NAME_RAW,NAME_LOWERCASE,NAME_UNSTEMMED,NAME_STEMMED};
     
+    private Float boost;
     
-    final float boost;
+    @Property(uri="http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasBoost")
+    public void setBoost(float boost) {
+    	this.boost = boost;
+    }
     
-    public NameBoost(float boost){
-        this.boost = boost;
+    @Validation
+    public void validate() {
+		if (boost == null) {
+			throw new IllegalStateException(
+					"Configuration did not include a boost value.");
+		}
+
     }
     
     @Override
@@ -42,5 +56,11 @@ public class NameBoost implements DocumentModifier {
     public void shutdown() {
         // do nothing.
     }
+
+	@Override
+	public String toString() {
+		return "NameBoost[fieldsToBoost=" + Arrays.toString(fieldsToBoost)
+				+ ", boost=" + boost + "]";
+	}
 
 }

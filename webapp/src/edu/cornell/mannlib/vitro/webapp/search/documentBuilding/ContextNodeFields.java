@@ -15,12 +15,12 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputField;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.ContextModelsUser;
 
 /**
  * DocumentModifier that will run SPARQL queries for an
@@ -30,19 +30,24 @@ import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
  * @author bdc34
  *
  */
-public class ContextNodeFields implements DocumentModifier{
+public class ContextNodeFields implements DocumentModifier, ContextModelsUser{
     protected List<String> queries = new ArrayList<String>();
     protected boolean shutdown = false;    
     protected Log log = LogFactory.getLog(ContextNodeFields.class);   
-    protected RDFServiceFactory rdfServiceFactory;
-       
+
+    private RDFService rdfService;
+	
+	@Override
+	public void setContextModels(ContextModelAccess models) {
+		this.rdfService = models.getRDFService();
+	}
+
     /**
      * Construct this with a model to query when building search documents and
      * a list of the SPARQL queries to run.
      */
-    protected ContextNodeFields(List<String> queries, RDFServiceFactory rdfServiceFactory){   
+    protected ContextNodeFields(List<String> queries){   
         this.queries = queries;
-        this.rdfServiceFactory = rdfServiceFactory;
     }        
     
 
@@ -74,7 +79,6 @@ public class ContextNodeFields implements DocumentModifier{
      */
     protected StringBuffer executeQueryForValues( Individual individual, Collection<String> queries){
     	  /* execute all the queries on the list and concat the values to add to all text */        
-    	RDFService rdfService = rdfServiceFactory.getRDFService();
         StringBuffer allValues = new StringBuffer("");                
 
         for(String query : queries ){    
@@ -102,8 +106,6 @@ public class ContextNodeFields implements DocumentModifier{
             }
             allValues.append(valuesForQuery);
         }
-        
-        rdfService.close();
         return allValues;    
     }       
     
@@ -137,4 +139,11 @@ public class ContextNodeFields implements DocumentModifier{
     public void shutdown(){
         shutdown=true;  
     }
+
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + "[]";
+	}
+
 }
