@@ -18,7 +18,7 @@
 
 <tr class="editformcell">
     <td style="vertical-align:top;" valign="top" colspan="2">
-        <b>Label for public display</b><br/><br/>
+        <br /><b>Label for public display</b><br/>
         <input type="text" class="fullWidthInput" name="DisplayName" value="<form:value name="DisplayName"/>" maxlength="80" />
         <c:set var="DisplayNameError"><form:error name="DisplayName"/></c:set>
         <c:if test="${!empty DisplayNameError}">
@@ -66,15 +66,12 @@
             <form:option name="HiddenFromDisplayBelowRoleLevelUsingRoleUri"/>
         </select>
     </td>
-    <td valign="top" colspan="2">
+    <td valign="top" colspan="1">
         <b>Update level</b><br/>
         <select name="ProhibitedFromUpdateBelowRoleLevelUsingRoleUri">
             <form:option name="ProhibitedFromUpdateBelowRoleLevelUsingRoleUri"/>
         </select>
     </td>
-</tr>
-
-<tr class="editformcell">
     <td valign="top" colspan="2">
         <b>Publish level</b><br />
         <select name="HiddenFromPublishBelowRoleLevelUsingRoleUri">
@@ -146,7 +143,7 @@
 <tr><td colspan="5"><hr class="formDivider"/></td></tr>
 
 <tr class="editformcell">
-    <td valign="top" colspan="2">
+    <td valign="top" colspan="5">
         <b>Custom entry form</b><br/>
         <input type="text" class="fullWidthInput" name="CustomEntryForm" value="<form:value name="CustomEntryForm"/>" />
             <c:set var="CustomEntryFormError"><form:error name="CustomEntryForm"/></c:set>
@@ -154,7 +151,9 @@
                 <span class="notice"><c:out value="${CustomEntryFormError}"/></span>
             </c:if>
     </td>
-    <td valign="top" colspan="2">
+</tr>
+<tr class="editformcell">
+	    <td valign="top" colspan="5">
         <b>Custom list view</b><br/>
         <input type="text" class="fullWidthInput" name="CustomListView" value="<form:value name="CustomListView"/>" />
             <c:set var="CustomListViewError"><form:error name="CustomListView"/></c:set>
