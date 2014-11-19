@@ -20,10 +20,10 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao.FullPropertyKey;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -42,7 +42,6 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
  */
 public class GroupedPropertyList extends BaseTemplateModel {
 
-    private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(GroupedPropertyList.class);
     private static final int MAX_GROUP_DISPLAY_RANK = 99;
 
@@ -247,16 +246,9 @@ public class GroupedPropertyList extends BaseTemplateModel {
                     }
                     boolean addToList = true;
                     for(ObjectProperty op : populatedObjectPropertyList) {
-                        RedundancyReason reason = redundant(op, piOp); 
-                        if(reason != null) {
-                            addToList = false;
-                            if (reason == RedundancyReason.LABEL_AND_URI_MATCH 
-                                    && moreRestrictiveRange(piOp, op, wadf)) {
-                                op.setRangeVClassURI(piOp.getRangeVClassURI());
-                                op.setRangeVClass(piOp.getRangeVClass());
-                            }
-                            break;
-                        } 
+                    	if (redundant(op, piOp)) {
+                    		addToList = false;
+                    	}
                     }
                     if(addToList) {
                         propertyList.add(piOp);         
@@ -281,67 +273,8 @@ public class GroupedPropertyList extends BaseTemplateModel {
         return propertyList;
     }
     
-    private enum RedundancyReason {
-         LABEL_AND_URI_MATCH, LABEL_URI_DOMAIN_AND_RANGE_MATCH   
-    }
-    
-    private boolean moreRestrictiveRange(ObjectProperty piOp, ObjectProperty op, 
-            WebappDaoFactory wadf) {
-        if(piOp.getRangeVClassURI() == null) {
-            return false;
-        } else if (op.getRangeVClassURI() == null) {
-            return (piOp.getRangeVClassURI() != null);
-        } else {
-        	//Check and see if the range vclass exists for the possible piOp and populated op properties,
-        	//because for populated properties, if the range class is a union,
-        	//blank nodes will be broken and the code should instead use the existing or piOp range class uri
-        	VClass piOpRangeClass = wadf.getVClassDao().getVClassByURI(piOp.getRangeVClassURI());
-        	VClass opRangeClass = wadf.getVClassDao().getVClassByURI(op.getRangeVClassURI());
-        	//if the possible range class exists but the populated one does not, then return true to allow the possible
-        	//class to be utilized
-        	if(piOpRangeClass != null && opRangeClass == null) return true;
-            return (wadf.getVClassDao().isSubClassOf(
-                    piOp.getRangeVClassURI(), op.getRangeVClassURI()));
-        }
-    }
-    
-    private RedundancyReason redundant(ObjectProperty op, ObjectProperty op2) {
-        if (op2.getURI() == null) {
-            return null;
-        }
-        boolean uriMatches = (op.getURI() != null 
-                && op.getURI().equals(op2.getURI()));
-        boolean domainMatches = false;
-        boolean rangeMatches = false;
-        boolean labelMatches = false;
-        if(op.getDomainPublic() == null) {
-            if(op2.getDomainPublic() == null) {
-                labelMatches = true;
-            }
-        } else if (op.getDomainPublic().equals(op2.getDomainPublic())) {
-            labelMatches = true;
-        }
-        if(uriMatches && labelMatches) {
-            return RedundancyReason.LABEL_AND_URI_MATCH;
-        }
-        if(op.getDomainVClassURI() == null) {
-            if(op2.getDomainVClassURI() == null) {
-                domainMatches = true;   
-            }
-        } else if (op.getDomainVClassURI().equals(op2.getDomainVClassURI())) {
-            domainMatches = true;
-        }
-        if(op.getRangeVClassURI() == null) {
-            if (op2.getRangeVClassURI() == null) {
-                rangeMatches = true;
-            }
-        } else if (op.getRangeVClassURI().equals(op2.getRangeVClassURI())) {
-            rangeMatches = true;
-        }
-        if (uriMatches && domainMatches && rangeMatches) {
-            return RedundancyReason.LABEL_URI_DOMAIN_AND_RANGE_MATCH;
-        }
-        return null;
+    private boolean redundant(ObjectProperty op, ObjectProperty op2) {
+    	return new FullPropertyKey(op).equals(new FullPropertyKey(op2));
     }
 
     private void addObjectPropertyToPropertyList(String propertyUri, String domainUri, String rangeUri,
