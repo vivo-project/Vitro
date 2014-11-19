@@ -40,6 +40,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     protected String addUrl;
     
     private String name;
+    private FauxProperty fauxProperty;
        
     PropertyTemplateModel(Property property, Individual subject, VitroRequest vreq, String name) {
         this.vreq = vreq;
@@ -48,12 +49,14 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         propertyUri = property.getURI();
         localName = property.getLocalName();
         this.name = name;
-        setVerboseDisplayValues(property);
         addUrl = "";
         
-        // Do in subclass constructor. The label has not been set on the property, and the
-        // means of getting the label differs between object and data properties.
-        // this.name = property.getLabel();
+        fauxProperty = isFauxProperty(property);
+        if (fauxProperty != null) {
+        	this.name = fauxProperty.getDisplayName();
+        } 
+
+        setVerboseDisplayValues(property);
     }
     
     protected void setVerboseDisplayValues(Property property) {  
@@ -100,10 +103,8 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         String editUrl = UrlBuilder.getUrl(getPropertyEditRoute(), "uri", property.getURI());
         verboseDisplay.put("propertyEditUrl", editUrl);
         
-        FauxProperty fauxProperty = isFauxProperty(property);
         if (fauxProperty != null) {
         	verboseDisplay.put("fauxProperty", assembleFauxPropertyValues(fauxProperty));
-        	this.name = fauxProperty.getDisplayName();
         } 
     }
 
