@@ -69,8 +69,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq, 
             boolean editing, List<DataProperty> populatedDataPropertyList) {
         
-        super(dp, subject, vreq);
-        setName(dp.getPublicName());
+        super(dp, subject, vreq, dp.getPublicName());
 
         // Get the config for this data property
         try {
