@@ -5,8 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.controller.individual;
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet.N3_MIMETYPE;
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet.RDFXML_MIMETYPE;
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet.TTL_MIMETYPE;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.net.URL;
 

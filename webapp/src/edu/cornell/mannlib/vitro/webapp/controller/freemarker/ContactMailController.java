@@ -25,8 +25,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.TemplateProcessingHelper.TemplateProcessingException;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
@@ -50,7 +50,6 @@ public class ContactMailController extends FreemarkerHttpServlet {
     private final static String TEMPLATE_ERROR = "contactForm-error.ftl";
     private final static String TEMPLATE_FORM = "contactForm-form.ftl";
     
-	private static final String PROPERTY_VITRO_HOME_DIR = "vitro.home";
 	private static final String EMAIL_JOURNAL_FILE_DIR = "emailJournal";
 	private static final String EMAIL_JOURNAL_FILE_NAME = "contactFormEmails.html";
     
@@ -116,7 +115,7 @@ public class ContactMailController extends FreemarkerHttpServlet {
 	    
 	    try {
 	    	// Write the message to the journal file
-	    	FileWriter fw = new FileWriter(locateTheJournalFile(vreq),true);
+	    	FileWriter fw = new FileWriter(locateTheJournalFile(), true);
 	        PrintWriter outFile = new PrintWriter(fw); 
 	        writeBackupCopy(outFile, msgText, vreq);
   
@@ -159,21 +158,8 @@ public class ContactMailController extends FreemarkerHttpServlet {
 	 * The journal file belongs in a sub-directory of the Vitro home directory.
 	 * If the sub-directory doesn't exist, create it.
 	 */
-	private File locateTheJournalFile(VitroRequest vreq) {
-		String homeDirPath = ConfigurationProperties.getBean(vreq).getProperty(
-				PROPERTY_VITRO_HOME_DIR);
-		if (homeDirPath == null) {
-			throw new IllegalArgumentException(
-					"Configuration properties must contain a value for '"
-							+ PROPERTY_VITRO_HOME_DIR + "'");
-		}
-
-		File homeDir = new File(homeDirPath);
-		if (!homeDir.exists()) {
-			throw new IllegalStateException("Vitro home directory '"
-					+ homeDir.getAbsolutePath() + "' does not exist.");
-		}
-
+	private File locateTheJournalFile() {
+		File homeDir = ApplicationUtils.instance().getHomeDirectory().getPath().toFile();
 		File journalDir = new File(homeDir, EMAIL_JOURNAL_FILE_DIR);
 		if (!journalDir.exists()) {
 			boolean created = journalDir.mkdir();

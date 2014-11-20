@@ -13,8 +13,6 @@ import java.nio.file.Paths;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -23,7 +21,7 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 
 /**
  * Help to load RDF files on first time and on every startup.
@@ -31,7 +29,6 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 public class RDFFilesLoader {
 	private static final Log log = LogFactory.getLog(RDFFilesLoader.class);
 
-	private static final String PROPERTY_VITRO_HOME = "vitro.home";
 	private static final String DEFAULT_RDF_FORMAT = "RDF/XML";
 	private static final String RDF = "rdf";
 	private static final String FIRST_TIME = "firsttime";
@@ -61,10 +58,10 @@ public class RDFFilesLoader {
 	 * 
 	 * The files from the directory are added to the model.
 	 */
-	public static void loadFirstTimeFiles(ServletContext ctx, String modelPath,
-			Model model, boolean firstTime) {
+	public static void loadFirstTimeFiles(String modelPath, Model model,
+			boolean firstTime) {
 		if (firstTime) {
-			Set<Path> paths = getPaths(locateHomeDirectory(ctx), RDF,
+			Set<Path> paths = getPaths(locateHomeDirectory(), RDF,
 					modelPath, FIRST_TIME);
 			for (Path p : paths) {
 				readOntologyFileIntoModel(p, model);
@@ -83,11 +80,10 @@ public class RDFFilesLoader {
 	 * 
 	 * The files from the directory become a sub-model of the model.
 	 */
-	public static void loadEveryTimeFiles(ServletContext ctx, String modelPath,
-			OntModel model) {
+	public static void loadEveryTimeFiles(String modelPath, OntModel model) {
 		OntModel everytimeModel = ModelFactory
 				.createOntologyModel(OntModelSpec.OWL_MEM);
-		String home = locateHomeDirectory(ctx);
+		String home = locateHomeDirectory();
 		Set<Path> paths = getPaths(home, RDF, modelPath, EVERY_TIME);
 		for (Path p : paths) {
 			log.info("Loading " + relativePath(p, home));
@@ -177,9 +173,9 @@ public class RDFFilesLoader {
 			return DEFAULT_RDF_FORMAT;
 	}
 
-	private static String locateHomeDirectory(ServletContext ctx) {
-		return ConfigurationProperties.getBean(ctx).getProperty(
-				PROPERTY_VITRO_HOME);
+	private static String locateHomeDirectory() {
+		return ApplicationUtils.instance().getHomeDirectory().getPath()
+				.toString();
 	}
 
 	/**

@@ -1,12 +1,16 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 package edu.cornell.mannlib.vitro.webapp.search.documentBuilding;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.EXCLUDE_CLASS;
+import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.SEARCH_INDEX_URI;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -23,25 +27,35 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.ContextModelsUser;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
 
 /**
  * This excludes based on types defined as EXCLUDE_CLASS in the 
  * configuration RDF model. 
  */
-public class SyncingExcludeBasedOnType extends ExcludeBasedOnType implements ModelChangedListener{
+public class SyncingExcludeBasedOnType extends ExcludeBasedOnType implements ModelChangedListener, ContextModelsUser {
     static final Log log = LogFactory.getLog(SyncingExcludeBasedOnType.class);        
 
     private static final String queryForProhibitedClasses = 
         "SELECT ?prohibited WHERE{" +
-        "?searchConfig <" + DisplayVocabulary.EXCLUDE_CLASS + "> ?prohibited . " +
+        "?searchConfig <" + EXCLUDE_CLASS + "> ?prohibited . " +
         "}";
     
-    String searchIndexURI = DisplayVocabulary.SEARCH_INDEX_URI;        
-    
-    public SyncingExcludeBasedOnType( Model model){            
-        this.setExcludedTypes( buildProhibitedClassesList(searchIndexURI, model) );
-        log.info("types excluded from search: " + typeURIs);
+    private ContextModelAccess models;
+
+    @Override
+	public void setContextModels(ContextModelAccess models) {
+		this.models = models;
+	}
+
+	@Validation
+    public void buildClassList( ){
+		OntModel model = models.getOntModel(ModelNames.DISPLAY);
+        this.setExcludedTypes( buildProhibitedClassesList(SEARCH_INDEX_URI, model) );
+        log.debug(this);
     }       
         
     private List<String> buildProhibitedClassesList( String URI, Model model){
@@ -81,10 +95,10 @@ public class SyncingExcludeBasedOnType extends ExcludeBasedOnType implements Mod
     public void addedStatement(Statement s) {
         try{
             if( isExcludeClassPredicate( s ) && isAboutSearchIndex(s)){             
-                if( s.getObject() != null && s.getObject().canAs(Resource.class)){                
-                    String classURI = ((Resource)s.getObject().as(Resource.class)).getURI();     
+                if( s.getObject() != null && s.getObject().isURIResource()){                
+                    String classURI = s.getObject().asResource().getURI();     
                     this.addTypeToExclude(classURI);
-                    log.debug("prohibited classes: " + this.typeURIs);
+                    log.debug("prohibited classes: " + this);
                 }
             }
         }catch(Exception ex){
@@ -97,10 +111,10 @@ public class SyncingExcludeBasedOnType extends ExcludeBasedOnType implements Mod
     public void removedStatement(Statement s) { 
         try{
             if( isExcludeClassPredicate( s ) && isAboutSearchIndex(s)){             
-                if( s.getObject() != null && s.getObject().canAs(Resource.class)){            
-                    String classURI = ((Resource)s.getObject().as(Resource.class)).getURI();                            
+                if( s.getObject() != null && s.getObject().isURIResource()){            
+                    String classURI = s.getObject().asResource().getURI();                            
                     this.removeTypeToExclude(classURI);
-                    log.debug("prohibited classes: " + this.typeURIs);
+                    log.debug("prohibited classes: " + this);
                 }
             }
         }catch(Exception ex){
@@ -111,13 +125,13 @@ public class SyncingExcludeBasedOnType extends ExcludeBasedOnType implements Mod
     private boolean isExcludeClassPredicate(Statement s){
         return s != null
             && s.getPredicate() != null
-            && DisplayVocabulary.EXCLUDE_CLASS.getURI().equals( s.getPredicate().getURI()); 
+            && EXCLUDE_CLASS.getURI().equals( s.getPredicate().getURI()); 
     }
     
     private boolean isAboutSearchIndex(Statement s){
         if( s.getSubject() != null ){
-            String subURI = ((Resource) s.getSubject()).getURI() ;
-            return this.searchIndexURI.equals(subURI);
+            String subURI = s.getSubject().getURI() ;
+            return SEARCH_INDEX_URI.equals(subURI);
         }else{
             return false;
         }
@@ -152,10 +166,9 @@ public class SyncingExcludeBasedOnType extends ExcludeBasedOnType implements Mod
     @Override
     public void addedStatements(Model model) {
         if( model != null){
-            addedStatements(model.listStatements(
-                    model.createResource(searchIndexURI), 
-                    DisplayVocabulary.EXCLUDE_CLASS, 
-                    (RDFNode)null));
+			addedStatements(model.listStatements(
+					model.createResource(SEARCH_INDEX_URI), EXCLUDE_CLASS,
+					(RDFNode) null));
         }        
     }
 
@@ -193,10 +206,9 @@ public class SyncingExcludeBasedOnType extends ExcludeBasedOnType implements Mod
     @Override
     public void removedStatements(Model model) {
         if( model != null){
-            removedStatements(model.listStatements(
-                    model.createResource(searchIndexURI), 
-                    DisplayVocabulary.EXCLUDE_CLASS, 
-                    (RDFNode)null));
+			removedStatements(model.listStatements(
+					model.createResource(SEARCH_INDEX_URI), EXCLUDE_CLASS,
+					(RDFNode) null));
         }                
     }
 

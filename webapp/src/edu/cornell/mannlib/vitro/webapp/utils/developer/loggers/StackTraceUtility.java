@@ -124,8 +124,9 @@ public class StackTraceUtility {
 		StringBuilder sb = new StringBuilder();
 		if (requested) {
 			for (StackTraceElement ste : stackTrace) {
-				sb.append(String.format("   line %4d, %s \n",
-						ste.getLineNumber(), ste.getClassName()));
+				sb.append(String.format("   %s.%s(%s:%d) \n",
+						ste.getClassName(), ste.getMethodName(),
+						ste.getFileName(), ste.getLineNumber()));
 			}
 			sb.append("   ...\n");
 		}

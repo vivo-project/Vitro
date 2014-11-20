@@ -62,13 +62,13 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
         
         if (isFirstStartup()) {
         	initializeApplicationMetadata(ctx, applicationMetadataModel);
-        	RDFFilesLoader.loadFirstTimeFiles(ctx, "abox", baseABoxModel, true);
-        	RDFFilesLoader.loadFirstTimeFiles(ctx, "tbox", baseTBoxModel, true);
+        	RDFFilesLoader.loadFirstTimeFiles("abox", baseABoxModel, true);
+        	RDFFilesLoader.loadFirstTimeFiles("tbox", baseTBoxModel, true);
         } else {
         	checkForNamespaceMismatch( applicationMetadataModel, ctx );
         }
-    	RDFFilesLoader.loadEveryTimeFiles(ctx, "abox", baseABoxModel);
-    	RDFFilesLoader.loadEveryTimeFiles(ctx, "tbox", baseTBoxModel);
+    	RDFFilesLoader.loadEveryTimeFiles("abox", baseABoxModel);
+    	RDFFilesLoader.loadEveryTimeFiles("tbox", baseTBoxModel);
     	
 		log.info("Setting up DAO factories");
     }
@@ -89,7 +89,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 	private void initializeApplicationMetadata(ServletContext ctx,
 			Model applicationMetadataModel) {
 		OntModel temporaryAMModel = VitroModelFactory.createOntologyModel();
-    	RDFFilesLoader.loadFirstTimeFiles(ctx, "applicationMetadata", temporaryAMModel, true);
+    	RDFFilesLoader.loadFirstTimeFiles("applicationMetadata", temporaryAMModel, true);
     	setPortalUriOnFirstTime(temporaryAMModel, ctx);
     	applicationMetadataModel.add(temporaryAMModel);
 	}

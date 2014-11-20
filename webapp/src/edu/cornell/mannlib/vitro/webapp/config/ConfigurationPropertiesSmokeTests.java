@@ -25,7 +25,6 @@ public class ConfigurationPropertiesSmokeTests implements
 	private static final Log log = LogFactory
 			.getLog(ConfigurationPropertiesSmokeTests.class);
 
-	private static final String PROPERTY_HOME_DIRECTORY = "vitro.home";
 	private static final String PROPERTY_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
 	private static final String PROPERTY_LANGUAGE_BUILD = "languages.addToBuild";
 	private static final String PROPERTY_LANGUAGE_SELECTABLE = "languages.selectableLocales";
@@ -38,47 +37,10 @@ public class ConfigurationPropertiesSmokeTests implements
 		ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
-		checkHomeDirectory(ctx, props, ss);
 		checkDefaultNamespace(ctx, props, ss);
 		checkLanguages(props, ss);
 	}
 
-	/**
-	 * Confirm that: a home directory has been specified; it exists; it is a
-	 * directory; it is readable and writable.
-	 */
-	private void checkHomeDirectory(ServletContext ctx,
-			ConfigurationProperties props, StartupStatus ss) {
-		String homeDirectoryPath = props.getProperty(PROPERTY_HOME_DIRECTORY);
-		if (homeDirectoryPath == null || homeDirectoryPath.isEmpty()) {
-			ss.fatal(this, "Can't find a value for the home directory: '"
-					+ PROPERTY_HOME_DIRECTORY + "'");
-			return;
-		}
-
-		File homeDirectory = new File(homeDirectoryPath);
-		if (!homeDirectory.exists()) {
-			ss.fatal(this, PROPERTY_HOME_DIRECTORY + " '" + homeDirectoryPath
-					+ "' does not exist.");
-			return;
-		}
-		if (!homeDirectory.isDirectory()) {
-			ss.fatal(this, PROPERTY_HOME_DIRECTORY + " '" + homeDirectoryPath
-					+ "' is not a directory.");
-			return;
-		}
-
-		if (!homeDirectory.canRead()) {
-			ss.fatal(this, PROPERTY_HOME_DIRECTORY + " '" + homeDirectoryPath
-					+ "' cannot be read.");
-		}
-		if (!homeDirectory.canWrite()) {
-			ss.fatal(this, PROPERTY_HOME_DIRECTORY + " '" + homeDirectoryPath
-					+ "' cannot be written to.");
-		}
-	}
-
-	
 	/**
 	 * Confirm that the default namespace is specified and a syntactically valid
 	 * URI. It should also end with "/individual/".

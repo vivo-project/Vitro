@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.search.documentBuilding;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONTENT;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_RAW;
 import static org.junit.Assert.assertEquals;
 
@@ -9,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import stubs.edu.cornell.mannlib.vitro.webapp.beans.IndividualStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccessStub;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -16,8 +18,6 @@ import com.hp.hpl.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchInputDocument;
 
@@ -38,27 +38,29 @@ public class NameFieldsTest {
 		doc = new BaseSearchInputDocument();
 
 		RDFServiceModel rdfService = new RDFServiceModel(baseModel);
-		RDFServiceFactory rdfServiceFactory = new RDFServiceFactorySingle(
-				rdfService);
-		nameFields = new NameFields(rdfServiceFactory);
+		ContextModelAccessStub models = new ContextModelAccessStub();
+		models.setRDFService(CONTENT, rdfService);
+
+		nameFields = new NameFields();
+		nameFields.setContextModels(models);
 	}
 
 	@Test
-	public void nullIndividual() throws SkipIndividualException {
+	public void nullIndividual() {
 		SearchInputDocument expected = new BaseSearchInputDocument(doc);
 
 		assertResultingSearchDocument(null, expected);
 	}
 
 	@Test
-	public void nullUri() throws SkipIndividualException {
+	public void nullUri() {
 		SearchInputDocument expected = new BaseSearchInputDocument(doc);
 
 		assertResultingSearchDocument(new IndividualStub(null), expected);
 	}
 
 	@Test
-	public void foundNoLabels() throws SkipIndividualException {
+	public void foundNoLabels() {
 		SearchInputDocument expected = new BaseSearchInputDocument(doc);
 		expected.addField(NAME_RAW, "");
 
@@ -67,7 +69,7 @@ public class NameFieldsTest {
 	}
 
 	@Test
-	public void foundOneLabel() throws SkipIndividualException {
+	public void foundOneLabel() {
 		baseModel.add(stmt(INDIVIDUAL_URI, LABEL_PROPERTY_URI, "label1"));
 
 		SearchInputDocument expected = new BaseSearchInputDocument(doc);
@@ -78,7 +80,7 @@ public class NameFieldsTest {
 	}
 
 	@Test
-	public void foundTwoLabels() throws SkipIndividualException {
+	public void foundTwoLabels() {
 		baseModel.add(stmt(INDIVIDUAL_URI, LABEL_PROPERTY_URI, "label1"));
 		baseModel.add(stmt(INDIVIDUAL_URI, LABEL_PROPERTY_URI, "label2"));
 
@@ -100,7 +102,7 @@ public class NameFieldsTest {
 	}
 
 	private void assertResultingSearchDocument(Individual ind,
-			SearchInputDocument expected) throws SkipIndividualException {
+			SearchInputDocument expected) {
 		nameFields.modifyDocument(ind, doc);
 		assertEquals(expected, doc);
 	}

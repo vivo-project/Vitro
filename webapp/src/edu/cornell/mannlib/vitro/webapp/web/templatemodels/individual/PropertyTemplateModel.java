@@ -13,13 +13,11 @@ import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
 import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
-import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
@@ -42,21 +40,23 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     protected String addUrl;
     
     private String name;
-
-
+    private FauxProperty fauxProperty;
        
-    PropertyTemplateModel(Property property, Individual subject, VitroRequest vreq) {
+    PropertyTemplateModel(Property property, Individual subject, VitroRequest vreq, String name) {
         this.vreq = vreq;
         subjectUri = subject.getURI(); 
         this.property = property;
         propertyUri = property.getURI();
         localName = property.getLocalName();
-        setVerboseDisplayValues(property);
+        this.name = name;
         addUrl = "";
         
-        // Do in subclass constructor. The label has not been set on the property, and the
-        // means of getting the label differs between object and data properties.
-        // this.name = property.getLabel();
+        fauxProperty = isFauxProperty(property);
+        if (fauxProperty != null) {
+        	this.name = fauxProperty.getDisplayName();
+        } 
+
+        setVerboseDisplayValues(property);
     }
     
     protected void setVerboseDisplayValues(Property property) {  
@@ -103,7 +103,6 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         String editUrl = UrlBuilder.getUrl(getPropertyEditRoute(), "uri", property.getURI());
         verboseDisplay.put("propertyEditUrl", editUrl);
         
-        FauxProperty fauxProperty = isFauxProperty(property);
         if (fauxProperty != null) {
         	verboseDisplay.put("fauxProperty", assembleFauxPropertyValues(fauxProperty));
         } 
@@ -128,10 +127,6 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
 
 	protected abstract int getPropertyDisplayTier(Property p);
     protected abstract Route getPropertyEditRoute();
-    
-    protected void setName(String name) {
-        this.name = name;
-    }
     
     public String toString() {
         return String.format("%s on %s",

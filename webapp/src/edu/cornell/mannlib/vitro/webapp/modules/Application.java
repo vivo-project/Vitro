@@ -4,21 +4,32 @@ package edu.cornell.mannlib.vitro.webapp.modules;
 
 import javax.servlet.ServletContext;
 
+import edu.cornell.mannlib.vitro.webapp.application.VitroHomeDirectory;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ConfigurationTripleSource;
+import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource;
 
 /**
  * The interface that holds the modules and extensions together.
  */
 public interface Application {
 	ServletContext getServletContext();
+	
+	VitroHomeDirectory getHomeDirectory();
 
 	SearchEngine getSearchEngine();
 
 	ImageProcessor getImageProcessor();
 	
 	FileStorage getFileStorage();
+	
+	ContentTripleSource getContentTripleSource();
+	
+	ConfigurationTripleSource getConfigurationTripleSource();
+	
+	void shutdown();
 
 	public interface Component {
 		enum LifecycleState {

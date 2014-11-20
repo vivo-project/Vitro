@@ -26,6 +26,7 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
@@ -273,9 +274,11 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 
 	private static final String VCARD_KIND_URI = "http://www.w3.org/2006/vcard/ns#Kind";
 	private static final String VCARD_NAMESPACE = "http://www.w3.org/2006/vcard/ns#";
+
 	private void storeQualifiedByRoot(OntResource context, String rangeURI) {
 		if (rangeURI.startsWith(VCARD_NAMESPACE)) {
-			updatePropertyResourceURIValue(context, QUALIFIED_BY_ROOT, VCARD_KIND_URI);
+			updatePropertyResourceURIValue(context, QUALIFIED_BY_ROOT,
+					VCARD_KIND_URI);
 		} else {
 			updatePropertyResourceURIValue(context, QUALIFIED_BY_ROOT, null);
 		}
@@ -504,8 +507,6 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 			+ "        :hasConfiguration ?config . \n" //
 			+ "} \n"; //
 
-	// TODO Add a filter that will reject solutions that include
-	// qualifiedByDomain
 	private static final String QUERY_LOCATE_CONFIG_CONTEXT_WITH_NO_DOMAIN = "" //
 			+ "PREFIX : <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" //
 			+ "\n" //
@@ -515,6 +516,9 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 			+ "        :configContextFor ?baseUri ; \n" //
 			+ "        :qualifiedBy ?rangeUri ; \n" //
 			+ "        :hasConfiguration ?config . \n" //
+			+ "     FILTER NOT EXISTS { \n" //
+			+ "        ?context :qualifiedByDomain ?domainUri \n" //
+			+ "     } \n" //
 			+ "} \n"; //
 
 	private static class ParserLocateConfigContext extends
@@ -558,7 +562,8 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 				String baseUri, String rangeUri) {
 			try (LockedOntModel displayModel = lockableDisplayModel.read()) {
 				String queryString;
-				if (domainUri == null || domainUri.trim().isEmpty()) {
+				if (domainUri == null || domainUri.trim().isEmpty()
+						|| domainUri.equals(OWL.Thing.getURI())) {
 					queryString = bindValues(
 							QUERY_LOCATE_CONFIG_CONTEXT_WITH_NO_DOMAIN,
 							uriValue("baseUri", baseUri),

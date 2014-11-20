@@ -180,6 +180,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 					.getHiddenFromPublishBelowRoleLevel());
 			fp.setProhibitedFromUpdateBelowRoleLevel(base
 					.getProhibitedFromUpdateBelowRoleLevel());
+			fp.setCustomEntryForm(base.getCustomEntryForm());
 			log.debug("Created new FauxProperty: " + fp);
 			return fp;
 		}
