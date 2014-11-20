@@ -233,14 +233,14 @@ name will be used as the label. -->
         <section class="verbosePropertyListing">
             <#if verboseDisplay.fauxProperty?has_content>
                  <a class="propertyLink" href="${verboseDisplay.fauxProperty.propertyEditUrl}" title="${i18n().name}">
-                 ${verboseDisplay.fauxProperty.displayName}
-                 </a>, a faux property of
+                 ${verboseDisplay.fauxProperty.displayName}</a>
+                 is a faux property of
             </#if>
             <a class="propertyLink" href="${verboseDisplay.propertyEditUrl}" title="${i18n().name}">${verboseDisplay.localName}</a> 
             (<span>${property.type?lower_case}</span> property);
-            order in group: <span>${verboseDisplay.displayRank};</span> 
-            display level: <span>${verboseDisplay.displayLevel};</span>
-            update level: <span>${verboseDisplay.updateLevel};</span>
+            order in group: <span>${verboseDisplay.displayRank}</span>;
+            display level: <span>${verboseDisplay.displayLevel}</span>;
+            update level: <span>${verboseDisplay.updateLevel}</span>;
             publish level: <span>${verboseDisplay.publishLevel}</span>
         </section>
     </#if>
