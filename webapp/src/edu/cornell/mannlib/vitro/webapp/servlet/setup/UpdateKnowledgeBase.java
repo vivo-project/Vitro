@@ -89,7 +89,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			putReportingPathsIntoSettings(ctx, settings);
 			putNonReportingPathsIntoSettings(ctx, settings);
 
-            SimpleReasonerSetup.waitForTBoxReasoning(sce); 
+            PelletReasonerSetup.waitForTBoxReasoning(sce); 
 			
 			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());

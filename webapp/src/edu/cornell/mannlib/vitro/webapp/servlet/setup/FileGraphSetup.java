@@ -97,13 +97,6 @@ public class FileGraphSetup implements ServletContextListener {
             OntDocumentManager.getInstance().setProcessImports(false);
         }
 
-        /*
-        if (isUpdateRequired(ctx))  {
-            log.info("mostSpecificType will be computed because a knowledge base migration was performed." );
-            SimpleReasonerSetup.setMSTComputeRequired(ctx);
-        } else 
-        */
-        
         if ( (aboxChanged || tboxChanged) && !isUpdateRequired(ctx)) {
             log.info("a full recompute of the Abox will be performed because" +
                     " the filegraph abox(s) and/or tbox(s) have changed or are being read for the first time." );

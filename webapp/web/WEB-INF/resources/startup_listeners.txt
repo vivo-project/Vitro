@@ -34,6 +34,7 @@ edu.cornell.mannlib.vitro.webapp.servlet.setup.RemoveObsoletePermissions
 
 edu.cornell.mannlib.vitro.webapp.servlet.setup.FileGraphSetup
 
+edu.cornell.mannlib.vitro.webapp.servlet.setup.PelletListenerSetup
 edu.cornell.mannlib.vitro.webapp.servlet.setup.SimpleReasonerSetup
 
 #edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateKnowledgeBase

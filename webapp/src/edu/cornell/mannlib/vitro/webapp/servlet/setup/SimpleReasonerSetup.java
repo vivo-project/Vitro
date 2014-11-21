@@ -21,11 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.vocabulary.OWL;
 
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -33,7 +29,6 @@ import edu.cornell.mannlib.vitro.webapp.reasoner.ReasonerPlugin;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasonerTBoxListener;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
-import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 public class SimpleReasonerSetup implements ServletContextListener {
@@ -51,41 +46,10 @@ public class SimpleReasonerSetup implements ServletContextListener {
     	ServletContext ctx = sce.getServletContext();
         
         try {    
-            // set up Pellet reasoning for the TBox    
         	OntModel tboxAssertionsModel = ModelAccess.on(ctx).getOntModel(ModelNames.TBOX_ASSERTIONS);
         	OntModel tboxInferencesModel = ModelAccess.on(ctx).getOntModel(ModelNames.TBOX_INFERENCES);
         	OntModel tboxUnionModel = ModelAccess.on(ctx).getOntModel(ModelNames.TBOX_UNION);
-        	log.debug("tboxAssertionsModel=" + tboxAssertionsModel);
-        	log.debug("tboxInferencesModel=" + tboxInferencesModel);
-        	log.debug("tboxUnionModel=" + tboxUnionModel);
 
-			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
-            
-            if (!tboxAssertionsModel.getProfile().NAMESPACE().equals(OWL.NAMESPACE.getNameSpace())) {        
-                log.error("Not connecting Pellet reasoner - the TBox assertions model is not an OWL model");
-                return;
-            }
-            
-            // Set various Pellet options for incremental consistency checking, etc.
-            //PelletOptions.DL_SAFE_RULES = true;
-            //PelletOptions.USE_COMPLETION_QUEUE = true;
-            //PelletOptions.USE_TRACING = true;
-            //PelletOptions.TRACK_BRANCH_EFFECTS = true;
-            //PelletOptions.USE_INCREMENTAL_CONSISTENCY = true;
-            //PelletOptions.USE_INCREMENTAL_DELETION = true;
-             
-            PelletListener pelletListener = new PelletListener(tboxUnionModel,tboxAssertionsModel,tboxInferencesModel,ReasonerConfiguration.DEFAULT);
-            sce.getServletContext().setAttribute("pelletListener",pelletListener);
-            sce.getServletContext().setAttribute("pelletOntModel", pelletListener.getPelletModel());
-            
-            if (wadf instanceof WebappDaoFactoryJena) {
-                ((WebappDaoFactoryJena) wadf).setPelletListener(pelletListener);
-            }
-            
-            log.info("Pellet reasoner connected for the TBox");
-     
-            waitForTBoxReasoning(sce); 
-            
             // set up simple reasoning for the ABox
                                 
             RDFService rdfService = ModelAccess.on(ctx).getRDFService();            
@@ -137,23 +101,6 @@ public class SimpleReasonerSetup implements ServletContextListener {
         } catch (Throwable t) {
             t.printStackTrace();
         }        
-    }
-    
-    public static void waitForTBoxReasoning(ServletContextEvent sce) 
-        throws InterruptedException {
-        PelletListener pelletListener = (PelletListener) sce.getServletContext().getAttribute("pelletListener");
-        if (pelletListener == null) {
-            return ;
-        }
-        int sleeps = 0;
-        // sleep at least once to make sure the TBox reasoning gets started
-        while ((0 == sleeps) || ((sleeps < 1000) && pelletListener.isReasoning())) {
-            if (((sleeps - 1) % 10) == 0) { // print message at 10 second intervals
-                log.info("Waiting for initial TBox reasoning to complete");
-            }
-            Thread.sleep(1000);   
-            sleeps++;
-        }
     }
     
     @Override
@@ -209,17 +156,6 @@ public class SimpleReasonerSetup implements ServletContextListener {
         return (RecomputeMode) ctx.getAttribute(RECOMPUTE_REQUIRED_ATTR);
     }
   
-    private static final String MSTCOMPUTE_REQUIRED_ATTR = 
-        SimpleReasonerSetup.class.getName() + ".MSTComputeRequired";
-
-    public static void setMSTComputeRequired(ServletContext ctx) {
-        ctx.setAttribute(MSTCOMPUTE_REQUIRED_ATTR, true);
-    }
-    
-    private static boolean isMSTComputeRequired(ServletContext ctx) {
-        return (ctx.getAttribute(MSTCOMPUTE_REQUIRED_ATTR) != null);
-    }
-        
     /**
      * Read the names of the plugin classes classes.
      * 
@@ -278,7 +214,8 @@ public class SimpleReasonerSetup implements ServletContextListener {
             this.simpleReasoner = simpleReasoner;
         }
 
-        public void run() {
+        @Override
+		public void run() {
             simpleReasoner.recompute();
         }
     }
