@@ -1,0 +1,2543 @@
+@prefix ocresd: <http://purl.org/net/OCRe/study_design.owl#> .
+@prefix geo:   <http://aims.fao.org/aos/geopolitical.owl#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix scires: <http://vivoweb.org/ontology/scientific-research#> .
+@prefix cito:  <http://purl.org/spar/cito/> .
+@prefix fabio: <http://purl.org/spar/fabio/> .
+@prefix vcard: <http://www.w3.org/2006/vcard/ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix obo:   <http://purl.obolibrary.org/obo/> .
+@prefix ocrer: <http://purl.org/net/OCRe/research.owl#> .
+@prefix vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> .
+@prefix event: <http://purl.org/NET/c4dm/event.owl#> .
+@prefix bibo:  <http://purl.org/ontology/bibo/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix c4o:   <http://purl.org/spar/c4o/> .
+@prefix vitro-public: <http://vitro.mannlib.cornell.edu/ns/vitro/public#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix vivo:  <http://vivoweb.org/ontology/core#> .
+
+vcard:Identification  rdfs:subClassOf  vcard:Security , vcard:TimeZone , vcard:Calendar , vcard:Geo , owl:Thing , vcard:Geographical ;
+        owl:equivalentClass  vcard:Identification , vcard:Explanatory , vcard:Organizational , vcard:Communication , vcard:Addressing .
+
+vcard:hasFormattedName
+        rdfs:subPropertyOf  vcard:hasFormattedName , owl:topObjectProperty .
+
+geo:countryAreaNotes  rdfs:subPropertyOf
+                geo:countryAreaNotes , owl:topDataProperty .
+
+vivo:dateTime  rdfs:subPropertyOf  vivo:dateTime , owl:topDataProperty .
+
+fabio:Erratum  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  fabio:Erratum .
+
+vivo:Certificate  rdfs:subClassOf  skos:Concept , owl:Thing ;
+        owl:equivalentClass  vivo:Certificate .
+
+vivo:AdministratorRole
+        rdfs:subClassOf      obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  vivo:AdministratorRole .
+
+obo:ERO_0000398  rdfs:subPropertyOf  owl:topObjectProperty , obo:ERO_0000398 .
+
+geo:codeUN  rdfs:subPropertyOf  geo:codeUN , owl:topDataProperty .
+
+bibo:performer  rdfs:subPropertyOf  bibo:performer , owl:topObjectProperty .
+
+obo:OBI_0000304  rdfs:subPropertyOf  obo:OBI_0000304 , owl:topObjectProperty .
+
+geo:countryArea  rdfs:subPropertyOf  geo:countryArea , owl:topDataProperty .
+
+vcard:hasOrganizationName
+        rdfs:subPropertyOf  vcard:hasOrganizationName , owl:topObjectProperty .
+
+bibo:pmid  rdfs:subPropertyOf  vivo:identifier , bibo:pmid , owl:topDataProperty .
+
+obo:RO_0000056  rdfs:subPropertyOf  obo:RO_0000056 , owl:topObjectProperty ;
+        owl:inverseOf       obo:RO_0000057 .
+
+vivo:PostdocOrFellowAdvisingRelationship
+        rdfs:subClassOf      vivo:Relationship , obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:PostdocOrFellowAdvisingRelationship .
+
+vivo:PrimaryPosition  rdfs:subClassOf  vivo:Relationship , obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:PrimaryPosition .
+
+skos:broader  rdfs:subPropertyOf  skos:broader , owl:topObjectProperty .
+
+vivo:contributingRole
+        rdfs:subPropertyOf  vivo:contributingRole , owl:topObjectProperty .
+
+geo:hasShortName  rdfs:subPropertyOf  geo:hasShortName , owl:topDataProperty .
+
+ocresd:Phase_4  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  ocresd:Phase_4 .
+
+vivo:Competition  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:Competition .
+
+geo:codeFAOTERM  rdfs:subPropertyOf  geo:codeFAOTERM , owl:topDataProperty .
+
+obo:ERO_0000776  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:ERO_0000776 .
+
+bibo:eissn  rdfs:subPropertyOf  vivo:identifier , bibo:eissn , owl:topDataProperty .
+
+vivo:AwardReceipt  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:AwardReceipt .
+
+ocrer:Interventional_study
+        a                    owl:Class ;
+        rdfs:subClassOf      owl:Thing ;
+        owl:equivalentClass  ocrer:Interventional_study .
+
+vivo:F1000Link  rdfs:subClassOf  vcard:Geographical , owl:Thing , vcard:Identification , vcard:Organizational , vcard:Geo , vcard:Addressing , vcard:Security , vcard:Explanatory , vcard:Communication , vcard:Calendar , vcard:TimeZone ;
+        owl:equivalentClass  vivo:F1000Link .
+
+vcard:Video  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Video .
+
+vivo:grantDirectCosts
+        rdfs:subPropertyOf  vivo:grantDirectCosts , owl:topDataProperty .
+
+geo:countryAreaUnit  rdfs:subPropertyOf
+                geo:countryAreaUnit , owl:topDataProperty .
+
+geo:isAdministeredBy  rdfs:subPropertyOf
+                geo:isAdministeredBy , owl:topObjectProperty .
+
+obo:ERO_0000071  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0000071 .
+
+obo:ERO_0000919  rdfs:subPropertyOf  owl:topObjectProperty , obo:ERO_0000919 ;
+        owl:inverseOf       obo:ERO_0000918 .
+
+vivo:offeredBy  rdfs:subPropertyOf  vivo:offeredBy , owl:topObjectProperty ;
+        owl:inverseOf       vivo:offers .
+
+vitro:bannerWidth  rdfs:subPropertyOf  vitro:bannerWidth , owl:topDataProperty .
+
+obo:ERO_0000790  rdfs:subClassOf  obo:BFO_0000020 , owl:Thing , obo:BFO_0000023 , obo:BFO_0000001 , obo:BFO_0000002 , obo:BFO_0000017 ;
+        owl:disjointWith     obo:ARG_2000021 , obo:BFO_0000019 , obo:ARG_2000022 ;
+        owl:equivalentClass  obo:ERO_0000790 .
+
+vivo:Course  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:Course .
+
+geo:hasNationality  rdfs:subPropertyOf  geo:hasNationality , owl:topDataProperty .
+
+vcard:TelephoneType  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  vcard:TelephoneType .
+
+vcard:TimeZone  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  vcard:TimeZone .
+
+vitro:ClassGroup  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  vitro:ClassGroup .
+
+vivo:SubnationalRegion
+        rdfs:subClassOf      obo:BFO_0000141 , vivo:Location , obo:BFO_0000001 , owl:Thing , obo:BFO_0000006 , vivo:GeographicLocation , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:SubnationalRegion .
+
+geo:nameShortES  rdfs:subPropertyOf  geo:nameShortES , owl:topDataProperty .
+
+obo:ERO_0000481  rdfs:subPropertyOf  obo:ERO_0000481 , owl:topObjectProperty ;
+        owl:inverseOf       scires:protocolRealizedBy .
+
+vivo:hasCollaborator  rdfs:subPropertyOf
+                vivo:hasCollaborator , owl:topObjectProperty .
+
+vivo:Student  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Student .
+
+vitro:bannerImage  rdfs:subPropertyOf  vitro:bannerImage , owl:topDataProperty .
+
+vcard:FormattedName  rdfs:subClassOf  vcard:Addressing , vcard:Geographical , vcard:Calendar , vcard:Geo , vcard:Organizational , vcard:Security , owl:Thing , vcard:Communication , vcard:Explanatory , vcard:TimeZone ;
+        owl:equivalentClass  vcard:FormattedName .
+
+bibo:director  rdfs:subPropertyOf  bibo:director , owl:topObjectProperty .
+
+obo:BFO_0000051  rdfs:subPropertyOf  obo:BFO_0000051 , owl:topObjectProperty .
+
+geo:nameOfficialES  rdfs:subPropertyOf  geo:nameOfficialES , owl:topDataProperty .
+
+vivo:FacultyAdministrativePosition
+        rdfs:subClassOf      vivo:Relationship , obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:FacultyAdministrativePosition .
+
+obo:ERO_0000393  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0000393 .
+
+bibo:sici  rdfs:subPropertyOf  vivo:identifier , bibo:sici , owl:topDataProperty .
+
+vcard:revision  rdfs:subPropertyOf  vcard:revision , owl:topDataProperty .
+
+owl:bottomDataProperty
+        a                   owl:DatatypeProperty , owl:FunctionalProperty ;
+        rdfs:subPropertyOf  vcard:photo , vcard:language , bibo:eanucc13 , geo:nameShortAR , vcard:calendarLink , vitro:logotypeHeight , geo:nameOfficialFR , owl:topDataProperty , geo:countryAreaYear , geo:hasMinLatitude , vitro:bannerHeight , geo:population , bibo:isbn13 , bibo:issn , vitro:urlPrefix , bibo:isbn10 , obo:ARG_0000197 , vcard:familyName , vivo:outreachOverview , vivo:isCorrespondingAuthor , geo:nameListRU , vivo:licenseNumber , vivo:majorField , obo:ERO_0000045 , vitro:displayLimit , vivo:sponsorAwardId , geo:nationalityAR , geo:nameCurrencyEN , geo:countryAreaNotes , geo:GDP , vivo:localAwardId , bibo:upc , vitro:namespaceURI , geo:hasMinLongitude , vivo:eRACommonsId , vivo:reportId , geo:nameCurrencyIT , vivo:teachingOverview , bibo:numPages , geo:nameListEN , vitro-public:mimeType , geo:nationalityZH , geo:codeDBPediaID , obo:ARG_0000172 , geo:countryAreaTotal , vcard:calendarBusy , geo:countryAreaUnit , obo:ERO_0000046 , geo:nameOfficialZH , <http://purl.org/vocab/vann/preferredNamespaceUri> , vitro:rootLogotypeImage , geo:agriculturalAreaTotal , geo:codeISO3 , geo:nameShortFR , geo:GDPUnit , vivo:dateTime , vitro:acknowledgeText , bibo:lccn , vitro:md5password , vitro:bannerWidth , vivo:supplementalInformation , bibo:oclcnum , geo:nameCurrencyRU , geo:landArea , vivo:patentNumber , vcard:locality , geo:hasCurrency , bibo:uri , vivo:grantDirectCosts , geo:codeGAUL , vcard:instantMessage , vitro:firstTime , bibo:pageEnd , bibo:sici , vcard:honorificSuffix , vivo:overview , geo:nameListFR , vivo:totalAwardAmount , obo:ERO_0000774 , geo:nameShortIT , vitro:moniker , vivo:researcherId , vivo:abbreviation , geo:populationUnit , geo:hasNationality , bibo:gtin14 , geo:hasStatistics , geo:nameOfficialAR , vitro:logotypeImage , geo:countryArea , vivo:hrJobTitle , geo:hasMaxLatitude , vcard:gender , geo:hasListName , geo:nameShortES , geo:GDPNotes , geo:nameCurrencyZH , obo:ERO_0000044 , c4o:hasGlobalCountValue , geo:codeUNDP , geo:HDITotal , vitro-public:filename , geo:GDPTotalInCurrentPrices , geo:nationalityIT , vcard:givenName , bibo:pageStart , vivo:termLabel , vivo:identifier , vcard:url , obo:ERO_0000424 , vivo:seatingCapacity , vivo:hideFromDisplay , vivo:entryTerm , vitro:rootBreadCrumbAnchor , geo:populationTotal , vcard:country , geo:codeISO2 , geo:nameListES , vcard:sound , geo:validUntil , geo:hasCode , geo:landAreaUnit , vcard:region , bibo:volume , geo:hasOfficialName , vivo:middleName , vivo:preferredDisplayOrder , vcard:productId , bibo:issue , vcard:anniversary , vivo:termType , scires:irbNumber , geo:hasCoordinate , vcard:related , vcard:organizationName , vcard:birthdate , geo:landAreaYear , bibo:prefixName , geo:HDIYear , bibo:number , vitro:themeDir , geo:hasMaxLongitude , geo:nationalityFR , geo:HDINotes , vitro:modTime , bibo:chapter , geo:nameShortRU , vivo:cclCode , vcard:key , obo:ARG_0000015 , geo:agriculturalArea , bibo:pmid , obo:ERO_0000050 , obo:ARG_0000001 , vivo:researchOverview , vitro:imageThumbWidth , vcard:revision , bibo:eissn , bibo:identifier , vitro:contactMail , geo:HDIUnit , vivo:rank , vivo:hasMonetaryAmount , vitro:hidden , vitro:displayRank , geo:codeCurrency , vcard:additionalName , geo:codeUN , geo:nameShortEN , geo:nameCurrencyAR , vcard:source , bibo:locator , vivo:iclCode , geo:codeFAOTERM , geo:nameShortZH , vitro:shortHand , vitro-public:directDownloadUrl , bibo:section , vcard:category , geo:populationYear , geo:codeFAOSTAT , vcard:organizationalUnitName , geo:nationalityEN , bibo:coden , vcard:postalCode , owl:bottomDataProperty , vitro:oldpassword , vivo:scopusId , vcard:uid , geo:landAreaNotes , geo:nameListIT , geo:nameCurrencyFR , vivo:contactInformation , geo:validSince , geo:GDPYear , geo:nameListZH , vitro:logotypeWidth , bibo:shortDescription , vivo:placeOfPublication , obo:ERO_0000054 , vivo:pmcid , vcard:timeZone , vcard:note , geo:agriculturalAreaYear , geo:nationalityRU , bibo:abstract , geo:nameOfficialES , vitro:aboutText , vitro:roleURI , vitro:copyrightURL , vitro:rootBreadCrumbURL , vitro:loginCount , vcard:nickName , geo:nameCurrencyES , geo:codeAGROVOC , vcard:role , geo:hasShortName , scires:nctId , obo:ARG_2000012 , vivo:description , vitro:username , vivo:courseCredits , geo:agriculturalAreaNotes , geo:nameOfficialIT , vivo:hasValue , vcard:telephone , geo:landAreaTotal , vcard:honorificPrefix , vitro:copyrightAnchor , vivo:freetextKeyword , vcard:logo , vcard:streetAddress , geo:HDI , vcard:email , bibo:doi , vitro:bannerImage , vivo:departmentOrSchool , geo:agriculturalAreaUnit , geo:nameListAR , bibo:edition , geo:nameOfficialEN , vcard:formattedName , obo:ERO_0000072 , geo:nameOfficialRU , vcard:sortAs , c4o:hasGlobalCountDate , vcard:geo , vitro-public:attribution , vcard:calendarRequest , geo:populationNotes , vcard:title , vivo:nihmsid , geo:nationalityES , bibo:asin , scires:studyPopulationCount .
+
+vcard:Addressing  rdfs:subClassOf  vcard:TimeZone , vcard:Security , vcard:Geo , owl:Thing , vcard:Calendar , vcard:Geographical ;
+        owl:equivalentClass  vcard:Explanatory , vcard:Identification , vcard:Organizational , vcard:Communication , vcard:Addressing .
+
+event:Event  rdfs:subClassOf  obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  event:Event .
+
+bibo:Legislation  rdfs:subClassOf  bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Legislation .
+
+obo:ERO_0000789  rdfs:subClassOf  obo:BFO_0000023 , obo:BFO_0000002 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000020 , obo:BFO_0000001 ;
+        owl:disjointWith     obo:BFO_0000019 , obo:ARG_2000021 , obo:ARG_2000022 ;
+        owl:equivalentClass  obo:ERO_0000789 .
+
+<http://www.geneontology.org/formats/oboInOwl#SynonymType>
+        rdfs:subClassOf      obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:IAO_0000027 , obo:BFO_0000002 ;
+        owl:equivalentClass  <http://www.geneontology.org/formats/oboInOwl#SynonymType> .
+
+obo:ERO_0000038  rdfs:subPropertyOf  obo:ERO_0000038 , owl:topObjectProperty .
+
+scires:protocolRealizedBy
+        rdfs:subPropertyOf  scires:protocolRealizedBy , owl:topObjectProperty .
+
+vivo:Dataset  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Dataset .
+
+obo:ERO_0000006  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0000006 .
+
+vitro-public:image  rdfs:subPropertyOf  vitro-public:image , owl:topObjectProperty .
+
+vivo:OrganizingProcess
+        rdfs:subClassOf      obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:OrganizingProcess .
+
+geo:economic_region  rdfs:subClassOf  geo:area , owl:Thing ;
+        owl:equivalentClass  geo:economic_region .
+
+obo:ERO_0000020  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0000020 .
+
+obo:ERO_0000914  rdfs:subClassOf  obo:BFO_0000017 , owl:Thing , obo:BFO_0000002 , obo:BFO_0000023 , obo:BFO_0000001 , obo:BFO_0000020 ;
+        owl:disjointWith     obo:BFO_0000019 , obo:ARG_2000022 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:ERO_0000914 .
+
+geo:populationTotal  rdfs:subPropertyOf
+                geo:populationTotal , owl:topDataProperty .
+
+vivo:patentNumber  rdfs:subPropertyOf  vivo:identifier , vivo:patentNumber , owl:topDataProperty .
+
+geo:hasOfficialName  rdfs:subPropertyOf
+                geo:hasOfficialName , owl:topDataProperty .
+
+obo:ARG_2000008  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , obo:IAO_0000109 , owl:Thing , obo:BFO_0000031 , obo:IAO_0000027 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ARG_2000008 .
+
+bibo:Letter  rdfs:subClassOf  bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Letter .
+
+vcard:hasURL  rdfs:subPropertyOf  vcard:hasURL , owl:topObjectProperty .
+
+bibo:Brief  rdfs:subClassOf  bibo:Document , obo:IAO_0000030 , bibo:LegalDocument , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Brief .
+
+vcard:role  rdfs:subPropertyOf  vcard:role , owl:topDataProperty .
+
+obo:ARG_2000022  rdfs:subClassOf  owl:Thing , obo:BFO_0000001 , obo:BFO_0000020 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ERO_0000914 , obo:BFO_0000023 , obo:ERO_0000787 , obo:ERO_0000785 , vivo:PrincipalInvestigatorRole , vivo:AdvisorRole , vivo:CoPrincipalInvestigatorRole , obo:ERO_0000224 , vivo:AttendeeRole , vivo:OutreachProviderRole , obo:ERO_0000778 , obo:BFO_0000034 , obo:ERO_0000595 , obo:BFO_0000016 , obo:OBI_0000017 , vivo:LeaderRole , obo:ERO_0000784 , vivo:ReviewerRole , vivo:PeerReviewerRole , obo:ERO_0000789 , obo:ERO_0000777 , obo:ERO_0000790 , vivo:EditorRole , vivo:MemberRole , vivo:ResearcherRole , obo:BFO_0000017 , obo:ERO_0000012 , vivo:OrganizerRole , obo:ERO_0000783 , obo:ERO_0000779 , vivo:TeacherRole , vivo:AdviseeRole , obo:ERO_0000788 , obo:ERO_0000786 , obo:ERO_0000780 , obo:ERO_0000776 , obo:ERO_0000225 , vivo:AdministratorRole , vivo:ClinicalRole , vivo:PresenterRole , vivo:InvestigatorRole ;
+        owl:equivalentClass  obo:ARG_2000022 .
+
+geo:nameShortEN  rdfs:subPropertyOf  geo:nameShortEN , owl:topDataProperty .
+
+obo:RO_0001025  rdfs:subPropertyOf  obo:RO_0001025 , owl:topObjectProperty ;
+        owl:inverseOf       obo:RO_0001015 .
+
+obo:OBI_0000312  rdfs:subPropertyOf  obo:OBI_0000312 , obo:RO_0000056 , owl:topObjectProperty ;
+        owl:inverseOf       obo:OBI_0000299 .
+
+bibo:unpublished  a  owl:Thing .
+
+bibo:abstract  rdfs:subPropertyOf  bibo:abstract , owl:topDataProperty .
+
+vcard:honorificSuffix
+        rdfs:subPropertyOf  vcard:honorificSuffix , owl:topDataProperty .
+
+vivo:equipmentFor  rdfs:subPropertyOf  vivo:equipmentFor , owl:topObjectProperty ;
+        owl:inverseOf       vivo:hasEquipment .
+
+bibo:Hearing  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  bibo:Hearing .
+
+vcard:None  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:None .
+
+obo:ERO_0000595  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:ERO_0000595 .
+
+vcard:hasCalendarRequest
+        rdfs:subPropertyOf  vcard:hasCalendarRequest , owl:topObjectProperty .
+
+geo:nameOfficialEN  rdfs:subPropertyOf  geo:nameOfficialEN , owl:topDataProperty .
+
+obo:ARG_2000400  a  obo:IAO_0000003 , obo:IAO_0000030 , obo:IAO_0000009 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 .
+
+<http://isf/deprecated_op>
+        a                   owl:ObjectProperty ;
+        rdfs:subPropertyOf  <http://isf/deprecated_op> , owl:topObjectProperty .
+
+vcard:hasAddress  rdfs:subPropertyOf  vcard:hasAddress , owl:topObjectProperty .
+
+vcard:Logo  rdfs:subClassOf  vcard:Communication , vcard:Geo , vcard:Security , vcard:Geographical , vcard:Addressing , owl:Thing , vcard:Identification , vcard:TimeZone , vcard:Calendar , vcard:Explanatory ;
+        owl:equivalentClass  vcard:Logo .
+
+geo:landAreaYear  rdfs:subPropertyOf  geo:landAreaYear , owl:topDataProperty .
+
+bibo:Manual  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Manual .
+
+obo:ERO_0000784  rdfs:subClassOf  obo:BFO_0000017 , obo:BFO_0000020 , obo:BFO_0000023 , obo:BFO_0000002 , owl:Thing , obo:BFO_0000001 ;
+        owl:disjointWith     obo:BFO_0000019 , obo:ARG_2000022 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:ERO_0000784 .
+
+geo:nationalityIT  rdfs:subPropertyOf  geo:nationalityIT , owl:topDataProperty .
+
+obo:ARG_2000376  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  obo:ARG_2000376 .
+
+bibo:isbn13  rdfs:subPropertyOf  bibo:isbn13 , vivo:identifier , owl:topDataProperty .
+
+obo:ERO_0001261  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0001261 .
+
+obo:ERO_0000033  rdfs:subPropertyOf  obo:ERO_0000033 , owl:topObjectProperty .
+
+vcard:Individual  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:ARG_2000379 , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vcard:Individual .
+
+geo:nationalityFR  rdfs:subPropertyOf  geo:nationalityFR , owl:topDataProperty .
+
+bibo:AudioDocument  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:AudioDocument .
+
+vivo:validIn  rdfs:subPropertyOf  vivo:validIn , owl:topObjectProperty .
+
+vivo:inPress  a  owl:Thing .
+
+bibo:Report  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Report .
+
+obo:ARG_2000390  rdfs:subPropertyOf  owl:topObjectProperty , obo:ARG_2000390 .
+
+vcard:givenName  rdfs:subPropertyOf  vcard:givenName , owl:topDataProperty .
+
+foaf:Group  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  foaf:Group .
+
+geo:disputed  rdfs:subClassOf  obo:BFO_0000141 , vivo:GeopoliticalEntity , geo:area , vivo:GeographicRegion , owl:Thing , obo:BFO_0000006 , obo:BFO_0000004 , vivo:GeographicLocation , obo:BFO_0000001 , vivo:Location , obo:BFO_0000002 ;
+        owl:equivalentClass  geo:disputed .
+
+bibo:Performance  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  bibo:Performance .
+
+vcard:birthdate  rdfs:subPropertyOf  vcard:birthdate , owl:topDataProperty .
+
+vcard:Fax  rdfs:subClassOf   vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Fax .
+
+vcard:instantMessage  rdfs:subPropertyOf
+                vcard:instantMessage , owl:topDataProperty .
+
+geo:agriculturalAreaUnit
+        rdfs:subPropertyOf  geo:agriculturalAreaUnit , owl:topDataProperty .
+
+geo:codeUNDP  rdfs:subPropertyOf  geo:codeUNDP , owl:topDataProperty .
+
+vcard:gender  rdfs:subPropertyOf  vcard:gender , owl:topDataProperty .
+
+obo:RO_0002234  rdfs:subPropertyOf  obo:RO_0002234 , owl:topObjectProperty .
+
+vcard:url  rdfs:subPropertyOf  vcard:url , owl:topDataProperty .
+
+vcard:Nickname  rdfs:subClassOf  vcard:Geo , owl:Thing , vcard:Geographical , vcard:Calendar , vcard:Addressing , vcard:TimeZone , vcard:Explanatory , vcard:Security , vcard:Communication , vcard:Organizational ;
+        owl:equivalentClass  vcard:Nickname .
+
+vivo:ResearchProposal
+        rdfs:subClassOf      obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:ResearchProposal .
+
+c4o:hasGlobalCountDate
+        rdfs:subPropertyOf  c4o:hasGlobalCountDate , owl:topDataProperty .
+
+vivo:CoreLaboratory  rdfs:subClassOf  foaf:Agent , vivo:Laboratory , obo:BFO_0000001 , owl:Thing , foaf:Organization , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:CoreLaboratory .
+
+vivo:abbreviation  rdfs:subPropertyOf  vivo:abbreviation , owl:topDataProperty .
+
+bibo:distributor  rdfs:subPropertyOf  bibo:distributor , owl:topObjectProperty ;
+        owl:inverseOf       vivo:distributes .
+
+vcard:Work  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Work .
+
+vivo:overview  rdfs:subPropertyOf  vivo:overview , owl:topDataProperty .
+
+geo:nationalityRU  rdfs:subPropertyOf  geo:nationalityRU , owl:topDataProperty .
+
+vcard:Pager  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Pager .
+
+vivo:reviewedIn  rdfs:subPropertyOf  vivo:reviewedIn , owl:topObjectProperty ;
+        owl:inverseOf       bibo:reviewOf .
+
+vcard:hasCalendarLink
+        rdfs:subPropertyOf  vcard:hasCalendarLink , owl:topObjectProperty .
+
+geo:nameCurrencyES  rdfs:subPropertyOf  geo:nameCurrencyES , owl:topDataProperty .
+
+obo:ERO_0000046  rdfs:subPropertyOf  obo:ERO_0000046 , owl:topDataProperty .
+
+vivo:start  rdfs:subPropertyOf  vivo:start , owl:topObjectProperty .
+
+bibo:presents  rdfs:subPropertyOf  bibo:presents , owl:topObjectProperty ;
+        owl:inverseOf       bibo:presentedAt .
+
+vivo:proceedingsOf  rdfs:subPropertyOf  vivo:proceedingsOf , owl:topObjectProperty .
+
+obo:ERO_0000014  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  obo:ERO_0000014 .
+
+vivo:grantSubcontractedThrough
+        rdfs:subPropertyOf  vivo:grantSubcontractedThrough , owl:topObjectProperty ;
+        owl:inverseOf       vivo:subcontractsGrant .
+
+vcard:Coworker  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Coworker .
+
+vivo:ServiceProvidingLaboratory
+        rdfs:subClassOf      foaf:Agent , obo:BFO_0000001 , owl:Thing , foaf:Organization , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:ServiceProvidingLaboratory .
+
+cito:isCitedAsDataSourceBy
+        rdfs:subPropertyOf  cito:isCitedAsDataSourceBy , owl:topObjectProperty .
+
+vivo:ClinicalOrganization
+        rdfs:subClassOf      foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:ClinicalOrganization .
+
+bibo:translationOf  rdfs:subPropertyOf  bibo:translationOf , owl:topObjectProperty ;
+        owl:inverseOf       vivo:hasTranslation .
+
+obo:RO_0003001  rdfs:subPropertyOf  obo:RO_0003001 , owl:topObjectProperty .
+
+vivo:assignedBy  rdfs:subPropertyOf  vivo:assignedBy , owl:topObjectProperty ;
+        owl:inverseOf       vivo:assigns .
+
+obo:ERO_0000424  rdfs:subPropertyOf  obo:ERO_0000424 , owl:topDataProperty .
+
+vivo:rank  rdfs:subPropertyOf  vivo:rank , owl:topDataProperty .
+
+vivo:hasFundingVehicle
+        a                   owl:ObjectProperty ;
+        rdfs:subPropertyOf  vivo:hasFundingVehicle , vivo:supportedBy , owl:topObjectProperty ;
+        owl:inverseOf       vivo:fundingVehicleFor .
+
+vitro:displayRank  rdfs:subPropertyOf  vitro:displayRank , owl:topDataProperty .
+
+vitro:copyrightURL  rdfs:subPropertyOf  vitro:copyrightURL , owl:topDataProperty .
+
+obo:RO_0001019  rdfs:subPropertyOf  obo:RO_0001019 , owl:topObjectProperty ;
+        owl:inverseOf       obo:RO_0001018 .
+
+vivo:hasFacility  a         owl:ObjectProperty ;
+        rdfs:subPropertyOf  vivo:hasFacility , owl:topObjectProperty ;
+        owl:inverseOf       vivo:facilityFor .
+
+vivo:Hospital  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Hospital .
+
+vitro:moniker  rdfs:subPropertyOf  vitro:moniker , owl:topDataProperty .
+
+vivo:researchOverview
+        rdfs:subPropertyOf  vivo:researchOverview , owl:topDataProperty .
+
+vivo:ReviewerRole  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  vivo:ReviewerRole .
+
+vitro:username  rdfs:subPropertyOf  vitro:username , owl:topDataProperty .
+
+obo:ERO_0001518  rdfs:subPropertyOf  obo:ERO_0001518 , owl:topObjectProperty .
+
+bibo:recipient  rdfs:subPropertyOf  bibo:recipient , owl:topObjectProperty .
+
+obo:ARG_0000172  rdfs:subPropertyOf  obo:ARG_0000172 , owl:topDataProperty .
+
+bibo:Manuscript  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Manuscript .
+
+bibo:presentedAt  rdfs:subPropertyOf  bibo:presentedAt , owl:topObjectProperty .
+
+obo:BFO_0000040  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:BFO_0000040 .
+
+vcard:RelatedType  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  vcard:RelatedType .
+
+vcard:Group  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:ARG_2000379 , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vcard:Group .
+
+geo:HDINotes  rdfs:subPropertyOf  geo:HDINotes , owl:topDataProperty .
+
+geo:HDIYear  rdfs:subPropertyOf  geo:HDIYear , owl:topDataProperty .
+
+obo:ERO_0000778  rdfs:subClassOf  owl:Thing , obo:BFO_0000017 , obo:BFO_0000001 , obo:BFO_0000023 , obo:BFO_0000002 , obo:BFO_0000020 ;
+        owl:disjointWith     obo:ARG_2000021 , obo:BFO_0000019 , obo:ARG_2000022 ;
+        owl:equivalentClass  obo:ERO_0000778 .
+
+vivo:Position  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Position .
+
+vcard:hasSound  rdfs:subPropertyOf  owl:topObjectProperty , vcard:hasSound .
+
+obo:ERO_0001255  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0001255 .
+
+vcard:Address  rdfs:subClassOf  vcard:Geo , vcard:TimeZone , vcard:Geographical , vcard:Communication , vcard:Calendar , vcard:Explanatory , vcard:Security , vcard:Organizational , owl:Thing , vcard:Identification ;
+        owl:equivalentClass  vcard:Address .
+
+obo:OBI_0000011  rdfs:subClassOf  obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  obo:OBI_0000011 .
+
+vitro:modTime  rdfs:subPropertyOf  vitro:modTime , owl:topDataProperty .
+
+geo:nameCurrencyEN  rdfs:subPropertyOf  geo:nameCurrencyEN , owl:topDataProperty .
+
+owl:topDataProperty  a      owl:DatatypeProperty ;
+        rdfs:subPropertyOf  owl:topDataProperty .
+
+geo:nameListES  rdfs:subPropertyOf  geo:nameListES , owl:topDataProperty .
+
+vivo:Certification  rdfs:subClassOf  vivo:Relationship , obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Certification .
+
+vitro:aboutText  rdfs:subPropertyOf  vitro:aboutText , owl:topDataProperty .
+
+geo:population  rdfs:subPropertyOf  geo:population , owl:topDataProperty .
+
+rdfs:seeAlso  a  owl:AnnotationProperty .
+
+obo:ARG_2000029  rdfs:subPropertyOf  obo:ARG_2000029 , owl:topObjectProperty .
+
+vivo:contactInformation
+        a                   owl:DatatypeProperty ;
+        rdfs:subPropertyOf  vivo:contactInformation , owl:topDataProperty .
+
+bibo:DocumentStatus  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  bibo:DocumentStatus .
+
+vivo:dateFiled  rdfs:subPropertyOf  vivo:dateFiled , owl:topObjectProperty .
+
+obo:BFO_0000141  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:BFO_0000141 .
+
+bibo:issuer  rdfs:subPropertyOf  bibo:issuer , owl:topObjectProperty .
+
+geo:agriculturalAreaTotal
+        rdfs:subPropertyOf  geo:agriculturalAreaTotal , owl:topDataProperty .
+
+vivo:freetextKeyword  rdfs:subPropertyOf
+                vivo:freetextKeyword , owl:topDataProperty .
+
+vivo:EditorRole  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  vivo:EditorRole .
+
+vivo:dateTimeInterval
+        rdfs:subPropertyOf  vivo:dateTimeInterval , owl:topObjectProperty .
+
+bibo:Interview  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  bibo:Interview .
+
+vivo:featuredIn  rdfs:subPropertyOf  vivo:featuredIn , owl:topObjectProperty .
+
+<http://www.ebi.ac.uk/efo/swo/SWO_0000740>
+        rdfs:subPropertyOf  <http://www.ebi.ac.uk/efo/swo/SWO_0000740> , owl:topObjectProperty .
+
+obo:ARG_2000011  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing , obo:OBI_0000011 ;
+        owl:equivalentClass  obo:ARG_2000011 .
+
+vitro:bannerHeight  rdfs:subPropertyOf  vitro:bannerHeight , owl:topDataProperty .
+
+vcard:Unknown  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Unknown .
+
+vivo:hasPublicationVenue
+        rdfs:subPropertyOf  vivo:hasPublicationVenue , owl:topObjectProperty .
+
+obo:ERO_0000395  rdfs:subClassOf  obo:ERO_0000005 , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0000395 .
+
+bibo:affirmedBy  rdfs:subPropertyOf  bibo:affirmedBy , owl:topObjectProperty .
+
+vivo:FacultyMentoringRelationship
+        rdfs:subClassOf      vivo:Relationship , obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:FacultyMentoringRelationship .
+
+vivo:GraduateAdvisingRelationship
+        rdfs:subClassOf      vivo:Relationship , obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:GraduateAdvisingRelationship .
+
+vitro:shortHand  rdfs:subPropertyOf  vitro:shortHand , owl:topDataProperty .
+
+owl:priorVersion  a  owl:AnnotationProperty .
+
+vcard:timeZone  rdfs:subPropertyOf  vcard:timeZone , owl:topDataProperty .
+
+obo:RO_0000053  rdfs:subPropertyOf  obo:RO_0000053 , owl:topObjectProperty ;
+        owl:inverseOf       obo:RO_0000052 .
+
+vivo:translatorOf  rdfs:subPropertyOf  vivo:translatorOf , owl:topObjectProperty ;
+        owl:inverseOf       bibo:translator .
+
+vivo:geographicFocus  rdfs:subPropertyOf
+                vivo:geographicFocus , owl:topObjectProperty ;
+        owl:inverseOf       vivo:geographicFocusOf .
+
+vitro:hidden  rdfs:subPropertyOf  vitro:hidden , owl:topDataProperty .
+
+geo:landAreaTotal  rdfs:subPropertyOf  geo:landAreaTotal , owl:topDataProperty .
+
+vivo:NewsRelease  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:NewsRelease .
+
+geo:validUntil  rdfs:subPropertyOf  geo:validUntil , owl:topDataProperty .
+
+vcard:sortAs  rdfs:subPropertyOf  vcard:sortAs , owl:topDataProperty .
+
+foaf:Organization  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  foaf:Organization .
+
+ocresd:Phase_1  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  ocresd:Phase_1 .
+
+bibo:published  a  owl:Thing .
+
+geo:populationYear  rdfs:subPropertyOf  geo:populationYear , owl:topDataProperty .
+
+obo:ERO_0000054  rdfs:subPropertyOf  obo:ERO_0000054 , owl:topDataProperty .
+
+vcard:logo  rdfs:subPropertyOf  vcard:logo , owl:topDataProperty .
+
+vivo:hasPrerequisite  rdfs:subPropertyOf
+                vivo:hasPrerequisite , owl:topObjectProperty .
+
+vivo:UndergraduateAdvisingRelationship
+        rdfs:subClassOf      vivo:Relationship , obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:UndergraduateAdvisingRelationship .
+
+vivo:EmeritusFaculty  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:EmeritusFaculty .
+
+bibo:reversedBy  rdfs:subPropertyOf  bibo:reversedBy , owl:topObjectProperty .
+
+obo:ARG_0000001  rdfs:subPropertyOf  obo:ARG_0000001 , owl:topDataProperty .
+
+obo:IAO_0000033  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:IAO_0000033 .
+
+vcard:Text  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Text .
+
+geo:nameListEN  rdfs:subPropertyOf  geo:nameListEN , owl:topDataProperty .
+
+vivo:sponsoredBy  rdfs:subPropertyOf  owl:topObjectProperty , vivo:sponsoredBy ;
+        owl:inverseOf       vivo:sponsors .
+
+vitro:firstTime  rdfs:subPropertyOf  vitro:firstTime , owl:topDataProperty .
+
+geo:geographical_region
+        rdfs:subClassOf      owl:Thing , vivo:GeographicLocation , geo:area , obo:BFO_0000004 , obo:BFO_0000141 , obo:BFO_0000002 , obo:BFO_0000006 , obo:BFO_0000001 , vivo:Location ;
+        owl:equivalentClass  geo:geographical_region .
+
+geo:nameShortZH  rdfs:subPropertyOf  geo:nameShortZH , owl:topDataProperty .
+
+vivo:AcademicDegree  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  vivo:AcademicDegree .
+
+vcard:Other  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Other .
+
+bibo:PersonalCommunicationDocument
+        rdfs:subClassOf      obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:PersonalCommunicationDocument .
+
+vivo:Translation  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Translation .
+
+geo:validSince  rdfs:subPropertyOf  geo:validSince , owl:topDataProperty .
+
+vivo:researchAreaOf  rdfs:subPropertyOf
+                vivo:researchAreaOf , owl:topObjectProperty ;
+        owl:inverseOf       vivo:hasResearchArea .
+
+vivo:invited  a  owl:Thing .
+
+scires:Phase4ClinicalTrial
+        rdfs:subClassOf      ocrer:Interventional_study , owl:Thing ;
+        owl:equivalentClass  scires:Phase4ClinicalTrial .
+
+vivo:facilityFor  rdfs:subPropertyOf  vivo:facilityFor , owl:topObjectProperty .
+
+vivo:expirationDate  rdfs:subPropertyOf
+                vivo:expirationDate , owl:topObjectProperty .
+
+obo:BFO_0000034  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:BFO_0000034 .
+
+vivo:geographicFocusOf
+        rdfs:subPropertyOf  vivo:geographicFocusOf , owl:topObjectProperty .
+
+vivo:ConferenceSeries
+        rdfs:subClassOf      obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:ConferenceSeries .
+
+vcard:geo  rdfs:subPropertyOf  vcard:geo , owl:topDataProperty .
+
+bibo:interviewer  rdfs:subPropertyOf  bibo:interviewer , owl:topObjectProperty .
+
+bibo:AudioVisualDocument
+        rdfs:subClassOf      obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:AudioVisualDocument .
+
+vivo:UndergraduateStudent
+        rdfs:subClassOf      foaf:Agent , obo:BFO_0000001 , foaf:Person , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:UndergraduateStudent .
+
+obo:BFO_0000002  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  obo:BFO_0000002 .
+
+owl:topObjectProperty
+        a                   owl:SymmetricProperty , owl:ReflexiveProperty , owl:TransitiveProperty ;
+        rdfs:subPropertyOf  owl:topObjectProperty .
+
+bibo:Thesis  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Thesis .
+
+vivo:GraduateStudent  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , foaf:Person , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:GraduateStudent .
+
+vivo:Relationship  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Relationship .
+
+obo:ERO_0000390  rdfs:subPropertyOf  obo:ERO_0000390 , owl:topObjectProperty .
+
+geo:nameOfficialZH  rdfs:subPropertyOf  geo:nameOfficialZH , owl:topDataProperty .
+
+vivo:DateTimeInterval
+        rdfs:subClassOf      obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000008 ;
+        owl:equivalentClass  vivo:DateTimeInterval .
+
+obo:ERO_0000565  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0000565 .
+
+vitro-public:attribution
+        rdfs:subPropertyOf  vitro-public:attribution , owl:topDataProperty .
+
+obo:IAO_0000102  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:IAO_0000102 .
+
+bibo:Patent  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Patent .
+
+obo:ERO_0000786  rdfs:subClassOf  obo:BFO_0000017 , obo:BFO_0000020 , obo:BFO_0000023 , obo:BFO_0000002 , owl:Thing , obo:BFO_0000001 ;
+        owl:disjointWith     obo:BFO_0000019 , obo:ARG_2000022 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:ERO_0000786 .
+
+bibo:Article  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Article .
+
+vcard:honorificPrefix
+        rdfs:subPropertyOf  vcard:honorificPrefix , owl:topDataProperty .
+
+obo:ERO_0001263  rdfs:subClassOf  obo:ERO_0000005 , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0001263 .
+
+obo:OBI_0000272  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:OBI_0000272 .
+
+vivo:nihmsid  rdfs:subPropertyOf  vivo:identifier , vivo:nihmsid , owl:topDataProperty .
+
+vcard:note  rdfs:subPropertyOf  vcard:note , owl:topDataProperty .
+
+obo:ERO_0000224  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:ERO_0000224 .
+
+vivo:features  rdfs:subPropertyOf  owl:topObjectProperty , vivo:features ;
+        owl:inverseOf       vivo:featuredIn .
+
+geo:codeISO2  rdfs:subPropertyOf  geo:codeISO2 , owl:topDataProperty .
+
+vitro-public:mainImage
+        rdfs:subPropertyOf  vitro-public:mainImage , owl:topObjectProperty .
+
+vivo:eligibleFor  rdfs:subPropertyOf  vivo:eligibleFor , owl:topObjectProperty .
+
+vcard:Date  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Date .
+
+vivo:ResearcherRole  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  vivo:ResearcherRole .
+
+vcard:Friend  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Friend .
+
+vivo:termType  rdfs:subPropertyOf  vivo:termType , owl:topDataProperty .
+
+vivo:degreeCandidacy  rdfs:subPropertyOf
+                owl:topObjectProperty , vivo:degreeCandidacy .
+
+vivo:supportedBy  rdfs:subPropertyOf  vivo:supportedBy , owl:topObjectProperty .
+
+vcard:hasTimeZone  rdfs:subPropertyOf  vcard:hasTimeZone , owl:topObjectProperty .
+
+geo:self_governing  rdfs:subClassOf  obo:BFO_0000002 , owl:Thing , vivo:GeographicLocation , vivo:GeographicRegion , obo:BFO_0000001 , obo:BFO_0000004 , obo:BFO_0000141 , vivo:Location , obo:BFO_0000006 , geo:area ;
+        owl:equivalentClass  geo:self_governing .
+
+bibo:rejected  a  owl:Thing .
+
+vivo:dateTimeValue  rdfs:subPropertyOf  owl:topObjectProperty , vivo:dateTimeValue .
+
+bibo:Proceedings  rdfs:subClassOf  bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Proceedings .
+
+vivo:NonFacultyAcademic
+        rdfs:subClassOf      foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:NonFacultyAcademic .
+
+obo:BFO_0000015  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  obo:BFO_0000015 .
+
+vivo:FacultyMember  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:FacultyMember .
+
+bibo:Journal  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , bibo:Collection , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Journal .
+
+vcard:Female  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Female .
+
+vcard:country  rdfs:subPropertyOf  vcard:country , owl:topDataProperty .
+
+ocresd:OCRE100038  rdfs:subClassOf  obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  ocresd:OCRE100038 .
+
+vivo:assigns  rdfs:subPropertyOf  vivo:assigns , owl:topObjectProperty .
+
+obo:ERO_0001521  rdfs:subPropertyOf  obo:ERO_0001521 , owl:topObjectProperty ;
+        owl:inverseOf       obo:ERO_0001520 .
+
+vivo:Authorship  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Authorship .
+
+vcard:Gender  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  vcard:Gender .
+
+vcard:hasRelated  rdfs:subPropertyOf  vcard:hasRelated , owl:topObjectProperty .
+
+vcard:streetAddress  rdfs:subPropertyOf
+                vcard:streetAddress , owl:topDataProperty .
+
+vivo:Presentation  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:Presentation .
+
+vivo:TeacherRole  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  vivo:TeacherRole .
+
+vitro:rootBreadCrumbURL
+        rdfs:subPropertyOf  vitro:rootBreadCrumbURL , owl:topDataProperty .
+
+vivo:OutreachProviderRole
+        rdfs:subClassOf      obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  vivo:OutreachProviderRole .
+
+obo:ERO_0000016  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  obo:ERO_0000016 .
+
+vivo:Association  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Association .
+
+geo:hasMember  rdfs:subPropertyOf  geo:hasMember , owl:topObjectProperty .
+
+obo:BFO_0000148  rdfs:subClassOf  obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  obo:BFO_0000148 .
+
+vitro:logotypeHeight  rdfs:subPropertyOf
+                vitro:logotypeHeight , owl:topDataProperty .
+
+bibo:Image  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Image .
+
+bibo:isbn10  rdfs:subPropertyOf  bibo:isbn10 , vivo:identifier , owl:topDataProperty .
+
+obo:IAO_0000027  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:IAO_0000027 .
+
+bibo:LegalCaseDocument
+        rdfs:subClassOf      bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:LegalCaseDocument .
+
+vcard:calendarBusy  rdfs:subPropertyOf  vcard:calendarBusy , owl:topDataProperty .
+
+vivo:County  rdfs:subClassOf  vivo:GeographicLocation , obo:BFO_0000004 , owl:Thing , obo:BFO_0000006 , vivo:Location , obo:BFO_0000141 , obo:BFO_0000001 , obo:BFO_0000002 , vivo:GeographicRegion ;
+        owl:equivalentClass  vivo:County .
+
+obo:RO_0002351  rdfs:subPropertyOf  obo:RO_0002351 , owl:topObjectProperty ;
+        owl:inverseOf       obo:RO_0002350 .
+
+obo:OBI_0500000  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:IAO_0000033 , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:OBI_0500000 .
+
+bibo:Slideshow  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Slideshow .
+
+vitro:urlPrefix  rdfs:subPropertyOf  vitro:urlPrefix , owl:topDataProperty .
+
+bibo:Website  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Website .
+
+vcard:Geo  rdfs:subClassOf   owl:Thing ;
+        owl:equivalentClass  vcard:Geo .
+
+owl:bottomObjectProperty
+        a                   owl:SymmetricProperty , owl:InverseFunctionalProperty , owl:FunctionalProperty , owl:AsymmetricProperty , owl:TransitiveProperty , owl:IrreflexiveProperty , owl:ObjectProperty ;
+        rdfs:subPropertyOf  owl:sameAs , <http://purl.org/dc/terms/contributor> , obo:RO_0003000 , obo:RO_0002353 , vcard:hasFormattedName , obo:OBI_0000304 , bibo:court , obo:IAO_0000417 , vcard:hasMember , owl:topObjectProperty , vitro-public:image , vivo:fundingVehicleFor , vivo:relatedBy , vivo:dateTimeInterval , vivo:hasPublicationVenue , vivo:offeredBy , vivo:end , bibo:presentedAt , <http://www.obofoundry.org/ro/ro.owl#has_agent> , c4o:hasGlobalCountSource , obo:ERO_0000918 , vitro:rootTab , obo:ERO_0000543 , vcard:hasKey , obo:ARG_2000029 , obo:ERO_0000482 , vivo:hasSubjectArea , vivo:supports , obo:RO_0002351 , obo:ERO_0000070 , vivo:reviewedIn , obo:ERO_0000033 , geo:isAdministeredBy , bibo:performer , c4o:hasGlobalCitationFrequency , vivo:dateFiled , skos:broader , obo:OBI_0000833 , obo:OBI_0000417 , geo:isPredecessorOf , obo:OBI_0000299 , vivo:governingAuthorityFor , obo:ERO_0000037 , obo:RO_0001015 , bibo:distributor , obo:ERO_0000572 , geo:isInGroup , bibo:reversedBy , scires:documentationFor , obo:RO_0001019 , vcard:hasOrganizationalUnitName , cito:isCitedAsDataSourceBy , obo:OBI_0000293 , obo:ERO_0001521 , bibo:interviewer , vivo:sponsors , obo:ERO_0000029 , vcard:hasOrganizationName , vcard:hasLogo , vivo:publicationVenueFor , <http://www.ebi.ac.uk/efo/swo/SWO_0000740> , obo:BFO_0000051 , vcard:hasLanguage , vivo:subcontractsGrant , vcard:hasTelephone , obo:RO_0002234 , vivo:hasCollaborator , obo:BFO_0000055 , vcard:hasGeo , geo:isSuccessorOf , vivo:facilityFor , vivo:supportedInformationResource , vcard:hasCategory , vivo:hasResearchArea , vivo:expirationDate , vivo:affiliatedOrganization , vivo:publisherOf , bibo:reviewOf , obo:IAO_0000039 , vivo:hasPrerequisite , obo:RO_0000053 , bibo:status , vivo:conceptAssociatedWith , vivo:relates , vitro-public:mainImage , vivo:sponsoredBy , obo:RO_0000057 , vivo:assigneeFor , vitro-public:thumbnailImage , vivo:hasFacility , bibo:issuer , obo:ERO_0000397 , obo:RO_0002220 , vivo:hasEquipment , obo:RO_0001025 , bibo:presents , vivo:supportedBy , obo:ARG_2000391 , owl:DeprecatedProperty , bibo:degree , vivo:eligibleFor , vivo:validIn , scires:accessProvidedBy , vivo:featuredIn , vivo:start , vcard:hasInstantMessage , obo:OBI_0000643 , vivo:geographicFocusOf , vivo:assignee , vivo:features , obo:ARG_2000028 , vcard:hasCalendarLink , vivo:offers , vivo:dateTimeValue , bibo:interviewee , bibo:subsequentLegalDecision , scires:protocolRealizedBy , obo:RO_0002350 , vivo:grantSubcontractedThrough , vivo:assigns , geo:hasBorderWith , vivo:subjectAreaOf , <http://isf/deprecated_op> , bibo:cites , vivo:contributingRole , obo:ERO_0000460 , vivo:translatorOf , vivo:hasSuccessorOrganization , obo:ARG_2000399 , vivo:distributes , vivo:distributesFundingFrom , obo:ERO_0000775 , obo:RO_0003001 , vcard:hasRelated , skos:related , vivo:roleContributesTo , vitro-public:downloadLocation , vcard:hasPhoto , bibo:citedBy , vivo:proceedingsOf , obo:ERO_0001520 , vivo:prerequisiteFor , obo:ERO_0000919 , bibo:director , vcard:hasTitle , vivo:hasAssociatedConcept , obo:BFO_0000050 , skos:narrower , vivo:geographicFocus , obo:RO_0002233 , obo:ERO_0000034 , vivo:hasPredecessorOrganization , obo:BFO_0000054 , obo:ERO_0000398 , obo:RO_0001000 , obo:ERO_0000038 , vivo:hasGoverningAuthority , vivo:confirmedOrcidId , obo:RO_0000052 , vivo:degreeCandidacy , vivo:hasProceedings , vivo:researchAreaOf , obo:ERO_0000481 , bibo:annotates , obo:RO_0000056 , geo:hasMember , vivo:publisher , bibo:affirmedBy , obo:ERO_0000390 , <http://www.ebi.ac.uk/efo/swo/SWO_0000741> , vivo:dateTimePrecision , bibo:recipient , owl:bottomObjectProperty , obo:IAO_0000142 , cito:citesAsDataSource , vivo:orcidId , obo:ARG_2000390 , vcard:hasSound , vivo:assignedBy , vcard:hasCalendarRequest , vcard:hasCalenderBusy , vcard:hasNickname , vivo:hasTranslation , bibo:transcriptOf , vivo:informationResourceSupportedBy , obo:IAO_0000221 , vcard:hasNote , obo:OBI_0000312 , bibo:translator , vivo:hasFundingVehicle , obo:IAO_0000136 , obo:RO_0001018 , vcard:hasAddress , vivo:dateIssued , vcard:hasTimeZone , vcard:hasURL , vivo:reproduces , vcard:hasName , vcard:hasEmail , obo:ERO_0000031 , bibo:reproducedIn , obo:ERO_0001518 , bibo:translationOf , vivo:equipmentFor , vivo:providesFundingThrough .
+
+skos:Concept  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  skos:Concept .
+
+bibo:DocumentPart  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:DocumentPart .
+
+vcard:CalendarBusy  rdfs:subClassOf  vcard:Security , vcard:TimeZone , owl:Thing , vcard:Geographical , vcard:Geo ;
+        owl:equivalentClass  vcard:CalendarBusy .
+
+bibo:Issue  rdfs:subClassOf  bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Issue .
+
+vivo:Licensure  rdfs:subClassOf  vivo:Relationship , obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Licensure .
+
+geo:GDPTotalInCurrentPrices
+        rdfs:subPropertyOf  geo:GDPTotalInCurrentPrices , owl:topDataProperty .
+
+geo:nameShortAR  rdfs:subPropertyOf  geo:nameShortAR , owl:topDataProperty .
+
+vivo:assigneeFor  rdfs:subPropertyOf  vivo:assigneeFor , owl:topObjectProperty .
+
+vivo:submitted  a  owl:Thing .
+
+vivo:reproduces  rdfs:subPropertyOf  vivo:reproduces , owl:topObjectProperty .
+
+vivo:supports  rdfs:subPropertyOf  vivo:supports , owl:topObjectProperty ;
+        owl:inverseOf       vivo:supportedBy .
+
+vcard:hasNote  rdfs:subPropertyOf  vcard:hasNote , owl:topObjectProperty .
+
+vcard:hasGeo  rdfs:subPropertyOf  vcard:hasGeo , owl:topObjectProperty .
+
+vivo:Screenplay  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Screenplay .
+
+vcard:hasName  rdfs:subPropertyOf  vcard:hasName , owl:topObjectProperty .
+
+vivo:ClinicalRole  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  vivo:ClinicalRole .
+
+bibo:issn  rdfs:subPropertyOf  vivo:identifier , bibo:issn , owl:topDataProperty .
+
+geo:countryAreaTotal  rdfs:subPropertyOf
+                geo:countryAreaTotal , owl:topDataProperty .
+
+vivo:Grant  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Grant .
+
+geo:nameOfficialAR  rdfs:subPropertyOf  geo:nameOfficialAR , owl:topDataProperty .
+
+vivo:MemberRole  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  vivo:MemberRole .
+
+obo:IAO_0000142  rdfs:subPropertyOf  obo:IAO_0000142 , owl:topObjectProperty .
+
+geo:non_self_governing
+        rdfs:subClassOf      vivo:Location , obo:BFO_0000004 , obo:BFO_0000001 , geo:area , obo:BFO_0000141 , owl:Thing , obo:BFO_0000002 , vivo:GeographicLocation , vivo:GeographicRegion , vivo:GeopoliticalEntity , obo:BFO_0000006 ;
+        owl:equivalentClass  geo:non_self_governing .
+
+bibo:court  rdfs:subPropertyOf  bibo:court , owl:topObjectProperty .
+
+obo:ERO_0001257  rdfs:subClassOf  obo:ERO_0000005 , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0001257 .
+
+obo:ERO_0000029  rdfs:subPropertyOf  obo:ERO_0000029 , owl:topObjectProperty ;
+        owl:inverseOf       scires:accessProvidedBy .
+
+owl:DeprecatedProperty
+        a                   owl:ObjectProperty ;
+        rdfs:subPropertyOf  owl:DeprecatedProperty , owl:topObjectProperty .
+
+vivo:outreachOverview
+        rdfs:subPropertyOf  vivo:outreachOverview , owl:topDataProperty .
+
+vivo:publisher  rdfs:subPropertyOf  vivo:publisher , owl:topObjectProperty .
+
+bibo:volume  rdfs:subPropertyOf  bibo:volume , owl:topDataProperty .
+
+scires:studyPopulationCount
+        rdfs:subPropertyOf  scires:studyPopulationCount , owl:topDataProperty .
+
+vivo:CaseStudy  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:CaseStudy .
+
+geo:nameCurrencyZH  rdfs:subPropertyOf  geo:nameCurrencyZH , owl:topDataProperty .
+
+vivo:Building  rdfs:subClassOf  obo:BFO_0000141 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000029 , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Building .
+
+vcard:Photo  rdfs:subClassOf  vcard:TimeZone , vcard:Communication , vcard:Geo , vcard:Addressing , owl:Thing , vcard:Geographical , vcard:Organizational , vcard:Calendar , vcard:Security , vcard:Explanatory ;
+        owl:equivalentClass  vcard:Photo .
+
+vivo:Program  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Program .
+
+bibo:CourtReporter  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , bibo:Collection , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:CourtReporter .
+
+vivo:Review  rdfs:subClassOf  bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Review .
+
+vivo:SeminarSeries  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:SeminarSeries .
+
+vivo:Team  rdfs:subClassOf   foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Team .
+
+geo:GDPUnit  rdfs:subPropertyOf  geo:GDPUnit , owl:topDataProperty .
+
+vivo:sponsorAwardId  rdfs:subPropertyOf
+                vivo:sponsorAwardId , owl:topDataProperty .
+
+bibo:Series  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Series .
+
+vitro-public:FileByteStream
+        rdfs:subClassOf      owl:Thing ;
+        owl:equivalentClass  vitro-public:FileByteStream .
+
+c4o:GlobalCitationCount
+        rdfs:subClassOf      obo:IAO_0000030 , obo:BFO_0000001 , obo:IAO_0000109 , owl:Thing , obo:BFO_0000031 , obo:IAO_0000027 , obo:BFO_0000002 ;
+        owl:equivalentClass  c4o:GlobalCitationCount .
+
+vitro:acknowledgeText
+        rdfs:subPropertyOf  vitro:acknowledgeText , owl:topDataProperty .
+
+obo:OBI_0000833  rdfs:subPropertyOf  obo:OBI_0000833 , owl:topObjectProperty .
+
+vcard:Calendar  rdfs:subClassOf  vcard:TimeZone , owl:Thing , vcard:Geographical , vcard:Geo ;
+        owl:equivalentClass  vcard:Security , vcard:Calendar .
+
+vivo:hasResearchArea  rdfs:subPropertyOf
+                vivo:hasResearchArea , owl:topObjectProperty .
+
+geo:special_group  rdfs:subClassOf  geo:area , owl:Thing ;
+        owl:equivalentClass  geo:special_group .
+
+obo:BFO_0000055  rdfs:subPropertyOf  obo:BFO_0000055 , owl:topObjectProperty .
+
+obo:ERO_0000397  rdfs:subPropertyOf  obo:ERO_0000397 , owl:topObjectProperty ;
+        owl:inverseOf       obo:ERO_0000398 .
+
+vivo:providesFundingThrough
+        rdfs:subPropertyOf  vivo:providesFundingThrough , owl:topObjectProperty ;
+        owl:inverseOf       vivo:distributesFundingFrom .
+
+vcard:Emergency  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Emergency .
+
+obo:IAO_0000109  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:IAO_0000109 .
+
+obo:BFO_0000023  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:BFO_0000023 .
+
+geo:landAreaUnit  rdfs:subPropertyOf  geo:landAreaUnit , owl:topDataProperty .
+
+geo:agriculturalArea  rdfs:subPropertyOf
+                geo:agriculturalArea , owl:topDataProperty .
+
+bibo:oclcnum  rdfs:subPropertyOf  vivo:identifier , bibo:oclcnum , owl:topDataProperty .
+
+vivo:courseCredits  rdfs:subPropertyOf  vivo:courseCredits , owl:topDataProperty .
+
+vivo:termLabel  rdfs:subPropertyOf  vivo:termLabel , owl:topDataProperty .
+
+vcard:additionalName  rdfs:subPropertyOf
+                vcard:additionalName , owl:topDataProperty .
+
+vivo:yearMonthPrecision
+        a       skos:Concept , owl:Thing .
+
+vcard:hasNickname  rdfs:subPropertyOf  vcard:hasNickname , owl:topObjectProperty .
+
+vcard:hasKey  rdfs:subPropertyOf  vcard:hasKey , owl:topObjectProperty .
+
+obo:ARG_2000399  rdfs:subPropertyOf  obo:ARG_2000399 , owl:topObjectProperty .
+
+ocresd:Phase_3  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  ocresd:Phase_3 .
+
+vcard:Related  rdfs:subClassOf  vcard:TimeZone , owl:Thing , vcard:Geographical , vcard:Communication , vcard:Addressing , vcard:Calendar , vcard:Identification , vcard:Security , vcard:Geo , vcard:Explanatory ;
+        owl:equivalentClass  vcard:Related .
+
+fabio:Comment  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  fabio:Comment .
+
+obo:OBI_0000293  rdfs:subPropertyOf  owl:topObjectProperty , obo:RO_0000057 , obo:OBI_0000293 .
+
+geo:hasCurrency  rdfs:subPropertyOf  geo:hasCurrency , owl:topDataProperty .
+
+vcard:Kind  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vcard:Kind .
+
+obo:ERO_0000775  rdfs:subPropertyOf  obo:ERO_0000775 , owl:topObjectProperty .
+
+bibo:doi  rdfs:subPropertyOf  vivo:identifier , bibo:doi , owl:topDataProperty .
+
+vitro:logotypeImage  rdfs:subPropertyOf
+                vitro:logotypeImage , owl:topDataProperty .
+
+vcard:OrganizationUnitName
+        rdfs:subClassOf      vcard:Communication , vcard:Geographical , vcard:Organizational , vcard:Geo , vcard:TimeZone , owl:Thing , vcard:Explanatory , vcard:Security , vcard:Calendar , vcard:Addressing , vcard:Identification ;
+        owl:equivalentClass  vcard:OrganizationUnitName .
+
+bibo:locator  rdfs:subPropertyOf  bibo:locator , owl:topDataProperty .
+
+vcard:CalendarLink  rdfs:subClassOf  vcard:Security , vcard:TimeZone , owl:Thing , vcard:Geographical , vcard:Geo ;
+        owl:equivalentClass  vcard:CalendarLink .
+
+vivo:PresenterRole  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  vivo:PresenterRole .
+
+geo:nationalityES  rdfs:subPropertyOf  owl:topDataProperty , geo:nationalityES .
+
+vivo:Credential  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  vivo:Credential .
+
+obo:ERO_0000918  rdfs:subPropertyOf  obo:ERO_0000918 , owl:topObjectProperty .
+
+obo:ERO_0000070  rdfs:subPropertyOf  obo:ERO_0000070 , owl:topObjectProperty ;
+        owl:inverseOf       obo:ERO_0000031 .
+
+geo:nameListZH  rdfs:subPropertyOf  geo:nameListZH , owl:topDataProperty .
+
+vcard:formattedName  rdfs:subPropertyOf
+                vcard:formattedName , owl:topDataProperty .
+
+vitro:loginCount  rdfs:subPropertyOf  vitro:loginCount , owl:topDataProperty .
+
+vivo:Division  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Division .
+
+vivo:OrganizerRole  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  vivo:OrganizerRole .
+
+vivo:affiliatedOrganization
+        rdfs:subPropertyOf  owl:topObjectProperty , vivo:affiliatedOrganization .
+
+geo:landAreaNotes  rdfs:subPropertyOf  geo:landAreaNotes , owl:topDataProperty .
+
+vivo:ResearchOrganization
+        rdfs:subClassOf      foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:ResearchOrganization .
+
+geo:hasListName  rdfs:subPropertyOf  geo:hasListName , owl:topDataProperty .
+
+vivo:reportId  rdfs:subPropertyOf  vivo:identifier , vivo:reportId , owl:topDataProperty .
+
+obo:IAO_0000003  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:IAO_0000003 .
+
+geo:GDP  rdfs:subPropertyOf  geo:GDP , owl:topDataProperty .
+
+bibo:Collection  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Collection .
+
+<http://purl.org/vocab/vann/preferredNamespaceUri>
+        rdfs:subPropertyOf  <http://purl.org/vocab/vann/preferredNamespaceUri> , owl:topDataProperty .
+
+geo:codeGAUL  rdfs:subPropertyOf  geo:codeGAUL , owl:topDataProperty .
+
+vcard:productId  rdfs:subPropertyOf  vcard:productId , owl:topDataProperty .
+
+vivo:AcademicDepartment
+        rdfs:subClassOf      foaf:Agent , obo:BFO_0000001 , owl:Thing , foaf:Organization , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:AcademicDepartment .
+
+vivo:PostdoctoralTraining
+        rdfs:subClassOf      obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:PostdoctoralTraining .
+
+vivo:Blog  rdfs:subClassOf   obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , bibo:Collection , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Blog .
+
+vcard:Language  rdfs:subClassOf  vcard:Geo , owl:Thing , vcard:TimeZone , vcard:Geographical , vcard:Identification , vcard:Security , vcard:Organizational , vcard:Explanatory , vcard:Calendar , vcard:Addressing ;
+        owl:equivalentClass  vcard:Language .
+
+obo:OBI_0100026  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:OBI_0100026 .
+
+bibo:transcriptOf  rdfs:subPropertyOf  bibo:transcriptOf , owl:topObjectProperty .
+
+vivo:Library  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Library .
+
+vcard:Category  rdfs:subClassOf  vcard:Geo , owl:Thing , vcard:TimeZone , vcard:Organizational , vcard:Geographical , vcard:Communication , vcard:Addressing , vcard:Security , vcard:Identification , vcard:Calendar ;
+        owl:equivalentClass  vcard:Category .
+
+geo:GDPNotes  rdfs:subPropertyOf  geo:GDPNotes , owl:topDataProperty .
+
+vivo:cclCode  rdfs:subPropertyOf  vivo:cclCode , owl:topDataProperty .
+
+vivo:Department  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Department .
+
+obo:BFO_0000004  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  obo:BFO_0000004 .
+
+bibo:issue  rdfs:subPropertyOf  bibo:issue , owl:topDataProperty .
+
+vcard:Home  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Home .
+
+obo:IAO_0000136  rdfs:subPropertyOf  obo:IAO_0000136 , owl:topObjectProperty .
+
+obo:BFO_0000050  rdfs:subPropertyOf  obo:BFO_0000050 , owl:topObjectProperty ;
+        owl:inverseOf       obo:BFO_0000051 .
+
+obo:ERO_0000392  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0000392 .
+
+geo:other  rdfs:subClassOf   vivo:GeographicLocation , vivo:Location , obo:BFO_0000141 , obo:BFO_0000001 , obo:BFO_0000002 , vivo:GeographicRegion , vivo:GeopoliticalEntity , obo:BFO_0000006 , geo:area , obo:BFO_0000004 , owl:Thing ;
+        owl:equivalentClass  geo:other .
+
+bibo:Statute  rdfs:subClassOf  bibo:Document , obo:IAO_0000030 , bibo:LegalDocument , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Statute .
+
+vcard:hasPhoto  rdfs:subPropertyOf  vcard:hasPhoto , owl:topObjectProperty .
+
+bibo:section  rdfs:subPropertyOf  bibo:section , owl:topDataProperty .
+
+obo:IAO_0000104  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:IAO_0000104 .
+
+obo:ERO_0000788  rdfs:subClassOf  obo:BFO_0000001 , obo:BFO_0000023 , obo:BFO_0000002 , obo:BFO_0000020 , owl:Thing , obo:BFO_0000017 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:ARG_2000021 , obo:BFO_0000019 ;
+        owl:equivalentClass  obo:ERO_0000788 .
+
+vivo:hasValue  rdfs:subPropertyOf  vivo:hasValue , owl:topDataProperty .
+
+vivo:PopulatedPlace  rdfs:subClassOf  vivo:Location , owl:Thing , obo:BFO_0000006 , obo:BFO_0000001 , vivo:GeographicRegion , obo:BFO_0000002 , vivo:GeographicLocation , obo:BFO_0000004 , obo:BFO_0000141 ;
+        owl:equivalentClass  vivo:PopulatedPlace .
+
+obo:ERO_0000037  rdfs:subPropertyOf  owl:topObjectProperty , obo:ERO_0000037 ;
+        owl:inverseOf       obo:ERO_0000390 .
+
+vivo:offers  rdfs:subPropertyOf  vivo:offers , owl:topObjectProperty .
+
+vivo:Speech  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Speech .
+
+vivo:University  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:University .
+
+geo:nameCurrencyAR  rdfs:subPropertyOf  geo:nameCurrencyAR , owl:topDataProperty .
+
+vivo:scopusId  rdfs:subPropertyOf  vivo:scopusId , owl:topDataProperty .
+
+vivo:licenseNumber  rdfs:subPropertyOf  vivo:licenseNumber , owl:topDataProperty .
+
+obo:ERO_0000005  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0000005 .
+
+foaf:Person  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  foaf:Person .
+
+obo:OBI_0000417  rdfs:subPropertyOf  obo:OBI_0000417 , owl:topObjectProperty ;
+        owl:inverseOf       obo:OBI_0000833 .
+
+vivo:Newsletter  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , bibo:Collection , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Newsletter .
+
+vivo:hasGoverningAuthority
+        a                   owl:ObjectProperty ;
+        rdfs:subPropertyOf  vivo:hasGoverningAuthority , owl:topObjectProperty ;
+        owl:inverseOf       vivo:governingAuthorityFor .
+
+geo:nationalityEN  rdfs:subPropertyOf  geo:nationalityEN , owl:topDataProperty .
+
+bibo:Film  rdfs:subClassOf   bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Film .
+
+vivo:pmcid  rdfs:subPropertyOf  vivo:pmcid , vivo:identifier , owl:topDataProperty .
+
+vivo:EducationalProcess
+        rdfs:subClassOf      obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:EducationalProcess .
+
+obo:IAO_0000030  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:IAO_0000030 .
+
+vcard:Acquaintance  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Acquaintance .
+
+vitro-public:File  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  vitro-public:File .
+
+vitro:displayLimit  rdfs:subPropertyOf  vitro:displayLimit , owl:topDataProperty .
+
+obo:ARG_2000021  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000002 , owl:Thing , obo:BFO_0000001 ;
+        owl:disjointWith     vivo:EditorRole , obo:ERO_0000224 , obo:BFO_0000034 , vivo:AttendeeRole , vivo:OutreachProviderRole , obo:ERO_0000914 , obo:ERO_0000790 , vivo:OrganizerRole , obo:OBI_0000017 , vivo:InvestigatorRole , obo:ERO_0000012 , vivo:ResearcherRole , vivo:AdvisorRole , obo:ERO_0000788 , obo:ERO_0000783 , vivo:TeacherRole , obo:ERO_0000786 , obo:ERO_0000778 , vivo:PrincipalInvestigatorRole , obo:ERO_0000225 , vivo:MemberRole , obo:ERO_0000779 , vivo:AdviseeRole , vivo:CoPrincipalInvestigatorRole , obo:ERO_0000789 , vivo:LeaderRole , obo:ERO_0000784 , obo:ERO_0000776 , vivo:ClinicalRole , vivo:AdministratorRole , vivo:ReviewerRole , vivo:PresenterRole , obo:ERO_0000595 , obo:BFO_0000023 , obo:BFO_0000017 , obo:ERO_0000787 , obo:BFO_0000016 , obo:ERO_0000785 , obo:ERO_0000777 , vivo:PeerReviewerRole , obo:ERO_0000780 ;
+        owl:equivalentClass  obo:ARG_2000021 .
+
+obo:BFO_0000017  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:BFO_0000017 .
+
+geo:HDIUnit  rdfs:subPropertyOf  geo:HDIUnit , owl:topDataProperty .
+
+vivo:yearPrecision  a  skos:Concept , owl:Thing .
+
+obo:RO_0002220  rdfs:subPropertyOf  owl:topObjectProperty , obo:RO_0002220 .
+
+vivo:entryTerm  rdfs:subPropertyOf  vivo:entryTerm , owl:topDataProperty .
+
+vcard:Cell  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Cell .
+
+geo:hasMinLatitude  rdfs:subPropertyOf  geo:hasMinLatitude , owl:topDataProperty .
+
+vcard:Explanatory  rdfs:subClassOf  vcard:Geo , vcard:Security , vcard:Calendar , vcard:TimeZone , owl:Thing , vcard:Geographical ;
+        owl:equivalentClass  vcard:Addressing , vcard:Identification , vcard:Organizational , vcard:Communication , vcard:Explanatory .
+
+vivo:PrincipalInvestigatorRole
+        rdfs:subClassOf      obo:BFO_0000002 , obo:BFO_0000023 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000020 , obo:BFO_0000017 , vivo:ResearcherRole ;
+        owl:disjointWith     obo:BFO_0000019 , obo:ARG_2000022 , obo:ARG_2000021 ;
+        owl:equivalentClass  vivo:PrincipalInvestigatorRole .
+
+obo:BFO_0000031  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  obo:BFO_0000031 .
+
+vivo:DateTimeValue  rdfs:subClassOf  obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000008 ;
+        owl:equivalentClass  vivo:DateTimeValue .
+
+scires:accessProvidedBy
+        rdfs:subPropertyOf  scires:accessProvidedBy , owl:topObjectProperty .
+
+vivo:hasTranslation  rdfs:subPropertyOf
+                vivo:hasTranslation , owl:topObjectProperty .
+
+geo:GDPYear  rdfs:subPropertyOf  geo:GDPYear , owl:topDataProperty .
+
+geo:hasStatistics  rdfs:subPropertyOf  geo:hasStatistics , owl:topDataProperty .
+
+vivo:NonAcademicPosition
+        rdfs:subClassOf      vivo:Relationship , obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:NonAcademicPosition .
+
+vivo:subcontractsGrant
+        rdfs:subPropertyOf  vivo:subcontractsGrant , owl:topObjectProperty .
+
+bibo:Excerpt  rdfs:subClassOf  bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Excerpt .
+
+vivo:GovernmentAgency
+        rdfs:subClassOf      foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:GovernmentAgency .
+
+vivo:Facility  rdfs:subClassOf  obo:BFO_0000141 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Facility .
+
+vitro-public:downloadLocation
+        rdfs:subPropertyOf  vitro-public:downloadLocation , owl:topObjectProperty .
+
+obo:ERO_0000783  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:ERO_0000783 .
+
+vivo:EmeritusLibrarian
+        rdfs:subClassOf      foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:EmeritusLibrarian .
+
+obo:ERO_0001260  rdfs:subClassOf  obo:ERO_0000005 , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0001260 .
+
+obo:RO_0002353  rdfs:subPropertyOf  obo:RO_0002353 , owl:topObjectProperty ;
+        owl:inverseOf       obo:RO_0002234 .
+
+vivo:Score  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Score .
+
+bibo:lccn  rdfs:subPropertyOf  bibo:lccn , vivo:identifier , owl:topDataProperty .
+
+geo:nameListAR  rdfs:subPropertyOf  geo:nameListAR , owl:topDataProperty .
+
+vcard:Sound  rdfs:subClassOf  vcard:Identification , vcard:Organizational , vcard:TimeZone , vcard:Calendar , owl:Thing , vcard:Communication , vcard:Security , vcard:Geographical , vcard:Addressing , vcard:Geo ;
+        owl:equivalentClass  vcard:Sound .
+
+vcard:hasEmail  rdfs:subPropertyOf  vcard:hasEmail , owl:topObjectProperty .
+
+c4o:hasGlobalCitationFrequency
+        rdfs:subPropertyOf  c4o:hasGlobalCitationFrequency , owl:topObjectProperty .
+
+vcard:postalCode  rdfs:subPropertyOf  vcard:postalCode , owl:topDataProperty .
+
+vcard:telephone  rdfs:subPropertyOf  vcard:telephone , owl:topDataProperty .
+
+vcard:CalendarRequest
+        rdfs:subClassOf      vcard:Security , vcard:TimeZone , owl:Thing , vcard:Geographical , vcard:Geo ;
+        owl:equivalentClass  vcard:CalendarRequest .
+
+vcard:Sibling  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Sibling .
+
+obo:RO_0002233  rdfs:subPropertyOf  obo:RO_0002233 , owl:topObjectProperty .
+
+bibo:status  rdfs:subPropertyOf  bibo:status , owl:topObjectProperty .
+
+cito:citesAsDataSource
+        rdfs:subPropertyOf  owl:topObjectProperty , cito:citesAsDataSource ;
+        owl:inverseOf       cito:isCitedAsDataSourceBy .
+
+geo:codeFAOSTAT  rdfs:subPropertyOf  geo:codeFAOSTAT , owl:topDataProperty .
+
+geo:populationUnit  rdfs:subPropertyOf  geo:populationUnit , owl:topDataProperty .
+
+vcard:Code  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  vcard:Code .
+
+obo:IAO_0000144  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:IAO_0000144 .
+
+obo:ERO_0001259  rdfs:subClassOf  obo:ERO_0000005 , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0001259 .
+
+scires:documentationFor
+        rdfs:subPropertyOf  scires:documentationFor , owl:topObjectProperty .
+
+vivo:PostdocPosition  rdfs:subClassOf  vivo:Relationship , obo:BFO_0000020 , obo:BFO_0000001 , vivo:Position , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:PostdocPosition .
+
+vivo:sponsors  rdfs:subPropertyOf  vivo:sponsors , owl:topObjectProperty .
+
+obo:ERO_0000543  rdfs:subPropertyOf  obo:ERO_0000543 , owl:topObjectProperty .
+
+geo:hasMaxLongitude  rdfs:subPropertyOf
+                geo:hasMaxLongitude , owl:topDataProperty .
+
+<http://purl.org/dc/terms/contributor>
+        a                   owl:ObjectProperty ;
+        rdfs:subPropertyOf  <http://purl.org/dc/terms/contributor> , owl:topObjectProperty .
+
+vivo:BlogPosting  rdfs:subClassOf  bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:BlogPosting .
+
+bibo:upc  rdfs:subPropertyOf  vivo:identifier , bibo:upc , owl:topDataProperty .
+
+bibo:AcademicArticle  rdfs:subClassOf  bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:AcademicArticle .
+
+obo:ERO_0000045  rdfs:subPropertyOf  obo:ERO_0000045 , owl:topDataProperty .
+
+vivo:roleContributesTo
+        rdfs:subPropertyOf  vivo:roleContributesTo , owl:topObjectProperty .
+
+vitro-public:filename
+        rdfs:subPropertyOf  vitro-public:filename , owl:topDataProperty .
+
+vivo:Equipment  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Equipment .
+
+vcard:Sweetheart  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Sweetheart .
+
+vivo:Room  rdfs:subClassOf   obo:BFO_0000141 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000029 , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Room .
+
+vcard:Muse  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Muse .
+
+vivo:publicationVenueFor
+        rdfs:subPropertyOf  vivo:publicationVenueFor , owl:topObjectProperty ;
+        owl:inverseOf       vivo:hasPublicationVenue .
+
+obo:RO_0003000  rdfs:subPropertyOf  obo:RO_0003000 , owl:topObjectProperty ;
+        owl:inverseOf       obo:RO_0003001 .
+
+obo:OBI_0000835  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:OBI_0000835 .
+
+bibo:Standard  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Standard .
+
+bibo:prefixName  rdfs:subPropertyOf  bibo:prefixName , owl:topDataProperty .
+
+vivo:confirmedOrcidId
+        rdfs:subPropertyOf  vivo:confirmedOrcidId , owl:topObjectProperty .
+
+obo:RO_0001018  rdfs:subPropertyOf  obo:RO_0001018 , owl:topObjectProperty .
+
+vivo:hasProceedings  rdfs:subPropertyOf
+                vivo:hasProceedings , owl:topObjectProperty ;
+        owl:inverseOf       vivo:proceedingsOf .
+
+<http://www.geneontology.org/formats/oboInOwl#DbXref>
+        rdfs:subClassOf      obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:IAO_0000027 , obo:BFO_0000002 ;
+        owl:equivalentClass  <http://www.geneontology.org/formats/oboInOwl#DbXref> .
+
+vcard:Kin  rdfs:subClassOf   vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Kin .
+
+bibo:reviewOf  rdfs:subPropertyOf  bibo:reviewOf , owl:topObjectProperty .
+
+bibo:eanucc13  rdfs:subPropertyOf  vivo:identifier , bibo:eanucc13 , owl:topDataProperty .
+
+bibo:degree  rdfs:subPropertyOf  owl:topObjectProperty , bibo:degree .
+
+bibo:Newspaper  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , bibo:Collection , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Newspaper .
+
+obo:RO_0000057  rdfs:subPropertyOf  owl:topObjectProperty , obo:RO_0000057 .
+
+vivo:hideFromDisplay  rdfs:subPropertyOf
+                vivo:hideFromDisplay , owl:topDataProperty .
+
+vivo:NonAcademic  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:NonAcademic .
+
+vivo:Continent  rdfs:subClassOf  obo:BFO_0000141 , vivo:Location , obo:BFO_0000001 , owl:Thing , obo:BFO_0000006 , vivo:GeographicLocation , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Continent .
+
+bibo:ThesisDegree  rdfs:subClassOf  skos:Concept , owl:Thing ;
+        owl:equivalentClass  bibo:ThesisDegree .
+
+obo:RO_0001000  rdfs:subPropertyOf  obo:RO_0001000 , owl:topObjectProperty .
+
+c4o:hasGlobalCountSource
+        rdfs:subPropertyOf  c4o:hasGlobalCountSource , owl:topObjectProperty .
+
+vivo:yearMonthDayTimePrecision
+        a       skos:Concept , owl:Thing .
+
+obo:ERO_0000777  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , obo:BFO_0000023 , obo:BFO_0000002 , obo:BFO_0000017 , owl:Thing ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:ERO_0000777 .
+
+bibo:Magazine  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , bibo:Collection , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Magazine .
+
+obo:ERO_0001254  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0001254 .
+
+vivo:majorField  rdfs:subPropertyOf  vivo:majorField , owl:topDataProperty .
+
+obo:ERO_0000072  rdfs:subPropertyOf  obo:ERO_0000072 , owl:topDataProperty .
+
+vcard:Neighbor  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Neighbor .
+
+bibo:interviewee  rdfs:subPropertyOf  bibo:interviewee , owl:topObjectProperty .
+
+vcard:Geographical  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  vcard:Geographical .
+
+bibo:identifier  rdfs:subPropertyOf  bibo:identifier , owl:topDataProperty .
+
+vcard:anniversary  rdfs:subPropertyOf  vcard:anniversary , owl:topDataProperty .
+
+vivo:hasAssociatedConcept
+        rdfs:subPropertyOf  vivo:hasAssociatedConcept , owl:topObjectProperty .
+
+vcard:Security  rdfs:subClassOf  vcard:TimeZone , owl:Thing , vcard:Geographical , vcard:Geo ;
+        owl:equivalentClass  vcard:Security , vcard:Calendar .
+
+geo:organization  rdfs:subClassOf  geo:area , owl:Thing ;
+        owl:equivalentClass  geo:organization .
+
+obo:IAO_0000005  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:IAO_0000005 .
+
+obo:ARG_2000028  rdfs:subPropertyOf  obo:ARG_2000028 , owl:topObjectProperty ;
+        owl:inverseOf       obo:ARG_2000029 .
+
+vivo:distributes  rdfs:subPropertyOf  vivo:distributes , owl:topObjectProperty .
+
+obo:ERO_0000482  rdfs:subPropertyOf  owl:topObjectProperty , obo:ERO_0000482 .
+
+vcard:Coresident  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Coresident .
+
+vcard:familyName  rdfs:subPropertyOf  vcard:familyName , owl:topDataProperty .
+
+vcard:hasCalenderBusy
+        rdfs:subPropertyOf  vcard:hasCalenderBusy , owl:topObjectProperty .
+
+vivo:description  rdfs:subPropertyOf  vivo:description , owl:topDataProperty .
+
+<http://www.geneontology.org/formats/oboInOwl#Definition>
+        rdfs:subClassOf      obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:IAO_0000027 , obo:BFO_0000002 ;
+        owl:equivalentClass  <http://www.geneontology.org/formats/oboInOwl#Definition> .
+
+vivo:ConferencePaper  rdfs:subClassOf  bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:ConferencePaper .
+
+owl:incompatibleWith  a  owl:AnnotationProperty .
+
+obo:BFO_0000038  rdfs:subClassOf  obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  obo:BFO_0000038 .
+
+owl:versionInfo  a  owl:AnnotationProperty .
+
+obo:ARG_2000010  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  obo:ARG_2000010 .
+
+bibo:peerReviewed  a  owl:Thing .
+
+obo:BFO_0000006  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:BFO_0000006 .
+
+vivo:yearMonthDayPrecision
+        a       skos:Concept , owl:Thing .
+
+vcard:sound  rdfs:subPropertyOf  vcard:sound , owl:topDataProperty .
+
+skos:narrower  rdfs:subPropertyOf  skos:narrower , owl:topObjectProperty ;
+        owl:inverseOf       skos:broader .
+
+bibo:Quote  rdfs:subClassOf  bibo:DocumentPart , bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Quote .
+
+bibo:CollectedDocument
+        rdfs:subClassOf      obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:CollectedDocument .
+
+ocresd:Single_group_study
+        rdfs:subClassOf      owl:Thing ;
+        owl:equivalentClass  ocresd:Single_group_study .
+
+obo:ERO_0000394  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0000394 .
+
+vitro:Application  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  vitro:Application .
+
+vcard:organizationalUnitName
+        rdfs:subPropertyOf  vcard:organizationalUnitName , owl:topDataProperty .
+
+bibo:uri  rdfs:subPropertyOf  vivo:identifier , bibo:uri , owl:topDataProperty .
+
+vcard:URL  rdfs:subClassOf   vcard:Addressing , vcard:Geo , owl:Thing , vcard:Geographical , vcard:Identification , vcard:Calendar , vcard:Organizational , vcard:TimeZone , vcard:Communication , vcard:Security ;
+        owl:equivalentClass  vcard:URL .
+
+bibo:LegalDocument  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:LegalDocument .
+
+obo:BFO_0000020  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  obo:BFO_0000020 .
+
+obo:RO_0000052  rdfs:subPropertyOf  obo:RO_0000052 , owl:topObjectProperty .
+
+vivo:Foundation  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Foundation .
+
+vivo:StateOrProvince  rdfs:subClassOf  vivo:GeographicRegion , obo:BFO_0000006 , obo:BFO_0000141 , obo:BFO_0000002 , owl:Thing , obo:BFO_0000001 , vivo:Location , vivo:GeographicLocation , obo:BFO_0000004 ;
+        owl:equivalentClass  vivo:StateOrProvince .
+
+c4o:hasGlobalCountValue
+        rdfs:subPropertyOf  c4o:hasGlobalCountValue , owl:topDataProperty .
+
+vivo:FacultyPosition  rdfs:subClassOf  vivo:Relationship , obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:FacultyPosition .
+
+vivo:WorkingPaper  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:WorkingPaper .
+
+vivo:supportedInformationResource
+        rdfs:subPropertyOf  vivo:supportedInformationResource , owl:topObjectProperty .
+
+vcard:language  rdfs:subPropertyOf  vcard:language , owl:topDataProperty .
+
+obo:ERO_0000007  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  obo:ERO_0000007 .
+
+ocresd:Phase_0  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  ocresd:Phase_0 .
+
+vivo:hasSubjectArea  rdfs:subPropertyOf
+                vivo:hasSubjectArea , owl:topObjectProperty .
+
+vivo:eRACommonsId  rdfs:subPropertyOf  vivo:eRACommonsId , owl:topDataProperty .
+
+vcard:category  rdfs:subPropertyOf  vcard:category , owl:topDataProperty .
+
+geo:nationalityZH  rdfs:subPropertyOf  geo:nationalityZH , owl:topDataProperty .
+
+vivo:middleName  rdfs:subPropertyOf  vivo:middleName , owl:topDataProperty .
+
+vivo:AdvisorRole  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  vivo:AdvisorRole .
+
+vivo:School  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:School .
+
+vivo:Consortium  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Consortium .
+
+vitro-public:mimeType
+        rdfs:subPropertyOf  vitro-public:mimeType , owl:topDataProperty .
+
+obo:IAO_0000032  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:IAO_0000027 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:IAO_0000032 .
+
+vivo:Exhibit  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:Exhibit .
+
+obo:ARG_2000009  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , obo:IAO_0000109 , owl:Thing , obo:BFO_0000031 , obo:IAO_0000032 , obo:IAO_0000027 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ARG_2000009 .
+
+vitro-public:thumbnailImage
+        rdfs:subPropertyOf  vitro-public:thumbnailImage , owl:topObjectProperty .
+
+vcard:Crush  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Crush .
+
+bibo:translator  rdfs:subPropertyOf  owl:topObjectProperty , bibo:translator .
+
+vivo:Museum  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Museum .
+
+vivo:Librarian  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Librarian .
+
+geo:area  owl:equivalentClass  geo:area .
+
+obo:ARG_0000197  rdfs:subPropertyOf  obo:ARG_0000197 , owl:topDataProperty .
+
+vivo:EditorialArticle
+        rdfs:subClassOf      bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:EditorialArticle .
+
+obo:IAO_0000221  rdfs:subPropertyOf  obo:IAO_0000221 , owl:topObjectProperty ;
+        owl:inverseOf       obo:IAO_0000417 .
+
+obo:BFO_0000019  rdfs:subClassOf  obo:BFO_0000001 , obo:BFO_0000002 , owl:Thing ;
+        owl:disjointWith     obo:ERO_0000779 , obo:ERO_0000780 , vivo:ReviewerRole , obo:ERO_0000790 , obo:ERO_0000778 , obo:BFO_0000017 , obo:OBI_0000017 , obo:ERO_0000777 , vivo:PresenterRole , vivo:AdvisorRole , obo:ERO_0000783 , vivo:TeacherRole , obo:ERO_0000787 , vivo:ClinicalRole , vivo:ResearcherRole , obo:ERO_0000914 , obo:ERO_0000225 , obo:BFO_0000034 , vivo:MemberRole , obo:ERO_0000786 , obo:ERO_0000776 , obo:BFO_0000023 , vivo:OrganizerRole , obo:ERO_0000012 , vivo:PeerReviewerRole , vivo:AttendeeRole , vivo:PrincipalInvestigatorRole , obo:ERO_0000595 , obo:ERO_0000224 , vivo:AdministratorRole , vivo:LeaderRole , obo:ERO_0000785 , obo:BFO_0000016 , vivo:EditorRole , obo:ERO_0000789 , obo:ERO_0000784 , vivo:CoPrincipalInvestigatorRole , vivo:OutreachProviderRole , vivo:AdviseeRole , obo:ERO_0000788 , vivo:InvestigatorRole ;
+        owl:equivalentClass  obo:BFO_0000019 .
+
+bibo:pageEnd  rdfs:subPropertyOf  bibo:pageEnd , owl:topDataProperty .
+
+vcard:organizationName
+        rdfs:subPropertyOf  vcard:organizationName , owl:topDataProperty .
+
+bibo:Workshop  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  bibo:Workshop .
+
+vivo:informationResourceSupportedBy
+        rdfs:subPropertyOf  vivo:informationResourceSupportedBy , owl:topObjectProperty ;
+        owl:inverseOf       vivo:supportedInformationResource .
+
+<http://www.obofoundry.org/ro/ro.owl#has_agent>
+        a                   owl:ObjectProperty ;
+        rdfs:subPropertyOf  <http://www.obofoundry.org/ro/ro.owl#has_agent> , owl:topObjectProperty .
+
+obo:BFO_0000001  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  obo:BFO_0000001 .
+
+vivo:Campus  rdfs:subClassOf  obo:BFO_0000141 , vivo:Location , obo:BFO_0000001 , owl:Thing , obo:BFO_0000006 , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Campus .
+
+vitro:User  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  vitro:User .
+
+vivo:GeographicRegion
+        rdfs:subClassOf      obo:BFO_0000141 , vivo:Location , obo:BFO_0000001 , owl:Thing , obo:BFO_0000006 , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:GeographicRegion .
+
+vivo:GeopoliticalEntity
+        rdfs:subClassOf      obo:BFO_0000141 , vivo:Location , obo:BFO_0000001 , owl:Thing , obo:BFO_0000006 , vivo:GeographicLocation , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:GeopoliticalEntity .
+
+vcard:Organization  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:ARG_2000379 , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vcard:Organization .
+
+vivo:relatedBy  rdfs:subPropertyOf  vivo:relatedBy , owl:topObjectProperty ;
+        owl:inverseOf       vivo:relates .
+
+geo:populationNotes  rdfs:subPropertyOf
+                geo:populationNotes , owl:topDataProperty .
+
+obo:ERO_0000785  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000023 , obo:BFO_0000002 , obo:BFO_0000017 , obo:BFO_0000001 , owl:Thing ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:ERO_0000785 .
+
+obo:ARG_2000377  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ARG_2000377 .
+
+obo:ERO_0001262  rdfs:subClassOf  obo:ERO_0000005 , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0001262 .
+
+obo:ERO_0000034  rdfs:subPropertyOf  obo:ERO_0000034 , owl:topObjectProperty .
+
+vcard:Voice  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Voice .
+
+vcard:region  rdfs:subPropertyOf  vcard:region , owl:topDataProperty .
+
+vivo:preferredDisplayOrder
+        rdfs:subPropertyOf  vivo:preferredDisplayOrder , owl:topDataProperty .
+
+obo:ARG_2000391  rdfs:subPropertyOf  owl:topObjectProperty , obo:ARG_2000391 ;
+        owl:inverseOf       obo:ARG_2000390 .
+
+geo:nameShortIT  rdfs:subPropertyOf  geo:nameShortIT , owl:topDataProperty .
+
+geo:countryAreaYear  rdfs:subPropertyOf
+                geo:countryAreaYear , owl:topDataProperty .
+
+vivo:CoPrincipalInvestigatorRole
+        rdfs:subClassOf      obo:BFO_0000017 , obo:BFO_0000001 , obo:BFO_0000002 , obo:BFO_0000020 , vivo:ResearcherRole , obo:BFO_0000023 , owl:Thing ;
+        owl:disjointWith     obo:BFO_0000019 , obo:ARG_2000021 , obo:ARG_2000022 ;
+        owl:equivalentClass  vivo:CoPrincipalInvestigatorRole .
+
+obo:IAO_0000013  rdfs:subClassOf  bibo:Article , bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:IAO_0000013 .
+
+scires:irbNumber  rdfs:subPropertyOf  scires:irbNumber , owl:topDataProperty .
+
+vitro:copyrightAnchor
+        rdfs:subPropertyOf  vitro:copyrightAnchor , owl:topDataProperty .
+
+bibo:Chapter  rdfs:subClassOf  bibo:DocumentPart , bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Chapter .
+
+vcard:hasMember  rdfs:subPropertyOf  vcard:hasMember , owl:topObjectProperty .
+
+geo:nameShortFR  rdfs:subPropertyOf  geo:nameShortFR , owl:topDataProperty .
+
+bibo:subsequentLegalDecision
+        rdfs:subPropertyOf  owl:topObjectProperty , bibo:subsequentLegalDecision .
+
+bibo:chapter  rdfs:subPropertyOf  bibo:chapter , owl:topDataProperty .
+
+bibo:asin  rdfs:subPropertyOf  vivo:identifier , bibo:asin , owl:topDataProperty .
+
+bibo:edition  rdfs:subPropertyOf  bibo:edition , owl:topDataProperty .
+
+vivo:AcademicTerm  rdfs:subClassOf  obo:BFO_0000003 , obo:BFO_0000038 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000008 ;
+        owl:equivalentClass  vivo:AcademicTerm .
+
+obo:OBI_0001554  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , obo:IAO_0000109 , owl:Thing , obo:BFO_0000031 , obo:IAO_0000027 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:OBI_0001554 .
+
+vcard:Me  rdfs:subClassOf    vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Me .
+
+c4o:BibliographicInformationSource
+        rdfs:subClassOf      obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  c4o:BibliographicInformationSource .
+
+bibo:gtin14  rdfs:subPropertyOf  vivo:identifier , bibo:gtin14 , owl:topDataProperty .
+
+vcard:Contact  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Contact .
+
+vivo:Catalog  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Catalog .
+
+vcard:Communication  rdfs:subClassOf  vcard:Security , vcard:TimeZone , vcard:Calendar , owl:Thing , vcard:Geographical , vcard:Geo ;
+        owl:equivalentClass  vcard:Addressing , vcard:Communication , vcard:Explanatory , vcard:Organizational , vcard:Identification .
+
+bibo:BookSection  rdfs:subClassOf  bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:BookSection .
+
+vivo:LeaderRole  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  vivo:LeaderRole .
+
+geo:nameOfficialIT  rdfs:subPropertyOf  geo:nameOfficialIT , owl:topDataProperty .
+
+bibo:number  rdfs:subPropertyOf  bibo:number , owl:topDataProperty .
+
+bibo:Code  rdfs:subClassOf   obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , bibo:Collection , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Code .
+
+vcard:Note  rdfs:subClassOf  vcard:TimeZone , vcard:Security , vcard:Geographical , vcard:Identification , vcard:Addressing , vcard:Calendar , vcard:Geo , owl:Thing , vcard:Communication , vcard:Organizational ;
+        owl:equivalentClass  vcard:Note .
+
+vcard:hasLanguage  rdfs:subPropertyOf  vcard:hasLanguage , owl:topObjectProperty .
+
+bibo:Map  rdfs:subClassOf    bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Map .
+
+geo:nameOfficialFR  rdfs:subPropertyOf  geo:nameOfficialFR , owl:topDataProperty .
+
+vcard:Name  rdfs:subClassOf  vcard:TimeZone , vcard:Addressing , owl:Thing , vcard:Security , vcard:Explanatory , vcard:Organizational , vcard:Calendar , vcard:Communication , vcard:Geographical , vcard:Geo ;
+        owl:equivalentClass  vcard:Name .
+
+obo:OBI_0000017  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:OBI_0000017 .
+
+vivo:end  rdfs:subPropertyOf  vivo:end , owl:topObjectProperty .
+
+vcard:hasCategory  rdfs:subPropertyOf  vcard:hasCategory , owl:topObjectProperty .
+
+obo:ERO_0001520  rdfs:subPropertyOf  obo:ERO_0001520 , owl:topObjectProperty .
+
+vivo:InvestigatorRole
+        rdfs:subClassOf      obo:BFO_0000002 , obo:BFO_0000023 , obo:BFO_0000001 , obo:BFO_0000020 , owl:Thing , obo:BFO_0000017 ;
+        owl:disjointWith     obo:ARG_2000021 , obo:BFO_0000019 , obo:ARG_2000022 ;
+        owl:equivalentClass  vivo:InvestigatorRole .
+
+geo:territory  rdfs:subClassOf  obo:BFO_0000004 , vivo:GeographicRegion , obo:BFO_0000001 , obo:BFO_0000141 , vivo:GeographicLocation , owl:Thing , vivo:Location , obo:BFO_0000002 , obo:BFO_0000006 ;
+        owl:equivalentClass  geo:territory .
+
+vcard:hasLogo  rdfs:subPropertyOf  vcard:hasLogo , owl:topObjectProperty .
+
+vcard:Location  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:ARG_2000379 , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vcard:Location .
+
+vivo:hasEquipment  rdfs:subPropertyOf  vivo:hasEquipment , owl:topObjectProperty .
+
+obo:ERO_0000015  rdfs:subClassOf  obo:BFO_0000015 , vivo:Project , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing , obo:OBI_0000011 ;
+        owl:equivalentClass  obo:ERO_0000015 .
+
+vitro:md5password  rdfs:subPropertyOf  vitro:md5password , owl:topDataProperty .
+
+geo:HDI  rdfs:subPropertyOf  geo:HDI , owl:topDataProperty .
+
+vcard:InstantMessage  rdfs:subClassOf  vcard:Explanatory , vcard:Security , vcard:Calendar , owl:Thing , vcard:Geo , vcard:Identification , vcard:Organizational , vcard:Geographical , vcard:Addressing , vcard:TimeZone ;
+        owl:equivalentClass  vcard:InstantMessage .
+
+geo:nameShortRU  rdfs:subPropertyOf  geo:nameShortRU , owl:topDataProperty .
+
+obo:ERO_0000780  rdfs:subClassOf  obo:BFO_0000017 , obo:BFO_0000001 , obo:BFO_0000020 , obo:BFO_0000002 , owl:Thing , obo:ERO_0000776 , obo:BFO_0000023 ;
+        owl:disjointWith     obo:BFO_0000019 , obo:ARG_2000021 , obo:ARG_2000022 ;
+        owl:equivalentClass  obo:ERO_0000780 .
+
+vitro:rootLogotypeImage
+        rdfs:subPropertyOf  vitro:rootLogotypeImage , owl:topDataProperty .
+
+vcard:OrganizationName
+        rdfs:subClassOf      vcard:Security , vcard:Calendar , owl:Thing , vcard:Identification , vcard:Explanatory , vcard:Addressing , vcard:TimeZone , vcard:Geo , vcard:Communication , vcard:Geographical ;
+        owl:equivalentClass  vcard:OrganizationName .
+
+geo:nationalityAR  rdfs:subPropertyOf  geo:nationalityAR , owl:topDataProperty .
+
+obo:RO_0002350  rdfs:subPropertyOf  obo:RO_0002350 , owl:topObjectProperty .
+
+vivo:Contract  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Contract .
+
+vcard:hasOrganizationalUnitName
+        rdfs:subPropertyOf  vcard:hasOrganizationalUnitName , owl:topObjectProperty .
+
+geo:codeAGROVOC  rdfs:subPropertyOf  geo:codeAGROVOC , owl:topDataProperty .
+
+bibo:ReferenceSource  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:ReferenceSource .
+
+geo:isInGroup  rdfs:subPropertyOf  owl:topObjectProperty , geo:isInGroup ;
+        owl:inverseOf       geo:hasMember .
+
+vivo:Publisher  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Publisher .
+
+vivo:FundingOrganization
+        rdfs:subClassOf      foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:FundingOrganization .
+
+vcard:Organizational  rdfs:subClassOf  vcard:Security , owl:Thing , vcard:TimeZone , vcard:Geo , vcard:Calendar , vcard:Geographical ;
+        owl:equivalentClass  vcard:Explanatory , vcard:Identification , vcard:Organizational , vcard:Addressing , vcard:Communication .
+
+geo:nameOfficialRU  rdfs:subPropertyOf  geo:nameOfficialRU , owl:topDataProperty .
+
+vivo:PrivateCompany  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , foaf:Organization , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:PrivateCompany .
+
+bibo:Book  rdfs:subClassOf   obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Book .
+
+vcard:hasTelephone  rdfs:subPropertyOf  vcard:hasTelephone , owl:topObjectProperty .
+
+bibo:EditedBook  rdfs:subClassOf  bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:EditedBook .
+
+vivo:EmeritusProfessor
+        rdfs:subClassOf      foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:EmeritusProfessor .
+
+vcard:nickName  rdfs:subPropertyOf  vcard:nickName , owl:topDataProperty .
+
+vitro:namespaceURI  rdfs:subPropertyOf  vitro:namespaceURI , owl:topDataProperty .
+
+vivo:placeOfPublication
+        rdfs:subPropertyOf  vivo:placeOfPublication , owl:topDataProperty .
+
+obo:ERO_0000779  rdfs:subClassOf  obo:BFO_0000017 , obo:BFO_0000001 , obo:BFO_0000023 , obo:BFO_0000002 , owl:Thing , obo:ERO_0000776 , obo:BFO_0000020 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:ERO_0000779 .
+
+vivo:identifier  rdfs:subPropertyOf  vivo:identifier , owl:topDataProperty .
+
+obo:ERO_0001256  rdfs:subClassOf  obo:ERO_0000005 , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0001256 .
+
+obo:ERO_0000572  rdfs:subPropertyOf  owl:topObjectProperty , obo:ERO_0000572 .
+
+vivo:fundingVehicleFor
+        rdfs:subPropertyOf  vivo:fundingVehicleFor , owl:topObjectProperty .
+
+vitro:imageThumbWidth
+        rdfs:subPropertyOf  vitro:imageThumbWidth , owl:topDataProperty .
+
+obo:IAO_0000039  rdfs:subPropertyOf  owl:topObjectProperty , obo:IAO_0000039 .
+
+geo:isSuccessorOf  rdfs:subPropertyOf  geo:isSuccessorOf , owl:topObjectProperty ;
+        owl:inverseOf       geo:isPredecessorOf .
+
+scires:nctId  rdfs:subPropertyOf  scires:nctId , owl:topDataProperty .
+
+vivo:subjectAreaOf  rdfs:subPropertyOf  vivo:subjectAreaOf , owl:topObjectProperty ;
+        owl:inverseOf       vivo:hasSubjectArea .
+
+obo:IAO_0000007  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:IAO_0000007 .
+
+vitro:PropertyGroup  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  vitro:PropertyGroup .
+
+vivo:seatingCapacity  rdfs:subPropertyOf
+                vivo:seatingCapacity , owl:topDataProperty .
+
+foaf:Agent  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  foaf:Agent .
+
+fabio:ClinicalGuideline
+        rdfs:subClassOf      obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  fabio:ClinicalGuideline .
+
+obo:OBI_0000643  rdfs:subPropertyOf  obo:OBI_0000643 , owl:topObjectProperty .
+
+vivo:publisherOf  rdfs:subPropertyOf  vivo:publisherOf , owl:topObjectProperty ;
+        owl:inverseOf       vivo:publisher .
+
+vivo:conceptAssociatedWith
+        rdfs:subPropertyOf  vivo:conceptAssociatedWith , owl:topObjectProperty ;
+        owl:inverseOf       vivo:hasAssociatedConcept .
+
+vitro:Namespace  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  vitro:Namespace .
+
+vivo:Meeting  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:Meeting .
+
+obo:IAO_0000417  rdfs:subPropertyOf  obo:IAO_0000417 , owl:topObjectProperty .
+
+<http://www.ebi.ac.uk/efo/swo/SWO_0000741>
+        rdfs:subPropertyOf  owl:topObjectProperty , <http://www.ebi.ac.uk/efo/swo/SWO_0000741> .
+
+obo:ARG_2000012  rdfs:subPropertyOf  obo:ARG_2000012 , owl:topDataProperty .
+
+geo:codeCurrency  rdfs:subPropertyOf  geo:codeCurrency , owl:topDataProperty .
+
+obo:BFO_0000008  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  obo:BFO_0000008 .
+
+vivo:dateTimePrecision
+        rdfs:subPropertyOf  vivo:dateTimePrecision , owl:topObjectProperty .
+
+vivo:Company  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Company .
+
+obo:RO_0001015  rdfs:subPropertyOf  obo:RO_0001015 , owl:topObjectProperty .
+
+obo:BFO_0000054  rdfs:subPropertyOf  obo:BFO_0000054 , owl:topObjectProperty ;
+        owl:inverseOf       obo:BFO_0000055 .
+
+obo:ERO_0000396  rdfs:subClassOf  obo:ERO_0000005 , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0000396 .
+
+vivo:NonFacultyAcademicPosition
+        rdfs:subClassOf      vivo:Relationship , obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:NonFacultyAcademicPosition .
+
+vitro:rootBreadCrumbAnchor
+        rdfs:subPropertyOf  vitro:rootBreadCrumbAnchor , owl:topDataProperty .
+
+vitro-public:directDownloadUrl
+        rdfs:subPropertyOf  vitro-public:directDownloadUrl , owl:topDataProperty .
+
+geo:agriculturalAreaYear
+        rdfs:subPropertyOf  geo:agriculturalAreaYear , owl:topDataProperty .
+
+vivo:Laboratory  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Laboratory .
+
+vcard:Spouse  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Spouse .
+
+vivo:College  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:College .
+
+geo:hasBorderWith  rdfs:subPropertyOf  geo:hasBorderWith , owl:topObjectProperty .
+
+vivo:AttendingProcess
+        rdfs:subClassOf      obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:AttendingProcess .
+
+geo:nameCurrencyIT  rdfs:subPropertyOf  geo:nameCurrencyIT , owl:topDataProperty .
+
+ocresd:Phase_2  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  ocresd:Phase_2 .
+
+geo:nameCurrencyFR  rdfs:subPropertyOf  geo:nameCurrencyFR , owl:topDataProperty .
+
+bibo:citedBy  rdfs:subPropertyOf  bibo:citedBy , owl:topObjectProperty .
+
+obo:ERO_0000774  rdfs:subPropertyOf  obo:ERO_0000774 , owl:topDataProperty .
+
+bibo:Document  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Document .
+
+vivo:supplementalInformation
+        rdfs:subPropertyOf  vivo:supplementalInformation , owl:topDataProperty .
+
+geo:agriculturalAreaNotes
+        rdfs:subPropertyOf  geo:agriculturalAreaNotes , owl:topDataProperty .
+
+geo:codeDBPediaID  rdfs:subPropertyOf  geo:codeDBPediaID , owl:topDataProperty .
+
+vivo:Video  rdfs:subClassOf  bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Video .
+
+vivo:PresentingProcess
+        rdfs:subClassOf      obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:PresentingProcess .
+
+vcard:calendarLink  rdfs:subPropertyOf  vcard:calendarLink , owl:topDataProperty .
+
+vcard:hasInstantMessage
+        rdfs:subPropertyOf  vcard:hasInstantMessage , owl:topObjectProperty .
+
+vivo:DateTimeValuePrecision
+        rdfs:subClassOf      owl:Thing ;
+        owl:equivalentClass  vivo:DateTimeValuePrecision .
+
+owl:backwardCompatibleWith
+        a       owl:AnnotationProperty .
+
+vivo:AttendeeRole  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  vivo:AttendeeRole .
+
+vivo:distributesFundingFrom
+        rdfs:subPropertyOf  vivo:distributesFundingFrom , owl:topObjectProperty .
+
+vcard:source  rdfs:subPropertyOf  vcard:source , owl:topDataProperty .
+
+bibo:numPages  rdfs:subPropertyOf  bibo:numPages , owl:topDataProperty .
+
+vcard:related  rdfs:subPropertyOf  vcard:related , owl:topDataProperty .
+
+vcard:Title  rdfs:subClassOf  vcard:TimeZone , vcard:Communication , vcard:Security , vcard:Explanatory , vcard:Geographical , vcard:Geo , vcard:Identification , vcard:Calendar , owl:Thing , vcard:Addressing ;
+        owl:equivalentClass  vcard:Title .
+
+vivo:Center  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Center .
+
+owl:Thing  a                 owl:Class ;
+        owl:equivalentClass  owl:Thing .
+
+vivo:prerequisiteFor  rdfs:subPropertyOf
+                vivo:prerequisiteFor , owl:topObjectProperty ;
+        owl:inverseOf       vivo:hasPrerequisite .
+
+vcard:Child  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Child .
+
+vivo:dateIssued  rdfs:subPropertyOf  vivo:dateIssued , owl:topObjectProperty .
+
+bibo:Webpage  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Webpage .
+
+vivo:hasSuccessorOrganization
+        rdfs:subPropertyOf  vivo:hasSuccessorOrganization , owl:topObjectProperty ;
+        owl:inverseOf       vivo:hasPredecessorOrganization .
+
+vivo:License  rdfs:subClassOf  skos:Concept , owl:Thing ;
+        owl:equivalentClass  vivo:License .
+
+vcard:locality  rdfs:subPropertyOf  vcard:locality , owl:topDataProperty .
+
+vivo:AdvisingRelationship
+        rdfs:subClassOf      obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:AdvisingRelationship .
+
+vitro:themeDir  rdfs:subPropertyOf  vitro:themeDir , owl:topDataProperty .
+
+bibo:Periodical  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Periodical .
+
+bibo:cites  rdfs:subPropertyOf  bibo:cites , owl:topObjectProperty ;
+        owl:inverseOf       bibo:citedBy .
+
+geo:hasCoordinate  rdfs:subPropertyOf  geo:hasCoordinate , owl:topDataProperty .
+
+geo:nameCurrencyRU  rdfs:subPropertyOf  geo:nameCurrencyRU , owl:topDataProperty .
+
+vcard:TextPhone  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:TextPhone .
+
+obo:BFO_0000003  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  obo:BFO_0000003 .
+
+vivo:Project  rdfs:subClassOf  obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:Project .
+
+vitro:rootTab  rdfs:subPropertyOf  vitro:rootTab , owl:topObjectProperty .
+
+obo:ERO_0000391  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0000391 .
+
+vivo:GeographicLocation
+        rdfs:subClassOf      obo:BFO_0000141 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000006 , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:GeographicLocation .
+
+vcard:Email  rdfs:subClassOf  vcard:Calendar , vcard:Security , vcard:Geo , vcard:Identification , vcard:Addressing , vcard:Explanatory , owl:Thing , vcard:TimeZone , vcard:Organizational , vcard:Geographical ;
+        owl:equivalentClass  vcard:Email .
+
+scires:Phase3ClinicalTrial
+        rdfs:subClassOf      ocrer:Interventional_study , owl:Thing ;
+        owl:equivalentClass  scires:Phase3ClinicalTrial .
+
+vcard:Agent  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Agent .
+
+obo:ERO_0001716  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0001716 .
+
+bibo:Conference  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  bibo:Conference .
+
+vivo:relates  rdfs:subPropertyOf  vivo:relates , owl:topObjectProperty .
+
+obo:ERO_0000787  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:ERO_0000787 .
+
+obo:ARG_2000379  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ARG_2000379 .
+
+<http://www.geneontology.org/formats/oboInOwl#Synonym>
+        rdfs:subClassOf      obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:IAO_0000027 , obo:BFO_0000002 ;
+        owl:equivalentClass  <http://www.geneontology.org/formats/oboInOwl#Synonym> .
+
+geo:nameListIT  rdfs:subPropertyOf  geo:nameListIT , owl:topDataProperty .
+
+vivo:hrJobTitle  rdfs:subPropertyOf  vivo:hrJobTitle , owl:topDataProperty .
+
+obo:ARG_0000015  rdfs:subPropertyOf  obo:ARG_0000015 , owl:topDataProperty .
+
+obo:ERO_0000004  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0000004 .
+
+geo:nameListFR  rdfs:subPropertyOf  geo:nameListFR , owl:topDataProperty .
+
+obo:ERO_0000050  rdfs:subPropertyOf  obo:ERO_0000050 , owl:topDataProperty .
+
+obo:ERO_0000225  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:ERO_0000225 .
+
+vivo:AdvisingProcess  rdfs:subClassOf  obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:AdvisingProcess .
+
+geo:isPredecessorOf  rdfs:subPropertyOf
+                geo:isPredecessorOf , owl:topObjectProperty .
+
+geo:codeISO3  rdfs:subPropertyOf  geo:codeISO3 , owl:topDataProperty .
+
+vivo:Editorship  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Editorship .
+
+vivo:Award  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  vivo:Award .
+
+vcard:calendarRequest
+        rdfs:subPropertyOf  vcard:calendarRequest , owl:topDataProperty .
+
+vcard:Parent  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Parent .
+
+scires:Phase2ClinicalTrial
+        rdfs:subClassOf      ocrer:Interventional_study , owl:Thing ;
+        owl:equivalentClass  scires:Phase2ClinicalTrial .
+
+vivo:assignee  rdfs:subPropertyOf  vivo:assignee , owl:topObjectProperty ;
+        owl:inverseOf       vivo:assigneeFor .
+
+geo:hasCode  rdfs:subPropertyOf  geo:hasCode , owl:topDataProperty .
+
+obo:ERO_0000460  rdfs:subPropertyOf  obo:ERO_0000460 , owl:topObjectProperty ;
+        owl:inverseOf       scires:documentationFor .
+
+vitro:roleURI  rdfs:subPropertyOf  vitro:roleURI , owl:topDataProperty .
+
+bibo:coden  rdfs:subPropertyOf  vivo:identifier , bibo:coden , owl:topDataProperty .
+
+vivo:ConferencePoster
+        rdfs:subClassOf      obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:ConferencePoster .
+
+vcard:Met  rdfs:subClassOf   vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Met .
+
+vivo:orcidId  rdfs:subPropertyOf  vivo:orcidId , owl:topObjectProperty .
+
+bibo:pageStart  rdfs:subPropertyOf  bibo:pageStart , owl:topDataProperty .
+
+obo:BFO_0000016  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:BFO_0000016 .
+
+vcard:photo  rdfs:subPropertyOf  vcard:photo , owl:topDataProperty .
+
+bibo:Note  rdfs:subClassOf   obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Note .
+
+vcard:key  rdfs:subPropertyOf  vcard:key , owl:topDataProperty .
+
+vivo:IssuedCredential
+        rdfs:subClassOf      obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:IssuedCredential .
+
+vitro:contactMail  rdfs:subPropertyOf  vitro:contactMail , owl:topDataProperty .
+
+scires:Phase1ClinicalTrial
+        rdfs:subClassOf      ocrer:Interventional_study , owl:Thing ;
+        owl:equivalentClass  scires:Phase1ClinicalTrial .
+
+vivo:AcademicYear  rdfs:subClassOf  obo:BFO_0000003 , obo:BFO_0000038 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000008 ;
+        owl:equivalentClass  vivo:AcademicYear .
+
+vcard:Telephone  rdfs:subClassOf  vcard:Explanatory , owl:Thing , vcard:Identification , vcard:Geo , vcard:Security , vcard:Organizational , vcard:Calendar , vcard:TimeZone , vcard:Geographical , vcard:Addressing ;
+        owl:equivalentClass  vcard:Telephone .
+
+geo:nameListRU  rdfs:subPropertyOf  geo:nameListRU , owl:topDataProperty .
+
+vivo:localAwardId  rdfs:subPropertyOf  vivo:localAwardId , owl:topDataProperty .
+
+vivo:Abstract  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Abstract .
+
+vivo:hasPredecessorOrganization
+        rdfs:subPropertyOf  vivo:hasPredecessorOrganization , owl:topObjectProperty .
+
+geo:landArea  rdfs:subPropertyOf  geo:landArea , owl:topDataProperty .
+
+obo:ERO_0001245  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  obo:ERO_0001245 .
+
+vivo:teachingOverview
+        rdfs:subPropertyOf  vivo:teachingOverview , owl:topDataProperty .
+
+vivo:Country  rdfs:subClassOf  vivo:Location , obo:BFO_0000141 , obo:BFO_0000001 , obo:BFO_0000006 , vivo:GeographicLocation , vivo:GeographicRegion , geo:area , owl:Thing , geo:territory , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  geo:self_governing , vivo:Country .
+
+vcard:hasTitle  rdfs:subPropertyOf  vcard:hasTitle , owl:topObjectProperty .
+
+vivo:departmentOrSchool
+        rdfs:subPropertyOf  vivo:departmentOrSchool , owl:topDataProperty .
+
+vivo:AwardedDegree  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:AwardedDegree .
+
+bibo:Bill  rdfs:subClassOf   bibo:Document , obo:IAO_0000030 , bibo:LegalDocument , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Bill .
+
+vivo:InvitedTalk  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , event:Event , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:InvitedTalk .
+
+obo:ERO_0000031  rdfs:subPropertyOf  owl:topObjectProperty , obo:ERO_0000031 .
+
+vivo:Committee  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Committee .
+
+bibo:shortDescription
+        rdfs:subPropertyOf  bibo:shortDescription , owl:topDataProperty .
+
+vitro:oldpassword  rdfs:subPropertyOf  vitro:oldpassword , owl:topDataProperty .
+
+vivo:Location  rdfs:subClassOf  obo:BFO_0000141 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Location .
+
+obo:UO_0000280  rdfs:subClassOf  obo:IAO_0000030 , obo:IAO_0000009 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:UO_0000280 .
+
+vivo:Postdoc  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , foaf:Person , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Postdoc .
+
+scires:Phase0ClinicalTrial
+        rdfs:subClassOf      ocrer:Interventional_study , owl:Thing ;
+        owl:equivalentClass  scires:Phase0ClinicalTrial .
+
+vivo:LibrarianPosition
+        rdfs:subClassOf      vivo:Relationship , obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:LibrarianPosition .
+
+bibo:annotates  rdfs:subPropertyOf  bibo:annotates , owl:topObjectProperty .
+
+vcard:Type  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  vcard:Type .
+
+vivo:Institute  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Institute .
+
+obo:BFO_0000029  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:BFO_0000029 .
+
+vivo:Database  rdfs:subClassOf  bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:Database .
+
+bibo:draft  a   owl:Thing .
+
+vcard:title  rdfs:subPropertyOf  vcard:title , owl:topDataProperty .
+
+owl:sameAs  rdfs:subPropertyOf  owl:sameAs .
+
+vivo:Internship  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:Internship .
+
+vivo:totalAwardAmount
+        rdfs:subPropertyOf  vivo:totalAwardAmount , owl:topDataProperty .
+
+obo:OBI_0000299  rdfs:subPropertyOf  obo:OBI_0000299 , owl:topObjectProperty , obo:RO_0000057 .
+
+bibo:accepted  a  owl:Thing .
+
+geo:group  rdfs:subClassOf   owl:Thing ;
+        owl:equivalentClass  geo:group .
+
+obo:ERO_0001258  rdfs:subClassOf  obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:ERO_0001258 .
+
+vivo:WorkshopSeries  rdfs:subClassOf  obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:WorkshopSeries .
+
+skos:related  rdfs:subPropertyOf  skos:related , owl:topObjectProperty ;
+        owl:inverseOf       skos:related .
+
+vivo:iclCode  rdfs:subPropertyOf  vivo:iclCode , owl:topDataProperty .
+
+geo:hasMaxLatitude  rdfs:subPropertyOf  geo:hasMaxLatitude , owl:topDataProperty .
+
+vivo:AdviseeRole  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  vivo:AdviseeRole .
+
+geo:hasMinLongitude  rdfs:subPropertyOf
+                geo:hasMinLongitude , owl:topDataProperty .
+
+vcard:Male  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Male .
+
+vivo:StudentOrganization
+        rdfs:subClassOf      foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:StudentOrganization .
+
+vivo:MedicalResidency
+        rdfs:subClassOf      obo:BFO_0000015 , obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:MedicalResidency .
+
+vitro:Portal  rdfs:subClassOf  owl:Thing ;
+        owl:equivalentClass  vitro:Portal .
+
+vcard:uid  rdfs:subPropertyOf  vcard:uid , owl:topDataProperty .
+
+obo:ERO_0000044  rdfs:subPropertyOf  obo:ERO_0000044 , owl:topDataProperty .
+
+bibo:LegalDecision  rdfs:subClassOf  bibo:Document , obo:IAO_0000030 , bibo:LegalDocument , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:LegalDecision .
+
+vcard:Colleague  rdfs:subClassOf  vcard:Code , owl:Thing ;
+        owl:equivalentClass  vcard:Colleague .
+
+bibo:Slide  rdfs:subClassOf  bibo:Document , obo:IAO_0000030 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  bibo:Slide .
+
+vivo:governingAuthorityFor
+        rdfs:subPropertyOf  vivo:governingAuthorityFor , owl:topObjectProperty .
+
+obo:IAO_0000009  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:IAO_0000009 .
+
+obo:IAO_0000300  rdfs:subClassOf  obo:BFO_0000001 , owl:Thing , obo:BFO_0000031 , obo:BFO_0000002 ;
+        owl:equivalentClass  obo:IAO_0000300 .
+
+vcard:email  rdfs:subPropertyOf  vcard:email , owl:topDataProperty .
+
+obo:ERO_0000012  rdfs:subClassOf  obo:BFO_0000020 , obo:BFO_0000001 , owl:Thing , obo:BFO_0000017 , obo:BFO_0000002 ;
+        owl:disjointWith     obo:ARG_2000022 , obo:BFO_0000019 , obo:ARG_2000021 ;
+        owl:equivalentClass  obo:ERO_0000012 .
+
+vivo:PeerReviewerRole
+        rdfs:subClassOf      obo:BFO_0000001 , obo:BFO_0000017 , obo:BFO_0000020 , owl:Thing , obo:BFO_0000002 , obo:BFO_0000023 ;
+        owl:disjointWith     obo:BFO_0000019 , obo:ARG_2000021 , obo:ARG_2000022 ;
+        owl:equivalentClass  vivo:PeerReviewerRole .
+
+vivo:isCorrespondingAuthor
+        rdfs:subPropertyOf  vivo:isCorrespondingAuthor , owl:topDataProperty .
+
+vitro:logotypeWidth  rdfs:subPropertyOf
+                vitro:logotypeWidth , owl:topDataProperty .
+
+bibo:reproducedIn  rdfs:subPropertyOf  owl:topObjectProperty , bibo:reproducedIn ;
+        owl:inverseOf       vivo:reproduces .
+
+vivo:EventSeries  rdfs:subClassOf  obo:BFO_0000003 , obo:BFO_0000001 , owl:Thing ;
+        owl:equivalentClass  vivo:EventSeries .
+
+vcard:Key  rdfs:subClassOf   vcard:TimeZone , vcard:Calendar , owl:Thing , vcard:Geographical , vcard:Geo ;
+        owl:equivalentClass  vcard:Key .
+
+vivo:hasMonetaryAmount
+        rdfs:subPropertyOf  vivo:hasMonetaryAmount , owl:topDataProperty .
+
+vivo:researcherId  rdfs:subPropertyOf  vivo:researcherId , owl:topDataProperty .
+
+vivo:ExtensionUnit  rdfs:subClassOf  foaf:Agent , obo:BFO_0000001 , owl:Thing , obo:BFO_0000004 , obo:BFO_0000002 ;
+        owl:equivalentClass  vivo:ExtensionUnit .
+
+geo:HDITotal  rdfs:subPropertyOf  geo:HDITotal , owl:topDataProperty .
