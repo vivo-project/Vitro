@@ -2,11 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena.pellet;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -19,28 +16,25 @@ import org.mindswap.pellet.jena.PelletReasonerFactory;
 import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ConfiguredReasonerListener;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ConfiguredReasonerListener.Suspension;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerStatementPattern;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerDriver;
 
-public class PelletListener implements ModelChangedListener {
+public class PelletListener implements TBoxReasonerDriver {
 
 	private static final Log log = LogFactory.getLog(PelletListener.class.getName());
 	private boolean isReasoning = false;
@@ -56,15 +50,13 @@ public class PelletListener implements ModelChangedListener {
 	private Set<ReasonerStatementPattern> inferenceDrivingPatternDenySet;
 	private Set<ReasonerStatementPattern> inferenceReceivingPatternAllowSet;
 	
-	private Map<Property,List<ReasonerStatementPattern>> inferenceDrivingPatternMap;
+	private final ConfiguredReasonerListener listener;
 	
 	private Model additionModel;
 	private Model removalModel;
 	
 	private Model deletedObjectProperties;
 	private Model deletedDataProperties;
-	
-	private boolean pipeOpen;
 	
 	private boolean isConsistent = true;
 	private boolean inErrorState = false;
@@ -86,14 +78,6 @@ public class PelletListener implements ModelChangedListener {
 		return this.isReasoning;
 	}
 	
-	public void closePipe() {
-		pipeOpen = false;
-	}
-	
-	public void openPipe() {
-		pipeOpen = true;
-	}
-		
 	public synchronized boolean checkAndStartReasoning(){
 	    if( this.isReasoning )
 	        return false;
@@ -143,45 +127,88 @@ public class PelletListener implements ModelChangedListener {
 		this.inferenceDrivingPatternDenySet = reasonerConfiguration.getInferenceDrivingPatternDenySet();
 		this.inferenceReceivingPatternAllowSet = reasonerConfiguration.getInferenceReceivingPatternAllowSet();
         
-		if (this.inferenceDrivingPatternAllowSet != null) {
-			this.inferenceDrivingPatternMap = new HashMap<>();
-			for (Iterator<ReasonerStatementPattern> i = inferenceDrivingPatternAllowSet.iterator(); i.hasNext();) {
-				ReasonerStatementPattern pat = i.next();
-				Property p = pat.getPredicate();
-				List<ReasonerStatementPattern> patList = inferenceDrivingPatternMap.get(p);
-				if (patList == null) {
-					patList = new LinkedList<>();
-					patList.add(pat);
-					inferenceDrivingPatternMap.put(p, patList);
-				} else {
-					patList.add(pat);
-				}
-			}
-		}
-		this.pipeOpen = true;
 		this.additionModel = ModelFactory.createDefaultModel();
 		this.removalModel = ModelFactory.createDefaultModel();
 		this.deletedObjectProperties = ModelFactory.createDefaultModel();
 		this.deletedDataProperties = ModelFactory.createDefaultModel();
+		
+		listener = new ConfiguredReasonerListener(reasonerConfiguration, this);
+		
 		this.mainModel.enterCriticalSection(Lock.READ);
     	try {
     	    for (ReasonerStatementPattern pat : this.inferenceDrivingPatternAllowSet) {
-    	        addedStatements(mainModel.listStatements((Resource) null, pat.getPredicate(), (RDFNode) null));    
+    	        listener.addedStatements(mainModel.listStatements((Resource) null, pat.getPredicate(), (RDFNode) null));    
     	    }
         	if (!skipReasoningUponInitialization) {
         		this.foreground = foreground;
-        		notifyEvent(null,new EditEvent(null,false));
+        		listener.notifyEvent(null,new EditEvent(null,false));
         	} else if (inferenceModel.size() == 0){
         		foreground = true;
-        		notifyEvent(null,new EditEvent(null,false));
+        		listener.notifyEvent(null,new EditEvent(null,false));
         		this.foreground = foreground;
         	}
         } finally {
         	this.mainModel.leaveCriticalSection();
         }
         
-		this.fullModel.getBaseModel().register(this);
-        this.mainModel.getBaseModel().register(this);
+		this.fullModel.getBaseModel().register(listener);
+        this.mainModel.getBaseModel().register(listener);
+	}
+	
+	@Override
+	public void addStatement(Statement stmt) {
+		additionModel.enterCriticalSection(Lock.WRITE);
+		try {
+			additionModel.add(stmt);
+		} finally {
+			additionModel.leaveCriticalSection();
+		}
+	}
+
+	@Override
+	public void removeStatement(Statement stmt) {
+		removalModel.enterCriticalSection(Lock.WRITE);
+		try {
+			removalModel.add(stmt);
+		} finally {
+			removalModel.leaveCriticalSection();
+		}
+	}
+
+	@Override
+	public void deleteDataProperty(Statement stmt) {
+		deletedDataProperties.enterCriticalSection(Lock.WRITE);
+		try {
+			deletedDataProperties.add(stmt);
+		} finally {
+			deletedDataProperties.leaveCriticalSection();
+		}
+	}
+
+	@Override
+	public void deleteObjectProperty(Statement stmt) {
+		deletedObjectProperties.enterCriticalSection(Lock.WRITE);
+		try {
+			deletedObjectProperties.add(stmt);
+		} finally {
+			deletedObjectProperties.leaveCriticalSection();
+		}
+	}
+
+	@Override
+	public void runSynchronizer() {
+		if ((additionModel.size() > 0) || (removalModel.size() > 0)) {
+			if (!isSynchronizing) {
+				if (foreground) {
+					log.debug("Running Pellet in foreground.");
+					(new PelletSynchronizer()).run();
+				} else {
+					log.debug("Running Pellet in background.");
+					new Thread(new PelletSynchronizer(),
+							"PelletListener.PelletSynchronizer").start();
+				}
+			}
+		}
 	}
 	
 	private class InferenceGetter implements Runnable {
@@ -333,12 +360,10 @@ public class PelletListener implements ModelChangedListener {
 							        	if (!fullModelContainsStatement) {
 							        		// in theory we should be able to lock only the inference model, but I'm not sure yet if Jena propagates the locking upward
 							        		fullModel.enterCriticalSection(Lock.WRITE);
-							        		closePipe();
-							        		try {
+								        	try (Suspension susp = listener.suspend()) {
 							        			inferenceModel.add(stmt);
 							        			addCount++;
 							        		} finally {
-							        			openPipe();
 							        			fullModel.leaveCriticalSection();
 							        		}
 							        	}
@@ -360,12 +385,10 @@ public class PelletListener implements ModelChangedListener {
 								}
 						        for (Iterator<Statement> i = localRemovalQueue.iterator(); i.hasNext(); ) {
 						        	fullModel.enterCriticalSection(Lock.WRITE);
-						        	closePipe();
-						        	try {
+						        	try (Suspension susp = listener.suspend()) {
 						        		retractCount++;
 						        		inferenceModel.remove(i.next());
 						        	} finally {
-						        		openPipe();
 						        		fullModel.leaveCriticalSection();
 						        	}
 						        }
@@ -412,208 +435,6 @@ public class PelletListener implements ModelChangedListener {
 		}
 	}
 	
-	// TODO: These next two methods are really ugly; I need to refactor them to remove redundancy.
-	
-	private void tryAdd(Statement stmt) {
-		boolean sendToPellet = false;
-		if ( pipeOpen && reasonerConfiguration.getReasonOnAllDatatypePropertyStatements() && stmt.getObject().isLiteral() ) {
-			sendToPellet = true;
-		} else 
-		if ( pipeOpen && hasCardinalityPredicate(stmt) ) { // see comment on this method
-			sendToPellet = true;
-		} else 
-		if ( (stmt.getObject().isResource()) && !((stmt.getPredicate().getURI().indexOf(VitroVocabulary.vitroURI)==0)) ) {
-			if (pipeOpen) {
-				sendToPellet = false;
-				boolean denied = false;
-				ReasonerStatementPattern stPat = ReasonerStatementPattern.objectPattern(stmt);
-				if (inferenceDrivingPatternDenySet != null) {
-					for (Iterator<ReasonerStatementPattern> i = inferenceDrivingPatternDenySet.iterator(); i.hasNext(); ){
-						ReasonerStatementPattern pat = i.next();
-						if (pat.matches(stPat)) {
-							denied = true;
-							break;
-						}
-					}
-				}
-				if (!denied) {
-	 				if (inferenceDrivingPatternAllowSet==null) {
-						sendToPellet = true;
-					} else {
-						// TODO: O(1) implementation of this
-						List<ReasonerStatementPattern> patList = this.inferenceDrivingPatternMap.get(stmt.getPredicate());
-						if (patList != null) {
-							for (Iterator<ReasonerStatementPattern> i = patList.iterator(); i.hasNext(); ){
-								ReasonerStatementPattern pat = i.next();
-								if (pat.matches(stPat)) {
-									sendToPellet = true;
-									break;
-								}
-							}
-						}
-					}
-				}
-				
-			}
-		}	
-		if (sendToPellet) {
-			//long startTime = System.currentTimeMillis();
-			String valueStr = (stmt.getObject().isResource()) ? ((Resource)stmt.getObject()).getLocalName() : ((Literal)stmt.getObject()).getLexicalForm();
-			if ( log.isDebugEnabled() ) {
-				log.debug( "Adding to Pellet: " + renderStatement( stmt ) );
-			}
-			additionModel.enterCriticalSection(Lock.WRITE);
-			try {
-				additionModel.add(stmt);
-			} finally {
-				additionModel.leaveCriticalSection();
-			}
-		} else {
-			if ( log.isDebugEnabled() ) {
-				log.debug( "Not adding to Pellet: " + renderStatement( stmt ) );
-			}
-		}
-	}
-	
-	
-	private void tryRemove(Statement stmt) {
-		boolean removeFromPellet = false;
-		if ( pipeOpen && reasonerConfiguration.getReasonOnAllDatatypePropertyStatements() && stmt.getObject().isLiteral() ) {
-			removeFromPellet = true;
-		} else
-		if ( pipeOpen && hasCardinalityPredicate(stmt) ) { // see comment on this method
-			removeFromPellet = true;
-		} else
-		if ( stmt.getObject().isResource() ) {
-			if (pipeOpen) {
-				if (reasonerConfiguration.getQueryForAllObjectProperties() && stmt.getPredicate().equals(RDF.type) && stmt.getObject().equals(OWL.ObjectProperty)) {
-					deletedObjectProperties.enterCriticalSection(Lock.WRITE);
-					try {
-						deletedObjectProperties.add(stmt);
-					} finally {
-						deletedObjectProperties.leaveCriticalSection();
-					}
-				}
-				if (reasonerConfiguration.getQueryForAllDatatypeProperties() && stmt.getPredicate().equals(RDF.type) && stmt.getObject().equals(OWL.DatatypeProperty)) {
-					deletedDataProperties.enterCriticalSection(Lock.WRITE);
-					try{
-						deletedDataProperties.add(stmt);
-					} finally {
-						deletedDataProperties.leaveCriticalSection();
-					}
-				}
-				removeFromPellet = false;
-				boolean denied = false;
-				ReasonerStatementPattern stPat = ReasonerStatementPattern.objectPattern(stmt);
-				if (inferenceDrivingPatternDenySet != null) {
-					for (Iterator<ReasonerStatementPattern> i = inferenceDrivingPatternDenySet.iterator(); i.hasNext(); ){
-						ReasonerStatementPattern pat = i.next();
-						if (pat.matches(stPat)) {
-							denied = true;
-							break;
-						}
-					}
-				}
-				if (!denied) {
-					if (inferenceDrivingPatternAllowSet==null) {
-						removeFromPellet = true;
-					} else {
-						// TODO: O(1) implementation of this
-						List<ReasonerStatementPattern> patList = this.inferenceDrivingPatternMap.get(stmt.getPredicate());
-						if (patList != null) {
-							for (Iterator<ReasonerStatementPattern> i = patList.iterator(); i.hasNext(); ){
-								ReasonerStatementPattern pat = i.next();
-								if (pat.matches(stPat)) {
-									removeFromPellet = true;
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		if (removeFromPellet) {
-			String valueStr = (stmt.getObject().isResource()) ? ((Resource)stmt.getObject()).getLocalName() : ((Literal)stmt.getObject()).getLexicalForm();
-			log.info("Removing from Pellet: "+stmt.getSubject().getLocalName()+" "+stmt.getPredicate().getLocalName()+" "+valueStr);
-			removalModel.enterCriticalSection(Lock.WRITE);
-			try {
-				removalModel.add(stmt);
-			} finally {
-				removalModel.leaveCriticalSection();
-			}
-		}
-	}
-	
-	// The pattern matching stuff needs to get reworked.
-	// It originally assumed that only resources would be in object
-	// position, but cardinality axioms will have e.g. nonNegativeIntegers.
-	// This is a temporary workaround: all cardinality statements will
-	// be exposed to Pellet, regardless of configuration patterns.
-	private boolean hasCardinalityPredicate(Statement stmt) {
-		return (
-			stmt.getPredicate().equals(OWL.cardinality) ||
-			stmt.getPredicate().equals(OWL.minCardinality) ||
-			stmt.getPredicate().equals(OWL.maxCardinality) 
-		) ;
-	}
-	
-	
-	public void addedStatement(Statement arg0) {
-		tryAdd(arg0);
- 	}
-
-	
-	public void addedStatements(Statement[] arg0) {
-		for (int i=0; i<arg0.length; i++) {
-			tryAdd(arg0[i]);
-		}
-	}
-
-	
-	public void addedStatements( List arg0 ) {
-		for ( Iterator i = arg0.iterator(); i.hasNext(); ) {
-			tryAdd( (Statement) i.next() );
-		}
-
-	}
-
-	
-	public void addedStatements(StmtIterator arg0) {
-		for (Iterator i = arg0; i.hasNext(); ) {
-			tryAdd( (Statement) i.next() );
-		}
-
-	}
-
-	
-	public void addedStatements(Model arg0) {
-		for (Iterator i = arg0.listStatements(); i.hasNext(); ) {
-			tryAdd( (Statement) i.next() );
-		}
-
-	}
-
-	
-	public void notifyEvent(Model arg0, Object arg1) {
-		if (arg1 instanceof EditEvent) {
-			EditEvent ee = (EditEvent) arg1;
-			if (!ee.getBegin()) {
-				if ( (additionModel.size() > 0) || (removalModel.size()>0) ) {
-					if (!isSynchronizing) {
-						if (foreground) {
-                            log.debug("Running Pellet in foreground.");
-							(new PelletSynchronizer()).run();
-						} else {
-                            log.debug("Running Pellet in background.");
-							new Thread(new PelletSynchronizer(), "PelletListener.PelletSynchronizer").start();
-						}
-					}
-				}
-			}
-		}
-	}
-
 	private class PelletSynchronizer implements Runnable {
 		public void run() {
 			try {
@@ -657,54 +478,9 @@ public class PelletListener implements ModelChangedListener {
 			}
 		}
 	}
- 	
-	public void removedStatement(Statement arg0) {
-		tryRemove(arg0);
-	}
-
-	
-	public void removedStatements(Statement[] arg0) {
-		for (int i=0; i<arg0.length; i++) {
-			tryRemove(arg0[i]);
-		}
-	}
-
-	
-	public void removedStatements(List arg0) {
-		for (Iterator i = arg0.iterator(); i.hasNext(); ) {
-			tryRemove( (Statement) i.next());
-		}
-	}
-
-	
-	public void removedStatements(StmtIterator arg0) {
-		for (Iterator i = arg0; i.hasNext();) {
-			tryRemove( (Statement) i.next());
-		}
-	}
-
-	
-	public void removedStatements(Model arg0) {
-		for (Iterator i = arg0.listStatements(); i.hasNext();) {
-			tryRemove( (Statement) i.next());
-		}
-	}
 	
 	public OntModel getPelletModel() {
 		return this.pelletModel;
-	}
-
-	private String renderStatement(Statement stmt) {
-		String subjStr = (stmt.getSubject().getURI() != null) ? stmt.getSubject().getURI() : stmt.getSubject().getId().toString();
-		String predStr = stmt.getPredicate().getURI();
-		String objStr = "";
-		RDFNode obj = stmt.getObject();
-		if (obj.isLiteral()) {
-			objStr = "\""+(((Literal)obj).getLexicalForm());
-		} else {
-			objStr = (((Resource)stmt.getObject()).getURI() != null) ? ((Resource)stmt.getObject()).getURI() : ((Resource)stmt.getObject()).getId().toString();
-		}
-		return (subjStr+" : "+predStr+" : "+objStr);
 	}
 
 }
