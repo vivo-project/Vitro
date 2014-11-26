@@ -26,7 +26,6 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.ReasonerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -34,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.reasoner.ReasonerPlugin;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasonerTBoxListener;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 public class SimpleReasonerSetup implements ServletContextListener {
