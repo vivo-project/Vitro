@@ -1,22 +1,22 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.dao.jena.pellet;
+package edu.cornell.mannlib.vitro.webapp.tboxreasoner;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import org.mindswap.pellet.jena.PelletReasonerFactory;
 
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import org.mindswap.pellet.jena.PelletReasonerFactory;
-
 public class ReasonerConfiguration {
 	
-	public Set<ObjectPropertyStatementPattern> inferenceDrivingPatternAllowSet;
-	public Set<ObjectPropertyStatementPattern> inferenceDrivingPatternDenySet;
-	public Set<ObjectPropertyStatementPattern> inferenceReceivingPatternAllowSet;
+	public Set<ReasonerStatementPattern> inferenceDrivingPatternAllowSet;
+	public Set<ReasonerStatementPattern> inferenceDrivingPatternDenySet;
+	public Set<ReasonerStatementPattern> inferenceReceivingPatternAllowSet;
 	
 	private boolean queryForAllObjectProperties = false;
 	private boolean incrementalReasoningEnabled = true;
@@ -58,34 +58,34 @@ public class ReasonerConfiguration {
 		
 		//ask the reasoner only to classify, realize, and infer disjointWith statements (based on a somewhat incomplete information)
 		DEFAULT = new ReasonerConfiguration();
-		HashSet<ObjectPropertyStatementPattern> defaultInferenceDrivingPatternAllowSet = new HashSet<ObjectPropertyStatementPattern>();
-		defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,RDF.type,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,RDFS.subClassOf,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,RDFS.subPropertyOf,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.equivalentClass,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.unionOf,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.intersectionOf,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.complementOf,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.oneOf,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.onProperty,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.someValuesFrom,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.allValuesFrom,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.hasValue,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.minCardinality,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.maxCardinality,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.cardinality,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,RDF.first,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,RDF.rest,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.disjointWith,null));
-        defaultInferenceDrivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.inverseOf,null));
+		HashSet<ReasonerStatementPattern> defaultInferenceDrivingPatternAllowSet = new HashSet<>();
+		defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(RDF.type));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(RDFS.subClassOf));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(RDFS.subPropertyOf));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.equivalentClass));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.unionOf));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.intersectionOf));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.complementOf));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.oneOf));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.onProperty));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.someValuesFrom));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.allValuesFrom));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.hasValue));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.minCardinality));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.maxCardinality));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.cardinality));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(RDF.first));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(RDF.rest));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.disjointWith));
+        defaultInferenceDrivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.inverseOf));
         DEFAULT.setInferenceDrivingPatternAllowSet(defaultInferenceDrivingPatternAllowSet);
-        Set<ObjectPropertyStatementPattern> defaultInferenceReceivingPatternAllowSet = new HashSet<ObjectPropertyStatementPattern>();
-        defaultInferenceReceivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,RDF.type,null));
-        defaultInferenceReceivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,RDFS.subClassOf,null));
-        defaultInferenceReceivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,RDFS.subPropertyOf,null));
-        defaultInferenceReceivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.equivalentClass,null));
-        defaultInferenceReceivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.disjointWith,null));
-        defaultInferenceReceivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null,OWL.inverseOf,null));
+        Set<ReasonerStatementPattern> defaultInferenceReceivingPatternAllowSet = new HashSet<>();
+        defaultInferenceReceivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(RDF.type));
+        defaultInferenceReceivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(RDFS.subClassOf));
+        defaultInferenceReceivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(RDFS.subPropertyOf));
+        defaultInferenceReceivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.equivalentClass));
+        defaultInferenceReceivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.disjointWith));
+        defaultInferenceReceivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.inverseOf));
         DEFAULT.setInferenceReceivingPatternAllowSet(defaultInferenceReceivingPatternAllowSet);
         DEFAULT.setQueryForAllObjectProperties(false);
 
@@ -107,36 +107,36 @@ public class ReasonerConfiguration {
 		COMPLETE.setQueryForAllObjectProperties(true); 
 		COMPLETE.setReasonOnAllDatatypePropertyStatements(true); 
 		COMPLETE.setQueryForAllDatatypeProperties(true); 
-		Set<ObjectPropertyStatementPattern> completeInferenceReceivingPatternAllowSet = new HashSet<ObjectPropertyStatementPattern>(); 
+		Set<ReasonerStatementPattern> completeInferenceReceivingPatternAllowSet = new HashSet<>(); 
 		completeInferenceReceivingPatternAllowSet.addAll(defaultInferenceReceivingPatternAllowSet);
-		completeInferenceReceivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null, OWL.sameAs, null));
+		completeInferenceReceivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern(OWL.sameAs));
 		// getting NPEs inside Pellet with differentFrom on 2.0.0-rc7 
-        //completeInferenceReceivingPatternAllowSet.add(ObjectPropertyStatementPatternFactory.getPattern(null, OWL.differentFrom, null));
+        //completeInferenceReceivingPatternAllowSet.add(ReasonerStatementPattern.objectPattern( OWL.differentFrom, null));
         COMPLETE.setInferenceReceivingPatternAllowSet(completeInferenceReceivingPatternAllowSet);
         
 	}
 	
-	public Set<ObjectPropertyStatementPattern> getInferenceDrivingPatternAllowSet() {
+	public Set<ReasonerStatementPattern> getInferenceDrivingPatternAllowSet() {
 		return this.inferenceDrivingPatternAllowSet;
 	}
 	
-	public void setInferenceDrivingPatternAllowSet(Set<ObjectPropertyStatementPattern> patternSet) {
+	public void setInferenceDrivingPatternAllowSet(Set<ReasonerStatementPattern> patternSet) {
 		this.inferenceDrivingPatternAllowSet = patternSet;
 	}
 	
-	public Set<ObjectPropertyStatementPattern> getInferenceDrivingPatternDenySet() {
+	public Set<ReasonerStatementPattern> getInferenceDrivingPatternDenySet() {
 		return this.inferenceDrivingPatternDenySet;
 	}
 	
-	public void setInferenceDrivingPatternDenySet(Set<ObjectPropertyStatementPattern> patternSet) {
+	public void setInferenceDrivingPatternDenySet(Set<ReasonerStatementPattern> patternSet) {
 		this.inferenceDrivingPatternDenySet = patternSet;
 	}
 	
-	public Set<ObjectPropertyStatementPattern> getInferenceReceivingPatternAllowSet() {
+	public Set<ReasonerStatementPattern> getInferenceReceivingPatternAllowSet() {
 		return this.inferenceReceivingPatternAllowSet;
 	}
 	
-	public void setInferenceReceivingPatternAllowSet(Set<ObjectPropertyStatementPattern> patternSet) {
+	public void setInferenceReceivingPatternAllowSet(Set<ReasonerStatementPattern> patternSet) {
 		this.inferenceReceivingPatternAllowSet = patternSet;
 	}
 	

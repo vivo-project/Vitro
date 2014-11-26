@@ -37,6 +37,8 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerConfiguration;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerStatementPattern;
 
 public class PelletListener implements ModelChangedListener {
 
@@ -50,11 +52,11 @@ public class PelletListener implements ModelChangedListener {
 	private OntModel mainModel;
 	private Model inferenceModel;
 	private ReasonerConfiguration reasonerConfiguration;
-	private Set<ObjectPropertyStatementPattern> inferenceDrivingPatternAllowSet;
-	private Set<ObjectPropertyStatementPattern> inferenceDrivingPatternDenySet;
-	private Set<ObjectPropertyStatementPattern> inferenceReceivingPatternAllowSet;
+	private Set<ReasonerStatementPattern> inferenceDrivingPatternAllowSet;
+	private Set<ReasonerStatementPattern> inferenceDrivingPatternDenySet;
+	private Set<ReasonerStatementPattern> inferenceReceivingPatternAllowSet;
 	
-	private Map<Property,List<ObjectPropertyStatementPattern>> inferenceDrivingPatternMap;
+	private Map<Property,List<ReasonerStatementPattern>> inferenceDrivingPatternMap;
 	
 	private Model additionModel;
 	private Model removalModel;
@@ -142,13 +144,13 @@ public class PelletListener implements ModelChangedListener {
 		this.inferenceReceivingPatternAllowSet = reasonerConfiguration.getInferenceReceivingPatternAllowSet();
         
 		if (this.inferenceDrivingPatternAllowSet != null) {
-			this.inferenceDrivingPatternMap = new HashMap<Property,List<ObjectPropertyStatementPattern>>();
-			for (Iterator<ObjectPropertyStatementPattern> i = inferenceDrivingPatternAllowSet.iterator(); i.hasNext();) {
-				ObjectPropertyStatementPattern pat = i.next();
+			this.inferenceDrivingPatternMap = new HashMap<>();
+			for (Iterator<ReasonerStatementPattern> i = inferenceDrivingPatternAllowSet.iterator(); i.hasNext();) {
+				ReasonerStatementPattern pat = i.next();
 				Property p = pat.getPredicate();
-				List<ObjectPropertyStatementPattern> patList = inferenceDrivingPatternMap.get(p);
+				List<ReasonerStatementPattern> patList = inferenceDrivingPatternMap.get(p);
 				if (patList == null) {
-					patList = new LinkedList<ObjectPropertyStatementPattern>();
+					patList = new LinkedList<>();
 					patList.add(pat);
 					inferenceDrivingPatternMap.put(p, patList);
 				} else {
@@ -163,7 +165,7 @@ public class PelletListener implements ModelChangedListener {
 		this.deletedDataProperties = ModelFactory.createDefaultModel();
 		this.mainModel.enterCriticalSection(Lock.READ);
     	try {
-    	    for (ObjectPropertyStatementPattern pat : this.inferenceDrivingPatternAllowSet) {
+    	    for (ReasonerStatementPattern pat : this.inferenceDrivingPatternAllowSet) {
     	        addedStatements(mainModel.listStatements((Resource) null, pat.getPredicate(), (RDFNode) null));    
     	    }
         	if (!skipReasoningUponInitialization) {
@@ -198,12 +200,12 @@ public class PelletListener implements ModelChangedListener {
 					inferenceRounds++;
 					log.info("Getting new inferences");
 					long startTime = System.currentTimeMillis();
-					LinkedList<ObjectPropertyStatementPattern> irpl = new LinkedList<ObjectPropertyStatementPattern>();
+					LinkedList<ReasonerStatementPattern> irpl = new LinkedList<>();
 					
 					if (inferenceReceivingPatternAllowSet != null) {
 						irpl.addAll(inferenceReceivingPatternAllowSet);
 					} else {
-						irpl.add(ObjectPropertyStatementPatternFactory.getPattern(null,null,null));
+						irpl.add(ReasonerStatementPattern.ANY_OBJECT_PROPERTY);
 					}
 					
 					if (reasonerConfiguration.getQueryForAllObjectProperties()) {	
@@ -214,7 +216,7 @@ public class PelletListener implements ModelChangedListener {
 									for (Iterator objPropIt = closeIt; objPropIt.hasNext();) {
 										ObjectProperty objProp = (ObjectProperty) objPropIt.next();
 										if ( !("http://www.w3.org/2002/07/owl#".equals(objProp.getNameSpace())) ) {
-											irpl.add(ObjectPropertyStatementPatternFactory.getPattern(null,objProp,null));
+											irpl.add(ReasonerStatementPattern.objectPattern(objProp));
 										}
 									}
 								} finally {
@@ -229,7 +231,7 @@ public class PelletListener implements ModelChangedListener {
 								try {
 									while (sit.hasNext()) {
 										Resource subj = (Resource) sit.next();
-										irpl.add(ObjectPropertyStatementPatternFactory.getPattern(null,ResourceFactory.createProperty(subj.getURI()),null));
+										irpl.add(ReasonerStatementPattern.objectPattern(ResourceFactory.createProperty(subj.getURI())));
 									}
 								} finally {
 									sit.close();
@@ -249,7 +251,7 @@ public class PelletListener implements ModelChangedListener {
 									DatatypeProperty dataProp = (DatatypeProperty) dataPropIt.next();
 									if ( !("http://www.w3.org/2002/07/owl#".equals(dataProp.getNameSpace())) ) {
 										// TODO: THIS WILL WORK, BUT NEED TO GENERALIZE THE PATTERN CLASSES 
-										irpl.add(ObjectPropertyStatementPatternFactory.getPattern(null,dataProp,null));
+										irpl.add(ReasonerStatementPattern.objectPattern(dataProp));
 									}
 								}
 							} finally {
@@ -264,7 +266,7 @@ public class PelletListener implements ModelChangedListener {
 							try {
 								while (sit.hasNext()) {
 									Resource subj = (Resource) sit.next();
-									irpl.add(ObjectPropertyStatementPatternFactory.getPattern(null,ResourceFactory.createProperty(subj.getURI()),null));
+									irpl.add(ReasonerStatementPattern.objectPattern(ResourceFactory.createProperty(subj.getURI())));
 								}
 							} finally {
 								sit.close();
@@ -294,68 +296,55 @@ public class PelletListener implements ModelChangedListener {
 						pelletModel.leaveCriticalSection();
 					} 
 					
-					 for (Iterator<ObjectPropertyStatementPattern> patIt = irpl.iterator(); patIt.hasNext(); ) {
-				        	ObjectPropertyStatementPattern pat = patIt.next();
-
-				        	if (log.isDebugEnabled()) {
-				        		String subjStr = (pat.getSubject() != null) ? pat.getSubject().getURI() : "*";
-				        		String predStr = (pat.getPredicate() != null) ? pat.getPredicate().getURI() : "*";
-				        		String objStr = (pat.getObject() != null) ? pat.getObject().getURI() : "*";
-								log.debug("Querying for "+subjStr+" : "+predStr+" : "+objStr);
-							}
+					 for (Iterator<ReasonerStatementPattern> patIt = irpl.iterator(); patIt.hasNext(); ) {
+				        	ReasonerStatementPattern pat = patIt.next();
+							log.debug("Querying for "+pat);
 				        	
 				        	Model tempModel = ModelFactory.createDefaultModel();
 				        	
 				        	pelletModel.enterCriticalSection(Lock.READ); 
 				        	try {
-				        		
-					        	ClosableIterator ci = pelletModel.listStatements(pat.getSubject(),pat.getPredicate(),pat.getObject());
-						        try {	
-							        for (ClosableIterator i=ci; i.hasNext();) {
-							        	Statement stmt = (Statement) i.next();
-							        	
-							        	boolean reject = false;
-						        		
-						        		// this next part is only needed if we're using Jena's OWL reasoner instead of actually using Pellet
-						        		try {
-						        			if ( ( ((Resource)stmt.getObject()).equals(RDFS.Resource) ) ) {
-						        				reject = true;
-						        			} else if ( ( stmt.getSubject().equals(OWL.Nothing) ) )  {
-												reject = true; 
-											}  else if ( ( stmt.getObject().equals(OWL.Nothing) ) )  {
-												reject = true;
-											}
-						        		} catch (Exception e) {}
-						        		
-						        		if (!reject) {
-						        			tempModel.add(stmt);
-						        		
-						        			boolean fullModelContainsStatement = false;
-						        			fullModel.enterCriticalSection(Lock.READ);
-						        			try {
-						        				fullModelContainsStatement = fullModel.contains(stmt);
-						        			} finally {
-						        				fullModel.leaveCriticalSection();
-						        			}
-						        			
-								        	if (!fullModelContainsStatement) {
-								        		// in theory we should be able to lock only the inference model, but I'm not sure yet if Jena propagates the locking upward
-								        		fullModel.enterCriticalSection(Lock.WRITE);
-								        		closePipe();
-								        		try {
-								        			inferenceModel.add(stmt);
-								        			addCount++;
-								        		} finally {
-								        			openPipe();
-								        			fullModel.leaveCriticalSection();
-								        		}
-								        	}
-							        	
-						        		}
-							        }   
-						        } finally {
-						        	ci.close();
-						        }
+				        		for(Statement stmt : pat.matchStatementsFromModel(pelletModel)) {
+						        	
+						        	boolean reject = false;
+					        		
+					        		// this next part is only needed if we're using Jena's OWL reasoner instead of actually using Pellet
+					        		try {
+					        			if ( ( ((Resource)stmt.getObject()).equals(RDFS.Resource) ) ) {
+					        				reject = true;
+					        			} else if ( ( stmt.getSubject().equals(OWL.Nothing) ) )  {
+											reject = true; 
+										}  else if ( ( stmt.getObject().equals(OWL.Nothing) ) )  {
+											reject = true;
+										}
+					        		} catch (Exception e) {}
+					        		
+					        		if (!reject) {
+					        			tempModel.add(stmt);
+					        		
+					        			boolean fullModelContainsStatement = false;
+					        			fullModel.enterCriticalSection(Lock.READ);
+					        			try {
+					        				fullModelContainsStatement = fullModel.contains(stmt);
+					        			} finally {
+					        				fullModel.leaveCriticalSection();
+					        			}
+					        			
+							        	if (!fullModelContainsStatement) {
+							        		// in theory we should be able to lock only the inference model, but I'm not sure yet if Jena propagates the locking upward
+							        		fullModel.enterCriticalSection(Lock.WRITE);
+							        		closePipe();
+							        		try {
+							        			inferenceModel.add(stmt);
+							        			addCount++;
+							        		} finally {
+							        			openPipe();
+							        			fullModel.leaveCriticalSection();
+							        		}
+							        	}
+						        	
+					        		}
+						        }   
 				        	} finally {
 				        		pelletModel.leaveCriticalSection();
 				        	}
@@ -364,22 +353,11 @@ public class PelletListener implements ModelChangedListener {
 				        	
 							try {
 								Queue<Statement> localRemovalQueue = new LinkedList<Statement>();
-									inferenceModel.enterCriticalSection(Lock.READ);
-									try {
-										ClosableIterator ci = inferenceModel.listStatements(pat.getSubject(),pat.getPredicate(),pat.getObject());
-										try {
-									        for (ClosableIterator i=ci; i.hasNext();) {
-									        	Statement stmt = (Statement) i.next();
-									        	if (!tempModel.contains(stmt)) {
-									        		localRemovalQueue.add(stmt);
-									        	}
-									        }    
-										} finally {
-											ci.close();
-										}
-									} finally {
-										inferenceModel.leaveCriticalSection();
-									}
+								for (Statement stmt : pat.matchStatementsFromModel(inferenceModel)) {
+						        	if (!tempModel.contains(stmt)) {
+						        		localRemovalQueue.add(stmt);
+						        	}
+								}
 						        for (Iterator<Statement> i = localRemovalQueue.iterator(); i.hasNext(); ) {
 						        	fullModel.enterCriticalSection(Lock.WRITE);
 						        	closePipe();
@@ -448,10 +426,10 @@ public class PelletListener implements ModelChangedListener {
 			if (pipeOpen) {
 				sendToPellet = false;
 				boolean denied = false;
-				ObjectPropertyStatementPattern stPat = ObjectPropertyStatementPatternFactory.getPattern(stmt.getSubject(), stmt.getPredicate(), (Resource) stmt.getObject());
+				ReasonerStatementPattern stPat = ReasonerStatementPattern.objectPattern(stmt);
 				if (inferenceDrivingPatternDenySet != null) {
-					for (Iterator<ObjectPropertyStatementPattern> i = inferenceDrivingPatternDenySet.iterator(); i.hasNext(); ){
-						ObjectPropertyStatementPattern pat = i.next();
+					for (Iterator<ReasonerStatementPattern> i = inferenceDrivingPatternDenySet.iterator(); i.hasNext(); ){
+						ReasonerStatementPattern pat = i.next();
 						if (pat.matches(stPat)) {
 							denied = true;
 							break;
@@ -463,10 +441,10 @@ public class PelletListener implements ModelChangedListener {
 						sendToPellet = true;
 					} else {
 						// TODO: O(1) implementation of this
-						List<ObjectPropertyStatementPattern> patList = this.inferenceDrivingPatternMap.get(stmt.getPredicate());
+						List<ReasonerStatementPattern> patList = this.inferenceDrivingPatternMap.get(stmt.getPredicate());
 						if (patList != null) {
-							for (Iterator<ObjectPropertyStatementPattern> i = patList.iterator(); i.hasNext(); ){
-								ObjectPropertyStatementPattern pat = i.next();
+							for (Iterator<ReasonerStatementPattern> i = patList.iterator(); i.hasNext(); ){
+								ReasonerStatementPattern pat = i.next();
 								if (pat.matches(stPat)) {
 									sendToPellet = true;
 									break;
@@ -526,10 +504,10 @@ public class PelletListener implements ModelChangedListener {
 				}
 				removeFromPellet = false;
 				boolean denied = false;
-				ObjectPropertyStatementPattern stPat = ObjectPropertyStatementPatternFactory.getPattern(stmt.getSubject(), stmt.getPredicate(), (Resource) stmt.getObject());
+				ReasonerStatementPattern stPat = ReasonerStatementPattern.objectPattern(stmt);
 				if (inferenceDrivingPatternDenySet != null) {
-					for (Iterator<ObjectPropertyStatementPattern> i = inferenceDrivingPatternDenySet.iterator(); i.hasNext(); ){
-						ObjectPropertyStatementPattern pat = i.next();
+					for (Iterator<ReasonerStatementPattern> i = inferenceDrivingPatternDenySet.iterator(); i.hasNext(); ){
+						ReasonerStatementPattern pat = i.next();
 						if (pat.matches(stPat)) {
 							denied = true;
 							break;
@@ -541,10 +519,10 @@ public class PelletListener implements ModelChangedListener {
 						removeFromPellet = true;
 					} else {
 						// TODO: O(1) implementation of this
-						List<ObjectPropertyStatementPattern> patList = this.inferenceDrivingPatternMap.get(stmt.getPredicate());
+						List<ReasonerStatementPattern> patList = this.inferenceDrivingPatternMap.get(stmt.getPredicate());
 						if (patList != null) {
-							for (Iterator<ObjectPropertyStatementPattern> i = patList.iterator(); i.hasNext(); ){
-								ObjectPropertyStatementPattern pat = i.next();
+							for (Iterator<ReasonerStatementPattern> i = patList.iterator(); i.hasNext(); ){
+								ReasonerStatementPattern pat = i.next();
 								if (pat.matches(stPat)) {
 									removeFromPellet = true;
 									break;
