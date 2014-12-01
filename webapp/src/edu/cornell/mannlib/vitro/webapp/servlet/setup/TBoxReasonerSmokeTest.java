@@ -13,9 +13,14 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -33,6 +38,9 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
  * KLUGE -- in production, startup_listeners shouldn't mention this.
  */
 public class TBoxReasonerSmokeTest implements ServletContextListener {
+	private static final Log log = LogFactory
+			.getLog(TBoxReasonerSmokeTest.class);
+
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		ServletContext ctx = sce.getServletContext();
@@ -53,8 +61,43 @@ public class TBoxReasonerSmokeTest implements ServletContextListener {
 		if (savedInferencesModel.isIsomorphicWith(tboxInferencesModel)) {
 			ss.info(this, "TBox inferences matches saved.");
 		} else {
+			dumpDifferences(savedInferencesModel, tboxInferencesModel);
 			ss.fatal(this, "TBox inferences does not match saved.");
 		}
+	}
+
+	private void dumpDifferences(OntModel savedInferencesModel,
+			OntModel tboxInferencesModel) {
+		Model missingStatements = ModelFactory.createDefaultModel();
+		for (Statement stmt : savedInferencesModel.listStatements().toList()) {
+			if (!tboxInferencesModel.contains(stmt)) {
+				missingStatements.add(stmt);
+			}
+		}
+		
+		Model extraStatements = ModelFactory.createDefaultModel();
+		for (Statement stmt : tboxInferencesModel.listStatements().toList()) {
+			if (!savedInferencesModel.contains(stmt)) {
+				extraStatements.add(stmt);
+			}
+		}
+		
+		log.error("inferences: " + tboxInferencesModel.size() + ", saved: "
+				+ savedInferencesModel.size() + ", missing: "
+				+ missingStatements.size() + ", extra: "
+				+ extraStatements.size());
+
+		String missing = "";
+		for (Statement stmt : missingStatements.listStatements().toList()) {
+			missing += "\n   " + stmt;
+		}
+		log.error("missing statements:" + missing);
+
+		String extras = "";
+		for (Statement stmt : extraStatements.listStatements().toList()) {
+			extras += "\n   " + stmt;
+		}
+		log.error("extra statements:" + extras);
 	}
 
 	private File locateSavedInferencesFile() {

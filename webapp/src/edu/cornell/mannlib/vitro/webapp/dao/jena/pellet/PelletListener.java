@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena.pellet;
 
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -24,12 +23,9 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
-import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ConfiguredReasonerListener;
-import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ConfiguredReasonerListener.Suspension;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerStatementPattern;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerDriver;
@@ -303,10 +299,7 @@ public class PelletListener implements TBoxReasonerDriver {
 							deletedDataProperties.leaveCriticalSection();
 						}
 					}
-						
-					int addCount = 0;
-					int retractCount = 0;
-				
+					
 					// force new reasoner (disabled)
 					if (false && !reasonerConfiguration.isIncrementalReasoningEnabled()) {
 						Model baseModel = pelletModel.getBaseModel();
@@ -323,88 +316,16 @@ public class PelletListener implements TBoxReasonerDriver {
 						pelletModel.leaveCriticalSection();
 					} 
 					
-					 for (Iterator<ReasonerStatementPattern> patIt = irpl.iterator(); patIt.hasNext(); ) {
-				        	ReasonerStatementPattern pat = patIt.next();
-							log.debug("Querying for "+pat);
-				        	
-				        	Model tempModel = ModelFactory.createDefaultModel();
-				        	
-				        	pelletModel.enterCriticalSection(Lock.READ); 
-				        	try {
-				        		for(Statement stmt : pat.matchStatementsFromModel(pelletModel)) {
-						        	
-						        	boolean reject = false;
-					        		
-					        		// this next part is only needed if we're using Jena's OWL reasoner instead of actually using Pellet
-					        		try {
-					        			if ( ( ((Resource)stmt.getObject()).equals(RDFS.Resource) ) ) {
-					        				reject = true;
-					        			} else if ( ( stmt.getSubject().equals(OWL.Nothing) ) )  {
-											reject = true; 
-										}  else if ( ( stmt.getObject().equals(OWL.Nothing) ) )  {
-											reject = true;
-										}
-					        		} catch (Exception e) {}
-					        		
-					        		if (!reject) {
-					        			tempModel.add(stmt);
-					        		
-					        			boolean fullModelContainsStatement = false;
-					        			fullModel.enterCriticalSection(Lock.READ);
-					        			try {
-					        				fullModelContainsStatement = fullModel.contains(stmt);
-					        			} finally {
-					        				fullModel.leaveCriticalSection();
-					        			}
-					        			
-							        	if (!fullModelContainsStatement) {
-							        		// in theory we should be able to lock only the inference model, but I'm not sure yet if Jena propagates the locking upward
-							        		fullModel.enterCriticalSection(Lock.WRITE);
-								        	try (Suspension susp = listener.suspend()) {
-							        			inferenceModel.add(stmt);
-							        			addCount++;
-							        		} finally {
-							        			fullModel.leaveCriticalSection();
-							        		}
-							        	}
-						        	
-					        		}
-						        }   
-				        	} finally {
-				        		pelletModel.leaveCriticalSection();
-				        	}
-				        	
-				        	// now we see what's in the inference model that isn't in the temp model and remove it
-				        	
-							try {
-								Queue<Statement> localRemovalQueue = new LinkedList<Statement>();
-								for (Statement stmt : pat.matchStatementsFromModel(inferenceModel)) {
-						        	if (!tempModel.contains(stmt)) {
-						        		localRemovalQueue.add(stmt);
-						        	}
-								}
-						        for (Iterator<Statement> i = localRemovalQueue.iterator(); i.hasNext(); ) {
-						        	fullModel.enterCriticalSection(Lock.WRITE);
-						        	try (Suspension susp = listener.suspend()) {
-						        		retractCount++;
-						        		inferenceModel.remove(i.next());
-						        	} finally {
-						        		fullModel.leaveCriticalSection();
-						        	}
-						        }
-						        
-						        localRemovalQueue.clear();
-						    } catch (Exception e) {
-								log.error("Error getting inferences", e);
-						    } 
-						    tempModel = null;
-				        }
+					InferenceModelUpdater inferenceModelUpdater = new InferenceModelUpdater(
+							pelletModel, inferenceModel, fullModel, listener);
+					inferenceModelUpdater.update(irpl);					 
+					 
 					 this.pelletListener.isConsistent = true;
 					 this.pelletListener.inErrorState = false;
 					 this.pelletListener.explanation = "";
 					 if (log.isDebugEnabled()) {
-						 log.info("Added "+addCount+" statements entailed by assertions");					 
-						 log.info("Retracted "+retractCount+" statements no longer entailed by assertions");						 
+						 log.info("Added "+inferenceModelUpdater.getAddCount()+" statements entailed by assertions");					 
+						 log.info("Retracted "+inferenceModelUpdater.getRetractCount()+" statements no longer entailed by assertions");						 
 						 log.info("Done getting new inferences: "+(System.currentTimeMillis()-startTime)/1000+" seconds");
 					 }
 				} catch (InconsistentOntologyException ioe) {
@@ -421,7 +342,6 @@ public class PelletListener implements TBoxReasonerDriver {
 				}
 			}
 		}
-			
 	}
 	
 	private void getInferences() {
