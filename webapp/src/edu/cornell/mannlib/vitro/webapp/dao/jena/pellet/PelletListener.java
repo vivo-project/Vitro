@@ -2,8 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena.pellet;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
@@ -32,6 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ConfiguredReasonerListener;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ConfiguredReasonerListener.Suspension;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerStatementPattern;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxChanges;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerDriver;
 
 public class PelletListener implements TBoxReasonerDriver {
@@ -51,12 +55,6 @@ public class PelletListener implements TBoxReasonerDriver {
 	private Set<ReasonerStatementPattern> inferenceReceivingPatternAllowSet;
 	
 	private final ConfiguredReasonerListener listener;
-	
-	private Model additionModel;
-	private Model removalModel;
-	
-	private Model deletedObjectProperties;
-	private Model deletedDataProperties;
 	
 	private boolean isConsistent = true;
 	private boolean inErrorState = false;
@@ -99,6 +97,8 @@ public class PelletListener implements TBoxReasonerDriver {
 		this.dirty = dirt;
 	}
 	
+	private final List<TBoxChanges> pendingChangeSets = Collections.synchronizedList(new ArrayList<TBoxChanges>());
+	
 	private int inferenceRounds = 0;
 	
 	private boolean foreground = false;
@@ -127,11 +127,6 @@ public class PelletListener implements TBoxReasonerDriver {
 		this.inferenceDrivingPatternDenySet = reasonerConfiguration.getInferenceDrivingPatternDenySet();
 		this.inferenceReceivingPatternAllowSet = reasonerConfiguration.getInferenceReceivingPatternAllowSet();
         
-		this.additionModel = ModelFactory.createDefaultModel();
-		this.removalModel = ModelFactory.createDefaultModel();
-		this.deletedObjectProperties = ModelFactory.createDefaultModel();
-		this.deletedDataProperties = ModelFactory.createDefaultModel();
-		
 		listener = new ConfiguredReasonerListener(reasonerConfiguration, this);
 		
 		this.mainModel.enterCriticalSection(Lock.READ);
@@ -156,48 +151,9 @@ public class PelletListener implements TBoxReasonerDriver {
 	}
 	
 	@Override
-	public void addStatement(Statement stmt) {
-		additionModel.enterCriticalSection(Lock.WRITE);
-		try {
-			additionModel.add(stmt);
-		} finally {
-			additionModel.leaveCriticalSection();
-		}
-	}
-
-	@Override
-	public void removeStatement(Statement stmt) {
-		removalModel.enterCriticalSection(Lock.WRITE);
-		try {
-			removalModel.add(stmt);
-		} finally {
-			removalModel.leaveCriticalSection();
-		}
-	}
-
-	@Override
-	public void deleteDataProperty(Statement stmt) {
-		deletedDataProperties.enterCriticalSection(Lock.WRITE);
-		try {
-			deletedDataProperties.add(stmt);
-		} finally {
-			deletedDataProperties.leaveCriticalSection();
-		}
-	}
-
-	@Override
-	public void deleteObjectProperty(Statement stmt) {
-		deletedObjectProperties.enterCriticalSection(Lock.WRITE);
-		try {
-			deletedObjectProperties.add(stmt);
-		} finally {
-			deletedObjectProperties.leaveCriticalSection();
-		}
-	}
-
-	@Override
-	public void runSynchronizer() {
-		if ((additionModel.size() > 0) || (removalModel.size() > 0)) {
+	public void runSynchronizer(TBoxChanges changeSet) {
+		if (!changeSet.isEmpty()) {
+			pendingChangeSets.add(changeSet);
 			if (!isSynchronizing) {
 				if (foreground) {
 					log.debug("Running Pellet in foreground.");
@@ -214,9 +170,11 @@ public class PelletListener implements TBoxReasonerDriver {
 	private class InferenceGetter implements Runnable {
 		
 		private PelletListener pelletListener;
+		private TBoxChanges changeSet;
 		
-		public InferenceGetter(PelletListener pelletListener) {
+		public InferenceGetter(PelletListener pelletListener, TBoxChanges changeSet) {
 			this.pelletListener = pelletListener;
+			this.changeSet = changeSet;
 		}
 		
 		public void run() {
@@ -252,20 +210,8 @@ public class PelletListener implements TBoxReasonerDriver {
 							} finally {
 								pelletModel.leaveCriticalSection();
 							}
-							deletedObjectProperties.enterCriticalSection(Lock.WRITE);
-							try {
-								ClosableIterator sit = deletedObjectProperties.listSubjects();
-								try {
-									while (sit.hasNext()) {
-										Resource subj = (Resource) sit.next();
-										irpl.add(ReasonerStatementPattern.objectPattern(ResourceFactory.createProperty(subj.getURI())));
-									}
-								} finally {
-									sit.close();
-								}
-								deletedObjectProperties.removeAll();
-							} finally {
-								deletedObjectProperties.leaveCriticalSection();
+							for (String uri: changeSet.getDeletedObjectPropertyUris()) {
+								irpl.add(ReasonerStatementPattern.objectPattern(ResourceFactory.createProperty(uri)));
 							}
 					}
 					
@@ -287,20 +233,8 @@ public class PelletListener implements TBoxReasonerDriver {
 						} finally {
 							pelletModel.leaveCriticalSection();
 						}
-						deletedDataProperties.enterCriticalSection(Lock.WRITE);
-						try {
-							ClosableIterator sit = deletedDataProperties.listSubjects();
-							try {
-								while (sit.hasNext()) {
-									Resource subj = (Resource) sit.next();
-									irpl.add(ReasonerStatementPattern.objectPattern(ResourceFactory.createProperty(subj.getURI())));
-								}
-							} finally {
-								sit.close();
-							}
-							deletedDataProperties.removeAll();
-						} finally {
-							deletedDataProperties.leaveCriticalSection();
+						for (String uri: changeSet.getDeletedDataPropertyUris()) {
+							irpl.add(ReasonerStatementPattern.objectPattern(ResourceFactory.createProperty(uri)));
 						}
 					}
 						
@@ -424,13 +358,13 @@ public class PelletListener implements TBoxReasonerDriver {
 			
 	}
 	
-	private void getInferences() {
+	private void getInferences(TBoxChanges changeSet) {
 		this.setDirty(true);
 		if ( this.checkAndStartReasoning() ){
 			if (foreground) {
-				(new InferenceGetter(this)).run();
+				(new InferenceGetter(this, changeSet)).run();
 			} else {
-				new Thread(new InferenceGetter(this), "PelletListener.InferenceGetter").start();
+				new Thread(new InferenceGetter(this, changeSet), "PelletListener.InferenceGetter").start();
 			}
 		}
 	}
@@ -439,38 +373,18 @@ public class PelletListener implements TBoxReasonerDriver {
 		public void run() {
 			try {
 				isSynchronizing = true;
-				while (removalModel.size()>0 || additionModel.size()>0) {
-					Model tempModel = ModelFactory.createDefaultModel();
-					removalModel.enterCriticalSection(Lock.WRITE);
-					try {
-						tempModel.add(removalModel);
-						removalModel.removeAll();
-					} finally {
-						removalModel.leaveCriticalSection();
-					}
+				while (!pendingChangeSets.isEmpty()) {
+					TBoxChanges changeSet = pendingChangeSets.remove(0);
+					
 					pelletModel.enterCriticalSection(Lock.WRITE); 
 					try {
-						pelletModel.remove(tempModel);
+						pelletModel.remove(changeSet.getRemovedStatements());
+						pelletModel.add(changeSet.getAddedStatements());
 					} finally {
 						pelletModel.leaveCriticalSection();
 					}
-					tempModel.removeAll();
-					additionModel.enterCriticalSection(Lock.WRITE);
-					try {
-						tempModel.add(additionModel);
-						additionModel.removeAll();
-					} finally {
-						additionModel.leaveCriticalSection();
-					}
-					pelletModel.enterCriticalSection(Lock.WRITE);
-					try {
-						pelletModel.add(tempModel);
-					} finally {
-						pelletModel.leaveCriticalSection();
-					}
-					tempModel = null;
 					
-					getInferences();
+					getInferences(changeSet);
 					
 				}
 			} finally {

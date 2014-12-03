@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,8 +24,11 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 
 /**
- * Listens for changes on a model. When a change is announced, it is passed
- * along to the reasoner driver, if the configuration says that it is worthy.
+ * Listens for changes on a model. When a change is announced, it is checked for
+ * worthiness. If worthy, it is added to a change set.
+ * 
+ * When an ending EditEvent is received, the current change set is passed along
+ * to the reasoner driver, and a new change set is begun.
  * 
  * It is possible to "suspend" the listener, so it will ignore any changes. This
  * is useful when the reasoner itself makes changes to the models, so those
@@ -36,9 +40,11 @@ public class ConfiguredReasonerListener implements ModelChangedListener {
 
 	private final ReasonerConfiguration reasonerConfiguration;
 	private final TBoxReasonerDriver reasonerDriver;
+
 	private final DrivingPatternMap drivingPatternMap;
 
-	private final AtomicBoolean suspended = new AtomicBoolean();
+	private final AtomicReference<TBoxChanges> changeSet;
+	private final AtomicBoolean suspended;
 
 	public ConfiguredReasonerListener(
 			ReasonerConfiguration reasonerConfiguration,
@@ -48,6 +54,9 @@ public class ConfiguredReasonerListener implements ModelChangedListener {
 
 		this.drivingPatternMap = new DrivingPatternMap(
 				reasonerConfiguration.getInferenceDrivingPatternAllowSet());
+
+		this.changeSet = new AtomicReference<>(new TBoxChanges());
+		this.suspended = new AtomicBoolean();
 	}
 
 	public Suspension suspend() {
@@ -162,7 +171,8 @@ public class ConfiguredReasonerListener implements ModelChangedListener {
 		if (event instanceof EditEvent) {
 			EditEvent ee = (EditEvent) event;
 			if (!ee.getBegin()) {
-				this.reasonerDriver.runSynchronizer();
+				TBoxChanges changes = changeSet.getAndSet(new TBoxChanges());
+				this.reasonerDriver.runSynchronizer(changes);
 			}
 		}
 	}
@@ -305,19 +315,19 @@ public class ConfiguredReasonerListener implements ModelChangedListener {
 	}
 
 	private void addIt(Statement stmt) {
-		this.reasonerDriver.addStatement(stmt);
+		changeSet.get().addStatement(stmt);
 	}
 
 	private void removeIt(Statement stmt) {
-		this.reasonerDriver.removeStatement(stmt);
+		changeSet.get().removeStatement(stmt);
 	}
 
 	private void deleteObjectProperty(Statement stmt) {
-		this.reasonerDriver.deleteObjectProperty(stmt);
+		changeSet.get().deleteObjectProperty(stmt);
 	}
 
 	private void deleteDataProperty(Statement stmt) {
-		this.reasonerDriver.deleteDataProperty(stmt);
+		changeSet.get().deleteDataProperty(stmt);
 	}
 
 	// The pattern matching stuff needs to get reworked.
