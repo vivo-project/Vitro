@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.dao.jena.pellet;
+package edu.cornell.mannlib.vitro.webapp.tboxreasoner;
 
 import static com.hp.hpl.jena.rdf.model.ResourceFactory.createProperty;
 
@@ -13,7 +13,7 @@ import com.hp.hpl.jena.ontology.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerStatementPattern;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxChanges;
-import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerWrapper;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasoner;
 
 /**
  * The list of patterns for filtering the models will include:
@@ -27,11 +27,11 @@ public class PatternListBuilder {
 	private static final String OWL_NS = "http://www.w3.org/2002/07/owl#";
 
 	private final ReasonerConfiguration reasonerConfiguration;
-	private final TBoxReasonerWrapper reasoner;
+	private final TBoxReasoner reasoner;
 	private final TBoxChanges changes;
 
 	public PatternListBuilder(ReasonerConfiguration reasonerConfiguration,
-			TBoxReasonerWrapper reasoner, TBoxChanges changes) {
+			TBoxReasoner reasoner, TBoxChanges changes) {
 		this.reasonerConfiguration = reasonerConfiguration;
 		this.reasoner = reasoner;
 		this.changes = changes;

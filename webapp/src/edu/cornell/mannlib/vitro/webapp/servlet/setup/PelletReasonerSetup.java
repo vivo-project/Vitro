@@ -24,8 +24,8 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.BasicTBoxReasonerDriver;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerDriver;
-import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerWrapper;
-import edu.cornell.mannlib.vitro.webapp.tboxreasoner.impl.pellet.PelletTBoxReasonerDriver;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasoner;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.impl.pellet.PelletTBoxReasoner;
 
 /**
  * Start the Pellet reasoner on the TBox.
@@ -46,7 +46,7 @@ public class PelletReasonerSetup implements ServletContextListener {
 		OntModel tboxUnionModel = contextModels.getOntModel(TBOX_UNION);
 		WebappDaoFactory wadf = contextModels.getWebappDaoFactory();
 
-		TBoxReasonerWrapper reasoner = new PelletTBoxReasonerDriver(
+		TBoxReasoner reasoner = new PelletTBoxReasoner(
 				ReasonerConfiguration.DEFAULT);
 		TBoxReasonerDriver driver = new BasicTBoxReasonerDriver(
 				tboxAssertionsModel, tboxInferencesModel, tboxUnionModel,

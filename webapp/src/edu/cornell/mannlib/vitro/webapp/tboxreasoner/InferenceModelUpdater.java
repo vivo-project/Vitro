@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.dao.jena.pellet;
+package edu.cornell.mannlib.vitro.webapp.tboxreasoner;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ConfiguredReasonerListener;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ConfiguredReasonerListener.Suspension;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerStatementPattern;
-import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerWrapper;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasoner;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableModel;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableOntModel;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedModel;
@@ -28,7 +28,7 @@ public class InferenceModelUpdater {
 	private static final Log log = LogFactory
 			.getLog(InferenceModelUpdater.class);
 
-	private final TBoxReasonerWrapper reasoner;
+	private final TBoxReasoner reasoner;
 	private final LockableModel lockableInferencesModel;
 	private final LockableOntModel lockableFullModel;
 	private final ConfiguredReasonerListener listener;
@@ -44,7 +44,7 @@ public class InferenceModelUpdater {
 		return retractCount;
 	}
 
-	public InferenceModelUpdater(TBoxReasonerWrapper reasoner,
+	public InferenceModelUpdater(TBoxReasoner reasoner,
 			LockableModel lockableInferencesModel,
 			LockableOntModel lockableFullModel,
 			ConfiguredReasonerListener listener) {

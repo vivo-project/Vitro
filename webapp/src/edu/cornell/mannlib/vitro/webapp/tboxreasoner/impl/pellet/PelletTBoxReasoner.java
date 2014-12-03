@@ -23,20 +23,20 @@ import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerStatementPattern;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxChanges;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerDriver.Status;
-import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerWrapper;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasoner;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableOntModel;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedOntModel;
 
 /**
  * An implementation the TBoxReasonerWrapper for Pellet.
  */
-public class PelletTBoxReasonerDriver implements TBoxReasonerWrapper {
+public class PelletTBoxReasoner implements TBoxReasoner {
 	private static final Log log = LogFactory
-			.getLog(PelletTBoxReasonerDriver.class);
+			.getLog(PelletTBoxReasoner.class);
 
 	private final LockableOntModel lockablePelletModel;
 
-	public PelletTBoxReasonerDriver(ReasonerConfiguration reasonerConfiguration) {
+	public PelletTBoxReasoner(ReasonerConfiguration reasonerConfiguration) {
 		this.lockablePelletModel = new LockableOntModel(
 				ModelFactory.createOntologyModel(reasonerConfiguration
 						.getOntModelSpec()));

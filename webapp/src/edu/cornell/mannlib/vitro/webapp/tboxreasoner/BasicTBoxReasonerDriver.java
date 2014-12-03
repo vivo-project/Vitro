@@ -41,12 +41,12 @@ public class BasicTBoxReasonerDriver implements TBoxReasonerDriver {
 	
 	private final ExecutorService executorService;
 	
-	private final TBoxReasonerWrapper reasoner;
+	private final TBoxReasoner reasoner;
 	
 	private TBoxReasonerDriver.Status status;
 
 	public BasicTBoxReasonerDriver(OntModel assertionsModel,
-			Model inferencesModel, OntModel fullModel, TBoxReasonerWrapper reasoner,
+			Model inferencesModel, OntModel fullModel, TBoxReasoner reasoner,
 			ReasonerConfiguration reasonerConfiguration) {
 		this.lockableAssertionsModel = new LockableOntModel(assertionsModel);
 		this.lockableInferencesModel = new LockableModel(inferencesModel);

@@ -12,9 +12,13 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerDriver.Status;
 
 /**
- * TODO
+ * The functionality of a TBox reasoner.
+ * 
+ * The reasoner will maintain its own TBox model. It will receive updates to
+ * that model and perform reasoning on it. It will answer queries about the
+ * contents of the model, when reasoning is complete.
  */
-public interface TBoxReasonerWrapper {
+public interface TBoxReasoner {
 
 	/**
 	 * Add the additions and remove the removals.
@@ -39,15 +43,15 @@ public interface TBoxReasonerWrapper {
 	List<DatatypeProperty> listDatatypeProperties();
 
 	/**
-	 * List all of the statements that satisfy any of these patterns, after
-	 * updating and reasoning.
-	 */
-	List<Statement> filterResults(List<ReasonerStatementPattern> patternList);
-
-	/**
 	 * List all of the restrictions in the reasoner model, after updating and
 	 * reasoning.
 	 */
 	List<Restriction> listRestrictions();
+	
+	/**
+	 * List all of the statements that satisfy any of these patterns, after
+	 * updating and reasoning.
+	 */
+	List<Statement> filterResults(List<ReasonerStatementPattern> patternList);
 
 }
