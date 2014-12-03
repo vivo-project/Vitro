@@ -8,6 +8,7 @@ import edu.cornell.mannlib.vitro.webapp.application.VitroHomeDirectory;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerModule;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ConfigurationTripleSource;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource;
 
@@ -28,6 +29,8 @@ public interface Application {
 	ContentTripleSource getContentTripleSource();
 	
 	ConfigurationTripleSource getConfigurationTripleSource();
+	
+	TBoxReasonerModule getTBoxReasonerModule();
 	
 	void shutdown();
 

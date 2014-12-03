@@ -30,6 +30,11 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
  * When an ending EditEvent is received, the current change set is passed along
  * to the reasoner driver, and a new change set is begun.
  * 
+ * Among the criteria for deciding on worthiness is the driving pattern set. In
+ * the constructor, a map is made from this set, to reduce the number of tests
+ * made against each statement. I don't know whether this optimization is
+ * justified.
+ * 
  * It is possible to "suspend" the listener, so it will ignore any changes. This
  * is useful when the reasoner itself makes changes to the models, so those
  * changes do not trigger additional reasoning.

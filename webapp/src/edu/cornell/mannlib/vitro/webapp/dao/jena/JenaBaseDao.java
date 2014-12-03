@@ -18,7 +18,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.jena.iri.IRI;
 import org.apache.jena.iri.IRIFactory;
-import org.mindswap.pellet.jena.vocabulary.SWRL;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.graph.Node;
@@ -54,6 +53,8 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 
 	public static final boolean KEEP_ONLY_IF_TRUE = true; //used for updatePropertyBooleanValue()
     public static final boolean KEEP_ONLY_IF_FALSE = false; //used for updatePropertyBooleanValue()
+    
+    private static final String SWRL_IMP = "http://www.w3.org/2003/11/swrl#Imp";
     
     protected static final Log log = LogFactory.getLog(JenaBaseDao.class.getName());
     
@@ -1090,7 +1091,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     }
     
     public void removeRulesMentioningResource(Resource res, OntModel ontModel) {
-    	Iterator<Resource> impIt = ontModel.listSubjectsWithProperty(RDF.type, SWRL.Imp);
+    	Iterator<Resource> impIt = ontModel.listSubjectsWithProperty(RDF.type, SWRL_IMP);
     	while (impIt.hasNext()) {
     		Resource imp = impIt.next();
     		boolean removeMe = false;
