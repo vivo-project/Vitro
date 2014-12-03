@@ -22,6 +22,7 @@ public class TBoxChanges {
 
 	private final List<String> deletedDataPropertyUris = Collections
 			.synchronizedList(new ArrayList<String>());
+
 	private final List<String> deletedObjectPropertyUris = Collections
 			.synchronizedList(new ArrayList<String>());
 
@@ -53,8 +54,8 @@ public class TBoxChanges {
 	}
 
 	// ----------------------------------------------------------------------
-	// These methods are called when processing the changeSet. By then, it is
-	// owned and accessed by a single thread.
+	// These methods are called when processing the changeSet. By that time, it
+	// is owned and accessed by a single thread.
 	// ----------------------------------------------------------------------
 
 	public boolean isEmpty() {

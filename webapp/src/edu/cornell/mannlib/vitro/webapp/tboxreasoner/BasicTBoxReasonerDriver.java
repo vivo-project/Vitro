@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,11 +16,8 @@ import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.InferenceModelUpdater;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PatternListBuilder;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableModel;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableOntModel;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedOntModel;
@@ -41,7 +37,6 @@ public class BasicTBoxReasonerDriver implements TBoxReasonerDriver {
 
 	private final ConfiguredReasonerListener listener;
 
-	private final AtomicReference<TBoxChanges> currentChangeSet;
 	private final Set<TBoxChanges> pendingChangeSets;
 	
 	private final ExecutorService executorService;
@@ -62,7 +57,6 @@ public class BasicTBoxReasonerDriver implements TBoxReasonerDriver {
 		this.listener = new ConfiguredReasonerListener(reasonerConfiguration,
 				this);
 		
-		this.currentChangeSet = new AtomicReference<>(new TBoxChanges());
 		this.pendingChangeSets = Collections.synchronizedSet(new HashSet<TBoxChanges>());
 		
 		this.executorService = Executors.newFixedThreadPool(1);
@@ -97,32 +91,10 @@ public class BasicTBoxReasonerDriver implements TBoxReasonerDriver {
 	}
 
 	@Override
-	public void addStatement(Statement stmt) {
-		currentChangeSet.get().addStatement(stmt);
-	}
-
-	@Override
-	public void removeStatement(Statement stmt) {
-		currentChangeSet.get().removeStatement(stmt);
-	}
-
-	@Override
-	public void deleteDataProperty(Statement stmt) {
-		currentChangeSet.get().deleteDataProperty(stmt);
-	}
-
-	@Override
-	public void deleteObjectProperty(Statement stmt) {
-		currentChangeSet.get().deleteObjectProperty(stmt);
-	}
-	
-	@Override
-	public void runSynchronizer() {
-		TBoxChanges changes = currentChangeSet.getAndSet(new TBoxChanges());
-		if (changes.isEmpty()) {
-			return;
+	public void runSynchronizer(TBoxChanges changeSet) {
+		if (!changeSet.isEmpty()) {
+			executorService.execute(new ReasoningTask(changeSet));
 		}
-		executorService.execute(new ReasoningTask(changes));
 	}
 	
 	private  class ReasoningTask implements Runnable {
@@ -139,6 +111,7 @@ public class BasicTBoxReasonerDriver implements TBoxReasonerDriver {
 			try {
 				reasoner.updateReasonerModel(changes);
 				status = reasoner.performReasoning();
+				
 				buildPatternList();
 				updateInferencesModel();
 			} finally {
