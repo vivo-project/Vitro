@@ -51,8 +51,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerDriver;
 
 public class DataPropertyDaoJena extends PropertyDaoJena implements
         DataPropertyDao {
@@ -357,9 +357,9 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     }
 
     protected boolean reasoningAvailable() {
-    	PelletListener pl = getWebappDaoFactory().getPelletListener();
+    	TBoxReasonerDriver pl = getWebappDaoFactory().getTBoxReasonerDriver();
     	return !(
-    			( pl == null || !pl.isConsistent() || pl.isInErrorState() )
+    			( pl == null || !pl.getStatus().isConsistent() || pl.getStatus().isInErrorState() )
     	);
     }
     

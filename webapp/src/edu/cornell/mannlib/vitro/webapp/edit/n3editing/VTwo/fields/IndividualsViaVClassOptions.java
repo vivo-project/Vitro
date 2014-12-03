@@ -12,8 +12,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerDriver;
 
 public class IndividualsViaVClassOptions implements FieldOptions {
 
@@ -104,8 +104,8 @@ public class IndividualsViaVClassOptions implements FieldOptions {
     protected boolean isReasoningAvailable( WebappDaoFactory wDaoFact){
         boolean inferenceAvailable = false;
         if (wDaoFact instanceof WebappDaoFactoryJena) {
-            PelletListener pl = ((WebappDaoFactoryJena) wDaoFact).getPelletListener();
-            if (pl != null && pl.isConsistent() && !pl.isInErrorState()
+            TBoxReasonerDriver pl = ((WebappDaoFactoryJena) wDaoFact).getTBoxReasonerDriver();
+            if (pl != null && pl.getStatus().isConsistent() && !pl.getStatus().isInErrorState()
                     && !pl.isReasoning()) {
                 inferenceAvailable = true;
             }

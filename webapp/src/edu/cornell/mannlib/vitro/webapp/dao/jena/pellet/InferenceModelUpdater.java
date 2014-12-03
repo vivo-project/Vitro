@@ -2,21 +2,19 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena.pellet;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ConfiguredReasonerListener;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ConfiguredReasonerListener.Suspension;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerStatementPattern;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerWrapper;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableModel;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableOntModel;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedModel;
@@ -30,8 +28,8 @@ public class InferenceModelUpdater {
 	private static final Log log = LogFactory
 			.getLog(InferenceModelUpdater.class);
 
-	private final LockableOntModel lockableReasonerModel;
-	private final LockableModel lockableInferenceModel;
+	private final TBoxReasonerWrapper reasoner;
+	private final LockableModel lockableInferencesModel;
 	private final LockableOntModel lockableFullModel;
 	private final ConfiguredReasonerListener listener;
 
@@ -46,57 +44,36 @@ public class InferenceModelUpdater {
 		return retractCount;
 	}
 
-	public InferenceModelUpdater(OntModel reasonerModel, Model inferenceModel,
-			OntModel fullModel, ConfiguredReasonerListener listener) {
-		this.lockableReasonerModel = new LockableOntModel(reasonerModel);
-		this.lockableInferenceModel = new LockableModel(inferenceModel);
-		this.lockableFullModel = new LockableOntModel(fullModel);
+	public InferenceModelUpdater(TBoxReasonerWrapper reasoner,
+			LockableModel lockableInferencesModel,
+			LockableOntModel lockableFullModel,
+			ConfiguredReasonerListener listener) {
+		this.reasoner = reasoner;
+		this.lockableInferencesModel = lockableInferencesModel;
+		this.lockableFullModel = lockableFullModel;
 		this.listener = listener;
 	}
 
 	/**
-	 * Synchronize the inferences model with the reasoner model, with these
-	 * provisos:
-	 * 
-	 * Statements in the reasoner model about RDFS.Resource or OWL.Nothing are
-	 * ignored.
+	 * Synchronize the inferences model with the reasoner model, with this
+	 * proviso:
 	 * 
 	 * If a statement exists anywhere in the full TBox, don't bother adding it
 	 * to the inferences model.
 	 */
-	public void update(LinkedList<ReasonerStatementPattern> patternList) {
-		Model filteredReasonerModel = filterReasonerModel(patternList);
+	public void update(List<ReasonerStatementPattern> patternList) {
+		List<Statement> filteredReasonerModel = reasoner
+				.filterResults(patternList);
 		addNewInferences(filteredReasonerModel);
 		removeOldInferences(filterInferencesModel(patternList),
 				filteredReasonerModel);
 		log.warn("Added: " + addCount + ", Retracted: " + retractCount);
 	}
 
-	private Model filterReasonerModel(
-			LinkedList<ReasonerStatementPattern> patternList) {
-		Model filtered = ModelFactory.createDefaultModel();
-		try (LockedOntModel reasonerModel = lockableReasonerModel.read()) {
-			for (ReasonerStatementPattern pattern : patternList) {
-				filtered.add(pattern.matchStatementsFromModel(reasonerModel));
-			}
-		}
-		for (Statement stmt : filtered.listStatements().toList()) {
-			if (stmt.getObject().equals(RDFS.Resource)) {
-				filtered.remove(stmt);
-			} else if (stmt.getSubject().equals(OWL.Nothing)) {
-				filtered.remove(stmt);
-			} else if (stmt.getObject().equals(OWL.Nothing)) {
-				filtered.remove(stmt);
-			}
-		}
-		log.warn("Filtered reasoner model: " + filtered.size());
-		return filtered;
-	}
-
-	private void addNewInferences(Model filteredReasonerModel) {
-		for (Statement stmt : filteredReasonerModel.listStatements().toList()) {
+	private void addNewInferences(List<Statement> filteredReasonerModel) {
+		for (Statement stmt : filteredReasonerModel) {
 			if (!fullModelContainsStatement(stmt)) {
-				try (LockedModel inferenceModel = lockableInferenceModel
+				try (LockedModel inferenceModel = lockableInferencesModel
 						.write(); Suspension susp = listener.suspend()) {
 					inferenceModel.add(stmt);
 					addCount++;
@@ -112,11 +89,11 @@ public class InferenceModelUpdater {
 	}
 
 	private Model filterInferencesModel(
-			LinkedList<ReasonerStatementPattern> patternList) {
+			List<ReasonerStatementPattern> patternList) {
 		Model filtered = ModelFactory.createDefaultModel();
-		try (LockedOntModel reasonerModel = lockableReasonerModel.read()) {
+		try (LockedModel inferencesModel = lockableInferencesModel.read()) {
 			for (ReasonerStatementPattern pattern : patternList) {
-				filtered.add(pattern.matchStatementsFromModel(reasonerModel));
+				filtered.add(pattern.matchStatementsFromModel(inferencesModel));
 			}
 		}
 		log.warn("Filtered inferences model: " + filtered.size());
@@ -124,10 +101,13 @@ public class InferenceModelUpdater {
 	}
 
 	private void removeOldInferences(Model filteredInferencesModel,
-			Model filteredReasonerModel) {
+			List<Statement> filteredReasonerStatements) {
+		Model filteredReasonerModel = ModelFactory.createDefaultModel();
+		filteredReasonerModel.add(filteredReasonerStatements);
+
 		for (Statement stmt : filteredInferencesModel.listStatements().toList()) {
 			if (!filteredReasonerModel.contains(stmt)) {
-				try (LockedModel inferenceModel = lockableInferenceModel
+				try (LockedModel inferenceModel = lockableInferencesModel
 						.write(); Suspension susp = listener.suspend()) {
 					retractCount++;
 					inferenceModel.remove(stmt);

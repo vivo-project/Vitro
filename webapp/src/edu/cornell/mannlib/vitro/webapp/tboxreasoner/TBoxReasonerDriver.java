@@ -18,6 +18,10 @@ public interface TBoxReasonerDriver {
 	void deleteDataProperty(Statement stmt);
 
 	void deleteObjectProperty(Statement stmt);
+	
+	boolean isReasoning();
+
+	Status getStatus();
 
 	public static class Status {
 		public static final Status SUCCESS = new Status(true, false, "");
@@ -51,4 +55,5 @@ public interface TBoxReasonerDriver {
 		}
 
 	}
+
 }

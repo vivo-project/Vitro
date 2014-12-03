@@ -9,16 +9,11 @@ import java.util.Set;
 
 import com.hp.hpl.jena.ontology.DatatypeProperty;
 import com.hp.hpl.jena.ontology.ObjectProperty;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerConfiguration;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerStatementPattern;
-import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableModel;
-import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableOntModel;
-import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedModel;
-import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedOntModel;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxChanges;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerWrapper;
 
 /**
  * The list of patterns for filtering the models will include:
@@ -32,79 +27,55 @@ public class PatternListBuilder {
 	private static final String OWL_NS = "http://www.w3.org/2002/07/owl#";
 
 	private final ReasonerConfiguration reasonerConfiguration;
-	private final LockableOntModel lockableReasonerModel;
-	private final LockableModel lockableDeletedObjectProperties;
-	private final LockableModel lockableDeletedDataProperties;
+	private final TBoxReasonerWrapper reasoner;
+	private final TBoxChanges changes;
 
 	public PatternListBuilder(ReasonerConfiguration reasonerConfiguration,
-			OntModel reasonerModel, Model deletedObjectProperties,
-			Model deletedDataProperties) {
+			TBoxReasonerWrapper reasoner, TBoxChanges changes) {
 		this.reasonerConfiguration = reasonerConfiguration;
-		this.lockableReasonerModel = new LockableOntModel(reasonerModel);
-		this.lockableDeletedObjectProperties = new LockableModel(
-				deletedObjectProperties);
-		this.lockableDeletedDataProperties = new LockableModel(
-				deletedDataProperties);
+		this.reasoner = reasoner;
+		this.changes = changes;
 	}
 
-	/**
-	 * @return
-	 */
 	public LinkedList<ReasonerStatementPattern> build() {
-		LinkedList<ReasonerStatementPattern> irpl = new LinkedList<>();
+		LinkedList<ReasonerStatementPattern> patterns = new LinkedList<>();
 
 		Set<ReasonerStatementPattern> allowSet = reasonerConfiguration
 				.getInferenceReceivingPatternAllowSet();
 		if (allowSet != null) {
-			irpl.addAll(allowSet);
+			patterns.addAll(allowSet);
 		} else {
-			irpl.add(ReasonerStatementPattern.ANY_OBJECT_PROPERTY);
+			patterns.add(ReasonerStatementPattern.ANY_OBJECT_PROPERTY);
 		}
 
 		if (reasonerConfiguration.getQueryForAllObjectProperties()) {
-			try (LockedOntModel reasonerModel = lockableReasonerModel.read()) {
-				for (ObjectProperty objProp : reasonerModel
-						.listObjectProperties().toList()) {
-					if (!(OWL_NS.equals(objProp.getNameSpace()))) {
-						irpl.add(ReasonerStatementPattern
-								.objectPattern(objProp));
-					}
+			for (ObjectProperty objProp : reasoner.listObjectProperties()) {
+				if (!(OWL_NS.equals(objProp.getNameSpace()))) {
+					patterns.add(ReasonerStatementPattern
+							.objectPattern(objProp));
 				}
 			}
 
-			try (LockedModel deletedObjectProperties = lockableDeletedObjectProperties
-					.write()) {
-				for (Resource subj : deletedObjectProperties.listSubjects()
-						.toList()) {
-					irpl.add(ReasonerStatementPattern
-							.objectPattern(createProperty(subj.getURI())));
-				}
-				deletedObjectProperties.removeAll();
+			for (String uri : changes.getDeletedObjectPropertyUris()) {
+				patterns.add(ReasonerStatementPattern
+						.objectPattern(createProperty(uri)));
 			}
 		}
 
 		if (reasonerConfiguration.getQueryForAllDatatypeProperties()) {
-			try (LockedOntModel reasonerModel = lockableReasonerModel.read()) {
-				for (DatatypeProperty dataProp : reasonerModel
-						.listDatatypeProperties().toList()) {
-					if (!(OWL_NS.equals(dataProp.getNameSpace()))) {
-						// TODO: THIS WILL WORK, BUT NEED TO GENERALIZE THE
-						// PATTERN CLASSES
-						irpl.add(ReasonerStatementPattern
-								.objectPattern(dataProp));
-					}
+			for (DatatypeProperty dataProp : reasoner.listDatatypeProperties()) {
+				if (!(OWL_NS.equals(dataProp.getNameSpace()))) {
+					// TODO: THIS WILL WORK, BUT NEED TO GENERALIZE THE
+					// PATTERN CLASSES
+					patterns.add(ReasonerStatementPattern
+							.objectPattern(dataProp));
 				}
 			}
-			try (LockedModel deletedDataProperties = lockableDeletedDataProperties
-					.write()) {
-				for (Resource subj : deletedDataProperties.listSubjects()
-						.toList()) {
-					irpl.add(ReasonerStatementPattern
-							.objectPattern(createProperty(subj.getURI())));
-				}
-				deletedDataProperties.removeAll();
+			for (String uri : changes.getDeletedDataPropertyUris()) {
+				patterns.add(ReasonerStatementPattern
+						.objectPattern(createProperty(uri)));
 			}
 		}
-		return irpl;
+		return patterns;
 	}
 }

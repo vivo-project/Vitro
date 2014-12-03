@@ -48,6 +48,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerWrapper;
 
 public class JenaAdminActions extends BaseEditController {
 	
@@ -190,8 +191,8 @@ public class JenaAdminActions extends BaseEditController {
 	}
 
     private void printRestrictions() {
-    	OntModel memoryModel = (OntModel) getServletContext().getAttribute("pelletOntModel");
-    	for (Restriction rest : memoryModel.listRestrictions().toList() ) {
+    	TBoxReasonerWrapper reasoner = (TBoxReasonerWrapper) getServletContext().getAttribute("tboxReasonerWrapper");
+    	for (Restriction rest : reasoner.listRestrictions() ) {
     		//System.out.println();
     		if (rest.isAllValuesFromRestriction()) {
     			log.trace("All values from: ");

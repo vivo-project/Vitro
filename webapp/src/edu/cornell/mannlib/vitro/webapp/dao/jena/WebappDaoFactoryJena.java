@@ -47,10 +47,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerDriver;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.URIUtils;
 
 public class WebappDaoFactoryJena implements WebappDaoFactory {
@@ -70,7 +70,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     
     protected WebappDaoFactoryConfig config;
     
-    protected PelletListener pelletListener;
+    protected TBoxReasonerDriver tbrd;
 
     protected String userURI;
 	
@@ -242,12 +242,12 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
      * This enables the WebappDaoFactory to check the status of a reasoner.
      * This will likely be refactored in future releases.
      */
-    public void setPelletListener(PelletListener pl) {
-    	this.pelletListener = pl;
+    public void setTBoxReasonerDriver(TBoxReasonerDriver tbrd) {
+    	this.tbrd = tbrd;
     }
     
-    public PelletListener getPelletListener() {
-    	return this.pelletListener;
+    public TBoxReasonerDriver getTBoxReasonerDriver() {
+    	return this.tbrd;
     }
     
     @Override

@@ -24,9 +24,10 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMa
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.search.controller.IndexController;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerDriver;
+import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerDriver.Status;
 
 public class BaseSiteAdminController extends FreemarkerHttpServlet {
 	
@@ -161,13 +162,13 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
             
             String pelletError = null;
             String pelletExplanation = null;
-            Object plObj = getServletContext().getAttribute("pelletListener");
-            if ( (plObj != null) && (plObj instanceof PelletListener) ) {
-                PelletListener pelletListener = (PelletListener) plObj;
-                if (!pelletListener.isConsistent()) {
+            Object tbrObj = getServletContext().getAttribute("tboxReasoner");
+            if ( tbrObj instanceof TBoxReasonerDriver) {
+            	Status status = ((TBoxReasonerDriver) tbrObj).getStatus();
+                if (!status.isConsistent()) {
                     pelletError = "INCONSISTENT ONTOLOGY: reasoning halted.";
-                    pelletExplanation = pelletListener.getExplanation();
-                } else if ( pelletListener.isInErrorState() ) {
+                    pelletExplanation = status.getExplanation();
+                } else if ( status.isInErrorState() ) {
                     pelletError = "An error occurred during reasoning. Reasoning has been halted. See error log for details.";
                 }
             }
