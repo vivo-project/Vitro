@@ -9,8 +9,6 @@ import com.hp.hpl.jena.ontology.ObjectProperty;
 import com.hp.hpl.jena.ontology.Restriction;
 import com.hp.hpl.jena.rdf.model.Statement;
 
-import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerDriver.Status;
-
 /**
  * The functionality of a TBox reasoner.
  * 
@@ -53,5 +51,37 @@ public interface TBoxReasoner {
 	 * updating and reasoning.
 	 */
 	List<Statement> filterResults(List<ReasonerStatementPattern> patternList);
+	
+	public static class Status {
+		public static final Status SUCCESS = new Status(true, false, "");
+		public static final Status ERROR = new Status(true, true, "");
+		
+		public static final Status inconsistent(String explanation) {
+			return new Status(false, false, explanation);
+		}
+
+		private final boolean consistent;
+		private final boolean inErrorState;
+		private final String explanation;
+
+		private Status(boolean consistent, boolean inErrorState,
+				String explanation) {
+			this.consistent = consistent;
+			this.inErrorState = inErrorState;
+			this.explanation = explanation;
+		}
+
+		public boolean isConsistent() {
+			return consistent;
+		}
+
+		public boolean isInErrorState() {
+			return inErrorState;
+		}
+
+		public String getExplanation() {
+			return explanation;
+		}
+	}
 
 }

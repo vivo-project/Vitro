@@ -50,7 +50,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
-import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerDriver;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.URIUtils;
 
 public class WebappDaoFactoryJena implements WebappDaoFactory {
@@ -70,8 +69,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     
     protected WebappDaoFactoryConfig config;
     
-    protected TBoxReasonerDriver tbrd;
-
     protected String userURI;
 	
 	private Map<String,String> properties = new HashMap<String,String>();
@@ -236,18 +233,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     @Override
 	public Set<String> getNonuserNamespaces() {
     	return config.getNonUserNamespaces();
-    }
-    
-    /**
-     * This enables the WebappDaoFactory to check the status of a reasoner.
-     * This will likely be refactored in future releases.
-     */
-    public void setTBoxReasonerDriver(TBoxReasonerDriver tbrd) {
-    	this.tbrd = tbrd;
-    }
-    
-    public TBoxReasonerDriver getTBoxReasonerDriver() {
-    	return this.tbrd;
     }
     
     @Override

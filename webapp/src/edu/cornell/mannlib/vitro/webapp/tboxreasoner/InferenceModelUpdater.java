@@ -67,7 +67,7 @@ public class InferenceModelUpdater {
 		addNewInferences(filteredReasonerModel);
 		removeOldInferences(filterInferencesModel(patternList),
 				filteredReasonerModel);
-		log.warn("Added: " + addCount + ", Retracted: " + retractCount);
+		log.debug("Added: " + addCount + ", Retracted: " + retractCount);
 	}
 
 	private void addNewInferences(List<Statement> filteredReasonerModel) {
@@ -96,7 +96,7 @@ public class InferenceModelUpdater {
 				filtered.add(pattern.matchStatementsFromModel(inferencesModel));
 			}
 		}
-		log.warn("Filtered inferences model: " + filtered.size());
+		log.debug("Filtered inferences model: " + filtered.size());
 		return filtered;
 	}
 

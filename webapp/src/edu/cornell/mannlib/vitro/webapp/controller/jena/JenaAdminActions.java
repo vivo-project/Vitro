@@ -44,11 +44,12 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasoner;
+import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerModule;
 
 public class JenaAdminActions extends BaseEditController {
 	
@@ -191,9 +192,8 @@ public class JenaAdminActions extends BaseEditController {
 	}
 
     private void printRestrictions() {
-    	TBoxReasoner reasoner = (TBoxReasoner) getServletContext().getAttribute("tboxReasonerWrapper");
+    	TBoxReasonerModule reasoner = ApplicationUtils.instance().getTBoxReasonerModule();
     	for (Restriction rest : reasoner.listRestrictions() ) {
-    		//System.out.println();
     		if (rest.isAllValuesFromRestriction()) {
     			log.trace("All values from: ");
     			AllValuesFromRestriction avfr = rest.asAllValuesFromRestriction();

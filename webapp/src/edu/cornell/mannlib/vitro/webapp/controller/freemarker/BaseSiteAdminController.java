@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.util.FormUtils;
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
@@ -24,10 +25,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMa
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerStatus;
 import edu.cornell.mannlib.vitro.webapp.search.controller.IndexController;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
-import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerDriver;
-import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasonerDriver.Status;
 
 public class BaseSiteAdminController extends FreemarkerHttpServlet {
 	
@@ -160,24 +160,21 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
  
         if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.EDIT_ONTOLOGY.ACTION)) {
             
-            String pelletError = null;
-            String pelletExplanation = null;
-            Object tbrObj = getServletContext().getAttribute("tboxReasoner");
-            if ( tbrObj instanceof TBoxReasonerDriver) {
-            	Status status = ((TBoxReasonerDriver) tbrObj).getStatus();
-                if (!status.isConsistent()) {
-                    pelletError = "INCONSISTENT ONTOLOGY: reasoning halted.";
-                    pelletExplanation = status.getExplanation();
-                } else if ( status.isInErrorState() ) {
-                    pelletError = "An error occurred during reasoning. Reasoning has been halted. See error log for details.";
-                }
+            String error = null;
+            String explanation = null;
+            TBoxReasonerStatus status = ApplicationUtils.instance().getTBoxReasonerModule().getStatus();
+            if (!status.isConsistent()) {
+                error = "INCONSISTENT ONTOLOGY: reasoning halted.";
+                explanation = status.getExplanation();
+            } else if ( status.isInErrorState() ) {
+                error = "An error occurred during reasoning. Reasoning has been halted. See error log for details.";
             }
     
-            if (pelletError != null) {
+            if (error != null) {
                 Map<String, String> pellet = new HashMap<String, String>();
-                pellet.put("error", pelletError);
-                if (pelletExplanation != null) {
-                    pellet.put("explanation", pelletExplanation);
+                pellet.put("error", error);
+                if (explanation != null) {
+                    pellet.put("explanation", explanation);
                 }
                 map.put("pellet", pellet);
             }
