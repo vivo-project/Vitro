@@ -89,7 +89,11 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			putReportingPathsIntoSettings(ctx, settings);
 			putNonReportingPathsIntoSettings(ctx, settings);
 
-            SimpleReasonerSetup.waitForTBoxReasoning(sce); 
+			try {
+				ApplicationUtils.instance().getTBoxReasonerModule().waitForTBoxReasoning();
+			} catch (Exception e) {
+				// Should mean that the reasoner is not even started yet.
+			}
 			
 			WebappDaoFactory wadf = ModelAccess.on(ctx).getWebappDaoFactory();
 			settings.setDefaultNamespace(wadf.getDefaultNamespace());

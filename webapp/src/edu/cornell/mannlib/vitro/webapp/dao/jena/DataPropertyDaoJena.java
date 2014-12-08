@@ -41,6 +41,7 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -51,7 +52,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
+import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerStatus;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 
 public class DataPropertyDaoJena extends PropertyDaoJena implements
@@ -357,10 +358,8 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     }
 
     protected boolean reasoningAvailable() {
-    	PelletListener pl = getWebappDaoFactory().getPelletListener();
-    	return !(
-    			( pl == null || !pl.isConsistent() || pl.isInErrorState() )
-    	);
+    	TBoxReasonerStatus status = ApplicationUtils.instance().getTBoxReasonerModule().getStatus();
+    	return status.isConsistent() && !status.isInErrorState();
     }
     
     private String getRequiredDatatypeURI(Individual individual, DataProperty dataprop, List<String> vclassURIs) {

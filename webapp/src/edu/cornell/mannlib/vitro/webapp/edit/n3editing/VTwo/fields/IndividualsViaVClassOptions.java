@@ -8,12 +8,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
+import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerStatus;
 
 public class IndividualsViaVClassOptions implements FieldOptions {
 
@@ -101,20 +101,13 @@ public class IndividualsViaVClassOptions implements FieldOptions {
         return individualMap;        
     }
     
-    protected boolean isReasoningAvailable( WebappDaoFactory wDaoFact){
-        boolean inferenceAvailable = false;
-        if (wDaoFact instanceof WebappDaoFactoryJena) {
-            PelletListener pl = ((WebappDaoFactoryJena) wDaoFact).getPelletListener();
-            if (pl != null && pl.isConsistent() && !pl.isInErrorState()
-                    && !pl.isReasoning()) {
-                inferenceAvailable = true;
-            }
-        }
-        return inferenceAvailable;
+    protected boolean isReasoningAvailable(){
+    	TBoxReasonerStatus status = ApplicationUtils.instance().getTBoxReasonerModule().getStatus();
+    	return status.isConsistent() && !status.isInErrorState();
     }
     
     protected Map<String, Individual> addWhenMissingInference( String classUri , WebappDaoFactory wDaoFact ){
-        boolean inferenceAvailable = isReasoningAvailable(wDaoFact);    
+        boolean inferenceAvailable = isReasoningAvailable();    
         Map<String,Individual> individualMap = new HashMap<String,Individual>();
         if ( !inferenceAvailable ) {
             for (String subclassURI : wDaoFact.getVClassDao().getAllSubClassURIs(classUri)) {

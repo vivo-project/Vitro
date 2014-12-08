@@ -16,6 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerModule;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ConfigurationTripleSource;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
@@ -41,6 +42,7 @@ public class ApplicationImpl implements Application {
 	private FileStorage fileStorage;
 	private ContentTripleSource contentTripleSource;
 	private ConfigurationTripleSource configurationTripleSource;
+	private TBoxReasonerModule tboxReasonerModule;
 
 	public void setServletContext(ServletContext ctx) {
 		this.ctx = ctx;
@@ -140,6 +142,22 @@ public class ApplicationImpl implements Application {
 		}
 	}
 
+	@Override
+	public TBoxReasonerModule getTBoxReasonerModule() {
+		return tboxReasonerModule;
+	}
+
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasTBoxReasonerModule")
+	public void setTBoxReasonerModule(TBoxReasonerModule module) {
+		if (tboxReasonerModule == null) {
+			tboxReasonerModule = module;
+		} else {
+			throw new IllegalStateException(
+					"Configuration includes multiple intances of TBoxReasonerModule: "
+							+ tboxReasonerModule + ", and " + module);
+		}
+	}
+
 	@Validation
 	public void validate() throws Exception {
 		if (searchEngine == null) {
@@ -161,6 +179,10 @@ public class ApplicationImpl implements Application {
 		if (configurationTripleSource == null) {
 			throw new IllegalStateException(
 					"Configuration did not include a ConfigurationTripleSource.");
+		}
+		if (tboxReasonerModule == null) {
+			throw new IllegalStateException(
+					"Configuration did not include a TBoxReasonerModule.");
 		}
 	}
 
@@ -244,4 +266,30 @@ public class ApplicationImpl implements Application {
 		}
 	}
 
+	// ----------------------------------------------------------------------
+	// Setup the reasoners.
+	//
+	// This must happen after the FileGraphSetup.
+	// ----------------------------------------------------------------------
+
+	public static class ReasonersSetup implements ServletContextListener {
+		@Override
+		public void contextInitialized(ServletContextEvent sce) {
+			ServletContext ctx = sce.getServletContext();
+			Application app = ApplicationUtils.instance();
+			StartupStatus ss = StartupStatus.getBean(ctx);
+			ComponentStartupStatus css = new ComponentStartupStatusImpl(this,
+					ss);
+
+			TBoxReasonerModule tboxReasoner = app.getTBoxReasonerModule();
+			tboxReasoner.startup(app, css);
+			ss.info(this, "Started the TBoxReasonerModule: " + tboxReasoner);
+		}
+
+		@Override
+		public void contextDestroyed(ServletContextEvent sce) {
+			Application app = ApplicationUtils.instance();
+			app.getTBoxReasonerModule().shutdown(app);
+		}
+	}
 }
