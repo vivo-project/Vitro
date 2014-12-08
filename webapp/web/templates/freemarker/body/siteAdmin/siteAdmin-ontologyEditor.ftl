@@ -6,11 +6,11 @@
     <section class="pageBodyGroup" role="region">
         <h3>${i18n().ontology_editor}</h3>
         
-        <#if ontologyEditor.pellet?has_content>
+        <#if ontologyEditor.tboxReasonerStatus?has_content>
             <div class="notice">
-                <p>${ontologyEditor.pellet.error}</p>
-                <#if ontologyEditor.pellet.explanation?has_content>
-                    <p>${i18n().cause} ${ontologyEditor.pellet.explanation}</p>
+                <p>${ontologyEditor.tboxReasonerStatus.error}</p>
+                <#if ontologyEditor.tboxReasonerStatus.explanation?has_content>
+                    <p>${i18n().cause} ${ontologyEditor.tboxReasonerStatus.explanation}</p>
                 </#if>
             </div>
         </#if>

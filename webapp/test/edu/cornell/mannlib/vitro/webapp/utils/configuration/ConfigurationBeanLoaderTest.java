@@ -970,7 +970,7 @@ public class ConfigurationBeanLoaderTest extends AbstractTestClass {
 		// Nothing.
 	}
 
-	public class AGoodApple implements OneBadAppleSpoilsTheBunch {
+	public static class AGoodApple implements OneBadAppleSpoilsTheBunch {
 		// Nothing
 	}
 

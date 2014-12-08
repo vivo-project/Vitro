@@ -564,26 +564,36 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     	
     }
     
-    /*
+    /* Removed: see VIVO-766.
      * sorts VClasses so that subclasses come before superclasses
+     * 
+     * Because subclass/superclass is only a partial ordering, this breaks the 
+     * contract for Comparator, and throws an IllegalArgumentException under Java 8.
+     * In particular, for classes sub, super and other, we have sub=other, sub<super, 
+     * which should imply other<super, but that is not true.
+     * 
+     * As far as I can determine, this sort is never relied on anyway, so there 
+     * should be no impact in removing it. Note that PropertyInstanceDaoJena re-sorts
+     * thes results before using them, so this sort was irrelevant for any calls 
+     * through that path.
      */
-    private class VClassHierarchyRanker implements Comparator<VClass> {
-    	private VClassDao vcDao;
-    	public VClassHierarchyRanker(VClassDao vcDao) {
-    		this.vcDao = vcDao;
-    	}
-        @Override
-    	public int compare(VClass vc1, VClass vc2) {
-    		if (vcDao.isSubClassOf(vc1, vc2)) {
-    			return -1;
-    		} else if (vcDao.isSubClassOf(vc2, vc1)) {
-    		    return 1;
-    		} else {
-    		    return 0;
-    		}
-    	}
-    }
-    
+//    private class VClassHierarchyRanker implements Comparator<VClass> {
+//    	private VClassDao vcDao;
+//    	public VClassHierarchyRanker(VClassDao vcDao) {
+//    		this.vcDao = vcDao;
+//    	}
+//        @Override
+//    	public int compare(VClass vc1, VClass vc2) {
+//    		if (vcDao.isSubClassOf(vc1, vc2)) {
+//    			return -1;
+//    		} else if (vcDao.isSubClassOf(vc2, vc1)) {
+//    		    return 1;
+//    		} else {
+//    		    return 0;
+//    		}
+//    	}
+//    }
+//    
     
     public List<PropertyInstance> getAllPropInstByVClass(String classURI) {
         if (classURI==null || classURI.length()<1) {
@@ -708,7 +718,8 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
             return propInsts;
         }
         
-        Collections.sort(vclasses, new VClassHierarchyRanker(this.getWebappDaoFactory().getVClassDao()));
+        // Removed: see VIVO-766.
+        // Collections.sort(vclasses, new VClassHierarchyRanker(this.getWebappDaoFactory().getVClassDao()));
         
         OntModel ontModel = getOntModelSelector().getTBoxModel();
         

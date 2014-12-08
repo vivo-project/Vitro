@@ -48,7 +48,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
@@ -71,8 +70,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     
     protected WebappDaoFactoryConfig config;
     
-    protected PelletListener pelletListener;
-
     protected String userURI;
 	
 	private Map<String,String> properties = new HashMap<String,String>();
@@ -237,18 +234,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     @Override
 	public Set<String> getNonuserNamespaces() {
     	return config.getNonUserNamespaces();
-    }
-    
-    /**
-     * This enables the WebappDaoFactory to check the status of a reasoner.
-     * This will likely be refactored in future releases.
-     */
-    public void setPelletListener(PelletListener pl) {
-    	this.pelletListener = pl;
-    }
-    
-    public PelletListener getPelletListener() {
-    	return this.pelletListener;
     }
     
     @Override
