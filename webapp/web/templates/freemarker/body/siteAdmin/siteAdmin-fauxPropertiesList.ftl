@@ -34,7 +34,7 @@
       <#assign ks = fauxProps[key] />
       <section id="classContainer1">
       <div>
-        <a href='editForm?controller=FauxProperty&baseUri=${ks["baseURI"]?url!}&<#if ks["domainURI"]?has_content>domainUri=${ks["domainURI"]?url}&</#if>rangeUri=${ks["rangeURI"]?url!}'>${key}</a>
+        <a href='editForm?controller=FauxProperty&baseUri=${ks["baseURI"]?url!}&<#if ks["domainURI"]?has_content>domainUri=${ks["domainURI"]?url}&</#if>rangeUri=${ks["rangeURI"]?url!}'>${key?substring(0,key?index_of("@@"))}</a>
       </div>
       <table id="classHierarchy1" class="classHierarchy">
         <tbody>
@@ -76,7 +76,7 @@
           <tbody>
               <tr>
                 <td class="classDetail">${i18n().faux_property_capitalized}:</td>
-	            <td><a href='editForm?controller=FauxProperty&baseUri=${faux["baseURI"]?url!}&<#if faux["domainURI"]?has_content>domainUri=${faux["domainURI"]?url}&</#if>rangeUri=${faux["rangeURI"]?url!}'>${k2}</a></td>
+	            <td><a href='editForm?controller=FauxProperty&baseUri=${faux["baseURI"]?url!}&<#if faux["domainURI"]?has_content>domainUri=${faux["domainURI"]?url}&</#if>rangeUri=${faux["rangeURI"]?url!}'>${k2?substring(0,k2?index_of("@@"))}</a></td>
 	          </tr>
 	          <tr>
                 <td class="classDetail">${i18n().group_capitalized}:</td>

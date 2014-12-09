@@ -118,7 +118,6 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
                     ObjectProperty op = opIt.next();
 					String baseURI = op.getURI();
                     fauxProps = fpDao.getFauxPropertiesForBaseUri(baseURI);
-
 					if ( fauxProps != null ) {
 						Iterator<FauxProperty> fpIt = fauxProps.iterator();
 						if ( !fpIt.hasNext()) {
@@ -152,7 +151,7 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 								tmpHash.put("domain", domainLabel);
 								tmpHash.put("domainURI", domainURI);
 								// add the faux and its details to the treemap	
-								theFauxProps.put(fauxLabel, tmpHash);
+								theFauxProps.put(fauxLabel + "@@" + domainLabel, tmpHash);
 							} 
 						} 
 					}
@@ -208,7 +207,7 @@ public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 								tmpHash.put("domain", domainLabel);
 								tmpHash.put("domainURI", domainURI);
 								// add the faux and its details to the treemap	
-								fauxForGivenBase.put(fauxLabel, tmpHash);
+								fauxForGivenBase.put(fauxLabel + "@@" + domainLabel, tmpHash);
 							}
 							 fauxByBaseProps.put(baseLabel, fauxForGivenBase);
 						} 
