@@ -46,6 +46,13 @@ public class VitroApiServlet extends HttpServlet {
 
 		Authenticator auth = Authenticator.getInstance(req);
 		UserAccount account = auth.getAccountForInternalAuth(email);
+		
+		if (auth.accountRequiresEditing(account)) {
+			log.debug("Account " + email + " requires editing.");
+			throw new AuthException("user account must include first and "
+					+ "last names and a valid email address.");
+		}
+		
 		if (!auth.isCurrentPassword(account, password)) {
 			log.debug("Invalid: '" + email + "'/'" + password + "'");
 			throw new AuthException("email/password combination is not valid");
@@ -57,6 +64,11 @@ public class VitroApiServlet extends HttpServlet {
 			throw new AuthException("Account is not authorized");
 		}
 
+		if (account.isPasswordChangeRequired()) {
+			log.debug("Account " + email + " requires a new password.");
+			throw new AuthException("user account requires a new password.");
+		}
+		
 		log.debug("Authorized for '" + email + "'");
 	}
 
