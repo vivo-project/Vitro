@@ -33,9 +33,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 public class PropertyRetryController extends BaseEditController {
     
@@ -115,7 +115,7 @@ public class PropertyRetryController extends BaseEditController {
 
         //set up any listeners
         List<ChangeListener> changeListenerList = new ArrayList<>();
-        changeListenerList.add(new PropertyRestrictionListener(getServletContext()));
+        changeListenerList.add(new PropertyRestrictionListener());
         epo.setChangeListenerList(changeListenerList);
 
         //make a postinsert pageforwarder that will send us to a new class's fetch screen

@@ -9,6 +9,12 @@ import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
  * user's role level.
  */
 public interface RoleRestrictedProperty {
+	String getDomainVClassURI();
+
+	String getRangeVClassURI();
+
+	String getURI();
+
 	RoleLevel getHiddenFromDisplayBelowRoleLevel();
 
 	RoleLevel getProhibitedFromUpdateBelowRoleLevel();

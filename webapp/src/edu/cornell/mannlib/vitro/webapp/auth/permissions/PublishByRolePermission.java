@@ -2,12 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.permissions;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionBean;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.publish.PublishDataProperty;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.publish.PublishDataPropertyStatement;
@@ -29,10 +27,8 @@ public class PublishByRolePermission extends Permission {
 
 	private final String roleName;
 	private final RoleLevel roleLevel;
-	private final ServletContext ctx;
 
-	public PublishByRolePermission(String roleName, RoleLevel roleLevel,
-			ServletContext ctx) {
+	public PublishByRolePermission(String roleName, RoleLevel roleLevel) {
 		super(NAMESPACE + roleName);
 
 		if (roleName == null) {
@@ -41,13 +37,9 @@ public class PublishByRolePermission extends Permission {
 		if (roleLevel == null) {
 			throw new NullPointerException("roleLevel may not be null.");
 		}
-		if (ctx == null) {
-			throw new NullPointerException("context may not be null.");
-		}
 
 		this.roleName = roleName;
 		this.roleLevel = roleLevel;
-		this.ctx = ctx;
 	}
 
 	@Override
@@ -116,13 +108,13 @@ public class PublishByRolePermission extends Permission {
 	}
 
 	private boolean canPublishResource(String resourceUri) {
-		return PropertyRestrictionPolicyHelper.getBean(ctx).canPublishResource(
+		return PropertyRestrictionBean.getBean().canPublishResource(
 				resourceUri, this.roleLevel);
 	}
 
 	private boolean canPublishPredicate(Property predicate) {
-		return PropertyRestrictionPolicyHelper.getBean(ctx)
-				.canPublishPredicate(predicate, this.roleLevel);
+		return PropertyRestrictionBean.getBean().canPublishPredicate(predicate,
+				this.roleLevel);
 	}
 
 	@Override

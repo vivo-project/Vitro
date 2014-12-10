@@ -211,7 +211,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 
 		private void setListeners() {
 			epo.setChangeListenerList(Collections
-					.singletonList(new PropertyRestrictionListener(ctx)));
+					.singletonList(new PropertyRestrictionListener()));
 		}
 
 		private void setForwarders() {

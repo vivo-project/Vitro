@@ -233,4 +233,18 @@ public class FauxProperty extends BaseResourceBean implements ResourceBean,
 				+ ", customEntryForm=" + customEntryForm + ", customListView="
 				+ customListView + "]";
 	}
+
+	// ----------------------------------------------------------------------
+	// Satisfy the RoleRestrictedProperty interface.
+	// ----------------------------------------------------------------------
+
+	@Override
+	public String getDomainVClassURI() {
+		return getDomainURI();
+	}
+
+	@Override
+	public String getRangeVClassURI() {
+		return getRangeURI();
+	}
 }

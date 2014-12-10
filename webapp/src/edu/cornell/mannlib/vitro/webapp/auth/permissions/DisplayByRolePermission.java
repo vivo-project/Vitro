@@ -2,12 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.permissions;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionBean;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataProperty;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.display.DisplayDataPropertyStatement;
@@ -30,10 +28,8 @@ public class DisplayByRolePermission extends Permission {
 
 	private final String roleName;
 	private final RoleLevel roleLevel;
-	private final ServletContext ctx;
 
-	public DisplayByRolePermission(String roleName, RoleLevel roleLevel,
-			ServletContext ctx) {
+	public DisplayByRolePermission(String roleName, RoleLevel roleLevel) {
 		super(NAMESPACE + roleName);
 
 		if (roleName == null) {
@@ -42,13 +38,9 @@ public class DisplayByRolePermission extends Permission {
 		if (roleLevel == null) {
 			throw new NullPointerException("roleLevel may not be null.");
 		}
-		if (ctx == null) {
-			throw new NullPointerException("context may not be null.");
-		}
 
 		this.roleName = roleName;
 		this.roleLevel = roleLevel;
-		this.ctx = ctx;
 	}
 
 	@Override
@@ -110,22 +102,21 @@ public class DisplayByRolePermission extends Permission {
 	 * subject, its predicate, and its object.
 	 */
 	private boolean isAuthorized(DisplayObjectPropertyStatement action) {
-		String subjectUri = action.getSubjectUri(); 
+		String subjectUri = action.getSubjectUri();
 		String objectUri = action.getObjectUri();
 		Property op = action.getProperty();
-		return canDisplayResource(subjectUri)
-				&& canDisplayPredicate(op)
+		return canDisplayResource(subjectUri) && canDisplayPredicate(op)
 				&& canDisplayResource(objectUri);
 	}
 
 	private boolean canDisplayResource(String resourceUri) {
-		return PropertyRestrictionPolicyHelper.getBean(ctx).canDisplayResource(
+		return PropertyRestrictionBean.getBean().canDisplayResource(
 				resourceUri, this.roleLevel);
 	}
 
 	private boolean canDisplayPredicate(Property predicate) {
-		return PropertyRestrictionPolicyHelper.getBean(ctx)
-				.canDisplayPredicate(predicate, this.roleLevel);
+		return PropertyRestrictionBean.getBean().canDisplayPredicate(predicate,
+				this.roleLevel);
 	}
 
 	@Override

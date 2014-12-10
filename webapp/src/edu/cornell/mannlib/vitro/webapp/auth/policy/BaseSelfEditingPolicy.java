@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 
 import javax.servlet.ServletContext;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
@@ -23,13 +23,13 @@ public abstract class BaseSelfEditingPolicy {
 	}
 
 	protected boolean canModifyResource(String uri) {
-		return PropertyRestrictionPolicyHelper.getBean(ctx).canModifyResource(
-				uri, roleLevel);
+		return PropertyRestrictionBean.getBean().canModifyResource(uri,
+				roleLevel);
 	}
 
 	protected boolean canModifyPredicate(Property predicate) {
-		return PropertyRestrictionPolicyHelper.getBean(ctx).canModifyPredicate(
-				predicate, roleLevel);
+		return PropertyRestrictionBean.getBean().canModifyPredicate(predicate,
+				roleLevel);
 	}
 
 	protected PolicyDecision cantModifyResource(String uri) {

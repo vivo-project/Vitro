@@ -2,9 +2,11 @@
 
 package stubs.edu.cornell.mannlib.vitro.webapp.dao;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
@@ -19,7 +21,7 @@ public class FauxPropertyDaoStub implements FauxPropertyDao {
 	// ----------------------------------------------------------------------
 
 	private final Map<FullPropertyKey, FauxProperty> props = new HashMap<>();
-	
+
 	// ----------------------------------------------------------------------
 	// Stub methods
 	// ----------------------------------------------------------------------
@@ -30,26 +32,30 @@ public class FauxPropertyDaoStub implements FauxPropertyDao {
 		return props.get(new FullPropertyKey(domainUri, baseUri, rangeUri));
 	}
 
+	@Override
+	public List<FauxProperty> getFauxPropertiesForBaseUri(String uri) {
+		List<FauxProperty> list = new ArrayList<>();
+		for (FauxProperty fp : props.values()) {
+			if (Objects.equals(fp.getBaseURI(), uri)) {
+				list.add(fp);
+			}
+		}
+		return list;
+	}
+
+	@Override
+	public void insertFauxProperty(FauxProperty fp) {
+		props.put(new FullPropertyKey(fp), fp);
+	}
+
 	// ----------------------------------------------------------------------
 	// Un-implemented methods
 	// ----------------------------------------------------------------------
 
 	@Override
-	public List<FauxProperty> getFauxPropertiesForBaseUri(String uri) {
-		throw new RuntimeException(
-				"FauxPropertyDaoStub.getFauxPropertiesForBaseUri() not implemented.");
-	}
-
-	@Override
 	public FauxProperty getFauxPropertyFromContextUri(String contextUri) {
 		throw new RuntimeException(
 				"FauxPropertyDaoStub.getFauxPropertyFromContextUri() not implemented.");
-	}
-
-	@Override
-	public void insertFauxProperty(FauxProperty fp) {
-		throw new RuntimeException(
-				"FauxPropertyDaoStub.insertFauxProperty() not implemented.");
 	}
 
 	@Override

@@ -274,7 +274,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
     }
     
     private boolean redundant(ObjectProperty op, ObjectProperty op2) {
-    	return new FullPropertyKey(op).equals(new FullPropertyKey(op2));
+    	return new FullPropertyKey((Property)op).equals(new FullPropertyKey((Property)op2));
     }
 
     private void addObjectPropertyToPropertyList(String propertyUri, String domainUri, String rangeUri,

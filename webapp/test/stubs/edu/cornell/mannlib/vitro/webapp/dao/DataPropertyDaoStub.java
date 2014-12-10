@@ -2,6 +2,7 @@
 
 package stubs.edu.cornell.mannlib.vitro.webapp.dao;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +57,11 @@ public class DataPropertyDaoStub implements DataPropertyDao {
 	// ----------------------------------------------------------------------
 	// Stub methods
 	// ----------------------------------------------------------------------
+
+	@Override
+	public List<DataProperty> getAllDataProperties() {
+		return new ArrayList<>(dpMap.values());
+	}
 
 	@Override
 	public DataProperty getDataPropertyByURI(String dataPropertyURI) {
@@ -187,12 +193,6 @@ public class DataPropertyDaoStub implements DataPropertyDao {
 	public List<VClass> getClassesWithRestrictionOnProperty(String propertyURI) {
 		throw new RuntimeException(
 				"PropertyDao.getClassesWithRestrictionOnProperty() not implemented.");
-	}
-
-	@Override
-	public List getAllDataProperties() {
-		throw new RuntimeException(
-				"DataPropertyDao.getAllDataProperties() not implemented.");
 	}
 
 	@Override
