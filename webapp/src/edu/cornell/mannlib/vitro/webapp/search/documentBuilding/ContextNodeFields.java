@@ -34,8 +34,8 @@ public class ContextNodeFields implements DocumentModifier, ContextModelsUser{
     protected List<String> queries = new ArrayList<String>();
     protected boolean shutdown = false;    
     protected Log log = LogFactory.getLog(ContextNodeFields.class);   
-
-    private RDFService rdfService;
+    //Subclasses may want to utilize rdfService directly (for example, to execute queries that yielding multiple variables mapped to different fields)
+    protected RDFService rdfService;
 	
 	@Override
 	public void setContextModels(ContextModelAccess models) {
