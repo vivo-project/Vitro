@@ -38,6 +38,7 @@ edu.cornell.mannlib.vitro.webapp.application.ApplicationImpl$ReasonersSetup
 edu.cornell.mannlib.vitro.webapp.servlet.setup.SimpleReasonerSetup
 
 #edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateKnowledgeBase
+edu.cornell.mannlib.vitro.webapp.migration.Release18Migrator
 
 # Must run after JenaDataSourceSetup
 edu.cornell.mannlib.vitro.webapp.servlet.setup.ThemeInfoSetup
