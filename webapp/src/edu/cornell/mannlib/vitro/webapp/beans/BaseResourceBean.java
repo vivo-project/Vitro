@@ -78,7 +78,8 @@ public class BaseResourceBean implements ResourceBean {
 		public String getShorthand() {
 			return shorthand;
 		}
-
+		
+		// Never returns null.
 		public static RoleLevel getRoleByUri(String uri2) {
 			if (uri2 == null)
 				return RoleLevel.values()[0];
@@ -208,13 +209,13 @@ public class BaseResourceBean implements ResourceBean {
     }
     
     @Override
-	public void setHiddenFromDisplayBelowRoleLevel(RoleLevel eR) {
-        hiddenFromDisplayBelowRoleLevel = eR;
+	public void setHiddenFromDisplayBelowRoleLevel(RoleLevel level) {
+        hiddenFromDisplayBelowRoleLevel = level;
     }
     
     @Override
 	public void setHiddenFromDisplayBelowRoleLevelUsingRoleUri(String roleUri) {
-        hiddenFromDisplayBelowRoleLevel = BaseResourceBean.RoleLevel.getRoleByUri(roleUri);
+        hiddenFromDisplayBelowRoleLevel = RoleLevel.getRoleByUri(roleUri);
     }
 
     @Override
@@ -223,13 +224,13 @@ public class BaseResourceBean implements ResourceBean {
     }
     
     @Override
-	public void setProhibitedFromUpdateBelowRoleLevel(RoleLevel eR) {
-        prohibitedFromUpdateBelowRoleLevel = eR;
+	public void setProhibitedFromUpdateBelowRoleLevel(RoleLevel level) {
+        prohibitedFromUpdateBelowRoleLevel = level;
     }
     
     @Override
 	public void setProhibitedFromUpdateBelowRoleLevelUsingRoleUri(String roleUri) {
-        prohibitedFromUpdateBelowRoleLevel = BaseResourceBean.RoleLevel.getRoleByUri(roleUri);
+        prohibitedFromUpdateBelowRoleLevel = RoleLevel.getRoleByUri(roleUri);
     }
 
 	@Override
@@ -238,8 +239,8 @@ public class BaseResourceBean implements ResourceBean {
 	}
     
     @Override
-	public void setHiddenFromPublishBelowRoleLevel(RoleLevel eR) {
-        hiddenFromPublishBelowRoleLevel = eR;
+	public void setHiddenFromPublishBelowRoleLevel(RoleLevel level) {
+        hiddenFromPublishBelowRoleLevel = level;
     }
     
     @Override

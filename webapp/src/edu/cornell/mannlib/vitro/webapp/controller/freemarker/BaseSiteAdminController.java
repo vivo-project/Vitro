@@ -185,6 +185,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
             urls.put("classHierarchy", UrlBuilder.getUrl("/showClassHierarchy"));
             urls.put("classGroups", UrlBuilder.getUrl("/listGroups"));
             urls.put("dataPropertyHierarchy", UrlBuilder.getUrl("/showDataPropertyHierarchy"));
+            urls.put("fauxPropertyList", UrlBuilder.getUrl("/listFauxProperties"));
             urls.put("propertyGroups", UrlBuilder.getUrl("/listPropertyGroups"));            
             urls.put("objectPropertyHierarchy", UrlBuilder.getUrl("/showObjectPropertyHierarchy", new ParamMap("iffRoot", "true")));
             map.put("urls", urls);

@@ -33,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
+import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
@@ -360,6 +361,15 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         return objectPropertyDao;
     }
 
+    private FauxPropertyDao fauxPropertyDao = null;
+    @Override
+    public FauxPropertyDao getFauxPropertyDao() {
+    	if( fauxPropertyDao == null ) {
+			fauxPropertyDao = new FauxPropertyDaoJena(this);
+    	}
+    	return fauxPropertyDao;
+    }
+    
     private PropertyInstanceDao propertyInstanceDao = null;
     @Override
 	public PropertyInstanceDao getPropertyInstanceDao() {

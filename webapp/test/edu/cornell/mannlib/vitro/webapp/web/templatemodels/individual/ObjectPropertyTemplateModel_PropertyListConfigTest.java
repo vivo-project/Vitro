@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.PolicyOption.POLICY_NEUTRAL;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ReasoningOption.ASSERTIONS_AND_INFERENCES;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
 import static org.junit.Assert.assertEquals;
@@ -27,6 +28,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import stubs.edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
@@ -60,6 +62,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 
 	private WebappDaoFactoryStub wadf;
 	private ObjectPropertyDaoStub opDao;
+	private FauxPropertyDaoStub fpDao;
 
 	private ServletContextStub ctx;
 	private HttpSessionStub session;
@@ -117,8 +120,10 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 		logMessages = new StringWriter();
 
 		opDao = new ObjectPropertyDaoStub();
+		fpDao = new FauxPropertyDaoStub();
 		wadf = new WebappDaoFactoryStub();
 		wadf.setObjectPropertyDao(opDao);
+		wadf.setFauxPropertyDao(fpDao);
 
 		ctx = new ServletContextStub();
 		// create paths for all of the files in the temporary config directory.
@@ -136,6 +141,7 @@ public class ObjectPropertyTemplateModel_PropertyListConfigTest extends
 		
 		mafs = new ModelAccessFactoryStub();
 		mafs.get(vreq).setWebappDaoFactory(wadf, ASSERTIONS_AND_INFERENCES);
+		mafs.get(vreq).setWebappDaoFactory(wadf, POLICY_NEUTRAL);
 
 		subject = new IndividualImpl();
 

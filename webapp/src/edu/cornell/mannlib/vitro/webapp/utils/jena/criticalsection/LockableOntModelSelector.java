@@ -12,7 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
  * LockableOntModels.
  * 
  * <pre>
- * LockableOntModelSelector lockableOms = new LockingOntModelSelector(oms);
+ * LockableOntModelSelector lockableOms = new LockableOntModelSelector(oms);
  *  
  * try (LockedOntModel m = lockableOms.getDisplayModel.read()) {
  *    ...

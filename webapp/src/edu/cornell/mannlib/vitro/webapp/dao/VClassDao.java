@@ -91,14 +91,14 @@ public interface VClassDao {
     /**
      * @param vc1
      * @param vc2
-     * @return true if subClassOf(vc1, vc2)
+     * @return true if vc1 subClassOf vc2
      */
     boolean isSubClassOf(VClass vc1, VClass vc2);
     
     /**
      * @param vc1
      * @param vc2
-     * @return true if subClassOf(vc1, vc2)
+     * @return true if vc1 subClassOf vc2
      */
     boolean isSubClassOf(String vclassURI1, String vclassURI2);
     

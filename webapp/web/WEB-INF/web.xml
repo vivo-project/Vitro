@@ -763,6 +763,15 @@
   </servlet-mapping>
 
   <servlet>
+    <servlet-name>ListFauxPropertiesController</servlet-name>
+    <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ListFauxPropertiesController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ListFauxPropertiesController</servlet-name>
+    <url-pattern>/listFauxProperties</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
     <servlet-name>ListPropertyWebappsController</servlet-name>
     <servlet-class>edu.cornell.mannlib.vitro.webapp.controller.freemarker.ListPropertyWebappsController</servlet-class>
   </servlet>

@@ -3,7 +3,6 @@
 package stubs.edu.cornell.mannlib.vitro.webapp.dao;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.dao.ApplicationDao;
@@ -11,6 +10,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
+import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
@@ -42,6 +42,7 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	private MenuDao menuDao;
 	private ObjectPropertyDao objectPropertyDao;
 	private ObjectPropertyStatementDao objectPropertyStatementDao;
+	private FauxPropertyDao fauxPropertyDao;
 	private OntologyDao ontologyDao;
 	private UserAccountsDao userAccountsDao;
 	private VClassDao vClassDao;
@@ -74,6 +75,10 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 		this.objectPropertyStatementDao = objectPropertyStatementDao;
 	}
 	
+	public void setFauxPropertyDao(FauxPropertyDao fauxPropertyDao) {
+		this.fauxPropertyDao = fauxPropertyDao;
+	}
+
 	public void setOntologyDao(OntologyDao ontologyDao) {
 		this.ontologyDao = ontologyDao;
 	}
@@ -121,8 +126,14 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	}
 
 	@Override
+	public FauxPropertyDao getFauxPropertyDao() {
+		return this.fauxPropertyDao;
+	}
+
+	@Override
 	public ObjectPropertyStatementDao getObjectPropertyStatementDao() {
-return this.objectPropertyStatementDao;	}
+		return this.objectPropertyStatementDao;
+	}
 
 	@Override
 	public OntologyDao getOntologyDao() {

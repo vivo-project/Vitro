@@ -42,6 +42,7 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
+import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.RoleRestrictedProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -1137,7 +1138,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             }
             qexec.close();
         }
-        FullPropertyKey key = new FullPropertyKey(op);
+        FullPropertyKey key = new FullPropertyKey((RoleRestrictedProperty)op);
 		String customListViewConfigFileName = customListViewConfigFileMap.get(key);
         if (customListViewConfigFileName == null) {
             log.debug("no list view found for " + key);

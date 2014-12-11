@@ -92,6 +92,53 @@
 </tr>
 
 <tr><td colspan="3"><hr/></td></tr>
+<!-- _____________________________________________ faux properties __________________________________________ -->
+<tr valign="bottom" align="center">
+	<td colspan="2" valign="bottom" align="left">
+	  <c:if test="${!empty fauxproperties}">
+		<c:forEach var="fauxproperty" items="${fauxproperties}">
+		  <ul style="list-style-type:none;">
+			<li>
+			  <c:choose>
+			    <c:when test="${empty fauxproperty.domainLabel}">
+		          <c:url var="fauxpropertyURL" value="editForm">
+			        <c:param name="controller" value="FauxProperty"/>
+			        <c:param name="baseUri" value="${property.URI}"/>
+			        <c:param name="rangeUri" value="${fauxproperty.rangeURI}" />
+			      </c:url>
+			      <a href="${fauxpropertyURL}">${fauxproperty.pickListName}</a>
+			      no domain,
+			    </c:when>
+			    <c:otherwise>
+		          <c:url var="fauxpropertyURL" value="editForm">
+			        <c:param name="controller" value="FauxProperty"/>
+			        <c:param name="baseUri" value="${property.URI}"/>
+			        <c:param name="domainUri" value="${fauxproperty.domainURI}" />
+			        <c:param name="rangeUri" value="${fauxproperty.rangeURI}" />
+			      </c:url>
+			      <a href="${fauxpropertyURL}">${fauxproperty.pickListName}</a>
+			      domain: ${fauxproperty.domainLabel},
+			    </c:otherwise>
+			  </c:choose> 
+			  range: ${fauxproperty.rangeLabel}
+			</li>
+		  </ul>
+		</c:forEach>
+	  </c:if>
+	</td>
+	<td>
+	<form action="editForm" method="get">
+	  <input type="hidden" name="create" value="create"/>
+	  <input type="hidden" name="baseUri" value="${property.URI}"/>
+	  <input type="hidden" name="controller" value="FauxProperty"/>
+	  <input type="submit" class="form-button" value="Create New Faux Property"/>
+	</form>
+	</td>
+</tr>
+
+
+
+<tr><td colspan="3"><hr/></td></tr>
 <!-- _____________________________________________ superproperties __________________________________________ -->
 <tr valign="bottom" align="center">
 	<td colspan="2" valign="bottom" align="left">

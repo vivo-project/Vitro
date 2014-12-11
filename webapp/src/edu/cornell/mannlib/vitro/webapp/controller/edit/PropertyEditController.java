@@ -17,8 +17,10 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
+import edu.cornell.mannlib.vedit.beans.Option;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
+import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
@@ -33,7 +35,8 @@ public class PropertyEditController extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(PropertyEditController.class.getName());
 	
-    public void doPost (HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doPost (HttpServletRequest request, HttpServletResponse response) {
 		if (!isAuthorizedToDisplayPage(request, response,
 				SimplePermission.EDIT_ONTOLOGY.ACTION)) {
         	return;
@@ -189,11 +192,9 @@ public class PropertyEditController extends BaseEditController {
         request.setAttribute("suppressquery","true");
 
 
-        boolean FORCE_NEW = true;
-
         EditProcessObject epo = super.createEpo(request, FORCE_NEW);
         FormObject foo = new FormObject();
-        HashMap OptionMap = new HashMap();
+        HashMap<String, List<Option>> OptionMap = new HashMap<>();
         foo.setOptionLists(OptionMap);
         epo.setFormObject(foo);
 
@@ -210,10 +211,17 @@ public class PropertyEditController extends BaseEditController {
         sortForPickList(subProps, vreq);
         request.setAttribute("subproperties", subProps);
         
+        // equivalent properties and faux properties 
+        
         List<ObjectProperty> eqProps = getObjectPropertiesForURIList(
                 opDao.getEquivalentPropertyURIs(p.getURI()), opDao);
         sortForPickList(eqProps, vreq);
         request.setAttribute("equivalentProperties", eqProps);
+        
+        List<FauxProperty> fauxProps = vreq.getUnfilteredAssertionsWebappDaoFactory().getFauxPropertyDao().
+        		getFauxPropertiesForBaseUri(p.getURI());
+        sortForPickList(fauxProps, vreq);
+        request.setAttribute("fauxproperties", fauxProps);
         
         RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("epoKey",epo.getKey());
@@ -232,7 +240,8 @@ public class PropertyEditController extends BaseEditController {
 
     }
 
-    public void doGet (HttpServletRequest request, HttpServletResponse response) {
+    @Override
+	public void doGet (HttpServletRequest request, HttpServletResponse response) {
         doPost(request,response);
     }
     

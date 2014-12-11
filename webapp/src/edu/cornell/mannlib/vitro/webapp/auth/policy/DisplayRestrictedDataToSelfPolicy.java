@@ -11,7 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasAssociatedIndividual;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
@@ -114,14 +114,18 @@ public class DisplayRestrictedDataToSelfPolicy implements PolicyIface {
 		String subjectUri = action.getSubjectUri();
 		Property predicate = action.getProperty();
 		String objectUri = action.getObjectUri();
-		if (canDisplayResource(subjectUri) && canDisplayPredicate(predicate)
+		if (canDisplayResource(subjectUri)
+				&& canDisplayPredicate(predicate)
 				&& canDisplayResource(objectUri)
-				&& isAboutAssociatedIndividual(individuals, subjectUri, objectUri)) {
+				&& isAboutAssociatedIndividual(individuals, subjectUri,
+						objectUri)) {
 			return authorized("user may view ObjectPropertyStatement "
-					+ subjectUri + " ==> " + predicate.getURI() + " ==> " + objectUri);
+					+ subjectUri + " ==> " + predicate.getURI() + " ==> "
+					+ objectUri);
 		} else {
 			return defaultDecision("user may not view ObjectPropertyStatement "
-					+ subjectUri + " ==> " + predicate.getURI() + " ==> " + objectUri);
+					+ subjectUri + " ==> " + predicate.getURI() + " ==> "
+					+ objectUri);
 		}
 	}
 
@@ -138,13 +142,13 @@ public class DisplayRestrictedDataToSelfPolicy implements PolicyIface {
 	}
 
 	private boolean canDisplayResource(String uri) {
-		return PropertyRestrictionPolicyHelper.getBean(ctx).canDisplayResource(
-				uri, RoleLevel.SELF);
+		return PropertyRestrictionBean.getBean().canDisplayResource(uri,
+				RoleLevel.SELF);
 	}
 
 	private boolean canDisplayPredicate(Property predicate) {
-		return PropertyRestrictionPolicyHelper.getBean(ctx)
-				.canDisplayPredicate(predicate, RoleLevel.SELF);
+		return PropertyRestrictionBean.getBean().canDisplayPredicate(predicate,
+				RoleLevel.SELF);
 	}
 
 	private boolean isAboutAssociatedIndividual(Collection<String> selves,

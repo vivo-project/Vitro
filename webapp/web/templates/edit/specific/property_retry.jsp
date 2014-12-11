@@ -18,7 +18,7 @@
 <tr><td colspan="5"><hr class="formDivider"/></td></tr>
 <tr class="editformcell">
 	<td style="vertical-align:top;" valign="top" colspan="1">
-		<b>Ontology</b><br/><br/>
+		<b>Ontology</b><br/>
         <c:choose>
         	<c:when test="${_action eq 'update'}">
 				<select name="Namespace" disabled="disabled"><form:option name="Namespace"/></select><br/>
@@ -30,8 +30,7 @@
 		</c:choose>
 	</td>
 	<td style="vertical-align:top;" valign="top" colspan="2">
-		<b>Internal name*</b><br/>
-	    (RDF local name)<br/>
+		<b>Internal name*</b> (RDF local name)<br/>
         <c:choose>
         	<c:when test="${_action eq 'update'}">
         	    <input type="text" class="fullWidthInput" disabled="disabled" name="LocalName" value="<form:value name='LocalName'/>" /><br/>
@@ -49,7 +48,7 @@
         </c:if>
 	</td>
     <td style="vertical-align:top;" valign="top" colspan="2">
-        <b>Label for public display</b><br/><br/>
+        <b>Label for public display</b><br/>
         <input type="text" class="fullWidthInput" name="DomainPublic" value="<form:value name="DomainPublic"/>" maxlength="80" />
         <c:set var="DomainPublicError"><form:error name="DomainPublic"/></c:set>
         <c:if test="${!empty DomainPublicError}">

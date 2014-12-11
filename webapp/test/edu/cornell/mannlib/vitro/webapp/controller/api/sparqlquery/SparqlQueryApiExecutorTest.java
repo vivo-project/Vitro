@@ -2,11 +2,19 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,6 +33,20 @@ import edu.cornell.mannlib.vitro.webapp.utils.http.NotAcceptableException;
  * formats.
  */
 public class SparqlQueryApiExecutorTest extends AbstractTestClass {
+
+	/* SPARQL response types */
+	private static final String ACCEPT_TEXT = "text/plain";
+	private static final String ACCEPT_CSV = "text/csv";
+	private static final String ACCEPT_TSV = "text/tab-separated-values";
+	private static final String ACCEPT_SPARQL_XML = "application/sparql-results+xml";
+	private static final String ACCEPT_SPARQL_JSON = "application/sparql-results+json";
+
+	/* RDF result types */
+	private static final String ACCEPT_RDFXML = "application/rdf+xml";
+	private static final String ACCEPT_N3 = "text/n3";
+	private static final String ACCEPT_TURTLE = "text/turtle";
+	private static final String ACCEPT_JSON = "application/json";
+
 	private static final String MODEL_CONTENTS_N3 = "" //
 			+ "<http://here.edu/subject> \n"
 			+ "    <http://here.edu/predicate> <http://here.edu/object> ."
@@ -201,24 +223,24 @@ public class SparqlQueryApiExecutorTest extends AbstractTestClass {
 
 	@Test(expected = NullPointerException.class)
 	public void nullRdfService() throws Exception {
-		SparqlQueryApiExecutor.instance(null, SELECT_ALL_QUERY, "text/plain");
+		SparqlQueryApiExecutor.instance(null, SELECT_ALL_QUERY, ACCEPT_TEXT);
 	}
 
 	@Test(expected = NullPointerException.class)
 	public void nullQuery() throws Exception {
-		SparqlQueryApiExecutor.instance(rdfService, null, "text/plain");
+		SparqlQueryApiExecutor.instance(rdfService, null, ACCEPT_TEXT);
 		fail("nullQuery not implemented");
 	}
 
 	@Test(expected = QueryParseException.class)
 	public void emptyQuery() throws Exception {
-		SparqlQueryApiExecutor.instance(rdfService, "", "text/plain");
+		SparqlQueryApiExecutor.instance(rdfService, "", ACCEPT_TEXT);
 		fail("emptyQuery not implemented");
 	}
 
 	@Test(expected = QueryParseException.class)
 	public void cantParseQuery() throws Exception {
-		SparqlQueryApiExecutor.instance(rdfService, "BOGUS", "text/plain");
+		SparqlQueryApiExecutor.instance(rdfService, "BOGUS", ACCEPT_TEXT);
 		fail("cantParseQuery not implemented");
 	}
 
@@ -237,179 +259,177 @@ public class SparqlQueryApiExecutorTest extends AbstractTestClass {
 
 	@Test
 	public void selectToText() throws Exception {
-		executeQuery("select to text", SELECT_ALL_QUERY, "text/plain",
+		executeQuery("select to text", SELECT_ALL_QUERY, ACCEPT_TEXT,
 				SELECT_RESULT_TEXT);
 	}
 
 	@Test
 	public void selectToCsv() throws Exception {
-		executeQuery("select to csv", SELECT_ALL_QUERY, "text/csv",
+		executeQuery("select to csv", SELECT_ALL_QUERY, ACCEPT_CSV,
 				SELECT_RESULT_CSV);
 	}
 
 	@Test
 	public void selectToTsv() throws Exception {
-		executeQuery("select to tsv", SELECT_ALL_QUERY,
-				"text/tab-separated-values", SELECT_RESULT_TSV);
+		executeQuery("select to tsv", SELECT_ALL_QUERY, ACCEPT_TSV,
+				SELECT_RESULT_TSV);
 	}
 
 	@Test
 	public void selectToXml() throws Exception {
-		executeQuery("select to xml", SELECT_ALL_QUERY,
-				"application/sparql-results+xml", SELECT_RESULT_XML);
+		executeQuery("select to xml", SELECT_ALL_QUERY, ACCEPT_SPARQL_XML,
+				SELECT_RESULT_XML);
 	}
 
 	@Test
 	public void selectToJson() throws Exception {
-		executeQuery("select to json", SELECT_ALL_QUERY,
-				"application/sparql-results+json", SELECT_RESULT_JSON);
+		executeQuery("select to json", SELECT_ALL_QUERY, ACCEPT_SPARQL_JSON,
+				SELECT_RESULT_JSON);
 	}
 
 	@Test
 	public void selectWithInvalidContentType() throws Exception {
 		executeWithInvalidAcceptHeader("select with application/rdf+xml",
-				SELECT_ALL_QUERY, "application/rdf+xml");
+				SELECT_ALL_QUERY, ACCEPT_RDFXML);
 		executeWithInvalidAcceptHeader("select with text/n3", SELECT_ALL_QUERY,
-				"text/n3");
+				ACCEPT_N3);
 		executeWithInvalidAcceptHeader("select with text/turtle",
-				SELECT_ALL_QUERY, "text/turtle");
+				SELECT_ALL_QUERY, ACCEPT_TURTLE);
 		executeWithInvalidAcceptHeader("select with application/json",
-				SELECT_ALL_QUERY, "application/json");
+				SELECT_ALL_QUERY, ACCEPT_JSON);
 	}
 
 	// ----------------------------------------------------------------------
 
 	@Test
 	public void askToText() throws Exception {
-		executeQuery("ask to text", ASK_ALL_QUERY, "text/plain",
-				ASK_RESULT_TEXT);
+		executeQuery("ask to text", ASK_ALL_QUERY, ACCEPT_TEXT, ASK_RESULT_TEXT);
 	}
 
 	@Test
 	public void askToCsv() throws Exception {
-		executeQuery("ask to csv", ASK_ALL_QUERY, "text/csv", ASK_RESULT_CSV);
+		executeQuery("ask to csv", ASK_ALL_QUERY, ACCEPT_CSV, ASK_RESULT_CSV);
 	}
 
 	@Test
 	public void askToTsv() throws Exception {
-		executeQuery("ask to tsv", ASK_ALL_QUERY, "text/tab-separated-values",
-				ASK_RESULT_TSV);
+		executeQuery("ask to tsv", ASK_ALL_QUERY, ACCEPT_TSV, ASK_RESULT_TSV);
 	}
 
 	@Test
 	public void askToXml() throws Exception {
-		executeQuery("ask to xml", ASK_ALL_QUERY,
-				"application/sparql-results+xml", ASK_RESULT_XML);
+		executeQuery("ask to xml", ASK_ALL_QUERY, ACCEPT_SPARQL_XML,
+				ASK_RESULT_XML);
 	}
 
 	@Test
 	public void askToJson() throws Exception {
-		executeQuery("ask to json", ASK_ALL_QUERY,
-				"application/sparql-results+json", ASK_RESULT_JSON);
+		executeQuery("ask to json", ASK_ALL_QUERY, ACCEPT_SPARQL_JSON,
+				ASK_RESULT_JSON);
 	}
 
 	@Test
 	public void askWithInvalidAcceptHeader() throws Exception {
 		executeWithInvalidAcceptHeader("ask with application/rdf+xml",
-				ASK_ALL_QUERY, "application/rdf+xml");
+				ASK_ALL_QUERY, ACCEPT_RDFXML);
 		executeWithInvalidAcceptHeader("ask with text/n3", ASK_ALL_QUERY,
-				"text/n3");
+				ACCEPT_N3);
 		executeWithInvalidAcceptHeader("ask with text/turtle", ASK_ALL_QUERY,
-				"text/turtle");
+				ACCEPT_TURTLE);
 		executeWithInvalidAcceptHeader("ask with application/json",
-				ASK_ALL_QUERY, "application/json");
+				ASK_ALL_QUERY, ACCEPT_JSON);
 	}
 
 	// ----------------------------------------------------------------------
 
 	@Test
 	public void constructToText() throws Exception {
-		executeQuery("construct to text", CONSTRUCT_ALL_QUERY, "text/plain",
+		executeQuery("construct to text", CONSTRUCT_ALL_QUERY, ACCEPT_TEXT,
 				CONSTRUCT_RESULT_TEXT);
 	}
 
 	@Test
 	public void constructToRdfXml() throws Exception {
 		executeQuery("construct to rdf/xml", CONSTRUCT_ALL_QUERY,
-				"application/rdf+xml", CONSTRUCT_RESULT_RDFXML);
+				ACCEPT_RDFXML, CONSTRUCT_RESULT_RDFXML);
 	}
 
 	@Test
 	public void constructToN3() throws Exception {
-		executeQuery("construct to n3", CONSTRUCT_ALL_QUERY, "text/n3",
+		executeQuery("construct to n3", CONSTRUCT_ALL_QUERY, ACCEPT_N3,
 				CONSTRUCT_RESULT_N3);
 	}
 
 	@Test
 	public void constructToTurtle() throws Exception {
-		executeQuery("construct to turtle", CONSTRUCT_ALL_QUERY, "text/turtle",
+		executeQuery("construct to turtle", CONSTRUCT_ALL_QUERY, ACCEPT_TURTLE,
 				CONSTRUCT_RESULT_TURTLE);
 	}
 
 	@Test
 	public void constructToJsonld() throws Exception {
-		executeQuery("construct to JSON-LD", CONSTRUCT_ALL_QUERY,
-				"application/json", CONSTRUCT_RESULT_JSONLD);
+		executeQuery("construct to JSON-LD", CONSTRUCT_ALL_QUERY, ACCEPT_JSON,
+				CONSTRUCT_RESULT_JSONLD);
 	}
 
 	@Test
 	public void constructWithInvalidAcceptHeader() throws Exception {
 		executeWithInvalidAcceptHeader("construct with text/csv",
-				CONSTRUCT_ALL_QUERY, "text/csv");
+				CONSTRUCT_ALL_QUERY, ACCEPT_CSV);
 		executeWithInvalidAcceptHeader("construct with text/tsv",
 				CONSTRUCT_ALL_QUERY, "text/tsv");
 		executeWithInvalidAcceptHeader(
 				"construct with application/sparql-results+xml",
-				CONSTRUCT_ALL_QUERY, "application/sparql-results+xml");
+				CONSTRUCT_ALL_QUERY, ACCEPT_SPARQL_XML);
 		executeWithInvalidAcceptHeader(
 				"construct with application/sparql-results+json",
-				CONSTRUCT_ALL_QUERY, "application/sparql-results+json");
+				CONSTRUCT_ALL_QUERY, ACCEPT_SPARQL_JSON);
 	}
 
 	// ----------------------------------------------------------------------
 
 	@Test
 	public void describeToText() throws Exception {
-		executeQuery("describe to text", DESCRIBE_ALL_QUERY, "text/plain",
+		executeQuery("describe to text", DESCRIBE_ALL_QUERY, ACCEPT_TEXT,
 				DESCRIBE_RESULT_TEXT);
 	}
 
 	@Test
 	public void describeToRdfXml() throws Exception {
-		executeQuery("describe to rdf/xml", DESCRIBE_ALL_QUERY,
-				"application/rdf+xml", DESCRIBE_RESULT_RDFXML);
+		executeQuery("describe to rdf/xml", DESCRIBE_ALL_QUERY, ACCEPT_RDFXML,
+				DESCRIBE_RESULT_RDFXML);
 	}
 
 	@Test
 	public void describeToN3() throws Exception {
-		executeQuery("describe to n3", DESCRIBE_ALL_QUERY, "text/n3",
+		executeQuery("describe to n3", DESCRIBE_ALL_QUERY, ACCEPT_N3,
 				DESCRIBE_RESULT_N3);
 	}
 
 	@Test
 	public void describeToTurtle() throws Exception {
-		executeQuery("describe to turtle", DESCRIBE_ALL_QUERY, "text/turtle",
+		executeQuery("describe to turtle", DESCRIBE_ALL_QUERY, ACCEPT_TURTLE,
 				DESCRIBE_RESULT_TURTLE);
 	}
 
 	@Test
 	public void describeToJsonld() throws Exception {
-		executeQuery("describe to JSON-LD", DESCRIBE_ALL_QUERY,
-				"application/json", DESCRIBE_RESULT_JSONLD);
+		executeQuery("describe to JSON-LD", DESCRIBE_ALL_QUERY, ACCEPT_JSON,
+				DESCRIBE_RESULT_JSONLD);
 	}
 
 	@Test
 	public void describeWithInvalidAcceptHeader() throws Exception {
 		executeWithInvalidAcceptHeader("describe with text/csv",
-				DESCRIBE_ALL_QUERY, "text/csv");
+				DESCRIBE_ALL_QUERY, ACCEPT_CSV);
 		executeWithInvalidAcceptHeader("describe with text/tsv",
 				DESCRIBE_ALL_QUERY, "text/tsv");
 		executeWithInvalidAcceptHeader(
 				"describe with application/sparql-results+xml",
-				DESCRIBE_ALL_QUERY, "application/sparql-results+xml");
+				DESCRIBE_ALL_QUERY, ACCEPT_SPARQL_XML);
 		executeWithInvalidAcceptHeader(
 				"describe with application/sparql-results+json",
-				DESCRIBE_ALL_QUERY, "application/sparql-results+json");
+				DESCRIBE_ALL_QUERY, ACCEPT_SPARQL_JSON);
 	}
 
 	// ----------------------------------------------------------------------
@@ -424,7 +444,87 @@ public class SparqlQueryApiExecutorTest extends AbstractTestClass {
 				rdfService, queryString, acceptHeader);
 		executor.executeAndFormat(out);
 
-		assertEquals(message, expected.replaceAll("\\s+", " "), out.toString().replaceAll("\\s+", " "));
+		if (ACCEPT_RDFXML.equals(acceptHeader)) {
+			assertEquivalentRdfxml(message, expected, out.toString());
+		} else if (ACCEPT_TURTLE.equals(acceptHeader)) {
+			assertEquivalentTurtle(message, expected, out.toString());
+		} else if (ACCEPT_N3.equals(acceptHeader)) {
+			assertEquivalentN3(message, expected, out.toString());
+		} else {
+			assertEqualsIgnoreWhiteSpace(message, expected, out.toString());
+		}
+	}
+
+	/**
+	 * RDF/XML namespaces may come in any order, so separate them out and test
+	 * accordingly.
+	 */
+	private void assertEquivalentRdfxml(String message, String expected,
+			String actual) {
+		assertEquals(message, getRdfxmlNamespaces(expected),
+				getRdfxmlNamespaces(actual));
+		assertEqualsIgnoreWhiteSpace(message, omitRdfxmlNamespaces(expected),
+				omitRdfxmlNamespaces(actual));
+	}
+
+	private Set<String> getRdfxmlNamespaces(String rdfxml) {
+		Set<String> namespaces = new TreeSet<>();
+		Pattern p = Pattern.compile("xmlns:\\w+=\\\"[^\\\"]*\\\"");
+		Matcher m = p.matcher(rdfxml);
+		while (m.find()) {
+			namespaces.add(m.group());
+		}
+		return namespaces;
+	}
+
+	private String omitRdfxmlNamespaces(String rdfxml) {
+		return rdfxml.replaceAll("xmlns:\\w+=\\\"[^\\\"]*\\\"", "");
+	}
+
+	/**
+	 * TTL prefix lines may come in any order, so separate them out and test
+	 * accordingly.
+	 */
+	private void assertEquivalentTurtle(String message, String expected,
+			String actual) {
+		assertEquals(message, getTurtlePrefixes(expected),
+				getTurtlePrefixes(actual));
+		assertEqualsIgnoreWhiteSpace(message, getTurtleRemainder(expected),
+				getTurtleRemainder(actual));
+	}
+
+	/**
+	 * N3 is like TTL, as far as prefix lines are concerned.
+	 */
+	private void assertEquivalentN3(String message, String expected,
+			String actual) {
+		assertEquivalentTurtle(message, expected, actual);
+	}
+
+	private Set<String> getTurtlePrefixes(String ttl) {
+		Set<String> prefixes = new TreeSet<>();
+		for (String line : ttl.split("[\\n\\r]+")) {
+			if (line.startsWith("@prefix")) {
+				prefixes.add(line.replaceAll("\\s+", " "));
+			}
+		}
+		return prefixes;
+	}
+
+	private String getTurtleRemainder(String ttl) {
+		List<String> remainder = new ArrayList<>();
+		for (String line : ttl.split("[\\n\\r]+")) {
+			if (!line.startsWith("@prefix")) {
+				remainder.add(line);
+			}
+		}
+		return StringUtils.join(remainder, "\n");
+	}
+
+	private void assertEqualsIgnoreWhiteSpace(String message, String expected,
+			String actual) {
+		assertEquals(message, expected.replaceAll("\\s+", " "),
+				actual.replaceAll("\\s+", " "));
 	}
 
 	private void executeWithInvalidAcceptHeader(String message,
