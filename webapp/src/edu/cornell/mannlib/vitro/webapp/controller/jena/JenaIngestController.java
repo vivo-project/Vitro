@@ -17,10 +17,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -38,8 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mindswap.pellet.exceptions.InconsistentOntologyException;
-import org.mindswap.pellet.jena.PelletReasonerFactory;
+import org.semanticweb.owlapi.reasoner.InconsistentOntologyException;
 
 import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
@@ -837,12 +834,7 @@ public class JenaIngestController extends BaseEditController {
     
     private long doExecuteSparql(VitroRequest vreq) {
 		OntModel jenaOntModel = ModelAccess.on(getServletContext()).getOntModel();
-        OntModel source = null;
-        if ("pellet".equals(vreq.getParameter("reasoning"))) {
-            source = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC);
-        } else {
-             source = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
-        }
+        OntModel source = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
         String[] sourceModel = vreq.getParameterValues("sourceModelName");
         for (int i=0; i<sourceModel.length; i++) {
             Model m = getModel(sourceModel[i],vreq);
@@ -1184,21 +1176,6 @@ public class JenaIngestController extends BaseEditController {
 		vreq.getRequestDispatcher("/dumpRestore").forward(vreq, response);
 	}
 	
-	private class CollationSort implements Comparator<String> {
-        
-        Collator collator;
-        
-        public CollationSort(VitroRequest vreq) {
-             this.collator = vreq.getCollator();   
-        }
-        
-        @Override
-		public int compare(String s1, String s2) {
-            return collator.compare(s1, s2);
-        }
-        
-    }
-
 	public static Model getModel(String name, HttpServletRequest request) {
 		return getModelMaker(request).getModel(name);
 	}

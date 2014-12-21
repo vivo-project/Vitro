@@ -174,17 +174,5 @@ PREFIX <%=prefixText%>: <<%=urlText%>><%}}%>
 	<%    
     }
 %>
-</select> <c:choose>
-	<c:when test="${paramValues['reasoning'] != null}">
-		<c:forEach var="paramValue" items="${paramValues['reasoning']}">
-			<c:if test="${paramValue eq 'pellet'}">
-				<p><input type="checkbox" name="reasoning" value="pellet"
-					checked="checked" /> include pellet reasoning</p>
-			</c:if>
-		</c:forEach>
-	</c:when>
-	<c:otherwise>
-		<p><input type="checkbox" name="reasoning" value="pellet" />
-		include Pellet OWL-DL reasoning</p>
-	</c:otherwise>
-</c:choose> <input id="submit" type="submit" value="Execute CONSTRUCT" />
+</select> 
+<input id="submit" type="submit" value="Execute CONSTRUCT" />
