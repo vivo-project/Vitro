@@ -339,7 +339,7 @@ public class ConfiguredReasonerListener implements ModelChangedListener {
 	// It originally assumed that only resources would be in object
 	// position, but cardinality axioms will have e.g. nonNegativeIntegers.
 	// This is a temporary workaround: all cardinality statements will
-	// be exposed to Pellet, regardless of configuration patterns.
+	// be exposed to the TBox reasoner, regardless of configuration patterns.
 	private boolean hasCardinalityPredicate(Statement stmt) {
 		return (stmt.getPredicate().equals(OWL.cardinality)
 				|| stmt.getPredicate().equals(OWL.minCardinality) || stmt
