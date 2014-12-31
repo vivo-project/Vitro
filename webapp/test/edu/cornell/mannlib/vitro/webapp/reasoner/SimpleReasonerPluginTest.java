@@ -9,7 +9,6 @@ import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mindswap.pellet.jena.PelletReasonerFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
@@ -23,9 +22,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
-
-public class SimpleReasonerPluginTest extends AbstractTestClass {
+public class SimpleReasonerPluginTest extends SimpleReasonerTBoxHelper {
 	long delay = 50;
 	
 	private final static String DEFAULT_NS = "http://vivoweb.org/individual/";
@@ -53,7 +50,7 @@ public class SimpleReasonerPluginTest extends AbstractTestClass {
 	*/
 	@Test
 	public void test1()  {
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		OntModel tBox = createTBoxModel(); 
 		
 		OntProperty authorInAuthorship = tBox.createObjectProperty(authorInAuthorship_URI);
 		OntProperty linkedAuthor = tBox.createObjectProperty(linkedAuthor_URI);
