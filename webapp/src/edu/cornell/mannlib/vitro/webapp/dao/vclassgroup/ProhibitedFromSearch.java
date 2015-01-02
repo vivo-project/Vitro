@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.search.beans;
+package edu.cornell.mannlib.vitro.webapp.dao.vclassgroup;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ import com.hp.hpl.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 
-public class ProhibitedFromSearch implements ClassProhibitedFromSearch{
+public class ProhibitedFromSearch {
 	List<String> prohibitedClasses;
 	String ProhibitedFromSearchURI;
 	
@@ -94,7 +94,7 @@ public class ProhibitedFromSearch implements ClassProhibitedFromSearch{
 		return newProhibitedClasses;
 	}
 
-	private static enum ChangeType { ADD, REMOVE } ;
+	private static enum ChangeType { ADD, REMOVE }
 	
 	class ProhibitedFromSearchChangeListener extends StatementListener {
 		ProhibitedFromSearch pfs;
@@ -117,10 +117,10 @@ public class ProhibitedFromSearch implements ClassProhibitedFromSearch{
 				
 				//is it about this ProhibitedFromSearch?
 				if( s.getSubject() != null ){
-					String subURI = ((Resource) s.getSubject()).getURI() ;
+					String subURI = s.getSubject().getURI() ;
 					if( subURI != null && subURI.equals( ProhibitedFromSearchURI )){
 						if( s.getObject() != null && s.getObject().canAs(Resource.class)){
-							String classURI = ((Resource)s.getObject().as(Resource.class)).getURI();
+							String classURI = s.getObject().as(Resource.class).getURI();
 							if( add == ChangeType.ADD )
 								pfs.addProhibitedClass(classURI);
 							else

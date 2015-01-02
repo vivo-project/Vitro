@@ -1,7 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -42,10 +41,8 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchFacetField.Co
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexingEventListener;
-import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerSetup;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
@@ -243,10 +240,7 @@ public class VClassGroupCache implements IndexingEventListener {
     }
     
     /**
-     * Method that rebuilds the cache. This will use a WebappDaoFactory, 
-     * a SearchEngine and maybe a ProhibitedFromSearch from the cache.context.
-     * 
-     * If ProhibitedFromSearch is not found in the context, that will be skipped.
+     * Method that rebuilds the cache. This will use a WebappDaoFactory and a SearchEngine.
      */
     protected static void rebuildCacheUsingSearch( VClassGroupCache cache ) throws SearchEngineException{                        
         long start = System.currentTimeMillis();
@@ -260,7 +254,6 @@ public class VClassGroupCache implements IndexingEventListener {
         List<VClassGroup> groups = vcgDao.getPublicGroupsWithVClasses(ORDER_BY_DISPLAYRANK, 
                 INCLUDE_UNINSTANTIATED, DONT_INCLUDE_INDIVIDUAL_COUNT);
                                 
-        removeClassesHiddenFromSearch(groups, cache.context);
         addCountsUsingSearch(groups, searchEngine);        
         cache.setCache(groups, classMapForGroups(groups));
         
@@ -281,28 +274,6 @@ public class VClassGroupCache implements IndexingEventListener {
         return newClassMap;
     }      
 
-        
-    /**
-     * Removes classes from groups that are prohibited from search. 
-     */
-    protected static void removeClassesHiddenFromSearch(List<VClassGroup> groups, ServletContext context2) {
-        ProhibitedFromSearch pfs = (ProhibitedFromSearch)context2.getAttribute(SearchIndexerSetup.PROHIBITED_FROM_SEARCH);
-        if(pfs==null){
-            log.debug("Could not get ProhibitedFromSearch from ServletContext");
-            return;
-        }
-        
-        for (VClassGroup group : groups) {
-            List<VClass> classList = new ArrayList<VClass>();
-            for (VClass vclass : group.getVitroClassList()) {
-                if (!pfs.isClassProhibitedFromSearch(vclass.getURI())) {
-                    classList.add(vclass);
-                }
-            }
-            group.setVitroClassList(classList);
-        }        
-    }
-    
     
     /**
      * Add the Individual count to classes in groups.

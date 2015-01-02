@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.search.beans;
+package edu.cornell.mannlib.vitro.webapp.dao.vclassgroup;
 
 import java.io.StringReader;
 
@@ -34,7 +34,7 @@ public class ProhibitedFromSearchTest {
 	@Test
 	public void testBuildingProhibited(){
 		Model r = ModelFactory.createDefaultModel().read(new StringReader(n3), null, "N3");
-		OntModel m = (OntModel) ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		OntModel m = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		m.add( r.listStatements() );
 		
 		Assert.assertTrue(m.size() > 4);	
@@ -48,7 +48,7 @@ public class ProhibitedFromSearchTest {
 	@Test
 	public void testNotFound(){
 		Model r = ModelFactory.createDefaultModel().read(new StringReader(n3), null, "N3");
-		OntModel m = (OntModel) ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		OntModel m = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		m.add( r.listStatements() );
 		
 		Assert.assertTrue(m.size() > 4);	
@@ -63,7 +63,7 @@ public class ProhibitedFromSearchTest {
 	@Test
 	public void testListener(){
 		Model r = ModelFactory.createDefaultModel().read(new StringReader(n3), null, "N3");
-		OntModel m = (OntModel) ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		OntModel m = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		m.add( r.listStatements() );		
 		Assert.assertTrue(m.size() > 4);
 		
@@ -87,7 +87,7 @@ public class ProhibitedFromSearchTest {
 	@Test
 	public void testListenerAbnormal(){
 		Model r = ModelFactory.createDefaultModel().read(new StringReader(n3), null, "N3");
-		OntModel m = (OntModel) ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		OntModel m = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		m.add( r.listStatements() );		
 		Assert.assertTrue(m.size() > 4);
 		
@@ -115,7 +115,7 @@ public class ProhibitedFromSearchTest {
 			"<http://vivoweb.org/ontology/core#NonAcademic> . ";		
 		
 		Model r = ModelFactory.createDefaultModel().read(new StringReader(primaryIndexN3), null, "N3");
-		OntModel m = (OntModel) ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
+		OntModel m = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);
 		m.add( r.listStatements() );
 		
 		Assert.assertTrue(m.size() == 1);	

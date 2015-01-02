@@ -2,10 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao;
 
-import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 
 public interface VClassGroupDao {
 
@@ -54,8 +54,6 @@ public interface VClassGroupDao {
 
     public abstract int removeUnpopulatedGroups(List<VClassGroup> groups);
 
-    public void removeClassesHiddenFromSearch(List<VClassGroup> groups);    
-    
     int insertNewVClassGroup(VClassGroup vcg);
 
     void updateVClassGroup(VClassGroup vcg);

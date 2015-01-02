@@ -47,8 +47,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.developer.listeners.DeveloperDisab
 public class SearchIndexerSetup implements ServletContextListener {
 	private static final Log log = LogFactory.getLog(SearchIndexerSetup.class);
 	
-	public static final String PROHIBITED_FROM_SEARCH = "edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch";
-	
 	private ServletContext ctx;
 	private OntModel displayModel;
 	private ConfigurationBeanLoader beanLoader;
