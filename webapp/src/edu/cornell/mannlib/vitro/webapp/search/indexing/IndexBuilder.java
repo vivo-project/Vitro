@@ -25,7 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
-import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
+import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.StatementToURIsToUpdate;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 

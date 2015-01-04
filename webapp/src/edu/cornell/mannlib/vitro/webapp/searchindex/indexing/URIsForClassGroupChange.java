@@ -1,5 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
-package edu.cornell.mannlib.vitro.webapp.search.indexing;
+
+package edu.cornell.mannlib.vitro.webapp.searchindex.indexing;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,7 +11,6 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
 
 /**
  * if a class's classgroup changes, reindex all individuals in that class.  

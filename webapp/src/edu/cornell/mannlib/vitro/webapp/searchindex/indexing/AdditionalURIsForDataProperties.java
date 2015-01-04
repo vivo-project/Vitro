@@ -1,13 +1,13 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.search.indexing;
+package edu.cornell.mannlib.vitro.webapp.searchindex.indexing;
 
 import java.util.Collections;
 import java.util.List;
 
 import com.hp.hpl.jena.rdf.model.Statement;
 
-import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
+import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.StatementToURIsToUpdate;
 
 public class AdditionalURIsForDataProperties  implements StatementToURIsToUpdate{
 

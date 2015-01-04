@@ -2,7 +2,7 @@
 /**
  * 
  */
-package edu.cornell.mannlib.vitro.webapp.search.indexing;
+package edu.cornell.mannlib.vitro.webapp.searchindex.indexing;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,7 +15,6 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
 
 /**
  * If a class changes classgroups, then all members of that class

@@ -1,6 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package edu.cornell.mannlib.vitro.webapp.search.indexing;
+package edu.cornell.mannlib.vitro.webapp.searchindex.indexing;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +21,6 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
 
 /**
  * For a given statement, return the URIs that may need to be updated in

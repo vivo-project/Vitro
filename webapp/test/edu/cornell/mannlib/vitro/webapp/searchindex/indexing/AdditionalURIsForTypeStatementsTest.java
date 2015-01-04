@@ -1,10 +1,7 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
-/**
- * 
- */
-package edu.cornell.mannlib.vitro.webapp.search.indexing;
 
-import java.util.ArrayList;
+package edu.cornell.mannlib.vitro.webapp.searchindex.indexing;
+
 import java.util.List;
 
 import org.junit.Assert;

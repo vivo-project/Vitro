@@ -1,10 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
-/**
- * 
- */
-package edu.cornell.mannlib.vitro.webapp.search.indexing;
 
-import static org.junit.Assert.*;
+package edu.cornell.mannlib.vitro.webapp.searchindex.indexing;
 
 import java.io.StringReader;
 import java.util.List;
@@ -16,11 +12,8 @@ import org.junit.Test;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.search.beans.StatementToURIsToUpdate;
 
 /**
  * @author bdc34

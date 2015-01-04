@@ -37,6 +37,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocument;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
+import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier;
+import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluder;
 
 public class IndividualToSearchDocument {
         
