@@ -229,12 +229,10 @@ public class FileGraphSetup implements ServletContextListener {
         Model dbModel = dataset.getModel(graphURI);
         boolean modelChanged = false;
         
-        boolean isIsomorphic = dbModel.isIsomorphicWith(fileModel);
-        
         if (dbModel.isEmpty()  && !fileModel.isEmpty()) {
             dbModel.add(fileModel);
             modelChanged = true;
-        } else if (!isIsomorphic) {
+        } else if (!isIsomorphic(dbModel, fileModel)) {
             log.info("Updating " + path + " because graphs are not isomorphic");
             log.info("dbModel: " + dbModel.size() + " ; fileModel: " + fileModel.size());
             dbModel.removeAll();
@@ -244,6 +242,18 @@ public class FileGraphSetup implements ServletContextListener {
 
         return modelChanged;
     }
+
+	/**
+	 * If we check isomorphism with a dbModel directly, we issue many ASK
+	 * queries against the underlying RDFService.
+	 * 
+	 * It's faster to read the entire model from the RDFService and then issue
+	 * all of those ASKs against a memory-resident model.
+	 */
+	private boolean isIsomorphic(Model dbModel, Model fileModel) {
+		return ModelFactory.createDefaultModel().add(dbModel)
+				.isIsomorphicWith(fileModel);
+	}
 
     /*
      * Deletes any file graphs that are  no longer present in the file system
