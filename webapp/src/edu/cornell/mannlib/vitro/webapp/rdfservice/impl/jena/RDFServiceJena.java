@@ -43,6 +43,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 public abstract class RDFServiceJena extends RDFServiceImpl implements RDFService {
 
@@ -106,8 +107,8 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 				dumpOperation(model, modelChange);
 			}
             if (modelChange.getOperation() == ModelChange.Operation.ADD) {
-                model.read(modelChange.getSerializedModel(), null,
-                        getSerializationFormatString(modelChange.getSerializationFormat()));  
+            	Model addition = parseModel(modelChange);
+            	model.add(addition);
             } else if (modelChange.getOperation() == ModelChange.Operation.REMOVE) {
                 Model removal = parseModel(modelChange);
                 model.remove(removal);
@@ -165,17 +166,13 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 
 		String changeString = new String(changeBytes).replace('\n', ' ');
 
-		String graphUri = modelChange.getGraphURI();
-		int delimHere = Math.max(graphUri.lastIndexOf('#'),
-				graphUri.lastIndexOf('/'));
-		String graphLocalName = graphUri.substring(delimHere + 1);
-
-		String modelClassName = model.getClass().getSimpleName();
-
-		log.debug(String
-				.format(">>>>OPERATION: %3.3s %03dpunc, name='%s', class=%s, start=%.200s",
-						op, puncCount, graphLocalName, modelClassName,
-						changeString));
+		log.debug(String.format(
+				">>>>OPERATION: %3.3s %03dpunc, format=%s, graphUri='%s'\n"
+						+ "    start=%.200s\n" + "    model=%s",
+				modelChange.getOperation(), puncCount,
+				modelChange.getSerializationFormat(),
+				modelChange.getGraphURI(), changeString,
+				ToString.modelToString(model)));
 	}
 
 	private void removeBlankNodesWithSparqlUpdate(Dataset dataset, Model model, String graphURI) {

@@ -463,7 +463,6 @@ public class IndexBuilder extends VitroBackgroundThread {
         }
     }               
     
-    /* maybe ObjectSourceIface should be replaced with just an iterator. */
     protected class UriToIndividualIterator implements Iterator<Individual>{        
         private final Iterator<String> uris;
         private final WebappDaoFactory wdf;

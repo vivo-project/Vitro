@@ -47,12 +47,25 @@ public class TDBTripleStoreQuirks extends DefaultTripleStoreQuirks {
 			Model mangled = ModelFactory.createDefaultModel();
 			mangled.read(mangleStream, null, "N-TRIPLE");
 
-			return !mangled.isIsomorphicWith(previous);
+			return !isIsomorphic(previous, mangled);
 		} catch (Exception e) {
 			log.warn("Failed to test for changes in filegraph. "
 					+ "Change assumed.", e);
 			return true;
 		}
+	}
+
+	/**
+	 * If we check isomorphism with a dbModel directly, we issue many ASK
+	 * queries against the underlying RDFService.
+	 * 
+	 * It's faster to read the entire model from the RDFService and then issue
+	 * all of those ASKs against a memory-resident model.
+	 */
+	private boolean isIsomorphic(Model previous, Model mangled) {
+		Model previousInMemory = ModelFactory.createDefaultModel()
+				.add(previous);
+		return mangled.isIsomorphicWith(previousInMemory);
 	}
 
 }

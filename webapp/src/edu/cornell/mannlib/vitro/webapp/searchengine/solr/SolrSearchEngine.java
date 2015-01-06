@@ -167,4 +167,9 @@ public class SolrSearchEngine implements SearchEngine {
 		}
 	}
 
+	@Override
+	public int documentCount() throws SearchEngineException {
+    	SearchResponse response = query(createQuery("*:*"));
+    	return (int) response.getResults().getNumFound();
+	}
 }

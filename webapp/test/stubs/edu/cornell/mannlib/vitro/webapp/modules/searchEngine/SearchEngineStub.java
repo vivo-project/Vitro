@@ -22,9 +22,9 @@ public class SearchEngineStub implements SearchEngine {
 	// ----------------------------------------------------------------------
 	// Stub infrastructure
 	// ----------------------------------------------------------------------
-	
+
 	Map<String, SearchResponseStub> queryResponses = new HashMap<>();
-	
+
 	public void setQueryResponse(String queryText, SearchResponseStub response) {
 		queryResponses.put(queryText, response);
 	}
@@ -58,77 +58,69 @@ public class SearchEngineStub implements SearchEngine {
 		return new BaseSearchInputDocument();
 	}
 
-
 	// ----------------------------------------------------------------------
 	// Un-implemented methods
 	// ----------------------------------------------------------------------
 
-	
-
 	@Override
 	public void startup(Application application, ComponentStartupStatus ss) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException(
 				"SearchEngineStub.startup() not implemented.");
 	}
 
 	@Override
 	public void shutdown(Application application) {
-		// TODO Auto-generated method stub
 		throw new RuntimeException(
 				"SearchEngineStub.shutdown() not implemented.");
 	}
 
 	@Override
 	public void ping() throws SearchEngineException {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("SearchEngineStub.ping() not implemented.");
 	}
 
 	@Override
 	public void add(SearchInputDocument... docs) throws SearchEngineException {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("SearchEngineStub.add() not implemented.");
 	}
 
 	@Override
 	public void add(Collection<SearchInputDocument> docs)
 			throws SearchEngineException {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("SearchEngineStub.add() not implemented.");
 	}
 
 	@Override
 	public void commit() throws SearchEngineException {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("SearchEngineStub.commit() not implemented.");
 	}
 
 	@Override
 	public void commit(boolean wait) throws SearchEngineException {
-		// TODO Auto-generated method stub
 		throw new RuntimeException("SearchEngineStub.commit() not implemented.");
 	}
 
 	@Override
 	public void deleteById(String... ids) throws SearchEngineException {
-		// TODO Auto-generated method stub
 		throw new RuntimeException(
 				"SearchEngineStub.deleteById() not implemented.");
 	}
 
 	@Override
 	public void deleteById(Collection<String> ids) throws SearchEngineException {
-		// TODO Auto-generated method stub
 		throw new RuntimeException(
 				"SearchEngineStub.deleteById() not implemented.");
 	}
 
 	@Override
 	public void deleteByQuery(String query) throws SearchEngineException {
-		// TODO Auto-generated method stub
 		throw new RuntimeException(
 				"SearchEngineStub.deleteByQuery() not implemented.");
 	}
 
+	@Override
+	public int documentCount() throws SearchEngineException {
+		throw new RuntimeException(
+				"SearchEngineStub.documentCount() not implemented.");
+	}
 }

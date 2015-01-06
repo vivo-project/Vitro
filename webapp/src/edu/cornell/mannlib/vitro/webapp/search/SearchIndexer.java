@@ -202,15 +202,10 @@ public class SearchIndexer implements IndexerIface {
      * Returns true if there are documents in the index, false if there are none,
      * and returns false on failure to connect to server.
      */
-    public boolean isIndexEmpty() {
-    	SearchQuery query = ApplicationUtils.instance().getSearchEngine().createQuery();
-    	query.setQuery("*:*");
+    @Override
+	public boolean isIndexEmpty() {
     	try {
-    		SearchResponse rsp = server.query(query);
-    		SearchResultDocumentList docs = rsp.getResults();
-    		if(docs==null || docs.size()==0){
-    			return true;
-    		}
+    		return server.documentCount() == 0;
     	} catch (SearchEngineException e) {
     		log.error("Could not connect to the search engine." ,e.getCause());
     	}

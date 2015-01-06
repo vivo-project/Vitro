@@ -86,5 +86,9 @@ public interface SearchEngine extends Application.Module {
 	 * Query the search index and return the results. Response is never null.
 	 */
 	SearchResponse query(SearchQuery query) throws SearchEngineException;
-
+	
+	/**
+	 * Find the number of documents in the search index.
+	 */
+	int documentCount() throws SearchEngineException;
 }
