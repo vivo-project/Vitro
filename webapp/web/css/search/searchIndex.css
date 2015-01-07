@@ -1,0 +1,17 @@
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+
+/* Styles for the search index controller. */
+
+section#indexer table.history {
+    font-size: smaller;
+    border: 1px solid gray;
+    width: 100%;
+}
+
+section#indexer table.history th{
+    font-weight: bolder;
+}
+
+section#indexer table.history td{
+    padding: 2px 5px 2px 5px;
+}

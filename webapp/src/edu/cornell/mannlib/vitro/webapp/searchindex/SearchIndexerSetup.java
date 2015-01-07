@@ -35,6 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentMod
 import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluder;
 import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.AdditionalUriFinders;
 import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.StatementToURIsToUpdate;
+import edu.cornell.mannlib.vitro.webapp.startup.ComponentStartupStatusImpl;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
@@ -43,6 +44,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.developer.listeners.DeveloperDisab
 
 /**
  * TODO
+ * A silly implementation that just wraps the old IndexBuilder with a new SearchIndexerImpl.
  */
 public class SearchIndexerSetup implements ServletContextListener {
 	private static final Log log = LogFactory.getLog(SearchIndexerSetup.class);
@@ -96,6 +98,8 @@ public class SearchIndexerSetup implements ServletContextListener {
 							Key.SEARCH_INDEX_SUPPRESS_MODEL_CHANGE_LISTENER));
 
 			ss.info(this, "Setup of search indexer completed.");
+			
+			ApplicationUtils.instance().getSearchIndexer().startup(ApplicationUtils.instance(), new ComponentStartupStatusImpl(this, ss));
 		} catch (Throwable e) {
 			ss.fatal(this, "could not setup search engine", e);
 		}

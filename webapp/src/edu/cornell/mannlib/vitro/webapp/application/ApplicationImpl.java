@@ -16,13 +16,14 @@ import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerModule;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ConfigurationTripleSource;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.triplesource.impl.BasicCombinedTripleSource;
 import edu.cornell.mannlib.vitro.webapp.startup.ComponentStartupStatusImpl;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
+import edu.cornell.mannlib.vitro.webapp.triplesource.impl.BasicCombinedTripleSource;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
 
@@ -38,6 +39,7 @@ public class ApplicationImpl implements Application {
 	private VitroHomeDirectory homeDirectory;
 
 	private SearchEngine searchEngine;
+	private SearchIndexer searchIndexer;
 	private ImageProcessor imageProcessor;
 	private FileStorage fileStorage;
 	private ContentTripleSource contentTripleSource;
@@ -73,8 +75,24 @@ public class ApplicationImpl implements Application {
 			searchEngine = se;
 		} else {
 			throw new IllegalStateException(
-					"Configuration includes multiple SearchEngine instancess: "
+					"Configuration includes multiple SearchEngine instances: "
 							+ searchEngine + ", and " + se);
+		}
+	}
+
+	@Override
+	public SearchIndexer getSearchIndexer() {
+		return searchIndexer;
+	}
+
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasSearchIndexer")
+	public void setSearchIndexer(SearchIndexer si) {
+		if (searchIndexer == null) {
+			searchIndexer = si;
+		} else {
+			throw new IllegalStateException(
+					"Configuration includes multiple SearchIndexer instances: "
+							+ searchIndexer + ", and " + si);
 		}
 	}
 
@@ -89,7 +107,7 @@ public class ApplicationImpl implements Application {
 			imageProcessor = ip;
 		} else {
 			throw new IllegalStateException(
-					"Configuration includes multiple ImageProcessor instancess: "
+					"Configuration includes multiple ImageProcessor instances: "
 							+ imageProcessor + ", and " + ip);
 		}
 	}
@@ -105,7 +123,7 @@ public class ApplicationImpl implements Application {
 			fileStorage = fs;
 		} else {
 			throw new IllegalStateException(
-					"Configuration includes multiple FileStorage intances: "
+					"Configuration includes multiple FileStorage instances: "
 							+ fileStorage + ", and " + fs);
 		}
 	}
@@ -121,7 +139,7 @@ public class ApplicationImpl implements Application {
 			contentTripleSource = source;
 		} else {
 			throw new IllegalStateException(
-					"Configuration includes multiple intances of ContentTripleSource: "
+					"Configuration includes multiple instances of ContentTripleSource: "
 							+ contentTripleSource + ", and " + source);
 		}
 	}
@@ -137,7 +155,7 @@ public class ApplicationImpl implements Application {
 			configurationTripleSource = source;
 		} else {
 			throw new IllegalStateException(
-					"Configuration includes multiple intances of ConfigurationTripleSource: "
+					"Configuration includes multiple instances of ConfigurationTripleSource: "
 							+ configurationTripleSource + ", and " + source);
 		}
 	}
@@ -153,7 +171,7 @@ public class ApplicationImpl implements Application {
 			tboxReasonerModule = module;
 		} else {
 			throw new IllegalStateException(
-					"Configuration includes multiple intances of TBoxReasonerModule: "
+					"Configuration includes multiple instances of TBoxReasonerModule: "
 							+ tboxReasonerModule + ", and " + module);
 		}
 	}
@@ -163,6 +181,10 @@ public class ApplicationImpl implements Application {
 		if (searchEngine == null) {
 			throw new IllegalStateException(
 					"Configuration did not include a SearchEngine.");
+		}
+		if (searchIndexer == null) {
+			throw new IllegalStateException(
+					"Configuration did not include a SearchIndexer.");
 		}
 		if (imageProcessor == null) {
 			throw new IllegalStateException(

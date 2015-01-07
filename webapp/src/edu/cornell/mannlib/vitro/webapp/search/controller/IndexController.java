@@ -3,12 +3,10 @@
 package edu.cornell.mannlib.vitro.webapp.search.controller;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,31 +16,30 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
-import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.WorkLevel;
-import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.WorkLevelStamp;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.State;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.StatementCounts;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.UriCounts;
+import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessingServiceSetup;
 
 /**
- * Accepts requests to rebuild or update the search index. It uses an
- * IndexBuilder and finds that IndexBuilder from the servletContext using the
- * key "edu.cornel.mannlib.vitro.search.indexing.IndexBuilder"
+ * Accepts requests to display the current status of the search index, or to
+ * initiate a rebuild.
  * 
- * That IndexBuilder will be associated with a object that implements the
- * IndexerIface.
+ * A DISPLAY or REBUILD request is handled like any other FreemarkerHttpServlet.
+ * A STATUS is an AJAX request, we override doGet() so we can format the
+ * template without enclosing it in a body template.
  * 
- * An example of the IndexerIface is SearchIndexer. An example of the IndexBuilder
- * and SearchIndexer setup is in SearchIndexerSetup.
- * 
- * @author bdc34
+ * When initialized, this servlet adds a listener to the SearchIndexer, so it
+ * can maintain a history of activity. This will provide the contents of the
+ * display.
  */
 public class IndexController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory.getLog(IndexController.class);
@@ -50,27 +47,22 @@ public class IndexController extends FreemarkerHttpServlet {
 	/**
 	 * <pre>
 	 * This request might be:
-	 * SETUP -- Index is not building and nothing is requested. Solicit requests.
-	 * REFRESH  -- Index is building, nothing is requested. Show continuing status.
-	 * REBUILD -- Rebuild is requested. Set the rebuild flag and show continuing status.
+	 * DISPLAY (default) -- Send the template that will contain the status display. 
+	 * STATUS  -- Send the current status and history.
+	 * REBUILD -- Initiate a rebuild. Then act like DISPLAY.
 	 * </pre>
 	 */
 	private enum RequestType {
-		SETUP, REFRESH, REBUILD;
+		DISPLAY, STATUS, REBUILD;
 
 		/** What type of request is this? */
 		static RequestType fromRequest(HttpServletRequest req) {
 			if (hasParameter(req, "rebuild")) {
 				return REBUILD;
+			} else if (hasParameter(req, "status")) {
+				return STATUS;
 			} else {
-				ServletContext ctx = req.getSession().getServletContext();
-				IndexBuilder builder = IndexBuilder.getBuilder(ctx);
-				WorkLevelStamp workLevel = builder.getWorkLevel();
-				if (workLevel.getLevel() == WorkLevel.WORKING) {
-					return REFRESH;
-				} else {
-					return SETUP;
-				}
+				return DISPLAY;
 			}
 		}
 
@@ -81,13 +73,43 @@ public class IndexController extends FreemarkerHttpServlet {
 	}
 
 	private static final String PAGE_URL = "/SearchIndex";
-	private static final String TEMPLATE_NAME = "searchIndex.ftl";
+	private static final String PAGE_TEMPLATE_NAME = "searchIndex.ftl";
+	private static final String STATUS_TEMPLATE_NAME = "searchIndexStatus.ftl";
 
 	public static final RequestedAction REQUIRED_ACTIONS = SimplePermission.MANAGE_SEARCH_INDEX.ACTION;
 
+	private SearchIndexer indexer;
+	private IndexHistory history;
+
 	@Override
-	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
-		return REQUIRED_ACTIONS;
+	public void init() throws ServletException {
+		super.init();
+		this.indexer = ApplicationUtils.instance().getSearchIndexer();
+		this.history = new IndexHistory();
+		this.indexer.addListener(this.history);
+	}
+
+	@Override
+	public void destroy() {
+		this.indexer.removeListener(this.history);
+		super.destroy();
+	}
+
+	@Override
+	public void doGet(HttpServletRequest req, HttpServletResponse resp)
+			throws IOException, ServletException {
+		if (!isAuthorizedToDisplayPage(req, resp, REQUIRED_ACTIONS)) {
+			return;
+		}
+
+		switch (RequestType.fromRequest(req)) {
+		case STATUS:
+			showStatus(req, resp);
+			break;
+		default:
+			super.doGet(req, resp);
+			break;
+		}
 	}
 
 	@Override
@@ -96,75 +118,79 @@ public class IndexController extends FreemarkerHttpServlet {
 	}
 
 	@Override
-	public void doGet(HttpServletRequest req, HttpServletResponse resp)
-			throws IOException, ServletException {
-		if (RequestType.fromRequest(req) == RequestType.REFRESH) {
-			resp.addHeader("Refresh", "5; " + UrlBuilder.getUrl(PAGE_URL));
-		}
-		super.doGet(req, resp);
-	}
-
-	@Override
 	protected ResponseValues processRequest(VitroRequest vreq) {
-		Map<String, Object> body = new HashMap<String, Object>();
-		body.put("actionUrl", UrlBuilder.getUrl(PAGE_URL));
-
-		try {
-			IndexBuilder builder = IndexBuilder.getBuilder(getServletContext());
-
-			switch (RequestType.fromRequest(vreq)) {
-			case REBUILD:
-				builder.doIndexRebuild();
-				Thread.sleep(500);
-				return redirectToRefresh();
-			default:
-				return showCurrentStatus(builder, body);
-			}
-		} catch (Exception e) {
-			log.error("Error rebuilding search index", e);
-			body.put("errorMessage",
-					"There was an error while rebuilding the search index. "
-							+ e.getMessage());
-			return new ExceptionResponseValues(
-					Template.ERROR_MESSAGE.toString(), body, e);
+		switch (RequestType.fromRequest(vreq)) {
+		case REBUILD:
+			requestRebuild();
+			return showDisplay();
+		default:
+			return showDisplay();
 		}
 	}
 
-	private ResponseValues redirectToRefresh() {
-		return new RedirectResponseValues(PAGE_URL);
+	private ResponseValues showDisplay() {
+		HashMap<String, Object> body = new HashMap<>();
+		body.put("statusUrl", UrlBuilder.getUrl(PAGE_URL, "status", "true"));
+		body.put("rebuildUrl", UrlBuilder.getUrl(PAGE_URL, "rebuild", "true"));
+		return new TemplateResponseValues(PAGE_TEMPLATE_NAME, body);
 	}
 
-	private ResponseValues showCurrentStatus(IndexBuilder builder,
-			Map<String, Object> body) {
-		WorkLevelStamp stamp = builder.getWorkLevel();
-
-		WorkLevel workLevel = stamp.getLevel();
-		long completedCount = builder.getCompletedCount();
-		long totalToDo = builder.getTotalToDo();
-		Date since = stamp.getSince();
-		Date expectedCompletion = figureExpectedCompletion(since, totalToDo,
-				completedCount);
-
-		body.put("worklevel", workLevel.toString());
-		body.put("completedCount", completedCount);
-		body.put("totalToDo", totalToDo);
-		body.put("currentTask", figureCurrentTask(stamp.getFlags()));
-		body.put("since", since);
-		body.put("elapsed", formatElapsedTime(since, new Date()));
-		body.put("expected", formatElapsedTime(since, expectedCompletion));
-		body.put("hasPreviousBuild", since.getTime() > 0L);
-		body.put("indexIsConnected", testIndexConnection());
-		return new TemplateResponseValues(TEMPLATE_NAME, body);
-	}
-
-	private Boolean testIndexConnection() {
+	private void showStatus(HttpServletRequest req, HttpServletResponse resp)
+			throws IOException {
 		try {
-			ApplicationUtils.instance().getSearchEngine().ping();
-			return Boolean.TRUE;
+			Map<String, Object> body = new HashMap<>();
+			body.put("statusUrl", UrlBuilder.getUrl(PAGE_URL, "status", "true"));
+			body.put("rebuildUrl",
+					UrlBuilder.getUrl(PAGE_URL, "rebuild", "true"));
+			body.put("status", buildStatusMap(indexer.getStatus()));
+			body.put("history", history.toMaps());
+
+			String rendered = FreemarkerProcessingServiceSetup.getService(
+					getServletContext()).renderTemplate(STATUS_TEMPLATE_NAME,
+					body, req);
+			resp.getWriter().write(rendered);
 		} catch (Exception e) {
-			log.error("Can't connect to the search engine.", e);
-			return Boolean.FALSE;
+			resp.setStatus(500);
+			resp.getWriter().write(e.toString());
+			log.error(e, e);
 		}
+	}
+
+	private void requestRebuild() {
+		indexer.rebuildIndex();
+	}
+
+	private Map<String, Object> buildStatusMap(SearchIndexerStatus status) {
+		Map<String, Object> map = new HashMap<>();
+		State state = status.getState();
+		map.put("statusType", state);
+		map.put("since", status.getSince());
+
+		if (state == State.PROCESSING_URIS) {
+			UriCounts counts = status.getCounts().asUriCounts();
+			map.put("updated", counts.getUpdated());
+			map.put("deleted", counts.getDeleted());
+			map.put("remaining", counts.getRemaining());
+			map.put("total", counts.getTotal());
+			map.put("elapsed", breakDownElapsedTime(status.getSince()));
+			map.put("expectedCompletion",
+					figureExpectedCompletion(status.getSince(),
+							counts.getTotal(),
+							counts.getTotal() - counts.getRemaining()));
+		} else if (state == State.PROCESSING_STMTS) {
+			StatementCounts counts = status.getCounts().asStatementCounts();
+			map.put("processed", counts.getProcessed());
+			map.put("remaining", counts.getRemaining());
+			map.put("total", counts.getTotal());
+			map.put("elapsed", breakDownElapsedTime(status.getSince()));
+			map.put("expectedCompletion",
+					figureExpectedCompletion(status.getSince(),
+							counts.getTotal(), counts.getProcessed()));
+		} else {
+			// nothing for IDLE or SHUTDOWN, except what's already there.
+		}
+
+		return map;
 	}
 
 	private Date figureExpectedCompletion(Date startTime, long totalToDo,
@@ -186,22 +212,12 @@ public class IndexController extends FreemarkerHttpServlet {
 		return new Date(expectedDuration + startTime.getTime());
 	}
 
-	private String formatElapsedTime(Date since, Date until) {
-		long elapsedMillis = until.getTime() - since.getTime();
+	private int[] breakDownElapsedTime(Date since) {
+		long elapsedMillis = new Date().getTime() - since.getTime();
 		long seconds = (elapsedMillis / 1000L) % 60L;
 		long minutes = (elapsedMillis / 60000L) % 60L;
 		long hours = elapsedMillis / 3600000L;
-		return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-	}
-
-	private String figureCurrentTask(Collection<String> flags) {
-		if (flags.contains(IndexBuilder.FLAG_REBUILDING)) {
-			return "Rebuilding";
-		} else if (flags.contains(IndexBuilder.FLAG_UPDATING)) {
-			return "Updating";
-		} else {
-			return "Not working on";
-		}
+		return new int[] {(int) hours, (int) minutes, (int) seconds};
 	}
 
 }

@@ -8,6 +8,7 @@ import edu.cornell.mannlib.vitro.webapp.application.VitroHomeDirectory;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerModule;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ConfigurationTripleSource;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource;
@@ -17,21 +18,23 @@ import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource
  */
 public interface Application {
 	ServletContext getServletContext();
-	
+
 	VitroHomeDirectory getHomeDirectory();
 
 	SearchEngine getSearchEngine();
 
+	SearchIndexer getSearchIndexer();
+
 	ImageProcessor getImageProcessor();
-	
+
 	FileStorage getFileStorage();
-	
+
 	ContentTripleSource getContentTripleSource();
-	
+
 	ConfigurationTripleSource getConfigurationTripleSource();
-	
+
 	TBoxReasonerModule getTBoxReasonerModule();
-	
+
 	void shutdown();
 
 	public interface Component {
@@ -39,8 +42,16 @@ public interface Application {
 			NEW, ACTIVE, STOPPED
 		}
 
+		/**
+		 * This should be called only once, and should be the first call on this
+		 * Component.
+		 */
 		void startup(Application application, ComponentStartupStatus ss);
 
+		/**
+		 * This should be called only once, and should be the last call on this
+		 * Component.
+		 */
 		void shutdown(Application application);
 	}
 

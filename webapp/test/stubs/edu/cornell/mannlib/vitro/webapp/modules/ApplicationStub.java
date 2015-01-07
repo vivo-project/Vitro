@@ -12,6 +12,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner.TBoxReasonerModule;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ConfigurationTripleSource;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource;
@@ -104,9 +105,14 @@ public class ApplicationStub implements Application {
 
 	@Override
 	public TBoxReasonerModule getTBoxReasonerModule() {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("ApplicationStub.getTBoxReasonerModule() not implemented.");
-		
+		throw new RuntimeException(
+				"ApplicationStub.getTBoxReasonerModule() not implemented.");
+	}
+
+	@Override
+	public SearchIndexer getSearchIndexer() {
+		throw new RuntimeException(
+				"Application.getSearchIndexer() not implemented.");
 	}
 
 }

@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsRootUser;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
@@ -29,7 +30,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LogoutEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
 
 /**
  * The "standard" implementation of Authenticator.
@@ -162,7 +164,17 @@ public class BasicAuthenticator extends Authenticator {
 
 		if (IsRootUser.isRootUser(RequestIdentifiers
 				.getIdBundleForRequest(request))) {
-			IndexBuilder.checkIndexOnRootLogin(request);
+			try {
+				SearchEngine engine = ApplicationUtils.instance()
+						.getSearchEngine();
+				if (engine.documentCount() == 0) {
+					log.info("Search index is empty. Running a full index rebuild.");
+					ApplicationUtils.instance().getSearchIndexer()
+							.rebuildIndex();
+				}
+			} catch (SearchEngineException e) {
+				log.warn("Unable to check for search index", e);
+			}
 		}
 	}
 
@@ -262,7 +274,8 @@ public class BasicAuthenticator extends Authenticator {
 	 * Get a reference to the UserAccountsDao, or null.
 	 */
 	private UserAccountsDao getUserAccountsDao() {
-		UserAccountsDao userAccountsDao = getWebappDaoFactory().getUserAccountsDao();
+		UserAccountsDao userAccountsDao = getWebappDaoFactory()
+				.getUserAccountsDao();
 		if (userAccountsDao == null) {
 			log.error("getUserAccountsDao: no UserAccountsDao");
 		}

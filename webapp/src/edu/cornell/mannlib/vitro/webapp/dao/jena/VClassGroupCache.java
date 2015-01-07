@@ -40,9 +40,9 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchFacetField;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchFacetField.Count;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexingEventListener;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
@@ -64,7 +64,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
  * search index is not built or if there were problems building the index,
  * the class counts from VClassGroupCache will be incorrect.
  */
-public class VClassGroupCache implements IndexingEventListener {
+public class VClassGroupCache implements SearchIndexer.Listener {
     private static final Log log = LogFactory.getLog(VClassGroupCache.class);
 
     private static final String ATTRIBUTE_NAME = "VClassGroupCache";
@@ -208,19 +208,17 @@ public class VClassGroupCache implements IndexingEventListener {
      * Handle notification of events from the IndexBuilder.
      */
     @Override
-    public void notifyOfIndexingEvent(EventTypes event) {
-        switch( event ){
-            case FINISH_FULL_REBUILD: 
-            case FINISHED_UPDATE:
-                log.debug("rebuilding because of IndexBuilder " + event.name());
-                requestCacheUpdate();
-                break;            
-            default: 
-                log.debug("ignoring event type " + event.name());
-                break;
-                    
-        }        
-    }
+	public void receiveSearchIndexerEvent(Event event) {
+    	switch (event.getType()) {
+    	case STOP_PROCESSING_URIS:
+            log.debug("rebuilding because of IndexBuilder " + event.getType());
+            requestCacheUpdate();
+            break;            
+        default: 
+            log.debug("ignoring event type " + event.getType());
+            break;
+    	}
+	}
     
     /* **************** static utility methods ***************** */
     
@@ -489,8 +487,8 @@ public class VClassGroupCache implements IndexingEventListener {
             context.setAttribute(ATTRIBUTE_NAME,vcgc);           
             log.info("VClassGroupCache added to context");   
             
-            IndexBuilder indexBuilder = IndexBuilder.getBuilder(context);
-            indexBuilder.addIndexBuilderListener(vcgc);
+            SearchIndexer searchIndexer = ApplicationUtils.instance().getSearchIndexer();
+            searchIndexer.addListener(vcgc);
             log.info("VClassGroupCache set to listen to events from IndexBuilder");
         }
 
