@@ -25,7 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
-import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.StatementToURIsToUpdate;
+import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
 
@@ -52,7 +52,7 @@ public class IndexBuilder extends VitroBackgroundThread {
     
     /** This is a list of objects that will compute what URIs need to be
      * updated in the search index when a statement changes.  */     
-    private final List<StatementToURIsToUpdate> stmtToURIsToIndexFunctions;    
+    private final List<IndexingUriFinder> stmtToURIsToIndexFunctions;    
     
     /** Indicates that a full index re-build has been requested. */
     private volatile boolean reindexRequested = false;
@@ -102,7 +102,7 @@ public class IndexBuilder extends VitroBackgroundThread {
 
     public IndexBuilder(IndexerIface indexer,
                         WebappDaoFactory wdf,
-                        List<StatementToURIsToUpdate> stmtToURIsToIndexFunctions ){
+                        List<IndexingUriFinder> stmtToURIsToIndexFunctions ){
         super("IndexBuilder");
         
         this.indexer = indexer;
@@ -275,7 +275,7 @@ public class IndexBuilder extends VitroBackgroundThread {
      */
     private Collection<String> changedStatementsToUris(){
         //inform StatementToURIsToUpdate that index is starting
-        for( StatementToURIsToUpdate stu : stmtToURIsToIndexFunctions ) {
+        for( IndexingUriFinder stu : stmtToURIsToIndexFunctions ) {
             stu.startIndexing();        
         }
         
@@ -291,7 +291,7 @@ public class IndexBuilder extends VitroBackgroundThread {
         
 		for (int i = 0; i < howManyChanges; i++) {
 			Statement stmt = changedStatements[i];
-			for (StatementToURIsToUpdate stu : stmtToURIsToIndexFunctions) {
+			for (IndexingUriFinder stu : stmtToURIsToIndexFunctions) {
 				urisToUpdate.addAll(stu.findAdditionalURIsToIndex(stmt));
 			}
 			if ((i > 0) && (i % 1000 == 0)) {
@@ -301,8 +301,8 @@ public class IndexBuilder extends VitroBackgroundThread {
 		}
         
         //inform StatementToURIsToUpdate that they are done
-        for( StatementToURIsToUpdate stu : stmtToURIsToIndexFunctions ) {
-            stu.endIndxing();
+        for( IndexingUriFinder stu : stmtToURIsToIndexFunctions ) {
+            stu.endIndexing();
         }
                 
         return urisToUpdate;        

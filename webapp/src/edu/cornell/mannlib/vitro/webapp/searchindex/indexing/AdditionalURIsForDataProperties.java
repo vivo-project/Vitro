@@ -7,9 +7,9 @@ import java.util.List;
 
 import com.hp.hpl.jena.rdf.model.Statement;
 
-import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.StatementToURIsToUpdate;
+import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder;
 
-public class AdditionalURIsForDataProperties  implements StatementToURIsToUpdate{
+public class AdditionalURIsForDataProperties  implements IndexingUriFinder{
 
     @Override
     public List<String> findAdditionalURIsToIndex(Statement stmt) {
@@ -23,5 +23,11 @@ public class AdditionalURIsForDataProperties  implements StatementToURIsToUpdate
     public void startIndexing() { /* nothing to prepare */ }
 
     @Override
-    public void endIndxing() { /* nothing to do */ }
+    public void endIndexing() { /* nothing to do */ }
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName();
+	}
+
 }

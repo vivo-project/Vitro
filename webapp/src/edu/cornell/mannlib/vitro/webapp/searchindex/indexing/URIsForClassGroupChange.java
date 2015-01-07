@@ -11,19 +11,22 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.ContextModelsUser;
 
 /**
  * if a class's classgroup changes, reindex all individuals in that class.  
  */
-public class URIsForClassGroupChange  implements StatementToURIsToUpdate {
+public class URIsForClassGroupChange  implements IndexingUriFinder, ContextModelsUser {
     
     IndividualDao indDao;
-    
-    public URIsForClassGroupChange(IndividualDao individualDao){
-        this.indDao = individualDao;
-    }
-    
+
     @Override
+	public void setContextModels(ContextModelAccess models) {
+    	this.indDao = models.getWebappDaoFactory().getIndividualDao();
+	}
+
+	@Override
     public List<String> findAdditionalURIsToIndex(Statement stmt) {
         if( stmt == null || stmt.getPredicate() == null) 
             return Collections.emptyList();
@@ -57,9 +60,14 @@ public class URIsForClassGroupChange  implements StatementToURIsToUpdate {
     }
 
     @Override
-    public void endIndxing() {
+    public void endIndexing() {
         // Do nothing
         
     }
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName();
+	}
 
 }

@@ -61,6 +61,6 @@ public class ExcludeBasedOnTypeNamespace implements SearchIndexExcluder {
 
 	@Override
 	public String toString() {
-		return "ExcludeBasedOnTypeNamespace [namespaces=" + namespaces + "]";
+		return "ExcludeBasedOnTypeNamespace[namespaces=" + namespaces + "]";
 	}    
 }

@@ -2,12 +2,16 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchindex.indexing;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONTENT;
+
 import java.io.StringReader;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccessStub;
 
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -22,6 +26,7 @@ public class AdditionalURIsForObjectPropertiesTest {
 
     Model model;
     RDFService rdfService;
+    AdditionalURIsForObjectProperties aufop;
     
     String testNS = "http://example.com/test#";
     String n3 = "" +
@@ -44,11 +49,16 @@ public class AdditionalURIsForObjectPropertiesTest {
         model = ModelFactory.createDefaultModel();
         model.read(new StringReader(n3 ), null , "N3");
         rdfService = new RDFServiceModel(model);
+        
+        ContextModelAccessStub models = new ContextModelAccessStub();
+        models.setRDFService(CONTENT, rdfService);
+        
+        aufop = new AdditionalURIsForObjectProperties();
+        aufop.setContextModels(models);
     }
 
     @Test
     public void testChangeOfRdfsLabel() {
-        AdditionalURIsForObjectProperties aufop = new AdditionalURIsForObjectProperties(rdfService);
         List<String> uris = aufop.findAdditionalURIsToIndex( 
                 ResourceFactory.createStatement(
                         ResourceFactory.createResource(testNS + "bob"),
@@ -70,8 +80,6 @@ public class AdditionalURIsForObjectPropertiesTest {
     
     @Test
     public void testChangeOfObjPropStmt() {
-        
-        AdditionalURIsForObjectProperties aufop = new AdditionalURIsForObjectProperties(rdfService);
         List<String> uris = aufop.findAdditionalURIsToIndex( 
                 ResourceFactory.createStatement(
                         ResourceFactory.createResource(testNS + "bob"),
@@ -93,7 +101,6 @@ public class AdditionalURIsForObjectPropertiesTest {
     
     @Test
     public void testOfDataPropChange() {
-        AdditionalURIsForObjectProperties aufop = new AdditionalURIsForObjectProperties(rdfService);
         List<String> uris = aufop.findAdditionalURIsToIndex( 
                 ResourceFactory.createStatement(
                         ResourceFactory.createResource(testNS + "bob"),
@@ -112,9 +119,12 @@ public class AdditionalURIsForObjectPropertiesTest {
         
         Model model = ModelFactory.createDefaultModel();
         model.read(new StringReader( n3ForNIHVIVO_2902 ), null , "N3");
-        RDFService rdfService = new RDFServiceModel(model);
+        
+        ContextModelAccessStub models = new ContextModelAccessStub();
+        models.setRDFService(CONTENT, new RDFServiceModel(model));
 
-        AdditionalURIsForObjectProperties aufop = new AdditionalURIsForObjectProperties(rdfService);
+        aufop.setContextModels(models);
+        
         List<String> uris = aufop.findAdditionalURIsToIndex( 
                 ResourceFactory.createStatement(
                         ResourceFactory.createResource("http://caruso-laptop.mannlib.cornell.edu:8090/vivo/individual/n2241"),

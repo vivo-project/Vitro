@@ -1,8 +1,8 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
-/**
- * 
- */
+
 package edu.cornell.mannlib.vitro.webapp.searchindex.indexing;
+
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +15,8 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.ContextModelsUser;
 
 /**
  * If a class changes classgroups, then all members of that class
@@ -27,14 +29,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
  * obj='http://vivoweb.org/ontology#vitroClassGrouppeople&#39; 
  * changes, all members of the class core:Summer need to be update so they get the new classgroup values. 
  */
-public class AdditionalURIsForClassGroupChanges implements
-        StatementToURIsToUpdate {
+public class AdditionalURIsForClassGroupChanges implements IndexingUriFinder, ContextModelsUser {
 
     private OntModel model;
 
-    public AdditionalURIsForClassGroupChanges(OntModel model) {
-        this.model = model;                
-    }
+	@Override
+	public void setContextModels(ContextModelAccess models) {
+		model = models.getOntModel(TBOX_ASSERTIONS);
+	}
 
     @Override
     public List<String> findAdditionalURIsToIndex(Statement stmt) {
@@ -66,5 +68,11 @@ public class AdditionalURIsForClassGroupChanges implements
     public void startIndexing() { /* nothing to prepare */ }
 
     @Override
-    public void endIndxing() { /* nothing to do */ }
+    public void endIndexing() { /* nothing to do */ }
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName();
+	}
+
 }

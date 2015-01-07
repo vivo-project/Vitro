@@ -2,10 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchindex.exclusions;
 
-import static edu.cornell.mannlib.vitro.webapp.search.documentBuilding.IndividualToSearchDocument.DONT_EXCLUDE;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -92,6 +89,6 @@ public class ExcludeBasedOnType implements SearchIndexExcluder {
 
 	@Override
 	public String toString() {
-		return this.getClass().getSimpleName() + " [typeURIs=" + typeURIs + "]";
+		return this.getClass().getSimpleName() + "[typeURIs=" + typeURIs + "]";
 	}
 }

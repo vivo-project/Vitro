@@ -94,6 +94,11 @@ public class ThumbnailImageURL implements DocumentModifier, ContextModelsUser {
 	}
 
 	@Override
+	public String toString() {
+		return this.getClass().getSimpleName();
+	}
+
+	@Override
 	public void shutdown() {		
 		// nothing to release.
 	}

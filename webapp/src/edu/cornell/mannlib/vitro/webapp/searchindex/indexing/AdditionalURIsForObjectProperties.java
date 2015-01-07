@@ -20,7 +20,9 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.ContextModelsUser;
 
 /**
  * For a given statement, return the URIs that may need to be updated in
@@ -29,13 +31,14 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
  * 
  * Context nodes are not handled here. They are taken care of in AdditionalURIsForContextNodex.
  */
-public class AdditionalURIsForObjectProperties implements StatementToURIsToUpdate {
+public class AdditionalURIsForObjectProperties implements IndexingUriFinder, ContextModelsUser {
     protected static final Log log = LogFactory.getLog(AdditionalURIsForObjectProperties.class);
     
-    protected final RDFService rdfService;
+    protected RDFService rdfService;
     
-    public AdditionalURIsForObjectProperties(RDFService rdfService) {
-		this.rdfService = rdfService;
+    @Override
+	public void setContextModels(ContextModelAccess models) {
+    	this.rdfService = models.getRDFService();
 	}
 
 	@Override
@@ -53,7 +56,7 @@ public class AdditionalURIsForObjectProperties implements StatementToURIsToUpdat
     public void startIndexing() { /* nothing to prepare */ }
 
     @Override
-    public void endIndxing() { /* nothing to do */ }
+    public void endIndexing() { /* nothing to do */ }
     
     protected List<String> doObjectPropertyStmt(Statement stmt) {
         // Only need to consider the object since the subject 
@@ -132,5 +135,9 @@ public class AdditionalURIsForObjectProperties implements StatementToURIsToUpdat
         "  filter( isURI( ?related ) && ?p != rdf:type )  \n" +                
         "}" ;
     
-    
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName();
+	}
+
 }

@@ -9,11 +9,14 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccessStub;
+
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 
 /**
  * @author bdc34
@@ -36,7 +39,12 @@ public class AdditionalURIsForClassGroupChangesTest {
         OntModel model = ModelFactory.createOntologyModel();
         model.read( new StringReader(n3ForPresentationClass), null,  "N3");
         
-        StatementToURIsToUpdate uriFinder = new AdditionalURIsForClassGroupChanges( model );
+        ContextModelAccessStub models = new ContextModelAccessStub();
+        models.setOntModel(ModelNames.TBOX_ASSERTIONS, model);
+        
+        AdditionalURIsForClassGroupChanges uriFinder = new AdditionalURIsForClassGroupChanges( );
+        uriFinder.setContextModels(models);
+        
         List<String> uris = uriFinder.findAdditionalURIsToIndex( 
                 ResourceFactory.createStatement(
                         ResourceFactory.createResource("http://vivoweb.org/ontology/core#Presentation"),

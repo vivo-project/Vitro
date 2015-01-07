@@ -110,6 +110,8 @@ public interface SearchIndexer extends Application.Module {
 	 */
 	public static class Event {
 		public enum Type {
+			STARTUP, 
+			
 			START_PROCESSING_URIS,
 
 			PROGRESS_PROCESSING_URIS,

@@ -25,16 +25,13 @@ import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.search.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.search.documentBuilding.IndividualToSearchDocument;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.SearchReindexingListener;
 import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier;
 import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluder;
-import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.AdditionalUriFinders;
-import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.StatementToURIsToUpdate;
+import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder;
 import edu.cornell.mannlib.vitro.webapp.startup.ComponentStartupStatusImpl;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
@@ -78,10 +75,7 @@ public class SearchIndexerSetup implements ServletContextListener {
 			wadf = new WebappDaoFactoryFiltering(wadf, vf);
 
 			// make objects that will find additional URIs for context nodes etc
-			RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(
-					context).getRDFService();
-			List<StatementToURIsToUpdate> uriFinders = AdditionalUriFinders
-					.getList(rdfService, wadf.getIndividualDao());
+			List<IndexingUriFinder> uriFinders = loadUriFinders();
 
 			// Make the IndexBuilder
 			IndexBuilder builder = new IndexBuilder(searchIndexer, wadf,
@@ -124,6 +118,14 @@ public class SearchIndexerSetup implements ServletContextListener {
 			log.debug("Modifiers: (" + modifiers.size() + ") " + modifiers);
 			
 			return new IndividualToSearchDocument(new ArrayList<>(excluders), new ArrayList<>(modifiers));
+		} catch (ConfigurationBeanLoaderException e) {
+			throw new RuntimeException("Failed to configure the SearchIndexer", e);
+		}
+	}
+	
+	private List<IndexingUriFinder> loadUriFinders() {
+		try {
+			return new ArrayList<>(beanLoader.loadAll(IndexingUriFinder.class));
 		} catch (ConfigurationBeanLoaderException e) {
 			throw new RuntimeException("Failed to configure the SearchIndexer", e);
 		}

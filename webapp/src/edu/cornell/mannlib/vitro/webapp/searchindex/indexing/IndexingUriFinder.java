@@ -10,7 +10,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
  * Interface to use with IndexBuilder to find more URIs to index given a changed statement.
  * The statement may have been added or removed from the model.  
  */
-public interface StatementToURIsToUpdate {
+public interface IndexingUriFinder {
     
     /**
      * For the domain that is the responsibility of the given implementation,
@@ -25,5 +25,5 @@ public interface StatementToURIsToUpdate {
     
     void startIndexing();
     
-    void endIndxing();
+    void endIndexing();
 }
