@@ -595,13 +595,13 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	
     private void performChange(ModelChange modelChange) throws RDFServiceException {
         Model model = parseModel(modelChange);
+        Model[] separatedModel = separateStatementsWithBlankNodes(model);
         if (modelChange.getOperation() == ModelChange.Operation.ADD) {
-            Model[] separatedModel = separateStatementsWithBlankNodes(model);
             addModel(separatedModel[1], modelChange.getGraphURI());
             addBlankNodesWithSparqlUpdate(separatedModel[0], modelChange.getGraphURI());
         } else if (modelChange.getOperation() == ModelChange.Operation.REMOVE) {
-            deleteModel(model, modelChange.getGraphURI());
-            removeBlankNodesWithSparqlUpdate(model, modelChange.getGraphURI());
+            deleteModel(separatedModel[1], modelChange.getGraphURI());
+            removeBlankNodesWithSparqlUpdate(separatedModel[0], modelChange.getGraphURI());
         } else {
             log.error("unrecognized operation type");
         }         

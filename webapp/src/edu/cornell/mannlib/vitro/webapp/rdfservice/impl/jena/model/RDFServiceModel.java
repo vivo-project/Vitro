@@ -27,6 +27,7 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
     private final static Log log = LogFactory.getLog(RDFServiceModel.class);
     
     private Model model;
+    private Dataset dataset;
     private String modelName;
     
     /**
@@ -36,14 +37,27 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
     public RDFServiceModel(Model model) {
         this.model = model;
     }
-      
+    
+    /**
+     * Create an RDFService to access a Jena Dataset
+     * @param dataset
+     */
+    public RDFServiceModel(Dataset dataset) {
+        this.dataset = dataset;
+    }
+    
     @Override
     protected DatasetWrapper getDatasetWrapper() {
-      Dataset d = DatasetFactory.createMem();
-      if (modelName == null) {
-          d.setDefaultModel(this.model);
+      Dataset d = null;
+      if (dataset != null)  {
+          d = dataset; 
       } else {
-          d.addNamedModel(this.modelName, model);
+          d = DatasetFactory.createMem();
+          if (modelName == null) {
+              d.setDefaultModel(this.model);
+          } else {
+              d.addNamedModel(this.modelName, model);
+          }
       }
       DatasetWrapper datasetWrapper = new DatasetWrapper(d);
       return datasetWrapper;
@@ -75,7 +89,16 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
                     modelChange.setSerializedModel(new ByteArrayInputStream(bytes));
                 }
                 modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
-                operateOnModel(model, modelChange, null);
+                Model m = this.model;
+                if (m == null && dataset != null) {
+                    String changeGraphURI = modelChange.getGraphURI();
+                    if (changeGraphURI != null) {
+                        m = dataset.getNamedModel(changeGraphURI);
+                    } else {
+                        m = dataset.getDefaultModel();
+                    }
+                }                
+                operateOnModel(m, modelChange, null);
             }
                         
             // notify listeners of triple changes

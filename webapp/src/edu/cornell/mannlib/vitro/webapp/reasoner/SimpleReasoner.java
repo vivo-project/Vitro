@@ -18,6 +18,8 @@ import com.hp.hpl.jena.ontology.AnnotationProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -40,6 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.CumulativeDeltaModeler;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DifferenceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
@@ -114,7 +117,7 @@ public class SimpleReasoner extends StatementListener {
 		this.batchMode = 0;
 		aBoxDeltaModeler1 = new CumulativeDeltaModeler();
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
-		recomputer = new ABoxRecomputer(tboxModel,this.aboxModel,inferenceModel,inferenceRebuildModel,scratchpadModel,rdfService,this);
+		recomputer = new ABoxRecomputer(tboxModel, aboxModel, rdfService, this);
 		stopRequested = false;
 		
 		if (rdfService == null) {
@@ -146,7 +149,13 @@ public class SimpleReasoner extends StatementListener {
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
 		this.batchMode = 0;
 		stopRequested = false;
-		recomputer = new ABoxRecomputer(tboxModel,this.aboxModel,inferenceModel,ModelFactory.createDefaultModel(), ModelFactory.createDefaultModel(), new RDFServiceModel(aboxModel), this);
+		Dataset ds = DatasetFactory.createMem();
+		ds.addNamedModel(ModelNames.ABOX_ASSERTIONS, aboxModel);
+		ds.addNamedModel(ModelNames.ABOX_INFERENCES, inferenceModel);
+		ds.addNamedModel(ModelNames.TBOX_ASSERTIONS, tboxModel);
+		
+		ds.setDefaultModel(ModelFactory.createUnion(fullModel, tboxModel));
+		recomputer = new ABoxRecomputer(tboxModel, aboxModel, new RDFServiceModel(ds), this);
 	}
 	
 	public void setPluginList(List<ReasonerPlugin> pluginList) {
@@ -805,17 +814,8 @@ public class SimpleReasoner extends StatementListener {
 			Resource subject = sameIter.next();
 			Statement sameStmt = 
                 ResourceFactory.createStatement(subject,stmt.getPredicate(),stmt.getObject());
-			addInference(sameStmt,inferenceModel,false);
+			addInference(sameStmt,inferenceModel, doSameAs);
 		}	    
-
-		inferenceModel.enterCriticalSection(Lock.WRITE);
-		try {
-			if (inferenceModel.contains(stmt)) {
-				inferenceModel.remove(stmt);
-			}
-		} finally {
-			inferenceModel.leaveCriticalSection();
-		}
     }
 
 
@@ -838,11 +838,22 @@ public class SimpleReasoner extends StatementListener {
     	       Property inverseProp = inverseIter.next();
     	       Statement infStmt = ResourceFactory.createStatement(
     	               stmt.getObject().asResource(), inverseProp, stmt.getSubject());
-    	       addInference(infStmt,inferenceModel,true);
+    	       addInference(infStmt, inferenceModel, true);
     	    }	
 	    }
 
-        doSameAsForAddedABoxAssertion( stmt, inferenceModel);
+	    inferenceModel.enterCriticalSection(Lock.WRITE);
+        try {
+            if (inferenceModel.contains(stmt)) {
+                inferenceModel.remove(stmt);
+            }
+        } finally {
+            inferenceModel.leaveCriticalSection();
+        }
+	    
+	    if(doSameAs) {
+            doSameAsForAddedABoxAssertion( stmt, inferenceModel);
+	    }
 	}	
 
     void doSameAsForRemovedABoxAssertion(Statement stmt, Model inferenceModel){
