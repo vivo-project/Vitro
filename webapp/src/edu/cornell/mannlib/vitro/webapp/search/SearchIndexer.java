@@ -18,7 +18,6 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumentList;
 import edu.cornell.mannlib.vitro.webapp.search.IndexingException;
 import edu.cornell.mannlib.vitro.webapp.search.beans.IndexerIface;
-import edu.cornell.mannlib.vitro.webapp.search.documentBuilding.IndividualToSearchDocument;
 
 
 public class SearchIndexer implements IndexerIface {
@@ -27,7 +26,6 @@ public class SearchIndexer implements IndexerIface {
     protected SearchEngine server;
     protected boolean indexing;        
     protected HashSet<String> urisIndexed;    
-    protected IndividualToSearchDocument individualToSearchDoc;
     
     /**
      * System is shutting down if true.
@@ -48,9 +46,8 @@ public class SearchIndexer implements IndexerIface {
      */
     protected boolean doingFullIndexRebuild = false;
     
-    public SearchIndexer( SearchEngine server, IndividualToSearchDocument indToDoc){
+    public SearchIndexer( SearchEngine server){
         this.server = server; 
-        this.individualToSearchDoc = indToDoc;        
     }
     
     @Override
@@ -74,7 +71,7 @@ public class SearchIndexer implements IndexerIface {
             		urisIndexed.add(ind.getURI());
             	}
                 log.debug("indexing " + ind.getURI());      
-                doc = individualToSearchDoc.translate(ind);
+//                doc = individualToSearchDoc.translate(ind);
 
                 if( doc != null){
                 	if( log.isDebugEnabled()){
@@ -109,9 +106,9 @@ public class SearchIndexer implements IndexerIface {
     public void removeFromIndex(String uri) throws IndexingException {
         if( uri != null ){            
             try {
-                server.deleteById(individualToSearchDoc.getIdForUri(uri));
+//                server.deleteById(individualToSearchDoc.getIdForUri(uri));
                 log.debug("deleted " + " " + uri);                                       
-            } catch (SearchEngineException e) {
+            } catch (Exception e) {
                 log.error( "could not delete individual " + uri, e);
             }
         }        
@@ -136,7 +133,7 @@ public class SearchIndexer implements IndexerIface {
     public void abortIndexingAndCleanUp() {
         shutdownRequested = true;
         try{
-            individualToSearchDoc.shutdown();
+//            individualToSearchDoc.shutdown();
         }catch(Exception e){
             if( log != null)
                 log.debug(e,e);

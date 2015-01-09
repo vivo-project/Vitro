@@ -5,22 +5,33 @@ package edu.cornell.mannlib.vitro.webapp.modules.searchIndexer;
 import java.util.Date;
 
 /**
- * An immutable summary of the status of the SearchIndexer, at some point in
- * time.Contains the current state, and some counts.
+ * An immutable summary of the status of the SearchIndexer, at a fixed point in
+ * time. Contains the current state, the time, and some counts.
  * 
  * If the indexer is processing URIs, processing statements, or preparing a
- * rebuild, the counts are URI_COUNTS, STATEMENT_COUNTS, or REBUILD_COUNTS.
+ * rebuild, the counts are URI_COUNTS, STATEMENT_COUNTS, or REBUILD_COUNTS,
+ * respectively.
  * 
- * When the indexer starts up, and when it is is shut down, the counts are
+ * When the indexer starts up, becomes idle, or shuts down, the counts are
  * NO_COUNTS.
- * 
- * If the indexer is idle, the counts are carried over from the previous
- * operation.
  */
 public class SearchIndexerStatus {
-	public enum State {
-		IDLE, PROCESSING_URIS, PROCESSING_STMTS, PREPARING_REBUILD, SHUTDOWN
+	// ----------------------------------------------------------------------
+	// factory methods
+	// ----------------------------------------------------------------------
+
+	public static SearchIndexerStatus idle() {
+		return new SearchIndexerStatus(State.IDLE, new Date(), new NoCounts());
 	}
+
+	public static SearchIndexerStatus shutdown() {
+		return new SearchIndexerStatus(State.SHUTDOWN, new Date(),
+				new NoCounts());
+	}
+
+	// ----------------------------------------------------------------------
+	// the instance
+	// ----------------------------------------------------------------------
 
 	private final State state;
 	private final Date since;
@@ -39,9 +50,17 @@ public class SearchIndexerStatus {
 	public Date getSince() {
 		return since;
 	}
-	
+
 	public Counts getCounts() {
 		return counts;
+	}
+
+	// ----------------------------------------------------------------------
+	// helper classes
+	// ----------------------------------------------------------------------
+
+	public enum State {
+		IDLE, PROCESSING_URIS, PROCESSING_STMTS, PREPARING_REBUILD, SHUTDOWN
 	}
 
 	public abstract static class Counts {

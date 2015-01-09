@@ -6,7 +6,6 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -26,11 +25,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.search.SearchIndexer;
-import edu.cornell.mannlib.vitro.webapp.search.documentBuilding.IndividualToSearchDocument;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
 import edu.cornell.mannlib.vitro.webapp.search.indexing.SearchReindexingListener;
-import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier;
-import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluder;
 import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder;
 import edu.cornell.mannlib.vitro.webapp.startup.ComponentStartupStatusImpl;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -40,12 +36,12 @@ import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.listeners.DeveloperDisabledModelChangeListener;
 
 /**
- * TODO
- * A silly implementation that just wraps the old IndexBuilder with a new SearchIndexerImpl.
+ * TODO A silly implementation that just wraps the old IndexBuilder with a new
+ * SearchIndexerImpl.
  */
 public class SearchIndexerSetup implements ServletContextListener {
 	private static final Log log = LogFactory.getLog(SearchIndexerSetup.class);
-	
+
 	private ServletContext ctx;
 	private OntModel displayModel;
 	private ConfigurationBeanLoader beanLoader;
@@ -55,79 +51,55 @@ public class SearchIndexerSetup implements ServletContextListener {
 		this.ctx = sce.getServletContext();
 		this.displayModel = ModelAccess.on(ctx).getOntModel(DISPLAY);
 		this.beanLoader = new ConfigurationBeanLoader(displayModel, ctx);
-		
+
 		ServletContext context = sce.getServletContext();
 		StartupStatus ss = StartupStatus.getBean(context);
-		SearchEngine searchEngine = ApplicationUtils.instance().getSearchEngine();
+		SearchEngine searchEngine = ApplicationUtils.instance()
+				.getSearchEngine();
 
-		try {
-			IndividualToSearchDocument indToSearchDoc = setupTranslation();
-
-			/* setup search indexer */
-			SearchIndexer searchIndexer = new SearchIndexer(searchEngine, indToSearchDoc);
-
-			// This is where the builder gets the list of places to try to
-			// get objects to index. It is filtered so that non-public text
-			// does not get into the search index.
-			WebappDaoFactory wadf = ModelAccess.on(context)
-					.getWebappDaoFactory();
-			VitroFilters vf = VitroFilterUtils.getPublicFilter(context);
-			wadf = new WebappDaoFactoryFiltering(wadf, vf);
-
-			// make objects that will find additional URIs for context nodes etc
-			List<IndexingUriFinder> uriFinders = loadUriFinders();
-
-			// Make the IndexBuilder
-			IndexBuilder builder = new IndexBuilder(searchIndexer, wadf,
-					uriFinders);
-			// Save it to the servlet context so we can access it later in the
-			// webapp.
-			context.setAttribute(IndexBuilder.class.getName(), builder);
-
-			// Create listener to notify index builder of changes to model
-			// (can be disabled by developer setting.)
-			ModelContext.registerListenerForChanges(context,
-					new DeveloperDisabledModelChangeListener(
-							new SearchReindexingListener(builder),
-							Key.SEARCH_INDEX_SUPPRESS_MODEL_CHANGE_LISTENER));
-
-			ss.info(this, "Setup of search indexer completed.");
-			
-			ApplicationUtils.instance().getSearchIndexer().startup(ApplicationUtils.instance(), new ComponentStartupStatusImpl(this, ss));
-		} catch (Throwable e) {
-			ss.fatal(this, "could not setup search engine", e);
+		{ // >>>>> TODO
+			try {
+//				/* setup search indexer */
+//				SearchIndexer searchIndexer = new SearchIndexer(searchEngine,
+//						indToSearchDoc);
+//
+//				// Make the IndexBuilder
+//				IndexBuilder builder = new IndexBuilder(searchIndexer, wadf,
+//						uriFinders);
+//
+//				// Create listener to notify index builder of changes to model
+//				// (can be disabled by developer setting.)
+//				ModelContext
+//						.registerListenerForChanges(
+//								context,
+//								new DeveloperDisabledModelChangeListener(
+//										new SearchReindexingListener(builder),
+//										Key.SEARCH_INDEX_SUPPRESS_MODEL_CHANGE_LISTENER));
+//
+//				ss.info(this, "Setup of search indexer completed.");
+//
+			} catch (Throwable e) {
+				ss.fatal(this, "could not setup search engine", e);
+			}
 		}
-
+		ApplicationUtils
+				.instance()
+				.getSearchIndexer()
+				.startup(ApplicationUtils.instance(),
+						new ComponentStartupStatusImpl(this, ss));
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		IndexBuilder builder = (IndexBuilder) sce.getServletContext()
-				.getAttribute(IndexBuilder.class.getName());
-		if (builder != null)
-			builder.stopIndexingThread();
+		ApplicationUtils.instance().getSearchIndexer()
+				.shutdown(ApplicationUtils.instance());
 
-	}
-
-	private IndividualToSearchDocument setupTranslation() {
-		try {
-			Set<SearchIndexExcluder> excluders = beanLoader.loadAll(SearchIndexExcluder.class);
-			log.debug("Excludes: (" + excluders.size() + ") " + excluders);
-
-			Set<DocumentModifier> modifiers = beanLoader.loadAll(DocumentModifier.class);
-			log.debug("Modifiers: (" + modifiers.size() + ") " + modifiers);
-			
-			return new IndividualToSearchDocument(new ArrayList<>(excluders), new ArrayList<>(modifiers));
-		} catch (ConfigurationBeanLoaderException e) {
-			throw new RuntimeException("Failed to configure the SearchIndexer", e);
+		{ // >>>>> TODO
+			IndexBuilder builder = (IndexBuilder) sce.getServletContext()
+					.getAttribute(IndexBuilder.class.getName());
+			if (builder != null)
+				builder.stopIndexingThread();
 		}
 	}
-	
-	private List<IndexingUriFinder> loadUriFinders() {
-		try {
-			return new ArrayList<>(beanLoader.loadAll(IndexingUriFinder.class));
-		} catch (ConfigurationBeanLoaderException e) {
-			throw new RuntimeException("Failed to configure the SearchIndexer", e);
-		}
-	}
+
 }

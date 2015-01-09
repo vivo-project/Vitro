@@ -20,7 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
  */
 public class ExcludeBasedOnType implements SearchIndexExcluder {
 
-	private static final String SKIP_MSG = "skipping due to type.";
+	private static final String SKIP_MSG = "skipping due to type: ";
 
 	private final Set<String> typeURIs = new HashSet<>();
 
@@ -35,7 +35,7 @@ public class ExcludeBasedOnType implements SearchIndexExcluder {
 			return DONT_EXCLUDE;
 		}
 		if (typeURIinExcludeList(ind.getVClass())) {
-			return SKIP_MSG;
+			return SKIP_MSG + ind.getVClass();
 		}
 
 		List<VClass> vclasses = new ArrayList<>();
@@ -44,7 +44,7 @@ public class ExcludeBasedOnType implements SearchIndexExcluder {
 
 		for (VClass vclz : vclasses) {
 			if (typeURIinExcludeList(vclz))
-				return SKIP_MSG;
+				return SKIP_MSG + vclz;
 		}
 
 		return DONT_EXCLUDE;
