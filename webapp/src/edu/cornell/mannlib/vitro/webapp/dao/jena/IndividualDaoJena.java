@@ -603,7 +603,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         return inds;
     }    
 
-    public Iterator<String> getAllOfThisTypeIterator() {
+    public Collection<String> getAllIndividualUris() {
         //this is implemented in IndivdiualSDB
         throw new NotImplementedException();
     }  

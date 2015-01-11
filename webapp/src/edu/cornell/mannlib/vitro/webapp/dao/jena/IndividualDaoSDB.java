@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -437,9 +438,8 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     }
     
     @Override
-    public Iterator<String> getAllOfThisTypeIterator() {
-        final List<String> list = 
-            new LinkedList<String>();
+    public Collection<String> getAllIndividualUris() {
+        final List<String> list = new LinkedList<String>();
         
         // get all labeled resources from any non-tbox and non-metadata graphs,
         // as well as the unnamed graph (first pattern below)
@@ -472,8 +472,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         	w.close();
         }
 
-        return list.iterator();
-
+        return list;
     }  
 
     private Iterator<Individual> getIndividualIterator(
