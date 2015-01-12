@@ -3,6 +3,9 @@
 package edu.cornell.mannlib.vitro.webapp.modules.searchIndexer;
 
 import java.util.Collection;
+import java.util.List;
+
+import com.hp.hpl.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 
@@ -13,6 +16,23 @@ import edu.cornell.mannlib.vitro.webapp.modules.Application;
  * removeListener().
  */
 public interface SearchIndexer extends Application.Module {
+	/**
+	 * Update any search documents that are affected by these statements.
+	 * 
+	 * These statements are a mixture of additions and deletions. In either
+	 * case, we feed them to the URI finders to see what individuals might have
+	 * been affected by the change.
+	 * 
+	 * We accumulate a batch of affected URIs, removing duplicates if they
+	 * occur, and then submit them for updates.
+	 * 
+	 * @param urls
+	 *            if null or empty, this call has no effect.
+	 * @throws IllegalStateException
+	 *             if called after shutdown()
+	 */
+	void scheduleUpdatesForStatements(List<Statement> changes);
+
 	/**
 	 * Update the search documents for these URIs.
 	 * 
@@ -116,7 +136,7 @@ public interface SearchIndexer extends Application.Module {
 
 			START_PROCESSING_STATEMENTS, STOP_PROCESSING_STATEMENTS,
 
-			REBUILD_REQUESTED, REBUILD_COMPLETE,
+			START_REBUILD, STOP_REBUILD,
 
 			SHUTDOWN_REQUESTED, SHUTDOWN_COMPLETE
 		}
@@ -135,6 +155,11 @@ public interface SearchIndexer extends Application.Module {
 
 		public SearchIndexerStatus getStatus() {
 			return status;
+		}
+
+		@Override
+		public String toString() {
+			return type + ", " + status;
 		}
 	}
 

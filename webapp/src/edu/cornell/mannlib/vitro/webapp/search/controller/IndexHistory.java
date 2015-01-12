@@ -9,6 +9,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus;
@@ -23,12 +26,17 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatu
  * format them for display in a Freemarker template.
  */
 public class IndexHistory implements SearchIndexer.Listener {
+	private static final Log log = LogFactory.getLog(IndexHistory.class);
+
 	private final static int MAX_EVENTS = 10;
 
 	private final Deque<Event> events = new LinkedList<>();
 
 	@Override
 	public void receiveSearchIndexerEvent(Event event) {
+		if (log.isInfoEnabled()) {
+			log.info(event);
+		}
 		synchronized (events) {
 			events.addFirst(event);
 			while (events.size() > MAX_EVENTS) {
@@ -89,7 +97,8 @@ public class IndexHistory implements SearchIndexer.Listener {
 	}
 
 	private void addCounts(RebuildCounts counts, Map<String, Object> map) {
-		map.put("numberOfIndividuals", counts.getNumberOfIndividuals());
+		map.put("documentsBefore", counts.getDocumentsBefore());
+		map.put("documentsAfter", counts.getDocumentsAfter());
 	}
 
 }

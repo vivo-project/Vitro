@@ -24,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.RebuildCounts;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.State;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.StatementCounts;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.UriCounts;
@@ -79,20 +80,20 @@ public class IndexController extends FreemarkerHttpServlet {
 	public static final RequestedAction REQUIRED_ACTIONS = SimplePermission.MANAGE_SEARCH_INDEX.ACTION;
 
 	private SearchIndexer indexer;
-	private IndexHistory history;
+	private static IndexHistory history;
 
 	@Override
 	public void init() throws ServletException {
-		super.init();
 		this.indexer = ApplicationUtils.instance().getSearchIndexer();
-		this.history = new IndexHistory();
-		this.indexer.addListener(this.history);
+		super.init();
 	}
 
-	@Override
-	public void destroy() {
-		this.indexer.removeListener(this.history);
-		super.destroy();
+	/**
+	 * Called by SearchIndexerSetup to provide a history that dates from
+	 * startup, not just from servlet load time.
+	 */
+	public static void setHistory(IndexHistory history) {
+		IndexController.history = history;
 	}
 
 	@Override
@@ -186,6 +187,10 @@ public class IndexController extends FreemarkerHttpServlet {
 			map.put("expectedCompletion",
 					figureExpectedCompletion(status.getSince(),
 							counts.getTotal(), counts.getProcessed()));
+		} else if (state == State.REBUILDING) {
+			RebuildCounts counts = status.getCounts().asRebuildCounts();
+			map.put("documentsBefore", counts.getDocumentsBefore());
+			map.put("documentsAfter", counts.getDocumentsAfter());
 		} else {
 			// nothing for IDLE or SHUTDOWN, except what's already there.
 		}
@@ -217,7 +222,6 @@ public class IndexController extends FreemarkerHttpServlet {
 		long seconds = (elapsedMillis / 1000L) % 60L;
 		long minutes = (elapsedMillis / 60000L) % 60L;
 		long hours = elapsedMillis / 3600000L;
-		return new int[] {(int) hours, (int) minutes, (int) seconds};
+		return new int[] { (int) hours, (int) minutes, (int) seconds };
 	}
-
 }

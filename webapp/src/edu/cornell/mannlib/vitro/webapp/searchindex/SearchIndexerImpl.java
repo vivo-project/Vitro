@@ -26,6 +26,8 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.rdf.model.Statement;
+
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
@@ -40,6 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentMod
 import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluder;
 import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder;
 import edu.cornell.mannlib.vitro.webapp.searchindex.tasks.RebuildIndexTask;
+import edu.cornell.mannlib.vitro.webapp.searchindex.tasks.UpdateStatementsTask;
 import edu.cornell.mannlib.vitro.webapp.searchindex.tasks.UpdateUrisTask;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
@@ -106,15 +109,47 @@ public class SearchIndexerImpl implements SearchIndexer {
 	}
 
 	@Override
+	public void scheduleUpdatesForStatements(List<Statement> changes) {
+		if (changes == null || changes.isEmpty()) {
+			return;
+		}
+		
+		if (taskQueue.isShutdown()) {
+			throw new IllegalStateException("SearchIndexer is shut down.");
+		}
+		
+		Task task = new UpdateStatementsTask(changes, uriFinders, excluders,
+				modifiers, wadf.getIndividualDao(), listeners, pool);
+		scheduler.scheduleTask(task);
+		log.debug("Scheduled updates for " + changes.size() + " statements.");
+	}
+
+	@Override
 	public void scheduleUpdatesForUris(Collection<String> uris) {
-		log.debug("Schedule updates for " + uris.size() + " uris.");
-		scheduler.scheduleTask(new UpdateUrisTask(uris, excluders, modifiers,
-				wadf.getIndividualDao(), listeners, pool));
+		if (uris == null || uris.isEmpty()) {
+			return;
+		}
+		
+		if (taskQueue.isShutdown()) {
+			throw new IllegalStateException("SearchIndexer is shut down.");
+		}
+		
+		Task task = new UpdateUrisTask(uris, excluders, modifiers,
+				wadf.getIndividualDao(), listeners, pool);
+		scheduler.scheduleTask(task);
+		log.debug("Scheduled updates for " + uris.size() + " uris.");
 	}
 
 	@Override
 	public void rebuildIndex() {
-		scheduler.scheduleTask(new RebuildIndexTask());
+		if (taskQueue.isShutdown()) {
+			throw new IllegalStateException("SearchIndexer is shut down.");
+		}
+		
+		Task task = new RebuildIndexTask(excluders, modifiers,
+				wadf.getIndividualDao(), listeners, pool);
+		scheduler.scheduleTask(task);
+		log.debug("Scheduled a full rebuild.");
 	}
 
 	@Override
@@ -148,6 +183,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (status.getState() != State.SHUTDOWN) {
 			listeners.fireEvent(new Event(SHUTDOWN_REQUESTED, status));
 
+			pool.shutdown();
 			taskQueue.shutdown();
 
 			for (DocumentModifier dm : modifiers) {
@@ -230,7 +266,8 @@ public class SearchIndexerImpl implements SearchIndexer {
 			paused = false;
 			for (Task task : deferredQueue) {
 				taskQueue.scheduleTask(task);
-				log.debug("moved task from deferred queue to task queue: " + task);
+				log.debug("moved task from deferred queue to task queue: "
+						+ task);
 			}
 		}
 	}
@@ -273,6 +310,10 @@ public class SearchIndexerImpl implements SearchIndexer {
 			} catch (InterruptedException e) {
 				log.warn("call to 'awaitTermination' was interrupted.");
 			}
+		}
+
+		public boolean isShutdown() {
+			return queue.isShutdown();
 		}
 
 		/** When this wrapper is run, we will know the current task and status. */

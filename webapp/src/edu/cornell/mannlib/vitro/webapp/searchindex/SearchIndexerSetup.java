@@ -2,11 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchindex;
 
-import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -14,92 +9,75 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
-
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
-import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
-import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
-import edu.cornell.mannlib.vitro.webapp.search.SearchIndexer;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.SearchReindexingListener;
-import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder;
+import edu.cornell.mannlib.vitro.webapp.modules.Application;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.search.controller.IndexController;
+import edu.cornell.mannlib.vitro.webapp.search.controller.IndexHistory;
 import edu.cornell.mannlib.vitro.webapp.startup.ComponentStartupStatusImpl;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
-import edu.cornell.mannlib.vitro.webapp.utils.developer.listeners.DeveloperDisabledModelChangeListener;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.listeners.DeveloperDisabledChangeListener;
 
 /**
- * TODO A silly implementation that just wraps the old IndexBuilder with a new
- * SearchIndexerImpl.
+ * Start the SearchIndexer. Create a listener on the RDFService and link it to
+ * the indexer. Create a history object as a listener and make it avaiable to
+ * the IndexController.
  */
 public class SearchIndexerSetup implements ServletContextListener {
 	private static final Log log = LogFactory.getLog(SearchIndexerSetup.class);
 
 	private ServletContext ctx;
-	private OntModel displayModel;
-	private ConfigurationBeanLoader beanLoader;
+	private Application app;
+	private SearchIndexer searchIndexer;
+	private IndexingChangeListener listener;
+	private DeveloperDisabledChangeListener listenerWrapper;
+	private IndexHistory history;
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		this.ctx = sce.getServletContext();
-		this.displayModel = ModelAccess.on(ctx).getOntModel(DISPLAY);
-		this.beanLoader = new ConfigurationBeanLoader(displayModel, ctx);
+		ctx = sce.getServletContext();
+		app = ApplicationUtils.instance();
 
-		ServletContext context = sce.getServletContext();
-		StartupStatus ss = StartupStatus.getBean(context);
-		SearchEngine searchEngine = ApplicationUtils.instance()
-				.getSearchEngine();
+		StartupStatus ss = StartupStatus.getBean(ctx);
 
-		{ // >>>>> TODO
-			try {
-//				/* setup search indexer */
-//				SearchIndexer searchIndexer = new SearchIndexer(searchEngine,
-//						indToSearchDoc);
-//
-//				// Make the IndexBuilder
-//				IndexBuilder builder = new IndexBuilder(searchIndexer, wadf,
-//						uriFinders);
-//
-//				// Create listener to notify index builder of changes to model
-//				// (can be disabled by developer setting.)
-//				ModelContext
-//						.registerListenerForChanges(
-//								context,
-//								new DeveloperDisabledModelChangeListener(
-//										new SearchReindexingListener(builder),
-//										Key.SEARCH_INDEX_SUPPRESS_MODEL_CHANGE_LISTENER));
-//
-//				ss.info(this, "Setup of search indexer completed.");
-//
-			} catch (Throwable e) {
-				ss.fatal(this, "could not setup search engine", e);
-			}
+		try {
+			searchIndexer = app.getSearchIndexer();
+
+			listener = new IndexingChangeListener(searchIndexer);
+
+			listenerWrapper = new DeveloperDisabledChangeListener(listener,
+					Key.SEARCH_INDEX_SUPPRESS_MODEL_CHANGE_LISTENER);
+			RDFServiceUtils.getRDFServiceFactory(ctx).registerListener(
+					listenerWrapper);
+
+			this.history = new IndexHistory();
+			searchIndexer.addListener(this.history);
+			IndexController.setHistory(this.history);
+
+			searchIndexer
+					.startup(app, new ComponentStartupStatusImpl(this, ss));
+
+			ss.info(this, "Setup of search indexer completed.");
+		} catch (RDFServiceException e) {
+			ss.fatal(this, "Failed to register the model changed listener.", e);
 		}
-		ApplicationUtils
-				.instance()
-				.getSearchIndexer()
-				.startup(ApplicationUtils.instance(),
-						new ComponentStartupStatusImpl(this, ss));
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		ApplicationUtils.instance().getSearchIndexer()
-				.shutdown(ApplicationUtils.instance());
+		searchIndexer.shutdown(app);
 
-		{ // >>>>> TODO
-			IndexBuilder builder = (IndexBuilder) sce.getServletContext()
-					.getAttribute(IndexBuilder.class.getName());
-			if (builder != null)
-				builder.stopIndexingThread();
+		searchIndexer.removeListener(this.history);
+
+		try {
+			RDFServiceUtils.getRDFServiceFactory(ctx).unregisterListener(
+					listenerWrapper);
+		} catch (RDFServiceException e) {
+			log.warn("Failed to unregister the indexing listener.");
 		}
+		listener.shutdown();
 	}
-
 }

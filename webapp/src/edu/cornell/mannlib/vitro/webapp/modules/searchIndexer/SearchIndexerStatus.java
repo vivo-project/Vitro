@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.modules.searchIndexer;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -55,12 +56,17 @@ public class SearchIndexerStatus {
 		return counts;
 	}
 
+	@Override
+	public String toString() {
+		return new SimpleDateFormat().format(since) + ", " + counts;
+	}
+
 	// ----------------------------------------------------------------------
 	// helper classes
 	// ----------------------------------------------------------------------
 
 	public enum State {
-		IDLE, PROCESSING_URIS, PROCESSING_STMTS, PREPARING_REBUILD, SHUTDOWN
+		IDLE, PROCESSING_URIS, PROCESSING_STMTS, REBUILDING, SHUTDOWN
 	}
 
 	public abstract static class Counts {
@@ -125,6 +131,11 @@ public class SearchIndexerStatus {
 			return total;
 		}
 
+		@Override
+		public String toString() {
+			return "[deleted=" + deleted + ", updated=" + updated
+					+ ", remaining=" + remaining + ", total=" + total + "]";
+		}
 	}
 
 	public static class StatementCounts extends Counts {
@@ -151,25 +162,46 @@ public class SearchIndexerStatus {
 			return total;
 		}
 
+		@Override
+		public String toString() {
+			return "[processed=" + processed + ", remaining=" + remaining
+					+ ", total=" + total + "]";
+		}
 	}
 
 	public static class RebuildCounts extends Counts {
-		private final int numberOfIndividuals;
+		private final int documentsBefore;
+		private final int documentsAfter;
 
-		public RebuildCounts(int numberOfIndividuals) {
+		public RebuildCounts(int documentsBefore, int documentsAfter) {
 			super(Type.REBUILD_COUNTS);
-			this.numberOfIndividuals = numberOfIndividuals;
+			this.documentsBefore = documentsBefore;
+			this.documentsAfter = documentsAfter;
 		}
 
-		public int getNumberOfIndividuals() {
-			return numberOfIndividuals;
+		public int getDocumentsBefore() {
+			return documentsBefore;
 		}
 
+		public int getDocumentsAfter() {
+			return documentsAfter;
+		}
+
+		@Override
+		public String toString() {
+			return "[documentsBefore=" + documentsBefore + ", documentsAfter="
+					+ documentsAfter + "]";
+		}
 	}
 
 	public static class NoCounts extends Counts {
 		public NoCounts() {
 			super(Type.NO_COUNTS);
+		}
+
+		@Override
+		public String toString() {
+			return "[]";
 		}
 	}
 }

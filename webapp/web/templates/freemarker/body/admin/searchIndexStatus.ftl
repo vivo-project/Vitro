@@ -18,8 +18,9 @@
         <p><@showIndexerCounts "STATEMENT_COUNTS", status /></p>
         <p><@showElapsedTime status.elapsed /> Expected completion ${status.expectedCompletion?datetime}.</p>
 
-    <#elseif status.statusType = "PREPARING_REBUILD">
-        <h3>The search indexer has been preparing to rebuild the index since ${status.since?datetime}</h3>
+    <#elseif status.statusType = "REBUILDING">
+        <h3>The search indexer has been rebuilding the index since ${status.since?datetime}</h3>
+        <p><@showIndexerCounts "REBUILD_COUNTS", status /></p>
 
     <#else>
         <h3>The search indexer status is: ${status.statusType}
@@ -67,6 +68,11 @@
    <#elseif countsType == "STATEMENT_COUNTS">
        Processed: ${counts.processed}, remaining: ${counts.remaining}, total: ${counts.total}
    <#elseif countsType == "REBUILD_COUNTS">
-       Number of individuals before rebuild: ${counts.numberOfIndividuals}
+       Number of document before rebuild: ${counts.documentsBefore}, after rebuild: 
+       <#if counts.documentsAfter == 0>
+           UNKNOWN
+       <#else>
+           ${counts.documentsAfter}
+       </#if> 
    </#if>
 </#macro>

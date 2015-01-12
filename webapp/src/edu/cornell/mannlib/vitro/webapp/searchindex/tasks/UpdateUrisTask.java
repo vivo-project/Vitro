@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchindex.tasks;
 
+import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.PROGRESS;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.START_PROCESSING_URIS;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.STOP_PROCESSING_URIS;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.State.PROCESSING_URIS;
@@ -67,7 +68,7 @@ public class UpdateUrisTask implements Task {
 		this.listeners = listeners;
 		this.pool = pool;
 
-		this.status = new Status(uris.size());
+		this.status = new Status(uris.size(), 200, listeners);
 
 		this.searchEngine = ApplicationUtils.instance().getSearchEngine();
 	}
@@ -90,8 +91,17 @@ public class UpdateUrisTask implements Task {
 			}
 		}
 		pool.waitUntilIdle();
+		commitChanges();
 		listeners.fireEvent(new Event(STOP_PROCESSING_URIS, status
 				.getSearchIndexerStatus()));
+	}
+
+	private void commitChanges() {
+		try {
+			searchEngine.commit();
+		} catch (SearchEngineException e) {
+			log.error("Failed to commit the changes.");
+		}
 	}
 
 	private boolean isInterrupted() {
@@ -170,22 +180,34 @@ public class UpdateUrisTask implements Task {
 	 */
 	private static class Status {
 		private final int total;
+		private final int progressInterval;
+		private final ListenerList listeners;
 		private int updated = 0;
 		private int deleted = 0;
 		private Date since = new Date();
 
-		public Status(int total) {
+		public Status(int total, int progressInterval, ListenerList listeners) {
 			this.total = total;
+			this.progressInterval = progressInterval;
+			this.listeners = listeners;
 		}
 
 		public synchronized void incrementUpdates() {
 			updated++;
 			since = new Date();
+			maybeFireProgressEvent();
 		}
 
 		public synchronized void incrementDeletes() {
 			deleted++;
 			since = new Date();
+		}
+
+		private void maybeFireProgressEvent() {
+			if (updated > 0 && updated % progressInterval == 0) {
+				listeners.fireEvent(new Event(PROGRESS,
+						getSearchIndexerStatus()));
+			}
 		}
 
 		public synchronized SearchIndexerStatus getSearchIndexerStatus() {
