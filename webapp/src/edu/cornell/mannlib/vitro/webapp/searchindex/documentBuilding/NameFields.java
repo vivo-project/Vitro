@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding;
 
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_RAW;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,17 +17,15 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ContextModelsUser;
 
 /**
  * Adds all labels to name fields, not just the one returned by Individual.getName().
  */
 public class NameFields implements DocumentModifier, ContextModelsUser {
-	private RDFService rdfService;
-	
-	public static final VitroSearchTermNames term = new VitroSearchTermNames();
 	public static final Log log = LogFactory.getLog(NameFields.class.getName());
+	
+	private volatile RDFService rdfService;
 	
 	@Override
 	public void setContextModels(ContextModelAccess models) {
@@ -59,7 +59,7 @@ public class NameFields implements DocumentModifier, ContextModelsUser {
 			}
 			
 			log.debug("Adding labels for " + ind.getURI() + " \"" + buffer.toString() + "\"");
-			doc.addField(term.NAME_RAW, buffer.toString());
+			doc.addField(NAME_RAW, buffer.toString());
 			 
 		} catch (RDFServiceException e) {
 			log.error("could not get the rdfs:label for " + ind.getURI(), e);

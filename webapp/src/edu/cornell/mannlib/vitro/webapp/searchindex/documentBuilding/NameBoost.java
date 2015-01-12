@@ -23,9 +23,9 @@ public class NameBoost implements DocumentModifier {
      * please consider if you need to change this list
      * of name fields to boost. 
      */
-    private String[] fieldsToBoost = {NAME_RAW,NAME_LOWERCASE,NAME_UNSTEMMED,NAME_STEMMED};
+    private final String[] fieldsToBoost = {NAME_RAW,NAME_LOWERCASE,NAME_UNSTEMMED,NAME_STEMMED};
     
-    private Float boost;
+    private volatile Float boost;
     
     @Property(uri="http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasBoost")
     public void setBoost(float boost) {

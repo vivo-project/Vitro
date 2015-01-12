@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ContextModelsUser;
 
 public class ThumbnailImageURL implements DocumentModifier, ContextModelsUser {
+	private static final Log log = LogFactory.getLog(ThumbnailImageURL.class);
 	
     private static final String PREFIX = "prefix owl: <http://www.w3.org/2002/07/owl#> "
         + " prefix vitroDisplay: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>  "
@@ -37,8 +38,7 @@ public class ThumbnailImageURL implements DocumentModifier, ContextModelsUser {
 		+ " ?uri <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> ?a . "
 		+ " ?a <http://vitro.mannlib.cornell.edu/ns/vitro/public#downloadLocation> ?downloadLocation . } ";
     
-    private RDFService rdf;
-    private Log log = LogFactory.getLog(ThumbnailImageURL.class);
+    private volatile RDFService rdf;
     
 	@Override
 	public void setContextModels(ContextModelAccess models) {
