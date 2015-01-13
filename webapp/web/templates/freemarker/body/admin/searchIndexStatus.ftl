@@ -68,11 +68,9 @@
    <#elseif countsType == "STATEMENT_COUNTS">
        Processed: ${counts.processed}, remaining: ${counts.remaining}, total: ${counts.total}
    <#elseif countsType == "REBUILD_COUNTS">
-       Number of document before rebuild: ${counts.documentsBefore}, after rebuild: 
-       <#if counts.documentsAfter == 0>
-           UNKNOWN
-       <#else>
-           ${counts.documentsAfter}
+       Number of document before rebuild: ${counts.documentsBefore}
+       <#if counts.documentsAfter != 0>
+           - after rebuild: ${counts.documentsAfter}
        </#if> 
    </#if>
 </#macro>

@@ -6,6 +6,9 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.SHUTDOWN_COMPLETE;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.SHUTDOWN_REQUESTED;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.STARTUP;
+import static edu.cornell.mannlib.vitro.webapp.utils.developer.Key.SEARCH_INDEX_LOG_INDEXING_BREAKDOWN_TIMINGS;
+import static edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.WorkLevel.IDLE;
+import static edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.WorkLevel.WORKING;
 import static java.util.concurrent.TimeUnit.MINUTES;
 
 import java.util.ArrayList;
@@ -39,14 +42,25 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.State;
 import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier;
+import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifierList;
+import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifierListBasic;
+import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifierListDeveloper;
 import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluder;
+import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluderList;
+import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluderListBasic;
+import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluderListDeveloper;
 import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder;
+import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinderList;
+import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinderListBasic;
+import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinderListDeveloper;
 import edu.cornell.mannlib.vitro.webapp.searchindex.tasks.RebuildIndexTask;
 import edu.cornell.mannlib.vitro.webapp.searchindex.tasks.UpdateStatementsTask;
 import edu.cornell.mannlib.vitro.webapp.searchindex.tasks.UpdateUrisTask;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
+import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
+import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.WorkLevel;
 
 /**
  * An implementation of the SearchIndexer interface.
@@ -113,13 +127,14 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (changes == null || changes.isEmpty()) {
 			return;
 		}
-		
+
 		if (taskQueue.isShutdown()) {
 			throw new IllegalStateException("SearchIndexer is shut down.");
 		}
-		
-		Task task = new UpdateStatementsTask(changes, uriFinders, excluders,
-				modifiers, wadf.getIndividualDao(), listeners, pool);
+
+		Task task = new UpdateStatementsTask(changes, createFindersList(),
+				createExcludersList(), createModifiersList(),
+				wadf.getIndividualDao(), listeners, pool);
 		scheduler.scheduleTask(task);
 		log.debug("Scheduled updates for " + changes.size() + " statements.");
 	}
@@ -129,13 +144,13 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (uris == null || uris.isEmpty()) {
 			return;
 		}
-		
+
 		if (taskQueue.isShutdown()) {
 			throw new IllegalStateException("SearchIndexer is shut down.");
 		}
-		
-		Task task = new UpdateUrisTask(uris, excluders, modifiers,
-				wadf.getIndividualDao(), listeners, pool);
+
+		Task task = new UpdateUrisTask(uris, createExcludersList(),
+				createModifiersList(), wadf.getIndividualDao(), listeners, pool);
 		scheduler.scheduleTask(task);
 		log.debug("Scheduled updates for " + uris.size() + " uris.");
 	}
@@ -145,11 +160,40 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (taskQueue.isShutdown()) {
 			throw new IllegalStateException("SearchIndexer is shut down.");
 		}
-		
-		Task task = new RebuildIndexTask(excluders, modifiers,
-				wadf.getIndividualDao(), listeners, pool);
+
+		Task task = new RebuildIndexTask(createExcludersList(),
+				createModifiersList(), wadf.getIndividualDao(), listeners, pool);
 		scheduler.scheduleTask(task);
 		log.debug("Scheduled a full rebuild.");
+	}
+
+	private SearchIndexExcluderList createExcludersList() {
+		if (isDeveloperOptionSet()) {
+			return new SearchIndexExcluderListDeveloper(excluders);
+		} else {
+			return new SearchIndexExcluderListBasic(excluders);
+		}
+	}
+
+	private DocumentModifierList createModifiersList() {
+		if (isDeveloperOptionSet()) {
+			return new DocumentModifierListDeveloper(modifiers);
+		} else {
+			return new DocumentModifierListBasic(modifiers);
+		}
+	}
+
+	private IndexingUriFinderList createFindersList() {
+		if (isDeveloperOptionSet()) {
+			return new IndexingUriFinderListDeveloper(uriFinders);
+		} else {
+			return new IndexingUriFinderListBasic(uriFinders);
+		}
+	}
+
+	private boolean isDeveloperOptionSet() {
+		return DeveloperSettings.getInstance().getBoolean(
+				SEARCH_INDEX_LOG_INDEXING_BREAKDOWN_TIMINGS);
 	}
 
 	@Override
@@ -327,10 +371,21 @@ public class SearchIndexerImpl implements SearchIndexer {
 			@Override
 			public void run() {
 				current.set(new QueueStatus(task));
+				setWorkLevel(WORKING);
 				log.debug("starting task: " + task);
+
 				task.run();
+
 				current.set(new QueueStatus(SearchIndexerStatus.idle()));
+				setWorkLevel(IDLE);
 				log.debug("ended task: " + task);
+			}
+
+			private void setWorkLevel(WorkLevel level) {
+				if (Thread.currentThread() instanceof VitroBackgroundThread) {
+					((VitroBackgroundThread) Thread.currentThread())
+							.setWorkLevel(level);
+				}
 			}
 		}
 
@@ -429,9 +484,20 @@ public class SearchIndexerImpl implements SearchIndexer {
 			@Override
 			public void run() {
 				try {
+					setWorkLevel(WORKING);
+
 					workUnit.run();
+
+					setWorkLevel(IDLE);
 				} finally {
 					task.notifyWorkUnitCompletion(workUnit);
+				}
+			}
+
+			private void setWorkLevel(WorkLevel level) {
+				if (Thread.currentThread() instanceof VitroBackgroundThread) {
+					((VitroBackgroundThread) Thread.currentThread())
+							.setWorkLevel(level);
 				}
 			}
 

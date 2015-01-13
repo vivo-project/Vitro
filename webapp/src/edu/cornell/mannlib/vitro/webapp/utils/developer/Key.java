@@ -111,6 +111,13 @@ public enum Key {
 			"developer.searchIndex.documentRestriction", false),
 
 	/**
+	 * Accumulate breakdown timings for search indexing, and log them at the end
+	 * of the indexing operation.
+	 */
+	SEARCH_INDEX_LOG_INDEXING_BREAKDOWN_TIMINGS(
+			"developer.searchIndex.logIndexingBreakdownTimings", true),
+
+	/**
 	 * If set, don't pass model change events to the search indexer.
 	 */
 	SEARCH_INDEX_SUPPRESS_MODEL_CHANGE_LISTENER(

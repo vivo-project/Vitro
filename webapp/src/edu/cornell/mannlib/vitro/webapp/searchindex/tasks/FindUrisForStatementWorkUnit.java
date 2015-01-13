@@ -2,13 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchindex.tasks;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import com.hp.hpl.jena.rdf.model.Statement;
 
-import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder;
+import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinderList;
 
 /**
  * Ask all of the URI Finders to find URIs that might be affected by this
@@ -16,21 +15,19 @@ import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder;
  */
 public class FindUrisForStatementWorkUnit implements Runnable {
 	private final Statement stmt;
-	private final Collection<IndexingUriFinder> uriFinders;
+	private final IndexingUriFinderList finders;
 	private final Set<String> uris;
 
 	public FindUrisForStatementWorkUnit(Statement stmt,
-			Collection<IndexingUriFinder> uriFinders) {
+			IndexingUriFinderList finders) {
 		this.stmt = stmt;
-		this.uriFinders = uriFinders;
+		this.finders = finders;
 		this.uris = new HashSet<>();
 	}
 
 	@Override
 	public void run() {
-		for (IndexingUriFinder uriFinder : uriFinders) {
-			uris.addAll(uriFinder.findAdditionalURIsToIndex(stmt));
-		}
+		uris.addAll(finders.findAdditionalUris(stmt));
 	}
 
 	public Statement getStatement() {

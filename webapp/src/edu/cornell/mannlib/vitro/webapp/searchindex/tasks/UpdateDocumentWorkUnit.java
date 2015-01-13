@@ -13,8 +13,6 @@ import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.NAME_
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.RDFTYPE;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.URI;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -34,7 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerUtils;
-import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier;
+import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifierList;
 
 public class UpdateDocumentWorkUnit implements Runnable {
 	private static final Log log = LogFactory
@@ -45,16 +43,15 @@ public class UpdateDocumentWorkUnit implements Runnable {
 	private static final String URI_RDFS_LABEL = RDFS.label.getURI();
 
 	private final Individual ind;
-	private final List<DocumentModifier> modifiers;
+	private final DocumentModifierList modifiers;
 	private final SearchEngine searchEngine;
 
-	public UpdateDocumentWorkUnit(Individual ind,
-			Collection<DocumentModifier> modifiers) {
+	public UpdateDocumentWorkUnit(Individual ind, DocumentModifierList modifiers) {
 		this.ind = ind;
-		this.modifiers = new ArrayList<>(modifiers);
+		this.modifiers = modifiers;
 		this.searchEngine = ApplicationUtils.instance().getSearchEngine();
 	}
-	
+
 	public Individual getInd() {
 		return ind;
 	}
@@ -72,9 +69,7 @@ public class UpdateDocumentWorkUnit implements Runnable {
 			addDataPropertyText(doc);
 			addEntityBoost(doc);
 
-			for (DocumentModifier modifier : modifiers) {
-				modifier.modifyDocument(ind, doc);
-			}
+			modifiers.modifyDocument(ind, doc);
 
 			addIndexedTime(doc);
 
@@ -170,10 +165,10 @@ public class UpdateDocumentWorkUnit implements Runnable {
 	}
 
 	private void addEntityBoost(SearchInputDocument doc) {
-        Float boost = ind.getSearchBoost();
-		if(boost != null && ! boost.equals(0.0F)) {
-			doc.setDocumentBoost(boost);                    
-        }    
+		Float boost = ind.getSearchBoost();
+		if (boost != null && !boost.equals(0.0F)) {
+			doc.setDocumentBoost(boost);
+		}
 	}
 
 	private void addIndexedTime(SearchInputDocument doc) {

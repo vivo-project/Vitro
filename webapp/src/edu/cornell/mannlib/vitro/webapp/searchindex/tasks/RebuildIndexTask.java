@@ -7,10 +7,8 @@ import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndex
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.State.REBUILDING;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,8 +24,8 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatu
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.ListenerList;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.Task;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.WorkerThreadPool;
-import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier;
-import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluder;
+import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifierList;
+import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluderList;
 
 /**
  * Get the URIs of all individuals in the model. Update each of their search
@@ -40,8 +38,8 @@ public class RebuildIndexTask implements Task {
 	private static final Log log = LogFactory.getLog(RebuildIndexTask.class);
 
 	private final IndividualDao indDao;
-	private final List<SearchIndexExcluder> excluders;
-	private final List<DocumentModifier> modifiers;
+	private final SearchIndexExcluderList excluders;
+	private final DocumentModifierList modifiers;
 	private final ListenerList listeners;
 	private final WorkerThreadPool pool;
 	private final SearchEngine searchEngine;
@@ -51,11 +49,11 @@ public class RebuildIndexTask implements Task {
 
 	private volatile SearchIndexerStatus status;
 
-	public RebuildIndexTask(Collection<SearchIndexExcluder> excluders,
-			Collection<DocumentModifier> modifiers, IndividualDao indDao,
+	public RebuildIndexTask(SearchIndexExcluderList excluders,
+			DocumentModifierList modifiers, IndividualDao indDao,
 			ListenerList listeners, WorkerThreadPool pool) {
-		this.excluders = new ArrayList<>(excluders);
-		this.modifiers = new ArrayList<>(modifiers);
+		this.excluders = excluders;
+		this.modifiers = modifiers;
 		this.indDao = indDao;
 		this.listeners = listeners;
 		this.pool = pool;

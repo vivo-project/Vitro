@@ -26,9 +26,9 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatu
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.ListenerList;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.Task;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.WorkerThreadPool;
-import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier;
-import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluder;
-import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder;
+import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifierList;
+import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluderList;
+import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinderList;
 
 /**
  * Receive a collection of statements that have been added to the model, or
@@ -53,9 +53,9 @@ public class UpdateStatementsTask implements Task {
 			.getLog(UpdateStatementsTask.class);
 
 	private final List<Statement> changes;
-	private final Set<IndexingUriFinder> uriFinders;
-	private final Set<SearchIndexExcluder> excluders;
-	private final Set<DocumentModifier> modifiers;
+	private final IndexingUriFinderList uriFinders;
+	private final SearchIndexExcluderList excluders;
+	private final DocumentModifierList modifiers;
 	private final IndividualDao indDao;
 	private final ListenerList listeners;
 	private final WorkerThreadPool pool;
@@ -64,10 +64,9 @@ public class UpdateStatementsTask implements Task {
 	private final Status status;
 
 	public UpdateStatementsTask(List<Statement> changes,
-			Set<IndexingUriFinder> uriFinders,
-			Set<SearchIndexExcluder> excluders,
-			Set<DocumentModifier> modifiers, IndividualDao indDao,
-			ListenerList listeners, WorkerThreadPool pool) {
+			IndexingUriFinderList uriFinders,
+			SearchIndexExcluderList excluders, DocumentModifierList modifiers,
+			IndividualDao indDao, ListenerList listeners, WorkerThreadPool pool) {
 		this.changes = new ArrayList<>(changes);
 		this.uriFinders = uriFinders;
 		this.excluders = excluders;
@@ -94,7 +93,8 @@ public class UpdateStatementsTask implements Task {
 	}
 
 	private void findAffectedUris() {
-		tellFindersWeAreStarting();
+		log.debug("Tell finders we are starting.");
+		uriFinders.startIndexing();
 
 		for (Statement stmt : changes) {
 			if (isInterrupted()) {
@@ -106,21 +106,8 @@ public class UpdateStatementsTask implements Task {
 		}
 		waitForWorkUnitsToComplete();
 
-		tellFindersWeAreStopping();
-	}
-
-	private void tellFindersWeAreStarting() {
-		log.debug("Tell finders we are starting.");
-		for (IndexingUriFinder uriFinder : uriFinders) {
-			uriFinder.startIndexing();
-		}
-	}
-
-	private void tellFindersWeAreStopping() {
 		log.debug("Tell finders we are stopping.");
-		for (IndexingUriFinder uriFinder : uriFinders) {
-			uriFinder.endIndexing();
-		}
+		uriFinders.stopIndexing();
 	}
 
 	private boolean isInterrupted() {

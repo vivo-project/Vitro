@@ -7,7 +7,6 @@ import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndex
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.STOP_PROCESSING_URIS;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.State.PROCESSING_URIS;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -30,8 +29,8 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerUtils
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.ListenerList;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.Task;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.WorkerThreadPool;
-import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier;
-import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluder;
+import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifierList;
+import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluderList;
 
 /**
  * Given a list of URIs, remove the ones that don't belong in the index and
@@ -49,8 +48,8 @@ public class UpdateUrisTask implements Task {
 
 	private final Set<String> uris;
 	private final IndividualDao indDao;
-	private final List<SearchIndexExcluder> excluders;
-	private final List<DocumentModifier> modifiers;
+	private final SearchIndexExcluderList excluders;
+	private final DocumentModifierList modifiers;
 	private final ListenerList listeners;
 	private final WorkerThreadPool pool;
 
@@ -58,12 +57,11 @@ public class UpdateUrisTask implements Task {
 	private final SearchEngine searchEngine;
 
 	public UpdateUrisTask(Collection<String> uris,
-			Collection<SearchIndexExcluder> excluders,
-			Collection<DocumentModifier> modifiers, IndividualDao indDao,
-			ListenerList listeners, WorkerThreadPool pool) {
+			SearchIndexExcluderList excluders, DocumentModifierList modifiers,
+			IndividualDao indDao, ListenerList listeners, WorkerThreadPool pool) {
 		this.uris = new HashSet<>(uris);
-		this.excluders = new ArrayList<>(excluders);
-		this.modifiers = new ArrayList<>(modifiers);
+		this.excluders = excluders;
+		this.modifiers = modifiers;
 		this.indDao = indDao;
 		this.listeners = listeners;
 		this.pool = pool;
@@ -77,6 +75,9 @@ public class UpdateUrisTask implements Task {
 	public void run() {
 		listeners.fireEvent(new Event(START_PROCESSING_URIS, status
 				.getSearchIndexerStatus()));
+		excluders.startIndexing();
+		modifiers.startIndexing();
+
 		for (String uri : uris) {
 			if (isInterrupted()) {
 				log.info("Interrupted: " + status.getSearchIndexerStatus());
@@ -92,6 +93,9 @@ public class UpdateUrisTask implements Task {
 		}
 		pool.waitUntilIdle();
 		commitChanges();
+
+		excluders.stopIndexing();
+		modifiers.stopIndexing();
 		listeners.fireEvent(new Event(STOP_PROCESSING_URIS, status
 				.getSearchIndexerStatus()));
 	}
@@ -131,14 +135,7 @@ public class UpdateUrisTask implements Task {
 	}
 
 	private boolean isExcluded(Individual ind) {
-		for (SearchIndexExcluder excluder : excluders) {
-			String message = excluder.checkForExclusion(ind);
-			if (message != SearchIndexExcluder.DONT_EXCLUDE) {
-				log.debug("Excluded " + ind + " because " + message);
-				return true;
-			}
-		}
-		return false;
+		return excluders.isExcluded(ind);
 	}
 
 	/** A delete is fast enough to be done synchronously. */

@@ -129,9 +129,13 @@
 								<@showTextbox "developer_searchIndex_documentRestriction", 
 										"Restrict by document contents" />
 							</div>
+							<@showCheckbox "developer_searchIndex_logIndexingBreakdownTimings", 
+									"Log breakdown timings for indexing operation." />
 							<@showCheckbox "developer_searchDeletions_enable", "Log deletions." />
-							<@showCheckbox "developer_searchIndex_suppressModelChangeListener", 
-									"Suppress the automatic indexing of changed triples." />
+							<div class="container">
+								<@showCheckbox "developer_searchIndex_suppressModelChangeListener", 
+										"Suppress the automatic indexing of changed triples." />
+							</div>
 						</div>
 					</div>
 				</div>
