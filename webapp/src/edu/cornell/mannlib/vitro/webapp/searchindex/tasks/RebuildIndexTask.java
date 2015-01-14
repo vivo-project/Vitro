@@ -70,11 +70,25 @@ public class RebuildIndexTask implements Task {
 		listeners.fireEvent(new Event(START_REBUILD, status));
 
 		Collection<String> uris = getAllUrisInTheModel();
-		updateTheUris(uris);
-		deleteOutdatedDocuments();
+
+		if (!isInterrupted()) {
+			updateTheUris(uris);
+			if (!isInterrupted()) {
+				deleteOutdatedDocuments();
+			}
+		}
 
 		status = buildStatus(REBUILDING, getDocumentCount());
 		listeners.fireEvent(new Event(STOP_REBUILD, status));
+	}
+
+	private boolean isInterrupted() {
+		if (Thread.interrupted()) {
+			Thread.currentThread().interrupt();
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private Collection<String> getAllUrisInTheModel() {

@@ -21,7 +21,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.UriCounts;
@@ -81,7 +80,7 @@ public class UpdateUrisTask implements Task {
 		for (String uri : uris) {
 			if (isInterrupted()) {
 				log.info("Interrupted: " + status.getSearchIndexerStatus());
-				return;
+				break;
 			} else {
 				Individual ind = getIndividual(uri);
 				if (ind == null || hasNoClass(ind) || isExcluded(ind)) {
@@ -103,8 +102,8 @@ public class UpdateUrisTask implements Task {
 	private void commitChanges() {
 		try {
 			searchEngine.commit();
-		} catch (SearchEngineException e) {
-			log.error("Failed to commit the changes.");
+		} catch (Exception e) {
+			log.error("Failed to commit the changes.", e);
 		}
 	}
 
@@ -144,7 +143,7 @@ public class UpdateUrisTask implements Task {
 			searchEngine.deleteById(SearchIndexerUtils.getIdForUri(uri));
 			status.incrementDeletes();
 			log.debug("deleted '" + uri + "' from search index.");
-		} catch (SearchEngineException e) {
+		} catch (Exception e) {
 			log.warn("Failed to delete '" + uri + "' from search index", e);
 		}
 	}

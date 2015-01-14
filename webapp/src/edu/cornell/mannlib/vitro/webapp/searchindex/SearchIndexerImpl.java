@@ -334,7 +334,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 			try {
 				queue.execute(new TaskWrapper(task));
 			} catch (RejectedExecutionException e) {
-				log.warn("Search Indexer task was rejected: " + e);
+				log.warn("Search Indexer task was rejected: " + task);
 			}
 		}
 
@@ -442,7 +442,11 @@ public class SearchIndexerImpl implements SearchIndexer {
 		}
 
 		public void submit(Runnable workUnit, Task task) {
-			pool.execute(new WorkUnitWrapper(workUnit, task));
+			try {
+				pool.execute(new WorkUnitWrapper(workUnit, task));
+			} catch (RejectedExecutionException e) {
+				log.warn("Work unit was rejected: " + workUnit + " for " + task);
+			}
 		}
 
 		public void waitUntilIdle() {

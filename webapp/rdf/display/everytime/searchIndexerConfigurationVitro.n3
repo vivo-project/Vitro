@@ -1,4 +1,5 @@
 @prefix : <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 #
@@ -41,21 +42,6 @@
 
 # ------------------------------------
 
-:documentModifier_nameFields
-    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.NameFields> ,
-        <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier> .
-
-:documentModifier_nameBoost
-    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.NameBoost> ,
-        <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier> ;
-    :hasBoost "1.2"^^xsd:float .
-
-:documentModifier_thumbnailImageUrl
-    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.ThumbnailImageURL> ,
-        <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier> .
-
-# ------------------------------------
-
 :uriFinder_forDataProperties
     a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder> ,
         <java:edu.cornell.mannlib.vitro.webapp.searchindex.indexing.AdditionalURIsForDataProperties> .
@@ -71,3 +57,18 @@
 :uriFinder_forClassGroupChange
     a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder> ,
         <java:edu.cornell.mannlib.vitro.webapp.searchindex.indexing.URIsForClassGroupChange> .
+
+# ------------------------------------
+
+:documentModifier_nameFields
+    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.NameFields> ,
+        <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier> .
+
+:documentModifier_nameBoost
+    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.NameBoost> ,
+        <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier> ;
+    :hasBoost "1.2"^^xsd:float .
+
+:documentModifier_thumbnailImageUrl
+    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.ThumbnailImageURL> ,
+        <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier> .
