@@ -44,7 +44,7 @@ public class ExcludeBasedOnTypeTest {
 		vClassList.add( new VClass("http://example.com/Robot"));
 		vClassList.add( new VClass("http://example.com/KillerRobot"));
 		vClassList.add( new VClass("http://example.com/Droid"));
-		ind.setVClasses(vClassList, true);
+		ind.setVClasses(vClassList, false);
 		
 		String excludeResult = ebot.checkForExclusion(ind);
 		assertNotNull( excludeResult );		
@@ -79,7 +79,7 @@ public class ExcludeBasedOnTypeTest {
 		vClassList.add( new VClass("http://example.com/Robot"));
 		vClassList.add( new VClass("http://example.com/KillerRobot"));
 		vClassList.add( new VClass("http://example.com/Droid"));
-		ind.setVClasses(vClassList, true);
+		ind.setVClasses(vClassList, false);
 		
 		String excludeResult = ebot.checkForExclusion(ind);
 		assertNull( excludeResult );		

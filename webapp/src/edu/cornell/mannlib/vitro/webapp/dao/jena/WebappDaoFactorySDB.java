@@ -129,12 +129,6 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	                        .append("&& ").append(graphVars[i]).append(" != <")
 	                        .append(ModelNames.TBOX_INFERENCES)
 	                        .append(">")
-	                        .append("&& ").append(graphVars[i]).append(" != <")
-                            .append(SimpleReasonerSetup.JENA_INF_MODEL_REBUILD)
-                            .append(">")
-                            .append("&& ").append(graphVars[i]).append(" != <")
-                            .append(SimpleReasonerSetup.JENA_INF_MODEL_SCRATCHPAD)
-                            .append(">")
 	                        .append(") ) \n");
 	                    break;
 	            case INFERENCES_ONLY :  

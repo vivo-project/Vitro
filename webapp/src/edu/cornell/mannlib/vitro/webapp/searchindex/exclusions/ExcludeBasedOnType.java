@@ -12,11 +12,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 /**
- * Exclude individual from search index if it is a member of any of the the
- * types.
- * 
- * @author bdc34
- * 
+ * Exclude individual from search index if it is a member of any of the
+ * excluding types.
  */
 public class ExcludeBasedOnType implements SearchIndexExcluder {
 
@@ -34,13 +31,10 @@ public class ExcludeBasedOnType implements SearchIndexExcluder {
 		if (ind == null) {
 			return DONT_EXCLUDE;
 		}
-		if (typeURIinExcludeList(ind.getVClass())) {
-			return SKIP_MSG + ind.getVClass();
-		}
 
 		List<VClass> vclasses = new ArrayList<>();
+		vclasses.add(ind.getVClass());
 		addToList(vclasses, ind.getVClasses());
-		addToList(vclasses, ind.getVClasses(true));
 
 		for (VClass vclz : vclasses) {
 			if (typeURIinExcludeList(vclz))
