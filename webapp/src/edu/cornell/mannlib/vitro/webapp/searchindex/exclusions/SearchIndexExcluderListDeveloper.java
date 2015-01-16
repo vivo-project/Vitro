@@ -80,7 +80,7 @@ public class SearchIndexExcluderListDeveloper implements
 			int thisCount = timing.getCount();
 			int totalMillis = timing.getTotal();
 			float totalSeconds = totalMillis / 1000.0F;
-			int average = totalMillis / thisCount;
+			int average = (thisCount == 0) ? 0 : totalMillis / thisCount;
 			message += String
 					.format("\n   count: %7d, total: %9.3fsec, average: %4dms-- %1.200s",
 							thisCount, totalSeconds, average,

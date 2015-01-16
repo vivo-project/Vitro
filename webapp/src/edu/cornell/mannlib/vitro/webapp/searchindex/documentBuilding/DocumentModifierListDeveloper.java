@@ -67,7 +67,7 @@ public class DocumentModifierListDeveloper implements DocumentModifierList {
 		for (ModifierTiming timing : timings) {
 			int totalMillis = timing.getTotal();
 			float totalSeconds = totalMillis / 1000.0F;
-			int average = totalMillis / count.get();
+			int average = (count.get() == 0) ? 0 : totalMillis / count.get();
 			message += String
 					.format("\n   count: %7d, total: %9.3fsec, average: %4dms-- %1.200s",
 							count.get(), totalSeconds, average,

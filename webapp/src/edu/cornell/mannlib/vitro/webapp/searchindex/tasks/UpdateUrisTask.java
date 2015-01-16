@@ -29,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.ListenerLi
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.Task;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.WorkerThreadPool;
 import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifierList;
+import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluder;
 import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluderList;
 
 /**
@@ -68,6 +69,8 @@ public class UpdateUrisTask implements Task {
 		this.status = new Status(uris.size(), 200, listeners);
 
 		this.searchEngine = ApplicationUtils.instance().getSearchEngine();
+		
+		
 	}
 
 	@Override
@@ -83,7 +86,7 @@ public class UpdateUrisTask implements Task {
 				break;
 			} else {
 				Individual ind = getIndividual(uri);
-				if (ind == null || hasNoClass(ind) || isExcluded(ind)) {
+				if (ind == null || isExcluded(ind)) {
 					deleteDocument(uri);
 				} else {
 					updateDocument(ind);
@@ -122,15 +125,6 @@ public class UpdateUrisTask implements Task {
 			log.debug("Found no individual for '" + uri + "'");
 		}
 		return ind;
-	}
-
-	private boolean hasNoClass(Individual ind) {
-		List<VClass> vclasses = ind.getVClasses(false);
-		if (vclasses == null || vclasses.isEmpty()) {
-			log.debug("Individual " + ind + " has no classes.");
-			return true;
-		}
-		return false;
 	}
 
 	private boolean isExcluded(Individual ind) {
@@ -214,4 +208,23 @@ public class UpdateUrisTask implements Task {
 
 	}
 
+	/**
+	 * This will be first in the list of SearchIndexExcluders.
+	 */
+	public static class ExcludeIfNoVClasses implements SearchIndexExcluder {
+		@Override
+		public String checkForExclusion(Individual ind) {
+			List<VClass> vclasses = ind.getVClasses(false);
+			if (vclasses == null || vclasses.isEmpty()) {
+				return "Individual " + ind + " has no classes.";
+			}
+			return null;
+		}
+
+		@Override
+		public String toString() {
+			return "ExcludeIfNoVClasses";
+		}
+
+	}
 }

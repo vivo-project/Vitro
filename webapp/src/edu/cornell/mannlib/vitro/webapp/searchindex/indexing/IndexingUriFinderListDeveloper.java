@@ -71,12 +71,12 @@ public class IndexingUriFinderListDeveloper implements IndexingUriFinderList {
 		}
 
 		String message = String.format(
-				"Timings for %d modifiers after %d calls:", timings.size(),
+				"Timings for %d URI finders after %d calls:", timings.size(),
 				count.get());
 		for (FinderTiming timing : timings) {
 			int totalMillis = timing.getTotal();
 			float totalSeconds = totalMillis / 1000.0F;
-			int average = totalMillis / count.get();
+			int average = (count.get() == 0) ? 0 : totalMillis / count.get();
 			message += String
 					.format("\n   count: %7d, total: %9.3fsec, average: %4dms-- %1.200s",
 							count.get(), totalSeconds, average,

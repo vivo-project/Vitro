@@ -54,6 +54,7 @@ import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinderLi
 import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinderListBasic;
 import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinderListDeveloper;
 import edu.cornell.mannlib.vitro.webapp.searchindex.tasks.RebuildIndexTask;
+import edu.cornell.mannlib.vitro.webapp.searchindex.tasks.UpdateDocumentWorkUnit;
 import edu.cornell.mannlib.vitro.webapp.searchindex.tasks.UpdateStatementsTask;
 import edu.cornell.mannlib.vitro.webapp.searchindex.tasks.UpdateUrisTask;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
@@ -82,8 +83,8 @@ public class SearchIndexerImpl implements SearchIndexer {
 	private final WorkerThreadPool pool = new WorkerThreadPool();
 
 	private ServletContext ctx;
-	private Set<SearchIndexExcluder> excluders;
-	private Set<DocumentModifier> modifiers;
+	private List<SearchIndexExcluder> excluders;
+	private List<DocumentModifier> modifiers;
 	private Set<IndexingUriFinder> uriFinders;
 	private WebappDaoFactory wadf;
 
@@ -107,9 +108,16 @@ public class SearchIndexerImpl implements SearchIndexer {
 	private void loadConfiguration() throws ConfigurationBeanLoaderException {
 		ConfigurationBeanLoader beanLoader = new ConfigurationBeanLoader(
 				ModelAccess.on(ctx).getOntModel(DISPLAY), ctx);
-		excluders = beanLoader.loadAll(SearchIndexExcluder.class);
-		modifiers = beanLoader.loadAll(DocumentModifier.class);
 		uriFinders = beanLoader.loadAll(IndexingUriFinder.class);
+
+		excluders = new ArrayList<>();
+		excluders.add(new UpdateUrisTask.ExcludeIfNoVClasses());
+		excluders.addAll(beanLoader.loadAll(SearchIndexExcluder.class));
+
+		modifiers = new ArrayList<>();
+		modifiers.addAll(new UpdateDocumentWorkUnit.MinimalDocumentModifiers()
+				.getList());
+		modifiers.addAll(beanLoader.loadAll(DocumentModifier.class));
 	}
 
 	/**
