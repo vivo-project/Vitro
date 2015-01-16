@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.searchindex.exclusions;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
@@ -22,8 +23,9 @@ public class ExcludeBasedOnTypeTest {
 		
 		IndividualImpl ind = new IndividualImpl();
 		ind.setURI("http://example.com/n2343");
+
 		VClass personClass = new VClass("http://xmlns.com/foaf/0.1/Person");		
-		ind.setVClass(personClass);
+		ind.setVClasses(Collections.singletonList(personClass), false);		
 		
 		String excludeResult = ebot.checkForExclusion(ind);
 		assertNotNull( excludeResult );		
@@ -37,10 +39,9 @@ public class ExcludeBasedOnTypeTest {
 		
 		IndividualImpl ind = new IndividualImpl();
 		ind.setURI("http://example.com/n2343");
-		VClass personClass = new VClass("http://xmlns.com/foaf/0.1/Agent");		
-		ind.setVClass(personClass);
 		
 		List<VClass> vClassList = new ArrayList<VClass>();
+		vClassList.add( new VClass("http://xmlns.com/foaf/0.1/Agent"));
 		vClassList.add( new VClass("http://example.com/Robot"));
 		vClassList.add( new VClass("http://example.com/KillerRobot"));
 		vClassList.add( new VClass("http://example.com/Droid"));
@@ -52,14 +53,13 @@ public class ExcludeBasedOnTypeTest {
 	
 	@Test
 	public void testCheckForNonExclusion() {
-		
 		ExcludeBasedOnType ebot = new ExcludeBasedOnType();
 		ebot.addTypeToExclude("http://xmlns.com/foaf/0.1/Person");
 		
 		IndividualImpl ind = new IndividualImpl();
 		ind.setURI("http://example.com/n2343");
 		VClass personClass = new VClass("http://xmlns.com/foaf/0.1/Robot");		
-		ind.setVClass(personClass);
+		ind.setVClasses(Collections.singletonList(personClass), false);		
 		
 		String excludeResult = ebot.checkForExclusion(ind);
 		assertNull( excludeResult );		
@@ -72,10 +72,9 @@ public class ExcludeBasedOnTypeTest {
 		
 		IndividualImpl ind = new IndividualImpl();
 		ind.setURI("http://example.com/n2343");
-		VClass personClass = new VClass("http://xmlns.com/foaf/0.1/Agent");		
-		ind.setVClass(personClass);
 		
 		List<VClass> vClassList = new ArrayList<VClass>();
+		vClassList.add( new VClass("http://xmlns.com/foaf/0.1/Agent"));
 		vClassList.add( new VClass("http://example.com/Robot"));
 		vClassList.add( new VClass("http://example.com/KillerRobot"));
 		vClassList.add( new VClass("http://example.com/Droid"));

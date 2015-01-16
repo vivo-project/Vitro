@@ -60,13 +60,26 @@
 
 # ------------------------------------
 
-:documentModifier_nameFields
-    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.NameFields> ,
-        <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier> .
-
-:documentModifier_nameBoost
-    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.NameBoost> ,
+:documentModifier_AllNames
+    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.SimpleSparqlQueryDocumentModifier> ,
         <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier> ;
+    rdfs:label "All labels are added to name fields." ;
+    :hasTargetField "nameRaw" ;
+    :hasSparqlQuery """
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+		SELECT ?label 
+		WHERE {
+			?uri rdfs:label ?label .
+	    }
+        """ .
+    
+:documentModifier_NameFieldBooster
+    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.FieldBooster> ,
+        <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier> ;
+    :hasTargetField "nameRaw" ;
+    :hasTargetField "nameLowercase" ;
+    :hasTargetField "nameUnstemmed" ;
+    :hasTargetField "nameStemmed" ;
     :hasBoost "1.2"^^xsd:float .
 
 :documentModifier_thumbnailImageUrl

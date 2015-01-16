@@ -33,7 +33,6 @@ public class ExcludeBasedOnType implements SearchIndexExcluder {
 		}
 
 		List<VClass> vclasses = new ArrayList<>();
-		vclasses.add(ind.getVClass());
 		addToList(vclasses, ind.getVClasses());
 
 		for (VClass vclz : vclasses) {
