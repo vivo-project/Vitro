@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchindex;
 
+import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.PROGRESS;
+import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.STOP_PROCESSING_URIS;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -11,7 +14,11 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Listener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.search.controller.IndexController;
@@ -23,8 +30,13 @@ import edu.cornell.mannlib.vitro.webapp.utils.developer.listeners.DeveloperDisab
 
 /**
  * Start the SearchIndexer. Create a listener on the RDFService and link it to
- * the indexer. Create a history object as a listener and make it avaiable to
- * the IndexController.
+ * the indexer.
+ * 
+ * Create a history object as a listener and make it avaiable to the
+ * IndexController.
+ * 
+ * Create a listener that will call commit() on the SearchEngine every time it
+ * hears a progress or completion event.
  */
 public class SearchIndexerSetup implements ServletContextListener {
 	private static final Log log = LogFactory.getLog(SearchIndexerSetup.class);
@@ -35,6 +47,7 @@ public class SearchIndexerSetup implements ServletContextListener {
 	private IndexingChangeListener listener;
 	private DeveloperDisabledChangeListener listenerWrapper;
 	private IndexHistory history;
+	private Committer committer;
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -57,6 +70,9 @@ public class SearchIndexerSetup implements ServletContextListener {
 			searchIndexer.addListener(this.history);
 			IndexController.setHistory(this.history);
 
+			this.committer = new Committer();
+			searchIndexer.addListener(this.committer);
+
 			searchIndexer
 					.startup(app, new ComponentStartupStatusImpl(this, ss));
 
@@ -70,6 +86,7 @@ public class SearchIndexerSetup implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent sce) {
 		searchIndexer.shutdown(app);
 
+		searchIndexer.removeListener(this.committer);
 		searchIndexer.removeListener(this.history);
 
 		try {
@@ -79,5 +96,30 @@ public class SearchIndexerSetup implements ServletContextListener {
 			log.warn("Failed to unregister the indexing listener.");
 		}
 		listener.shutdown();
+	}
+
+	// ----------------------------------------------------------------------
+	// Helper classes
+	// ----------------------------------------------------------------------
+
+	private static class Committer implements Listener {
+		private final SearchEngine searchEngine = ApplicationUtils.instance()
+				.getSearchEngine();
+
+		@Override
+		public void receiveSearchIndexerEvent(Event event) {
+			Type type = event.getType();
+			if (type == PROGRESS || type == STOP_PROCESSING_URIS) {
+				commitChanges();
+			}
+		}
+
+		private void commitChanges() {
+			try {
+				searchEngine.commit();
+			} catch (Exception e) {
+				log.error("Failed to commit the changes.", e);
+			}
+		}
 	}
 }

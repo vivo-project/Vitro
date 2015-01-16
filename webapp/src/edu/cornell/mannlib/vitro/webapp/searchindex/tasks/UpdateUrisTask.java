@@ -94,20 +94,11 @@ public class UpdateUrisTask implements Task {
 			}
 		}
 		pool.waitUntilIdle();
-		commitChanges();
 
 		excluders.stopIndexing();
 		modifiers.stopIndexing();
 		listeners.fireEvent(new Event(STOP_PROCESSING_URIS, status
 				.getSearchIndexerStatus()));
-	}
-
-	private void commitChanges() {
-		try {
-			searchEngine.commit();
-		} catch (Exception e) {
-			log.error("Failed to commit the changes.", e);
-		}
 	}
 
 	private boolean isInterrupted() {
