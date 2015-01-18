@@ -210,9 +210,7 @@ public class ApplicationImpl implements Application {
 
 	@Override
 	public void shutdown() {
-		getFileStorage().shutdown(this);
-		getImageProcessor().shutdown(this);
-		getSearchEngine().shutdown(this);
+		// Nothing to do.
 	}
 
 	// ----------------------------------------------------------------------

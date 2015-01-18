@@ -59,6 +59,8 @@ import edu.cornell.mannlib.vitro.webapp.searchindex.tasks.UpdateStatementsTask;
 import edu.cornell.mannlib.vitro.webapp.searchindex.tasks.UpdateUrisTask;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoaderException;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.WorkLevel;
@@ -73,6 +75,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.Work
  * A thread pool is available so the tasks can create small units of work to be
  * run in parallel. Each task should block until all of its work units are
  * complete, to preserve the pattern of running one task at a time.
+ * 
+ * The number of threads in the thread pool is specified in the application
+ * setup file.
  */
 public class SearchIndexerImpl implements SearchIndexer {
 	private static final Log log = LogFactory.getLog(SearchIndexerImpl.class);
@@ -80,13 +85,36 @@ public class SearchIndexerImpl implements SearchIndexer {
 	private final ListenerList listeners = new ListenerList();
 	private final TaskQueue taskQueue = new TaskQueue();
 	private final Scheduler scheduler = new Scheduler(taskQueue);
-	private final WorkerThreadPool pool = new WorkerThreadPool();
+
+	private Integer threadPoolSize;
+	private WorkerThreadPool pool;
 
 	private ServletContext ctx;
 	private List<SearchIndexExcluder> excluders;
 	private List<DocumentModifier> modifiers;
 	private Set<IndexingUriFinder> uriFinders;
 	private WebappDaoFactory wadf;
+
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#threadPoolSize")
+	public void setThreadPoolSize(String size) {
+		if (threadPoolSize == null) {
+			threadPoolSize = Integer.parseInt(size);
+		} else {
+			throw new IllegalStateException(
+					"Configuration includes multiple values for threadPoolSize: "
+							+ threadPoolSize + ", and " + size);
+		}
+	}
+
+	@Validation
+	public void validate() throws Exception {
+		if (threadPoolSize == null) {
+			throw new IllegalStateException(
+					"Configuration did not include a value for threadPoolSize.");
+		} else {
+			this.pool = new WorkerThreadPool(threadPoolSize);
+		}
+	}
 
 	@Override
 	public void startup(Application application, ComponentStartupStatus ss) {
@@ -442,9 +470,9 @@ public class SearchIndexerImpl implements SearchIndexer {
 	public static class WorkerThreadPool {
 		private final ThreadPoolExecutor pool;
 
-		public WorkerThreadPool() {
-			this.pool = new ThreadPoolExecutor(10, 10, 10, TimeUnit.SECONDS,
-					new ArrayBlockingQueue<Runnable>(50),
+		public WorkerThreadPool(int threadPoolSize) {
+			this.pool = new ThreadPoolExecutor(threadPoolSize, threadPoolSize,
+					10, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(50),
 					new VitroBackgroundThread.Factory(
 							"SearchIndexer_ThreadPool"));
 		}

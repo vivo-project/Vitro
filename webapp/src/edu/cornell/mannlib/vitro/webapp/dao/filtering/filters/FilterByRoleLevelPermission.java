@@ -129,7 +129,7 @@ public class FilterByRoleLevelPermission extends VitroFiltersImpl {
 		/**
 		 * It would be nice if every ObjectPropertyStatement held a real
 		 * ObjectProperty. If it doesn't, we do the next best thing, but it
-		 * won't recognize any applicaable Faux properties.
+		 * won't recognize any applicable Faux properties.
 		 */
 		private ObjectProperty getOrCreateProperty(ObjectPropertyStatement ops) {
 			if (ops.getProperty() != null) {
