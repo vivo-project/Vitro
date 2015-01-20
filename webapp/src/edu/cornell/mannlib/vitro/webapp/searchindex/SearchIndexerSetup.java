@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineNotRespondingException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type;
@@ -118,6 +119,9 @@ public class SearchIndexerSetup implements ServletContextListener {
 		private void commitChanges() {
 			try {
 				searchEngine.commit();
+			} catch (SearchEngineNotRespondingException e) {
+				log.error("Failed to commit the changes: "
+						+ "the search engine is not responding.");
 			} catch (Exception e) {
 				log.error("Failed to commit the changes.", e);
 			}

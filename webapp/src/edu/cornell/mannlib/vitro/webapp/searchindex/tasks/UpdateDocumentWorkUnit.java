@@ -31,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineNotRespondingException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerUtils;
 import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier;
@@ -65,6 +66,9 @@ public class UpdateDocumentWorkUnit implements Runnable {
 			modifiers.modifyDocument(ind, doc);
 			addIndexedTime(doc);
 			searchEngine.add(doc);
+		} catch (SearchEngineNotRespondingException e) {
+			log.warn("Failed to add '" + ind + "' to the search index: "
+					+ "the search engine is not responding.");
 		} catch (Exception e) {
 			log.warn("Failed to add '" + ind + "' to the search index.", e);
 		}

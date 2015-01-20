@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineNotRespondingException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.UriCounts;
@@ -131,6 +132,9 @@ public class UpdateUrisTask implements Task {
 			searchEngine.deleteById(SearchIndexerUtils.getIdForUri(uri));
 			status.incrementDeletes();
 			log.debug("deleted '" + uri + "' from search index.");
+		} catch (SearchEngineNotRespondingException e) {
+			log.warn("Failed to delete '" + uri + "' from search index: "
+					+ "the search engine is not responding.");
 		} catch (Exception e) {
 			log.warn("Failed to delete '" + uri + "' from search index", e);
 		}
@@ -142,6 +146,9 @@ public class UpdateUrisTask implements Task {
 			searchEngine.deleteById(SearchIndexerUtils.getIdForUri(uri));
 			status.incrementExclusions();
 			log.debug("excluded '" + uri + "' from search index.");
+		} catch (SearchEngineNotRespondingException e) {
+			log.warn("Failed to exclude '" + uri + "' from search index: "
+					+ "the search engine is not responding.", e);
 		} catch (Exception e) {
 			log.warn("Failed to exclude '" + uri + "' from search index", e);
 		}
