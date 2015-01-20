@@ -83,6 +83,8 @@ public class UpdateUrisTask implements Task {
 			if (isInterrupted()) {
 				log.info("Interrupted: " + status.getSearchIndexerStatus());
 				break;
+			} else if (uri == null) {
+				// Nothing to do
 			} else {
 				Individual ind = getIndividual(uri);
 				if (ind == null) {
