@@ -66,7 +66,7 @@ public class UpdateUrisTask implements Task {
 		this.listeners = listeners;
 		this.pool = pool;
 
-		this.status = new Status(uris.size(), 200, listeners);
+		this.status = new Status(uris.size(), 500, listeners);
 
 		this.searchEngine = ApplicationUtils.instance().getSearchEngine();
 		

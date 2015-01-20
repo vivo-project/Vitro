@@ -53,8 +53,8 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 
     private static final Log log = LogFactory.getLog(ObjectPropertyStatementDaoJena.class);
     
-    private DatasetWrapperFactory dwf;
-    private RDFService rdfService;
+    protected DatasetWrapperFactory dwf;
+    protected RDFService rdfService;
     
     public ObjectPropertyStatementDaoJena(RDFService rdfService,
                                           DatasetWrapperFactory dwf,

@@ -77,7 +77,7 @@ public class UpdateStatementsTask implements Task {
 
 		this.uris = Collections.synchronizedSet(new HashSet<String>());
 
-		this.status = new Status(changes.size(), 200, listeners);
+		this.status = new Status(changes.size(), 500, listeners);
 	}
 
 	@Override
