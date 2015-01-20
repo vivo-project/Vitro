@@ -32,7 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.developer.listeners.DeveloperDisab
  * Start the SearchIndexer. Create a listener on the RDFService and link it to
  * the indexer.
  * 
- * Create a history object as a listener and make it avaiable to the
+ * Create a history object as a listener and make it available to the
  * IndexController.
  * 
  * Create a listener that will call commit() on the SearchEngine every time it
@@ -75,6 +75,7 @@ public class SearchIndexerSetup implements ServletContextListener {
 
 			searchIndexer
 					.startup(app, new ComponentStartupStatusImpl(this, ss));
+			searchIndexer.unpause();
 
 			ss.info(this, "Setup of search indexer completed.");
 		} catch (RDFServiceException e) {

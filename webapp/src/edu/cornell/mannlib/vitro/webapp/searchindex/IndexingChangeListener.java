@@ -160,7 +160,7 @@ public class IndexingChangeListener implements ChangeListener {
 			if (queue.isShutdown()) {
 				log.warn("Attempt to start ticker after shutdown request.");
 			} else {
-				queue.schedule(new TickerResponse(), 500, TimeUnit.MILLISECONDS);
+				queue.schedule(new TickerResponse(), 1, TimeUnit.SECONDS);
 				running = true;
 			}
 		}
