@@ -144,17 +144,20 @@ public class IndexController extends FreemarkerHttpServlet {
 			throws IOException {
 		if (!PolicyHelper.isAuthorizedForActions(req, REQUIRED_ACTIONS)) {
 			resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-			resp.getWriter().write("You are not authorized to access this page.");
+			resp.getWriter().write(
+					"You are not authorized to access this page.");
 			return;
 		}
-		
+
 		try {
 			Map<String, Object> body = new HashMap<>();
 			body.put("statusUrl", UrlBuilder.getUrl(PAGE_URL, "status", "true"));
 			body.put("rebuildUrl",
 					UrlBuilder.getUrl(PAGE_URL, "rebuild", "true"));
 			body.put("status", buildStatusMap(indexer.getStatus()));
-			body.put("history", history.toMaps());
+			if (history != null) {
+				body.put("history", history.toMaps());
+			}
 
 			String rendered = FreemarkerProcessingServiceSetup.getService(
 					getServletContext()).renderTemplate(STATUS_TEMPLATE_NAME,

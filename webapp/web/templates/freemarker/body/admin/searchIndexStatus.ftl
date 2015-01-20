@@ -40,9 +40,13 @@
     <h3>History</h3>
     <table class="history">
         <tr> <th>Event</th> <th>Status</th> <th>Since</th> <th>Counts</th> </tr>
-        <#list history as ie>
-           <@showIndexerEvent ie />
-        </#list>
+        <#if history?has_content >
+            <#list history as ie>
+               <@showIndexerEvent ie />
+            </#list>
+        <#else>
+            <tr><td colspan="4">Search indexer history is not available.</td></tr>
+        </#if>
     </table>
 </section>
 
