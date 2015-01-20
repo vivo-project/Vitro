@@ -16,10 +16,13 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
@@ -99,10 +102,6 @@ public class IndexController extends FreemarkerHttpServlet {
 	@Override
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException, ServletException {
-		if (!isAuthorizedToDisplayPage(req, resp, REQUIRED_ACTIONS)) {
-			return;
-		}
-
 		switch (RequestType.fromRequest(req)) {
 		case STATUS:
 			showStatus(req, resp);
@@ -119,11 +118,16 @@ public class IndexController extends FreemarkerHttpServlet {
 	}
 
 	@Override
+	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
+		return REQUIRED_ACTIONS;
+	}
+
+	@Override
 	protected ResponseValues processRequest(VitroRequest vreq) {
 		switch (RequestType.fromRequest(vreq)) {
 		case REBUILD:
 			requestRebuild();
-			return showDisplay();
+			return new RedirectResponseValues(PAGE_URL);
 		default:
 			return showDisplay();
 		}
@@ -138,6 +142,12 @@ public class IndexController extends FreemarkerHttpServlet {
 
 	private void showStatus(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
+		if (!PolicyHelper.isAuthorizedForActions(req, REQUIRED_ACTIONS)) {
+			resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			resp.getWriter().write("You are not authorized to access this page.");
+			return;
+		}
+		
 		try {
 			Map<String, Object> body = new HashMap<>();
 			body.put("statusUrl", UrlBuilder.getUrl(PAGE_URL, "status", "true"));

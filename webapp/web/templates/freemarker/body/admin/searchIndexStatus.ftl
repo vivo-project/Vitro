@@ -64,7 +64,7 @@
 
 <#macro showIndexerCounts countsType, counts>
    <#if countsType == "URI_COUNTS">
-       Updated: ${counts.updated}, deleted: ${counts.deleted}, remaining: ${counts.remaining}, total: ${counts.total}
+       Updated: ${counts.updated}, excluded: ${counts.excluded}, deleted: ${counts.deleted}, remaining: ${counts.remaining}, total: ${counts.total}
    <#elseif countsType == "STATEMENT_COUNTS">
        Processed: ${counts.processed}, remaining: ${counts.remaining}, total: ${counts.total}
    <#elseif countsType == "REBUILD_COUNTS">

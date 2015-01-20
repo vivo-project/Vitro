@@ -69,8 +69,7 @@ public class UpdateUrisTask implements Task {
 		this.status = new Status(uris.size(), 500, listeners);
 
 		this.searchEngine = ApplicationUtils.instance().getSearchEngine();
-		
-		
+
 	}
 
 	@Override
@@ -86,8 +85,10 @@ public class UpdateUrisTask implements Task {
 				break;
 			} else {
 				Individual ind = getIndividual(uri);
-				if (ind == null || isExcluded(ind)) {
+				if (ind == null) {
 					deleteDocument(uri);
+				} else if (isExcluded(ind)) {
+					excludeDocument(uri);
 				} else {
 					updateDocument(ind);
 				}
@@ -133,6 +134,17 @@ public class UpdateUrisTask implements Task {
 		}
 	}
 
+	/** An exclusion is just a delete for different reasons. */
+	private void excludeDocument(String uri) {
+		try {
+			searchEngine.deleteById(SearchIndexerUtils.getIdForUri(uri));
+			status.incrementExclusions();
+			log.debug("excluded '" + uri + "' from search index.");
+		} catch (Exception e) {
+			log.warn("Failed to exclude '" + uri + "' from search index", e);
+		}
+	}
+
 	private void updateDocument(Individual ind) {
 		Runnable workUnit = new UpdateDocumentWorkUnit(ind, modifiers);
 		pool.submit(workUnit, this);
@@ -165,6 +177,7 @@ public class UpdateUrisTask implements Task {
 		private final ListenerList listeners;
 		private int updated = 0;
 		private int deleted = 0;
+		private int excluded = 0;
 		private Date since = new Date();
 
 		public Status(int total, int progressInterval, ListenerList listeners) {
@@ -184,6 +197,11 @@ public class UpdateUrisTask implements Task {
 			since = new Date();
 		}
 
+		public synchronized void incrementExclusions() {
+			excluded++;
+			since = new Date();
+		}
+
 		private void maybeFireProgressEvent() {
 			if (updated > 0 && updated % progressInterval == 0) {
 				listeners.fireEvent(new Event(PROGRESS,
@@ -192,9 +210,9 @@ public class UpdateUrisTask implements Task {
 		}
 
 		public synchronized SearchIndexerStatus getSearchIndexerStatus() {
-			int remaining = total - updated - deleted;
+			int remaining = total - updated - deleted - excluded;
 			return new SearchIndexerStatus(PROCESSING_URIS, since,
-					new UriCounts(deleted, updated, remaining, total));
+					new UriCounts(excluded, deleted, updated, remaining, total));
 		}
 
 	}
