@@ -102,19 +102,25 @@ public class SearchIndexerStatus {
 	}
 
 	public static class UriCounts extends Counts {
+		private final int excluded;
 		private final int deleted;
 		private final int updated;
 		private final int remaining;
 		private final int total;
 
-		public UriCounts(int deleted, int updated, int remaining, int total) {
+		public UriCounts(int excluded, int deleted, int updated, int remaining, int total) {
 			super(Type.URI_COUNTS);
+			this.excluded = excluded;
 			this.deleted = deleted;
 			this.updated = updated;
 			this.remaining = remaining;
 			this.total = total;
 		}
 
+		public int getExcluded() {
+			return excluded;
+		}
+		
 		public int getDeleted() {
 			return deleted;
 		}
@@ -133,7 +139,7 @@ public class SearchIndexerStatus {
 
 		@Override
 		public String toString() {
-			return "[deleted=" + deleted + ", updated=" + updated
+			return "[excluded=" + excluded + ", deleted=" + deleted + ", updated=" + updated
 					+ ", remaining=" + remaining + ", total=" + total + "]";
 		}
 	}

@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineNotRespondingException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.UriCounts;
@@ -66,11 +67,10 @@ public class UpdateUrisTask implements Task {
 		this.listeners = listeners;
 		this.pool = pool;
 
-		this.status = new Status(uris.size(), 200, listeners);
+		this.status = new Status(uris.size(), 500, listeners);
 
 		this.searchEngine = ApplicationUtils.instance().getSearchEngine();
-		
-		
+
 	}
 
 	@Override
@@ -84,10 +84,14 @@ public class UpdateUrisTask implements Task {
 			if (isInterrupted()) {
 				log.info("Interrupted: " + status.getSearchIndexerStatus());
 				break;
+			} else if (uri == null) {
+				// Nothing to do
 			} else {
 				Individual ind = getIndividual(uri);
-				if (ind == null || isExcluded(ind)) {
+				if (ind == null) {
 					deleteDocument(uri);
+				} else if (isExcluded(ind)) {
+					excludeDocument(uri);
 				} else {
 					updateDocument(ind);
 				}
@@ -128,8 +132,25 @@ public class UpdateUrisTask implements Task {
 			searchEngine.deleteById(SearchIndexerUtils.getIdForUri(uri));
 			status.incrementDeletes();
 			log.debug("deleted '" + uri + "' from search index.");
+		} catch (SearchEngineNotRespondingException e) {
+			log.warn("Failed to delete '" + uri + "' from search index: "
+					+ "the search engine is not responding.");
 		} catch (Exception e) {
 			log.warn("Failed to delete '" + uri + "' from search index", e);
+		}
+	}
+
+	/** An exclusion is just a delete for different reasons. */
+	private void excludeDocument(String uri) {
+		try {
+			searchEngine.deleteById(SearchIndexerUtils.getIdForUri(uri));
+			status.incrementExclusions();
+			log.debug("excluded '" + uri + "' from search index.");
+		} catch (SearchEngineNotRespondingException e) {
+			log.warn("Failed to exclude '" + uri + "' from search index: "
+					+ "the search engine is not responding.", e);
+		} catch (Exception e) {
+			log.warn("Failed to exclude '" + uri + "' from search index", e);
 		}
 	}
 
@@ -165,6 +186,7 @@ public class UpdateUrisTask implements Task {
 		private final ListenerList listeners;
 		private int updated = 0;
 		private int deleted = 0;
+		private int excluded = 0;
 		private Date since = new Date();
 
 		public Status(int total, int progressInterval, ListenerList listeners) {
@@ -184,6 +206,11 @@ public class UpdateUrisTask implements Task {
 			since = new Date();
 		}
 
+		public synchronized void incrementExclusions() {
+			excluded++;
+			since = new Date();
+		}
+
 		private void maybeFireProgressEvent() {
 			if (updated > 0 && updated % progressInterval == 0) {
 				listeners.fireEvent(new Event(PROGRESS,
@@ -192,9 +219,9 @@ public class UpdateUrisTask implements Task {
 		}
 
 		public synchronized SearchIndexerStatus getSearchIndexerStatus() {
-			int remaining = total - updated - deleted;
+			int remaining = total - updated - deleted - excluded;
 			return new SearchIndexerStatus(PROCESSING_URIS, since,
-					new UriCounts(deleted, updated, remaining, total));
+					new UriCounts(excluded, deleted, updated, remaining, total));
 		}
 
 	}

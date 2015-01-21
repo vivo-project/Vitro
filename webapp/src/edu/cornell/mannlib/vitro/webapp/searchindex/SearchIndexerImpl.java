@@ -3,9 +3,11 @@
 package edu.cornell.mannlib.vitro.webapp.searchindex;
 
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
+import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.PAUSE;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.SHUTDOWN_COMPLETE;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.SHUTDOWN_REQUESTED;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.STARTUP;
+import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.UNPAUSE;
 import static edu.cornell.mannlib.vitro.webapp.utils.developer.Key.SEARCH_INDEX_LOG_INDEXING_BREAKDOWN_TIMINGS;
 import static edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.WorkLevel.IDLE;
 import static edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread.WorkLevel.WORKING;
@@ -39,6 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.State;
 import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier;
@@ -235,11 +238,13 @@ public class SearchIndexerImpl implements SearchIndexer {
 	@Override
 	public void pause() {
 		scheduler.pause();
+		listeners.fireEvent(new Event(PAUSE, getStatus()));
 	}
 
 	@Override
 	public void unpause() {
 		scheduler.unpause();
+		listeners.fireEvent(new Event(UNPAUSE, getStatus()));
 	}
 
 	@Override
@@ -263,8 +268,8 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (status.getState() != State.SHUTDOWN) {
 			listeners.fireEvent(new Event(SHUTDOWN_REQUESTED, status));
 
-			pool.shutdown();
 			taskQueue.shutdown();
+			pool.shutdown();
 
 			for (DocumentModifier dm : modifiers) {
 				try {
@@ -321,7 +326,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 	private static class Scheduler {
 		private final TaskQueue taskQueue;
 		private final List<Task> deferredQueue;
-		private volatile boolean paused;
+		private volatile boolean paused = true;
 
 		public Scheduler(TaskQueue taskQueue) {
 			this.taskQueue = taskQueue;
@@ -461,6 +466,9 @@ public class SearchIndexerImpl implements SearchIndexer {
 	 * 
 	 * The task is notified as each unit completes.
 	 * 
+	 * If no thread is available for a work unit, the thread of the task itself
+	 * will run it. This provides automatic throttling.
+	 * 
 	 * Only one task is active at a time, so the task can simply wait until this
 	 * pool is idle to know that all of its units have completed.
 	 * 
@@ -474,14 +482,21 @@ public class SearchIndexerImpl implements SearchIndexer {
 			this.pool = new ThreadPoolExecutor(threadPoolSize, threadPoolSize,
 					10, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(50),
 					new VitroBackgroundThread.Factory(
-							"SearchIndexer_ThreadPool"));
+							"SearchIndexer_ThreadPool"),
+					new ThreadPoolExecutor.CallerRunsPolicy());
 		}
 
 		public void submit(Runnable workUnit, Task task) {
 			try {
 				pool.execute(new WorkUnitWrapper(workUnit, task));
 			} catch (RejectedExecutionException e) {
-				log.warn("Work unit was rejected: " + workUnit + " for " + task);
+				if (pool.isShutdown()) {
+					log.warn("Work unit was rejected: " + workUnit + " for "
+							+ task);
+				} else {
+					log.error("Work unit was rejected: " + workUnit + " for "
+							+ task, e);
+				}
 			}
 		}
 

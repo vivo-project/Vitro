@@ -20,12 +20,19 @@ table.threadInfo th {
 <h2>${i18n().background_threads}</h2>
 
 <section id="show-threads" role="region">
-    <#list threads as threadInfo>
-        <table class="threadInfo ${threadInfo.workLevel}" summary="Thread ${threadInfo.name}">
-            <tr><th>${i18n().name}</th><td>${threadInfo.name}</td></tr>
-            <tr><th>${i18n().work_level}</th><td>${threadInfo.workLevel}</td></tr>
-            <tr><th>${i18n().since}</th><td>${threadInfo.since}</td></tr>
-            <tr><th>${i18n().flags}</th><td>${threadInfo.flags}</td></tr>
-        </table>
-    </#list>
+    <table class="threadInfo" summary="Status of background threads.">
+        <tr>
+            <th>${i18n().name}</th>
+            <th>${i18n().work_level}</th>
+            <th>${i18n().since}</th>
+            <th>${i18n().flags}</th>
+        </tr>
+        <#list threads as threadInfo>
+            <tr>
+                <td>${threadInfo.name}</td>
+                <td>${threadInfo.workLevel}</td>
+                <td>${threadInfo.since}</td>
+                <td>${threadInfo.flags}</td>
+        </#list>
+    </table>
 </section>

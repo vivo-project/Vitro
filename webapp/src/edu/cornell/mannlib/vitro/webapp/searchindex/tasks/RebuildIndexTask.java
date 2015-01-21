@@ -17,6 +17,7 @@ import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineNotRespondingException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.RebuildCounts;
@@ -105,6 +106,9 @@ public class RebuildIndexTask implements Task {
 		try {
 			searchEngine.deleteByQuery(query);
 			searchEngine.commit();
+		} catch (SearchEngineNotRespondingException e) {
+			log.warn("Failed to delete outdated documents from the search index: "
+					+ "the search engine is not responding.");
 		} catch (SearchEngineException e) {
 			log.warn("Failed to delete outdated documents "
 					+ "from the search index", e);
@@ -114,8 +118,12 @@ public class RebuildIndexTask implements Task {
 	private int getDocumentCount() {
 		try {
 			return searchEngine.documentCount();
+		} catch (SearchEngineNotRespondingException e) {
+			log.warn("Failed to get document count from the search index: "
+					+ "the search engine is not responding.");
+			return 0;
 		} catch (SearchEngineException e) {
-			log.warn("Failed to get docoument count from the search index.", e);
+			log.warn("Failed to get document count from the search index.", e);
 			return 0;
 		}
 	}
