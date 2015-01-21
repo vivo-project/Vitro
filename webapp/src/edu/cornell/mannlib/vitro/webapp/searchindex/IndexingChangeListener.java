@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchindex;
 
+import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.PAUSE;
+import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.UNPAUSE;
+
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -20,6 +23,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
@@ -27,13 +31,18 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
  * When a change is heard, wait for an interval to see if more changes come in.
  * When changes stop coming in for a specified interval, send what has
  * accumulated.
+ * 
+ * When the SearchIndexer pauses, stop sending changes until the SearchIndexer
+ * unpauses.
  */
-public class IndexingChangeListener implements ChangeListener {
+public class IndexingChangeListener implements ChangeListener,
+		SearchIndexer.Listener {
 	private static final Log log = LogFactory
 			.getLog(IndexingChangeListener.class);
 
 	private final SearchIndexer searchIndexer;
 	private final Ticker ticker;
+	private volatile boolean paused = true;
 
 	/** All access to the list must be synchronized. */
 	private final List<Statement> changes;
@@ -42,16 +51,32 @@ public class IndexingChangeListener implements ChangeListener {
 		this.searchIndexer = searchIndexer;
 		this.ticker = new Ticker();
 		this.changes = new ArrayList<>();
+		
+		searchIndexer.addListener(this);
 	}
 
 	private synchronized void noteChange(Statement stmt) {
 		changes.add(stmt);
-		ticker.start();
+		if (!paused) {
+			ticker.start();
+		}
+	}
+
+	@Override
+	public void receiveSearchIndexerEvent(Event event) {
+		if (event.getType() == PAUSE) {
+			paused = true;
+		} else if (event.getType() == UNPAUSE) {
+			paused = false;
+			respondToTicker();
+		}
 	}
 
 	private synchronized void respondToTicker() {
-		searchIndexer.scheduleUpdatesForStatements(changes);
-		changes.clear();
+		if (!paused && !changes.isEmpty()) {
+			searchIndexer.scheduleUpdatesForStatements(changes);
+			changes.clear();
+		}
 	}
 
 	public void shutdown() {

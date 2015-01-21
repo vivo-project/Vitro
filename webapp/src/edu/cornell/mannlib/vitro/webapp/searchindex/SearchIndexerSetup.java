@@ -61,9 +61,11 @@ public class SearchIndexerSetup implements ServletContextListener {
 			searchIndexer = app.getSearchIndexer();
 
 			listener = new IndexingChangeListener(searchIndexer);
-
+			
+			// Wrap it so it can be disabled by a developer flag.
 			listenerWrapper = new DeveloperDisabledChangeListener(listener,
 					Key.SEARCH_INDEX_SUPPRESS_MODEL_CHANGE_LISTENER);
+
 			RDFServiceUtils.getRDFServiceFactory(ctx).registerListener(
 					listenerWrapper);
 
