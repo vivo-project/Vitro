@@ -282,13 +282,13 @@ public class CachingResponseFilter implements Filter {
 		@SuppressWarnings("unchecked")
 		List<Locale> locales = EnumerationUtils.toList(req.getLocales());
 
-		StringBuilder buffer = new StringBuilder('"').append(rawEtag);
+		StringBuilder buffer = new StringBuilder("\"").append(rawEtag);
 		for (Locale locale : locales) {
-			buffer.append(locale.toString()).append(" ");
+			buffer.append(locale.toString());
 		}
-		buffer.append('"');
+		buffer.append("\"");
 
-		String etag = buffer.toString();
+		String etag = buffer.toString().replaceAll("\\s", "");
 		log.debug("Language-specific ETAG = " + etag);
 		return etag;
 	}
