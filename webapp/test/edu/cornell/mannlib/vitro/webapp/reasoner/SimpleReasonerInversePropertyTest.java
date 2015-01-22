@@ -7,6 +7,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import stubs.edu.cornell.mannlib.vitro.webapp.modules.ApplicationStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineStub;
+import stubs.javax.servlet.ServletContextStub;
+
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.OntProperty;
@@ -28,6 +32,10 @@ public class SimpleReasonerInversePropertyTest extends SimpleReasonerTBoxHelper 
 		setLoggerLevel(SimpleReasoner.class, Level.OFF);
 		setLoggerLevel(SimpleReasonerTBoxListener.class, Level.OFF);
 		setLoggerLevel(ABoxRecomputer.class, Level.OFF);
+	}
+
+	@Before public void setup() {
+		ApplicationStub.setup(new ServletContextStub(), new SearchEngineStub());
 	}
 	
     @Test

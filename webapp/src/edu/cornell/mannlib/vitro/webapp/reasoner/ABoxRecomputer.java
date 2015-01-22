@@ -38,6 +38,7 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -46,6 +47,8 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 public class ABoxRecomputer {
 
     private static final Log log = LogFactory.getLog(ABoxRecomputer.class);
+    
+    private final SearchIndexer searchIndexer;
 
     private OntModel tboxModel;             // asserted and inferred TBox axioms
     private OntModel aboxModel;
@@ -67,11 +70,13 @@ public class ABoxRecomputer {
     public ABoxRecomputer(OntModel tboxModel,
             OntModel aboxModel,
             RDFService rdfService,
-            SimpleReasoner simpleReasoner) {
+            SimpleReasoner simpleReasoner,
+            SearchIndexer searchIndexer) {
         this.tboxModel = tboxModel;
         this.aboxModel = aboxModel;
         this.rdfService = rdfService;
         this.simpleReasoner = simpleReasoner;
+        this.searchIndexer = searchIndexer;
         recomputing = false;
         stopRequested = false;		
         handleSameAs = simpleReasoner.getSameAsEnabled();
@@ -97,8 +102,14 @@ public class ABoxRecomputer {
             }
         }
         try {
+        	if  (searchIndexer != null) {
+        		searchIndexer.pause();
+        	}
             recomputeABox();
         } finally {
+        	if  (searchIndexer != null) {
+        		searchIndexer.unpause();
+        	}
             synchronized (lock1) {
                 recomputing = false;	    		
             }

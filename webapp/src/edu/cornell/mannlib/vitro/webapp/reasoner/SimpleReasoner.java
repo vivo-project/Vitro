@@ -43,6 +43,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.DifferenceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
@@ -59,6 +60,8 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 public class SimpleReasoner extends StatementListener {
 
 	private static final Log log = LogFactory.getLog(SimpleReasoner.class);
+	
+	private final SearchIndexer searchIndexer;
 	
 	private OntModel tboxModel;             // asserted and inferred TBox axioms
 	private OntModel aboxModel;             // ABox assertions
@@ -95,12 +98,17 @@ public class SimpleReasoner extends StatementListener {
      *  whole ABox inference model is rebuilt
 	 * @param inferenceScratchpadModel - output. This the model is temporarily used when 
      *  the whole ABox inference model is rebuilt
+     * @param searchIndexer - output. If not null, the indexer will be paused before the 
+     *  ABox inference model is rebuilt and unpaused when the rebuild is complete.
  	 */
 	public SimpleReasoner(OntModel tboxModel, 
 			              RDFService rdfService, 
 			              Model inferenceModel,
 			              Model inferenceRebuildModel, 
-			              Model scratchpadModel) {
+			              Model scratchpadModel, 
+			              SearchIndexer searchIndexer) {
+		
+		this.searchIndexer = searchIndexer;
 
 		this.tboxModel = tboxModel;
 		
@@ -117,7 +125,7 @@ public class SimpleReasoner extends StatementListener {
 		this.batchMode = 0;
 		aBoxDeltaModeler1 = new CumulativeDeltaModeler();
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
-		recomputer = new ABoxRecomputer(tboxModel, aboxModel, rdfService, this);
+		recomputer = new ABoxRecomputer(tboxModel, aboxModel, rdfService, this, searchIndexer);
 		stopRequested = false;
 		
 		if (rdfService == null) {
@@ -140,6 +148,7 @@ public class SimpleReasoner extends StatementListener {
      *  ABox statements are maintained (added or retracted).
  	 */
 	public SimpleReasoner(OntModel tboxModel, OntModel aboxModel, Model inferenceModel) {
+		this.searchIndexer = null;
 		this.tboxModel = tboxModel;
 		this.aboxModel = aboxModel; 
 		this.inferenceModel = inferenceModel;
@@ -155,7 +164,7 @@ public class SimpleReasoner extends StatementListener {
 		ds.addNamedModel(ModelNames.TBOX_ASSERTIONS, tboxModel);
 		
 		ds.setDefaultModel(ModelFactory.createUnion(fullModel, tboxModel));
-		recomputer = new ABoxRecomputer(tboxModel, aboxModel, new RDFServiceModel(ds), this);
+		recomputer = new ABoxRecomputer(tboxModel, aboxModel, new RDFServiceModel(ds), this, searchIndexer);
 	}
 	
 	public void setPluginList(List<ReasonerPlugin> pluginList) {

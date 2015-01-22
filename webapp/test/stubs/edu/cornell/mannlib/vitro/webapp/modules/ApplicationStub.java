@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 
 import javax.servlet.ServletContext;
 
+import stubs.edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStub;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.application.VitroHomeDirectory;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
@@ -42,10 +43,14 @@ public class ApplicationStub implements Application {
 
 	private final ServletContext ctx;
 	private final SearchEngine searchEngine;
+	private final SearchIndexer searchIndexer;
 
 	public ApplicationStub(ServletContext ctx, SearchEngine searchEngine) {
 		this.ctx = ctx;
 		this.searchEngine = searchEngine;
+		
+		this.searchIndexer = new SearchIndexerStub();
+		this.searchIndexer.unpause();
 	}
 
 	// ----------------------------------------------------------------------
@@ -60,6 +65,11 @@ public class ApplicationStub implements Application {
 	@Override
 	public SearchEngine getSearchEngine() {
 		return searchEngine;
+	}
+
+	@Override
+	public SearchIndexer getSearchIndexer() {
+		return searchIndexer;
 	}
 
 	// ----------------------------------------------------------------------
@@ -107,12 +117,6 @@ public class ApplicationStub implements Application {
 	public TBoxReasonerModule getTBoxReasonerModule() {
 		throw new RuntimeException(
 				"ApplicationStub.getTBoxReasonerModule() not implemented.");
-	}
-
-	@Override
-	public SearchIndexer getSearchIndexer() {
-		throw new RuntimeException(
-				"Application.getSearchIndexer() not implemented.");
 	}
 
 }
