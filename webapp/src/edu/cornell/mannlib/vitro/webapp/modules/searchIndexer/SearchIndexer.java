@@ -12,6 +12,9 @@ import edu.cornell.mannlib.vitro.webapp.modules.Application;
 /**
  * Interface for the code that controls the contents of the search index.
  * 
+ * If calls are made to schedule tasks prior to startup(), they will be queued,
+ * since the indexer is created in paused mode.
+ * 
  * The only calls that are valid after shutdown are shutdown(), getStatus() and
  * removeListener().
  */
@@ -25,6 +28,8 @@ public interface SearchIndexer extends Application.Module {
 	 * 
 	 * We accumulate a batch of affected URIs, removing duplicates if they
 	 * occur, and then submit them for updates.
+	 * 
+	 * If called before startup or while paused, this task will be queued.
 	 * 
 	 * @param urls
 	 *            if null or empty, this call has no effect.
@@ -43,6 +48,8 @@ public interface SearchIndexer extends Application.Module {
 	 * A URI belongs in the index if it refers to an existing individual in the
 	 * model, and is not excluded.
 	 * 
+	 * If called before startup or while paused, this task will be queued.
+	 * 
 	 * @param uris
 	 *            if null or empty, this call has no effect.
 	 * @throws IllegalStateException
@@ -57,6 +64,8 @@ public interface SearchIndexer extends Application.Module {
 	 * If a rebuild is already pending or in progress, this method has no
 	 * effect.
 	 * 
+	 * If called before startup or while paused, this task will be queued.
+	 * 
 	 * @throws IllegalStateException
 	 *             if called after shutdown()
 	 */
@@ -64,7 +73,12 @@ public interface SearchIndexer extends Application.Module {
 
 	/**
 	 * Stop processing new tasks. Requests will be queued until a call to
-	 * unpause().
+	 * unpause(). Fires a PAUSED event to listeners.
+	 * 
+	 * The SearchIndexer is paused when created. When fully initialized, it
+	 * should be unpaused.
+	 * 
+	 * If already paused, this call has no effect.
 	 * 
 	 * @throws IllegalStateException
 	 *             if called after shutdown()
@@ -73,9 +87,13 @@ public interface SearchIndexer extends Application.Module {
 
 	/**
 	 * Resume processing new tasks. Any requests that were received since the
-	 * call to pause() will now be scheduled for processing.
+	 * call to pause() will now be scheduled for processing. Fires an UNPAUSED
+	 * event to listeners.
 	 * 
-	 * Has no effect if called after shutdown().
+	 * The SearchIndexer is paused when created. When fully initialized, it
+	 * should be unpaused.
+	 * 
+	 * Has no effect if called after shutdown() or if not paused.
 	 */
 	void unpause();
 
@@ -131,6 +149,8 @@ public interface SearchIndexer extends Application.Module {
 	public static class Event {
 		public enum Type {
 			STARTUP, PROGRESS,
+
+			PAUSE, UNPAUSE,
 
 			START_PROCESSING_URIS, STOP_PROCESSING_URIS,
 

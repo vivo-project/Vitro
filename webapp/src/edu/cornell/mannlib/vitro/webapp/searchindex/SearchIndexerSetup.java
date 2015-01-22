@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineNotRespondingException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type;
@@ -32,7 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.developer.listeners.DeveloperDisab
  * Start the SearchIndexer. Create a listener on the RDFService and link it to
  * the indexer.
  * 
- * Create a history object as a listener and make it avaiable to the
+ * Create a history object as a listener and make it available to the
  * IndexController.
  * 
  * Create a listener that will call commit() on the SearchEngine every time it
@@ -60,9 +61,11 @@ public class SearchIndexerSetup implements ServletContextListener {
 			searchIndexer = app.getSearchIndexer();
 
 			listener = new IndexingChangeListener(searchIndexer);
-
+			
+			// Wrap it so it can be disabled by a developer flag.
 			listenerWrapper = new DeveloperDisabledChangeListener(listener,
 					Key.SEARCH_INDEX_SUPPRESS_MODEL_CHANGE_LISTENER);
+
 			RDFServiceUtils.getRDFServiceFactory(ctx).registerListener(
 					listenerWrapper);
 
@@ -75,6 +78,7 @@ public class SearchIndexerSetup implements ServletContextListener {
 
 			searchIndexer
 					.startup(app, new ComponentStartupStatusImpl(this, ss));
+			searchIndexer.unpause();
 
 			ss.info(this, "Setup of search indexer completed.");
 		} catch (RDFServiceException e) {
@@ -117,6 +121,9 @@ public class SearchIndexerSetup implements ServletContextListener {
 		private void commitChanges() {
 			try {
 				searchEngine.commit();
+			} catch (SearchEngineNotRespondingException e) {
+				log.error("Failed to commit the changes: "
+						+ "the search engine is not responding.");
 			} catch (Exception e) {
 				log.error("Failed to commit the changes.", e);
 			}

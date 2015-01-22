@@ -40,9 +40,13 @@
     <h3>History</h3>
     <table class="history">
         <tr> <th>Event</th> <th>Status</th> <th>Since</th> <th>Counts</th> </tr>
-        <#list history as ie>
-           <@showIndexerEvent ie />
-        </#list>
+        <#if history?has_content >
+            <#list history as ie>
+               <@showIndexerEvent ie />
+            </#list>
+        <#else>
+            <tr><td colspan="4">Search indexer history is not available.</td></tr>
+        </#if>
     </table>
 </section>
 
@@ -64,7 +68,7 @@
 
 <#macro showIndexerCounts countsType, counts>
    <#if countsType == "URI_COUNTS">
-       Updated: ${counts.updated}, deleted: ${counts.deleted}, remaining: ${counts.remaining}, total: ${counts.total}
+       Updated: ${counts.updated}, excluded: ${counts.excluded}, deleted: ${counts.deleted}, remaining: ${counts.remaining}, total: ${counts.total}
    <#elseif countsType == "STATEMENT_COUNTS">
        Processed: ${counts.processed}, remaining: ${counts.remaining}, total: ${counts.total}
    <#elseif countsType == "REBUILD_COUNTS">

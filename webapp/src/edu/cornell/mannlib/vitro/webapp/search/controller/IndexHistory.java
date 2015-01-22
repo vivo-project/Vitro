@@ -28,7 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatu
 public class IndexHistory implements SearchIndexer.Listener {
 	private static final Log log = LogFactory.getLog(IndexHistory.class);
 
-	private final static int MAX_EVENTS = 10;
+	private final static int MAX_EVENTS = 20;
 
 	private final Deque<Event> events = new LinkedList<>();
 
@@ -84,6 +84,7 @@ public class IndexHistory implements SearchIndexer.Listener {
 	}
 
 	private void addCounts(UriCounts counts, Map<String, Object> map) {
+		map.put("excluded", counts.getExcluded());
 		map.put("updated", counts.getUpdated());
 		map.put("deleted", counts.getDeleted());
 		map.put("remaining", counts.getRemaining());

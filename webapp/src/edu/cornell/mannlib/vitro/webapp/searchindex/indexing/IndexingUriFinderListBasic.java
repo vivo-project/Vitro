@@ -9,12 +9,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.rdf.model.Statement;
 
 /**
  * The basic implementation.
  */
 public class IndexingUriFinderListBasic implements IndexingUriFinderList {
+	private static final Log log = LogFactory
+			.getLog(IndexingUriFinderListBasic.class);
+
 	private final List<IndexingUriFinder> finders;
 
 	public IndexingUriFinderListBasic(
@@ -40,7 +46,14 @@ public class IndexingUriFinderListBasic implements IndexingUriFinderList {
 	public Set<String> findAdditionalUris(Statement stmt) {
 		Set<String> uris = new HashSet<>();
 		for (IndexingUriFinder uriFinder : finders) {
-			uris.addAll(uriFinder.findAdditionalURIsToIndex(stmt));
+			List<String> additions = uriFinder.findAdditionalURIsToIndex(stmt);
+			for (String addition : additions) {
+				if (addition == null) {
+					log.warn("Finder " + uriFinder + " returned a null URI.");
+				} else {
+					uris.add(addition);
+				}
+			}
 		}
 		return uris;
 	}

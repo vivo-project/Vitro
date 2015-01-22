@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.searchengine.solr;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,6 +20,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineNotRespondingException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
@@ -72,8 +74,8 @@ public class SolrSearchEngine implements SearchEngine {
 		try {
 			server.ping();
 		} catch (SolrServerException | IOException e) {
-			throw new SearchEngineException(
-					"Solr server did not respont to ping.", e);
+			throw appropriateException("Solr server did not respond to ping.",
+					e);
 		}
 	}
 
@@ -93,8 +95,8 @@ public class SolrSearchEngine implements SearchEngine {
 		try {
 			server.add(SolrConversionUtils.convertToSolrInputDocuments(docs));
 		} catch (SolrServerException | IOException e) {
-			throw new SearchEngineException(
-					"Solr server failed to add documents " + docs, e);
+			throw appropriateException("Solr server failed to add documents "
+					+ docs, e);
 		}
 	}
 
@@ -103,8 +105,7 @@ public class SolrSearchEngine implements SearchEngine {
 		try {
 			server.commit();
 		} catch (SolrServerException | IOException e) {
-			throw new SearchEngineException("Failed to commit to Solr server.",
-					e);
+			throw appropriateException("Failed to commit to Solr server.", e);
 		}
 	}
 
@@ -113,8 +114,7 @@ public class SolrSearchEngine implements SearchEngine {
 		try {
 			server.commit(wait, wait);
 		} catch (SolrServerException | IOException e) {
-			throw new SearchEngineException("Failed to commit to Solr server.",
-					e);
+			throw appropriateException("Failed to commit to Solr server.", e);
 		}
 	}
 
@@ -128,7 +128,7 @@ public class SolrSearchEngine implements SearchEngine {
 		try {
 			server.deleteById(new ArrayList<>(ids));
 		} catch (SolrServerException | IOException e) {
-			throw new SearchEngineException(
+			throw appropriateException(
 					"Solr server failed to delete documents: " + ids, e);
 		}
 	}
@@ -138,7 +138,7 @@ public class SolrSearchEngine implements SearchEngine {
 		try {
 			server.deleteByQuery(query);
 		} catch (SolrServerException | IOException e) {
-			throw new SearchEngineException(
+			throw appropriateException(
 					"Solr server failed to delete documents: " + query, e);
 		}
 	}
@@ -162,14 +162,32 @@ public class SolrSearchEngine implements SearchEngine {
 			QueryResponse response = server.query(solrQuery);
 			return SolrConversionUtils.convertToSearchResponse(response);
 		} catch (SolrServerException e) {
-			throw new SearchEngineException(
+			throw appropriateException(
 					"Solr server failed to execute the query" + query, e);
 		}
 	}
 
 	@Override
 	public int documentCount() throws SearchEngineException {
-    	SearchResponse response = query(createQuery("*:*"));
-    	return (int) response.getResults().getNumFound();
+		SearchResponse response = query(createQuery("*:*"));
+		return (int) response.getResults().getNumFound();
 	}
+
+	/**
+	 * If there is a SocketTimeoutException in the causal chain for this
+	 * exception, then wrap it in a SearchEngineNotRespondingException instead
+	 * of a generic SearchEngineException.
+	 */
+	private SearchEngineException appropriateException(String message,
+			Exception e) {
+		Throwable cause = e;
+		while (cause != null) {
+			if (cause instanceof SocketTimeoutException) {
+				return new SearchEngineNotRespondingException(message, e);
+			}
+			cause = cause.getCause();
+		}
+		return new SearchEngineException(message, e);
+	}
+
 }
