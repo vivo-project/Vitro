@@ -208,12 +208,18 @@ public class RequestModelAccessImpl implements RequestModelAccess {
 	private OntModel getOntModel(OntModelKey key) {
 		if (!ontModelMap.containsKey(key)) {
 			OntModel ontModel = createOntModel(key);
-			log.debug("Creating:   " + key + ", request=" + req.hashCode()
-					+ ", " + ontModel);
+			if ( log.isDebugEnabled() ) {
+				String ontModelStr = ToString.ontModelToString(ontModel);
+				log.debug("Creating:   " + key + ", request=" + req.hashCode()
+						+ ", " + ontModelStr);
+			}
 			ontModelMap.put(key, ontModel);
 		}
 		OntModel ontModel = ontModelMap.get(key);
-		log.debug("getOntModel, " + key + ": " + ontModel);
+		if ( log.isDebugEnabled() ) {
+			String ontModelStr = ToString.ontModelToString(ontModel);
+			log.debug("getOntModel, " + key + ": " + ontModelStr);
+		}
 		return ontModel;
 	}
 
