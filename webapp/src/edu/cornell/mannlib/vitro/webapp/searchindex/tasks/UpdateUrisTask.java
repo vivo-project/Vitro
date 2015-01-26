@@ -3,8 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.searchindex.tasks;
 
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.PROGRESS;
-import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.START_PROCESSING_URIS;
-import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.STOP_PROCESSING_URIS;
+import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.START_URIS;
+import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.STOP_URIS;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.State.PROCESSING_URIS;
 
 import java.util.Collection;
@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineNotRespondingException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus;
@@ -43,6 +44,9 @@ import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExclud
  * 
  * Deletions are done synchronously, but updates are scheduled to run on the
  * thread pool.
+ * 
+ * Commit requests are issued to the SearchEngine at each progress event and
+ * again at the end of the task.
  */
 public class UpdateUrisTask implements Task {
 	private static final Log log = LogFactory.getLog(UpdateUrisTask.class);
@@ -67,7 +71,7 @@ public class UpdateUrisTask implements Task {
 		this.listeners = listeners;
 		this.pool = pool;
 
-		this.status = new Status(uris.size(), 500, listeners);
+		this.status = new Status(this, uris.size(), 500);
 
 		this.searchEngine = ApplicationUtils.instance().getSearchEngine();
 
@@ -75,7 +79,7 @@ public class UpdateUrisTask implements Task {
 
 	@Override
 	public void run() {
-		listeners.fireEvent(new Event(START_PROCESSING_URIS, status
+		listeners.fireEvent(new Event(START_URIS, status
 				.getSearchIndexerStatus()));
 		excluders.startIndexing();
 		modifiers.startIndexing();
@@ -99,9 +103,11 @@ public class UpdateUrisTask implements Task {
 		}
 		pool.waitUntilIdle();
 
+		commitChanges();
+
 		excluders.stopIndexing();
 		modifiers.stopIndexing();
-		listeners.fireEvent(new Event(STOP_PROCESSING_URIS, status
+		listeners.fireEvent(new Event(STOP_URIS, status
 				.getSearchIndexerStatus()));
 	}
 
@@ -160,6 +166,21 @@ public class UpdateUrisTask implements Task {
 		log.debug("scheduled update to " + ind);
 	}
 
+	private void fireEvent(Event event) {
+		listeners.fireEvent(event);
+		if (event.getType() == PROGRESS || event.getType() == STOP_URIS) {
+			commitChanges();
+		}
+	}
+
+	private void commitChanges() {
+		try {
+			searchEngine.commit();
+		} catch (SearchEngineException e) {
+			log.warn("Failed to commit changes.", e);
+		}
+	}
+
 	@Override
 	public void notifyWorkUnitCompletion(Runnable workUnit) {
 		log.debug("completed update to "
@@ -181,18 +202,18 @@ public class UpdateUrisTask implements Task {
 	 * synchronized.
 	 */
 	private static class Status {
+		private final UpdateUrisTask parent;
 		private final int total;
 		private final int progressInterval;
-		private final ListenerList listeners;
 		private int updated = 0;
 		private int deleted = 0;
 		private int excluded = 0;
 		private Date since = new Date();
 
-		public Status(int total, int progressInterval, ListenerList listeners) {
+		public Status(UpdateUrisTask parent, int total, int progressInterval) {
+			this.parent = parent;
 			this.total = total;
 			this.progressInterval = progressInterval;
-			this.listeners = listeners;
 		}
 
 		public synchronized void incrementUpdates() {
@@ -213,8 +234,7 @@ public class UpdateUrisTask implements Task {
 
 		private void maybeFireProgressEvent() {
 			if (updated > 0 && updated % progressInterval == 0) {
-				listeners.fireEvent(new Event(PROGRESS,
-						getSearchIndexerStatus()));
+				parent.fireEvent(new Event(PROGRESS, getSearchIndexerStatus()));
 			}
 		}
 
@@ -241,7 +261,7 @@ public class UpdateUrisTask implements Task {
 
 		@Override
 		public String toString() {
-			return "ExcludeIfNoVClasses";
+			return "Internal: ExcludeIfNoVClasses";
 		}
 
 	}

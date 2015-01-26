@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding;
 
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONTENT;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.ALLTEXT;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.ALLTEXTUNSTEMMED;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -33,7 +34,8 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
  * If the individual qualifies, execute the SPARQL queries and add the results
  * to the specified search fields.
  * 
- * If there are no specified search fields, ALLTEXT is assumed.
+ * If there are no specified search fields, ALLTEXT and ALLTEXTUNSTEMMED are
+ * assumed.
  * 
  * An individual qualifies if it satisfies any of the type restrictions, or if
  * there are no type restrictions.
@@ -63,7 +65,7 @@ public class SimpleSparqlQueryDocumentModifier implements DocumentModifier,
 
 	/**
 	 * The names of the fields where the results of the queries will be stored.
-	 * If empty, it is assumed to be ALLTEXT.
+	 * If empty, it is assumed to be ALLTEXT and ALLTEXTUNSTEMMED.
 	 */
 	private List<String> fieldNames = new ArrayList<>();
 
@@ -105,6 +107,7 @@ public class SimpleSparqlQueryDocumentModifier implements DocumentModifier,
 		}
 		if (fieldNames.isEmpty()) {
 			fieldNames.add(ALLTEXT);
+			fieldNames.add(ALLTEXTUNSTEMMED);
 		}
 		if (queries.isEmpty()) {
 			throw new IllegalStateException(

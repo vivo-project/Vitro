@@ -2,9 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchindex;
 
-import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.PROGRESS;
-import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.STOP_PROCESSING_URIS;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -14,12 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
-import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineNotRespondingException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
-import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
-import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type;
-import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Listener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.search.controller.IndexController;
@@ -48,7 +40,6 @@ public class SearchIndexerSetup implements ServletContextListener {
 	private IndexingChangeListener listener;
 	private DeveloperDisabledChangeListener listenerWrapper;
 	private IndexHistory history;
-	private Committer committer;
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -73,9 +64,6 @@ public class SearchIndexerSetup implements ServletContextListener {
 			searchIndexer.addListener(this.history);
 			IndexController.setHistory(this.history);
 
-			this.committer = new Committer();
-			searchIndexer.addListener(this.committer);
-
 			searchIndexer
 					.startup(app, new ComponentStartupStatusImpl(this, ss));
 			searchIndexer.unpause();
@@ -90,7 +78,6 @@ public class SearchIndexerSetup implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent sce) {
 		searchIndexer.shutdown(app);
 
-		searchIndexer.removeListener(this.committer);
 		searchIndexer.removeListener(this.history);
 
 		try {
@@ -102,31 +89,4 @@ public class SearchIndexerSetup implements ServletContextListener {
 		listener.shutdown();
 	}
 
-	// ----------------------------------------------------------------------
-	// Helper classes
-	// ----------------------------------------------------------------------
-
-	private static class Committer implements Listener {
-		private final SearchEngine searchEngine = ApplicationUtils.instance()
-				.getSearchEngine();
-
-		@Override
-		public void receiveSearchIndexerEvent(Event event) {
-			Type type = event.getType();
-			if (type == PROGRESS || type == STOP_PROCESSING_URIS) {
-				commitChanges();
-			}
-		}
-
-		private void commitChanges() {
-			try {
-				searchEngine.commit();
-			} catch (SearchEngineNotRespondingException e) {
-				log.error("Failed to commit the changes: "
-						+ "the search engine is not responding.");
-			} catch (Exception e) {
-				log.error("Failed to commit the changes.", e);
-			}
-		}
-	}
 }

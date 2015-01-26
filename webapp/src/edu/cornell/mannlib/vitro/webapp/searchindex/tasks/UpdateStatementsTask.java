@@ -3,8 +3,8 @@
 package edu.cornell.mannlib.vitro.webapp.searchindex.tasks;
 
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.PROGRESS;
-import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.START_PROCESSING_STATEMENTS;
-import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.STOP_PROCESSING_STATEMENTS;
+import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.START_STATEMENTS;
+import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.STOP_STATEMENTS;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.State.PROCESSING_STMTS;
 
 import java.util.ArrayList;
@@ -82,14 +82,12 @@ public class UpdateStatementsTask implements Task {
 
 	@Override
 	public void run() {
-		listeners
-				.fireEvent(new Event(START_PROCESSING_STATEMENTS, getStatus()));
+		listeners.fireEvent(new Event(START_STATEMENTS, getStatus()));
 
 		findAffectedUris();
-		listeners.fireEvent(new Event(PROGRESS, getStatus()));
 
 		updateTheUris();
-		listeners.fireEvent(new Event(STOP_PROCESSING_STATEMENTS, getStatus()));
+		listeners.fireEvent(new Event(STOP_STATEMENTS, getStatus()));
 	}
 
 	private void findAffectedUris() {

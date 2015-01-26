@@ -145,7 +145,7 @@ public class UpdateDocumentWorkUnit implements Runnable {
 
 		@Override
 		public String toString() {
-			return "REQUIRED: IdUriLabel";
+			return "Internal: IdUriLabel";
 		}
 	}
 
@@ -184,7 +184,7 @@ public class UpdateDocumentWorkUnit implements Runnable {
 
 		@Override
 		public String toString() {
-			return "REQUIRED: AddClasses";
+			return "Internal: AddClasses";
 		}
 	}
 
@@ -203,7 +203,7 @@ public class UpdateDocumentWorkUnit implements Runnable {
 
 		@Override
 		public String toString() {
-			return "REQUIRED: AddMostSpecificTypes";
+			return "Internal: AddMostSpecificTypes";
 		}
 	}
 
@@ -212,21 +212,18 @@ public class UpdateDocumentWorkUnit implements Runnable {
 		public void modifyDocument(Individual ind, SearchInputDocument doc) {
 			List<ObjectPropertyStatement> stmts = ind
 					.getObjectPropertyStatements();
-			if (stmts == null) {
-				return;
-			}
-
-			for (ObjectPropertyStatement stmt : stmts) {
-				if (URI_DIFFERENT_FROM.equals(stmt.getPropertyURI())) {
-					continue;
+			if (stmts != null) {
+				for (ObjectPropertyStatement stmt : stmts) {
+					if (!URI_DIFFERENT_FROM.equals(stmt.getPropertyURI())) {
+						addToAlltext(doc, stmt.getObject().getRdfsLabel());
+					}
 				}
-				addToAlltext(doc, stmt.getObject().getRdfsLabel());
 			}
 		}
 
 		@Override
 		public String toString() {
-			return "REQUIRED: AddObjectPropertyText";
+			return "Internal: AddObjectPropertyText";
 		}
 	}
 
@@ -234,21 +231,18 @@ public class UpdateDocumentWorkUnit implements Runnable {
 		@Override
 		public void modifyDocument(Individual ind, SearchInputDocument doc) {
 			List<DataPropertyStatement> stmts = ind.getDataPropertyStatements();
-			if (stmts == null) {
-				return;
-			}
-
-			for (DataPropertyStatement stmt : stmts) {
-				if (stmt.getDatapropURI().equals(URI_RDFS_LABEL)) {
-					continue;
+			if (stmts != null) {
+				for (DataPropertyStatement stmt : stmts) {
+					if (!stmt.getDatapropURI().equals(URI_RDFS_LABEL)) {
+						addToAlltext(doc, stmt.getData());
+					}
 				}
-				addToAlltext(doc, stmt.getData());
 			}
 		}
 
 		@Override
 		public String toString() {
-			return "REQUIRED: AddDataPropertyText";
+			return "Internal: AddDataPropertyText";
 		}
 	}
 
@@ -263,7 +257,7 @@ public class UpdateDocumentWorkUnit implements Runnable {
 
 		@Override
 		public String toString() {
-			return "REQUIRED: AddEntityBoost";
+			return "Internal: AddEntityBoost";
 		}
 	}
 

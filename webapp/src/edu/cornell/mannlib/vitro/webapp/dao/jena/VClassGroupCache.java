@@ -210,7 +210,7 @@ public class VClassGroupCache implements SearchIndexer.Listener {
     @Override
 	public void receiveSearchIndexerEvent(Event event) {
     	switch (event.getType()) {
-    	case STOP_PROCESSING_URIS:
+    	case STOP_URIS:
             log.debug("rebuilding because of IndexBuilder " + event.getType());
             requestCacheUpdate();
             break;            
