@@ -14,7 +14,9 @@ import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.RDFTY
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.URI;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -161,6 +163,7 @@ public class UpdateDocumentWorkUnit implements Runnable {
 				return;
 			}
 
+			Set<String> classGroupUris = new HashSet<>();
 			for (VClass clz : vclasses) {
 				String classUri = clz.getURI();
 				if (classUri == null || URI_OWL_THING.equals(classUri)) {
@@ -170,7 +173,7 @@ public class UpdateDocumentWorkUnit implements Runnable {
 
 				String classGroupUri = clz.getGroupURI();
 				if (classGroupUri != null) {
-					doc.addField(CLASSGROUP_URI, classGroupUri);
+					classGroupUris.add(classGroupUri);
 				}
 
 				addToAlltext(doc, clz.getName());
@@ -179,6 +182,9 @@ public class UpdateDocumentWorkUnit implements Runnable {
 				if (boost != null) {
 					doc.setDocumentBoost(doc.getDocumentBoost() + boost);
 				}
+			}
+			if (!classGroupUris.isEmpty()) {
+				doc.addField(CLASSGROUP_URI, classGroupUris);
 			}
 		}
 
