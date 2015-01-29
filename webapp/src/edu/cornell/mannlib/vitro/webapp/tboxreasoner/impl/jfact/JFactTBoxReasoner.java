@@ -17,6 +17,7 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
+import org.semarglproject.vocab.OWL;
 
 import uk.ac.manchester.cs.jfact.JFactFactory;
 
@@ -27,7 +28,12 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.ontology.Restriction;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerStatementPattern;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxChanges;
@@ -76,7 +82,46 @@ public class JFactTBoxReasoner implements
 				+ ", removing " + changes.getRemovedStatements().size());
 		filteredAssertionsModel.add(changes.getAddedStatements());
 		filteredAssertionsModel.remove(changes.getRemovedStatements());
+		clearEmptyAxiomStatements();
 	}
+	
+	/*Adding this method in case axiom statements are read into the model where the statements
+	are not fully qualified.
+	N3 of the following format [ rdf:type owl:Axiom ;
+ 	owl:annotatedSource obo:BFO_0000056 ;
+  	owl:annotatedTarget obo:BFO_0000057 ;
+  	obo:IAO_0010000 obo:BFO_0010006 ;
+  	owl:annotatedProperty owl:inverseOf
+	] . results in the model containing empty axiom statements = [ rdf:type owl:Axiom .]
+	which causes the OWLManager to return an error.
+	*/
+	
+	private void clearEmptyAxiomStatements() {
+		//Check and see if the model has any empty axiom statements and if so, remove them
+		StmtIterator axiomStatements = filteredAssertionsModel.listStatements(null, RDF.type, ResourceFactory.createResource(OWL.AXIOM));
+		List<Statement> removeStatements = new ArrayList<Statement>();
+		while(axiomStatements.hasNext()) {
+			Statement axiomStatement = axiomStatements.nextStatement();
+			
+			List<Statement> axiomSubjectStatements = filteredAssertionsModel.listStatements(
+					axiomStatement.getSubject(), null, (RDFNode) null).toList();
+			//if no statements associated with axiom, then add for removal
+			//TODO: Check to make sure the axiom statement is actually CORRECTLY formed as per the OWL api requirements
+			if(axiomSubjectStatements.size() == 1) {
+				removeStatements.add(axiomStatement);
+			}
+		}
+		
+		if(removeStatements.size() > 0) {
+			log.warn("The following statements are empty axiom statements and have been removed" + removeStatements.toString());
+			//Remove the statements from the filtered model
+			filteredAssertionsModel.remove(removeStatements);
+		} else {
+			log.debug("No empty axiom statements were found");
+		}
+		
+	}
+	
 
 	@Override
 	public Status performReasoning() {
