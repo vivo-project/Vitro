@@ -7,7 +7,7 @@
 
 <h2>${i18n().search_index_status}</h2>
 
-<div id="searchIndexerError" />
+<div id="searchIndexerError" /></div>
 
 <div id="searchIndexerStatus">
 	Search Indexer Status
