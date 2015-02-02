@@ -339,7 +339,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 "    ?publicDescription ?stubDeletion \n" + 
                 " WHERE { \n" +
                 "    ?context config:configContextFor <" + propertyURI + "> . \n";
-        if (domainURI != null) {
+        if (domainURI != null && !domainURI.equals(OWL.Thing.getURI())) {
                 propQuery += "    ?context config:qualifiedByDomain <" + domainURI + "> . \n";
         } else {
                 propQuery += "   FILTER NOT EXISTS { ?context config:qualifiedByDomain ?domainURI } \n";
