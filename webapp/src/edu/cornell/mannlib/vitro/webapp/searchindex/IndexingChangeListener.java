@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.searchindex;
 
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.PAUSE;
+import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.START_REBUILD;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.UNPAUSE;
 
 import java.io.ByteArrayInputStream;
@@ -24,6 +25,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
@@ -34,6 +36,9 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
  * 
  * When the SearchIndexer pauses, stop sending changes until the SearchIndexer
  * unpauses.
+ * 
+ * If the SearchIndexer begins a rebuild, discard any changes that we had
+ * accumulated. They will be accomplished by the rebuild.
  */
 public class IndexingChangeListener implements ChangeListener,
 		SearchIndexer.Listener {
@@ -51,7 +56,7 @@ public class IndexingChangeListener implements ChangeListener,
 		this.searchIndexer = searchIndexer;
 		this.ticker = new Ticker();
 		this.changes = new ArrayList<>();
-		
+
 		searchIndexer.addListener(this);
 	}
 
@@ -68,7 +73,9 @@ public class IndexingChangeListener implements ChangeListener,
 			paused = true;
 		} else if (event.getType() == UNPAUSE) {
 			paused = false;
-			respondToTicker();
+			ticker.start();
+		} else if (event.getType() == START_REBUILD) {
+			discardChanges();
 		}
 	}
 
@@ -77,6 +84,10 @@ public class IndexingChangeListener implements ChangeListener,
 			searchIndexer.scheduleUpdatesForStatements(changes);
 			changes.clear();
 		}
+	}
+	
+	private synchronized void discardChanges() {
+		changes.clear();
 	}
 
 	public void shutdown() {
