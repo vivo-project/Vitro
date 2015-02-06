@@ -5,34 +5,32 @@ package edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONTENT;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.ALLTEXT;
 import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.ALLTEXTUNSTEMMED;
+import static edu.cornell.mannlib.vitro.webapp.utils.sparql.SelectQueryRunner.createQueryContext;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ContextModelsUser;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.SelectQueryHolder;
 
 /**
- * If the individual qualifies, execute the SPARQL queries and add the results
- * to the specified search fields.
+ * Modify the document, adding the results of one or more select queries.
+ * 
+ * If the individual qualifies, execute the queries and add the results to the
+ * specified search fields.
  * 
  * If there are no specified search fields, ALLTEXT and ALLTEXTUNSTEMMED are
  * assumed.
@@ -44,16 +42,15 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
  * of the individual.
  * 
  * All of the result fields of all result rows of all of the queries will be
- * concatenated into a single result, separated by spaces. That result will be
- * added to each of the specified search fields.
+ * converted to strings and added to each of the specified search fields.
  * 
  * A label may be supplied to the instance, for use in logging. If no label is
  * supplied, one will be generated.
  */
-public class SimpleSparqlQueryDocumentModifier implements DocumentModifier,
+public class SelectQueryDocumentModifier implements DocumentModifier,
 		ContextModelsUser {
 	private static final Log log = LogFactory
-			.getLog(SimpleSparqlQueryDocumentModifier.class);
+			.getLog(SelectQueryDocumentModifier.class);
 
 	private RDFService rdfService;
 
@@ -85,7 +82,7 @@ public class SimpleSparqlQueryDocumentModifier implements DocumentModifier,
 		label = l;
 	}
 
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasSparqlQuery")
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasSelectQuery")
 	public void addQuery(String query) {
 		queries.add(query);
 	}
@@ -122,14 +119,12 @@ public class SimpleSparqlQueryDocumentModifier implements DocumentModifier,
 
 	@Override
 	public void modifyDocument(Individual ind, SearchInputDocument doc) {
-		if (!passesTypeRestrictions(ind)) {
-			return;
-		}
+		if (passesTypeRestrictions(ind)) {
+			List<String> values = getTextForQueries(ind);
 
-		String text = getTextForQueries(ind);
-
-		for (String fieldName : fieldNames) {
-			doc.addField(fieldName, text);
+			for (String fieldName : fieldNames) {
+				doc.addField(fieldName, values);
+			}
 		}
 	}
 
@@ -146,59 +141,25 @@ public class SimpleSparqlQueryDocumentModifier implements DocumentModifier,
 		return false;
 	}
 
-	private String getTextForQueries(Individual ind) {
+	private List<String> getTextForQueries(Individual ind) {
 		List<String> list = new ArrayList<>();
 		for (String query : queries) {
-			String text = getTextForQuery(substituteUri(ind, query));
-			if (StringUtils.isNotBlank(text)) {
-				list.add(text);
-			}
+			list.addAll(getTextForQuery(query, ind));
 		}
-		return StringUtils.join(list, " ");
+		return list;
 	}
 
-	private String substituteUri(Individual ind, String query) {
-		return query.replace("?uri", "<" + ind.getURI() + "> ");
-	}
-
-	private String getTextForQuery(String query) {
-		List<String> list = new ArrayList<>();
+	private List<String> getTextForQuery(String query, Individual ind) {
 		try {
-			ResultSet results = RDFServiceUtils.sparqlSelectQuery(query,
-					rdfService);
-			while (results.hasNext()) {
-				String text = getTextForRow(results.nextSolution());
-				if (StringUtils.isNotBlank(text)) {
-					list.add(text);
-				}
-			}
+			SelectQueryHolder queryHolder = new SelectQueryHolder(query)
+					.bindToUri("uri", ind.getURI());
+			List<String> list = createQueryContext(rdfService, queryHolder)
+					.execute().getStringFields().flatten();
+			log.debug(label + " - query: '" + query + "' returns " + list);
+			return list;
 		} catch (Throwable t) {
 			log.error("problem while running query '" + query + "'", t);
-		}
-		log.debug(label + " - query: '" + query + "' returns " + list);
-		return StringUtils.join(list, " ");
-	}
-
-	private String getTextForRow(QuerySolution row) {
-		List<String> list = new ArrayList<>();
-		Iterator<String> names = row.varNames();
-		while (names.hasNext()) {
-			RDFNode node = row.get(names.next());
-			String text = getTextForNode(node);
-			if (StringUtils.isNotBlank(text)) {
-				list.add(text);
-			}
-		}
-		return StringUtils.join(list, " ");
-	}
-
-	private String getTextForNode(RDFNode node) {
-		if (node == null) {
-			return "";
-		} else if (node.isLiteral()) {
-			return node.asLiteral().getString().trim();
-		} else {
-			return node.toString().trim();
+			return Collections.emptyList();
 		}
 	}
 
