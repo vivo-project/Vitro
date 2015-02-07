@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletContext;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,6 +24,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview.InvalidConfigurationException;
 
 public class CollatedObjectPropertyTemplateModel extends
@@ -135,6 +139,9 @@ public class CollatedObjectPropertyTemplateModel extends
 		// others will be removed
 		List<Map<String, String>> filteredList = new ArrayList<Map<String, String>>();
 		Set<String> processedObjects = new HashSet<String>();
+		//Useful to keep track of objects where statement data may not match the most specific type
+		//returne for some reason, in which case useful to keep track
+		Set<String> filteredObjects = new HashSet<String>();
 		for (Map<String, String> outerMap : statementData) {
 
 			String objectUri = outerMap.get(objectVariableName);
@@ -142,18 +149,29 @@ public class CollatedObjectPropertyTemplateModel extends
 				continue;
 			}
 			processedObjects.add(objectUri);
-			List<Map<String, String>> dataForThisObject = new ArrayList<Map<String, String>>();
+			//Get most specific type for this particular
+			List<String> mostSpecificTypes = this.getSortedMostSpecificType(objectUri);
+			//If more than one most specific type, will compare against both of them
+			//and if the first one matches, the object will be placed under that
+			//otherwise subclass will be checked against the other
 			for (Map<String, String> innerMap : statementData) {
+				//Check both the object uri and that the subclass returned matches
+				//the most specific type
 				if (innerMap.get(objectVariableName) == objectUri) {
-					dataForThisObject.add(innerMap);
+					//At this point, the statement data will already have the most specific type
+					//represented
+					String subclass = innerMap.get(SUBCLASS_VARIABLE_NAME);
+					if(mostSpecificTypes.contains(subclass)) {
+						filteredList.add(innerMap);
+						filteredObjects.add(objectUri);
+					} else {
+						if(log.isDebugEnabled()) {
+							log.debug("Iterating through statement data, Subclass does not match most specific type for Object URI - " + objectUri + " - subclass:" + subclass + " - most specific types=" + mostSpecificTypes.toString());
+						}
+					}
 				}
 			}
-			// Sort the data for this object from most to least specific
-			// subclass, with nulls at end
-
-			Collections.sort(dataForThisObject, new DataComparatorBySubclass());
-
-			filteredList.add(dataForThisObject.get(0));
+		
 		}
 
 		statementData.retainAll(filteredList);
@@ -161,66 +179,34 @@ public class CollatedObjectPropertyTemplateModel extends
 		if (log.isDebugEnabled()) {
 			log.debug("Data after subclass filtering");
 			logData(statementData);
+			//check and see if filteredObjects and processedObjects not the same size
+			if(filteredObjects.size() < processedObjects.size()) {
+				log.debug("Certain objects not included in statements displayed for collated subclasses");
+				processedObjects.removeAll(filteredObjects);
+				log.debug("These object uris not represented" + processedObjects.toString());
+			}
 		}
 	}
-
-	private class DataComparatorBySubclass implements
-			Comparator<Map<String, String>> {
-
-		@Override
-		public int compare(Map<String, String> map1, Map<String, String> map2) {
-
-			String subclass1 = map1.get(SUBCLASS_VARIABLE_NAME);
-			String subclass2 = map2.get(SUBCLASS_VARIABLE_NAME);
-
-			if (subclass1 == null) {
-				if (subclass2 == null) {
-					return 0;
-				} else {
-					return 1; // nulls rank highest
-				}
-			}
-
-			if (subclass2 == null) {
-				return -1; // nulls rank highest
-			}
-
-			// if subclasses are equal, return 0
-			if (subclass1.equals(subclass2))
-				return 0;
-			String subclass1Superclasses = this
-					.getSuperclassesAsString(subclass1);
-			String subclass2Superclasses = this
-					.getSuperclassesAsString(subclass2);
-
-			int s1SuperclassesLength = subclass1Superclasses.length();
-			int s2SuperclassesLength = subclass2Superclasses.length();
-
-			if (s1SuperclassesLength == s2SuperclassesLength) {
-				// If the length is the same, then compare the strings
-				// alphabetically
-				return subclass1Superclasses.compareTo(subclass2Superclasses);
-			} else {
-				// if the length is different, the longer string is the more
-				// specific type
-				return (s1SuperclassesLength > s2SuperclassesLength ? -1 : 1);
-			}
-		}
-
-		// Given a particular class URI, generate a string representing the
-		// superclasses and types of the class
-		// The types are first sorted alphabetically and then concatenated to
-		// form the string representation
-		private String getSuperclassesAsString(String classURI) {
-			List<String> superclasses = vclassDao
-					.getAllSuperClassURIs(classURI);
-			if (superclasses == null || superclasses.size() == 0)
-				return "";
-			Collections.sort(superclasses);
-			return StringUtils.join(superclasses, " | ");
-
-		}
+	
+	//Get the most specific type
+	//An alternative would be to ensure that the default form, or any form that utilizes collation
+	//will return most specific type within the listview select/construct queries so the resulting
+	//statement data has that value
+	List<String> getMostSpecificTypesForObject(String objectURI) {
+		WebappDaoFactory wadf = ModelAccess.on(vreq).getWebappDaoFactory();
+		return wadf.getIndividualDao().getIndividualByURI(objectURI).getMostSpecificTypeURIs();
 	}
+
+	//This will return a single most specific type for an object
+	//If there are multiple most specific types, the list will be sorted alphabetically and
+	//the first one will be returned
+	List<String> getSortedMostSpecificType(String objectURI) {
+		List<String> mostSpecificTypeURIs = this.getMostSpecificTypesForObject(objectURI);
+		Collections.sort(mostSpecificTypeURIs);
+		return mostSpecificTypeURIs;
+	}
+	
+	
 
 	// Collate the statements by subclass.
 	private List<SubclassTemplateModel> collate(String subjectUri,
