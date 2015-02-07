@@ -25,7 +25,6 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
-import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 

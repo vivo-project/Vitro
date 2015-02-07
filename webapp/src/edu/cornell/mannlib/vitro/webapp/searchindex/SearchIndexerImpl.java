@@ -43,7 +43,6 @@ import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus;
-import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.State;
 import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier;
 import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifierList;
 import edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifierListBasic;
@@ -98,6 +97,10 @@ public class SearchIndexerImpl implements SearchIndexer {
 	private Set<IndexingUriFinder> uriFinders;
 	private WebappDaoFactory wadf;
 
+	// ----------------------------------------------------------------------
+	// ConfigurationBeanLoader methods.
+	// ----------------------------------------------------------------------
+
 	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#threadPoolSize")
 	public void setThreadPoolSize(String size) {
 		if (threadPoolSize == null) {
@@ -119,21 +122,39 @@ public class SearchIndexerImpl implements SearchIndexer {
 		}
 	}
 
+	// ----------------------------------------------------------------------
+	// State management.
+	// ----------------------------------------------------------------------
+
 	@Override
 	public void startup(Application application, ComponentStartupStatus ss) {
+		if (isStarted()) {
+			throw new IllegalStateException("startup() called more than once.");
+		}
+		if (isShutdown()) {
+			throw new IllegalStateException(
+					"startup() called after shutdown().");
+		}
 		try {
 			this.ctx = application.getServletContext();
-
+			this.wadf = getFilteredWebappDaoFactory();
 			loadConfiguration();
 
-			this.wadf = getFilteredWebappDaoFactory();
+			fireEvent(STARTUP);
+			scheduler.start();
 
-			listeners.fireEvent(new Event(STARTUP, getStatus()));
 			ss.info("Configured SearchIndexer: excluders=" + excluders
 					+ ", modifiers=" + modifiers + ", uriFinders=" + uriFinders);
 		} catch (Exception e) {
 			ss.fatal("Failed to configure the SearchIndexer", e);
 		}
+	}
+
+	/** With a filtered factory, only public data goes into the search index. */
+	private WebappDaoFactory getFilteredWebappDaoFactory() {
+		WebappDaoFactory rawWadf = ModelAccess.on(ctx).getWebappDaoFactory();
+		VitroFilters vf = VitroFilterUtils.getPublicFilter(ctx);
+		return new WebappDaoFactoryFiltering(rawWadf, vf);
 	}
 
 	private void loadConfiguration() throws ConfigurationBeanLoaderException {
@@ -151,24 +172,77 @@ public class SearchIndexerImpl implements SearchIndexer {
 		modifiers.addAll(beanLoader.loadAll(DocumentModifier.class));
 	}
 
-	/**
-	 * Use a filtered DAO factory, so only public data goes into the search
-	 * index.
-	 */
-	private WebappDaoFactory getFilteredWebappDaoFactory() {
-		WebappDaoFactory rawWadf = ModelAccess.on(ctx).getWebappDaoFactory();
-		VitroFilters vf = VitroFilterUtils.getPublicFilter(ctx);
-		return new WebappDaoFactoryFiltering(rawWadf, vf);
-	}
-
 	@Override
-	public void scheduleUpdatesForStatements(List<Statement> changes) {
-		if (changes == null || changes.isEmpty()) {
+	public synchronized void shutdown(Application application) {
+		if (isShutdown()) {
 			return;
 		}
 
-		if (taskQueue.isShutdown()) {
-			throw new IllegalStateException("SearchIndexer is shut down.");
+		fireEvent(SHUTDOWN_REQUESTED);
+
+		taskQueue.shutdown();
+		pool.shutdown();
+
+		for (DocumentModifier dm : modifiers) {
+			try {
+				dm.shutdown();
+			} catch (Exception e) {
+				log.warn("Failed to shut down document modifier " + dm, e);
+			}
+		}
+
+		fireEvent(SHUTDOWN_COMPLETE);
+	}
+
+	@Override
+	public void pause() {
+		if (!isPaused() && !isShutdown()) {
+			scheduler.pause();
+			fireEvent(PAUSE);
+		}
+	}
+
+	@Override
+	public void unpause() {
+		if (isPaused() && !isShutdown()) {
+			scheduler.unpause();
+			fireEvent(UNPAUSE);
+		}
+	}
+
+	private boolean isStarted() {
+		return scheduler.isStarted();
+	}
+
+	private boolean isPaused() {
+		return scheduler.isPaused();
+	}
+
+	private boolean isShutdown() {
+		return taskQueue.isShutdown();
+	}
+
+	@Override
+	public SearchIndexerStatus getStatus() {
+		return taskQueue.getStatus();
+	}
+
+	private void fireEvent(Type type) {
+		listeners.fireEvent(new Event(type, getStatus()));
+	}
+
+	// ----------------------------------------------------------------------
+	// Tasks
+	// ----------------------------------------------------------------------
+
+	@Override
+	public void scheduleUpdatesForStatements(List<Statement> changes) {
+		if (isShutdown()) {
+			log.warn("Call to scheduleUpdatesForStatements after shutdown.");
+			return;
+		}
+		if (changes == null || changes.isEmpty()) {
+			return;
 		}
 
 		Task task = new UpdateStatementsTask(changes, createFindersList(),
@@ -180,12 +254,12 @@ public class SearchIndexerImpl implements SearchIndexer {
 
 	@Override
 	public void scheduleUpdatesForUris(Collection<String> uris) {
-		if (uris == null || uris.isEmpty()) {
+		if (isShutdown()) {
+			log.warn("Call to scheduleUpdatesForUris after shutdown.");
 			return;
 		}
-
-		if (taskQueue.isShutdown()) {
-			throw new IllegalStateException("SearchIndexer is shut down.");
+		if (uris == null || uris.isEmpty()) {
+			return;
 		}
 
 		Task task = new UpdateUrisTask(uris, createExcludersList(),
@@ -196,8 +270,8 @@ public class SearchIndexerImpl implements SearchIndexer {
 
 	@Override
 	public void rebuildIndex() {
-		if (taskQueue.isShutdown()) {
-			throw new IllegalStateException("SearchIndexer is shut down.");
+		if (isShutdown()) {
+			log.warn("Call to rebuildIndex after shutdown.");
 		}
 
 		Task task = new RebuildIndexTask(createExcludersList(),
@@ -235,53 +309,26 @@ public class SearchIndexerImpl implements SearchIndexer {
 				SEARCH_INDEX_LOG_INDEXING_BREAKDOWN_TIMINGS);
 	}
 
-	@Override
-	public void pause() {
-		scheduler.pause();
-		listeners.fireEvent(new Event(PAUSE, getStatus()));
-	}
-
-	@Override
-	public void unpause() {
-		scheduler.unpause();
-		listeners.fireEvent(new Event(UNPAUSE, getStatus()));
-	}
+	// ----------------------------------------------------------------------
+	// Listeners
+	// ----------------------------------------------------------------------
 
 	@Override
 	public void addListener(Listener listener) {
-		listeners.add(listener);
+		if (isShutdown()) {
+			return;
+		}
+		synchronized (listeners) {
+			listeners.add(listener);
+			if (isPaused()) {
+				listener.receiveSearchIndexerEvent(new Event(PAUSE, getStatus()));
+			}
+		}
 	}
 
 	@Override
 	public void removeListener(Listener listener) {
 		listeners.remove(listener);
-	}
-
-	@Override
-	public SearchIndexerStatus getStatus() {
-		return taskQueue.getStatus();
-	}
-
-	@Override
-	public synchronized void shutdown(Application application) {
-		SearchIndexerStatus status = taskQueue.getStatus();
-		if (status.getState() != State.SHUTDOWN) {
-			listeners.fireEvent(new Event(SHUTDOWN_REQUESTED, status));
-
-			taskQueue.shutdown();
-			pool.shutdown();
-
-			for (DocumentModifier dm : modifiers) {
-				try {
-					dm.shutdown();
-				} catch (Exception e) {
-					log.warn("Failed to shut down document modifier " + dm, e);
-				}
-			}
-
-			listeners.fireEvent(new Event(SHUTDOWN_COMPLETE, taskQueue
-					.getStatus()));
-		}
 	}
 
 	// ----------------------------------------------------------------------
@@ -326,6 +373,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 	private static class Scheduler {
 		private final TaskQueue taskQueue;
 		private final List<Task> deferredQueue;
+		private volatile boolean started;
 		private volatile boolean paused = true;
 
 		public Scheduler(TaskQueue taskQueue) {
@@ -333,13 +381,28 @@ public class SearchIndexerImpl implements SearchIndexer {
 			this.deferredQueue = new ArrayList<Task>();
 		}
 
+		public boolean isStarted() {
+			return started;
+		}
+
+		public boolean isPaused() {
+			return paused;
+		}
+
 		public synchronized void scheduleTask(Task task) {
-			if (paused) {
+			if (paused || !started) {
 				deferredQueue.add(task);
 				log.debug("added task to deferred queue: " + task);
 			} else {
 				taskQueue.scheduleTask(task);
 				log.debug("added task to task queue: " + task);
+			}
+		}
+
+		public synchronized void start() {
+			started = true;
+			if (!paused) {
+				processDeferredTasks();
 			}
 		}
 
@@ -349,12 +412,19 @@ public class SearchIndexerImpl implements SearchIndexer {
 
 		public synchronized void unpause() {
 			paused = false;
+			if (started) {
+				processDeferredTasks();
+			}
+		}
+
+		private void processDeferredTasks() {
 			for (Task task : deferredQueue) {
 				taskQueue.scheduleTask(task);
 				log.debug("moved task from deferred queue to task queue: "
 						+ task);
 			}
 		}
+
 	}
 
 	/**

@@ -8,17 +8,62 @@ import java.util.List;
 import com.hp.hpl.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
+import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 
 /**
  * Interface for the code that controls the contents of the search index.
  * 
- * If calls are made to schedule tasks prior to startup(), they will be queued,
- * since the indexer is created in paused mode.
+ * The search indexer is started rather late in the startup sequence, since it
+ * requires the search engine, the triple stores and the filters.
+ * 
+ * If calls are made to schedule tasks prior to startup(), they will be queued.
+ * Calls to pause or unpause set the state as expected, but tasks will not be
+ * run until the indexer is both started and unpaused.
  * 
  * The only calls that are valid after shutdown are shutdown(), getStatus() and
- * removeListener().
+ * removeListener(). Calls to other methods produce a warning, but have no other
+ * effect.
  */
 public interface SearchIndexer extends Application.Module {
+
+	/**
+	 * Start processing. If unpaused, schedule any queued tasks.
+	 * 
+	 * @throws IllegalStateException
+	 *             if called after shutdown, or if called more than once.
+	 */
+	@Override
+	void startup(Application app, ComponentStartupStatus ss);
+
+	/**
+	 * Stop processing new tasks. Requests will be queued until a call to
+	 * unpause(). Fires a PAUSED event to listeners.
+	 * 
+	 * This call has no effect if already paused, or if called after shutdown.
+	 */
+	void pause();
+
+	/**
+	 * Resume processing new tasks. Any requests that were received since the
+	 * call to pause() will now be scheduled for processing. Fires an UNPAUSED
+	 * event to listeners.
+	 * 
+	 * If startup has not been called, the unpaused state will be recorded, but
+	 * tasks will still await the call to startup.
+	 * 
+	 * This call has no effect if not paused, or if called after shutdown.
+	 */
+	void unpause();
+
+	/**
+	 * Stop processing and release resources. This call should block until the
+	 * dependent threads are stopped.
+	 * 
+	 * Repeated calls have no effect.
+	 */
+	@Override
+	void shutdown(Application app);
+
 	/**
 	 * Update any search documents that are affected by these statements.
 	 * 
@@ -29,12 +74,11 @@ public interface SearchIndexer extends Application.Module {
 	 * We accumulate a batch of affected URIs, removing duplicates if they
 	 * occur, and then submit them for updates.
 	 * 
-	 * If called before startup or while paused, this task will be queued.
+	 * If called before startup or while paused, the task will be queued. If
+	 * called after shutdown, this has no effect.
 	 * 
 	 * @param urls
 	 *            if null or empty, this call has no effect.
-	 * @throws IllegalStateException
-	 *             if called after shutdown()
 	 */
 	void scheduleUpdatesForStatements(List<Statement> changes);
 
@@ -48,12 +92,11 @@ public interface SearchIndexer extends Application.Module {
 	 * A URI belongs in the index if it refers to an existing individual in the
 	 * model, and is not excluded.
 	 * 
-	 * If called before startup or while paused, this task will be queued.
+	 * If called before startup or while paused, the task will be queued. If
+	 * called after shutdown, this has no effect.
 	 * 
 	 * @param uris
 	 *            if null or empty, this call has no effect.
-	 * @throws IllegalStateException
-	 *             if called after shutdown()
 	 */
 	void scheduleUpdatesForUris(Collection<String> uris);
 
@@ -64,38 +107,10 @@ public interface SearchIndexer extends Application.Module {
 	 * If a rebuild is already pending or in progress, this method has no
 	 * effect.
 	 * 
-	 * If called before startup or while paused, this task will be queued.
-	 * 
-	 * @throws IllegalStateException
-	 *             if called after shutdown()
+	 * If called before startup or while paused, the task will be queued. If
+	 * called after shutdown, this has no effect.
 	 */
 	void rebuildIndex();
-
-	/**
-	 * Stop processing new tasks. Requests will be queued until a call to
-	 * unpause(). Fires a PAUSED event to listeners.
-	 * 
-	 * The SearchIndexer is paused when created. When fully initialized, it
-	 * should be unpaused.
-	 * 
-	 * If already paused, this call has no effect.
-	 * 
-	 * @throws IllegalStateException
-	 *             if called after shutdown()
-	 */
-	void pause();
-
-	/**
-	 * Resume processing new tasks. Any requests that were received since the
-	 * call to pause() will now be scheduled for processing. Fires an UNPAUSED
-	 * event to listeners.
-	 * 
-	 * The SearchIndexer is paused when created. When fully initialized, it
-	 * should be unpaused.
-	 * 
-	 * Has no effect if called after shutdown() or if not paused.
-	 */
-	void unpause();
 
 	/**
 	 * What is the current status of the indexer?
@@ -105,35 +120,31 @@ public interface SearchIndexer extends Application.Module {
 	SearchIndexerStatus getStatus();
 
 	/**
-	 * Add this listener, allowing it to receive events from the indexer. If
-	 * this listener has already been added, this method has no effect.
+	 * Add this listener, allowing it to receive events from the indexer.
+	 * 
+	 * The listener can safely assume that the SearchIndexer is not paused. If
+	 * the SearchIndexer is indeed paused when the listener is added, then a
+	 * PAUSE event will immediately be passed to the listener.
+	 * 
+	 * If this listener has already been added, or if called after shutdown,
+	 * this method has no effect.
 	 * 
 	 * @param listener
 	 *            if null, this method has no effect.
-	 * @throws IllegalStateException
-	 *             if called after shutdown()
 	 */
 	void addListener(Listener listener);
 
 	/**
 	 * Remove this listener, meaning that it will no longer receive events from
-	 * the indexer. If this listener is not active, this method has no effect.
+	 * the indexer.
 	 * 
-	 * Has no effect if called after shutdown().
+	 * If this listener is not active, or if called after shutdown, this method
+	 * has no effect.
 	 * 
 	 * @param listener
 	 *            if null, this method has no effect.
 	 */
 	void removeListener(Listener listener);
-
-	/**
-	 * Stop processing and release resources. This call should block until the
-	 * dependent threads are stopped.
-	 * 
-	 * Repeated calls have no effect.
-	 */
-	@Override
-	void shutdown(Application app);
 
 	/**
 	 * A listener that will be notified of events from the SearchIndexer.
