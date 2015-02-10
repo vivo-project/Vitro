@@ -16,6 +16,7 @@ public class Release18Migrator implements ServletContextListener {
 		ServletContext ctx = sce.getServletContext();
 
 		new FauxPropertiesUpdater(ctx, this).migrate();
+		new RemoveObsoleteMetadataGraphs(ctx, this).migrate();
 	}
 
 	@Override
