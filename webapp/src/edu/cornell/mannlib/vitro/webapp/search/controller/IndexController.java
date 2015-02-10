@@ -172,6 +172,7 @@ public class IndexController extends FreemarkerHttpServlet {
 
 	private void requestRebuild() {
 		indexer.rebuildIndex();
+		indexer.unpause();
 	}
 
 	private Map<String, Object> buildStatusMap(SearchIndexerStatus status) {
