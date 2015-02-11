@@ -47,17 +47,17 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 public class ABoxRecomputer {
 
     private static final Log log = LogFactory.getLog(ABoxRecomputer.class);
-    
+
     private final SearchIndexer searchIndexer;
 
     private OntModel tboxModel;             // asserted and inferred TBox axioms
     private OntModel aboxModel;
+    private Model inferenceModel;
     private RDFService rdfService;
     private SimpleReasoner simpleReasoner;
     private Object lock1 = new Object();
     private volatile boolean recomputing = false;
     private boolean stopRequested = false;
-    private boolean handleSameAs = false;
 
     private final int BATCH_SIZE = 100;
     private final int REPORTING_INTERVAL = 1000;
@@ -75,11 +75,12 @@ public class ABoxRecomputer {
         this.tboxModel = tboxModel;
         this.aboxModel = aboxModel;
         this.rdfService = rdfService;
+        this.inferenceModel = RDFServiceGraph.createRDFServiceModel(
+                new RDFServiceGraph(rdfService, ModelNames.ABOX_INFERENCES));
         this.simpleReasoner = simpleReasoner;
         this.searchIndexer = searchIndexer;
         recomputing = false;
         stopRequested = false;		
-        handleSameAs = simpleReasoner.getSameAsEnabled();
     }
 
     /**
@@ -102,15 +103,15 @@ public class ABoxRecomputer {
             }
         }
         try {
-        	if  (searchIndexer != null) {
-        		searchIndexer.pause();
-        	}
+            if  (searchIndexer != null) {
+                searchIndexer.pause();
+            }
             recomputeABox();
         } finally {
-        	if  (searchIndexer != null) {
-        		searchIndexer.rebuildIndex();
-        		searchIndexer.unpause();
-        	}
+            if  (searchIndexer != null) {
+                searchIndexer.rebuildIndex();
+                searchIndexer.unpause();
+            }
             synchronized (lock1) {
                 recomputing = false;	    		
             }
@@ -175,7 +176,7 @@ public class ABoxRecomputer {
 
     private static final boolean RUN_PLUGINS = true;
     private static final boolean SKIP_PLUGINS = !RUN_PLUGINS;
-    
+
     private Model recomputeIndividual(String individualURI, 
             Model rebuildModel) throws RDFServiceException {
         long start = System.currentTimeMillis();
@@ -183,7 +184,8 @@ public class ABoxRecomputer {
         log.trace((System.currentTimeMillis() - start) + " ms to get assertions.");
         Model additionalInferences = recomputeIndividual(
                 individualURI, null, assertions, rebuildModel, RUN_PLUGINS);
-        if (handleSameAs) {
+
+        if (simpleReasoner.getSameAsEnabled()) {
             Set<String> sameAsInds = getSameAsIndividuals(individualURI);
             for (String sameAsInd : sameAsInds) {
                 // sameAs for plugins is handled by the SimpleReasoner
@@ -201,7 +203,7 @@ public class ABoxRecomputer {
         }
         return additionalInferences;
     }
-    
+
     /**
      * Adds inferences to temporary rebuildmodel
      * @param individualURI
@@ -340,7 +342,7 @@ public class ABoxRecomputer {
                         queryStr, RDFService.ModelSerializationFormat.N3)
                         , RDFService.ModelSerializationFormat.N3);
     }
-    
+
     private Model rewriteInferences(Model inferences, String aliasURI) {
         if (aliasURI == null) {
             return inferences;
@@ -423,8 +425,6 @@ public class ABoxRecomputer {
      */
     protected void updateInferenceModel(Model rebuildModel, 
             Collection<String> individuals) throws RDFServiceException {
-        Model inferenceModel = RDFServiceGraph.createRDFServiceModel(
-                new RDFServiceGraph(rdfService, ModelNames.ABOX_INFERENCES));
         Model existing = ModelFactory.createDefaultModel();
         for (String individualURI : individuals) {
             Resource subjInd = ResourceFactory.createResource(individualURI); 
@@ -432,21 +432,16 @@ public class ABoxRecomputer {
         }
         Model retractions = existing.difference(rebuildModel);
         Model additions = rebuildModel.difference(existing);
-        inferenceModel.enterCriticalSection(Lock.WRITE);
-        try {
-            long start = System.currentTimeMillis();
-            ChangeSet change = rdfService.manufactureChangeSet();
-            change.addRemoval(makeN3InputStream(retractions), 
-                    RDFService.ModelSerializationFormat.N3, ModelNames.ABOX_INFERENCES);
-            change.addAddition(makeN3InputStream(additions), 
-                    RDFService.ModelSerializationFormat.N3, ModelNames.ABOX_INFERENCES);
-            rdfService.changeSetUpdate(change);
-            log.debug((System.currentTimeMillis() - start) + 
-                    " ms to retract " + retractions.size() + 
-                    " statements and add " + additions.size() + " statements");
-        } finally {
-            inferenceModel.leaveCriticalSection();
-        }
+        long start = System.currentTimeMillis();
+        ChangeSet change = rdfService.manufactureChangeSet();
+        change.addRemoval(makeN3InputStream(retractions), 
+                RDFService.ModelSerializationFormat.N3, ModelNames.ABOX_INFERENCES);
+        change.addAddition(makeN3InputStream(additions), 
+                RDFService.ModelSerializationFormat.N3, ModelNames.ABOX_INFERENCES);
+        rdfService.changeSetUpdate(change);
+        log.debug((System.currentTimeMillis() - start) + 
+                " ms to retract " + retractions.size() + 
+                " statements and add " + additions.size() + " statements");
     }
 
     private InputStream makeN3InputStream(Model m) {
@@ -454,7 +449,7 @@ public class ABoxRecomputer {
         m.write(out, "N3");
         return new ByteArrayInputStream(out.toByteArray());
     }
-    
+
     private Set<String> getSameAsIndividuals(String individualURI) {
         HashSet<String> sameAsInds = new HashSet<String>();
         sameAsInds.add(individualURI);
@@ -462,7 +457,7 @@ public class ABoxRecomputer {
         sameAsInds.remove(individualURI);
         return sameAsInds;
     }
-    
+
     private void getSameAsIndividuals(String individualURI, Set<String> sameAsInds) {
         Model m = RDFServiceGraph.createRDFServiceModel(new RDFServiceGraph(rdfService));
         Resource individual = ResourceFactory.createResource(individualURI);
@@ -483,8 +478,8 @@ public class ABoxRecomputer {
             if (stmt.getSubject().isURIResource()) {
                 String sameAsURI = stmt.getSubject().asResource().getURI();
                 if (!sameAsInds.contains(sameAsURI)) {
-                   sameAsInds.add(sameAsURI);
-                   getSameAsIndividuals(sameAsURI, sameAsInds);
+                    sameAsInds.add(sameAsURI);
+                    getSameAsIndividuals(sameAsURI, sameAsInds);
                 }
             }
         }        
