@@ -1,4 +1,6 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#import "lib-microformats.ftl" as mf>
+
 <#--Number of labels present-->
 <#if !labelCount??>
     <#assign labelCount = 0 >
@@ -14,7 +16,7 @@
 
 <#-- Default individual profile page template -->
 <#--@dumpAll /-->
-<section id="individual-intro" class="vcard" role="region">
+<section id="individual-intro" class="vcard" role="region" <@mf.sectionSchema individual/>>
     <section id="share-contact" role="region">
         <#-- Image -->
         <#assign individualImage>
@@ -39,7 +41,7 @@
                 <h2>${relatedSubject.relatingPredicateDomainPublic} for ${relatedSubject.name}</h2>
                 <p><a href="${relatedSubject.url}" title="${i18n().return_to(relatedSubject.name)}">&larr; ${i18n().return_to(relatedSubject.name)}</a></p>                
             <#else>                
-                <h1 class="fn">
+                <h1 class="fn" itemprop="name">
                     <#-- Label -->
                     <@p.label individual editable labelCount localesCount languageCount/>
 

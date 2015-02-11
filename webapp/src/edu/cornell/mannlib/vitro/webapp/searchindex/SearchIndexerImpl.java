@@ -374,7 +374,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 		private final TaskQueue taskQueue;
 		private final List<Task> deferredQueue;
 		private volatile boolean started;
-		private volatile boolean paused = true;
+		private volatile boolean paused;
 
 		public Scheduler(TaskQueue taskQueue) {
 			this.taskQueue = taskQueue;

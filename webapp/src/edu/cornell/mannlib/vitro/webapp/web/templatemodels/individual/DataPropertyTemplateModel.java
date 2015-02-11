@@ -65,6 +65,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     private String objectKey;   
     private String queryString;
     private Set<String> constructQueries;
+    private int displayLimit;
     
     DataPropertyTemplateModel(DataProperty dp, Individual subject, VitroRequest vreq, 
             boolean editing, List<DataProperty> populatedDataPropertyList) {
@@ -82,7 +83,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
         constructQueries = getConstructQueries();
 
         statements = new ArrayList<DataPropertyStatementTemplateModel>();
-        
+		displayLimit = dp.getDisplayLimit();
         // If the property is populated, get the data property statements via a sparql query
         if (populatedDataPropertyList.contains(dp)) {
             log.debug("Getting data for populated data property " + getUri());
@@ -108,14 +109,22 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
             return;
         }
         
-        // If the display limit has already been reached, we can't add a new statement.
-        // NB This appears to be a misuse of a value called "display limit". Note that it's 
-        // not used to limit display, either, so should be renamed.
+/*       If the display limit has already been reached, we can't add a new statement.
+         NB This appears to be a misuse of a value called "display limit". Note that it's 
+         not used to limit display, either, so should be renamed.
         int displayLimit = dp.getDisplayLimit();
-        // Display limit of -1 (default value for new property) means no display limit
+         Display limit of -1 (default value for new property) means no display limit
         if ( displayLimit >= 0 && statements.size() >= displayLimit ) {
             return;
         }
+*/
+		// Rewriting the above per jc55. If the data property is functional, there should only
+		// be 1 statement. The Display Limit is for determining how many statements to display
+		// before a "more..." link is used to hide statements exceeding the display limit. tlw72
+		boolean functional = dp.getFunctional();
+		if ( functional && statements.size() >= 1 ) {
+			return;
+		}
           
         // Determine whether a new statement can be added
 		RequestedAction action = new AddDataPropertyStatement(
@@ -146,6 +155,11 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     protected Route getPropertyEditRoute() {
         return Route.DATA_PROPERTY_EDIT;
     }
+
+	@Override
+	public int getDisplayLimit() {
+			return displayLimit;
+	}	
     
     public ConfigError checkQuery(String queryString) {
         if (StringUtils.isBlank(queryString)) {
@@ -191,6 +205,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     public String getTemplate() {
         return getTemplateName();
     }
+
     
     /* Template methods */
     

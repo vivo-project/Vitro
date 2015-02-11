@@ -25,7 +25,7 @@
     <section class="account-feedback">
         <p>
             ${strings.updated_account_1}
-            <a href="${updatedUserAccount.editUrl}" title="${strings.updated_account_title}}">${updatedUserAccount.firstName} ${updatedUserAccount.lastName}</a>
+            <a href="${updatedUserAccount.editUrl}" title="${strings.updated_account_title}">${updatedUserAccount.firstName} ${updatedUserAccount.lastName}</a>
             ${strings.updated_account_2}
             <#if emailWasSent?? >${strings.updated_account_notification(updatedUserAccount.emailAddress)}</#if>
         </p>

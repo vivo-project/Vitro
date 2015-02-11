@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -139,39 +140,31 @@ public class CollatedObjectPropertyTemplateModel extends
 		// others will be removed
 		List<Map<String, String>> filteredList = new ArrayList<Map<String, String>>();
 		Set<String> processedObjects = new HashSet<String>();
-		//Useful to keep track of objects where statement data may not match the most specific type
-		//returne for some reason, in which case useful to keep track
-		Set<String> filteredObjects = new HashSet<String>();
 		for (Map<String, String> outerMap : statementData) {
 
 			String objectUri = outerMap.get(objectVariableName);
+
 			if (processedObjects.contains(objectUri)) {
 				continue;
 			}
 			processedObjects.add(objectUri);
-			//Get most specific type for this particular
-			List<String> mostSpecificTypes = this.getSortedMostSpecificType(objectUri);
-			//If more than one most specific type, will compare against both of them
-			//and if the first one matches, the object will be placed under that
-			//otherwise subclass will be checked against the other
+			List<Map<String, String>> dataForThisObject = new ArrayList<Map<String, String>>();
+			//Retrieve the statements that are related to this specific object
 			for (Map<String, String> innerMap : statementData) {
-				//Check both the object uri and that the subclass returned matches
-				//the most specific type
-				if (innerMap.get(objectVariableName) == objectUri) {
-					//At this point, the statement data will already have the most specific type
-					//represented
-					String subclass = innerMap.get(SUBCLASS_VARIABLE_NAME);
-					if(mostSpecificTypes.contains(subclass)) {
-						filteredList.add(innerMap);
-						filteredObjects.add(objectUri);
-					} else {
-						if(log.isDebugEnabled()) {
-							log.debug("Iterating through statement data, Subclass does not match most specific type for Object URI - " + objectUri + " - subclass:" + subclass + " - most specific types=" + mostSpecificTypes.toString());
-						}
-					}
+				if (innerMap.get(objectVariableName).equals(objectUri)) {
+					// Subclass should at this point contain the most specific
+					// type already
+					dataForThisObject.add(innerMap);
 				}
 			}
-		
+			
+			if(log.isDebugEnabled()) {
+				log.debug("Object URI " + objectUri + " has number of statements = " + dataForThisObject.size());
+			}
+			//Subclass variable should already reflect most specifick types but there may be more than one most specific type
+			Collections.sort(dataForThisObject, new DataComparatorBySubclass());
+			filteredList.add(dataForThisObject.get(0));
+
 		}
 
 		statementData.retainAll(filteredList);
@@ -179,33 +172,25 @@ public class CollatedObjectPropertyTemplateModel extends
 		if (log.isDebugEnabled()) {
 			log.debug("Data after subclass filtering");
 			logData(statementData);
-			//check and see if filteredObjects and processedObjects not the same size
-			if(filteredObjects.size() < processedObjects.size()) {
-				log.debug("Certain objects not included in statements displayed for collated subclasses");
-				processedObjects.removeAll(filteredObjects);
-				log.debug("These object uris not represented" + processedObjects.toString());
-			}
 		}
 	}
-	
-	//Get the most specific type
-	//An alternative would be to ensure that the default form, or any form that utilizes collation
-	//will return most specific type within the listview select/construct queries so the resulting
-	//statement data has that value
-	List<String> getMostSpecificTypesForObject(String objectURI) {
-		WebappDaoFactory wadf = ModelAccess.on(vreq).getWebappDaoFactory();
-		return wadf.getIndividualDao().getIndividualByURI(objectURI).getMostSpecificTypeURIs();
+
+	//Subclass variable should already contain most specific type
+	//If there is more than one most specific type, then order alphabetically
+	private class DataComparatorBySubclass implements
+			Comparator<Map<String, String>> {
+
+		@Override
+		public int compare(Map<String, String> map1, Map<String, String> map2) {
+
+			String subclass1 = map1.get(SUBCLASS_VARIABLE_NAME);
+			String subclass2 = map2.get(SUBCLASS_VARIABLE_NAME);
+
+			return subclass1.compareTo(subclass2);
+
+		}
 	}
 
-	//This will return a single most specific type for an object
-	//If there are multiple most specific types, the list will be sorted alphabetically and
-	//the first one will be returned
-	List<String> getSortedMostSpecificType(String objectURI) {
-		List<String> mostSpecificTypeURIs = this.getMostSpecificTypesForObject(objectURI);
-		Collections.sort(mostSpecificTypeURIs);
-		return mostSpecificTypeURIs;
-	}
-	
 	
 
 	// Collate the statements by subclass.
