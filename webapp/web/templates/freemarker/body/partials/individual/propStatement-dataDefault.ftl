@@ -17,7 +17,7 @@
         <#assign theValue = theValue?replace("<ol>","<ol class='tinyMCENumeric'>") />
     </#if>
     <#if theValue?contains("<p>") >
-        <#assign theValue = theValue?replace("<p>","")?replace("</p>","") />
+        <#assign theValue = theValue?replace("<p>","<p style='margin-bottom:.6em'>") />
     </#if>
     ${theValue}
 </#macro>
