@@ -31,7 +31,12 @@ public class SearchIndexerStub implements SearchIndexer {
 		paused = true;
 	}
 
-	@Override
+    @Override
+    public void pauseWithoutDeferring() {
+        paused = true;
+    }
+
+    @Override
 	public void unpause() {
 		paused = false;
 	}

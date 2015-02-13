@@ -98,6 +98,9 @@ public class SearchIndexerImpl implements SearchIndexer {
 	private Set<IndexingUriFinder> uriFinders;
 	private WebappDaoFactory wadf;
 
+    private boolean ignoreTasksWhilePaused = false;
+    private boolean rebuildOnUnpause = false;
+
 	// ----------------------------------------------------------------------
 	// ConfigurationBeanLoader methods.
 	// ----------------------------------------------------------------------
@@ -198,16 +201,32 @@ public class SearchIndexerImpl implements SearchIndexer {
 	@Override
 	public void pause() {
 		if (!isPaused() && !isShutdown()) {
+            ignoreTasksWhilePaused = false;
+            rebuildOnUnpause = false;
 			scheduler.pause();
 			fireEvent(PAUSE);
 		}
 	}
+
+    @Override
+    public void pauseWithoutDeferring() {
+        if (!isPaused() && !isShutdown()) {
+            ignoreTasksWhilePaused = true;
+            rebuildOnUnpause = false;
+            scheduler.pause();
+            fireEvent(PAUSE);
+        }
+    }
 
 	@Override
 	public void unpause() {
 		if (isPaused() && !isShutdown()) {
 			scheduler.unpause();
 			fireEvent(UNPAUSE);
+            if (rebuildOnUnpause) {
+                rebuildOnUnpause = false;
+                rebuildIndex();
+            }
 		}
 	}
 
@@ -245,6 +264,10 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (changes == null || changes.isEmpty()) {
 			return;
 		}
+        if (ignoreTasksWhilePaused && isPaused()) {
+            rebuildOnUnpause = true;
+            return;
+        }
 
 		scheduler.scheduleTask(new UpdateStatementsTask.Deferrable(changes));
 		log.debug("Scheduled updates for " + changes.size() + " statements.");
@@ -259,6 +282,10 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (uris == null || uris.isEmpty()) {
 			return;
 		}
+        if (ignoreTasksWhilePaused && isPaused()) {
+            rebuildOnUnpause = true;
+            return;
+        }
 
 		scheduler.scheduleTask(new UpdateUrisTask.Deferrable(uris));
 		log.debug("Scheduled updates for " + uris.size() + " uris.");
@@ -269,6 +296,10 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (isShutdown()) {
 			log.warn("Call to rebuildIndex after shutdown.");
 		}
+        if (ignoreTasksWhilePaused && isPaused()) {
+            rebuildOnUnpause = true;
+            return;
+        }
 
 		scheduler.scheduleTask(new RebuildIndexTask.Deferrable());
 		log.debug("Scheduled a full rebuild.");
@@ -423,8 +454,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 		private void processDeferredTasks() {
 			for (DeferrableTask task : deferredQueue) {
                 taskQueue.scheduleTask(task.makeRunnable(indexer.createFindersList(), indexer.createExcludersList(), indexer.createModifiersList(), indexer.wadf.getIndividualDao(), indexer.listeners, indexer.pool));
-				log.debug("moved task from deferred queue to task queue: "
-						+ task);
+				log.debug("moved task from deferred queue to task queue: " + task);
 			}
 
             // Empty out the deferred queue as we've now processed it
