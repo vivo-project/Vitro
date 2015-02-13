@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -23,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.StatementCounts;
+import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.DeferrableTask;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.ListenerList;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.Task;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.WorkerThreadPool;
@@ -63,7 +65,18 @@ public class UpdateStatementsTask implements Task {
 	private final Set<String> uris;
 	private final Status status;
 
-	public UpdateStatementsTask(List<Statement> changes,
+    public static class Deferrable implements DeferrableTask {
+        List<Statement> changes;
+
+        public Deferrable(List<Statement> changes) { this.changes = changes; }
+
+        @Override
+        public Task makeRunnable(IndexingUriFinderList uriFinders, SearchIndexExcluderList excluders, DocumentModifierList modifiers, IndividualDao indDao, ListenerList listeners, WorkerThreadPool pool) {
+            return new UpdateStatementsTask(changes, uriFinders, excluders, modifiers, indDao, listeners, pool);
+        }
+    }
+
+    public UpdateStatementsTask(List<Statement> changes,
 			IndexingUriFinderList uriFinders,
 			SearchIndexExcluderList excluders, DocumentModifierList modifiers,
 			IndividualDao indDao, ListenerList listeners, WorkerThreadPool pool) {

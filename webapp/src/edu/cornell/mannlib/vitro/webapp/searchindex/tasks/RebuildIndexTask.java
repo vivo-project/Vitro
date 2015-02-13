@@ -10,6 +10,8 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 
+import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl;
+import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinderList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -22,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Even
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.RebuildCounts;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.State;
+import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.DeferrableTask;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.ListenerList;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.Task;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.WorkerThreadPool;
@@ -49,6 +52,15 @@ public class RebuildIndexTask implements Task {
 	private final int documentsBefore;
 
 	private volatile SearchIndexerStatus status;
+
+    public static class Deferrable implements DeferrableTask {
+        public Deferrable() {}
+
+        @Override
+        public Task makeRunnable(IndexingUriFinderList uriFinders, SearchIndexExcluderList excluders, DocumentModifierList modifiers, IndividualDao indDao, ListenerList listeners, WorkerThreadPool pool) {
+            return new RebuildIndexTask(excluders, modifiers, indDao, listeners, pool);
+        }
+    }
 
 	public RebuildIndexTask(SearchIndexExcluderList excluders,
 			DocumentModifierList modifiers, IndividualDao indDao,

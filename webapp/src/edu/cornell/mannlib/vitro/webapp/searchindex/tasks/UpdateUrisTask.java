@@ -13,6 +13,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl;
+import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinderList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -61,7 +63,17 @@ public class UpdateUrisTask implements Task {
 	private final Status status;
 	private final SearchEngine searchEngine;
 
-	public UpdateUrisTask(Collection<String> uris,
+    public static class Deferrable implements SearchIndexerImpl.DeferrableTask {
+        Collection<String> uris;
+        public Deferrable(Collection<String> uris) { this.uris = uris; }
+
+        @Override
+        public Task makeRunnable(IndexingUriFinderList uriFinders, SearchIndexExcluderList excluders, DocumentModifierList modifiers, IndividualDao indDao, ListenerList listeners, WorkerThreadPool pool) {
+            return new UpdateUrisTask(uris, excluders, modifiers, indDao, listeners, pool);
+        }
+    }
+
+    public UpdateUrisTask(Collection<String> uris,
 			SearchIndexExcluderList excluders, DocumentModifierList modifiers,
 			IndividualDao indDao, ListenerList listeners, WorkerThreadPool pool) {
 		this.uris = new HashSet<>(uris);
