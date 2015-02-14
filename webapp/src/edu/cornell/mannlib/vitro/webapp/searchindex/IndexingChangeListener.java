@@ -14,11 +14,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
@@ -38,6 +44,19 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
  * 
  * If the SearchIndexer begins a rebuild, discard any changes that we had
  * accumulated. They will be accomplished by the rebuild.
+ * 
+ * -----------------------
+ * 
+ * When a changed statement is received, it should not be added to the list of
+ * pending changes. The elements of the statement hold references to the model
+ * in which they were created, as well as to other structures.
+ * 
+ * Thus, an action that produces many changes to the models could become
+ * unscalable.
+ * 
+ * To avoid this, we use the ResourceFactory to create a "sanitized" statement
+ * which is semantically equivalent to the original, and add that to the list
+ * instead. The original statement is released.
  */
 public class IndexingChangeListener implements ChangeListener,
 		SearchIndexer.Listener {
@@ -60,10 +79,51 @@ public class IndexingChangeListener implements ChangeListener,
 	}
 
 	private synchronized void noteChange(Statement stmt) {
-		changes.add(stmt);
-		if (!paused) {
-			ticker.start();
+		try {
+			changes.add(sanitize(stmt));
+			if (!paused) {
+				ticker.start();
+			}
+		} catch (Exception e) {
+			log.warn("Failed to sanitize this statement: " + stmt);
 		}
+	}
+
+	private Statement sanitize(Statement rawStmt) {
+		return ResourceFactory.createStatement(
+				sanitizeSubject(rawStmt.getSubject()),
+				sanitizePredicate(rawStmt.getPredicate()),
+				sanitizeObject(rawStmt.getObject()));
+	}
+
+	private Resource sanitizeSubject(Resource rawSubject) {
+		if (rawSubject.isURIResource()) {
+			return ResourceFactory.createResource(rawSubject.getURI());
+		}
+		return ResourceFactory.createResource();
+	}
+
+	private Property sanitizePredicate(Property rawPredicate) {
+		return ResourceFactory.createProperty(rawPredicate.getURI());
+	}
+
+	private RDFNode sanitizeObject(RDFNode rawObject) {
+		if (rawObject.isURIResource()) {
+			return ResourceFactory.createResource(rawObject.asResource()
+					.getURI());
+		}
+		if (rawObject.isResource()) {
+			return ResourceFactory.createResource();
+		}
+		Literal l = rawObject.asLiteral();
+		if (StringUtils.isNotEmpty(l.getLanguage())) {
+			return ResourceFactory.createLangLiteral(l.getString(),
+					l.getLanguage());
+		}
+		if (null != l.getDatatype()) {
+			return ResourceFactory.createTypedLiteral(l.getValue());
+		}
+		return ResourceFactory.createPlainLiteral(l.getString());
 	}
 
 	@Override
@@ -84,7 +144,7 @@ public class IndexingChangeListener implements ChangeListener,
 			changes.clear();
 		}
 	}
-	
+
 	private synchronized void discardChanges() {
 		changes.clear();
 	}
