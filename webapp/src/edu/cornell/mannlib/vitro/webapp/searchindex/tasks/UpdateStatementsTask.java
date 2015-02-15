@@ -24,7 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.StatementCounts;
-import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.DeferrableTask;
+import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.IndexerConfig;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.ListenerList;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.Task;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.WorkerThreadPool;
@@ -51,157 +51,169 @@ import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinderLi
  * Set to remove duplicates, and then process the URIs in the set.
  */
 public class UpdateStatementsTask implements Task {
-	private static final Log log = LogFactory
-			.getLog(UpdateStatementsTask.class);
+    private static final Log log = LogFactory.getLog(UpdateStatementsTask.class);
 
-	private final List<Statement> changes;
-	private final IndexingUriFinderList uriFinders;
-	private final SearchIndexExcluderList excluders;
-	private final DocumentModifierList modifiers;
-	private final IndividualDao indDao;
-	private final ListenerList listeners;
-	private final WorkerThreadPool pool;
+    private final IndexerConfig config;
+    private UpdateStatementsTaskImpl impl;
 
-	private final Set<String> uris;
-	private final Status status;
+    private List<Statement> changes;
 
-    public static class Deferrable implements DeferrableTask {
-        List<Statement> changes;
+    public UpdateStatementsTask(IndexerConfig config, List<Statement> changes) {
+        this.config = config;
+        this.changes = new ArrayList<>(changes);
+    }
 
-        public Deferrable(List<Statement> changes) { this.changes = changes; }
+    @Override
+    public void run() {
+        impl = new UpdateStatementsTaskImpl(config, changes);
+        impl.run();
+    }
+    @Override
+    public SearchIndexerStatus getStatus() {
+        return impl == null ? null : impl.getStatus();
+    }
 
-        @Override
-        public Task makeRunnable(IndexingUriFinderList uriFinders, SearchIndexExcluderList excluders, DocumentModifierList modifiers, IndividualDao indDao, ListenerList listeners, WorkerThreadPool pool) {
-            return new UpdateStatementsTask(changes, uriFinders, excluders, modifiers, indDao, listeners, pool);
+    @Override
+    public void notifyWorkUnitCompletion(Runnable workUnit) {
+        if (impl != null) {
+            impl.notifyWorkUnitCompletion(workUnit);
         }
     }
 
-    public UpdateStatementsTask(List<Statement> changes,
-			IndexingUriFinderList uriFinders,
-			SearchIndexExcluderList excluders, DocumentModifierList modifiers,
-			IndividualDao indDao, ListenerList listeners, WorkerThreadPool pool) {
-		this.changes = new ArrayList<>(changes);
-		this.uriFinders = uriFinders;
-		this.excluders = excluders;
-		this.modifiers = modifiers;
-		this.indDao = indDao;
-		this.listeners = listeners;
-		this.pool = pool;
+    private static class UpdateStatementsTaskImpl implements Task {
+        private final List<Statement> changes;
+        private final IndexingUriFinderList uriFinders;
+        private final SearchIndexExcluderList excluders;
+        private final DocumentModifierList modifiers;
+        private final IndividualDao indDao;
+        private final ListenerList listeners;
+        private final WorkerThreadPool pool;
 
-		this.uris = Collections.synchronizedSet(new HashSet<String>());
+        private final Set<String> uris;
+        private final Status status;
 
-		this.status = new Status(changes.size(), 500, listeners);
-	}
+        public UpdateStatementsTaskImpl(IndexerConfig config, List<Statement> changes) {
+            this.changes = changes;
+            this.uriFinders = config.uriFinderList();
+            this.excluders = config.excluderList();
+            this.modifiers = config.documentModifierList();
+            this.indDao = config.individualDao();
+            this.listeners = config.listenerList();
+            this.pool = config.workerThreadPool();
 
-	@Override
-	public void run() {
-		listeners.fireEvent(new Event(START_STATEMENTS, getStatus()));
+            this.uris = Collections.synchronizedSet(new HashSet<String>());
 
-		findAffectedUris();
+            this.status = new Status(changes.size(), 500, listeners);
+        }
 
-		updateTheUris();
-		listeners.fireEvent(new Event(STOP_STATEMENTS, getStatus()));
-	}
+        @Override
+        public void run() {
+            listeners.fireEvent(new Event(START_STATEMENTS, getStatus()));
 
-	private void findAffectedUris() {
-		log.debug("Tell finders we are starting.");
-		uriFinders.startIndexing();
+            findAffectedUris();
 
-		for (Statement stmt : changes) {
-			if (isInterrupted()) {
-				log.info("Interrupted: " + status.getSearchIndexerStatus());
-				return;
-			} else {
-				findUrisForStatement(stmt);
-			}
-		}
-		waitForWorkUnitsToComplete();
+            updateTheUris();
+            listeners.fireEvent(new Event(STOP_STATEMENTS, getStatus()));
+        }
 
-		log.debug("Tell finders we are stopping.");
-		uriFinders.stopIndexing();
-	}
+        private void findAffectedUris() {
+            log.debug("Tell finders we are starting.");
+            uriFinders.startIndexing();
 
-	private boolean isInterrupted() {
-		if (Thread.interrupted()) {
-			Thread.currentThread().interrupt();
-			return true;
-		} else {
-			return false;
-		}
-	}
+            for (Statement stmt : changes) {
+                if (isInterrupted()) {
+                    log.info("Interrupted: " + status.getSearchIndexerStatus());
+                    return;
+                } else {
+                    findUrisForStatement(stmt);
+                }
+            }
+            waitForWorkUnitsToComplete();
 
-	private void findUrisForStatement(Statement stmt) {
-		Runnable workUnit = new FindUrisForStatementWorkUnit(stmt, uriFinders);
-		pool.submit(workUnit, this);
-		log.debug("scheduled uri finders for " + stmt);
-	}
+            log.debug("Tell finders we are stopping.");
+            uriFinders.stopIndexing();
+        }
 
-	private void waitForWorkUnitsToComplete() {
-		pool.waitUntilIdle();
-	}
+        private boolean isInterrupted() {
+            if (Thread.interrupted()) {
+                Thread.currentThread().interrupt();
+                return true;
+            } else {
+                return false;
+            }
+        }
 
-	private void updateTheUris() {
-		new UpdateUrisTask(uris, excluders, modifiers, indDao, listeners, pool)
-				.run();
-	}
+        private void findUrisForStatement(Statement stmt) {
+            Runnable workUnit = new FindUrisForStatementWorkUnit(stmt, uriFinders);
+            pool.submit(workUnit, this);
+            log.debug("scheduled uri finders for " + stmt);
+        }
 
-	@Override
-	public SearchIndexerStatus getStatus() {
-		return status.getSearchIndexerStatus();
-	}
+        private void waitForWorkUnitsToComplete() {
+            pool.waitUntilIdle();
+        }
 
-	@Override
-	public void notifyWorkUnitCompletion(Runnable workUnit) {
-		FindUrisForStatementWorkUnit worker = (FindUrisForStatementWorkUnit) workUnit;
+        private void updateTheUris() {
+            UpdateUrisTask.runNow(uris, excluders, modifiers, indDao, listeners, pool);
+        }
 
-		Set<String> foundUris = worker.getUris();
-		Statement stmt = worker.getStatement();
-		log.debug("Found " + foundUris.size() + " uris for statement: " + stmt);
+        @Override
+        public SearchIndexerStatus getStatus() {
+            return status.getSearchIndexerStatus();
+        }
 
-		uris.addAll(foundUris);
-		status.incrementProcessed();
-	}
+        @Override
+        public void notifyWorkUnitCompletion(Runnable workUnit) {
+            FindUrisForStatementWorkUnit worker = (FindUrisForStatementWorkUnit) workUnit;
 
-	// ----------------------------------------------------------------------
-	// Helper classes
-	// ----------------------------------------------------------------------
+            Set<String> foundUris = worker.getUris();
+            Statement stmt = worker.getStatement();
+            log.debug("Found " + foundUris.size() + " uris for statement: " + stmt);
 
-	/**
-	 * A thread-safe collection of status information. All methods are
-	 * synchronized.
-	 */
-	private static class Status {
-		private final int total;
-		private final int progressInterval;
-		private final ListenerList listeners;
-		private int processed = 0;
-		private Date since = new Date();
+            uris.addAll(foundUris);
+            status.incrementProcessed();
+        }
 
-		public Status(int total, int progressInterval, ListenerList listeners) {
-			this.total = total;
-			this.progressInterval = progressInterval;
-			this.listeners = listeners;
-		}
+        // ----------------------------------------------------------------------
+        // Helper classes
+        // ----------------------------------------------------------------------
 
-		public synchronized void incrementProcessed() {
-			processed++;
-			since = new Date();
-			maybeFireProgressEvent();
-		}
+        /**
+         * A thread-safe collection of status information. All methods are
+         * synchronized.
+         */
+        private static class Status {
+            private final int total;
+            private final int progressInterval;
+            private final ListenerList listeners;
+            private int processed = 0;
+            private Date since = new Date();
 
-		private void maybeFireProgressEvent() {
-			if (processed > 0 && processed % progressInterval == 0) {
-				listeners.fireEvent(new Event(PROGRESS,
-						getSearchIndexerStatus()));
-			}
-		}
+            public Status(int total, int progressInterval, ListenerList listeners) {
+                this.total = total;
+                this.progressInterval = progressInterval;
+                this.listeners = listeners;
+            }
 
-		public synchronized SearchIndexerStatus getSearchIndexerStatus() {
-			int remaining = total - processed;
-			return new SearchIndexerStatus(PROCESSING_STMTS, since,
-					new StatementCounts(processed, remaining, total));
-		}
+            public synchronized void incrementProcessed() {
+                processed++;
+                since = new Date();
+                maybeFireProgressEvent();
+            }
 
-	}
+            private void maybeFireProgressEvent() {
+                if (processed > 0 && processed % progressInterval == 0) {
+                    listeners.fireEvent(new Event(PROGRESS,
+                            getSearchIndexerStatus()));
+                }
+            }
 
+            public synchronized SearchIndexerStatus getSearchIndexerStatus() {
+                int remaining = total - processed;
+                return new SearchIndexerStatus(PROCESSING_STMTS, since,
+                        new StatementCounts(processed, remaining, total));
+            }
+
+        }
+    }
 }
