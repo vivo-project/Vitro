@@ -125,17 +125,6 @@ public class RDFServiceTDB extends RDFServiceJena {
 	}
 
 	@Override
-	public void sparqlSelectQuery(String query, ResultFormat resultFormat,
-			OutputStream outputStream) throws RDFServiceException {
-		dataset.getLock().enterCriticalSection(Lock.READ);
-		try {
-			super.sparqlSelectQuery(query, resultFormat, outputStream);
-		} finally {
-			dataset.getLock().leaveCriticalSection();
-		}
-	}
-
-	@Override
 	public InputStream sparqlSelectQuery(String query, ResultFormat resultFormat)
 			throws RDFServiceException {
 		dataset.getLock().enterCriticalSection(Lock.READ);
@@ -161,6 +150,28 @@ public class RDFServiceTDB extends RDFServiceJena {
 		dataset.getLock().enterCriticalSection(Lock.READ);
 		try {
 			return super.getGraphURIs();
+		} finally {
+			dataset.getLock().leaveCriticalSection();
+		}
+	}
+
+	@Override
+	public void serializeAll(OutputStream outputStream)
+			throws RDFServiceException {
+		dataset.getLock().enterCriticalSection(Lock.READ);
+		try {
+			super.serializeAll(outputStream);
+		} finally {
+			dataset.getLock().leaveCriticalSection();
+		}
+	}
+
+	@Override
+	public void serializeGraph(String graphURI, OutputStream outputStream)
+			throws RDFServiceException {
+		dataset.getLock().enterCriticalSection(Lock.READ);
+		try {
+			super.serializeGraph(graphURI, outputStream);
 		} finally {
 			dataset.getLock().leaveCriticalSection();
 		}

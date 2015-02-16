@@ -93,21 +93,6 @@ public interface RDFService {
 	 * the query is executed against the union of all named and unnamed graphs in the 
 	 * store.
 	 * 
-	 * Preferred for streaming because it avoids in-memory buffering.
-	 * 
-	 * @param query - the SPARQL query to be executed against the RDF store
-	 * @param resultFormat - format for the result of the Select query
-	 * @param outputStream - receives the result of the query 
-	 * 
-	 */
-	public void sparqlSelectQuery(String query, RDFService.ResultFormat resultFormat, OutputStream outputStream) throws RDFServiceException;
-	
-	/**
-	 * Performs a SPARQL select query against the knowledge base. The query may have
-	 * an embedded graph identifier. If the query does not contain a graph identifier
-	 * the query is executed against the union of all named and unnamed graphs in the 
-	 * store.
-	 * 
 	 * @param query - the SPARQL query to be executed against the RDF store
 	 * @param resultFormat - format for the result of the Select query
 	 * 
@@ -151,6 +136,29 @@ public interface RDFService {
 	 */
 	public String getDefaultWriteGraphURI() throws RDFServiceException;
 	
+	/**
+	 * Serializes the union of all named and unnamed graphs in the store to the
+	 * supplied OutputStream, in N-Quads format. This method is designed for 
+	 * exporting data from VIVO, so any filters should be bypassed. If possible, 
+	 * this should be done without buffering in memory, so arbitrarily large 
+	 * graphs can be exported.
+	 * 
+	 * @param outputStream - receives the serialized result.
+	 */
+	public void serializeAll(OutputStream outputStream) throws RDFServiceException;
+
+	/**
+	 * Serializes the contents of the named graph to the supplied OutputStream,
+	 * in N-Triples format. This method is designed for exporting data from 
+	 * VIVO, so any filters should be bypassed. If possible, this should be 
+	 * done without buffering in memory, so arbitrarily large graphs can be 
+	 * exported.
+	 * 
+	 * @param graphURI - the URI of the desired graph. May not be null.
+	 * @param outputStream - receives the serialized result.
+	 */
+	public void serializeGraph(String graphURI, OutputStream outputStream) throws RDFServiceException;
+
 	/**
 	 * Registers a listener to listen to changes in any graph in
 	 * the RDF store.

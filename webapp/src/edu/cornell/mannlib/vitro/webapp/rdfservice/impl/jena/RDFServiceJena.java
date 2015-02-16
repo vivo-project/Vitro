@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.riot.RDFDataMgr;
 import org.apache.log4j.lf5.util.StreamUtils;
 
 import com.hp.hpl.jena.graph.Triple;
@@ -35,6 +36,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sdb.SDB;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.sparql.core.Quad;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
@@ -44,6 +46,8 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetQuadsIterator;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetTriplesIterator;
 
 public abstract class RDFServiceJena extends RDFServiceImpl implements RDFService {
 
@@ -430,45 +434,6 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         return getRDFResultStream(query, DESCRIBE, resultFormat);
     }
 
-	@Override
-	public void sparqlSelectQuery(String query, ResultFormat resultFormat,
-			OutputStream outputStream) throws RDFServiceException {
-		DatasetWrapper dw = getDatasetWrapper();
-		try {
-			Dataset d = dw.getDataset();
-			Query q = createQuery(query);
-			QueryExecution qe = createQueryExecution(query, q, d);
-			// These properties only help for SDB, but shouldn't hurt for TDB.
-			qe.getContext().set(SDB.jdbcFetchSize, Integer.MIN_VALUE);
-			qe.getContext().set(SDB.jdbcStream, true);
-			qe.getContext().set(SDB.streamGraphAPI, true);
-			try {
-				ResultSet resultSet = qe.execSelect();
-				switch (resultFormat) {
-				case CSV:
-					ResultSetFormatter.outputAsCSV(outputStream, resultSet);
-					break;
-				case TEXT:
-					ResultSetFormatter.out(outputStream, resultSet);
-					break;
-				case JSON:
-					ResultSetFormatter.outputAsJSON(outputStream, resultSet);
-					break;
-				case XML:
-					ResultSetFormatter.outputAsXML(outputStream, resultSet);
-					break;
-				default:
-					throw new RDFServiceException("unrecognized result format");
-				}
-			} finally {
-				qe.close();
-			}
-		} finally {
-			dw.close();
-		}
-
-	}
-
 	/**
 	 * TODO Is there a way to accomplish this without buffering the entire result?
 	 */
@@ -548,6 +513,47 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     }
     
     @Override
+	public void serializeAll(OutputStream outputStream)
+			throws RDFServiceException {
+    	String query = "SELECT * WHERE { GRAPH ?g {?s ?p ?o}}";
+		serialize(outputStream, query);
+	}
+
+	@Override
+	public void serializeGraph(String graphURI, OutputStream outputStream)
+			throws RDFServiceException {
+		String query = "SELECT * WHERE { GRAPH <" + graphURI + "> {?s ?p ?o}}";
+		serialize(outputStream, query);
+	}
+
+	private void serialize(OutputStream outputStream, String query) {
+		DatasetWrapper dw = getDatasetWrapper();
+		try {
+			Dataset d = dw.getDataset();
+			Query q = createQuery(query);
+			QueryExecution qe = createQueryExecution(query, q, d);
+			// These properties only help for SDB, but shouldn't hurt for TDB.
+			qe.getContext().set(SDB.jdbcFetchSize, Integer.MIN_VALUE);
+			qe.getContext().set(SDB.jdbcStream, true);
+			qe.getContext().set(SDB.streamGraphAPI, true);
+			try {
+				ResultSet resultSet = qe.execSelect();
+				if (resultSet.getResultVars().contains("g")) {
+					Iterator<Quad> quads = new ResultSetQuadsIterator(resultSet);
+					RDFDataMgr.writeQuads(outputStream, quads);
+				} else {
+					Iterator<Triple> triples = new ResultSetTriplesIterator(resultSet);
+					RDFDataMgr.writeTriples(outputStream, triples);
+				}
+			} finally {
+				qe.close();
+			}
+		} finally {
+			dw.close();
+		}
+	}
+
+	@Override
     public void close() {
         // nothing
     }

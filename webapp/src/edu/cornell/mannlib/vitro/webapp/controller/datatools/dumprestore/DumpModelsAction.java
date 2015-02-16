@@ -16,7 +16,6 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.BadRequestException;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 
 /**
@@ -70,9 +69,7 @@ class DumpModelsAction extends AbstractDumpRestoreAction {
 	 */
 	private void dumpNQuads(RDFService rdfService, String query)
 			throws RDFServiceException, IOException {
-		JsonToNquads converter = new JsonToNquads(resp.getOutputStream());
-		rdfService.sparqlSelectQuery(query, ResultFormat.JSON, converter);
-		converter.close();
+		rdfService.serializeAll(resp.getOutputStream());
 	}
 
 }

@@ -53,13 +53,6 @@ public class LoggingRDFService implements RDFService {
 	}
 
 	@Override
-	public void sparqlSelectQuery(String query, ResultFormat resultFormat,
-			OutputStream outputStream) throws RDFServiceException {
-		innerService.sparqlSelectQuery(query, resultFormat,
-				outputStream);
-	}
-	
-	@Override
 	public InputStream sparqlSelectQuery(String query, ResultFormat resultFormat)
 			throws RDFServiceException {
 		try (RDFServiceLogger l = new RDFServiceLogger(resultFormat, query)) {
@@ -71,6 +64,22 @@ public class LoggingRDFService implements RDFService {
 	public boolean sparqlAskQuery(String query) throws RDFServiceException {
 		try (RDFServiceLogger l = new RDFServiceLogger(query)) {
 			return innerService.sparqlAskQuery(query);
+		}
+	}
+
+	@Override
+	public void serializeAll(OutputStream outputStream)
+			throws RDFServiceException {
+		try (RDFServiceLogger l = new RDFServiceLogger()) {
+			innerService.serializeAll(outputStream);
+		}
+	}
+
+	@Override
+	public void serializeGraph(String graphURI, OutputStream outputStream)
+			throws RDFServiceException {
+		try (RDFServiceLogger l = new RDFServiceLogger(graphURI)) {
+			innerService.serializeGraph(graphURI, outputStream);
 		}
 	}
 

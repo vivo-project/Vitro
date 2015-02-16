@@ -27,6 +27,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.jena.riot.RDFDataMgr;
 
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
@@ -43,6 +44,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.sparql.core.Quad;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
@@ -53,6 +55,8 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.ChangeSetImpl;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.ListeningGraph;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetQuadsIterator;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetTriplesIterator;
 
 /*
  * API to write, read, and update Vitro's RDF store, with support 
@@ -263,20 +267,6 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		return result;
 	}
 
-	/**
-	 * TODO rewrite the query to use this form instead - avoid one level of
-	 * buffering.
-	 */
-	@Override
-	public void sparqlSelectQuery(String query, ResultFormat resultFormat,
-			OutputStream outputStream) throws RDFServiceException {
-		try (InputStream input = sparqlSelectQuery(query, resultFormat)) {
-			IOUtils.copy(input, outputStream);
-		} catch (IOException e) {
-			throw new RDFServiceException(e);
-		}
-	}
-	
 	/**
 	 * Performs a SPARQL select query against the knowledge base. The query may have
 	 * an embedded graph identifier.
@@ -826,4 +816,31 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
                 getSerializationFormatString(modelChange.getSerializationFormat()));
         return model;
     }
+
+    @Override
+	public void serializeAll(OutputStream outputStream)
+			throws RDFServiceException {
+    	String query = "SELECT * WHERE { GRAPH ?g {?s ?p ?o}}";
+		serialize(outputStream, query);
+	}
+
+	@Override
+	public void serializeGraph(String graphURI, OutputStream outputStream)
+			throws RDFServiceException {
+		String query = "SELECT * WHERE { GRAPH <" + graphURI + "> {?s ?p ?o}}";
+		serialize(outputStream, query);
+	}
+
+	private void serialize(OutputStream outputStream, String query) throws RDFServiceException {
+        InputStream resultStream = sparqlSelectQuery(query, RDFService.ResultFormat.JSON);
+        ResultSet resultSet = ResultSetFactory.fromJSON(resultStream);
+		if (resultSet.getResultVars().contains("g")) {
+			Iterator<Quad> quads = new ResultSetQuadsIterator(resultSet);
+			RDFDataMgr.writeQuads(outputStream, quads);
+		} else {
+			Iterator<Triple> triples = new ResultSetTriplesIterator(resultSet);
+			RDFDataMgr.writeTriples(outputStream, triples);
+		}
+	}
+
 }
