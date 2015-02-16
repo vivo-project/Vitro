@@ -104,7 +104,7 @@ public class ABoxRecomputer {
         }
         try {
             if  (searchIndexer != null) {
-                searchIndexer.pause();
+                searchIndexer.pauseWithoutDeferring();
             }
             recomputeABox();
         } finally {
