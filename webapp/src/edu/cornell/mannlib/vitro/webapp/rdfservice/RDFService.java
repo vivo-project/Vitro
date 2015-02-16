@@ -160,6 +160,18 @@ public interface RDFService {
 	public void serializeGraph(String graphURI, OutputStream outputStream) throws RDFServiceException;
 
 	/**
+	 * Tests to see whether the supplied serialization is equivalent to the 
+	 * named graph, as it exists in the store. Equivalence means that if this 
+	 * serialization were written to the store, the resulting graph would be 
+	 * isomorphic to the existing named graph.
+	 * 
+	 * @param graphURI - the URI of the graph to test against. May not be null.
+	 * @param serializedGraph - the contents to be compared with the existing graph. May not be null.
+	 * @param serializationFormat - May not be null.
+	 */
+	public boolean isEquivalentGraph(String graphURI, InputStream serializedGraph, ModelSerializationFormat serializationFormat);
+	
+	/**
 	 * Registers a listener to listen to changes in any graph in
 	 * the RDF store.
 	 * 

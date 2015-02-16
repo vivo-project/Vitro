@@ -39,12 +39,15 @@ import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.sparql.core.Quad;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetQuadsIterator;
 import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetTriplesIterator;
@@ -551,6 +554,19 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 		} finally {
 			dw.close();
 		}
+	}
+
+	/**
+	 * The basic version. Parse the model from the file, read the model from the
+	 * tripleStore, and ask whether they are isomorphic.
+	 */
+	@Override
+	public boolean isEquivalentGraph(String graphURI, InputStream serializedGraph, 
+			ModelSerializationFormat serializationFormat) {
+		Model fileModel = RDFServiceUtils.parseModel(serializedGraph, serializationFormat);
+		Model tripleStoreModel = new RDFServiceDataset(this).getNamedModel(graphURI);
+		Model fromTripleStoreModel = ModelFactory.createDefaultModel().add(tripleStoreModel);
+		return fileModel.isIsomorphicWith(fromTripleStoreModel);
 	}
 
 	@Override

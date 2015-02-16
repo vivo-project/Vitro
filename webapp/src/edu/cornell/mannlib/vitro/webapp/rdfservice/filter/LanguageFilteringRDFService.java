@@ -336,6 +336,13 @@ public class LanguageFilteringRDFService implements RDFService {
 	}
 
 	@Override
+	public boolean isEquivalentGraph(String graphURI,
+			InputStream serializedGraph,
+			ModelSerializationFormat serializationFormat) {
+		return s.isEquivalentGraph(graphURI, serializedGraph, serializationFormat);
+	}
+
+	@Override
     public void registerListener(ChangeListener changeListener)
             throws RDFServiceException {
         // TODO Auto-generated method stub

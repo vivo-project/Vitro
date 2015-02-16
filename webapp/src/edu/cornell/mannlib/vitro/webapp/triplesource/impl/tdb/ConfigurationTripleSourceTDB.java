@@ -18,7 +18,6 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ConfigurationTripleSource;
-import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.TripleStoreQuirks;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
@@ -41,8 +40,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
  */
 public class ConfigurationTripleSourceTDB extends ConfigurationTripleSource {
 	private static final String DIRECTORY_TDB = "tdbModels";
-
-	private final TripleStoreQuirks quirks = new TDBTripleStoreQuirks();
 
 	private volatile RDFService rdfService;
 	private RDFServiceFactory rdfServiceFactory;
@@ -112,11 +109,6 @@ public class ConfigurationTripleSourceTDB extends ConfigurationTripleSource {
 			OntModelCache longTermOntModelCache) {
 		// No need to use short-term models.
 		return longTermOntModelCache;
-	}
-
-	@Override
-	public TripleStoreQuirks getQuirks() {
-		return quirks;
 	}
 
 	@Override

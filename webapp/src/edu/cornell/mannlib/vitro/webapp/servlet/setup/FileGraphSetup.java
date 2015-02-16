@@ -4,9 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONTENT;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,6 +40,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 // This ContextListener must run after the JenaDataSourceSetup ContextListener
@@ -204,30 +208,26 @@ public class FileGraphSetup implements ServletContextListener {
      */
     public boolean updateGraphInDB(RDFService rdfService, Model fileModel, String type, Path path) {
         String graphURI = pathToURI(path,type);
-        Model dbModel = new RDFServiceDataset(rdfService).getNamedModel(graphURI);
-        boolean modelChanged = false;
-		log.debug(String.format(
-				"%s %s dbModel size is %d, fileModel size is %d", type,
-				path.getFileName(), dbModel.size(), fileModel.size()));
         
-
-		// Isomorphism has some quirky issues with TDB, and perhaps also with Virtuoso.
-		boolean isChanged = ApplicationUtils.instance()
-				.getContentTripleSource().getQuirks()
-				.hasFileGraphChanged(fileModel, dbModel, graphURI);
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        fileModel.write(buffer, "N-TRIPLE");
+		InputStream inStream = new ByteArrayInputStream(buffer.toByteArray());
+		if (rdfService.isEquivalentGraph(graphURI, inStream, ModelSerializationFormat.NTRIPLE)) {
+			return false;
+		}
         
-        if (dbModel.isEmpty()  && !fileModel.isEmpty()) {
-            dbModel.add(fileModel);
-            modelChanged = true;
-        } else if (isChanged) {
-            log.info("Updating " + path + " because graphs are not isomorphic");
-            log.info("dbModel: " + dbModel.size() + " ; fileModel: " + fileModel.size());
-            dbModel.removeAll();
-            dbModel.add(fileModel);
-            modelChanged = true;
-        }
+		Model dbModel = new RDFServiceDataset(rdfService).getNamedModel(graphURI);
+		if (log.isDebugEnabled()) {
+			log.debug(String.format(
+					"%s %s dbModel size is %d, fileModel size is %d", type,
+					path.getFileName(), dbModel.size(), fileModel.size()));
+		}
 
-        return modelChanged;
+		log.info("Updating " + path + " because graphs are not isomorphic");
+		log.info("dbModel: " + dbModel.size() + " ; fileModel: " + fileModel.size());
+		dbModel.removeAll();
+		dbModel.add(fileModel);
+		return true;
     }
 
     /*

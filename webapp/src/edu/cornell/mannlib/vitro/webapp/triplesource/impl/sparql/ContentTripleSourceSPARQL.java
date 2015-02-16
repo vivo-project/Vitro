@@ -13,13 +13,11 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource;
-import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.TripleStoreQuirks;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging.LoggingRDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sparql.RDFServiceSparql;
-import edu.cornell.mannlib.vitro.webapp.triplesource.impl.DefaultTripleStoreQuirks;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
@@ -38,8 +36,6 @@ public class ContentTripleSourceSPARQL extends ContentTripleSource {
 	private String endpointURI;
 	private String updateEndpointURI; // Optional
 	
-	private final TripleStoreQuirks quirks = new DefaultTripleStoreQuirks();
-
 	private RDFService rdfService;
 	private RDFServiceFactory rdfServiceFactory;
 	private Dataset dataset;
@@ -134,11 +130,6 @@ public class ContentTripleSourceSPARQL extends ContentTripleSource {
 			OntModelCache longTermOntModelCache) {
 		// No need to use short-term models.
 		return longTermOntModelCache;
-	}
-
-	@Override
-	public TripleStoreQuirks getQuirks() {
-		return quirks;
 	}
 
 	@Override

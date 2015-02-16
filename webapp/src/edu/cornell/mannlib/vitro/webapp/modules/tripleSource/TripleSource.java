@@ -24,7 +24,4 @@ public interface TripleSource extends Application.Module{
 
 	OntModelCache getShortTermOntModels(RDFService shortTermRdfService,
 			OntModelCache longTermOntModelCache);
-
-	/** Ways in which this TripleSource behaves oddly. */
-	TripleStoreQuirks getQuirks();
 }

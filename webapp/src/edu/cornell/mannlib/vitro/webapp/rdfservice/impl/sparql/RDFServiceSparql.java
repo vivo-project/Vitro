@@ -46,6 +46,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sparql.core.Quad;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
@@ -54,6 +55,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.ChangeSetImpl;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.ListeningGraph;
 import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetQuadsIterator;
 import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetTriplesIterator;
@@ -628,8 +630,6 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         Model blankNodeModel = ModelFactory.createDefaultModel();
         blankNodeModel.add(blankNodeStatements);
         
-        
-        
         log.debug("update model size " + model.size());       
         log.debug("blank node model size " + blankNodeModel.size());
         
@@ -841,6 +841,19 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 			Iterator<Triple> triples = new ResultSetTriplesIterator(resultSet);
 			RDFDataMgr.writeTriples(outputStream, triples);
 		}
+	}
+
+	/**
+	 * The basic version. Parse the model from the file, read the model from the
+	 * tripleStore, and ask whether they are isomorphic.
+	 */
+	@Override
+	public boolean isEquivalentGraph(String graphURI, InputStream serializedGraph, 
+			ModelSerializationFormat serializationFormat) {
+		Model fileModel = RDFServiceUtils.parseModel(serializedGraph, serializationFormat);
+		Model tripleStoreModel = new RDFServiceDataset(this).getNamedModel(graphURI);
+		Model fromTripleStoreModel = ModelFactory.createDefaultModel().add(tripleStoreModel);
+		return fileModel.isIsomorphicWith(fromTripleStoreModel);
 	}
 
 }

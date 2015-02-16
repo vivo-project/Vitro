@@ -16,7 +16,6 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.ContentTripleSource;
-import edu.cornell.mannlib.vitro.webapp.modules.tripleSource.TripleStoreQuirks;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
@@ -40,8 +39,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
  * Memory-map the small content models, and add the standard decorators.
  */
 public class ContentTripleSourceTDB extends ContentTripleSource {
-	private final TripleStoreQuirks quirks = new TDBTripleStoreQuirks();
-
 	private String tdbPath;
 
 	private volatile RDFService rdfService;
@@ -125,11 +122,6 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 			OntModelCache longTermOntModelCache) {
 		// No need to use short-term models.
 		return longTermOntModelCache;
-	}
-
-	@Override
-	public TripleStoreQuirks getQuirks() {
-		return quirks;
 	}
 
 	@Override
