@@ -14,6 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
@@ -57,8 +58,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         if (fauxProperty != null) {
         	this.name = fauxProperty.getDisplayName();
 			this.displayLimit = fauxProperty.getDisplayLimit();
-        } 
-
+        }
         setVerboseDisplayValues(property);
     }
     
