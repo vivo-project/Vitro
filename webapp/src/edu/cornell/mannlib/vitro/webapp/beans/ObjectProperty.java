@@ -55,13 +55,13 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
 
     private String domainEntitySortDirection = null;
     private Integer domainDisplayTier = null;
-    private Integer domainDisplayLimit = 5;
+    private Integer domainDisplayLimit = null;
 
     private String objectIndividualSortPropertyURI = null;
     
     private String rangeEntitySortDirection = null;
     private Integer rangeDisplayTier = null;
-    private Integer rangeDisplayLimit = 5;
+    private Integer rangeDisplayLimit = null;
     
     private boolean selectFromExisting = true;
     private boolean offerCreateNewOption = false;
