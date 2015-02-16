@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore;
 
 import static edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.ACTION_DUMP;
-import static edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.PARAMETER_FORMAT;
 import static edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.PARAMETER_WHICH;
 
 import java.io.IOException;
@@ -15,7 +14,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.BadRequestException;
-import edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.DumpFormat;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
@@ -32,8 +30,10 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 class DumpModelsAction extends AbstractDumpRestoreAction {
 	private static final Log log = LogFactory.getLog(DumpModelsAction.class);
 
+	private static final String N_QUADS_EXTENSION = ".nq";
+	private static final String N_QUADS_MIME_TYPE = "application/n-quads";
+
 	private final HttpServletResponse resp;
-	private final DumpFormat format;
 	private final WhichService which;
 	private final String queryString;
 
@@ -41,14 +41,12 @@ class DumpModelsAction extends AbstractDumpRestoreAction {
 			throws BadRequestException {
 		super(req);
 		this.resp = resp;
-		this.format = getEnumFromParameter(DumpFormat.class, PARAMETER_FORMAT);
 		this.which = getEnumFromParameter(WhichService.class, PARAMETER_WHICH);
 		this.queryString = req.getQueryString();
-
 	}
 
 	void redirectToFilename() throws IOException {
-		String filename = which + "." + format.getExtension();
+		String filename = which + N_QUADS_EXTENSION;
 		String urlPath = req.getContextPath() + req.getServletPath()
 				+ ACTION_DUMP;
 		resp.sendRedirect(urlPath + "/" + filename + "?" + queryString);
@@ -59,16 +57,11 @@ class DumpModelsAction extends AbstractDumpRestoreAction {
 			RDFService rdfService = getRdfService(which);
 			String query = "SELECT * WHERE { GRAPH ?g {?s ?p ?o}}";
 
-			resp.setContentType(format.getMimeType());
-			if (format == DumpFormat.NQUADS) {
-				dumpNQuads(rdfService, query);
-			} else {
-				rdfService.sparqlSelectQuery(query,
-						format.getRdfServiceFormat(), resp.getOutputStream());
-			}
+			resp.setContentType(N_QUADS_MIME_TYPE);
+			
+			dumpNQuads(rdfService, query);
 		} catch (Throwable t) {
-			log.error("Failed to dump " + which + " models as " + format + ".",
-					t);
+			log.error("Failed to dump " + which + " models as N-Quads.", t);
 		}
 	}
 
