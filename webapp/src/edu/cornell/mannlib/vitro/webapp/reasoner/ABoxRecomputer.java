@@ -109,8 +109,8 @@ public class ABoxRecomputer {
             recomputeABox();
         } finally {
             if  (searchIndexer != null) {
-                searchIndexer.rebuildIndex();
                 searchIndexer.unpause();
+                searchIndexer.rebuildIndex();
             }
             synchronized (lock1) {
                 recomputing = false;	    		
