@@ -28,12 +28,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.ServletContext;
 
-import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.rdf.model.Statement;
 
+import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
@@ -87,7 +87,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 
 	private final ListenerList listeners = new ListenerList();
 	private final TaskQueue taskQueue = new TaskQueue();
-	private final Scheduler scheduler = new Scheduler(this, taskQueue);
+	private final Scheduler scheduler = new Scheduler(taskQueue);
 
 	private Integer threadPoolSize;
 	private WorkerThreadPool pool;
@@ -209,7 +209,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 	}
 
     @Override
-    public void pauseWithoutDeferring() {
+    public void pauseInAnticipationOfRebuild() {
         if (!isPaused() && !isShutdown()) {
             ignoreTasksWhilePaused = true;
             rebuildOnUnpause = false;
@@ -398,12 +398,10 @@ public class SearchIndexerImpl implements SearchIndexer {
 	private static class Scheduler {
 		private final TaskQueue taskQueue;
 		private final List<Task> deferredQueue;
-        private final SearchIndexerImpl indexer;
 		private volatile boolean started;
 		private volatile boolean paused;
 
-		public Scheduler(SearchIndexerImpl indexer, TaskQueue taskQueue) {
-            this.indexer = indexer;
+		public Scheduler(TaskQueue taskQueue) {
 			this.taskQueue = taskQueue;
 			this.deferredQueue = new ArrayList<Task>();
 		}
@@ -449,9 +447,7 @@ public class SearchIndexerImpl implements SearchIndexer {
                 taskQueue.scheduleTask(task);
 				log.debug("moved task from deferred queue to task queue: " + task);
 			}
-
-            // Empty out the deferred queue as we've now processed it
-            deferredQueue.clear();
+			deferredQueue.clear();
 		}
 
 	}
@@ -554,35 +550,65 @@ public class SearchIndexerImpl implements SearchIndexer {
 		}
 	}
 
-    /**
-     * Interface for tasks to access the Indexer config
-     */
-    public static interface IndexerConfig {
-        public IndexingUriFinderList uriFinderList();
-        public SearchIndexExcluderList excluderList();
-        public DocumentModifierList documentModifierList();
-        public IndividualDao individualDao();
-        public ListenerList listenerList();
-        public WorkerThreadPool workerThreadPool();
-    }
+	/**
+	 * Interface for tasks to access the Indexer config
+	 */
+	public static interface IndexerConfig {
+		public IndexingUriFinderList uriFinderList();
 
-    /**
-     * Implementation of IndexerConfig
-     * Defers access to the configuration until the task is running, so a Task
-     * created and deferred before the indexer is started will not cause a NullPointerException
-     */
-    private static class IndexerConfigImpl implements IndexerConfig {
-        private final SearchIndexerImpl sii;
+		public SearchIndexExcluderList excluderList();
 
-        public IndexerConfigImpl(SearchIndexerImpl sii) { this.sii = sii; }
+		public DocumentModifierList documentModifierList();
 
-        public IndexingUriFinderList uriFinderList()       { return sii.createFindersList(); }
-        public SearchIndexExcluderList excluderList()      { return sii.createExcludersList(); }
-        public DocumentModifierList documentModifierList() { return sii.createModifiersList(); }
-        public IndividualDao individualDao()               { return sii.wadf.getIndividualDao(); }
-        public ListenerList listenerList()                 { return sii.listeners; }
-        public WorkerThreadPool workerThreadPool()         { return sii.pool; }
-    }
+		public IndividualDao individualDao();
+
+		public ListenerList listenerList();
+
+		public WorkerThreadPool workerThreadPool();
+	}
+
+	/**
+	 * Implementation of IndexerConfig Defers access to the configuration until
+	 * the task is running, so a Task created and deferred before the indexer is
+	 * started will not cause a NullPointerException
+	 */
+	private static class IndexerConfigImpl implements IndexerConfig {
+		private final SearchIndexerImpl sii;
+
+		public IndexerConfigImpl(SearchIndexerImpl sii) {
+			this.sii = sii;
+		}
+
+		@Override
+		public IndexingUriFinderList uriFinderList() {
+			return sii.createFindersList();
+		}
+
+		@Override
+		public SearchIndexExcluderList excluderList() {
+			return sii.createExcludersList();
+		}
+
+		@Override
+		public DocumentModifierList documentModifierList() {
+			return sii.createModifiersList();
+		}
+
+		@Override
+		public IndividualDao individualDao() {
+			return sii.wadf.getIndividualDao();
+		}
+
+		@Override
+		public ListenerList listenerList() {
+			return sii.listeners;
+		}
+
+		@Override
+		public WorkerThreadPool workerThreadPool() {
+			return sii.pool;
+		}
+	}
 
 	public static interface Task extends Runnable {
 		public SearchIndexerStatus getStatus();
@@ -688,28 +714,4 @@ public class SearchIndexerImpl implements SearchIndexer {
 		}
 
 	}
-
-    private static class StatementList {
-        List<Statement> changes;
-
-        public StatementList() {
-            changes = new ArrayList<Statement>();
-        }
-
-        public synchronized void addStatement(Statement stmt) {
-            changes.add(stmt);
-        }
-
-        public synchronized List<Statement> getStatements() {
-            try {
-                return new ArrayList<>(changes);
-            } finally {
-                changes.clear();
-            }
-        }
-
-        public synchronized int size() {
-            return changes.size();
-        }
-    };
 }

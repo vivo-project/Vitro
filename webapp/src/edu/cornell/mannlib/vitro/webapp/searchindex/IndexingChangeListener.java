@@ -15,10 +15,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.hp.hpl.jena.graph.Triple;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.jena.riot.RDFLanguages;
+import org.apache.jena.riot.RiotReader;
 
+import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -28,8 +30,6 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
-import org.apache.jena.riot.RDFLanguages;
-import org.apache.jena.riot.RiotReader;
 
 /**
  * When a change is heard, wait for an interval to see if more changes come in.
@@ -62,6 +62,7 @@ public class IndexingChangeListener implements ChangeListener,
 
 	private final SearchIndexer searchIndexer;
 	private final Ticker ticker;
+	private volatile boolean paused = true;
     private final Model defaultModel;
 
 	/** All access to the list must be synchronized. */
@@ -77,19 +78,33 @@ public class IndexingChangeListener implements ChangeListener,
 	}
 
 	private synchronized void noteChange(Statement stmt) {
-        changes.add(stmt);
-        ticker.start();
+        changes.add(stmt); 
+		if (!paused) {
+			ticker.start();
+		}
 	}
 
 	@Override
 	public void receiveSearchIndexerEvent(Event event) {
+		if (event.getType() == PAUSE) {
+			paused = true;
+		} else if (event.getType() == UNPAUSE) {
+			paused = false;
+			ticker.start();
+		} else if (event.getType() == START_REBUILD) {
+			discardChanges();
+		}
 	}
 
 	private synchronized void respondToTicker() {
-		if (!changes.isEmpty()) {
+		if (!paused && !changes.isEmpty()) {
 			searchIndexer.scheduleUpdatesForStatements(changes);
 			changes.clear();
 		}
+	}
+
+	private synchronized void discardChanges() {
+		changes.clear();
 	}
 
 	public void shutdown() {
@@ -128,13 +143,14 @@ public class IndexingChangeListener implements ChangeListener,
         try {
             // Use RiotReader to parse a Triple
             // NB A Triple can be serialized correctly with: FmtUtils.stringForTriple(triple, PrefixMapping.Factory.create()) + " .";
-            Iterator<Triple> it = RiotReader.createIteratorTriples(new ByteArrayInputStream(serializedTriple.getBytes("UTF-8")), RDFLanguages.NTRIPLES, null);
+            ByteArrayInputStream input = new ByteArrayInputStream(serializedTriple.getBytes("UTF-8"));
+			Iterator<Triple> it = RiotReader.createIteratorTriples(input, RDFLanguages.NTRIPLES, null);
 
             if (it.hasNext()) {
                 Triple triple = it.next();
 
                 if (it.hasNext()) {
-                    log.warn("More than one triple parsed from change event");
+                    log.warn("More than one triple parsed from change event: '" + serializedTriple + "'");
                 }
 
                 // Use the retained defaultModel instance to convert the Triple to a Statement
@@ -143,7 +159,7 @@ public class IndexingChangeListener implements ChangeListener,
                 // is created and attached to all of the Statements created by this instance
                 return defaultModel.asStatement(triple);
             } else {
-                throw new RuntimeException("no triple parsed from change event");
+                throw new RuntimeException("no triple parsed from change event: '" + serializedTriple + "'");
             }
         } catch (RuntimeException riot) {
             log.error("Failed to parse triple " + serializedTriple, riot);

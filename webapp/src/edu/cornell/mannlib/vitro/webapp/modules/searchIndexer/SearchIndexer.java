@@ -40,18 +40,19 @@ public interface SearchIndexer extends Application.Module {
 	 * unpause(). Fires a PAUSED event to listeners.
 	 * 
 	 * This call has no effect if already paused, or if called after shutdown.
-     */
+	 */
 	void pause();
 
-    /**
-     * Stop processing new tasks. Requests will be ignored and the index rebuilt when unpaused.
-     * Fires a PAUSED event to listeners.
-     *
-     * This call has no effect if already paused, or if called after shutdown.
-     */
-    void pauseWithoutDeferring();
+	/**
+	 * Stop processing new tasks. If any request is received while the indexer
+	 * is paused, the request will be ignored, but the index will be rebuilt
+	 * when unpaused. Fires a PAUSED event to listeners.
+	 * 
+	 * This call has no effect if already paused, or if called after shutdown.
+	 */
+	void pauseInAnticipationOfRebuild();
 
-    /**
+	/**
 	 * Resume processing new tasks. Any requests that were received since the
 	 * call to pause() will now be scheduled for processing. Fires an UNPAUSED
 	 * event to listeners.
