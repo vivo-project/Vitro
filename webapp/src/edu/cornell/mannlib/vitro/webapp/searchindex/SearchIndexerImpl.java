@@ -101,6 +101,11 @@ public class SearchIndexerImpl implements SearchIndexer {
     private boolean ignoreTasksWhilePaused = false;
     private boolean rebuildOnUnpause = false;
 
+    private volatile int paused = 0;
+
+    private List<Statement> pendingStatements = new ArrayList<Statement>();
+    private Collection<String> pendingUris = new ArrayList<String>();
+
 	// ----------------------------------------------------------------------
 	// ConfigurationBeanLoader methods.
 	// ----------------------------------------------------------------------
@@ -199,44 +204,66 @@ public class SearchIndexerImpl implements SearchIndexer {
 	}
 
 	@Override
-	public void pause() {
-		if (!isPaused() && !isShutdown()) {
-            ignoreTasksWhilePaused = false;
-            rebuildOnUnpause = false;
-			scheduler.pause();
-			fireEvent(PAUSE);
-		}
+	public synchronized void pause() {
+        if (!isShutdown()) {
+            paused++;
+            // Only fire a PAUSE event if we are transitioning to a paused state
+            if (paused == 1) {
+                fireEvent(PAUSE);
+            }
+        }
 	}
 
     @Override
-    public void pauseInAnticipationOfRebuild() {
-        if (!isPaused() && !isShutdown()) {
+    public synchronized void pauseInAnticipationOfRebuild() {
+        if (!isShutdown()) {
+            paused++;
             ignoreTasksWhilePaused = true;
-            rebuildOnUnpause = false;
-            scheduler.pause();
-            fireEvent(PAUSE);
+            // Only fire a PAUSE event if we are transitioning to a paused state
+            if (paused == 1) {
+                fireEvent(PAUSE);
+            }
         }
     }
 
 	@Override
-	public void unpause() {
-		if (isPaused() && !isShutdown()) {
-			scheduler.unpause();
-			fireEvent(UNPAUSE);
-            if (rebuildOnUnpause) {
+	public synchronized void unpause() {
+		if (paused > 0 && !isShutdown()) {
+            paused--;
+
+            // Only process if we transition to unpaused state
+            if (paused == 0) {
+                fireEvent(UNPAUSE);
+                if (rebuildOnUnpause) {
+                    rebuildIndex();
+                    pendingStatements.clear();
+                    pendingUris.clear();
+                } else {
+                    schedulePendingStatements();
+                    schedulePendingUris();
+                }
+
                 rebuildOnUnpause = false;
-                rebuildIndex();
+                ignoreTasksWhilePaused = false;
             }
 		}
 	}
 
-	private boolean isStarted() {
-		return scheduler.isStarted();
-	}
+    private synchronized void schedulePendingStatements() {
+        if (paused == 0 && pendingStatements.size() > 0) {
+            scheduleUpdatesForStatements(pendingStatements);
+            pendingStatements = new ArrayList<>();
+        }
+    }
 
-	private boolean isPaused() {
-		return scheduler.isPaused();
-	}
+    private synchronized  void schedulePendingUris() {
+        if (paused == 0 && pendingUris.size() > 0) {
+            scheduleUpdatesForUris(pendingUris);
+            pendingUris = new ArrayList<>();
+        }
+    }
+
+	private boolean isStarted() { return scheduler.isStarted();	}
 
 	private boolean isShutdown() {
 		return taskQueue.isShutdown();
@@ -264,8 +291,12 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (changes == null || changes.isEmpty()) {
 			return;
 		}
-        if (ignoreTasksWhilePaused && isPaused()) {
-            rebuildOnUnpause = true;
+        if (paused > 0) {
+            if (ignoreTasksWhilePaused) {
+                rebuildOnUnpause = true;
+            } else {
+                pendingStatements.addAll(changes);
+            }
             return;
         }
 
@@ -282,8 +313,12 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (uris == null || uris.isEmpty()) {
 			return;
 		}
-        if (ignoreTasksWhilePaused && isPaused()) {
-            rebuildOnUnpause = true;
+        if (paused > 0) {
+            if (ignoreTasksWhilePaused) {
+                rebuildOnUnpause = true;
+            } else {
+                pendingUris.addAll(uris);
+            }
             return;
         }
 
@@ -296,7 +331,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (isShutdown()) {
 			log.warn("Call to rebuildIndex after shutdown.");
 		}
-        if (ignoreTasksWhilePaused && isPaused()) {
+        if (paused > 0) {
             rebuildOnUnpause = true;
             return;
         }
@@ -345,7 +380,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 		}
 		synchronized (listeners) {
 			listeners.add(listener);
-			if (isPaused()) {
+			if (paused > 0) {
 				listener.receiveSearchIndexerEvent(new Event(PAUSE, getStatus()));
 			}
 		}
@@ -399,7 +434,6 @@ public class SearchIndexerImpl implements SearchIndexer {
 		private final TaskQueue taskQueue;
 		private final List<Task> deferredQueue;
 		private volatile boolean started;
-		private volatile boolean paused;
 
 		public Scheduler(TaskQueue taskQueue) {
 			this.taskQueue = taskQueue;
@@ -410,12 +444,8 @@ public class SearchIndexerImpl implements SearchIndexer {
 			return started;
 		}
 
-		public boolean isPaused() {
-			return paused;
-		}
-
 		public synchronized void scheduleTask(Task task) {
-            if (paused || !started) {
+            if (!started) {
                 deferredQueue.add(task);
                 log.debug("added task to deferred queue: " + task);
             } else {
@@ -426,20 +456,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 
 		public synchronized void start() {
 			started = true;
-			if (!paused) {
-				processDeferredTasks();
-			}
-		}
-
-		public synchronized void pause() {
-			paused = true;
-		}
-
-		public synchronized void unpause() {
-			paused = false;
-			if (started) {
-				processDeferredTasks();
-			}
+            processDeferredTasks();
 		}
 
 		private void processDeferredTasks() {
@@ -712,6 +729,5 @@ public class SearchIndexerImpl implements SearchIndexer {
 			}
 
 		}
-
 	}
 }
