@@ -332,7 +332,10 @@ public class SearchIndexerImpl implements SearchIndexer {
 			log.warn("Call to rebuildIndex after shutdown.");
 		}
         if (paused > 0) {
+            // Make sure we are rebuilding when we unpause,
+            // and don't bother noting any other changes until unpaused
             rebuildOnUnpause = true;
+            ignoreTasksWhilePaused = true;
             return;
         }
 
