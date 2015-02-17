@@ -169,7 +169,8 @@ public interface RDFService {
 	 * @param serializedGraph - the contents to be compared with the existing graph. May not be null.
 	 * @param serializationFormat - May not be null.
 	 */
-	public boolean isEquivalentGraph(String graphURI, InputStream serializedGraph, ModelSerializationFormat serializationFormat);
+	public boolean isEquivalentGraph(String graphURI, InputStream serializedGraph, 
+			ModelSerializationFormat serializationFormat) throws RDFServiceException;
 	
 	/**
 	 * Registers a listener to listen to changes in any graph in

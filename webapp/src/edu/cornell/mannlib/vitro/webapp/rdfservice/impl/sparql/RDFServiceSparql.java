@@ -849,7 +849,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	 */
 	@Override
 	public boolean isEquivalentGraph(String graphURI, InputStream serializedGraph, 
-			ModelSerializationFormat serializationFormat) {
+			ModelSerializationFormat serializationFormat) throws RDFServiceException {
 		Model fileModel = RDFServiceUtils.parseModel(serializedGraph, serializationFormat);
 		Model tripleStoreModel = new RDFServiceDataset(this).getNamedModel(graphURI);
 		Model fromTripleStoreModel = ModelFactory.createDefaultModel().add(tripleStoreModel);

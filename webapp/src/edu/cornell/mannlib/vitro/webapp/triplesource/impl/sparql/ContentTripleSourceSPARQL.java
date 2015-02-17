@@ -35,7 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 public class ContentTripleSourceSPARQL extends ContentTripleSource {
 	private String endpointURI;
 	private String updateEndpointURI; // Optional
-	
+
 	private RDFService rdfService;
 	private RDFServiceFactory rdfServiceFactory;
 	private Dataset dataset;
@@ -73,20 +73,22 @@ public class ContentTripleSourceSPARQL extends ContentTripleSource {
 
 	@Override
 	public void startup(Application application, ComponentStartupStatus ss) {
-		this.rdfServiceFactory = createRDFServiceFactory(createRDFService(ss));
+		this.rdfServiceFactory = createRDFServiceFactory(createRDFService(ss,
+				endpointURI, updateEndpointURI));
 		this.rdfService = this.rdfServiceFactory.getRDFService();
 		this.dataset = createDataset();
 		this.modelMaker = createModelMaker();
 	}
 
-	private RDFService createRDFService(ComponentStartupStatus ss) {
-		if (updateEndpointURI == null) {
-			ss.info("Using endpoint at " + endpointURI);
-			return new RDFServiceSparql(endpointURI);
+	protected RDFService createRDFService(ComponentStartupStatus ss,
+			String endpoint, String updateEndpoint) {
+		if (updateEndpoint == null) {
+			ss.info("Using endpoint at " + endpoint);
+			return new RDFServiceSparql(endpoint);
 		} else {
-			ss.info("Using read endpoint at " + endpointURI
-					+ " and update endpoint at " + updateEndpointURI);
-			return new RDFServiceSparql(endpointURI, updateEndpointURI);
+			ss.info("Using read endpoint at " + endpoint
+					+ " and update endpoint at " + updateEndpoint);
+			return new RDFServiceSparql(endpoint, updateEndpoint);
 		}
 	}
 
