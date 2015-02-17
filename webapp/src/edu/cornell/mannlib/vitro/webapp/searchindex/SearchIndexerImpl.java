@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.servlet.ServletContext;
 
+import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -86,7 +87,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 
 	private final ListenerList listeners = new ListenerList();
 	private final TaskQueue taskQueue = new TaskQueue();
-	private final Scheduler scheduler = new Scheduler(taskQueue);
+	private final Scheduler scheduler = new Scheduler(this, taskQueue);
 
 	private Integer threadPoolSize;
 	private WorkerThreadPool pool;
@@ -96,6 +97,9 @@ public class SearchIndexerImpl implements SearchIndexer {
 	private List<DocumentModifier> modifiers;
 	private Set<IndexingUriFinder> uriFinders;
 	private WebappDaoFactory wadf;
+
+    private boolean ignoreTasksWhilePaused = false;
+    private boolean rebuildOnUnpause = false;
 
 	// ----------------------------------------------------------------------
 	// ConfigurationBeanLoader methods.
@@ -197,16 +201,32 @@ public class SearchIndexerImpl implements SearchIndexer {
 	@Override
 	public void pause() {
 		if (!isPaused() && !isShutdown()) {
+            ignoreTasksWhilePaused = false;
+            rebuildOnUnpause = false;
 			scheduler.pause();
 			fireEvent(PAUSE);
 		}
 	}
+
+    @Override
+    public void pauseWithoutDeferring() {
+        if (!isPaused() && !isShutdown()) {
+            ignoreTasksWhilePaused = true;
+            rebuildOnUnpause = false;
+            scheduler.pause();
+            fireEvent(PAUSE);
+        }
+    }
 
 	@Override
 	public void unpause() {
 		if (isPaused() && !isShutdown()) {
 			scheduler.unpause();
 			fireEvent(UNPAUSE);
+            if (rebuildOnUnpause) {
+                rebuildOnUnpause = false;
+                rebuildIndex();
+            }
 		}
 	}
 
@@ -244,11 +264,12 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (changes == null || changes.isEmpty()) {
 			return;
 		}
+        if (ignoreTasksWhilePaused && isPaused()) {
+            rebuildOnUnpause = true;
+            return;
+        }
 
-		Task task = new UpdateStatementsTask(changes, createFindersList(),
-				createExcludersList(), createModifiersList(),
-				wadf.getIndividualDao(), listeners, pool);
-		scheduler.scheduleTask(task);
+		scheduler.scheduleTask(new UpdateStatementsTask(new IndexerConfigImpl(this), changes));
 		log.debug("Scheduled updates for " + changes.size() + " statements.");
 	}
 
@@ -261,10 +282,12 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (uris == null || uris.isEmpty()) {
 			return;
 		}
+        if (ignoreTasksWhilePaused && isPaused()) {
+            rebuildOnUnpause = true;
+            return;
+        }
 
-		Task task = new UpdateUrisTask(uris, createExcludersList(),
-				createModifiersList(), wadf.getIndividualDao(), listeners, pool);
-		scheduler.scheduleTask(task);
+		scheduler.scheduleTask(new UpdateUrisTask(new IndexerConfigImpl(this), uris));
 		log.debug("Scheduled updates for " + uris.size() + " uris.");
 	}
 
@@ -273,10 +296,12 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (isShutdown()) {
 			log.warn("Call to rebuildIndex after shutdown.");
 		}
+        if (ignoreTasksWhilePaused && isPaused()) {
+            rebuildOnUnpause = true;
+            return;
+        }
 
-		Task task = new RebuildIndexTask(createExcludersList(),
-				createModifiersList(), wadf.getIndividualDao(), listeners, pool);
-		scheduler.scheduleTask(task);
+		scheduler.scheduleTask(new RebuildIndexTask(new IndexerConfigImpl(this)));
 		log.debug("Scheduled a full rebuild.");
 	}
 
@@ -373,10 +398,12 @@ public class SearchIndexerImpl implements SearchIndexer {
 	private static class Scheduler {
 		private final TaskQueue taskQueue;
 		private final List<Task> deferredQueue;
+        private final SearchIndexerImpl indexer;
 		private volatile boolean started;
 		private volatile boolean paused;
 
-		public Scheduler(TaskQueue taskQueue) {
+		public Scheduler(SearchIndexerImpl indexer, TaskQueue taskQueue) {
+            this.indexer = indexer;
 			this.taskQueue = taskQueue;
 			this.deferredQueue = new ArrayList<Task>();
 		}
@@ -390,13 +417,13 @@ public class SearchIndexerImpl implements SearchIndexer {
 		}
 
 		public synchronized void scheduleTask(Task task) {
-			if (paused || !started) {
-				deferredQueue.add(task);
-				log.debug("added task to deferred queue: " + task);
-			} else {
+            if (paused || !started) {
+                deferredQueue.add(task);
+                log.debug("added task to deferred queue: " + task);
+            } else {
 				taskQueue.scheduleTask(task);
 				log.debug("added task to task queue: " + task);
-			}
+            }
 		}
 
 		public synchronized void start() {
@@ -419,10 +446,12 @@ public class SearchIndexerImpl implements SearchIndexer {
 
 		private void processDeferredTasks() {
 			for (Task task : deferredQueue) {
-				taskQueue.scheduleTask(task);
-				log.debug("moved task from deferred queue to task queue: "
-						+ task);
+                taskQueue.scheduleTask(task);
+				log.debug("moved task from deferred queue to task queue: " + task);
 			}
+
+            // Empty out the deferred queue as we've now processed it
+            deferredQueue.clear();
 		}
 
 	}
@@ -524,6 +553,36 @@ public class SearchIndexerImpl implements SearchIndexer {
 			}
 		}
 	}
+
+    /**
+     * Interface for tasks to access the Indexer config
+     */
+    public static interface IndexerConfig {
+        public IndexingUriFinderList uriFinderList();
+        public SearchIndexExcluderList excluderList();
+        public DocumentModifierList documentModifierList();
+        public IndividualDao individualDao();
+        public ListenerList listenerList();
+        public WorkerThreadPool workerThreadPool();
+    }
+
+    /**
+     * Implementation of IndexerConfig
+     * Defers access to the configuration until the task is running, so a Task
+     * created and deferred before the indexer is started will not cause a NullPointerException
+     */
+    private static class IndexerConfigImpl implements IndexerConfig {
+        private final SearchIndexerImpl sii;
+
+        public IndexerConfigImpl(SearchIndexerImpl sii) { this.sii = sii; }
+
+        public IndexingUriFinderList uriFinderList()       { return sii.createFindersList(); }
+        public SearchIndexExcluderList excluderList()      { return sii.createExcludersList(); }
+        public DocumentModifierList documentModifierList() { return sii.createModifiersList(); }
+        public IndividualDao individualDao()               { return sii.wadf.getIndividualDao(); }
+        public ListenerList listenerList()                 { return sii.listeners; }
+        public WorkerThreadPool workerThreadPool()         { return sii.pool; }
+    }
 
 	public static interface Task extends Runnable {
 		public SearchIndexerStatus getStatus();
@@ -629,4 +688,28 @@ public class SearchIndexerImpl implements SearchIndexer {
 		}
 
 	}
+
+    private static class StatementList {
+        List<Statement> changes;
+
+        public StatementList() {
+            changes = new ArrayList<Statement>();
+        }
+
+        public synchronized void addStatement(Statement stmt) {
+            changes.add(stmt);
+        }
+
+        public synchronized List<Statement> getStatements() {
+            try {
+                return new ArrayList<>(changes);
+            } finally {
+                changes.clear();
+            }
+        }
+
+        public synchronized int size() {
+            return changes.size();
+        }
+    };
 }

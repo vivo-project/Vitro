@@ -7,11 +7,7 @@ import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndex
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.STOP_URIS;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.State.PROCESSING_URIS;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,6 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Even
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerStatus.UriCounts;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexerUtils;
+import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.IndexerConfig;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.ListenerList;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.Task;
 import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerImpl.WorkerThreadPool;
@@ -49,220 +46,268 @@ import edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExclud
  * again at the end of the task.
  */
 public class UpdateUrisTask implements Task {
-	private static final Log log = LogFactory.getLog(UpdateUrisTask.class);
+    private static final Log log = LogFactory.getLog(UpdateUrisTask.class);
 
-	private final Set<String> uris;
-	private final IndividualDao indDao;
-	private final SearchIndexExcluderList excluders;
-	private final DocumentModifierList modifiers;
-	private final ListenerList listeners;
-	private final WorkerThreadPool pool;
+    private final IndexerConfig config;
+    private UpdateUrisTaskImpl impl;
 
-	private final Status status;
-	private final SearchEngine searchEngine;
+    private final Collection<String> uris;
+    private Date since = new Date();
 
-	public UpdateUrisTask(Collection<String> uris,
-			SearchIndexExcluderList excluders, DocumentModifierList modifiers,
-			IndividualDao indDao, ListenerList listeners, WorkerThreadPool pool) {
-		this.uris = new HashSet<>(uris);
-		this.excluders = excluders;
-		this.modifiers = modifiers;
-		this.indDao = indDao;
-		this.listeners = listeners;
-		this.pool = pool;
+    public UpdateUrisTask(IndexerConfig config, Collection<String> uris) {
+        this.config = config;
+        this.uris = new HashSet<>(uris);
+    }
 
-		this.status = new Status(this, uris.size(), 500);
+    static void runNow(Collection<String> uris, SearchIndexExcluderList excluders, DocumentModifierList modifiers, IndividualDao indDao, ListenerList listeners, WorkerThreadPool pool) {
+        UpdateUrisTaskImpl impl = new UpdateUrisTaskImpl(uris, excluders, modifiers, indDao, listeners, pool);
+        impl.run();
+    }
 
-		this.searchEngine = ApplicationUtils.instance().getSearchEngine();
+    @Override
+    public void run() {
+        impl = new UpdateUrisTaskImpl(config, uris);
+        impl.run();
+    }
 
-	}
+    @Override
+    public SearchIndexerStatus getStatus() {
+        if (impl != null) {
+            return impl.getStatus();
+        }
 
-	@Override
-	public void run() {
-		listeners.fireEvent(new Event(START_URIS, status
-				.getSearchIndexerStatus()));
-		excluders.startIndexing();
-		modifiers.startIndexing();
+        return new SearchIndexerStatus(PROCESSING_URIS, since, new UriCounts(0, 0, 0, uris.size(), uris.size()));
+    }
 
-		for (String uri : uris) {
-			if (isInterrupted()) {
-				log.info("Interrupted: " + status.getSearchIndexerStatus());
-				break;
-			} else if (uri == null) {
-				// Nothing to do
-			} else {
-				Individual ind = getIndividual(uri);
-				if (ind == null) {
-					deleteDocument(uri);
-				} else if (isExcluded(ind)) {
-					excludeDocument(uri);
-				} else {
-					updateDocument(ind);
-				}
-			}
-		}
-		pool.waitUntilIdle();
+    @Override
+    public void notifyWorkUnitCompletion(Runnable workUnit) {
+        if (impl != null) {
+            impl.notifyWorkUnitCompletion(workUnit);
+        }
+    }
 
-		commitChanges();
+    private static class UpdateUrisTaskImpl implements Task {
+        private final Collection<String> uris;
+        private final IndividualDao indDao;
+        private final SearchIndexExcluderList excluders;
+        private final DocumentModifierList modifiers;
+        private final ListenerList listeners;
+        private final WorkerThreadPool pool;
 
-		excluders.stopIndexing();
-		modifiers.stopIndexing();
-		listeners.fireEvent(new Event(STOP_URIS, status
-				.getSearchIndexerStatus()));
-	}
+        private final Status status;
+        private final SearchEngine searchEngine;
 
-	private boolean isInterrupted() {
-		if (Thread.interrupted()) {
-			Thread.currentThread().interrupt();
-			return true;
-		} else {
-			return false;
-		}
-	}
+        public UpdateUrisTaskImpl(IndexerConfig config, Collection<String> uris) {
+            this.excluders = config.excluderList();
+            this.modifiers = config.documentModifierList();
+            this.indDao = config.individualDao();
+            this.listeners = config.listenerList();
+            this.pool = config.workerThreadPool();
 
-	private Individual getIndividual(String uri) {
-		Individual ind = indDao.getIndividualByURI(uri);
-		if (ind == null) {
-			log.debug("Found no individual for '" + uri + "'");
-		}
-		return ind;
-	}
+            this.uris = uris;
+            this.status = new Status(this, uris.size(), 500);
 
-	private boolean isExcluded(Individual ind) {
-		return excluders.isExcluded(ind);
-	}
+            this.searchEngine = ApplicationUtils.instance().getSearchEngine();
+        }
 
-	/** A delete is fast enough to be done synchronously. */
-	private void deleteDocument(String uri) {
-		try {
-			searchEngine.deleteById(SearchIndexerUtils.getIdForUri(uri));
-			status.incrementDeletes();
-			log.debug("deleted '" + uri + "' from search index.");
-		} catch (SearchEngineNotRespondingException e) {
-			log.warn("Failed to delete '" + uri + "' from search index: "
-					+ "the search engine is not responding.");
-		} catch (Exception e) {
-			log.warn("Failed to delete '" + uri + "' from search index", e);
-		}
-	}
+        public UpdateUrisTaskImpl(Collection<String> uris, SearchIndexExcluderList excluders, DocumentModifierList modifiers, IndividualDao indDao, ListenerList listeners, WorkerThreadPool pool) {
+            this.uris = uris;
+            this.excluders = excluders;
+            this.modifiers = modifiers;
+            this.indDao = indDao;
+            this.listeners = listeners;
+            this.pool = pool;
+            this.status = new Status(this, uris.size(), 500);
 
-	/** An exclusion is just a delete for different reasons. */
-	private void excludeDocument(String uri) {
-		try {
-			searchEngine.deleteById(SearchIndexerUtils.getIdForUri(uri));
-			status.incrementExclusions();
-			log.debug("excluded '" + uri + "' from search index.");
-		} catch (SearchEngineNotRespondingException e) {
-			log.warn("Failed to exclude '" + uri + "' from search index: "
-					+ "the search engine is not responding.", e);
-		} catch (Exception e) {
-			log.warn("Failed to exclude '" + uri + "' from search index", e);
-		}
-	}
+            this.searchEngine = ApplicationUtils.instance().getSearchEngine();
+        }
 
-	private void updateDocument(Individual ind) {
-		Runnable workUnit = new UpdateDocumentWorkUnit(ind, modifiers);
-		pool.submit(workUnit, this);
-		log.debug("scheduled update to " + ind);
-	}
+        @Override
+        public void run() {
+            listeners.fireEvent(new Event(START_URIS, status.getSearchIndexerStatus()));
+            excluders.startIndexing();
+            modifiers.startIndexing();
 
-	private void fireEvent(Event event) {
-		listeners.fireEvent(event);
-		if (event.getType() == PROGRESS || event.getType() == STOP_URIS) {
-			commitChanges();
-		}
-	}
+            for (String uri : uris) {
+                if (isInterrupted()) {
+                    log.info("Interrupted: " + status.getSearchIndexerStatus());
+                    break;
+                } else if (uri == null) {
+                    // Nothing to do
+                } else {
+                    Individual ind = getIndividual(uri);
+                    if (ind == null) {
+                        deleteDocument(uri);
+                    } else if (isExcluded(ind)) {
+                        excludeDocument(uri);
+                    } else {
+                        updateDocument(ind);
+                    }
+                }
+            }
+            pool.waitUntilIdle();
 
-	private void commitChanges() {
-		try {
-			searchEngine.commit();
-		} catch (SearchEngineException e) {
-			log.warn("Failed to commit changes.", e);
-		}
-	}
+            commitChanges();
 
-	@Override
-	public void notifyWorkUnitCompletion(Runnable workUnit) {
-		log.debug("completed update to "
-				+ ((UpdateDocumentWorkUnit) workUnit).getInd());
-		status.incrementUpdates();
-	}
+            excluders.stopIndexing();
+            modifiers.stopIndexing();
+            listeners.fireEvent(new Event(STOP_URIS, status.getSearchIndexerStatus()));
+        }
 
-	@Override
-	public SearchIndexerStatus getStatus() {
-		return status.getSearchIndexerStatus();
-	}
+        private boolean isInterrupted() {
+            if (Thread.interrupted()) {
+                Thread.currentThread().interrupt();
+                return true;
+            } else {
+                return false;
+            }
+        }
 
-	// ----------------------------------------------------------------------
-	// helper classes
-	// ----------------------------------------------------------------------
+        private Individual getIndividual(String uri) {
+            Individual ind = indDao.getIndividualByURI(uri);
+            if (ind == null) {
+                log.debug("Found no individual for '" + uri + "'");
+            }
+            return ind;
+        }
 
-	/**
-	 * A thread-safe collection of status information. All methods are
-	 * synchronized.
-	 */
-	private static class Status {
-		private final UpdateUrisTask parent;
-		private final int total;
-		private final int progressInterval;
-		private int updated = 0;
-		private int deleted = 0;
-		private int excluded = 0;
-		private Date since = new Date();
+        private boolean isExcluded(Individual ind) {
+            return excluders.isExcluded(ind);
+        }
 
-		public Status(UpdateUrisTask parent, int total, int progressInterval) {
-			this.parent = parent;
-			this.total = total;
-			this.progressInterval = progressInterval;
-		}
+        /**
+         * A delete is fast enough to be done synchronously.
+         */
+        private void deleteDocument(String uri) {
+            try {
+                searchEngine.deleteById(SearchIndexerUtils.getIdForUri(uri));
+                status.incrementDeletes();
+                log.debug("deleted '" + uri + "' from search index.");
+            } catch (SearchEngineNotRespondingException e) {
+                log.warn("Failed to delete '" + uri + "' from search index: "
+                        + "the search engine is not responding.");
+            } catch (Exception e) {
+                log.warn("Failed to delete '" + uri + "' from search index", e);
+            }
+        }
 
-		public synchronized void incrementUpdates() {
-			updated++;
-			since = new Date();
-			maybeFireProgressEvent();
-		}
+        /**
+         * An exclusion is just a delete for different reasons.
+         */
+        private void excludeDocument(String uri) {
+            try {
+                searchEngine.deleteById(SearchIndexerUtils.getIdForUri(uri));
+                status.incrementExclusions();
+                log.debug("excluded '" + uri + "' from search index.");
+            } catch (SearchEngineNotRespondingException e) {
+                log.warn("Failed to exclude '" + uri + "' from search index: "
+                        + "the search engine is not responding.", e);
+            } catch (Exception e) {
+                log.warn("Failed to exclude '" + uri + "' from search index", e);
+            }
+        }
 
-		public synchronized void incrementDeletes() {
-			deleted++;
-			since = new Date();
-		}
+        private void updateDocument(Individual ind) {
+            Runnable workUnit = new UpdateDocumentWorkUnit(ind, modifiers);
+            pool.submit(workUnit, this);
+            log.debug("scheduled update to " + ind);
+        }
 
-		public synchronized void incrementExclusions() {
-			excluded++;
-			since = new Date();
-		}
+        private void fireEvent(Event event) {
+            listeners.fireEvent(event);
+            if (event.getType() == PROGRESS || event.getType() == STOP_URIS) {
+                commitChanges();
+            }
+        }
 
-		private void maybeFireProgressEvent() {
-			if (updated > 0 && updated % progressInterval == 0) {
-				parent.fireEvent(new Event(PROGRESS, getSearchIndexerStatus()));
-			}
-		}
+        private void commitChanges() {
+            try {
+                searchEngine.commit();
+            } catch (SearchEngineException e) {
+                log.warn("Failed to commit changes.", e);
+            }
+        }
 
-		public synchronized SearchIndexerStatus getSearchIndexerStatus() {
-			int remaining = total - updated - deleted - excluded;
-			return new SearchIndexerStatus(PROCESSING_URIS, since,
-					new UriCounts(excluded, deleted, updated, remaining, total));
-		}
+        @Override
+        public void notifyWorkUnitCompletion(Runnable workUnit) {
+            log.debug("completed update to "
+                    + ((UpdateDocumentWorkUnit) workUnit).getInd());
+            status.incrementUpdates();
+        }
 
-	}
+        @Override
+        public SearchIndexerStatus getStatus() {
+            return status.getSearchIndexerStatus();
+        }
 
-	/**
-	 * This will be first in the list of SearchIndexExcluders.
-	 */
-	public static class ExcludeIfNoVClasses implements SearchIndexExcluder {
-		@Override
-		public String checkForExclusion(Individual ind) {
-			List<VClass> vclasses = ind.getVClasses(false);
-			if (vclasses == null || vclasses.isEmpty()) {
-				return "Individual " + ind + " has no classes.";
-			}
-			return null;
-		}
+        /**
+         * A thread-safe collection of status information. All methods are
+         * synchronized.
+         */
+        private static class Status {
+            private final UpdateUrisTaskImpl parent;
+            private final int total;
+            private final int progressInterval;
+            private int updated = 0;
+            private int deleted = 0;
+            private int excluded = 0;
+            private Date since = new Date();
 
-		@Override
-		public String toString() {
-			return "Internal: ExcludeIfNoVClasses";
-		}
+            public Status(UpdateUrisTaskImpl parent, int total, int progressInterval) {
+                this.parent = parent;
+                this.total = total;
+                this.progressInterval = progressInterval;
+            }
 
-	}
+            public synchronized void incrementUpdates() {
+                updated++;
+                since = new Date();
+                maybeFireProgressEvent();
+            }
+
+            public synchronized void incrementDeletes() {
+                deleted++;
+                since = new Date();
+            }
+
+            public synchronized void incrementExclusions() {
+                excluded++;
+                since = new Date();
+            }
+
+            private void maybeFireProgressEvent() {
+                if (updated > 0 && updated % progressInterval == 0) {
+                    parent.fireEvent(new Event(PROGRESS, getSearchIndexerStatus()));
+                }
+            }
+
+            public synchronized SearchIndexerStatus getSearchIndexerStatus() {
+                int remaining = total - updated - deleted - excluded;
+                return new SearchIndexerStatus(PROCESSING_URIS, since,
+                        new UriCounts(excluded, deleted, updated, remaining, total));
+            }
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    // helper classes
+    // ----------------------------------------------------------------------
+    /**
+     * This will be first in the list of SearchIndexExcluders.
+     */
+    public static class ExcludeIfNoVClasses implements SearchIndexExcluder {
+        @Override
+        public String checkForExclusion(Individual ind) {
+            List<VClass> vclasses = ind.getVClasses(false);
+            if (vclasses == null || vclasses.isEmpty()) {
+                return "Individual " + ind + " has no classes.";
+            }
+            return null;
+        }
+
+        @Override
+        public String toString() {
+            return "Internal: ExcludeIfNoVClasses";
+        }
+   }
 }
