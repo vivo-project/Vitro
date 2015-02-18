@@ -255,7 +255,7 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
     	@Override
     	public boolean isEquivalentGraph(String graphURI,
     			InputStream serializedGraph,
-    			ModelSerializationFormat serializationFormat) {
+    			ModelSerializationFormat serializationFormat) throws RDFServiceException {
     		return s.isEquivalentGraph(graphURI, serializedGraph, serializationFormat);
     	}
 

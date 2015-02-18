@@ -27,7 +27,6 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.RDFServiceJena;
-import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 public class RDFServiceSDB extends RDFServiceJena implements RDFService {
 
@@ -172,9 +171,4 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
         }
     }
 
-	@Override
-	public String toString() {
-		return "RDFServiceSDB[" + ToString.hashHex(this) + "]";
-	}
-    
 }

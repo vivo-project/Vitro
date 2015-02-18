@@ -86,7 +86,8 @@ public class LoggingRDFService implements RDFService {
 	@Override
 	public boolean isEquivalentGraph(String graphURI,
 			InputStream serializedGraph,
-			ModelSerializationFormat serializationFormat) {
+			ModelSerializationFormat serializationFormat)
+			throws RDFServiceException {
 		try (RDFServiceLogger l = new RDFServiceLogger(graphURI)) {
 			return innerService.isEquivalentGraph(graphURI, serializedGraph,
 					serializationFormat);
