@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -33,9 +34,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.http.AcceptHeaderParsingException;
 import edu.cornell.mannlib.vitro.webapp.utils.http.NotAcceptableException;
@@ -103,8 +104,8 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 
 	private void respondToQuery(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
-		RDFService rdfService = ModelAccess.on(getServletContext())
-				.getRDFService();
+		RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(
+				getServletContext()).getRDFService();
 
 		String queryString = req.getParameter("query");
 		try {
@@ -134,12 +135,18 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 		String parameterName = (query.isSelectType() || query.isAskType()) ? "resultFormat"
 				: "rdfResultFormat";
 		String parameterValue = req.getParameter(parameterName);
-		if (StringUtils.isBlank(parameterValue)) {
-			throw new NotAcceptableException("Parameter '" + parameterName
-					+ "' was '" + parameterValue + "'.");
-		} else {
-			return parameterValue;
-		}
+                if (StringUtils.isBlank(parameterValue)){
+                    parameterName = "Accept";
+                    Enumeration acceptHeader = req.getHeaders("Accept");
+                    if (acceptHeader.hasMoreElements()) {
+                        parameterValue = acceptHeader.nextElement().toString();
+                    }
+                    else {
+                        throw new NotAcceptableException("Parameter '" + parameterName
+                                        + "' was '" + parameterValue + "'.");
+                   }
+                }
+                return parameterValue;
 	}
 
 	private void do400BadRequest(String message, HttpServletResponse resp)
