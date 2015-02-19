@@ -21,9 +21,12 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.reasoner.ReasonerPlugin;
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
@@ -44,6 +47,7 @@ public class SimpleReasonerSetup implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
     	ServletContext ctx = sce.getServletContext();
+    	SearchIndexer searchIndexer = ApplicationUtils.instance().getSearchIndexer();
         
         try {    
         	OntModel tboxAssertionsModel = ModelAccess.on(ctx).getOntModel(ModelNames.TBOX_ASSERTIONS);
@@ -55,13 +59,21 @@ public class SimpleReasonerSetup implements ServletContextListener {
             RDFService rdfService = ModelAccess.on(ctx).getRDFService();            
             Dataset dataset = ModelAccess.on(ctx).getDataset();
             
-            Model rebuildModel = dataset.getNamedModel(JENA_INF_MODEL_REBUILD); 
+            Model rebuildModel = dataset.getNamedModel(JENA_INF_MODEL_REBUILD);
+            if(rebuildModel.contains(null, null, (RDFNode) null)) {
+                log.info("Clearing obsolete data from inference rebuild model");
+                rebuildModel.removeAll();
+            }
             Model scratchModel = dataset.getNamedModel(JENA_INF_MODEL_SCRATCHPAD);
+            if(scratchModel.contains(null, null, (RDFNode) null)) {
+                log.info("Clearing obsolete data from inference scratchpad model");
+                scratchModel.removeAll();
+            }
             Model inferenceModel = dataset.getNamedModel(ABOX_INFERENCES);
 
             // the simple reasoner will register itself as a listener to the ABox assertions
             SimpleReasoner simpleReasoner = new SimpleReasoner(
-                    tboxUnionModel, rdfService, inferenceModel, rebuildModel, scratchModel);
+                    tboxUnionModel, rdfService, inferenceModel, rebuildModel, scratchModel, searchIndexer);
             sce.getServletContext().setAttribute(SimpleReasoner.class.getName(),simpleReasoner);
             
             StartupStatus ss = StartupStatus.getBean(ctx);

@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY;
+
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.text.Collator;
@@ -817,8 +819,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     }
     
     @Override
-    public List<VClass> getVClasses(boolean direct) {
-    	if (direct) {
+    public List<VClass> getVClasses(boolean assertedOnly) {
+    	if (assertedOnly) {
     		if (directVClasses != null) {
     			return directVClasses;
     		} else {
@@ -835,34 +837,19 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	}
     }
     
-    private List<VClass> getMyVClasses(boolean direct) {
+    private List<VClass> getMyVClasses(boolean assertedOnly) {
 		List<VClass> vClassList = new ArrayList<VClass>(); 
 		Model tempModel = null;
 		if (ind.getModel().contains((Resource) null, RDF.type, (RDFNode) null)){
 		    tempModel = ind.getModel();
 		} else {
-			String[] graphVars = { "?g" };
-    		String getTypes = 
-        		"CONSTRUCT{ <" + this.individualURI + "> <" + RDF.type +
-        		        "> ?types }\n" +
-        		"WHERE{ { GRAPH ?g"   
-        		+ " { <" + this.individualURI +"> <" +RDF.type+ "> ?types } \n" 
-   		        + WebappDaoFactorySDB.getFilterBlock(
-   		        		graphVars, (direct 
-   		        				? WebappDaoFactorySDB.SDBDatasetMode
-   		        						.ASSERTIONS_ONLY 
-   		        			    : datasetMode)) 
-        		+ "} \n" 
-        		// GRAPH-less pattern to support retrieving inferred types
-        		// from the unnamed base graph, as in Sesame and OWLIM
-    		    + ((datasetMode.equals(WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY)) 
-    		      ? "" : "UNION { <" + this.individualURI +"> <" +RDF.type+ "> ?types }" ) 
-    		    + "} \n";
+			String getTypesQuery = buildMyVClassesQuery(assertedOnly);
+			
     		RDFService service = webappDaoFactory.getRDFService();	
         	try {
         	    tempModel = RDFServiceUtils.parseModel(
         	            service.sparqlConstructQuery(
-        	                    getTypes, RDFService.ModelSerializationFormat.N3),
+        	                    getTypesQuery, RDFService.ModelSerializationFormat.N3),
         	                            RDFService.ModelSerializationFormat.N3);
         	} catch (RDFServiceException e) {
         	    throw new RuntimeException(e);
@@ -884,7 +871,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 	    ArrayList<String> done = new ArrayList<String>();
 	    
 	    /* Loop for comparing starts here */
-	    if(direct){
+	    if(assertedOnly){
         	while(!directTypes){
         		 itr = list.listIterator();
         		 
@@ -942,6 +929,36 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 		}
 		
 		return vClassList;
+	}
+
+	/**
+	 * If we are restricting to asserted types, either by request or by dataset
+	 * mode, then filter by graph and include a UNION clause to support
+	 * retrieving inferred types from the unnamed base graph, as in Sesame and
+	 * OWLIM.
+	 */
+	private String buildMyVClassesQuery(boolean assertedOnly) {
+		SDBDatasetMode queryMode = assertedOnly ? ASSERTIONS_ONLY : datasetMode;
+		
+		String filterBlock = WebappDaoFactorySDB.getFilterBlock(new String[] { "?g" }, queryMode);
+		
+		if (filterBlock.isEmpty()) {
+			return 
+				"CONSTRUCT { <" + this.individualURI + "> " + "<" + RDF.type + "> ?types }\n" +
+				"WHERE { <" + this.individualURI +"> <" +RDF.type+ "> ?types } \n"; 
+		} else {
+			String unionBlock = (queryMode.equals(ASSERTIONS_ONLY)) ? 
+				"" : 
+				"UNION { <" + this.individualURI +"> <" +RDF.type+ "> ?types }";
+			return 
+				"CONSTRUCT{ <" + this.individualURI + "> " + "<" + RDF.type + "> ?types }\n" +
+				"WHERE{ { GRAPH ?g"   
+				+ " { <" + this.individualURI +"> <" +RDF.type+ "> ?types } \n" 
+			    + filterBlock 
+				+ "} \n" 
+			    + unionBlock 
+			    + "} \n";
+		}
 	}
     
 	/**

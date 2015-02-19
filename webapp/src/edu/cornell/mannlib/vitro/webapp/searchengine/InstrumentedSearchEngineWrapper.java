@@ -7,6 +7,10 @@ import static edu.cornell.mannlib.vitro.webapp.modules.Application.Component.Lif
 import static edu.cornell.mannlib.vitro.webapp.modules.Application.Component.LifecycleState.STOPPED;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -15,9 +19,12 @@ import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchFacetField;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputDocument;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocument;
+import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumentList;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
 
@@ -206,4 +213,69 @@ public class InstrumentedSearchEngineWrapper implements SearchEngine {
 		}
 	}
 
+	@Override
+	public int documentCount() throws SearchEngineException {
+		try (SearchEngineLogger l = SearchEngineLogger.doCountQuery()) {
+			confirmActive();
+			int count = innerEngine.documentCount();
+			l.setSearchResponse(new SearchResponseForDocumentCount(count));
+			return count;
+		}
+	}
+	
+	// ----------------------------------------------------------------------
+	// Helper classes
+	// ----------------------------------------------------------------------
+
+	
+	private static class SearchResponseForDocumentCount implements SearchResponse {
+		private final int count;
+
+		public SearchResponseForDocumentCount(int count) {
+			this.count = count;
+		}
+
+		@Override
+		public SearchResultDocumentList getResults() {
+			return new EmptyDocumentListWithCount();
+		}
+
+		@Override
+		public Map<String, Map<String, List<String>>> getHighlighting() {
+			return Collections.emptyMap();
+		}
+
+		@Override
+		public SearchFacetField getFacetField(String name) {
+			return null;
+		}
+
+		@Override
+		public List<SearchFacetField> getFacetFields() {
+			return Collections.emptyList();
+		}
+		
+		private class EmptyDocumentListWithCount implements SearchResultDocumentList {
+				@Override
+				public Iterator<SearchResultDocument> iterator() {
+					return Collections.emptyIterator();
+				}
+				
+				@Override
+				public int size() {
+					return 0;
+				}
+				
+				@Override
+				public long getNumFound() {
+					return count;
+				}
+				
+				@Override
+				public SearchResultDocument get(int i) {
+					throw new ArrayIndexOutOfBoundsException(i);
+				}
+		}
+	}
+	
 }

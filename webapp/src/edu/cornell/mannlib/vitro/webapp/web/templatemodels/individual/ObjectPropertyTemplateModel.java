@@ -81,6 +81,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     private PropertyListConfig config;
     private String objectKey;    
     private String sortDirection;
+	private int displayLimit;
     
     ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, 
             boolean editing)
@@ -91,7 +92,8 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         sortDirection = op.getDomainEntitySortDirection();
         domainUri = op.getDomainVClassURI();
         rangeUri = op.getRangeVClassURI();
-        
+		displayLimit = op.getDomainDisplayLimit();
+
         // Get the config for this object property
         try {
         	config = new PropertyListConfig(this, getFreemarkerTemplateLoader(), vreq, op, editing);
@@ -174,6 +176,11 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     protected Route getPropertyEditRoute() {
         return Route.OBJECT_PROPERTY_EDIT;
     }
+
+	@Override
+	public int getDisplayLimit() {
+			return displayLimit;
+	}	
 
     public ConfigError checkQuery(String queryString) {
         if (StringUtils.isBlank(queryString)) {

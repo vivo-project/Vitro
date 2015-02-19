@@ -14,6 +14,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.Route;
@@ -41,6 +42,7 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     private String name;
     private FauxProperty fauxProperty;
+    private int displayLimit;
        
     PropertyTemplateModel(Property property, Individual subject, VitroRequest vreq, String name) {
         this.vreq = vreq;
@@ -49,13 +51,14 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         propertyUri = property.getURI();
         localName = property.getLocalName();
         this.name = name;
+		this.displayLimit = displayLimit;
         addUrl = "";
         
         fauxProperty = isFauxProperty(property);
         if (fauxProperty != null) {
         	this.name = fauxProperty.getDisplayName();
-        } 
-
+			this.displayLimit = fauxProperty.getDisplayLimit();
+        }
         setVerboseDisplayValues(property);
     }
     
@@ -140,6 +143,10 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
     
     public String getName() {
         return name;
+    }
+
+    public int getDisplayLimit() {
+        return displayLimit;
     }
 
     public String getLocalName() {

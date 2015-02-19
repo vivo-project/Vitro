@@ -27,6 +27,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.jena.riot.RDFDataMgr;
 
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
@@ -43,7 +44,9 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.sparql.core.Quad;
 
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
@@ -52,7 +55,10 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.ChangeSetImpl;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.ListeningGraph;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetQuadsIterator;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetTriplesIterator;
 
 /*
  * API to write, read, and update Vitro's RDF store, with support 
@@ -263,20 +269,6 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		return result;
 	}
 
-	/**
-	 * TODO rewrite the query to use this form instead - avoid one level of
-	 * buffering.
-	 */
-	@Override
-	public void sparqlSelectQuery(String query, ResultFormat resultFormat,
-			OutputStream outputStream) throws RDFServiceException {
-		try (InputStream input = sparqlSelectQuery(query, resultFormat)) {
-			IOUtils.copy(input, outputStream);
-		} catch (IOException e) {
-			throw new RDFServiceException(e);
-		}
-	}
-	
 	/**
 	 * Performs a SPARQL select query against the knowledge base. The query may have
 	 * an embedded graph identifier.
@@ -595,13 +587,13 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	
     private void performChange(ModelChange modelChange) throws RDFServiceException {
         Model model = parseModel(modelChange);
+        Model[] separatedModel = separateStatementsWithBlankNodes(model);
         if (modelChange.getOperation() == ModelChange.Operation.ADD) {
-            Model[] separatedModel = separateStatementsWithBlankNodes(model);
             addModel(separatedModel[1], modelChange.getGraphURI());
             addBlankNodesWithSparqlUpdate(separatedModel[0], modelChange.getGraphURI());
         } else if (modelChange.getOperation() == ModelChange.Operation.REMOVE) {
-            deleteModel(model, modelChange.getGraphURI());
-            removeBlankNodesWithSparqlUpdate(model, modelChange.getGraphURI());
+            deleteModel(separatedModel[1], modelChange.getGraphURI());
+            removeBlankNodesWithSparqlUpdate(separatedModel[0], modelChange.getGraphURI());
         } else {
             log.error("unrecognized operation type");
         }         
@@ -637,8 +629,6 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         
         Model blankNodeModel = ModelFactory.createDefaultModel();
         blankNodeModel.add(blankNodeStatements);
-        
-        
         
         log.debug("update model size " + model.size());       
         log.debug("blank node model size " + blankNodeModel.size());
@@ -826,4 +816,44 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
                 getSerializationFormatString(modelChange.getSerializationFormat()));
         return model;
     }
+
+    @Override
+	public void serializeAll(OutputStream outputStream)
+			throws RDFServiceException {
+    	String query = "SELECT * WHERE { GRAPH ?g {?s ?p ?o}}";
+		serialize(outputStream, query);
+	}
+
+	@Override
+	public void serializeGraph(String graphURI, OutputStream outputStream)
+			throws RDFServiceException {
+		String query = "SELECT * WHERE { GRAPH <" + graphURI + "> {?s ?p ?o}}";
+		serialize(outputStream, query);
+	}
+
+	private void serialize(OutputStream outputStream, String query) throws RDFServiceException {
+        InputStream resultStream = sparqlSelectQuery(query, RDFService.ResultFormat.JSON);
+        ResultSet resultSet = ResultSetFactory.fromJSON(resultStream);
+		if (resultSet.getResultVars().contains("g")) {
+			Iterator<Quad> quads = new ResultSetQuadsIterator(resultSet);
+			RDFDataMgr.writeQuads(outputStream, quads);
+		} else {
+			Iterator<Triple> triples = new ResultSetTriplesIterator(resultSet);
+			RDFDataMgr.writeTriples(outputStream, triples);
+		}
+	}
+
+	/**
+	 * The basic version. Parse the model from the file, read the model from the
+	 * tripleStore, and ask whether they are isomorphic.
+	 */
+	@Override
+	public boolean isEquivalentGraph(String graphURI, InputStream serializedGraph, 
+			ModelSerializationFormat serializationFormat) throws RDFServiceException {
+		Model fileModel = RDFServiceUtils.parseModel(serializedGraph, serializationFormat);
+		Model tripleStoreModel = new RDFServiceDataset(this).getNamedModel(graphURI);
+		Model fromTripleStoreModel = ModelFactory.createDefaultModel().add(tripleStoreModel);
+		return fileModel.isIsomorphicWith(fromTripleStoreModel);
+	}
+
 }

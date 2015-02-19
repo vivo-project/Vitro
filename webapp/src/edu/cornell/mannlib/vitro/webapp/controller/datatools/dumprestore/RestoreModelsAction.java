@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore;
 
-import static edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.PARAMETER_FORMAT;
 import static edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.PARAMETER_PURGE;
 import static edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.PARAMETER_SOURCE_FILE;
 import static edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.PARAMETER_WHICH;
@@ -32,7 +31,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.BadRequestException;
-import edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore.DumpRestoreController.RestoreFormat;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
@@ -59,7 +57,6 @@ public class RestoreModelsAction extends AbstractDumpRestoreAction {
 	private static final String DEFAULT_GRAPH_URI = "__default__";
 
 	private final FileItem sourceFile;
-	private final RestoreFormat format;
 	private final WhichService which;
 	private final boolean purge;
 	private final SelfLimitingTripleBuckets bnodeBuckets;
@@ -71,8 +68,6 @@ public class RestoreModelsAction extends AbstractDumpRestoreAction {
 			throws BadRequestException {
 		super(req);
 		this.sourceFile = getFileItem(PARAMETER_SOURCE_FILE);
-		this.format = getEnumFromParameter(RestoreFormat.class,
-				PARAMETER_FORMAT);
 		this.which = getEnumFromParameter(WhichService.class, PARAMETER_WHICH);
 		this.purge = null != req.getParameter(PARAMETER_PURGE);
 
@@ -114,7 +109,7 @@ public class RestoreModelsAction extends AbstractDumpRestoreAction {
 		log.info("Restoring the " + which + " models.");
 		long lineCount = 0;
 		try (InputStream is = sourceFile.getInputStream();
-				DumpParser p = format.getParser(is)) {
+				DumpParser p = new NquadsParser(is)) {
 			for (DumpQuad line : p) {
 				bucketize(line);
 				lineCount++;
@@ -158,9 +153,9 @@ public class RestoreModelsAction extends AbstractDumpRestoreAction {
 				ModelSerializationFormat.NTRIPLE, graphUri);
 
 		rdfService.changeSetUpdate(change);
-		
+
 		tripleCount += triples.size();
-		log.info("processed " + tripleCount  +" triples.");
+		log.info("processed " + tripleCount + " triples.");
 	}
 
 	private InputStream serialize(Collection<DumpTriple> triples)

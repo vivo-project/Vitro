@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.tdb;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -10,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -22,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.RDFServiceJena;
-import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
  * An implementation that is based on Jena TDB.
@@ -125,17 +126,6 @@ public class RDFServiceTDB extends RDFServiceJena {
 	}
 
 	@Override
-	public void sparqlSelectQuery(String query, ResultFormat resultFormat,
-			OutputStream outputStream) throws RDFServiceException {
-		dataset.getLock().enterCriticalSection(Lock.READ);
-		try {
-			super.sparqlSelectQuery(query, resultFormat, outputStream);
-		} finally {
-			dataset.getLock().leaveCriticalSection();
-		}
-	}
-
-	@Override
 	public InputStream sparqlSelectQuery(String query, ResultFormat resultFormat)
 			throws RDFServiceException {
 		dataset.getLock().enterCriticalSection(Lock.READ);
@@ -167,7 +157,64 @@ public class RDFServiceTDB extends RDFServiceJena {
 	}
 
 	@Override
-	public String toString() {
-		return "RDFServiceTDB[" + ToString.hashHex(this) + "]";
+	public void serializeAll(OutputStream outputStream)
+			throws RDFServiceException {
+		dataset.getLock().enterCriticalSection(Lock.READ);
+		try {
+			super.serializeAll(outputStream);
+		} finally {
+			dataset.getLock().leaveCriticalSection();
+		}
+	}
+
+	@Override
+	public void serializeGraph(String graphURI, OutputStream outputStream)
+			throws RDFServiceException {
+		dataset.getLock().enterCriticalSection(Lock.READ);
+		try {
+			super.serializeGraph(graphURI, outputStream);
+		} finally {
+			dataset.getLock().leaveCriticalSection();
+		}
+	}
+
+	/**
+	 * TDB has a bug: if given a literal of type xsd:nonNegativeInteger, it
+	 * stores a literal of type xsd:integer.
+	 * 
+	 * To determine whether this serialized graph is equivalent to what's in
+	 * TDB, we need to do the same.
+	 */
+	@Override
+	public boolean isEquivalentGraph(String graphURI,
+			InputStream serializedGraph,
+			ModelSerializationFormat serializationFormat)
+			throws RDFServiceException {
+		return super.isEquivalentGraph(graphURI,
+				adjustForNonNegativeIntegers(serializedGraph),
+				serializationFormat);
+	}
+
+	/**
+	 * Convert all of the references to "nonNegativeInteger" to "integer" in
+	 * this serialized graph.
+	 * 
+	 * This isn't rigorous: it could fail if another property contained the text
+	 * "nonNegativeInteger" in its name, or if that text were used as part of a
+	 * string literal. If that happens before this TDB bug is fixed, we'll need
+	 * to improve this method.
+	 * 
+	 * It also isn't scalable: if we wanted real scalability, we would write to
+	 * a temporary file as we converted.
+	 */
+	private InputStream adjustForNonNegativeIntegers(InputStream serializedGraph)
+			throws RDFServiceException {
+		try {
+			String raw = IOUtils.toString(serializedGraph, "UTF-8");
+			String modified = raw.replace("nonNegativeInteger", "integer");
+			return new ByteArrayInputStream(modified.getBytes("UTF-8"));
+		} catch (IOException e) {
+			throw new RDFServiceException(e);
+		}
 	}
 }

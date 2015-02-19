@@ -62,11 +62,11 @@ public class InferenceModelUpdater {
 	 * to the inferences model.
 	 */
 	public void update(List<ReasonerStatementPattern> patternList) {
-		List<Statement> filteredReasonerModel = reasoner
+		List<Statement> filteredReasonerStatements = reasoner
 				.filterResults(patternList);
-		addNewInferences(filteredReasonerModel);
+		addNewInferences(filteredReasonerStatements);
 		removeOldInferences(filterInferencesModel(patternList),
-				filteredReasonerModel);
+				filteredReasonerStatements);
 		log.debug("Added: " + addCount + ", Retracted: " + retractCount);
 	}
 

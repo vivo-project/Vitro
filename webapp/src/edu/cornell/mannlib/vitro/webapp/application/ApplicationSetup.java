@@ -108,8 +108,6 @@ public class ApplicationSetup implements ServletContextListener {
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
-		if (app != null) {
-			app.shutdown();
-		}
+		// Nothing to do.
 	}
 }

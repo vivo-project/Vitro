@@ -18,6 +18,8 @@ import com.hp.hpl.jena.ontology.AnnotationProperty;
 import com.hp.hpl.jena.ontology.OntClass;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -40,6 +42,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.CumulativeDeltaModeler;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DifferenceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
@@ -56,6 +60,8 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 public class SimpleReasoner extends StatementListener {
 
 	private static final Log log = LogFactory.getLog(SimpleReasoner.class);
+	
+	private final SearchIndexer searchIndexer;
 	
 	private OntModel tboxModel;             // asserted and inferred TBox axioms
 	private OntModel aboxModel;             // ABox assertions
@@ -92,12 +98,17 @@ public class SimpleReasoner extends StatementListener {
      *  whole ABox inference model is rebuilt
 	 * @param inferenceScratchpadModel - output. This the model is temporarily used when 
      *  the whole ABox inference model is rebuilt
+     * @param searchIndexer - output. If not null, the indexer will be paused before the 
+     *  ABox inference model is rebuilt and unpaused when the rebuild is complete.
  	 */
 	public SimpleReasoner(OntModel tboxModel, 
 			              RDFService rdfService, 
 			              Model inferenceModel,
 			              Model inferenceRebuildModel, 
-			              Model scratchpadModel) {
+			              Model scratchpadModel, 
+			              SearchIndexer searchIndexer) {
+		
+		this.searchIndexer = searchIndexer;
 
 		this.tboxModel = tboxModel;
 		
@@ -114,7 +125,7 @@ public class SimpleReasoner extends StatementListener {
 		this.batchMode = 0;
 		aBoxDeltaModeler1 = new CumulativeDeltaModeler();
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
-		recomputer = new ABoxRecomputer(tboxModel,this.aboxModel,inferenceModel,inferenceRebuildModel,scratchpadModel,rdfService,this);
+		recomputer = new ABoxRecomputer(tboxModel, aboxModel, rdfService, this, searchIndexer);
 		stopRequested = false;
 		
 		if (rdfService == null) {
@@ -137,6 +148,7 @@ public class SimpleReasoner extends StatementListener {
      *  ABox statements are maintained (added or retracted).
  	 */
 	public SimpleReasoner(OntModel tboxModel, OntModel aboxModel, Model inferenceModel) {
+		this.searchIndexer = null;
 		this.tboxModel = tboxModel;
 		this.aboxModel = aboxModel; 
 		this.inferenceModel = inferenceModel;
@@ -146,7 +158,13 @@ public class SimpleReasoner extends StatementListener {
 		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
 		this.batchMode = 0;
 		stopRequested = false;
-		recomputer = new ABoxRecomputer(tboxModel,this.aboxModel,inferenceModel,ModelFactory.createDefaultModel(), ModelFactory.createDefaultModel(), new RDFServiceModel(aboxModel), this);
+		Dataset ds = DatasetFactory.createMem();
+		ds.addNamedModel(ModelNames.ABOX_ASSERTIONS, aboxModel);
+		ds.addNamedModel(ModelNames.ABOX_INFERENCES, inferenceModel);
+		ds.addNamedModel(ModelNames.TBOX_ASSERTIONS, tboxModel);
+		
+		ds.setDefaultModel(ModelFactory.createUnion(fullModel, tboxModel));
+		recomputer = new ABoxRecomputer(tboxModel, aboxModel, new RDFServiceModel(ds), this, searchIndexer);
 	}
 	
 	public void setPluginList(List<ReasonerPlugin> pluginList) {
@@ -805,17 +823,8 @@ public class SimpleReasoner extends StatementListener {
 			Resource subject = sameIter.next();
 			Statement sameStmt = 
                 ResourceFactory.createStatement(subject,stmt.getPredicate(),stmt.getObject());
-			addInference(sameStmt,inferenceModel,false);
+			addInference(sameStmt,inferenceModel, doSameAs);
 		}	    
-
-		inferenceModel.enterCriticalSection(Lock.WRITE);
-		try {
-			if (inferenceModel.contains(stmt)) {
-				inferenceModel.remove(stmt);
-			}
-		} finally {
-			inferenceModel.leaveCriticalSection();
-		}
     }
 
 
@@ -838,11 +847,22 @@ public class SimpleReasoner extends StatementListener {
     	       Property inverseProp = inverseIter.next();
     	       Statement infStmt = ResourceFactory.createStatement(
     	               stmt.getObject().asResource(), inverseProp, stmt.getSubject());
-    	       addInference(infStmt,inferenceModel,true);
+    	       addInference(infStmt, inferenceModel, true);
     	    }	
 	    }
 
-        doSameAsForAddedABoxAssertion( stmt, inferenceModel);
+	    inferenceModel.enterCriticalSection(Lock.WRITE);
+        try {
+            if (inferenceModel.contains(stmt)) {
+                inferenceModel.remove(stmt);
+            }
+        } finally {
+            inferenceModel.leaveCriticalSection();
+        }
+	    
+	    if(doSameAs) {
+            doSameAsForAddedABoxAssertion( stmt, inferenceModel);
+	    }
 	}	
 
     void doSameAsForRemovedABoxAssertion(Statement stmt, Model inferenceModel){

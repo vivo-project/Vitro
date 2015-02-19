@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -23,7 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServ
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 
 /**
  * Accepts requests to update a set of URIs in the search index.
@@ -73,8 +74,8 @@ public class SearchServiceController extends FreemarkerHttpServlet {
 	 */
 	private ResponseValues doUpdateUrisInSearch(HttpServletRequest req)
 			throws IOException, ServletException {
-		IndexBuilder builder = IndexBuilder.getBuilder(getServletContext());
-		int uriCount = new UpdateUrisInIndex().doUpdateUris(req, builder);
+		SearchIndexer indexer = ApplicationUtils.instance().getSearchIndexer();
+		int uriCount = new UpdateUrisInIndex().doUpdateUris(req, indexer);
 
 		Map<String, Object> body = new HashMap<>();
 		body.put("msg", "Received " + uriCount + " URIs.");

@@ -68,3 +68,6 @@ li.selectedGroupTab {
 li.groupTabSpacer {
     float:left;border-bottom: 1px solid #DFE6E5;background-color:#fff;width:3px;height:37px
 }
+div.additionalItems {
+	margin-top: 0 !important;
+}

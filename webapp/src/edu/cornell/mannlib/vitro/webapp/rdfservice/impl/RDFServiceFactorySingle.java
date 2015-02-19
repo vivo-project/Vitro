@@ -88,12 +88,6 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
         }
 
         @Override
-		public void sparqlSelectQuery(String query, ResultFormat resultFormat,
-				OutputStream outputStream) throws RDFServiceException {
-        	s.sparqlSelectQuery(query, resultFormat, outputStream);
-		}
-
-        @Override
         public InputStream sparqlSelectQuery(String query,
                 ResultFormat resultFormat) throws RDFServiceException {
             return s.sparqlSelectQuery(query, resultFormat);
@@ -120,6 +114,25 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
         }
 
         @Override
+    	public void serializeAll(OutputStream outputStream)
+    			throws RDFServiceException {
+        	s.serializeAll(outputStream);
+    	}
+
+    	@Override
+    	public void serializeGraph(String graphURI, OutputStream outputStream)
+    			throws RDFServiceException {
+    		s.serializeGraph(graphURI, outputStream);
+    	}
+
+    	@Override
+    	public boolean isEquivalentGraph(String graphURI,
+    			InputStream serializedGraph,
+    			ModelSerializationFormat serializationFormat) throws RDFServiceException {
+    		return s.isEquivalentGraph(graphURI, serializedGraph, serializationFormat);
+    	}
+
+       @Override
         public void registerListener(ChangeListener changeListener)
                 throws RDFServiceException {
             s.registerListener(changeListener);

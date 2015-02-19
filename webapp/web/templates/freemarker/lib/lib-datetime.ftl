@@ -159,15 +159,15 @@
          and the format type to determine how to display it.  -->    
     <#local format>
         <#if formatType == "long">
-            <#if precision == "yearPrecision">yyyy
-            <#elseif precision == "yearMonthPrecision">MMMM yyyy
-            <#elseif precision == "yearMonthDayPrecision">MMMM d, yyyy
+            <#if precision?ends_with("yearPrecision")>yyyy
+            <#elseif precision?ends_with("yearMonthPrecision")>MMMM yyyy
+            <#elseif precision?ends_with("yearMonthDayPrecision")>MMMM d, yyyy
             <#else>MMMM d, yyyy h:mm a
             </#if>
         <#else> <#-- formatType == "short" -->
-            <#if precision == "yearPrecision">yyyy
-            <#elseif precision == "yearMonthPrecision">M/yyyy
-            <#elseif precision == "yearMonthDayPrecision">M/d/yyyy
+            <#if precision?ends_with("yearPrecision")>yyyy
+            <#elseif precision?ends_with("yearMonthPrecision")>M/yyyy
+            <#elseif precision?ends_with("yearMonthDayPrecision")>M/d/yyyy
             <#else>M/d/yyyy h:mm a
             </#if>
         </#if>

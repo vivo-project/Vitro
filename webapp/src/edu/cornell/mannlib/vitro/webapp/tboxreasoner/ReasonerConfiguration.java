@@ -5,9 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.tboxreasoner;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.mindswap.pellet.jena.PelletReasonerFactory;
-
-import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
@@ -25,8 +22,6 @@ public class ReasonerConfiguration {
 	private boolean reasonOnAllDatatypePropertyStatements = false;
 	private boolean queryForAllDatatypeProperties = false;
 	
-	private OntModelSpec ontModelSpec = PelletReasonerFactory.THE_SPEC;
-
 	/**
 	 * The default reasoner configuration is designed to provide acceptable performance on larger knowledge bases.
 	 * It will classify and realize, and add inferred disjointWith statements.
@@ -54,8 +49,6 @@ public class ReasonerConfiguration {
 	public static ReasonerConfiguration PSEUDOCOMPLETE_IGNORE_DATAPROPERTIES;
 		
 	static {	
-	
-		
 		//ask the reasoner only to classify, realize, and infer disjointWith statements (based on a somewhat incomplete information)
 		DEFAULT = new ReasonerConfiguration();
 		HashSet<ReasonerStatementPattern> defaultInferenceDrivingPatternAllowSet = new HashSet<>();
@@ -164,14 +157,6 @@ public class ReasonerConfiguration {
 		this.queryForAllDatatypeProperties = boole;
 	}
 
-	public OntModelSpec getOntModelSpec() {
-		return this.ontModelSpec;
-	}
-
-	public void setOntModelSpec(OntModelSpec spec) {
-		this.ontModelSpec = spec;
-	}
-	
 	public boolean isIncrementalReasoningEnabled() {
 		return this.incrementalReasoningEnabled;
 	}

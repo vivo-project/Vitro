@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LanguageOption.LANGUAGE_NEUTRAL;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.PolicyOption.POLICY_NEUTRAL;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -22,12 +26,14 @@ import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao.FullPropertyKey;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.ApplicationConfigurationOntologyUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
@@ -239,8 +245,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
                 if (pi != null) {
                     // use the language-aware wdf because redundancy check
                     // for display will depend on public label match
-                    ObjectProperty piOp = wdf.getObjectPropertyDao().getObjectPropertyByURIs(
-                            pi.getPropertyURI(), pi.getDomainClassURI(), pi.getRangeClassURI());
+                    ObjectProperty piOp = assembleObjectProperty(pi);
                     if (piOp == null) {
                         continue;
                     }
@@ -272,8 +277,30 @@ public class GroupedPropertyList extends BaseTemplateModel {
         
         return propertyList;
     }
+
+	private ObjectProperty assembleObjectProperty(PropertyInstance pi) {
+		WebappDaoFactory rawWadf = ModelAccess.on(vreq).getWebappDaoFactory(
+				LANGUAGE_NEUTRAL, POLICY_NEUTRAL);
+		ObjectPropertyDao opDao = rawWadf.getObjectPropertyDao();
+		FauxPropertyDao fpDao = rawWadf.getFauxPropertyDao();
+		
+		String base = pi.getPropertyURI();
+		String domain = pi.getDomainClassURI();
+		String range = pi.getRangeClassURI();
+
+		ObjectProperty op = opDao.getObjectPropertyByURIs(base, domain, range);
+		try {
+			FauxProperty fp = fpDao.getFauxPropertyByUris(domain, base, range);
+			if (fp != null) {
+				return new FauxObjectPropertyWrapper(op, fp);
+			}
+		} catch (Exception e) {
+			log.warn("Couldn't look up the faux property", e);
+		}
+		return op;
+	}
     
-    private boolean redundant(ObjectProperty op, ObjectProperty op2) {
+	private boolean redundant(ObjectProperty op, ObjectProperty op2) {
     	return new FullPropertyKey((Property)op).equals(new FullPropertyKey((Property)op2));
     }
 

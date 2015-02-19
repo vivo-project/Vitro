@@ -35,7 +35,6 @@ table.choices td {
     <table class="choices">
         <tr>
             <td>Select models</td>
-            <td>Select format</td>
             <td>&nbsp;</td>
         </tr>
         <tr>
@@ -43,13 +42,6 @@ table.choices td {
                 <select name="which">
                     <option value="CONFIGURATION">Configuration models</option>
                     <option value="CONTENT">Content models</option>
-                </select>
-            </td>
-            <td>
-                <select name="format">
-                    <option value="NQUADS">N-Quads</option>
-                    <option value="JSON">RS-JSON</option>
-                    <option value="XML">RS-XML</option>
                 </select>
             </td>
             <td>
@@ -84,8 +76,7 @@ table.choices td {
     <table class="choices">
         <tr>
             <td>Select models</td>
-            <td>Select a file to restore from</td>
-            <td>Select format</td>
+            <td>Select a file to restore from (N-Quads format)</td>
             <td>&nbsp;</td>
         </tr>
         <tr>
@@ -97,13 +88,6 @@ table.choices td {
             </td>
             <td>
                 <input type="file" name="sourceFile" size="60"/>
-            </td>
-            <td>
-                <select name="format">
-                    <option value="NQUADS">N-Quads</option>
-<!--                    <option value="JSON">RS-JSON</option>    TODO -->
-<!--                    <option value="XML">RS-XML</option>      TODO -->
-                </select>
             </td>
             <td>
                 <input type="submit" value="Restore" />

@@ -6,7 +6,6 @@ import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mindswap.pellet.jena.PelletReasonerFactory;
 
 import com.hp.hpl.jena.ontology.AnnotationProperty;
 import com.hp.hpl.jena.ontology.OntClass;
@@ -21,10 +20,9 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
-public class SimpleReasonerSameAsTest extends AbstractTestClass {
+public class SimpleReasonerSameAsTest extends SimpleReasonerTBoxHelper {
 	
 	long delay = 50;
 	private static final String mostSpecificTypePropertyURI = "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#mostSpecificType";
@@ -43,21 +41,11 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	//*/
 	@Test
 	public void addSameAsABoxAssertion1() {
-
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		
-		OntProperty P = tBox.createObjectProperty("http://test.vivo/P");		
-	    P.setLabel("property P", "en-US");
-
-		OntProperty Q = tBox.createObjectProperty("http://test.vivo/Q");
-		Q.setLabel("property Q", "en-US");
-	            
-		OntProperty S = tBox.createDatatypeProperty("http://test.vivo/");
-		S.setLabel("property S", "en-US");
-		
-		OntProperty T = tBox.createDatatypeProperty("http://test.vivo/");
-		T.setLabel("property T", "en-US");
-		
+		OntModel tBox = createTBoxModel(); 
+		OntProperty P = createObjectProperty(tBox, "http://test.vivo/P", "property P");
+		OntProperty Q = createObjectProperty(tBox, "http://test.vivo/Q", "property Q");
+		OntProperty S = createObjectProperty(tBox, "http://test.vivo/S", "property S");
+		OntProperty T = createObjectProperty(tBox, "http://test.vivo/T", "property T");
 		Literal literal1 = tBox.createLiteral("Literal value 1");
 		Literal literal2 = tBox.createLiteral("Literal value 2");
 		
@@ -129,21 +117,11 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	*/
 	@Test
 	public void removeSameAsABoxAssertion1() {
-
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		
-		OntProperty P = tBox.createObjectProperty("http://test.vivo/P");		
-	    P.setLabel("property P", "en-US");
-
-		OntProperty Q = tBox.createObjectProperty("http://test.vivo/Q");
-		Q.setLabel("property Q", "en-US");
-	            
-		OntProperty S = tBox.createDatatypeProperty("http://test.vivo/data1");
-		S.setLabel("property S", "en-US");
-		
-		OntProperty T = tBox.createDatatypeProperty("http://test.vivo/data2");
-		T.setLabel("property T", "en-US");
-		
+		OntModel tBox = createTBoxModel(); 
+		OntProperty P = createObjectProperty(tBox, "http://test.vivo/P", "property P");
+		OntProperty Q = createObjectProperty(tBox, "http://test.vivo/Q", "property Q");
+		OntProperty S = createObjectProperty(tBox, "http://test.vivo/S", "property S");
+		OntProperty T = createObjectProperty(tBox, "http://test.vivo/T", "property T");
 		Literal literal1 = tBox.createLiteral("Literal value 1");
 		Literal literal2 = tBox.createLiteral("Literal value 2");
 		
@@ -186,21 +164,11 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	*/
 	@Test
 	public void addABoxAssertion1() {
-
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		
-		OntProperty P = tBox.createObjectProperty("http://test.vivo/P");		
-	    P.setLabel("property P", "en-US");
-
-		OntProperty Q = tBox.createObjectProperty("http://test.vivo/Q");
-		Q.setLabel("property Q", "en-US");
-	            
-		OntProperty S = tBox.createDatatypeProperty("http://test.vivo/");
-		S.setLabel("property S", "en-US");
-		
-		OntProperty T = tBox.createDatatypeProperty("http://test.vivo/");
-		T.setLabel("property T", "en-US");
-		
+		OntModel tBox = createTBoxModel(); 
+		OntProperty P = createObjectProperty(tBox, "http://test.vivo/P", "property P");
+		OntProperty Q = createObjectProperty(tBox, "http://test.vivo/Q", "property Q");
+		OntProperty S = createObjectProperty(tBox, "http://test.vivo/S", "property S");
+		OntProperty T = createObjectProperty(tBox, "http://test.vivo/T", "property T");
 		Literal literal1 = tBox.createLiteral("Literal value 1");
 		Literal literal2 = tBox.createLiteral("Literal value 2");
 		
@@ -283,21 +251,11 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
      */
 	@Test
 	public void disabledSameAs() {
-
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		
-		OntProperty P = tBox.createObjectProperty("http://test.vivo/P");		
-	    P.setLabel("property P", "en-US");
-
-		OntProperty Q = tBox.createObjectProperty("http://test.vivo/Q");
-		Q.setLabel("property Q", "en-US");
-	            
-		OntProperty S = tBox.createDatatypeProperty("http://test.vivo/");
-		S.setLabel("property S", "en-US");
-		
-		OntProperty T = tBox.createDatatypeProperty("http://test.vivo/");
-		T.setLabel("property T", "en-US");
-		
+		OntModel tBox = createTBoxModel(); 
+		OntProperty P = createObjectProperty(tBox, "http://test.vivo/P", "property P");
+		OntProperty Q = createObjectProperty(tBox, "http://test.vivo/Q", "property Q");
+		OntProperty S = createObjectProperty(tBox, "http://test.vivo/S", "property S");
+		OntProperty T = createObjectProperty(tBox, "http://test.vivo/T", "property T");
 		Literal literal1 = tBox.createLiteral("Literal value 1");
 		Literal literal2 = tBox.createLiteral("Literal value 2");
 		
@@ -369,7 +327,7 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	*/
 	@Test
 	public void addABoxAssertion2() {
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		OntModel tBox = createTBoxModel(); 
 			     		
 		OntProperty desc = tBox.createDatatypeProperty("http://test.vivo/desc");
 		desc.setLabel("property desc", "en-US");
@@ -403,21 +361,11 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	*/
 	@Test
 	public void removeABoxAssertion1() {
-
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		
-		OntProperty P = tBox.createObjectProperty("http://test.vivo/P");		
-	    P.setLabel("property P", "en-US");
-
-		OntProperty Q = tBox.createObjectProperty("http://test.vivo/Q");
-		Q.setLabel("property Q", "en-US");
-	            
-		OntProperty S = tBox.createDatatypeProperty("http://test.vivo/");
-		S.setLabel("property S", "en-US");
-		
-		OntProperty T = tBox.createDatatypeProperty("http://test.vivo/");
-		T.setLabel("property T", "en-US");
-		
+		OntModel tBox = createTBoxModel(); 
+		OntProperty P = createObjectProperty(tBox, "http://test.vivo/P", "property P");
+		OntProperty Q = createObjectProperty(tBox, "http://test.vivo/Q", "property Q");
+		OntProperty S = createObjectProperty(tBox, "http://test.vivo/S", "property S");
+		OntProperty T = createObjectProperty(tBox, "http://test.vivo/T", "property T");
 		Literal literal1 = tBox.createLiteral("Literal value 1");
 		Literal literal2 = tBox.createLiteral("Literal value 2");
 		
@@ -453,18 +401,12 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	 */
 	@Test
 	public void tBoxInverseAssertion1() throws InterruptedException {
-				
-		// Create TBox, ABox and Inference models and register
-		// the ABox reasoner listeners with the ABox and TBox
-		// Pellet will compute TBox inferences
-		
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		
-		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
-	    P.setLabel("property P", "en-US");
+		OntModel tBox = createTBoxModel(); 
+		OntProperty P = createObjectProperty(tBox, "http://test.vivo/P", "property P");
+		OntProperty Q = createObjectProperty(tBox, "http://test.vivo/Q", "property Q");
 
-		OntProperty Q = tBox.createOntProperty("http://test.vivo/Q");
-		Q.setLabel("property Q", "en-US");
+		// Create ABox and Inference models and register
+		// the ABox reasoner listeners with the ABox and TBox
 
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
@@ -482,7 +424,7 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 		aBox.add(a,P,b);	
         aBox.add(a, OWL.sameAs,b);
 			    
-	    Q.addInverseOf(P);
+	    setInverse(Q, P);
 	    
 	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
 	    	Thread.sleep(delay);
@@ -492,8 +434,8 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 		Assert.assertTrue(inf.contains(b,OWL.sameAs,a));
 		Assert.assertTrue(inf.contains(b,P,b));
 		Assert.assertTrue(inf.contains(a,Q,a));
-		
-		Q.removeInverseProperty(P);
+
+		removeInverse(Q, P);
 
 	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
 	    	Thread.sleep(delay);
@@ -513,19 +455,12 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	 * a sameAs individual.
 	 */
 	//@Test
-	public void tBoxTypeAssertion1() throws InterruptedException {
-				
+	public void tBoxTypeAssertion1() {
 		// Create a Tbox with a simple class hierarchy. B is a subclass of A.
-		// Pellet will compute TBox inferences
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		
-		OntClass classA = tBox.createClass("http://test.vivo/A");
-	    classA.setLabel("class A", "en-US");
-
-		OntClass classB = tBox.createClass("http://test.vivo/B");
-	    classB.setLabel("class B", "en-US");
-
-	    classA.addSubClass(classB);
+		OntModel tBox = createTBoxModel(); 
+		OntClass classA = createClass(tBox, "http://test.vivo/A", "class A"); 
+		OntClass classB = createClass(tBox, "http://test.vivo/B", "class B"); 
+	    addSubclass(classA, classB);
 	            
         // this is the model to receive inferences
         Model inf = ModelFactory.createDefaultModel();
@@ -560,17 +495,13 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	 */
 	//@Test
 	public void tBoxSubclassAssertion1() throws InterruptedException {
-		
-		//create aBox and tBox, and SimpleReasoner to listen to them
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		// set up TBox	
-		OntClass classA = tBox.createClass("http://test.vivo/A");
-	    classA.setLabel("class A", "en-US");
-		OntClass classB = tBox.createClass("http://test.vivo/B");
-	    classB.setLabel("class B", "en-US");
-		OntClass classC = tBox.createClass("http://test.vivo/C");
-	    classC.setLabel("class C", "en-US");
-	    
+		// Create a Tbox with a simple class hierarchy. B is a subclass of A.
+		OntModel tBox = createTBoxModel(); 
+		OntClass classA = createClass(tBox, "http://test.vivo/A", "class A"); 
+		OntClass classB = createClass(tBox, "http://test.vivo/B", "class B"); 
+		OntClass classC = createClass(tBox, "http://test.vivo/C", "class C"); 
+
+		//create aBox and SimpleReasoner to listen to them
 		OntModel aBox = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
         Model inf = ModelFactory.createDefaultModel();
 		
@@ -589,17 +520,14 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	    aBox.add(c, OWL.sameAs, a);
 			    
 	    // update TBox
-	    classA.addSubClass(classB); 
+	    addSubclass(classA, classB);
 	    	    
 	    // wait for SimpleReasonerTBoxListener thread to end
 	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
 	    	Thread.sleep(delay);
 	    }
 	    
-	    classB.addSubClass(classC);
-	    classA.addSubClass(classC); // simulate what Pellet would infer, and
-	                                // thus what the SimpleReasonerTBoxListener 
-	                                // would be notified of.
+	    addSubclass(classB, classC);
 	    	    
 	    // wait for SimpleReasonerTBoxListener thread to end
 	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
@@ -620,10 +548,7 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 		Assert.assertTrue(inf.contains(c, RDF.type, classA));
 
 	    // update TBox
-		classA.removeSubClass(classB);
-	    classA.removeSubClass(classC); // simulate what Pellet would infer, and
-                                       // thus what the SimpleReasonerTBoxListener 
-                                       // would be notified of.
+		removeSubclass(classA, classB);
 
 	    // wait for SimpleReasonerTBoxListener thread to end
 	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
@@ -643,8 +568,8 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 		Assert.assertTrue(inf.contains(c, RDF.type, classB));
 		Assert.assertFalse(inf.contains(c, RDF.type, classA));
 	    
-	    // update TBox	    
-	    classB.removeSubClass(classC);
+	    // update TBox
+		removeSubclass(classB, classC);
 	    
 	    // wait for SimpleReasonerTBoxListener thread to end
 	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
@@ -672,24 +597,19 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	 * individuals
 	 */
 	//@Test
-	public void mostSpecificTypeTest1() throws InterruptedException {
+	public void mostSpecificTypeTest1() {
+		// Create a Tbox with a simple class hierarchy. B is a subclass of A.
+		OntModel tBox = createTBoxModel(); 
+		OntClass classA = createClass(tBox, "http://test.vivo/A", "class A"); 
+		OntClass classC = createClass(tBox, "http://test.vivo/B", "class C"); 
+		OntClass classD = createClass(tBox, "http://test.vivo/B", "class D"); 
+		OntClass classE = createClass(tBox, "http://test.vivo/B", "class E");
+		addSubclass(classA, classC);
+		addSubclass(classC, classD);
+		addSubclass(classC, classE);
 
-		// set up tbox. Pellet is reasoning; SimpleReasonerTBoxListener is not being used.
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
+		// SimpleReasonerTBoxListener is not being used.
 		AnnotationProperty mostSpecificType = tBox.createAnnotationProperty(mostSpecificTypePropertyURI);
-		
-		OntClass classA = tBox.createClass("http://test.vivo/A");
-	    classA.setLabel("class A", "en-US");
-		OntClass classC = tBox.createClass("http://test.vivo/C");
-	    classC.setLabel("class C", "en-US");
-	    OntClass classD = tBox.createClass("http://test.vivo/D");
-	    classD.setLabel("class D", "en-US");
-	    OntClass classE = tBox.createClass("http://test.vivo/E");
-	    classE.setLabel("class E", "en-US");
-
-	    classA.addSubClass(classC);	   	    
-	    classC.addSubClass(classD);
-	    classC.addSubClass(classE);
 
 		// this will receive the abox inferences
         Model inf = ModelFactory.createDefaultModel();
@@ -755,21 +675,11 @@ public class SimpleReasonerSameAsTest extends AbstractTestClass {
 	 */
 	@Test
 	public void recomputeABox1() throws InterruptedException {
-				
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		
-		OntProperty P = tBox.createObjectProperty("http://test.vivo/P");		
-	    P.setLabel("property P", "en-US");
-
-		OntProperty Q = tBox.createObjectProperty("http://test.vivo/Q");
-		Q.setLabel("property Q", "en-US");
-	            
-		OntProperty S = tBox.createDatatypeProperty("http://test.vivo/");
-		S.setLabel("property S", "en-US");
-		
-		OntProperty T = tBox.createDatatypeProperty("http://test.vivo/");
-		T.setLabel("property T", "en-US");
-		
+		OntModel tBox = createTBoxModel(); 
+		OntProperty P = createObjectProperty(tBox, "http://test.vivo/P", "property P");
+		OntProperty Q = createObjectProperty(tBox, "http://test.vivo/Q", "property Q");
+		OntProperty S = createObjectProperty(tBox, "http://test.vivo/S", "property S");
+		OntProperty T = createObjectProperty(tBox, "http://test.vivo/T", "property T");
 		Literal literal1 = tBox.createLiteral("Literal value 1");
 		Literal literal2 = tBox.createLiteral("Literal value 2");
 		

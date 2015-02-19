@@ -43,7 +43,6 @@ public class DumpRestoreController extends FreemarkerHttpServlet {
 	static final String ACTION_RESTORE = "/restore";
 	static final String ACTION_SELECT = "/select";
 	static final String PARAMETER_WHICH = "which";
-	static final String PARAMETER_FORMAT = "format";
 	static final String PARAMETER_SOURCE_FILE = "sourceFile";
 	static final String PARAMETER_PURGE = "purge";
 	static final String ATTRIBUTE_TRIPLE_COUNT = "tripleCount";
@@ -128,53 +127,4 @@ public class DumpRestoreController extends FreemarkerHttpServlet {
 			super(message);
 		}
 	}
-
-	/**
-	 * The formats that we will accept on a dump request.
-	 */
-	enum DumpFormat {
-		NQUADS("application/n-quads", "nq", null),
-
-		JSON("application/sparql-results+json", "srj", ResultFormat.JSON),
-
-		XML("application/sparql-results+xml", "srx", ResultFormat.XML);
-
-		private final String mimeType;
-		private final String extension;
-		private final ResultFormat rdfServiceFormat;
-
-		private DumpFormat(String mimeType, String extension,
-				ResultFormat rdfServiceFormat) {
-			this.mimeType = mimeType;
-			this.extension = extension;
-			this.rdfServiceFormat = rdfServiceFormat;
-		}
-
-		public String getMimeType() {
-			return mimeType;
-		}
-
-		public String getExtension() {
-			return extension;
-		}
-
-		public ResultFormat getRdfServiceFormat() {
-			return rdfServiceFormat;
-		}
-	}
-
-	/**
-	 * The formats that we will accept on a restore request.
-	 */
-	enum RestoreFormat {
-		NQUADS {
-			@Override
-			public DumpParser getParser(InputStream is) throws IOException {
-				return new NquadsParser(is);
-			}
-		};
-
-		public abstract DumpParser getParser(InputStream is) throws IOException;
-	}
-
 }
