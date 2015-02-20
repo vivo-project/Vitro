@@ -236,8 +236,8 @@ public class SearchIndexerImpl implements SearchIndexer {
                 fireEvent(UNPAUSE);
                 if (rebuildOnUnpause) {
                     rebuildIndex();
-                    pendingStatements.clear();
-                    pendingUris.clear();
+                    pendingStatements = new ArrayList<>();
+                    pendingUris = new ArrayList<>();
                 } else {
                     schedulePendingStatements();
                     schedulePendingUris();
@@ -249,6 +249,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 		}
 	}
 
+    /** Synchronized helper for scheduling deferred processing, to ensure we are unpaused and have access to the statements */
     private synchronized void schedulePendingStatements() {
         if (paused == 0 && pendingStatements.size() > 0) {
             scheduleUpdatesForStatements(pendingStatements);
@@ -256,14 +257,35 @@ public class SearchIndexerImpl implements SearchIndexer {
         }
     }
 
-    private synchronized  void schedulePendingUris() {
+    /** Synchronized helper for scheduling deferred processing, to ensure we are unpaused and have access to the statements */
+    private synchronized void schedulePendingUris() {
         if (paused == 0 && pendingUris.size() > 0) {
             scheduleUpdatesForUris(pendingUris);
             pendingUris = new ArrayList<>();
         }
     }
 
-	private boolean isStarted() { return scheduler.isStarted();	}
+    /** Synchronized helper for deferral to ensure that the indexer is paused when we add to the list */
+    private synchronized boolean deferUpdatesForStatements(List<Statement> changes) {
+        if (paused > 0) {
+            pendingStatements.addAll(changes);
+            return true;
+        }
+
+        return false;
+    }
+
+    /** Synchronized helper for deferral to ensure that the indexer is paused when we add to the list */
+    private synchronized boolean deferUpdatesForUris(Collection<String> uris) {
+        if (paused > 0) {
+            pendingUris.addAll(uris);
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean isStarted() { return scheduler.isStarted();	}
 
 	private boolean isShutdown() {
 		return taskQueue.isShutdown();
@@ -291,15 +313,24 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (changes == null || changes.isEmpty()) {
 			return;
 		}
+
+        // Indexer is paused
         if (paused > 0) {
             if (ignoreTasksWhilePaused) {
+                // If we are ignoring tasks, ensure a rebuild is scheduled and return
                 rebuildOnUnpause = true;
+                return;
             } else {
-                pendingStatements.addAll(changes);
+                // Attempt to defer the statements for later processing
+                if (deferUpdatesForStatements(changes)) {
+                    // Statements have been deferred, so we can return
+                    return;
+                }
             }
-            return;
         }
 
+        // Either the indexer is known to be unpaused, or we have been unable to defer the Statements
+        // (probably because the indexer was unpaused), so schedule them for processing.
 		scheduler.scheduleTask(new UpdateStatementsTask(new IndexerConfigImpl(this), changes));
 		log.debug("Scheduled updates for " + changes.size() + " statements.");
 	}
@@ -313,15 +344,24 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (uris == null || uris.isEmpty()) {
 			return;
 		}
+
+        // Indexer is paused
         if (paused > 0) {
             if (ignoreTasksWhilePaused) {
+                // If we are ignoring tasks, ensure a rebuild is scheduled and return
                 rebuildOnUnpause = true;
+                return;
             } else {
-                pendingUris.addAll(uris);
+                // Attempt to defer the uris for later processing
+                if (deferUpdatesForUris(uris)) {
+                    // Uris have been deferred, so we can return
+                    return;
+                }
             }
-            return;
         }
 
+        // Either the indexer is known to be unpaused, or we have been unable to defer the URIs
+        // (probably because the indexer was unpaused), so schedule them for processing.
 		scheduler.scheduleTask(new UpdateUrisTask(new IndexerConfigImpl(this), uris));
 		log.debug("Scheduled updates for " + uris.size() + " uris.");
 	}
