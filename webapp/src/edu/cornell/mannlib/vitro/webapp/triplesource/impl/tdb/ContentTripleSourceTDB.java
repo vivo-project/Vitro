@@ -70,7 +70,7 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 	public void startup(Application application, ComponentStartupStatus ss) {
 		configureTDB();
 		try {
-			this.rdfService = new RDFServiceTDB(tdbPath);
+			this.rdfService = new RDFServiceTDB(resolveTdbPath(application));
 			this.rdfServiceFactory = createRDFServiceFactory();
 			this.unclosableRdfService = this.rdfServiceFactory.getRDFService();
 			this.dataset = new RDFServiceDataset(this.unclosableRdfService);
@@ -80,6 +80,11 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 			throw new RuntimeException(
 					"Failed to set up the RDF source for TDB", e);
 		}
+	}
+
+	private String resolveTdbPath(Application application) {
+		return application.getHomeDirectory().getPath().resolve(tdbPath)
+				.toString();
 	}
 
 	private void configureTDB() {
