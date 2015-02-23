@@ -272,7 +272,7 @@
 		<mkdir dir="${vitrohome.image.dir}/config" />
 		<copy todir="${vitrohome.image.dir}/config" >
 			<fileset dir="${appbase.dir}/config" >
-				<include name="applicationSetup.n3" />
+				<include name="example.applicationSetup.n3" />
 			</fileset>
 		</copy>
 		<copy todir="${vitrohome.image.dir}" >
