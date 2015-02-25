@@ -62,7 +62,7 @@ public class IndexingChangeListener implements ChangeListener,
 
 	private final SearchIndexer searchIndexer;
 	private final Ticker ticker;
-	private volatile boolean paused = true;
+	private volatile boolean paused;
     private final Model defaultModel;
 
 	/** All access to the list must be synchronized. */
