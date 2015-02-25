@@ -534,7 +534,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
 	        getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),true));
-	    	String errMsgStr = getWebappDaoFactory().checkURI(prop.getURI());
+	    	String errMsgStr = getWebappDaoFactory().checkURIForEditableEntity(prop.getURI());
 	    	if (errMsgStr != null) {
 	    		throw new InsertException(errMsgStr);
 	    	}
@@ -542,7 +542,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 	        com.hp.hpl.jena.ontology.ObjectProperty inv = null;
 	        if (hasInverse(prop)) {
 	        	log.debug("non-null inverse URI: " +prop.getURIInverse());	        	
-	        	errMsgStr = getWebappDaoFactory().checkURI(prop.getURIInverse());
+	        	errMsgStr = getWebappDaoFactory().checkURIForEditableEntity(prop.getURIInverse());
 	        	if (errMsgStr != null) {
 	        		throw new InsertException("Unusable URI for inverse property: "+errMsgStr);
 	        	}

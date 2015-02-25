@@ -23,6 +23,8 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
@@ -174,39 +176,65 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 		return this.properties;
 	}
 
-    @Override
+	@Override
 	public String checkURI(String uriStr) {
-    	return checkURI(uriStr, true);
-    }
+		String errorMessage = checkURIForValidity(uriStr);
+		if (errorMessage != null) {
+			return errorMessage;
+		}
+
+		if (this.hasExistingURI(uriStr)) {
+			return "URI is already in use. Please enter another URI. ";
+		}
+		
+		return null;
+	}
     
     @Override
-	public String checkURI(String uriStr, boolean checkUniqueness) {
-        uriStr = (uriStr == null) ? " " : uriStr;
-		String errorMsg = "";
-		String duplicateMsg = "URI is already in use. " +
-		                      "Please enter another URI. ";
-		IRIFactory factory = IRIFactory.jenaImplementation();
-	    IRI iri = factory.create( uriStr );
-	    if (iri.hasViolation(false) ) {
-	    	errorMsg += (iri.violations(false).next())
-	    	                    .getShortMessage() + " ";
-	    } else if (checkUniqueness) {
-	    	boolean existingURI = this.hasExistingURI(uriStr);
-	    	if(existingURI) {
-				errorMsg+="Not a valid URI.  Please enter another URI. ";
-				errorMsg+=duplicateMsg;
-	    	}
-	    }
-	    return (errorMsg.length()>0) ? errorMsg : null;
-    }
-    
-    
-    
-    //Check if URI already in use or not either as resource OR as property
+	public String checkURIForEditableEntity(String uriStr) {
+		String errorMessage = checkURIForValidity(uriStr);
+		if (errorMessage != null) {
+			return errorMessage;
+		}
+		
+		if(hasEditableEntity(uriStr)) {
+			return "URI is already in use. Please enter another URI. ";
+		}
+		
+		return null;
+	}
+
+	private String checkURIForValidity(String uriStr) {
+		uriStr = (uriStr == null) ? " " : uriStr;
+
+		IRI iri = IRIFactory.jenaImplementation().create(uriStr);
+		if (iri.hasViolation(false)) {
+			return (iri.violations(false).next()).getShortMessage() + " ";
+		}
+
+		try {
+			Resource res = ResourceFactory.createResource(uriStr);
+			if (res.getLocalName().matches("\\d+")) {
+				return "Localname must contain at least one non-numeric "
+						+ "character.  Please enter another URI. ";
+			}
+		} catch (Exception e) {
+			return "Not a valid URI.  Please enter another URI. ";
+		}
+		
+		return null;
+	}
+
+	//Check if URI already in use or not either as resource OR as property
     @Override
 	public boolean hasExistingURI(String uriStr) {
     	OntModel ontModel = ontModelSelector.getFullModel(); 
 		return URIUtils.hasExistingURI(uriStr, ontModel);
+    }
+    
+    private boolean hasEditableEntity(String uriStr) {
+    	OntModel ontModel = ontModelSelector.getFullModel();
+    	return URIUtils.hasEditableEntity(uriStr, ontModel);
     }
     
     @Override
