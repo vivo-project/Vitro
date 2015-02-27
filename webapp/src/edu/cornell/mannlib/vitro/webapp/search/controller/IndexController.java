@@ -127,6 +127,13 @@ public class IndexController extends FreemarkerHttpServlet {
 		switch (RequestType.fromRequest(vreq)) {
 		case REBUILD:
 			requestRebuild();
+			try {
+				// Pause, giving a chance to start the task queue.
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// Don't care, so pass it along.
+				Thread.currentThread().interrupt();
+			}
 			return new RedirectResponseValues(PAGE_URL);
 		default:
 			return showDisplay();

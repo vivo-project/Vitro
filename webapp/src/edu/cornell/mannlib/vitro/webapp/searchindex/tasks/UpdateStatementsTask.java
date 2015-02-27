@@ -69,7 +69,7 @@ public class UpdateStatementsTask implements Task {
     }
     @Override
     public SearchIndexerStatus getStatus() {
-        return impl == null ? null : impl.getStatus();
+        return impl == null ? SearchIndexerStatus.idle() : impl.getStatus();
     }
 
     @Override
