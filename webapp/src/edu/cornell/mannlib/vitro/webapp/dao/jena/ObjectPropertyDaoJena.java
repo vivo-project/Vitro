@@ -933,10 +933,6 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         return subURIs;
     }
 
-    public List<ObjectPropertyStatement> getStatementsUsingObjectProperty(ObjectProperty op) {
-        return null;
-    }
-    
     // checks for annotation property vitro:skipEditForm.
     // Used by N3 editing system to govern behavior of edit link:
     // if annotation is present, editing system redirects to display
