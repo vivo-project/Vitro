@@ -6,12 +6,25 @@ import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.virtuoso.RDFServiceVirtuoso;
 import edu.cornell.mannlib.vitro.webapp.triplesource.impl.sparql.ContentTripleSourceSPARQL;
+import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 
 /**
  * So far, it's just like a ContentTripleSourceSPARQL but it uses an instance of
  * RDFServiceVirtuoso.
  */
 public class ContentTripleSourceVirtuoso extends ContentTripleSourceSPARQL {
+
+	@Override
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasEndpointURI")
+	public void setEndpointURI(String eUri) {
+		super.setEndpointURI(eUri);
+	}
+
+	@Override
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasUpdateEndpointURI")
+	public void setUpdateEndpointURI(String ueUri) {
+		super.setUpdateEndpointURI(ueUri);
+	}
 
 	@Override
 	protected RDFService createRDFService(ComponentStartupStatus ss,
