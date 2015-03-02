@@ -345,4 +345,10 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     public boolean hasThumb() {
         return getThumbUrl() != null && ! getThumbUrl().isEmpty();
     }
+    
+	@Override
+	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
+		// No webappDaoFactory, so nothing to do.
+	}
+
 }

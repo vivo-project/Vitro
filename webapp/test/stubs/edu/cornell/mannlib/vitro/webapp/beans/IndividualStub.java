@@ -208,6 +208,11 @@ public class IndividualStub implements Individual {
 		return new ArrayList<VClass>(vClasses);
 	}
 
+	@Override
+	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
+		// Nothing to do: no associated webappDaoFactory
+	}
+
 	// ----------------------------------------------------------------------
 	// Un-implemented methods
 	// ----------------------------------------------------------------------
@@ -501,4 +506,5 @@ public class IndividualStub implements Individual {
 				"IndividualStub.setRdfsLabel() not implemented.");
 
 	}
+
 }

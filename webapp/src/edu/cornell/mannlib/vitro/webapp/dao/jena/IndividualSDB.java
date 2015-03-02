@@ -1087,5 +1087,9 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	}
     }
     
+	@Override
+	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
+		webappDaoFactory.getObjectPropertyStatementDao().resolveAsFauxPropertyStatement(stmt);
+	}
     
 }
