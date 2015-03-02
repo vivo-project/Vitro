@@ -657,14 +657,13 @@ public class SearchIndexerImpl implements SearchIndexer {
 
 		public void waitUntilIdle() {
 			for (int i = 0; i < 60; i++) {
-				if (pool.getActiveCount() == 0) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
+				if (pool.getActiveCount() + pool.getQueue().size() == 0) {
 					return;
-				} else {
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						Thread.currentThread().interrupt();
-					}
 				}
 			}
 		}
