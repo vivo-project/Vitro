@@ -17,6 +17,8 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.vocabulary.OWL;
+
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -300,9 +302,38 @@ public class GroupedPropertyList extends BaseTemplateModel {
 		return op;
 	}
     
+	/**
+	* Don't know what the real problem is with VIVO-976, but somehow we have the same property 
+	* showing up once with a blank node as a domain, and once with null or OWL:Thing as a domain.
+	*/
 	private boolean redundant(ObjectProperty op, ObjectProperty op2) {
-    	return new FullPropertyKey((Property)op).equals(new FullPropertyKey((Property)op2));
+		if (new FullPropertyKey((Property)op).equals(new FullPropertyKey((Property)op2))) {
+			return true;
+		} else if (
+			new FullPropertyKey(
+					fudgeBlankNodeInDomain(op.getDomainVClassURI()), 
+					op.getURI(),
+					op.getRangeVClassURI())
+			.equals(
+				new FullPropertyKey(
+						fudgeBlankNodeInDomain(op2.getDomainVClassURI()), 
+						op2.getURI(),
+						op2.getRangeVClassURI()))) {
+			return true;
+		} else {
+			return false;
+		}
     }
+	
+	private String fudgeBlankNodeInDomain(String rawDomainUri) {
+		if (rawDomainUri == null) {
+			return null;
+		} else if (rawDomainUri.contains("http://vitro.mannlib.cornell.edu/ns/bnode#")) {
+			return OWL.Thing.getURI();
+		} else {
+			return rawDomainUri;
+		}
+	}
 
     private void addObjectPropertyToPropertyList(String propertyUri, String domainUri, String rangeUri,
             List<Property> propertyList) {
