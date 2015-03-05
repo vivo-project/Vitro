@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -134,12 +135,18 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 		String parameterName = (query.isSelectType() || query.isAskType()) ? "resultFormat"
 				: "rdfResultFormat";
 		String parameterValue = req.getParameter(parameterName);
-		if (StringUtils.isBlank(parameterValue)) {
-			throw new NotAcceptableException("Parameter '" + parameterName
-					+ "' was '" + parameterValue + "'.");
-		} else {
-			return parameterValue;
-		}
+                if (StringUtils.isBlank(parameterValue)){
+                    parameterName = "Accept";
+                    Enumeration acceptHeader = req.getHeaders("Accept");
+                    if (acceptHeader.hasMoreElements()) {
+                        parameterValue = acceptHeader.nextElement().toString();
+                    }
+                    else {
+                        throw new NotAcceptableException("Parameter '" + parameterName
+                                        + "' was '" + parameterValue + "'.");
+                   }
+                }
+                return parameterValue;
 	}
 
 	private void do400BadRequest(String message, HttpServletResponse resp)
