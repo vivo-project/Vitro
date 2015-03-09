@@ -66,22 +66,48 @@ public class SolrConversionUtils {
 			SearchInputField searchInputField) {
 		SolrInputField solrField = new SolrInputField(
 				searchInputField.getName());
-		Collection<Object> values = searchInputField.getValues();
-		//Check if single value or multiple, if single only add that one
-		//This is done in this way to ensure that if the field itself is single valued
-		//we are not passing an array of a single object but just the object itself to prevent errors
-		if(values.size() > 1) {
-			solrField.addValue(searchInputField.getValues(),
-				searchInputField.getBoost());
-		} else if(values.size() == 1){
-			Object value = values.iterator().next();
-			solrField.addValue(value, searchInputField.getBoost());
+
+		Collection<Object> values = joinStringValues(searchInputField
+				.getValues());
+
+		if (values.isEmpty()) {
+			// No values, nothing to do.
+		} else if (values.size() == 1) {
+			// One value? Insure that it is accepted as such.
+			solrField.addValue(values.iterator().next(),
+					searchInputField.getBoost());
 		} else {
-			//in this case, values are empty? Just add null? Do nothing?
-			//solrField.addValue(null, searchInputField.getBoost());
-			//log.debug("Values empty so doing nothing for " + searchInputField.getName());
+			// A collection of values? Add them.
+			solrField.addValue(values, searchInputField.getBoost());
 		}
+
 		return solrField;
+	}
+
+	/**
+	 * Join the String values while preserving the non-String values. It
+	 * shouldn't affect the score, and it produces better snippets.
+	 */
+	private static Collection<Object> joinStringValues(Collection<Object> values) {
+		StringBuilder buffer = new StringBuilder();
+		List<Object> betterValues = new ArrayList<>();
+
+		for (Object value : values) {
+			if (value instanceof String) {
+				if (buffer.length() > 0) {
+					buffer.append(" ");
+				}
+				buffer.append((String) value);
+			} else {
+				betterValues.add(value);
+			}
+		}
+
+		if (buffer.length() > 0) {
+			betterValues.add(buffer.toString());
+		}
+
+		return betterValues;
 	}
 
 	// ----------------------------------------------------------------------
@@ -128,7 +154,7 @@ public class SolrConversionUtils {
 		if (facetLimit >= 0) {
 			solrQuery.setFacetLimit(facetLimit);
 		}
-		
+
 		int minCount = query.getFacetMinCount();
 		if (minCount >= 0) {
 			solrQuery.setFacetMinCount(minCount);
