@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchengine.solr;
 
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.ALLTEXT;
+import static edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames.ALLTEXTUNSTEMMED;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputField;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery.Order;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
+import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchFacetField;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchFacetField.BaseCount;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchResponse;
@@ -64,11 +68,15 @@ public class SolrConversionUtils {
 
 	private static SolrInputField convertToSolrInputField(
 			SearchInputField searchInputField) {
-		SolrInputField solrField = new SolrInputField(
-				searchInputField.getName());
+		String name = searchInputField.getName();
+		SolrInputField solrField = new SolrInputField(name);
 
-		Collection<Object> values = joinStringValues(searchInputField
-				.getValues());
+		Collection<Object> values;
+		if (name.equals(ALLTEXT) || name.equals(ALLTEXTUNSTEMMED)) {
+			values = joinStringValues(searchInputField.getValues());
+		} else {
+			values = searchInputField.getValues();
+		}
 
 		if (values.isEmpty()) {
 			// No values, nothing to do.
