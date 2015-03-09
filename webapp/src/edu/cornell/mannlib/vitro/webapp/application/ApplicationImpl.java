@@ -280,9 +280,11 @@ public class ApplicationImpl implements Application {
 		@Override
 		public void contextDestroyed(ServletContextEvent sce) {
 			Application app = ApplicationUtils.instance();
-			app.getSearchEngine().shutdown(app);
-			app.getImageProcessor().shutdown(app);
+			app.getConfigurationTripleSource().shutdown(app);
+			app.getContentTripleSource().shutdown(app);
 			app.getFileStorage().shutdown(app);
+			app.getImageProcessor().shutdown(app);
+			app.getSearchEngine().shutdown(app);
 		}
 	}
 

@@ -16,6 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.shared.JenaException;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.tdb.TDB;
 import com.hp.hpl.jena.tdb.TDBFactory;
@@ -94,12 +95,7 @@ public class RDFServiceTDB extends RDFServiceJena {
 	@Override
 	public void close() {
 		if (this.dataset != null) {
-			dataset.getLock().enterCriticalSection(Lock.WRITE);
-			try {
-				dataset.close();
-			} finally {
-				dataset.getLock().leaveCriticalSection();
-			}
+			dataset.close();
 		}
 	}
 
