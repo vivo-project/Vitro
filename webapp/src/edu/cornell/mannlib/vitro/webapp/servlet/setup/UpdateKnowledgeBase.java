@@ -44,7 +44,6 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
@@ -58,26 +57,32 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
  * @author bjl23
  *
  */
-public class UpdateKnowledgeBase implements ServletContextListener {
+public class UpdateKnowledgeBase {
     public static final String KBM_REQURIED_AT_STARTUP = "KNOWLEDGE_BASE_MIGRATION_REQUIRED_AT_STARTUP";
 	private final static Log log = LogFactory.getLog(UpdateKnowledgeBase.class);
 	
-	private static final String DATA_DIR = "/WEB-INF/ontologies/update/";
-	private static final String DIFF_FILE = DATA_DIR + "diff.tab.txt";
-	private static final String ASK_QUERY_FILE = DATA_DIR + "askUpdated.sparql";
-	private static final String SUCCESS_ASSERTIONS_FILE = DATA_DIR + "success.n3";
-	private static final String OLD_TBOX_MODEL_DIR = DATA_DIR + "oldVersion/";
-	private static final String OLD_TBOX_ANNOTATIONS_DIR = DATA_DIR + "oldAnnotations/";
+	private final String dataDir;
+	private final ServletContextListener parent;
+	
+	public UpdateKnowledgeBase(String dataDir, ServletContextListener parent) {
+		this.dataDir = dataDir;
+		this.parent = parent;
+	}
+	
+	private String diffFile() { return dataDir + "diff.tab.txt"; }
+	private String askQueryFile() { return dataDir + "askUpdated.sparql"; }
+	private String successAssertionsFile() { return dataDir + "success.n3"; }
+	private String oldTBoxModelDir() { return dataDir + "oldVersion/"; }
+	private String oldTBoxAnnotationsDir() { return dataDir + "oldAnnotations/"; }
 	//For display model migration
-	private static final String OLD_DISPLAYMODEL_TBOX_PATH = DATA_DIR + "oldDisplayModel/displayTBOX.n3";
+	private String oldDisplayModelTBoxPath() { return dataDir + "oldDisplayModel/displayTBOX.n3"; }
 	private static final String NEW_DISPLAYMODEL_TBOX_PATH = "/WEB-INF/ontologies/app/menuload/displayTBOX.n3";
-	private static final String OLD_DISPLAYMODEL_DISPLAYMETADATA_PATH = DATA_DIR + "oldDisplayModel/displayDisplay.n3";
+	private String oldDisplayModelDisplayMetadataPath() { return dataDir + "oldDisplayModel/displayDisplay.n3"; }
 	private static final String NEW_DISPLAYMODEL_DISPLAYMETADATA_PATH = "/WEB-INF/ontologies/app/menuload/displayDisplay.n3";
 	private static final String NEW_DISPLAYMODEL_PATH = "/WEB-INF/ontologies/app/menu.n3";
 	private static final String LOADED_STARTUPT_DISPLAYMODEL_DIR = "/WEB-INF/ontologies/app/loadedAtStartup/";
-	private static final String OLD_DISPLAYMODEL_VIVOLISTVIEW_PATH = DATA_DIR + "oldDisplayModel/vivoListViewConfig.rdf";
+	private String oldDisplayModelVivoListViewPath() { return dataDir + "oldDisplayModel/vivoListViewConfig.rdf"; }
 
-	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		ServletContext ctx = sce.getServletContext();
 		StartupStatus ss = StartupStatus.getBean(ctx);
@@ -101,14 +106,13 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			settings.setInferenceOntModelSelector(ModelAccess.on(ctx).getOntModelSelector(INFERENCES_ONLY));
 			settings.setUnionOntModelSelector(ModelAccess.on(ctx).getOntModelSelector());
 			
-		    ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
 		    Path homeDir = ApplicationUtils.instance().getHomeDirectory().getPath();
 			settings.setDisplayModel(ModelAccess.on(ctx).getOntModel(DISPLAY));
-			OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_MODEL_DIR));
+			OntModel oldTBoxModel = loadModelFromDirectory(ctx.getRealPath(oldTBoxModelDir()));
 			settings.setOldTBoxModel(oldTBoxModel);
 			OntModel newTBoxModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "tbox", "filegraph").toString());
 			settings.setNewTBoxModel(newTBoxModel);
-			OntModel oldTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(OLD_TBOX_ANNOTATIONS_DIR));
+			OntModel oldTBoxAnnotationsModel = loadModelFromDirectory(ctx.getRealPath(oldTBoxAnnotationsDir()));
 			settings.setOldTBoxAnnotationsModel(oldTBoxAnnotationsModel);
 			OntModel newTBoxAnnotationsModel = loadModelFromDirectory(createDirectory(homeDir, "rdf", "tbox", "firsttime").toString());
 			settings.setNewTBoxAnnotationsModel(newTBoxAnnotationsModel);
@@ -118,13 +122,13 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			try {
 			    //Display model tbox and display metadata 
 			    //old display model tbox model
-			    OntModel oldDisplayModelTboxModel = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_TBOX_PATH));
+			    OntModel oldDisplayModelTboxModel = loadModelFromFile(ctx.getRealPath(oldDisplayModelTBoxPath()));
 			    settings.setOldDisplayModelTboxModel(oldDisplayModelTboxModel);
 			    //new display model tbox model
 			    OntModel newDisplayModelTboxModel = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_TBOX_PATH));
 			    settings.setNewDisplayModelTboxModel(newDisplayModelTboxModel);
 			    //old display model display model metadata
-			    OntModel oldDisplayModelDisplayMetadataModel = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_DISPLAYMETADATA_PATH));
+			    OntModel oldDisplayModelDisplayMetadataModel = loadModelFromFile(ctx.getRealPath(oldDisplayModelDisplayMetadataPath()));
 			    settings.setOldDisplayModelDisplayMetadataModel(oldDisplayModelDisplayMetadataModel);
 			    //new display model display model metadata
 			    OntModel newDisplayModelDisplayMetadataModel = loadModelFromFile(ctx.getRealPath(NEW_DISPLAYMODEL_DISPLAYMETADATA_PATH));
@@ -134,7 +138,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 			    settings.setNewDisplayModelFromFile(newDisplayModelFromFile);
 			    OntModel loadedAtStartupFiles = loadModelFromDirectory(ctx.getRealPath(LOADED_STARTUPT_DISPLAYMODEL_DIR));
 			    settings.setLoadedAtStartupDisplayModel(loadedAtStartupFiles);
-			    OntModel oldDisplayModelVivoListView = loadModelFromFile(ctx.getRealPath(OLD_DISPLAYMODEL_VIVOLISTVIEW_PATH));
+			    OntModel oldDisplayModelVivoListView = loadModelFromFile(ctx.getRealPath(oldDisplayModelVivoListViewPath()));
 			    settings.setVivoListViewConfigDisplayModel(oldDisplayModelVivoListView);
 			} catch (ModelFileNotFoundException e) {
 			    // expected if no display migration was intended
@@ -164,7 +168,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
     			    // modified it
     			    new ConfigurationModelsSetup().contextInitialized(sce);				  
     			} catch (Exception ioe) {
-    			    ss.fatal(this, "Exception updating knowledge base for ontology changes: ", ioe);
+    			    ss.fatal(parent, "Exception updating knowledge base for ontology changes: ", ioe);
     			}	
 			}
 			
@@ -181,7 +185,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
             }
 	
 		} catch (Throwable t){
-		    ss.fatal(this, "Exception updating knowledge base for ontology changes: ", t);
+		    ss.fatal(parent, "Exception updating knowledge base for ontology changes: ", t);
 		}
 		
 	}	
@@ -193,11 +197,11 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 	 * Set the paths for the files that specify how to perform the update
 	 */
 	private void putNonReportingPathsIntoSettings(ServletContext ctx, UpdateSettings settings) {
-        settings.setAskUpdatedQueryFile(ctx.getRealPath(ASK_QUERY_FILE));
-        settings.setDiffFile(ctx.getRealPath(DIFF_FILE));
-        settings.setSparqlConstructAdditionsDir(ctx.getRealPath(DATA_DIR + "sparqlConstructs/additions"));
-        settings.setSparqlConstructDeletionsDir(ctx.getRealPath(DATA_DIR + "sparqlConstructs/deletions"));
-        settings.setSuccessAssertionsFile(ctx.getRealPath(SUCCESS_ASSERTIONS_FILE));
+        settings.setAskUpdatedQueryFile(ctx.getRealPath(askQueryFile()));
+        settings.setDiffFile(ctx.getRealPath(diffFile()));
+        settings.setSparqlConstructAdditionsDir(ctx.getRealPath(dataDir + "sparqlConstructs/additions"));
+        settings.setSparqlConstructDeletionsDir(ctx.getRealPath(dataDir + "sparqlConstructs/deletions"));
+        settings.setSuccessAssertionsFile(ctx.getRealPath(successAssertionsFile()));
         settings.setSuccessRDFFormat("N3");
 	}
 	
@@ -210,7 +214,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		
 		Path dataDir = createDirectory(homeDir, "upgrade", "knowledgeBase");
 		settings.setDataDir(dataDir.toString());
-		StartupStatus.getBean(ctx).info(this, "Updating knowledge base: reports are in '" + dataDir + "'");
+		StartupStatus.getBean(ctx).info(parent, "Updating knowledge base: reports are in '" + dataDir + "'");
 
 		Path changedDir = createDirectory(dataDir, "changedData");
 		settings.setAddedDataFile(changedDir.resolve(timestampedFileName("addedData", "n3")).toString());
@@ -220,7 +224,7 @@ public class UpdateKnowledgeBase implements ServletContextListener {
 		settings.setLogFile(logDir.resolve(timestampedFileName("knowledgeBaseUpdate", "log")).toString());
 		settings.setErrorLogFile(logDir.resolve(timestampedFileName("knowledgeBaseUpdate.error", "log")).toString());
 		
-		Path qualifiedPropertyConfigFile = getFilePath(homeDir, "rdf", "display", "everytime", "PropertyConfig.n3");
+		Path qualifiedPropertyConfigFile = getFilePath(homeDir, "rdf", "display", "firsttime", "PropertyConfig.n3");
 		settings.setQualifiedPropertyConfigFile(qualifiedPropertyConfigFile.toString());
 	}
 
@@ -585,11 +589,6 @@ public class UpdateKnowledgeBase implements ServletContextListener {
                 }
             }
 	    }
-	}
-	
-	@Override
-	public void contextDestroyed(ServletContextEvent arg0) {
-		// nothing to do	
 	}
 	
 	private static String timestampedFileName(String prefix, String suffix) {
