@@ -42,7 +42,7 @@ public class PropertyEditController extends BaseEditController {
         	return;
         }
 
-        final int NUM_COLS=25;
+        final int NUM_COLS=26;
 
         VitroRequest vreq = new VitroRequest(request);
         
@@ -74,6 +74,7 @@ public class PropertyEditController extends BaseEditController {
         results.add("display level");         // column 16
         results.add("update level");          // column 17
         results.add("display tier");          // column 18
+        results.add("display limit");         // column 15
         results.add("collate by subclass");   // column 19
         results.add("custom entry form");     // column 20
         results.add("select from existing");  // column 21
@@ -175,7 +176,7 @@ public class PropertyEditController extends BaseEditController {
 				: p.getProhibitedFromUpdateBelowRoleLevel().getUpdateLabel()); // column 17
         
         results.add("property: "+p.getDomainDisplayTier() + ", inverse: "+p.getRangeDisplayTier()); // column 18
-        
+        results.add("property: "+p.getDomainDisplayLimitInteger() + ", inverse: "+p.getRangeDisplayLimit());
         results.add(p.getCollateBySubclass() ? "true" : "false"); // column 19
  
         results.add(p.getCustomEntryForm() == null ? "(unspecified)" : p.getCustomEntryForm()); // column 20
