@@ -32,6 +32,8 @@
 	    <form action="listVClassWebapps" method="get">
 			<input type="hidden" name="showPropertyRestrictions" value="true"/>
 			<input type="hidden" name="propertyURI" value="${datatypeProperty.URI}"/>
+			<input type="hidden" name="propertyName" value="${datatypeProperty.publicName}"/>
+			<input type="hidden" name="propertyType" value="data"/>
 			<input type="submit" class="form-button" value="Show Classes With a Restriction on This Property"/>
 		</form>		
         <form action="listDataPropertyStatements" method="get">
