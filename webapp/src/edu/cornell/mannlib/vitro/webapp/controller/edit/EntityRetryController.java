@@ -8,6 +8,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -60,7 +61,7 @@ public class EntityRetryController extends BaseEditController {
 				SimplePermission.DO_BACK_END_EDITING.ACTION)) {
         	return;
         }
-
+		
         VitroRequest vreq = new VitroRequest(request);
         String siteAdminUrl = vreq.getContextPath() + Controllers.SITE_ADMIN;
 
@@ -216,13 +217,18 @@ public class EntityRetryController extends BaseEditController {
                 if (!dpMap.containsKey(d.getURI())) {
                     dpMap.put(d.getURI(),d);
                 }
+				
             }
 
             if (individualForEditing.getDataPropertyList() != null) {
                 Iterator<DataProperty> existingDps = individualForEditing.getDataPropertyList().iterator();
                 while (existingDps.hasNext()) {
                     DataProperty existingDp = existingDps.next();
-                    dpMap.put(existingDp.getURI(),existingDp);
+					// Since the edit form begins with a "name" field, which gets saved as the rdfs:label,
+					// do not want to include the label as well. 
+					if ( !existingDp.getPublicName().equals("label") ) {
+						dpMap.put(existingDp.getURI(),existingDp);
+					}
                 }
             }
 
@@ -296,7 +302,6 @@ public class EntityRetryController extends BaseEditController {
         request.setAttribute("_action",action);
         request.setAttribute("unqualifiedClassName","Individual");
         setRequestAttributes(request,epo);
-
         try {
             rd.forward(request, response);
         } catch (Exception e) {
