@@ -20,7 +20,9 @@ public enum RdfResultMediaType {
 
 	TTL("text/turtle", false, "N3", "TTL"),
 
-	JSON("application/json", false, "N3", "JSON");
+	JSON("application/json", false, "N3", "JSON"),
+	
+	JSON_LD("application/ld+json", false, "N3", "JSON");
 
 	// ----------------------------------------------------------------------
 	// Keep a map of content types, for easy conversion back and forth

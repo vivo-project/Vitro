@@ -55,7 +55,7 @@ abstract class SparqlQueryApiRdfProducer extends SparqlQueryApiExecutor {
 
 		if (mediaType.isNativeFormat()) {
 			IOUtils.copy(rawResult, out);
-		} else if (mediaType == RdfResultMediaType.JSON) {
+		} else if (mediaType.getJenaResponseFormat().equals("JSON")) {
 			// JSON-LD is a special case, since jena 2.6.4 doesn't support it.
 			try {
 				JenaRDFParser parser = new JenaRDFParser();

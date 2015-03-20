@@ -2,10 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.individual;
 
+import static edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet.JSON_LD_MIMETYPE;
+import static edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet.JSON_MIMETYPE;
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet.N3_MIMETYPE;
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet.RDFXML_MIMETYPE;
 import static edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet.TTL_MIMETYPE;
-import static edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet.JSON_MIMETYPE;
 
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -118,7 +119,7 @@ public class IndividualRequestAnalyzer {
 				return "/individual/" + m.group(1) + "/" + m.group(1) + ".n3";
 			} else if (TTL_MIMETYPE.equals(mediaType)) {
 				return "/individual/" + m.group(1) + "/" + m.group(1) + ".ttl";
-			} else if (JSON_MIMETYPE.equals(mediaType)){
+			} else if (JSON_MIMETYPE.equals(mediaType) || JSON_LD_MIMETYPE.equals(mediaType)){
                 return "/individual/" + m.group(1) + "/" + m.group(1) + ".jsonld";
             }
 		}
@@ -145,7 +146,8 @@ public class IndividualRequestAnalyzer {
 					IndividualController.ACCEPTED_CONTENT_TYPES);
 	
 			if (RDFXML_MIMETYPE.equals(ctStr) || N3_MIMETYPE.equals(ctStr)
-					|| TTL_MIMETYPE.equals(ctStr) || JSON_MIMETYPE.equals(ctStr)) {
+					|| TTL_MIMETYPE.equals(ctStr) || JSON_MIMETYPE.equals(ctStr)
+					|| JSON_LD_MIMETYPE.equals(ctStr)) {
 				return new ContentType(ctStr);
 			}
 		} catch (Throwable th) {
