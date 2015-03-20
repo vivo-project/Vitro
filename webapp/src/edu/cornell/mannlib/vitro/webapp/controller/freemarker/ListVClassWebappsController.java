@@ -46,17 +46,21 @@ public class ListVClassWebappsController extends FreemarkerHttpServlet {
 
         body.put("displayOption", "all");
         body.put("pageTitle", "All Classes");
-		body.put("propertyURI", vreq.getParameter("propertyURI"));
-		if ( vreq.getParameter("propertyType").equals("object") ) {
-			body.put("editController", "propertyEdit?uri=");
+
+		if ( vreq.getParameter("propertyURI") != null ) {
+			body.put("propertyURI", vreq.getParameter("propertyURI"));
 		}
-		else {
-			body.put("editController", "datapropEdit?uri=");
-		}
-        
+
         List<VClass> classes = null;
 
         if (vreq.getParameter("showPropertyRestrictions") != null) {
+			if ( vreq.getParameter("propertyType").equals("object") ) {
+				body.put("editController", "propertyEdit?uri=");
+			}
+			else {
+				body.put("editController", "datapropEdit?uri=");
+			}
+
 			body.put("propertyName", vreq.getParameter("propertyName"));
         	PropertyDao pdao = vreq.getLanguageNeutralWebappDaoFactory().getObjectPropertyDao();
         	classes = pdao.getClassesWithRestrictionOnProperty(vreq.getParameter("propertyURI"));
