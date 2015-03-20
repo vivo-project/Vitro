@@ -128,7 +128,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
         if (editing) {
             mergeAllPossibleDataProperties(propertyList);
         }
-                
         sort(propertyList);
 
         // Put the list into groups
@@ -305,20 +304,28 @@ public class GroupedPropertyList extends BaseTemplateModel {
 	/**
 	* Don't know what the real problem is with VIVO-976, but somehow we have the same property 
 	* showing up once with a blank node as a domain, and once with null or OWL:Thing as a domain.
+	* 
+	* Similarly, don't know the real problem with VIVO-989, except that the ranges are both
+	* blank nodes - probably the same blank node but on two different reads.
 	*/
 	private boolean redundant(ObjectProperty op, ObjectProperty op2) {
 		if (new FullPropertyKey((Property)op).equals(new FullPropertyKey((Property)op2))) {
 			return true;
 		} else if (
-			new FullPropertyKey(
-					fudgeBlankNodeInDomain(op.getDomainVClassURI()), 
-					op.getURI(),
-					op.getRangeVClassURI())
-			.equals(
-				new FullPropertyKey(
-						fudgeBlankNodeInDomain(op2.getDomainVClassURI()), 
-						op2.getURI(),
-						op2.getRangeVClassURI()))) {
+			new FullPropertyKey(fudgeBlankNodeInDomain(op.getDomainVClassURI()), 
+								op.getURI(),
+								op.getRangeVClassURI()).equals(
+			new FullPropertyKey(fudgeBlankNodeInDomain(op2.getDomainVClassURI()), 
+								op2.getURI(),
+								op2.getRangeVClassURI()))) {
+			return true;
+		} else if (
+			new FullPropertyKey(op.getDomainVClassURI(), 
+								op.getURI(),
+								fudgeBlankNodeInRange(op.getRangeVClassURI())).equals(
+			new FullPropertyKey(op2.getDomainVClassURI(), 
+								op2.getURI(),
+								fudgeBlankNodeInRange(op2.getRangeVClassURI())))) {
 			return true;
 		} else {
 			return false;
@@ -335,6 +342,16 @@ public class GroupedPropertyList extends BaseTemplateModel {
 		}
 	}
 
+	private String fudgeBlankNodeInRange(String rawRangeUri) {
+		if (rawRangeUri == null) {
+			return null;
+		} else if (rawRangeUri.contains("http://vitro.mannlib.cornell.edu/ns/bnode#")) {
+			return "http://vitro.mannlib.cornell.edu/ns/bnode#-deadbeef";
+		} else {
+			return rawRangeUri;
+		}
+	}
+	
     private void addObjectPropertyToPropertyList(String propertyUri, String domainUri, String rangeUri,
             List<Property> propertyList) {
         ObjectPropertyDao opDao = wdf.getObjectPropertyDao();
