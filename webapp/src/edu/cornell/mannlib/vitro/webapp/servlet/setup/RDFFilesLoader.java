@@ -34,7 +34,10 @@ public class RDFFilesLoader {
 	private static final String FIRST_TIME = "firsttime";
 	private static final String EVERY_TIME = "everytime";
 
-	/** Path filter that ignores sub-directories and hidden files. */
+	/**
+	 * Path filter that ignores sub-directories, hidden files, and markdown
+	 * files.
+	 */
 	private static final DirectoryStream.Filter<Path> RDF_FILE_FILTER = new DirectoryStream.Filter<Path>() {
 		@Override
 		public boolean accept(Path p) throws IOException {
@@ -44,6 +47,9 @@ public class RDFFilesLoader {
 			if (Files.isDirectory(p)) {
 				log.warn("RDF files in subdirectories are not loaded. Directory '"
 						+ p + "' ignored.");
+				return false;
+			}
+			if (p.toString().endsWith(".md")) {
 				return false;
 			}
 			return true;
@@ -61,8 +67,8 @@ public class RDFFilesLoader {
 	public static void loadFirstTimeFiles(String modelPath, Model model,
 			boolean firstTime) {
 		if (firstTime) {
-			Set<Path> paths = getPaths(locateHomeDirectory(), RDF,
-					modelPath, FIRST_TIME);
+			Set<Path> paths = getPaths(locateHomeDirectory(), RDF, modelPath,
+					FIRST_TIME);
 			for (Path p : paths) {
 				readOntologyFileIntoModel(p, model);
 			}
@@ -128,8 +134,8 @@ public class RDFFilesLoader {
 	}
 
 	/**
-	 * Find the paths to RDF files in this directory. Sub-directories and hidden
-	 * files are ignored.
+	 * Find the paths to RDF files in this directory. Sub-directories, hidden
+	 * files, and markdown files are ignored.
 	 */
 	private static Set<Path> getPaths(String parentDir, String... strings) {
 		Path dir = Paths.get(parentDir, strings);
@@ -153,7 +159,7 @@ public class RDFFilesLoader {
 
 	private static void readOntologyFileIntoModel(Path p, Model model) {
 		String format = getRdfFormat(p);
-		log.debug("Loading "+ p);
+		log.debug("Loading " + p);
 		try (InputStream stream = new FileInputStream(p.toFile())) {
 			model.read(stream, null, format);
 			log.debug("...successful");

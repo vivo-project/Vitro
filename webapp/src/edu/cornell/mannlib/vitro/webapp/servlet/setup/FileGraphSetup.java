@@ -40,8 +40,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 // This ContextListener must run after the JenaDataSourceSetup ContextListener
@@ -164,6 +164,8 @@ public class FileGraphSetup implements ServletContextListener {
                         model.read( fis, null, "N3" );
                     } else if ( fn.endsWith(".owl") || fn.endsWith(".rdf") || fn.endsWith(".xml") ) {
                         model.read( fis, null, "RDF/XML" );
+                    } else if ( fn.endsWith(".md") ) {
+                    	// Ignore markdown files - documentation.
                     } else {
                         log.warn("Ignoring " + type + " file graph " + p + " because the file extension is unrecognized.");
                     }

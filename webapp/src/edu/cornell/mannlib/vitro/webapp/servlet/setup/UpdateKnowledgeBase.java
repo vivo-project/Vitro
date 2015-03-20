@@ -532,7 +532,9 @@ public class UpdateKnowledgeBase {
 		try {
 			FileInputStream fis = new FileInputStream(f);
 			try {	
-				if (f.getName().endsWith(".n3")) {
+				if (f.getName().endsWith(".md")) {
+					// Markdown files are documentation - skip.
+				} else if (f.getName().endsWith(".n3")) {
 					om.read(fis, null, "N3");
 				} else {
 					om.read(fis, null, "RDF/XML");
