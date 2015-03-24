@@ -238,10 +238,10 @@ public class RefactorOperationController extends BaseEditController {
     			Model model = null;
     			
     			if (TBOX_ASSERTIONS.equals(graphURI)) {
-    				model = ModelAccess.on(getServletContext()).getOntModel(TBOX_ASSERTIONS);
+    				model = ModelAccess.on(getServletContext()).getOntModel(TBOX_ASSERTIONS).getBaseModel();
     				doNotify = true;
     			} else if (ABOX_ASSERTIONS.equals(graphURI)) {
-					model = ModelAccess.on(getServletContext()).getOntModel(ABOX_ASSERTIONS);
+					model = ModelAccess.on(getServletContext()).getOntModel(ABOX_ASSERTIONS).getBaseModel();
 					doNotify = true;
     			} else {
     			    model = dataset.getNamedModel(graphURI);
