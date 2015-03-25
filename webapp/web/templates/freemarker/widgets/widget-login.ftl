@@ -90,7 +90,7 @@
                 <label for="newPassword">${i18n().new_password_capitalized}</label>
                 <input id="newPassword" name="newPassword" class="text-field focus" type="password" required autofocus/>
                 
-                <p class="password-note">${i18n().minimum_password_length(minimumPasswordLength)}</p>
+                <p class="password-note">${i18n().minimum_password_length(minimumLength, maximumLength)}</p>
                 
                 <label for="confirmPassword">${i18n().confirm_password_capitalized}</label>
                 <input id="confirmPassword" name="confirmPassword" class="text-field" type="password" required />
