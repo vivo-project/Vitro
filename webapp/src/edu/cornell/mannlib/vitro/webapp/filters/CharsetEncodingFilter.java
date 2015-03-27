@@ -7,6 +7,7 @@ import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -15,17 +16,37 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 public class CharsetEncodingFilter implements Filter {
-    public void init(FilterConfig filterConfig) throws ServletException {
-    }
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
+		// Nothing to set up
+	}
 
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        if( !ServletFileUpload.isMultipartContent((HttpServletRequest) servletRequest) )
-            servletRequest.setCharacterEncoding("UTF-8");        
-        servletResponse.setContentType("text/html;charset=UTF-8");
-        filterChain.doFilter(servletRequest, servletResponse);
-    }
+	@Override
+	public void doFilter(ServletRequest servletRequest,
+			ServletResponse servletResponse, FilterChain filterChain)
+			throws IOException, ServletException {
+		HttpServletRequest req = (HttpServletRequest) servletRequest;
+		ServletContext ctx = req.getSession().getServletContext();
+		String url = req.getRequestURL().toString();
 
-    public void destroy() {
-    }
+		if (!ServletFileUpload.isMultipartContent(req)) {
+			servletRequest.setCharacterEncoding("UTF-8");
+		}
+
+		if (req.getContentType() == null) {
+			String typeFromContext = ctx.getMimeType(url);
+			if (typeFromContext == null) {
+				servletResponse.setContentType("text/html;charset=UTF-8");
+			} else {
+				servletResponse.setContentType(typeFromContext);
+			}
+		}
+
+		filterChain.doFilter(servletRequest, servletResponse);
+	}
+
+	@Override
+	public void destroy() {
+		// Nothing to tear down
+	}
 }
-
