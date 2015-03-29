@@ -32,11 +32,6 @@ public class SearchIndexerStub implements SearchIndexer {
 	}
 
     @Override
-    public void pauseInAnticipationOfRebuild() {
-        paused = true;
-    }
-
-    @Override
 	public void unpause() {
 		paused = false;
 	}
@@ -69,7 +64,12 @@ public class SearchIndexerStub implements SearchIndexer {
 				"SearchIndexerStub.rebuildIndex() not implemented.");
 	}
 
-	@Override
+    @Override
+    public boolean isRebuildScheduled() {
+        return false;
+    }
+
+    @Override
 	public SearchIndexerStatus getStatus() {
 		throw new RuntimeException(
 				"SearchIndexerStub.getStatus() not implemented.");

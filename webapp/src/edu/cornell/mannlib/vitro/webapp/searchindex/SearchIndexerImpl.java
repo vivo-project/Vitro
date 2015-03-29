@@ -98,7 +98,6 @@ public class SearchIndexerImpl implements SearchIndexer {
 	private Set<IndexingUriFinder> uriFinders;
 	private WebappDaoFactory wadf;
 
-    private boolean ignoreTasksWhilePaused = false;
     private boolean rebuildOnUnpause = false;
 
     private volatile int paused = 0;
@@ -214,18 +213,6 @@ public class SearchIndexerImpl implements SearchIndexer {
         }
 	}
 
-    @Override
-    public synchronized void pauseInAnticipationOfRebuild() {
-        if (!isShutdown()) {
-            paused++;
-            ignoreTasksWhilePaused = true;
-            // Only fire a PAUSE event if we are transitioning to a paused state
-            if (paused == 1) {
-                fireEvent(PAUSE);
-            }
-        }
-    }
-
 	@Override
 	public synchronized void unpause() {
 		if (paused > 0 && !isShutdown()) {
@@ -235,16 +222,14 @@ public class SearchIndexerImpl implements SearchIndexer {
             if (paused == 0) {
                 fireEvent(UNPAUSE);
                 if (rebuildOnUnpause) {
-                    rebuildIndex();
+                    rebuildOnUnpause = false;
                     pendingStatements.clear();
                     pendingUris.clear();
+                    rebuildIndex();
                 } else {
                     schedulePendingStatements();
                     schedulePendingUris();
                 }
-
-                rebuildOnUnpause = false;
-                ignoreTasksWhilePaused = false;
             }
 		}
 	}
@@ -292,11 +277,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 			return;
 		}
         if (paused > 0) {
-            if (ignoreTasksWhilePaused) {
-                rebuildOnUnpause = true;
-            } else {
-                pendingStatements.addAll(changes);
-            }
+            pendingStatements.addAll(changes);
             return;
         }
 
@@ -314,11 +295,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 			return;
 		}
         if (paused > 0) {
-            if (ignoreTasksWhilePaused) {
-                rebuildOnUnpause = true;
-            } else {
-                pendingUris.addAll(uris);
-            }
+            pendingUris.addAll(uris);
             return;
         }
 
@@ -335,7 +312,6 @@ public class SearchIndexerImpl implements SearchIndexer {
             // Make sure we are rebuilding when we unpause,
             // and don't bother noting any other changes until unpaused
             rebuildOnUnpause = true;
-            ignoreTasksWhilePaused = true;
             return;
         }
 
@@ -343,7 +319,12 @@ public class SearchIndexerImpl implements SearchIndexer {
 		log.debug("Scheduled a full rebuild.");
 	}
 
-	private SearchIndexExcluderList createExcludersList() {
+    @Override
+    public boolean isRebuildScheduled() {
+        return rebuildOnUnpause;
+    }
+
+    private SearchIndexExcluderList createExcludersList() {
 		if (isDeveloperOptionSet()) {
 			return new SearchIndexExcluderListDeveloper(excluders);
 		} else {
