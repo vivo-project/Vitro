@@ -72,14 +72,14 @@ public class BasicCombinedTripleSource implements CombinedTripleSource {
 		sources.put(CONFIGURATION, configurationSource);
 
 		ontModels = new EnumMap<>(WhichService.class);
-		ontModels.put(CONTENT, new ModelMakerOntModelCache(
-				getModelMaker(CONTENT)));
+		ontModels.put(CONTENT, new UnionModelsOntModelsCache(
+				new ModelMakerOntModelCache(getModelMaker(CONTENT)),
+				CONTENT_UNIONS));
 		ontModels.put(CONFIGURATION, new ModelMakerOntModelCache(
 				getModelMaker(CONFIGURATION)));
 
-		ontModelCache = new UnionModelsOntModelsCache(new JoinedOntModelCache(
-				ontModels.get(CONTENT), ontModels.get(CONFIGURATION)),
-				CONTENT_UNIONS);
+		ontModelCache = new JoinedOntModelCache(ontModels.get(CONTENT),
+				ontModels.get(CONFIGURATION));
 	}
 
 	protected OntModelCache getOntModels(WhichService whichService) {

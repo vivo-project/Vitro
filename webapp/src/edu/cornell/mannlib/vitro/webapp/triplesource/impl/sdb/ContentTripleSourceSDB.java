@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb;
 
 import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.BasicCombinedTripleSource.CONTENT_UNIONS;
 
-import java.lang.reflect.Method;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -194,6 +193,9 @@ public class ContentTripleSourceSDB extends ContentTripleSource {
 	 * Use models from the short-term RDFService, since there is less contention
 	 * for the database connections that way. The exceptions are the
 	 * memory-mapped models. By keeping them, we also keep their sub-models.
+	 * 
+	 * Set up the Union models again also, so they will reference the short-term
+	 * models.
 	 */
 	@Override
 	public OntModelCache getShortTermOntModels(RDFService shortTermRdfService,
