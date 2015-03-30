@@ -78,6 +78,15 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         } catch (IndividualNotFoundException e) {
             // If the individual does not exist, return null.
             return null;
+        } catch(Exception ex) {
+        	//Should some other error occur, please log it here
+        	log.error("An error occurred trying to make an individual ", ex);
+        	if(StringUtils.isNotEmpty(individualURI)) {
+        		log.error("IndividualURI equals " + individualURI);
+        	} else {
+        		log.error("IndividualURI is null or empty");
+        	}
+        	return null;
         }
     }
 
