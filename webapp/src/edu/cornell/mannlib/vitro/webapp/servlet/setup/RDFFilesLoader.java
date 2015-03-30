@@ -67,9 +67,10 @@ public class RDFFilesLoader {
 	public static void loadFirstTimeFiles(String modelPath, Model model,
 			boolean firstTime) {
 		if (firstTime) {
-			Set<Path> paths = getPaths(locateHomeDirectory(), RDF, modelPath,
-					FIRST_TIME);
+			String home = locateHomeDirectory();
+			Set<Path> paths = getPaths(home, RDF, modelPath, FIRST_TIME);
 			for (Path p : paths) {
+				log.info("Loading " + relativePath(p, home));
 				readOntologyFileIntoModel(p, model);
 			}
 		} else {

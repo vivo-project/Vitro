@@ -10,6 +10,7 @@ import com.hp.hpl.jena.tdb.TDB;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ListCachingModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.MemoryMappingModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
@@ -21,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.tdb.RDFServiceTDB;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging.LoggingRDFServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
@@ -75,6 +77,7 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 			this.unclosableRdfService = this.rdfServiceFactory.getRDFService();
 			this.dataset = new RDFServiceDataset(this.unclosableRdfService);
 			this.modelMaker = createModelMaker();
+			checkForFirstTimeStartup();
 			ss.info("Initialized the RDF source for TDB");
 		} catch (IOException e) {
 			throw new RuntimeException(
@@ -100,6 +103,12 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 		return addContentDecorators(new ListCachingModelMaker(
 				new MemoryMappingModelMaker(new RDFServiceModelMaker(
 						this.unclosableRdfService), SMALL_CONTENT_MODELS)));
+	}
+
+	private void checkForFirstTimeStartup() {
+		if (this.dataset.getNamedModel(ModelNames.TBOX_ASSERTIONS).size() == 0) {
+			JenaDataSourceSetupBase.thisIsFirstStartup();
+		}
 	}
 
 	@Override
