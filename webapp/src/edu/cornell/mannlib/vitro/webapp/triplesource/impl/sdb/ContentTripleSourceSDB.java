@@ -32,8 +32,8 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ListCachingModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.MemoryMappingModelMaker;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ModelMakerWithPersistentEmptyModels;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.MaskingOntModelCache;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.ModelMakerOntModelCache;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
@@ -164,7 +164,7 @@ public class ContentTripleSourceSDB extends ContentTripleSource {
 	}
 
 	private ModelMaker createModelMaker() {
-		return addContentDecorators(new ListCachingModelMaker(
+		return addContentDecorators(new ModelMakerWithPersistentEmptyModels(
 				new MemoryMappingModelMaker(new RDFServiceModelMaker(
 						this.rdfService), SMALL_CONTENT_MODELS)));
 	}
@@ -201,7 +201,7 @@ public class ContentTripleSourceSDB extends ContentTripleSource {
 	public OntModelCache getShortTermOntModels(RDFService shortTermRdfService,
 			OntModelCache longTermOntModelCache) {
 		ModelMakerOntModelCache shortCache = new ModelMakerOntModelCache(
-				addContentDecorators(new ListCachingModelMaker(
+				addContentDecorators(new ModelMakerWithPersistentEmptyModels(
 						new RDFServiceModelMaker(shortTermRdfService))));
 
 		MaskingOntModelCache combinedCache = new MaskingOntModelCache(

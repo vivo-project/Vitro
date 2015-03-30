@@ -12,8 +12,8 @@ import com.hp.hpl.jena.tdb.TDB;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ListCachingModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.MemoryMappingModelMaker;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ModelMakerWithPersistentEmptyModels;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
@@ -78,7 +78,7 @@ public class ConfigurationTripleSourceTDB extends ConfigurationTripleSource {
 	}
 
 	private ModelMaker createModelMaker() {
-		ModelMaker longTermModelMaker = new ListCachingModelMaker(
+		ModelMaker longTermModelMaker = new ModelMakerWithPersistentEmptyModels(
 				new MemoryMappingModelMaker(new RDFServiceModelMaker(
 						this.unclosableRdfService), CONFIGURATION_MODELS));
 		return addConfigurationDecorators(longTermModelMaker);
