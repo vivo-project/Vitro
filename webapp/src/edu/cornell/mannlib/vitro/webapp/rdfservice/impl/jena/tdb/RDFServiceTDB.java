@@ -63,7 +63,6 @@ public class RDFServiceTDB extends RDFServiceJena {
 			return false;
 		}
 
-		dataset.begin(ReadWrite.WRITE);
 		try {
 			insureThatInputStreamsAreResettable(changeSet);
 
@@ -72,18 +71,20 @@ public class RDFServiceTDB extends RDFServiceJena {
 			}
 			notifyListenersOfPreChangeEvents(changeSet);
 
-			applyChangeSetToModel(changeSet, dataset);
-
+			dataset.begin(ReadWrite.WRITE);
+			try {
+				applyChangeSetToModel(changeSet, dataset);
+				dataset.commit();
+			} finally {
+				dataset.end();
+			}
+			
 			notifyListenersOfChanges(changeSet);
 			notifyListenersOfPostChangeEvents(changeSet);
-
-			dataset.commit();
 			return true;
 		} catch (Exception e) {
 			log.error(e, e);
 			throw new RDFServiceException(e);
-		} finally {
-			dataset.end();
 		}
 	}
 
