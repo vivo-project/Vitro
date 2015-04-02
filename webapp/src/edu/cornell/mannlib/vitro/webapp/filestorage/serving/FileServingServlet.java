@@ -117,13 +117,15 @@ public class FileServingServlet extends VitroHttpServlet {
 			try {
 				in.close();
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.warn("Serving " + request.getRequestURI()
+						+ ". Failed to close input stream.", e);
 			}
 			if (out != null) {
 				try {
 					out.close();
 				} catch (Exception e) {
-					e.printStackTrace();
+					log.warn("Serving " + request.getRequestURI()
+							+ ". Failed to close output stream.", e);
 				}
 			}
 		}
