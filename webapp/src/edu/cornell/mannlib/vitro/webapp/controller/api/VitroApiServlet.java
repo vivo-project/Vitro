@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller.api;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Collection;
 
@@ -74,17 +75,27 @@ public class VitroApiServlet extends HttpServlet {
 	protected void sendShortResponse(int statusCode, String message,
 			HttpServletResponse resp) throws IOException {
 		resp.setStatus(statusCode);
-		PrintWriter writer = resp.getWriter();
+		PrintWriter writer = getWriter(resp);
 		writer.println("<H1>" + statusCode + " " + message + "</H1>");
 	}
 
 	protected void sendShortResponse(int statusCode, String message,
 			Throwable e, HttpServletResponse resp) throws IOException {
+		log.warn("Unexpected exception: " + e, e);
 		sendShortResponse(statusCode, message, resp);
-		PrintWriter writer = resp.getWriter();
+		PrintWriter writer = getWriter(resp);
 		writer.println("<pre>");
 		e.printStackTrace(writer);
 		writer.println("</pre>");
+	}
+
+	private PrintWriter getWriter(HttpServletResponse resp) throws IOException {
+		try {
+			return resp.getWriter();
+		} catch (IllegalStateException e) {
+			return new PrintWriter(new OutputStreamWriter(
+					resp.getOutputStream()));
+		}
 	}
 
 	// ----------------------------------------------------------------------
