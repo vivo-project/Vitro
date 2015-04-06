@@ -296,3 +296,7 @@ ol.tinyMCENumeric li {
     padding: 0 !important;
     margin-left: 30px;
 }
+img.invalidFormat {
+	 padding-left:8px;
+	 vertical-align:middle;
+}

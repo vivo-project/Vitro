@@ -6,10 +6,14 @@
      is also used to generate the property statement during a deletion.  
  -->
 <#import "lib-datetime.ftl" as dt>
-<@showStatement statement />
+<#if property.rangeDatatypeURI?? && property.rangeDatatypeURI?contains("#")>
+	<#assign datatype = property.rangeDatatypeURI?substring(property.rangeDatatypeURI?last_index_of("#")+1) />
+</#if>
+<@showStatement statement datatype />
 
-<#macro showStatement statement>
+<#macro showStatement statement datatype>
     <#assign theValue = statement.value />
+	
     <#if theValue?contains("<ul>") >
         <#assign theValue = theValue?replace("<ul>","<ul class='tinyMCEDisc'>") />
     </#if>
@@ -23,7 +27,11 @@
 		<#assign theValue = theValue + "T00:00:00" />
 		${dt.formatXsdDateTimeLong(theValue, "yearMonthDayPrecision")}
 	<#elseif theValue?matches("^([0-9]{4})-((0[1-9])|(1[0-2]))-((0[1-9])|([1-2][0-9])|(3[0-1]))(T|\\s)(([0-1][0-9])|(2[0-3])):([0-5][0-9]):([0-5][0-9])")>
-		${dt.formatXsdDateTimeLong(theValue, "yearMonthDayTimePrecision")}
+		<#if theValue?contains("T00:00:00") >
+			${dt.formatXsdDateTimeLong(theValue, "yearMonthDayPrecision")}
+		<#else>
+			${dt.formatXsdDateTimeLong(theValue, "yearMonthDayTimePrecision")}
+		</#if>
 	<#elseif theValue?matches("^([0-9]{4})-(0[1-9]|1[012])")>
 		<#assign theValue = theValue + "-01T00:00:00" />
 		${dt.formatXsdDateTimeLong(theValue, "yearMonthPrecision")}
@@ -31,6 +39,56 @@
 		<#assign theValue = "2000" + theValue?substring(1) + "-01T00:00:00" />
 		${dt.formatXsdDateTimeLong(theValue, "monthPrecision")}
 	<#else>
-    	${theValue}
+    	${theValue} <@validateFormat theValue datatype/>
+	</#if>
+</#macro> 
+<#macro validateFormat value datatype >
+	<#if datatype?? >
+		<#switch datatype>
+			<#case "date">
+				<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt="${i18n().invalid_format}" title=" ${i18n().invalid_format}"> <#-- validated above -->
+		     	<#break>
+		    <#case "dateTime">
+				<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}"> <#-- validated above -->
+		     	<#break>
+		  	<#case "time">
+		     	<#if !value?matches("(([0-1][0-9])|(2[0-3])):([0-5][0-9]):([0-5][0-9])") >
+					<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+			 	</#if>
+		     	<#break>
+		  	<#case "gYear">
+		     	<#if !value?matches("^\\d{4}") >
+					<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+			 	</#if>
+		     	<#break>
+		    <#case "gMonth">
+		     	<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}"> <#-- validated above -->
+		     	<#break>
+		    <#case "gYearMonth">
+		     	<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}"> <#-- validated above -->
+		     	<#break>
+		  	<#case "float">
+				<#if !value?matches("^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?.") >
+		     		<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+				</#if>
+		     	<#break>
+		  	<#case "integer">
+				<#if !value?matches("^-?\\d+$") >
+		     		<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+				</#if>
+		     	<#break>
+		  	<#case "int">
+				<#if !value?matches("^-?\\d+$") >
+	     			<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+				</#if>
+		     	<#break>
+		  	<#case "boolean">
+				<#if !value?matches("false") && !value?matches("true") >
+		     		<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+				</#if>
+		     <#break>
+		  	<#default>
+		</#switch>
 	</#if>
 </#macro>
+
