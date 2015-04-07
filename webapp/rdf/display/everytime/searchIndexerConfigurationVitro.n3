@@ -32,10 +32,6 @@
     :excludes
         "http://vitro.mannlib.cornell.edu/ns/vitro/role#public" .
 
-:searchExcluder_vitroExcluder
-    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.ExcludeNonFlagVitro> ,
-        <java:edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluder> .
-
 :searchExcluder_syncingTypeExcluder
     a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SyncingExcludeBasedOnType> ,
         <java:edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluder> .

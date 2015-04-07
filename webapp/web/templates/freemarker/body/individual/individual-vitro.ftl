@@ -86,6 +86,12 @@
         viewRDFProfile: '${i18n().view_profile_in_rdf}',
         closeString: '${i18n().close}'
     };
+	var i18nStrings = {
+	    displayLess: '${i18n().display_less}',
+	    displayMoreEllipsis: '${i18n().display_more_ellipsis}',
+	    showMoreContent: '${i18n().show_more_content}',
+	};
+
 </script>
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/individual/individual.css" />')}
@@ -94,6 +100,7 @@ ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_pl
                   '<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>')}
 
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/imageUpload/imageUploadUtils.js"></script>',
+	          '<script type="text/javascript" src="${urls.base}/js/individual/moreLessController.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/individual/individualUriRdf.js"></script>')}
 
 <script type="text/javascript">

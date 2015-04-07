@@ -62,10 +62,13 @@ public class UpdateUrisTask implements Task {
         this.uris = new HashSet<>(uris);
     }
 
-    static void runNow(Collection<String> uris, SearchIndexExcluderList excluders, DocumentModifierList modifiers, IndividualDao indDao, ListenerList listeners, WorkerThreadPool pool) {
-        UpdateUrisTaskImpl impl = new UpdateUrisTaskImpl(uris, excluders, modifiers, indDao, listeners, pool);
-        impl.run();
-    }
+	static void runNow(Collection<String> uris,
+			SearchIndexExcluderList excluders, DocumentModifierList modifiers,
+			IndividualDao indDao, ListenerList listeners, WorkerThreadPool pool) {
+		UpdateUrisTaskImpl impl = new UpdateUrisTaskImpl(uris, excluders,
+				modifiers, indDao, listeners, pool);
+		impl.run();
+	}
 
     @Override
     public void run() {
@@ -75,11 +78,7 @@ public class UpdateUrisTask implements Task {
 
     @Override
     public SearchIndexerStatus getStatus() {
-        if (impl != null) {
-            return impl.getStatus();
-        }
-
-        return new SearchIndexerStatus(PROCESSING_URIS, since, new UriCounts(0, 0, 0, uris.size(), uris.size()));
+    	return (impl == null) ? SearchIndexerStatus.idle() : impl.getStatus();
     }
 
     @Override
@@ -113,8 +112,12 @@ public class UpdateUrisTask implements Task {
             this.searchEngine = ApplicationUtils.instance().getSearchEngine();
         }
 
-        public UpdateUrisTaskImpl(Collection<String> uris, SearchIndexExcluderList excluders, DocumentModifierList modifiers, IndividualDao indDao, ListenerList listeners, WorkerThreadPool pool) {
-            this.uris = uris;
+		public UpdateUrisTaskImpl(Collection<String> uris,
+				SearchIndexExcluderList excluders,
+				DocumentModifierList modifiers, IndividualDao indDao,
+				ListenerList listeners, WorkerThreadPool pool) {
+			log.debug("Updating " + uris.size() + " uris.");
+        	this.uris = uris;
             this.excluders = excluders;
             this.modifiers = modifiers;
             this.indDao = indDao;

@@ -28,10 +28,10 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
  * 
  * Start with an empty settings map.
  * 
- * The Setup class will read "developer.properties" from the Vitro home
- * directory, and load its settings. If the file doesn't exist, or doesn't
- * contain values for certain properties, those propertiew will keep their
- * default values.
+ * The Setup class will read "developer.properties" from the "config"
+ * sub-directory of the Vitro home directory, and load its settings. If the file
+ * doesn't exist, or doesn't contain values for certain properties, those
+ * properties will keep their default values.
  * 
  * An AJAX request can be used to update the properties. If the request has
  * multiple values for a property, the first value will be used. If the request
@@ -196,8 +196,10 @@ public class DeveloperSettings {
 			StartupStatus ss = StartupStatus.getBean(ctx);
 			DeveloperSettings devSettings = DeveloperSettings.getInstance();
 
-			Path homeDir = ApplicationUtils.instance().getHomeDirectory().getPath();
-			File dsFile = homeDir.resolve("developer.properties").toFile();
+			Path homeDir = ApplicationUtils.instance().getHomeDirectory()
+					.getPath();
+			File dsFile = homeDir.resolve("config/developer.properties")
+					.toFile();
 
 			try (FileReader reader = new FileReader(dsFile)) {
 				Properties dsProps = new Properties();

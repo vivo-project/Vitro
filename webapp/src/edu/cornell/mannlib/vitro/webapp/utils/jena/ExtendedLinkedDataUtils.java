@@ -13,10 +13,7 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.ontology.Individual;
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -24,26 +21,17 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.util.ResourceUtils;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
-import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDF;
-
-import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
-import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class ExtendedLinkedDataUtils {
 	
 	private static final Log log = LogFactory.getLog(ExtendedLinkedDataUtils.class.getName());
 	
 	public static Model createModelFromQueries(ServletContext sc, String rootDir, OntModel sourceModel, String subject) {
+		log.debug("Exploring queries in directory '" + rootDir + "'");
 		
 		Model model = ModelFactory.createDefaultModel(); 
 		
+		@SuppressWarnings("unchecked")
 		Set<String> pathSet = sc.getResourcePaths(rootDir);
 		
 		if (pathSet == null) {
@@ -61,6 +49,8 @@ public class ExtendedLinkedDataUtils {
     				continue;
     			}
             	model.add(createModelFromQuery(file, sourceModel, subject));
+				log.debug("model size is " + model.size() + " after query in '"
+						+ path + "'");
             } else {
             	log.warn("path is neither a directory nor a file " + path);
             }
@@ -95,7 +85,9 @@ public class ExtendedLinkedDataUtils {
 		   	} catch (Exception e) {
 				log.error("Unable to process file " + sparqlFile.getAbsolutePath(), e);
 			} finally {
-				reader.close();
+				if (reader != null) {
+					reader.close();
+				}
 			}
 		} catch (IOException ioe) {
 			// this is for the reader.close above

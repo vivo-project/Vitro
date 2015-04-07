@@ -21,12 +21,13 @@ public interface WebappDaoFactory {
 	public String checkURI(String uriStr);
 	
 	/**
-	 * Checks a URI String for two things: well-formedness and, optionally, 
-	 * uniqueness in the model.  Ill-formed strings or those matching URIs 
-	 * already in use will cause an error message to be returned.
+	 * Checks a URI String to see whether it is suitable for use on a new editable entity.
+	 * It must be well-formed, and it must not be declared in the model as a Thing, Class, 
+	 * ObjectProperty or DataProperty. Ill-formed strings or those so declared will 
+	 * cause an error message to be returned.
 	 * @return error message String if invalid; otherwise null
 	 */
-	public String checkURI(String uriStr, boolean checkUniqueness);
+	public String checkURIForEditableEntity(String uriStr);
 	
 	/**
 	 * Check if a given URI string exists in the system:

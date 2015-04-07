@@ -44,7 +44,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
@@ -400,7 +399,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     }
     
     private InputStream getRDFResultStream(String query, boolean construct, 
-            ModelSerializationFormat resultFormat) {
+            ModelSerializationFormat resultFormat) throws RDFServiceException {
         DatasetWrapper dw = getDatasetWrapper();
         try {
             Dataset d = dw.getDataset();
@@ -529,7 +528,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 		serialize(outputStream, query);
 	}
 
-	private void serialize(OutputStream outputStream, String query) {
+	private void serialize(OutputStream outputStream, String query) throws RDFServiceException {
 		DatasetWrapper dw = getDatasetWrapper();
 		try {
 			Dataset d = dw.getDataset();

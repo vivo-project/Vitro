@@ -18,7 +18,11 @@ import com.hp.hpl.jena.util.iterator.WrappedIterator;
  * that remove a model must remove its name from the list.
  * 
  * This is a useful decorator for some ModelMakers where listModels() is a
- * costly operation.
+ * costly operation. The drawback is that it will not see models that were
+ * created at a lower level; perhaps by RDFServiceDataset.getNamedModel().
+ * 
+ * If listModels() is not costly, you might be better off with a
+ * ModelMakerWithPersistentEmptyModels.
  */
 public class ListCachingModelMaker extends AbstractModelMakerDecorator {
 	private final Set<String> modelNames;

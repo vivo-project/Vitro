@@ -71,10 +71,11 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 		this.objectPropertyDao = objectPropertyDao;
 	}
 
-	public void setObjectPropertyStatementDao(ObjectPropertyStatementDao objectPropertyStatementDao) {
+	public void setObjectPropertyStatementDao(
+			ObjectPropertyStatementDao objectPropertyStatementDao) {
 		this.objectPropertyStatementDao = objectPropertyStatementDao;
 	}
-	
+
 	public void setFauxPropertyDao(FauxPropertyDao fauxPropertyDao) {
 		this.fauxPropertyDao = fauxPropertyDao;
 	}
@@ -86,7 +87,7 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	public void setUserAccountsDao(UserAccountsDao userAccountsDao) {
 		this.userAccountsDao = userAccountsDao;
 	}
-	
+
 	public void setVClassDao(VClassDao vClassDao) {
 		this.vClassDao = vClassDao;
 	}
@@ -161,11 +162,11 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	}
 
 	@Override
-	public String checkURI(String uriStr, boolean checkUniqueness) {
+	public String checkURIForEditableEntity(String uriStr) {
 		throw new RuntimeException(
-				"WebappDaoFactory.checkURI() not implemented.");
+				"WebappDaoFactory.checkURIForNewEditableEntity() not implemented.");
 	}
-	
+
 	@Override
 	public boolean hasExistingURI(String uriStr) {
 		throw new RuntimeException(

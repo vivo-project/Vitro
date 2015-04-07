@@ -45,6 +45,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 		map.put(XHTML_MIMETYPE, 0.5f);
 		map.put("application/xml", 0.5f);
         map.put(JSON_MIMETYPE, 1.0f);
+        map.put(JSON_LD_MIMETYPE, 1.0f);
 		map.put(RDFXML_MIMETYPE, 1.0f);
 		map.put(RDFXML_MIMETYPE, 1.0f);
 		map.put(N3_MIMETYPE, 1.0f);

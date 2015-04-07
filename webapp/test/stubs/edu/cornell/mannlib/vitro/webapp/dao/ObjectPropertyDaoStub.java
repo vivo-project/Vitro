@@ -222,13 +222,6 @@ public class ObjectPropertyDaoStub implements ObjectPropertyDao {
 	}
 
 	@Override
-	public List<ObjectPropertyStatement> getStatementsUsingObjectProperty(
-			ObjectProperty op) {
-		throw new RuntimeException(
-				"ObjectPropertyDaoStub.getStatementsUsingObjectProperty() not implemented.");
-	}
-
-	@Override
 	public void fillObjectPropertiesForIndividual(Individual individual) {
 		throw new RuntimeException(
 				"ObjectPropertyDaoStub.fillObjectPropertiesForIndividual() not implemented.");

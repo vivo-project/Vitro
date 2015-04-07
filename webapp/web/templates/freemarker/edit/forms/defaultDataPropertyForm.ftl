@@ -23,6 +23,11 @@
 </#if>
 
 <#assign literalValues = "${editConfiguration.dataLiteralValuesAsString}" />
+<#if editConfiguration.dataPredicateProperty.rangeDatatypeURI?? >
+	<#assign datatype = editConfiguration.dataPredicateProperty.rangeDatatypeURI />
+<#else>
+	<#assign datatype = "none" />
+</#if>
 
 <form class="editForm" action = "${submitUrl}" method="post">
     <input type="hidden" name="editKey" id="editKey" value="${editKey}" role="input" />
@@ -30,8 +35,41 @@
        <label for="${editConfiguration.dataLiteral}"><p class="propEntryHelpText">${editConfiguration.dataPredicatePublicDescription}</p></label>
     </#if>   
 
-    
-    <textarea rows="2"  id="literal" name="literal" value="" class="useTinyMce" role="textarea">${literalValues}</textarea>
+    <#if datatype = "http://www.w3.org/2001/XMLSchema#integer" || datatype = "http://www.w3.org/2001/XMLSchema#int">
+    	<input
+            type="text" id="literal" name="literal" value="${literalValues}"
+            placeholder="123456"
+        />
+    <#elseif datatype = "http://www.w3.org/2001/XMLSchema#float">
+        <input
+            type="text" id="literal" name="literal" value="${literalValues}"
+            placeholder="12.345"
+        />
+    <#elseif datatype = "http://www.w3.org/2001/XMLSchema#boolean">
+        <select id="literal" name="literal">
+            <#if literalValues = "true">
+                <option value="true" selected="true">true</option>
+                <option value="false">false</option>
+            <#else>
+                <option value="true">true</option>
+                <option value="false" selected="true">false</option>
+            </#if>
+        </select>
+    <#elseif datatype = "http://www.w3.org/2001/XMLSchema#anyURI">
+        <input
+            type="text" id="literal" name="literal" value="${literalValues}"
+            placeholder="http://..."
+        />
+    <#elseif datatype = "http://www.w3.org/2001/XMLSchema#dateTime" || 
+        		datatype = "http://www.w3.org/2001/XMLSchema#date" ||
+        		datatype = "http://www.w3.org/2001/XMLSchema#time" ||
+        		datatype = "http://www.w3.org/2001/XMLSchema#gYearMonth" ||
+        		datatype = "http://www.w3.org/2001/XMLSchema#gYear"	||
+        		datatype = "http://www.w3.org/2001/XMLSchema#gMonth" >
+        <#include "dateTimeEntryForm.ftl">
+    <#else>
+    	<textarea rows="2"  id="literal" name="literal" value="" class="useTinyMce" role="textarea">${literalValues}</textarea>
+    </#if> 
 
     <br />
     <#--The submit label should be set within the template itself, right now
@@ -47,10 +85,25 @@
 <#include "defaultDeletePropertyForm.ftl">
 </#if>
 
+<script type="text/javascript">
+	var datatype = "${datatype!}";
+
+	var i18nStrings = {
+    	four_digit_year: '${i18n().four_digit_year}',
+    	year_numeric: '${i18n().year_numeric}',
+    	year_month_day: '${i18n().year_month_day}',
+    	minimum_ymd: '${i18n().minimum_ymd}',
+    	minimum_hour: '${i18n().minimum_hour}',
+    	year_month: '${i18n().year_month}',
+    	decimal_only: '${i18n().decimal_only}',
+    	whole_number: '${i18n().whole_number}'
+	};
+</script> 
+
 <#include "defaultFormScripts.ftl">     
 
-<script type="text/javascript">
-$(document).ready(function(){
-    defaultDataPropertyUtils.onLoad();
-});
-</script> 
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/templates/freemarker/edit/forms/css/customForm.css" />')}
+
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/utils.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/customFormUtils.js"></script>')}
+

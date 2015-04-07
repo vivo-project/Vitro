@@ -10,8 +10,9 @@ import com.hp.hpl.jena.tdb.TDB;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ListCachingModelMaker;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.MemoryMappingModelMaker;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ModelMakerWithPersistentEmptyModels;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
@@ -21,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceFactorySingle;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.tdb.RDFServiceTDB;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging.LoggingRDFServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
@@ -70,16 +72,22 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 	public void startup(Application application, ComponentStartupStatus ss) {
 		configureTDB();
 		try {
-			this.rdfService = new RDFServiceTDB(tdbPath);
+			this.rdfService = new RDFServiceTDB(resolveTdbPath(application));
 			this.rdfServiceFactory = createRDFServiceFactory();
 			this.unclosableRdfService = this.rdfServiceFactory.getRDFService();
 			this.dataset = new RDFServiceDataset(this.unclosableRdfService);
 			this.modelMaker = createModelMaker();
+			checkForFirstTimeStartup();
 			ss.info("Initialized the RDF source for TDB");
 		} catch (IOException e) {
 			throw new RuntimeException(
 					"Failed to set up the RDF source for TDB", e);
 		}
+	}
+
+	private String resolveTdbPath(Application application) {
+		return application.getHomeDirectory().getPath().resolve(tdbPath)
+				.toString();
 	}
 
 	private void configureTDB() {
@@ -92,9 +100,15 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 	}
 
 	private ModelMaker createModelMaker() {
-		return addContentDecorators(new ListCachingModelMaker(
+		return addContentDecorators(new ModelMakerWithPersistentEmptyModels(
 				new MemoryMappingModelMaker(new RDFServiceModelMaker(
 						this.unclosableRdfService), SMALL_CONTENT_MODELS)));
+	}
+
+	private void checkForFirstTimeStartup() {
+		if (this.dataset.getNamedModel(ModelNames.TBOX_ASSERTIONS).size() == 0) {
+			JenaDataSourceSetupBase.thisIsFirstStartup();
+		}
 	}
 
 	@Override

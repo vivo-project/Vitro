@@ -325,7 +325,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         String mediaType = values.getContentType().getMediaType();
         response.setContentType(mediaType);
                 
-        if (   JSON_MIMETYPE.equals(mediaType)){
+        if ( JSON_MIMETYPE.equals(mediaType) || JSON_LD_MIMETYPE.equals(mediaType)){
             //json-ld is not supported by jena v2.6.4
             try {   
                 JenaRDFParser parser = new JenaRDFParser();

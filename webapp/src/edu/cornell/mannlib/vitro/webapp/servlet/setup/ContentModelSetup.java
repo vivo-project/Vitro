@@ -53,24 +53,22 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
     	
     	Model applicationMetadataModel = models.getOntModel(APPLICATION_METADATA);
 		if (applicationMetadataModel.size()== 0) {
-			thisIsFirstStartup();
+        	initializeApplicationMetadata(ctx, applicationMetadataModel);
+		} else {
+        	checkForNamespaceMismatch( applicationMetadataModel, ctx );
 		}
 
-
         OntModel baseABoxModel = models.getOntModel(ABOX_ASSERTIONS);
-        OntModel baseTBoxModel = models.getOntModel(TBOX_ASSERTIONS);
-        
-        if (isFirstStartup()) {
-        	initializeApplicationMetadata(ctx, applicationMetadataModel);
+        if (baseABoxModel.size() == 0) {
         	RDFFilesLoader.loadFirstTimeFiles("abox", baseABoxModel, true);
-        	RDFFilesLoader.loadFirstTimeFiles("tbox", baseTBoxModel, true);
-        } else {
-        	checkForNamespaceMismatch( applicationMetadataModel, ctx );
         }
-    	RDFFilesLoader.loadEveryTimeFiles("abox", baseABoxModel);
+        RDFFilesLoader.loadEveryTimeFiles("abox", baseABoxModel);
+        
+        OntModel baseTBoxModel = models.getOntModel(TBOX_ASSERTIONS);
+        if (baseTBoxModel.size() == 0) {
+        	RDFFilesLoader.loadFirstTimeFiles("tbox", baseTBoxModel, true);
+        }
     	RDFFilesLoader.loadEveryTimeFiles("tbox", baseTBoxModel);
-    	
-		log.info("Setting up DAO factories");
     }
 
 	private long secondsSince(long startTime) {

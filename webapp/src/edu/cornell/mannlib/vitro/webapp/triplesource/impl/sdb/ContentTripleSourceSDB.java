@@ -4,8 +4,11 @@ package edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb;
 
 import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.BasicCombinedTripleSource.CONTENT_UNIONS;
 
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Enumeration;
 
 import javax.servlet.ServletContext;
 import javax.sql.DataSource;
@@ -29,8 +32,8 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ListCachingModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.MemoryMappingModelMaker;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ModelMakerWithPersistentEmptyModels;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.MaskingOntModelCache;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.ModelMakerOntModelCache;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
@@ -76,7 +79,7 @@ public class ContentTripleSourceSDB extends ContentTripleSource {
 
 	static final boolean DEFAULT_TESTONBORROW = true;
 	static final boolean DEFAULT_TESTONRETURN = true;
-	
+
 	private ServletContext ctx;
 	private ComboPooledDataSource ds;
 	private RDFServiceFactory rdfServiceFactory;
@@ -161,7 +164,7 @@ public class ContentTripleSourceSDB extends ContentTripleSource {
 	}
 
 	private ModelMaker createModelMaker() {
-		return addContentDecorators(new ListCachingModelMaker(
+		return addContentDecorators(new ModelMakerWithPersistentEmptyModels(
 				new MemoryMappingModelMaker(new RDFServiceModelMaker(
 						this.rdfService), SMALL_CONTENT_MODELS)));
 	}
@@ -190,12 +193,15 @@ public class ContentTripleSourceSDB extends ContentTripleSource {
 	 * Use models from the short-term RDFService, since there is less contention
 	 * for the database connections that way. The exceptions are the
 	 * memory-mapped models. By keeping them, we also keep their sub-models.
+	 * 
+	 * Set up the Union models again also, so they will reference the short-term
+	 * models.
 	 */
 	@Override
 	public OntModelCache getShortTermOntModels(RDFService shortTermRdfService,
 			OntModelCache longTermOntModelCache) {
 		ModelMakerOntModelCache shortCache = new ModelMakerOntModelCache(
-				addContentDecorators(new ListCachingModelMaker(
+				addContentDecorators(new ModelMakerWithPersistentEmptyModels(
 						new RDFServiceModelMaker(shortTermRdfService))));
 
 		MaskingOntModelCache combinedCache = new MaskingOntModelCache(
@@ -212,9 +218,62 @@ public class ContentTripleSourceSDB extends ContentTripleSource {
 
 	@Override
 	public void shutdown(Application application) {
+		if (this.modelMaker != null) {
+			this.modelMaker.close();
+		}
+		if (this.dataset != null) {
+			this.dataset.close();
+		}
+		if (this.rdfService != null) {
+			this.rdfService.close();
+		}
 		if (ds != null) {
+			String driverClassName = ds.getDriverClass();
 			ds.close();
+			attemptToDeregisterJdbcDriver(driverClassName);
+			cleanupAbandonedConnectionThread(driverClassName);
 		}
 	}
 
+	private void attemptToDeregisterJdbcDriver(String driverClassName) {
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+		for (Enumeration<Driver> drivers = DriverManager.getDrivers(); drivers
+				.hasMoreElements();) {
+			Driver driver = drivers.nextElement();
+			if (driver.getClass().getClassLoader() == cl) {
+				// This driver was registered by the webapp's ClassLoader, so
+				// deregister it:
+				try {
+					DriverManager.deregisterDriver(driver);
+				} catch (SQLException ex) {
+					log.error("Error deregistering JDBC driver {" + driver
+							+ "}", ex);
+				}
+			} else {
+				// driver was not registered by the webapp's ClassLoader and may
+				// be in use elsewhere
+			}
+		}
+	}
+
+	/**
+	 * The MySQL driver leaves a thread running after it is deregistered.
+	 * Versions after 5.1.23 provide AbandonedConnectionCleanupThread.shutdown()
+	 * to stop this thread.
+	 * 
+	 * Using reflection to invoke this method means that we don't have a
+	 * hard-coded dependency to MySQL.
+	 */
+	private void cleanupAbandonedConnectionThread(String driverClassName) {
+		if (!driverClassName.contains("mysql")) {
+			return;
+		}
+		try {
+			Class.forName("com.mysql.jdbc.AbandonedConnectionCleanupThread")
+					.getMethod("shutdown").invoke(null);
+		} catch (Exception e) {
+			log.info("Failed to shutdown MySQL connection cleanup thread: " + e);
+		}
+	}
 }

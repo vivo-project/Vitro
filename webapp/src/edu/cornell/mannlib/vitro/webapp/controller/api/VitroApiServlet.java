@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.controller.api;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Collection;
 
@@ -46,13 +47,13 @@ public class VitroApiServlet extends HttpServlet {
 
 		Authenticator auth = Authenticator.getInstance(req);
 		UserAccount account = auth.getAccountForInternalAuth(email);
-		
+
 		if (auth.accountRequiresEditing(account)) {
 			log.debug("Account " + email + " requires editing.");
 			throw new AuthException("user account must include first and "
 					+ "last names and a valid email address.");
 		}
-		
+
 		if (!auth.isCurrentPassword(account, password)) {
 			log.debug("Invalid: '" + email + "'/'" + password + "'");
 			throw new AuthException("email/password combination is not valid");
@@ -68,7 +69,7 @@ public class VitroApiServlet extends HttpServlet {
 			log.debug("Account " + email + " requires a new password.");
 			throw new AuthException("user account requires a new password.");
 		}
-		
+
 		log.debug("Authorized for '" + email + "'");
 	}
 
@@ -86,17 +87,27 @@ public class VitroApiServlet extends HttpServlet {
 	protected void sendShortResponse(int statusCode, String message,
 			HttpServletResponse resp) throws IOException {
 		resp.setStatus(statusCode);
-		PrintWriter writer = resp.getWriter();
+		PrintWriter writer = getWriter(resp);
 		writer.println("<H1>" + statusCode + " " + message + "</H1>");
 	}
 
 	protected void sendShortResponse(int statusCode, String message,
 			Throwable e, HttpServletResponse resp) throws IOException {
+		log.warn("Unexpected exception: " + e, e);
 		sendShortResponse(statusCode, message, resp);
-		PrintWriter writer = resp.getWriter();
+		PrintWriter writer = getWriter(resp);
 		writer.println("<pre>");
 		e.printStackTrace(writer);
 		writer.println("</pre>");
+	}
+
+	private PrintWriter getWriter(HttpServletResponse resp) throws IOException {
+		try {
+			return resp.getWriter();
+		} catch (IllegalStateException e) {
+			return new PrintWriter(new OutputStreamWriter(
+					resp.getOutputStream()));
+		}
 	}
 
 	// ----------------------------------------------------------------------

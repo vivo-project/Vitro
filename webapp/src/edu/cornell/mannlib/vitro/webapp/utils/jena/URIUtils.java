@@ -2,59 +2,67 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.jena;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import static com.hp.hpl.jena.rdf.model.ResourceFactory.createProperty;
+import static com.hp.hpl.jena.rdf.model.ResourceFactory.createResource;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.vocabulary.OWL;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 public class URIUtils {
-	
-	private static final Log log = LogFactory.getLog(URIUtils.class.getName());
-		
-	 public static boolean hasExistingURI(String uriStr, OntModel ontModel) {
-	    	boolean existingURI = false;
-			ontModel.enterCriticalSection(Lock.READ);
-			try {
-				boolean validPropertyURI = true;
-				String localName = uriStr.substring(uriStr.lastIndexOf("/") + 1);
-				//if local name is only numbers, this is not a valid uri for a property
-				if(localName.matches("\\d+")) {
-					validPropertyURI = false;
-				}
-				Resource newURIAsRes = ResourceFactory.createResource(uriStr);
-				
-				StmtIterator closeIt = ontModel.listStatements(
-						newURIAsRes, null, (RDFNode)null);
-				if (closeIt.hasNext()) {
-					existingURI = true;
-					
-				}
-				//if not in the subject position, check in object position
-				if (!existingURI) {
-					closeIt = ontModel.listStatements(null, null, newURIAsRes);
-					if (closeIt.hasNext()) {
-						existingURI= true;
-					}
-				}
-				//Check for property
-				if (validPropertyURI && !existingURI) {
-					Property newURIAsProp = ResourceFactory.createProperty(uriStr);
-					closeIt = ontModel.listStatements(
-							null, newURIAsProp, (RDFNode)null);
-					if (closeIt.hasNext()) {
-						existingURI = true;
-					}
-				}
-			} finally {
-				ontModel.leaveCriticalSection();
+	public static boolean hasExistingURI(String uriStr, OntModel ontModel) {
+		ontModel.enterCriticalSection(Lock.READ);
+		try {
+			if (anyStatements(ontModel, createResource(uriStr), null, null)) {
+				return true;
 			}
-			
-			return existingURI;	
-	    }
+			if (anyStatements(ontModel, null, createProperty(uriStr), null)) {
+				return true;
+			}
+			if (anyStatements(ontModel, null, null, createResource(uriStr))) {
+				return true;
+			}
+			return false;
+		} finally {
+			ontModel.leaveCriticalSection();
+		}
+	}
+
+	public static boolean hasEditableEntity(String uriStr, OntModel ontModel) {
+		ontModel.enterCriticalSection(Lock.READ);
+		try {
+			Resource res = createResource(uriStr);
+			if (anyStatements(ontModel, res, RDF.type, OWL.Thing)) {
+				return true;
+			}
+			if (anyStatements(ontModel, res, RDF.type, OWL.Class)) {
+				return true;
+			}
+			if (anyStatements(ontModel, res, RDF.type, OWL.DatatypeProperty)) {
+				return true;
+			}
+			if (anyStatements(ontModel, res, RDF.type, OWL.ObjectProperty)) {
+				return true;
+			}
+			return false;
+		} finally {
+			ontModel.leaveCriticalSection();
+		}
+	}
+
+	private static boolean anyStatements(OntModel m, Resource s, Property p,
+			RDFNode o) {
+		StmtIterator stmts = m.listStatements(s, p, o);
+		try {
+			return stmts.hasNext();
+		} finally {
+			stmts.close();
+		}
+	}
+
 }

@@ -487,7 +487,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
         	getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),true));
-        	String errMsgStr = getWebappDaoFactory().checkURI(dtp.getURI());
+        	String errMsgStr = getWebappDaoFactory().checkURIForEditableEntity(dtp.getURI());
         	if (errMsgStr != null) {
         		throw new InsertException(errMsgStr);
         	}

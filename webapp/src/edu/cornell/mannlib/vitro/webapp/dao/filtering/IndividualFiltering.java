@@ -185,6 +185,9 @@ public class IndividualFiltering implements Individual {
 		if (opStmts == null) {
 			return Collections.emptyList();
 		}
+		for(ObjectPropertyStatement opStmt: opStmts) {
+			_innerIndividual.resolveAsFauxPropertyStatement(opStmt);
+		}
 		ArrayList<ObjectPropertyStatement> filtered = new ArrayList<ObjectPropertyStatement>();
 		Filter.filter(opStmts, _filters.getObjectPropertyStatementFilter(),	filtered);
 		return filtered;
@@ -557,4 +560,11 @@ public class IndividualFiltering implements Individual {
     public boolean hasThumb() {
         return _innerIndividual.hasThumb();
     }
+
+
+	@Override
+	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
+		_innerIndividual.resolveAsFauxPropertyStatement(stmt);
+	}
+    
 }

@@ -51,6 +51,7 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 
 	public final static String RDFXML_MIMETYPE = "application/rdf+xml";
     public final static String JSON_MIMETYPE = "application/json";
+    public final static String JSON_LD_MIMETYPE = "application/ld+json";
 	public final static String N3_MIMETYPE = "text/n3"; // unofficial and unregistered
 	public final static String TTL_MIMETYPE = "text/turtle"; // unofficial and unregistered
 

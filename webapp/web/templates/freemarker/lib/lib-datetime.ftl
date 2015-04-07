@@ -161,6 +161,7 @@
         <#if formatType == "long">
             <#if precision?ends_with("yearPrecision")>yyyy
             <#elseif precision?ends_with("yearMonthPrecision")>MMMM yyyy
+            <#elseif precision?ends_with("monthPrecision")>MMMM
             <#elseif precision?ends_with("yearMonthDayPrecision")>MMMM d, yyyy
             <#else>MMMM d, yyyy h:mm a
             </#if>

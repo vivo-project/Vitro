@@ -64,6 +64,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
     private DataPropertyListConfig config;
     private String objectKey;   
     private String queryString;
+    private String rangeDatatypeURI;
     private Set<String> constructQueries;
     private int displayLimit;
     
@@ -84,6 +85,7 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
 
         statements = new ArrayList<DataPropertyStatementTemplateModel>();
 		displayLimit = dp.getDisplayLimit();
+		rangeDatatypeURI = dp.getRangeDatatypeURI();
         // If the property is populated, get the data property statements via a sparql query
         if (populatedDataPropertyList.contains(dp)) {
             log.debug("Getting data for populated data property " + getUri());
@@ -161,6 +163,11 @@ public class DataPropertyTemplateModel extends PropertyTemplateModel {
 			return displayLimit;
 	}	
     
+//	@Override
+	public String getRangeDatatypeURI() {
+			return rangeDatatypeURI;
+	}	
+
     public ConfigError checkQuery(String queryString) {
         if (StringUtils.isBlank(queryString)) {
             return ConfigError.NO_SELECT_QUERY;

@@ -934,7 +934,7 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         ontModel.enterCriticalSection(Lock.WRITE);
         getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),true));
         try {
-            String errMsgStr = getWebappDaoFactory().checkURI(cls.getURI());
+            String errMsgStr = getWebappDaoFactory().checkURIForEditableEntity(cls.getURI());
             if (errMsgStr != null) {
                 throw new InsertException(errMsgStr);
             }

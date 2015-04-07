@@ -45,6 +45,23 @@ public interface ObjectPropertyStatementDao {
 			String rangeUri, String queryString, Set<String> constructQueryStrings,
 			String sortDirection);
 
-	
+	/**
+	 * Inspect the elements of the statement to see whether it qualifies as a
+	 * faux property.
+	 * 
+	 * That is, is there a faux property definition, such that
+	 * <ul>
+	 * <li>The property URI of this statement is the base URI of the faux
+	 * property</li>
+	 * <li>One of the VClasses of the subject of this statement is the domain of
+	 * the faux property</li>
+	 * <li>One of the VClasses of the object of this statement is the range of
+	 * the faux property</li>
+	 * </ul>
+	 * 
+	 * If that is so, then set the domain and range (and the domainURI and
+	 * rangeURI) of the property of this statement to match the faux property.
+	 */
+	void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt);
   
 }

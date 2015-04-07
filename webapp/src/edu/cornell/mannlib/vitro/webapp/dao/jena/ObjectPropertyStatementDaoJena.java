@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -39,10 +40,12 @@ import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 
+import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatementImpl;
+import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.IndividualUpdateEvent;
@@ -551,4 +554,102 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         }
            
     }
+    
+	/**
+	 * If this statement qualifies as a faux property, set the range and domain
+	 * accordingly.
+	 */
+	@Override
+	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
+		if (stmt == null) {
+			return;
+		}
+
+		ObjectProperty prop = obtainObjectPropertyFromStatement(stmt);
+		if (prop == null) {
+			return;
+		}
+
+		List<FauxProperty> fauxProps = getWebappDaoFactory()
+				.getFauxPropertyDao()
+				.getFauxPropertiesForBaseUri(prop.getURI());
+		if (fauxProps.isEmpty()) {
+			return;
+		}
+
+		Individual subject = obtainSubjectFromStatement(stmt);
+		if (subject == null) {
+			return;
+		}
+
+		Individual object = obtainObjectFromStatement(stmt);
+		if (object == null) {
+			return;
+		}
+
+		List<VClass> subjectTypes = subject.getVClasses();
+		List<VClass> objectTypes = object.getVClasses();
+		for (FauxProperty fauxProp : fauxProps) {
+			VClass subjectType = selectType(subjectTypes,
+					fauxProp.getDomainURI());
+			VClass objectType = selectType(objectTypes, fauxProp.getRangeURI());
+			if (subjectType != null && objectType != null) {
+				prop.setDomainVClass(subjectType);
+				prop.setDomainVClassURI(subjectType.getURI());
+				prop.setRangeVClass(objectType);
+				prop.setRangeVClassURI(objectType.getURI());
+				return;
+			}
+		}
+	}
+
+	private ObjectProperty obtainObjectPropertyFromStatement(
+			ObjectPropertyStatement stmt) {
+		ObjectProperty prop = stmt.getProperty();
+		if (prop != null) {
+			return prop;
+		}
+		String propertyURI = stmt.getPropertyURI();
+		if (propertyURI == null) {
+			return null;
+		}
+		return getWebappDaoFactory().getObjectPropertyDao()
+				.getObjectPropertyByURI(propertyURI);
+	}
+
+	private Individual obtainSubjectFromStatement(ObjectPropertyStatement stmt) {
+		Individual subject = stmt.getSubject();
+		if (subject != null) {
+			return subject;
+		}
+		String subjectURI = stmt.getSubjectURI();
+		if (subjectURI == null) {
+			return null;
+		}
+		return getWebappDaoFactory().getIndividualDao().getIndividualByURI(
+				subjectURI);
+	}
+
+	private Individual obtainObjectFromStatement(ObjectPropertyStatement stmt) {
+		Individual object = stmt.getObject();
+		if (object != null) {
+			return object;
+		}
+		String objectURI = stmt.getObjectURI();
+		if (objectURI == null) {
+			return null;
+		}
+		return getWebappDaoFactory().getIndividualDao().getIndividualByURI(
+				objectURI);
+	}
+
+	private VClass selectType(List<VClass> types, String uri) {
+		for (VClass type : types) {
+			if (Objects.equals(type.getURI(), uri)) {
+				return type;
+			}
+		}
+		return null;
+	}
+
 }

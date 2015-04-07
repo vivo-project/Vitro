@@ -6,8 +6,6 @@ import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 
 public interface ObjectPropertyDao extends PropertyDao {
 
@@ -34,8 +32,6 @@ public interface ObjectPropertyDao extends PropertyDao {
     public List<String> getSuperPropertyURIs(String objectPropertyURI, boolean direct);
 
     public List<String> getSubPropertyURIs(String objectPropertyURI);
-
-    public List<ObjectPropertyStatement> getStatementsUsingObjectProperty(ObjectProperty op);
 
     public void fillObjectPropertiesForIndividual(Individual individual);
 

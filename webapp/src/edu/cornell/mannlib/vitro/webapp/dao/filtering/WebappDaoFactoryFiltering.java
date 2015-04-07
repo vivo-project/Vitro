@@ -88,11 +88,12 @@ public class WebappDaoFactoryFiltering implements WebappDaoFactory {
     	return innerWebappDaoFactory.checkURI(uriStr);
     }
     
-    public String checkURI(String uriStr, boolean checkUniqueness) {
-    	return innerWebappDaoFactory.checkURI(uriStr, checkUniqueness);
-    }
-    
-    public boolean hasExistingURI(String uriStr) {
+    @Override
+	public String checkURIForEditableEntity(String uriStr) {
+    	return innerWebappDaoFactory.checkURIForEditableEntity(uriStr);
+	}
+
+	public boolean hasExistingURI(String uriStr) {
     	return innerWebappDaoFactory.hasExistingURI(uriStr);
     }
     

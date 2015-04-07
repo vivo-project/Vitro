@@ -268,7 +268,7 @@ public abstract class RDFServiceImpl implements RDFService {
         return result;
     }
     
-    protected Query createQuery(String queryString) {
+    protected Query createQuery(String queryString) throws RDFServiceException {
         List<Syntax> syntaxes = Arrays.asList(
                 Syntax.defaultQuerySyntax, Syntax.syntaxSPARQL_11, 
                 Syntax.syntaxSPARQL_10, Syntax.syntaxSPARQL, Syntax.syntaxARQ);
@@ -280,7 +280,8 @@ public abstract class RDFServiceImpl implements RDFService {
                q = QueryFactory.create(queryString, syntax);  
             } catch (QueryParseException e) {
                if (!syntaxIt.hasNext()) {
-                   throw(e);
+					throw new RDFServiceException("Failed to parse query \""
+							+ queryString + "\"", e);
                }
             }
         }

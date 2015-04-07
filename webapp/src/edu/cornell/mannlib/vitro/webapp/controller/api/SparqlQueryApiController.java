@@ -80,7 +80,7 @@ public class SparqlQueryApiController extends VitroApiServlet {
 		} catch (NotAcceptableException | AcceptHeaderParsingException e) {
 			sendShortResponse(SC_NOT_ACCEPTABLE,
 					"The accept header does not include any "
-							+ "available content type.", e, resp);
+							+ "available content type: " + e.getMessage(), resp);
 		} catch (RDFServiceException e) {
 			sendShortResponse(SC_INTERNAL_SERVER_ERROR,
 					"Problem executing the query.", e, resp);

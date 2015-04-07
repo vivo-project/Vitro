@@ -36,7 +36,7 @@ public class TBoxChanges {
 	}
 
 	public void removeStatement(Statement stmt) {
-		removedStatements.remove(stmt);
+		removedStatements.add(stmt);
 	}
 
 	public void deleteDataProperty(Statement stmt) {
@@ -78,6 +78,15 @@ public class TBoxChanges {
 
 	public List<String> getDeletedObjectPropertyUris() {
 		return deletedObjectPropertyUris;
+	}
+
+	@Override
+	public String toString() {
+		return "TBoxChanges[addedStatements=" + addedStatements
+				+ ", removedStatements=" + removedStatements
+				+ ", deletedDataPropertyUris=" + deletedDataPropertyUris
+				+ ", deletedObjectPropertyUris=" + deletedObjectPropertyUris
+				+ "]";
 	}
 
 }

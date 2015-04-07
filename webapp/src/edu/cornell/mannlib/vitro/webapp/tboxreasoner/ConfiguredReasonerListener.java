@@ -173,10 +173,17 @@ public class ConfiguredReasonerListener implements ModelChangedListener {
 
 	@Override
 	public void notifyEvent(Model m, Object event) {
+		log.debug("Notified of event.");
 		if (event instanceof EditEvent) {
 			EditEvent ee = (EditEvent) event;
 			if (!ee.getBegin()) {
+				log.debug("Notified of ending EditEvent.");
+
 				TBoxChanges changes = changeSet.getAndSet(new TBoxChanges());
+				if (log.isDebugEnabled()) {
+					log.debug("Change set: " + changes);
+				}
+				
 				this.reasonerDriver.runSynchronizer(changes);
 			}
 		}
@@ -190,6 +197,10 @@ public class ConfiguredReasonerListener implements ModelChangedListener {
 	// ----------------------------------------------------------------------
 
 	public void tryAdd(Statement stmt) {
+		if (log.isDebugEnabled()) {
+			log.debug("try to add statement: " + stmt);
+		}
+
 		if (suspended.get()) {
 			return;
 		}
@@ -215,6 +226,10 @@ public class ConfiguredReasonerListener implements ModelChangedListener {
 	}
 
 	public void tryRemove(Statement stmt) {
+		if (log.isDebugEnabled()) {
+			log.debug("try to remove statement: " + stmt);
+		}
+
 		if (suspended.get()) {
 			return;
 		}

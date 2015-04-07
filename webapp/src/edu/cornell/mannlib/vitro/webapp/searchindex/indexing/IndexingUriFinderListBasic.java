@@ -47,6 +47,11 @@ public class IndexingUriFinderListBasic implements IndexingUriFinderList {
 		Set<String> uris = new HashSet<>();
 		for (IndexingUriFinder uriFinder : finders) {
 			List<String> additions = uriFinder.findAdditionalURIsToIndex(stmt);
+			if (log.isDebugEnabled() && !additions.isEmpty()) {
+				log.debug(uriFinder + " found " + additions.size()
+						+ " additions " + additions + " for this statement "
+						+ stmt);
+			}
 			for (String addition : additions) {
 				if (addition == null) {
 					log.warn("Finder " + uriFinder + " returned a null URI.");

@@ -137,4 +137,16 @@ section#pubsContainer input {
 img#indicator {
     padding-left:60px;
 }
-
+/* for placeholder text */
+::-webkit-input-placeholder { /* WebKit browsers */
+   opacity:  .25; 
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+   opacity:  .25; 
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+   opacity:  .25; 
+}
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+   opacity:  .25; 
+}

@@ -20,7 +20,6 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
     final ObjectPropertyStatementDao innerObjectPropertyStatementDao;
     final VitroFilters filters;
 
-
     public ObjectPropertyStatementDaoFiltering(
             ObjectPropertyStatementDao objectPropertyStatementDao,
             VitroFilters filters) {
@@ -36,8 +35,11 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
     }
 
 
-    protected static List<ObjectPropertyStatement> filterAndWrapList(List<ObjectPropertyStatement> list, VitroFilters filters){        
-        if( ( list ) != null ){                        
+    private List<ObjectPropertyStatement> filterAndWrapList(List<ObjectPropertyStatement> list){        
+        if( ( list ) != null ){       
+        	for (ObjectPropertyStatement stmt: list) {
+        		innerObjectPropertyStatementDao.resolveAsFauxPropertyStatement(stmt);
+        	}
             
             ArrayList<ObjectPropertyStatement> ctemp = new ArrayList<ObjectPropertyStatement>();
             Filter.filter(list,filters.getObjectPropertyStatementFilter(),ctemp);
@@ -58,25 +60,25 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
         if( ind == null ) 
             return null;
         else{    
-            ind.setObjectPropertyStatements( filterAndWrapList( ind.getObjectPropertyStatements(), filters) );       
+            ind.setObjectPropertyStatements( filterAndWrapList( ind.getObjectPropertyStatements()) );       
             return ind;
         }
     }
 
     @Override
     public List<ObjectPropertyStatement> getObjectPropertyStatements(ObjectProperty objectProperty) {
-    	return filterAndWrapList( innerObjectPropertyStatementDao.getObjectPropertyStatements(objectProperty), filters );
+    	return filterAndWrapList( innerObjectPropertyStatementDao.getObjectPropertyStatements(objectProperty) );
     }
     
     @Override
     public List<ObjectPropertyStatement> getObjectPropertyStatements(ObjectProperty objectProperty, int startIndex, int endIndex) {
-    	return filterAndWrapList( innerObjectPropertyStatementDao.getObjectPropertyStatements(objectProperty, startIndex, endIndex) ,filters);    	
+    	return filterAndWrapList( innerObjectPropertyStatementDao.getObjectPropertyStatements(objectProperty, startIndex, endIndex));    	
     }
     
     @Override
 	public List<ObjectPropertyStatement> getObjectPropertyStatements(
 			ObjectPropertyStatement objPropertyStmt) {
-    	return filterAndWrapList(innerObjectPropertyStatementDao.getObjectPropertyStatements(objPropertyStmt), filters);
+    	return filterAndWrapList(innerObjectPropertyStatementDao.getObjectPropertyStatements(objPropertyStmt));
 	}
 
     @Override
@@ -117,7 +119,7 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
         List<ObjectPropertyStatement> stmtList = new ArrayList<ObjectPropertyStatement>(stmtsToData.keySet());
         
         // Apply the filters to the list of statements
-        List<ObjectPropertyStatement> filteredStatements = filterAndWrapList(stmtList, filters);     
+        List<ObjectPropertyStatement> filteredStatements = filterAndWrapList(stmtList);     
         
         // Get the data associated with the filtered statements out of the map
         List<Map<String, String>> filteredData = new ArrayList<Map<String, String>>(filteredStatements.size());
@@ -139,6 +141,9 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
     }
 
 
-    
+	@Override
+	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
+		innerObjectPropertyStatementDao.resolveAsFauxPropertyStatement(stmt);
+	}
 
 }

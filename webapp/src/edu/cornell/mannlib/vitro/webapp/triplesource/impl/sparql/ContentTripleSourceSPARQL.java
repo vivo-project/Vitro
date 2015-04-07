@@ -7,8 +7,8 @@ import com.hp.hpl.jena.rdf.model.ModelMaker;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ListCachingModelMaker;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.MemoryMappingModelMaker;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.ModelMakerWithPersistentEmptyModels;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels.OntModelCache;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
@@ -102,7 +102,7 @@ public class ContentTripleSourceSPARQL extends ContentTripleSource {
 	}
 
 	private ModelMaker createModelMaker() {
-		return addContentDecorators(new ListCachingModelMaker(
+		return addContentDecorators(new ModelMakerWithPersistentEmptyModels(
 				new MemoryMappingModelMaker(new RDFServiceModelMaker(
 						getRDFService()), SMALL_CONTENT_MODELS)));
 	}
