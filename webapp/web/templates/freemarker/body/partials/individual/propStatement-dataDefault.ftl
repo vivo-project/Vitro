@@ -46,47 +46,57 @@
 	<#if datatype?? >
 		<#switch datatype>
 			<#case "date">
-				<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt="${i18n().invalid_format}" title=" ${i18n().invalid_format}"> <#-- validated above -->
-		     	<#break>
+				<img class="invalidFormatImg" src="${urls.base}/images/iconAlert.png" width="18" alt="${i18n().invalid_format}" title=" ${i18n().invalid_format}"> <#-- validated above -->
+		     	<span class="invalidFormatText">invalid format</span>
+				<#break>
 		    <#case "dateTime">
-				<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}"> <#-- validated above -->
-		     	<#break>
+				<img class="invalidFormatImg" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}"> <#-- validated above -->
+		     	<span class="invalidFormatText">invalid format</span>
+				<#break>
 		  	<#case "time">
 		     	<#if !value?matches("(([0-1][0-9])|(2[0-3])):([0-5][0-9]):([0-5][0-9])") >
-					<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+					<img class="invalidFormatImg" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+					<span class="invalidFormatText">invalid format</span>
 			 	</#if>
 		     	<#break>
 		  	<#case "gYear">
 		     	<#if !value?matches("^\\d{4}") >
-					<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+					<img class="invalidFormatImg" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+					<span class="invalidFormatText">invalid format</span>
 			 	</#if>
 		     	<#break>
 		    <#case "gMonth">
-		     	<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}"> <#-- validated above -->
-		     	<#break>
+		     	<img class="invalidFormatImg" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}"> <#-- validated above -->
+		     	<span class="invalidFormatText">invalid format</span>
+				<#break>
 		    <#case "gYearMonth">
-		     	<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}"> <#-- validated above -->
-		     	<#break>
+		     	<img class="invalidFormatImg" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}"> <#-- validated above -->
+		     	<span class="invalidFormatText">invalid format</span>
+				<#break>
 		  	<#case "float">
 				<#if !value?matches("^[-+]?[0-9]*\\.?[0-9]+([eE][-+]?[0-9]+)?.") >
-		     		<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+		     		<img class="invalidFormatImg" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+			     	<span class="invalidFormatText">invalid format</span>
 				</#if>
-		     	<#break>
+				<#break>
 		  	<#case "integer">
 				<#if !value?matches("^-?\\d+$") >
-		     		<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+		     		<img class="invalidFormatImg" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+			     	<span class="invalidFormatText">invalid format</span>
 				</#if>
-		     	<#break>
+				<#break>
 		  	<#case "int">
 				<#if !value?matches("^-?\\d+$") >
-	     			<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+	     			<img class="invalidFormatImg" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+			     	<span class="invalidFormatText">invalid format</span>
 				</#if>
-		     	<#break>
+				<#break>
 		  	<#case "boolean">
 				<#if !value?matches("false") && !value?matches("true") >
-		     		<img class="invalidFormat" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+		     		<img class="invalidFormatImg" src="${urls.base}/images/iconAlert.png" width="18" alt=" ${i18n().invalid_format}" title=" ${i18n().invalid_format}">
+			     	<span class="invalidFormatText">invalid format</span>
 				</#if>
-		     <#break>
+				<#break>
 		  	<#default>
 		</#switch>
 	</#if>

@@ -25,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.RdfLiteralHash;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.DefaultDataPropEmptyField;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.AntiXssValidation;
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.validators.DefaultDataPropertyFormValidator;
 
 public class DefaultDataPropertyFormGenerator extends BaseEditConfigurationGenerator implements EditConfigurationGenerator {
 	
@@ -97,6 +98,7 @@ public class DefaultDataPropertyFormGenerator extends BaseEditConfigurationGener
             literalField.setValidators(list( "nonempty" ));
             editConfiguration.setN3Required(Arrays.asList( dataPropN3 ));                        
         }
+		editConfiguration.addValidator(new DefaultDataPropertyFormValidator(rangeDatatypeUri, vreq));
         //prepare
         prepare(vreq, editConfiguration);
 		return editConfiguration;	
