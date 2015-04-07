@@ -15,6 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntProperty;
+import com.hp.hpl.jena.query.QueryParseException;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFactory;
@@ -153,6 +154,8 @@ public class ABoxRecomputer {
     						}
     					}
 					}
+				} catch (QueryParseException qpe) {
+					log.error("Problem with individual '" + individualURI + "'", qpe);
 				} catch (NullPointerException npe) {
 	            	log.error("a NullPointerException was received while recomputing the ABox inferences. Halting inference computation.");
 	            	npe.printStackTrace();
@@ -425,12 +428,18 @@ public class ABoxRecomputer {
 	        inferenceModel.enterCriticalSection(Lock.READ);		
 	        try {
 	            existing.add(inferenceModel.listStatements(subjInd, null, (RDFNode) null));
+			} catch (QueryParseException qpe) {
+				log.error("Problem with individual '" + individualURI + "'", qpe);
+				continue;
 	        } finally {
 	            inferenceModel.leaveCriticalSection();
 	        }
 	        inferenceRebuildModel.enterCriticalSection(Lock.READ);        
             try {
                 rebuild.add(inferenceRebuildModel.listStatements(subjInd, null, (RDFNode) null));
+			} catch (QueryParseException qpe) {
+				log.error("Problem with individual '" + individualURI + "'", qpe);
+				continue;
             } finally {
                 inferenceRebuildModel.leaveCriticalSection();
             }
