@@ -8,6 +8,8 @@
 <#import "lib-datetime.ftl" as dt>
 <#if property.rangeDatatypeURI?? && property.rangeDatatypeURI?contains("#")>
 	<#assign datatype = property.rangeDatatypeURI?substring(property.rangeDatatypeURI?last_index_of("#")+1) />
+<#else>
+	<#assign datatype = "none" />
 </#if>
 <@showStatement statement datatype />
 
@@ -39,7 +41,7 @@
 		<#assign theValue = "2000" + theValue?substring(1) + "-01T00:00:00" />
 		${dt.formatXsdDateTimeLong(theValue, "monthPrecision")}
 	<#else>
-    	${theValue} <@validateFormat theValue datatype/>
+    	${theValue} <#if !datatype?contains("none")> <@validateFormat theValue datatype/> </#if>
 	</#if>
 </#macro> 
 <#macro validateFormat value datatype >
