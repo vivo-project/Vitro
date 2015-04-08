@@ -98,7 +98,10 @@ public class DefaultDataPropertyFormGenerator extends BaseEditConfigurationGener
             literalField.setValidators(list( "nonempty" ));
             editConfiguration.setN3Required(Arrays.asList( dataPropN3 ));                        
         }
-		editConfiguration.addValidator(new DefaultDataPropertyFormValidator(rangeDatatypeUri, vreq));
+		// if the property has a rangeDatatypeUri, validate it
+		if ( rangeDatatypeUri != null ) {
+			editConfiguration.addValidator(new DefaultDataPropertyFormValidator(rangeDatatypeUri, vreq));
+		}
         //prepare
         prepare(vreq, editConfiguration);
 		return editConfiguration;	
