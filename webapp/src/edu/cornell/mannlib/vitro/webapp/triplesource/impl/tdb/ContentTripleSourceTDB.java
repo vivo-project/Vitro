@@ -106,7 +106,7 @@ public class ContentTripleSourceTDB extends ContentTripleSource {
 	}
 
 	private void checkForFirstTimeStartup() {
-		if (this.dataset.getNamedModel(ModelNames.TBOX_ASSERTIONS).size() == 0) {
+		if (this.dataset.getNamedModel(ModelNames.TBOX_ASSERTIONS).getGraph().isEmpty()) {
 			JenaDataSourceSetupBase.thisIsFirstStartup();
 		}
 	}

@@ -170,7 +170,9 @@ public class SparqlGraph implements GraphWithPerform {
 
     @Override
     public boolean contains(Node subject, Node predicate, Node object) {
-        if (subject.isBlank() || predicate.isBlank() || object.isBlank()) {
+		if ((subject != null && subject.isBlank())
+				|| (predicate != null && predicate.isBlank())
+				|| (object != null && object.isBlank())) {
             return false;
         }
         StringBuffer containsQuery = new StringBuffer("ASK { \n");
@@ -357,7 +359,7 @@ public class SparqlGraph implements GraphWithPerform {
 
     @Override
     public boolean isEmpty() {
-        return (size() == 0);
+        return !contains(null, null, null);
     }
 
     @Override

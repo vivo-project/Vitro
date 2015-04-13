@@ -32,6 +32,11 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * Sets up the content models, OntModelSelectors and webapp DAO factories.
+ * 
+ * Why the firstTimeStartup flag? Because you can't ask a large SDB model
+ * whether it is empty. SDB translates  this into a call to size(), which
+ * in turn becomes find(null, null, null) and a count, and this gives an
+ * OutOfMemoryError because it tries to read the entire model into memory.
  */
 public class ContentModelSetup extends JenaDataSourceSetupBase 
         implements javax.servlet.ServletContextListener {
@@ -50,22 +55,24 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 
     private void setUpJenaDataSource(ServletContext ctx) {
         ContextModelAccess models = ModelAccess.on(ctx);
+        boolean firstTimeStartup = false;
     	
     	Model applicationMetadataModel = models.getOntModel(APPLICATION_METADATA);
-		if (applicationMetadataModel.size()== 0) {
+		if (applicationMetadataModel.isEmpty()) {
+			firstTimeStartup = true;
         	initializeApplicationMetadata(ctx, applicationMetadataModel);
 		} else {
         	checkForNamespaceMismatch( applicationMetadataModel, ctx );
 		}
 
         OntModel baseABoxModel = models.getOntModel(ABOX_ASSERTIONS);
-        if (baseABoxModel.size() == 0) {
+        if (firstTimeStartup) {
         	RDFFilesLoader.loadFirstTimeFiles("abox", baseABoxModel, true);
         }
         RDFFilesLoader.loadEveryTimeFiles("abox", baseABoxModel);
         
         OntModel baseTBoxModel = models.getOntModel(TBOX_ASSERTIONS);
-        if (baseTBoxModel.size() == 0) {
+        if (firstTimeStartup) {
         	RDFFilesLoader.loadFirstTimeFiles("tbox", baseTBoxModel, true);
         }
     	RDFFilesLoader.loadEveryTimeFiles("tbox", baseTBoxModel);

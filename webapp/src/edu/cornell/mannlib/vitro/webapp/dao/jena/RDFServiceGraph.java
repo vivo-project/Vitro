@@ -145,10 +145,12 @@ public class RDFServiceGraph implements GraphWithPerform {
 
     @Override
     public boolean contains(Node subject, Node predicate, Node object) {
-        if (subject.isBlank() || predicate.isBlank() || object.isBlank()) {
+		if ((subject != null && subject.isBlank())
+				|| (predicate != null && predicate.isBlank())
+				|| (object != null && object.isBlank())) {
             return false;
         }
-        StringBuffer containsQuery = new StringBuffer("ASK { \n");
+        StringBuffer containsQuery = new StringBuffer("SELECT * WHERE { \n");
         if (graphURI != null) {
             containsQuery.append("  GRAPH <" + graphURI + "> { ");
         }
@@ -160,9 +162,9 @@ public class RDFServiceGraph implements GraphWithPerform {
         if (graphURI != null) {
             containsQuery.append(" } \n");
         }
-        containsQuery.append("\n}");
-        boolean result = execAsk(containsQuery.toString());
-        return result;
+        containsQuery.append("} \nLIMIT 1 ");
+        ResultSet result = execSelect(containsQuery.toString());
+        return result.hasNext();
     }
 
     @Override
@@ -319,7 +321,7 @@ public class RDFServiceGraph implements GraphWithPerform {
 
     @Override
     public boolean isEmpty() {
-        return (size() == 0);
+        return !contains(null, null, null);
     }
 
     @Override

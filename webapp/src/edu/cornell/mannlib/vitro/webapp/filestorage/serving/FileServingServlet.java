@@ -113,6 +113,8 @@ public class FileServingServlet extends VitroHttpServlet {
 			while (-1 != (howMany = in.read(buffer))) {
 				out.write(buffer, 0, howMany);
 			}
+		} catch (IOException e) {
+			log.warn("Failed to serve the file", e);
 		} finally {
 			try {
 				in.close();

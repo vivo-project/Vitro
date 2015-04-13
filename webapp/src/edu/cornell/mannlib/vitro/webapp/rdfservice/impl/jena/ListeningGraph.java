@@ -163,7 +163,7 @@ public class ListeningGraph implements GraphWithPerform {
 
     @Override
     public boolean isEmpty() {
-        return (size() == 0);
+        return !contains(null, null, null);
     }
 
     @Override
