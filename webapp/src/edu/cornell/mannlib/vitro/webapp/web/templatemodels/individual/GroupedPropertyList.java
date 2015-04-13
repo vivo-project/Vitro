@@ -307,6 +307,11 @@ public class GroupedPropertyList extends BaseTemplateModel {
 	* 
 	* Similarly, don't know the real problem with VIVO-989, except that the ranges are both
 	* blank nodes - probably the same blank node but on two different reads.
+	* 
+	* For VIVO-1015, if op2 (the unpopulated property) is a Faux property, it will appear to 
+	* be not redundant because of the range difference, and that's what we want. But if op2
+	* (the unpopulated property) has a different range than op1 because of a restriction, 
+	* then we want to ignore that difference, so it appears to be redundant.
 	*/
 	private boolean redundant(ObjectProperty op, ObjectProperty op2) {
 		if (new FullPropertyKey((Property)op).equals(new FullPropertyKey((Property)op2))) {
@@ -326,6 +331,9 @@ public class GroupedPropertyList extends BaseTemplateModel {
 			new FullPropertyKey(op2.getDomainVClassURI(), 
 								op2.getURI(),
 								fudgeBlankNodeInRange(op2.getRangeVClassURI())))) {
+			return true;
+		} else if (!(op instanceof FauxObjectPropertyWrapper) && 
+			         op.getURI().equals(op2.getURI())) { // If not faux property, ignore range difference
 			return true;
 		} else {
 			return false;
