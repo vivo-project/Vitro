@@ -239,25 +239,25 @@ public class GroupedPropertyList extends BaseTemplateModel {
         WebappDaoFactory wadf = vreq.getLanguageNeutralWebappDaoFactory();
         PropertyInstanceDao piDao = wadf.getPropertyInstanceDao();
         
-        Collection<PropertyInstance> allPropInstColl = piDao
+        Collection<PropertyInstance> allPossiblePI = piDao
                 .getAllPossiblePropInstForIndividual(subject.getURI());
-        if (allPropInstColl != null) {
-            for (PropertyInstance pi : allPropInstColl) {
-                if (pi != null) {
+        if (allPossiblePI != null) {
+            for (PropertyInstance possiblePI : allPossiblePI) {
+                if (possiblePI != null) {
                     // use the language-aware wdf because redundancy check
                     // for display will depend on public label match
-                    ObjectProperty piOp = assembleObjectProperty(pi);
-                    if (piOp == null) {
+                    ObjectProperty possibleOP = assembleObjectProperty(possiblePI);
+                    if (possibleOP == null) {
                         continue;
                     }
                     boolean addToList = true;
-                    for(ObjectProperty op : populatedObjectPropertyList) {
-                    	if (redundant(op, piOp)) {
+                    for(ObjectProperty populatedOP : populatedObjectPropertyList) {
+                    	if (redundant(populatedOP, possibleOP)) {
                     		addToList = false;
                     	}
                     }
                     if(addToList) {
-                        propertyList.add(piOp);         
+                        propertyList.add(possibleOP);         
                     }
                 } else {
                     log.error("a property instance in the Collection created by PropertyInstanceDao.getAllPossiblePropInstForIndividual() is unexpectedly null");
@@ -313,27 +313,28 @@ public class GroupedPropertyList extends BaseTemplateModel {
 	* (the unpopulated property) has a different range than op1 because of a restriction, 
 	* then we want to ignore that difference, so it appears to be redundant.
 	*/
-	private boolean redundant(ObjectProperty op, ObjectProperty op2) {
-		if (new FullPropertyKey((Property)op).equals(new FullPropertyKey((Property)op2))) {
+	private boolean redundant(ObjectProperty populatedOP, ObjectProperty possibleOP) {
+		if (new FullPropertyKey((Property)populatedOP).equals(
+			new FullPropertyKey((Property)possibleOP))) {
 			return true;
 		} else if (
-			new FullPropertyKey(fudgeBlankNodeInDomain(op.getDomainVClassURI()), 
-								op.getURI(),
-								op.getRangeVClassURI()).equals(
-			new FullPropertyKey(fudgeBlankNodeInDomain(op2.getDomainVClassURI()), 
-								op2.getURI(),
-								op2.getRangeVClassURI()))) {
+			new FullPropertyKey(fudgeBlankNodeInDomain(populatedOP.getDomainVClassURI()), 
+								populatedOP.getURI(),
+								populatedOP.getRangeVClassURI()).equals(
+			new FullPropertyKey(fudgeBlankNodeInDomain(possibleOP.getDomainVClassURI()), 
+								possibleOP.getURI(),
+								possibleOP.getRangeVClassURI()))) {
 			return true;
 		} else if (
-			new FullPropertyKey(op.getDomainVClassURI(), 
-								op.getURI(),
-								fudgeBlankNodeInRange(op.getRangeVClassURI())).equals(
-			new FullPropertyKey(op2.getDomainVClassURI(), 
-								op2.getURI(),
-								fudgeBlankNodeInRange(op2.getRangeVClassURI())))) {
+			new FullPropertyKey(populatedOP.getDomainVClassURI(), 
+								populatedOP.getURI(),
+								fudgeBlankNodeInRange(populatedOP.getRangeVClassURI())).equals(
+			new FullPropertyKey(possibleOP.getDomainVClassURI(), 
+								possibleOP.getURI(),
+								fudgeBlankNodeInRange(possibleOP.getRangeVClassURI())))) {
 			return true;
-		} else if (!(op instanceof FauxObjectPropertyWrapper) && 
-			         op.getURI().equals(op2.getURI())) { // If not faux property, ignore range difference
+		} else if (!(possibleOP instanceof FauxObjectPropertyWrapper) && 
+			         populatedOP.getURI().equals(possibleOP.getURI())) { // If not faux property, ignore range difference
 			return true;
 		} else {
 			return false;
