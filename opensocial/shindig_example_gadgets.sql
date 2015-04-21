@@ -4,13 +4,13 @@
 DELETE FROM `orng_apps`;
 
 INSERT INTO `orng_apps` (`appid`, `name`, `url`, `PersonFilterID`, `enabled`, `channels`) VALUES
-(100, 'Google Search', 'http://stage-profiles.ucsf.edu/apps/ucsfsearch.xml', NULL, 1, NULL),
-(101, 'Featured Presentations', 'http://stage-profiles.ucsf.edu/apps/SlideShare.xml', NULL, 1, NULL),
-(102, 'Faculty Mentor', 'http://stage-profiles.ucsf.edu/apps/Mentor.xml', NULL, 0, NULL),
-(103, 'Websites', 'http://stage-profiles.ucsf.edu/apps/Links.xml', NULL, 1, NULL),
-(104, 'Profile List', 'http://stage-profiles.ucsf.edu/apps/ProfileListTool.xml', NULL, 1, 'JSONPersonIds'),
-(106, 'RDF Test Gadget', 'http://stage-profiles.ucsf.edu/apps/RDFTest.xml', NULL, 1, NULL),
-(112, 'Twitter', 'http://stage-profiles.ucsf.edu/apps/Twitter.xml', NULL, 1, NULL);
+(100, 'Search Example',         'http://localhost:8080/sample-gadgets/SearchExample.xml', NULL, 1, NULL),
+(101, 'Featured Presentations', 'http://localhost:8080/sample-gadgets/SlideShare.xml', NULL, 1, NULL),
+(102, 'Faculty Mentor',         'http://localhost:8080/sample-gadgets/Mentor.xml', NULL, 0, NULL),
+(103, 'Websites',               'http://localhost:8080/sample-gadgets/Links.xml', NULL, 1, NULL),
+(104, 'Profile List',           'http://localhost:8080/sample-gadgets/ProfileListTool.xml', NULL, 1, 'JSONPersonIds'),
+(106, 'RDF Test Gadget',        'http://localhost:8080/sample-gadgets/RDFTest.xml', NULL, 1, NULL),
+(112, 'Twitter',                'http://localhost:8080/sample-gadgets/Twitter.xml', NULL, 1, NULL);
 
 DELETE FROM `orng_app_views`;
 

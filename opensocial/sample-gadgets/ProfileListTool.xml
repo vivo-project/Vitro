@@ -1,0 +1,624 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+    <ModulePrefs title="Create a Group" author="Eric Meeks">
+        <Require feature="opensocial-0.9" />
+        <Require feature="pubsub" />
+        <Require feature="views" />
+        <Require feature="osapi" />
+        <Require feature="rdf" />
+    </ModulePrefs>
+    <Content type="html" view="canvas, small"><![CDATA[<!--HTML-->
+    <!DOCTYPE html>
+    
+        <!-- #includes -->
+        <link rel="stylesheet" href="css/gadget.css" type="text/css" media="screen, projection" >
+    <script type="text/javascript" src="js/os.js" ></script>
+        <script type="text/javascript" src="js/jquery-1.4.4.js"></script>
+        <script type="text/javascript" src="js/environment.js"></script>
+                
+        <style>
+            .tool_title {font-family:Arial,Helvetica; font-size:14px;}
+            .tool_title_orange {font-weight:bold; font-family:Arial,Helvetica; font-size:14px; color:#CA7C29;margin-top:-1px;}
+            .tool_body {font-family:Arial; font-size:12px;}
+            .tool_credit {font-family:Arial; font-size:10px;}
+            .tool_table_cell {font-family:Arial,Helvetica; font-size:12px; padding:0 20px 0 0;}
+            .tool_table_cell_small {font-family:Arial,Helvetica;font-size:11px;}
+            .tool_table_cell_small span a {font-size:11px;}
+        .tool_table_cell_small span {font-size:11px;display:inline-block;margin-right: -15px; }
+            .tool_toggle_button {font-size: 13px;padding:0 5px;}          
+            a, a:visited { color: #0088CC; text-decoration: none; }
+            a:hover { color: #005580; text-decoration: underline; }
+    </style>
+
+        <script type="text/javascript">
+        
+        // ==============================================================
+
+        function gadgetEventTrack(action, label, value) {
+        
+                var message = {'action' : action};
+                if (label) {message.label = label;}
+                if (value) {message.value = value;}
+                
+                gadgets.pubsub.publish("analytics", message);
+        }        
+        // ==============================================================
+        
+        function showHelp() {
+        
+                var pop = window.open('Create a Group Help','','top=200,left=200,width=450,height=340,scrollbars=0,status=0,menubar=0,location=0,resizable=0');
+                pop.document.title = "Create a Group Help";
+                pop.document.write("<html><head></head><body><div style='margin:10px; font-family:Arial; font-size:12px;'>");  
+                pop.document.write("Create a list of profiles and start a UCSF Chatter group or email list from here. "
+                                + "Here's how:<br><ol>"
+                                + "<li>Click the 'Create Now!' button</li>"
+                                + "<li>Start compiling a list of profiles for your group. "
+                                + "You can add one profile at a time, add a set of search results, "
+                                + "or add a set of co-authors.</li>"
+                                + "<li>Review your list and create your group</li>"
+                                + "<li>Name your group and add a description</li></ol>"
+                                + "<strong>Tips:</strong><br><br>"
+                                + "You are automatically added to the UCSF Chatter group if you create it. "
+                                + "You don't need to add yourself to the list of group members. "
+                                + "This works best if your group is 25 people or less. "
+                                + "If you want to add or remove members after the group is created, "
+                                + "go to UCSF Chatter directly.<br><br>"
+                                + "To learn more about UCSF Chatter, go to "
+                                + "<a href='http://it.ucsf.edu/services/chatter' target='_blank'>"
+                                + "http://it.ucsf.edu/services/chatter</a>");
+                pop.document.write("<br><br><center>" 
+                        + "<input type = 'button' value = 'Close' onclick = 'window.close();'>" 
+                        + "</center>");
+                pop.document.write("</body></html>");
+        }
+        // ==============================================================
+        
+        function getNewProfilesStats(sender, message) {
+        	 var stats = gadgets.json.parse(message);
+             // display the action item table and update it
+             $("#actions").show();
+             if (message === 0) {
+	                document.getElementById("add_profiles").innerHTML = "No Profiles found";             	
+             }
+        	 else {
+	                document.getElementById("add_profiles").innerHTML = "<a style='font-size:11px;' href='javascript:addNewProfiles();'>Add " + message + " to list</a>";
+        	 }
+        }
+        
+        function addNewProfiles() {
+             document.getElementById("add_profiles").innerHTML = "Adding profiles...";		                    
+             document.getElementById("list_profiles").innerHTML = "Merging into list...";		                    
+             readIdsFromDB(function(existingIds) {
+             	gadgets.pubsub.subscribe("JSONPersonIds", getNewIdsCallback(existingIds));
+             });
+        }
+        
+        function getNewIdsCallback(existingIds) {
+        	return function(sender, message) {
+		        // extract the array of incoming person IDs
+		        var newIds =  gadgets.json.parse(message).personIds;
+
+	            var addedListSize = getListSize(newIds);
+
+	            var priorListSize = getListSize(existingIds);
+	            
+	            // merge the incoming and existing person ID arrays
+	            // existing array already populated
+	        	for (var baseURI in newIds) {
+					if (!existingIds.hasOwnProperty(baseURI)) {
+	        			existingIds[baseURI] = [];
+	        		}
+	       			existingIds[baseURI] = dedupeArray(existingIds[baseURI].concat(newIds[baseURI]));
+	        	}
+	
+	            var newListSize = getListSize(existingIds);
+
+	            showCurrentListSize(newListSize);
+	            if (newListSize > priorListSize) {
+		            saveData(existingIds, function() {
+		                    document.getElementById("add_profiles").innerHTML = ((newListSize - priorListSize) === 1 ? "1 new Profile added" : "" + (newListSize - priorListSize) + " new Profiles added");
+		                    showCurrentListSize(newListSize);
+		            });
+				}
+		        else {
+		            document.getElementById("add_profiles").innerHTML = (addedListSize == 1 ? "Profile already in list" : "Profiles already in list");
+		        }		                
+        	};
+        }
+        // ==============================================================
+        
+        function getListSize(ids) {
+            var cnt = 0;
+        	for (var baseURI in ids) {
+        		cnt += ids[baseURI].length;
+        	}
+        	return cnt;
+        }   
+        // ==============================================================
+                        
+        function showCurrentListSize(count) {
+        	if (count > 0) {
+        		document.getElementById("list_profiles").innerHTML = "<a href='javascript:gadgets.views.requestNavigateTo(\"canvas\");'>" + count + " Profiles in list</a>";
+        	}
+        	else {
+        		document.getElementById("list_profiles").innerHTML = "List is currently empty";
+        	}		                            		
+        }
+
+        function showToolVersion(canvasMode) {
+                
+                // fetch the extended state
+                osapi.appdata.get({'userId':'@viewer', 'appId':'@app', 'fields':['extended']} )
+                        .execute(function(result) {                        
+                                if (os.osapi.getViewerFromResult(result).extended == "True") {
+                                        if (canvasMode) {
+                                                document.getElementById("extended_functions").style.display = "inline-block";
+                                                document.getElementById("extended_functions").style.padding = "0 0 0 20px";
+                                                document.getElementById("canvas_help").innerHTML =  
+                                                            'Create a UCSF Chatter group or email list that includes the people below. '
+                                                          + 'To manage your UCSF Chatter group after you create it, such as adding or ' 
+                                                          + 'removing members, go to UCSF Chatter directly.' ;
+
+                                        }                                                
+                                }
+                                else {
+                                        // this is what people who have limited functionality (only chatter group) see
+                                        if (canvasMode) {
+                                                document.getElementById("basic_functions").style.display = "inline-block";
+                                                document.getElementById("basic_functions").style.padding = "0 0 0 20px";
+                                                document.getElementById("canvas_help").innerHTML =  
+                                                            'Create a UCSF Chatter group that includes the people below. '
+                                                          + 'To manage your group after you create it, such as adding or ' 
+                                                          + 'removing members, go to UCSF Chatter directly.' ;
+                                        }                                                
+                                }
+                                // if we are not in canvas mode, show the On/Off state correctly
+                                if (!canvasMode) {   
+                                	readCountFromDB( function(count) {
+                                		showCurrentListSize(count);
+                                	});                             	
+                                	gadgets.pubsub.subscribe("PersonResultCount", getNewProfilesStats);
+                                }        
+                        });
+        }
+        // ==============================================================
+
+        function toURIList(existingIds) {
+        	var uriList = [];
+        	for (var baseURI in existingIds) {
+        		for (var i = 0; i < existingIds[baseURI].length; i++) {
+        			uriList.push(baseURI + existingIds[baseURI][i]);
+        		}
+        	}
+        	return uriList;
+        }
+        
+        // first argument is an map of data, 
+    	// second argument is the callback function to execute after updating the data    	    	     
+   	function saveData(ids, callback) {   
+            	osapi.appdata.update({'userId': '@viewer', 'appId':'@app', 'data': {'count' : '' + getListSize(ids), 'ids' : gadgets.json.stringify(ids)}}).execute(callback);
+	    }
+        // ==============================================================
+        
+	    function readCountFromDB(callback) {
+	        osapi.appdata.get({'userId':'@viewer', 'appId':'@app', 'fields':'count'}).execute(function(result) {	                        
+			 	// a map of {baseURI1 : ["string", "string"], baseURI2 : ["string", "string"]}
+	        	var count = os.osapi.getViewerFromResult(result).count || 0;
+	        	callback(count);
+	        });
+	    }
+
+	    function readIdsFromDB(callback) {
+	        osapi.appdata.get({'userId':'@viewer', 'appId':'@app', 'fields':'ids'}).execute(function(result) {	                        
+			 	// a map of {baseURI1 : ["string", "string"], baseURI2 : ["string", "string"]}
+	        	var existingIds = os.osapi.getViewerFromResult(result).ids || "{}";
+	        	callback(gadgets.json.parse(existingIds));
+	        });
+	    }
+        // ==============================================================        
+
+	    function deleteList() {
+		    osapi.appdata['delete']({'userId':'@viewer', 'appId':'@app', 'fields': ['ids', 'count']} )
+		            .execute(function(result){
+		            if (result.error) { 
+		                    alert("Error " + result.error.code + " deleting application data: " + result.error.message);
+		            } else {
+		                    document.getElementById("canvas_email_list_textarea").value = "";
+		                    document.getElementById("canvas_full_list_textarea").value = "";
+		                    document.getElementById("canvas_profile_list").innerHTML = "";
+		                    document.getElementById("number_selected").innerHTML = "Select Profiles";
+		            }                                
+		    }); /* end osapi.appdata.delete */
+	    }    
+        // ==============================================================        
+        
+        function dedupeArray(arrHasDupes) {
+			var deduped = [];
+			$.each(arrHasDupes, function(i, el){
+			    if($.inArray(el, deduped) === -1) deduped.push(el);
+			});
+			return deduped;       
+        }
+        // ==============================================================     
+
+        function displayProfileList(existingIds) {    
+        	var uris = toURIList(existingIds);
+// put these as individual fields in an ontology.js file
+// pass in as options to getRdf call        	
+var fullName = 'http://profiles.catalyst.harvard.edu/ontology/prns#fullName';
+var preferredTitle = 'http://vivoweb.org/ontology/core#preferredTitle';
+var email = 'http://vivoweb.org/ontology/core#email';          
+                var strTable="<table cellspacing='0' cellpadding='0' width='640'><tr>";
+                
+                // build the table header row
+                strTable += "<td align='left' valign='top' class='tool_table_cell'>" + "<u><b>Name</b></u></td>";
+                strTable += "<td align='left' valign='top' class='tool_table_cell'>" + "<u><b>Title</b></u></td>";
+                strTable += "<td align='left' valign='top' class='tool_table_cell'>" + "<u><b>Email&nbsp;Address</b></u></td>";
+                strTable += "</tr>";
+                
+                for (i in uris) {
+                    //strTable += "<tr id='" + uris[i] + "'><div id='displayPerson_" + i + "'></div></tr>";
+                    strTable += "<tr id='" + uris[i] + "'></tr>";
+                }                
+                strTable += "</table>";
+                        
+                // dispay the empty table in canvas view
+                document.getElementById("canvas_profile_list").innerHTML = strTable;
+                document.getElementById("number_selected").innerHTML = "Your list includes (" + uris.length + ")" + " selected profiles";
+
+                // initialize the export divs
+                document.getElementById("canvas_email_list_textarea").value = "";
+                document.getElementById("canvas_full_list_textarea").value = "";
+      
+                // load in groups of ten
+                var batchSize = 10;
+                var batchCount = Math.floor(uris.length/batchSize) + (uris.length % batchSize == 0 ? 0 : 1);
+                for (i = 0; i < uris.length; i += batchSize) {
+                        var ids = '';
+                        for (j = 0; j < batchSize && i+j < uris.length; j++) {
+                             ids += (j > 0 ? ',' : '') + uris[i + j];             
+                        }
+                        osapi.rdf.getRDF(ids).execute(function(data) {
+                                var people = data.list;
+                                if(!people) {
+                                        people = [data];
+                                }
+                                for (var j = 0; j < people.length; j++) {
+                                        var base = people[j].base;
+                                        people[j] = jsonldHelper.getItem(people[j]);
+                                        
+                                        // put in div now so people can see progress
+                                        var table_row = "<td align='left' valign='top' class='tool_table_cell'>" + people[j][fullName] + "</td>";
+                                        table_row += "<td align='left' valign='top' class='tool_table_cell'>" + people[j][preferredTitle] + "</td>";
+                                        table_row += "<td align='left' valign='top' class='tool_table_cell email'>" + (people[j][email] ? people[j][email] : "") + "</td>";
+                             
+                                        document.getElementById(base + people[j]['@id']).innerHTML = table_row;
+                                }
+                                // see if we are done and if so turn off progress bar and
+                                // add to export lists 
+                                if (--batchCount == 0) {
+                                        var full_list = "";
+                                        var email_list = "";
+                                        $("#canvas_profile_list tr").each(function(index, tr){
+                                                if(!$(tr).attr("id")) {
+                                                        return true;
+                                                }
+                                                var row = "";
+                                                $("td", tr).each(function(fld_index, td){
+                                                        var txt = $(td).text(); 
+                                                        row += txt + ";";
+                                                        if(fld_index == 2 && txt != "") {
+                                                                email_list += txt + "\n";
+                                                        }
+                                                });
+                                                full_list += row + "\n";
+                                                
+                                        });
+                                        document.getElementById("canvas_full_list_textarea").value = full_list;
+                                        document.getElementById("canvas_email_list_textarea").value = email_list;
+                                        
+                                     document.getElementById("progress").style.display="none";
+                                }
+                        });
+                }
+        } /* end displayProfileList */
+        
+        // ==============================================================                
+                
+        function copyEmailDivToClipboard() {
+                
+                $("#canvas_email_list").show();
+                $("#canvas_email_list_text").show();
+                $("#canvas_full_list").hide();
+                $("#canvas_full_list_text").hide();
+                $("#canvas_profile_list").hide();        
+        }
+        // ==============================================================                
+                
+        function copyFullDivToClipboard() {
+                $("#canvas_full_list").show();
+                $("#canvas_full_list_text").show();
+                $("#canvas_email_list").hide();
+                $("#canvas_email_list_text").hide();
+                $("#canvas_profile_list").hide();
+        }        
+        // ==============================================================                        
+        var root = (typeof ENV_LOCAL_URL === 'undefined')? "": ENV_LOCAL_URL;
+        var chatterProxyURL = root + "/chatter/ChatterProxyService.svc"; 
+
+        function getNodeIdFromURI(uri) {
+           if (typeof uri === 'string') { 
+                   var c = uri.split('/');
+                   return c[c.length-1];
+           }
+           else {
+               var retval = [];
+               for ( i = 0; i < uri.length; i++) {
+                        retval[i] = getNodeIdFromURI(uri[i]);
+               } 
+                return retval;
+           }
+        }
+        
+        function createGroup(name, description, ownerId, users) {
+                document.getElementById("progress").style.display="block";
+
+                var params = {
+                        "name": name,
+                        "description": description,
+                        "ownerId": ownerId,
+                        "users": users};
+                        
+            sendRequest(false, false, chatterProxyURL + "/group/new", params, function(data) {
+                document.getElementById("progress").style.display="none";
+                    if(data.Success) {
+                                showMessage("<strong>Success! Your UCSF Chatter group '" + name + "' has been created.</strong><br> " 
+                                                + "<a target='_blank' href='" + data.URL + "'>Go to UCSF Chatter to start working with your group.</a>");
+                                $("input#goup_name").val("");
+                        }
+                        else {
+                                showMessage("Cannot create a group. " + data.ErrorMessage, true);
+                        }
+            },
+            function(obj) {
+                        showMessage("Server error " + obj.rc + " : " + obj.errors, true);
+            });
+        }
+                        
+        // ==============================================================                        
+        function sendRequest(cache, signed, url, post_params, success, error) {
+          var params = {};                         
+          if (signed) {
+            params[gadgets.io.RequestParameters.AUTHORIZATION] = gadgets.io.AuthorizationType.SIGNED;
+          }
+          params[gadgets.io.RequestParameters.POST_DATA] = gadgets.io.encodeValues(post_params);
+          params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.POST;
+          params[gadgets.io.RequestParameters.CONTENT_TYPE] = gadgets.io.ContentType.JSON;
+          if(cache == false) {
+                  params[gadgets.io.RequestParameters.REFRESH_INTERVAL] = 0;
+          }
+                            
+          gadgets.io.makeRequest(url, function(obj) {
+                  if(obj.data != null) {
+                          success(obj.data);
+                }
+                else if(obj.errors != null) {                                  
+                          if(error) {
+                                  error(obj);
+                          }
+                }
+          } 
+          , params);
+        }
+        
+        // ==============================================================                                
+        function showMessage(msg, isError) {
+                $("div.message").html(msg);
+                if(isError == true) {
+                        $("div.message").removeClass("info");        
+                        $("div.message").addClass("error");
+                }
+                else {
+                        $("div.message").removeClass("error");        
+                        $("div.message").addClass("info");
+                }
+                $("div.message").removeClass("hidden");        
+        }
+        
+        // ==============================================================                        
+        function getUserList() {
+                var items = [];
+                $("div#canvas_profile_list tr").each( function(index, elem) {
+                        var id = $(elem).attr("id");
+                        if(id != null && id != "") {
+                                items.push(getNodeIdFromURI(id));
+                        }
+                }); 
+                
+                return items.join(',');
+        }
+        // ==============================================================                        
+        </script>]]></Content>
+    <Content type="html" view="small" preferred_height="75" preferred_width="190"><![CDATA[<!--HTML-->
+    <!DOCTYPE html>
+                
+        <table id="button_and_help" cellspacing="6" cellpadding="5" style="display:block;">
+                <tr>
+                        <td class="tool_table_cell_small" style="width:145px">Add profiles to your list</td>
+                        <td><img src="images/hovertiptarget.png" border="0" onClick="gadgetEventTrack('help');showHelp()"></td>
+                </tr>
+        </table>
+        <table id="actions" style="display:none;clear:right;" cellspacing="2" cellpadding="0">
+                <tr>
+                        <td class="tool_table_cell_small">&nbsp;1.&nbsp;</td>
+                        <td class="tool_table_cell_small"><span id="add_profiles" onClick="gadgetEventTrack('add_profiles')"></span></td>
+                </tr>
+                <tr>
+                        <td class="tool_table_cell_small" valign="top" style="padding-top:4px">&nbsp;2.&nbsp;</td>
+                        <td class="tool_table_cell_small" valign="top" style="padding-top:4px"><span id="list_profiles" onClick="gadgetEventTrack('list_profiles')">Loading...</span></td>
+                </tr>
+        </table>
+        
+        <script type="text/javascript">
+                function init() {
+                        showToolVersion(false);
+                }        
+                
+                gadgets.util.registerOnLoadHandler(init);
+        </script>]]></Content>
+    <Content type="html" view="canvas" preferred_height="600" preferred_width="700"><![CDATA[<!--HTML-->
+    <!DOCTYPE html>
+           <style type="text/css">
+                   div#create_group {
+                           margin-left: 20px;
+                           margin-top:10px;
+                           margin-bottom:10px;
+                           padding-top:10px;
+                           padding-bottom:10px;
+                           padding-left:10px;
+                           padding-right:10px;
+                           border:solid gray 1px;
+                           width:470px;
+                        border-radius: 0;
+                   }
+                   input#close {
+                           margin-left:10px;
+                   }
+                   div.message {
+                           margin-bottom:10px;
+                   }
+                   div.info {
+                           color:green;
+                   }
+                   div.error {
+                           color:red;
+                   }
+                   .hidden {
+                           display:none;
+                   }
+                     a, a:visited { color: #0088CC; text-decoration: none; }
+                    a:hover { color: #005580; text-decoration: underline; }
+                p { width: 640px; }
+                  
+           </style>
+    
+    <!-- top menu links -->
+        <div style="width:640px;">
+                <p id="number_selected" class="tool_title_orange" style="margin-left:20px;margin-top:20px\9;">
+                Selected Profiles<p>
+                <p id="canvas_help" style="padding-left:20px"></p>
+                <p class="tool_body" style="margin-left:20px; margin-bottom:10px;">
+                        <div id="extended_functions" style="display:none;">
+                                <a href="" id="create_group">Create UCSF Chatter Group</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;
+                                <a href="javascript:gadgetEventTrack('export_email');copyEmailDivToClipboard();">Export email addresses only</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp; 
+                                <a href="javascript:gadgetEventTrack('export_all_data');copyFullDivToClipboard();">Export all data</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;
+                                <a href="" id="compose-email">Compose email to list</a><p>
+                        </div>
+                        <div id="basic_functions" style="display:none;">
+                                <a href="" id="create_group">Create UCSF Chatter Group</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|
+                        </div>
+                        <a href="javascript:gadgetEventTrack('delete_list');deleteList();" style="margin-left:20px;">Delete list</a>
+                </p>
+                
+                <p id="progress" style="margin-left:20px;">
+                <br><br>
+                <img src="images/waiting.gif">
+                <br><br>
+                <b>This may take a minute or two, based on the size of your selected Profiles list.</b></p>
+        </div>
+        <div id="create_group" class="hidden">
+                <div class="message hidden"><strong>Success! Your UCSF Chatter group has been created.</strong><br> 
+                        Go to UCSF Chatter to start working with your group.</div>
+                <table><tr>                
+                <td nowrap valign="top">UCSF Chatter Group Name:</td>
+                <td><input id="group_name" type="text" style="width:218px"></input><br><br></td></tr><tr>
+                <td nowrap valign="top" align="right">Group Description:</td>
+                <td><textarea id="group_description" rows="4" cols="25"></textarea><br><br></td></tr><tr><td>&nbsp;</td>
+                <td><input id="create" type="button" value="Create"></input>
+                <input id="close" type="button" value="Cancel/Close"></input></td></tr></table> 
+        </div>
+        
+        <div id="canvas_email_list" style="display:none; background:#FFF; width:670px; height:50px; margin-left:20px;">
+        Copy and paste the email addresses below into an Excel spreadsheet or email client "To" field.
+        <input type="button" style="height:22px; font-size:10; margin-left:40px; margin-top: 6px;" value="Close" onClick="document.getElementById('canvas_email_list').style.display='none';document.getElementById('canvas_email_list_text').style.display='none';document.getElementById('canvas_profile_list').style.display='block';"></button>
+        </div>
+        
+        <!-- holds the email address list to be copied to the clipboard -->
+        <div id="canvas_email_list_text" style="display:none; width:658px; height:450px; color:#000; margin:0px 5px 0px 5px;">
+        <textarea id="canvas_email_list_textarea" rows="27" cols="78" style="border:1px solid #000; margin: 0px 8px 0px 8px;">
+        </textarea>
+        </div>
+        
+        <div id="canvas_full_list" style="display:none; background:#FFF; width:640px; height:50px; margin-left: 20px;">
+        Copy and paste the profile data below into an Excel spreadsheet or external text editor.
+        <input type="button" style="height:22px; font-size:10; margin-left:40px; margin-top: 6px;" value="Close" onClick="document.getElementById('canvas_full_list').style.display='none';document.getElementById('canvas_full_list_text').style.display='none';document.getElementById('canvas_profile_list').style.display='block';"></button>
+        </div>
+        
+        <!-- holds the full profile list to be copied to the clipboard -->
+        <div id="canvas_full_list_text" style="display:none; width:640px; height:450px; color:#000; margin:0px 5px 0px 5px;">
+        <textarea id="canvas_full_list_textarea" rows="27" cols="78" style="border:1px solid #000; margin: 0px 8px 0px 8px;">
+        </textarea>
+        </div>        
+        
+        <!-- holds the visible profile details list -->
+        <div id="canvas_profile_list" style="display:none; margin-left:20px; height:463px; height:443px\9; width: 660px; overflow:auto;"></div>
+        
+        <script type="text/javascript">
+                function init() {
+                        // update UI
+                        showToolVersion(true);
+                        readIdsFromDB(displayProfileList);                
+                        document.getElementById("canvas_profile_list").style.display="block";
+                        
+                        $("a#create_group").click(function(event){
+                            event.preventDefault();
+                                $("div.message").addClass("hidden");        
+                                $("div#create_group").removeClass("hidden");
+                        }); 
+                        $("input#close").click(function(event){
+                                $("div#create_group").addClass("hidden");
+                        });
+                         
+                        $("input#create").click(function(event){
+                                $("div.message").addClass("hidden");        
+                                var name = $("div#create_group input#group_name").val();
+                                var description = $("div#create_group #group_description").val();
+                                if(name == null || name == '') {
+                                        showMessage("Please enter a group name.", true);
+                                }
+                                else {                                
+                                        osapi.people.getViewer({ fields: ['id'] }).execute(function(result) {
+                                                var users = getUserList();
+                                                createGroup(name, description, getNodeIdFromURI(result.id), users);
+                                        });                        
+                                }
+                        });
+                         
+                        $("#compose-email").click(function(event){
+                        var emails = [];
+                        var emailElem = $("td.email");
+                        if(emailElem.size() > 50) {
+                                if(!confirm("Only the first 50 email addresses can be used. If your list has more, please use the Export function and paste them into email. Do you want to proceed?")) {
+                                        event.preventDefault();
+                                        return false;
+                                }
+                        }        
+                        
+                                emailElem.each(function(index, elem) {
+                                        var email = $.trim($(elem).text());
+                                        if(email != '') {
+                                                emails.push(email);
+                                        }
+                                        if(emails.length >= 50) {
+                                                return false;
+                                        }
+                                });
+                                if(emails.length > 0) {
+                                        $(this).attr("href", "mailto:" + emails.join(';'));
+                                }
+                        });
+                }
+                
+                gadgets.util.registerOnLoadHandler(init);
+        </script>]]></Content>
+</Module>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+    <ModulePrefs
+            title="Tweets"
+            author="Alexei Vassiliev"
+            author_email="alexnv@sbcglobal.com"
+            description="Twitter">
+        <Require feature="opensocial-0.9" />
+        <Require feature="pubsub" />
+        <Require feature="views" />
+        <Require feature="osapi" />
+        <Require feature="dynamic-height" />
+    </ModulePrefs>
+    <Content type="html" view="default, home, profile"><![CDATA[<!--HTML-->
+	    <!DOCTYPE html>    
+	    <!-- #includes -->
+	    <link rel="stylesheet" href="css/gadget.css" type="text/css" media="screen, projection">
+	    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>    
+	    <script type="text/javascript" src="js/jquery.blockUI.js"></script>    
+		<script charset="utf-8" src="http://widgets.twimg.com/j/2/widget.js"></script>
+	    <script type="text/javascript" src="js/os.js" ></script>
+    
+	    <script type="text/javascript">
+	        var ucsf = ucsf || {};
+	        ucsf.twitter = {};
+		    ucsf.gadgetEventTrack=function(action, label, value) {
+	    		var message = {'action' : action};
+	    		if (label) {message.label = label;}
+	    		if (value) {message.value = value;}
+	    		gadgets.pubsub.publish("analytics", message);
+			};
+			
+			ucsf.twitter.getUsername=function(callback) {
+				osapi.appdata.get({'userId': '@owner', 'groupId': '@self', 'appId':'@app', 'fields': ['twitter_username']})
+			    	.execute(function(response){
+			    		var viewer = os.osapi.getViewerFromResult(response);
+			    		var username = viewer.twitter_username;
+			    		if(username != null && username != '' && callback) {
+			    			callback(username);
+			    		}
+			    	});
+			}
+			
+			ucsf.twitter.render=function(username) {
+				$("#twitter-wjs").remove();
+				$(".twitter-gadget .content").empty();
+				$(".twitter-gadget .content").append('<a width="520" height="300" class="twitter-timeline" href="https://twitter.com/'+username+'" data-screen-name="'+username+'" data-widget-id="320982656688996353">Tweets by @'+username+'</a>')
+				
+				var fjs=document.getElementsByTagName("script")[0];
+				var p=/^http:/.test(document.location)?'http':'https';
+				js=document.createElement("script");
+				js.id="twitter-wjs";
+				js.src=p+"://platform.twitter.com/widgets.js";
+				fjs.parentNode.insertBefore(js,fjs);
+			}
+			
+	        ucsf.twitter.preview=function(widget_id) {
+				if(widget_id) {
+					ucsf.twitter.render(widget_id);
+				}				    			
+	        }		
+		</script>
+	]]></Content>
+    <Content type="html" view="profile" preferred_width="670"><![CDATA[<!--HTML-->	
+	    <script type="text/javascript">
+	        ucsf.twitter.profilePageInit = function() {
+	        	gadgets.window.adjustHeight(300);
+	        	ucsf.twitter.getUsername(ucsf.twitter.preview);
+	        }
+    		gadgets.util.registerOnLoadHandler(ucsf.twitter.profilePageInit);    		
+		</script>	
+		
+	    <!-- Styles -->
+	    <style type="text/css">	    
+	    	.twitter-gadget .content {text-align: center;}	    	
+	    </style>
+		
+		<div class="twitter-gadget">
+			<div class="content">
+			</div>			
+		</div>
+	]]></Content>
+    <Content type="html" view="home" preferred_width="700"><![CDATA[<!--HTML-->	
+    	<script type="text/javascript">	        
+	        $(document).ready(function () {
+		        $(".twitter-gadget .save").click(function() {
+		        	$(".twitter-gadget").block({ message: "Saving..." });
+	    			osapi.appdata.update({'userId': '@owner', 'groupId': '@self', 'appId':'@app', 'data':{'twitter_username':$('.twitter-gadget input').val()} }).execute(function(response){
+	    				$(".twitter-gadget").unblock();
+	    			});		        	
+		        });
+		        $(".twitter-gadget .preview").click(function() {
+		        	var username = $('.twitter-gadget input').val();
+		        	if(username != null && username != '') {
+		        		$('.twitter-gadget .content').show();
+			        	gadgets.window.adjustHeight(350);
+		        		ucsf.twitter.preview(username);
+		        	}
+		        	else {
+		        		$('.twitter-gadget .content').hide();
+			        	gadgets.window.adjustHeight(50);
+		        	}
+		        });
+	        });
+	        	        
+	        ucsf.twitter.homePageInit = function() {
+	        	gadgets.window.adjustHeight(50);
+	           	ucsf.twitter.getUsername(function(username) {
+	    			$('.twitter-gadget input').val(username);
+	        		$('.twitter-gadget .content').show();
+		        	gadgets.window.adjustHeight(350);
+	    			ucsf.twitter.preview(username);
+	           	});	        
+	        }
+    		gadgets.util.registerOnLoadHandler(ucsf.twitter.homePageInit);    		
+		</script>
+		
+	    <!-- Styles -->
+	    <style type="text/css">	    
+	    	.twitter-gadget {margin-top: 10px;}	
+	    	.twitter-gadget input {width: 400px;}
+	    	.twitter-gadget .label {margin-right: 10px;font-weight: bold;}
+	    	.twitter-gadget .preview, .twitter-gadget .save {margin-left: 10px;color: #3B6394; cursor:pointer;}
+	    	.twitter-gadget .content {margin-top: 10px; margin-left: 20px;}	    	
+	    </style>
+	    
+		<div class="twitter-gadget">  
+			<span class="label">Widget Id:</span><input type="text" name="keywords"></input><span class="preview">Preview</span><span class="save">Save</span>
+			<div class="content" style="display:none">								
+			</div>
+		</div>
+	]]></Content>
+</Module>

@@ -44,6 +44,7 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 
 		<fail unless="tomcat.home" message="${build.properties.file} must contain a value for tomcat.home" />
 		<fail unless="vitro.home" message="${build.properties.file} must contain a value for vitro.home" />
+		<fail unless="webapp.name" message="${build.properties.file} must contain a value for webapp.name" />
 
 		<property name="runtime.properties.file" location="${vitro.home}/runtime.properties" />
 
@@ -109,6 +110,11 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 		<property name="shindig.properties.template.file" location="${basedir}/shindigorng.properties.template" />
 		<property name="shindig.properties.modified.file" location="${build.shindig.dir}/shindigorng.properties" />
 		<property name="shindig.properties.deployed.file" location="${shindig.config.dir}/shindigorng.properties" />
+		
+		<!-- sample-gadgets webapp -->
+		<property name="sample.webapp.original.dir" location="./sample-gadgets" />
+		<property name="sample.webapp.deployed.dir" location="${tomcat.webapps.dir}/sample-gadgets" />
+		
 
 	</target>
 
@@ -118,9 +124,9 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 	<target name="clean" depends="properties" description="--> Delete all artifacts">
 		<delete includeemptydirs="true" failonerror="false">
 			<fileset dir="${build.shindig.dir}" />
-		</delete>
-		<delete includeemptydirs="true" failonerror="false">
+			<fileset file="${shindig.war.deployed.file}" />
 			<fileset dir="${shindig.war.deployed.dir}" />
+			<fileset dir="${sample.webapp.deployed.dir}" />
 		</delete>
 	</target>
 
@@ -146,6 +152,7 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 				<filter token="DATA_SOURCE_USERNAME" value="${VitroConnection.DataSource.username}" />
 				<filter token="DATA_SOURCE_PASSWORD" value="${VitroConnection.DataSource.password}" />
 				<filter token="DATA_SOURCE_DRIVER" value="${VitroConnection.DataSource.driver}" />
+				<filter token="WEBAPP_NAME" value="${webapp.name}" />
 			</filterset>
 		</copy>
 	</target>
@@ -156,6 +163,9 @@ deploy   - Configure the application and deploy directly into the Tomcat webapps
 	<target name="deploy" depends="modifyPropertiesFile" description="--> Deploy the application directly into the Tomcat webapps directory.">
 		<copy file="${shindig.properties.modified.file}" tofile="${shindig.properties.deployed.file}" />
 		<copy file="${shindig.war.original.file}" tofile="${shindig.war.deployed.file}" overwrite="true" />
+		<copy todir="${sample.webapp.deployed.dir}" overwrite="true" >
+			<fileset dir = "${sample.webapp.original.dir}" />
+		</copy>
 	</target>
 
 </project>

@@ -1,0 +1,478 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+	<ModulePrefs title="Faculty Mentoring"
+				 description="Faculty Mentoring details">
+		<Require feature="opensocial-0.9" />
+		<Require feature="views" />
+		<Require feature="dynamic-height" />
+		<Require feature="pubsub" />
+		<Require feature="osapi" />
+	</ModulePrefs>
+
+	<!-- ==================== START COMBINED VIEWS ==================== -->
+
+	<Content type="html" view="default, home, profile"><![CDATA[<!--HTML-->
+    <!DOCTYPE html>
+    
+    <!-- #includes -->
+    <link rel="stylesheet" href="css/gadget.css" type="text/css" media="screen, projection" >
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>
+    <script type="text/javascript" src="js/os.js" ></script>
+	
+	<style>
+    	.mentor_title {
+    		font-family: Verdana, Arial;
+    		font-size: 14px;
+    	}
+    	.mentor_body {
+    		font-family: Arial;
+    		font-size: 11px;
+    	}
+    	.mentor_credit {
+    		font-family: Arial;
+    		font-size: 10px;
+    	}      	
+    	.mentor_list {
+    		font-family: Arial;
+    		font-size: 11px;
+    	}
+    	.mentor_message {
+    		font-family: Arial;
+    		font-size: 12px;
+    		font-weight: normal;
+    	}      	
+    	a, a:visited { color: #0088CC; text-decoration: none; }
+    	a:hover { color: #005580; text-decoration: underline; }
+    </style>
+	
+    <script type="text/javascript">
+	
+		var g_chars_allowed=2000;
+		var g_textarea_content="";
+	
+		function limit_chars(){
+			num_chars = document.getElementById("facultyNarrative").value.length; 
+			if (num_chars > g_chars_allowed) {
+				alert("Your narrative exceeds the maximum number of characters.");
+				document.getElementById("facultyNarrative").value = g_textarea_content;
+			}
+			else { 
+				g_textarea_content = document.getElementById("facultyNarrative").value; 
+			}
+		}
+		// ==============================================================
+
+		function gadgetEventTrack(action, label, value) {
+	
+			var message = {'action' : action};
+			if (label) {message.label = label;}
+			if (value) {message.value = value;}
+		
+			gadgets.pubsub.publish("analytics", message);
+		}	
+		// ==============================================================		
+    
+		function displayMentorAppData() {
+		
+			var fields = ["careerMentor", "coMentor", "leadResearch", "projectMentor",
+							"contactEmail", "contactPhone", "contactAssistant", 
+							"assistantName", "assistantEmail", "assistantPhone", 
+							"narrative", "lastUpdate"];
+		
+			osapi.appdata.get( {'userId': '@owner', 'appId':'@app', 'fields': fields } ).execute(function(result) {
+
+				if (result.error) { 
+					alert("Error " + result.error.code + " reading application data: " + result.error.message);
+				} else {
+			
+				// get incoming mentor data 
+				var viewer = os.osapi.getViewerFromResult(result);
+	
+				if (viewer.careerMentor == "T" && document.getElementById("edit_career_mentor") )
+					document.getElementById("edit_career_mentor").checked = true;
+				if (viewer.coMentor == "T" && document.getElementById("edit_co_mentor") )
+					document.getElementById("edit_co_mentor").checked = true;						
+				if (viewer.leadResearch == "T" && document.getElementById("edit_lead_research") )
+					document.getElementById("edit_lead_research").checked = true;						
+				if (viewer.projectMentor == "T" && document.getElementById("edit_project_mentor") )
+					document.getElementById("edit_project_mentor").checked = true;	
+					
+				if (viewer.contactEmail == "T" && document.getElementById("edit_email"))
+					document.getElementById("edit_email").checked = true;
+				if (viewer.contactPhone == "T" && document.getElementById("edit_phone"))
+					document.getElementById("edit_phone").checked = true;
+				if (viewer.contactAssistant == "T" && document.getElementById("edit_assistant"))
+					document.getElementById("edit_assistant").checked = true;								
+
+				if (viewer.assistantName && document.getElementById("edit_assistant_name") ) 
+					document.getElementById("edit_assistant_name").value = viewer.assistantName;
+				if (viewer.assistantEmail && document.getElementById("edit_assistant_email") )
+					document.getElementById("edit_assistant_email").value = viewer.assistantEmail;
+				if (viewer.assistantPhone && document.getElementById("edit_assistant_phone") )
+					document.getElementById("edit_assistant_phone").value = viewer.assistantPhone;
+					
+				if (viewer.narrative)
+					document.getElementById("facultyNarrative").value = viewer.narrative;
+													
+				if (viewer.lastUpdate)
+					document.getElementById("last_updated").innerHTML = viewer.lastUpdate;
+					
+				// VIEW MODE - build table to hold retrieved app data
+				
+				var view_window_height=80;
+				var mentor_as = "hidden";
+				var mentor_contact = "hidden";
+									  					      
+										
+				if (viewer.careerMentor == "T" && document.getElementById("mentor_as_career_mentor") && document.getElementById("mentor_as") ) {
+					document.getElementById("mentor_as").style.display = "block";
+					document.getElementById("mentor_as_career_mentor").style.display = "block";
+					view_window_height += 20;
+					mentor_as = "visible";
+				}
+							
+				if (viewer.coMentor == "T" && document.getElementById("mentor_as_co_mentor") && document.getElementById("mentor_as") ) {
+					document.getElementById("mentor_as").style.display = "block";
+					document.getElementById("mentor_as_co_mentor").style.display = "block";
+					view_window_height += 20;
+					mentor_as = "visible";
+				}
+							
+				if (viewer.leadResearch == "T" && document.getElementById("mentor_as_lead_research") && document.getElementById("mentor_as") ) {
+					document.getElementById("mentor_as").style.display = "block";
+					document.getElementById("mentor_as_lead_research").style.display = "block";
+					view_window_height += 20;
+					mentor_as = "visible";
+				}
+							
+				if (viewer.projectMentor == "T" && document.getElementById("mentor_as_project_mentor") && document.getElementById("mentor_as") ) {								
+					document.getElementById("mentor_as").style.display = "block";
+					document.getElementById("mentor_as_project_mentor").style.display = "block";
+					view_window_height += 20;
+					mentor_as = "visible";
+				}
+							
+				if (viewer.contactEmail == "T" && document.getElementById("mentor_contact_email") && document.getElementById("mentor_contact") ) {		
+					document.getElementById("mentor_contact").style.display = "block";
+					document.getElementById("mentor_contact_email").style.display = "block";
+					view_window_height += 20;
+					mentor_contact = "visible";
+				}
+															
+				if (viewer.contactPhone == "T" && document.getElementById("mentor_contact_phone") && document.getElementById("mentor_contact") ) {
+					document.getElementById("mentor_contact").style.display = "block";
+					document.getElementById("mentor_contact_phone").style.display = "block";
+					view_window_height += 20;
+					mentor_contact = "visible";
+				}
+						
+				if (viewer.contactAssistant == "T" && document.getElementById("mentor_contact_assistant") && document.getElementById("mentor_contact") ) {
+					document.getElementById("mentor_contact").style.display = "block";
+					document.getElementById("mentor_contact_assistant").style.display = "block";
+					document.getElementById("mentor_assistant").style.display = "block";
+					view_window_height += 20;
+					mentor_contact = "visible";
+				}
+
+				if (viewer.assistantName && document.getElementById("mentor_assistant") && document.getElementById("mentor_assistant_name") ) {
+					document.getElementById("mentor_assistant_name").style.display = "block";
+					document.getElementById("mentor_assistant_name").innerHTML += viewer.assistantName;
+					view_window_height += 20;
+				}
+							
+				if (viewer.assistantEmail && document.getElementById("mentor_assistant") && document.getElementById("mentor_assistant_email") ) {
+					document.getElementById("mentor_assistant_email").style.display = "block";
+					document.getElementById("mentor_assistant_email").innerHTML += viewer.assistantEmail;
+					view_window_height += 20;
+				}
+							
+				if (viewer.assistantPhone && document.getElementById("mentor_assistant") && document.getElementById("mentor_assistant_phone") ) {
+					document.getElementById("mentor_assistant_phone").style.display = "block";
+					document.getElementById("mentor_assistant_phone").innerHTML += viewer.assistantPhone;
+					view_window_height += 20;
+				}
+					
+				if (viewer.narrative) {
+						document.getElementById("facultyNarrative").style.display = "block";
+						var p_chars = viewer.narrative;
+								
+					// count the characters	and calculate number of rows								
+					p_num_chars = p_chars.length;									
+					document.getElementById("facultyNarrative").innerHTML = p_chars;
+					p_lines = Math.round(p_num_chars / 100);
+					if (p_lines < 1) {p_lines = 1}
+					view_window_height += (p_lines * 15);
+																	
+					// note works in FF but not IE:
+					// view_window_height += document.getElementById('facultyNarrative').offsetHeight;
+				}
+							
+				if (viewer.lastUpdated)
+						document.getElementById("last_updated").innerHTML = viewer.lastUpdated;
+				
+				if (mentor_as == "visible") {view_window_height += 20};
+				if (mentor_contact == "visible") {view_window_height += 20};
+				
+				// adjust the window height - only do this here if in profile VIEW (not in EDIT)
+				if (document.getElementById("mentor_as")) { 
+					gadgets.window.adjustHeight(view_window_height);
+				}
+				
+			} /* end else */
+					
+			}); /*osapi.appdata.get*/	
+		}
+		
+		function saveMentorAppData() {
+		
+			var mentor_today = new Date();
+			var weekday=new Array(7);
+			weekday[0]="Sunday";
+			weekday[1]="Monday";
+			weekday[2]="Tuesday";
+			weekday[3]="Wednesday";
+			weekday[4]="Thursday";
+			weekday[5]="Friday";
+			weekday[6]="Saturday";
+			
+			var month=new Array(12);
+			month[0]="January";
+			month[1]="February";
+			month[2]="March";
+			month[3]="April";
+			month[4]="May";
+			month[5]="June";
+			month[6]="July";
+			month[7]="August";
+			month[8]="September";
+			month[9]="October";
+			month[10]="November";
+			month[11]="December";			
+			
+			var mentor_day = weekday[mentor_today.getDay()]
+			var mentor_month = month[mentor_today.getMonth()]
+			var mentor_date = mentor_today.getDate();
+			var mentor_year = mentor_today.getFullYear();
+			var current_date = mentor_day + " " + mentor_month + " " + mentor_date + ", " + mentor_year;			
+			
+			// pack the data into an Object (md for mentor data) 
+			// with property names that match the values in the "fields" array 
+			// used by osapi.appdate.get in displayMentorAppData							
+			var md = {};
+			
+			md.careerMentor = document.getElementById("edit_career_mentor").checked ? "T" : "F";
+			md.coMentor = document.getElementById("edit_co_mentor").checked ? "T" : "F";
+			md.leadResearch = document.getElementById("edit_lead_research").checked ? "T" : "F";
+			md.projectMentor = document.getElementById("edit_project_mentor").checked ? "T" : "F";
+			
+			md.contactEmail = document.getElementById("edit_email").checked ? "T" : "F";
+			md.contactPhone = document.getElementById("edit_phone").checked ? "T" : "F";
+			md.contactAssistant = document.getElementById("edit_assistant").checked ? "T" : "F";
+			
+			md.assistantName = document.getElementById("edit_assistant_name").value;
+			md.assistantEmail = document.getElementById("edit_assistant_email").value;
+			md.assistantPhone = document.getElementById("edit_assistant_phone").value;
+			md.narrative = document.getElementById("facultyNarrative").value;
+			md.lastUpdate = current_date;
+			
+            osapi.appdata.update({'userId': '@viewer', 'appId':'@app', 'data':md }).execute(function(result) {
+				if (result.error) { 
+					alert("Error " + result.error.code + " writing application data: " + result.error.message);
+				} 
+			});
+		}
+
+    </script>
+    
+    ]]></Content>
+
+	<!-- ==================== END COMBINED VIEWS ==================== -->
+
+
+	<!-- ==================== START HOME/EDIT VIEW ==================== -->
+
+	<Content type="html" view="default, home" preferred_width="700"><![CDATA[<!--HTML-->
+    	    	
+	<h4 style="padding-left:12px;">Add Faculty Mentoring to Your Profile</h4>
+	
+    <div id='AddEdit' style="padding:15px 0px 0px 12px;">
+		Add details about your availability to mentor UCSF faculty. 
+		Learn about the <a href="http://academicaffairs.ucsf.edu/ccfl/faculty_mentoring_program.php" target="_blank" title="Go to the UCSF Faculty Mentoring Website">Faculty Mentoring Program</a> 
+		and the <a href="http://ctsi.ucsf.edu/training/mdp-announcement" target="_blank" title="Go to the CTSI MDP Web page">CTSI&nbsp;Mentor&nbsp;Development&nbsp;Program</a>
+		<br /><br />
+	</div>
+		
+		
+	<div>
+		<div style="float:left;">
+			<span class="mentor_message">&nbsp;&nbsp;&nbsp;
+			Be sure to <b>SAVE</b> your work below.</span>
+		</div>
+		
+		<div class="updated" style="float:right; display:block; text-align:left; padding-right:10px; font-size: 10px;">
+			Last Updated: <span id="last_updated" style="font-size: 10px;"></span>
+		</div>
+	</div>
+
+	<div class='question' style="padding: 0px; width:500px;">
+		<br>
+		<h4>Available to Mentor Faculty as:</h4> <span>(check all that apply)</span> &nbsp;&nbsp;&mdash;&nbsp;&nbsp; <a href="http://ctsi.ucsf.edu/training/mdp-seminar1-definitions" target="_blank" title="Go to the Mentor Role Definitions Web page">Review Mentor Role Definitions</a>
+		<table cellspacing="0" cellpadding="15">
+			<tr>
+				<td valign="middle" width="220" class="mentor_list">
+				<input id="edit_career_mentor" type="checkbox">Career Mentor</td>
+				<td valign="middle" class="mentor_list">
+				<input id="edit_co_mentor" type="checkbox">Co-Mentor</td>
+			</tr>
+			<tr>
+				<td valign="middle" class="mentor_list">
+				<input id="edit_lead_research" type="checkbox">Lead Research / Scholarly Mentor&nbsp;&nbsp;&nbsp;&nbsp;</td>
+				<td valign="middle" class="mentor_list">
+				<input id="edit_project_mentor" type="checkbox">Project Mentor</td>	
+			</tr>
+		</table>
+	</div>	
+	
+	<div class='question'>
+		<h4>My Contact Preference:</h4>
+		<table cellspacing="0" cellpadding="15">
+			<tr>
+				<td valign="middle" width="220" class="mentor_list">
+				<input id="edit_email" type="checkbox">Email</td>
+				<td valign="middle" class="mentor_list">
+				<input id="edit_phone" type="checkbox">Phone</td>
+			</tr>
+			<tr>
+				<td valign="middle" class="mentor_list">
+				<input id="edit_assistant" type="checkbox">Assistant</td>
+				<td></td>
+			</tr>
+		</table>
+	</div>
+	
+	<div class='question' style="padding:0px 0px 0px 10px;">
+		<span class="mentor_list"><b>Assistant Details</b></span><br>
+		<fieldset class='details roundbox'>
+			<table cellpadding="0" cellspacing="0">
+				<tr>
+					<td>
+					<label class='textlabel'>Name</label>
+					<input id="edit_assistant_name" type="text" style="width:420px;">
+					</td>
+				</tr>
+			</table>
+			<br>
+			<table cellpadding="0" cellspacing="0">
+				<tr>
+					<td><label class='textlabel'>Email</label>
+					<input id="edit_assistant_email"></td>
+					<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+					<td><label class='textlabel'>Phone</label>
+					<input id="edit_assistant_phone"></td>
+				</tr>				
+			</table>			
+
+		</fieldset>
+	</div>
+	
+	<div class='question'>
+		<h4>Mentoring Narrative:&nbsp;<img src="images/hovertiptarget.png" border="0" onClick="document.getElementById('sample').style.display='block';">
+		<span class="mentor_message">&nbsp;&nbsp;Be sure to <b>SAVE</b> your work below.</span></h4>
+		
+		<div id="sample" style="display:none; border:1px solid #383838; padding:10px 10px 10px 10px; margin:10px; height:160px;">
+		
+			<div style="padding-bottom: 5px;">
+			<button style="float:right;" onClick="document.getElementById('sample').style.display='none';">Close</button><br>
+			<center><b>Sample Mentor Narratives</b> (cut and paste to create your own)</center><br>
+			</div>
+			
+			<div style="height:110px; padding: 0px 0px 0 5px;overflow:auto;">
+			EXAMPLE 1:<br />
+			Dr. Brown is willing to mentor faculty, fellows, residents and students interested in an academic research career.  Most often her mentees have had training in clinical research methods or will obtain training through the CTSI CTST.  For students, it is expected they will have dedicated time for research. Through email or meeting, if there is a “match” for research interest, time, and training, further discussions as to project, goals, and access to resources (space, databases, and  statistical support) will be discussed to provide a productive experience.
+			<br><br>
+			EXAMPLE 2:<br />
+			I am highly qualified to participate as a lead mentor or co-mentor at UCSF. My program of research is focused on health outcomes associated with disturbed sleep in various populations of healthy women and women with chronic illnesses like HIV/AIDS and cancer.  I have completed cross-sectional studies, longitudinal studies, and most recently, randomized clinical trials to improve sleep.  I have mentored doctoral students and postdoctoral fellows studying various patient populations, from the very young to very old.  During my tenure at UCSF, I have directly supervised over 30 doctoral students, mentored 14 postdoctoral trainees, and served as a lead mentor for 6 pre-tenured faculty. I have been the Director for a T32 Nurse Research Training Grant since 1996, and I have been honored with being voted mentor of the year by doctoral students on two occasions.  I play a significant role in the clinical and translational (CTSI) research mentoring and career development programs at UCSF.  I am the seminar leader for the first session in the CTSI Mentor Development program on “Rewards and Challenges of Mentoring” and I have co-mentored two KL2 scholars.  I have published over 50 peer-reviewed research articles with trainees as first-author, and serve as a consultant on two external K awards as well as three external R01 awards with former mentees.  Finally, I have served on many different NIH study section review panels, and I served as the Chair of an NIH study section (2008-2010), which allows me to be particularly effective in mentoring early career principal investigators who are writing their first NIH applications.
+ 			<br><br>
+			I can provide mentees a cubicle space with my research team, tangible resources such as access to large datasets for secondary analysis as needed, and intangible resources such as attending our formal research team meetings and our informal spontaneous group discussions as well as networking at national sleep research conferences.
+			
+ 			</div>
+ 		
+ 		</div>
+		
+		<fieldset>
+			<textarea id="facultyNarrative" rows='9' cols='72' class='roundbox' style="margin-left:12px;" name="facultyNarrative" onKeyDown="limit_chars()" onKeyUp="limit_chars()" onMouseout="limit_chars()"></textarea>
+			<span style="margin-left:12px;white-space:nowrap">(2000 characters max)</span>
+		</fieldset>		
+	</div>
+	
+	<div>
+		<center>
+			<input type="button" onClick="saveMentorAppData();" value="Save">
+			&nbsp;&nbsp;&nbsp;
+			<input type="button" onClick="displayMentorAppData()" value="Cancel">
+		</center>
+	</div>
+	
+	<script type="text/javascript" >
+    	// retrieve last-saved data and map it to the fields in the markup
+    	displayMentorAppData();
+    	gadgets.window.adjustHeight(700);
+	</script>  
+
+    ]]></Content>
+
+	<!-- ==================== END HOME/EDIT VIEW ==================== -->
+
+
+	<!-- ==================== START PROFILE VIEW ==================== -->
+
+	<Content type="html" view="default, profile" preferred_width="670"><![CDATA[<!--HTML-->
+    
+	<div class="updated" style="display:block; text-align:left; padding: 5px 10px 10px 0; font-size: 10px;">
+		Last Updated: <span id="last_updated" style="font-size: 10px;"></span>
+	</div>
+	<br>
+    <div>
+		<p id="facultyNarrative" style="margin-left:20px; margin-right:20px; font-family:Arial; font-size:12px; display:none;"></p>
+	</div>
+				
+	<div id="mentor_as" style="display:none; margin-left:20px;">
+		<span class='detailtitle'>Available to Mentor as: </span> (<a href="http://ctsi.ucsf.edu/training/mdp-seminar1-definitions" target="_blank" title="Go to the Mentor Role Definitions Web page" onClick="gadgetEventTrack('view_mentor_roles', 'http://ctsi.ucsf.edu/training/mdp-seminar1-definitions'); return true">Review Mentor Role Definitions</a>):
+			<span id="mentor_as_career_mentor" style="display:none; padding-botom:3px;"><span style="font-size:18px;">&nbsp;&nbsp;&nbsp;<b>&middot;</b>&nbsp;</span>Career Mentor</span>
+			<span id="mentor_as_co_mentor" style="display:none; padding-botom:3px;"><span style="font-size:18px;">&nbsp;&nbsp;&nbsp;<b>&middot;</b>&nbsp;</span>Co-Mentor</span>
+			<span id="mentor_as_lead_research" style="display:none; padding-botom:3px;"><span style="font-size:18px;">&nbsp;&nbsp;&nbsp;<b>&middot;</b>&nbsp;</span>Lead Research / Scholarly Mentor</span>
+			<span id="mentor_as_project_mentor" style="display:none; padding-botom:3px;"><span style="font-size:18px;">&nbsp;&nbsp;&nbsp;<b>&middot;</b>&nbsp;</span>Project Mentor</span>
+	</div>
+		
+	<div id="mentor_contact" style="padding:10px 0 0 0; display:none; margin-left: 20px;">
+		<span class='detailtitle'>Contact for Mentoring:</span>
+		<ul style="width:400px;">
+			<li id="mentor_contact_email" style="display:none; padding-botom:3px;"><span style="font-size:18px;">&nbsp;&nbsp;&nbsp;<b>&middot;</b>&nbsp;</span>Email (see above)</li>
+			<li id="mentor_contact_phone" style="display:none; padding-botom:3px;"><span style="font-size:18px;">&nbsp;&nbsp;&nbsp;<b>&middot;</b>&nbsp;</span>Phone (see above)</li>
+			<li id="mentor_contact_assistant" style="display:none; padding-botom:3px;"><span style="font-size:18px;">&nbsp;&nbsp;&nbsp;<b>&middot;</b>&nbsp;</span>Assistant</li>		
+		</ul>
+	</div>
+					
+	<div id="mentor_assistant" style="padding:5px 0 0 0; display:none; margin-left: 55px;">
+		<div id="mentor_assistant_name" style="display:none; height:20px;">Name:&nbsp;</div>
+		<div id="mentor_assistant_email" style="display:none; height:20px;">Email:&nbsp;</div>
+		<div id="mentor_assistant_phone" style="display:none; height:20px;">Phone:&nbsp;</div>
+	</div>
+
+    <div style="padding:10px 0px 0px 20px;"> 
+		Learn about the <a href="http://academicaffairs.ucsf.edu/ccfl/faculty_mentoring_program.php" target="_blank" title="Go to the UCSF Faculty Mentoring Website" onClick="gadgetEventTrack('go_to_program', 'http://academicaffairs.ucsf.edu/ccfl/faculty_mentoring_program.php'); return true">Faculty Mentoring Program</a> 
+		and the <a href="http://ctsi.ucsf.edu/training/mdp-announcement" target="_blank" title="Go to the CTSI | MDP Web page" onClick="gadgetEventTrack('go_to_development', 'http://ctsi.ucsf.edu/training/mdp-announcement'); return true">CTSI Mentor Development Program</a>
+		<br /><br />
+	</div>
+	
+    <script type="text/javascript">
+	
+    	displayMentorAppData();
+
+    </script>	
+		
+    ]]></Content>
+
+	<!-- ==================== END PROFILE VIEW ==================== -->
+
+</Module>
