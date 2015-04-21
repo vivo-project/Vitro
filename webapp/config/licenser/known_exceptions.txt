@@ -188,3 +188,11 @@ webapp/src/edu/ucsf/vitro/opensocial/GadgetViewRequirements.java
 webapp/src/edu/ucsf/vitro/opensocial/OpenSocialManager.java
 webapp/src/edu/ucsf/vitro/opensocial/PreparedGadget.java
 webapp/web/js/openSocial/shindig.js
+opensocial/sample-gadgets/SearchExample.xml
+opensocial/sample-gadgets/ProfileListTool.xml
+opensocial/sample-gadgets/SlideShare.xml
+opensocial/sample-gadgets/Twitter.xml
+opensocial/sample-gadgets/RDFTest.xml
+opensocial/sample-gadgets/WEB-INF/web.xml
+opensocial/sample-gadgets/Mentor.xml
+opensocial/sample-gadgets/Links.xml
