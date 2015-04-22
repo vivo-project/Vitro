@@ -6,8 +6,6 @@ import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndex
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.START_REBUILD;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.UNPAUSE;
 
-import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,8 +15,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.riot.RiotReader;
+import org.apache.jena.riot.tokens.Tokenizer;
+import org.apache.jena.riot.tokens.TokenizerFactory;
 
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -142,9 +141,9 @@ public class IndexingChangeListener implements ChangeListener,
 	private Statement parseTriple(String serializedTriple) {
         try {
             // Use RiotReader to parse a Triple
-            // NB A Triple can be serialized correctly with: FmtUtils.stringForTriple(triple, PrefixMapping.Factory.create()) + " .";
-            ByteArrayInputStream input = new ByteArrayInputStream(serializedTriple.getBytes("UTF-8"));
-			Iterator<Triple> it = RiotReader.createIteratorTriples(input, RDFLanguages.NTRIPLES, null);
+            // NB A Triple can be serialized correctly with: FmtUtils.stringForTriple(triple, PrefixMapping.Factory.create()) + " .";'
+        	Tokenizer tokenizer = TokenizerFactory.makeTokenizerString(serializedTriple);
+			Iterator<Triple> it = RiotReader.createParserNTriples(tokenizer, null);
 
             if (it.hasNext()) {
                 Triple triple = it.next();
@@ -164,8 +163,6 @@ public class IndexingChangeListener implements ChangeListener,
         } catch (RuntimeException riot) {
             log.error("Failed to parse triple " + serializedTriple, riot);
             throw riot;
-        } catch (UnsupportedEncodingException uee) {
-            throw new RuntimeException(uee);
         }
 	}
 
