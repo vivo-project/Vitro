@@ -73,22 +73,20 @@ public class ContentTripleSourceSPARQL extends ContentTripleSource {
 
 	@Override
 	public void startup(Application application, ComponentStartupStatus ss) {
-		this.rdfServiceFactory = createRDFServiceFactory(createRDFService(ss,
-				endpointURI, updateEndpointURI));
+		this.rdfServiceFactory = createRDFServiceFactory(createRDFService(ss));
 		this.rdfService = this.rdfServiceFactory.getRDFService();
 		this.dataset = createDataset();
 		this.modelMaker = createModelMaker();
 	}
 
-	protected RDFService createRDFService(ComponentStartupStatus ss,
-			String endpoint, String updateEndpoint) {
-		if (updateEndpoint == null) {
-			ss.info("Using endpoint at " + endpoint);
-			return new RDFServiceSparql(endpoint);
+	protected RDFService createRDFService(ComponentStartupStatus ss) {
+		if (updateEndpointURI == null) {
+			ss.info("Using endpoint at " + endpointURI);
+			return new RDFServiceSparql(endpointURI);
 		} else {
-			ss.info("Using read endpoint at " + endpoint
-					+ " and update endpoint at " + updateEndpoint);
-			return new RDFServiceSparql(endpoint, updateEndpoint);
+			ss.info("Using read endpoint at " + endpointURI
+					+ " and update endpoint at " + updateEndpointURI);
+			return new RDFServiceSparql(endpointURI, updateEndpointURI);
 		}
 	}
 

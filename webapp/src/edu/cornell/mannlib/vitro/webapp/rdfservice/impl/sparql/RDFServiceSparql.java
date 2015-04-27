@@ -70,7 +70,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	private static final Log log = LogFactory.getLog(RDFServiceImpl.class);
 	protected String readEndpointURI;	
 	protected String updateEndpointURI;
-    private CloseableHttpClient httpClient;
+    protected CloseableHttpClient httpClient;
 	                                            // the number of triples to be 
 	private static final int CHUNK_SIZE = 1000; // added/removed in a single
 	                                            // SPARQL UPDATE
@@ -467,7 +467,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
             try {
                 int statusCode = response.getStatusLine().getStatusCode();
                 if (statusCode > 399) {
-                    log.error("response " + statusCode + " to update. \n");
+                    log.error("response " + response.getStatusLine() + " to update. \n");
                     //log.debug("update string: \n" + updateString);
                     throw new RDFServiceException("Unable to perform SPARQL UPDATE");
                 }
