@@ -7,41 +7,132 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sparql.RDFServiceSparql;
 
 /**
- * For now, at least, it is just like an RDFServiceSparql except for:
+ * For now, at least, it is just like an RDFServiceSparql except:
  * 
- * A small change in the syntax of an UPDATE request.
+ * A username and password are required. These should refer to a Virtuoso user
+ * that posesses the SPARQL_UPDATE role.
+ * 
+ * The endpoint URI and the update endpoint URI are derived from the base URI.
+ *   You provide: http://localhost:8890
+ *   endpoint is: http://localhost:8890/sparql/
+ *   update is:   http://localhost:8890/DAV/home/username/rdf_sink/vitro_update
+ * 
+ * A change in the syntax of an UPDATE request: "INSERT DATA" becomes "INSERT".
+ * This fixes a problem with inserting blank nodes.
+ * 
+ * The HTTP request is equipped with the username and password, to answer a
+ * challenge for basic authentication.
  * 
  * Allow for the nonNegativeInteger bug when checking to see whether a graph has
  * changed.
  */
 public class RDFServiceVirtuoso extends RDFServiceSparql {
+	private static final Log log = LogFactory.getLog(RDFServiceVirtuoso.class);
 
-	public RDFServiceVirtuoso(String readEndpointURI, String updateEndpointURI,
-			String defaultWriteGraphURI) {
-		super(readEndpointURI, updateEndpointURI, defaultWriteGraphURI);
+	private final String username;
+	private final String password;
+
+	public RDFServiceVirtuoso(String baseURI, String username, String password) {
+		super(figureReadEndpointUri(baseURI), figureUpdateEndpointUri(baseURI,
+				username));
+		this.username = username;
+		this.password = password;
 	}
 
-	public RDFServiceVirtuoso(String readEndpointURI, String updateEndpointURI) {
-		super(readEndpointURI, updateEndpointURI);
+	private static String figureReadEndpointUri(String baseUri) {
+		return noTrailingSlash(baseUri) + "/sparql/";
 	}
 
-	public RDFServiceVirtuoso(String endpointURI) {
-		super(endpointURI);
+	private static String figureUpdateEndpointUri(String baseUri,
+			String username) {
+		return noTrailingSlash(baseUri) + "/DAV/home/" + username
+				+ "/rdf_sink/vitro_update";
+	}
+
+	private static String noTrailingSlash(String uri) {
+		return uri.endsWith("/") ? uri.substring(0, uri.length() - 1) : uri;
 	}
 
 	@Override
 	protected void executeUpdate(String updateString)
 			throws RDFServiceException {
-		super.executeUpdate(updateString.replace("INSERT DATA", "INSERT"));
+		updateString = tweakUpdateStringSyntax(updateString);
+		log.debug("UPDATE STRING: " + updateString);
+
+		try {
+			CloseableHttpResponse response = httpClient.execute(
+					createHttpRequest(updateString), createHttpContext());
+			try {
+				int statusCode = response.getStatusLine().getStatusCode();
+				if (statusCode > 399) {
+					log.error("response " + response.getStatusLine()
+							+ " to update. \n");
+
+					InputStream content = response.getEntity().getContent();
+					for (String line : IOUtils.readLines(content)) {
+						log.error("response-line >>" + line);
+					}
+
+					throw new RDFServiceException(
+							"Unable to perform SPARQL UPDATE: status code = "
+									+ statusCode);
+				}
+			} finally {
+				response.close();
+			}
+		} catch (Exception e) {
+			log.error("Failed to update: " + updateString, e);
+			throw new RDFServiceException(
+					"Unable to perform change set update", e);
+		}
+	}
+
+	private String tweakUpdateStringSyntax(String updateString) {
+		if (updateString.startsWith("INSERT DATA")) {
+			return updateString.replaceFirst("INSERT DATA", "INSERT");
+		}
+		return updateString;
+	}
+
+	// TODO entity.setContentType("application/sparql-query");
+	private HttpPost createHttpRequest(String updateString) {
+		HttpPost meth = new HttpPost(updateEndpointURI);
+		meth.addHeader("Content-Type", "application/sparql-query");
+		meth.setEntity(new StringEntity(updateString, "UTF-8"));
+		return meth;
 	}
 
 	/**
-	 * Virtuoso has a bug, which it shares with TDB: if given a literal of type
+	 * We need an HttpContext that will provide username and password in
+	 * response to a basic authentication challenge.
+	 */
+	private HttpClientContext createHttpContext() {
+		CredentialsProvider provider = new BasicCredentialsProvider();
+		provider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(
+				username, password));
+
+		HttpClientContext context = HttpClientContext.create();
+		context.setCredentialsProvider(provider);
+		return context;
+	}
+
+	/**
+	 * Virtuoso has a bug which it shares with TDB: if given a literal of type
 	 * xsd:nonNegativeInteger, it stores a literal of type xsd:integer.
 	 * 
 	 * To determine whether this serialized graph is equivalent to what is

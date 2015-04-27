@@ -27,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 public class RDFServiceGraphBulkUpdater implements BulkUpdateHandler {
 	private static final Log log = LogFactory.getLog(RDFServiceGraphBulkUpdater.class);
@@ -203,7 +204,8 @@ public class RDFServiceGraphBulkUpdater implements BulkUpdateHandler {
 
     private static void removeAll(Graph g, Node s, Node p, Node o)
     {    
-		log.debug("removeAll: g=" + g + ", s=" + s + ", p=" + p + ", o=" + o);
+		log.debug("removeAll: g=" + ToString.graphToString(g) + ", s=" + s
+				+ ", p=" + p + ", o=" + o);
         if (!(g instanceof RDFServiceGraph)) {
             removeAllTripleByTriple(g, s, p, o);
             return;
