@@ -22,11 +22,10 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -350,8 +349,7 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 
 		private final String shindigBaseUrl;
 		private final String shindigTestUrl;
-		private final CloseableHttpClient httpClient = HttpClients
-				.createDefault();
+		private final DefaultHttpClient httpClient = new DefaultHttpClient();
 
 		private int statusCode = Integer.MIN_VALUE;
 
@@ -383,13 +381,9 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 			HttpGet method = new HttpGet(shindigTestUrl);
 			try {
 				log.debug("Trying to connect to Shindig");
-				CloseableHttpResponse response = httpClient.execute(method);
-				try {
-					statusCode = response.getStatusLine().getStatusCode();
-					log.debug("HTTP status was " + statusCode);
-				} finally {
-					response.close();
-				}
+				HttpResponse response = httpClient.execute(method);
+				statusCode = response.getStatusLine().getStatusCode();
+				log.debug("HTTP status was " + statusCode);
 			} catch (SocketTimeoutException e) {
 				// Catch the exception so we can retry this.
 				// Save the status so we know why we failed.

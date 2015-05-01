@@ -5,18 +5,21 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.virtuoso;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sparql.RDFServiceSparql;
@@ -75,25 +78,22 @@ public class RDFServiceVirtuoso extends RDFServiceSparql {
 		log.debug("UPDATE STRING: " + updateString);
 
 		try {
-			CloseableHttpResponse response = httpClient.execute(
+			HttpResponse response = httpClient.execute(
 					createHttpRequest(updateString), createHttpContext());
-			try {
-				int statusCode = response.getStatusLine().getStatusCode();
-				if (statusCode > 399) {
-					log.error("response " + response.getStatusLine()
-							+ " to update. \n");
+			int statusCode = response.getStatusLine().getStatusCode();
+			if (statusCode > 399) {
+				log.error("response " + response.getStatusLine()
+						+ " to update. \n");
 
-					InputStream content = response.getEntity().getContent();
+				try (InputStream content = response.getEntity().getContent()) {
 					for (String line : IOUtils.readLines(content)) {
 						log.error("response-line >>" + line);
 					}
-
-					throw new RDFServiceException(
-							"Unable to perform SPARQL UPDATE: status code = "
-									+ statusCode);
 				}
-			} finally {
-				response.close();
+
+				throw new RDFServiceException(
+						"Unable to perform SPARQL UPDATE: status code = "
+								+ statusCode);
 			}
 		} catch (Exception e) {
 			log.error("Failed to update: " + updateString, e);
@@ -113,7 +113,12 @@ public class RDFServiceVirtuoso extends RDFServiceSparql {
 	private HttpPost createHttpRequest(String updateString) {
 		HttpPost meth = new HttpPost(updateEndpointURI);
 		meth.addHeader("Content-Type", "application/sparql-query");
-		meth.setEntity(new StringEntity(updateString, "UTF-8"));
+		try {
+			meth.setEntity(new StringEntity(updateString, "UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			// UTF-8 is unsupported?
+			throw new RuntimeException(e);
+		}
 		return meth;
 	}
 
@@ -121,13 +126,13 @@ public class RDFServiceVirtuoso extends RDFServiceSparql {
 	 * We need an HttpContext that will provide username and password in
 	 * response to a basic authentication challenge.
 	 */
-	private HttpClientContext createHttpContext() {
+	private HttpContext createHttpContext() {
 		CredentialsProvider provider = new BasicCredentialsProvider();
 		provider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(
 				username, password));
 
-		HttpClientContext context = HttpClientContext.create();
-		context.setCredentialsProvider(provider);
+		BasicHttpContext context = new BasicHttpContext();
+		context.setAttribute(ClientContext.CREDS_PROVIDER, provider);
 		return context;
 	}
 

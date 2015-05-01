@@ -15,11 +15,11 @@ import javax.servlet.ServletContextListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpException;
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -207,8 +207,7 @@ public class SolrSmokeTest implements ServletContextListener {
 		private static final long SLEEP_INTERVAL = 20000; // 20 seconds
 
 		private final URL solrUrl;
-		private final CloseableHttpClient httpClient = HttpClients
-				.createDefault();
+		private final HttpClient httpClient = new DefaultHttpClient();
 
 		private int statusCode;
 
@@ -238,13 +237,9 @@ public class SolrSmokeTest implements ServletContextListener {
 			try {
 				HttpGet method = new HttpGet(solrUrl.toExternalForm());
 				SolrSmokeTest.log.debug("Trying to connect to Solr");
-				CloseableHttpResponse response = httpClient.execute(method);
-				try {
-					statusCode = response.getStatusLine().getStatusCode();
-					SolrSmokeTest.log.debug("HTTP status was " + statusCode);
-				} finally {
-					response.close();
-				}
+				HttpResponse response = httpClient.execute(method);
+				statusCode = response.getStatusLine().getStatusCode();
+				SolrSmokeTest.log.debug("HTTP status was " + statusCode);
 			} catch (SocketTimeoutException e) {
 				// Catch the exception so we can retry this.
 				// Save the status so we know why we failed.
@@ -279,8 +274,7 @@ public class SolrSmokeTest implements ServletContextListener {
 	 */
 	private static class SolrPinger {
 		private final URL solrUrl;
-		private final CloseableHttpClient httpClient = HttpClients
-				.createDefault();
+		private final HttpClient httpClient = new DefaultHttpClient();
 
 		public SolrPinger(URL solrUrl) {
 			this.solrUrl = solrUrl;
@@ -291,15 +285,11 @@ public class SolrSmokeTest implements ServletContextListener {
 				HttpGet method = new HttpGet(solrUrl.toExternalForm()
 						+ "/admin/ping");
 				SolrSmokeTest.log.debug("Trying to ping Solr");
-				CloseableHttpResponse response = httpClient.execute(method);
+				HttpResponse response = httpClient.execute(method);
 				SolrSmokeTest.log.debug("Finished pinging Solr");
-				try {
-					int statusCode = response.getStatusLine().getStatusCode();
-					if (statusCode != HttpStatus.SC_OK) {
-						throw new SolrProblemException(statusCode);
-					}
-				} finally {
-					response.close();
+				int statusCode = response.getStatusLine().getStatusCode();
+				if (statusCode != HttpStatus.SC_OK) {
+					throw new SolrProblemException(statusCode);
 				}
 			} catch (IOException e) {
 				throw new SolrProblemException(e);
