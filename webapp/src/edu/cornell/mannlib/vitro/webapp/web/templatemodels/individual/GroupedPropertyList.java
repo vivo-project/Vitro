@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LanguageOption.LANGUAGE_NEUTRAL;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.PolicyOption.POLICY_NEUTRAL;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -14,20 +17,25 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.vocabulary.OWL;
+
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
-import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
+import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao.FullPropertyKey;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.ApplicationConfigurationOntologyUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
 
@@ -42,7 +50,6 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.BaseTemplateModel;
  */
 public class GroupedPropertyList extends BaseTemplateModel {
 
-    private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(GroupedPropertyList.class);
     private static final int MAX_GROUP_DISPLAY_RANK = 99;
 
@@ -91,8 +98,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
          
         if (log.isDebugEnabled()) {
             for (ObjectProperty t : additions) {
-                log.debug(t.getDomainPublic() + " " + t.getGroupURI() + " domain " +
-                        t.getDomainVClassURI());
+                log.debug("addition: " + t);
             }
             log.debug("Added " + additions.size() + 
                     " properties due to application configuration ontology");
@@ -122,7 +128,6 @@ public class GroupedPropertyList extends BaseTemplateModel {
         if (editing) {
             mergeAllPossibleDataProperties(propertyList);
         }
-                
         sort(propertyList);
 
         // Put the list into groups
@@ -234,33 +239,25 @@ public class GroupedPropertyList extends BaseTemplateModel {
         WebappDaoFactory wadf = vreq.getLanguageNeutralWebappDaoFactory();
         PropertyInstanceDao piDao = wadf.getPropertyInstanceDao();
         
-        Collection<PropertyInstance> allPropInstColl = piDao
+        Collection<PropertyInstance> allPossiblePI = piDao
                 .getAllPossiblePropInstForIndividual(subject.getURI());
-        if (allPropInstColl != null) {
-            for (PropertyInstance pi : allPropInstColl) {
-                if (pi != null) {
+        if (allPossiblePI != null) {
+            for (PropertyInstance possiblePI : allPossiblePI) {
+                if (possiblePI != null) {
                     // use the language-aware wdf because redundancy check
                     // for display will depend on public label match
-                    ObjectProperty piOp = wdf.getObjectPropertyDao().getObjectPropertyByURIs(
-                            pi.getPropertyURI(), pi.getDomainClassURI(), pi.getRangeClassURI());
-                    if (piOp == null) {
+                    ObjectProperty possibleOP = assembleObjectProperty(possiblePI);
+                    if (possibleOP == null) {
                         continue;
                     }
                     boolean addToList = true;
-                    for(ObjectProperty op : populatedObjectPropertyList) {
-                        RedundancyReason reason = redundant(op, piOp); 
-                        if(reason != null) {
-                            addToList = false;
-                            if (reason == RedundancyReason.LABEL_AND_URI_MATCH 
-                                    && moreRestrictiveRange(piOp, op, wadf)) {
-                                op.setRangeVClassURI(piOp.getRangeVClassURI());
-                                op.setRangeVClass(piOp.getRangeVClass());
-                            }
-                            break;
-                        } 
+                    for(ObjectProperty populatedOP : populatedObjectPropertyList) {
+                    	if (redundant(populatedOP, possibleOP)) {
+                    		addToList = false;
+                    	}
                     }
                     if(addToList) {
-                        propertyList.add(piOp);         
+                        propertyList.add(possibleOP);         
                     }
                 } else {
                     log.error("a property instance in the Collection created by PropertyInstanceDao.getAllPossiblePropInstForIndividual() is unexpectedly null");
@@ -281,70 +278,89 @@ public class GroupedPropertyList extends BaseTemplateModel {
         
         return propertyList;
     }
-    
-    private enum RedundancyReason {
-         LABEL_AND_URI_MATCH, LABEL_URI_DOMAIN_AND_RANGE_MATCH   
-    }
-    
-    private boolean moreRestrictiveRange(ObjectProperty piOp, ObjectProperty op, 
-            WebappDaoFactory wadf) {
-        if(piOp.getRangeVClassURI() == null) {
-            return false;
-        } else if (op.getRangeVClassURI() == null) {
-            return (piOp.getRangeVClassURI() != null);
-        } else {
-        	//Check and see if the range vclass exists for the possible piOp and populated op properties,
-        	//because for populated properties, if the range class is a union,
-        	//blank nodes will be broken and the code should instead use the existing or piOp range class uri
-        	VClass piOpRangeClass = wadf.getVClassDao().getVClassByURI(piOp.getRangeVClassURI());
-        	VClass opRangeClass = wadf.getVClassDao().getVClassByURI(op.getRangeVClassURI());
-        	//if the possible range class exists but the populated one does not, then return true to allow the possible
-        	//class to be utilized
-        	if(piOpRangeClass != null && opRangeClass == null) return true;
-            return (wadf.getVClassDao().isSubClassOf(
-                    piOp.getRangeVClassURI(), op.getRangeVClassURI()));
-        }
-    }
-    
-    private RedundancyReason redundant(ObjectProperty op, ObjectProperty op2) {
-        if (op2.getURI() == null) {
-            return null;
-        }
-        boolean uriMatches = (op.getURI() != null 
-                && op.getURI().equals(op2.getURI()));
-        boolean domainMatches = false;
-        boolean rangeMatches = false;
-        boolean labelMatches = false;
-        if(op.getDomainPublic() == null) {
-            if(op2.getDomainPublic() == null) {
-                labelMatches = true;
-            }
-        } else if (op.getDomainPublic().equals(op2.getDomainPublic())) {
-            labelMatches = true;
-        }
-        if(uriMatches && labelMatches) {
-            return RedundancyReason.LABEL_AND_URI_MATCH;
-        }
-        if(op.getDomainVClassURI() == null) {
-            if(op2.getDomainVClassURI() == null) {
-                domainMatches = true;   
-            }
-        } else if (op.getDomainVClassURI().equals(op2.getDomainVClassURI())) {
-            domainMatches = true;
-        }
-        if(op.getRangeVClassURI() == null) {
-            if (op2.getRangeVClassURI() == null) {
-                rangeMatches = true;
-            }
-        } else if (op.getRangeVClassURI().equals(op2.getRangeVClassURI())) {
-            rangeMatches = true;
-        }
-        if (uriMatches && domainMatches && rangeMatches) {
-            return RedundancyReason.LABEL_URI_DOMAIN_AND_RANGE_MATCH;
-        }
-        return null;
-    }
 
+	private ObjectProperty assembleObjectProperty(PropertyInstance pi) {
+		WebappDaoFactory rawWadf = ModelAccess.on(vreq).getWebappDaoFactory(
+				LANGUAGE_NEUTRAL, POLICY_NEUTRAL);
+		ObjectPropertyDao opDao = rawWadf.getObjectPropertyDao();
+		FauxPropertyDao fpDao = rawWadf.getFauxPropertyDao();
+		
+		String base = pi.getPropertyURI();
+		String domain = pi.getDomainClassURI();
+		String range = pi.getRangeClassURI();
+
+		ObjectProperty op = opDao.getObjectPropertyByURIs(base, domain, range);
+		try {
+			FauxProperty fp = fpDao.getFauxPropertyByUris(domain, base, range);
+			if (fp != null) {
+				return new FauxObjectPropertyWrapper(op, fp);
+			}
+		} catch (Exception e) {
+			log.warn("Couldn't look up the faux property", e);
+		}
+		return op;
+	}
+    
+	/**
+	* Don't know what the real problem is with VIVO-976, but somehow we have the same property 
+	* showing up once with a blank node as a domain, and once with null or OWL:Thing as a domain.
+	* 
+	* Similarly, don't know the real problem with VIVO-989, except that the ranges are both
+	* blank nodes - probably the same blank node but on two different reads.
+	* 
+	* For VIVO-1015, if op2 (the unpopulated property) is a Faux property, it will appear to 
+	* be not redundant because of the range difference, and that's what we want. But if op2
+	* (the unpopulated property) has a different range than op1 because of a restriction, 
+	* then we want to ignore that difference, so it appears to be redundant.
+	*/
+	private boolean redundant(ObjectProperty populatedOP, ObjectProperty possibleOP) {
+		if (new FullPropertyKey((Property)populatedOP).equals(
+			new FullPropertyKey((Property)possibleOP))) {
+			return true;
+		} else if (
+			new FullPropertyKey(fudgeBlankNodeInDomain(populatedOP.getDomainVClassURI()), 
+								populatedOP.getURI(),
+								populatedOP.getRangeVClassURI()).equals(
+			new FullPropertyKey(fudgeBlankNodeInDomain(possibleOP.getDomainVClassURI()), 
+								possibleOP.getURI(),
+								possibleOP.getRangeVClassURI()))) {
+			return true;
+		} else if (
+			new FullPropertyKey(populatedOP.getDomainVClassURI(), 
+								populatedOP.getURI(),
+								fudgeBlankNodeInRange(populatedOP.getRangeVClassURI())).equals(
+			new FullPropertyKey(possibleOP.getDomainVClassURI(), 
+								possibleOP.getURI(),
+								fudgeBlankNodeInRange(possibleOP.getRangeVClassURI())))) {
+			return true;
+		} else if (!(possibleOP instanceof FauxObjectPropertyWrapper) && 
+			         populatedOP.getURI().equals(possibleOP.getURI())) { // If not faux property, ignore range difference
+			return true;
+		} else {
+			return false;
+		}
+    }
+	
+	private String fudgeBlankNodeInDomain(String rawDomainUri) {
+		if (rawDomainUri == null) {
+			return null;
+		} else if (rawDomainUri.contains("http://vitro.mannlib.cornell.edu/ns/bnode#")) {
+			return OWL.Thing.getURI();
+		} else {
+			return rawDomainUri;
+		}
+	}
+
+	private String fudgeBlankNodeInRange(String rawRangeUri) {
+		if (rawRangeUri == null) {
+			return null;
+		} else if (rawRangeUri.contains("http://vitro.mannlib.cornell.edu/ns/bnode#")) {
+			return "http://vitro.mannlib.cornell.edu/ns/bnode#-deadbeef";
+		} else {
+			return rawRangeUri;
+		}
+	}
+	
     private void addObjectPropertyToPropertyList(String propertyUri, String domainUri, String rangeUri,
             List<Property> propertyList) {
         ObjectPropertyDao opDao = wdf.getObjectPropertyDao();

@@ -111,6 +111,19 @@ public enum Key {
 			"developer.searchIndex.documentRestriction", false),
 
 	/**
+	 * Accumulate breakdown timings for search indexing, and log them at the end
+	 * of the indexing operation.
+	 */
+	SEARCH_INDEX_LOG_INDEXING_BREAKDOWN_TIMINGS(
+			"developer.searchIndex.logIndexingBreakdownTimings", true),
+
+	/**
+	 * If set, don't pass model change events to the search indexer.
+	 */
+	SEARCH_INDEX_SUPPRESS_MODEL_CHANGE_LISTENER(
+			"developer.searchIndex.suppressModelChangeListener", true),
+
+	/**
 	 * Tell the SearchEngineLogger to log all index deletions.
 	 */
 	SEARCH_DELETIONS_ENABLE("developer.searchDeletions.enable", true),
@@ -185,6 +198,7 @@ public enum Key {
 	private final String propertyName;
 	private final boolean bool;
 
+	// TODO create a private enum for KeyType to clarify these constructors.
 	private Key(String propertyName, boolean bool) {
 		this.propertyName = propertyName;
 		this.bool = bool;

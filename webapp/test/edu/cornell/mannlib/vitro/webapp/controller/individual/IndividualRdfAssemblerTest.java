@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.individual;
 import static com.hp.hpl.jena.ontology.OntModelSpec.OWL_MEM;
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.LABEL;
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.RDF_TYPE;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LanguageOption.LANGUAGE_NEUTRAL;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ import org.apache.log4j.Level;
 import org.junit.Before;
 import org.junit.Test;
 
+import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
 import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
 import stubs.javax.servlet.http.HttpSessionStub;
@@ -45,8 +47,8 @@ import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.publish.PublishDataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.publish.PublishObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
@@ -349,8 +351,7 @@ public class IndividualRdfAssemblerTest extends AbstractTestClass {
 
 	private void setupIndividualRdfAssembler() {
 		rdfService = new RDFServiceModel(rawRdf);
-		req.setAttribute("rdfService", rdfService);
-		req.setAttribute("unfilteredRDFService", rdfService);
+		new ModelAccessFactoryStub().get(req).setRDFService(rdfService, LANGUAGE_NEUTRAL);
 		vreq = new VitroRequest(req);
 		ira = new IndividualRdfAssembler(vreq, INDIVIDUAL_URI, ContentType.N3);
 	}

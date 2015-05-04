@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -45,9 +46,9 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualSDB.IndividualNotFoundException;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class IndividualDaoSDB extends IndividualDaoJena {
 
@@ -77,6 +78,15 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         } catch (IndividualNotFoundException e) {
             // If the individual does not exist, return null.
             return null;
+        } catch(Exception ex) {
+        	//Should some other error occur, please log it here
+        	log.error("An error occurred trying to make an individual ", ex);
+        	if(StringUtils.isNotEmpty(individualURI)) {
+        		log.error("IndividualURI equals " + individualURI);
+        	} else {
+        		log.error("IndividualURI is null or empty");
+        	}
+        	return null;
         }
     }
 
@@ -437,9 +447,8 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     }
     
     @Override
-    public Iterator<String> getAllOfThisTypeIterator() {
-        final List<String> list = 
-            new LinkedList<String>();
+    public Collection<String> getAllIndividualUris() {
+        final List<String> list = new LinkedList<String>();
         
         // get all labeled resources from any non-tbox and non-metadata graphs,
         // as well as the unnamed graph (first pattern below)
@@ -448,8 +457,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                        " UNION { " + 
                        "  GRAPH ?g { ?ind <" + RDFS.label.getURI() +
                                           "> ?label } \n" +
-                       "  FILTER (?g != <" + JenaDataSourceSetupBase
-                               .JENA_APPLICATION_METADATA_MODEL + "> " +
+                       "  FILTER (?g != <" + ModelNames.APPLICATION_METADATA + "> " +
                        "          && !regex(str(?g),\"tbox\")) \n " +
                        " } " +
                        "}";
@@ -473,8 +481,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
         	w.close();
         }
 
-        return list.iterator();
-
+        return list;
     }  
 
     private Iterator<Individual> getIndividualIterator(

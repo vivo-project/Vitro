@@ -5,14 +5,14 @@ package edu.cornell.mannlib.vitro.webapp.auth.policy;
 import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization.AUTHORIZED;
 import static edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization.INCONCLUSIVE;
 import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction.SOME_LITERAL;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import stubs.edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelperStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionBeanStub;
 import stubs.javax.servlet.ServletContextStub;
 
 import com.hp.hpl.jena.ontology.OntModel;
@@ -23,7 +23,6 @@ import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.HasProfile;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
@@ -71,9 +70,8 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 	public void setUp() throws Exception {
 		ctx = new ServletContextStub();
 
-		PropertyRestrictionPolicyHelper prph = PropertyRestrictionPolicyHelperStub
+		PropertyRestrictionBeanStub
 				.getInstance(new String[] { UNSAFE_NS });
-		PropertyRestrictionPolicyHelper.setBean(ctx, prph);
 
 		policy = new SelfEditingPolicy(ctx);
 
@@ -87,14 +85,13 @@ public class SelfEditingPolicyTest extends AbstractTestClass {
 
 	@Test
 	public void testProhibitedProperties() {
-		PropertyRestrictionPolicyHelper prph = PropertyRestrictionPolicyHelperStub
+		PropertyRestrictionBeanStub
 				.getInstance(new String[] { UNSAFE_NS }, new String[] {
 						"http://mannlib.cornell.edu/bad#prp234",
 						"http://mannlib.cornell.edu/bad#prp999",
 						"http://mannlib.cornell.edu/bad#prp333",
 						"http://mannlib.cornell.edu/bad#prp777",
 						"http://mannlib.cornell.edu/bad#prp0020" });
-		PropertyRestrictionPolicyHelper.setBean(ctx, prph);
 
 		whatToAuth = new AddObjectPropertyStatement(ontModel, SELFEDITOR_URI,
 				new Property("http://mannlib.cornell.edu/bad#prp234"), SAFE_RESOURCE);

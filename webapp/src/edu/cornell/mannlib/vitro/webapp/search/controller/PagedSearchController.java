@@ -48,7 +48,6 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocument;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumentList;
-import edu.cornell.mannlib.vitro.webapp.search.IndexConstants;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.LinkTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.searchresult.IndividualSearchResult;
@@ -646,20 +645,6 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         return rv;
     }
     
-    @SuppressWarnings({ "unchecked", "unused" })
-    private HashSet<String> getDataPropertyBlacklist(){
-        HashSet<String>dpBlacklist = (HashSet<String>)
-        getServletContext().getAttribute(IndexConstants.SEARCH_DATAPROPERTY_BLACKLIST);
-        return dpBlacklist;        
-    }
-    
-    @SuppressWarnings({ "unchecked", "unused" })
-    private HashSet<String> getObjectPropertyBlacklist(){
-        HashSet<String>opBlacklist = (HashSet<String>)
-        getServletContext().getAttribute(IndexConstants.SEARCH_OBJECTPROPERTY_BLACKLIST);
-        return opBlacklist;        
-    }
-    
     public static final int MAX_QUERY_LENGTH = 500;
 
     protected boolean isRequestedFormatXml(VitroRequest req){
@@ -707,8 +692,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     }
     
     protected static Map<Format,Map<Result,String>> setupTemplateTable(){
-        Map<Format,Map<Result,String>> templateTable = 
-            new HashMap<Format,Map<Result,String>>();
+        Map<Format,Map<Result,String>> table = new HashMap<>();
         
         HashMap<Result,String> resultsToTemplates = new HashMap<Result,String>();
         
@@ -716,7 +700,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         resultsToTemplates.put(Result.PAGED, "search-pagedResults.ftl");
         resultsToTemplates.put(Result.ERROR, "search-error.ftl");
         // resultsToTemplates.put(Result.BAD_QUERY, "search-badQuery.ftl");        
-        templateTable.put(Format.HTML, Collections.unmodifiableMap(resultsToTemplates));
+        table.put(Format.HTML, Collections.unmodifiableMap(resultsToTemplates));
         
         // set up XML format
         resultsToTemplates = new HashMap<Result,String>();
@@ -724,7 +708,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         resultsToTemplates.put(Result.ERROR, "search-xmlError.ftl");
 
         // resultsToTemplates.put(Result.BAD_QUERY, "search-xmlBadQuery.ftl");        
-        templateTable.put(Format.XML, Collections.unmodifiableMap(resultsToTemplates));
+        table.put(Format.XML, Collections.unmodifiableMap(resultsToTemplates));
         
         
         // set up CSV format
@@ -733,9 +717,9 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         resultsToTemplates.put(Result.ERROR, "search-csvError.ftl");
         
         // resultsToTemplates.put(Result.BAD_QUERY, "search-xmlBadQuery.ftl");        
-        templateTable.put(Format.CSV, Collections.unmodifiableMap(resultsToTemplates));
+        table.put(Format.CSV, Collections.unmodifiableMap(resultsToTemplates));
 
         
-        return Collections.unmodifiableMap(templateTable);
+        return Collections.unmodifiableMap(table);
     }
 }

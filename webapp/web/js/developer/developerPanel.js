@@ -54,6 +54,8 @@ function DeveloperPanel(developerAjaxUrl) {
 		document.getElementById("developer_i18n_logStringRequests").disabled = !developerEnabled;
 		document.getElementById("developer_loggingRDFService_enable").disabled = !developerEnabled;
 		document.getElementById("developer_searchIndex_enable").disabled = !developerEnabled;
+		document.getElementById("developer_searchIndex_logIndexingBreakdownTimings").disabled = !developerEnabled;
+		document.getElementById("developer_searchIndex_suppressModelChangeListener").disabled = !developerEnabled;
 		document.getElementById("developer_searchDeletions_enable").disabled = !developerEnabled;
 		document.getElementById("developer_searchEngine_enable").disabled = !developerEnabled;
 		document.getElementById("developer_authorization_logDecisions_enable").disabled = !developerEnabled;

@@ -152,6 +152,12 @@ public class ContentType implements Serializable {
      new ContentType("application/json;" + DEFAULT_CHARSET).lock();
 
  /**
+  * A ContentType constant that describes the JSON-LD content type.
+  */
+ public static final ContentType JSON_LD =
+		 new ContentType("application/ld+json;" + DEFAULT_CHARSET).lock();
+ 
+ /**
   * A ContentType constant that describes the Javascript content type.
   */
  public static final ContentType JAVASCRIPT =

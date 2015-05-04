@@ -10,46 +10,6 @@
     padding: .5em;  
     margin-bottom: 20px;
 }
-table#account {
-    table-layout: auto;
-    width: 930px;
-    text-align: left;
-    margin: 0 auto; 
-    border-collapse: collapse;
-    empty-cells: show;
-    caption-side: top;
-    margin: 20px 0 20px 0;
-}
-table#account caption {
-    display: none;
-}
-table#account th {
-    background-color: #F7F9F9;
-    height: 40px;
-    color: #064D68;
-    padding-top: 7px;
-    border: 1px solid #d9e4ea;
-    border-bottom: none;
-    padding-left: 6px;
-    font-size: .9em;
-}
-table#account th {
-    text-align: left;
-} /*Fix for IE8 and 9, force text in a cell to be aligned to the left*/
-table#account td {
-    vertical-align: top;
-    padding: .5em;
-    border: 1px solid #d9e4ea; 
-    font-size: .825em;
-    padding-top: .5em;
-    padding-bottom: .5em;
-}  
-table#account td  a {
-   word-wrap: break-word;
-}
-table#account tr:nth-child(2n) {
-    background-color: rgba(200, 200, 180,.25);
-}
 input#externalAuthChkBox {
     height:18px;
     width:18px;
@@ -126,7 +86,8 @@ form.customForm p.note {
      padding-bottom: 20px;
      padding-top: 5px;
 }
-#add-account p.note {
+#add-account p.note,
+#passwordContainer  {
     margin-top: 20px;
 }
 #search-feedback {
@@ -136,8 +97,9 @@ form.customForm p.note {
 #filter-roles span {
     font-size: .8em;
 }
-/* CREATE PASSWORD ------>  */
-#create-password p.note {
+/* CREATE/RESET PASSWORD ------>  */
+#create-password p.note,
+#reset-password p.note  {
      margin-top: 0;
 }
 /* EDIT ACCOUNT ------>  */
@@ -149,15 +111,12 @@ form.customForm p.note {
      padding-bottom: 10px;
 }
 #my-account input#email-address,
-#my-account input#new-password {
+#my-account input#new-password,
+#search-proxy h4 {
     margin-bottom: 0;
 }
 section.account-feedback img {
 padding-right: 5px;
-}
-/* RESET PASSWORD ------>  */
-#reset-password p.note {
-     margin-top: 0;
 }
 
 /* ASSOCIATE PROFILE ------>  */
@@ -170,19 +129,13 @@ padding-right: 5px;
     line-height:15px; 
     margin-top:-8px !important;
 }
-#associated {
-    float:right; 
-     display:none;
-}
-#associated label {
-    margin-bottom: 10px;
-}
+#associated,
 #associationOptions {
     float:right; 
     display:none;
 }
-#verifyProfileLink {
-    margin-left:10px;
+#associated label {
+    margin-bottom: 10px;
 }
 #externalAuthIdInUse {
     color: #f70;
@@ -263,20 +216,10 @@ form.customForm input[name="newPassword"],
 form.customForm input[name="confirmPassword"] {
     width: 10em;
 }
-a.disable-delete {
-    padding-left: 24px;
-}
 #passwordContainer p.note {
     margin-top: -10px;
     padding-bottom: 5px;
 }
-#passwordContainer {
-    margin-top: 20px;
-}
-.disabledSubmit {
-    cursor: default ! important;
-}
-
 /* PROXY MY ACCOUNT'S PROFILE ------>  */
 #edit-myProxy {
     float: right;
@@ -311,21 +254,9 @@ a.disable-delete {
     border-top: 1px solid #E0DFDF;
     padding-left: 0;
 }
-#edit-myProxy img.photo-profile {
-    border: 2px solid #DDE4E3;
-    float: left;
-}
-#edit-myProxy p.proxy-info {
-    padding-left: 110px;
-    padding-top: 15px;
-}
 #edit-myProxy span.class-label {
     color: #7F8993;
 }
-#edit-myProxy a.remove-proxy {
-    font-size: .9em;
-}
-
 /* MANAGE PROXY ------>  */
 
 section.proxy-profile h4 {
@@ -335,9 +266,7 @@ section.proxy-profile h4 {
 #add-relation legend{
     display: none;
 }
-.proxy-profile .acSelector {
-    margin-left: 20px;
-}
+.proxy-profile .acSelector,
 #add-relation label {
     margin-left: 20px;
 }
@@ -412,17 +341,14 @@ p.selected-editors {
     border-top: 1px solid #E0DFDF;
     padding-left: 1.2em;
 }
+img.photo-profile, 
 img.photo-proxy {
-    border: 2px solid #DDE4E3;
-    float: left;
-}
-
-img.photo-profile {
     border: 1px solid #DDE4E3;
     float: left;
 }
 #add-relation p.proxy-info,
-#list-relation p.proxy-info {
+#list-relation p.proxy-info,
+#edit-myProxy p.proxy-info {
     padding-left: 110px;
     padding-top: 15px;
 }
@@ -435,17 +361,12 @@ img.photo-profile {
 span.class-label {
     color: #7F8993;
 }
-a.remove-proxy {
-    font-size: .9em;
-}
+a.remove-proxy,
 a.remove-proxyUri {
     font-size: .9em;
 }
-
-a.remove-proxyUri {
-    font-size: .9em;
-}
-h4.profile-editors {
+h4.profile-editors,
+#verifyProfileLink {
     margin-left: 10px;
 }
 #search-proxy {
@@ -453,10 +374,6 @@ h4.profile-editors {
     padding: 10px;
     padding-top: 20px;
 }
-#search-proxy h4 {
-    margin-bottom: 0;
-}
-
 #search-proxy p {
     margin-top: .3em;
     font-size: .8em;
@@ -479,4 +396,8 @@ img.loading-relateProfile,
 img.loading-addProfile,
 img.loading-profileMyAccoount {
     padding-left: 10px;
+}
+span.unlinkedAccount,
+a.disable-delete {
+	padding-left:24px;
 }

@@ -21,6 +21,8 @@ import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.vocabulary.DCTerms;
 import com.hp.hpl.jena.vocabulary.RDF;
 
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
+
 public class RegeneratingGraph implements Graph, Regenerable {
 
 	private final static Log log = LogFactory.getLog(RegeneratingGraph.class);
@@ -296,4 +298,9 @@ public class RegeneratingGraph implements Graph, Regenerable {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "RegeneratingGraph[" + ToString.hashHex(this) + ", "
+				+ ToString.graphToString(g) + "]";
+	}
 }

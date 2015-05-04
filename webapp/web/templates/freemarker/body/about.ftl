@@ -2,7 +2,7 @@
 
 <#-- Template for the body of the About page -->
 
-<h2>${title}</h2>
+<h2>${siteName!}</h2>
 
 <#if aboutText?has_content>
     <div class="pageGroupBody" id="aboutText">${aboutText}</div>

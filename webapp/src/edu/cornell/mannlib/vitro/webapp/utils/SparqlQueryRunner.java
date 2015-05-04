@@ -15,6 +15,7 @@ import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 
 /**
  * Execute SPARQL queries against a model.
@@ -95,6 +96,15 @@ public class SparqlQueryRunner {
 
 		protected abstract T defaultValue();
 
+		protected String ifResourcePresent(QuerySolution solution,
+				String variableName, String defaultValue) {
+			RDFNode node = solution.get(variableName);
+			if (node == null || !node.isURIResource()) {
+				return defaultValue;
+			}
+			return node.asResource().getURI();
+		}
+
 		protected String ifLiteralPresent(QuerySolution solution,
 				String variableName, String defaultValue) {
 			Literal literal = solution.getLiteral(variableName);
@@ -126,5 +136,36 @@ public class SparqlQueryRunner {
 		}
 
 	}
+	
+	public static String bindValues(String rawString, VariableValue... values) {
+		String queryString = rawString;
+		for (VariableValue value: values) {
+			queryString = value.bind(queryString);
+		}
+		return queryString;
+	}
+	
+	public static UriValue uriValue(String name, String uri) {
+		return new UriValue(name, uri);
+	}
 
+	public interface VariableValue {
+		String bind(String rawString);
+	}
+	
+	private static class UriValue implements VariableValue {
+		private final String name;
+		private final String uri;
+		
+		public UriValue(String name, String uri) {
+			this.name = name;
+			this.uri = uri;
+		}
+
+		@Override
+		public String bind(String rawString) {
+			return rawString.replaceAll("\\?" + name + "\\b", "<" + uri + ">");
+		}
+		
+	}
 }

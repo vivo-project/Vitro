@@ -8,7 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.BasicPolicyDecision;
-import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.PolicyIface;
@@ -31,13 +31,13 @@ public abstract class AbstractRelationshipPolicy implements PolicyIface {
 	}
 
 	protected boolean canModifyResource(String uri) {
-		return PropertyRestrictionPolicyHelper.getBean(ctx).canModifyResource(
-				uri, RoleLevel.SELF);
+		return PropertyRestrictionBean.getBean().canModifyResource(uri,
+				RoleLevel.SELF);
 	}
 
 	protected boolean canModifyPredicate(Property predicate) {
-		return PropertyRestrictionPolicyHelper.getBean(ctx).canModifyPredicate(
-				predicate, RoleLevel.SELF);
+		return PropertyRestrictionBean.getBean().canModifyPredicate(predicate,
+				RoleLevel.SELF);
 	}
 
 	protected PolicyDecision cantModifyResource(String uri) {

@@ -11,7 +11,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
@@ -32,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 public abstract class RDFServiceImpl implements RDFService {
 	
@@ -268,7 +268,7 @@ public abstract class RDFServiceImpl implements RDFService {
         return result;
     }
     
-    protected Query createQuery(String queryString) {
+    protected Query createQuery(String queryString) throws RDFServiceException {
         List<Syntax> syntaxes = Arrays.asList(
                 Syntax.defaultQuerySyntax, Syntax.syntaxSPARQL_11, 
                 Syntax.syntaxSPARQL_10, Syntax.syntaxSPARQL, Syntax.syntaxARQ);
@@ -280,11 +280,17 @@ public abstract class RDFServiceImpl implements RDFService {
                q = QueryFactory.create(queryString, syntax);  
             } catch (QueryParseException e) {
                if (!syntaxIt.hasNext()) {
-                   throw(e);
+					throw new RDFServiceException("Failed to parse query \""
+							+ queryString + "\"", e);
                }
             }
         }
         return q;
     }
+
+	@Override
+	public String toString() {
+		return ToString.simpleName(this) + "[" + ToString.hashHex(this) + "]";
+	}
     
 }

@@ -10,10 +10,10 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matcher;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.matchers.JUnitMatchers;
 import org.junit.rules.ExpectedException;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
@@ -71,7 +71,7 @@ public class CustomListViewConfigFileTest extends AbstractTestClass {
 	@Test
 	public void invalidXml() throws InvalidConfigurationException {
 		suppressSyserr(); // catch the error report from the XML parser
-		expectException(JUnitMatchers
+		expectException(CoreMatchers
 				.containsString("Config file is not valid XML:"));
 		readConfigFile("<unbalancedTag>");
 	}

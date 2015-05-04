@@ -81,18 +81,19 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     private PropertyListConfig config;
     private String objectKey;    
     private String sortDirection;
+	private int displayLimit;
     
     ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, 
             boolean editing)
         throws InvalidConfigurationException {
         
-        super(op, subject, vreq); 
-        setName(op.getDomainPublic());
+        super(op, subject, vreq, op.getDomainPublic());
         
         sortDirection = op.getDomainEntitySortDirection();
         domainUri = op.getDomainVClassURI();
         rangeUri = op.getRangeVClassURI();
-        
+		displayLimit = op.getDomainDisplayLimit();
+
         // Get the config for this object property
         try {
         	config = new PropertyListConfig(this, getFreemarkerTemplateLoader(), vreq, op, editing);
@@ -176,6 +177,11 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         return Route.OBJECT_PROPERTY_EDIT;
     }
 
+	@Override
+	public int getDisplayLimit() {
+			return displayLimit;
+	}	
+
     public ConfigError checkQuery(String queryString) {
         if (StringUtils.isBlank(queryString)) {
             return ConfigError.NO_SELECT_QUERY;
@@ -232,7 +238,6 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     public static ObjectPropertyTemplateModel getObjectPropertyTemplateModel(ObjectProperty op, 
             Individual subject, VitroRequest vreq, boolean editing, 
             List<ObjectProperty> populatedObjectPropertyList) {
-        
         if (op.getCollateBySubclass()) {
             try {
                 return new CollatedObjectPropertyTemplateModel(op, subject, vreq, editing, populatedObjectPropertyList);

@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.filestorage;
 
 import java.io.IOException;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
@@ -12,9 +11,9 @@ import javax.servlet.http.HttpSessionBindingListener;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
+import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 
 /**
  * Attaches an uploaded file to the session with a listener, so the file will be
@@ -109,6 +108,7 @@ public class TempFileHolder implements HttpSessionBindingListener {
 	 */
 	@Override
 	public void valueBound(HttpSessionBindingEvent event) {
+		// Nothing to do.
 	}
 
 	/**
@@ -130,17 +130,7 @@ public class TempFileHolder implements HttpSessionBindingListener {
 			return;
 		}
 
-		HttpSession session = event.getSession();
-		ServletContext servletContext = session.getServletContext();
-
-		FileStorage fs = (FileStorage) servletContext
-				.getAttribute(FileStorageSetup.ATTRIBUTE_NAME);
-		if (fs == null) {
-			log.error("Servlet context does not contain file storage at '"
-					+ FileStorageSetup.ATTRIBUTE_NAME + "'");
-			return;
-		}
-
+		FileStorage fs = ApplicationUtils.instance().getFileStorage(); 
 		try {
 			fs.deleteFile(fileInfo.getBytestreamUri());
 			log.debug("Deleted file " + fileInfo);

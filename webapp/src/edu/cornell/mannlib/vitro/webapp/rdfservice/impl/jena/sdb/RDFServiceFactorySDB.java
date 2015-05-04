@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.sdb;
 
-import java.sql.SQLException;
-
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
@@ -59,7 +57,7 @@ public class RDFServiceFactorySDB implements RDFServiceFactory {
     @Override
     public void unregisterListener(ChangeListener changeListener)
             throws RDFServiceException {
-        this.longTermRDFService.registerListener(changeListener);
+        this.longTermRDFService.unregisterListener(changeListener);
     }
 
 }

@@ -9,12 +9,12 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 
 import com.hp.hpl.jena.graph.BulkUpdateHandler;
@@ -43,11 +43,13 @@ import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.SingletonIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
+
 public class SparqlGraph implements GraphWithPerform {
     
     private String endpointURI;
     private String graphURI;
-    private CloseableHttpClient httpClient;
+    private HttpClient httpClient;
     private static final Log log = LogFactory.getLog(SparqlGraph.class);
     
     private BulkUpdateHandler bulkUpdateHandler;
@@ -71,9 +73,9 @@ public class SparqlGraph implements GraphWithPerform {
        this.endpointURI = endpointURI;
        this.graphURI = graphURI;
        
-       PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
+       PoolingClientConnectionManager cm = new PoolingClientConnectionManager();
        cm.setDefaultMaxPerRoute(50);
-       this.httpClient = HttpClients.custom().setConnectionManager(cm).build();
+       this.httpClient = new DefaultHttpClient(cm);
     }
     
     public String getEndpointURI() {
@@ -95,17 +97,13 @@ public class SparqlGraph implements GraphWithPerform {
             meth.addHeader("Content-Type", "application/x-www-form-urlencoded");
             meth.setEntity(new UrlEncodedFormEntity(Arrays.asList(
                     new BasicNameValuePair("update", updateString))));
-            CloseableHttpResponse response = httpClient.execute(meth);
-            try {
-                int statusCode = response.getStatusLine().getStatusCode();
-                if (statusCode > 399) {
-                    log.error("response " + statusCode + " to update. \n");
-                    throw new RuntimeException("Unable to perform SPARQL UPDATE: \n"
-                        + updateString);
-                }
-            } finally {
-                response.close();
-            } 
+            HttpResponse response = httpClient.execute(meth);
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode > 399) {
+                log.error("response " + statusCode + " to update. \n");
+                throw new RuntimeException("Unable to perform SPARQL UPDATE: \n"
+                    + updateString);
+            }
         } catch (Exception e) {
             throw new RuntimeException("Unable to perform SPARQL UPDATE", e);
         } 
@@ -168,7 +166,9 @@ public class SparqlGraph implements GraphWithPerform {
 
     @Override
     public boolean contains(Node subject, Node predicate, Node object) {
-        if (subject.isBlank() || predicate.isBlank() || object.isBlank()) {
+		if ((subject != null && subject.isBlank())
+				|| (predicate != null && predicate.isBlank())
+				|| (object != null && object.isBlank())) {
             return false;
         }
         StringBuffer containsQuery = new StringBuffer("ASK { \n");
@@ -355,7 +355,7 @@ public class SparqlGraph implements GraphWithPerform {
 
     @Override
     public boolean isEmpty() {
-        return (size() == 0);
+        return !contains(null, null, null);
     }
 
     @Override
@@ -497,4 +497,11 @@ public class SparqlGraph implements GraphWithPerform {
 //            sbuff.append(hexstr);
         }
     }
+
+	@Override
+	public String toString() {
+		return "SparqlGraph[" + ToString.hashHex(this) + ", endpoint="
+				+ endpointURI + ", name=" + ToString.modelName(graphURI) + "]";
+	}
+    
 }

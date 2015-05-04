@@ -25,7 +25,7 @@
     <section class="account-feedback">
         <p>
             ${strings.updated_account_1}
-            <a href="${updatedUserAccount.editUrl}" title="${strings.updated_account_title}}">${updatedUserAccount.firstName} ${updatedUserAccount.lastName}</a>
+            <a href="${updatedUserAccount.editUrl}" title="${strings.updated_account_title}">${updatedUserAccount.firstName} ${updatedUserAccount.lastName}</a>
             ${strings.updated_account_2}
             <#if emailWasSent?? >${strings.updated_account_notification(updatedUserAccount.emailAddress)}</#if>
         </p>
@@ -81,7 +81,7 @@
 <form method="POST" action="${formUrls.list}" id="account-display" class="customForm" role="accounts display">
     <@p.accountsNav />
     
-    <table id="account">
+    <table id="table-listing">
         <caption>${strings.account_management}</caption>
 
         <thead>
@@ -154,7 +154,7 @@
                             <a ${disableDeleteAccount} href="${account.editUrl}"  title="${strings.click_to_view_account}">${account.emailAddress}</a>
                             <!-- when this link is clicked, editAccount is noticed and all other fields are ignored. -->
                         <#else>
-                            ${account.emailAddress}
+                            <span class="unlinkedAccount">${account.emailAddress}</span>
                         </#if>
                     </td>
                     <td>${account.firstName}</td>

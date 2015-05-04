@@ -5,7 +5,7 @@
 <#import "lib-datetime.ftl" as dt>
 <#import "lib-string.ftl" as str>
 
-<h2>${title}</h2>
+<h2>${title!}</h2>
 
 <@widget name="test" />
 
@@ -57,8 +57,8 @@
 <p>${year?number?c}</p>
 
 <h3>${i18n().raw_string_literals}</h3>
-<p>${r"#{title}"}</p>
-<p>${r"${title}"}</p>
+<p>${r"#{title!}"}</p>
+<p>${r"${title!}"}</p>
 
 <h2>${i18n().containers_do_not_pick_up_changes}</h2>
 <#assign

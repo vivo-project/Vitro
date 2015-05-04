@@ -22,10 +22,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileAlreadyExistsException;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
+import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileAlreadyExistsException;
+import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 
 /**
  * A helper object to handle the mundane details of dealing with uploaded files

@@ -82,6 +82,14 @@ public abstract class SearchEngineLogger implements AutoCloseable {
 		}
 	}
 
+	public static SearchEngineLogger doCountQuery() {
+		if (isEnabled(SEARCH_ENGINE_ENABLE)) {
+			return new CountQueryLogger();
+		} else {
+			return new DisabledLogger();
+		}
+	}
+
 	private static boolean isEnabled(Key enableKey) {
 		return log.isInfoEnabled()
 				&& DeveloperSettings.getInstance().getBoolean(enableKey);
@@ -254,8 +262,8 @@ public abstract class SearchEngineLogger implements AutoCloseable {
 
 		QueryLogger(SearchQuery query) {
 			this.query = query;
-			this.stackTrace = new StackTraceUtility(SearchEngineWrapper.class,
-					true);
+			this.stackTrace = new StackTraceUtility(
+					InstrumentedSearchEngineWrapper.class, true);
 			this.passesRestrictions = passesQueryRestriction()
 					&& passesStackRestriction();
 			log.debug("QueryLogger: query=" + query + ", passes="
@@ -312,8 +320,56 @@ public abstract class SearchEngineLogger implements AutoCloseable {
 		}
 	}
 
+	public static class CountQueryLogger extends SearchEngineLogger {
+		private final StackTraceUtility stackTrace;
+		private final boolean passesRestrictions;
+
+		private long count;
+
+		CountQueryLogger() {
+			this.stackTrace = new StackTraceUtility(
+					InstrumentedSearchEngineWrapper.class, true);
+			this.passesRestrictions = passesQueryRestriction()
+					&& passesStackRestriction();
+			log.debug("CountQueryLogger: passes=" + passesRestrictions);
+		}
+
+		private boolean passesStackRestriction() {
+			return stackTrace.passesStackRestriction(DeveloperSettings
+					.getInstance().getString(
+							Key.SEARCH_ENGINE_STACK_RESTRICTION));
+		}
+
+		/** Only passes if there is no restriction. */
+		private boolean passesQueryRestriction() {
+			String restriction = DeveloperSettings.getInstance().getString(
+					Key.SEARCH_ENGINE_QUERY_RESTRICTION);
+			return StringUtils.isEmpty(restriction);
+		}
+
+		@Override
+		public void setSearchResponse(SearchResponse response) {
+			this.count = response.getResults().getNumFound();
+		}
+
+		@Override
+		public void writeToLog() {
+			if (!passesRestrictions) {
+				return;
+			}
+			String results = "Document count query found " + count + " documents.\n";
+			String trace = stackTrace.format(showStackTrace());
+			log.info(String.format("%8.3f %s%s", elapsedSeconds(), results,
+					trace));
+		}
+
+		private boolean showStackTrace() {
+			return DeveloperSettings.getInstance().getBoolean(
+					Key.SEARCH_ENGINE_ADD_STACK_TRACE);
+		}
+	}
+
 	private static class DisabledLogger extends SearchEngineLogger {
-		
 		@Override
 		public void setSearchResponse(SearchResponse response) {
 			// Does nothing.
@@ -323,6 +379,5 @@ public abstract class SearchEngineLogger implements AutoCloseable {
 		protected void writeToLog() {
 			// Does nothing.
 		}
-
 	}
 }

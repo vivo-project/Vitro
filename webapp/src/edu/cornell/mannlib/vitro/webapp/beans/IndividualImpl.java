@@ -2,25 +2,20 @@
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
-import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 /**
  * Represents a single entity record.
@@ -350,4 +345,10 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     public boolean hasThumb() {
         return getThumbUrl() != null && ! getThumbUrl().isEmpty();
     }
+    
+	@Override
+	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
+		// No webappDaoFactory, so nothing to do.
+	}
+
 }

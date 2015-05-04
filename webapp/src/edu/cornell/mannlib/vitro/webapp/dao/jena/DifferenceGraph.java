@@ -19,6 +19,8 @@ import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
+
 public class DifferenceGraph implements Graph {
 
     private Graph g;
@@ -132,6 +134,13 @@ public class DifferenceGraph implements Graph {
 	@Override
 	public void clear() {
 		g.clear();
+	}
+
+	@Override
+	public String toString() {
+		return "DifferenceGraph[" + ToString.hashHex(this) + ", g="
+				+ ToString.graphToString(g) + ", subtract="
+				+ ToString.graphToString(subtract) + "]";
 	}
 
 }

@@ -120,8 +120,8 @@ class IndividualDaoFiltering extends BaseFiltering implements IndividualDao{
     
     /* ******************* unfiltered methods ****************** */
     
-    public Iterator<String> getAllOfThisTypeIterator() {        
-        return innerIndividualDao.getAllOfThisTypeIterator(); 
+    public Collection<String> getAllIndividualUris() {        
+        return innerIndividualDao.getAllIndividualUris(); 
                        
     }
     

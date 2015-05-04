@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+    <ModulePrefs
+            title="Featured Presentations"
+            author="Nels Johnson"
+            author_email="njohnson@downrecs.com"
+            description="Featured Presentations">
+        <Require feature="opensocial-0.9" />
+        <Require feature="pubsub" />
+        <Require feature="views" />
+        <Require feature="flash" />
+        <!-- Require feature="dynamic-height" / -->
+        <Require feature="osapi" />
+    </ModulePrefs>
+    <Content type="html" view="default, home, profile" preferred_height="470" preferred_width="670"><![CDATA[<!--HTML-->
+    <!DOCTYPE html>
+    <base target="_blank"/>
+    
+    <!-- TODO: Fix height for OSDE. Should be removed --> 
+    <!--script type="text/javascript">
+    	gadgets.window.adjustHeight(700);
+    </script-->
+    
+    <!-- #includes -->
+    <link rel="stylesheet" href="css/gadget.css" type="text/css" media="screen, projection">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>    
+    <script type="text/javascript" src="js/os.js" ></script>
+    
+    <!-- Styles -->
+    <style type="text/css">
+    	.slideshare_title {	font-family: Arial, helvetica; font-size: 14px;}
+    	.slideshare_body { font-family: Arial, helvetica; font-size: 11px;}    
+    	.slideshare_credit { font-family: Arial, helvetica; font-size: 10px;}
+    	.ss-link{ margin:10px 0px 10px 0px; }
+    	a, a:visited { color: #0088CC; text-decoration: none; }
+    	a:hover { color: #005580; text-decoration: underline; }
+    </style>
+    
+    <script type="text/javascript">
+	    
+	    function gotoSlideshare() {    		
+	        var action = 'go_to_slideshare';
+	        var href = $('div.ss-link a').attr('href');
+    		gadgets.pubsub.subscribe("analytics", function(sender, message){
+    			if(message.action = action) {
+    				window.top.location.href = href;
+    			}
+    		});
+    		gadgetEventTrack(action, href);
+	    }
+	    
+	    function gadgetEventTrack(action, label, value) {
+    		var message = {'action' : action};
+    		if (label) {message.label = label;}
+    		if (value) {message.value = value;}
+    		gadgets.pubsub.publish("analytics", message);
+		}
+	    
+	    // ========================================
+	    function getUserNameAndPreview(userId){
+			osapi.appdata.get({'userId': userId, 'groupId': '@self', 'appId':'@app', 'fields': ['username']})
+		    	.execute(function(response){
+		    		var viewer = os.osapi.getViewerFromResult(response);
+		    		var username = viewer.username;
+		    		$('input[name=username]').val(username);
+		    		if(username != null && username != "") { // only render flash if there's a username
+		    			preview(username);
+		    		}	    				
+		    });
+		}
+	    // ========================================
+    
+	    // ========================================
+		function preview(username){
+    		var url = "http://static.slidesharecdn.com/swf/multiwidget.swf";
+    			
+ 			$('#preview').html(
+	 			'<div style="width:577px;margin:auto;">' +
+		    		'<object style="margin:0px" width="600" height="428" ' +
+		    			' classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"' +
+		    			' codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0"' +
+		    			' id="slideshow"' +
+		    			'>' +
+		    		'<param name="movie" value="http://static.slidesharecdn.com/swf/multiwidget.swf"/>' +
+		    		'<param name="allowFullScreen" value="true"/>' +
+		    		'<param name="allowScriptAccess" value="always"/>' +
+		    		'<param name="flashVars" value="feedurl=user/'+ username + '&widgettitle=Slides%20by%20'+ username +'"/>' +
+		    		'<embed src="http://static.slidesharecdn.com/swf/multiwidget.swf" ' +
+		    				' name="slideshow" ' +
+		    				' flashVars="feedurl=user/'+ username + '&widgettitle=Slides%20by%20'+ username +'"' + 
+		    				' type="application/x-shockwave-flash"' +
+		    				' pluginspage="http://www.adobe.com/go/getflashplayer"' + 
+		    				' allowscriptaccess="always"' + 
+		    				' allowfullscreen="true"' + 
+		    				' width="600" ' +
+		    				' height="428">' +
+		    				'</embed>' +
+		    		'</object>' +
+		    	'<div class="ss-link">Having trouble seeing this? <a href="http://www.slideshare.net/'+ username + '" target="_top">View at SlideShare</a><div/>' +
+		    	'</div>'
+	 		);   	
+	 		
+	    	$('div.ss-link a').click(function(event){
+	    	    event.preventDefault();
+	    		gotoSlideshare();	    		
+	    	}); //click	 					
+	    }
+	    // ========================================
+	    
+	     // ========================================
+   		gadgets.util.registerOnLoadHandler(function(){
+	    	var viewName=gadgets.views.getCurrentView().getName();
+	    	
+	    	if(viewName=='home'){
+	    		var innerDiv=$('#inner_home_settings').html();
+	    		$('#settings').html(innerDiv);
+	    		
+	    		$('#secondHeader').show();
+	    		
+	    		getUserNameAndPreview('@viewer');
+
+		    	$('span.save').click(function(){
+	    			var username = $('input[name=username]').val();
+	    			osapi.appdata.update({'userId': '@viewer', 'groupId': '@self', 'appId':'@app', 'data':{'username':username} })
+	    				.execute(function(response){
+	    				});
+	    				
+	    				$('#preview').html('');
+	    				if(username != null && username != "") {
+	    					preview(username);
+	    				}
+		    	}); //click
+	    	}
+	    	else{
+	    		getUserNameAndPreview('@owner');
+	    	}	    	
+    	}); // registerOnLoadHandler    	
+    	// ========================================
+    	
+	</script>
+	    	
+	    	
+	<div id="secondHeader" style="display:none; margin:0px 10px 0px 10px;">
+		<span class="slideshare_title"><b>SlideShare: A great way to share presentations</b></span>
+	</div>
+	
+	<div id="settings" style="clear:both; margin:0px 10px 0px 10px;">	 
+    </div>
+    <br>
+    <div id="preview">
+    </div>
+    <br><br>
+    ]]>
+    </Content>
+    <Content type="html" view="home" preferred_height="670" preferred_width="700"><![CDATA[<!--HTML-->	
+		<div id="inner_home_settings" style="display:none;">
+			<p class="slideshare_body">
+			If you already have a SlideShare account and have uploaded presentations, simply follow these steps:<br>
+			</p>
+			<p class="slideshare_body" style="padding-left:20px;">
+			<ol>
+				<li class="slideshare_body">Enter your SlideShare Username below and click Save/Preview. 
+				Any public presentations that you've uploaded to SlideShare will be shown in the preview below.</li>
+				<li class="slideshare_body">Make sure these presentations are the ones you want to share on your profile.</li>
+				<li class="slideshare_body">Click the "Show" link (above, upper right) to make the presentations publicly available within your profile.</li>
+				<li class="slideshare_body">To remove the presentations, delete your SlideShare Username and click Save/Preview. 
+				Make sure to "Hide" your presentations from the public if you delete your SlideShare Username.</li>
+			</ol>
+			</p>
+		    <div class="question">
+				<span class="slideshare_body">SlideShare Username:&nbsp;</span><input type="text" name="username" style="display:inline;width:20em;">
+				&nbsp;&nbsp;&nbsp;</span>
+				<span class="save slideshare_body" style="text-decoration:underline;cursor:pointer;color:#44F; display:inline;" title="Save this Username and preview the presentations.">Save/Preview</span>
+				<br><br>
+				<span class="slideshare_body">Don't have a SlideShare account yet? 
+				Go to <a href="http://www.slideshare.net" target="_blank" style="font-size:12px;text-decoration:none; cursor:pointer;color:#44F;" title="Go to the SlideShare Web site">
+				SlideShare</a> now to create an account and upload presentations.</span>
+			</div>
+		</div>
+		]]>
+	</Content>
+</Module>

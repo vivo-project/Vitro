@@ -99,6 +99,13 @@ public class DatatypeDaoJena extends JenaBaseDao implements DatatypeDao {
        allDatatypes.add(integerD);
        allDatatypesMap.put(integerD.getUri(), integerD);
        
+       Datatype floatD = new Datatype();
+       floatD.setUri(XSD+"float");
+       floatD.setName("float");
+       floatD.setId(index++);
+       allDatatypes.add(floatD);
+       allDatatypesMap.put(floatD.getUri(), floatD);
+       
        Datatype dateTimeD = new Datatype();
        dateTimeD.setUri(XSD+"dateTime");
        dateTimeD.setName("date and time (YYYY-MM-DDThh:mm:ss)");

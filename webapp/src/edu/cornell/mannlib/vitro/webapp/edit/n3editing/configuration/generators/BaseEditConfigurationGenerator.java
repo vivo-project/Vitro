@@ -11,11 +11,11 @@ import org.apache.commons.lang.StringUtils;
 import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.IdModelSelector;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.StandardModelSelector;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 public abstract class BaseEditConfigurationGenerator implements EditConfigurationGenerator {
 
@@ -62,7 +62,7 @@ public abstract class BaseEditConfigurationGenerator implements EditConfiguratio
         //setup the model selectors for query, write and display models on editConfig
         setupModelSelectorsFromVitroRequest(vreq, editConfig);        
         
-        OntModel queryModel = ModelAccess.on(vreq).getJenaOntModel();
+        OntModel queryModel = ModelAccess.on(vreq).getOntModel();
         
         if( editConfig.getSubjectUri() == null)
             editConfig.setSubjectUri( EditConfigurationUtils.getSubjectUri(vreq));

@@ -2,16 +2,21 @@
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.tdb;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.tdb.TDB;
+import com.hp.hpl.jena.query.ReadWrite;
 import com.hp.hpl.jena.tdb.TDBFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
@@ -20,7 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.RDFServiceJena;
 
 /**
- * TODO
+ * An implementation that is based on Jena TDB.
  */
 public class RDFServiceTDB extends RDFServiceJena {
 	private static final Log log = LogFactory.getLog(RDFServiceTDB.class);
@@ -65,13 +70,17 @@ public class RDFServiceTDB extends RDFServiceJena {
 				log.debug("Change Set: " + changeSet);
 			}
 			notifyListenersOfPreChangeEvents(changeSet);
-			
-			applyChangeSetToModel(changeSet, dataset);
-			TDB.sync(dataset);
+
+			dataset.begin(ReadWrite.WRITE);
+			try {
+				applyChangeSetToModel(changeSet, dataset);
+				dataset.commit();
+			} finally {
+				dataset.end();
+			}
 			
 			notifyListenersOfChanges(changeSet);
 			notifyListenersOfPostChangeEvents(changeSet);
-
 			return true;
 		} catch (Exception e) {
 			log.error(e, e);
@@ -79,4 +88,126 @@ public class RDFServiceTDB extends RDFServiceJena {
 		}
 	}
 
+	
+	@Override
+	public void close() {
+		if (this.dataset != null) {
+			dataset.close();
+		}
+	}
+
+	@Override
+	public InputStream sparqlConstructQuery(String query,
+			ModelSerializationFormat resultFormat) throws RDFServiceException {
+		dataset.begin(ReadWrite.READ);
+		try {
+			return super.sparqlConstructQuery(query, resultFormat);
+		} finally {
+			dataset.end();
+		}
+	}
+
+	@Override
+	public InputStream sparqlDescribeQuery(String query,
+			ModelSerializationFormat resultFormat) throws RDFServiceException {
+		dataset.begin(ReadWrite.READ);
+		try {
+			return super.sparqlDescribeQuery(query, resultFormat);
+		} finally {
+			dataset.end();
+		}
+	}
+
+	@Override
+	public InputStream sparqlSelectQuery(String query, ResultFormat resultFormat)
+			throws RDFServiceException {
+		dataset.begin(ReadWrite.READ);
+		try {
+			return super.sparqlSelectQuery(query, resultFormat);
+		} finally {
+			dataset.end();
+		}
+	}
+
+	@Override
+	public boolean sparqlAskQuery(String query) throws RDFServiceException {
+		dataset.begin(ReadWrite.READ);
+		try {
+			return super.sparqlAskQuery(query);
+		} finally {
+			dataset.end();
+		}
+	}
+
+	@Override
+	public List<String> getGraphURIs() throws RDFServiceException {
+		dataset.begin(ReadWrite.READ);
+		try {
+			return super.getGraphURIs();
+		} finally {
+			dataset.end();
+		}
+	}
+
+	@Override
+	public void serializeAll(OutputStream outputStream)
+			throws RDFServiceException {
+		dataset.begin(ReadWrite.READ);
+		try {
+			super.serializeAll(outputStream);
+		} finally {
+			dataset.end();
+		}
+	}
+
+	@Override
+	public void serializeGraph(String graphURI, OutputStream outputStream)
+			throws RDFServiceException {
+		dataset.begin(ReadWrite.READ);
+		try {
+			super.serializeGraph(graphURI, outputStream);
+		} finally {
+			dataset.end();
+		}
+	}
+
+	/**
+	 * TDB has a bug: if given a literal of type xsd:nonNegativeInteger, it
+	 * stores a literal of type xsd:integer.
+	 * 
+	 * To determine whether this serialized graph is equivalent to what's in
+	 * TDB, we need to do the same.
+	 */
+	@Override
+	public boolean isEquivalentGraph(String graphURI,
+			InputStream serializedGraph,
+			ModelSerializationFormat serializationFormat)
+			throws RDFServiceException {
+		return super.isEquivalentGraph(graphURI,
+				adjustForNonNegativeIntegers(serializedGraph),
+				serializationFormat);
+	}
+
+	/**
+	 * Convert all of the references to "nonNegativeInteger" to "integer" in
+	 * this serialized graph.
+	 * 
+	 * This isn't rigorous: it could fail if another property contained the text
+	 * "nonNegativeInteger" in its name, or if that text were used as part of a
+	 * string literal. If that happens before this TDB bug is fixed, we'll need
+	 * to improve this method.
+	 * 
+	 * It also isn't scalable: if we wanted real scalability, we would write to
+	 * a temporary file as we converted.
+	 */
+	private InputStream adjustForNonNegativeIntegers(InputStream serializedGraph)
+			throws RDFServiceException {
+		try {
+			String raw = IOUtils.toString(serializedGraph, "UTF-8");
+			String modified = raw.replace("nonNegativeInteger", "integer");
+			return new ByteArrayInputStream(modified.getBytes("UTF-8"));
+		} catch (IOException e) {
+			throw new RDFServiceException(e);
+		}
+	}
 }

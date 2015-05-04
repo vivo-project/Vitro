@@ -6,7 +6,10 @@ import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mindswap.pellet.jena.PelletReasonerFactory;
+
+import stubs.edu.cornell.mannlib.vitro.webapp.modules.ApplicationStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineStub;
+import stubs.javax.servlet.ServletContextStub;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.OntModelSpec;
@@ -16,10 +19,9 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.vocabulary.OWL;
 
-import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
-public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
+public class SimpleReasonerInversePropertyTest extends SimpleReasonerTBoxHelper {
 	
 	long delay = 50;
   
@@ -30,6 +32,10 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		setLoggerLevel(SimpleReasoner.class, Level.OFF);
 		setLoggerLevel(SimpleReasonerTBoxListener.class, Level.OFF);
 		setLoggerLevel(ABoxRecomputer.class, Level.OFF);
+	}
+
+	@Before public void setup() {
+		ApplicationStub.setup(new ServletContextStub(), new SearchEngineStub());
 	}
 	
     @Test
@@ -46,21 +52,16 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	* basic scenarios around adding abox data
 	* 
 	* Create a Tbox with property P inverseOf property Q.
-    * Pellet will compute TBox inferences. Add a statement
-    * a P b, and verify that b Q a is inferred.
-    * Add a statement c Q d and verify that d Q c 
-	* is inferred. 
+    * Add a statement a P b, and verify that b Q a is inferred.
+    * Add a statement c Q d and verify that d Q c is inferred. 
 	*/
 	public void addABoxAssertion1(boolean sameAs ) {
 
 		// set up the tbox
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
-	    P.setLabel("property P", "en-US");
-		OntProperty Q = tBox.createOntProperty("http://test.vivo/Q");
-		Q.setLabel("property Q", "en-US");
-
-	    P.addInverseOf(Q);
+		OntModel tBox = createTBoxModel(); 
+		OntProperty P = createObjectProperty(tBox, "http://test.vivo/P", "property P");
+		OntProperty Q = createObjectProperty(tBox, "http://test.vivo/Q", "property Q");
+		setInverse(P, Q);
 	            
         // this is the model to receive abox inferences
         Model inf = ModelFactory.createDefaultModel();
@@ -109,14 +110,11 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	public void addABoxAssertion2(boolean sameAs ) {
 
 		// set up the tbox
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		
-		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
-	    P.setLabel("property P", "en-US");
-		OntProperty Q = tBox.createOntProperty("http://test.vivo/Q");
-		Q.setLabel("property Q", "en-US");
-	    P.addInverseOf(Q);
-	    
+		OntModel tBox = createTBoxModel(); 
+		OntProperty P = createObjectProperty(tBox, "http://test.vivo/P", "property P");
+		OntProperty Q = createObjectProperty(tBox, "http://test.vivo/Q", "property Q");
+		setInverse(P, Q);
+	            
         // this is the model to receive abox inferences
         Model inf = ModelFactory.createDefaultModel();
         
@@ -153,13 +151,11 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	public void addABoxAssertion3(boolean sameAs) {
 		
 		// set up the tbox
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
-	    P.setLabel("property P", "en-US");
-		OntProperty Q = tBox.createOntProperty("http://test.vivo/Q");
-		Q.setLabel("property Q", "en-US");
-	    P.addInverseOf(Q);
-	    
+		OntModel tBox = createTBoxModel(); 
+		OntProperty P = createObjectProperty(tBox, "http://test.vivo/P", "property P");
+		OntProperty Q = createObjectProperty(tBox, "http://test.vivo/Q", "property Q");
+		setInverse(P, Q);
+	            
         // this is the model to receive abox inferences
         Model inf = ModelFactory.createDefaultModel();
         
@@ -197,16 +193,13 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	public void addABoxAssertion4( boolean sameAs ) {
 
 		// set up the tbox
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
-	    P.setLabel("property P", "en-US");
-		OntProperty R = tBox.createOntProperty("http://test.vivo/R");
-	    R.setLabel("property R", "en-US");
-		OntProperty Q = tBox.createOntProperty("http://test.vivo/Q");
-		Q.setLabel("property Q", "en-US");
-
-	    R.addEquivalentProperty(P);
-	    P.addInverseOf(Q);
+		OntModel tBox = createTBoxModel(); 
+		OntProperty P = createObjectProperty(tBox, "http://test.vivo/P", "property P");
+		OntProperty Q = createObjectProperty(tBox, "http://test.vivo/Q", "property Q");
+		OntProperty R = createObjectProperty(tBox, "http://test.vivo/R", "property R");
+		setInverse(P, Q);
+		setInverse(R, Q);
+		setEquivalent(R, P);
 	            
         // this is the model to receive abox inferences
         Model inf = ModelFactory.createDefaultModel();
@@ -250,15 +243,12 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	public void removedABoxAssertion1(boolean sameAs) {
 		
 		// set up the tbox
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
-	    P.setLabel("property P", "en-US");
-		OntProperty Q = tBox.createOntProperty("http://test.vivo/Q");
-		Q.setLabel("property Q", "en-US");
-		OntProperty T = tBox.createOntProperty("http://test.vivo/T");
-		Q.setLabel("property T", "en-US");
-	    P.addInverseOf(Q);
-	    P.addInverseOf(T);
+		OntModel tBox = createTBoxModel(); 
+		OntProperty P = createObjectProperty(tBox, "http://test.vivo/P", "property P");
+		OntProperty Q = createObjectProperty(tBox, "http://test.vivo/Q", "property Q");
+		OntProperty T = createObjectProperty(tBox, "http://test.vivo/T", "property T");
+		setInverse(P, Q);
+		setInverse(P, T);
 	            
         // this is the model to receive abox inferences
         Model inf = ModelFactory.createDefaultModel();
@@ -307,20 +297,14 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	public void removedABoxAssertion2(boolean sameAs) {
 		
 		// set up the tbox
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
-	    P.setLabel("property P", "en-US");
-		OntProperty Q = tBox.createOntProperty("http://test.vivo/Q");
-		Q.setLabel("property Q", "en-US");
-		OntProperty T = tBox.createOntProperty("http://test.vivo/T");
-		Q.setLabel("property T", "en-US");
-	    P.addInverseOf(Q);
-	    P.addEquivalentProperty(T);
-       
-	    // not clear what these will do
-	    tBox.rebind();
-	    tBox.prepare();
-	    
+		OntModel tBox = createTBoxModel(); 
+		OntProperty P = createObjectProperty(tBox, "http://test.vivo/P", "property P");
+		OntProperty Q = createObjectProperty(tBox, "http://test.vivo/Q", "property Q");
+		OntProperty T = createObjectProperty(tBox, "http://test.vivo/T", "property T");
+		setInverse(P, Q);
+		setInverse(T, Q);
+		setEquivalent(P, T);
+
         // this is the model to receive abox inferences
         Model inf = ModelFactory.createDefaultModel();
         
@@ -360,16 +344,12 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	 */ 
 	public void removedABoxAssertion3(boolean sameAs) {
 		
-		//set up the tbox
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
-	    P.setLabel("property P", "en-US");
-		OntProperty Q = tBox.createOntProperty("http://test.vivo/Q");
-		Q.setLabel("property Q", "en-US");
-	    P.addInverseOf(Q);
-	    
-	    tBox.rebind(); // not sure what effect this has
-	    
+		// set up the tbox
+		OntModel tBox = createTBoxModel(); 
+		OntProperty P = createObjectProperty(tBox, "http://test.vivo/P", "property P");
+		OntProperty Q = createObjectProperty(tBox, "http://test.vivo/Q", "property Q");
+		setInverse(P, Q);
+
         // this is the model to receive abox inferences
         Model inf = ModelFactory.createDefaultModel();
         
@@ -410,12 +390,10 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	 */
 	public void addTBoxInverseAssertion1(boolean sameAs) throws InterruptedException {
          
-		// Set up the TBox. 
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-		OntProperty P = tBox.createOntProperty("http://test.vivo/P");
-	    P.setLabel("property P", "en-US");
-		OntProperty Q = tBox.createOntProperty("http://test.vivo/Q");
-		Q.setLabel("property Q", "en-US");
+		// set up the tbox
+		OntModel tBox = createTBoxModel(); 
+		OntProperty P = createObjectProperty(tBox, "http://test.vivo/P", "property P");
+		OntProperty Q = createObjectProperty(tBox, "http://test.vivo/Q", "property Q");
 
         // this is the model to receive abox inferences
         Model inf = ModelFactory.createDefaultModel();
@@ -444,7 +422,7 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
         // Assert P and Q as inverses and wait for
 	    // SimpleReasonerTBoxListener thread to end
 	    
-	    Q.addInverseOf(P);
+		setInverse(P, Q);
 
 	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
 	    	Thread.sleep(delay);
@@ -473,14 +451,11 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	 */
 	public void removeTBoxInverseAssertion1(boolean sameAs) throws InterruptedException {
 				
-		// set up the tbox.
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-
-		OntProperty P = tBox.createOntProperty("http://test.vivo/propP");
-	    P.setLabel("property P", "en-US");
-		OntProperty Q = tBox.createOntProperty("http://test.vivo/propQ");
-		Q.setLabel("property Q", "en-US");
-	    Q.addInverseOf(P);
+		// set up the tbox
+		OntModel tBox = createTBoxModel(); 
+		OntProperty P = createObjectProperty(tBox, "http://test.vivo/P", "property P");
+		OntProperty Q = createObjectProperty(tBox, "http://test.vivo/Q", "property Q");
+		setInverse(P, Q);
 	    
 		// this is the model to receive abox inferences
 		Model inf = ModelFactory.createDefaultModel();
@@ -505,7 +480,7 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
         // Remove P and Q inverse relationship and wait for
 	    // SimpleReasoner TBox thread to end.
 		
-	    Q.removeInverseProperty(P);
+	    removeInverse(P, Q);
 	    
 	    while (!VitroBackgroundThread.getLivingThreads().isEmpty()) {
 	    	Thread.sleep(delay);
@@ -532,20 +507,14 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 	 */
 	public void recomputeABox1(boolean sameAs) throws InterruptedException {
 				
-        // set up tbox
-		OntModel tBox = ModelFactory.createOntologyModel(PelletReasonerFactory.THE_SPEC); 
-
-		OntProperty P = tBox.createOntProperty("http://test.vivo/propP");
-	    P.setLabel("property P", "en-US");
-		OntProperty Q = tBox.createOntProperty("http://test.vivo/propQ");
-		Q.setLabel("property Q", "en-US");
-	    Q.addInverseOf(P);
-	    
-		OntProperty X = tBox.createOntProperty("http://test.vivo/propX");
-	    P.setLabel("property X", "en-US");
-		OntProperty Y = tBox.createOntProperty("http://test.vivo/propY");
-		Q.setLabel("property Y", "en-US");
-		X.addInverseOf(Y);
+		// set up the tbox
+		OntModel tBox = createTBoxModel(); 
+		OntProperty P = createObjectProperty(tBox, "http://test.vivo/P", "property P");
+		OntProperty Q = createObjectProperty(tBox, "http://test.vivo/Q", "property Q");
+		setInverse(P, Q);
+		OntProperty X = createObjectProperty(tBox, "http://test.vivo/X", "property X");
+		OntProperty Y = createObjectProperty(tBox, "http://test.vivo/Y", "property Y");
+		setInverse(X, Y);
 
 		// create abox and abox inf model and register simplereasoner
 		// with abox.
@@ -565,8 +534,8 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
         aBox.add(c,X,d);
 	    
 		Assert.assertTrue(inf.contains(b,Q,a));
-		Assert.assertTrue(inf.contains(d,Y,c));				
-                
+		Assert.assertTrue(inf.contains(d,Y,c));		
+		
         inf.remove(b,Q,a);
         inf.remove(d,Y,c);
         
@@ -581,7 +550,7 @@ public class SimpleReasonerInversePropertyTest extends AbstractTestClass {
 		Assert.assertTrue(inf.contains(b,Q,a));
 		Assert.assertTrue(inf.contains(d,Y,c));				
 	}
-	
+
 	//==================================== Utility methods ====================
 	SimpleReasonerTBoxListener getTBoxListener(SimpleReasoner simpleReasoner) {
 	    return new SimpleReasonerTBoxListener(simpleReasoner, new Exception().getStackTrace()[1].getMethodName());

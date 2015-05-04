@@ -616,6 +616,10 @@ public class IndividualJena extends IndividualImpl implements Individual {
     		log.error(e, e);
     	}
     }
-    
+
+	@Override
+	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
+		webappDaoFactory.getObjectPropertyStatementDao().resolveAsFauxPropertyStatement(stmt);
+	}
     
 }

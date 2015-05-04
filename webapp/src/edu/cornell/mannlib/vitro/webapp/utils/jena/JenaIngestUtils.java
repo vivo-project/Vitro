@@ -615,8 +615,17 @@ public class JenaIngestUtils {
         }    
     }
 
+    /**
+     * Merges statements about resource uri2 into resource uri1 and delete uri2.
+     * @param uri1 The resource to merge to
+     * @param uri2 The resource to merge from
+     * @param baseOntModel The model containing the relevant statements
+     * @param tboxOntModel The model containing class and property data
+     * @param usePrimaryLabelOnly If true, discard rdfs:labels from uri2.  Otherwise retain.
+     * @return
+     */
     public MergeResult doMerge(String uri1, String uri2, OntModel baseOntModel, 
-            OntModel tboxOntModel, String usePrimaryLabelOnly){
+            OntModel tboxOntModel, boolean usePrimaryLabelOnly){
 
         boolean functionalPresent = false;
 
@@ -660,8 +669,7 @@ public class JenaIngestUtils {
                 // part of the primary resource.
                 leftoverModel.add(res2, stmt.getPredicate(), stmt.getObject());
                 functionalPresent = true;
-            } else if (stmt.getPredicate().equals(RDFS.label) &&
-                    usePrimaryLabelOnly!=null && !usePrimaryLabelOnly.isEmpty()) {
+            } else if (stmt.getPredicate().equals(RDFS.label) && usePrimaryLabelOnly) {
                 // if the checkbox is checked, use primary resource rdfs:labels only  
                 // and dump secondary resource rdfs:labels into leftoverModel
                 leftoverModel.add(res2, stmt.getPredicate(), stmt.getObject());

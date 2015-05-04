@@ -12,19 +12,18 @@ import java.net.URLDecoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.UnavailableException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorage;
-import edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.FileInfo;
+import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
 
 /**
  * <p>
@@ -59,16 +58,8 @@ public class FileServingServlet extends VitroHttpServlet {
 	 */
 	@Override
 	public void init() throws ServletException {
-		Object o = getServletContext().getAttribute(
-				FileStorageSetup.ATTRIBUTE_NAME);
-		if (o instanceof FileStorage) {
-			fileStorage = (FileStorage) o;
-		} else {
-			throw new UnavailableException(
-					"The ServletContext did not hold a FileStorage object at '"
-							+ FileStorageSetup.ATTRIBUTE_NAME
-							+ "'; found this instead: " + o);
-		}
+		super.init();
+		fileStorage = ApplicationUtils.instance().getFileStorage();
 	}
 
 	@Override
@@ -122,17 +113,21 @@ public class FileServingServlet extends VitroHttpServlet {
 			while (-1 != (howMany = in.read(buffer))) {
 				out.write(buffer, 0, howMany);
 			}
+		} catch (IOException e) {
+			log.warn("Failed to serve the file", e);
 		} finally {
 			try {
 				in.close();
 			} catch (Exception e) {
-				e.printStackTrace();
+				log.warn("Serving " + request.getRequestURI()
+						+ ". Failed to close input stream.", e);
 			}
 			if (out != null) {
 				try {
 					out.close();
 				} catch (Exception e) {
-					e.printStackTrace();
+					log.warn("Serving " + request.getRequestURI()
+							+ ". Failed to close output stream.", e);
 				}
 			}
 		}
@@ -219,10 +214,6 @@ public class FileServingServlet extends VitroHttpServlet {
 	private static class FileServingException extends Exception {
 		public FileServingException(String message) {
 			super(message);
-		}
-
-		public FileServingException(String message, Throwable cause) {
-			super(message, cause);
 		}
 	}
 

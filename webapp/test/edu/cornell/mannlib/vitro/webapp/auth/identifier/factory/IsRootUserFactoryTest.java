@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDaoStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
+import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
 import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
 import stubs.javax.servlet.http.HttpSessionStub;
@@ -19,7 +20,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.common.IsRootUser;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 
 /**
  * Can we tell whether a user is logged in as root?
@@ -57,7 +57,7 @@ public class IsRootUserFactoryTest extends AbstractTestClass {
 		wdf.setUserAccountsDao(uaDao);
 
 		ctx = new ServletContextStub();
-		ModelAccess.on(ctx).setWebappDaoFactory(wdf);
+		new ModelAccessFactoryStub().get(ctx).setWebappDaoFactory(wdf);
 
 		session = new HttpSessionStub();
 		session.setServletContext(ctx);

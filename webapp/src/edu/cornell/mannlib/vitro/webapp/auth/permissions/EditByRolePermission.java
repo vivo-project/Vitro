@@ -2,12 +2,10 @@
 
 package edu.cornell.mannlib.vitro.webapp.auth.permissions;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper;
+import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionBean;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractDataPropertyStatementAction;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.propstmt.AbstractObjectPropertyStatementAction;
@@ -27,10 +25,8 @@ public class EditByRolePermission extends Permission {
 
 	private final String roleName;
 	private final RoleLevel roleLevel;
-	private final ServletContext ctx;
 
-	public EditByRolePermission(String roleName, RoleLevel roleLevel,
-			ServletContext ctx) {
+	public EditByRolePermission(String roleName, RoleLevel roleLevel) {
 		super(NAMESPACE + roleName);
 
 		if (roleName == null) {
@@ -39,13 +35,9 @@ public class EditByRolePermission extends Permission {
 		if (roleLevel == null) {
 			throw new NullPointerException("roleLevel may not be null.");
 		}
-		if (ctx == null) {
-			throw new NullPointerException("context may not be null.");
-		}
 
 		this.roleName = roleName;
 		this.roleLevel = roleLevel;
-		this.ctx = ctx;
 	}
 
 	/**
@@ -80,8 +72,7 @@ public class EditByRolePermission extends Permission {
 	private boolean isAuthorized(AbstractDataPropertyStatementAction action) {
 		String subjectUri = action.getSubjectUri();
 		Property predicate = action.getPredicate();
-		return canModifyResource(subjectUri)
-				&& canModifyPredicate(predicate);
+		return canModifyResource(subjectUri) && canModifyPredicate(predicate);
 	}
 
 	/**
@@ -92,19 +83,18 @@ public class EditByRolePermission extends Permission {
 		String subjectUri = action.getSubjectUri();
 		Property predicate = action.getPredicate();
 		String objectUri = action.getObjectUri();
-		return canModifyResource(subjectUri)
-				&& canModifyPredicate(predicate)
+		return canModifyResource(subjectUri) && canModifyPredicate(predicate)
 				&& canModifyResource(objectUri);
 	}
 
 	private boolean canModifyResource(String resourceUri) {
-		return PropertyRestrictionPolicyHelper.getBean(ctx).canModifyResource(
-				resourceUri, roleLevel);
+		return PropertyRestrictionBean.getBean().canModifyResource(resourceUri,
+				roleLevel);
 	}
 
 	private boolean canModifyPredicate(Property predicate) {
-		return PropertyRestrictionPolicyHelper.getBean(ctx).canModifyPredicate(
-				predicate, roleLevel);
+		return PropertyRestrictionBean.getBean().canModifyPredicate(predicate,
+				roleLevel);
 	}
 
 	@Override

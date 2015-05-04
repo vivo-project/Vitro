@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+
+<!-- ====================================================================== 
+     A tool to convert SDB data into TDB.
+     ====================================================================== -->
+
+<project name="SDB-to-TDB" default="describe">
+
+	<property name="working.dir" location=".work" />
+	<property name="src.dir" location="src" />
+	<property name="lib.dir" location="lib" />
+	<property name="classes.dir" location="${working.dir}/classes" />
+	<property name="jar.file" location="${working.dir}/sdb2tdb.jar" />
+
+	<!-- ================================= 
+	      target: describe              
+	     ================================= -->
+	<target name="describe"
+	        description="--> Describe the targets (this is the default).">
+		<echo>
+	all - Compiles the tool ad packs it into a JAR
+	    </echo>
+	</target>
+
+	<!-- ================================= 
+	      target: all              
+	     ================================= -->
+	<target name="all"
+	        depends="clean, jar"
+	        description="Build from scratch and run the migration.">
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: clean                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="clean">
+		<delete dir="${working.dir}" />
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: prepare                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="prepare">
+		<mkdir dir="${working.dir}" />
+		<mkdir dir="${classes.dir}" />
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: compile                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="compile" depends="prepare">
+		<path id="main.compile.classpath">
+			<fileset dir="${lib.dir}" includes="*.jar" />
+		</path>
+
+		<javac srcdir="${src.dir}"
+		       destdir="${classes.dir}"
+		       debug="true"
+		       deprecation="true"
+		       encoding="UTF8"
+		       includeantruntime="false"
+		       optimize="true"
+		       source="1.7">
+			<classpath refid="main.compile.classpath" />
+		</javac>
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: jar                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="jar" depends="compile">
+		<jar destfile="${jar.file}">
+			<manifest>
+				<attribute name="Main-Class"
+				           value="edu.cornell.mannlib.vitro.utilities.sdb2tdb.Sdb2Tdb" />
+			</manifest>
+			<fileset dir="${classes.dir}" />
+			<archives>
+				<zips>
+					<fileset dir="${lib.dir}" includes="**/*.jar" />
+				</zips>
+			</archives>
+		</jar>
+	</target>
+
+</project>
+

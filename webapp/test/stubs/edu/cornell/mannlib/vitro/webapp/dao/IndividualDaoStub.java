@@ -130,9 +130,9 @@ public class IndividualDaoStub implements IndividualDao {
 	}
 
 	@Override
-	public Iterator<String> getAllOfThisTypeIterator() {
+	public Collection<String> getAllIndividualUris() {
 		throw new RuntimeException(
-				"IndividualDaoStub.getAllOfThisTypeIterator() not implemented.");
+				"IndividualDaoStub.getAllIndividualUris() not implemented.");
 	}	
 
 	@Override

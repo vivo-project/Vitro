@@ -216,8 +216,9 @@ public class ObjectPropertyStatementDaoStub implements
 
 	@Override
 	public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
-			String subjectUri, String propertyUri, String objectKey, String domainUri, String rangeUri,
-			String query, Set<String> constructQueries, String sortDir) {
+			String subjectUri, String propertyUri, String objectKey,
+			String domainUri, String rangeUri, String query,
+			Set<String> constructQueries, String sortDir) {
 		throw new RuntimeException(
 				"ObjectPropertyStatementDaoStub.getObjectPropertyStatementsForIndividualByProperty() not implemented.");
 	}
@@ -227,6 +228,12 @@ public class ObjectPropertyStatementDaoStub implements
 			String subjectUri) {
 		throw new RuntimeException(
 				"ObjectPropertyStatementDaoStub.getMostSpecificTypesInClassgroupsForIndividual() not implemented.");
+	}
+
+	@Override
+	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
+		throw new RuntimeException(
+				"ObjectPropertyStatementDaoStub.resolveAsFauxPropertyStatement() not implemented.");
 	}
 
 }

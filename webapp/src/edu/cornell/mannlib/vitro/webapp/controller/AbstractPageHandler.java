@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,14 +22,13 @@ import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18nBundle;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 /**
  * A base class with some utility routines for page handler (created by
@@ -56,8 +58,8 @@ public abstract class AbstractPageHandler {
 		this.i18n = I18n.bundle(vreq);
 		this.ctx = vreq.getSession().getServletContext();
 
-		userAccountsModel = ModelAccess.on(ctx).getUserAccountsModel();
-		unionModel = ModelAccess.on(ctx).getOntModel(ModelID.UNION_FULL);
+		userAccountsModel = ModelAccess.on(ctx).getOntModel(USER_ACCOUNTS);
+		unionModel = ModelAccess.on(ctx).getOntModel(FULL_UNION);
 
 		WebappDaoFactory wdf = ModelAccess.on(ctx).getWebappDaoFactory();
 		userAccountsDao = wdf.getUserAccountsDao();

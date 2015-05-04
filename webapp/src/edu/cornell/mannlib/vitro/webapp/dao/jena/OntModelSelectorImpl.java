@@ -12,7 +12,7 @@ public class OntModelSelectorImpl implements OntModelSelector {
 	private OntModel fullModel;
 	private OntModel tboxModel;
 	private OntModel userAccountsModel;
-	
+
 	@Override
 	public OntModel getABoxModel() {
 		return this.aboxModel;
@@ -42,11 +42,11 @@ public class OntModelSelectorImpl implements OntModelSelector {
 	public OntModel getUserAccountsModel() {
 		return this.userAccountsModel;
 	}
-		
+
 	public void setABoxModel(OntModel m) {
 		this.aboxModel = m;
 	}
-		
+
 	public void setApplicationMetadataModel(OntModel m) {
 		this.applicationMetadataModel = m;
 	}
@@ -54,17 +54,26 @@ public class OntModelSelectorImpl implements OntModelSelector {
 	public void setDisplayModel(OntModel m) {
 		this.displayModel = m;
 	}
-	
+
 	public void setTBoxModel(OntModel m) {
 		this.tboxModel = m;
 	}
-	
+
 	public void setUserAccountsModel(OntModel m) {
 		this.userAccountsModel = m;
 	}
-	
+
 	public void setFullModel(OntModel m) {
 		this.fullModel = m;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "OntModelSelectorImpl[abox=" + hashHex(aboxModel) + ", tbox="
+				+ hashHex(tboxModel) + ", full=" + hashHex(fullModel) + "]";
+	}
+
+	private String hashHex(Object o) {
+		return (o == null) ? "00000000" : Integer.toString(o.hashCode(), 16);
+	}
 }

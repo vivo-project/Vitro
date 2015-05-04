@@ -170,5 +170,5 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
             }
         }
     }
-    
+
 }

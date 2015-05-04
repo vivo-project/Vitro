@@ -46,6 +46,13 @@
 //        this.toggleSpan = $('span#propsToggle');
 //        this.toggleLink = $('span#propsToggle').find('a');
         noProps = new Boolean;
+		this.range = ""
+		if ( propertyType == "object" ) {
+			this.range = i18nStrings.rangeClass;
+		}
+		else {
+			this.range = i18nStrings.rangeDataType;
+		}
     },
 
     bindEventListeners: function() {
@@ -148,7 +155,7 @@
             objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.domainClass + ":</td><td>" 
                                                + (this.data.domainVClass.length > 0 ? this.data.domainVClass : "none" ) + " ";
 
-            objectPropHierarchyUtils.classHtml += "<span class='rangeClass'>" + i18nStrings.rangeClass + ":</span>" 
+            objectPropHierarchyUtils.classHtml += "<span class='rangeClass'>" + objectPropHierarchyUtils.range + ":</span>" 
                                                + (this.data.rangeVClass.length > 0 ? this.data.rangeVClass : "none" ) + "</td></tr>";
 
             if ( descendants.length > 1 ) {
@@ -209,7 +216,7 @@
             childDetails += "<tr><td class='classDetail'>" + i18nStrings.domainClass + ":</td><td>" 
                                                + (this.data.domainVClass.length > 0 ? this.data.domainVClass : "none" ) + " ";
 
-            childDetails += "<span class='rangeClass'>" + i18nStrings.rangeClass + ":</span>" 
+            childDetails += "<span class='rangeClass'>" + objectPropHierarchyUtils.range + ":</span>" 
                                                + (this.data.rangeVClass.length > 0 ? this.data.rangeVClass : "none" ) + "</td></tr>";
 
             if ( this.children ) {
@@ -300,7 +307,7 @@
             objectPropHierarchyUtils.classHtml += "<tr><td class='classDetail'>" + i18nStrings.domainClass + ":</td><td>" 
                                          + (this.data.domainVClass.length > 0 ? this.data.domainVClass : "none" ) + " ";
 
-            objectPropHierarchyUtils.classHtml += "<span class='rangeClass'>" + i18nStrings.rangeClass + ":</span>" 
+            objectPropHierarchyUtils.classHtml += "<span class='rangeClass'>" + objectPropHierarchyUtils.range + ":</span>" 
                                          + (this.data.rangeVClass.length > 0 ? this.data.rangeVClass : "none" ) + "</td></tr>";
 
             objectPropHierarchyUtils.classHtml += "</table>";

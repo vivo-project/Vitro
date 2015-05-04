@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ReasoningOption.ASSERTIONS_ONLY;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,10 +27,10 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 public class VclassEditController extends BaseEditController {
 	
@@ -45,7 +47,7 @@ public class VclassEditController extends BaseEditController {
         EditProcessObject epo = super.createEpo(request, FORCE_NEW);
         request.setAttribute("epoKey", epo.getKey());
 
-        VClassDao vcwDao = ModelAccess.on(getServletContext()).getBaseWebappDaoFactory().getVClassDao();
+        VClassDao vcwDao = ModelAccess.on(getServletContext()).getWebappDaoFactory(ASSERTIONS_ONLY).getVClassDao();
         VClass vcl = (VClass)vcwDao.getVClassByURI(request.getParameter("uri"));
         
         if (vcl == null) {
@@ -149,7 +151,7 @@ public class VclassEditController extends BaseEditController {
         request.setAttribute("formSelect",formSelect);
 
         // if supported, we want to show only the asserted superclasses and subclasses.
-        VClassDao vcDao = ModelAccess.on(getServletContext()).getBaseWebappDaoFactory().getVClassDao();
+        VClassDao vcDao = ModelAccess.on(getServletContext()).getWebappDaoFactory(ASSERTIONS_ONLY).getVClassDao();
         VClassDao displayVcDao = ModelAccess.on(getServletContext()).getWebappDaoFactory().getVClassDao();
         
         List<VClass> superVClasses = getVClassesForURIList(

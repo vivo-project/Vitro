@@ -58,7 +58,8 @@ public class LoginWidget extends Widget {
         EXTERNAL_AUTH_URL("externalAuthUrl"),
         CANCEL_URL("cancelUrl"),
         SITE_NAME("siteName"),
-        MINIMUM_PASSWORD_LENGTH("minimumPasswordLength");
+        MINIMUM_PASSWORD_LENGTH("minimumPasswordLength"),
+    	MAXIMUM_PASSWORD_LENGTH("maximumPasswordLength");
 
         private final String variableName;
         
@@ -173,6 +174,7 @@ public class LoginWidget extends Widget {
         values.put(TemplateVariable.FORM_ACTION.toString(), getAuthenticateUrl(request));
         values.put(TemplateVariable.CANCEL_URL.toString(), getCancelUrl(request));
         values.put(TemplateVariable.MINIMUM_PASSWORD_LENGTH.toString(), UserAccount.MIN_PASSWORD_LENGTH);
+        values.put(TemplateVariable.MAXIMUM_PASSWORD_LENGTH.toString(), UserAccount.MAX_PASSWORD_LENGTH);
 
         String errorMessage = bean.getErrorMessageAndClear();
         if (!errorMessage.isEmpty()) {

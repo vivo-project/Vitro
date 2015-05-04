@@ -210,9 +210,6 @@ article.property ul.subclass-property-list li {
     padding-right: 1px;
     vertical-align: middle;
 }
-.delete-individual {
-    vertical-align: middle;
-}
 .edit-mainImage {
     position: absolute;
     background: rgba(255, 255, 255, 0.6);
@@ -232,7 +229,8 @@ a.edit-mainImage img.edit-individual {
     background: rgba(255, 255, 255, 0.6);
     padding: 0 6px 0 8px;
 }
-.middle {
+.middle,
+.delete-individual {
     vertical-align: middle;
 }
 a.more-less {
@@ -293,11 +291,16 @@ ul.tinyMCEDisc {
 ol.tinyMCENumeric {
     list-style-type: decimal;
 }
-ul.tinyMCEDisc li {
-    padding: 0 !important;
-    margin-left: 30px;
-}
+ul.tinyMCEDisc li, 
 ol.tinyMCENumeric li {
     padding: 0 !important;
     margin-left: 30px;
+}
+img.invalidFormatImg {
+	 padding-left:8px;
+	 vertical-align:middle;
+}
+.invalidFormatText {
+	 font-size:10px;
+	 color:#A12424;
 }

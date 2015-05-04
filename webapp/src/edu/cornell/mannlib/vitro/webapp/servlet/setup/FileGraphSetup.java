@@ -2,9 +2,14 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONTENT;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,11 +35,13 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 // This ContextListener must run after the JenaDataSourceSetup ContextListener
@@ -46,7 +53,6 @@ public class FileGraphSetup implements ServletContextListener {
     private static final String ABOX = "abox";
     private static final String TBOX = "tbox";
     private static final String FILEGRAPH = "filegraph";
-    private static final String PROPERTY_VITRO_HOME = "vitro.home";
 
     public static final String FILEGRAPH_URI_ROOT = "http://vitro.mannlib.cornell.edu/filegraph/";
     
@@ -63,32 +69,29 @@ public class FileGraphSetup implements ServletContextListener {
 
         boolean aboxChanged = false; // indicates whether any ABox file graph model has changed
         boolean tboxChanged = false; // indicates whether any TBox file graph model has changed
-        OntModelSelector baseOms = null;
 
         ServletContext ctx = sce.getServletContext();
         
         try {
             OntDocumentManager.getInstance().setProcessImports(true);
-            baseOms = ModelAccess.on(ctx).getBaseOntModelSelector();
-            Dataset dataset = JenaDataSourceSetupBase.getStartupDataset(ctx);
-            RDFServiceModelMaker maker = new RDFServiceModelMaker(RDFServiceUtils.getRDFServiceFactory(ctx));
+            Dataset dataset = ModelAccess.on(ctx).getDataset(); 
+			RDFService rdfService = ModelAccess.on(ctx).getRDFService(CONTENT);
 
             // ABox files
             Set<Path> paths = getFilegraphPaths(ctx, RDF, ABOX, FILEGRAPH);
 
             cleanupDB(dataset, pathsToURIs(paths, ABOX), ABOX);
 
-            OntModel aboxBaseModel = baseOms.getABoxModel();
             // Just update the ABox filegraphs in the DB; don't attach them to a base model.
-            aboxChanged = readGraphs(paths, maker, ABOX, /* aboxBaseModel */ null);		
+            aboxChanged = readGraphs(paths, rdfService, ABOX, /* aboxBaseModel */ null);		
 
             // TBox files
             paths = getFilegraphPaths(ctx, RDF, TBOX, FILEGRAPH);
 
             cleanupDB(dataset, pathsToURIs(paths, TBOX),TBOX);
 
-            OntModel tboxBaseModel = baseOms.getTBoxModel();
-            tboxChanged = readGraphs(paths, maker, TBOX, tboxBaseModel);
+            OntModel tboxBaseModel = ModelAccess.on(ctx).getOntModel(ModelNames.TBOX_ASSERTIONS);
+            tboxChanged = readGraphs(paths, rdfService, TBOX, tboxBaseModel);
         } catch (ClassCastException cce) {
             String errMsg = "Unable to cast servlet context attribute to the appropriate type " + cce.getLocalizedMessage();
             log.error(errMsg);
@@ -99,25 +102,17 @@ public class FileGraphSetup implements ServletContextListener {
             OntDocumentManager.getInstance().setProcessImports(false);
         }
 
-        /*
-        if (isUpdateRequired(sce.getServletContext()))  {
-            log.info("mostSpecificType will be computed because a knowledge base migration was performed." );
-            SimpleReasonerSetup.setMSTComputeRequired(sce.getServletContext());
-        } else 
-        */
-        
-        if ( (aboxChanged || tboxChanged) && !isUpdateRequired(sce.getServletContext())) {
+        if ( (aboxChanged || tboxChanged) && !isUpdateRequired(ctx)) {
             log.info("a full recompute of the Abox will be performed because" +
                     " the filegraph abox(s) and/or tbox(s) have changed or are being read for the first time." );
-            SimpleReasonerSetup.setRecomputeRequired(sce.getServletContext(), SimpleReasonerSetup.RecomputeMode.BACKGROUND);
+            SimpleReasonerSetup.setRecomputeRequired(ctx, SimpleReasonerSetup.RecomputeMode.BACKGROUND);
         }
     }
 
 	private Set<Path> getFilegraphPaths(ServletContext ctx, String... strings) {
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
-		ConfigurationProperties props = ConfigurationProperties.getBean(ctx);
-		String homeDirProperty = props.getProperty(PROPERTY_VITRO_HOME);
+		String homeDirProperty = ApplicationUtils.instance().getHomeDirectory().getPath().toString();
 		Path filegraphDir = Paths.get(homeDirProperty, strings);
 
 		Set<Path> paths = new TreeSet<>();
@@ -142,14 +137,6 @@ public class FileGraphSetup implements ServletContextListener {
 	}
 
 	/*
-	 * Reads graphs without using submodels to separate filegraph content from the
-	 * base model.
-	 */
-	public boolean readGraphs(Set<Path> pathSet, RDFServiceModelMaker dataset, String type, OntModel baseModel) {
-	    return readGraphs(pathSet, dataset, type, baseModel, true);
-	}
-	
-	/*
      * Reads the graphs stored as files in sub-directories of 
      *   1. updates the SDB store to reflect the current contents of the graph.
      *   2. adds the graph as an in-memory submodel of the base in-memory graph 
@@ -157,7 +144,7 @@ public class FileGraphSetup implements ServletContextListener {
      * Note: no connection needs to be maintained between the in-memory copy of the
      * graph and the DB copy.
      */
-    public boolean readGraphs(Set<Path> pathSet, RDFServiceModelMaker dataset, String type, OntModel baseModel, boolean useSubmodels) {
+    private boolean readGraphs(Set<Path> pathSet, RDFService rdfService, String type, OntModel baseModel) {
 
         int count = 0;
 
@@ -177,20 +164,18 @@ public class FileGraphSetup implements ServletContextListener {
                         model.read( fis, null, "N3" );
                     } else if ( fn.endsWith(".owl") || fn.endsWith(".rdf") || fn.endsWith(".xml") ) {
                         model.read( fis, null, "RDF/XML" );
+                    } else if ( fn.endsWith(".md") ) {
+                    	// Ignore markdown files - documentation.
                     } else {
                         log.warn("Ignoring " + type + " file graph " + p + " because the file extension is unrecognized.");
                     }
 
                     if ( !model.isEmpty() && baseModel != null ) {
-                        if (useSubmodels) {
-                            baseModel.addSubModel(model);
-                        } else {
-                            baseModel.add(model);
-                        }
+                        baseModel.addSubModel(model);
                         log.debug("Attached file graph as " + type + " submodel " + p.getFileName());
                     } 
 
-                    modelChanged = modelChanged | updateGraphInDB(dataset, model, type, p);
+                    modelChanged = modelChanged | updateGraphInDB(rdfService, model, type, p);
 
                 } catch (Exception ioe) {
                     log.error("Unable to process file graph " + p, ioe);
@@ -224,25 +209,28 @@ public class FileGraphSetup implements ServletContextListener {
      * Otherwise, if a graph with the given name is in the DB and is isomorphic with
      * the graph that was read from the files system, then do nothing. 
      */
-    public boolean updateGraphInDB(RDFServiceModelMaker dataset, Model fileModel, String type, Path path) {
+    public boolean updateGraphInDB(RDFService rdfService, Model fileModel, String type, Path path) throws RDFServiceException {
         String graphURI = pathToURI(path,type);
-        Model dbModel = dataset.getModel(graphURI);
-        boolean modelChanged = false;
         
-        boolean isIsomorphic = dbModel.isIsomorphicWith(fileModel);
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        fileModel.write(buffer, "N-TRIPLE");
+		InputStream inStream = new ByteArrayInputStream(buffer.toByteArray());
+		if (rdfService.isEquivalentGraph(graphURI, inStream, ModelSerializationFormat.NTRIPLE)) {
+			return false;
+		}
         
-        if (dbModel.isEmpty()  && !fileModel.isEmpty()) {
-            dbModel.add(fileModel);
-            modelChanged = true;
-        } else if (!isIsomorphic) {
-            log.info("Updating " + path + " because graphs are not isomorphic");
-            log.info("dbModel: " + dbModel.size() + " ; fileModel: " + fileModel.size());
-            dbModel.removeAll();
-            dbModel.add(fileModel);
-            modelChanged = true;
-        }
+		Model dbModel = new RDFServiceDataset(rdfService).getNamedModel(graphURI);
+		if (log.isDebugEnabled()) {
+			log.debug(String.format(
+					"%s %s dbModel size is %d, fileModel size is %d", type,
+					path.getFileName(), dbModel.size(), fileModel.size()));
+		}
 
-        return modelChanged;
+		log.info("Updating " + path + " because graphs are not isomorphic");
+		log.info("dbModel: " + dbModel.size() + " ; fileModel: " + fileModel.size());
+		dbModel.removeAll();
+		dbModel.add(fileModel);
+		return true;
     }
 
     /*

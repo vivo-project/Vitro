@@ -23,6 +23,8 @@ import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 
@@ -33,6 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayModelDao;
+import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.MenuDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
@@ -47,10 +50,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.pellet.PelletListener;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.URIUtils;
 
 public class WebappDaoFactoryJena implements WebappDaoFactory {
@@ -70,8 +72,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     
     protected WebappDaoFactoryConfig config;
     
-    protected PelletListener pelletListener;
-
     protected String userURI;
 	
 	private Map<String,String> properties = new HashMap<String,String>();
@@ -158,11 +158,11 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         OntModel union = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM);        
         if (assertions != null) {
             dataset.addNamedModel(
-            		JenaDataSourceSetupBase.JENA_DB_MODEL, assertions);
+            		ModelNames.ABOX_ASSERTIONS, assertions);
             union.addSubModel(assertions);
         } 
         if (inferences != null) {
-            dataset.addNamedModel(JenaDataSourceSetupBase.JENA_INF_MODEL, 
+            dataset.addNamedModel(ModelNames.ABOX_INFERENCES, 
                     inferences);
             union.addSubModel(inferences);
         }
@@ -176,39 +176,65 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
 		return this.properties;
 	}
 
-    @Override
+	@Override
 	public String checkURI(String uriStr) {
-    	return checkURI(uriStr, true);
-    }
+		String errorMessage = checkURIForValidity(uriStr);
+		if (errorMessage != null) {
+			return errorMessage;
+		}
+
+		if (this.hasExistingURI(uriStr)) {
+			return "URI is already in use. Please enter another URI. ";
+		}
+		
+		return null;
+	}
     
     @Override
-	public String checkURI(String uriStr, boolean checkUniqueness) {
-        uriStr = (uriStr == null) ? " " : uriStr;
-		String errorMsg = "";
-		String duplicateMsg = "URI is already in use. " +
-		                      "Please enter another URI. ";
-		IRIFactory factory = IRIFactory.jenaImplementation();
-	    IRI iri = factory.create( uriStr );
-	    if (iri.hasViolation(false) ) {
-	    	errorMsg += (iri.violations(false).next())
-	    	                    .getShortMessage() + " ";
-	    } else if (checkUniqueness) {
-	    	boolean existingURI = this.hasExistingURI(uriStr);
-	    	if(existingURI) {
-				errorMsg+="Not a valid URI.  Please enter another URI. ";
-				errorMsg+=duplicateMsg;
-	    	}
-	    }
-	    return (errorMsg.length()>0) ? errorMsg : null;
-    }
-    
-    
-    
-    //Check if URI already in use or not either as resource OR as property
+	public String checkURIForEditableEntity(String uriStr) {
+		String errorMessage = checkURIForValidity(uriStr);
+		if (errorMessage != null) {
+			return errorMessage;
+		}
+		
+		if(hasEditableEntity(uriStr)) {
+			return "URI is already in use. Please enter another URI. ";
+		}
+		
+		return null;
+	}
+
+	private String checkURIForValidity(String uriStr) {
+		uriStr = (uriStr == null) ? " " : uriStr;
+
+		IRI iri = IRIFactory.jenaImplementation().create(uriStr);
+		if (iri.hasViolation(false)) {
+			return (iri.violations(false).next()).getShortMessage() + " ";
+		}
+
+		try {
+			Resource res = ResourceFactory.createResource(uriStr);
+			if (res.getLocalName().matches("\\d+")) {
+				return "Localname must contain at least one non-numeric "
+						+ "character.  Please enter another URI. ";
+			}
+		} catch (Exception e) {
+			return "Not a valid URI.  Please enter another URI. ";
+		}
+		
+		return null;
+	}
+
+	//Check if URI already in use or not either as resource OR as property
     @Override
 	public boolean hasExistingURI(String uriStr) {
     	OntModel ontModel = ontModelSelector.getFullModel(); 
 		return URIUtils.hasExistingURI(uriStr, ontModel);
+    }
+    
+    private boolean hasEditableEntity(String uriStr) {
+    	OntModel ontModel = ontModelSelector.getFullModel();
+    	return URIUtils.hasEditableEntity(uriStr, ontModel);
     }
     
     @Override
@@ -236,18 +262,6 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     @Override
 	public Set<String> getNonuserNamespaces() {
     	return config.getNonUserNamespaces();
-    }
-    
-    /**
-     * This enables the WebappDaoFactory to check the status of a reasoner.
-     * This will likely be refactored in future releases.
-     */
-    public void setPelletListener(PelletListener pl) {
-    	this.pelletListener = pl;
-    }
-    
-    public PelletListener getPelletListener() {
-    	return this.pelletListener;
     }
     
     @Override
@@ -375,6 +389,15 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
         return objectPropertyDao;
     }
 
+    private FauxPropertyDao fauxPropertyDao = null;
+    @Override
+    public FauxPropertyDao getFauxPropertyDao() {
+    	if( fauxPropertyDao == null ) {
+			fauxPropertyDao = new FauxPropertyDaoJena(this);
+    	}
+    	return fauxPropertyDao;
+    }
+    
     private PropertyInstanceDao propertyInstanceDao = null;
     @Override
 	public PropertyInstanceDao getPropertyInstanceDao() {

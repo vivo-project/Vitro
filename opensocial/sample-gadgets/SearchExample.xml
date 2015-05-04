@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+	<ModulePrefs title="Google site search: full text search results XX" width="600">
+		<Require feature="pubsub" />
+		<Require feature="dynamic-height" />
+	</ModulePrefs>
+	<Content type="html"><![CDATA[<!--HTML-->
+    <!-- #includes -->
+    <!DOCTYPE html>
+    
+    <style>
+
+    .gadget_text {
+    	font-family: Verdana, Arial;
+    	font-size: 11px;
+    }
+    
+    .gadgets-gadget-chrome {
+    	margin-left: 8px;
+    }
+    
+    </style>
+    
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>
+
+    <pre><div id="content" class="gadget_text"></div></pre>
+    <script>
+    
+function parseXml(xml) {	
+	if (jQuery.browser.msie) {
+		var xmlDoc = new ActiveXObject("Microsoft.XMLDOM"); 
+		xmlDoc.loadXML(xml);
+		xml = xmlDoc;
+	}
+	
+	return xml;
+}    
+
+function handleResponse(obj) {
+  var ids = [];
+  var theXML = obj.text;
+  
+  // IE hack
+  theXML = parseXml(theXML); 
+
+  // JB hack
+ 	$("#content").append( "Additional search results for " + gadgets.util.getUrlParameters()['keyword'] )  
+  
+  gadgets.window.adjustHeight();
+};
+
+function makeRequest(url, postdata) {
+  var params = {};
+  postdata = gadgets.io.encodeValues(postdata);
+  params[gadgets.io.RequestParameters.METHOD] = gadgets.io.MethodType.GET;
+  gadgets.io.makeRequest(url + "?" + postdata, handleResponse, params);
+};
+
+var data = {
+  start : "0",
+  num : "30",
+  q: gadgets.util.getUrlParameters()['keyword'],
+//  q: "cat",
+  client : "google-csbe",
+  output : "xml_no_dtd",
+  cx : "016654132415451954564:o_v7w23054u"
+};
+
+makeRequest("http://www.google.com/search", data);
+
+</script>
+
+]]>
+	</Content>
+</Module>

@@ -10,9 +10,8 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ObjectSourceIface;
 
-public interface IndividualDao extends ObjectSourceIface {
+public interface IndividualDao {
 
 	/**
 	 * Returns a collection of DataPropertyStatements involving all the external ID literals for a given Individual.
@@ -85,9 +84,9 @@ public interface IndividualDao extends ObjectSourceIface {
     public abstract Individual getIndividualByURI(String individualURI);
 
     /**
-     * Returns an Iterator over all Individuals in the model that are user-viewable.
+     * Returns a collection of all Individuals in the model that are user-viewable.
      */
-    public abstract Iterator<String> getAllOfThisTypeIterator();
+    public abstract Collection<String> getAllIndividualUris();
 
     /**
      * Returns an Iterator over all Individuals in the model that are user-viewable and have been updated since the specified time.

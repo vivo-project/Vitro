@@ -45,7 +45,7 @@
         <section id="existingContentType" name="existingContentType" ${existingClassGroupStyle} role="region">
             <p>${i18n().selected_page_content_type}</p>
             <p>
-                <span id="selectedContentTypeValue" name="selectedContentTypeValue">${associatedPage}</span>
+                <span id="selectedContentTypeValue" name="selectedContentTypeValue">${associatedPage!}</span>
                 <a href="#" id="changeContentType" name="changeContentType" title="${i18n().change_content_type}">${i18n().change_content_type}</a>
             </p>
         </section>

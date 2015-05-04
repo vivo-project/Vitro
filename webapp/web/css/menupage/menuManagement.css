@@ -7,7 +7,9 @@
     display:none;
 }
 #add-menu-item p,
-#edit-menu-item p {
+#edit-menu-item p,
+#existingContentType,
+#selectContentType label {
     margin-top: 15px;
 }
 #add-menu-item input[name="prettyUrl"],
@@ -17,12 +19,6 @@
 #add-menu-item p.note,
 #edit-menu-item p.note {
     margin-top: 5px;
-}
-#existingContentType {
-    margin-top: 15px;
-}
-#selectContentType label {
-    margin-top: 15px;
 }
 #selectedContentTypeValue {
     padding: 0.2em 0.4em;

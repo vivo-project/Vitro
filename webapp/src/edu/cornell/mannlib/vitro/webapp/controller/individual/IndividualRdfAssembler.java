@@ -219,7 +219,7 @@ public class IndividualRdfAssembler {
 					stmts.remove();
 				}
 			} else {
-				log.warn("blank node: + stmt");
+				log.warn("blank node: " + stmt);
 				stmts.remove();
 			}
 		}

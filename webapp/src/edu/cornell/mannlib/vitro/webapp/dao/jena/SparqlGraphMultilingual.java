@@ -21,6 +21,8 @@ import com.hp.hpl.jena.shared.AddDeniedException;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
+
 public class SparqlGraphMultilingual extends SparqlGraph implements GraphWithPerform {
     
     private static final Log log = LogFactory.getLog(SparqlGraphMultilingual.class);
@@ -145,5 +147,11 @@ public class SparqlGraphMultilingual extends SparqlGraph implements GraphWithPer
         
     }
     
+	@Override
+	public String toString() {
+		return "SparqlGraphMultilingual[" + ToString.hashHex(this)
+				+ ", endpoint=" + getEndpointURI() + ", name="
+				+ ToString.modelName(getGraphURI()) + "]";
+	}
 
 }

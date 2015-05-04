@@ -1,0 +1,15 @@
+@prefix ns: <http://example.com/ns/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ns:n1 a ns:Duck .
+ns:n1 ns:duckCode "1" .
+ns:n1 rdfs:label "duck" .
+ns:n1 rdfs:label "duck"@en-US .
+ns:n1 ns:d "cheese"@en-US .
+ns:n1 ns:o ns:f .
+ns:n1 ns:upcCode "2" .
+ns:n1 ns:p ns:q .
+ns:n3 a ns:Duck .
+ns:n3 ns:productCode "3"^^<http://example.org/datatype> .
+ns:n3 ns:q ns:z .
+ns:n4 ns:q ns:n1 .

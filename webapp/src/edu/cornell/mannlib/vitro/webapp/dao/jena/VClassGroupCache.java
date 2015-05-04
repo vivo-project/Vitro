@@ -1,7 +1,6 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +26,6 @@ import com.hp.hpl.jena.vocabulary.RDFS;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -35,17 +33,16 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchFacetField;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchFacetField.Count;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
 import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexingEventListener;
-import edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerSetup;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
@@ -67,7 +64,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
  * search index is not built or if there were problems building the index,
  * the class counts from VClassGroupCache will be incorrect.
  */
-public class VClassGroupCache implements IndexingEventListener {
+public class VClassGroupCache implements SearchIndexer.Listener {
     private static final Log log = LogFactory.getLog(VClassGroupCache.class);
 
     private static final String ATTRIBUTE_NAME = "VClassGroupCache";
@@ -211,19 +208,17 @@ public class VClassGroupCache implements IndexingEventListener {
      * Handle notification of events from the IndexBuilder.
      */
     @Override
-    public void notifyOfIndexingEvent(EventTypes event) {
-        switch( event ){
-            case FINISH_FULL_REBUILD: 
-            case FINISHED_UPDATE:
-                log.debug("rebuilding because of IndexBuilder " + event.name());
-                requestCacheUpdate();
-                break;            
-            default: 
-                log.debug("ignoring event type " + event.name());
-                break;
-                    
-        }        
-    }
+	public void receiveSearchIndexerEvent(Event event) {
+    	switch (event.getType()) {
+    	case STOP_URIS:
+            log.debug("rebuilding because of IndexBuilder " + event.getType());
+            requestCacheUpdate();
+            break;            
+        default: 
+            log.debug("ignoring event type " + event.getType());
+            break;
+    	}
+	}
     
     /* **************** static utility methods ***************** */
     
@@ -243,10 +238,7 @@ public class VClassGroupCache implements IndexingEventListener {
     }
     
     /**
-     * Method that rebuilds the cache. This will use a WebappDaoFactory, 
-     * a SearchEngine and maybe a ProhibitedFromSearch from the cache.context.
-     * 
-     * If ProhibitedFromSearch is not found in the context, that will be skipped.
+     * Method that rebuilds the cache. This will use a WebappDaoFactory and a SearchEngine.
      */
     protected static void rebuildCacheUsingSearch( VClassGroupCache cache ) throws SearchEngineException{                        
         long start = System.currentTimeMillis();
@@ -260,7 +252,6 @@ public class VClassGroupCache implements IndexingEventListener {
         List<VClassGroup> groups = vcgDao.getPublicGroupsWithVClasses(ORDER_BY_DISPLAYRANK, 
                 INCLUDE_UNINSTANTIATED, DONT_INCLUDE_INDIVIDUAL_COUNT);
                                 
-        removeClassesHiddenFromSearch(groups, cache.context);
         addCountsUsingSearch(groups, searchEngine);        
         cache.setCache(groups, classMapForGroups(groups));
         
@@ -281,28 +272,6 @@ public class VClassGroupCache implements IndexingEventListener {
         return newClassMap;
     }      
 
-        
-    /**
-     * Removes classes from groups that are prohibited from search. 
-     */
-    protected static void removeClassesHiddenFromSearch(List<VClassGroup> groups, ServletContext context2) {
-        ProhibitedFromSearch pfs = (ProhibitedFromSearch)context2.getAttribute(SearchIndexerSetup.PROHIBITED_FROM_SEARCH);
-        if(pfs==null){
-            log.debug("Could not get ProhibitedFromSearch from ServletContext");
-            return;
-        }
-        
-        for (VClassGroup group : groups) {
-            List<VClass> classList = new ArrayList<VClass>();
-            for (VClass vclass : group.getVitroClassList()) {
-                if (!pfs.isClassProhibitedFromSearch(vclass.getURI())) {
-                    classList.add(vclass);
-                }
-            }
-            group.setVitroClassList(classList);
-        }        
-    }
-    
     
     /**
      * Add the Individual count to classes in groups.
@@ -498,7 +467,7 @@ public class VClassGroupCache implements IndexingEventListener {
             } else if(VitroVocabulary.DISPLAY_RANK.equals(stmt.getPredicate().getURI())){
             	requestCacheUpdate();
             } else {
-                OntModel jenaOntModel = ModelAccess.on(context).getJenaOntModel();
+                OntModel jenaOntModel = ModelAccess.on(context).getOntModel();
                 if( isClassNameChange(stmt, jenaOntModel) ) {            
                     requestCacheUpdate();
                 }
@@ -518,8 +487,8 @@ public class VClassGroupCache implements IndexingEventListener {
             context.setAttribute(ATTRIBUTE_NAME,vcgc);           
             log.info("VClassGroupCache added to context");   
             
-            IndexBuilder indexBuilder = IndexBuilder.getBuilder(context);
-            indexBuilder.addIndexBuilderListener(vcgc);
+            SearchIndexer searchIndexer = ApplicationUtils.instance().getSearchIndexer();
+            searchIndexer.addListener(vcgc);
             log.info("VClassGroupCache set to listen to events from IndexBuilder");
         }
 

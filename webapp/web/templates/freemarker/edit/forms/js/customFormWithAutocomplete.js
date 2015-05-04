@@ -3,7 +3,9 @@
 var customForm = {
     
     /* *** Initial page setup *** */
-   
+   //Setting the default Concept class here
+	//This would need to change if we update the ontology, etc.
+	conceptClassURI: "http://www.w3.org/2004/02/skos/core#Concept",
     onLoad: function() {
         
         if (this.disableFormInUnsupportedBrowsers()) {
@@ -323,9 +325,12 @@ var customForm = {
                         // Not sure why, but we need an explicit json parse here. 
                         var results = $.parseJSON(xhr.responseText);                        
                         var filteredResults = customForm.filterAcResults(results);
-                        
-                        if ( customForm.acTypes[$(selectedObj).attr('acGroupName')] == "http://www.w3.org/2004/02/skos/core#Concept" ) {
+                        /*
+                        if ( customForm.acTypes[$(selectedObj).attr('acGroupName')] == customForm.conceptClassURI ) {
                             filteredResults = customForm.removeConceptSubclasses(filteredResults);
+                        }*/
+                        if(customForm.doRemoveConceptSubclasses()) {
+                        	filteredResults = customForm.removeConceptSubclasses(filteredResults);
                         }
 
                         customForm.acCache[request.term] = filteredResults;
@@ -340,6 +345,15 @@ var customForm = {
                 }
             }
         });
+    },
+    
+    //Method to check whether we need to filter to individuals with a most specific type = Concept or other allowed subclasses
+    doRemoveConceptSubclasses:function() {
+    	//if this array of allowable subclasses was declared annd there is at least one element in it
+    	if(customForm.limitToConceptClasses && customForm.limitToConceptClasses.length) {
+    		return true;
+    	}
+    	return false;
     },
     
     // Store original or base text with elements that will have text substitutions.
@@ -426,15 +440,51 @@ var customForm = {
         customForm.acFilter = customForm.acFilter.concat(this.acFilterForIndividuals);
         
     },
-        
+       
+    //Updating this code to utilize an array to 
     removeConceptSubclasses: function(array) {
-       $(array).each(function(i) {
-          if(this["msType"] != "http://www.w3.org/2004/02/skos/core#Concept") {
-              //Remove from array
-              array.splice(i, 1);
-          }    
-       });
+    	//Using map because the resulting array might be different from the original
+    	array = jQuery.map(array, function(arrayValue, i) {
+    	   var allMsTypes = arrayValue["allMsTypes"];
+      	   var removeElement = false;
+      	 if(allMsTypes.length == 1 && !customForm.isAllowedConceptSubclass(arrayValue["msType"])) {
+             //Remove from array
+             removeElement = true;
+         }  else if(allMsTypes.length > 1) {
+       	  //If there are multiple most specific types returned, check if none of them equals concept
+       	  removeElement = true;
+       	  var j;
+       	 
+       	  for(j = 0; j < allMsTypes.length; j++) {
+       		  //this refers to the element itself
+       		  if(customForm.isAllowedConceptSubclass(allMsTypes[j])) {
+       			 //don't remove this element if one of the most specific types is a concept
+       			 removeElement = false;
+       			 break;
+       		 }
+       	  }
+         }
+         
+         if(removeElement) 
+        	 return null;
+         else 
+        	 return arrayValue;
+    	});
+    	
+       
        return array;
+    },
+    isAllowedConceptSubclass:function(classURI) {
+    	if(customForm.limitToConceptClasses && customForm.limitToConceptClasses.length) {
+    		var len = customForm.limitToConceptClasses.length;
+    		var i;
+    		for(i = 0; i < len; i++) {
+    			if(classURI == customForm.limitToConceptClasses[i]) {
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
     },
 
     showAutocompleteSelection: function(label, uri, selectedObj) {

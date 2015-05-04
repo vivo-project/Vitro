@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <Module>
+   <ModulePrefs title="Hello RDF!" height="800" width="700" scrolling="true">
+     <Require feature="opensocial-0.8" />
+	<Require feature="rdf"/>
+	<Require feature="dynamic-height"/>
+   </ModulePrefs>
+   <Content type="html">
+     <![CDATA[<!--HTML-->
+    <!DOCTYPE html>
+      <script type="text/javascript" src="js/jquery-1.4.4.js"></script>
+      <script type="text/javascript" src="js/prettyprint.js" ></script>
+      <script type="text/javascript">
+      
+	// use pretty print!
+        function loadPeople() {
+	    osapi.people.getViewer().execute(function(result) {
+		onLoadPeopleOsapi(result, 'viewer');
+	    });
+		// load RDF version, Alexei, please follow this pattern
+	    osapi.rdf.getViewer().execute(function(result) {
+	 	    var person = jsonldHelper.getItem(result);
+    		onLoadPeopleRdf(person, 'viewer_rdf');
+   	    });
+
+	    osapi.people.getOwner().execute(function(result) {
+		onLoadPeopleOsapi(result, 'owner');
+ 	    	document.getElementById('rdfurl').value = result.id;
+	    });
+		// load RDF version, Alexei, please follow this pattern
+	    var options = {};
+            options.output = 'full';
+	    osapi.rdf.getOwner(options).execute(function(result) {
+	 	    var person = jsonldHelper.getItem(result);
+		    onLoadPeopleRdf(person, 'owner_rdf');
+   	    });
+
+	    osapi.rdf.getOwner().execute(function(result) {
+		    var foo = result;
+	 	    var person = jsonldHelper.getItem(result);
+   	    });
+      }
+
+        function onLoadPeopleOsapi(person, divId) {          
+          html = new Array();
+          html.push('<ul>');
+          html.push('<li>You are looking at ' + person.displayName + '</li>');
+          html.push('<li>Their URI is ' + person.profileUrl + '</li>');
+          html.push('</ul>');
+          document.getElementById(divId).innerHTML = html.join('');
+        }
+
+        function onLoadPeopleRdf(person, divId) {          
+          html = new Array();
+          html.push('<ul>');
+          html.push('<li>You are looking at ' + person.label + '</li>');
+          html.push('<li>Their URI is ' + (person.uri || person._about) + '</li>');	    
+          html.push('<li>Their email is ' + person.primaryEmail + '</li>');
+          html.push('</ul>');
+          var ppTable = prettyPrint(person);
+          $('#' + divId).html(ppTable);
+	    gadgets.window.adjustHeight();
+        }
+
+  var priorurl = [];
+  var ndx = 0;
+  priorurl[ndx++] = "http://vivo.ufl.edu/individual/n25562";
+  priorurl[ndx++] = "http://connects.catalyst.harvard.edu/profiles/profile/person/32213/viewas/rdf";
+
+  function submitform() {
+	var rdfurl = document.getElementById('rdfurl');
+	if (ndx == 0 || priorurl[ndx] != rdfurl.value) {
+        priorurl[ndx++] = rdfurl.value; 
+      }
+	    document.getElementById('rdf').innerHTML = '...fetching content...';
+	    osapi.rdf.getRDF(rdfurl.value).execute(function(result) {
+		onLoadPeopleRdf(result, 'rdf');
+	    });
+  }
+
+  function goback() {
+      if (ndx > 0 && priorurl[ndx - 1] == document.getElementById('rdfurl').value) {
+	   ndx--;
+      }
+	if (ndx > 0) {
+	   ndx--
+      }
+  	document.getElementById('rdfurl').value = priorurl[ndx];
+  }
+
+        gadgets.util.registerOnLoadHandler(loadPeople);
+      </script>
+      <div id='main'>
+	  <h4>Viewer</h4>
+        <div id='viewer'></div>
+        <div id='viewer_rdf'></div>
+	  <h4>Owner</h4>
+        <div id='owner'></div>
+        <div id='owner_rdf'></div>
+	<form>
+  		RDF: <input type="text" id="rdfurl" name="rdfurl" size="80">
+  		<p>
+  		<div id="query"></div>
+  		<p>
+  		<a href="javascript: submitform()">Submit</a>&nbsp;<a href="javascript: goback()">Back</a>
+  	</form>
+        <div id='rdf'></div>
+      </div>     ]]>
+   </Content>
+</Module>

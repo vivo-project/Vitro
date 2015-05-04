@@ -5,11 +5,10 @@
 #login-form label, 
 #login-form input.text,
 #login-form #password,
-#login-form #confirmPassword {
+#login-form #confirmPassword,
+#login-form label.label-remember-me,
+#vivoAccountError {
     display: block;  
-}
-#login-form label.label-remember-me {
-    display: block;
 }
 #login-form p.submit {
     float: left;
@@ -71,9 +70,6 @@ h3.internal-auth {
 }
 .vivoAccount {
     display: none;
-}
-#vivoAccountError {
-    display: block;  
 }
 .formFieldAlert {
     border: 2px solid #900;

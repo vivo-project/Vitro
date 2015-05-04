@@ -31,6 +31,8 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
@@ -238,7 +240,7 @@ public class KnowledgeBaseUpdater {
                 record.recordRetractions(anonModel);
                 //log.info("removed " + anonModel.size() + " statements from SPARQL CONSTRUCTs");
             } else {
-                Model writeModel = dataset.getNamedModel(JenaDataSourceSetupBase.JENA_DB_MODEL);
+                Model writeModel = dataset.getNamedModel(ModelNames.ABOX_ASSERTIONS);
                 Model dedupeModel = dataset.getDefaultModel();
                 Model additions = jiu.renameBNodes(
                         anonModel, settings.getDefaultNamespace() + "n", dedupeModel);
@@ -332,7 +334,7 @@ public class KnowledgeBaseUpdater {
 			return required;
 		}
 		
-		RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(servletContext).getRDFService();
+		RDFService rdfService = ModelAccess.on(servletContext).getRDFService();
 
 		// if the ASK query DOES have a solution (i.e. the assertions exist
 		// showing that the update has already been performed), then the update
@@ -380,12 +382,12 @@ public class KnowledgeBaseUpdater {
 	
 	private void assertSuccess(ServletContext servletContext) throws FileNotFoundException, IOException {
 		try {				
-			RDFService rdfService = RDFServiceUtils.getRDFServiceFactory(servletContext).getRDFService();
+			RDFService rdfService = ModelAccess.on(servletContext).getRDFService();
 			
 			ChangeSet changeSet = rdfService.manufactureChangeSet();
 		    File successAssertionsFile = new File(settings.getSuccessAssertionsFile()); 
 		    InputStream inStream = new FileInputStream(successAssertionsFile);		    
-		    changeSet.addAddition(inStream, RDFService.ModelSerializationFormat.N3, JenaDataSourceSetupBase.JENA_APPLICATION_METADATA_MODEL);
+		    changeSet.addAddition(inStream, RDFService.ModelSerializationFormat.N3, ModelNames.APPLICATION_METADATA);
 			rdfService.changeSetUpdate(changeSet);	
 		} catch (Exception e) {
 			log.error("unable to make RDF assertions about successful " +

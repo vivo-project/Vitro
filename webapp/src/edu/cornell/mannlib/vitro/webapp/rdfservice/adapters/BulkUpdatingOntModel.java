@@ -9,8 +9,14 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.hp.hpl.jena.graph.BulkUpdateHandler;
+import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.graph.impl.GraphWithPerform;
+import com.hp.hpl.jena.graph.impl.WrappedBulkUpdateHandler;
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -27,13 +33,31 @@ import com.hp.hpl.jena.util.iterator.Map1;
  * BulkUpdateHandler.
  */
 public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
+	private static final Log log = LogFactory
+			.getLog(BulkUpdatingOntModel.class);
+
 	private static final RDFReaderF readerFactory = new RDFReaderFImpl();
 
 	private final BulkUpdateHandler buh;
 
-	public BulkUpdatingOntModel(OntModel inner, BulkUpdateHandler buh) {
+	public BulkUpdatingOntModel(OntModel inner) {
 		super(inner);
-		this.buh = buh;
+		this.buh = inner.getGraph().getBulkUpdateHandler();
+	}
+
+	@SuppressWarnings("deprecation")
+	private static BulkUpdateHandler getWrappedBulkUpdateHandler(Graph graph) {
+		if (graph instanceof GraphWithPerform) {
+			return new WrappedBulkUpdateHandler((GraphWithPerform) graph,
+					graph.getBulkUpdateHandler());
+		} else {
+			try {
+				throw new IllegalStateException();
+			} catch (IllegalStateException e) {
+				log.warn("Graph is not an instance of GraphWithPerform", e);
+			}
+			return graph.getBulkUpdateHandler();
+		}
 	}
 
 	@SuppressWarnings("deprecation")
@@ -181,11 +205,6 @@ public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
 	public Model remove(List<Statement> statements) {
 		remove(statements.toArray(new Statement[statements.size()]));
 		return this;
-	}
-
-	@Override
-	public String toString() {
-		return "<" + this.getClass().getSimpleName() + "  " + getGraph() + ">";
 	}
 
 	private Iterator<Triple> asTriples(StmtIterator it) {

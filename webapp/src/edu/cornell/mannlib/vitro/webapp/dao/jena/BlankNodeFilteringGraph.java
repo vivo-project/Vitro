@@ -20,6 +20,8 @@ import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
+
 public class BlankNodeFilteringGraph implements Graph {
 	
     private Graph graph;
@@ -140,5 +142,11 @@ public class BlankNodeFilteringGraph implements Graph {
 	@Override
 	public void remove(Node arg0, Node arg1, Node arg2) {
 		graph.remove(arg0, arg1, arg2);
+	}
+
+	@Override
+	public String toString() {
+		return "BlankNodeFilteringGraph[" + ToString.hashHex(this) + ", inner="
+				+ ToString.graphToString(graph) + "]";
 	}
 }

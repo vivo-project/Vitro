@@ -19,8 +19,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.SimpleReasonerSetup;
 
 public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
@@ -49,8 +49,14 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
             this.datasetMode = datasetMode;
         }
     }
-     
-    public WebappDaoFactorySDB(WebappDaoFactorySDB base, String userURI) {
+    
+	@Override
+	public String toString() {
+		return "WebappDaoFactorySDB[" + Integer.toString(hashCode(), 16) + ", "
+				+ datasetMode + "]";
+	}
+
+	public WebappDaoFactorySDB(WebappDaoFactorySDB base, String userURI) {
         super(base.ontModelSelector);
         this.ontModelSelector = base.ontModelSelector;
         this.config = base.config;
@@ -94,6 +100,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 			return vClassDao = new VClassDaoSDB(dwf, datasetMode, this, config.isUnderlyingStoreReasoned());
 	}
 	
+	@Override
 	public WebappDaoFactory getUserAwareDaoFactory(String userURI) {
         return new WebappDaoFactorySDB(this, userURI);
     }
@@ -117,17 +124,11 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	                        .append(")) || (")
 	                        .append(graphVars[i])
 	                        .append(" != <")
-	                        .append(JenaDataSourceSetupBase.JENA_INF_MODEL)
+	                        .append(ModelNames.ABOX_INFERENCES)
 	                        .append("> ")
 	                        .append("&& ").append(graphVars[i]).append(" != <")
-	                        .append(JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL)
+	                        .append(ModelNames.TBOX_INFERENCES)
 	                        .append(">")
-	                        .append("&& ").append(graphVars[i]).append(" != <")
-                            .append(SimpleReasonerSetup.JENA_INF_MODEL_REBUILD)
-                            .append(">")
-                            .append("&& ").append(graphVars[i]).append(" != <")
-                            .append(SimpleReasonerSetup.JENA_INF_MODEL_SCRATCHPAD)
-                            .append(">")
 	                        .append(") ) \n");
 	                    break;
 	            case INFERENCES_ONLY :  
@@ -136,10 +137,10 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
                         .append(")) || (")
                         .append(graphVars[i])
                         .append(" = <")
-                        .append(JenaDataSourceSetupBase.JENA_INF_MODEL)
+                        .append(ModelNames.ABOX_INFERENCES)
                         .append("> || ").append(graphVars[i])
                         .append(" = <")
-                        .append(JenaDataSourceSetupBase.JENA_TBOX_INF_MODEL)
+                        .append(ModelNames.TBOX_INFERENCES)
                         .append(">) )\n");
                     break;
 	            default:

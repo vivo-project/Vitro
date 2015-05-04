@@ -25,11 +25,12 @@ import com.hp.hpl.jena.update.UpdateAction;
 import com.hp.hpl.jena.update.UpdateFactory;
 import com.hp.hpl.jena.update.UpdateRequest;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 
 /**
  * Process SPARQL Updates, as an API.
@@ -55,6 +56,7 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
+		log.debug("Starting update");
 		try {
 			confirmAuthorization(req, REQUIRED_ACTIONS);
 			UpdateRequest parsed = parseUpdateString(req);
@@ -67,6 +69,7 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 		} catch (Exception e) {
 			do500response(resp, e);
 		}
+		log.debug("Update complete");
 	}
 
 	private UpdateRequest parseUpdateString(HttpServletRequest req)
@@ -96,13 +99,14 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 		ServletContext ctx = req.getSession().getServletContext();
 		VitroRequest vreq = new VitroRequest(req);
 
-		IndexBuilder.getBuilder(ctx).pause();
+		SearchIndexer indexer = ApplicationUtils.instance().getSearchIndexer();
+		indexer.pause();
 		try {
 			Dataset ds = new RDFServiceDataset(vreq.getUnfilteredRDFService());
 			GraphStore graphStore = GraphStoreFactory.create(ds);
 			UpdateAction.execute(parsed, graphStore);
 		} finally {
-			IndexBuilder.getBuilder(ctx).unpause();
+			indexer.unpause();
 		}
 	}
 

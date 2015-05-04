@@ -18,7 +18,7 @@
 <tr><td colspan="5"><hr class="formDivider"/></td></tr>
 <tr class="editformcell">
 	<td style="vertical-align:top;" valign="top" colspan="1">
-		<b>Ontology</b><br/><br/>
+		<b>Ontology</b><br/>
         <c:choose>
         	<c:when test="${_action eq 'update'}">
 				<select name="Namespace" disabled="disabled"><form:option name="Namespace"/></select><br/>
@@ -30,8 +30,7 @@
 		</c:choose>
 	</td>
 	<td style="vertical-align:top;" valign="top" colspan="2">
-		<b>Internal name*</b><br/>
-	    (RDF local name)<br/>
+		<b>Internal name*</b> (RDF local name)<br/>
         <c:choose>
         	<c:when test="${_action eq 'update'}">
         	    <input type="text" class="fullWidthInput" disabled="disabled" name="LocalName" value="<form:value name='LocalName'/>" /><br/>
@@ -49,7 +48,7 @@
         </c:if>
 	</td>
     <td style="vertical-align:top;" valign="top" colspan="2">
-        <b>Label for public display</b><br/><br/>
+        <b>Label for public display</b><br/>
         <input type="text" class="fullWidthInput" name="DomainPublic" value="<form:value name="DomainPublic"/>" maxlength="80" />
         <c:set var="DomainPublicError"><form:error name="DomainPublic"/></c:set>
         <c:if test="${!empty DomainPublicError}">
@@ -240,6 +239,29 @@
             </c:otherwise>            
         </c:choose>            
     </td>
+</tr>
+<tr class="editformcell" >
+	<td valign="top" colspan="2" style="padding-top:25px">
+		<b>Display limit</b> for this property<br/>
+		<input type="text" class="shortInput" name="DomainDisplayLimit" value="<form:value name="DomainDisplayLimit"/>"/>
+        <c:set var="DomainDisplayLimitError"><form:error name="DomainDisplayLimit"/></c:set>
+        <c:if test="${!empty DomainDisplayLimitError}">
+            <span class="notice"><c:out value="${DomainDisplayLimitError}"/></span>
+        </c:if>
+	</td>
+	<td valign="top" colspan="2">
+		<b>Display limit</b> for inverse property<br/>
+		<input type="text" class="shortInput" name="RangeDisplayLimit" value="<form:value name="RangeDisplayLimit"/>"/>
+        <c:set var="RangeDisplayLimitError"><form:error name="RangeDisplayLimit"/></c:set>
+        <c:if test="${!empty RangeDisplayLimitError}">
+            <span class="notice"><c:out value="${RangeDisplayLimitError}"/></span>
+        </c:if>
+	</td>
+</tr>
+<tr class="editformcell" >
+	<td valign="top" colspan="6"  style="padding-top:-12px">
+		The limit before the &quot;more ...&quot; button is displayed.<br/>
+	</td>
 </tr>
 <tr><td colspan="5"><hr class="formDivider"/></td></tr>
 <tr class="editformcell">

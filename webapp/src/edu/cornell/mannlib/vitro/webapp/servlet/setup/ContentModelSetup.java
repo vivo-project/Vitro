@@ -2,7 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.servlet.setup;
 
-import static edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_ONLY;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_ASSERTIONS;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.APPLICATION_METADATA;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +16,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -23,24 +24,19 @@ import com.hp.hpl.jena.util.ResourceUtils;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.FactoryID;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelSynchronizer;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
  * Sets up the content models, OntModelSelectors and webapp DAO factories.
+ * 
+ * Why the firstTimeStartup flag? Because you can't ask a large SDB model
+ * whether it is empty. SDB translates  this into a call to size(), which
+ * in turn becomes find(null, null, null) and a count, and this gives an
+ * OutOfMemoryError because it tries to read the entire model into memory.
  */
 public class ContentModelSetup extends JenaDataSourceSetupBase 
         implements javax.servlet.ServletContextListener {
@@ -58,94 +54,29 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
     } 
 
     private void setUpJenaDataSource(ServletContext ctx) {
-    	RDFServiceFactory rdfServiceFactory = RDFServiceUtils.getRDFServiceFactory(ctx);
-    	RDFService rdfService = rdfServiceFactory.getRDFService();
-    	Dataset dataset = new RDFServiceDataset(rdfService);
-    	setStartupDataset(dataset, ctx);
+        ContextModelAccess models = ModelAccess.on(ctx);
+        boolean firstTimeStartup = false;
     	
-    	OntModel applicationMetadataModel = createdMemoryMappedModel(dataset, JENA_APPLICATION_METADATA_MODEL, "application metadata model");
-		if (applicationMetadataModel.size()== 0) {
-			JenaDataSourceSetupBase.thisIsFirstStartup();
+    	Model applicationMetadataModel = models.getOntModel(APPLICATION_METADATA);
+		if (applicationMetadataModel.isEmpty()) {
+			firstTimeStartup = true;
+        	initializeApplicationMetadata(ctx, applicationMetadataModel);
+		} else {
+        	checkForNamespaceMismatch( applicationMetadataModel, ctx );
 		}
 
-    	ModelAccess models = ModelAccess.on(ctx);
-        OntModel baseABoxModel = createNamedModelFromDataset(dataset, JENA_DB_MODEL);
-        OntModel inferenceABoxModel = createNamedModelFromDataset(dataset, JENA_INF_MODEL);
-        OntModel baseTBoxModel = createdMemoryMappedModel(dataset, JENA_TBOX_ASSERTIONS_MODEL, "tbox assertions");
-        OntModel inferenceTBoxModel = createdMemoryMappedModel(dataset, JENA_TBOX_INF_MODEL, "tbox inferences");
-        OntModel unionABoxModel = VitroModelFactory.createUnion(baseABoxModel, inferenceABoxModel);
-        OntModel unionTBoxModel = VitroModelFactory.createUnion(baseTBoxModel, inferenceTBoxModel);
-
-
-        if (isFirstStartup()) {
-        	initializeApplicationMetadata(ctx, applicationMetadataModel);
-        	RDFFilesLoader.loadFirstTimeFiles(ctx, "abox", baseABoxModel, true);
-        	RDFFilesLoader.loadFirstTimeFiles(ctx, "tbox", baseTBoxModel, true);
-        } else {
-        	checkForNamespaceMismatch( applicationMetadataModel, ctx );
+        OntModel baseABoxModel = models.getOntModel(ABOX_ASSERTIONS);
+        if (firstTimeStartup) {
+        	RDFFilesLoader.loadFirstTimeFiles("abox", baseABoxModel, true);
         }
-    	RDFFilesLoader.loadEveryTimeFiles(ctx, "abox", baseABoxModel);
-    	RDFFilesLoader.loadEveryTimeFiles(ctx, "tbox", baseTBoxModel);
+        RDFFilesLoader.loadEveryTimeFiles("abox", baseABoxModel);
         
-        log.info("Setting up full models");
-        OntModel baseFullModel = VitroModelFactory.createUnion(baseABoxModel, baseTBoxModel);
-        OntModel inferenceFullModel = VitroModelFactory.createUnion(inferenceABoxModel, inferenceTBoxModel);
-        OntModel unionFullModel = VitroModelFactory.createOntologyModel(dataset.getDefaultModel());
-
-        models.setOntModel(ModelID.APPLICATION_METADATA, applicationMetadataModel);
-
-        models.setOntModel(ModelID.BASE_ABOX, baseABoxModel);
-        models.setOntModel(ModelID.BASE_TBOX, baseTBoxModel);
-        models.setOntModel(ModelID.BASE_FULL, baseFullModel);
-        models.setOntModel(ModelID.INFERRED_ABOX, inferenceABoxModel);
-        models.setOntModel(ModelID.INFERRED_TBOX, inferenceTBoxModel);
-        models.setOntModel(ModelID.INFERRED_FULL, inferenceFullModel);
-        models.setOntModel(ModelID.UNION_ABOX, unionABoxModel);
-        models.setOntModel(ModelID.UNION_TBOX, unionTBoxModel);
-        models.setOntModel(ModelID.UNION_FULL, unionFullModel);
-        
-        
-		log.info("Setting up DAO factories");
-		
-        WebappDaoFactoryConfig config = new WebappDaoFactoryConfig();
-        config.setDefaultNamespace(getDefaultNamespace(ctx));
-        
-        OntModelSelector baseOms = models.getBaseOntModelSelector();
-        WebappDaoFactory baseWadf = new WebappDaoFactorySDB(rdfService, baseOms, config, ASSERTIONS_ONLY);
-        ModelAccess.on(ctx).setWebappDaoFactory(FactoryID.BASE, baseWadf);
-        ModelAccess.on(ctx).setWebappDaoFactory(FactoryID.UNFILTERED_BASE, baseWadf);
-        
-        OntModelSelector unionOms = models.getUnionOntModelSelector();
-        WebappDaoFactory wadf = new WebappDaoFactorySDB(rdfService, unionOms, config);
-        ModelAccess.on(ctx).setWebappDaoFactory(FactoryID.UNION, wadf);
-        ModelAccess.on(ctx).setWebappDaoFactory(FactoryID.UNFILTERED_UNION, wadf);
-
-        log.info("Model makers set up");
-        
-        ctx.setAttribute("defaultNamespace", getDefaultNamespace(ctx));
-    }
-
-	private OntModel createNamedModelFromDataset(Dataset dataset, String name) {
-    	return VitroModelFactory.createOntologyModel(dataset.getNamedModel(name));
-    }
-    
-	private OntModel createdMemoryMappedModel(Dataset dataset, String name, String label) {
-		try {
-			Model dbModel = dataset.getNamedModel(name);
-			OntModel memoryModel = VitroModelFactory.createOntologyModel();
-			
-			if (dbModel != null) {
-			    long begin = System.currentTimeMillis();
-				log.info("Copying cached " + label + " into memory");
-			    memoryModel.add(dbModel);
-			    log.info(secondsSince(begin) + " seconds to load " + label);
-			    memoryModel.getBaseModel().register(new ModelSynchronizer(dbModel));
-			}
-			return memoryModel;
-        } catch (Throwable e) {
-            throw new RuntimeException("Unable to load " + label + " from DB", e);
+        OntModel baseTBoxModel = models.getOntModel(TBOX_ASSERTIONS);
+        if (firstTimeStartup) {
+        	RDFFilesLoader.loadFirstTimeFiles("tbox", baseTBoxModel, true);
         }
-	}
+    	RDFFilesLoader.loadEveryTimeFiles("tbox", baseTBoxModel);
+    }
 
 	private long secondsSince(long startTime) {
 		return (System.currentTimeMillis() - startTime) / 1000;
@@ -161,9 +92,9 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 	 * warnings about editing a blank node.
 	 */
 	private void initializeApplicationMetadata(ServletContext ctx,
-			OntModel applicationMetadataModel) {
+			Model applicationMetadataModel) {
 		OntModel temporaryAMModel = VitroModelFactory.createOntologyModel();
-    	RDFFilesLoader.loadFirstTimeFiles(ctx, "applicationMetadata", temporaryAMModel, true);
+    	RDFFilesLoader.loadFirstTimeFiles("applicationMetadata", temporaryAMModel, true);
     	setPortalUriOnFirstTime(temporaryAMModel, ctx);
     	applicationMetadataModel.add(temporaryAMModel);
 	}
@@ -172,7 +103,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
 	 * If we are loading the application metadata for the first time, set the
 	 * URI of the Portal based on the default namespace.
 	 */
-	private void setPortalUriOnFirstTime(OntModel model, ServletContext ctx) {
+	private void setPortalUriOnFirstTime(Model model, ServletContext ctx) {
 		// Only a single portal is permitted in the initialization data
 		Resource portalResource = null;
 		ClosableIterator<Resource> portalResIt = model
@@ -199,7 +130,7 @@ public class ContentModelSetup extends JenaDataSourceSetupBase
      * If we find a "portal1" portal (and we should), its URI should use the
      * default namespace.
      */
-    private void checkForNamespaceMismatch(OntModel model, ServletContext ctx) {
+    private void checkForNamespaceMismatch(Model model, ServletContext ctx) {
         String expectedNamespace = getDefaultNamespace(ctx);
 
         List<Resource> portals = getPortal1s(model);

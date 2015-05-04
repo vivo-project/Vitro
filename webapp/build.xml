@@ -234,7 +234,7 @@
 		</copy>
 
 		<!-- Copy the build.properties file to the resources directory. -->
-		<copy todir="${main.resources.dir}" file="${build.properties.file}" />
+		<copy tofile="${main.resources.dir}/build.properties" file="${build.properties.file}" />
 
 
 		<!-- copy any xml files from source tree to the war directory -->
@@ -266,6 +266,12 @@
 		<copy todir="${vitrohome.image.dir}" >
 			<fileset dir="${appbase.dir}/config" >
 				<include name="example.runtime.properties" />
+			</fileset>
+		</copy>
+		<mkdir dir="${vitrohome.image.dir}/config" />
+		<copy todir="${vitrohome.image.dir}/config" >
+			<fileset dir="${appbase.dir}/config" >
+				<include name="example.applicationSetup.n3" />
 				<include name="example.developer.properties" />
 			</fileset>
 		</copy>

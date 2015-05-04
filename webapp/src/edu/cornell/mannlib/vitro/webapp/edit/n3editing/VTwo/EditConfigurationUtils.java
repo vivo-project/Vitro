@@ -23,11 +23,11 @@ import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 import edu.cornell.mannlib.vitro.webapp.freemarker.config.FreemarkerConfiguration;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import freemarker.template.Configuration;
 
 public class EditConfigurationUtils {
@@ -215,7 +215,7 @@ public class EditConfigurationUtils {
     public static DataPropertyStatement getDataPropertyStatement(VitroRequest vreq, HttpSession session, Integer dataHash, String predicateUri) {
     	DataPropertyStatement dps = null;
    	    if( dataHash != 0) {
-   			OntModel model = ModelAccess.on(session.getServletContext()).getJenaOntModel();
+   			OntModel model = ModelAccess.on(session.getServletContext()).getOntModel();
    	        dps = RdfLiteralHash.getPropertyStmtByHash(EditConfigurationUtils.getSubjectUri(vreq), predicateUri, dataHash, model);   	        
    	    }
    	    return dps;

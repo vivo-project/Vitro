@@ -7,8 +7,10 @@ import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.SWITCH_TO_D
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_DISPLAY_MODEL_PARAM;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_MODEL_PARAM;
 import static edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary.USE_TBOX_MODEL_PARAM;
-import static edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService.CONFIGURATION;
-import static edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService.CONTENT;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONFIGURATION;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService.CONTENT;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_TBOX;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -25,15 +27,15 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactoryJena;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.impl.RequestModelAccessImpl;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils.WhichService;
 
 /**
  * Handle model switching, if requested for the editing framework.
@@ -86,8 +88,8 @@ public class ModelSwitcher {
     	
     	// If they asked for the display model, give it to them.
 		if (isParameterPresent(vreq, SWITCH_TO_DISPLAY_MODEL)) {
-			OntModel mainOntModel = ModelAccess.on(_context).getDisplayModel();
-			OntModel tboxOntModel = ModelAccess.on(_context).getOntModel(ModelID.DISPLAY_TBOX);
+			OntModel mainOntModel = ModelAccess.on(_context).getOntModel(DISPLAY);
+			OntModel tboxOntModel = ModelAccess.on(_context).getOntModel(DISPLAY_TBOX);
 	   		setSpecialWriteModel(vreq, mainOntModel);
 	   		
 	   		vreq.setAttribute(VitroRequest.ID_FOR_ABOX_MODEL, VitroModelSource.ModelName.DISPLAY.toString());
@@ -120,8 +122,8 @@ public class ModelSwitcher {
     }
 
 	private void setSpecialWriteModel(VitroRequest vreq, OntModel mainOntModel) {	    
-		if (mainOntModel != null) {    
-			ModelAccess.on(vreq).setJenaOntModel(mainOntModel);
+		if (mainOntModel != null) {
+			((RequestModelAccessImpl) ModelAccess.on(vreq)).setSpecialWriteModel(mainOntModel);
 			vreq.setAttribute(SPECIAL_WRITE_MODEL, mainOntModel);
 		}
 	}

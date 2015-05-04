@@ -10,6 +10,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -106,4 +108,25 @@ public class VitroBackgroundThread extends Thread {
 			return flags;
 		}
 	}
+	
+	/**
+	 * A factory class, for use in Executors, that creates threads with
+	 * successive names.
+	 */
+	public static class Factory implements ThreadFactory{
+		private final String threadName;
+		private final AtomicInteger index;
+
+		public Factory(String threadName) {
+			this.threadName = threadName;
+			this.index = new AtomicInteger();
+		}
+
+		@Override
+		public Thread newThread(Runnable r) {
+			return new VitroBackgroundThread(r, threadName + "_" + index.getAndIncrement());
+		}
+
+	}
+
 }

@@ -140,6 +140,11 @@ public class ObjectPropertyStatementTemplateModel extends PropertyStatementTempl
     public String uri(String key) {
     	return cleanURIForDisplay(data.get(key));
     }
+    
+    //Adding this method to enable retrieval of the entire data map
+    public Map<String, String> getAllData() {
+    	return data;
+    }
 
 	@Override
 	public String getDeleteUrl() {

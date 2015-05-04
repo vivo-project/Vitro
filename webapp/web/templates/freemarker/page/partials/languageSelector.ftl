@@ -7,14 +7,16 @@
  -->
 
 <#-- This is included by identity.ftl  --> 
-<#if selectLocale??>    
+<#if selectLocale??>
+<li><ul class="language-dropdown">  <li id="language-menu"><a id="lang-link" href="#" title="user">${i18n().select_a_language}</a><ul class="sub_menu">   
     <#list selectLocale.locales as locale>
-        <li>
-            <a href="${selectLocale.selectLocaleUrl}?selection=${locale.code}" title="${i18n().select_locale} -- ${locale.label}" <#if locale.selected>style="padding-bottom:1px;border-bottom: 1px solid #ccdfe6"</#if>>
-                <img src="${locale.imageUrl}" height="15" style="vertical-align:middle" alt="${locale.label}"/>
-            </a>
-        </li>
+        
+            <li <#if locale.selected>status="selected"</#if>>
+                	<a href="${selectLocale.selectLocaleUrl}?selection=${locale.code}" title="${i18n().select_locale} -- ${locale.label}"><img src="${locale.imageUrl}" title="${i18n().select_locale} -- ${locale.label}" height="15" style="vertical-align:middle" alt="${locale.label}"/></a>
+            </li>
     </#list>
+    </ul>
+</li></ul></li>
 </#if>
 
 <#-- 
@@ -27,3 +29,10 @@
  *       -- imageUrl
  *       -- selected (boolean)
 -->
+<script type="text/javascript">
+var i18nStringsLangMenu = {
+    selectLanguage: "${i18n().select_a_language}"
+};
+</script>
+
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/languageMenuUtils.js"></script>')}

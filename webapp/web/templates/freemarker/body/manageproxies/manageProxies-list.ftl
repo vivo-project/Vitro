@@ -22,7 +22,7 @@
 </section>
 
 <section class="proxy-profile">
-    <h4>${i18n().relate_editors_profiles} <img src="${urls.images}/iconInfo.png" alt="${i18n().info_icon}" title="${i18n().profile_editing_title}" /></h4>
+    <h4>${i18n().relate_editors_profiles} <img src="${urls.images}/iconInfo.png" alt="${i18n().info_icon}" title="${i18n().profile_editing_title(siteName!)}" /></h4>
     
     <form id="add-relation" action="${formUrls.create}" method="POST">
         <fieldset class="proxy">

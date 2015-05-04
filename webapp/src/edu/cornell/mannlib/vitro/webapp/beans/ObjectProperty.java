@@ -17,11 +17,13 @@ import org.joda.time.DateTime;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 
+import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.RoleRestrictedProperty;
+
 /**
  * a class representing an object property
  *
  */
-public class ObjectProperty extends Property implements Comparable<ObjectProperty>, ResourceBean, Cloneable
+public class ObjectProperty extends Property implements Comparable<ObjectProperty>, ResourceBean, Cloneable, RoleRestrictedProperty
 {
 	private static final Log log = LogFactory.getLog(ObjectProperty.class.getName());
 	
@@ -53,13 +55,13 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
 
     private String domainEntitySortDirection = null;
     private Integer domainDisplayTier = null;
-    private Integer domainDisplayLimit = 5;
+    private Integer domainDisplayLimit = null;
 
     private String objectIndividualSortPropertyURI = null;
     
     private String rangeEntitySortDirection = null;
     private Integer rangeDisplayTier = null;
-    private Integer rangeDisplayLimit = 5;
+    private Integer rangeDisplayLimit = null;
     
     private boolean selectFromExisting = true;
     private boolean offerCreateNewOption = false;

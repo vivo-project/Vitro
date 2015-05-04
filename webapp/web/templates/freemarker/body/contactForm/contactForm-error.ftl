@@ -2,7 +2,7 @@
 
 <#-- Contact form processing errors -->
 
-<h2>${title}</h2>
+<h2>${title!}</h2>
 
 <#if errorMessage?has_content>       
     <section id="error-alert"><img src="${urls.images}/iconAlert.png" role="error alert"/>

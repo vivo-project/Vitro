@@ -2,7 +2,7 @@
 
 <#-- Template for email message sent to site administrator when an error occurs on the site. -->
 
-<#assign subject = "${i18n().error_occurred}" />
+<#assign subject = "${i18n().error_occurred(siteName!)}" />
 
 <#assign datetime = datetime?string("yyyy-MM-dd HH:mm:ss zzz")>
 
@@ -13,7 +13,7 @@
     </head>
     <body>
         <p>
-            ${i18n().error_occurred_at(datetime!)}
+            ${i18n().error_occurred_at(siteName!,datetime!)}
         </p>
         
         <p>
@@ -27,7 +27,7 @@
         </p>
         
         <p>
-            <strong>${i18n().stack_trace}</strong> (${i18n().trace_available}): 
+            <strong>${i18n().stack_trace}</strong> (${i18n().trace_available(siteName!)}): 
             <pre>${stackTrace!}</pre>
         </p>
         
@@ -42,7 +42,7 @@
 </#assign>
 
 <#assign text>
-${i18n().error_occurred_at(datetime!)}
+${i18n().error_occurred_at(siteName!,datetime!)}
 
 ${i18n().requested_url}: ${requestedUrl!}
 
@@ -50,7 +50,7 @@ ${i18n().requested_url}: ${requestedUrl!}
     ${i18n().error_message}: ${errorMessage!}
 </#if>
 
-${i18n().stack_trace} (${i18n().trace_available}): 
+${i18n().stack_trace} (${i18n().trace_available(siteName!)}): 
 ${stackTrace!}
 
 <#if cause?has_content>

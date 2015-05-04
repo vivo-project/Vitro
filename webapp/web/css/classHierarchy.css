@@ -15,11 +15,7 @@ table.classHierarchy {
 table.classHierarchy td {
     padding-left:6px;
 }
-table.classHierarchy .classDetail {
-    width:90px;
-    color:#064D68;
-    white-space: nowrap;
-}
+table.classHierarchy .classDetail,
 td.classDetail {
     width:90px;
     color:#064D68;

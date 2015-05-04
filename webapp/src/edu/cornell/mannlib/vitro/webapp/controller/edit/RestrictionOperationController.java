@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS;
+
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -28,9 +30,8 @@ import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
 public class RestrictionOperationController extends BaseEditController {
 
@@ -45,9 +46,8 @@ public class RestrictionOperationController extends BaseEditController {
 		String defaultLandingPage = getDefaultLandingPage(request);
 		
 	    try {
-	    	
-	    	OntModel ontModel = ModelAccess.on(
-	    	        getServletContext()).getOntModel(ModelID.BASE_TBOX);
+			OntModel ontModel = ModelAccess.on(getServletContext())
+					.getOntModel(TBOX_ASSERTIONS);
 		    
             HashMap epoHash = null;
             EditProcessObject epo = null;

@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -136,7 +137,10 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
 				if ( label != null ) {
 					List<String> msTypes = ind.getMostSpecificTypeURIs();
 					if ( hasSubclasses && msTypes.size() > 0 ) {
-						label += " (" + getMsTypeLocalName(msTypes.get(0), wDaoFact) + ")";
+						String theType = getMsTypeLocalName(msTypes.get(0), wDaoFact);
+						if ( theType.length() > 0 ) {
+							label += " (" + theType + ")";
+						}
 					}
                 	optionsMap.put(uri, label);
                 	++optionsCount;
@@ -202,7 +206,13 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
 	private String getMsTypeLocalName(String theUri, WebappDaoFactory wDaoFact) {
 		VClassDao vcDao = wDaoFact.getVClassDao();
 		VClass vClass = vcDao.getVClassByURI(theUri);
-		String theType = ((vClass.getName() == null) ? "" : vClass.getName());
+		String theType = "";
+		if ( vClass == null ) {
+			return "";
+		}
+		else {
+			theType = ((vClass.getName() == null) ? "" : vClass.getName());
+		}
 		return theType;
 	}
 

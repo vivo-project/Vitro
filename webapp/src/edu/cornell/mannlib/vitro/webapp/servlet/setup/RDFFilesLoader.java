@@ -13,8 +13,6 @@ import java.nio.file.Paths;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.servlet.ServletContext;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -23,7 +21,7 @@ import com.hp.hpl.jena.ontology.OntModelSpec;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
-import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 
 /**
  * Help to load RDF files on first time and on every startup.
@@ -31,13 +29,15 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 public class RDFFilesLoader {
 	private static final Log log = LogFactory.getLog(RDFFilesLoader.class);
 
-	private static final String PROPERTY_VITRO_HOME = "vitro.home";
 	private static final String DEFAULT_RDF_FORMAT = "RDF/XML";
 	private static final String RDF = "rdf";
 	private static final String FIRST_TIME = "firsttime";
 	private static final String EVERY_TIME = "everytime";
 
-	/** Path filter that ignores sub-directories and hidden files. */
+	/**
+	 * Path filter that ignores sub-directories, hidden files, and markdown
+	 * files.
+	 */
 	private static final DirectoryStream.Filter<Path> RDF_FILE_FILTER = new DirectoryStream.Filter<Path>() {
 		@Override
 		public boolean accept(Path p) throws IOException {
@@ -47,6 +47,9 @@ public class RDFFilesLoader {
 			if (Files.isDirectory(p)) {
 				log.warn("RDF files in subdirectories are not loaded. Directory '"
 						+ p + "' ignored.");
+				return false;
+			}
+			if (p.toString().endsWith(".md")) {
 				return false;
 			}
 			return true;
@@ -61,12 +64,13 @@ public class RDFFilesLoader {
 	 * 
 	 * The files from the directory are added to the model.
 	 */
-	public static void loadFirstTimeFiles(ServletContext ctx, String modelPath,
-			Model model, boolean firstTime) {
+	public static void loadFirstTimeFiles(String modelPath, Model model,
+			boolean firstTime) {
 		if (firstTime) {
-			Set<Path> paths = getPaths(locateHomeDirectory(ctx), RDF,
-					modelPath, FIRST_TIME);
+			String home = locateHomeDirectory();
+			Set<Path> paths = getPaths(home, RDF, modelPath, FIRST_TIME);
 			for (Path p : paths) {
+				log.info("Loading " + relativePath(p, home));
 				readOntologyFileIntoModel(p, model);
 			}
 		} else {
@@ -83,11 +87,10 @@ public class RDFFilesLoader {
 	 * 
 	 * The files from the directory become a sub-model of the model.
 	 */
-	public static void loadEveryTimeFiles(ServletContext ctx, String modelPath,
-			OntModel model) {
+	public static void loadEveryTimeFiles(String modelPath, OntModel model) {
 		OntModel everytimeModel = ModelFactory
 				.createOntologyModel(OntModelSpec.OWL_MEM);
-		String home = locateHomeDirectory(ctx);
+		String home = locateHomeDirectory();
 		Set<Path> paths = getPaths(home, RDF, modelPath, EVERY_TIME);
 		for (Path p : paths) {
 			log.info("Loading " + relativePath(p, home));
@@ -132,8 +135,8 @@ public class RDFFilesLoader {
 	}
 
 	/**
-	 * Find the paths to RDF files in this directory. Sub-directories and hidden
-	 * files are ignored.
+	 * Find the paths to RDF files in this directory. Sub-directories, hidden
+	 * files, and markdown files are ignored.
 	 */
 	private static Set<Path> getPaths(String parentDir, String... strings) {
 		Path dir = Paths.get(parentDir, strings);
@@ -157,7 +160,7 @@ public class RDFFilesLoader {
 
 	private static void readOntologyFileIntoModel(Path p, Model model) {
 		String format = getRdfFormat(p);
-		log.debug("Loading "+ p);
+		log.debug("Loading " + p);
 		try (InputStream stream = new FileInputStream(p.toFile())) {
 			model.read(stream, null, format);
 			log.debug("...successful");
@@ -177,9 +180,9 @@ public class RDFFilesLoader {
 			return DEFAULT_RDF_FORMAT;
 	}
 
-	private static String locateHomeDirectory(ServletContext ctx) {
-		return ConfigurationProperties.getBean(ctx).getProperty(
-				PROPERTY_VITRO_HOME);
+	private static String locateHomeDirectory() {
+		return ApplicationUtils.instance().getHomeDirectory().getPath()
+				.toString();
 	}
 
 	/**

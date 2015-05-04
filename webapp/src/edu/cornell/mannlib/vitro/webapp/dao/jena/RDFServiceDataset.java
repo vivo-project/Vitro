@@ -16,6 +16,7 @@ import com.hp.hpl.jena.sparql.core.DatasetGraph;
 import com.hp.hpl.jena.sparql.util.Context;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 public class RDFServiceDataset implements Dataset {
 
@@ -137,6 +138,11 @@ public class RDFServiceDataset implements Dataset {
 	public void end() {
 		throw new UnsupportedOperationException(this.getClass().getSimpleName()
 				+ " does not support transactions.");
+	}
+
+	@Override
+	public String toString() {
+		return "RDFServiceDataset[" + ToString.hashHex(this) + ", " + g + "]";
 	}
 
 }

@@ -6,23 +6,27 @@ import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.Option;
-import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
+import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class FormUtils {
@@ -247,6 +251,35 @@ public class FormUtils {
         }
         return vclassOptionList;
     }
+    
+	public static List<Option> makeOptionListOfSubVClasses(
+			WebappDaoFactory wadf, String parentVClassUri,
+			String selectedVClassURI) {
+		VClassDao vClassDao = wadf.getVClassDao();
+		
+		Set<String> uris = new HashSet<>(vClassDao.getAllSubClassURIs(parentVClassUri));
+		uris.add(parentVClassUri);
+		
+		List<Option> options = new LinkedList<>();
+		for (String vclassUri: uris) {
+			VClass vclass = vClassDao.getVClassByURI(vclassUri);
+        	Option option = new Option();
+        	option.setValue(vclass.getURI());
+        	option.setBody(vclass.getPickListName());
+        	options.add(option);
+        	if(Objects.equals(selectedVClassURI, vclass.getURI())) {
+        	    option.setSelected(true);
+        	}
+		}
+		
+		Collections.sort(options, new Comparator<Option>() {
+			@Override
+			public int compare(Option o1, Option o2) {
+				return o1.getBody().compareTo(o2.getBody());
+			}});
+		
+		return options;
+	}
 
     public static void beanSet(Object newObj, String field, String value) {
         beanSet (newObj, field, value, null);

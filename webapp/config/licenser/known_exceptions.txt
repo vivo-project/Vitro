@@ -188,7 +188,11 @@ webapp/src/edu/ucsf/vitro/opensocial/GadgetViewRequirements.java
 webapp/src/edu/ucsf/vitro/opensocial/OpenSocialManager.java
 webapp/src/edu/ucsf/vitro/opensocial/PreparedGadget.java
 webapp/web/js/openSocial/shindig.js
-
-# This is a modified version of a Jena source file.
-# It is required to make Jena 2.10.1 compatible with Pellet 2.3.1
-webapp/src/com/hp/hpl/jena/reasoner/BaseInfGraph.java
+opensocial/sample-gadgets/SearchExample.xml
+opensocial/sample-gadgets/ProfileListTool.xml
+opensocial/sample-gadgets/SlideShare.xml
+opensocial/sample-gadgets/Twitter.xml
+opensocial/sample-gadgets/RDFTest.xml
+opensocial/sample-gadgets/WEB-INF/web.xml
+opensocial/sample-gadgets/Mentor.xml
+opensocial/sample-gadgets/Links.xml

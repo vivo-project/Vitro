@@ -11,6 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
  * An RDFServiceFactory that always returns the same RDFService object
@@ -87,12 +88,6 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
         }
 
         @Override
-		public void sparqlSelectQuery(String query, ResultFormat resultFormat,
-				OutputStream outputStream) throws RDFServiceException {
-        	s.sparqlSelectQuery(query, resultFormat, outputStream);
-		}
-
-        @Override
         public InputStream sparqlSelectQuery(String query,
                 ResultFormat resultFormat) throws RDFServiceException {
             return s.sparqlSelectQuery(query, resultFormat);
@@ -119,6 +114,25 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
         }
 
         @Override
+    	public void serializeAll(OutputStream outputStream)
+    			throws RDFServiceException {
+        	s.serializeAll(outputStream);
+    	}
+
+    	@Override
+    	public void serializeGraph(String graphURI, OutputStream outputStream)
+    			throws RDFServiceException {
+    		s.serializeGraph(graphURI, outputStream);
+    	}
+
+    	@Override
+    	public boolean isEquivalentGraph(String graphURI,
+    			InputStream serializedGraph,
+    			ModelSerializationFormat serializationFormat) throws RDFServiceException {
+    		return s.isEquivalentGraph(graphURI, serializedGraph, serializationFormat);
+    	}
+
+       @Override
         public void registerListener(ChangeListener changeListener)
                 throws RDFServiceException {
             s.registerListener(changeListener);
@@ -140,7 +154,12 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
             // Don't close s.  It's being used by everybody.
         }
         
+		@Override
+		public String toString() {
+			return ToString.simpleName(this) + "[" + ToString.hashHex(this)
+					+ ", inner=" + s + "]";
+		}
+
     }
-    
 
 }

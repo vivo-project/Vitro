@@ -7,6 +7,8 @@ import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
+
 public class Property extends BaseResourceBean implements ResourceBean {
     
     private static Log log = LogFactory.getLog( Property.class );
@@ -99,6 +101,23 @@ public class Property extends BaseResourceBean implements ResourceBean {
         this.deleteLinkSuppressed = deleteLinkSuppressed;
     }
     
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + "[" 
+				+ localNameFor(getURI())
+				+ ", domain=" + localNameFor(getDomainVClassURI()) 
+				+ ", range=" + localNameFor(getRangeVClassURI()) 
+				+ "]";
+	}
+    
+	private String localNameFor(String uri) {
+		try {
+			return ResourceFactory.createResource(uri).getLocalName();
+		} catch (Exception e) {
+			return uri;
+		}
+	}
+
     /**
      * Sorts Property objects, by property rank, then alphanumeric.
      * @author bdc34

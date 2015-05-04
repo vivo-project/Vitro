@@ -18,6 +18,7 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.sparql.resultset.ResultsFormat;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
@@ -31,8 +32,6 @@ public class RDFServiceUtils {
     private static final String RDFSERVICEFACTORY_ATTR = 
             RDFServiceUtils.class.getName() + ".RDFServiceFactory";
     
-    public enum WhichService {CONTENT, CONFIGURATION}
-       
     public static RDFServiceFactory getRDFServiceFactory(ServletContext context) {
     	return getRDFServiceFactory(context, WhichService.CONTENT);
     }

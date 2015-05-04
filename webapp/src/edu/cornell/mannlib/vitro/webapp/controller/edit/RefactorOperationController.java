@@ -2,6 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.ABOX_ASSERTIONS;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_ASSERTIONS;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS;
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -48,11 +53,9 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.FileGraphSetup;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaDataSourceSetupBase;
 
 public class RefactorOperationController extends BaseEditController {
 	
@@ -73,7 +76,7 @@ public class RefactorOperationController extends BaseEditController {
         request.setAttribute("title","Check Datatype Properties");
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
         
-        OntModel ontModel = ModelAccess.on(getServletContext()).getBaseOntModel();
+        OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel(FULL_ASSERTIONS);
 		ontModel.enterCriticalSection(Lock.WRITE);
 		ArrayList<String> results = new ArrayList<String>();
 				
@@ -234,11 +237,11 @@ public class RefactorOperationController extends BaseEditController {
     			boolean doNotify = false;
     			Model model = null;
     			
-    			if (JenaDataSourceSetupBase.JENA_TBOX_ASSERTIONS_MODEL.equals(graphURI)) {
-    				model = ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_TBOX);
+    			if (TBOX_ASSERTIONS.equals(graphURI)) {
+    				model = ModelAccess.on(getServletContext()).getOntModel(TBOX_ASSERTIONS).getBaseModel();
     				doNotify = true;
-    			} else if (JenaDataSourceSetupBase.JENA_DB_MODEL.equals(graphURI)) {
-					model = ModelAccess.on(getServletContext()).getOntModel(ModelID.BASE_ABOX);
+    			} else if (ABOX_ASSERTIONS.equals(graphURI)) {
+					model = ModelAccess.on(getServletContext()).getOntModel(ABOX_ASSERTIONS).getBaseModel();
 					doNotify = true;
     			} else {
     			    model = dataset.getNamedModel(graphURI);
@@ -251,7 +254,7 @@ public class RefactorOperationController extends BaseEditController {
     		dataset.getLock().leaveCriticalSection();
     	}
 		
-		renameResourceInModel(ModelAccess.on(getServletContext()).getUserAccountsModel(), 
+		renameResourceInModel(ModelAccess.on(getServletContext()).getOntModel(USER_ACCOUNTS), 
 				        userURI, oldURIStr, newURIStr, !NOTIFY);
     	
 		// there are no statements to delete, but we want indexes updated appropriately
@@ -328,7 +331,7 @@ public class RefactorOperationController extends BaseEditController {
 	private void doMovePropertyStatements(VitroRequest request, HttpServletResponse response, EditProcessObject epo) {
 		String userURI = LoginStatusBean.getBean(request).getUserURI();
 		
-		OntModel ontModel = ModelAccess.on(getServletContext()).getBaseOntModel();
+		OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel(FULL_ASSERTIONS);
 		
 		Model tempRetractModel = ModelFactory.createDefaultModel();
 		Model tempAddModel = ModelFactory.createDefaultModel();
@@ -412,7 +415,7 @@ public class RefactorOperationController extends BaseEditController {
 	private void doMoveInstances(VitroRequest request, HttpServletResponse response, EditProcessObject epo) {
 		String userURI = LoginStatusBean.getBean(request).getUserURI();
 		
-		OntModel ontModel = ModelAccess.on(getServletContext()).getBaseOntModel();
+		OntModel ontModel = ModelAccess.on(getServletContext()).getOntModel(FULL_ASSERTIONS);
 		
 		String oldClassURIStr = (String) epo.getAttribute("VClassURI");
 		String newClassURIStr = (String) request.getParameter("NewVClassURI");

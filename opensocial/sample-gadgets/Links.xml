@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+	<ModulePrefs title="Websites"
+				 description="Websites">
+		<Require feature="opensocial-0.9" />
+		<Require feature="views" />
+		<Require feature="dynamic-height" />
+		<Require feature="pubsub" />
+		<Require feature="osapi" />
+	</ModulePrefs>
+
+	<!-- ==================== START COMBINED VIEWS ==================== -->
+
+	<Content type="html" view="default, home, profile">
+	<![CDATA[<!--HTML-->
+    <!DOCTYPE html>
+    
+	<!-- #includes -->
+	<link rel="stylesheet" href="css/gadget.css" type="text/css" media="screen, projection" >
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>    
+    <script type="text/javascript" src="js/os.js" ></script>
+    
+	<style>
+    	.links_title { font-family:Verdana, Arial; font-size: 14px; }
+    	.links_body { font-family:Arial; font-size: 12px; }
+    	.links_credit { font-family:Arial; font-size:10px; }
+	.links_save_button { height:20px; font-size:11px; } 
+    	a, a:visited { color: #0088CC; text-decoration: none; }
+    	a:hover { color: #005580; text-decoration: underline; }
+    </style>
+	
+	<script type="text/javascript">
+	
+    	var g_max_links = 5;
+		var g_oLinks = []; // declare it like this to make json work
+		
+		// ========================================
+		
+		function sort_by (field, reverse, primer) {
+			reverse = (reverse) ? -1 : 1;
+			return function(a,b) {
+				a = a[field];
+				b = b[field];
+				if (typeof(primer) != 'undefined') {
+					a = primer(a);
+					b = primer(b);
+				}
+				if (a<b) return reverse * -1;
+				if (a>b) return reverse * 1;
+				return 0;
+			}
+		}
+		// ========================================
+		
+		
+		// ========================================
+		
+		function deleteArrayItem (array_index) {
+			g_oLinks.splice(array_index,1);
+			
+			// write links data to gadget database
+			osapi.appdata.update({'userId': '@viewer', 'appId': '@app', 'data': {'links' : gadgets.json.stringify(g_oLinks)} }).execute(function(result) {
+				if (result.error) { 
+					alert("Error " + result.error.code + " writing application data: " + result.error.message + ". Your edited link list was not saved.");
+				}
+			});
+			
+			// show links w/o deleted item even if data write fails - array already spliced
+			displayData();
+		}
+		// ========================================
+		
+		
+		// ========================================
+		
+		function readData(callback) {
+			osapi.appdata.get({'userId': '@owner', 'appId':'@app', 'fields' : ['links']} ).execute(function(result){
+				
+			// get incoming link data (in json string format)
+			var viewer = os.osapi.getViewerFromResult(result);
+	
+			// convert to json object format
+			g_oLinks = gadgets.json.parse(viewer.links) || [];
+			
+			// execute the callback;
+			callback();
+				
+			}); /* end osapi.appdata.get */			
+		}
+		// ========================================		
+	
+	
+		// ========================================
+		
+		function displayData() {
+				
+			// if links data exists
+			if (g_oLinks) {
+										
+				// sort object by link name, case-insensitive, A-Z
+				g_oLinks.sort(sort_by('link_name', false, function(a){return a.toUpperCase()}));
+				
+				if (document.getElementById("edit_links_table")){
+				
+                	// EDIT MODE - build table to hold retrieved app data
+                	var links_table_data = "<table cellspacing='10' cellpadding='0' border='0'><tr>";
+					var favicon_path_array;
+                    
+					for (i in g_oLinks) {
+						cell_name = g_oLinks[i].link_name;
+						cell_url = g_oLinks[i].link_url;
+						cell_url2 = g_oLinks[i].link_url;
+							
+						favicon_path_array = cell_url.split("//");
+						cell_url2 = favicon_path_array[1];
+						favicon_path_array = cell_url2.split("/");
+						cell_url2 = favicon_path_array[0];
+						cell_favicon="<img height='16' width=16' src='http://www.google.com/s2/favicons?domain=" + cell_url2 + "' />";
+                            
+						// build and add table row
+						links_table_data = links_table_data
+							+ "<tr>" + "<td>" + cell_favicon + "</td>"
+							+ "<td>" + "<a href='" + cell_url + "' target='_blank'>" + cell_name + "</a></td>"
+							+ "<td>" + cell_url + "</td>"
+							+ "<td><input type='button' class='links_save_button' value='Delete' onClick='deleteArrayItem(" 
+							+ i + ")'" + "></td>" + "</tr>";
+					}
+                    
+                	// close the table
+                	links_table_data = links_table_data + "</tr></table>";
+                        
+                	// put appdata table markup in designated div
+                	// and set height based on which view view this is
+					document.getElementById("edit_links_table").innerHTML=links_table_data;
+					gadgets.window.adjustHeight(250 + ((g_oLinks.length - 1) * 28 * 2) + 10 );
+				}
+				
+				if(document.getElementById("view_links_table")){				
+					
+                	// VIEW MODE - build table to hold retrieved app data
+					links_table_data = "<table cellspacing='10' cellpadding='0' border='0'><tr>";
+                    
+					for (i in g_oLinks) {
+						cell_name = g_oLinks[i].link_name;
+						cell_url = g_oLinks[i].link_url;
+						cell_url2 = g_oLinks[i].link_url;
+							
+						favicon_path_array = cell_url.split("//");
+						cell_url2 = favicon_path_array[1];
+						favicon_path_array = cell_url2.split("/");
+						cell_url2 = favicon_path_array[0];
+						cell_favicon="<img height='16' width=16' src='http://www.google.com/s2/favicons?domain=" + cell_url2 + "' />";
+
+						// build and add table row
+						links_table_data = links_table_data
+							+ "<tr>" + "<td>" + cell_favicon + "</td>"
+							+ "<td onClick=\"gadgetEventTrack('go_to_website', cell_name)\">" + "<a href='" + cell_url + "' target='_blank'>" + cell_name + "</a></td>" + "</tr>";
+					}                    
+                			// close the table
+                			links_table_data = links_table_data + "</tr></table>";
+                        
+                			// put appdata table markup in designated div
+					document.getElementById("view_links_table").innerHTML=links_table_data;
+					if (g_oLinks.length > 0) {
+						gadgets.window.adjustHeight( 12 + ((g_oLinks.length - 1) * 30) + 34 );					
+					}
+					else {
+						gadgets.pubsub.publish("hide");
+					}
+				}
+			} /* end if link data exists */
+		}
+		// ========================================
+		
+		
+		// ========================================
+		
+		function saveData() {
+
+			// get link name and url from form
+               var new_link_name=document.getElementById("linkname").value;
+               var new_link_url=document.getElementById("linkurl").value;
+
+			if (g_oLinks.length < g_max_links || !g_oLinks) {
+				
+				// check for empty input boxes
+				if(new_link_name=="" || new_link_url==""){
+					alert("Please provide both a Link Name and a URL");
+					return;
+				}
+				
+				// prepend http header if missing
+				if(new_link_url.indexOf("://") == -1){new_link_url = "http://" + new_link_url;}
+
+				var newLinkNdx = g_oLinks.length;
+				g_oLinks[newLinkNdx] = {};							
+				g_oLinks[newLinkNdx].link_name = new_link_name;							
+				g_oLinks[newLinkNdx].link_url = new_link_url;							
+
+				// write links data to gadget database
+				osapi.appdata.update({'userId': '@viewer', 'appId': '@app', 'data': {'links' : gadgets.json.stringify(g_oLinks)} }).execute(function(result) {
+					if (result.error) { 
+						alert("Error " + result.error.code + " writing application data: " + result.error.message);
+					} else {
+
+                		// refresh after update, clear input fields - don't need to reset g_oLinks as displayData does this
+                		displayData();
+						document.getElementById("linkname").value = "";
+                		document.getElementById("linkurl").value = "http://";
+						alert("Your links information is saved. Don't forget to use the Hide / Show links to make this section visible or hidden on your profile page.");
+					}
+				});
+				
+			} else {
+				alert("You already have the maximum number of links.");
+			}
+        }
+	// ==============================================================
+
+	function gadgetEventTrack(action, label, value) {
+	
+		var message = {'action' : action};
+		if (label) {message.label = label;}
+		if (value) {message.value = value;}
+		
+		gadgets.pubsub.publish("analytics", message);
+	}	
+	// ==============================================================
+        		
+	</script>
+    
+    ]]></Content>
+	<!-- ==================== END COMBINED VIEWS ==================== -->
+
+	<!-- ==================== START HOME/EDIT VIEW ==================== -->
+	<Content type="html" view="home" preferred_height="300" preferred_width="700">
+	<![CDATA[<!--HTML-->
+    	
+    <h3 style="padding-left:10px; padding-top: 0px;">Manage Links to Other Websites</h3>
+
+    <div style="padding:5px 0px 0px 25px;">
+    	Add up to five  websites to your profile. 
+		Enter the website name, as you want it to appear on your profile, and its URL. 
+        Some samples include a link to your lab web site, your research program or your research blog.<br /><br />
+	</div>
+	
+	<!-- display the new link input fields -->
+	<div class='question' style="padding:0px 0px 5px 12px;">
+		<table cellpadding="0" cellspacing="0">
+			<tr>
+				<td class="links_body" valign="top"><b>Website Name</b><br />
+					e.g. My Lab Site<br />
+                    <input id="linkname" type="linkname" name="linkname" style="width:280px; margin-top:4px;"><br />
+                    (60 characters max)
+                </td>
+				<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+				<td class="links_body" valign="top"><b>Website URL</b> (not displayed in profile)<br />
+					e.g. mylabsite.ucsf.edu<br />
+                    <input id="linkurl" type="linkurl" name="linkurl" style="width:250px; margin-top:4px;" value="http://">
+                </td>
+                <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                <td><br /><br /><input type="button" style="margin-bottom: 8px;" value="Save" onClick="saveData();"></td>
+			</tr>				
+		</table>			
+	</div>
+    
+    <h4 style="padding-left:10px; padding-top: 0px;">Your Current Websites:</h4>
+    <div id="edit_links_table" style="padding:0px 0px 10px 25px;"></div>
+            
+    <script type="text/javascript">
+    	gadgets.util.registerOnLoadHandler(function() {
+			readData(displayData)
+		});
+    </script>
+            
+    ]]></Content>
+	<!-- ==================== END HOME/EDIT VIEW ==================== -->
+
+
+	<!-- ==================== START PROFILE VIEW ==================== -->
+	<Content type="html" view="profile" preferred_height="100" preferred_width="670">
+	<![CDATA[<!--HTML-->
+   
+    <div id="view_links_table" style="padding:0px 0px 10px 20px;"></div>     
+   
+	<script type="text/javascript">
+    	gadgets.util.registerOnLoadHandler(function() {
+			readData(displayData)
+		});
+    </script>
+    
+    ]]></Content>
+	<!-- ==================== END PROFILE VIEW ==================== -->
+
+</Module>

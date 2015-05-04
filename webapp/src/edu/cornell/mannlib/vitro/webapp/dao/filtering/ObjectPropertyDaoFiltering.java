@@ -2,17 +2,14 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.jga.algorithms.Filter;
 import net.sf.jga.fn.UnaryFunctor;
 import net.sf.jga.fn.adaptor.AndUnary;
-import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
@@ -57,10 +54,6 @@ class ObjectPropertyDaoFiltering extends BaseFiltering implements ObjectProperty
     public ObjectProperty getObjectPropertyByURIs(String objectPropertyURI, String domainURI, String rangeURI, ObjectProperty base) {
         ObjectProperty newOprop=innerObjectPropertyDao.getObjectPropertyByURIs(objectPropertyURI, domainURI, rangeURI, base);
         return (newOprop == null) ? null : new ObjectPropertyFiltering(newOprop, filters);
-    }
-    
-    public List<ObjectPropertyStatement> getStatementsUsingObjectProperty(ObjectProperty op) {
-        return ObjectPropertyStatementDaoFiltering.filterAndWrapList(innerObjectPropertyDao.getStatementsUsingObjectProperty(op),filters);       
     }
     
     public List getRootObjectProperties() {

@@ -2,47 +2,34 @@
 # ServletContextListeners for Vitro, to be instantiated and run by the StartupManager.
 # 
 # For more information, 
-#     https://sourceforge.net/apps/mediawiki/vivo/index.php?title=The_StartupManager
+#     https://wiki.duraspace.org/display/VIVO/The+StartupManager
 #
 
 edu.cornell.mannlib.vitro.webapp.servlet.setup.JvmSmokeTests
+
+edu.cornell.mannlib.vitro.webapp.application.ApplicationSetup
 
 edu.cornell.mannlib.vitro.webapp.config.ConfigurationPropertiesSetup
 
 edu.cornell.mannlib.vitro.webapp.config.ConfigurationPropertiesSmokeTests
 
-# For the conversion from 1.6 or earlier (RDB) to 1.7 or later (TDB)
-edu.cornell.mannlib.vitro.webapp.servlet.setup.GuardAgainstUnmigratedRDB
-
 edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings$Setup
 
-edu.cornell.mannlib.vitro.webapp.application.ApplicationImpl$Setup
+edu.cornell.mannlib.vitro.webapp.application.ApplicationImpl$ComponentsSetup
 
 edu.cornell.mannlib.vitro.webapp.config.RevisionInfoSetup
 
 edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory$Setup
 
-### this listener must be run before SDBSetup, all models setups and WebappDaoSetup ###
-edu.cornell.mannlib.vitro.webapp.servlet.setup.JenaPersistentDataSourceSetup
- 
-edu.cornell.mannlib.vitro.webapp.servlet.setup.RDFServiceSetup
-
 edu.cornell.mannlib.vitro.webapp.servlet.setup.ConfigurationModelsSetup
 edu.cornell.mannlib.vitro.webapp.servlet.setup.ContentModelSetup
-edu.cornell.mannlib.vitro.webapp.servlet.setup.ModelMakerSetup
-
-edu.cornell.mannlib.vitro.webapp.filestorage.backend.FileStorageSetup
 
 edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil$Setup
 
-# Some permissions were removed in release 1.7
-edu.cornell.mannlib.vitro.webapp.servlet.setup.RemoveObsoletePermissions
-
 edu.cornell.mannlib.vitro.webapp.servlet.setup.FileGraphSetup
 
+edu.cornell.mannlib.vitro.webapp.application.ApplicationImpl$ReasonersSetup
 edu.cornell.mannlib.vitro.webapp.servlet.setup.SimpleReasonerSetup
-
-#edu.cornell.mannlib.vitro.webapp.servlet.setup.UpdateKnowledgeBase
 
 # Must run after JenaDataSourceSetup
 edu.cornell.mannlib.vitro.webapp.servlet.setup.ThemeInfoSetup
@@ -51,7 +38,7 @@ edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionRegistry$Setup
 
 edu.cornell.mannlib.vitro.webapp.auth.permissions.PermissionSetsSmokeTest
 
-edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionPolicyHelper$Setup
+edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionBean$Setup
 
 edu.cornell.mannlib.vitro.webapp.auth.policy.setup.CommonPolicyFamilySetup
 
@@ -68,7 +55,6 @@ edu.cornell.mannlib.vitro.webapp.i18n.selection.LocaleSelectionSetup
 
 # The search indexer uses a "public" permission, so the PropertyRestrictionPolicyHelper 
 #   and the PermissionRegistry must already be set up.
-edu.cornell.mannlib.vitro.webapp.searchengine.SearchEngineSetup
 edu.cornell.mannlib.vitro.webapp.searchindex.SearchIndexerSetup
 
 edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerSetup

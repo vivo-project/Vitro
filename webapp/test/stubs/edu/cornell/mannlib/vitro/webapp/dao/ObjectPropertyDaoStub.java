@@ -2,6 +2,7 @@
 
 package stubs.edu.cornell.mannlib.vitro.webapp.dao;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,17 +41,18 @@ public class ObjectPropertyDaoStub implements ObjectPropertyDao {
 
 		opMap.put(uri, property);
 	}
-	
-	public void setCustomListViewConfigFileName(ObjectProperty property, String filename) {
+
+	public void setCustomListViewConfigFileName(ObjectProperty property,
+			String filename) {
 		if (property == null) {
 			throw new NullPointerException("property may not be null.");
 		}
-		
+
 		String uri = property.getURI();
 		if (uri == null) {
 			throw new NullPointerException("uri may not be null.");
 		}
-		
+
 		configFilesMap.put(uri, filename);
 	}
 
@@ -59,24 +61,29 @@ public class ObjectPropertyDaoStub implements ObjectPropertyDao {
 	// ----------------------------------------------------------------------
 
 	@Override
+	public List<ObjectProperty> getAllObjectProperties() {
+		return new ArrayList<>(opMap.values());
+	}
+
+	@Override
 	public ObjectProperty getObjectPropertyByURI(String objectPropertyURI) {
 		if (objectPropertyURI == null) {
 			return null;
 		}
 		return opMap.get(objectPropertyURI);
 	}
-	
-    @Override
-    public ObjectProperty getObjectPropertyByURIs(String objectPropertyURI, 
-            String domainURI, String rangeURI) {
-        return getObjectPropertyByURI(objectPropertyURI);
-    }
-    
-    @Override
-    public ObjectProperty getObjectPropertyByURIs(String objectPropertyURI, 
-            String domainURI, String rangeURI, ObjectProperty base) {
-        return getObjectPropertyByURI(objectPropertyURI);
-    }
+
+	@Override
+	public ObjectProperty getObjectPropertyByURIs(String objectPropertyURI,
+			String domainURI, String rangeURI) {
+		return getObjectPropertyByURI(objectPropertyURI);
+	}
+
+	@Override
+	public ObjectProperty getObjectPropertyByURIs(String objectPropertyURI,
+			String domainURI, String rangeURI, ObjectProperty base) {
+		return getObjectPropertyByURI(objectPropertyURI);
+	}
 
 	@Override
 	public String getCustomListViewConfigFileName(ObjectProperty objectProperty) {
@@ -195,12 +202,6 @@ public class ObjectPropertyDaoStub implements ObjectPropertyDao {
 	}
 
 	@Override
-	public List<ObjectProperty> getAllObjectProperties() {
-		throw new RuntimeException(
-				"ObjectPropertyDaoStub.getAllObjectProperties() not implemented.");
-	}
-
-	@Override
 	public List<ObjectProperty> getObjectPropertiesForObjectPropertyStatements(
 			List objectPropertyStatements) {
 		throw new RuntimeException(
@@ -218,13 +219,6 @@ public class ObjectPropertyDaoStub implements ObjectPropertyDao {
 	public List<String> getSubPropertyURIs(String objectPropertyURI) {
 		throw new RuntimeException(
 				"ObjectPropertyDaoStub.getSubPropertyURIs() not implemented.");
-	}
-
-	@Override
-	public List<ObjectPropertyStatement> getStatementsUsingObjectProperty(
-			ObjectProperty op) {
-		throw new RuntimeException(
-				"ObjectPropertyDaoStub.getStatementsUsingObjectProperty() not implemented.");
 	}
 
 	@Override

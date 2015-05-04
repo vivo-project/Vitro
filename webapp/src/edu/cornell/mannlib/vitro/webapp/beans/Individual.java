@@ -104,4 +104,11 @@ public interface Individual extends ResourceBean, Comparable<Individual> {
     
     String getSearchSnippet();
     void setSearchSnippet( String snippet );
+    
+    /**
+     * This is crap. It was put in so IndividualFiltering could filter object properties properly,
+     * but what we really need is either: filters have a reference to a webappDaoFactory, or
+     * all ObjectPropertyStatements are resolved when they are created. See VIVO-946 and VIVO-984.
+     */
+	void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt);
 }

@@ -26,12 +26,10 @@ import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
-import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.search.beans.ProhibitedFromSearch;
 
 public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
 
@@ -293,22 +291,6 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
         } finally {
             ontModel.leaveCriticalSection();
         }
-    }
-
-    @Override
-    public void removeClassesHiddenFromSearch(List<VClassGroup> groups) {        
-        OntModel displayOntModel = getOntModelSelector().getDisplayModel();
-        ProhibitedFromSearch pfs = new ProhibitedFromSearch(
-                DisplayVocabulary.SEARCH_INDEX_URI, displayOntModel);
-        for (VClassGroup group : groups) {
-            List<VClass> classList = new ArrayList<VClass>();
-            for (VClass vclass : group.getVitroClassList()) {
-                if (!pfs.isClassProhibitedFromSearch(vclass.getURI())) {
-                    classList.add(vclass);
-                }
-            }
-            group.setVitroClassList(classList);
-        }        
     }
 
     @Override

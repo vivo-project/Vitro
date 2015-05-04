@@ -1,0 +1,13 @@
+@prefix ns: <http://example.com/ns/> .
+
+[] a ns:Duck ;
+    ns:duckCode "1" ;
+    ns:d [
+        a ns:Duck ;
+        ns:duckCode "2" ;
+        ns:d [
+            a ns:Duck ;
+            ns:duckCode "3" ;
+            ns:d "cake" ;
+        ] ;
+    ] .  

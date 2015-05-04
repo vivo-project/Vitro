@@ -63,7 +63,12 @@ display:RequiredAction a owl:Class ;
 
 <java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter>
     a owl:Class .
+    
+## Class defining what N3 editing model preprocessors are associated with the system  
+## This is technically a JAVA interface but we can designate this as an owl:Class to indicate
+## which classes are model change preprocessors  
 
+<java:edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.ModelChangePreprocessor> a owl:Class .
 ########Data Properties#########
 
 ###Basic

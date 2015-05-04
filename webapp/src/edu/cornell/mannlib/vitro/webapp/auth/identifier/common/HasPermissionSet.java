@@ -8,7 +8,6 @@ import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.Identifier;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.auth.permissions.Permission;
 import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
 
 /**
@@ -16,18 +15,26 @@ import edu.cornell.mannlib.vitro.webapp.beans.PermissionSet;
  */
 public class HasPermissionSet extends AbstractCommonIdentifier implements
 		Identifier, Comparable<HasPermissionSet> {
-	public static Collection<HasPermission> getIdentifiers(IdentifierBundle ids) {
-		return getIdentifiersForClass(ids, HasPermission.class);
+	public static Collection<HasPermissionSet> getIdentifiers(IdentifierBundle ids) {
+		return getIdentifiersForClass(ids, HasPermissionSet.class);
 	}
 
-	public static Collection<Permission> getPermissions(IdentifierBundle ids) {
-		Set<Permission> set = new HashSet<Permission>();
-		for (HasPermission id : getIdentifiers(ids)) {
-			set.add(id.getPermission());
+	public static Collection<PermissionSet> getPermissionSets(IdentifierBundle ids) {
+		Set<PermissionSet> set = new HashSet<>();
+		for (HasPermissionSet id : getIdentifiers(ids)) {
+			set.add(id.getPermissionSet());
 		}
 		return set;
 	}
 
+	public static Collection<String> getPermissionSetUris(IdentifierBundle ids) {
+		Set<String> set = new HashSet<>();
+		for (HasPermissionSet id : getIdentifiers(ids)) {
+			set.add(id.getPermissionSet().getUri());
+		}
+		return set;
+	}
+	
 	private final PermissionSet permissionSet; // never null
 
 	public HasPermissionSet(PermissionSet permissionSet) {

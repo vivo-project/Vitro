@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vedit.controller;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ReasoningOption.ASSERTIONS_ONLY;
+
 import java.text.Collator;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -18,13 +20,10 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import com.hp.hpl.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.Option;
@@ -32,10 +31,9 @@ import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ReasoningOption;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.ModelAccess.ModelID;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ModelContext;
 
 public class BaseEditController extends VitroHttpServlet {
 
@@ -198,7 +196,7 @@ public class BaseEditController extends VitroHttpServlet {
    }
     
     protected WebappDaoFactory getWebappDaoFactory() {
-    	return ModelAccess.on(getServletContext()).getBaseWebappDaoFactory();
+    	return ModelAccess.on(getServletContext()).getWebappDaoFactory(ASSERTIONS_ONLY);
     }
     
     protected WebappDaoFactory getWebappDaoFactory(String userURI) {

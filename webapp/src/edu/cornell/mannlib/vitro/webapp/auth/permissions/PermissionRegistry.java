@@ -150,9 +150,9 @@ public class PermissionRegistry {
 				List<Permission> permissions = new ArrayList<Permission>();
 
 				permissions.addAll(SimplePermission.getAllInstances());
-				permissions.addAll(createDisplayByRolePermissions(ctx));
-				permissions.addAll(createEditByRolePermissions(ctx));
-				permissions.addAll(createPublishByRolePermissions(ctx));
+				permissions.addAll(createDisplayByRolePermissions());
+				permissions.addAll(createEditByRolePermissions());
+				permissions.addAll(createPublishByRolePermissions());
 
 				PermissionRegistry.createRegistry(ctx, permissions);
 
@@ -169,17 +169,12 @@ public class PermissionRegistry {
 		 * same rights as PUBLIC. Other permissions give them their self-editing
 		 * privileges.
 		 */
-		private Collection<Permission> createDisplayByRolePermissions(
-				ServletContext ctx) {
+		private Collection<Permission> createDisplayByRolePermissions() {
 			List<Permission> list = new ArrayList<Permission>();
-			list.add(new DisplayByRolePermission("Admin", RoleLevel.DB_ADMIN,
-					ctx));
-			list.add(new DisplayByRolePermission("Curator", RoleLevel.CURATOR,
-					ctx));
-			list.add(new DisplayByRolePermission("Editor", RoleLevel.EDITOR,
-					ctx));
-			list.add(new DisplayByRolePermission("Public", RoleLevel.PUBLIC,
-					ctx));
+			list.add(new DisplayByRolePermission("Admin", RoleLevel.DB_ADMIN));
+			list.add(new DisplayByRolePermission("Curator", RoleLevel.CURATOR));
+			list.add(new DisplayByRolePermission("Editor", RoleLevel.EDITOR));
+			list.add(new DisplayByRolePermission("Public", RoleLevel.PUBLIC));
 			return list;
 		}
 
@@ -191,12 +186,11 @@ public class PermissionRegistry {
 		 * 
 		 * Other permissions give self-editors their editing privileges.
 		 */
-		private Collection<Permission> createEditByRolePermissions(
-				ServletContext ctx) {
+		private Collection<Permission> createEditByRolePermissions() {
 			List<Permission> list = new ArrayList<Permission>();
-			list.add(new EditByRolePermission("Admin", RoleLevel.DB_ADMIN, ctx));
-			list.add(new EditByRolePermission("Curator", RoleLevel.CURATOR, ctx));
-			list.add(new EditByRolePermission("Editor", RoleLevel.EDITOR, ctx));
+			list.add(new EditByRolePermission("Admin", RoleLevel.DB_ADMIN));
+			list.add(new EditByRolePermission("Curator", RoleLevel.CURATOR));
+			list.add(new EditByRolePermission("Editor", RoleLevel.EDITOR));
 			return list;
 		}
 
@@ -210,17 +204,12 @@ public class PermissionRegistry {
 		 * same rights as PUBLIC. Other permissions give them their self-editing
 		 * privileges.
 		 */
-		private Collection<Permission> createPublishByRolePermissions(
-				ServletContext ctx) {
+		private Collection<Permission> createPublishByRolePermissions() {
 			List<Permission> list = new ArrayList<Permission>();
-			list.add(new PublishByRolePermission("Admin", RoleLevel.DB_ADMIN,
-					ctx));
-			list.add(new PublishByRolePermission("Curator", RoleLevel.CURATOR,
-					ctx));
-			list.add(new PublishByRolePermission("Editor", RoleLevel.EDITOR,
-					ctx));
-			list.add(new PublishByRolePermission("Public", RoleLevel.PUBLIC,
-					ctx));
+			list.add(new PublishByRolePermission("Admin", RoleLevel.DB_ADMIN));
+			list.add(new PublishByRolePermission("Curator", RoleLevel.CURATOR));
+			list.add(new PublishByRolePermission("Editor", RoleLevel.EDITOR));
+			list.add(new PublishByRolePermission("Public", RoleLevel.PUBLIC));
 			return list;
 		}
 	}

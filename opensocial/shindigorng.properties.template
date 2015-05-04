@@ -190,8 +190,5 @@ orng.dbDriver = @DATA_SOURCE_DRIVER@
 orng.dbURL = @DATA_SOURCE_URL@
 orng.dbUser = @DATA_SOURCE_USERNAME@
 orng.dbPassword = @DATA_SOURCE_PASSWORD@
-orng.systemDomain = NOT_USED
-
-
-
+orng.systemDomain = http://localhost:8080/vivo
 

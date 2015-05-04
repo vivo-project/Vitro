@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -20,7 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.search.indexing.IndexBuilder;
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 
 /**
  * Class that performs the update of the uris in the search index for the
@@ -38,7 +39,7 @@ public class UpdateUrisInIndex {
 	 * 
 	 * @throws IOException
 	 */
-	protected int doUpdateUris(HttpServletRequest req, IndexBuilder builder)
+	protected int doUpdateUris(HttpServletRequest req, SearchIndexer indexer)
 			throws ServletException, IOException {
 		Map<String, List<FileItem>> map = new VitroRequest(req).getFiles();
 		if (map == null) {
@@ -51,25 +52,25 @@ public class UpdateUrisInIndex {
 		for (String name : map.keySet()) {
 			for (FileItem item : map.get(name)) {
 				log.debug("Found " + item.getSize() + " byte file for '" + name + "'");
-				uriCount += processFileItem(builder, item, enc);
+				uriCount += processFileItem(indexer, item, enc);
 			}
 		}
 		return uriCount;
 	}
 
-	private int processFileItem(IndexBuilder builder, 
+	private int processFileItem(SearchIndexer indexer, 
 			FileItem item, Charset enc) throws IOException {
-		int count = 0;
+		List<String> uris = new ArrayList<>();
 		Reader reader = new InputStreamReader(item.getInputStream(), enc.name());
 		try (Scanner scanner = createScanner(reader)) {
 			while (scanner.hasNext()) {
 				String uri = scanner.next();
 				log.debug("Request to index uri '" + uri + "'");
-				builder.addToChanged(uri);
-				count++;
+				uris.add(uri);
 			}
 		}
-		return count;
+		indexer.scheduleUpdatesForUris(uris);
+		return uris.size();
 	}
 
 	@SuppressWarnings("resource")

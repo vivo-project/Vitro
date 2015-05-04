@@ -6,8 +6,10 @@ the domain of the controllers. -->
 
 <#assign bodyClasses>
     <#-- The compress directives and formatting here resolve whitespace issues in output; please do not alter them. -->
+    <#-- Add the ?html builtin to currentServlet to guard against hacks. 
+         Otherwise, the servletPath portion of the URL is rendered verbatim into the HTML -->
     <#compress>
-    <#assign bodyClassList = [currentServlet!]>
+    <#assign bodyClassList = [(currentServlet?html)!]>
     
     <#if user.loggedIn> 
         <#assign bodyClassList = bodyClassList + ["loggedIn"]/>

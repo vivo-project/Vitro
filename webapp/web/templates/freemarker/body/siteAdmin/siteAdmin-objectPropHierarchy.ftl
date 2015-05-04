@@ -45,6 +45,7 @@
 </section>
 <script language="javascript" type="text/javascript" >
     var json = [${jsonTree!}];
+	var propertyType = '${propType}';
     var i18nStrings = {
         hideProperties: '${i18n().hide_properties}',
         showProperties: '${i18n().show_properties}',
@@ -52,6 +53,7 @@
         groupString: '${i18n().group_capitalized}',
         domainClass: '${i18n().domain_class}',
         rangeClass: '${i18n().range_class}',
+        rangeDataType: '${i18n().range_data_type}',
         expandAll: '${i18n().expand_all}',
         collapseAll: '${i18n().collapse_all}',
         subProperties: '${i18n().sub_properties}',
