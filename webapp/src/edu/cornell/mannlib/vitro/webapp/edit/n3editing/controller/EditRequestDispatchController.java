@@ -51,11 +51,11 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     public static Log log = LogFactory.getLog(EditRequestDispatchController.class);
     
-    final String DEFAULT_OBJ_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultObjectPropertyFormGenerator";
-    final String DEFAULT_DATA_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDataPropertyFormGenerator";
+    final static String DEFAULT_OBJ_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultObjectPropertyFormGenerator";
+    final static String DEFAULT_DATA_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDataPropertyFormGenerator";
     //TODO: Create this generator
-    final String RDFS_LABEL_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RDFSLabelGenerator";
-    final String DEFAULT_DELETE_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDeleteGenerator";
+    final static String RDFS_LABEL_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.RDFSLabelGenerator";
+    final static String DEFAULT_DELETE_FORM = "edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDeleteGenerator";
 
     @Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {
@@ -200,7 +200,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 	 * Forwarding should NOT be done here.  If an EditConfiguration needs to 
 	 * forward to a URL use editConfig.getSkipToUrl(). Also consider using a skip predicate annotation.
 	 */
-	private String processEditConfGeneratorName(VitroRequest vreq) {
+	public static String processEditConfGeneratorName(VitroRequest vreq) {
 	    String editConfGeneratorName = null;
 	    
 	    String predicateUri =  getPredicateUri(vreq);
@@ -252,8 +252,9 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
         log.debug("generator name is " + editConfGeneratorName);
         return editConfGeneratorName;
 	}
-
-	private String getCustomEntryForm(Property prop){
+	
+	
+	private static String getCustomEntryForm(Property prop){
 	    if (prop.getCustomEntryForm() == null) {
 	        return DEFAULT_OBJ_FORM;
 	    } else {
@@ -261,7 +262,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 	    }
 	}
 	
-	private Property getProperty(String predicateUri, String domainUri, String rangeUri, VitroRequest vreq) {	   
+	private static Property getProperty(String predicateUri, String domainUri, String rangeUri, VitroRequest vreq) {	   
 		Property p = null;
 		try{
     		p = vreq.getWebappDaoFactory().getObjectPropertyDao().getObjectPropertyByURIs(
@@ -281,7 +282,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
 		return predicateUri.equals(VitroVocabulary.LABEL);
 	}
 
-    private boolean isDataProperty( Property prop ) {
+    private static boolean isDataProperty( Property prop ) {
         return ( prop != null && prop instanceof DataProperty );        
     }
 
@@ -364,7 +365,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     }
     
 	//should return null
-	private String getFormParam(VitroRequest vreq) {
+	private static String getFormParam(VitroRequest vreq) {
 		String formParam = (String) vreq.getParameter("editForm");
 		return formParam;
 	}
@@ -383,7 +384,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     //Check whether command is delete and either process or save
     //Original code involved doing a jsp forward
     //TODO: Check how to integrate deletion
-    private boolean isDeleteForm(VitroRequest vreq) {
+    private static boolean isDeleteForm(VitroRequest vreq) {
     	String command = vreq.getParameter("cmd");
         if ("delete".equals(command)) {
        	 	return true;
