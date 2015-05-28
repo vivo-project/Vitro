@@ -28,6 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
+import edu.cornell.mannlib.vitro.webapp.dao.caching.IndividualCachingWebappDaoFactorySDB;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.HideFromDisplayByPolicyFilter;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;
@@ -208,7 +209,7 @@ public class RequestModelAccessImpl implements RequestModelAccess {
 	private OntModel getOntModel(OntModelKey key) {
 		if (!ontModelMap.containsKey(key)) {
 			OntModel ontModel = createOntModel(key);
-			if ( log.isDebugEnabled() ) {
+			if (log.isDebugEnabled()) {
 				String ontModelStr = ToString.ontModelToString(ontModel);
 				log.debug("Creating:   " + key + ", request=" + req.hashCode()
 						+ ", " + ontModelStr);
@@ -216,7 +217,7 @@ public class RequestModelAccessImpl implements RequestModelAccess {
 			ontModelMap.put(key, ontModel);
 		}
 		OntModel ontModel = ontModelMap.get(key);
-		if ( log.isDebugEnabled() ) {
+		if (log.isDebugEnabled()) {
 			String ontModelStr = ToString.ontModelToString(ontModel);
 			log.debug("getOntModel, " + key + ": " + ontModelStr);
 		}
@@ -331,8 +332,12 @@ public class RequestModelAccessImpl implements RequestModelAccess {
 		default: // ASSERTIONS_AND_INFERENCES
 			// TODO Do model switching and replace the WebappDaoFactory with
 			// a different version if requested by parameters
-			WebappDaoFactory unswitched = new WebappDaoFactorySDB(rdfService,
-					ontModelSelector, config);
+			// WebappDaoFactory unswitched = new
+			// IndividualCachingWebappDaoFactory(
+			// new WebappDaoFactorySDB(rdfService, ontModelSelector,
+			// config));
+			WebappDaoFactory unswitched = new IndividualCachingWebappDaoFactorySDB(
+					rdfService, ontModelSelector, config);
 			return new ModelSwitcher().checkForModelSwitching(new VitroRequest(
 					req), unswitched);
 		}
