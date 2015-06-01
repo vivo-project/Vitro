@@ -25,26 +25,26 @@ import edu.cornell.mannlib.vitro.webapp.utils.sparql.SelectQueryRunner.StringRes
 import edu.cornell.mannlib.vitro.webapp.utils.sparql.SelectQueryRunner.StringResultsMappingImpl;
 
 /**
- * An implementation of QueryContext based on an RDFService.
+ * An implementation of SelectQueryContext based on an RDFService.
  * 
  * Package access. Instances should be created only by SelectQueryRunner, or by
  * a method on this class.
  */
-class RdfServiceQueryContext implements SelectQueryContext {
+class RdfServiceSelectQueryContext implements SelectQueryContext {
 	private static final Log log = LogFactory
-			.getLog(RdfServiceQueryContext.class);
+			.getLog(RdfServiceSelectQueryContext.class);
 
 	private final RDFService rdfService;
 	private final SelectQueryHolder query;
 
-	RdfServiceQueryContext(RDFService rdfService, SelectQueryHolder query) {
+	RdfServiceSelectQueryContext(RDFService rdfService, SelectQueryHolder query) {
 		this.rdfService = rdfService;
 		this.query = query;
 	}
 
 	@Override
-	public RdfServiceQueryContext bindVariableToUri(String name, String uri) {
-		return new RdfServiceQueryContext(rdfService,
+	public RdfServiceSelectQueryContext bindVariableToUri(String name, String uri) {
+		return new RdfServiceSelectQueryContext(rdfService,
 				query.bindToUri(name, uri));
 	}
 

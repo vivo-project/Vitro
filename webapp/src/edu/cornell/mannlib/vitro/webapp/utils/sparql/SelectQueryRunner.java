@@ -14,7 +14,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 
 /**
- * A conversational tool for handling SPARQL queries.
+ * A conversational tool for handling SPARQL SELECT queries.
  * 
  * <pre>
  * Examples:
@@ -58,7 +58,7 @@ public final class SelectQueryRunner {
 
 	public static SelectQueryContext createQueryContext(RDFService rdfService,
 			SelectQueryHolder query) {
-		return new RdfServiceQueryContext(rdfService, query);
+		return new RdfServiceSelectQueryContext(rdfService, query);
 	}
 
 	public static interface SelectQueryContext {
