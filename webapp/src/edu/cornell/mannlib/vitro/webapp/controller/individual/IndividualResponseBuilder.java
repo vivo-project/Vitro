@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.individual;
 
+import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.POLICY_NEUTRAL;
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -28,8 +30,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.caching.IndividualDaoCaching;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
 import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.ExecuteDataRetrieval;
 import edu.cornell.mannlib.vitro.webapp.web.beanswrappers.ReadOnlyBeansWrapper;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
@@ -71,6 +75,12 @@ class IndividualResponseBuilder {
 		this.individual = individual;
 		//initializing execute data retrieval 
 		this.eDataRetrieval = new ExecuteDataRetrieval(this.vreq, this.vreq.getDisplayModel(), this.individual);
+		// seed the individualDao cache
+		// TODO This should be done in a more structured manner.
+		IndividualDao unfilteredDao = ModelAccess.on(vreq).getWebappDaoFactory(POLICY_NEUTRAL).getIndividualDao();
+		if (unfilteredDao instanceof IndividualDaoCaching) {
+			((IndividualDaoCaching) unfilteredDao).createObjectIndividualsFor(individual.getURI());
+		}
 	}
 
 	ResponseValues assembleResponse() throws TemplateModelException {

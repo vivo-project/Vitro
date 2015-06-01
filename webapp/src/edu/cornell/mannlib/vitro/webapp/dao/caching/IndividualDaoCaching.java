@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.caching;
 
+import static edu.cornell.mannlib.vitro.webapp.dao.jena.WebappDaoFactorySDB.SDBDatasetMode.ASSERTIONS_AND_INFERENCES;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -12,21 +14,32 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.vocabulary.RDF;
+
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualDaoSDB;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.IndividualSDB;
 import edu.cornell.mannlib.vitro.webapp.edit.EditLiteral;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.ConstructQueryRunner;
 
 /**
- * TODO
+ * Keep a cache of the Individuals that have been accessed by this request.
+ * Remove an individual from the cache if it is updated.
+ * 
+ * NOTE: This should not be used in a request-independent context.
+ * 
+ * The cache has a limited size of 64K individuals.
  */
 public class IndividualDaoCaching implements IndividualDao {
 	private static final Log log = LogFactory
 			.getLog(IndividualDaoCaching.class);
-	
-	
+
 	/**
 	 * A limited-size cache that keeps the most-recently-accessed items.
 	 */
@@ -42,7 +55,7 @@ public class IndividualDaoCaching implements IndividualDao {
 
 		@Override
 		protected boolean removeEldestEntry(Map.Entry<String, Individual> eldest) {
-			return size() >= 8192;
+			return size() >= 65536;
 		}
 	}
 
@@ -50,11 +63,13 @@ public class IndividualDaoCaching implements IndividualDao {
 		abstract Individual get(String uri);
 	}
 
-	private final IndividualDao inner;
+	private final IndividualDaoSDB inner;
+	private final IndividualCachingWebappDaoFactorySDB wadf;
 	private final Map<String, Individual> cache = CacheMap.create();
 
-	public IndividualDaoCaching(IndividualDao inner) {
-		this.inner = inner;
+	public IndividualDaoCaching(IndividualCachingWebappDaoFactorySDB wadf) {
+		this.wadf = wadf;
+		this.inner = (IndividualDaoSDB) wadf.getIndividualDao();
 	}
 
 	private void cache(Individual ind) {
@@ -76,9 +91,9 @@ public class IndividualDaoCaching implements IndividualDao {
 
 	private Individual getWithCaching(String uri, IndividualGetter getter) {
 		if (cache.containsKey(uri)) {
-			log.info("Cache hit:  " + uri);
+			log.debug("Cache hit:  " + uri);
 		} else {
-			log.info("Cache miss: " + uri);
+			log.debug("Cache miss: " + uri);
 			cache(getter.get(uri));
 		}
 		return cache.get(uri);
@@ -140,6 +155,7 @@ public class IndividualDaoCaching implements IndividualDao {
 	@Override
 	public List<Individual> getIndividualsByVClassURI(String vclassURI,
 			int offset, int quantity) {
+		@SuppressWarnings("unchecked")
 		List<Individual> list = inner.getIndividualsByVClassURI(vclassURI,
 				offset, quantity);
 		cacheAll(list);
@@ -231,4 +247,50 @@ public class IndividualDaoCaching implements IndividualDao {
 		return inner.getLabelEditLiteral(individualUri);
 	}
 
+	// ----------------------------------------------------------------------
+	// Seeding the cache
+	// ----------------------------------------------------------------------
+
+	private final String SEEDING_QUERY = "" //
+			+ "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n"
+			+ "CONSTRUCT { \n" //
+			+ "  ?o rdfs:label ?label . \n" //
+			+ "  ?o a ?type . \n" //
+			+ "} \n" //
+			+ "WHERE { \n" //
+			+ "  { \n" //
+			+ "    ?uri ?p ?o . \n" //
+			+ "    ?o rdfs:label ?label . \n" //
+			+ "  } UNION { " //
+			+ "    ?uri ?p ?o . \n" //
+			+ "    ?o a ?type . \n" //
+			+ "  } \n" //
+			+ "} ";
+
+	/**
+	 * Create instances of IndividualSDB for the object of each object property
+	 * of this individual. Add them to the cache. Creating them in bulk like
+	 * this is faster than doing it individually.
+	 */
+	public void createObjectIndividualsFor(String individualUri) {
+		Model tempModel = ConstructQueryRunner
+				.createQueryContext(wadf.getRDFService(), SEEDING_QUERY)
+				.bindVariableToUri("uri", individualUri).execute();
+
+		for (Resource seed : tempModel.listSubjectsWithProperty(RDF.type)
+				.toList()) {
+			if (seed.isURIResource()) {
+				String seedUri = seed.getURI();
+				try {
+					cache(new IndividualSDB(seedUri,
+							wadf.getDatasetWrapperFactory(),
+							ASSERTIONS_AND_INFERENCES, wadf, tempModel));
+					log.debug("Seeded the cache with '" + seedUri + "'");
+				} catch (Exception e) {
+					log.error("Failed to see the cache with '" + seedUri + "'",
+							e);
+				}
+			}
+		}
+	}
 }

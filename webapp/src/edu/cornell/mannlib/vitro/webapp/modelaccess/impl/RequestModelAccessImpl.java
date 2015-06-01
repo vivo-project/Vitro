@@ -330,14 +330,11 @@ public class RequestModelAccessImpl implements RequestModelAccess {
 			return new WebappDaoFactorySDB(rdfService, ontModelSelector,
 					config, SDBDatasetMode.INFERENCES_ONLY);
 		default: // ASSERTIONS_AND_INFERENCES
-			// TODO Do model switching and replace the WebappDaoFactory with
-			// a different version if requested by parameters
-			// WebappDaoFactory unswitched = new
-			// IndividualCachingWebappDaoFactory(
-			// new WebappDaoFactorySDB(rdfService, ontModelSelector,
-			// config));
+			// TODO Do we always want a caching factory here?
 			WebappDaoFactory unswitched = new IndividualCachingWebappDaoFactorySDB(
 					rdfService, ontModelSelector, config);
+			// TODO Do model switching and replace the WebappDaoFactory with
+			// a different version if requested by parameters
 			return new ModelSwitcher().checkForModelSwitching(new VitroRequest(
 					req), unswitched);
 		}
