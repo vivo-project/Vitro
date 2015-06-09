@@ -98,6 +98,7 @@ public class DeveloperSettings {
 		for (Key key : Key.values()) {
 			String s = changedSettings.get(key);
 			if (s != null) {
+				s = s.trim();
 				if (key.isBoolean()) {
 					settings.put(key, Boolean.valueOf(s).toString());
 				} else {
