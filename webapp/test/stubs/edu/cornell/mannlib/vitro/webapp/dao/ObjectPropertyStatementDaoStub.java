@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.hp.hpl.jena.rdf.model.Model;
+
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
@@ -234,6 +236,15 @@ public class ObjectPropertyStatementDaoStub implements
 	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
 		throw new RuntimeException(
 				"ObjectPropertyStatementDaoStub.resolveAsFauxPropertyStatement() not implemented.");
+	}
+
+	@Override
+	public Model getRDFForIndividualByProperty(String subjectUri,
+			String propertyUri, String objectKey, String domainUri,
+			String rangeUri, String queryString,
+			Set<String> constructQueryStrings, String sortDirection) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+
 import net.sf.jga.algorithms.Filter;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -145,5 +148,64 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
 	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
 		innerObjectPropertyStatementDao.resolveAsFauxPropertyStatement(stmt);
 	}
+	
+	/**
+	 * RDF Version
+	 */
+	@Override
+	    public Model getRDFForIndividualByProperty(
+	            String subjectUri, String propertyUri, String objectKey, String domainUri, 
+	            String rangeUri, String query, Set<String> queryStrings, String sortDirection) {
+	        
+	      
+	        Model propertyModel = innerObjectPropertyStatementDao.getRDFForIndividualByProperty(
+        			subjectUri, propertyUri, objectKey, domainUri, rangeUri, query, 
+			        queryStrings,sortDirection);
+	        Model filteredData = propertyModel;
+
+	        /* Filter the data
+	         * 
+	         * Filtering is applied to a list of ObjectPropertyStatements. Create these statements, mapped
+	         * to the item in data that they are built from, apply filtering to the statements, then get
+	         * the associated data out of the original list. Use a LinkedHashMap to preserve the ordering.
+	         */
+	        
+	        /*
+	        Map<ObjectPropertyStatement, Map<String, String>> stmtsToData = 
+	            new LinkedHashMap<ObjectPropertyStatement, Map<String, String>>(data.size());
+
+	        for (Map<String, String> map : data) {
+	            String objectUri = map.get(objectKey);
+	            ObjectPropertyStatement statement = new ObjectPropertyStatementImpl(subjectUri, propertyUri, objectUri);
+	            ObjectProperty op = new ObjectProperty();
+	            op.setURI(propertyUri);
+	            op.setDomainVClassURI(domainUri);
+	            op.setRangeVClassURI(rangeUri);
+	            statement.setProperty(op);
+	            stmtsToData.put(statement, map);
+	        }
+	        
+	        List<ObjectPropertyStatement> stmtList = new ArrayList<ObjectPropertyStatement>(stmtsToData.keySet());
+	        
+	        // Apply the filters to the list of statements
+	        List<ObjectPropertyStatement> filteredStatements = filterAndWrapList(stmtList);     
+	        
+	        // Get the data associated with the filtered statements out of the map
+	        List<Map<String, String>> filteredData = new ArrayList<Map<String, String>>(filteredStatements.size());
+	        for (ObjectPropertyStatement ops : filteredStatements) {        
+	            if (ops instanceof ObjectPropertyStatementFiltering) {
+	                ops = ((ObjectPropertyStatementFiltering)ops).innerStmt;
+	            } 
+	            filteredData.add(stmtsToData.get(ops));
+	        }       
+	        
+	        */
+	        // Return the filtered list of data
+	        return filteredData;
+
+	    }
+
+
+	 
 
 }

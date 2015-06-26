@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.hp.hpl.jena.rdf.model.Model;
+
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
@@ -63,5 +65,16 @@ public interface ObjectPropertyStatementDao {
 	 * rangeURI) of the property of this statement to match the faux property.
 	 */
 	void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt);
+	
+	/**
+	 * Returns Model representing RDF for object property
+	 */
+	 public Model getRDFForIndividualByProperty(
+	            String subjectUri, 
+	            String propertyUri,             
+	            String objectKey, String domainUri, String rangeUri,
+	            String queryString, 
+	            Set<String> constructQueryStrings,
+	            String sortDirection);
   
 }

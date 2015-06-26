@@ -36,7 +36,14 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.sparql.core.BasicPattern;
+import com.hp.hpl.jena.sparql.core.TriplePath;
 import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
+import com.hp.hpl.jena.sparql.syntax.Element;
+import com.hp.hpl.jena.sparql.syntax.ElementGroup;
+import com.hp.hpl.jena.sparql.syntax.ElementOptional;
+import com.hp.hpl.jena.sparql.syntax.ElementPathBlock;
+import com.hp.hpl.jena.sparql.syntax.Template;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
 import com.hp.hpl.jena.vocabulary.OWL;
 
@@ -320,6 +327,16 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             log.error("Error getting object property values for subject " + subjectUri + " and property " + propertyUri, e);
             return Collections.emptyList();
         }
+        
+        //As test, including this here
+        System.out.println("Before call to getting Model back");
+        Model m =  getRDFForIndividualByProperty(
+	            subjectUri, 
+	            propertyUri,             
+	            objectKey, domainUri, rangeUri,
+	            queryString, 
+	            constructQueryStrings,
+	            sortDirection);   	 
         return list;
     }
     
@@ -651,5 +668,150 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 		}
 		return null;
 	}
+	
+	/***
+	 * Methods for retrieving the actual RDF related to the result set being returned
+	 */
+	@Override
+	 public Model getRDFForIndividualByProperty(
+	            String subjectUri, 
+	            String propertyUri,             
+	            String objectKey, String domainUri, String rangeUri,
+	            String queryString, 
+	            Set<String> constructQueryStrings,
+	            String sortDirection) {    	        
+	    	
+	        Model propertyModel = ModelFactory.createDefaultModel();
+	        
+	        long start = System.currentTimeMillis();
+
+	        try {
+	            Model constructedModel = constructModelForSelectQueries(
+	                    subjectUri, propertyUri, rangeUri, constructQueryStrings);
+
+	            if(log.isDebugEnabled()) {
+	                log.debug("Constructed model has " + constructedModel.size() + " statements.");
+	            }
+
+	            if("desc".equalsIgnoreCase( sortDirection ) ){
+	                queryString = queryString.replaceAll(" ASC\\(", " DESC(");
+	            }
+	            
+	           propertyModel = (constructedModel == null) ? constructModelFromRDFService(
+	                    queryString, subjectUri, propertyUri, domainUri, rangeUri) : constructModelFromConstructedModel(
+	                            queryString, subjectUri, propertyUri, domainUri, rangeUri, constructedModel);
+	            
+	            /*
+	            ResultSet results = (constructedModel == null) ? selectFromRDFService(
+	                    queryString, subjectUri, propertyUri, domainUri, rangeUri) : selectFromConstructedModel(
+	                            queryString, subjectUri, propertyUri, domainUri, rangeUri, constructedModel);
+
+	                    while (results.hasNext()) {
+	                        QuerySolution soln = results.nextSolution();
+	                        RDFNode node = soln.get(objectKey);
+	                        if (node.isURIResource()) {
+	                            list.add(QueryUtils.querySolutionToStringValueMap(soln));
+	                        }
+	                    }
+	                    if(log.isDebugEnabled()) {
+	                        long duration = System.currentTimeMillis() - start; 
+	                        log.debug(duration + " to do list view for " + 
+	                                propertyUri + " / " + domainUri + " / " + rangeUri);
+	                    }
+	             */
+	        } catch (Exception e) {
+	            log.error("Error getting object property values for subject " + subjectUri + " and property " + propertyUri, e);
+	            return propertyModel;
+	        }
+	        return propertyModel;
+	    }
+
+	private Model constructModelFromConstructedModel(String queryString,
+			String subjectUri, String propertyUri, String domainUri,
+			String rangeUri, Model constructedModel) {
+		// TODO Auto-generated method stub
+		Model returnModel = ModelFactory.createDefaultModel();
+		Query selectQuery = QueryFactory.create(queryString);
+		System.out.println("Select Query is " + queryString);
+		Query newConstructQuery = selectQuery.cloneQuery();
+		//Now try and set the template
+		ElementGroup selectPatternGroup = (ElementGroup) selectQuery.getQueryPattern();
+		List<Element> elements = selectPatternGroup.getElements();
+		
+		BasicPattern constructPattern = new BasicPattern();
+		
+		for (Element elem : elements){
+            if(elem instanceof ElementPathBlock){
+            	System.out.println("Element Path Block");
+                ElementPathBlock pathBlock = (ElementPathBlock) elem;
+                for(TriplePath triple : pathBlock.getPattern().getList()){
+                    //This is each individual tripe
+                	System.out.println("TriplePATH is " + triple.toString());
+                	constructPattern.add(triple.asTriple());
+                }
+                
+            } else {
+            	System.out.println("NOT ElementPathBlock but " + elem.getClass().toString());
+            	if(elem instanceof ElementOptional) {
+            		//Get the internal statements for the optional
+            		ElementOptional elemOptional = (ElementOptional) elem;
+            		ElementGroup opElement = (ElementGroup) elemOptional.getOptionalElement();
+            		List<Element> opEls = opElement.getElements();
+            		for(Element opEl: opEls) {
+            			System.out.println("Optional element to string" + opEl.toString());
+            			System.out.println(" Type of element is " + opEl.getClass().toString());
+            			if(opEl instanceof ElementPathBlock) {
+	            			ElementPathBlock opBlock = (ElementPathBlock) opEl;
+	            			for(TriplePath opTriple : opBlock.getPattern().getList()) {
+	            				constructPattern.add(opTriple.asTriple());
+	            			}
+            			} else {
+            				System.out.println("OPTIONAL NOT ELEMENT BLOCK!!!");
+            			}
+            		}
+            	}
+            	
+            }
+        }
+		
+		newConstructQuery.setQueryConstructType();
+		
+		Template t = new Template(constructPattern);
+		newConstructQuery.setConstructTemplate(t);
+		System.out.println("Construct query is now " + newConstructQuery.toString());
+		
+		
+		//Run this query against the constructed model itself
+		QueryExecution qexec = null;
+        try {
+            qexec = QueryExecutionFactory.create(
+            		newConstructQuery, constructedModel);
+            qexec.execConstruct(returnModel);
+            
+            
+        } finally {
+            if (qexec != null) {
+                qexec.close();
+            }
+        } 
+		
+		System.out.println("RETURN MODEL!!");
+		//Write out the model being returned
+		String outputDomainUri = (domainUri != null)? domainUri: "";
+		String outputRangeUri = (rangeUri != null)? rangeUri:"";
+		System.out.println("For S:" + subjectUri + " - p: " + propertyUri + " - d:" + outputDomainUri + " - r:" + outputRangeUri);
+		returnModel.write(System.out, "N3");
+        
+		return returnModel;
+	}
+
+	private Model constructModelFromRDFService(String queryString,
+			String subjectUri, String propertyUri, String domainUri,
+			String rangeUri) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+		
 
 }
