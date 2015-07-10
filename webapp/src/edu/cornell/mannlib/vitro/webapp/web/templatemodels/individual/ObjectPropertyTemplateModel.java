@@ -81,6 +81,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     private PropertyListConfig config;
     private String objectKey;    
     private String sortDirection;
+    private String publicDescription;
 	private int displayLimit;
     
     ObjectPropertyTemplateModel(ObjectProperty op, Individual subject, VitroRequest vreq, 
@@ -92,6 +93,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
         sortDirection = op.getDomainEntitySortDirection();
         domainUri = op.getDomainVClassURI();
         rangeUri = op.getRangeVClassURI();
+        publicDescription = op.getPublicDescription();
 		displayLimit = op.getDomainDisplayLimit();
 
         // Get the config for this object property
@@ -180,6 +182,10 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
 	@Override
 	public int getDisplayLimit() {
 			return displayLimit;
+	}	
+
+	public String getPublicDescription() {
+			return publicDescription;
 	}	
 
     public ConfigError checkQuery(String queryString) {
