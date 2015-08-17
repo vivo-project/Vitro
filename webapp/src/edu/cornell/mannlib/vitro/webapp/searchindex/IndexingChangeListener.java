@@ -112,12 +112,16 @@ public class IndexingChangeListener implements ChangeListener,
 
 	@Override
 	public void addedStatement(String serializedTriple, String graphURI) {
-		noteChange(parseTriple(serializedTriple));
+        if (!searchIndexer.isRebuildScheduled()) {
+            noteChange(parseTriple(serializedTriple));
+        }
 	}
 
 	@Override
 	public void removedStatement(String serializedTriple, String graphURI) {
-		noteChange(parseTriple(serializedTriple));
+        if (!searchIndexer.isRebuildScheduled()) {
+            noteChange(parseTriple(serializedTriple));
+        }
 	}
 
 	/**

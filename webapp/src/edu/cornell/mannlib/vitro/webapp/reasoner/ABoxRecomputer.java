@@ -104,12 +104,14 @@ public class ABoxRecomputer {
         }
         try {
             if  (searchIndexer != null) {
-                searchIndexer.pauseInAnticipationOfRebuild();
+                searchIndexer.pause();
+                // Schedule a rebuild for when we unpause
+                // This will let the search indexer behave efficiently
+                searchIndexer.rebuildIndex();
             }
             recomputeABox();
         } finally {
             if  (searchIndexer != null) {
-                searchIndexer.rebuildIndex();
                 searchIndexer.unpause();
             }
             synchronized (lock1) {
