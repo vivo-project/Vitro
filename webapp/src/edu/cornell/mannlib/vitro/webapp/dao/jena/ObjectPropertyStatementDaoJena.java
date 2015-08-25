@@ -299,7 +299,6 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             if("desc".equalsIgnoreCase( sortDirection ) ){
                 queryString = queryString.replaceAll(" ASC\\(", " DESC(");
             }
-
             ResultSet results = (constructedModel == null) ? selectFromRDFService(
                     queryString, subjectUri, propertyUri, domainUri, rangeUri) : selectFromConstructedModel(
                             queryString, subjectUri, propertyUri, domainUri, rangeUri, constructedModel);
@@ -307,7 +306,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                     while (results.hasNext()) {
                         QuerySolution soln = results.nextSolution();
                         RDFNode node = soln.get(objectKey);
-                        if (node.isURIResource()) {
+                        if (node != null && node.isURIResource()) {
                             list.add(QueryUtils.querySolutionToStringValueMap(soln));
                         }
                     }
