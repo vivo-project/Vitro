@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.hp.hpl.jena.graph.NodeFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
@@ -61,6 +62,8 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
+
+import javax.xml.soap.Node;
 
 public class IndividualSDB extends IndividualImpl implements Individual {
 
@@ -166,18 +169,14 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     }
     
     private boolean noTriplesFor(String individualURI) {
-        String ask = "ASK { <" + individualURI + "> ?p ?o }";
         DatasetWrapper w = getDatasetWrapper();
         Dataset dataset = w.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
         try {
-            Query askQuery = QueryFactory.create(ask, Syntax.syntaxARQ);
-            QueryExecution qe = QueryExecutionFactory.create(askQuery, dataset);
-            try {
-                return !qe.execAsk();
-            } finally {
-                qe.close();
-            }
+            return !dataset.asDatasetGraph().contains(NodeFactory.createURI(individualURI),
+                    com.hp.hpl.jena.graph.Node.ANY,
+                    com.hp.hpl.jena.graph.Node.ANY,
+                    com.hp.hpl.jena.graph.Node.ANY);
         } finally {
             dataset.getLock().leaveCriticalSection();
             w.close();
@@ -185,8 +184,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     }
     
     static final boolean SKIP_INITIALIZATION = true;
-    
-    public IndividualSDB(String individualURI, 
+
+    public IndividualSDB(String individualURI,
             DatasetWrapperFactory datasetWrapperFactory,
             SDBDatasetMode datasetMode,
             WebappDaoFactorySDB wadf) throws IndividualNotFoundException {
