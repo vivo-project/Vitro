@@ -62,6 +62,6 @@ public interface ObjectPropertyStatementDao {
 	 * If that is so, then set the domain and range (and the domainURI and
 	 * rangeURI) of the property of this statement to match the faux property.
 	 */
-	void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt);
+	void resolveAsFauxPropertyStatements(List<ObjectPropertyStatement> list);
   
 }

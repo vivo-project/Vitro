@@ -99,12 +99,12 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 
 	@Override
 	public List<FauxProperty> getFauxPropertiesForBaseUri(String uri) {
-		try (LockedOntModel displayModel = models.getDisplayModel().read()) {
-			if (uri == null) {
-				return Collections.emptyList();
-			}
+		if (uri == null) {
+			return Collections.emptyList();
+		}
 
-			List<String> contextUris = new ArrayList<>();
+		try (LockedOntModel displayModel = models.getDisplayModel().read()) {
+			Set<String> contextUris = new HashSet<>();
 			ResIterator contextResources = displayModel
 					.listSubjectsWithProperty(CONFIG_CONTEXT_FOR,
 							createResource(uri));
@@ -131,11 +131,11 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 	 */
 	@Override
 	public FauxProperty getFauxPropertyFromContextUri(String contextUri) {
-		try (LockedOntModel displayModel = models.getDisplayModel().read()) {
-			if (contextUri == null) {
-				return null;
-			}
+		if (contextUri == null) {
+			return null;
+		}
 
+		try (LockedOntModel displayModel = models.getDisplayModel().read()) {
 			OntResource context = displayModel.createOntResource(contextUri);
 			if (!displayModel.contains(context, RDF.type, CONFIG_CONTEXT)) {
 				log.debug("'" + contextUri + "' is not a CONFIG_CONTEXT");
@@ -634,5 +634,4 @@ public class FauxPropertyDaoJena extends JenaBaseDao implements FauxPropertyDao 
 		}
 
 	}
-
 }

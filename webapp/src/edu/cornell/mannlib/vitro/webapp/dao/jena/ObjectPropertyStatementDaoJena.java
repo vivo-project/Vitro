@@ -559,47 +559,72 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 	 * accordingly.
 	 */
 	@Override
-	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
-		if (stmt == null) {
+	public void resolveAsFauxPropertyStatements(List<ObjectPropertyStatement> list) {
+		if (list == null || list.size() == 0) {
 			return;
 		}
 
-		ObjectProperty prop = obtainObjectPropertyFromStatement(stmt);
-		if (prop == null) {
-			return;
-		}
+        Map<String, List<FauxProperty>> fauxPropMap = new HashMap<String, List<FauxProperty>>();
+        Map<String, List<VClass>> subjectTypeMap = new HashMap<String, List<VClass>>();
+        Map<String, List<VClass>> objectTypeMap = new HashMap<String, List<VClass>>();
 
-		List<FauxProperty> fauxProps = getWebappDaoFactory()
-				.getFauxPropertyDao()
-				.getFauxPropertiesForBaseUri(prop.getURI());
-		if (fauxProps.isEmpty()) {
-			return;
-		}
+        for (ObjectPropertyStatement stmt : list) {
+            ObjectProperty prop = obtainObjectPropertyFromStatement(stmt);
+            if (prop != null) {
+                List<FauxProperty> fauxProps = fauxPropMap.get(prop.getURI());
+                if (fauxProps == null) {
+                    fauxProps = getWebappDaoFactory()
+                            .getFauxPropertyDao()
+                            .getFauxPropertiesForBaseUri(prop.getURI());
 
-		Individual subject = obtainSubjectFromStatement(stmt);
-		if (subject == null) {
-			return;
-		}
+                    fauxPropMap.put(prop.getURI(), fauxProps);
+                }
 
-		Individual object = obtainObjectFromStatement(stmt);
-		if (object == null) {
-			return;
-		}
+                if (fauxProps != null && !fauxProps.isEmpty()) {
+                    List<VClass> subjectTypes = null;
+                    List<VClass> objectTypes  = null;
 
-		List<VClass> subjectTypes = subject.getVClasses();
-		List<VClass> objectTypes = object.getVClasses();
-		for (FauxProperty fauxProp : fauxProps) {
-			VClass subjectType = selectType(subjectTypes,
-					fauxProp.getDomainURI());
-			VClass objectType = selectType(objectTypes, fauxProp.getRangeURI());
-			if (subjectType != null && objectType != null) {
-				prop.setDomainVClass(subjectType);
-				prop.setDomainVClassURI(subjectType.getURI());
-				prop.setRangeVClass(objectType);
-				prop.setRangeVClassURI(objectType.getURI());
-				return;
-			}
-		}
+                    if (stmt.getSubjectURI() != null) {
+                        subjectTypes = subjectTypeMap.get(stmt.getSubjectURI());
+                    }
+
+                    if (stmt.getObjectURI() != null) {
+                        objectTypes = objectTypeMap.get(stmt.getObjectURI());
+                    }
+
+                    if (subjectTypes == null) {
+                        Individual subject = obtainSubjectFromStatement(stmt);
+                        if (subject != null) {
+                            subjectTypes = subject.getVClasses();
+                            subjectTypeMap.put(stmt.getSubjectURI(), subjectTypes);
+                        }
+                    }
+
+                    if (objectTypes == null) {
+                        Individual object = obtainObjectFromStatement(stmt);
+                        if (object != null) {
+                            objectTypes = object.getVClasses();
+                            objectTypeMap.put(stmt.getObjectURI(), objectTypes);
+                        }
+                    }
+
+                    if (subjectTypes != null && objectTypes != null) {
+                        for (FauxProperty fauxProp : fauxProps) {
+                            VClass subjectType = selectType(subjectTypes, fauxProp.getDomainURI());
+                            VClass objectType  = selectType(objectTypes,  fauxProp.getRangeURI());
+
+                            if (subjectType != null && objectType != null) {
+                                prop.setDomainVClass(subjectType);
+                                prop.setDomainVClassURI(subjectType.getURI());
+                                prop.setRangeVClass(objectType);
+                                prop.setRangeVClassURI(objectType.getURI());
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
 	}
 
 	private ObjectProperty obtainObjectPropertyFromStatement(
