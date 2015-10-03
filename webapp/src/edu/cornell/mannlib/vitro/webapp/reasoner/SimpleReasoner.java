@@ -91,12 +91,11 @@ public class SimpleReasoner extends StatementListener {
 
 	/**
 	 * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
-	 * @param aboxModel - input.  This model contains asserted ABox statements
-	 * @param inferenceModel - output. This is the model in which inferred (materialized) 
+	 * @param inferenceModel - output. This is the model in which inferred (materialized)
      *  ABox statements are maintained (added or retracted).
 	 * @param inferenceRebuildModel - output. This the model is temporarily used when the 
      *  whole ABox inference model is rebuilt
-	 * @param inferenceScratchpadModel - output. This the model is temporarily used when 
+	 * @param scratchpadModel - output. This the model is temporarily used when
      *  the whole ABox inference model is rebuilt
      * @param searchIndexer - output. If not null, the indexer will be paused before the 
      *  ABox inference model is rebuilt and unpaused when the rebuild is complete.
@@ -1567,10 +1566,8 @@ public class SimpleReasoner extends StatementListener {
 
 	    this.stopRequested = true;
 	}
-	
 
-	  
-    // DeltaComputer    
+	// DeltaComputer
 	/**
 	 * Asynchronous reasoning mode (DeltaComputer) is used in the case of batch removals. 
 	 */
@@ -1778,6 +1775,48 @@ public class SimpleReasoner extends StatementListener {
                 "] [object = " + (statement.getObject().isLiteral() 
                                   ? ((Literal)statement.getObject()).getLexicalForm() + " (Literal)"
                                   : ((Resource)statement.getObject()).getURI() + " (Resource)") + "]";
-    }  
+    }
 
+	public void addListener(Listener listener) {
+		if (recomputer != null) {
+			recomputer.addListener(listener);
+		}
+	}
+
+	public static interface Listener {
+		void receiveEvent(Event event);
+	}
+
+	/**
+	 * An immutable event object. The event type describes just what happened.
+	 * The status object describes what the reasoner is doing now.
+	 */
+	public static class Event {
+		public enum Type {
+			STARTUP, PROGRESS,
+
+			START_REBUILD, STOP_REBUILD, REBUILD_REQUESTED,
+
+			SHUTDOWN_REQUESTED, SHUTDOWN_COMPLETE
+		}
+
+		private final Type type;
+		private String message;
+
+		public Event(Type type, String message) {
+			this.type = type;
+			this.message = message;
+		}
+
+		public Type getType() { return type; }
+
+		public String getMessage() {
+			return message;
+		}
+
+		@Override
+		public String toString() {
+			return type.toString();
+		}
+	}
 }

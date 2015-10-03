@@ -15,6 +15,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import edu.cornell.mannlib.vitro.webapp.controller.freemarker.SimpleReasonerRecomputeController;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -43,6 +44,8 @@ public class SimpleReasonerSetup implements ServletContextListener {
     // Models used during a full recompute of the ABox
     public static final String JENA_INF_MODEL_REBUILD = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf-rebuild";
     public static final String JENA_INF_MODEL_SCRATCHPAD = "http://vitro.mannlib.cornell.edu/default/vitro-kb-inf-scratchpad";
+
+    private static final SimpleReasonerRecomputeController.ReasonerHistory history = new SimpleReasonerRecomputeController.ReasonerHistory();
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -74,6 +77,10 @@ public class SimpleReasonerSetup implements ServletContextListener {
             // the simple reasoner will register itself as a listener to the ABox assertions
             SimpleReasoner simpleReasoner = new SimpleReasoner(
                     tboxUnionModel, rdfService, inferenceModel, rebuildModel, scratchModel, searchIndexer);
+
+            SimpleReasonerRecomputeController.setHistory(this.history);
+            simpleReasoner.addListener(this.history);
+
             sce.getServletContext().setAttribute(SimpleReasoner.class.getName(),simpleReasoner);
             
             StartupStatus ss = StartupStatus.getBean(ctx);

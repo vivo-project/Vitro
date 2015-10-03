@@ -65,7 +65,6 @@ public class ABoxRecomputer {
     /**
      * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
      * @param aboxModel - input.  This model contains asserted ABox statements
-     * @param inferenceModel - output. This is the model in which inferred (materialized) ABox statements are maintained (added or retracted).
      */
     public ABoxRecomputer(OntModel tboxModel,
             OntModel aboxModel,
@@ -150,7 +149,13 @@ public class ABoxRecomputer {
                     individualsInBatch.clear();
                 }
                 if (reportingInterval) {
-                    log.info("Still recomputing inferences (" 
+                    listeners.fireEvent(new SimpleReasoner.Event(
+                            SimpleReasoner.Event.Type.PROGRESS,
+                            "Inferenced " + numInds + " of " + individuals.size() +
+                                    ". Average time: " + (System.currentTimeMillis() - start) / numInds + " ms"
+                    ));
+
+                    log.info("Still recomputing inferences ("
                             + numInds + "/" + individuals.size() + " individuals)");
                     log.info((System.currentTimeMillis() - start) / numInds + " ms per individual");
                 }
@@ -492,5 +497,39 @@ public class ABoxRecomputer {
      */
     public void setStopRequested() {
         this.stopRequested = true;
+    }
+
+    public void addListener(SimpleReasoner.Listener listener) { listeners.add(listener); }
+
+    private ListenerList listeners = new ListenerList();
+
+    /**
+     * A simple thread-safe list of event listeners. All methods are
+     * synchronized.
+     */
+    public static class ListenerList {
+        private final List<SimpleReasoner.Listener> list;
+
+        public ListenerList() {
+            list = new ArrayList<SimpleReasoner.Listener>();
+        }
+
+        public synchronized void add(SimpleReasoner.Listener l) {
+            list.add(l);
+        }
+
+        public synchronized void remove(SimpleReasoner.Listener l) {
+            list.remove(l);
+        }
+
+        public synchronized void fireEvent(SimpleReasoner.Event event) {
+            for (SimpleReasoner.Listener l : list) {
+                try {
+                    l.receiveEvent(event);
+                } catch (Exception e) {
+                    log.warn("Failed to deliver event to listener '" + l + "'", e);
+                }
+            }
+        }
     }
 }
