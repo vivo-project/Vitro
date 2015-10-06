@@ -173,8 +173,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         Dataset dataset = w.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
         try {
-            return !dataset.asDatasetGraph().contains(NodeFactory.createURI(individualURI),
-                    com.hp.hpl.jena.graph.Node.ANY,
+            return !dataset.asDatasetGraph().contains(com.hp.hpl.jena.graph.Node.ANY,
+                    NodeFactory.createURI(individualURI),
                     com.hp.hpl.jena.graph.Node.ANY,
                     com.hp.hpl.jena.graph.Node.ANY);
         } finally {
