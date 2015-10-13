@@ -582,11 +582,27 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                     fauxPropMap.put(prop.getURI(), fauxProps);
                 }
 
-                String domainVClassURI = prop.getDomainVClassURI();
-                String rangeVClassURI  = prop.getRangeVClassURI();
+                if (fauxProps != null && !fauxProps.isEmpty()) {
+                    String domainVClassURI = indVClassURIMap.get(stmt.getSubjectURI());
+                    String rangeVClassURI  = indVClassURIMap.get(stmt.getObjectURI());
 
-                if (domainVClassURI != null && rangeVClassURI != null) {
-                    if (fauxProps != null && !fauxProps.isEmpty()) {
+                    if (domainVClassURI == null) {
+                        Individual subject = stmt.getSubject();
+                        if (subject != null) {
+                            domainVClassURI = subject.getVClassURI();
+                            indVClassURIMap.put(subject.getURI(), domainVClassURI);
+                        }
+                    }
+
+                    if (rangeVClassURI == null) {
+                        Individual object  = stmt.getObject();
+                        if (object != null) {
+                            rangeVClassURI = object.getVClassURI();
+                            indVClassURIMap.put(object.getURI(), rangeVClassURI);
+                        }
+                    }
+
+                    if (domainVClassURI != null && rangeVClassURI != null) {
                         for (FauxProperty fauxProp : fauxProps) {
                             if (domainVClassURI.equals(fauxProp.getDomainVClassURI()) &&
                                     rangeVClassURI.equals(fauxProp.getRangeVClassURI())) {
@@ -596,63 +612,35 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                             }
                         }
                     }
-                }
 
-                if (isFaux == null) {
-                    if (fauxProps != null && !fauxProps.isEmpty()) {
-                        domainVClassURI = domainVClassURI == null ? indVClassURIMap.get(stmt.getSubjectURI()) : domainVClassURI;
-                        rangeVClassURI  = rangeVClassURI  == null ? indVClassURIMap.get(stmt.getObjectURI())  : rangeVClassURI;
+                    if (domainVClassURI != null && rangeVClassURI != null) {
+                        List<String> domainSuperClasses = superClassMap.get(domainVClassURI);
+                        List<String> rangeSuperClasses  = superClassMap.get(rangeVClassURI);
 
-                        if (domainVClassURI == null) {
-                            Individual subject = stmt.getSubject();
-                            if (subject != null) {
-                                domainVClassURI = subject.getVClassURI();
-                                indVClassURIMap.put(subject.getURI(), domainVClassURI);
+                        if (domainSuperClasses == null) {
+                            domainSuperClasses = getWebappDaoFactory().getVClassDao().getAllSuperClassURIs(domainVClassURI);
+                            if (!domainSuperClasses.contains(domainVClassURI)) {
+                                domainSuperClasses.add(domainVClassURI);
                             }
+                            superClassMap.put(domainVClassURI, domainSuperClasses);
                         }
 
-                        if (rangeVClassURI == null) {
-                            Individual object  = stmt.getObject();
-                            if (object != null) {
-                                rangeVClassURI = object.getVClassURI();
-                                indVClassURIMap.put(object.getURI(), rangeVClassURI);
+                        if (rangeSuperClasses == null) {
+                            rangeSuperClasses  = getWebappDaoFactory().getVClassDao().getAllSuperClassURIs(rangeVClassURI);
+                            if (!rangeSuperClasses.contains(rangeVClassURI)) {
+                                rangeSuperClasses.add(rangeVClassURI);
                             }
+                            superClassMap.put(rangeVClassURI, rangeSuperClasses);
                         }
 
-                        if (domainVClassURI != null && rangeVClassURI != null) {
-                            for (FauxProperty fauxProp : fauxProps) {
-                                if (domainVClassURI.equals(fauxProp.getDomainVClassURI()) &&
-                                        rangeVClassURI.equals(fauxProp.getRangeVClassURI())) {
+                        if (domainSuperClasses != null && domainSuperClasses.size() > 0) {
+                            if (rangeSuperClasses != null && rangeSuperClasses.size() > 0) {
+                                for (FauxProperty fauxProp : fauxProps) {
+                                    if (domainSuperClasses.contains(fauxProp.getDomainVClassURI()) &&
+                                            rangeSuperClasses.contains(fauxProp.getRangeVClassURI())) {
 
-                                    isFaux = fauxProp;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (domainVClassURI != null && rangeVClassURI != null) {
-                            List<String> domainSuperClasses = superClassMap.get(domainVClassURI);
-                            List<String> rangeSuperClasses  = superClassMap.get(rangeVClassURI);
-
-                            if (domainSuperClasses == null) {
-                                domainSuperClasses = getWebappDaoFactory().getVClassDao().getAllSuperClassURIs(domainVClassURI);
-                                superClassMap.put(domainVClassURI, domainSuperClasses);
-                            }
-
-                            if (rangeSuperClasses == null) {
-                                rangeSuperClasses  = getWebappDaoFactory().getVClassDao().getAllSuperClassURIs(rangeVClassURI);
-                                superClassMap.put(rangeVClassURI, rangeSuperClasses);
-                            }
-
-                            if (domainSuperClasses != null && domainSuperClasses.size() > 0) {
-                                if (rangeSuperClasses != null && rangeSuperClasses.size() > 0) {
-                                    for (FauxProperty fauxProp : fauxProps) {
-                                        if (domainSuperClasses.contains(fauxProp.getDomainVClassURI()) &&
-                                                rangeSuperClasses.contains(fauxProp.getRangeVClassURI())) {
-
-                                            isFaux = fauxProp;
-                                            break;
-                                        }
+                                        isFaux = fauxProp;
+                                        break;
                                     }
                                 }
                             }
