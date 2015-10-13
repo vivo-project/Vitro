@@ -616,17 +616,27 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 
                 if (domainVClassURI == null || rangeVClassURI == null) {
                     if (fauxProps != null && !fauxProps.isEmpty()) {
-                        List<VClass> objectTypes = getWebappDaoFactory().getVClassDao().getVClassesForProperty(stmt.getObjectURI(), false);
                         List<VClass> subjectTypes = null;
+                        List<VClass> objectTypes  = null;
 
                         if (stmt.getSubjectURI() != null) {
                             subjectTypes = subjectTypeMap.get(stmt.getSubjectURI());
-                            if (subjectTypes == null) {
-                                subjectTypes = getWebappDaoFactory().getVClassDao().getVClassesForProperty(stmt.getSubjectURI(), false);
+                        }
+
+                        if (subjectTypes == null) {
+                            Individual subject = obtainSubjectFromStatement(stmt);
+                            if (subject != null) {
+                                subjectTypes = subject.getVClasses();
                                 subjectTypeMap.put(stmt.getSubjectURI(), subjectTypes);
                             }
                         }
 
+                        if (objectTypes == null) {
+                            Individual object = obtainObjectFromStatement(stmt);
+                            if (object != null) {
+                                objectTypes = object.getVClasses();
+                            }
+                        }
 
                         if (subjectTypes != null && objectTypes != null) {
                             for (FauxProperty fauxProp : fauxProps) {
