@@ -290,7 +290,7 @@ class IndividualResponseBuilder {
             ResultSet results = QueryUtils.getLanguageNeutralQueryResults(queryStr, vreq);
             if (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
-                String countStr = soln.get("labelCount").toString();
+                String countStr = soln.get("labelCount").toString().replaceFirst("\\^.*", "");
                 theCount = Integer.parseInt(countStr);
             }
         } catch (Exception e) {
@@ -309,7 +309,7 @@ class IndividualResponseBuilder {
                ResultSet results = QueryUtils.getLanguageNeutralQueryResults(queryStr, vreq);
                if (results.hasNext()) {
                    QuerySolution soln = results.nextSolution();
-                   String countStr = soln.get("languageCount").toString();
+                   String countStr = soln.get("languageCount").toString().replaceFirst("\\^.*", "");
                    theCount = Integer.parseInt(countStr);
                }
            } catch (Exception e) {
