@@ -1,8 +1,11 @@
 /**
- * $Id: editor_plugin_src.js 201 2007-02-12 15:56:56Z spocke $
+ * editor_plugin_src.js
  *
- * @author Moxiecode
- * @copyright Copyright © 2004-2008, Moxiecode Systems AB, All rights reserved.
+ * Copyright 2009, Moxiecode Systems AB
+ * Released under LGPL License.
+ *
+ * License: http://tinymce.moxiecode.com/license
+ * Contributing: http://tinymce.moxiecode.com/contributing
  */
 
 (function() {
@@ -46,7 +49,7 @@
 		},
 
 		/**
-		 * Creates control instances based in the incomming name. This method is normally not
+		 * Creates control instances based in the incoming name. This method is normally not
 		 * needed since the addButton method of the tinymce.Editor class is a more easy way of adding buttons
 		 * but you sometimes need to create more complex controls like listboxes, split buttons etc then this
 		 * method can be used to create those.
