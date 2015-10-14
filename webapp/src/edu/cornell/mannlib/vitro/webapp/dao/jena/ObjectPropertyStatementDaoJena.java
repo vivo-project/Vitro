@@ -565,12 +565,14 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
 		}
 
         Map<String, List<FauxProperty>> fauxPropMap = new HashMap<String, List<FauxProperty>>();
-        Map<String, List<VClass>> subjectTypeMap = new HashMap<String, List<VClass>>();
-        Map<String, List<VClass>> objectTypeMap = new HashMap<String, List<VClass>>();
+        Map<String, VClass> vclassTypeMap = new HashMap<String, VClass>();
+        Map<String, String> indVClassURIMap = new HashMap<String, String>();
+        Map<String, List<String>> superClassMap = new HashMap<String, List<String>>();
 
         for (ObjectPropertyStatement stmt : list) {
             ObjectProperty prop = obtainObjectPropertyFromStatement(stmt);
             if (prop != null) {
+                FauxProperty useThisFaux = null;
                 List<FauxProperty> fauxProps = fauxPropMap.get(prop.getURI());
                 if (fauxProps == null) {
                     fauxProps = getWebappDaoFactory()
@@ -581,46 +583,92 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                 }
 
                 if (fauxProps != null && !fauxProps.isEmpty()) {
-                    List<VClass> subjectTypes = null;
-                    List<VClass> objectTypes  = null;
+                    String domainVClassURI = indVClassURIMap.get(stmt.getSubjectURI());
+                    String rangeVClassURI  = indVClassURIMap.get(stmt.getObjectURI());
 
-                    if (stmt.getSubjectURI() != null) {
-                        subjectTypes = subjectTypeMap.get(stmt.getSubjectURI());
-                    }
-
-                    if (stmt.getObjectURI() != null) {
-                        objectTypes = objectTypeMap.get(stmt.getObjectURI());
-                    }
-
-                    if (subjectTypes == null) {
-                        Individual subject = obtainSubjectFromStatement(stmt);
+                    if (domainVClassURI == null) {
+                        Individual subject = stmt.getSubject();
                         if (subject != null) {
-                            subjectTypes = subject.getVClasses();
-                            subjectTypeMap.put(stmt.getSubjectURI(), subjectTypes);
+                            domainVClassURI = subject.getVClassURI();
+                            indVClassURIMap.put(subject.getURI(), domainVClassURI);
                         }
                     }
 
-                    if (objectTypes == null) {
-                        Individual object = obtainObjectFromStatement(stmt);
+                    if (rangeVClassURI == null) {
+                        Individual object  = stmt.getObject();
                         if (object != null) {
-                            objectTypes = object.getVClasses();
-                            objectTypeMap.put(stmt.getObjectURI(), objectTypes);
+                            rangeVClassURI = object.getVClassURI();
+                            indVClassURIMap.put(object.getURI(), rangeVClassURI);
                         }
                     }
 
-                    if (subjectTypes != null && objectTypes != null) {
+                    if (domainVClassURI != null && rangeVClassURI != null) {
                         for (FauxProperty fauxProp : fauxProps) {
-                            VClass subjectType = selectType(subjectTypes, fauxProp.getDomainURI());
-                            VClass objectType  = selectType(objectTypes,  fauxProp.getRangeURI());
-
-                            if (subjectType != null && objectType != null) {
-                                prop.setDomainVClass(subjectType);
-                                prop.setDomainVClassURI(subjectType.getURI());
-                                prop.setRangeVClass(objectType);
-                                prop.setRangeVClassURI(objectType.getURI());
+                            if (domainVClassURI.equals(fauxProp.getDomainVClassURI()) &&
+                                    rangeVClassURI.equals(fauxProp.getRangeVClassURI())) {
+                                useThisFaux = fauxProp;
                                 break;
                             }
                         }
+                    }
+
+                    if (useThisFaux == null) {
+                        List<String> domainSuperClasses = superClassMap.get(domainVClassURI);
+                        List<String> rangeSuperClasses  = superClassMap.get(rangeVClassURI);
+
+                        if (domainSuperClasses == null) {
+                            domainSuperClasses = getWebappDaoFactory().getVClassDao().getAllSuperClassURIs(domainVClassURI);
+                            if (!domainSuperClasses.contains(domainVClassURI)) {
+                                domainSuperClasses.add(domainVClassURI);
+                            }
+                            superClassMap.put(domainVClassURI, domainSuperClasses);
+                        }
+
+                        if (rangeSuperClasses == null) {
+                            rangeSuperClasses  = getWebappDaoFactory().getVClassDao().getAllSuperClassURIs(rangeVClassURI);
+                            if (!rangeSuperClasses.contains(rangeVClassURI)) {
+                                rangeSuperClasses.add(rangeVClassURI);
+                            }
+                            superClassMap.put(rangeVClassURI, rangeSuperClasses);
+                        }
+
+                        if (domainSuperClasses != null && domainSuperClasses.size() > 0) {
+                            if (rangeSuperClasses != null && rangeSuperClasses.size() > 0) {
+                                for (FauxProperty fauxProp : fauxProps) {
+                                    if (domainSuperClasses.contains(fauxProp.getDomainVClassURI()) &&
+                                            rangeSuperClasses.contains(fauxProp.getRangeVClassURI())) {
+                                        useThisFaux = fauxProp;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (useThisFaux != null) {
+                    String fauxDomainVClassURI = useThisFaux.getDomainVClassURI();
+                    VClass fauxDomainVClass = vclassTypeMap.get(fauxDomainVClassURI);
+                    if (fauxDomainVClass == null) {
+                        fauxDomainVClass = getWebappDaoFactory().getVClassDao().getVClassByURI(fauxDomainVClassURI);
+                        vclassTypeMap.put(fauxDomainVClassURI, fauxDomainVClass);
+                    }
+
+                    String fauxRangeVClassURI  = useThisFaux.getRangeVClassURI();
+                    VClass fauxRangeVClass  = vclassTypeMap.get(fauxRangeVClassURI);
+                    if (fauxRangeVClass == null) {
+                        fauxRangeVClass  = getWebappDaoFactory().getVClassDao().getVClassByURI(fauxRangeVClassURI);
+                        vclassTypeMap.put(fauxRangeVClassURI, fauxRangeVClass);
+                    }
+
+                    if (fauxDomainVClass != null && fauxDomainVClassURI != null) {
+                        prop.setDomainVClass(fauxDomainVClass);
+                        prop.setDomainVClassURI(fauxDomainVClassURI);
+                    }
+
+                    if (fauxRangeVClass != null && fauxRangeVClassURI != null) {
+                        prop.setRangeVClass(fauxRangeVClass);
+                        prop.setRangeVClassURI(fauxRangeVClassURI);
                     }
                 }
             }
