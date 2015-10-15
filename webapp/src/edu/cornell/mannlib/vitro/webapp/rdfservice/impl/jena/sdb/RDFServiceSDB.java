@@ -146,18 +146,10 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
     
     @Override
     protected QueryExecution createQueryExecution(String queryString, Query q, Dataset d) {
-        // query performance with OPTIONAL can be dramatically improved on SDB by 
-        // using the default model (union model) instead of the dataset, so long as 
-        // we're not querying particular named graphs
-                
-        Matcher optional = OPTIONAL_PATTERN.matcher(queryString);
-        Matcher graph = GRAPH_PATTERN.matcher(queryString);
-        
-        if (optional.find() && !graph.find()) { 
-            return QueryExecutionFactory.create(q, d.getDefaultModel());
-        } else {
-            return QueryExecutionFactory.create(q, d); 
-        }       
+        return QueryExecutionFactory.create(q, d);
+
+        // This used to execute against the default model if the query included an OPTIONAL
+        // However, in recent Jena this turns out to be much slower than executing against the dataset directly
     }
     
     @Override 
