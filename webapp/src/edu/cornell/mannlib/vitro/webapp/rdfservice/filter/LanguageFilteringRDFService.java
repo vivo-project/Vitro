@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -83,6 +84,12 @@ public class LanguageFilteringRDFService implements RDFService {
         Model m = RDFServiceUtils.parseModel(s.sparqlConstructQuery(query, resultFormat), resultFormat);
         InputStream in = outputModel(filterModel(m), resultFormat);
         return in;
+    }
+
+    @Override
+    public void sparqlConstructQuery(String query, Model model)
+            throws RDFServiceException {
+        s.sparqlConstructQuery(query, model);
     }
 
     @Override
@@ -237,7 +244,89 @@ public class LanguageFilteringRDFService implements RDFService {
         }        
         return new ByteArrayInputStream(outputStream.toByteArray());       
     }
-    
+
+    @Override
+    public void sparqlSelectQuery(String query, ResultSetConsumer consumer) throws RDFServiceException {
+        log.debug("sparqlSelectQuery: " + query.replaceAll("\\s+", " "));
+
+        s.sparqlSelectQuery(query, new ResultSetConsumer.Chaining(consumer) {
+            List<String> vars;
+            List<QuerySolution> solnList = new ArrayList<QuerySolution>();
+
+            @Override
+            protected void processQuerySolution(QuerySolution qs) {
+                solnList.add(qs);
+            }
+
+            @Override
+            protected void startProcessing() {
+                vars = getResultVars();
+            }
+
+            @Override
+            protected void endProcessing() {
+                chainStartProcessing();
+
+                Iterator<String> varIt = vars.iterator();
+                while (varIt.hasNext()) {
+                    String var = varIt.next();
+                    for (int i = 0 ; i < solnList.size(); i ++ ) {
+                        QuerySolution s = solnList.get(i);
+                        if (s == null) {
+                            continue;
+                        }
+                        RDFNode node = s.get(var);
+                        if (node == null || !node.isLiteral()) {
+                            continue;
+                        }
+                        List<RowIndexedLiteral> candidatesForRemoval =
+                                new ArrayList<RowIndexedLiteral>();
+                        candidatesForRemoval.add(new RowIndexedLiteral(node.asLiteral(), i));
+                        for (int j = i + 1; j < solnList.size(); j ++) {
+                            QuerySolution t = solnList.get(j);
+                            if (t == null) {
+                                continue;
+                            }
+                            if (matchesExceptForVar(s, t, var, vars)) {
+                                candidatesForRemoval.add(
+                                        new RowIndexedLiteral(t.getLiteral(var), j));
+                            }
+                        }
+                        if (candidatesForRemoval.size() == 1) {
+                            continue;
+                        }
+                        Collections.sort(candidatesForRemoval, new RowIndexedLiteralSortByLang());
+                        log.debug("sorted RowIndexedLiterals: " + showSortedRILs(candidatesForRemoval));
+                        Iterator<RowIndexedLiteral> candIt = candidatesForRemoval.iterator();
+                        String langRegister = null;
+                        boolean chuckRemaining = false;
+                        while(candIt.hasNext()) {
+                            RowIndexedLiteral rlit = candIt.next();
+                            if (chuckRemaining) {
+                                solnList.set(rlit.getIndex(), null);
+                            } else if (langRegister == null) {
+                                langRegister = rlit.getLiteral().getLanguage();
+                            } else if (!langRegister.equals(rlit.getLiteral().getLanguage())) {
+                                chuckRemaining = true;
+                                solnList.set(rlit.getIndex(), null);
+                            }
+                        }
+                    }
+                }
+
+                Iterator<QuerySolution> solIt = solnList.iterator();
+                while(solIt.hasNext()) {
+                    QuerySolution soln = solIt.next();
+                    if (soln != null) {
+                        chainProcessQuerySolution(soln);
+                    }
+                }
+
+                chainEndProcessing();
+            }
+        });
+    }
+
 	private String showSortedRILs(List<RowIndexedLiteral> candidatesForRemoval) {
 		List<String> langstrings = new ArrayList<String>();
 		for (RowIndexedLiteral ril: candidatesForRemoval) {
