@@ -347,7 +347,7 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     }
     
 	@Override
-	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
+	public void resolveAsFauxPropertyStatements(List<ObjectPropertyStatement> list) {
 		// No webappDaoFactory, so nothing to do.
 	}
 

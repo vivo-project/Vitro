@@ -11,6 +11,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -108,6 +110,16 @@ public class RDFServiceTDB extends RDFServiceJena {
 	}
 
 	@Override
+	public void sparqlConstructQuery(String query, Model model) throws RDFServiceException {
+		dataset.begin(ReadWrite.READ);
+		try {
+			super.sparqlConstructQuery(query, model);
+		} finally {
+			dataset.end();
+		}
+	}
+
+	@Override
 	public InputStream sparqlDescribeQuery(String query,
 			ModelSerializationFormat resultFormat) throws RDFServiceException {
 		dataset.begin(ReadWrite.READ);
@@ -124,6 +136,17 @@ public class RDFServiceTDB extends RDFServiceJena {
 		dataset.begin(ReadWrite.READ);
 		try {
 			return super.sparqlSelectQuery(query, resultFormat);
+		} finally {
+			dataset.end();
+		}
+	}
+
+	@Override
+	public void sparqlSelectQuery(String query, ResultSetConsumer consumer)
+			throws RDFServiceException {
+		dataset.begin(ReadWrite.READ);
+		try {
+			super.sparqlSelectQuery(query, consumer);
 		} finally {
 			dataset.end();
 		}

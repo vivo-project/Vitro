@@ -39,11 +39,9 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
 
 
     private List<ObjectPropertyStatement> filterAndWrapList(List<ObjectPropertyStatement> list){        
-        if( ( list ) != null ){       
-        	for (ObjectPropertyStatement stmt: list) {
-        		innerObjectPropertyStatementDao.resolveAsFauxPropertyStatement(stmt);
-        	}
-            
+        if( ( list ) != null ){
+            innerObjectPropertyStatementDao.resolveAsFauxPropertyStatements(list);
+
             ArrayList<ObjectPropertyStatement> ctemp = new ArrayList<ObjectPropertyStatement>();
             Filter.filter(list,filters.getObjectPropertyStatementFilter(),ctemp);
                         
@@ -145,8 +143,8 @@ class ObjectPropertyStatementDaoFiltering extends BaseFiltering implements Objec
 
 
 	@Override
-	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
-		innerObjectPropertyStatementDao.resolveAsFauxPropertyStatement(stmt);
+	public void resolveAsFauxPropertyStatements(List<ObjectPropertyStatement> list) {
+		innerObjectPropertyStatementDao.resolveAsFauxPropertyStatements(list);
 	}
 	
 	/**

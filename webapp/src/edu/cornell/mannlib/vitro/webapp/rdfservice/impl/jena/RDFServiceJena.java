@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -420,6 +421,23 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         }
     }
 
+    private void getRDFModel(String query, boolean construct, Model model) throws RDFServiceException {
+        DatasetWrapper dw = getDatasetWrapper();
+        try {
+            Dataset d = dw.getDataset();
+            Query q = createQuery(query);
+            QueryExecution qe = createQueryExecution(query, q, d);
+            ByteArrayOutputStream serializedModel = new ByteArrayOutputStream();
+            try {
+                Model m = construct ? qe.execConstruct(model) : qe.execDescribe(model);
+            } finally {
+                qe.close();
+            }
+        } finally {
+            dw.close();
+        }
+    }
+
     private static final boolean CONSTRUCT = true;
     
     private static final boolean DESCRIBE = false;
@@ -428,6 +446,10 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     public InputStream sparqlConstructQuery(String query,
             ModelSerializationFormat resultFormat) throws RDFServiceException {
         return getRDFResultStream(query, CONSTRUCT, resultFormat);
+    }
+
+    public void sparqlConstructQuery(String query, Model model) throws RDFServiceException {
+        getRDFModel(query, CONSTRUCT, model);
     }
 
     @Override
@@ -468,6 +490,24 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                 }              
                 InputStream result = new ByteArrayInputStream(outputStream.toByteArray());
                 return result;
+            } finally {
+                qe.close();
+            }
+        } finally {
+            dw.close();
+        }
+    }
+
+    @Override
+    public void sparqlSelectQuery(String query, ResultSetConsumer consumer)
+            throws RDFServiceException {
+        DatasetWrapper dw = getDatasetWrapper();
+        try {
+            Dataset d = dw.getDataset();
+            Query q = createQuery(query);
+            QueryExecution qe = createQueryExecution(query, q, d);
+            try {
+                consumer.processResultSet(qe.execSelect());
             } finally {
                 qe.close();
             }

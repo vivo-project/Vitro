@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice;
 
+import com.hp.hpl.jena.rdf.model.Model;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
@@ -72,7 +74,18 @@ public interface RDFService {
 	 * 
 	 */
 	public InputStream sparqlConstructQuery(String query, RDFService.ModelSerializationFormat resultFormat) throws RDFServiceException;
-	
+
+	/**
+	 * Performs a SPARQL construct query against the knowledge base. The query may have
+	 * an embedded graph identifier. If the query does not contain a graph identifier
+	 * the query is executed against the union of all named and unnamed graphs in the
+	 * store.
+	 *
+	 * @param query - the SPARQL query to be executed against the RDF store
+	 * @param model - the Model to add the statements to
+	 */
+	public void sparqlConstructQuery(String query, Model model) throws RDFServiceException;
+
 	/**
 	 * Performs a SPARQL describe query against the knowledge base. The query may have
 	 * an embedded graph identifier. If the query does not contain a graph identifier
@@ -100,7 +113,18 @@ public interface RDFService {
 	 * 
 	 */
 	public InputStream sparqlSelectQuery(String query, RDFService.ResultFormat resultFormat) throws RDFServiceException;
-	
+
+	/**
+	 * Performs a SPARQL select query against the knowledge base. The query may have
+	 * an embedded graph identifier. If the query does not contain a graph identifier
+	 * the query is executed against the union of all named and unnamed graphs in the
+	 * store.
+	 *
+	 * @param query - the SPARQL query to be executed against the RDF store
+	 * @param consumer - the class to consume the results of the query
+	 */
+	public void sparqlSelectQuery(String query, ResultSetConsumer consumer) throws RDFServiceException;
+
 	/**
 	 * Performs a SPARQL ASK query against the knowledge base. The query may have
 	 * an embedded graph identifier. If the query does not contain a graph identifier

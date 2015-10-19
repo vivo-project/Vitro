@@ -2,14 +2,19 @@ tinyMCEPopup.requireLangPack();
 
 var SearchReplaceDialog = {
 	init : function(ed) {
-		var f = document.forms[0], m = tinyMCEPopup.getWindowArg("mode");
+		var t = this, f = document.forms[0], m = tinyMCEPopup.getWindowArg("mode");
 
-		this.switchMode(m);
+		t.switchMode(m);
 
 		f[m + '_panel_searchstring'].value = tinyMCEPopup.getWindowArg("search_string");
 
 		// Focus input field
 		f[m + '_panel_searchstring'].focus();
+		
+		mcTabs.onChange.add(function(tab_id, panel_id) {
+			t.switchMode(tab_id.substring(0, tab_id.indexOf('_')));
+		});
+
 	},
 
 	switchMode : function(m) {
@@ -35,6 +40,11 @@ var SearchReplaceDialog = {
 	searchNext : function(a) {
 		var ed = tinyMCEPopup.editor, se = ed.selection, r = se.getRng(), f, m = this.lastMode, s, b, fl = 0, w = ed.getWin(), wm = ed.windowManager, fo = 0;
 
+		if (tinymce.isIE11 && !window.find) {
+			ed.windowManager.alert("This feature is not available in IE 11+. Upgrade TinyMCE to 4.x to get this functionallity back.");
+			return;
+		}
+
 		// Get input
 		f = document.forms[0];
 		s = f[m + '_panel_searchstring'].value;
@@ -42,18 +52,23 @@ var SearchReplaceDialog = {
 		ca = f[m + '_panel_casesensitivebox'].checked;
 		rs = f['replace_panel_replacestring'].value;
 
+		if (tinymce.isIE) {
+			r = ed.getDoc().selection.createRange();
+		}
+
+		if (s == '')
+			return;
+
 		function fix() {
 			// Correct Firefox graphics glitches
+			// TODO: Verify if this is actually needed any more, maybe it was for very old FF versions? 
 			r = se.getRng().cloneRange();
 			ed.getDoc().execCommand('SelectAll', false, null);
 			se.setRng(r);
 		};
 
 		function replace() {
-			if (tinymce.isIE)
-				ed.selection.getRng().duplicate().pasteHTML(rs); // Needs to be duplicated due to selection bug in IE
-			else
-				ed.getDoc().execCommand('InsertHTML', false, rs);
+			ed.selection.setContent(rs); // Needs to be duplicated due to selection bug in IE
 		};
 
 		// IE flags
@@ -67,11 +82,22 @@ var SearchReplaceDialog = {
 				ed.selection.collapse(true);
 
 				if (tinymce.isIE) {
+					ed.focus();
+					r = ed.getDoc().selection.createRange();
+
 					while (r.findText(s, b ? -1 : 1, fl)) {
 						r.scrollIntoView();
 						r.select();
 						replace();
 						fo = 1;
+
+						if (b) {
+							r.moveEnd("character", -(rs.length)); // Otherwise will loop forever
+						} else {
+							// to avoid looping for ever in MSIE 9/10 when just
+							// changing the case
+							r.moveStart("character", rs.length);
+						}
 					}
 
 					tinyMCEPopup.storeSelection();
@@ -104,6 +130,9 @@ var SearchReplaceDialog = {
 			return;
 
 		if (tinymce.isIE) {
+			ed.focus();
+			r = ed.getDoc().selection.createRange();
+
 			if (r.findText(s, b ? -1 : 1, fl)) {
 				r.scrollIntoView();
 				r.select();

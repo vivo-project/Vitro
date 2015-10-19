@@ -20,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.RequestedAction;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
@@ -185,9 +184,7 @@ public class IndividualFiltering implements Individual {
 		if (opStmts == null) {
 			return Collections.emptyList();
 		}
-		for(ObjectPropertyStatement opStmt: opStmts) {
-			_innerIndividual.resolveAsFauxPropertyStatement(opStmt);
-		}
+        _innerIndividual.resolveAsFauxPropertyStatements(opStmts);
 		ArrayList<ObjectPropertyStatement> filtered = new ArrayList<ObjectPropertyStatement>();
 		Filter.filter(opStmts, _filters.getObjectPropertyStatementFilter(),	filtered);
 		return filtered;
@@ -563,8 +560,8 @@ public class IndividualFiltering implements Individual {
 
 
 	@Override
-	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
-		_innerIndividual.resolveAsFauxPropertyStatement(stmt);
+	public void resolveAsFauxPropertyStatements(List<ObjectPropertyStatement> list) {
+		_innerIndividual.resolveAsFauxPropertyStatements(list);
 	}
     
 }

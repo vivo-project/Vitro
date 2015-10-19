@@ -618,8 +618,8 @@ public class IndividualJena extends IndividualImpl implements Individual {
     }
 
 	@Override
-	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
-		webappDaoFactory.getObjectPropertyStatementDao().resolveAsFauxPropertyStatement(stmt);
+	public void resolveAsFauxPropertyStatements(List<ObjectPropertyStatement> list) {
+		webappDaoFactory.getObjectPropertyStatementDao().resolveAsFauxPropertyStatements(list);
 	}
     
 }

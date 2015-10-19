@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.searchindex;
 
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.PAUSE;
+import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.REBUILD_REQUESTED;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.SHUTDOWN_COMPLETE;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.SHUTDOWN_REQUESTED;
 import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.STARTUP;
@@ -98,8 +99,12 @@ public class SearchIndexerImpl implements SearchIndexer {
 	private Set<IndexingUriFinder> uriFinders;
 	private WebappDaoFactory wadf;
 
-    private boolean ignoreTasksWhilePaused = false;
     private boolean rebuildOnUnpause = false;
+
+	private volatile int paused = 0;
+
+	private List<Statement> pendingStatements = new ArrayList<Statement>();
+	private Collection<String> pendingUris = new ArrayList<String>();
 
 	// ----------------------------------------------------------------------
 	// ConfigurationBeanLoader methods.
@@ -199,43 +204,52 @@ public class SearchIndexerImpl implements SearchIndexer {
 	}
 
 	@Override
-	public void pause() {
-		if (!isPaused() && !isShutdown()) {
-            ignoreTasksWhilePaused = false;
-            rebuildOnUnpause = false;
-			scheduler.pause();
-			fireEvent(PAUSE);
+	public synchronized void pause() {
+		if (!isShutdown()) {
+			paused++;
+			if (paused == 1) {
+				fireEvent(PAUSE);
+			}
 		}
 	}
 
-    @Override
-    public void pauseInAnticipationOfRebuild() {
-        if (!isPaused() && !isShutdown()) {
-            ignoreTasksWhilePaused = true;
-            rebuildOnUnpause = false;
-            scheduler.pause();
-            fireEvent(PAUSE);
-        }
-    }
-
 	@Override
-	public void unpause() {
-		if (isPaused() && !isShutdown()) {
-			scheduler.unpause();
-			fireEvent(UNPAUSE);
-            if (rebuildOnUnpause) {
-                rebuildOnUnpause = false;
-                rebuildIndex();
-            }
+	public synchronized void unpause() {
+		if (paused > 0 && !isShutdown()) {
+			paused--;
+
+			// Only process if we transition to unpaused state
+			if (paused == 0) {
+				fireEvent(UNPAUSE);
+				if (rebuildOnUnpause) {
+					rebuildOnUnpause = false;
+					pendingStatements.clear();
+					pendingUris.clear();
+					rebuildIndex();
+				} else {
+					schedulePendingStatements();
+					schedulePendingUris();
+				}
+			}
+		}
+	}
+
+	private synchronized void schedulePendingStatements() {
+		if (paused == 0 && pendingStatements.size() > 0) {
+			scheduleUpdatesForStatements(pendingStatements);
+			pendingStatements = new ArrayList<>();
+		}
+	}
+
+	private synchronized  void schedulePendingUris() {
+		if (paused == 0 && pendingUris.size() > 0) {
+			scheduleUpdatesForUris(pendingUris);
+			pendingUris = new ArrayList<>();
 		}
 	}
 
 	private boolean isStarted() {
 		return scheduler.isStarted();
-	}
-
-	private boolean isPaused() {
-		return scheduler.isPaused();
 	}
 
 	private boolean isShutdown() {
@@ -264,13 +278,23 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (changes == null || changes.isEmpty()) {
 			return;
 		}
-        if (ignoreTasksWhilePaused && isPaused()) {
-            rebuildOnUnpause = true;
-            return;
+        if (paused > 0) {
+			if (addToPendingStatements(changes)) {
+				return;
+			}
         }
 
 		scheduler.scheduleTask(new UpdateStatementsTask(new IndexerConfigImpl(this), changes));
 		log.debug("Scheduled updates for " + changes.size() + " statements.");
+	}
+
+	private synchronized boolean addToPendingStatements(List<Statement> changes) {
+		if (paused > 0) {
+			pendingStatements.addAll(changes);
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -282,25 +306,38 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (uris == null || uris.isEmpty()) {
 			return;
 		}
-        if (ignoreTasksWhilePaused && isPaused()) {
-            rebuildOnUnpause = true;
-            return;
+        if (paused > 0) {
+			if (pendingUris.addAll(uris)) {
+				return;
+			}
         }
 
 		scheduler.scheduleTask(new UpdateUrisTask(new IndexerConfigImpl(this), uris));
 		log.debug("Scheduled updates for " + uris.size() + " uris.");
 	}
 
+	private synchronized boolean addToPendingUris(Collection<String> uris) {
+		if (paused > 0) {
+			pendingUris.addAll(uris);
+			return true;
+		}
+
+		return false;
+	}
+
 	@Override
 	public void rebuildIndex() {
 		if (isShutdown()) {
 			log.warn("Call to rebuildIndex after shutdown.");
+			return;
 		}
-        if (ignoreTasksWhilePaused && isPaused()) {
+		fireEvent(REBUILD_REQUESTED);
+        if (paused > 0) {
+			// Make sure that we are rebuilding when we unpause
+			// and don't bother noting any other changes until unpaused
             rebuildOnUnpause = true;
             return;
         }
-
 		scheduler.scheduleTask(new RebuildIndexTask(new IndexerConfigImpl(this)));
 		log.debug("Scheduled a full rebuild.");
 	}
@@ -345,7 +382,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 		}
 		synchronized (listeners) {
 			listeners.add(listener);
-			if (isPaused()) {
+			if (paused > 0) {
 				listener.receiveSearchIndexerEvent(new Event(PAUSE, getStatus()));
 			}
 		}
@@ -399,7 +436,6 @@ public class SearchIndexerImpl implements SearchIndexer {
 		private final TaskQueue taskQueue;
 		private final List<Task> deferredQueue;
 		private volatile boolean started;
-		private volatile boolean paused;
 
 		public Scheduler(TaskQueue taskQueue) {
 			this.taskQueue = taskQueue;
@@ -410,12 +446,8 @@ public class SearchIndexerImpl implements SearchIndexer {
 			return started;
 		}
 
-		public boolean isPaused() {
-			return paused;
-		}
-
 		public synchronized void scheduleTask(Task task) {
-            if (paused || !started) {
+            if (!started) {
                 deferredQueue.add(task);
                 log.debug("added task to deferred queue: " + task);
             } else {
@@ -426,20 +458,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 
 		public synchronized void start() {
 			started = true;
-			if (!paused) {
-				processDeferredTasks();
-			}
-		}
-
-		public synchronized void pause() {
-			paused = true;
-		}
-
-		public synchronized void unpause() {
-			paused = false;
-			if (started) {
-				processDeferredTasks();
-			}
+			processDeferredTasks();
 		}
 
 		private void processDeferredTasks() {
@@ -711,6 +730,5 @@ public class SearchIndexerImpl implements SearchIndexer {
 			}
 
 		}
-
 	}
 }

@@ -16,6 +16,7 @@ import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
 
 /**
@@ -72,7 +73,18 @@ public class RDFServiceSparqlHttp extends RDFServiceSparql {
 		InputStream result = new ByteArrayInputStream(serializedModel.toByteArray());
 		return result;
 	}
-	
+
+	@Override
+	public void sparqlConstructQuery(String queryStr, Model model) throws RDFServiceException {
+
+		QueryEngineHTTP qeh = new QueryEngineHTTP( readEndpointURI, queryStr);
+		try {
+			qeh.execConstruct(model);
+		} finally {
+			qeh.close();
+		}
+	}
+
 	/**
 	 * Performs a SPARQL describe query against the knowledge base. The query may have
 	 * an embedded graph identifier.
@@ -145,7 +157,19 @@ public class RDFServiceSparqlHttp extends RDFServiceSparql {
             qeh.close();
         }
 	}
-	
+
+	@Override
+	public void sparqlSelectQuery(String queryStr, ResultSetConsumer consumer) throws RDFServiceException {
+
+		QueryEngineHTTP qeh = new QueryEngineHTTP( readEndpointURI, queryStr);
+
+		try {
+			consumer.processResultSet(qeh.execSelect());
+		} finally {
+			qeh.close();
+		}
+	}
+
 	/**
 	 * Performs a SPARQL ASK query against the knowledge base. The query may have
 	 * an embedded graph identifier.
