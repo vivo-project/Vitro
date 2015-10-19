@@ -411,20 +411,19 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	}
 	
 	private List<String> getGraphURIsFromSparqlQuery(String queryString) throws RDFServiceException {
-	    List<String> graphURIs = new ArrayList<String>();
+	    final List<String> graphURIs = new ArrayList<String>();
 	    try {
-            
-            ResultSet rs = ResultSetFactory.fromJSON(
-                    sparqlSelectQuery(queryString, RDFService.ResultFormat.JSON));
-            while (rs.hasNext()) {
-                QuerySolution qs = rs.nextSolution();
-                if (qs != null) { // no idea how this happens, but it seems to 
-                    RDFNode n = qs.getResource("g");
-                    if (n != null && n.isResource()) {
-                        graphURIs.add(((Resource) n).getURI());
-                    }
-                }
-            }
+            sparqlSelectQuery(queryString, new ResultSetConsumer() {
+				@Override
+				protected void processQuerySolution(QuerySolution qs) {
+					if (qs != null) { // no idea how this happens, but it seems to
+						RDFNode n = qs.getResource("g");
+						if (n != null && n.isResource()) {
+							graphURIs.add(((Resource) n).getURI());
+						}
+					}
+				}
+			});
         } catch (Exception e) {
             throw new RDFServiceException("Unable to list graph URIs", e);
         }

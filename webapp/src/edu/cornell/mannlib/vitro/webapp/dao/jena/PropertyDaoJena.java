@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -440,44 +441,24 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
         return classSet;
     }
      
-    protected ResultSet getPropertyQueryResults(String queryString) {        
-        log.debug("SPARQL query:\n" + queryString);
-        
-        // RY Removing prebinding due to Jena bug: when isLiteral(?object) or 
-        // isURI(?object) is added to the query as a filter, the query fails with prebinding
-        // but succeeds when the subject uri is concatenated into the query string.
-        //QuerySolutionMap subjectBinding = new QuerySolutionMap();
-        //subjectBinding.add("subject", ResourceFactory.createResource(subjectUri));
-                
-        // Run the SPARQL query to get the properties
-        
-        try {
-            return ResultSetFactory.fromJSON(
-                    getRDFService().sparqlSelectQuery(
-                            queryString, RDFService.ResultFormat.JSON));
-        } catch (RDFServiceException e) {
-            throw new RuntimeException(e);
-        }
-        
-//        DatasetWrapper w = dwf.getDatasetWrapper();
-//        Dataset dataset = w.getDataset();
-//        dataset.getLock().enterCriticalSection(Lock.READ);
-//        ResultSet rs = null;
-//        try {
-//            QueryExecution qexec = QueryExecutionFactory.create(
-//                    query, dataset); //, subjectBinding);
-//            try {
-//                rs = new ResultSetMem(qexec.execSelect());
-//            } finally {
-//                qexec.close();
-//            }
-//        } finally {
-//            dataset.getLock().leaveCriticalSection();
-//            w.close();
-//        }
-//        return rs;
-    }
-    
+	protected void getPropertyQueryResults(String queryString, ResultSetConsumer consumer) {
+		log.debug("SPARQL query:\n" + queryString);
+
+		// RY Removing prebinding due to Jena bug: when isLiteral(?object) or
+		// isURI(?object) is added to the query as a filter, the query fails with prebinding
+		// but succeeds when the subject uri is concatenated into the query string.
+		//QuerySolutionMap subjectBinding = new QuerySolutionMap();
+		//subjectBinding.add("subject", ResourceFactory.createResource(subjectUri));
+
+		// Run the SPARQL query to get the properties
+
+		try {
+			getRDFService().sparqlSelectQuery(queryString, consumer);
+		} catch (RDFServiceException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
     /**
      * requires SPARQL 1.1 (or ARQ) property path support
      * @param vclassURI

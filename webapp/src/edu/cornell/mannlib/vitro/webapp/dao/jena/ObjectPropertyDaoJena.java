@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -1021,39 +1022,43 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         } 
         log.debug("Object property query:\n" + query);
         
-        ObjectProperty propRegister = new ObjectProperty();
-        propRegister.setURI("");
-        
-        ResultSet results = getPropertyQueryResults(queryString);
-        List<ObjectProperty> properties = new ArrayList<ObjectProperty>();
-        while (results.hasNext()) {
-            QuerySolution soln = results.next();
-            Resource resource = soln.getResource("property");
-            String uri = resource.getURI();
-            Resource objType = soln.getResource("objType");
-            String objTypeUri = objType.getURI();
-            log.debug("Found populated object property " + uri + 
-                    " with object type " + objType);
-            ObjectProperty property = null;
-            if (uri.equals(propRegister.getURI())) {
-                property = propRegister.clone();
-            } else {
-                ObjectProperty newProperty = getObjectPropertyByURI(uri);
-                if (newProperty != null) {
-                    propRegister = newProperty;
-                    // add canonical instance of the property first in the list
-                    // before the range-changed versions
-                    properties.add(newProperty); 
-                    // isolate the canonical prop from what's about to happen next
-                    property = newProperty.clone();
-                } 
+
+        final List<ObjectProperty> properties = new ArrayList<ObjectProperty>();
+        getPropertyQueryResults(queryString, new ResultSetConsumer() {
+            ObjectProperty propRegister = new ObjectProperty();
+            {
+                propRegister.setURI("");
             }
-            if (property != null) {
-                property.setRangeVClassURI(objTypeUri);
-                properties.add(property);
+
+            @Override
+            protected void processQuerySolution(QuerySolution qs) {
+                Resource resource = qs.getResource("property");
+                String uri = resource.getURI();
+                Resource objType = qs.getResource("objType");
+                String objTypeUri = objType.getURI();
+                log.debug("Found populated object property " + uri + " with object type " + objType);
+                ObjectProperty property = null;
+                if (uri.equals(propRegister.getURI())) {
+                    property = propRegister.clone();
+                } else {
+                    ObjectProperty newProperty = getObjectPropertyByURI(uri);
+                    if (newProperty != null) {
+                        propRegister = newProperty;
+                        // add canonical instance of the property first in the list
+                        // before the range-changed versions
+                        properties.add(newProperty);
+                        // isolate the canonical prop from what's about to happen next
+                        property = newProperty.clone();
+                    }
+                }
+                if (property != null) {
+                    property.setRangeVClassURI(objTypeUri);
+                    properties.add(property);
+                }
             }
-        }
-        return properties; 
+        });
+
+        return properties;
     }
 
     protected static final String LIST_VIEW_CONFIG_FILE_QUERY_STRING =

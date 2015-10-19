@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -733,20 +734,21 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             log.error(queryString);
             return null;
         }                     
-        log.debug("Data property query string:\n" + query);         
-     
-        ResultSet results = getPropertyQueryResults(queryString);
-        List<DataProperty> properties = new ArrayList<DataProperty>();
-        while (results.hasNext()) {
-            QuerySolution sol = results.next();
-            Resource resource = sol.getResource("property");
-            String uri = resource.getURI();
-            DataProperty property = getDataPropertyByURI(uri);
-            if (property != null) {
-                properties.add(property);
+        log.debug("Data property query string:\n" + query);
+
+        final List<DataProperty> properties = new ArrayList<DataProperty>();
+        getPropertyQueryResults(queryString, new ResultSetConsumer() {
+            @Override
+            protected void processQuerySolution(QuerySolution qs) {
+                Resource resource = qs.getResource("property");
+                String uri = resource.getURI();
+                DataProperty property = getDataPropertyByURI(uri);
+                if (property != null) {
+                    properties.add(property);
+                }
             }
-        }
-        return properties; 
+        });
+        return properties;
     }
     protected static final String LIST_VIEW_CONFIG_FILE_QUERY_STRING =
         "PREFIX display: <http://vitro.mannlib.cornell.edu/ontologies/display/1.1#>" +

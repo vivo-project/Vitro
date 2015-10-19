@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -175,13 +176,12 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     }
         
     private List<Individual> getIndividualList(Resource theClass) {
-    	List<Individual> ents = new ArrayList<Individual>();
+    	final List<Individual> ents = new ArrayList<Individual>();
    	    DatasetWrapper w = getDatasetWrapper();
 	    Dataset dataset = w.getDataset();
     	dataset.getLock().enterCriticalSection(Lock.READ);
     	try {
-    	    
-    		String query = 
+    		String query =
 	    		"SELECT DISTINCT ?ind ?label " +
 	    		"WHERE " +
 	    		 "{ \n" +
@@ -191,47 +191,53 @@ public class IndividualDaoSDB extends IndividualDaoJena {
 	    		 	"    ?ind  <" + RDFS.label.getURI() + "> ?label \n" +
 	    		 	"} \n" +
 	    		 "} ORDER BY ?ind ?label";
+
             RDFService rdfService = wadf.getRDFService();
-            InputStream in = null;
             try {
-                in = rdfService.sparqlSelectQuery(
-                        query, RDFService.ResultFormat.JSON);
+                rdfService.sparqlSelectQuery(
+                        query, new ResultSetConsumer() {
+                            String uri = null;
+                            String label = null;
+
+                            @Override
+                            protected void processQuerySolution(QuerySolution qs) {
+                                Resource currRes = qs.getResource("ind");
+                                if (currRes.isAnon()) {
+                                    return;
+                                }
+
+                                if (uri != null && !uri.equals(currRes.getURI())) {
+                                    try {
+                                        ents.add(makeIndividual(uri, label));
+                                    } catch (IndividualNotFoundException e) {
+                                        // don't add
+                                    }
+                                    uri = currRes.getURI();
+                                    label = null;
+                                } else if (uri == null) {
+                                    uri = currRes.getURI();
+                                }
+                                Literal labelLit = qs.getLiteral("label");
+                                if (labelLit != null) {
+                                    label = labelLit.getLexicalForm();
+                                }
+                            }
+
+                            @Override
+                            protected void endProcessing() {
+                                if (uri != null) {
+                                    try {
+                                        ents.add(makeIndividual(uri, label));
+                                    } catch (IndividualNotFoundException e) {
+                                        // don't add
+                                    }
+                                }
+                            }
+                        });
             } catch (RDFServiceException e) {
                 log.debug(e,e);
                 throw new RuntimeException(e);
             }
-            ResultSet rs = ResultSetFactory.fromJSON(in);
-    		String uri = null;
-    		String label = null;
-    		while (rs.hasNext()) {
-    		    QuerySolution sol = rs.nextSolution();
-    		    Resource currRes = sol.getResource("ind");
-    		    if (currRes.isAnon()) {
-    		        continue;
-    		    }
-    		    if (uri != null && !uri.equals(currRes.getURI())) {
-    		        try {
-    		            ents.add(makeIndividual(uri, label));
-    		        } catch (IndividualNotFoundException e) {
-    		            // don't add
-    		        }
-    	            uri = currRes.getURI();
-    	            label = null;
-    		    } else if (uri == null) {
-    		        uri = currRes.getURI();
-    		    }
-                Literal labelLit = sol.getLiteral("label");
-                if (labelLit != null) {
-                    label = labelLit.getLexicalForm();
-                }
-                if (!rs.hasNext()) {
-                    try {
-                        ents.add(makeIndividual(uri, label));
-                    } catch (IndividualNotFoundException e) {
-                        // don't add   
-                    }
-                }
-    		}
     	} finally {
     		dataset.getLock().leaveCriticalSection();
     		w.close();
@@ -241,7 +247,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     
     private List<Individual> getGraphFilteredIndividualList(Resource theClass, 
     		                                                String filterStr) {
-		List<Individual> filteredIndividualList = new ArrayList<Individual>();
+		final List<Individual> filteredIndividualList = new ArrayList<Individual>();
 		DatasetWrapper w = getDatasetWrapper();
    	    Dataset dataset = w.getDataset();
        	dataset.getLock().enterCriticalSection(Lock.READ);
@@ -254,27 +260,25 @@ public class IndividualDaoSDB extends IndividualDaoJena {
                 "  } \n" + filterStr +
                 "} ORDER BY ?ind";
     		RDFService rdfService = wadf.getRDFService();
-    		InputStream in = null;
     		try {
-    		    in = rdfService.sparqlSelectQuery(
-    		            query, RDFService.ResultFormat.JSON);
+    		    rdfService.sparqlSelectQuery(
+                        query, new ResultSetConsumer() {
+                            @Override
+                            protected void processQuerySolution(QuerySolution qs) {
+                                Resource currRes = qs.getResource("ind");
+                                if (!currRes.isAnon()) {
+                                    try {
+                                        filteredIndividualList.add(
+                                                makeIndividual(currRes.getURI(), null));
+                                    } catch (IndividualNotFoundException e) {
+                                        // don't add
+                                    }
+                                }
+                            }
+                        });
     		} catch (RDFServiceException e) {
     		    log.debug(e,e);
     		    throw new RuntimeException(e);
-    		}
-    		ResultSet rs = ResultSetFactory.fromJSON(in);
-    		while (rs.hasNext()) {
-    		    QuerySolution sol = rs.nextSolution();
-    		    Resource currRes = sol.getResource("ind");
-    		    if (currRes.isAnon()) {
-    		        continue;
-    		    }
-    		    try {
-    		        filteredIndividualList.add(
-    		    	    	makeIndividual(currRes.getURI(), null));
-    		    } catch (IndividualNotFoundException e) {
-    		        // don't add
-    		    }
     		}
        	} finally {
     		dataset.getLock().leaveCriticalSection();

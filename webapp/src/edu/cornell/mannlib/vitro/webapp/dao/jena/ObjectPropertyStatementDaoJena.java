@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -279,12 +280,12 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
     public List<Map<String, String>> getObjectPropertyStatementsForIndividualByProperty(
             String subjectUri, 
             String propertyUri,             
-            String objectKey, String domainUri, String rangeUri,
+            final String objectKey, String domainUri, String rangeUri,
             String queryString, 
             Set<String> constructQueryStrings,
             String sortDirection) {    	        
     	
-        List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+        final List<Map<String, String>> list = new ArrayList<Map<String, String>>();
         
         long start = System.currentTimeMillis();
 
@@ -299,31 +300,39 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             if("desc".equalsIgnoreCase( sortDirection ) ){
                 queryString = queryString.replaceAll(" ASC\\(", " DESC(");
             }
-            ResultSet results = (constructedModel == null) ? selectFromRDFService(
-                    queryString, subjectUri, propertyUri, domainUri, rangeUri) : selectFromConstructedModel(
-                            queryString, subjectUri, propertyUri, domainUri, rangeUri, constructedModel);
 
-                    while (results.hasNext()) {
-                        QuerySolution soln = results.nextSolution();
-                        RDFNode node = soln.get(objectKey);
-                        if (node != null && node.isURIResource()) {
-                            list.add(QueryUtils.querySolutionToStringValueMap(soln));
-                        }
+            ResultSetConsumer consumer = new ResultSetConsumer() {
+                @Override
+                protected void processQuerySolution(QuerySolution qs) {
+                    RDFNode node = qs.get(objectKey);
+                    if (node != null && node.isURIResource()) {
+                        list.add(QueryUtils.querySolutionToStringValueMap(qs));
                     }
-                    if(log.isDebugEnabled()) {
-                        long duration = System.currentTimeMillis() - start; 
-                        log.debug(duration + " to do list view for " + 
-                                propertyUri + " / " + domainUri + " / " + rangeUri);
-                    }
+                }
+            };
+
+            if (constructedModel == null) {
+                selectFromRDFService(
+                        queryString, subjectUri, propertyUri, domainUri, rangeUri, consumer);
+            } else {
+                selectFromConstructedModel(
+                        queryString, subjectUri, propertyUri, domainUri, rangeUri, constructedModel, consumer);
+            }
+
+            if(log.isDebugEnabled()) {
+                long duration = System.currentTimeMillis() - start;
+                log.debug(duration + " to do list view for " +
+                        propertyUri + " / " + domainUri + " / " + rangeUri);
+            }
         } catch (Exception e) {
             log.error("Error getting object property values for subject " + subjectUri + " and property " + propertyUri, e);
             return Collections.emptyList();
         }
         return list;
     }
-    
-    private ResultSet selectFromRDFService(String queryString, String subjectUri,
-            String propertyUri, String domainUri, String rangeUri) {
+
+    private void selectFromRDFService(String queryString, String subjectUri,
+                                      String propertyUri, String domainUri, String rangeUri, ResultSetConsumer consumer) {
         String[] part = queryString.split("[Ww][Hh][Ee][Rr][Ee]");
         part[1] = part[1].replace("?subject", "<" + subjectUri + ">");
         part[1] = part[1].replace("?property", "<" + propertyUri + ">");
@@ -335,16 +344,15 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         }
         queryString = part[0] + "WHERE" + part[1];
         try {
-            return ResultSetFactory.fromJSON(
-                    rdfService.sparqlSelectQuery(queryString, RDFService.ResultFormat.JSON));
+            rdfService.sparqlSelectQuery(queryString, consumer);
         } catch (RDFServiceException e) {
             throw new RuntimeException(e);
-        }      
+        }
     }
 
-    private ResultSet selectFromConstructedModel(String queryString, 
-            String subjectUri, String propertyUri, String domainUri, String rangeUri, 
-            Model constructedModel) {
+    private void selectFromConstructedModel(String queryString,
+                                                 String subjectUri, String propertyUri, String domainUri, String rangeUri,
+                                                 Model constructedModel, ResultSetConsumer consumer) {
         Query query = null;
         try {
             query = QueryFactory.create(queryString, Syntax.syntaxARQ);
@@ -352,7 +360,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             log.error("Could not create SPARQL query for query string. " + th.getMessage());
             log.error(queryString);
             throw new RuntimeException(th);
-        } 
+        }
 
         QuerySolutionMap initialBindings = new QuerySolutionMap();
         initialBindings.add("subject", ResourceFactory.createResource(subjectUri));
@@ -369,19 +377,19 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         }
 
         // Run the SPARQL query to get the properties
-        
+
         QueryExecution qexec = null;
         try {
             qexec = QueryExecutionFactory.create(
                     query, constructedModel, initialBindings);
-            return new ResultSetMem(qexec.execSelect());
+            consumer.processResultSet(qexec.execSelect());
         } finally {
             if (qexec != null) {
                 qexec.close();
             }
-        } 
+        }
     }
-    
+
     private Model constructModelForSelectQueries(String subjectUri,
                                                  String propertyUri,    
                                                  String rangeUri,
@@ -441,25 +449,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                         w.close();
                     }	
             	} else {
-            	    String parseFormat = "N3";
-            	    RDFService.ModelSerializationFormat resultFormat = RDFService
-            	            .ModelSerializationFormat.N3;
-            	    
-            	    /* If the test ObjectPropertyStatementDaoJenaTest.testN3WithSameAs() 
-            	     * fails this code can be removed: */
-            	    if( OWL.sameAs.getURI().equals( propertyUri )){
-            	        // VIVO-111: owl:sameAs can be represented as = in n3 but 
-            	        // Jena's parser does not recognize it. 
-            	        // Switch to rdf/xml only for sameAs since it seems like n3
-            	        // would be faster the rest of the time.            	        
-            	        parseFormat = "RDF/XML";
-                        resultFormat = RDFService.ModelSerializationFormat.RDFXML;
-            	    }
-            	    /* end of removal */
-            	    
-            	    InputStream is = rdfService.sparqlConstructQuery(
-            	            queryString, resultFormat);            	                	    
-            	    constructedModel.read( is,  null, parseFormat);            
+            	    rdfService.sparqlConstructQuery(queryString, constructedModel);
             	}
             } catch (Exception e) {                
                 log.error("Error getting constructed model for subject " 
