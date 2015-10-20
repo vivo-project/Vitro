@@ -293,8 +293,10 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             Model constructedModel = constructModelForSelectQueries(
                     subjectUri, propertyUri, rangeUri, constructQueryStrings);
 
-            if(log.isDebugEnabled()) {
-                log.debug("Constructed model has " + constructedModel.size() + " statements.");
+            if (constructedModel != null) {
+                if(log.isDebugEnabled()) {
+                    log.debug("Constructed model has " + constructedModel.size() + " statements.");
+                }
             }
 
             if("desc".equalsIgnoreCase( sortDirection ) ){
