@@ -35,7 +35,11 @@
     <!-- start section individual-info -->
     <section id="individual-info" ${infoClass!} role="region">
         <#include "individual-adminPanel.ftl">
-        
+
+        <#if individualProductExtensionPreHeader??>
+            ${individualProductExtensionPreHeader}
+        </#if>
+
         <header>
             <#if relatedSubject??>
                 <h2>${relatedSubject.relatingPredicateDomainPublic} for ${relatedSubject.name}</h2>
