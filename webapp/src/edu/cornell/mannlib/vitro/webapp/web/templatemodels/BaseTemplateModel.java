@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,7 +59,7 @@ public abstract class BaseTemplateModel {
      * Currently this only checks for XSS exploits.
      */
     protected String cleanTextForDisplay( String dirty){
-        return AntiScript.cleanText(dirty);
+        return simpleScriptStripper(dirty);
     }
     
     /**
@@ -66,7 +67,23 @@ public abstract class BaseTemplateModel {
      * a map.  Map may be modified. 
      */
     protected <T> void cleanMapValuesForDisplay( Map<T,String> map){
-        AntiScript.cleanMapValues(map);
+        for( T key : map.keySet() ){
+            map.put(key, simpleScriptStripper(map.get(key)) );
+        }
     }
-    
+
+//    private static final Pattern stripScriptTags   = Pattern.compile("<script\\b[^<]*(?:(?!</script>)<[^<]*)*</script>");
+//    private static final Pattern stripOnAttributes = Pattern.compile(" on[a-z]*=\"(?:[^\\\\\"]|\\\\.)*\"");
+    private static final Pattern stripJavascript   = Pattern.compile("(<script\\b[^<]*(?:(?!</script>)<[^<]*)*</script>)|( on[a-z]*=\"(?:[^\\\\\"]|\\\\.)*\")");
+
+    protected String simpleScriptStripper(String dirtyInput) {
+        if( dirtyInput == null )
+            return null;
+
+        if (dirtyInput.contains("<script") || dirtyInput.contains(" on")) {
+            return stripJavascript.matcher(dirtyInput).replaceAll("");
+        }
+
+        return dirtyInput;
+    }
 }

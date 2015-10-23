@@ -44,7 +44,21 @@
                 fix_nesting : true,
                 cleanup_on_startup : true,
                 gecko_spellcheck : true,
-                forced_root_block: false
+                forced_root_block: false,
+                plugins : "paste",
+                paste_use_dialog : false,
+                paste_auto_cleanup_on_paste : true,
+                paste_convert_headers_to_strong : true,
+                paste_strip_class_attributes : "all",
+                paste_remove_spans : true,
+                paste_remove_styles : true,
+                paste_retain_style_properties : ""
+//                paste_text_sticky : true,
+//                setup : function(ed) {
+//                    ed.onInit.add(function(ed) {
+//                        ed.pasteAsPlainText = true;
+//                    });
+//                }
                 // plugins: "paste",
                 // theme_advanced_buttons1_add : "pastetext,pasteword,selectall",
                 // paste_create_paragraphs: false,
@@ -66,6 +80,6 @@
 <#-- Script to enable browsing individuals within a class -->
 <#--'<script type="text/javascript" src="${urls.base}/js/jquery_plugins/jquery.scrollTo-min.js"></script>',-->
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>',
-              '<script type="text/javascript" src="${urls.base}/js/tiny_mce/jquery-tinymce.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/tiny_mce/jquery.tinymce.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/edit/initTinyMce.js"></script>',
               '<script type="text/javascript" src="${urls.base}/templates/freemarker/edit/forms/js/defaultDataPropertyUtils.js"></script>')}

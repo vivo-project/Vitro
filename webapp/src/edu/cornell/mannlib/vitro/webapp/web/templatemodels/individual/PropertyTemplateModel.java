@@ -170,6 +170,10 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         return (addUrl != null) ? addUrl : "";
     }
     
+    //check to see whether or not this property represents a faux property
+    public boolean getIsFauxProperty() {
+    	return (fauxProperty != null);
+    }
     public Map<String, Object> getVerboseDisplay() {
         return verboseDisplay;
     } 

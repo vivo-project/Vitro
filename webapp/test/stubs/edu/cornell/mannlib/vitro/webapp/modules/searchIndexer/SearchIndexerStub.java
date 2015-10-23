@@ -32,11 +32,6 @@ public class SearchIndexerStub implements SearchIndexer {
 	}
 
     @Override
-    public void pauseInAnticipationOfRebuild() {
-        paused = true;
-    }
-
-    @Override
 	public void unpause() {
 		paused = false;
 	}

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -104,8 +105,23 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
                     resultFormat));
             return new ByteArrayInputStream(out.toByteArray());
         }
-              
-        @Override 
+
+        @Override
+        public void sparqlConstructQuery(String query, Model model)
+                throws RDFServiceException {
+            Model m = ModelFactory.createDefaultModel();
+            s.sparqlConstructQuery(query, m);
+
+            StmtIterator stmtIt = m.listStatements();
+            while (stmtIt.hasNext()) {
+                Statement stmt = stmtIt.nextStatement();
+                if (!isRedundant(stmt)) {
+                    model.add(stmt);
+                }
+            }
+        }
+
+        @Override
         public InputStream sparqlSelectQuery(String query, ResultFormat resultFormat) 
                 throws RDFServiceException {
             ResultSet rs = ResultSetFactory.load(
@@ -138,7 +154,21 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
             }              
             return new ByteArrayInputStream(outputStream.toByteArray());        
         }
-        
+
+        @Override
+        public void sparqlSelectQuery(String query, ResultSetConsumer consumer)
+                throws RDFServiceException {
+
+            s.sparqlSelectQuery(query, new ResultSetConsumer.Chaining(consumer) {
+                @Override
+                public void processQuerySolution(QuerySolution qs) {
+                    if (!isRedundant(qs)) {
+                        chainProcessQuerySolution(qs);
+                    }
+                }
+            });
+        }
+
         private boolean isRedundant(Statement s) {
             List<Resource> sameAsResources = getSameAsResources(s.getSubject());
             if (sameAsResources.size() > 0 && !sameAsResources.get(0).equals(s.getSubject())) {

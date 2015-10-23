@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -237,7 +238,21 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		InputStream result = new ByteArrayInputStream(serializedModel.toByteArray());
 		return result;
 	}
-	
+
+	public void sparqlConstructQuery(String queryStr, Model model) throws RDFServiceException {
+
+		Query query = createQuery(queryStr);
+		QueryExecution qe = QueryExecutionFactory.sparqlService(readEndpointURI, query);
+
+		try {
+			qe.execConstruct(model);
+		} catch (Exception e) {
+			log.error("Error executing CONSTRUCT against remote endpoint: " + queryStr);
+		} finally {
+			qe.close();
+		}
+	}
+
 	/**
 	 * Performs a SPARQL describe query against the knowledge base. The query may have
 	 * an embedded graph identifier.
@@ -323,7 +338,32 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
         	throw new RuntimeException(e);
 		}
 	}
-	
+
+	public void sparqlSelectQuery(String queryStr, ResultSetConsumer consumer) throws RDFServiceException {
+
+		//QueryEngineHTTP qh = new QueryEngineHTTP(readEndpointURI, queryStr);
+
+		try {
+			HttpGet meth = new HttpGet(new URIBuilder(readEndpointURI).addParameter("query", queryStr).build());
+			meth.addHeader("Accept", "application/sparql-results+xml");
+			HttpResponse response = httpClient.execute(meth);
+			int statusCode = response.getStatusLine().getStatusCode();
+			if (statusCode > 399) {
+				log.error("response " + statusCode + " to query. \n");
+				log.debug("update string: \n" + queryStr);
+				throw new RDFServiceException("Unable to perform SPARQL UPDATE");
+			}
+
+			try (InputStream in = response.getEntity().getContent()) {
+				consumer.processResultSet(ResultSetFactory.fromXML(in));
+			}
+		} catch (IOException ioe) {
+			throw new RuntimeException(ioe);
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	/**
 	 * Performs a SPARQL ASK query against the knowledge base. The query may have
 	 * an embedded graph identifier.
@@ -371,20 +411,19 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	}
 	
 	private List<String> getGraphURIsFromSparqlQuery(String queryString) throws RDFServiceException {
-	    List<String> graphURIs = new ArrayList<String>();
+	    final List<String> graphURIs = new ArrayList<String>();
 	    try {
-            
-            ResultSet rs = ResultSetFactory.fromJSON(
-                    sparqlSelectQuery(queryString, RDFService.ResultFormat.JSON));
-            while (rs.hasNext()) {
-                QuerySolution qs = rs.nextSolution();
-                if (qs != null) { // no idea how this happens, but it seems to 
-                    RDFNode n = qs.getResource("g");
-                    if (n != null && n.isResource()) {
-                        graphURIs.add(((Resource) n).getURI());
-                    }
-                }
-            }
+            sparqlSelectQuery(queryString, new ResultSetConsumer() {
+				@Override
+				protected void processQuerySolution(QuerySolution qs) {
+					if (qs != null) { // no idea how this happens, but it seems to
+						RDFNode n = qs.getResource("g");
+						if (n != null && n.isResource()) {
+							graphURIs.add(((Resource) n).getURI());
+						}
+					}
+				}
+			});
         } catch (Exception e) {
             throw new RDFServiceException("Unable to list graph URIs", e);
         }

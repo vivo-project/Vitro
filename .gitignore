@@ -11,3 +11,6 @@
 utilities/solrtester/.work
 utilities/rdbmigration/.work
 utilities/sdb_to_tdb/.work
+
+**/*.iml
+

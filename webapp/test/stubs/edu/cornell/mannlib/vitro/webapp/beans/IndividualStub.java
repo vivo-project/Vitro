@@ -209,7 +209,7 @@ public class IndividualStub implements Individual {
 	}
 
 	@Override
-	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
+	public void resolveAsFauxPropertyStatements(List<ObjectPropertyStatement> list) {
 		// Nothing to do: no associated webappDaoFactory
 	}
 

@@ -134,6 +134,11 @@ section#pubsContainer input {
 /* ---------------------------------- */
 /* --------- MISCELLANEOUS -------- */
 /* ------------------------------- */
+.listEmphasis {
+    padding: 0 0.4em;
+    font-size: 0.8em;
+    background: #f4f4f4;
+}
 img#indicator {
     padding-left:60px;
 }

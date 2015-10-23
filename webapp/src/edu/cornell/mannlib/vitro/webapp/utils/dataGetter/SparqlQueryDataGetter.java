@@ -165,7 +165,7 @@ public class SparqlQueryDataGetter extends DataGetterBase implements DataGetter{
 	private String bindParameters(String text, Map<String, String> merged) {
 		String bound = text;
 		for (String key : merged.keySet()) {
-			bound = bound.replace('?' + key, '<' + merged.get(key) + '>');
+            bound = bound.replaceAll("[?$]" + key + "[^a-zA-Z0-9_\\-]", '<' + merged.get(key) + '>');
 		}
 		if (log.isDebugEnabled()) {
 			log.debug("parameters: " + merged);

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -163,8 +164,10 @@ public class RDFServiceGraph implements GraphWithPerform {
             containsQuery.append(" } \n");
         }
         containsQuery.append("} \nLIMIT 1 ");
-        ResultSet result = execSelect(containsQuery.toString());
-        return result.hasNext();
+
+        ResultSetConsumer.HasResult consumer = new ResultSetConsumer.HasResult();
+        execSelect(containsQuery.toString(), consumer);
+        return consumer.hasResult();
     }
 
     @Override
@@ -232,7 +235,7 @@ public class RDFServiceGraph implements GraphWithPerform {
     }
     
     @Override
-    public ExtendedIterator<Triple> find(Node subject, Node predicate, Node object) {
+    public ExtendedIterator<Triple> find(final Node subject, final Node predicate, final Node object) {
         if (!isVar(subject) && !isVar(predicate)  && !isVar(object)) {
             if (contains(subject, predicate, object)) {
                 return new SingletonIterator<Triple>(new Triple(subject, predicate, object));
@@ -255,18 +258,31 @@ public class RDFServiceGraph implements GraphWithPerform {
         findQuery.append("\n}");
         
         String queryString = findQuery.toString();
-        
+
+        final List<Triple> triplist = new ArrayList<Triple>();
+
+        execSelect(queryString, new ResultSetConsumer() {
+            @Override
+            protected void processQuerySolution(QuerySolution qs) {
+                Triple t = new Triple(isVar(subject) ? qs.get("?s").asNode() : subject,
+                        isVar(predicate) ? qs.get("?p").asNode() : predicate,
+                        isVar(object) ? qs.get("?o").asNode() : object);
+                //log.info(t);
+                triplist.add(t);
+            }
+        });
+
+/*
         ResultSet rs = execSelect(queryString);
-        
-        List<Triple> triplist = new ArrayList<Triple>();
         while (rs.hasNext()) {
             QuerySolution soln = rs.nextSolution();
-            Triple t = new Triple(isVar(subject) ? soln.get("?s").asNode() : subject, 
-                                  isVar(predicate) ? soln.get("?p").asNode() : predicate, 
-                                  isVar(object) ? soln.get("?o").asNode() : object);
+            Triple t = new Triple(isVar(subject) ? soln.get("?s").asNode() : subject,
+                    isVar(predicate) ? soln.get("?p").asNode() : predicate,
+                    isVar(object) ? soln.get("?o").asNode() : object);
             //log.info(t);
             triplist.add(t);
         }
+*/
         //log.info(triplist.size() + " results");
         return WrappedIterator.create(triplist.iterator());
     }
@@ -389,18 +405,9 @@ public class RDFServiceGraph implements GraphWithPerform {
         }
     };
     
-    private boolean execAsk(String queryStr) {
-        try {
-            return rdfService.sparqlAskQuery(queryStr);
-        } catch (RDFServiceException rdfse) {
-            throw new RuntimeException(rdfse);
-        }
-    }
-    
-    private ResultSet execSelect(String queryStr) {
+    private void execSelect(String queryStr, ResultSetConsumer consumer) {
         try { 
-            return JSONInput.fromJSON(rdfService.sparqlSelectQuery(
-                    queryStr, RDFService.ResultFormat.JSON));
+            rdfService.sparqlSelectQuery(queryStr, consumer);
         } catch (RDFServiceException rdfse) {
             throw new RuntimeException(rdfse);
         }

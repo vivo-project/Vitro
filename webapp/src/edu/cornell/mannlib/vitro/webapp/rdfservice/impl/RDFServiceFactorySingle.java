@@ -6,11 +6,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 /**
@@ -81,6 +83,12 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
         }
 
         @Override
+        public void sparqlConstructQuery(String query, Model model)
+                throws RDFServiceException {
+            s.sparqlConstructQuery(query, model);
+        }
+
+        @Override
         public InputStream sparqlDescribeQuery(String query,
                 ModelSerializationFormat resultFormat)
                 throws RDFServiceException {
@@ -91,6 +99,11 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
         public InputStream sparqlSelectQuery(String query,
                 ResultFormat resultFormat) throws RDFServiceException {
             return s.sparqlSelectQuery(query, resultFormat);
+        }
+
+        @Override
+        public void sparqlSelectQuery(String query, ResultSetConsumer consumer) throws RDFServiceException {
+            s.sparqlSelectQuery(query, consumer);
         }
 
         @Override

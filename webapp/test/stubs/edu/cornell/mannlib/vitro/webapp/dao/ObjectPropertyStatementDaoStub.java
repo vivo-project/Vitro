@@ -231,9 +231,9 @@ public class ObjectPropertyStatementDaoStub implements
 	}
 
 	@Override
-	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
+	public void resolveAsFauxPropertyStatements(List<ObjectPropertyStatement> list) {
 		throw new RuntimeException(
-				"ObjectPropertyStatementDaoStub.resolveAsFauxPropertyStatement() not implemented.");
+				"ObjectPropertyStatementDaoStub.resolveAsFauxPropertyStatements() not implemented.");
 	}
 
 }

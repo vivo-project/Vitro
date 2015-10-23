@@ -6,10 +6,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import com.hp.hpl.jena.rdf.model.Model;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 
 /**
  * This RDFService wrapper adds instrumentation to the time-consuming methods of
@@ -45,6 +47,13 @@ public class LoggingRDFService implements RDFService {
 	}
 
 	@Override
+	public void sparqlConstructQuery(String query, Model model) throws RDFServiceException {
+		try (RDFServiceLogger l = new RDFServiceLogger(query)) {
+			innerService.sparqlConstructQuery(query, model);
+		}
+	}
+
+	@Override
 	public InputStream sparqlDescribeQuery(String query,
 			ModelSerializationFormat resultFormat) throws RDFServiceException {
 		try (RDFServiceLogger l = new RDFServiceLogger(resultFormat, query)) {
@@ -57,6 +66,14 @@ public class LoggingRDFService implements RDFService {
 			throws RDFServiceException {
 		try (RDFServiceLogger l = new RDFServiceLogger(resultFormat, query)) {
 			return innerService.sparqlSelectQuery(query, resultFormat);
+		}
+	}
+
+	@Override
+	public void sparqlSelectQuery(String query, ResultSetConsumer consumer)
+			throws RDFServiceException {
+		try (RDFServiceLogger l = new RDFServiceLogger(query)) {
+			innerService.sparqlSelectQuery(query, consumer);
 		}
 	}
 

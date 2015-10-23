@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -168,8 +169,9 @@ public abstract class RDFServiceImpl implements RDFService {
     }
 
     protected boolean sparqlSelectQueryHasResults(String queryStr) throws RDFServiceException {
-        ResultSet rs = XMLInput.fromXML(sparqlSelectQuery(queryStr, ResultFormat.XML));
-        return rs.hasNext();         
+        ResultSetConsumer.HasResult hasResult = new ResultSetConsumer.HasResult();
+        sparqlSelectQuery(queryStr, hasResult);
+        return hasResult.hasResult();
     }
 
     protected static String sparqlTriple(Triple triple) {
