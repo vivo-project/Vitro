@@ -202,7 +202,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
             urls.put("ingest", UrlBuilder.getUrl("/ingest"));
             urls.put("rdfData", UrlBuilder.getUrl("/uploadRDFForm"));
             urls.put("rdfExport", UrlBuilder.getUrl("/export"));
-            urls.put("sparqlQueryBuilder", UrlBuilder.getUrl("/admin/sparqlquerybuilder"));
+//            urls.put("sparqlQueryBuilder", UrlBuilder.getUrl("/admin/sparqlquerybuilder"));
         }
         if (PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_SPARQL_QUERY_PAGE.ACTION)) {            
         	urls.put("sparqlQuery", UrlBuilder.getUrl("/admin/sparqlquery"));
