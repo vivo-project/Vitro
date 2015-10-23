@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,7 +25,6 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.QuerySolutionMap;
 import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
@@ -37,9 +35,7 @@ import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
 import com.hp.hpl.jena.util.iterator.ClosableIterator;
-import com.hp.hpl.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -289,8 +285,9 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         
         long start = System.currentTimeMillis();
 
+        Model constructedModel = null;
         try {
-            Model constructedModel = constructModelForSelectQueries(
+            constructedModel = constructModelForSelectQueries(
                     subjectUri, propertyUri, rangeUri, constructQueryStrings);
 
             if (constructedModel != null) {
@@ -329,6 +326,10 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         } catch (Exception e) {
             log.error("Error getting object property values for subject " + subjectUri + " and property " + propertyUri, e);
             return Collections.emptyList();
+        } finally {
+            if (constructedModel != null) {
+                constructedModel.close();
+            }
         }
         return list;
     }
@@ -400,9 +401,9 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         if (constructQueries.size() == 0 || constructQueries == null) {
             return null;
         }
-        
-        Model constructedModel = ModelFactory.createDefaultModel();                        
-        
+
+        Model constructedModel = ModelFactory.createDefaultModel();
+
         for (String queryString : constructQueries) {
                      
             queryString = queryString.replace("?subject", "<" + subjectUri + ">");
@@ -508,7 +509,6 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         dataset.getLock().enterCriticalSection(Lock.READ);
         QueryExecution qexec = null;
         try {
-            
             qexec = QueryExecutionFactory.create(query, dataset);
             ResultSet results = qexec.execSelect();
             while (results.hasNext()) {
