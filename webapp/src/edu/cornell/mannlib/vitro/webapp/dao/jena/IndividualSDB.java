@@ -124,17 +124,15 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	this.individualURI = individualURI;
     	this.datasetMode = datasetMode;
     	this.dwf = datasetWrapperFactory;
-    	
+		this.webappDaoFactory = wadf;
+
     	if (skipInitialization) {
             OntModel ontModel = ModelFactory.createOntologyModel(
                     OntModelSpec.OWL_MEM);
             this.ind = ontModel.createOntResource(individualURI);  
     	} else {
-        	DatasetWrapper w = getDatasetWrapper();
-        	Dataset dataset = w.getDataset();
         	try {
-    	    	dataset.getLock().enterCriticalSection(Lock.READ);
-    	    	String getStatements = 
+    	    	String getStatements =
     	    		"CONSTRUCT " +
     	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
     	    		        "> ?ooo \n" +
@@ -142,18 +140,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
     	    		 	        "> ?ooo } \n" +
     	    		 "}";
-        		model = QueryExecutionFactory.create(
-        		        QueryFactory.create(getStatements), dataset)
-        		                .execConstruct();
-        	} finally {
-        	    if (dataset == null) {
-        	        throw new RuntimeException("dataset is null");
-        	    } else if (dataset.getLock() == null) {
-        	        throw new RuntimeException("dataset lock is null");
-        	    }
-        	    
-        		dataset.getLock().leaveCriticalSection();
-        		w.close();
+
+        		model = ModelFactory.createDefaultModel();
+				webappDaoFactory.getRDFService().sparqlConstructQuery(getStatements, model);
+        	} catch (RDFServiceException e) {
+				throw new IndividualNotFoundException();
         	}
         	
         	OntModel ontModel = ModelFactory.createOntologyModel(
@@ -166,7 +157,6 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         	this.ind = ontModel.createOntResource(individualURI);  
     	}
     	setUpURIParts(ind);
-        this.webappDaoFactory = wadf;
     }
     
     private boolean noTriplesFor(String individualURI) {
