@@ -17,6 +17,7 @@ import java.util.Set;
 
 import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -41,13 +42,11 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 public class ABoxRecomputer {
 
@@ -516,31 +515,60 @@ public class ABoxRecomputer {
         return sameAsInds;
     }
 
-    private void getSameAsIndividuals(String individualURI, Set<String> sameAsInds) {
-        Model m = RDFServiceGraph.createRDFServiceModel(new RDFServiceGraph(rdfService));
-        Resource individual = ResourceFactory.createResource(individualURI);
-        StmtIterator sit = m.listStatements(individual, OWL.sameAs, (RDFNode) null);
-        while(sit.hasNext()) {
-            Statement stmt = sit.nextStatement();
-            if (stmt.getObject().isURIResource()) {
-                String sameAsURI = stmt.getObject().asResource().getURI();
-                if (!sameAsInds.contains(sameAsURI)) {
-                    sameAsInds.add(sameAsURI);
-                    getSameAsIndividuals(sameAsURI, sameAsInds);
+    private void getSameAsIndividuals(String individualUri, final Set<String> sameAsInds) {
+        try {
+            final List<String> addedURIs = new ArrayList<String>();
+            StringBuilder builder = new StringBuilder();
+
+            builder.append("SELECT\n")
+                    .append("   ?object\n")
+                    .append("WHERE\n")
+                    .append("{\n")
+                    .append("   <" + individualUri + "> <" + OWL.sameAs + "> ?object .\n")
+                    .append("}\n");
+
+            rdfService.sparqlSelectQuery(builder.toString(), new ResultSetConsumer() {
+                @Override
+                protected void processQuerySolution(QuerySolution qs) {
+                    Resource object = qs.getResource("object");
+                    if (object != null && !sameAsInds.contains(object.getURI())) {
+                        sameAsInds.add(object.getURI());
+                        addedURIs.add(object.getURI());
+                    }
                 }
+            });
+
+            for (String indUri : addedURIs) {
+                getSameAsIndividuals(indUri, sameAsInds);
             }
+
+            addedURIs.clear();
+            builder = new StringBuilder();
+
+            builder.append("SELECT\n")
+                    .append("   ?subject\n")
+                    .append("WHERE\n")
+                    .append("{\n")
+                    .append("   ?subject <" + OWL.sameAs + "> <" + individualUri + "> .\n")
+                    .append("}\n");
+
+            rdfService.sparqlSelectQuery(builder.toString(), new ResultSetConsumer() {
+                @Override
+                protected void processQuerySolution(QuerySolution qs) {
+                    Resource object = qs.getResource("subject");
+                    if (object != null && !sameAsInds.contains(object.getURI())) {
+                        sameAsInds.add(object.getURI());
+                        addedURIs.add(object.getURI());
+                    }
+                }
+            });
+
+            for (String indUri : addedURIs) {
+                getSameAsIndividuals(indUri, sameAsInds);
+            }
+        } catch (RDFServiceException e) {
+
         }
-        sit = m.listStatements(null, OWL.sameAs, individual);
-        while(sit.hasNext()) {
-            Statement stmt = sit.nextStatement();
-            if (stmt.getSubject().isURIResource()) {
-                String sameAsURI = stmt.getSubject().asResource().getURI();
-                if (!sameAsInds.contains(sameAsURI)) {
-                    sameAsInds.add(sameAsURI);
-                    getSameAsIndividuals(sameAsURI, sameAsInds);
-                }
-            }
-        }        
     }
 
     /**
