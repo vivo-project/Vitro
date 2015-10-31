@@ -274,10 +274,10 @@ public class ABoxRecomputer {
                 "    } \n" +
                 "    FILTER (?g != <" + ModelNames.ABOX_INFERENCES + ">)\n" +
                 "} \n";
-        return RDFServiceUtils.parseModel(
-                rdfService.sparqlConstructQuery(
-                        queryStr, RDFService.ModelSerializationFormat.N3)
-                        , RDFService.ModelSerializationFormat.N3);
+
+        Model model = ModelFactory.createDefaultModel();
+        rdfService.sparqlConstructQuery(queryStr, model);
+        return model;
     }
 
     private Model getInferredTypes(Resource individual, Model assertedTypes, TypeCaches caches) {
