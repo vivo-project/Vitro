@@ -57,7 +57,6 @@ public class ABoxRecomputer {
 
     private OntModel tboxModel;             // asserted and inferred TBox axioms
     private OntModel aboxModel;
-    private Model inferenceModel;
     private RDFService rdfService;
     private SimpleReasoner simpleReasoner;
     private Object lock1 = new Object();
@@ -70,7 +69,6 @@ public class ABoxRecomputer {
     /**
      * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
      * @param aboxModel - input.  This model contains asserted ABox statements
-     * @param inferenceModel - output. This is the model in which inferred (materialized) ABox statements are maintained (added or retracted).
      */
     public ABoxRecomputer(OntModel tboxModel,
             OntModel aboxModel,
@@ -80,8 +78,6 @@ public class ABoxRecomputer {
         this.tboxModel = tboxModel;
         this.aboxModel = aboxModel;
         this.rdfService = rdfService;
-        this.inferenceModel = RDFServiceGraph.createRDFServiceModel(
-                new RDFServiceGraph(rdfService, ModelNames.ABOX_INFERENCES));
         this.simpleReasoner = simpleReasoner;
         this.searchIndexer = searchIndexer;
         recomputing = false;
@@ -328,7 +324,7 @@ public class ABoxRecomputer {
         if (caches == null) {
             return getMostSpecificTypes(individual, assertedTypes);
         }
-        
+
         TypeList key = new TypeList(assertedTypes, RDF.type);
         Model mostSpecificTypes = caches.getMostSpecificTypesToModel(key, individual);
         if (mostSpecificTypes == null) {
@@ -377,10 +373,10 @@ public class ABoxRecomputer {
                 "     UNION \n" +
                 "    { ?inv <" + OWL.inverseOf.getURI() + "> ?prop } \n" +
                 "} \n";
-        return RDFServiceUtils.parseModel(
-                rdfService.sparqlConstructQuery(
-                        queryStr, RDFService.ModelSerializationFormat.N3)
-                        , RDFService.ModelSerializationFormat.N3);
+
+        Model model = ModelFactory.createDefaultModel();
+        rdfService.sparqlConstructQuery(queryStr, model);
+        return model;
     }
 
     private Model rewriteInferences(Model inferences, String aliasURI) {
@@ -460,6 +456,23 @@ public class ABoxRecomputer {
 
     }
 
+    protected void addInferenceStatementsFor(String individualUri, Model addTo) throws RDFServiceException {
+        StringBuilder builder = new StringBuilder();
+        builder.append("CONSTRUCT\n")
+                .append("{\n")
+                .append("   <" + individualUri + "> ?p ?o .\n")
+                .append("}\n")
+                .append("WHERE\n")
+                .append("{\n")
+                .append("   GRAPH <").append(ModelNames.ABOX_INFERENCES).append(">\n")
+                .append("   {\n")
+                .append("       <" + individualUri + "> ?p ?o .\n")
+                .append("   }\n")
+                .append("}\n");
+
+        rdfService.sparqlConstructQuery(builder.toString(), addTo);
+    }
+
     /*
      * reconcile a set of inferences into the application inference model
      */
@@ -467,21 +480,26 @@ public class ABoxRecomputer {
             Collection<String> individuals) throws RDFServiceException {
         Model existing = ModelFactory.createDefaultModel();
         for (String individualURI : individuals) {
-            Resource subjInd = ResourceFactory.createResource(individualURI); 
-            existing.add(inferenceModel.listStatements(subjInd, null, (RDFNode) null));           
+            addInferenceStatementsFor(individualURI, existing);
         }
         Model retractions = existing.difference(rebuildModel);
         Model additions = rebuildModel.difference(existing);
-        long start = System.currentTimeMillis();
-        ChangeSet change = rdfService.manufactureChangeSet();
-        change.addRemoval(makeN3InputStream(retractions), 
-                RDFService.ModelSerializationFormat.N3, ModelNames.ABOX_INFERENCES);
-        change.addAddition(makeN3InputStream(additions), 
-                RDFService.ModelSerializationFormat.N3, ModelNames.ABOX_INFERENCES);
-        rdfService.changeSetUpdate(change);
-        log.debug((System.currentTimeMillis() - start) + 
-                " ms to retract " + retractions.size() + 
-                " statements and add " + additions.size() + " statements");
+        if (additions.size() > 0 || retractions.size() > 0) {
+            long start = System.currentTimeMillis();
+            ChangeSet change = rdfService.manufactureChangeSet();
+            if (retractions.size() > 0) {
+                change.addRemoval(makeN3InputStream(retractions),
+                        RDFService.ModelSerializationFormat.N3, ModelNames.ABOX_INFERENCES);
+            }
+            if (additions.size() > 0) {
+                change.addAddition(makeN3InputStream(additions),
+                        RDFService.ModelSerializationFormat.N3, ModelNames.ABOX_INFERENCES);
+            }
+            rdfService.changeSetUpdate(change);
+            log.debug((System.currentTimeMillis() - start) +
+                    " ms to retract " + retractions.size() +
+                    " statements and add " + additions.size() + " statements");
+        }
     }
 
     private InputStream makeN3InputStream(Model m) {
