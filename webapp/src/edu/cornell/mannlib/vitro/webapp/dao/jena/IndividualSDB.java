@@ -87,6 +87,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                          WebappDaoFactorySDB wadf,
                          Model initModel) {
     	this.individualURI = individualURI;
+		this.webappDaoFactory = wadf;
     	this.dwf = datasetWrapperFactory;
       
     	try {
@@ -113,7 +114,6 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	        OntModelSpec.OWL_MEM, model);
     	this.ind = ontModel.createOntResource(individualURI);  
     	setUpURIParts(ind);
-        this.webappDaoFactory = wadf;
     }
     
     public IndividualSDB(String individualURI, 
@@ -124,17 +124,15 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	this.individualURI = individualURI;
     	this.datasetMode = datasetMode;
     	this.dwf = datasetWrapperFactory;
-    	
+		this.webappDaoFactory = wadf;
+
     	if (skipInitialization) {
             OntModel ontModel = ModelFactory.createOntologyModel(
                     OntModelSpec.OWL_MEM);
             this.ind = ontModel.createOntResource(individualURI);  
     	} else {
-        	DatasetWrapper w = getDatasetWrapper();
-        	Dataset dataset = w.getDataset();
         	try {
-    	    	dataset.getLock().enterCriticalSection(Lock.READ);
-    	    	String getStatements = 
+    	    	String getStatements =
     	    		"CONSTRUCT " +
     	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
     	    		        "> ?ooo \n" +
@@ -142,18 +140,10 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
     	    		 	        "> ?ooo } \n" +
     	    		 "}";
-        		model = QueryExecutionFactory.create(
-        		        QueryFactory.create(getStatements), dataset)
-        		                .execConstruct();
-        	} finally {
-        	    if (dataset == null) {
-        	        throw new RuntimeException("dataset is null");
-        	    } else if (dataset.getLock() == null) {
-        	        throw new RuntimeException("dataset lock is null");
-        	    }
-        	    
-        		dataset.getLock().leaveCriticalSection();
-        		w.close();
+
+				model = ModelFactory.createDefaultModel();
+				webappDaoFactory.getRDFService().sparqlConstructQuery(getStatements, model);
+        	} catch (RDFServiceException e) {
         	}
         	
         	OntModel ontModel = ModelFactory.createOntologyModel(
@@ -166,22 +156,15 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         	this.ind = ontModel.createOntResource(individualURI);  
     	}
     	setUpURIParts(ind);
-        this.webappDaoFactory = wadf;
     }
     
     private boolean noTriplesFor(String individualURI) {
-        DatasetWrapper w = getDatasetWrapper();
-        Dataset dataset = w.getDataset();
-        dataset.getLock().enterCriticalSection(Lock.READ);
-        try {
-            return !dataset.asDatasetGraph().contains(com.hp.hpl.jena.graph.Node.ANY,
-                    NodeFactory.createURI(individualURI),
-                    com.hp.hpl.jena.graph.Node.ANY,
-                    com.hp.hpl.jena.graph.Node.ANY);
-        } finally {
-            dataset.getLock().leaveCriticalSection();
-            w.close();
-        }
+		try {
+			return !webappDaoFactory.getRDFService().sparqlAskQuery("ASK { <" + individualURI + "> ?p ?o }");
+		} catch (RDFServiceException rse) {
+		}
+
+		return true;
     }
     
     static final boolean SKIP_INITIALIZATION = true;
@@ -415,20 +398,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 "ASK { " +
                 "    <" + individualURI + "> <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> ?mainImage . \n" +
                 "    ?mainImage <http://vitro.mannlib.cornell.edu/ns/vitro/public#thumbnailImage> ?thumbImage . }\n"  ;                     
-          DatasetWrapper w = getDatasetWrapper();
-            Dataset dataset = w.getDataset();
-            dataset.getLock().enterCriticalSection(Lock.READ);
-            QueryExecution qexec = null;
-            try{            
-                qexec = QueryExecutionFactory.create(QueryFactory.create(ask), dataset);
-                _hasThumb = qexec.execAsk();
+            try{
+				_hasThumb = webappDaoFactory.getRDFService().sparqlAskQuery(ask);
             }catch(Exception ex){
                 _hasThumb = false;
                 log.error(ex,ex);
-            }finally{
-                if(qexec!=null) qexec.close();
-                dataset.getLock().leaveCriticalSection();
-                w.close();
             }
             return _hasThumb;
         }
