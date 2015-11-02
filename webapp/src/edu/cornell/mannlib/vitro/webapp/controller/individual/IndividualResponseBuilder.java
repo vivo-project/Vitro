@@ -187,7 +187,7 @@ class IndividualResponseBuilder {
             String badgePopover   = properties.getProperty("resource.altmetric.badge-popover", "right");
             String badgeDetails   = properties.getProperty("resource.altmetric.badge-details");
 
-            if ("enabled".equalsIgnoreCase(enabled)) {
+            if (!"disabled".equalsIgnoreCase(enabled)) {
                 body.put("altmetricEnabled", true);
 
                 body.put("altmetricDisplayTo", displayTo);
