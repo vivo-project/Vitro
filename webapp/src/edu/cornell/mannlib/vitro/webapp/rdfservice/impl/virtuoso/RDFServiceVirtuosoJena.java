@@ -29,12 +29,9 @@ public class RDFServiceVirtuosoJena extends RDFServiceJena {
 	private ConnectionPoolDataSource ds;
 	private final DatasetWrapper dsw;
 
-//	private StaticDatasetFactory staticDatasetFactory;
-
 	public RDFServiceVirtuosoJena(ConnectionPoolDataSource dataSource) {
 		this.ds = dataSource;
 		this.dsw = new VirtuosoDatasetWrapper(ds);
-//		this.staticDatasetFactory = new StaticDatasetFactory(getDataset());
 	}
 
 	@Override
@@ -167,7 +164,7 @@ public class RDFServiceVirtuosoJena extends RDFServiceJena {
 
 	private class VirtuosoDatasetWrapper extends DatasetWrapper {
 		private final ConnectionPoolDataSource dataSource;
-		private ThreadLocal<VirtDataset> datasets = new ThreadLocal<>();
+		private ThreadLocal<ReconnectingVirtuosoDataset> datasets = new ThreadLocal<>();
 
 		public VirtuosoDatasetWrapper(ConnectionPoolDataSource dataSource) {
 			super(null);
@@ -177,25 +174,25 @@ public class RDFServiceVirtuosoJena extends RDFServiceJena {
 		@Override
 		public synchronized Dataset getDataset() {
 			log.info("Getting Virtuoso Dataset from Wrapper");
-			VirtDataset dataset = datasets.get();
+			ReconnectingVirtuosoDataset dataset = datasets.get();
 			if (dataset == null) {
-				dataset = new VirtDataset(dataSource);
-				dataset.setReadFromAllGraphs(true);
+				dataset = new ReconnectingVirtuosoDataset(dataSource);
 				datasets.set(dataset);
 			}
 
+			log.info("Returning Virtuoso Dataset from Wrapper");
 			return dataset;
 		}
 
 		@Override
 		public synchronized void close() {
 			log.info("Closing Virtuoso Dataset from Wrapper");
-			VirtDataset dataset = datasets.get();
+			ReconnectingVirtuosoDataset dataset = datasets.get();
 			if (dataset != null) {
-				dataset.end();
 				dataset.close();
 				datasets.remove();
 			}
+			log.info("Closed Virtuoso Dataset");
 		}
 	}
 }

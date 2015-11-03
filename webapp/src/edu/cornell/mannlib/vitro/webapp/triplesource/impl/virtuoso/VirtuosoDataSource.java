@@ -31,7 +31,7 @@ public class VirtuosoDataSource {
 	public ConnectionPoolDataSource getDataSource(ContentTripleSourceVirtuosoJena.Configuration config) throws SQLException {
 		VirtuosoConnectionPoolDataSource ds = new VirtuosoConnectionPoolDataSource();
 		ds.setDataSourceName("VIVO");
-		ds.setDatabaseName("VIVO");
+//		ds.setDatabaseName("VIVO");
 		ds.setUser(config.username);
 		ds.setPassword(config.password);
 		ds.setPortNumber(1111);
@@ -40,22 +40,5 @@ public class VirtuosoDataSource {
 		ds.setMaxIdleTime(60);
 
 		return ds;
-/*
-			ComboPooledDataSource cpds = new ComboPooledDataSource();
-			cpds.setDriverClass(getDbDriverClassName());
-			cpds.setJdbcUrl(getJdbcUrl());
-			cpds.setUser(configProps.getProperty(PROPERTY_DB_USERNAME));
-			cpds.setPassword(configProps.getProperty(PROPERTY_DB_PASSWORD));
-			cpds.setMaxPoolSize(getMaxActive());
-			cpds.setMinPoolSize(getMaxIdle());
-			cpds.setMaxIdleTime(43200); // s
-			cpds.setMaxIdleTimeExcessConnections(300);
-			cpds.setAcquireIncrement(5);
-			cpds.setNumHelperThreads(6);
-			cpds.setTestConnectionOnCheckout(DEFAULT_TESTONBORROW);
-			cpds.setTestConnectionOnCheckin(DEFAULT_TESTONRETURN);
-			cpds.setPreferredTestQuery(getValidationQuery());
-			return cpds;
-*/
 	}
 }
