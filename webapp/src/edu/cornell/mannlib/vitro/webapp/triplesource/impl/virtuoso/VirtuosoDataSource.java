@@ -36,8 +36,8 @@ public class VirtuosoDataSource {
 		ds.setPassword(config.password);
 		ds.setPortNumber(1111);
 		ds.setServerName("localhost");
-		ds.setMaxPoolSize(1000);
-		ds.setMaxIdleTime(Integer.MAX_VALUE);
+		ds.setMaxPoolSize(10);
+		ds.setMaxIdleTime(60);
 
 		return ds;
 /*

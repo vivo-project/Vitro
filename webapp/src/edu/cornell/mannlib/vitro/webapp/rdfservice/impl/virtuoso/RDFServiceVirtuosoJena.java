@@ -27,22 +27,21 @@ public class RDFServiceVirtuosoJena extends RDFServiceJena {
 	private final static Log log = LogFactory.getLog(RDFServiceVirtuosoJena.class);
 
 	private ConnectionPoolDataSource ds;
+	private final DatasetWrapper dsw;
 
 //	private StaticDatasetFactory staticDatasetFactory;
 
 	public RDFServiceVirtuosoJena(ConnectionPoolDataSource dataSource) {
 		this.ds = dataSource;
+		this.dsw = new VirtuosoDatasetWrapper(ds);
 //		this.staticDatasetFactory = new StaticDatasetFactory(getDataset());
 	}
 
 	@Override
 	protected DatasetWrapper getDatasetWrapper() {
-//		if (staticDatasetFactory != null) {
-//			return staticDatasetFactory.getDatasetWrapper();
-//		}
-
 		log.info("Getting Virtuoso Dataset Wrapper");
-		return new VirtuosoDatasetWrapper(ds);
+		return dsw;
+//		return new VirtuosoDatasetWrapper(ds);
 	}
 
 	@Override
@@ -54,7 +53,7 @@ public class RDFServiceVirtuosoJena extends RDFServiceJena {
 			return false;
 		}
 
-		VirtDataset dataset = null;
+		Dataset dataset = null;
 		try {
 			insureThatInputStreamsAreResettable(changeSet);
 
@@ -80,10 +79,11 @@ public class RDFServiceVirtuosoJena extends RDFServiceJena {
 		}
 	}
 
-	private VirtDataset getDataset() {
-		VirtDataset dataset = new VirtDataset(ds);
-		dataset.setReadFromAllGraphs(true);
-		return dataset;
+	private Dataset getDataset() {
+		return dsw.getDataset();
+//		VirtDataset dataset = new VirtDataset(ds);
+//		dataset.setReadFromAllGraphs(true);
+// 		return dataset;
 	}
 
 	@Override
@@ -96,13 +96,7 @@ public class RDFServiceVirtuosoJena extends RDFServiceJena {
 		log.info("Virtuoso Construct query: " + query.replace("\n",""));
 		Dataset dataset = getDataset();
 		dataset.begin(ReadWrite.READ);
-		try {
-			return super.sparqlConstructQuery(query, resultFormat);
-		} finally {
-			dataset.end();
-			dataset.close();
-			log.info("Virtuoso Construct end");
-		}
+		return super.sparqlConstructQuery(query, resultFormat);
 	}
 
 	@Override
@@ -110,13 +104,7 @@ public class RDFServiceVirtuosoJena extends RDFServiceJena {
 		log.info("Virtuoso Construct query: " + query.replace("\n",""));
 		Dataset dataset = getDataset();
 		dataset.begin(ReadWrite.READ);
-		try {
-			super.sparqlConstructQuery(query, model);
-		} finally {
-			dataset.end();
-			dataset.close();
-			log.info("Virtuoso Construct end");
-		}
+		super.sparqlConstructQuery(query, model);
 	}
 
 	@Override
@@ -125,13 +113,7 @@ public class RDFServiceVirtuosoJena extends RDFServiceJena {
 		log.info("Virtuoso Select query: " + query.replace("\n",""));
 		Dataset dataset = getDataset();
 		dataset.begin(ReadWrite.READ);
-		try {
-			return super.sparqlDescribeQuery(query, resultFormat);
-		} finally {
-			dataset.end();
-			dataset.close();
-			log.info("Virtuoso Select end");
-		}
+		return super.sparqlDescribeQuery(query, resultFormat);
 	}
 
 	@Override
@@ -140,13 +122,7 @@ public class RDFServiceVirtuosoJena extends RDFServiceJena {
 		log.info("Virtuoso Select query: " + query.replace("\n",""));
 		Dataset dataset = getDataset();
 		dataset.begin(ReadWrite.READ);
-		try {
-			return super.sparqlSelectQuery(query, resultFormat);
-		} finally {
-			dataset.end();
-			dataset.close();
-			log.info("Virtuoso Select end");
-		}
+		return super.sparqlSelectQuery(query, resultFormat);
 	}
 
 	@Override
@@ -155,13 +131,7 @@ public class RDFServiceVirtuosoJena extends RDFServiceJena {
 		log.info("Virtuoso Select query: " + query.replace("\n",""));
 		Dataset dataset = getDataset();
 		dataset.begin(ReadWrite.READ);
-		try {
-			super.sparqlSelectQuery(query, consumer);
-		} finally {
-			dataset.end();
-			dataset.close();
-			log.info("Virtuoso Select end");
-		}
+		super.sparqlSelectQuery(query, consumer);
 	}
 
 	@Override
@@ -169,25 +139,14 @@ public class RDFServiceVirtuosoJena extends RDFServiceJena {
 		log.info("Virtuoso ASK query: " + query.replace("\n",""));
 		Dataset dataset = getDataset();
 		dataset.begin(ReadWrite.READ);
-		try {
-			return super.sparqlAskQuery(query);
-		} finally {
-			dataset.end();
-			dataset.close();
-			log.info("Virtuoso Ask end");
-		}
+		return super.sparqlAskQuery(query);
 	}
 
 	@Override
 	public List<String> getGraphURIs() throws RDFServiceException {
 		Dataset dataset = getDataset();
 		dataset.begin(ReadWrite.READ);
-		try {
-			return super.getGraphURIs();
-		} finally {
-			dataset.end();
-			dataset.close();
-		}
+		return super.getGraphURIs();
 	}
 
 	@Override
@@ -195,12 +154,7 @@ public class RDFServiceVirtuosoJena extends RDFServiceJena {
 			throws RDFServiceException {
 		Dataset dataset = getDataset();
 		dataset.begin(ReadWrite.READ);
-		try {
-			super.serializeAll(outputStream);
-		} finally {
-			dataset.end();
-			dataset.close();
-		}
+		super.serializeAll(outputStream);
 	}
 
 	@Override
@@ -208,12 +162,7 @@ public class RDFServiceVirtuosoJena extends RDFServiceJena {
 			throws RDFServiceException {
 		Dataset dataset = getDataset();
 		dataset.begin(ReadWrite.READ);
-		try {
-			super.serializeGraph(graphURI, outputStream);
-		} finally {
-			dataset.end();
-			dataset.close();
-		}
+		super.serializeGraph(graphURI, outputStream);
 	}
 
 	private class VirtuosoDatasetWrapper extends DatasetWrapper {
@@ -243,6 +192,7 @@ public class RDFServiceVirtuosoJena extends RDFServiceJena {
 			log.info("Closing Virtuoso Dataset from Wrapper");
 			VirtDataset dataset = datasets.get();
 			if (dataset != null) {
+				dataset.end();
 				dataset.close();
 				datasets.remove();
 			}
