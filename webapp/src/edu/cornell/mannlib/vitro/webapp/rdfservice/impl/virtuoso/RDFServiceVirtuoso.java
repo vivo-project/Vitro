@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
+import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,6 +24,7 @@ import org.apache.http.protocol.HttpContext;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.sparql.RDFServiceSparql;
+import org.apache.http.util.EntityUtils;
 
 /**
  * For now, at least, it is just like an RDFServiceSparql except:
@@ -78,22 +80,27 @@ public class RDFServiceVirtuoso extends RDFServiceSparql {
 		log.debug("UPDATE STRING: " + updateString);
 
 		try {
+			HttpPost request = createHttpRequest(updateString);
 			HttpResponse response = httpClient.execute(
-					createHttpRequest(updateString), createHttpContext());
-			int statusCode = response.getStatusLine().getStatusCode();
-			if (statusCode > 399) {
-				log.error("response " + response.getStatusLine()
-						+ " to update. \n");
+					request, createHttpContext());
+			try {
+				int statusCode = response.getStatusLine().getStatusCode();
+				if (statusCode > 399) {
+					log.error("response " + response.getStatusLine()
+							+ " to update. \n");
 
-				try (InputStream content = response.getEntity().getContent()) {
-					for (String line : IOUtils.readLines(content)) {
-						log.error("response-line >>" + line);
+					try (InputStream content = response.getEntity().getContent()) {
+						for (String line : IOUtils.readLines(content)) {
+							log.error("response-line >>" + line);
+						}
 					}
-				}
 
-				throw new RDFServiceException(
-						"Unable to perform SPARQL UPDATE: status code = "
-								+ statusCode);
+					throw new RDFServiceException(
+							"Unable to perform SPARQL UPDATE: status code = "
+									+ statusCode);
+				}
+			} finally {
+				EntityUtils.consume(response.getEntity());
 			}
 		} catch (Exception e) {
 			log.error("Failed to update: " + updateString, e);
