@@ -8,7 +8,7 @@
 </#if>
 <#assign rangeUri = editConfiguration.objectPredicateProperty.rangeVClassURI!"" />
 <#assign formTitle = editConfiguration.formTitle />
-<#if rangeUri?contains("IAO_0000030") || rangeUri?contains("Document")>
+<#if rangeUri?ends_with("/IAO_0000030") || rangeUri?ends_with("/Document")>
     <#assign formTitle = "${i18n().select_an_existing_document}" + " ${i18n().for} " + editConfiguration.subjectName/>
 </#if>
 <h2>${formTitle}</h2>
