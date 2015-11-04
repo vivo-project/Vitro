@@ -140,17 +140,24 @@ public class CollatedObjectPropertyTemplateModel extends
 		// others will be removed
 		List<Map<String, String>> filteredList = new ArrayList<Map<String, String>>();
 		Set<String> processedObjects = new HashSet<String>();
-		for (Map<String, String> outerMap : statementData) {
-
+		for (int outerIndex = 0; outerIndex < statementData.size(); outerIndex++) {
+			Map<String, String> outerMap = statementData.get(outerIndex);
 			String objectUri = outerMap.get(objectVariableName);
 
 			if (processedObjects.contains(objectUri)) {
 				continue;
 			}
 			processedObjects.add(objectUri);
+			if (outerIndex == statementData.size() - 1) {
+				filteredList.add(outerMap);
+				continue;
+			}
+
 			List<Map<String, String>> dataForThisObject = new ArrayList<Map<String, String>>();
+			dataForThisObject.add(outerMap);
 			//Retrieve the statements that are related to this specific object
-			for (Map<String, String> innerMap : statementData) {
+			for (int innerIndex = outerIndex + 1; innerIndex < statementData.size(); innerIndex++) {
+				Map<String, String> innerMap = statementData.get(innerIndex);
 				if (innerMap.get(objectVariableName).equals(objectUri)) {
 					// Subclass should at this point contain the most specific
 					// type already
@@ -161,13 +168,19 @@ public class CollatedObjectPropertyTemplateModel extends
 			if(log.isDebugEnabled()) {
 				log.debug("Object URI " + objectUri + " has number of statements = " + dataForThisObject.size());
 			}
-			//Subclass variable should already reflect most specifick types but there may be more than one most specific type
-			Collections.sort(dataForThisObject, new DataComparatorBySubclass());
-			filteredList.add(dataForThisObject.get(0));
 
+			if (dataForThisObject.size() == 1) {
+				filteredList.add(outerMap);
+			} else {
+				//Subclass variable should already reflect most specifick types but there may be more than one most specific type
+				Collections.sort(dataForThisObject, new DataComparatorBySubclass());
+				filteredList.add(dataForThisObject.get(0));
+			}
 		}
 
-		statementData.retainAll(filteredList);
+		if (statementData.size() > filteredList.size()) {
+			statementData.retainAll(filteredList);
+		}
 
 		if (log.isDebugEnabled()) {
 			log.debug("Data after subclass filtering");

@@ -7,11 +7,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import com.hp.hpl.jena.rdf.model.NodeIterator;
+import com.hp.hpl.jena.rdf.model.Property;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,13 +42,11 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 public class ABoxRecomputer {
 
@@ -52,7 +56,6 @@ public class ABoxRecomputer {
 
     private OntModel tboxModel;             // asserted and inferred TBox axioms
     private OntModel aboxModel;
-    private Model inferenceModel;
     private RDFService rdfService;
     private SimpleReasoner simpleReasoner;
     private Object lock1 = new Object();
@@ -65,7 +68,6 @@ public class ABoxRecomputer {
     /**
      * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
      * @param aboxModel - input.  This model contains asserted ABox statements
-     * @param inferenceModel - output. This is the model in which inferred (materialized) ABox statements are maintained (added or retracted).
      */
     public ABoxRecomputer(OntModel tboxModel,
             OntModel aboxModel,
@@ -75,8 +77,6 @@ public class ABoxRecomputer {
         this.tboxModel = tboxModel;
         this.aboxModel = aboxModel;
         this.rdfService = rdfService;
-        this.inferenceModel = RDFServiceGraph.createRDFServiceModel(
-                new RDFServiceGraph(rdfService, ModelNames.ABOX_INFERENCES));
         this.simpleReasoner = simpleReasoner;
         this.searchIndexer = searchIndexer;
         recomputing = false;
@@ -109,7 +109,9 @@ public class ABoxRecomputer {
                 // This allows the indexer to optimize behaviour whilst paused
                 searchIndexer.rebuildIndex();
             }
-            recomputeABox();
+            // Create a type cache for this execution and pass it to the recompute function
+            // Ensures that caches are only valid for the length of one recompute
+            recomputeABox(new TypeCaches());
         } finally {
             if  (searchIndexer != null) {
                 searchIndexer.unpause();
@@ -123,7 +125,7 @@ public class ABoxRecomputer {
     /*
      * Recompute the entire ABox inference graph.
      */
-    protected void recomputeABox() {
+    protected void recomputeABox(TypeCaches caches) {
         log.info("Recomputing ABox inferences.");
         log.info("Finding individuals in ABox.");
         Collection<String> individuals = this.getAllIndividualURIs();
@@ -138,7 +140,7 @@ public class ABoxRecomputer {
             String individualURI = individualIt.next();
             try {
                 additionalInferences.add(recomputeIndividual(
-                        individualURI, rebuildModel));
+                        individualURI, rebuildModel, caches));
                 numInds++;
                 individualsInBatch.add(individualURI);
                 boolean batchFilled = (numInds % BATCH_SIZE) == 0;
@@ -180,12 +182,12 @@ public class ABoxRecomputer {
     private static final boolean SKIP_PLUGINS = !RUN_PLUGINS;
 
     private Model recomputeIndividual(String individualURI, 
-            Model rebuildModel) throws RDFServiceException {
+            Model rebuildModel, TypeCaches caches) throws RDFServiceException {
         long start = System.currentTimeMillis();
         Model assertions = getAssertions(individualURI);
         log.trace((System.currentTimeMillis() - start) + " ms to get assertions.");
         Model additionalInferences = recomputeIndividual(
-                individualURI, null, assertions, rebuildModel, RUN_PLUGINS);
+                individualURI, null, assertions, rebuildModel, caches, RUN_PLUGINS);
 
         if (simpleReasoner.getSameAsEnabled()) {
             Set<String> sameAsInds = getSameAsIndividuals(individualURI);
@@ -193,7 +195,7 @@ public class ABoxRecomputer {
                 // sameAs for plugins is handled by the SimpleReasoner
                 Model sameAsIndAssertions = getAssertions(sameAsInd);
                 recomputeIndividual(
-                        sameAsInd, individualURI, sameAsIndAssertions, rebuildModel, SKIP_PLUGINS);
+                        sameAsInd, individualURI, sameAsIndAssertions, rebuildModel, caches, SKIP_PLUGINS);
                 rebuildModel.add(
                         rewriteInferences(getAssertions(sameAsInd), individualURI));
                 Resource indRes = ResourceFactory.createResource(individualURI);
@@ -214,7 +216,7 @@ public class ABoxRecomputer {
      *         individuals
      */
     private Model recomputeIndividual(String individualURI, String aliasURI, 
-            Model assertions, Model rebuildModel, boolean runPlugins) 
+            Model assertions, Model rebuildModel, TypeCaches caches, boolean runPlugins)
                     throws RDFServiceException {
 
         Model additionalInferences = ModelFactory.createDefaultModel();
@@ -223,13 +225,13 @@ public class ABoxRecomputer {
         long start = System.currentTimeMillis();
         Model types = ModelFactory.createDefaultModel();
         types.add(assertions.listStatements(null, RDF.type, (RDFNode) null));
-        Model inferredTypes = rewriteInferences(getInferredTypes(individual, types), aliasURI);
+        Model inferredTypes = rewriteInferences(getInferredTypes(individual, types, caches), aliasURI);
         rebuildModel.add(inferredTypes);
         log.trace((System.currentTimeMillis() - start) + " to infer " + inferredTypes.size() + " types");
 
         start = System.currentTimeMillis();
         types.add(inferredTypes);
-        Model mst = getMostSpecificTypes(individual, types);
+        Model mst = getMostSpecificTypes(individual, types, caches);
         rebuildModel.add(rewriteInferences(mst, aliasURI));
         log.trace((System.currentTimeMillis() - start) + " to infer " + mst.size() + " mostSpecificTypes");
 
@@ -271,13 +273,29 @@ public class ABoxRecomputer {
                 "    } \n" +
                 "    FILTER (?g != <" + ModelNames.ABOX_INFERENCES + ">)\n" +
                 "} \n";
-        return RDFServiceUtils.parseModel(
-                rdfService.sparqlConstructQuery(
-                        queryStr, RDFService.ModelSerializationFormat.N3)
-                        , RDFService.ModelSerializationFormat.N3);
+
+        Model model = ModelFactory.createDefaultModel();
+        rdfService.sparqlConstructQuery(queryStr, model);
+        return model;
+    }
+
+    private Model getInferredTypes(Resource individual, Model assertedTypes, TypeCaches caches) {
+        if (caches == null) {
+            return getInferredTypes(individual, assertedTypes);
+        }
+
+        TypeList key = new TypeList(assertedTypes, RDF.type);
+        Model inferredTypes = caches.getInferredTypesToModel(key, individual);
+        if (inferredTypes == null) {
+            inferredTypes = getInferredTypes(individual, assertedTypes);
+            caches.cacheInferredTypes(key, inferredTypes);
+        }
+
+        return inferredTypes;
     }
 
     private Model getInferredTypes(Resource individual, Model assertedTypes) {
+        new TypeList(assertedTypes, RDF.type);
         String queryStr = "CONSTRUCT { \n" +
                 "    <" + individual.getURI() + "> a ?type \n" +
                 "} WHERE { \n" +
@@ -299,6 +317,21 @@ public class ABoxRecomputer {
         } finally {
             tboxModel.leaveCriticalSection();
         }
+    }
+
+    private Model getMostSpecificTypes(Resource individual, Model assertedTypes, TypeCaches caches) {
+        if (caches == null) {
+            return getMostSpecificTypes(individual, assertedTypes);
+        }
+
+        TypeList key = new TypeList(assertedTypes, RDF.type);
+        Model mostSpecificTypes = caches.getMostSpecificTypesToModel(key, individual);
+        if (mostSpecificTypes == null) {
+            mostSpecificTypes = getMostSpecificTypes(individual, assertedTypes);
+            caches.cacheMostSpecificTypes(key, mostSpecificTypes);
+        }
+
+        return mostSpecificTypes;
     }
 
     private Model getMostSpecificTypes(Resource individual, Model assertedTypes) {
@@ -339,10 +372,10 @@ public class ABoxRecomputer {
                 "     UNION \n" +
                 "    { ?inv <" + OWL.inverseOf.getURI() + "> ?prop } \n" +
                 "} \n";
-        return RDFServiceUtils.parseModel(
-                rdfService.sparqlConstructQuery(
-                        queryStr, RDFService.ModelSerializationFormat.N3)
-                        , RDFService.ModelSerializationFormat.N3);
+
+        Model model = ModelFactory.createDefaultModel();
+        rdfService.sparqlConstructQuery(queryStr, model);
+        return model;
     }
 
     private Model rewriteInferences(Model inferences, String aliasURI) {
@@ -422,6 +455,23 @@ public class ABoxRecomputer {
 
     }
 
+    protected void addInferenceStatementsFor(String individualUri, Model addTo) throws RDFServiceException {
+        StringBuilder builder = new StringBuilder();
+        builder.append("CONSTRUCT\n")
+                .append("{\n")
+                .append("   <" + individualUri + "> ?p ?o .\n")
+                .append("}\n")
+                .append("WHERE\n")
+                .append("{\n")
+                .append("   GRAPH <").append(ModelNames.ABOX_INFERENCES).append(">\n")
+                .append("   {\n")
+                .append("       <" + individualUri + "> ?p ?o .\n")
+                .append("   }\n")
+                .append("}\n");
+
+        rdfService.sparqlConstructQuery(builder.toString(), addTo);
+    }
+
     /*
      * reconcile a set of inferences into the application inference model
      */
@@ -429,21 +479,26 @@ public class ABoxRecomputer {
             Collection<String> individuals) throws RDFServiceException {
         Model existing = ModelFactory.createDefaultModel();
         for (String individualURI : individuals) {
-            Resource subjInd = ResourceFactory.createResource(individualURI); 
-            existing.add(inferenceModel.listStatements(subjInd, null, (RDFNode) null));           
+            addInferenceStatementsFor(individualURI, existing);
         }
         Model retractions = existing.difference(rebuildModel);
         Model additions = rebuildModel.difference(existing);
-        long start = System.currentTimeMillis();
-        ChangeSet change = rdfService.manufactureChangeSet();
-        change.addRemoval(makeN3InputStream(retractions), 
-                RDFService.ModelSerializationFormat.N3, ModelNames.ABOX_INFERENCES);
-        change.addAddition(makeN3InputStream(additions), 
-                RDFService.ModelSerializationFormat.N3, ModelNames.ABOX_INFERENCES);
-        rdfService.changeSetUpdate(change);
-        log.debug((System.currentTimeMillis() - start) + 
-                " ms to retract " + retractions.size() + 
-                " statements and add " + additions.size() + " statements");
+        if (additions.size() > 0 || retractions.size() > 0) {
+            long start = System.currentTimeMillis();
+            ChangeSet change = rdfService.manufactureChangeSet();
+            if (retractions.size() > 0) {
+                change.addRemoval(makeN3InputStream(retractions),
+                        RDFService.ModelSerializationFormat.N3, ModelNames.ABOX_INFERENCES);
+            }
+            if (additions.size() > 0) {
+                change.addAddition(makeN3InputStream(additions),
+                        RDFService.ModelSerializationFormat.N3, ModelNames.ABOX_INFERENCES);
+            }
+            rdfService.changeSetUpdate(change);
+            log.debug((System.currentTimeMillis() - start) +
+                    " ms to retract " + retractions.size() +
+                    " statements and add " + additions.size() + " statements");
+        }
     }
 
     private InputStream makeN3InputStream(Model m) {
@@ -460,31 +515,60 @@ public class ABoxRecomputer {
         return sameAsInds;
     }
 
-    private void getSameAsIndividuals(String individualURI, Set<String> sameAsInds) {
-        Model m = RDFServiceGraph.createRDFServiceModel(new RDFServiceGraph(rdfService));
-        Resource individual = ResourceFactory.createResource(individualURI);
-        StmtIterator sit = m.listStatements(individual, OWL.sameAs, (RDFNode) null);
-        while(sit.hasNext()) {
-            Statement stmt = sit.nextStatement();
-            if (stmt.getObject().isURIResource()) {
-                String sameAsURI = stmt.getObject().asResource().getURI();
-                if (!sameAsInds.contains(sameAsURI)) {
-                    sameAsInds.add(sameAsURI);
-                    getSameAsIndividuals(sameAsURI, sameAsInds);
+    private void getSameAsIndividuals(String individualUri, final Set<String> sameAsInds) {
+        try {
+            final List<String> addedURIs = new ArrayList<String>();
+            StringBuilder builder = new StringBuilder();
+
+            builder.append("SELECT\n")
+                    .append("   ?object\n")
+                    .append("WHERE\n")
+                    .append("{\n")
+                    .append("   <" + individualUri + "> <" + OWL.sameAs + "> ?object .\n")
+                    .append("}\n");
+
+            rdfService.sparqlSelectQuery(builder.toString(), new ResultSetConsumer() {
+                @Override
+                protected void processQuerySolution(QuerySolution qs) {
+                    Resource object = qs.getResource("object");
+                    if (object != null && !sameAsInds.contains(object.getURI())) {
+                        sameAsInds.add(object.getURI());
+                        addedURIs.add(object.getURI());
+                    }
                 }
+            });
+
+            for (String indUri : addedURIs) {
+                getSameAsIndividuals(indUri, sameAsInds);
             }
+
+            addedURIs.clear();
+            builder = new StringBuilder();
+
+            builder.append("SELECT\n")
+                    .append("   ?subject\n")
+                    .append("WHERE\n")
+                    .append("{\n")
+                    .append("   ?subject <" + OWL.sameAs + "> <" + individualUri + "> .\n")
+                    .append("}\n");
+
+            rdfService.sparqlSelectQuery(builder.toString(), new ResultSetConsumer() {
+                @Override
+                protected void processQuerySolution(QuerySolution qs) {
+                    Resource object = qs.getResource("subject");
+                    if (object != null && !sameAsInds.contains(object.getURI())) {
+                        sameAsInds.add(object.getURI());
+                        addedURIs.add(object.getURI());
+                    }
+                }
+            });
+
+            for (String indUri : addedURIs) {
+                getSameAsIndividuals(indUri, sameAsInds);
+            }
+        } catch (RDFServiceException e) {
+
         }
-        sit = m.listStatements(null, OWL.sameAs, individual);
-        while(sit.hasNext()) {
-            Statement stmt = sit.nextStatement();
-            if (stmt.getSubject().isURIResource()) {
-                String sameAsURI = stmt.getSubject().asResource().getURI();
-                if (!sameAsInds.contains(sameAsURI)) {
-                    sameAsInds.add(sameAsURI);
-                    getSameAsIndividuals(sameAsURI, sameAsInds);
-                }
-            }
-        }        
     }
 
     /**
@@ -492,5 +576,115 @@ public class ABoxRecomputer {
      */
     public void setStopRequested() {
         this.stopRequested = true;
+    }
+
+    /**
+     * Caches for types -> inferred types, and types -> most specific type
+     */
+    private static class TypeCaches {
+        private Map<TypeList, TypeList> inferredTypes     = new HashMap<TypeList, TypeList>();
+        private Map<TypeList, TypeList> mostSpecificTypes = new HashMap<TypeList, TypeList>();
+
+        void cacheInferredTypes(TypeList key, Model model) {
+            inferredTypes.put(key, new TypeList(model, RDF.type));
+        }
+
+        Model getInferredTypesToModel(TypeList key, Resource individual) {
+            TypeList types = inferredTypes.get(key);
+            if (types != null) {
+                return types.constructModel(individual, RDF.type);
+            }
+            return null;
+        }
+
+        void cacheMostSpecificTypes(TypeList key, Model model) {
+            mostSpecificTypes.put(key, new TypeList(model, model.createProperty(VitroVocabulary.MOST_SPECIFIC_TYPE)));
+        }
+
+        Model getMostSpecificTypesToModel(TypeList key, Resource individual) {
+            TypeList types = mostSpecificTypes.get(key);
+            if (types != null) {
+                return types.constructModel(individual, VitroVocabulary.MOST_SPECIFIC_TYPE);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Bundle of type URIs
+     */
+    private static class TypeList {
+        private List<String> typeUris = new ArrayList<String>();
+
+        private Integer hashCode = null;
+
+        /**
+         * Extract type uris - either RDF type or most specific type - from a Model
+         */
+        TypeList(Model model, Property property) {
+            NodeIterator iterator = model.listObjectsOfProperty(property);
+            while (iterator.hasNext()) {
+                RDFNode node = iterator.next();
+                String uri = node.asResource().getURI();
+                if (!typeUris.contains(uri)) {
+                    typeUris.add(uri);
+                }
+            }
+        }
+
+        Model constructModel(Resource individual, Property property) {
+            Model model = ModelFactory.createDefaultModel();
+            for (String uri : typeUris) {
+                model.add(individual, property, model.createResource(uri));
+            }
+
+            return model;
+        }
+
+        Model constructModel(Resource individual, String property) {
+            Model model = ModelFactory.createDefaultModel();
+            for (String uri : typeUris) {
+                model.add(individual, model.createProperty(property), model.createResource(uri));
+            }
+
+            return model;
+        }
+
+        public void addUri(String uri) {
+            if (!typeUris.contains(uri)) {
+                typeUris.add(uri);
+                hashCode = null;
+            }
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof TypeList)) {
+                return false;
+            }
+
+            TypeList otherKey = (TypeList)obj;
+
+            if (typeUris.size() != otherKey.typeUris.size()) {
+                return false;
+            }
+
+            return typeUris.containsAll(otherKey.typeUris);
+        }
+
+        @Override
+        public int hashCode() {
+            if (hashCode == null) {
+                Collections.sort(typeUris);
+                StringBuilder builder = new StringBuilder();
+                for (String key : typeUris) {
+                    builder.append('<').append(key).append('>');
+                }
+
+                hashCode = builder.toString().hashCode();
+            }
+
+            return hashCode;
+        }
     }
 }

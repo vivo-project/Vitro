@@ -427,7 +427,6 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
             Dataset d = dw.getDataset();
             Query q = createQuery(query);
             QueryExecution qe = createQueryExecution(query, q, d);
-            ByteArrayOutputStream serializedModel = new ByteArrayOutputStream();
             try {
                 Model m = construct ? qe.execConstruct(model) : qe.execDescribe(model);
             } finally {
