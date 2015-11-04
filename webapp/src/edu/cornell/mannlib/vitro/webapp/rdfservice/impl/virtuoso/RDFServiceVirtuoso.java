@@ -6,20 +6,26 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.commons.httpclient.HttpMethod;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Selector;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -53,10 +59,10 @@ public class RDFServiceVirtuoso extends RDFServiceSparql {
 	private final String password;
 
 	public RDFServiceVirtuoso(String baseURI, String username, String password) {
-		super(figureReadEndpointUri(baseURI), figureUpdateEndpointUri(baseURI,
-				username));
+		super(figureReadEndpointUri(baseURI), figureUpdateEndpointUri(baseURI, username));
 		this.username = username;
 		this.password = password;
+		testConnection();
 	}
 
 	private static String figureReadEndpointUri(String baseUri) {
@@ -81,8 +87,8 @@ public class RDFServiceVirtuoso extends RDFServiceSparql {
 
 		try {
 			HttpPost request = createHttpRequest(updateString);
-			HttpResponse response = httpClient.execute(
-					request, createHttpContext());
+			HttpContext context = getContext(request);
+			HttpResponse response = context != null ? httpClient.execute(request, context) : httpClient.execute(request);
 			try {
 				int statusCode = response.getStatusLine().getStatusCode();
 				if (statusCode > 399) {
@@ -129,18 +135,29 @@ public class RDFServiceVirtuoso extends RDFServiceSparql {
 		return meth;
 	}
 
-	/**
-	 * We need an HttpContext that will provide username and password in
-	 * response to a basic authentication challenge.
-	 */
-	private HttpContext createHttpContext() {
-		CredentialsProvider provider = new BasicCredentialsProvider();
-		provider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(
-				username, password));
+	protected UsernamePasswordCredentials getCredentials() {
+		if (username != null && password != null) {
+			return new UsernamePasswordCredentials(username, password);
+		}
 
-		BasicHttpContext context = new BasicHttpContext();
-		context.setAttribute(ClientContext.CREDS_PROVIDER, provider);
-		return context;
+		return null;
+	}
+
+	private static boolean isNumeric(String typeUri) {
+		return typeUri != null && (typeUri.endsWith("decimal") ||
+				typeUri.endsWith("int") ||
+				typeUri.endsWith("integer") ||
+				typeUri.endsWith("float") ||
+				typeUri.endsWith("long") ||
+				typeUri.endsWith("negativeInteger") ||
+				typeUri.endsWith("nonNegativeInteger") ||
+				typeUri.endsWith("nonPositiveInteger") ||
+				typeUri.endsWith("positiveInteger") ||
+				typeUri.endsWith("short") ||
+				typeUri.endsWith("unsignedLong") ||
+				typeUri.endsWith("unsignedInt") ||
+				typeUri.endsWith("unsignedShort") ||
+				typeUri.endsWith("unsignedByte"));
 	}
 
 	/**
@@ -150,14 +167,84 @@ public class RDFServiceVirtuoso extends RDFServiceSparql {
 	 * To determine whether this serialized graph is equivalent to what is
 	 * already in Virtuoso, we need to do the same.
 	 */
-	@Override
-	public boolean isEquivalentGraph(String graphURI,
-			InputStream serializedGraph,
-			ModelSerializationFormat serializationFormat)
-			throws RDFServiceException {
-		return super.isEquivalentGraph(graphURI,
-				adjustForNonNegativeIntegers(serializedGraph),
-				serializationFormat);
+	public boolean isEquivalentGraph(String graphURI, InputStream serializedGraph,
+									 ModelSerializationFormat serializationFormat) throws RDFServiceException {
+		Model fileModel = RDFServiceUtils.parseModel(serializedGraph, serializationFormat);
+		Model tripleStoreModel = new RDFServiceDataset(this).getNamedModel(graphURI);
+		Model fromTripleStoreModel = ModelFactory.createDefaultModel().add(tripleStoreModel);
+
+		// Compare the models
+		Model difference = fileModel.difference(fromTripleStoreModel);
+
+		// If there is a difference
+		if (difference.size() > 0) {
+			// First, normalize the numeric values, as Virtuoso likes to mess with the datatypes
+			// Iterate over the differences
+			StmtIterator stmtIterator = difference.listStatements();
+			while (stmtIterator.hasNext()) {
+				final Statement stmt = stmtIterator.next();
+				final RDFNode subject = stmt.getSubject();
+				final Property predicate = stmt.getPredicate();
+				final RDFNode object = stmt.getObject();
+
+				// If the object is a numeric literal
+				if (object.isLiteral() &&  isNumeric(object.asLiteral().getDatatypeURI())) {
+					// Find a matching statement in the triple store, based on normalized numeric values
+					StmtIterator matching = fromTripleStoreModel.listStatements(new Selector() {
+						@Override
+						public boolean test(Statement statement) {
+							RDFNode objectToMatch = statement.getObject();
+
+							// Both values are numeric, so compare them as parsed doubles
+							if (objectToMatch.isLiteral()) {
+								String num1 = object.asLiteral().getString();
+								String num2 = objectToMatch.asLiteral().getString();
+
+								return Double.parseDouble(num1) == Double.parseDouble(num2);
+							}
+
+							return false;
+						}
+
+						@Override
+						public boolean isSimple() {
+							return false;
+						}
+
+						@Override
+						public Resource getSubject() {
+							return subject.asResource();
+						}
+
+						@Override
+						public Property getPredicate() {
+							return predicate;
+						}
+
+						@Override
+						public RDFNode getObject() {
+							return null;
+						}
+					});
+
+					// For every matching statement
+					// Rewrite the object as the one in the file model (they are the same, just differ in datatype)
+					List<Statement> toModify = new ArrayList<Statement>();
+					while (matching.hasNext()) {
+						toModify.add(matching.next());
+					}
+
+					for (Statement stmtToModify : toModify) {
+						stmtToModify.changeObject(object);
+					}
+				}
+			}
+
+			// Now we've normalized the datatypes, check the graphs are isomorphic
+			return fileModel.isIsomorphicWith(fromTripleStoreModel);
+		}
+
+		return true;
 	}
 
 	/**
