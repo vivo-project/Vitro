@@ -11,6 +11,7 @@ import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -86,6 +87,9 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	// SPARQL UPDATE
 
 	protected HttpClient httpClient;
+
+	protected boolean rebuildGraphURICache = true;
+	private List<String> graphURIs = null;
 
 	/**
 	 * Returns an RDFService for a remote repository
@@ -215,6 +219,8 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		} catch (Exception e) {
 			log.error(e, e);
 			throw new RDFServiceException(e);
+		} finally {
+			rebuildGraphURICache = true;
 		}
 		return true;
 	}
@@ -413,12 +419,16 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	 */
 	@Override
 	public List<String> getGraphURIs() throws RDFServiceException {
-		return getGraphURIsFromSparqlQuery();
+		if (graphURIs == null || rebuildGraphURICache) {
+			graphURIs = getGraphURIsFromSparqlQuery();
+			rebuildGraphURICache = false;
+		}
+		return graphURIs;
 	}
 
 	private List<String> getGraphURIsFromSparqlQuery() throws RDFServiceException {
 		String fastJenaQuery = "SELECT DISTINCT ?g WHERE { GRAPH ?g {} } ORDER BY ?g";
-		String standardQuery = "SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } } ORDER BY ?g";
+		String standardQuery = "SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o } }";
 		List<String> graphURIs = new ArrayList<String>();
 		try {
 			graphURIs = getGraphURIsFromSparqlQuery(fastJenaQuery);
@@ -427,6 +437,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		}
 		if (graphURIs.isEmpty()) {
 			graphURIs = getGraphURIsFromSparqlQuery(standardQuery);
+			Collections.sort(graphURIs);
 		}
 		return graphURIs;
 	}
@@ -537,11 +548,19 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	}
 
 	public void addModel(Model model, String graphURI) throws RDFServiceException {
-		verbModel(model, graphURI, "INSERT");
+		try {
+			verbModel(model, graphURI, "INSERT");
+		} finally {
+			rebuildGraphURICache = true;
+		}
 	}
 
 	public void deleteModel(Model model, String graphURI) throws RDFServiceException {
-		verbModel(model, graphURI, "DELETE");
+		try {
+			verbModel(model, graphURI, "DELETE");
+		} finally {
+			rebuildGraphURICache = true;
+		}
 	}
 
 	private void verbModel(Model model, String graphURI, String verb) throws RDFServiceException {
@@ -573,37 +592,43 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	}
 
 	protected void addTriple(Triple t, String graphURI) throws RDFServiceException {
+		try {
+			StringBuffer updateString = new StringBuffer();
+			updateString.append("INSERT DATA { ");
+			updateString.append((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "");
+			updateString.append(sparqlNodeUpdate(t.getSubject(), ""));
+			updateString.append(" ");
+			updateString.append(sparqlNodeUpdate(t.getPredicate(), ""));
+			updateString.append(" ");
+			updateString.append(sparqlNodeUpdate(t.getObject(), ""));
+			updateString.append(" }");
+			updateString.append((graphURI != null) ? " } " : "");
 
-		StringBuffer updateString = new StringBuffer();
-		updateString.append("INSERT DATA { ");
-		updateString.append((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" );
-		updateString.append(sparqlNodeUpdate(t.getSubject(), ""));
-		updateString.append(" ");
-		updateString.append(sparqlNodeUpdate(t.getPredicate(), ""));
-		updateString.append(" ");
-		updateString.append(sparqlNodeUpdate(t.getObject(), ""));
-		updateString.append(" }");
-		updateString.append((graphURI != null) ? " } " : "");
-
-		executeUpdate(updateString.toString());
-		notifyListeners(t, ModelChange.Operation.ADD, graphURI);
+			executeUpdate(updateString.toString());
+			notifyListeners(t, ModelChange.Operation.ADD, graphURI);
+		} finally {
+			rebuildGraphURICache = true;
+		}
 	}
 
 	protected void removeTriple(Triple t, String graphURI) throws RDFServiceException {
+		try {
+			StringBuffer updateString = new StringBuffer();
+			updateString.append("DELETE DATA { ");
+			updateString.append((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "");
+			updateString.append(sparqlNodeUpdate(t.getSubject(), ""));
+			updateString.append(" ");
+			updateString.append(sparqlNodeUpdate(t.getPredicate(), ""));
+			updateString.append(" ");
+			updateString.append(sparqlNodeUpdate(t.getObject(), ""));
+			updateString.append(" }");
+			updateString.append((graphURI != null) ? " } " : "");
 
-		StringBuffer updateString = new StringBuffer();
-		updateString.append("DELETE DATA { ");
-		updateString.append((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" );
-		updateString.append(sparqlNodeUpdate(t.getSubject(), ""));
-		updateString.append(" ");
-		updateString.append(sparqlNodeUpdate(t.getPredicate(), ""));
-		updateString.append(" ");
-		updateString.append(sparqlNodeUpdate(t.getObject(), ""));
-		updateString.append(" }");
-		updateString.append((graphURI != null) ? " } " : "");
-
-		executeUpdate(updateString.toString());
-		notifyListeners(t, ModelChange.Operation.REMOVE, graphURI);
+			executeUpdate(updateString.toString());
+			notifyListeners(t, ModelChange.Operation.REMOVE, graphURI);
+		} finally {
+			rebuildGraphURICache = true;
+		}
 	}
 
 	@Override
