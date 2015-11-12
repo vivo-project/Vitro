@@ -6,13 +6,10 @@
     <h2>SPARQL Query</h2>
     <form action='${submitUrl}' method="get">
         <h3>Query:</h3>
-        <div>
-            <textarea name='query' rows ='30' cols='100' class="span-23 maxWidth">
-${sampleQuery}
-            </textarea>
-        </div>
 
-        <div>
+        <textarea name='query' rows='30' cols='100' class="span-23 maxWidth" id="query-area">${sampleQuery}</textarea>
+
+        <div class="options">
         	 <h3>Format for SELECT and ASK query results:</h3>
         	 <label><input type='radio' name='resultFormat' value='text/plain' checked>RS_TEXT</label>
         	 <label><input type='radio' name='resultFormat' value='text/csv'>CSV</label>
@@ -21,7 +18,7 @@ ${sampleQuery}
         	 <label><input type='radio' name='resultFormat' value='application/sparql-results+json'>RS_JSON</label>
         </div>
 
-        <div>
+        <div class="options">
         	 <h3>Format for CONSTRUCT and DESCRIBE query results:</h3>
         	 <label><input type='radio' name='rdfResultFormat' value='text/plain'>N-Triples</label>
         	 <label><input type='radio' name='rdfResultFormat' value='application/rdf+xml' checked>RDF/XML</label>
@@ -33,3 +30,7 @@ ${sampleQuery}
         <input class="submit" type="submit" value="Run Query" />
     </form>
 </div><!-- content -->
+
+${stylesheets.add('<link rel="stylesheet" href="//cdn.jsdelivr.net/yasqe/2.6.1/yasqe.min.css" />')}
+${scripts.add('<script type="text/javascript" src="//cdn.jsdelivr.net/yasqe/2.6.1/yasqe.bundled.min.js"></script>',
+'<script type="text/javascript" src="${urls.base}/js/sparql/init-yasqe.js"></script>')}
