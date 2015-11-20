@@ -19,6 +19,8 @@
 
     <name>Vitro Solr App</name>
 
+
+
     <dependencies>
         <dependency>
             <groupId>org.apache.solr</groupId>
