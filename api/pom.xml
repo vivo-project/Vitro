@@ -38,11 +38,58 @@
 
     <dependencies>
         <dependency>
+            <!-- Added for runtime -->
+            <groupId>asm</groupId>
+            <artifactId>asm</artifactId>
+            <version>3.1</version>
+        </dependency>
+        <dependency>
+            <!-- Added for runtime, was 1.6 -->
+            <groupId>com.github.ansell.aterms</groupId>
+            <artifactId>aterm-java</artifactId>
+            <version>1.8.2</version>
+        </dependency>
+        <dependency>
+            <!-- Added for runtime -->
+            <groupId>cglib</groupId>
+            <artifactId>cglib</artifactId>
+            <version>2.2</version>
+        </dependency>
+        <dependency>
+            <!-- Added for runtime -->
+            <groupId>com.servlets</groupId>
+            <artifactId>cos</artifactId>
+            <version>05Nov2002</version>
+        </dependency>
+        <dependency>
+            <!-- Added for runtime -->
+            <groupId>org.apache.cxf.xjc-utils</groupId>
+            <artifactId>cxf-xjc-runtime</artifactId>
+            <version>2.6.2</version>
+        </dependency>
+        <dependency>
+            <!-- Added for runtime -->
+            <groupId>org.apache.cxf.xjcplugins</groupId>
+            <artifactId>cxf-xjc-ts</artifactId>
+            <version>2.6.2</version>
+        </dependency>
+        <dependency>
+            <!-- Added for runtime -->
+            <groupId>dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+
+
+
+        <dependency>
+            <!-- 0.3 requires code changes -->
             <groupId>com.github.jsonld-java</groupId>
             <artifactId>jsonld-java</artifactId>
             <version>0.2</version>
         </dependency>
         <dependency>
+            <!-- 0.3 requires code changes -->
             <groupId>com.github.jsonld-java</groupId>
             <artifactId>jsonld-java-jena</artifactId>
             <version>0.2</version>
@@ -66,6 +113,11 @@
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <version>1.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
@@ -112,6 +164,22 @@
             <groupId>net.sourceforge.owlapi</groupId>
             <artifactId>owlapi-distribution</artifactId>
             <version>4.0.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>4.2.5</version>
         </dependency>
         <dependency>
             <groupId>org.apache.jena</groupId>
