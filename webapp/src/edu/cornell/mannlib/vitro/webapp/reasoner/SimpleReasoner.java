@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.logging.Log;
@@ -74,6 +76,8 @@ public class SimpleReasoner extends StatementListener {
 	private static final AnnotationProperty mostSpecificType = (
 			VitroModelFactory.createOntologyModel())
 				.createAnnotationProperty(mostSpecificTypePropertyURI);
+	
+	private Queue<String> individualURIqueue = new ConcurrentLinkedQueue<String>();
 	
 	// DeltaComputer
 	private CumulativeDeltaModeler aBoxDeltaModeler1 = null;
@@ -183,6 +187,31 @@ public class SimpleReasoner extends StatementListener {
         return this.doSameAs;
     }
 
+    private void listenToStatement(Statement stmt) {
+        if(stmt.getSubject().isURIResource()) {
+            if (!individualURIqueue.contains(stmt.getSubject().getURI())) {
+                individualURIqueue.add(stmt.getSubject().getURI());
+            }
+        }
+        if(stmt.getObject().isURIResource() && !(RDF.type.equals(stmt.getPredicate()))) {
+            if (!individualURIqueue.contains(stmt.getObject().asResource().getURI())) {
+                individualURIqueue.add(stmt.getObject().asResource().getURI());
+            }
+        }
+        if(!accumulateChanges || individualURIqueue.size() > SAFETY_VALVE) {
+            recomputeIndividuals(); 
+        }
+    }
+    
+    private static final int SAFETY_VALVE = 1000000; // one million individuals
+    
+    private void recomputeIndividuals() {
+        recomputer.recompute(individualURIqueue);
+        individualURIqueue.clear();
+    }
+    
+    private boolean accumulateChanges = false;
+    
 	/*
 	 * Performs incremental ABox reasoning based
 	 * on the addition of a new statement
@@ -190,21 +219,24 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	@Override
 	public void addedStatement(Statement stmt) {
-		try {
-			if (stmt.getPredicate().equals(RDF.type)) {
-			     addedABoxTypeAssertion(stmt, inferenceModel, new HashSet<String>()); 
-			     setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
-			} else if ( doSameAs && stmt.getPredicate().equals(OWL.sameAs)) {  
-                 addedABoxSameAsAssertion(stmt, inferenceModel); 
-			} else {
-				 addedABoxAssertion(stmt, inferenceModel);
-			}
-			
-			doPlugins(ModelUpdate.Operation.ADD,stmt);
-
-		} catch (Exception e) { // don't stop the edit if there's an exception
-			log.error("Exception while computing inferences: " + e.getMessage());
-		}
+	    doPlugins(ModelUpdate.Operation.ADD,stmt);
+	    listenToStatement(stmt);
+	    
+//		try {
+//			if (stmt.getPredicate().equals(RDF.type)) {
+//			     addedABoxTypeAssertion(stmt, inferenceModel, new HashSet<String>()); 
+//			     setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
+//			} else if ( doSameAs && stmt.getPredicate().equals(OWL.sameAs)) {  
+//                 addedABoxSameAsAssertion(stmt, inferenceModel); 
+//			} else {
+//				 addedABoxAssertion(stmt, inferenceModel);
+//			}
+//			
+//			doPlugins(ModelUpdate.Operation.ADD,stmt);
+//
+//		} catch (Exception e) { // don't stop the edit if there's an exception
+//			log.error("Exception while computing inferences: " + e.getMessage());
+//		}
 	}
 	
 	/*
@@ -214,11 +246,13 @@ public class SimpleReasoner extends StatementListener {
 	 */
 	@Override
 	public void removedStatement(Statement stmt) {	
-		try {
-            handleRemovedStatement(stmt);            
-		} catch (Exception e) { // don't stop the edit if there's an exception
-			log.error("Exception while retracting inferences: ", e);
-		}
+        doPlugins(ModelUpdate.Operation.RETRACT,stmt);
+	    listenToStatement(stmt);
+//		try {
+//            handleRemovedStatement(stmt);            
+//		} catch (Exception e) { // don't stop the edit if there's an exception
+//			log.error("Exception while retracting inferences: ", e);
+//		}
 	}
 	
 	/*
@@ -1597,36 +1631,39 @@ public class SimpleReasoner extends StatementListener {
 	    
 	    if (event instanceof BulkUpdateEvent) {	
 	    	if (((BulkUpdateEvent) event).getBegin()) {	
+	    	    this.accumulateChanges = true;
 	    		
 	    		log.info("received a bulk update begin event");
-	    		if (deltaComputerProcessing) {
-	    			eventCount++;
-	    			log.info("received a bulk update begin event while processing in asynchronous mode. Event count = " + eventCount);
-	    			return;  
-	    		} else {
-	    			batchMode = 1;
-	    	    	if (aBoxDeltaModeler1.getRetractions().size() > 0) {
-	    	     	   log.warn("Unexpected condition: the aBoxDeltaModeler1 retractions model was not empty when entering batch mode.");
-	    	     	}
-
-	    	     	if (aBoxDeltaModeler2.getRetractions().size() > 0) {
-	    	      	   log.warn("Unexpected condition: the aBoxDeltaModeler2 retractions model was not empty when entering batch mode.");
-	    	      	}
-	    			    			
-	    			log.info("initializing batch mode 1");
-	    		}
+//	    		if (deltaComputerProcessing) {
+//	    			eventCount++;
+//	    			log.info("received a bulk update begin event while processing in asynchronous mode. Event count = " + eventCount);
+//	    			return;  
+//	    		} else {
+//	    			batchMode = 1;
+//	    	    	if (aBoxDeltaModeler1.getRetractions().size() > 0) {
+//	    	     	   log.warn("Unexpected condition: the aBoxDeltaModeler1 retractions model was not empty when entering batch mode.");
+//	    	     	}
+//
+//	    	     	if (aBoxDeltaModeler2.getRetractions().size() > 0) {
+//	    	      	   log.warn("Unexpected condition: the aBoxDeltaModeler2 retractions model was not empty when entering batch mode.");
+//	    	      	}
+//	    			    			
+//	    			log.info("initializing batch mode 1");
+//	    		}
 	    	} else {
 	    		log.info("received a bulk update end event");
-	    		if (!deltaComputerProcessing) {
-	    		    deltaComputerProcessing = true;
-					VitroBackgroundThread thread = new VitroBackgroundThread(new DeltaComputer(), 
-							"SimpleReasoner.DeltaComputer");
-	    		    thread.setWorkLevel(WORKING);
-					thread.start();
-	    		} else {
-	    			eventCount--;
-	    			log.info("received a bulk update end event while currently processing in aynchronous mode. Event count = " + eventCount);
-	    		}
+	    		this.accumulateChanges = false;
+	    		recomputeIndividuals();
+//	    		if (!deltaComputerProcessing) {
+//	    		    deltaComputerProcessing = true;
+//					VitroBackgroundThread thread = new VitroBackgroundThread(new DeltaComputer(), 
+//							"SimpleReasoner.DeltaComputer");
+//	    		    thread.setWorkLevel(WORKING);
+//					thread.start();
+//	    		} else {
+//	    			eventCount--;
+//	    			log.info("received a bulk update end event while currently processing in aynchronous mode. Event count = " + eventCount);
+//	    		}
 	    	}
 	    }
 	}

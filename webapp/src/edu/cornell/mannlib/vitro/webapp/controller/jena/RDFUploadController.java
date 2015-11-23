@@ -225,9 +225,19 @@ public class RDFUploadController extends JenaIngestController {
         }
     }
 
+    private static final boolean BEGIN = true;
+    private static final boolean END = !BEGIN;
+    
+    private ChangeSet makeChangeSet(RDFService rdfService) {
+        ChangeSet cs = rdfService.manufactureChangeSet();
+        cs.addPreChangeEvent(new BulkUpdateEvent(null, BEGIN));
+        cs.addPostChangeEvent(new BulkUpdateEvent(null, END));
+        return cs;
+    }
+    
     private void addUsingRDFService(InputStream in, String languageStr, 
             RDFService rdfService) {
-        ChangeSet changeSet = rdfService.manufactureChangeSet();
+        ChangeSet changeSet = makeChangeSet(rdfService);
         RDFService.ModelSerializationFormat format = 
                 ("RDF/XML".equals(languageStr) 
                         || "RDF/XML-ABBREV".equals(languageStr))
@@ -333,7 +343,7 @@ public class RDFUploadController extends JenaIngestController {
                     RDFService rdfService = new RDFServiceModel(mainModel);
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
                     changesModel.write(out, "N-TRIPLE");
-                    ChangeSet cs = rdfService.manufactureChangeSet();
+                    ChangeSet cs = makeChangeSet(rdfService);
                     ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
                     cs.addRemoval(in, RDFService.ModelSerializationFormat.NTRIPLE, null);
                     try {
@@ -398,7 +408,7 @@ public class RDFUploadController extends JenaIngestController {
     
     private void readIntoModel(InputStream in, String language, 
             RDFService rdfService, String modelName) {
-        ChangeSet cs = rdfService.manufactureChangeSet();
+        ChangeSet cs = makeChangeSet(rdfService);
         cs.addAddition(in, RDFServiceUtils.getSerializationFormatFromJenaString(
                         language), modelName);
         try {
