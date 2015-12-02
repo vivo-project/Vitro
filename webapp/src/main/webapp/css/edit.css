@@ -12,9 +12,11 @@ div.sparqlform label {
 input.block {
     display: block;
 }
-textarea,
-div.sparqlform div {
+textarea {
     margin-bottom: 1.5em;
+}
+div.sparqlform div.options, div.sparqlform input.submit {
+    margin-top: 1.5em;
 }
 form {
     padding-bottom: 20px;
