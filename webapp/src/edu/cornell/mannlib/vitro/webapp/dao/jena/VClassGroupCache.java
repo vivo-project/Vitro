@@ -358,25 +358,24 @@ public class VClassGroupCache implements SearchIndexer.Listener {
         }        
     }
 
-    protected static boolean isClassNameChange(Statement stmt, ServletContext context) {
+    protected static boolean isClassNameChange(Statement stmt, OntModel jenaOntModel) {
         // Check if the stmt is a rdfs:label change and that the
         // subject is an owl:Class.
-        if( !RDFS.label.equals( stmt.getPredicate() )) {
+        if( RDFS.label.equals( stmt.getPredicate() )) {                
+            jenaOntModel.enterCriticalSection(Lock.READ);
+            try{                                                  
+                return jenaOntModel.contains(
+                        ResourceFactory.createStatement(
+                                ResourceFactory.createResource(stmt.getSubject().getURI()), 
+                                RDF.type, 
+                                OWL.Class));
+            }finally{
+                jenaOntModel.leaveCriticalSection();
+            }
+        }else{
             return false;
-        } 
-        OntModel jenaOntModel = ModelAccess.on(context).getOntModelSelector().getTBoxModel();
-        jenaOntModel.enterCriticalSection(Lock.READ);
-        try{                                                  
-            return jenaOntModel.contains(
-                    ResourceFactory.createStatement(
-                            ResourceFactory.createResource(stmt.getSubject().getURI()), 
-                            RDF.type, 
-                            OWL.Class));
-        }finally{
-            jenaOntModel.leaveCriticalSection();
         }
     }
-    
     /* ******************** RebuildGroupCacheThread **************** */
     
     protected class RebuildGroupCacheThread extends VitroBackgroundThread {
@@ -488,8 +487,11 @@ public class VClassGroupCache implements SearchIndexer.Listener {
                 requestCacheUpdate();
             } else if(VitroVocabulary.DISPLAY_RANK.equals(stmt.getPredicate().getURI())){
             	requestCacheUpdate();
-            } else if( isClassNameChange(stmt, context) ) {            
-                requestCacheUpdate();
+            } else if (RDFS.label.equals(stmt.getPredicate())){
+                OntModel jenaOntModel = ModelAccess.on(context).getOntModelSelector().getTBoxModel();
+                if( isClassNameChange(stmt, jenaOntModel) ) {            
+                    requestCacheUpdate();
+                }
             }
         }       
         
