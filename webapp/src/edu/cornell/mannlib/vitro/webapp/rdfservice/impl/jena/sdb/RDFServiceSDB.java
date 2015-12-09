@@ -2,10 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.sdb;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
@@ -23,6 +22,8 @@ import com.hp.hpl.jena.sdb.sql.SDBConnection;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.StaticDatasetFactory;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -74,29 +75,42 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
             return false;
         }
             
-        SDBConnection sdbConn = getSDBConnection();
+        SDBConnection sdbConn = getSDBConnection();        
         Dataset dataset = getDataset(sdbConn);
-        
-        try {       
-        	insureThatInputStreamsAreResettable(changeSet);
-            
-        	beginTransaction(sdbConn);
+        try {
+            insureThatInputStreamsAreResettable(changeSet);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
+        try {
+            beginTransaction(sdbConn);
+        	startBulkUpdate();
         	notifyListenersOfPreChangeEvents(changeSet);
-            applyChangeSetToModel(changeSet, dataset);
-            
+        	applyChangeSetToModel(changeSet, dataset);
             commitTransaction(sdbConn);
-            
             notifyListenersOfChanges(changeSet);
-            notifyListenersOfPostChangeEvents(changeSet);
-            
+            notifyListenersOfPostChangeEvents(changeSet);            
             return true;
         } catch (Exception e) {
             log.error(e, e);
             abortTransaction(sdbConn);
             throw new RDFServiceException(e);
         } finally {
+            endBulkUpdate();
             close(sdbConn);
+        }
+    }
+    
+    private void startBulkUpdate() {
+        for (ChangeListener cl : this.getRegisteredListeners()) {
+            cl.notifyEvent(null, new BulkUpdateEvent(null, true));
+        }
+    }
+    
+    private void endBulkUpdate() {
+        for (ChangeListener cl : this.getRegisteredListeners()) {
+            cl.notifyEvent(null, new BulkUpdateEvent(null, false));
         }
     }
     
@@ -139,11 +153,7 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
 			sdbConn.getTransactionHandler().abort();
 		}
 	}
-	
-    private static final Pattern OPTIONAL_PATTERN = Pattern.compile("optional", Pattern.CASE_INSENSITIVE);
-    
-    private static final Pattern GRAPH_PATTERN = Pattern.compile("graph", Pattern.CASE_INSENSITIVE);
-    
+	    
     @Override
     protected QueryExecution createQueryExecution(String queryString, Query q, Dataset d) {
         return QueryExecutionFactory.create(q, d);

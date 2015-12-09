@@ -6,8 +6,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -23,14 +24,13 @@ import com.hp.hpl.jena.graph.TripleMatch;
 import com.hp.hpl.jena.graph.impl.GraphWithPerform;
 import com.hp.hpl.jena.graph.impl.SimpleEventManager;
 import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.AddDeniedException;
+import com.hp.hpl.jena.shared.Command;
 import com.hp.hpl.jena.shared.DeleteDeniedException;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
-import com.hp.hpl.jena.sparql.resultset.JSONInput;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 import com.hp.hpl.jena.util.iterator.SingletonIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
@@ -38,6 +38,7 @@ import com.hp.hpl.jena.util.iterator.WrappedIterator;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
@@ -51,6 +52,11 @@ public class RDFServiceGraph implements GraphWithPerform {
     private BulkUpdateHandler bulkUpdateHandler;
     private PrefixMapping prefixMapping = new PrefixMappingImpl();
     private GraphEventManager eventManager;
+    
+    private boolean queueWrites = false;
+    private ConcurrentLinkedQueue<Triple> addTripleQueue = new ConcurrentLinkedQueue<Triple>();
+    private ConcurrentLinkedQueue<Triple> removeTripleQueue = new ConcurrentLinkedQueue<Triple>();
+
 
     /**
      * Returns a SparqlGraph for the union of named graphs in a remote repository 
@@ -90,30 +96,48 @@ public class RDFServiceGraph implements GraphWithPerform {
                .append(sparqlNodeUpdate(t.getObject(), "")).append(" .");
         return sb.toString();
     }
-    
-    @Override
-    public void performAdd(Triple t) {
         
+    public void flush() {
+        log.debug("Flushing a batch");                                
         ChangeSet changeSet = rdfService.manufactureChangeSet();
         try {
-            changeSet.addAddition(RDFServiceUtils.toInputStream(serialize(t)), 
-                    RDFService.ModelSerializationFormat.N3, graphURI);
+            if(!removeTripleQueue.isEmpty()) {
+                String removals = serializeQueue(removeTripleQueue);
+                changeSet.addRemoval(RDFServiceUtils.toInputStream(removals), 
+                        RDFService.ModelSerializationFormat.N3, graphURI);
+            }
+            if(!addTripleQueue.isEmpty()) {
+                String additions = serializeQueue(addTripleQueue);
+                changeSet.addAddition(RDFServiceUtils.toInputStream(additions), 
+                        RDFService.ModelSerializationFormat.N3, graphURI);
+            }
             rdfService.changeSetUpdate(changeSet);
         } catch (RDFServiceException rdfse) {
             throw new RuntimeException(rdfse);
         }
-                
+    }
+    
+    private String serializeQueue(Queue<Triple> tripleQueue) {
+        String triples = "";
+        while(!tripleQueue.isEmpty()) {
+            triples += " \n" + serialize(tripleQueue.poll());
+        }
+        return triples;
+    }
+    
+    @Override
+    public void performAdd(Triple t) {
+        addTripleQueue.add(t);
+        if(!queueWrites) {
+            flush();
+        }
     }
     
     @Override
     public void performDelete(Triple t) {
-        ChangeSet changeSet = rdfService.manufactureChangeSet();
-        try {
-            changeSet.addRemoval(RDFServiceUtils.toInputStream(serialize(t)), 
-                    RDFService.ModelSerializationFormat.N3, graphURI);
-            rdfService.changeSetUpdate(changeSet);
-        } catch (RDFServiceException rdfse) {
-            throw new RuntimeException(rdfse);
+        removeTripleQueue.add(t);
+        if(!queueWrites) {
+            flush();
         }
     }
     
@@ -321,12 +345,11 @@ public class RDFServiceGraph implements GraphWithPerform {
     @Override
     public GraphStatisticsHandler getStatisticsHandler() {
         return null;
-    }
-
+    }  
+      
     @Override
     public TransactionHandler getTransactionHandler() {
-        // TODO Auto-generated method stub
-        return null;
+        return transactionHandler;
     }
 
     @Override
@@ -398,11 +421,42 @@ public class RDFServiceGraph implements GraphWithPerform {
         public boolean iteratorRemoveAllowed() {
             return false;
         }
-        
+
         @Override
         public boolean sizeAccurate() {
             return true;
         }
+	};
+
+	private final TransactionHandler transactionHandler = new TransactionHandler() {
+	    @Override
+	    public void abort() {
+	        queueWrites = false;
+	        removeTripleQueue.clear();
+	        addTripleQueue.clear();
+	    }
+
+        @Override
+        public void begin() {
+            queueWrites = true;
+        }
+
+        @Override
+        public void commit() {
+            flush();
+            queueWrites = false;
+        }
+
+        @Override
+        public Object executeInTransaction(Command arg0) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean transactionsSupported() {
+            return true;
+        }  
     };
     
     private void execSelect(String queryStr, ResultSetConsumer consumer) {

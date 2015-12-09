@@ -12,11 +12,14 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.shared.Lock;
+import com.hp.hpl.jena.vocabulary.OWL;
+import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.SimpleReasonerSetup;
 
 /**
  * A ChangeListener that forwards events to a Jena ModelChangedListener 
@@ -34,8 +37,10 @@ public class JenaChangeListener implements ChangeListener {
     
     public JenaChangeListener(ModelChangedListener listener) {
         this.listener = listener;
-        ignoredGraphs.add(SimpleReasonerSetup.JENA_INF_MODEL_REBUILD);
-        ignoredGraphs.add(SimpleReasonerSetup.JENA_INF_MODEL_SCRATCHPAD);
+        m.register(listener);
+        // these graphs no longer used
+//        ignoredGraphs.add(SimpleReasonerSetup.JENA_INF_MODEL_REBUILD);
+//        ignoredGraphs.add(SimpleReasonerSetup.JENA_INF_MODEL_SCRATCHPAD);
     }
     
     @Override
@@ -65,9 +70,11 @@ public class JenaChangeListener implements ChangeListener {
     // TODO avoid overhead of Model
     private Statement parseTriple(String serializedTriple) {
         try {
-            Model m = ModelFactory.createDefaultModel();
+            m.enterCriticalSection(Lock.WRITE);
+            m.removeAll();
+            // Model m = ModelFactory.createDefaultModel();
             m.read(new ByteArrayInputStream(
-                    serializedTriple.getBytes("UTF-8")), null, "N3");
+                    serializedTriple.getBytes("UTF-8")), null, "N-TRIPLE");
             StmtIterator sit = m.listStatements();
             if (!sit.hasNext()) {
                 throw new RuntimeException("no triple parsed from change event");
@@ -83,6 +90,8 @@ public class JenaChangeListener implements ChangeListener {
             throw riot;
         } catch (UnsupportedEncodingException uee) {
             throw new RuntimeException(uee);
+        } finally {
+            m.leaveCriticalSection();
         }
     }
 

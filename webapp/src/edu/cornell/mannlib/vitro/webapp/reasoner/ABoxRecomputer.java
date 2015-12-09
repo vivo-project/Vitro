@@ -64,7 +64,7 @@ public class ABoxRecomputer {
     private volatile boolean recomputing = false;
     private boolean stopRequested = false;
 
-    private final int BATCH_SIZE = 100;
+    private final int BATCH_SIZE = 500;
     private final int REPORTING_INTERVAL = 1000;
 
     /**
@@ -109,18 +109,24 @@ public class ABoxRecomputer {
                 recomputing = true;
             }
         }
+        boolean fullRecompute = (individualURIs == null);
+        boolean sizableRecompute = (!fullRecompute && individualURIs.size() > 2);
         try {
-            if  (searchIndexer != null) {
-                searchIndexer.pause();
-                // Register now that we want to rebuild the index when we unpause
-                // This allows the indexer to optimize behaviour whilst paused
-                searchIndexer.rebuildIndex();
+            if(fullRecompute || sizableRecompute) { // if doing a full rebuild
+                if (searchIndexer != null) {
+                    searchIndexer.pause();
+                    // Register now that we want to rebuild the index when we unpause
+                    // This allows the indexer to optimize behaviour whilst paused
+                    if(fullRecompute) {
+                        searchIndexer.rebuildIndex();
+                    }
+                }
             }
             // Create a type cache for this execution and pass it to the recompute function
             // Ensures that caches are only valid for the length of one recompute
             recomputeABox(individualURIs, new TypeCaches());
         } finally {
-            if  (searchIndexer != null) {
+            if  ((fullRecompute || sizableRecompute) && searchIndexer != null) {
                 searchIndexer.unpause();
             }
             synchronized (lock1) {
@@ -199,7 +205,7 @@ public class ABoxRecomputer {
             Model rebuildModel, TypeCaches caches) throws RDFServiceException {
         long start = System.currentTimeMillis();
         Model assertions = getAssertions(individualURI);
-        log.trace((System.currentTimeMillis() - start) + " ms to get assertions.");
+        log.debug((System.currentTimeMillis() - start) + " ms to get assertions.");
         Model additionalInferences = recomputeIndividual(
                 individualURI, null, assertions, rebuildModel, caches, RUN_PLUGINS);
 
@@ -588,7 +594,7 @@ public class ABoxRecomputer {
                 getSameAsIndividuals(indUri, sameAsInds);
             }
         } catch (RDFServiceException e) {
-
+            log.error(e,e);
         }
     }
 

@@ -16,6 +16,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
+import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.shared.Lock;
@@ -33,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.WebappDaoFactoryFiltering;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilterUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.VitroFilters;
+import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngine;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
@@ -161,9 +163,28 @@ public class VClassGroupCache implements SearchIndexer.Listener {
         VclassMap = classMap;
     }
     
+    private boolean paused = false;
+    private boolean updateRequested = false;
+    
+    public void pause() {
+        this.paused = true;
+    }
+    
+    public void unpause() {
+        this.paused = false;
+        if(updateRequested) {
+            updateRequested = false;
+            requestCacheUpdate();
+        }
+    }
+    
     public void requestCacheUpdate() {
-        log.debug("requesting update");        
-        _cacheRebuildThread.informOfQueueChange();
+        log.debug("requesting update");
+        if(paused) {
+            updateRequested = true;
+        } else {
+            _cacheRebuildThread.informOfQueueChange();
+        }
     }
     
     protected void requestStop() {
@@ -337,24 +358,25 @@ public class VClassGroupCache implements SearchIndexer.Listener {
         }        
     }
 
-    protected static boolean isClassNameChange(Statement stmt, OntModel jenaOntModel) {
+    protected static boolean isClassNameChange(Statement stmt, ServletContext context) {
         // Check if the stmt is a rdfs:label change and that the
         // subject is an owl:Class.
-        if( RDFS.label.equals( stmt.getPredicate() )) {                
-            jenaOntModel.enterCriticalSection(Lock.READ);
-            try{                                                  
-                return jenaOntModel.contains(
-                        ResourceFactory.createStatement(
-                                ResourceFactory.createResource(stmt.getSubject().getURI()), 
-                                RDF.type, 
-                                OWL.Class));
-            }finally{
-                jenaOntModel.leaveCriticalSection();
-            }
-        }else{
+        if( !RDFS.label.equals( stmt.getPredicate() )) {
             return false;
+        } 
+        OntModel jenaOntModel = ModelAccess.on(context).getOntModelSelector().getTBoxModel();
+        jenaOntModel.enterCriticalSection(Lock.READ);
+        try{                                                  
+            return jenaOntModel.contains(
+                    ResourceFactory.createStatement(
+                            ResourceFactory.createResource(stmt.getSubject().getURI()), 
+                            RDF.type, 
+                            OWL.Class));
+        }finally{
+            jenaOntModel.leaveCriticalSection();
         }
     }
+    
     /* ******************** RebuildGroupCacheThread **************** */
     
     protected class RebuildGroupCacheThread extends VitroBackgroundThread {
@@ -460,20 +482,26 @@ public class VClassGroupCache implements SearchIndexer.Listener {
                 log.debug("subject: " + stmt.getSubject().getURI());
                 log.debug("predicate: " + stmt.getPredicate().getURI());
             }
-            if (RDF.type.getURI().equals(stmt.getPredicate().getURI())) {
+            if (RDF.type.equals(stmt.getPredicate())) {
                 requestCacheUpdate();
             } else if (VitroVocabulary.IN_CLASSGROUP.equals(stmt.getPredicate().getURI())) {
                 requestCacheUpdate();
             } else if(VitroVocabulary.DISPLAY_RANK.equals(stmt.getPredicate().getURI())){
             	requestCacheUpdate();
-            } else {
-                OntModel jenaOntModel = ModelAccess.on(context).getOntModel();
-                if( isClassNameChange(stmt, jenaOntModel) ) {            
-                    requestCacheUpdate();
-                }
+            } else if( isClassNameChange(stmt, context) ) {            
+                requestCacheUpdate();
             }
         }       
         
+        public void notifyEvent(Model model, Object event) {
+            if (event instanceof BulkUpdateEvent) { 
+                if(((BulkUpdateEvent) event).getBegin()) {
+                    pause();
+                } else {
+                    unpause();
+                }
+            }
+        }
        
     }
     

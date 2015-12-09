@@ -19,6 +19,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.ReadWrite;
 import com.hp.hpl.jena.update.GraphStore;
 import com.hp.hpl.jena.update.GraphStoreFactory;
 import com.hp.hpl.jena.update.UpdateAction;
@@ -96,17 +97,26 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 	}
 
 	private void executeUpdate(HttpServletRequest req, UpdateRequest parsed) {
-		ServletContext ctx = req.getSession().getServletContext();
 		VitroRequest vreq = new VitroRequest(req);
-
 		SearchIndexer indexer = ApplicationUtils.instance().getSearchIndexer();
-		indexer.pause();
-		try {
-			Dataset ds = new RDFServiceDataset(vreq.getUnfilteredRDFService());
-			GraphStore graphStore = GraphStoreFactory.create(ds);
+		Dataset ds = new RDFServiceDataset(vreq.getUnfilteredRDFService());
+		GraphStore graphStore = GraphStoreFactory.create(ds);
+	    try {
+	        if(indexer != null) {
+	            indexer.pause();
+	        }
+	        if(ds.supportsTransactions()) {
+			    ds.begin(ReadWrite.WRITE);
+	        }
 			UpdateAction.execute(parsed, graphStore);
 		} finally {
-			indexer.unpause();
+		    if(ds.supportsTransactions()) {
+                ds.commit();
+                ds.end();
+		    }
+			if(indexer != null) {
+			    indexer.unpause();
+			}
 		}
 	}
 

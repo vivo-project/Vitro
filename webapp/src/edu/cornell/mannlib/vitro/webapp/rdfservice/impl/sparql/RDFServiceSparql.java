@@ -16,8 +16,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,6 +60,7 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sparql.core.Quad;
 
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
@@ -83,7 +86,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	protected String readEndpointURI;
 	protected String updateEndpointURI;
 	// the number of triples to be
-	private static final int CHUNK_SIZE = 1000; // added/removed in a single
+	private static final int CHUNK_SIZE = 5000; // added/removed in a single
 	// SPARQL UPDATE
 
 	protected HttpClient httpClient;
@@ -170,12 +173,13 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 				&& !isPreconditionSatisfied(
 				changeSet.getPreconditionQuery(),
 				changeSet.getPreconditionQueryType())) {
-			return false;
+		    return false;
 		}
 
 		try {
-			for (Object o : changeSet.getPreChangeEvents()) {
-				this.notifyListenersOfEvent(o);
+
+		    for (Object o : changeSet.getPreChangeEvents()) {
+		        this.notifyListenersOfEvent(o);
 			}
 
 			Iterator<ModelChange> csIt = changeSet.getModelChanges().iterator();
@@ -188,18 +192,26 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 				modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
 				performChange(modelChange);
 			}
-
+						
 			// notify listeners of triple changes
 			csIt = changeSet.getModelChanges().iterator();
-			while (csIt.hasNext()) {
+			while (csIt.hasNext()) {    
 				ModelChange modelChange = csIt.next();
 				modelChange.getSerializedModel().reset();
 				Model model = ModelFactory.createModelForGraph(
 						new ListeningGraph(modelChange.getGraphURI(), this));
+				long start = System.currentTimeMillis();
 				if (modelChange.getOperation() == ModelChange.Operation.ADD) {
-					model.read(modelChange.getSerializedModel(), null,
+				    Model temp = ModelFactory.createDefaultModel();
+					temp.read(modelChange.getSerializedModel(), null,
 							getSerializationFormatString(
 									modelChange.getSerializationFormat()));
+					StmtIterator sit = temp.listStatements();
+					while(sit.hasNext()) {
+					    Triple triple = sit.nextStatement().asTriple();
+					    this.notifyListeners(triple, ModelChange.Operation.ADD, modelChange.getGraphURI());
+					}
+					//model.add(temp);
 				} else if (modelChange.getOperation() == ModelChange.Operation.REMOVE){
 					Model temp = ModelFactory.createDefaultModel();
 					temp.read(modelChange.getSerializedModel(), null,
@@ -210,6 +222,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 					log.error("Unsupported model change type " +
 							modelChange.getOperation().getClass().getName());
 				}
+				log.info((System.currentTimeMillis() - start) + " ms to notify " + this.getRegisteredListeners().size() + " listeners");
 			}
 
 			for (Object o : changeSet.getPostChangeEvents()) {
@@ -468,7 +481,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 	 */
 	@Override
 	public void getGraphMetadata() throws RDFServiceException {
-
+	    throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -549,7 +562,9 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 
 	public void addModel(Model model, String graphURI) throws RDFServiceException {
 		try {
+		    long start = System.currentTimeMillis();
 			verbModel(model, graphURI, "INSERT");
+			log.info((System.currentTimeMillis() - start) + " ms to insert " + model.size() + " triples");
 		} finally {
 			rebuildGraphURICache = true;
 		}
