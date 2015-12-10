@@ -198,8 +198,6 @@ public class SimpleReasoner extends StatementListener {
         }
     }
     
-    private static final int SAFETY_VALVE = 1000000; // one million individuals
-    
     private void recomputeIndividuals() {
         if(recomputer.isRecomputing()) {
             return;
@@ -250,6 +248,16 @@ public class SimpleReasoner extends StatementListener {
 	@Override
 	public void removedStatement(Statement stmt) {	
         doPlugins(ModelUpdate.Operation.RETRACT,stmt);
+        if(doSameAs && OWL.sameAs.equals(stmt.getPredicate())) {
+            if (stmt.getSubject().isURIResource()) {
+               individualURIqueue.addAll(this.recomputer.getSameAsIndividuals(
+                       stmt.getSubject().getURI()));
+            }
+            if (stmt.getObject().isURIResource()) {
+                individualURIqueue.addAll(this.recomputer.getSameAsIndividuals(
+                        stmt.getObject().asResource().getURI()));
+            }
+        }
 	    listenToStatement(stmt);
 //		try {
 //            handleRemovedStatement(stmt);            
@@ -1954,5 +1962,4 @@ public class SimpleReasoner extends StatementListener {
         
     }
     
-
 }

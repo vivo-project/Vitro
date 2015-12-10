@@ -158,7 +158,7 @@ public class ABoxRecomputer {
             String individualURI = individuals.poll();
             try {
                 additionalInferences.add(recomputeIndividual(
-                        individualURI, rebuildModel, caches));
+                        individualURI, rebuildModel, caches, individuals));
                 numInds++;
                 individualsInBatch.add(individualURI);
                 boolean batchFilled = (numInds % BATCH_SIZE) == 0;
@@ -202,13 +202,14 @@ public class ABoxRecomputer {
     private static final boolean SKIP_PLUGINS = !RUN_PLUGINS;
 
     private Model recomputeIndividual(String individualURI, 
-            Model rebuildModel, TypeCaches caches) throws RDFServiceException {
+            Model rebuildModel, TypeCaches caches, Queue<String> individualQueue) 
+                    throws RDFServiceException {
         long start = System.currentTimeMillis();
         Model assertions = getAssertions(individualURI);
         log.debug((System.currentTimeMillis() - start) + " ms to get assertions.");
+        long prevRebuildSize = (simpleReasoner.getSameAsEnabled()) ? rebuildModel.size() : 0;
         Model additionalInferences = recomputeIndividual(
                 individualURI, null, assertions, rebuildModel, caches, RUN_PLUGINS);
-
         if (simpleReasoner.getSameAsEnabled()) {
             Set<String> sameAsInds = getSameAsIndividuals(individualURI);
             for (String sameAsInd : sameAsInds) {
@@ -221,7 +222,15 @@ public class ABoxRecomputer {
                 Resource indRes = ResourceFactory.createResource(individualURI);
                 Resource sameAsIndRes = ResourceFactory.createResource(sameAsInd); 
                 if(!assertions.contains(indRes, OWL.sameAs, sameAsIndRes)) {
-                    rebuildModel.add(indRes, OWL.sameAs, sameAsIndRes);
+                    if(!rebuildModel.contains(indRes, OWL.sameAs, sameAsIndRes)) {
+                        individualQueue.add(sameAsInd);
+                        rebuildModel.add(indRes, OWL.sameAs, sameAsIndRes);
+                    }
+                }
+            }
+            if(rebuildModel.size() - prevRebuildSize > 0) {
+                for (String sameAsInd : sameAsInds) {
+                    individualQueue.add(sameAsInd);
                 }
             }
         }
@@ -528,7 +537,7 @@ public class ABoxRecomputer {
         return new ByteArrayInputStream(out.toByteArray());
     }
 
-    private Set<String> getSameAsIndividuals(String individualURI) {
+    public Set<String> getSameAsIndividuals(String individualURI) {
         HashSet<String> sameAsInds = new HashSet<String>();
         sameAsInds.add(individualURI);
         getSameAsIndividuals(individualURI, sameAsInds);
@@ -540,7 +549,6 @@ public class ABoxRecomputer {
         try {
             final List<String> addedURIs = new ArrayList<String>();
             StringBuilder builder = new StringBuilder();
-
             builder.append("SELECT\n")
                     .append("   ?object\n")
                     .append("WHERE {\n")
@@ -553,7 +561,6 @@ public class ABoxRecomputer {
                     .append("    } \n")
                     .append("    FILTER (?g != <" + ModelNames.ABOX_INFERENCES + ">)\n") 
                     .append("}\n");
-            
             rdfService.sparqlSelectQuery(builder.toString(), new ResultSetConsumer() {
                 @Override
                 protected void processQuerySolution(QuerySolution qs) {
@@ -564,32 +571,6 @@ public class ABoxRecomputer {
                     }
                 }
             });
-
-            for (String indUri : addedURIs) {
-                getSameAsIndividuals(indUri, sameAsInds);
-            }
-
-            addedURIs.clear();
-            builder = new StringBuilder();
-
-            builder.append("SELECT\n")
-                    .append("   ?subject\n")
-                    .append("WHERE\n")
-                    .append("{\n")
-                    .append("   ?subject <" + OWL.sameAs + "> <" + individualUri + "> .\n")
-                    .append("}\n");
-
-            rdfService.sparqlSelectQuery(builder.toString(), new ResultSetConsumer() {
-                @Override
-                protected void processQuerySolution(QuerySolution qs) {
-                    Resource object = qs.getResource("subject");
-                    if (object != null && !sameAsInds.contains(object.getURI())) {
-                        sameAsInds.add(object.getURI());
-                        addedURIs.add(object.getURI());
-                    }
-                }
-            });
-
             for (String indUri : addedURIs) {
                 getSameAsIndividuals(indUri, sameAsInds);
             }
