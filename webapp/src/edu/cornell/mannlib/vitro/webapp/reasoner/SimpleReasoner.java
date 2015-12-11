@@ -28,7 +28,6 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -40,7 +39,6 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.ABoxJenaChangeListener;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.CumulativeDeltaModeler;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DifferenceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
@@ -77,19 +75,11 @@ public class SimpleReasoner extends StatementListener {
 				.createAnnotationProperty(mostSpecificTypePropertyURI);
 	
 	private Queue<String> individualURIqueue = new IndividualURIQueue<String>();
-	
-	// DeltaComputer
-	private CumulativeDeltaModeler aBoxDeltaModeler1 = null;
-	private CumulativeDeltaModeler aBoxDeltaModeler2 = null;
-	private int batchMode = 0;  // values: 0, 1 and 2
+    private boolean accumulateChanges = false;
 
 	// Recomputer
 	private ABoxRecomputer recomputer = null;
-	
-	private boolean stopRequested = false;
-	
-	private List<ReasonerPlugin> pluginList = new CopyOnWriteArrayList<ReasonerPlugin>();
-    
+	private List<ReasonerPlugin> pluginList = new CopyOnWriteArrayList<ReasonerPlugin>();   
     private boolean doSameAs = true;
 
 	/**
@@ -125,11 +115,7 @@ public class SimpleReasoner extends StatementListener {
                         		tboxModel.getGraph())));
                         
 		this.inferenceModel = inferenceModel;
-		this.batchMode = 0;
-		aBoxDeltaModeler1 = new CumulativeDeltaModeler();
-		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
 		recomputer = new ABoxRecomputer(tboxModel, aboxModel, rdfService, this, searchIndexer);
-		stopRequested = false;
 		
 		if (rdfService == null) {
 		    aboxModel.register(this);
@@ -157,10 +143,6 @@ public class SimpleReasoner extends StatementListener {
 		this.inferenceModel = inferenceModel;
 		this.fullModel = VitroModelFactory.createUnion(aboxModel, 
 				VitroModelFactory.createOntologyModel(inferenceModel));
-		aBoxDeltaModeler1 = new CumulativeDeltaModeler();
-		aBoxDeltaModeler2 = new CumulativeDeltaModeler();
-		this.batchMode = 0;
-		stopRequested = false;
 		Dataset ds = DatasetFactory.createMem();
 		ds.addNamedModel(ModelNames.ABOX_ASSERTIONS, aboxModel);
 		ds.addNamedModel(ModelNames.ABOX_INFERENCES, inferenceModel);
@@ -205,14 +187,11 @@ public class SimpleReasoner extends StatementListener {
         long start = System.currentTimeMillis();
         int size = individualURIqueue.size();
         recomputer.recompute(individualURIqueue);
-        //individualURIqueue.clear();
         if(size > 2) {
             log.info((System.currentTimeMillis() - start) + " ms to recompute " 
                     + size + " individuals");
         }
     }
-    
-    private boolean accumulateChanges = false;
     
 	/*
 	 * Performs incremental ABox reasoning based
@@ -223,21 +202,6 @@ public class SimpleReasoner extends StatementListener {
 	public void addedStatement(Statement stmt) {
 	    doPlugins(ModelUpdate.Operation.ADD,stmt);
 	    listenToStatement(stmt);;	    
-//		try {
-//			if (stmt.getPredicate().equals(RDF.type)) {
-//			     addedABoxTypeAssertion(stmt, inferenceModel, new HashSet<String>()); 
-//			     setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
-//			} else if ( doSameAs && stmt.getPredicate().equals(OWL.sameAs)) {  
-//                 addedABoxSameAsAssertion(stmt, inferenceModel); 
-//			} else {
-//				 addedABoxAssertion(stmt, inferenceModel);
-//			}
-//			
-//			doPlugins(ModelUpdate.Operation.ADD,stmt);
-//
-//		} catch (Exception e) { // don't stop the edit if there's an exception
-//			log.error("Exception while computing inferences: " + e.getMessage());
-//		}
 	}
 	
 	/*
@@ -259,33 +223,7 @@ public class SimpleReasoner extends StatementListener {
             }
         }
 	    listenToStatement(stmt);
-//		try {
-//            handleRemovedStatement(stmt);            
-//		} catch (Exception e) { // don't stop the edit if there's an exception
-//			log.error("Exception while retracting inferences: ", e);
-//		}
-	}
-	
-	/*
-	 * Synchronized part of removedStatement. Interacts with DeltaComputer.
-	 */
-	protected synchronized void handleRemovedStatement(Statement stmt) {    
-		if (batchMode == 1) {
-			 aBoxDeltaModeler1.removedStatement(stmt);
-		} else if (batchMode == 2) {
-			 aBoxDeltaModeler2.removedStatement(stmt);
-		} else {  // batchMode == 0
-			if (stmt.getPredicate().equals(RDF.type)) {
-				removedABoxTypeAssertion(stmt, inferenceModel);
-				setMostSpecificTypes(stmt.getSubject(), inferenceModel, new HashSet<String>());
-			} else if ( doSameAs && stmt.getPredicate().equals(OWL.sameAs)) {
-                removedABoxSameAsAssertion(stmt, inferenceModel); 	
-			} else {
-				removedABoxAssertion(stmt, inferenceModel);
-			}
-			doPlugins(ModelUpdate.Operation.RETRACT,stmt);
-		}
-	}
+	}	
 
     /**
 	 * Performs incremental ABox reasoning based
@@ -408,202 +346,7 @@ public class SimpleReasoner extends StatementListener {
 	public void removedTBoxStatement(Statement stmt) {	
         changedTBoxStatement(stmt, false);
 	}
-
-	protected void addedABoxTypeAssertion(Statement stmt, 
-	        Model inferenceModel, 
-	        HashSet<String> unknownTypes) {
-	    addedABoxTypeAssertion(stmt, inferenceModel, unknownTypes, true);
-	}
 	
-	/**
-	 * Performs incremental reasoning based on a new type assertion
-	 * added to the ABox (assertion that an individual is of a certain
-	 * type).
-	 * 
-	 * If it is added that B is of type A, then for each superclass of
-	 * A assert that B is of that type.
-	 */
-	protected void addedABoxTypeAssertion(Statement stmt, 
-                                          Model inferenceModel, 
-                                          HashSet<String> unknownTypes,
-                                          boolean checkRedundancy) {
-				
-	    tboxModel.enterCriticalSection(Lock.READ);
-		try {
-			Resource cls = null;
-			if ( (stmt.getObject().asResource()).getURI() != null ) {
-				
-			    cls = tboxModel.getResource(stmt.getObject().asResource().getURI()); 
-			    if (cls != null) {
-			    	List<Resource> parents = getParents(cls,tboxModel);
-			    	
-					Iterator<Resource> parentIt = parents.iterator();
-	
-					if (parentIt.hasNext()) {
-						while (parentIt.hasNext()) {
-							Resource parentClass = parentIt.next();
-							
-							// VIVO doesn't materialize statements that assert anonymous types
-							// for individuals. Also, sharing an identical anonymous node is
-							// not allowed in owl-dl. picklist population code looks at qualities
-							// of classes not individuals.
-							if (parentClass.isAnon()) continue;
-							
-							Statement infStmt = 
-                                ResourceFactory.createStatement(stmt.getSubject(), 
-                                                                RDF.type, parentClass);
-							addInference(infStmt, inferenceModel, true, checkRedundancy);
-						}						
-					}					
-				} else {
-					if ( !(stmt.getObject().asResource().getNameSpace()).equals(OWL.NS)) {
-						if (!unknownTypes.contains(stmt.getObject().asResource().getURI())) {
-							unknownTypes.add(stmt.getObject().asResource().getURI());
-					        log.warn("Didn't find the target class (the object of an added " +
-                                     "rdf:type statement) in the TBox: " +
-						          	 (stmt.getObject().asResource()).getURI() + 
-                                     ". No class subsumption reasoning will be done " +
-                                     "based on type assertions of this type.");
-						}
-					}
-				}
-			} else {
-				log.debug("The object of this rdf:type assertion has a null URI, no reasoning"
-                          + " will be done based on this assertion: " + stmtString(stmt));
-				return;
-			}
-		} finally {
-			tboxModel.leaveCriticalSection();
-		}
-		
-		inferenceModel.enterCriticalSection(Lock.WRITE);
-		try {
-			if (inferenceModel.contains(stmt)) {
-			    inferenceModel.remove(stmt);
-			}
-		} finally {
-			inferenceModel.leaveCriticalSection();
-		}	
-	}
-
-	/**
-     * If it is removed that B is of type A, then for each superclass of A remove
-     * the inferred statement that B is of that type UNLESS it is otherwise entailed
-     * that B is of that type.
-     * 
-     */
-	protected void removedABoxTypeAssertion(Statement stmt, Model inferenceModel) {
-	    removedABoxTypeAssertion(stmt, inferenceModel, null);
-	}
-	
-	/**
-	 * If it is removed that B is of type A, then for each superclass of A remove
-	 * the inferred statement that B is of that type UNLESS it is otherwise entailed
-	 * that B is of that type.
-	 * 
-	 * remainingTypeURIs is an optional list of asserted type URIs for the subject of 
-	 * stmt, and may be null.  Supplying a precompiled list can yield performance 
-     * improvement when this method is called repeatedly for the same subject.  
-	 * 
-	 */
-	protected void removedABoxTypeAssertion(Statement stmt, 
-                                            Model inferenceModel, 
-                                            List<String> remainingTypeURIs) {
-		tboxModel.enterCriticalSection(Lock.READ);
-		try {		
-			Resource cls = null;
-			
-			if ( (stmt.getObject().asResource()).getURI() != null ) {
-			    cls = tboxModel.getResource(stmt.getObject().asResource().getURI()); 
-			    
-				if (cls != null) {
-					if (entailedType(stmt.getSubject(),cls)) {
-						addInference(stmt,inferenceModel,true);
-					} 
-					
-			    	List<Resource> parents = getParents(cls,tboxModel);
-					
-					Iterator<Resource> parentIt = parents.iterator();
-					
-					while (parentIt.hasNext()) {
-					    
-						Resource parentClass = parentIt.next();
-						
-						// VIVO doesn't materialize statements that assert anonymous types
-						// for individuals. Also, sharing an identical anonymous node is
-						// not allowed in owl-dl. picklist population code looks at qualities
-						// of classes not individuals.
-						if (parentClass.isAnon()) continue;  
-						
-						List<String> typeURIs = (remainingTypeURIs == null) 
-                            ? getRemainingAssertedTypeURIs(stmt.getSubject()) : remainingTypeURIs;
-						if (entailedType(stmt.getSubject(),parentClass, typeURIs)) {
-						    continue;    // if a type is still entailed without the
-						}
-                        // removed statement, then don't remove it
-                        // from the inferences
-						
-						Statement infStmt = 
-                            ResourceFactory.createStatement(stmt.getSubject(), RDF.type, parentClass);
-                        removeInference(infStmt,inferenceModel,true,false);							
-					}
-				} else {
-					log.warn("Didn't find target class (the object of the removed rdf:type"
-                             + "statement) in the TBox: "
-							+ ((Resource)stmt.getObject()).getURI() + ". No class subsumption"
-                             +" reasoning will be performed based on the removal of this assertion.");
-				}
-			} else {
-				log.warn("The object of this rdf:type assertion has a null URI: " 
-                         + stmtString(stmt));
-			}		
-		} catch (Exception e) {
-			log.warn("exception while removing abox type assertions: " + e.getMessage());
-		} finally {
-			tboxModel.leaveCriticalSection();
-		}
-	}
-
-	/**
-	 * Performs incremental property-based reasoning.
-	 * 
-	 * Retracts inferences based on the owl:inverseOf relationship.
-	 * 
-	 * If it is removed that x prop1 y, and prop2 is an inverseOf prop1
-	 * then remove y prop2 x from the inference graph, unless it is 
-	 * otherwise entailed by the assertions graph independently of
-	 * this removed statement.
-	 */
-	protected void removedABoxAssertion(Statement stmt, Model inferenceModel) {
-		
-	    if (!stmt.getObject().isLiteral()) {
-    		List<OntProperty> inverseProperties = getInverseProperties(stmt);	
-    	    Iterator<OntProperty> inverseIter = inverseProperties.iterator();
-    		
-    	    while (inverseIter.hasNext()) {
-    	        OntProperty inverseProp = inverseIter.next();
-    	        Statement infStmt = ResourceFactory.createStatement(
-    	                stmt.getObject().asResource(), inverseProp, stmt.getSubject());
-    	        removeInference(infStmt,inferenceModel);
-    	    }	   
-	    }
-
-        if( doSameAs )
-            doSameAsForRemovedABoxAssertion( stmt, inferenceModel );
-
-		 // if a statement has been removed that is otherwise entailed,
-		 // add it to the inference graph.
-	    inferenceModel.enterCriticalSection(Lock.WRITE);
-	    try {
-			 if (entailedStatement(stmt) && !inferenceModel.contains(stmt)) {
-				inferenceModel.add(stmt);
-			 }			 
-	    } finally {
-	    	inferenceModel.leaveCriticalSection();
-	    }	      
-	}
-
-
 	/**
 	 * If it is added that B is a subClass of A, then for each
 	 * individual that is typed as B, either in the ABox or in the
@@ -762,241 +505,7 @@ public class SimpleReasoner extends StatementListener {
 		}		
 		return sameIndividuals;
 	}
-
-	/**
-	 * Materializes inferences based on the owl:sameAs relationship.
-	 *  
-	 * If it is added that x owl:sameAs y, then all asserted and inferred
-	 * statements about x will become inferred about y if they are not already
-	 * asserted about y, and vice versa.
-	 */
-	protected void addedABoxSameAsAssertion(Statement stmt, Model inferenceModel) {
-		Resource subject = null;
-		Resource object = null;
-		
-		if (stmt.getSubject().isResource()) {
-			 subject = stmt.getSubject().asResource();
-			 if (tboxModel.containsResource(subject) || subject.isAnon()) {
-				 log.debug("the subject of this sameAs statement is either in the tbox or an anonymous node, no reasoning will be done: " + stmtString(stmt));
-				 return;
-			 }
-		} else {
-			 log.warn("the subject of this sameAs statement is not a resource, no reasoning will be done: " + stmtString(stmt));
-			 return;
-		}
-
-		if (stmt.getObject().isResource()) {
-			 object = stmt.getObject().asResource();
-			 if (tboxModel.containsResource(object) || object.isAnon()) {
-				 log.debug("the object of this sameAs statement is either in the tbox or an anonymous node, no reasoning will be done: " + stmtString(stmt));
-				 return;
-			 }
-		} else {
-			 log.warn("the object of this sameAs statement is not a resource, no reasoning will be done: " + stmtString(stmt));
-			 return;
-		}
-
-		inferenceModel.enterCriticalSection(Lock.WRITE);
-		try {
-			if (inferenceModel.contains(stmt)) {
-			    inferenceModel.remove(stmt);
-			}
-		} finally {
-			inferenceModel.leaveCriticalSection();
-		}
-		
-		Statement opposite = ResourceFactory.createStatement(object, OWL.sameAs, subject);
-		addInference(opposite,inferenceModel,true);
-		
-		generateSameAsInferences(subject, object, inferenceModel);
-		generateSameAsInferences(object, subject, inferenceModel);		
-	}	
-
-	/**
-	 * Materializes inferences based on the owl:sameAs relationship.
-	 *  
-	 * If it is removed	that x is sameAs y, then remove y sameAs x from 
-	 * the inference graph and then recompute the inferences for x and
-	 * y based on their respective assertions.
-     * that x owl:sameAs y, then all asserted and inferred
-	 */
-	protected void removedABoxSameAsAssertion(Statement stmt, Model inferenceModel) {
-		Resource subject = null;
-		Resource object = null;
-		
-		if (stmt.getSubject().isResource()) {
-			 subject = stmt.getSubject().asResource();
-			 if (tboxModel.containsResource(subject) || subject.isAnon()) {
-				 log.debug("the subject of this removed sameAs statement is either in the tbox or an anonymous node, no reasoning will be done: " + stmtString(stmt));
-				 return;
-			 }
-		} else {
-			 log.warn("the subject of this removed sameAs statement is not a resource, no reasoning will be done: " + stmtString(stmt));
-			 return;
-		}
-
-		if (stmt.getObject().isResource()) {
-			 object = stmt.getObject().asResource();
-			 if (tboxModel.containsResource(object) || object.isAnon()) {
-				 log.debug("the object of this removed sameAs statement is either in the tbox or an anonymous node, no reasoning will be done: " + stmtString(stmt));
-				 return;
-			 }
-		} else {
-			 log.warn("the object of this removed sameAs statement is not a resource, no reasoning will be done: " + stmtString(stmt));
-			 return;
-		}
-		
-		List<Resource> sameIndividuals = getSameIndividuals(subject,inferenceModel);
-		sameIndividuals.addAll(getSameIndividuals(object, inferenceModel));
-		
-		Iterator<Resource> sIter1 = sameIndividuals.iterator();
-		while (sIter1.hasNext()) {
-		    removeInferencesForIndividual(sIter1.next(), inferenceModel);			
-		}
-		
-		Iterator<Resource> sIter2 = sameIndividuals.iterator();
-		while (sIter2.hasNext()) {
-		    computeInferencesForIndividual(sIter2.next(), inferenceModel);			
-		}
-	}
-    protected void doSameAsForAddedABoxAssertion(Statement stmt, Model inferenceModel){
-        List<Resource> sameIndividuals = 
-            getSameIndividuals(stmt.getSubject().asResource(), inferenceModel);
-
-		Iterator<Resource> sameIter = sameIndividuals.iterator();
-		while (sameIter.hasNext()) {
-			Resource subject = sameIter.next();
-			Statement sameStmt = 
-                ResourceFactory.createStatement(subject,stmt.getPredicate(),stmt.getObject());
-			addInference(sameStmt,inferenceModel, doSameAs);
-		}	    
-    }
-
-
-	/**
-	 * Materializes inferences based on the owl:inverseOf relationship.
-	 * and owl:sameAs
-	 *  
-	 * If it is added that x prop1 y, and prop2 is an inverseOf prop1
-	 * then add y prop2 x to the inference graph, if it is not already in
-	 * the assertions graph.
-	 * 
-	 */
-	protected void addedABoxAssertion(Statement stmt, Model inferenceModel) {
-		
-	    if (!stmt.getObject().isLiteral()) {
-    		List<OntProperty> inverseProperties = getInverseProperties(stmt);	
-            Iterator<OntProperty> inverseIter = inverseProperties.iterator();
-    		        
-    	    while (inverseIter.hasNext()) {
-    	       Property inverseProp = inverseIter.next();
-    	       Statement infStmt = ResourceFactory.createStatement(
-    	               stmt.getObject().asResource(), inverseProp, stmt.getSubject());
-    	       addInference(infStmt, inferenceModel, true);
-    	    }	
-	    }
-
-	    inferenceModel.enterCriticalSection(Lock.WRITE);
-        try {
-            if (inferenceModel.contains(stmt)) {
-                inferenceModel.remove(stmt);
-            }
-        } finally {
-            inferenceModel.leaveCriticalSection();
-        }
-	    
-	    if(doSameAs) {
-            doSameAsForAddedABoxAssertion( stmt, inferenceModel);
-	    }
-	}	
-
-    void doSameAsForRemovedABoxAssertion(Statement stmt, Model inferenceModel){
-	    List<Resource> sameIndividuals = 
-            getSameIndividuals(stmt.getSubject().asResource(), inferenceModel);
-		Iterator<Resource> sameIter = sameIndividuals.iterator();	 
-		while (sameIter.hasNext()) {
-			 Statement stmtSame = 
-                 ResourceFactory.createStatement(sameIter.next(), 
-                                                 stmt.getPredicate(), 
-                                                 stmt.getObject());
-			 removeInference(stmtSame,inferenceModel,false,true);
-		}		 	    	    
-    }
-
-	protected void generateSameAsInferences(Resource ind1, Resource ind2, Model inferenceModel) {	
-		
-		OntModel unionModel = VitroModelFactory.createOntologyModel(); 
-		unionModel.addSubModel(aboxModel);
-		unionModel.addSubModel(inferenceModel);
-		
-			aboxModel.enterCriticalSection(Lock.READ);
-			try {
-				Iterator<Statement> iter = 
-                    unionModel.listStatements(ind1, (Property) null, (RDFNode) null);
-				while (iter.hasNext()) {
-					Statement stmt = iter.next();
-					if (stmt.getObject() == null) continue;
-					Statement infStmt = 
-                        ResourceFactory.createStatement(ind2,stmt.getPredicate(),stmt.getObject());
-					addInference(infStmt, inferenceModel,true);
-				}
-			} finally {
-				aboxModel.leaveCriticalSection();
-			}
-		
-		return;
-	}
-
-	/**
-	 * Remove inferences for individual
-	 */
-	protected void removeInferencesForIndividual(Resource ind, Model inferenceModel) {	
-		
-		Model individualInferences = ModelFactory.createDefaultModel();
-		
-		inferenceModel.enterCriticalSection(Lock.READ);
-		try {
-			Iterator<Statement> iter = 
-                inferenceModel.listStatements(ind, (Property) null, (RDFNode) null);
-			
-			while (iter.hasNext()) {
-				individualInferences.add(iter.next());
-			}
-		} finally {
-			inferenceModel.leaveCriticalSection();
-		}
-
-		inferenceModel.enterCriticalSection(Lock.WRITE);
-		try {
-			inferenceModel.remove(individualInferences);
-		} finally {
-			inferenceModel.leaveCriticalSection();
-		}
-		
-		return;
-	}
-
-	/**
-	 * compute inferences for individual
-	 */
-	protected void computeInferencesForIndividual(Resource ind, Model inferenceModel) {	
-				
-		Iterator<Statement> iter = null;
-		aboxModel.enterCriticalSection(Lock.WRITE);
-		try {
-		    iter = aboxModel.listStatements(ind, (Property) null, (RDFNode) null);
-		} finally {
-			aboxModel.leaveCriticalSection();
-		}
-		
-		while (iter.hasNext()) {
-		   Statement stmt = iter.next();		
-		   addedStatement(stmt);	
-		}
-			
-		return;
-	}
-
+	
 	/**
      * Returns true if it is entailed by class subsumption that
      * subject is of type cls; otherwise returns false.
@@ -1132,7 +641,6 @@ public class SimpleReasoner extends StatementListener {
      */
 	protected boolean entailedStatement(Statement stmt) {	
 		//TODO think about checking class subsumption here (for convenience)
-		
 		// Inverse properties
 		List<OntProperty> inverses = getInverseProperties(stmt);
 		Iterator<OntProperty> iIter = inverses.iterator();
@@ -1609,30 +1117,18 @@ public class SimpleReasoner extends StatementListener {
 	    if (recomputer != null) {
 	    	recomputer.setStopRequested();
 	    }
-
-	    this.stopRequested = true;
 	}
-	
-
 	  
     // DeltaComputer    
 	/**
-	 * Asynchronous reasoning mode (DeltaComputer) is used in the case of batch removals. 
+	 * Asynchronous reasoning mode (DeltaComputer) was used in the case of batch removals. 
 	 */
 	public boolean isABoxReasoningAsynchronous() {
-         if (batchMode > 0) {
-        	 return true;
-         } else {
-        	 return false;
-         }
+         return false;
 	}
     
-	private volatile boolean deltaComputerProcessing = false;
-	private int eventCount = 0;
-    
 	@Override
-	public void notifyEvent(Model model, Object event) {
-	    
+	public void notifyEvent(Model model, Object event) {	    
 	    if (event instanceof BulkUpdateEvent) {	
 	    	handleBulkUpdateEvent(event);
 	    }
@@ -1643,180 +1139,14 @@ public class SimpleReasoner extends StatementListener {
 	    if (event instanceof BulkUpdateEvent) {	
 	    	if (((BulkUpdateEvent) event).getBegin()) {	
 	    	    this.accumulateChanges = true;
-	    		
-	    		//log.info("received a bulk update begin event");
-//	    		if (deltaComputerProcessing) {
-//	    			eventCount++;
-//	    			log.info("received a bulk update begin event while processing in asynchronous mode. Event count = " + eventCount);
-//	    			return;  
-//	    		} else {
-//	    			batchMode = 1;
-//	    	    	if (aBoxDeltaModeler1.getRetractions().size() > 0) {
-//	    	     	   log.warn("Unexpected condition: the aBoxDeltaModeler1 retractions model was not empty when entering batch mode.");
-//	    	     	}
-//
-//	    	     	if (aBoxDeltaModeler2.getRetractions().size() > 0) {
-//	    	      	   log.warn("Unexpected condition: the aBoxDeltaModeler2 retractions model was not empty when entering batch mode.");
-//	    	      	}
-//	    			    			
-//	    			log.info("initializing batch mode 1");
-//	    		}
 	    	} else {
-	    		//log.info("received a bulk update end event");
+	    		log.debug("received a bulk update end event");
 	    		this.accumulateChanges = false;
 	    		recomputeIndividuals();
-//	    		if (!deltaComputerProcessing) {
-//	    		    deltaComputerProcessing = true;
-//					VitroBackgroundThread thread = new VitroBackgroundThread(new DeltaComputer(), 
-//							"SimpleReasoner.DeltaComputer");
-//	    		    thread.setWorkLevel(WORKING);
-//					thread.start();
-//	    		} else {
-//	    			eventCount--;
-//	    			log.info("received a bulk update end event while currently processing in aynchronous mode. Event count = " + eventCount);
-//	    		}
 	    	}
 	    }
 	}
 	
-	private synchronized boolean switchBatchModes() {
-
-		if (batchMode == 1) { 
-    	   aBoxDeltaModeler2.getRetractions().removeAll();
-    	   
-    	   if (aBoxDeltaModeler1.getRetractions().size() > 0) {
-    		   batchMode = 2;
-			   log.info("entering batch mode " + batchMode);
-    	   } else {
-    		   deltaComputerProcessing = false;
-    		   if (eventCount == 0) {
-    			   batchMode = 0;
-    		   }
-    	   }
-	   } else if (batchMode == 2) {
-			aBoxDeltaModeler1.getRetractions().removeAll();
-
-    	    if (aBoxDeltaModeler2.getRetractions().size() > 0) {
-    	    	batchMode = 1; 
-			   log.info("entering batch mode " + batchMode);
-    	    } else {
-    		   deltaComputerProcessing = false;
-    		   if (eventCount == 0) {
-    			   batchMode = 0;
-    		   }
-    	    }
-	   } else { 
-		    log.warn("unexpected condition, invoked when batchMode is neither 1 nor 2. batchMode = " + batchMode);
-            deltaComputerProcessing = false;
-	   }
-       
-       return deltaComputerProcessing;
-	}
-		
-    private class DeltaComputer extends Thread  {      
-        public DeltaComputer() {
-        }
-        
-        @Override
-        public void run() {  
-        	log.info("starting DeltaComputer.run");
-        	boolean abort = false;
-       	    Model retractions = ModelFactory.createDefaultModel();
-       	    String qualifier = "";
-        	
-        	while (deltaComputerProcessing && !stopRequested) {
-        		
-        		if (switchBatchModes()) {
-        			if (batchMode == 1) {
-        				qualifier = "2";
-        				retractions = aBoxDeltaModeler2.getRetractions();
-        			} else if (batchMode == 2) {
-        				qualifier = "1";
-        				retractions = aBoxDeltaModeler1.getRetractions();        				
-        			} 
-        		} else {
-        			break;
-        		}
-        	
-    			retractions.enterCriticalSection(Lock.READ);	
-    			int num = 0;
-    			
-    			try {
-    	   	       	log.info("started computing inferences for batch " + qualifier + " updates");
-    				
-    			   	
-    				ResIterator subIt = retractions.listSubjects();
-    				while (subIt.hasNext()) {	
-    				    Resource subj = subIt.nextResource();
-    				    StmtIterator iter = retractions.listStatements(
-    				            subj, null, (RDFNode) null);
-    				    boolean typesModified = false;
-    				    try {
-    				        List<String> typeURIs = null;
-        				    while (iter.hasNext() && !stopRequested) {              
-                                Statement stmt = iter.next();
-                                num++;                         
-                                try {
-                                    if (stmt.getPredicate().equals(RDF.type)) {
-                                        typesModified = true;
-                                        if (typeURIs == null) {
-                                            typeURIs = getRemainingAssertedTypeURIs(stmt.getSubject());
-                                        }
-                                        removedABoxTypeAssertion(stmt, inferenceModel, typeURIs);
-                                    } else if (doSameAs && stmt.getPredicate().equals(OWL.sameAs)) {
-                                        removedABoxSameAsAssertion(stmt, inferenceModel);   
-                                    } else {
-                                        removedABoxAssertion(stmt, inferenceModel);
-                                    }
-                                    doPlugins(ModelUpdate.Operation.RETRACT,stmt);
-                                } catch (NullPointerException npe) {
-                                     abort = true;
-                                     break;
-                                } catch (Exception e) {
-                                     log.error("exception in batch mode ",e);
-                                }
-                                
-                                if ((num % 6000) == 0) {
-                                    log.info("still computing inferences for batch " + qualifier + " update...");
-                                }   
-                                
-                                if (stopRequested) {
-                                    log.info("a stopRequested signal was received during DeltaComputer.run. Halting Processing.");
-                                    return;
-                                }
-                            }
-    				    } finally {
-    				        iter.close();
-                            if (typesModified) {
-                                setMostSpecificTypes(subj, inferenceModel, new HashSet<String>());
-                            }
-    				    }
-    				}				
-    			} finally {
-    	    		retractions.removeAll();	
-    	   			retractions.leaveCriticalSection();
-    			}			
- 				
-                if (stopRequested) {
-                	log.info("a stopRequested signal was received during DeltaComputer.run. Halting Processing.");
-                	deltaComputerProcessing = false;
-                	return;
-                }
-                
-                if (abort) {
-                	log.error("a NullPointerException was received while computing inferences in batch " + qualifier + " mode. Halting inference computation.");
-                	deltaComputerProcessing = false;
-                	return;
-                }
-                
-                log.info("finished computing inferences for batch " + qualifier + " updates");
-                log.debug("\t--> processed " + num + " statements");
-        	}
-        	
-        	log.info("ending DeltaComputer.run. batchMode = " + batchMode);
-        }        
-    } 
-
 	/**
 	 * Utility method for logging
 	 */
@@ -1834,7 +1164,7 @@ public class SimpleReasoner extends StatementListener {
         private ConcurrentHashMap<E, Boolean> m = new ConcurrentHashMap<E, Boolean>();
         
         @Override
-        public boolean addAll(Collection<? extends E> c) {
+        public synchronized boolean addAll(Collection<? extends E> c) {
             boolean changed = false;
             for (E e : c) {
                 if(!m.containsKey(e)) {
@@ -1847,7 +1177,7 @@ public class SimpleReasoner extends StatementListener {
         }
         
         @Override
-        public void clear() {
+        public synchronized void clear() {
             m.clear();
             q.clear();
         }
@@ -1877,13 +1207,13 @@ public class SimpleReasoner extends StatementListener {
         }
         
         @Override
-        public boolean remove(Object o) {
+        public synchronized boolean remove(Object o) {
             m.remove(o);
             return q.remove(o);
         }
         
         @Override
-        public boolean removeAll(Collection<?> c) {
+        public synchronized boolean removeAll(Collection<?> c) {
             for (Object e : c) {
                 m.remove(e);
             }
@@ -1891,7 +1221,7 @@ public class SimpleReasoner extends StatementListener {
         }
         
         @Override
-        public boolean retainAll(Collection<?> c) {
+        public synchronized boolean retainAll(Collection<?> c) {
             boolean changed = false;
             Iterator<E> it = m.keySet().iterator();
             while(it.hasNext()) {
@@ -1921,7 +1251,7 @@ public class SimpleReasoner extends StatementListener {
         }
         
         @Override
-        public boolean add(E e) {
+        public synchronized boolean add(E e) {
             if(m.containsKey(e)) {
                 return false;
             } else {
@@ -1947,14 +1277,14 @@ public class SimpleReasoner extends StatementListener {
         }
         
         @Override
-        public E poll() {
+        public synchronized E poll() {
             E e =  q.poll();
             m.remove(e);
             return e;
         }
         
         @Override
-        public E remove() {
+        public synchronized E remove() {
             E e = q.remove();
             m.remove(e);
             return e;
