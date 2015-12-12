@@ -102,14 +102,15 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
             }
                         
             // notify listeners of triple changes
-            csIt = changeSet.getModelChanges().iterator();
-            while (csIt.hasNext()) {
-                ModelChange modelChange = csIt.next();
-                modelChange.getSerializedModel().reset();
-                Model model = ModelFactory.createModelForGraph(
-                        new ListeningGraph(modelChange.getGraphURI(), this));
-                operateOnModel(model, modelChange, null);
-            }
+            notifyListenersOfChanges(changeSet);
+//            csIt = changeSet.getModelChanges().iterator();
+//            while (csIt.hasNext()) {
+//                ModelChange modelChange = csIt.next();
+//                modelChange.getSerializedModel().reset();
+//                Model model = ModelFactory.createModelForGraph(
+//                        new ListeningGraph(modelChange.getGraphURI(), this));
+//                operateOnModel(model, modelChange, null);
+//            }
             
             for (Object o : changeSet.getPostChangeEvents()) {
                 this.notifyListenersOfEvent(o);

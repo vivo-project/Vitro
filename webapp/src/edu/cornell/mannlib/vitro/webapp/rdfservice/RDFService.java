@@ -2,11 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice;
 
-import com.hp.hpl.jena.rdf.model.Model;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 
 /**
  * Interface for API to write, read, and update Vitro's RDF store, with support 
@@ -197,20 +198,38 @@ public interface RDFService {
 			ModelSerializationFormat serializationFormat) throws RDFServiceException;
 	
 	/**
-	 * Registers a listener to listen to changes in any graph in
+	 * Registers a Jena listener to listen to changes in any graph in
 	 * the RDF store.
 	 * 
 	 * @param changeListener - the change listener
 	 */
-	public void registerListener(ChangeListener changeListener) throws RDFServiceException;
+	public void registerJenaModelChangedListener(ModelChangedListener changeListener) 
+	        throws RDFServiceException;
 	
 	/**
-	 * Unregisters a listener from listening to changes in
+	 * Unregisters a Jena listener from listening to changes in
 	 * any graph in the RDF store
 	 * 
 	 * @param changeListener - the change listener
 	 */
-	public void unregisterListener(ChangeListener changeListener) throws RDFServiceException;
+	public void unregisterJenaModelChangedListener(ModelChangedListener changeListener) 
+	        throws RDFServiceException;
+	
+	/**
+     * Registers a listener to listen to changes in any graph in
+     * the RDF store.
+     * 
+     * @param changeListener - the change listener
+     */
+    public void registerListener(ChangeListener changeListener) throws RDFServiceException;
+    
+    /**
+     * Unregisters a listener from listening to changes in
+     * any graph in the RDF store
+     * 
+     * @param changeListener - the change listener
+     */
+    public void unregisterListener(ChangeListener changeListener) throws RDFServiceException;
 
 	/**
 	 * Creates a ChangeSet object

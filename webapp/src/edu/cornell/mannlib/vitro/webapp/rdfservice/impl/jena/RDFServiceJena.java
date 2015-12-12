@@ -91,16 +91,6 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 		}
 	}  
 
-    protected void notifyListenersOfChanges(ChangeSet changeSet)
-			throws IOException {
-		for (ModelChange modelChange: changeSet.getModelChanges()) {
-			modelChange.getSerializedModel().reset();
-			Model model = ModelFactory.createModelForGraph(
-					new ListeningGraph(modelChange.getGraphURI(), this));
-			operateOnModel(model, modelChange, null);
-		}
-	}
-
     protected void notifyListenersOfPostChangeEvents(ChangeSet changeSet) {
 		for (Object o : changeSet.getPostChangeEvents()) {
 		    this.notifyListenersOfEvent(o);

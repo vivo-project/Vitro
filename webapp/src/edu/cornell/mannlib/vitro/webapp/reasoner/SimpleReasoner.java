@@ -25,9 +25,12 @@ import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.ResIterator;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
@@ -38,15 +41,16 @@ import com.hp.hpl.jena.vocabulary.OWL;
 import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.ABoxJenaChangeListener;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DifferenceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 
 /**
@@ -56,7 +60,8 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceMod
  * @author sjm222
  */
 
-public class SimpleReasoner extends StatementListener {
+public class SimpleReasoner extends StatementListener 
+        implements ModelChangedListener, ChangeListener {
 
 	private static final Log log = LogFactory.getLog(SimpleReasoner.class);
 	
@@ -74,9 +79,6 @@ public class SimpleReasoner extends StatementListener {
 			VitroModelFactory.createOntologyModel())
 				.createAnnotationProperty(mostSpecificTypePropertyURI);
 	
-	private Queue<String> individualURIqueue = new IndividualURIQueue<String>();
-    private boolean accumulateChanges = false;
-
 	// Recomputer
 	private ABoxRecomputer recomputer = null;
 	private List<ReasonerPlugin> pluginList = new CopyOnWriteArrayList<ReasonerPlugin>();   
@@ -121,7 +123,7 @@ public class SimpleReasoner extends StatementListener {
 		    aboxModel.register(this);
 		} else {
 		    try {
-    		    rdfService.registerListener(new ABoxJenaChangeListener(this));
+    		    rdfService.registerListener(this);
     		} catch (RDFServiceException e) {
     		    throw new RuntimeException("Unable to register change listener", e);
     		}
@@ -169,28 +171,63 @@ public class SimpleReasoner extends StatementListener {
     }
   
     private void listenToStatement(Statement stmt) {
-        if(stmt.getSubject().isURIResource()) {
-            individualURIqueue.add(stmt.getSubject().getURI());
-        }
-        if(stmt.getObject().isURIResource() && !(RDF.type.equals(stmt.getPredicate()))) {
-            individualURIqueue.add(stmt.getObject().asResource().getURI());
-        }
-        if(!accumulateChanges) {
-            recomputeIndividuals(); 
-        }
+        Queue<String> individualURIs = new IndividualURIQueue<String>();
+        listenToStatement(stmt, individualURIs);
     }
     
-    private void recomputeIndividuals() {
-        if(recomputer.isRecomputing()) {
-            return;
+    private void listenToStatement(Statement stmt, Queue<String> individualURIs) {
+        if(stmt.getSubject().isURIResource()) {
+            individualURIs.add(stmt.getSubject().getURI());
         }
+        if(stmt.getObject().isURIResource() && !(RDF.type.equals(stmt.getPredicate()))) {
+            individualURIs.add(stmt.getObject().asResource().getURI());
+        }
+        recomputeIndividuals(individualURIs); 
+    }
+    
+    private void recomputeIndividuals(Queue<String> individualURIs) {
         long start = System.currentTimeMillis();
-        int size = individualURIqueue.size();
-        recomputer.recompute(individualURIqueue);
+        int size = individualURIs.size();
+        recomputer.recompute(individualURIs);
         if(size > 2) {
             log.info((System.currentTimeMillis() - start) + " ms to recompute " 
                     + size + " individuals");
         }
+    }
+    
+    boolean isABoxInferenceGraph(String graphURI) {
+        return ModelNames.ABOX_INFERENCES.equals(graphURI);
+    }
+    
+    boolean isTBoxGraph(String graphURI) {
+        return ( ModelNames.TBOX_ASSERTIONS.equals(graphURI)
+                 || ModelNames.TBOX_INFERENCES.equals(graphURI)
+                 || (graphURI != null && graphURI.contains("tbox")) );
+    }
+    
+    public void notifyModelChange(ModelChange modelChange) {
+        if(isABoxInferenceGraph(modelChange.getGraphURI()) 
+                || isTBoxGraph(modelChange.getGraphURI())) {
+            return;
+        }
+        Queue<String> individualURIs = new IndividualURIQueue<String>();
+        Model m = RDFServiceUtils.parseModel(modelChange.getSerializedModel(), 
+                modelChange.getSerializationFormat());
+        ResIterator subjIt = m.listSubjects();
+        while(subjIt.hasNext()) {
+            Resource subj = subjIt.next();
+            if(subj.isURIResource()) {
+                individualURIs.add(subj.getURI());
+            }
+        }
+        NodeIterator objIt = m.listObjects();
+        while(objIt.hasNext()) {
+            RDFNode obj = objIt.next();
+            if(obj.isURIResource()) {
+                individualURIs.add(obj.asResource().getURI());
+            }
+        }
+        recomputeIndividuals(individualURIs);
     }
     
 	/*
@@ -201,7 +238,7 @@ public class SimpleReasoner extends StatementListener {
 	@Override
 	public void addedStatement(Statement stmt) {
 	    doPlugins(ModelUpdate.Operation.ADD,stmt);
-	    listenToStatement(stmt);;	    
+	    listenToStatement(stmt);	   
 	}
 	
 	/*
@@ -212,17 +249,18 @@ public class SimpleReasoner extends StatementListener {
 	@Override
 	public void removedStatement(Statement stmt) {	
         doPlugins(ModelUpdate.Operation.RETRACT,stmt);
+        Queue<String> individualURIs = new IndividualURIQueue<String>();
         if(doSameAs && OWL.sameAs.equals(stmt.getPredicate())) {
             if (stmt.getSubject().isURIResource()) {
-               individualURIqueue.addAll(this.recomputer.getSameAsIndividuals(
+               individualURIs.addAll(this.recomputer.getSameAsIndividuals(
                        stmt.getSubject().getURI()));
             }
             if (stmt.getObject().isURIResource()) {
-                individualURIqueue.addAll(this.recomputer.getSameAsIndividuals(
+                individualURIs.addAll(this.recomputer.getSameAsIndividuals(
                         stmt.getObject().asResource().getURI()));
             }
         }
-	    listenToStatement(stmt);
+	    listenToStatement(stmt, individualURIs);
 	}	
 
     /**
@@ -1119,33 +1157,37 @@ public class SimpleReasoner extends StatementListener {
 	    }
 	}
 	  
-    // DeltaComputer    
 	/**
-	 * Asynchronous reasoning mode (DeltaComputer) was used in the case of batch removals. 
+	 * Asynchronous reasoning mode (DeltaComputer) no longer used in the case of batch removals. 
 	 */
 	public boolean isABoxReasoningAsynchronous() {
          return false;
 	}
     
+	@Override 
+	public void notifyEvent(String string, Object event) {
+	    // don't care
+	}
+	
 	@Override
 	public void notifyEvent(Model model, Object event) {	    
-	    if (event instanceof BulkUpdateEvent) {	
-	    	handleBulkUpdateEvent(event);
-	    }
+//	    if (event instanceof BulkUpdateEvent) {	
+//	    	handleBulkUpdateEvent(event);
+//	    }
 	}
 		
-	public synchronized void handleBulkUpdateEvent(Object event) {
-	    
-	    if (event instanceof BulkUpdateEvent) {	
-	    	if (((BulkUpdateEvent) event).getBegin()) {	
-	    	    this.accumulateChanges = true;
-	    	} else {
-	    		log.debug("received a bulk update end event");
-	    		this.accumulateChanges = false;
-	    		recomputeIndividuals();
-	    	}
-	    }
-	}
+//	public synchronized void handleBulkUpdateEvent(Object event) {
+//	    
+//	    if (event instanceof BulkUpdateEvent) {	
+//	    	if (((BulkUpdateEvent) event).getBegin()) {	
+//	    	    this.accumulateChanges = true;
+//	    	} else {
+//	    		log.debug("received a bulk update end event");
+//	    		this.accumulateChanges = false;
+//	    		recomputeIndividuals();
+//	    	}
+//	    }
+//	}
 	
 	/**
 	 * Utility method for logging

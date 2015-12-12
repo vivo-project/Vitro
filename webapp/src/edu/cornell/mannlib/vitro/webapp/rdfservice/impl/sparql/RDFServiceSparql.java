@@ -192,38 +192,40 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 				modelChange.getSerializedModel().mark(Integer.MAX_VALUE);
 				performChange(modelChange);
 			}
+			
+			notifyListenersOfChanges(changeSet);
 						
 			// notify listeners of triple changes
-			csIt = changeSet.getModelChanges().iterator();
-			while (csIt.hasNext()) {    
-				ModelChange modelChange = csIt.next();
-				modelChange.getSerializedModel().reset();
-				Model model = ModelFactory.createModelForGraph(
-						new ListeningGraph(modelChange.getGraphURI(), this));
-				long start = System.currentTimeMillis();
-				if (modelChange.getOperation() == ModelChange.Operation.ADD) {
-				    Model temp = ModelFactory.createDefaultModel();
-					temp.read(modelChange.getSerializedModel(), null,
-							getSerializationFormatString(
-									modelChange.getSerializationFormat()));
-					StmtIterator sit = temp.listStatements();
-					while(sit.hasNext()) {
-					    Triple triple = sit.nextStatement().asTriple();
-					    this.notifyListeners(triple, ModelChange.Operation.ADD, modelChange.getGraphURI());
-					}
-					//model.add(temp);
-				} else if (modelChange.getOperation() == ModelChange.Operation.REMOVE){
-					Model temp = ModelFactory.createDefaultModel();
-					temp.read(modelChange.getSerializedModel(), null,
-							getSerializationFormatString(
-									modelChange.getSerializationFormat()));
-					model.remove(temp);
-				} else {
-					log.error("Unsupported model change type " +
-							modelChange.getOperation().getClass().getName());
-				}
-				log.info((System.currentTimeMillis() - start) + " ms to notify " + this.getRegisteredListeners().size() + " listeners");
-			}
+//			csIt = changeSet.getModelChanges().iterator();
+//			while (csIt.hasNext()) {    
+//				ModelChange modelChange = csIt.next();
+//				modelChange.getSerializedModel().reset();
+//				Model model = ModelFactory.createModelForGraph(
+//						new ListeningGraph(modelChange.getGraphURI(), this));
+//				long start = System.currentTimeMillis();
+//				if (modelChange.getOperation() == ModelChange.Operation.ADD) {
+//				    Model temp = ModelFactory.createDefaultModel();
+//					temp.read(modelChange.getSerializedModel(), null,
+//							getSerializationFormatString(
+//									modelChange.getSerializationFormat()));
+//					StmtIterator sit = temp.listStatements();
+//					while(sit.hasNext()) {
+//					    Triple triple = sit.nextStatement().asTriple();
+//					    this.notifyListeners(triple, ModelChange.Operation.ADD, modelChange.getGraphURI());
+//					}
+//					//model.add(temp);
+//				} else if (modelChange.getOperation() == ModelChange.Operation.REMOVE){
+//					Model temp = ModelFactory.createDefaultModel();
+//					temp.read(modelChange.getSerializedModel(), null,
+//							getSerializationFormatString(
+//									modelChange.getSerializationFormat()));
+//					model.remove(temp);
+//				} else {
+//					log.error("Unsupported model change type " +
+//							modelChange.getOperation().getClass().getName());
+//				}
+//				log.info((System.currentTimeMillis() - start) + " ms to notify " + this.getRegisteredListeners().size() + " listeners");
+//			}
 
 			for (Object o : changeSet.getPostChangeEvents()) {
 				this.notifyListenersOfEvent(o);
@@ -606,45 +608,45 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		}
 	}
 
-	protected void addTriple(Triple t, String graphURI) throws RDFServiceException {
-		try {
-			StringBuffer updateString = new StringBuffer();
-			updateString.append("INSERT DATA { ");
-			updateString.append((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "");
-			updateString.append(sparqlNodeUpdate(t.getSubject(), ""));
-			updateString.append(" ");
-			updateString.append(sparqlNodeUpdate(t.getPredicate(), ""));
-			updateString.append(" ");
-			updateString.append(sparqlNodeUpdate(t.getObject(), ""));
-			updateString.append(" }");
-			updateString.append((graphURI != null) ? " } " : "");
-
-			executeUpdate(updateString.toString());
-			notifyListeners(t, ModelChange.Operation.ADD, graphURI);
-		} finally {
-			rebuildGraphURICache = true;
-		}
-	}
-
-	protected void removeTriple(Triple t, String graphURI) throws RDFServiceException {
-		try {
-			StringBuffer updateString = new StringBuffer();
-			updateString.append("DELETE DATA { ");
-			updateString.append((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "");
-			updateString.append(sparqlNodeUpdate(t.getSubject(), ""));
-			updateString.append(" ");
-			updateString.append(sparqlNodeUpdate(t.getPredicate(), ""));
-			updateString.append(" ");
-			updateString.append(sparqlNodeUpdate(t.getObject(), ""));
-			updateString.append(" }");
-			updateString.append((graphURI != null) ? " } " : "");
-
-			executeUpdate(updateString.toString());
-			notifyListeners(t, ModelChange.Operation.REMOVE, graphURI);
-		} finally {
-			rebuildGraphURICache = true;
-		}
-	}
+//	protected void addTriple(Triple t, String graphURI) throws RDFServiceException {
+//		try {
+//			StringBuffer updateString = new StringBuffer();
+//			updateString.append("INSERT DATA { ");
+//			updateString.append((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "");
+//			updateString.append(sparqlNodeUpdate(t.getSubject(), ""));
+//			updateString.append(" ");
+//			updateString.append(sparqlNodeUpdate(t.getPredicate(), ""));
+//			updateString.append(" ");
+//			updateString.append(sparqlNodeUpdate(t.getObject(), ""));
+//			updateString.append(" }");
+//			updateString.append((graphURI != null) ? " } " : "");
+//
+//			executeUpdate(updateString.toString());
+//			notifyListeners(t, ModelChange.Operation.ADD, graphURI);
+//		} finally {
+//			rebuildGraphURICache = true;
+//		}
+//	}
+//
+//	protected void removeTriple(Triple t, String graphURI) throws RDFServiceException {
+//		try {
+//			StringBuffer updateString = new StringBuffer();
+//			updateString.append("DELETE DATA { ");
+//			updateString.append((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "");
+//			updateString.append(sparqlNodeUpdate(t.getSubject(), ""));
+//			updateString.append(" ");
+//			updateString.append(sparqlNodeUpdate(t.getPredicate(), ""));
+//			updateString.append(" ");
+//			updateString.append(sparqlNodeUpdate(t.getObject(), ""));
+//			updateString.append(" }");
+//			updateString.append((graphURI != null) ? " } " : "");
+//
+//			executeUpdate(updateString.toString());
+//			notifyListeners(t, ModelChange.Operation.REMOVE, graphURI);
+//		} finally {
+//			rebuildGraphURICache = true;
+//		}
+//	}
 
 	@Override
 	protected boolean isPreconditionSatisfied(String query,

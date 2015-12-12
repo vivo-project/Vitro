@@ -5,13 +5,13 @@ package edu.cornell.mannlib.vitro.webapp.reasoner;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -93,15 +93,10 @@ public class ABoxRecomputer {
         return recomputing;
     }
 
-    public void recompute() {
-        recompute(null);
-    }
-    
     /**
-     * Recompute inferences for specified collection of individual URIs, 
-     * or all URIs if parameter is null
+     * Recompute all individuals
      */
-    public void recompute(Queue<String> individualURIs) {	
+    public void recompute() {
         synchronized (lock1) {
             if (recomputing) {
                 return;
@@ -109,51 +104,70 @@ public class ABoxRecomputer {
                 recomputing = true;
             }
         }
-        boolean fullRecompute = (individualURIs == null);
-        boolean sizableRecompute = (!fullRecompute && individualURIs.size() > 2);
         try {
-            if(fullRecompute || sizableRecompute) { // if doing a full rebuild
-                if (searchIndexer != null) {
-                    searchIndexer.pause();
-                    // Register now that we want to rebuild the index when we unpause
-                    // This allows the indexer to optimize behaviour whilst paused
-                    if(fullRecompute) {
-                        searchIndexer.rebuildIndex();
-                    }
-                }
+            if (searchIndexer != null) {
+                searchIndexer.pause();
+                // Register now that we want to rebuild the index when we unpause
+                // This allows the indexer to optimize behaviour whilst paused
+                searchIndexer.rebuildIndex();
             }
+            log.info("Recomputing ABox inferences.");
+            log.info("Finding individuals in ABox.");
+            Queue<String>individualURIs = this.getAllIndividualURIs();
+            log.info("Recomputing inferences for " + individualURIs.size() + " individuals");
             // Create a type cache for this execution and pass it to the recompute function
             // Ensures that caches are only valid for the length of one recompute
-            recomputeABox(individualURIs, new TypeCaches());
+            recomputeIndividuals(individualURIs, new TypeCaches());
+            log.info("Finished recomputing inferences");
         } finally {
-            if  ((fullRecompute || sizableRecompute) && searchIndexer != null) {
+            if(searchIndexer != null) {
                 searchIndexer.unpause();
             }
             synchronized (lock1) {
-                recomputing = false;	    		
+                recomputing = false;                
+            }
+        }
+    }
+    
+    /**
+     * Recompute inferences for specified collection of individual URIs, 
+     * or all URIs if parameter is null
+     */
+    public void recompute(Queue<String> individualURIs) {	
+        boolean sizableRecompute = (individualURIs.size() > 20);
+        try {
+            if(sizableRecompute && searchIndexer != null) { 
+                searchIndexer.pause();
+            }
+            recomputeIndividuals(individualURIs);
+        } finally {
+            if (sizableRecompute && searchIndexer != null) {
+                searchIndexer.unpause();
             }
         }
     }
 
     /*
      * Recompute the ABox inference graph for the specified collection of
-     * individual URIs, or all individuals if the collection is null.
+     * individual URIs
      */
-    protected void recomputeABox(Queue<String> individuals, TypeCaches caches) {
-        boolean printLog = false;
+    private void recomputeIndividuals(Queue<String> individuals) {
+        recomputeIndividuals(individuals, new TypeCaches());
+    }
+    
+    /*
+     * Recompute the ABox inference graph for the specified collection of
+     * individual URIs
+     */
+    protected void recomputeIndividuals(Queue<String> individuals, TypeCaches caches) {
         if (individuals == null) {
-            printLog = true;
-            log.info("Recomputing ABox inferences.");
-            log.info("Finding individuals in ABox.");
-            individuals = this.getAllIndividualURIs();
-            log.info("Recomputing inferences for " + individuals.size() + " individuals");
+            return;
         }
         long start = System.currentTimeMillis();
         int numInds = 0;
         Model rebuildModel = ModelFactory.createDefaultModel();
         Model additionalInferences = ModelFactory.createDefaultModel();
         List<String> individualsInBatch = new ArrayList<String>();
-        //Iterator<String> individualIt = individuals.iterator();
         while (!individuals.isEmpty()) {
             String individualURI = individuals.poll();
             try {
@@ -175,7 +189,7 @@ public class ABoxRecomputer {
                     log.info((System.currentTimeMillis() - start) / numInds + " ms per individual");
                 }
                 if (stopRequested) {
-                    log.info("a stopRequested signal was received during recomputeABox. Halting Processing.");
+                    log.info("a stopRequested signal was received during recomputeIndividuals. Halting Processing.");
                     return;
                 }
             } catch (Exception e) {
@@ -193,16 +207,13 @@ public class ABoxRecomputer {
                 log.error("Unable to write additional inferences from reasoner plugins", e);
             }
         }
-        if (printLog) {
-            log.info("Finished recomputing inferences");
-        }
     }
 
     private static final boolean RUN_PLUGINS = true;
     private static final boolean SKIP_PLUGINS = !RUN_PLUGINS;
 
     private Model recomputeIndividual(String individualURI, 
-            Model rebuildModel, TypeCaches caches, Queue<String> individualQueue) 
+            Model rebuildModel, TypeCaches caches, Collection<String> individualQueue) 
                     throws RDFServiceException {
         long start = System.currentTimeMillis();
         Model assertions = getAssertions(individualURI);

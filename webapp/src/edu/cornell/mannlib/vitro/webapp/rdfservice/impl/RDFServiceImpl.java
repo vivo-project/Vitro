@@ -3,12 +3,12 @@
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -18,20 +18,22 @@ import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QueryParseException;
-import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.sparql.resultset.XMLInput;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange.Operation;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.ListeningGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 public abstract class RDFServiceImpl implements RDFService {
@@ -42,6 +44,7 @@ public abstract class RDFServiceImpl implements RDFService {
 	
 	protected String defaultWriteGraphURI;
 	protected List<ChangeListener> registeredListeners = new CopyOnWriteArrayList<ChangeListener>();
+	protected List<ModelChangedListener> registeredJenaListeners = new CopyOnWriteArrayList<ModelChangedListener>();
     	
 	@Override
 	public void newIndividual(String individualURI, 
@@ -87,7 +90,6 @@ public abstract class RDFServiceImpl implements RDFService {
 		
 	@Override
 	public synchronized void registerListener(ChangeListener changeListener) throws RDFServiceException {
-		
 		if (!registeredListeners.contains(changeListener)) {
 		   registeredListeners.add(changeListener);
 		}
@@ -97,9 +99,25 @@ public abstract class RDFServiceImpl implements RDFService {
 	public synchronized void unregisterListener(ChangeListener changeListener) throws RDFServiceException {
 		registeredListeners.remove(changeListener);
 	}
+	
+	@Override
+	public synchronized void registerJenaModelChangedListener(ModelChangedListener changeListener) throws RDFServiceException {
+	    if (!registeredJenaListeners.contains(changeListener)) {
+	        registeredJenaListeners.add(changeListener);
+	    }
+	}
+
+	@Override
+	public synchronized void unregisterJenaModelChangedListener(ModelChangedListener changeListener) throws RDFServiceException {
+	    registeredJenaListeners.remove(changeListener);
+	}
 
 	public synchronized List<ChangeListener> getRegisteredListeners() {
 	    return this.registeredListeners;
+	}
+	
+	public synchronized List<ModelChangedListener> getRegisteredJenaModelChangedListeners() {
+	    return this.registeredJenaListeners;
 	}
 	
 	@Override
@@ -107,29 +125,58 @@ public abstract class RDFServiceImpl implements RDFService {
 		return new ChangeSetImpl();
 	}    
 
-	// I switched the following two methods back to public so they could be 
-	// used by the ListeningGraph, which is common to both implementations.
-	// This could probably be improved later.  BJL
+    protected void notifyListenersOfChanges(ChangeSet changeSet)
+            throws IOException {
+        if (registeredListeners.isEmpty() && registeredJenaListeners.isEmpty()) {
+            return;
+        }
+        for (ModelChange modelChange: changeSet.getModelChanges()) {
+            modelChange.getSerializedModel().reset();
+            notifyListeners(modelChange);
+        }
+    }
 	
-    public void notifyListeners(Triple triple, ModelChange.Operation operation, String graphURI) {    			
+    protected void notifyListeners(ModelChange modelChange) {    			
         Iterator<ChangeListener> iter = registeredListeners.iterator();
-
         while (iter.hasNext()) {
             ChangeListener listener = iter.next();
-            if (operation == ModelChange.Operation.ADD) {
-                listener.addedStatement(sparqlTriple(triple), graphURI);
-            } else {
-                listener.removedStatement(sparqlTriple(triple).toString(), graphURI);   			
-            }
+            listener.notifyModelChange(modelChange);
+        }
+        log.debug(registeredJenaListeners.size() + " registered Jena listeners");
+        if (registeredJenaListeners.isEmpty()) {
+            return;
+        }
+        Model tempModel = ModelFactory.createDefaultModel();
+        Iterator<ModelChangedListener> jenaIter = registeredJenaListeners.iterator();
+        while (jenaIter.hasNext()) {
+            ModelChangedListener listener = jenaIter.next(); 
+            log.debug("\t" + listener.getClass().getSimpleName());
+            tempModel.register(listener);
+        }
+        if (Operation.ADD.equals(modelChange.getOperation())) {
+            tempModel.read(modelChange.getSerializedModel(), null,
+                   RDFServiceUtils.getSerializationFormatString(
+                           modelChange.getSerializationFormat())); 
+        } else if (Operation.REMOVE.equals(modelChange.getOperation())) {
+            tempModel.remove(RDFServiceUtils.parseModel(
+                    modelChange.getSerializedModel(), 
+                    modelChange.getSerializationFormat()));
+        }
+        while (jenaIter.hasNext()) {
+            tempModel.unregister(jenaIter.next());
         }
     }
     
     public void notifyListenersOfEvent(Object event) {       
         Iterator<ChangeListener> iter = registeredListeners.iterator();
-
         while (iter.hasNext()) {
             ChangeListener listener = iter.next();
             // TODO what is the graphURI parameter for?
+            listener.notifyEvent(null, event);
+        }
+        Iterator<ModelChangedListener> jenaIter = registeredJenaListeners.iterator();
+        while (jenaIter.hasNext()) {
+            ModelChangedListener listener = jenaIter.next();
             listener.notifyEvent(null, event);
         }
     }    
