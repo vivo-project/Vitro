@@ -5,13 +5,11 @@ package edu.cornell.mannlib.vitro.webapp.reasoner;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -164,6 +162,7 @@ public class ABoxRecomputer {
             return;
         }
         long start = System.currentTimeMillis();
+        int size = individuals.size();
         int numInds = 0;
         Model rebuildModel = ModelFactory.createDefaultModel();
         Model additionalInferences = ModelFactory.createDefaultModel();
@@ -185,7 +184,7 @@ public class ABoxRecomputer {
                 }
                 if (reportingInterval) {
                     log.info("Still recomputing inferences (" 
-                            + numInds + "/" + individuals.size() + " individuals)");
+                            + numInds + "/" + size + " individuals)");
                     log.info((System.currentTimeMillis() - start) / numInds + " ms per individual");
                 }
                 if (stopRequested) {
@@ -437,7 +436,7 @@ public class ABoxRecomputer {
      * Get the URIs for all individuals in the system
      */
     protected Queue<String> getAllIndividualURIs() {
-        Queue<String> individualURIs = new ArrayDeque<String>();
+        Queue<String> individualURIs = new IndividualURIQueue<String>();
         List<String> classList = new ArrayList<String>();
         tboxModel.enterCriticalSection(Lock.READ);
         try {

@@ -16,10 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
-import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -60,7 +56,6 @@ import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.sparql.core.Quad;
 
-import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
@@ -68,10 +63,11 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.ChangeSetImpl;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.ListeningGraph;
+import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetQuadsIterator;
 import edu.cornell.mannlib.vitro.webapp.utils.sparql.ResultSetIterators.ResultSetTriplesIterator;
 

@@ -85,7 +85,6 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
 
         try {
             beginTransaction(sdbConn);
-        	startBulkUpdate();
         	notifyListenersOfPreChangeEvents(changeSet);
         	applyChangeSetToModel(changeSet, dataset);
             commitTransaction(sdbConn);
@@ -97,20 +96,7 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
             abortTransaction(sdbConn);
             throw new RDFServiceException(e);
         } finally {
-            endBulkUpdate();
             close(sdbConn);
-        }
-    }
-    
-    private void startBulkUpdate() {
-        for (ChangeListener cl : this.getRegisteredListeners()) {
-            cl.notifyEvent(null, new BulkUpdateEvent(null, true));
-        }
-    }
-    
-    private void endBulkUpdate() {
-        for (ChangeListener cl : this.getRegisteredListeners()) {
-            cl.notifyEvent(null, new BulkUpdateEvent(null, false));
         }
     }
     

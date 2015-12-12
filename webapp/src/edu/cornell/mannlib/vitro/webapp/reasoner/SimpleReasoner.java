@@ -3,14 +3,11 @@
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.commons.logging.Log;
@@ -79,7 +76,6 @@ public class SimpleReasoner extends StatementListener
 			VitroModelFactory.createOntologyModel())
 				.createAnnotationProperty(mostSpecificTypePropertyURI);
 	
-	// Recomputer
 	private ABoxRecomputer recomputer = null;
 	private List<ReasonerPlugin> pluginList = new CopyOnWriteArrayList<ReasonerPlugin>();   
     private boolean doSameAs = true;
@@ -148,8 +144,7 @@ public class SimpleReasoner extends StatementListener
 		Dataset ds = DatasetFactory.createMem();
 		ds.addNamedModel(ModelNames.ABOX_ASSERTIONS, aboxModel);
 		ds.addNamedModel(ModelNames.ABOX_INFERENCES, inferenceModel);
-		ds.addNamedModel(ModelNames.TBOX_ASSERTIONS, tboxModel);
-		
+		ds.addNamedModel(ModelNames.TBOX_ASSERTIONS, tboxModel);	
 		ds.setDefaultModel(ModelFactory.createUnion(fullModel, tboxModel));
 		recomputer = new ABoxRecomputer(tboxModel, aboxModel, new RDFServiceModel(ds), this, searchIndexer);
 	}
@@ -170,41 +165,6 @@ public class SimpleReasoner extends StatementListener
         return this.doSameAs;
     }
   
-    private void listenToStatement(Statement stmt) {
-        Queue<String> individualURIs = new IndividualURIQueue<String>();
-        listenToStatement(stmt, individualURIs);
-    }
-    
-    private void listenToStatement(Statement stmt, Queue<String> individualURIs) {
-        if(stmt.getSubject().isURIResource()) {
-            individualURIs.add(stmt.getSubject().getURI());
-        }
-        if(stmt.getObject().isURIResource() && !(RDF.type.equals(stmt.getPredicate()))) {
-            individualURIs.add(stmt.getObject().asResource().getURI());
-        }
-        recomputeIndividuals(individualURIs); 
-    }
-    
-    private void recomputeIndividuals(Queue<String> individualURIs) {
-        long start = System.currentTimeMillis();
-        int size = individualURIs.size();
-        recomputer.recompute(individualURIs);
-        if(size > 2) {
-            log.info((System.currentTimeMillis() - start) + " ms to recompute " 
-                    + size + " individuals");
-        }
-    }
-    
-    boolean isABoxInferenceGraph(String graphURI) {
-        return ModelNames.ABOX_INFERENCES.equals(graphURI);
-    }
-    
-    boolean isTBoxGraph(String graphURI) {
-        return ( ModelNames.TBOX_ASSERTIONS.equals(graphURI)
-                 || ModelNames.TBOX_INFERENCES.equals(graphURI)
-                 || (graphURI != null && graphURI.contains("tbox")) );
-    }
-    
     public void notifyModelChange(ModelChange modelChange) {
         if(isABoxInferenceGraph(modelChange.getGraphURI()) 
                 || isTBoxGraph(modelChange.getGraphURI())) {
@@ -230,24 +190,24 @@ public class SimpleReasoner extends StatementListener
         recomputeIndividuals(individualURIs);
     }
     
-	/*
-	 * Performs incremental ABox reasoning based
-	 * on the addition of a new statement
-	 *  (aka assertion) to the ABox.
-	 */
-	@Override
-	public void addedStatement(Statement stmt) {
-	    doPlugins(ModelUpdate.Operation.ADD,stmt);
-	    listenToStatement(stmt);	   
-	}
-	
-	/*
-	 * Performs incremental ABox reasoning based
-	 * on the retraction of a statement (aka assertion)
-	 * from the ABox. 
-	 */
-	@Override
-	public void removedStatement(Statement stmt) {	
+    /*
+     * Performs incremental ABox reasoning based
+     * on the addition of a new statement
+     *  (aka assertion) to the ABox.
+     */
+    @Override
+    public void addedStatement(Statement stmt) {
+        doPlugins(ModelUpdate.Operation.ADD,stmt);
+        listenToStatement(stmt);       
+    }
+    
+    /*
+     * Performs incremental ABox reasoning based
+     * on the retraction of a statement (aka assertion)
+     * from the ABox. 
+     */
+    @Override
+    public void removedStatement(Statement stmt) {  
         doPlugins(ModelUpdate.Operation.RETRACT,stmt);
         Queue<String> individualURIs = new IndividualURIQueue<String>();
         if(doSameAs && OWL.sameAs.equals(stmt.getPredicate())) {
@@ -260,9 +220,34 @@ public class SimpleReasoner extends StatementListener
                         stmt.getObject().asResource().getURI()));
             }
         }
-	    listenToStatement(stmt, individualURIs);
-	}	
+        listenToStatement(stmt, individualURIs);
+    }   
+    
+    private void listenToStatement(Statement stmt) {
+        Queue<String> individualURIs = new IndividualURIQueue<String>();
+        listenToStatement(stmt, individualURIs);
+    }
+    
+    private void listenToStatement(Statement stmt, Queue<String> individualURIs) {
+        if(stmt.getSubject().isURIResource()) {
+            individualURIs.add(stmt.getSubject().getURI());
+        }
+        if(stmt.getObject().isURIResource() && !(RDF.type.equals(stmt.getPredicate()))) {
+            individualURIs.add(stmt.getObject().asResource().getURI());
+        }
+        recomputeIndividuals(individualURIs); 
+    }
 
+    private void recomputeIndividuals(Queue<String> individualURIs) {
+        long start = System.currentTimeMillis();
+        int size = individualURIs.size();
+        recomputer.recompute(individualURIs);
+        if(size > 2) {
+            log.info((System.currentTimeMillis() - start) + " ms to recompute " 
+                    + size + " individuals");
+        }
+    }
+    
     /**
 	 * Performs incremental ABox reasoning based
 	 * on changes to the class hierarchy.
@@ -1158,11 +1143,22 @@ public class SimpleReasoner extends StatementListener
 	}
 	  
 	/**
-	 * Asynchronous reasoning mode (DeltaComputer) no longer used in the case of batch removals. 
+	 * Asynchronous reasoning mode (DeltaComputer) no longer used 
+	 * in the case of batch removals. 
 	 */
 	public boolean isABoxReasoningAsynchronous() {
          return false;
 	}
+	
+    boolean isABoxInferenceGraph(String graphURI) {
+        return ModelNames.ABOX_INFERENCES.equals(graphURI);
+    }
+    
+    boolean isTBoxGraph(String graphURI) {
+        return ( ModelNames.TBOX_ASSERTIONS.equals(graphURI)
+                 || ModelNames.TBOX_INFERENCES.equals(graphURI)
+                 || (graphURI != null && graphURI.contains("tbox")) );
+    }
     
 	@Override 
 	public void notifyEvent(String string, Object event) {
@@ -1171,23 +1167,8 @@ public class SimpleReasoner extends StatementListener
 	
 	@Override
 	public void notifyEvent(Model model, Object event) {	    
-//	    if (event instanceof BulkUpdateEvent) {	
-//	    	handleBulkUpdateEvent(event);
-//	    }
+	    // don't care
 	}
-		
-//	public synchronized void handleBulkUpdateEvent(Object event) {
-//	    
-//	    if (event instanceof BulkUpdateEvent) {	
-//	    	if (((BulkUpdateEvent) event).getBegin()) {	
-//	    	    this.accumulateChanges = true;
-//	    	} else {
-//	    		log.debug("received a bulk update end event");
-//	    		this.accumulateChanges = false;
-//	    		recomputeIndividuals();
-//	    	}
-//	    }
-//	}
 	
 	/**
 	 * Utility method for logging
@@ -1199,139 +1180,5 @@ public class SimpleReasoner extends StatementListener
                                   ? ((Literal)statement.getObject()).getLexicalForm() + " (Literal)"
                                   : ((Resource)statement.getObject()).getURI() + " (Resource)") + "]";
     }  
-    
-    private class IndividualURIQueue<E> implements Queue<E> {
-
-        private ConcurrentLinkedQueue<E> q = new ConcurrentLinkedQueue<E>();
-        private ConcurrentHashMap<E, Boolean> m = new ConcurrentHashMap<E, Boolean>();
-        
-        @Override
-        public synchronized boolean addAll(Collection<? extends E> c) {
-            boolean changed = false;
-            for (E e : c) {
-                if(!m.containsKey(e)) {
-                    m.put(e, Boolean.TRUE);
-                    q.add(e);
-                    changed = true;
-                }
-            }
-            return changed;
-        }
-        
-        @Override
-        public synchronized void clear() {
-            m.clear();
-            q.clear();
-        }
-        
-        @Override
-        public boolean contains(Object o) {
-            return m.contains(o);
-        }
-        
-        @Override
-        public boolean containsAll(Collection<?> c) {
-            boolean contains = true;
-            for(Object e : c) {
-                contains |= m.contains(e);
-            }
-            return contains;
-        }
-        
-        @Override
-        public boolean isEmpty() {
-            return q.isEmpty();
-        }
-        
-        @Override
-        public Iterator<E> iterator() {
-            return q.iterator();
-        }
-        
-        @Override
-        public synchronized boolean remove(Object o) {
-            m.remove(o);
-            return q.remove(o);
-        }
-        
-        @Override
-        public synchronized boolean removeAll(Collection<?> c) {
-            for (Object e : c) {
-                m.remove(e);
-            }
-            return q.removeAll(c);
-        }
-        
-        @Override
-        public synchronized boolean retainAll(Collection<?> c) {
-            boolean changed = false;
-            Iterator<E> it = m.keySet().iterator();
-            while(it.hasNext()) {
-                E e = it.next();
-                if(!c.contains(e)) {
-                   m.remove(e);
-                   q.remove(e);
-                   changed = true;
-                }
-            }
-            return changed;
-        }
-        
-        @Override
-        public int size() {
-            return m.size();
-        }
-        
-        @Override
-        public Object[] toArray() {
-            return q.toArray();
-        }
-        
-        @Override
-        public <T> T[] toArray(T[] a) {
-            return q.toArray(a);
-        }
-        
-        @Override
-        public synchronized boolean add(E e) {
-            if(m.containsKey(e)) {
-                return false;
-            } else {
-                m.put(e, Boolean.TRUE);
-                q.add(e);
-                return true;
-            }
-        }
-        
-        @Override
-        public E element() {
-            return q.element();
-        }
-        
-        @Override
-        public boolean offer(E e) {
-            return q.offer(e);
-        }
-        
-        @Override
-        public E peek() {
-            return q.peek();
-        }
-        
-        @Override
-        public synchronized E poll() {
-            E e =  q.poll();
-            m.remove(e);
-            return e;
-        }
-        
-        @Override
-        public synchronized E remove() {
-            E e = q.remove();
-            m.remove(e);
-            return e;
-        }
-        
-    }
     
 }
