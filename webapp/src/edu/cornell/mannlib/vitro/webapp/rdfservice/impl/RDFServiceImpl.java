@@ -130,12 +130,12 @@ public abstract class RDFServiceImpl implements RDFService {
             return;
         }
         for (ModelChange modelChange: changeSet.getModelChanges()) {
-            modelChange.getSerializedModel().reset();
             notifyListeners(modelChange);
         }
     }
 	
-    protected void notifyListeners(ModelChange modelChange) {    			
+    protected void notifyListeners(ModelChange modelChange) throws IOException {
+        modelChange.getSerializedModel().reset();
         Iterator<ChangeListener> iter = registeredListeners.iterator();
         while (iter.hasNext()) {
             ChangeListener listener = iter.next();
@@ -145,6 +145,7 @@ public abstract class RDFServiceImpl implements RDFService {
         if (registeredJenaListeners.isEmpty()) {
             return;
         }
+        modelChange.getSerializedModel().reset();
         Model tempModel = ModelFactory.createDefaultModel();
         Iterator<ModelChangedListener> jenaIter = registeredJenaListeners.iterator();
         while (jenaIter.hasNext()) {

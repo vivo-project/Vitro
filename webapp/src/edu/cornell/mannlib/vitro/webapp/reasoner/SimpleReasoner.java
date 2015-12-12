@@ -173,19 +173,9 @@ public class SimpleReasoner extends StatementListener
         Queue<String> individualURIs = new IndividualURIQueue<String>();
         Model m = RDFServiceUtils.parseModel(modelChange.getSerializedModel(), 
                 modelChange.getSerializationFormat());
-        ResIterator subjIt = m.listSubjects();
-        while(subjIt.hasNext()) {
-            Resource subj = subjIt.next();
-            if(subj.isURIResource()) {
-                individualURIs.add(subj.getURI());
-            }
-        }
-        NodeIterator objIt = m.listObjects();
-        while(objIt.hasNext()) {
-            RDFNode obj = objIt.next();
-            if(obj.isURIResource()) {
-                individualURIs.add(obj.asResource().getURI());
-            }
+        StmtIterator sit = m.listStatements();
+        while(sit.hasNext()) {
+            queueRelevantIndividuals(sit.nextStatement(), individualURIs);
         }
         recomputeIndividuals(individualURIs);
     }
@@ -198,7 +188,7 @@ public class SimpleReasoner extends StatementListener
     @Override
     public void addedStatement(Statement stmt) {
         doPlugins(ModelUpdate.Operation.ADD,stmt);
-        listenToStatement(stmt);       
+        listenToStatement(stmt, new IndividualURIQueue<String>());       
     }
     
     /*
@@ -223,19 +213,18 @@ public class SimpleReasoner extends StatementListener
         listenToStatement(stmt, individualURIs);
     }   
     
-    private void listenToStatement(Statement stmt) {
-        Queue<String> individualURIs = new IndividualURIQueue<String>();
-        listenToStatement(stmt, individualURIs);
+    private void listenToStatement(Statement stmt, Queue<String> individualURIs) {
+        queueRelevantIndividuals(stmt, individualURIs);
+        recomputeIndividuals(individualURIs); 
     }
     
-    private void listenToStatement(Statement stmt, Queue<String> individualURIs) {
+    private void queueRelevantIndividuals(Statement stmt, Queue<String> individualURIs) {
         if(stmt.getSubject().isURIResource()) {
             individualURIs.add(stmt.getSubject().getURI());
         }
         if(stmt.getObject().isURIResource() && !(RDF.type.equals(stmt.getPredicate()))) {
             individualURIs.add(stmt.getObject().asResource().getURI());
         }
-        recomputeIndividuals(individualURIs); 
     }
 
     private void recomputeIndividuals(Queue<String> individualURIs) {
