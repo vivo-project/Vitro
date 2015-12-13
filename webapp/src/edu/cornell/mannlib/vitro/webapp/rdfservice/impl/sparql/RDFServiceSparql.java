@@ -189,39 +189,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 				performChange(modelChange);
 			}
 			
-			notifyListenersOfChanges(changeSet);
-						
-			// notify listeners of triple changes
-//			csIt = changeSet.getModelChanges().iterator();
-//			while (csIt.hasNext()) {    
-//				ModelChange modelChange = csIt.next();
-//				modelChange.getSerializedModel().reset();
-//				Model model = ModelFactory.createModelForGraph(
-//						new ListeningGraph(modelChange.getGraphURI(), this));
-//				long start = System.currentTimeMillis();
-//				if (modelChange.getOperation() == ModelChange.Operation.ADD) {
-//				    Model temp = ModelFactory.createDefaultModel();
-//					temp.read(modelChange.getSerializedModel(), null,
-//							getSerializationFormatString(
-//									modelChange.getSerializationFormat()));
-//					StmtIterator sit = temp.listStatements();
-//					while(sit.hasNext()) {
-//					    Triple triple = sit.nextStatement().asTriple();
-//					    this.notifyListeners(triple, ModelChange.Operation.ADD, modelChange.getGraphURI());
-//					}
-//					//model.add(temp);
-//				} else if (modelChange.getOperation() == ModelChange.Operation.REMOVE){
-//					Model temp = ModelFactory.createDefaultModel();
-//					temp.read(modelChange.getSerializedModel(), null,
-//							getSerializationFormatString(
-//									modelChange.getSerializationFormat()));
-//					model.remove(temp);
-//				} else {
-//					log.error("Unsupported model change type " +
-//							modelChange.getOperation().getClass().getName());
-//				}
-//				log.info((System.currentTimeMillis() - start) + " ms to notify " + this.getRegisteredListeners().size() + " listeners");
-//			}
+			notifyListenersOfChanges(changeSet);						
 
 			for (Object o : changeSet.getPostChangeEvents()) {
 				this.notifyListenersOfEvent(o);
