@@ -6,6 +6,7 @@ Vitro is an integrated ontology editor and semantic web application.
 Vitro is a Java web application that runs in a Tomcat servlet container.
 
 With Vitro, you can:
+
 * Create or load ontologies in OWL format
 * Edit instances and relationships
 * Build a public web site to display your data
@@ -14,5 +15,5 @@ With Vitro, you can:
 Vitro was originally developed at Cornell University, and is used as the core of the popular
 research and scholarship portal, [VIVO](http://vivoweb.org) .
 
-For more information, contact the [VIVO community](http://vivoweb.org/contact).
+For more information, contact the [VIVO community](http://www.vivoweb.org/support/user-feedback).
 
