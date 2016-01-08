@@ -56,7 +56,7 @@ public class MailUtil {
 	            msg.setSubject( subject );
 
 	            // add the multipart to the message
-	            msg.setContent(messageText,"text/html");
+	            msg.setContent(messageText,"text/html; charset=UTF-8");
 
 	            // set the Date: header
 	            msg.setSentDate( new Date() );
