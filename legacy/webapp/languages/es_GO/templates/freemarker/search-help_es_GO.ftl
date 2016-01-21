@@ -34,8 +34,9 @@ ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/search.css" />'
            $('a#closeLink').click(function() {
               $('ul#advanced').css("visibility","hidden"); 
               $('a#closeLink').css("visibility","hidden");
+              return false;
            });
-
+           return false;
         });
     });
     
