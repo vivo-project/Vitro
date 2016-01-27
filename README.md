@@ -1,4 +1,6 @@
 # What is Vitro?
+
+[![Join the chat at https://gitter.im/vivo-project/Vitro](https://badges.gitter.im/vivo-project/Vitro.svg)](https://gitter.im/vivo-project/Vitro?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Vitro is a general-purpose web-based ontology and instance editor with customizable public browsing. 
 
 Vitro is an integrated ontology editor and semantic web application.
