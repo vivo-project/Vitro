@@ -171,7 +171,7 @@ public class MailUsersServlet extends VitroHttpServlet {
             msg.setSubject( deliveryfrom );
 
             // add the multipart to the message
-            msg.setContent(msgText,"text/html");
+            msg.setContent(msgText,"text/html; charset=UTF-8");
 
             // set the Date: header
             msg.setSentDate( new Date() );

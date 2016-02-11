@@ -172,15 +172,15 @@ public class FreemarkerEmailMessage {
 				if (htmlContent.isEmpty()) {
 					log.error("Message has neither text body nor HTML body");
 				} else {
-					msg.setContent(htmlContent, "text/html");
+					msg.setContent(htmlContent, "text/html; charset=UTF-8");
 				}
 			} else {
 				if (htmlContent.isEmpty()) {
-					msg.setContent(textContent, "text/plain");
+					msg.setContent(textContent, "text/plain; charset=UTF-8");
 				} else {
 					MimeMultipart content = new MimeMultipart("alternative");
-					addBodyPart(content, textContent, "text/plain");
-					addBodyPart(content, htmlContent, "text/html");
+					addBodyPart(content, textContent, "text/plain; charset=UTF-8");
+					addBodyPart(content, htmlContent, "text/html; charset=UTF-8");
 					msg.setContent(content);
 				}
 			}
