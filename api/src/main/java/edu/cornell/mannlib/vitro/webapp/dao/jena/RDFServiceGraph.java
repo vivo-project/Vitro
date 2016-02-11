@@ -5,9 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,6 +25,8 @@ import com.hp.hpl.jena.graph.impl.SimpleEventManager;
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.shared.AddDeniedException;
 import com.hp.hpl.jena.shared.Command;
 import com.hp.hpl.jena.shared.DeleteDeniedException;
@@ -53,10 +54,9 @@ public class RDFServiceGraph implements GraphWithPerform {
     private PrefixMapping prefixMapping = new PrefixMappingImpl();
     private GraphEventManager eventManager;
     
-    private boolean queueWrites = false;
-    private ConcurrentLinkedQueue<Triple> addTripleQueue = new ConcurrentLinkedQueue<Triple>();
-    private ConcurrentLinkedQueue<Triple> removeTripleQueue = new ConcurrentLinkedQueue<Triple>();
-
+    private boolean inTransaction = false;
+    private Graph additionsGraph = ModelFactory.createDefaultModel().getGraph();
+    private Graph removalsGraph = ModelFactory.createDefaultModel().getGraph();
 
     /**
      * Returns a SparqlGraph for the union of named graphs in a remote repository 
@@ -97,19 +97,20 @@ public class RDFServiceGraph implements GraphWithPerform {
         return sb.toString();
     }
         
-    public void flush() {
-        log.debug("Flushing a batch");                                
+    private synchronized void flush() {                                
         ChangeSet changeSet = rdfService.manufactureChangeSet();
         try {
-            if(!removeTripleQueue.isEmpty()) {
-                String removals = serializeQueue(removeTripleQueue);
+            if(!removalsGraph.isEmpty()) {
+                String removals = serializeGraph(removalsGraph);
                 changeSet.addRemoval(RDFServiceUtils.toInputStream(removals), 
                         RDFService.ModelSerializationFormat.N3, graphURI);
+                removalsGraph.clear();
             }
-            if(!addTripleQueue.isEmpty()) {
-                String additions = serializeQueue(addTripleQueue);
+            if(!additionsGraph.isEmpty()) {
+                String additions = serializeGraph(additionsGraph);
                 changeSet.addAddition(RDFServiceUtils.toInputStream(additions), 
                         RDFService.ModelSerializationFormat.N3, graphURI);
+                additionsGraph.clear();
             }
             rdfService.changeSetUpdate(changeSet);
         } catch (RDFServiceException rdfse) {
@@ -117,27 +118,60 @@ public class RDFServiceGraph implements GraphWithPerform {
         }
     }
     
-    private String serializeQueue(Queue<Triple> tripleQueue) {
+    private synchronized String serializeGraph(Graph graph) {
         String triples = "";
-        while(!tripleQueue.isEmpty()) {
-            triples += " \n" + serialize(tripleQueue.poll());
+        Iterator<Triple> tripIt = graph.find(null, null, null);
+        while(tripIt.hasNext()) {
+            triples += " \n" + serialize(tripIt.next());
         }
         return triples;
     }
     
     @Override
     public void performAdd(Triple t) {
-        addTripleQueue.add(t);
-        if(!queueWrites) {
-            flush();
+        if(inTransaction) {
+            stageAddition(t);
+        } else {
+            ChangeSet changeSet = rdfService.manufactureChangeSet();
+            try {
+                changeSet.addAddition(RDFServiceUtils.toInputStream(serialize(t)),
+                        RDFService.ModelSerializationFormat.N3, graphURI);
+                rdfService.changeSetUpdate(changeSet);
+            } catch (RDFServiceException rdfse) {
+                throw new RuntimeException(rdfse);
+            }
+        }
+    }
+    
+    private void stageAddition(Triple t) {
+        if(removalsGraph.contains(t)) {
+            removalsGraph.remove(t.getSubject(), t.getPredicate(), t.getObject());
+        } else {
+            additionsGraph.add(t);
         }
     }
     
     @Override
     public void performDelete(Triple t) {
-        removeTripleQueue.add(t);
-        if(!queueWrites) {
-            flush();
+        if(inTransaction) {
+            stageDeletion(t);
+        } else {
+            ChangeSet changeSet = rdfService.manufactureChangeSet();
+            try {
+                changeSet.addRemoval(RDFServiceUtils.toInputStream(serialize(t)),
+                        RDFService.ModelSerializationFormat.N3, graphURI);
+                rdfService.changeSetUpdate(changeSet);
+            } catch (RDFServiceException rdfse) {
+                throw new RuntimeException(rdfse);
+            }
+        }
+    }
+    
+    private synchronized void stageDeletion(Triple t) {
+        if(additionsGraph.contains(t)) {
+            additionsGraph.remove(t.getSubject(), t.getPredicate(), t.getObject());
+        } else {
+            removalsGraph.add(t);
         }
     }
     
@@ -148,13 +182,27 @@ public class RDFServiceGraph implements GraphWithPerform {
         }
         String constructStr = "CONSTRUCT { ?s ?p ?o } WHERE { GRAPH <" + graphURI + "> { ?s ?p ?o } }";
         try {
-            InputStream model = rdfService.sparqlConstructQuery(
-                    constructStr, RDFService.ModelSerializationFormat.N3);
-            ChangeSet changeSet = rdfService.manufactureChangeSet();
-            changeSet.addRemoval(model, RDFService.ModelSerializationFormat.N3, graphURI);
-            rdfService.changeSetUpdate(changeSet);
+            if(inTransaction) {
+                Model model = ModelFactory.createDefaultModel();
+                rdfService.sparqlConstructQuery(constructStr, model);
+                stageRemoveAll(model);
+            } else {
+                InputStream model = rdfService.sparqlConstructQuery(
+                        constructStr, RDFService.ModelSerializationFormat.N3);
+                ChangeSet changeSet = rdfService.manufactureChangeSet();
+                changeSet.addRemoval(model, RDFService.ModelSerializationFormat.N3, graphURI);
+                rdfService.changeSetUpdate(changeSet);
+            }
         } catch (RDFServiceException rdfse) {
             throw new RuntimeException(rdfse);
+        }
+    }
+    
+    private void stageRemoveAll(Model removals) {
+        StmtIterator sit = removals.listStatements();
+        while (sit.hasNext()) {
+            Triple t = sit.nextStatement().asTriple();
+            stageDeletion(t);
         }
     }
     
@@ -191,7 +239,22 @@ public class RDFServiceGraph implements GraphWithPerform {
 
         ResultSetConsumer.HasResult consumer = new ResultSetConsumer.HasResult();
         execSelect(containsQuery.toString(), consumer);
-        return consumer.hasResult();
+        boolean initialResult = consumer.hasResult();
+        if(!inTransaction) {
+            return initialResult;
+        } else {
+            Triple t = Triple.create(subject, predicate, object);
+            return (initialResult || additionsGraphContains(t)) 
+                    && !removalsGraphContains(t);
+        } 
+    }
+    
+    private synchronized boolean additionsGraphContains(Triple t) {
+        return additionsGraph.contains(t);
+    }
+    
+    private synchronized boolean removalsGraphContains(Triple t) {
+        return removalsGraph.contains(t);
     }
 
     @Override
@@ -284,7 +347,11 @@ public class RDFServiceGraph implements GraphWithPerform {
         String queryString = findQuery.toString();
 
         final List<Triple> triplist = new ArrayList<Triple>();
-
+        if(inTransaction) {
+            addAdditions(triplist, additionsGraph.find(subject, predicate, object));
+            subtractRemovals(triplist, removalsGraph.find(subject, predicate, object));
+        }
+        
         execSelect(queryString, new ResultSetConsumer() {
             @Override
             protected void processQuerySolution(QuerySolution qs) {
@@ -311,6 +378,24 @@ public class RDFServiceGraph implements GraphWithPerform {
         return WrappedIterator.create(triplist.iterator());
     }
 
+    private void addAdditions(List<Triple> tripList, ExtendedIterator<Triple> tripIt) {
+        while(tripIt.hasNext()) {
+            Triple t = tripIt.next();
+            if(!tripList.contains(t)) {
+                tripList.add(t);
+            }
+         }
+    }
+    
+    private void subtractRemovals(List<Triple> tripList, ExtendedIterator<Triple> tripIt) {
+        while(tripIt.hasNext()) {
+            Triple t = tripIt.next();
+            if(tripList.contains(t)) {
+                tripList.remove(t);
+            }
+         }
+    }
+    
     private boolean isVar(Node node) {
         return (node == null || node.isVariable() || node == Node.ANY);
     }
@@ -430,21 +515,21 @@ public class RDFServiceGraph implements GraphWithPerform {
 
 	private final TransactionHandler transactionHandler = new TransactionHandler() {
 	    @Override
-	    public void abort() {
-	        queueWrites = false;
-	        removeTripleQueue.clear();
-	        addTripleQueue.clear();
+	    public synchronized void abort() {
+	        inTransaction = false;
+	        removalsGraph.clear();
+	        additionsGraph.clear();
 	    }
 
         @Override
-        public void begin() {
-            queueWrites = true;
+        public synchronized void begin() {
+            inTransaction = true;
         }
 
         @Override
-        public void commit() {
+        public synchronized void commit() {
             flush();
-            queueWrites = false;
+            inTransaction = false;
         }
 
         @Override
