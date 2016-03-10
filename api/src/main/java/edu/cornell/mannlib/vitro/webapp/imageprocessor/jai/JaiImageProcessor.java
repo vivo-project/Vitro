@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.imageprocessor.jai;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorConvertOp;
 import java.awt.image.ColorModel;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -85,9 +86,10 @@ public class JaiImageProcessor implements ImageProcessor {
 			throws ImageProcessorException, IOException {
 		try {
 			RenderedOp mainImage = loadImage(mainImageStream);
-			RenderedOp opaqueImage = makeImageOpaque(mainImage);
 
-			BufferedImage bufferedImage = opaqueImage.getAsBufferedImage();
+			BufferedImage bufferedImage = new BufferedImage(mainImage.getWidth(), mainImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+			new ColorConvertOp(null).filter(mainImage.getAsBufferedImage(), bufferedImage);
+
 			log.debug("initial image: " + imageSize(bufferedImage));
 
 			log.debug("initial crop: " + crop);
@@ -132,7 +134,7 @@ public class JaiImageProcessor implements ImageProcessor {
 		}
 
 		if (image.getNumBands() == 4) {
-			// The image has a separate alpha channel. Drop the alpha channel.
+				// The image has a separate alpha channel. Drop the alpha channel.
 			return BandSelectDescriptor.create(image, COLOR_BAND_INDEXES, null);
 		}
 
