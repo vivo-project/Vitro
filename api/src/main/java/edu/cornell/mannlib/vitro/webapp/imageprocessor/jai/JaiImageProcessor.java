@@ -87,7 +87,7 @@ public class JaiImageProcessor implements ImageProcessor {
 		try {
 			RenderedOp mainImage = loadImage(mainImageStream);
 
-			BufferedImage bufferedImage = new BufferedImage(mainImage.getWidth(), mainImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+			BufferedImage bufferedImage = new BufferedImage(mainImage.getWidth(), mainImage.getHeight(), BufferedImage.TYPE_3BYTE_BGR); // BufferedImage.TYPE_INT_RGB
 			new ColorConvertOp(null).filter(mainImage.getAsBufferedImage(), bufferedImage);
 
 			log.debug("initial image: " + imageSize(bufferedImage));
