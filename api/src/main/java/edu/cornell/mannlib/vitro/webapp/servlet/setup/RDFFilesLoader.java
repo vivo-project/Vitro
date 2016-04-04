@@ -174,6 +174,8 @@ public class RDFFilesLoader {
 		String filename = p.getFileName().toString().toLowerCase();
 		if (filename.endsWith("n3"))
 			return "N3";
+		else if (filename.endsWith("nt"))
+			return "N-TRIPLES";
 		else if (filename.endsWith("ttl"))
 			return "TURTLE";
 		else
