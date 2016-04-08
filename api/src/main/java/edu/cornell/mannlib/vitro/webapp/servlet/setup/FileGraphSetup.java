@@ -160,7 +160,9 @@ public class FileGraphSetup implements ServletContextListener {
                 try {
                     OntModel model = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM); 
                     String fn = p.getFileName().toString().toLowerCase();
-                    if ( fn.endsWith(".n3") || fn.endsWith(".ttl") ) {
+                    if ( fn.endsWith(".nt") ) {
+                        model.read( fis, null, "N-TRIPLE" );
+                    } else if ( fn.endsWith(".n3") || fn.endsWith(".ttl") ) {
                         model.read( fis, null, "N3" );
                     } else if ( fn.endsWith(".owl") || fn.endsWith(".rdf") || fn.endsWith(".xml") ) {
                         model.read( fis, null, "RDF/XML" );
