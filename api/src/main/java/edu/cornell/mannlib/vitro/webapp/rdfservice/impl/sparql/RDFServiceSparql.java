@@ -929,6 +929,17 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		return fileModel.isIsomorphicWith(fromTripleStoreModel);
 	}
 
+	/**
+	 * The basic version. Parse the model from the file, read the model from the
+	 * tripleStore, and ask whether they are isomorphic.
+	 */
+	@Override
+	public boolean isEquivalentGraph(String graphURI, Model graph) throws RDFServiceException {
+		Model tripleStoreModel = new RDFServiceDataset(this).getNamedModel(graphURI);
+		Model fromTripleStoreModel = ModelFactory.createDefaultModel().add(tripleStoreModel);
+		return graph.isIsomorphicWith(fromTripleStoreModel);
+	}
+
 	protected HttpContext getContext(HttpRequestBase request) {
 		UsernamePasswordCredentials credentials = getCredentials();
 		if (credentials != null) {

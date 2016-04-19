@@ -290,6 +290,12 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
     	}
 
         @Override
+        public boolean isEquivalentGraph(String graphURI,
+                                         Model graph) throws RDFServiceException {
+            return s.isEquivalentGraph(graphURI, graph);
+        }
+
+        @Override
         public void close() {
             s.close();
         }

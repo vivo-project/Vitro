@@ -111,6 +111,15 @@ public class LoggingRDFService implements RDFService {
 		}
 	}
 
+	@Override
+	public boolean isEquivalentGraph(String graphURI,
+									 Model graph)
+			throws RDFServiceException {
+		try (RDFServiceLogger l = new RDFServiceLogger(graphURI)) {
+			return innerService.isEquivalentGraph(graphURI, graph);
+		}
+	}
+
 	// ----------------------------------------------------------------------
 	// Untimed methods
 	// ----------------------------------------------------------------------

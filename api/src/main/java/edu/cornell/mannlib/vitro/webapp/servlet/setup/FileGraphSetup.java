@@ -214,13 +214,10 @@ public class FileGraphSetup implements ServletContextListener {
     public boolean updateGraphInDB(RDFService rdfService, Model fileModel, String type, Path path) throws RDFServiceException {
         String graphURI = pathToURI(path,type);
         
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        fileModel.write(buffer, "N-TRIPLE");
-		InputStream inStream = new ByteArrayInputStream(buffer.toByteArray());
-		if (rdfService.isEquivalentGraph(graphURI, inStream, ModelSerializationFormat.NTRIPLE)) {
-			return false;
-		}
-        
+        if (rdfService.isEquivalentGraph(graphURI, fileModel)) {
+            return false;
+        }
+
 		Model dbModel = new RDFServiceDataset(rdfService).getNamedModel(graphURI);
 		if (log.isDebugEnabled()) {
 			log.debug(String.format(

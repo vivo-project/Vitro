@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.virtuoso;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -245,6 +246,24 @@ public class RDFServiceVirtuoso extends RDFServiceSparql {
 		}
 
 		return true;
+	}
+
+	/**
+	 * TDB has a bug: if given a literal of type xsd:nonNegativeInteger, it
+	 * stores a literal of type xsd:integer.
+	 *
+	 * To determine whether this serialized graph is equivalent to what's in
+	 * TDB, we need to do the same.
+	 */
+	@Override
+	public boolean isEquivalentGraph(String graphURI,
+									 Model graph)
+			throws RDFServiceException {
+
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		graph.write(buffer, "N-TRIPLE");
+		InputStream inStream = new ByteArrayInputStream(buffer.toByteArray());
+		return isEquivalentGraph(graphURI, inStream, ModelSerializationFormat.NTRIPLE);
 	}
 
 	/**

@@ -145,7 +145,13 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
     		return s.isEquivalentGraph(graphURI, serializedGraph, serializationFormat);
     	}
 
-       @Override
+        @Override
+        public boolean isEquivalentGraph(String graphURI,
+                                         Model graph) throws RDFServiceException {
+            return s.isEquivalentGraph(graphURI, graph);
+        }
+
+        @Override
         public void registerListener(ChangeListener changeListener)
                 throws RDFServiceException {
             s.registerListener(changeListener);
