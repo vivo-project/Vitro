@@ -705,14 +705,7 @@ public class EditConfigurationVTwo {
 
     public static EditConfigurationVTwo getConfigFromSession(HttpSession sess, String editKey){
         Map<String,EditConfigurationVTwo> configs = (Map<String,EditConfigurationVTwo>)sess.getAttribute("EditConfigurations");
-        if( configs == null )
-          return null;
-
-        EditConfigurationVTwo config = configs.get( editKey );
-        if( config == null )
-            return null;
-        else
-            return config;
+	return (configs != null) ? configs.get( editKey ) : null;
     }
 
     /**

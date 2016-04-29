@@ -2,10 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchindex;
 
-import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.PAUSE;
-import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.START_REBUILD;
-import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.UNPAUSE;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,6 +25,8 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
+
+import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.*;
 
 /**
  * When a change is heard, wait for an interval to see if more changes come in.
@@ -61,7 +59,7 @@ public class IndexingChangeListener implements ChangeListener,
 
 	private final SearchIndexer searchIndexer;
 	private final Ticker ticker;
-	private volatile boolean paused;
+	private volatile boolean rebuildScheduled;
     private final Model defaultModel;
 
 	/** All access to the list must be synchronized. */
@@ -78,25 +76,21 @@ public class IndexingChangeListener implements ChangeListener,
 
 	private synchronized void noteChange(Statement stmt) {
         changes.add(stmt); 
-		if (!paused) {
-			ticker.start();
-		}
+		ticker.start();
 	}
 
 	@Override
 	public void receiveSearchIndexerEvent(Event event) {
-		if (event.getType() == PAUSE) {
-			paused = true;
-		} else if (event.getType() == UNPAUSE) {
-			paused = false;
-			ticker.start();
+		if (event.getType() == REBUILD_REQUESTED) {
+			rebuildScheduled = true;
 		} else if (event.getType() == START_REBUILD) {
+			rebuildScheduled = false;
 			discardChanges();
 		}
 	}
 
 	private synchronized void respondToTicker() {
-		if (!paused && !changes.isEmpty()) {
+		if (!changes.isEmpty()) {
 			searchIndexer.scheduleUpdatesForStatements(changes);
 			changes.clear();
 		}
@@ -112,12 +106,16 @@ public class IndexingChangeListener implements ChangeListener,
 
 	@Override
 	public void addedStatement(String serializedTriple, String graphURI) {
-		noteChange(parseTriple(serializedTriple));
+		if (!rebuildScheduled) {
+			noteChange(parseTriple(serializedTriple));
+		}
 	}
 
 	@Override
 	public void removedStatement(String serializedTriple, String graphURI) {
-		noteChange(parseTriple(serializedTriple));
+		if (!rebuildScheduled) {
+			noteChange(parseTriple(serializedTriple));
+		}
 	}
 
 	/**
@@ -133,7 +131,7 @@ public class IndexingChangeListener implements ChangeListener,
 			}
 		} else {
 			log.debug("ignoring event " + event.getClass().getName() + " "
-                    + event);
+					+ event);
 		}
 	}
 

@@ -24,6 +24,7 @@ import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
 public class RDFServiceDatasetGraph implements DatasetGraph {
@@ -109,7 +110,7 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
     }
 
     @Override
-    public Iterator<Quad> find(Node graph, Node subject, Node predicate, Node object) {
+    public Iterator<Quad> find(final Node graph, final Node subject, final Node predicate, final Node object) {
         if (!isVar(subject) && !isVar(predicate)  && !isVar(object) &&!isVar(graph)) {
             if (contains(subject, predicate, object, graph)) {
                 return new SingletonIterator<Quad>(new Quad(subject, predicate, object, graph));
@@ -136,25 +137,23 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
         
         //log.info(findQuery.toString());
         
-        ResultSet rs = null;
-        
+        final List<Quad> quadlist = new ArrayList<Quad>();
         try {
-            rs = JSONInput.fromJSON(rdfService.sparqlSelectQuery(
-                    findQuery.toString(), RDFService.ResultFormat.JSON));
+            rdfService.sparqlSelectQuery(findQuery.toString(), new ResultSetConsumer() {
+                @Override
+                protected void processQuerySolution(QuerySolution qs) {
+                    Quad q = new Quad(isVar(graph) ? qs.get("?g").asNode() : graph,
+                            isVar(subject) ? qs.get("?s").asNode() : subject,
+                            isVar(predicate) ? qs.get("?p").asNode() : predicate,
+                            isVar(object) ? qs.get("?o").asNode() : object);
+
+                    quadlist.add(q);
+                }
+            });
         } catch (RDFServiceException rdfse) {
             throw new RuntimeException(rdfse);
         }
-        
-        List<Quad> quadlist = new ArrayList<Quad>();
-        while (rs.hasNext()) {
-            QuerySolution soln = rs.nextSolution();
-            Quad q = new Quad(isVar(graph) ? soln.get("?g").asNode() : graph,
-                                  isVar(subject) ? soln.get("?s").asNode() : subject, 
-                                  isVar(predicate) ? soln.get("?p").asNode() : predicate, 
-                                  isVar(object) ? soln.get("?o").asNode() : object);
-            //log.info(t);
-            quadlist.add(q);
-        }
+
         //log.info(triplist.size() + " results");
         return WrappedIterator.create(quadlist.iterator());    }
 

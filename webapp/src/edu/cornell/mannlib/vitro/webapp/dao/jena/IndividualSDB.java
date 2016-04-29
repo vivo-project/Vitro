@@ -17,6 +17,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.hp.hpl.jena.graph.NodeFactory;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
@@ -62,6 +64,8 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
+import javax.xml.soap.Node;
+
 public class IndividualSDB extends IndividualImpl implements Individual {
 
     private static final Log log = LogFactory.getLog(
@@ -83,6 +87,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                          WebappDaoFactorySDB wadf,
                          Model initModel) {
     	this.individualURI = individualURI;
+		this.webappDaoFactory = wadf;
     	this.dwf = datasetWrapperFactory;
       
     	try {
@@ -109,7 +114,6 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	        OntModelSpec.OWL_MEM, model);
     	this.ind = ontModel.createOntResource(individualURI);  
     	setUpURIParts(ind);
-        this.webappDaoFactory = wadf;
     }
     
     public IndividualSDB(String individualURI, 
@@ -120,17 +124,15 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	this.individualURI = individualURI;
     	this.datasetMode = datasetMode;
     	this.dwf = datasetWrapperFactory;
-    	
+		this.webappDaoFactory = wadf;
+
     	if (skipInitialization) {
             OntModel ontModel = ModelFactory.createOntologyModel(
                     OntModelSpec.OWL_MEM);
             this.ind = ontModel.createOntResource(individualURI);  
     	} else {
-        	DatasetWrapper w = getDatasetWrapper();
-        	Dataset dataset = w.getDataset();
         	try {
-    	    	dataset.getLock().enterCriticalSection(Lock.READ);
-    	    	String getStatements = 
+    	    	String getStatements =
     	    		"CONSTRUCT " +
     	    		"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
     	    		        "> ?ooo \n" +
@@ -138,18 +140,10 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	    		 	"{ <"+individualURI+">  <" + RDFS.label.getURI() + 
     	    		 	        "> ?ooo } \n" +
     	    		 "}";
-        		model = QueryExecutionFactory.create(
-        		        QueryFactory.create(getStatements), dataset)
-        		                .execConstruct();
-        	} finally {
-        	    if (dataset == null) {
-        	        throw new RuntimeException("dataset is null");
-        	    } else if (dataset.getLock() == null) {
-        	        throw new RuntimeException("dataset lock is null");
-        	    }
-        	    
-        		dataset.getLock().leaveCriticalSection();
-        		w.close();
+
+				model = ModelFactory.createDefaultModel();
+				webappDaoFactory.getRDFService().sparqlConstructQuery(getStatements, model);
+        	} catch (RDFServiceException e) {
         	}
         	
         	OntModel ontModel = ModelFactory.createOntologyModel(
@@ -162,31 +156,20 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         	this.ind = ontModel.createOntResource(individualURI);  
     	}
     	setUpURIParts(ind);
-        this.webappDaoFactory = wadf;
     }
     
     private boolean noTriplesFor(String individualURI) {
-        String ask = "ASK { <" + individualURI + "> ?p ?o }";
-        DatasetWrapper w = getDatasetWrapper();
-        Dataset dataset = w.getDataset();
-        dataset.getLock().enterCriticalSection(Lock.READ);
-        try {
-            Query askQuery = QueryFactory.create(ask, Syntax.syntaxARQ);
-            QueryExecution qe = QueryExecutionFactory.create(askQuery, dataset);
-            try {
-                return !qe.execAsk();
-            } finally {
-                qe.close();
-            }
-        } finally {
-            dataset.getLock().leaveCriticalSection();
-            w.close();
-        }
+		try {
+			return !webappDaoFactory.getRDFService().sparqlAskQuery("ASK { <" + individualURI + "> ?p ?o }");
+		} catch (RDFServiceException rse) {
+		}
+
+		return true;
     }
     
     static final boolean SKIP_INITIALIZATION = true;
-    
-    public IndividualSDB(String individualURI, 
+
+    public IndividualSDB(String individualURI,
             DatasetWrapperFactory datasetWrapperFactory,
             SDBDatasetMode datasetMode,
             WebappDaoFactorySDB wadf) throws IndividualNotFoundException {
@@ -277,23 +260,23 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     
     @Override
     public List<String> getMostSpecificTypeURIs() {
-        List<String> typeURIs = new ArrayList<String>();
+        final List<String> typeURIs = new ArrayList<String>();
         if (this.getURI() == null) {
             return typeURIs;
         } else {
             String queryStr = "SELECT ?type WHERE { <" + this.getURI() + "> <" + 
                     VitroVocabulary.MOST_SPECIFIC_TYPE + "> ?type }";
             try {
-                InputStream json = webappDaoFactory.getRDFService().sparqlSelectQuery(
-                        queryStr, RDFService.ResultFormat.JSON);
-                ResultSet rs = ResultSetFactory.fromJSON(json);
-                while (rs.hasNext()) {
-                    QuerySolution qsoln = rs.nextSolution();
-                    RDFNode node = qsoln.get("type");
-                    if (node.isURIResource()) {
-                        typeURIs.add(node.asResource().getURI());
-                    }
-                }
+				webappDaoFactory.getRDFService().sparqlSelectQuery(queryStr, new ResultSetConsumer() {
+					@Override
+					protected void processQuerySolution(QuerySolution qs) {
+						RDFNode node = qs.get("type");
+						if (node.isURIResource()) {
+							typeURIs.add(node.asResource().getURI());
+						}
+					}
+				});
+
                 return typeURIs;
             } catch (RDFServiceException e) {
                 throw new RuntimeException(e);
@@ -415,20 +398,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 "ASK { " +
                 "    <" + individualURI + "> <http://vitro.mannlib.cornell.edu/ns/vitro/public#mainImage> ?mainImage . \n" +
                 "    ?mainImage <http://vitro.mannlib.cornell.edu/ns/vitro/public#thumbnailImage> ?thumbImage . }\n"  ;                     
-          DatasetWrapper w = getDatasetWrapper();
-            Dataset dataset = w.getDataset();
-            dataset.getLock().enterCriticalSection(Lock.READ);
-            QueryExecution qexec = null;
-            try{            
-                qexec = QueryExecutionFactory.create(QueryFactory.create(ask), dataset);
-                _hasThumb = qexec.execAsk();
+            try{
+				_hasThumb = webappDaoFactory.getRDFService().sparqlAskQuery(ask);
             }catch(Exception ex){
                 _hasThumb = false;
                 log.error(ex,ex);
-            }finally{
-                if(qexec!=null) qexec.close();
-                dataset.getLock().leaveCriticalSection();
-                w.close();
             }
             return _hasThumb;
         }
@@ -762,33 +736,35 @@ public class IndividualSDB extends IndividualImpl implements Individual {
         }
     }
 
-    private List<DataPropertyStatement> sparqlForDataPropertyStatements(String propertyUri) {
-        List<DataPropertyStatement> stmts = new ArrayList<DataPropertyStatement>();
+    private List<DataPropertyStatement> sparqlForDataPropertyStatements(final String propertyUri) {
+        final List<DataPropertyStatement> stmts = new ArrayList<DataPropertyStatement>();
+		final IndividualSDB individualSDB = this;
+
         String queryStr = "SELECT (str(?value) as ?valueString) WHERE { <" 
                 + this.getURI() + "> <" + propertyUri + "> ?value }"; 
         try {
-            InputStream json = webappDaoFactory.getRDFService().sparqlSelectQuery(
-                    queryStr, RDFService.ResultFormat.JSON);
-            ResultSet rs = ResultSetFactory.fromJSON(json);    
-            while (rs.hasNext()) {
-                QuerySolution qsoln = rs.nextSolution();
-                RDFNode node = qsoln.get("valueString");
-                if (!node.isLiteral()) { 
-                    log.debug("Ignoring non-literal value for " + node + 
-                            " for property " + propertyUri);
-                } else {
-                    Literal lit = node.asLiteral();
-                    DataPropertyStatement stmt = new DataPropertyStatementImpl();
-                    
-                    stmt.setData(lit.getLexicalForm());
-                    stmt.setDatatypeURI(lit.getDatatypeURI());
-                    stmt.setLanguage(lit.getLanguage());
-                    stmt.setDatapropURI(propertyUri);
-                    stmt.setIndividualURI(this.getURI());
-                    stmt.setIndividual(this);
-                    stmts.add(stmt);
-                }
-            }
+			webappDaoFactory.getRDFService().sparqlSelectQuery(
+					queryStr, new ResultSetConsumer() {
+						@Override
+						protected void processQuerySolution(QuerySolution qs) {
+							RDFNode node = qs.get("valueString");
+							if (!node.isLiteral()) {
+								log.debug("Ignoring non-literal value for " + node +
+										" for property " + propertyUri);
+							} else {
+								Literal lit = node.asLiteral();
+								DataPropertyStatement stmt = new DataPropertyStatementImpl();
+
+								stmt.setData(lit.getLexicalForm());
+								stmt.setDatatypeURI(lit.getDatatypeURI());
+								stmt.setLanguage(lit.getLanguage());
+								stmt.setDatapropURI(propertyUri);
+								stmt.setIndividualURI(individualSDB.getURI());
+								stmt.setIndividual(individualSDB);
+								stmts.add(stmt);
+							}
+						}
+					});
         } catch (RDFServiceException e) {
             log.error(e,e);
             throw new RuntimeException(e);
@@ -843,14 +819,12 @@ public class IndividualSDB extends IndividualImpl implements Individual {
 		if (ind.getModel().contains((Resource) null, RDF.type, (RDFNode) null)){
 		    tempModel = ind.getModel();
 		} else {
+			tempModel = ModelFactory.createDefaultModel();
 			String getTypesQuery = buildMyVClassesQuery(assertedOnly);
-			
+
     		RDFService service = webappDaoFactory.getRDFService();	
         	try {
-        	    tempModel = RDFServiceUtils.parseModel(
-        	            service.sparqlConstructQuery(
-        	                    getTypesQuery, RDFService.ModelSerializationFormat.N3),
-        	                            RDFService.ModelSerializationFormat.N3);
+				service.sparqlConstructQuery(getTypesQuery, tempModel);
         	} catch (RDFServiceException e) {
         	    throw new RuntimeException(e);
         	}
@@ -1088,8 +1062,8 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     }
     
 	@Override
-	public void resolveAsFauxPropertyStatement(ObjectPropertyStatement stmt) {
-		webappDaoFactory.getObjectPropertyStatementDao().resolveAsFauxPropertyStatement(stmt);
+	public void resolveAsFauxPropertyStatements(List<ObjectPropertyStatement> list) {
+		webappDaoFactory.getObjectPropertyStatementDao().resolveAsFauxPropertyStatements(list);
 	}
     
 }

@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
@@ -44,6 +45,7 @@ import com.hp.hpl.jena.util.iterator.SingletonIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
+import org.apache.http.util.EntityUtils;
 
 public class SparqlGraph implements GraphWithPerform {
     
@@ -73,9 +75,7 @@ public class SparqlGraph implements GraphWithPerform {
        this.endpointURI = endpointURI;
        this.graphURI = graphURI;
        
-       PoolingClientConnectionManager cm = new PoolingClientConnectionManager();
-       cm.setDefaultMaxPerRoute(50);
-       this.httpClient = new DefaultHttpClient(cm);
+       this.httpClient = HttpClientFactory.getHttpClient();
     }
     
     public String getEndpointURI() {
@@ -91,22 +91,28 @@ public class SparqlGraph implements GraphWithPerform {
         performAdd(arg0);
     }
 
-    public void executeUpdate(String updateString) {    
+    public void executeUpdate(String updateString) {
+        HttpPost meth = new HttpPost(endpointURI);
         try {
-            HttpPost meth = new HttpPost(endpointURI);
             meth.addHeader("Content-Type", "application/x-www-form-urlencoded");
             meth.setEntity(new UrlEncodedFormEntity(Arrays.asList(
                     new BasicNameValuePair("update", updateString))));
             HttpResponse response = httpClient.execute(meth);
-            int statusCode = response.getStatusLine().getStatusCode();
-            if (statusCode > 399) {
-                log.error("response " + statusCode + " to update. \n");
-                throw new RuntimeException("Unable to perform SPARQL UPDATE: \n"
-                    + updateString);
+            try {
+                int statusCode = response.getStatusLine().getStatusCode();
+                if (statusCode > 399) {
+                    log.error("response " + statusCode + " to update. \n");
+                    throw new RuntimeException("Unable to perform SPARQL UPDATE: \n"
+                            + updateString);
+                }
+            } finally {
+                EntityUtils.consume(response.getEntity());
             }
         } catch (Exception e) {
             throw new RuntimeException("Unable to perform SPARQL UPDATE", e);
-        } 
+        } finally {
+            meth.abort();
+        }
     }
     
     @Override

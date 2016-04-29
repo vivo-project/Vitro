@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -61,7 +63,7 @@ class IndividualResponseBuilder {
 	private final ExecuteDataRetrieval eDataRetrieval;
 
 	private final Individual individual;
-	
+
 	public IndividualResponseBuilder(VitroRequest vreq, Individual individual) {
 		this.vreq = vreq;
 		this.wadf = vreq.getWebappDaoFactory();
@@ -73,6 +75,7 @@ class IndividualResponseBuilder {
 		this.eDataRetrieval = new ExecuteDataRetrieval(this.vreq, this.vreq.getDisplayModel(), this.individual);
 	}
 
+
 	ResponseValues assembleResponse() throws TemplateModelException {
 		Map<String, Object> body = new HashMap<String, Object>();
 		
@@ -82,7 +85,9 @@ class IndividualResponseBuilder {
 		body.put("temporalVisualizationEnabled", getTemporalVisualizationFlag());
 		body.put("profilePageTypesEnabled", getprofilePageTypesFlag());
 		body.put("verbosePropertySwitch", getVerbosePropertyValues());
-		
+
+        addAltMetricOptions(body);
+
 		//Execute data getters that might apply to this individual, e.g. because of the class of the individual
 		try{
 			this.eDataRetrieval.executeDataGetters(body);
@@ -170,7 +175,32 @@ class IndividualResponseBuilder {
         }
         return map;
     }
-    
+
+    private void addAltMetricOptions(Map<String, Object> body) {
+        ConfigurationProperties properties = ConfigurationProperties.getBean(vreq);
+
+        if (properties != null) {
+            String enabled        = properties.getProperty("resource.altmetric"); //, "enabled"
+            String displayTo      = properties.getProperty("resource.altmetric.displayto", "right");
+            String badgeType      = properties.getProperty("resource.altmetric.badge-type", "donut");
+            String badgeHideEmpty = properties.getProperty("resource.altmetric.hide-no-mentions", "true");
+            String badgePopover   = properties.getProperty("resource.altmetric.badge-popover", "right");
+            String badgeDetails   = properties.getProperty("resource.altmetric.badge-details");
+
+            if (!"disabled".equalsIgnoreCase(enabled)) {
+                body.put("altmetricEnabled", true);
+
+                body.put("altmetricDisplayTo", displayTo);
+                body.put("altmetricBadgeType", badgeType);
+                if ("true".equalsIgnoreCase(badgeHideEmpty)) {
+                    body.put("altmetricHideEmpty", true);
+                }
+                body.put("altmetricPopover", badgePopover);
+                body.put("altmetricDetails", badgeDetails);
+            }
+        }
+    }
+
 	private boolean getTemporalVisualizationFlag() {
 		String property = ConfigurationProperties.getBean(vreq).getProperty(
 				"visualization.temporal");
@@ -290,8 +320,10 @@ class IndividualResponseBuilder {
             ResultSet results = QueryUtils.getLanguageNeutralQueryResults(queryStr, vreq);
             if (results.hasNext()) {
                 QuerySolution soln = results.nextSolution();
-                String countStr = soln.get("labelCount").toString();
-                theCount = Integer.parseInt(countStr);
+                RDFNode labelCount = soln.get("labelCount");
+                if (labelCount != null && labelCount.isLiteral()) {
+                    theCount = labelCount.asLiteral().getInt();
+                }
             }
         } catch (Exception e) {
             log.error(e, e);
@@ -309,8 +341,10 @@ class IndividualResponseBuilder {
                ResultSet results = QueryUtils.getLanguageNeutralQueryResults(queryStr, vreq);
                if (results.hasNext()) {
                    QuerySolution soln = results.nextSolution();
-                   String countStr = soln.get("languageCount").toString();
-                   theCount = Integer.parseInt(countStr);
+                   RDFNode languageCount = soln.get("languageCount");
+                   if (languageCount != null && languageCount.isLiteral()) {
+                       theCount = languageCount.asLiteral().getInt();
+                   }
                }
            } catch (Exception e) {
                log.error(e, e);

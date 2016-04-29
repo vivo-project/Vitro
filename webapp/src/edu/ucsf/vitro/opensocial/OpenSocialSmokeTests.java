@@ -18,12 +18,14 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
@@ -349,7 +351,7 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 
 		private final String shindigBaseUrl;
 		private final String shindigTestUrl;
-		private final DefaultHttpClient httpClient = new DefaultHttpClient();
+		private final HttpClient httpClient = HttpClientFactory.getHttpClient();
 
 		private int statusCode = Integer.MIN_VALUE;
 
