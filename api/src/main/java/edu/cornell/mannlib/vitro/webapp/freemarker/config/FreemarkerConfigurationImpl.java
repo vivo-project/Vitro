@@ -14,6 +14,9 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import freemarker.core.ParseException;
+import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.TemplateNotFoundException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -145,9 +148,8 @@ public class FreemarkerConfigurationImpl extends Configuration {
 	 * it must call retrieveAndRunDataGetters() for the top-level Template.
 	 */
 	@Override
-	public Template getTemplate(String name, Locale locale, String encoding,
-			boolean parse) throws IOException {
-		Template template = super.getTemplate(name, locale, encoding, parse);
+	public Template getTemplate(String name, Locale locale, Object customLookupCondition, String encoding, boolean parseAsFTL, boolean ignoreMissing) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException {
+		Template template = super.getTemplate(name, locale, customLookupCondition, encoding, parseAsFTL, ignoreMissing);
 
 		if (template == null) {
 			log.debug("Template '" + name + "' not found for locale '" + locale
