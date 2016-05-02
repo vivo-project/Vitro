@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice;
 
+import com.hp.hpl.jena.rdf.model.ModelChangedListener;
+
 public interface RDFServiceFactory {
 
     /**
@@ -37,11 +39,29 @@ public interface RDFServiceFactory {
     
     /**
      * Unregisters a listener from listening to changes in the RDF store.
-     * Any RDFService objects returned by this factory should notify
+     * Any RDFService objects returned by this factory should no longer notify
      * this listener of changes.
      * 
      * @param changeListener - the change listener
      */
     public void unregisterListener(ChangeListener changeListener) throws RDFServiceException;
+    
+    /**
+     * Registers a Jena ModelChangedListener to listen to changes in any graph in
+     * the RDF store.  Any RDFService objects returned by this factory
+     * should notify this listener of changes.
+     * 
+     * @param changeListener - the change listener
+     */
+    public void registerJenaModelChangedListener(ModelChangedListener changeListener) throws RDFServiceException;
+    
+    /**
+     * Unregisters a Jena ModelChangedListener from listening to changes in the RDF store.
+     * Any RDFService objects returned by this factory should no longer notify
+     * this listener of changes.
+     * 
+     * @param changeListener - the change listener
+     */
+    public void unregisterJenaModelChangedListener(ModelChangedListener changeListener) throws RDFServiceException;
     
 }

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -23,6 +22,7 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -36,6 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ModelSerializationFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceImpl;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
@@ -74,6 +75,16 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
     @Override
     public void unregisterListener(ChangeListener changeListener) throws RDFServiceException {
         f.registerListener(changeListener);
+    }
+    
+    @Override
+    public void registerJenaModelChangedListener(ModelChangedListener changeListener) throws RDFServiceException {
+        f.registerJenaModelChangedListener(changeListener);
+    }
+    
+    @Override
+    public void unregisterJenaModelChangedListener(ModelChangedListener changeListener) throws RDFServiceException {
+        f.registerJenaModelChangedListener(changeListener);
     }
     
     public class SameAsFilteringRDFService extends RDFServiceImpl implements RDFService {

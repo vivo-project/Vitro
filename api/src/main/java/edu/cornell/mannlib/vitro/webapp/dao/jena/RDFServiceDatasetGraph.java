@@ -6,18 +6,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.ReadWrite;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.shared.LockMRSW;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
 import com.hp.hpl.jena.sparql.core.Quad;
-import com.hp.hpl.jena.sparql.resultset.JSONInput;
 import com.hp.hpl.jena.sparql.util.Context;
 import com.hp.hpl.jena.util.iterator.SingletonIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
@@ -32,11 +33,25 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
     private RDFService rdfService;
     private Lock lock = new LockMRSW();
     private Context context = new Context() ;
-
+    private Map<String, RDFServiceGraph> graphCache = new ConcurrentHashMap<String, RDFServiceGraph>();
+    private ReadWrite transactionMode;
+    
     public RDFServiceDatasetGraph(RDFService rdfService) {
         this.rdfService = rdfService;
     }
 
+    public Map<String, RDFServiceGraph> getGraphCache() {
+        return graphCache;
+    }
+    
+    public void begin(ReadWrite mode) {
+        this.transactionMode = mode;
+    }
+    
+    public void end() {
+        this.transactionMode = null;
+    }
+    
     private Graph getGraphFor(Quad q) {
         return getGraphFor(q.getGraph());
     }
@@ -44,7 +59,7 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
     private Graph getGraphFor(Node g) {
         return (g == Node.ANY) 
                 ? new RDFServiceGraph(rdfService) 
-                : new RDFServiceGraph(rdfService, g.getURI());
+                : getGraph(g);
     }
     
     @Override
@@ -172,10 +187,25 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
     public RDFServiceGraph getDefaultGraph() {
         return new RDFServiceGraph(rdfService);
     }
-
+    
     @Override
     public RDFServiceGraph getGraph(Node arg0) {
-        return new RDFServiceGraph(rdfService, arg0.getURI());
+        String graphURI = arg0.getURI();
+        if(graphCache.containsKey(graphURI)) {
+            return graphCache.get(graphURI);
+        } else {
+            RDFServiceGraph graph = new RDFServiceGraph(rdfService, arg0.getURI());
+            graphCache.put(graphURI, graph);
+            if(transactionMode != null && supportsTransactions(graph)) {
+                graph.getTransactionHandler().begin();
+            }
+            return graph;
+        }
+    }
+    
+    private boolean supportsTransactions(Graph graph) {
+        return (graph.getTransactionHandler() != null 
+                && graph.getTransactionHandler().transactionsSupported());
     }
 
     @Override
@@ -205,13 +235,11 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
     @Override
     public void removeGraph(Node arg0) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void setDefaultGraph(Graph arg0) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -229,4 +257,5 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
 		return "RDFServiceDatasetGraph[" + ToString.hashHex(this)
 				+ ", " + rdfService + "]";
 	}
+	
 }

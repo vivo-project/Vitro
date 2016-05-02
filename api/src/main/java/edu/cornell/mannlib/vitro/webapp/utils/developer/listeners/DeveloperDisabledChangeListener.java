@@ -2,7 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.developer.listeners;
 
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
+import com.hp.hpl.jena.rdf.listeners.StatementListener;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelChangedListener;
+import com.hp.hpl.jena.rdf.model.Statement;
+
 import edu.cornell.mannlib.vitro.webapp.utils.developer.DeveloperSettings;
 import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
 
@@ -11,11 +15,12 @@ import edu.cornell.mannlib.vitro.webapp.utils.developer.Key;
  * 
  * Set the flag and this becomes opaque, passing no events through.
  */
-public class DeveloperDisabledChangeListener implements ChangeListener {
-	private final ChangeListener inner;
+public class DeveloperDisabledChangeListener extends StatementListener 
+        implements ModelChangedListener {
+	private final ModelChangedListener inner;
 	private final Key disablingKey;
 
-	public DeveloperDisabledChangeListener(ChangeListener inner,
+	public DeveloperDisabledChangeListener(ModelChangedListener inner,
 			Key disablingKey) {
 		this.inner = inner;
 		this.disablingKey = disablingKey;
@@ -30,23 +35,23 @@ public class DeveloperDisabledChangeListener implements ChangeListener {
 	// ----------------------------------------------------------------------
 
 	@Override
-	public void addedStatement(String serializedTriple, String graphURI) {
+	public void addedStatement(Statement stmt) {
 		if (isEnabled()) {
-			inner.addedStatement(serializedTriple, graphURI);
+			inner.addedStatement(stmt);
 		}
 	}
 
 	@Override
-	public void removedStatement(String serializedTriple, String graphURI) {
+	public void removedStatement(Statement stmt) {
 		if (isEnabled()) {
-			inner.removedStatement(serializedTriple, graphURI);
+			inner.removedStatement(stmt);
 		}
 	}
 
 	@Override
-	public void notifyEvent(String graphURI, Object event) {
+	public void notifyEvent(Model model, Object event) {
 		if (isEnabled()) {
-			inner.notifyEvent(graphURI, event);
+			inner.notifyEvent(model, event);
 		}
 	}
 

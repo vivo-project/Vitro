@@ -12,14 +12,12 @@ import org.apache.commons.logging.LogFactory;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.DatasetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ModelChange;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.ListeningGraph;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.RDFServiceJena;
 
 public class RDFServiceModel extends RDFServiceJena implements RDFService {
@@ -102,14 +100,15 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
             }
                         
             // notify listeners of triple changes
-            csIt = changeSet.getModelChanges().iterator();
-            while (csIt.hasNext()) {
-                ModelChange modelChange = csIt.next();
-                modelChange.getSerializedModel().reset();
-                Model model = ModelFactory.createModelForGraph(
-                        new ListeningGraph(modelChange.getGraphURI(), this));
-                operateOnModel(model, modelChange, null);
-            }
+            notifyListenersOfChanges(changeSet);
+//            csIt = changeSet.getModelChanges().iterator();
+//            while (csIt.hasNext()) {
+//                ModelChange modelChange = csIt.next();
+//                modelChange.getSerializedModel().reset();
+//                Model model = ModelFactory.createModelForGraph(
+//                        new ListeningGraph(modelChange.getGraphURI(), this));
+//                operateOnModel(model, modelChange, null);
+//            }
             
             for (Object o : changeSet.getPostChangeEvents()) {
                 this.notifyListenersOfEvent(o);

@@ -5,8 +5,13 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.NodeFactory;
+import com.hp.hpl.jena.graph.TransactionHandler;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.query.LabelExistsException;
 import com.hp.hpl.jena.query.ReadWrite;
@@ -21,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 public class RDFServiceDataset implements Dataset {
 
     private RDFServiceDatasetGraph g;
+    private ReadWrite transactionMode;
     
     public RDFServiceDataset(RDFServiceDatasetGraph g) {
         this.g = g;
@@ -55,9 +61,13 @@ public class RDFServiceDataset implements Dataset {
         return g.getLock();
     }
 
+    private final static Log log = LogFactory.getLog(RDFServiceDataset.class);
+    
     @Override
     public Model getNamedModel(String arg0) {
-        return RDFServiceGraph.createRDFServiceModel(g.getGraph(NodeFactory.createURI(arg0)));
+        Model model = RDFServiceGraph.createRDFServiceModel(
+                g.getGraph(NodeFactory.createURI(arg0)));
+        return model;
     }
 
     @Override
@@ -108,36 +118,60 @@ public class RDFServiceDataset implements Dataset {
 
 	@Override
 	public boolean supportsTransactions() {
-		return false;
+		if (g.getDefaultGraph().getTransactionHandler() == null) {
+		    return false;
+		} else {
+		    return g.getDefaultGraph().getTransactionHandler().transactionsSupported();
+		}
 	}
 
 	@Override
 	public boolean isInTransaction() {
-		return false;
+		return (transactionMode != null);
 	}
+	
+    private boolean supportsTransactions(Graph graph) {
+        return (graph.getTransactionHandler() != null 
+                && graph.getTransactionHandler().transactionsSupported());
+    }
 
 	@Override
 	public void begin(ReadWrite arg0) {
-		throw new UnsupportedOperationException(this.getClass().getSimpleName()
-				+ " does not support transactions.");
+	    this.transactionMode = arg0;
+	    g.begin(arg0);
+	    for(String graphURI : g.getGraphCache().keySet()) {
+            Graph graph = g.getGraphCache().get(graphURI);
+            if (supportsTransactions(graph)) {
+                graph.getTransactionHandler().begin();
+            }
+        }
 	}
 
 	@Override
 	public void commit() {
-		throw new UnsupportedOperationException(this.getClass().getSimpleName()
-				+ " does not support transactions.");
+	    for(String graphURI : g.getGraphCache().keySet()) {
+            Graph graph = g.getGraphCache().get(graphURI);
+            if(supportsTransactions(graph)) {
+                graph.getTransactionHandler().commit();
+            }
+        }
 	}
 
 	@Override
 	public void abort() {
-		throw new UnsupportedOperationException(this.getClass().getSimpleName()
-				+ " does not support transactions.");
+	    for(String graphURI : g.getGraphCache().keySet()) {
+            Graph graph = g.getGraphCache().get(graphURI);
+            if(supportsTransactions(graph)) {
+                graph.getTransactionHandler().abort();
+            }
+        }
 	}
 
 	@Override
 	public void end() {
-		throw new UnsupportedOperationException(this.getClass().getSimpleName()
-				+ " does not support transactions.");
+	    // the Graph tranaction handlers don't seem to support .end()
+	    this.transactionMode = null;
+	    g.end();
 	}
 
 	@Override

@@ -55,7 +55,7 @@ public class SearchIndexerSetup implements ServletContextListener {
 			listener = new IndexingChangeListener(searchIndexer);
 			listenerWrapper = new DeveloperDisabledChangeListener(listener,
 					Key.SEARCH_INDEX_SUPPRESS_MODEL_CHANGE_LISTENER);
-			RDFServiceUtils.getRDFServiceFactory(ctx).registerListener(
+			RDFServiceUtils.getRDFServiceFactory(ctx).registerJenaModelChangedListener(
 					listenerWrapper);
 
 			this.history = new IndexHistory();
@@ -78,7 +78,7 @@ public class SearchIndexerSetup implements ServletContextListener {
 		searchIndexer.removeListener(this.history);
 
 		try {
-			RDFServiceUtils.getRDFServiceFactory(ctx).unregisterListener(
+			RDFServiceUtils.getRDFServiceFactory(ctx).unregisterJenaModelChangedListener(
 					listenerWrapper);
 		} catch (RDFServiceException e) {
 			log.warn("Failed to unregister the indexing listener.");

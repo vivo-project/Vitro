@@ -7,6 +7,8 @@ import java.io.OutputStream;
 import java.util.List;
 
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelChangedListener;
+
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -46,6 +48,16 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
     @Override
     public void unregisterListener(ChangeListener listener) throws RDFServiceException {
         this.rdfService.unregisterListener(listener);
+    }
+    
+    @Override
+    public void registerJenaModelChangedListener(ModelChangedListener listener) throws RDFServiceException {
+        this.rdfService.registerJenaModelChangedListener(listener);
+    }
+    
+    @Override
+    public void unregisterJenaModelChangedListener(ModelChangedListener listener) throws RDFServiceException {
+        this.rdfService.unregisterJenaModelChangedListener(listener);
     }
     
     public class UnclosableRDFService implements RDFService {
@@ -161,6 +173,18 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
         public void unregisterListener(ChangeListener changeListener)
                 throws RDFServiceException {
             s.unregisterListener(changeListener);
+        }
+        
+        @Override
+        public void registerJenaModelChangedListener(ModelChangedListener changeListener)
+                throws RDFServiceException {
+            s.registerJenaModelChangedListener(changeListener);
+        }
+
+        @Override
+        public void unregisterJenaModelChangedListener(ModelChangedListener changeListener)
+                throws RDFServiceException {
+            s.unregisterJenaModelChangedListener(changeListener);
         }
 
         @Override
