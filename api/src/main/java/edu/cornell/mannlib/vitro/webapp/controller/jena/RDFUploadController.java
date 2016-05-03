@@ -44,6 +44,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
+import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -202,9 +203,20 @@ public class RDFUploadController extends JenaIngestController {
             }
             if (aboxModel != null) {
                 aboxChangeModel = uploadModel.remove(tboxChangeModel);
-                aboxstmtCount = operateOnModel(request.getUnfilteredWebappDaoFactory(),
-                        aboxModel, aboxChangeModel, ontModelSelector, 
-                                remove, makeClassgroups, loginBean.getUserURI());
+                aboxstmtCount = aboxChangeModel.size();
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                aboxChangeModel.write(os, "N3");
+                ByteArrayInputStream in = new ByteArrayInputStream(os.toByteArray());
+                if(!remove) {
+                    readIntoModel(in, "N3", request.getRDFService(), 
+                            ModelNames.ABOX_ASSERTIONS);
+                } else {
+                    removeFromModel(in, "N3", request.getRDFService(), 
+                            ModelNames.ABOX_ASSERTIONS);
+                }
+//                operateOnModel(request.getUnfilteredWebappDaoFactory(),
+//                        aboxModel, aboxChangeModel, ontModelSelector, 
+//                                remove, makeClassgroups, loginBean.getUserURI());
             }
             request.setAttribute("uploadDesc", uploadDesc + ". " + verb + " " + 
                     (tboxstmtCount + aboxstmtCount) + "  statements.");
@@ -225,9 +237,19 @@ public class RDFUploadController extends JenaIngestController {
         }
     }
 
+    private static final boolean BEGIN = true;
+    private static final boolean END = !BEGIN;
+    
+    private ChangeSet makeChangeSet(RDFService rdfService) {
+        ChangeSet cs = rdfService.manufactureChangeSet();
+        cs.addPreChangeEvent(new BulkUpdateEvent(null, BEGIN));
+        cs.addPostChangeEvent(new BulkUpdateEvent(null, END));
+        return cs;
+    }
+    
     private void addUsingRDFService(InputStream in, String languageStr, 
             RDFService rdfService) {
-        ChangeSet changeSet = rdfService.manufactureChangeSet();
+        ChangeSet changeSet = makeChangeSet(rdfService);
         RDFService.ModelSerializationFormat format = 
                 ("RDF/XML".equals(languageStr) 
                         || "RDF/XML-ABBREV".equals(languageStr))
@@ -333,7 +355,7 @@ public class RDFUploadController extends JenaIngestController {
                     RDFService rdfService = new RDFServiceModel(mainModel);
                     ByteArrayOutputStream out = new ByteArrayOutputStream();
                     changesModel.write(out, "N-TRIPLE");
-                    ChangeSet cs = rdfService.manufactureChangeSet();
+                    ChangeSet cs = makeChangeSet(rdfService);
                     ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
                     cs.addRemoval(in, RDFService.ModelSerializationFormat.NTRIPLE, null);
                     try {
@@ -398,8 +420,20 @@ public class RDFUploadController extends JenaIngestController {
     
     private void readIntoModel(InputStream in, String language, 
             RDFService rdfService, String modelName) {
-        ChangeSet cs = rdfService.manufactureChangeSet();
+        ChangeSet cs = makeChangeSet(rdfService);
         cs.addAddition(in, RDFServiceUtils.getSerializationFormatFromJenaString(
+                        language), modelName);
+        try {
+            rdfService.changeSetUpdate(cs);
+        } catch (RDFServiceException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    private void removeFromModel(InputStream in, String language, 
+            RDFService rdfService, String modelName) {
+        ChangeSet cs = makeChangeSet(rdfService);
+        cs.addRemoval(in, RDFServiceUtils.getSerializationFormatFromJenaString(
                         language), modelName);
         try {
             rdfService.changeSetUpdate(cs);

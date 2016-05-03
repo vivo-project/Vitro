@@ -2,6 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.searchindex;
 
+import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.REBUILD_REQUESTED;
+import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.START_REBUILD;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,17 +19,16 @@ import org.apache.jena.riot.tokens.Tokenizer;
 import org.apache.jena.riot.tokens.TokenizerFactory;
 
 import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.rdf.listeners.StatementListener;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
-
-import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer.Event.Type.*;
 
 /**
  * When a change is heard, wait for an interval to see if more changes come in.
@@ -52,8 +54,8 @@ import static edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndex
  * which is semantically equivalent to the original, and add that to the list
  * instead. The original statement is released.
  */
-public class IndexingChangeListener implements ChangeListener,
-		SearchIndexer.Listener {
+public class IndexingChangeListener extends StatementListener 
+        implements ModelChangedListener, SearchIndexer.Listener {
 	private static final Log log = LogFactory
 			.getLog(IndexingChangeListener.class);
 
@@ -105,16 +107,16 @@ public class IndexingChangeListener implements ChangeListener,
 	}
 
 	@Override
-	public void addedStatement(String serializedTriple, String graphURI) {
+	public void addedStatement(Statement stmt) {
 		if (!rebuildScheduled) {
-			noteChange(parseTriple(serializedTriple));
+			noteChange(stmt);
 		}
 	}
 
 	@Override
-	public void removedStatement(String serializedTriple, String graphURI) {
+	public void removedStatement(Statement stmt) {
 		if (!rebuildScheduled) {
-			noteChange(parseTriple(serializedTriple));
+			noteChange(stmt);
 		}
 	}
 
@@ -122,7 +124,7 @@ public class IndexingChangeListener implements ChangeListener,
 	 * We only care about events that signal the end of an edit operation.
 	 */
 	@Override
-	public void notifyEvent(String graphURI, Object event) {
+	public void notifyEvent(Model model, Object event) {
 		if ((event instanceof EditEvent)) {
 			EditEvent editEvent = (EditEvent) event;
 			if (!editEvent.getBegin()) { // editEvent is the end of an edit
@@ -135,34 +137,33 @@ public class IndexingChangeListener implements ChangeListener,
 		}
 	}
 
-	// TODO avoid duplication with JenaChangeListener
-	private Statement parseTriple(String serializedTriple) {
-        try {
-            // Use RiotReader to parse a Triple
-            // NB A Triple can be serialized correctly with: FmtUtils.stringForTriple(triple, PrefixMapping.Factory.create()) + " .";'
-        	Tokenizer tokenizer = TokenizerFactory.makeTokenizerString(serializedTriple);
-			Iterator<Triple> it = RiotReader.createParserNTriples(tokenizer, null);
-
-            if (it.hasNext()) {
-                Triple triple = it.next();
-
-                if (it.hasNext()) {
-                    log.warn("More than one triple parsed from change event: '" + serializedTriple + "'");
-                }
-
-                // Use the retained defaultModel instance to convert the Triple to a Statement
-                // This does not add the Statement to the Model, so the Statement can be disposed when unused
-                // And whilst the Model is attached to the Statement, using a single instance means only one Model
-                // is created and attached to all of the Statements created by this instance
-                return defaultModel.asStatement(triple);
-            } else {
-                throw new RuntimeException("no triple parsed from change event: '" + serializedTriple + "'");
-            }
-        } catch (RuntimeException riot) {
-            log.error("Failed to parse triple " + serializedTriple, riot);
-            throw riot;
-        }
-	}
+//	private Statement parseTriple(String serializedTriple) {
+//        try {
+//            // Use RiotReader to parse a Triple
+//            // NB A Triple can be serialized correctly with: FmtUtils.stringForTriple(triple, PrefixMapping.Factory.create()) + " .";'
+//        	Tokenizer tokenizer = TokenizerFactory.makeTokenizerString(serializedTriple);
+//			Iterator<Triple> it = RiotReader.createParserNTriples(tokenizer, null);
+//
+//            if (it.hasNext()) {
+//                Triple triple = it.next();
+//
+//                if (it.hasNext()) {
+//                    log.warn("More than one triple parsed from change event: '" + serializedTriple + "'");
+//                }
+//
+//                // Use the retained defaultModel instance to convert the Triple to a Statement
+//                // This does not add the Statement to the Model, so the Statement can be disposed when unused
+//                // And whilst the Model is attached to the Statement, using a single instance means only one Model
+//                // is created and attached to all of the Statements created by this instance
+//                return defaultModel.asStatement(triple);
+//            } else {
+//                throw new RuntimeException("no triple parsed from change event: '" + serializedTriple + "'");
+//            }
+//        } catch (RuntimeException riot) {
+//            log.error("Failed to parse triple " + serializedTriple, riot);
+//            throw riot;
+//        }
+//	}
 
 	// ----------------------------------------------------------------------
 	// helper classes

@@ -35,8 +35,7 @@ public class ModelContext {
 	public static void registerListenerForChanges(ServletContext ctx, ModelChangedListener ml){
 	    
         try {
-            RDFServiceUtils.getRDFServiceFactory(ctx).registerListener(
-                    new JenaChangeListener(ml));
+            RDFServiceUtils.getRDFServiceFactory(ctx).registerJenaModelChangedListener(ml);
         } catch (RDFServiceException e) {
             log.error(e,e);
         }

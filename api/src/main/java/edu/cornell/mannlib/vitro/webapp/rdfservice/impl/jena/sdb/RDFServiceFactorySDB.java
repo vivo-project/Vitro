@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 import com.hp.hpl.jena.sdb.StoreDesc;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
@@ -41,6 +42,10 @@ public class RDFServiceFactorySDB implements RDFServiceFactory {
                     .getRegisteredListeners() ) {
                 rdfService.registerListener(cl);    
             }
+            for (ModelChangedListener cl : ((RDFServiceSDB) longTermRDFService)
+                    .getRegisteredJenaModelChangedListeners() ) {
+                rdfService.registerJenaModelChangedListener(cl);    
+            }
             return rdfService;
         } catch (Exception e) {
             log.error(e,e);
@@ -58,6 +63,18 @@ public class RDFServiceFactorySDB implements RDFServiceFactory {
     public void unregisterListener(ChangeListener changeListener)
             throws RDFServiceException {
         this.longTermRDFService.unregisterListener(changeListener);
+    }
+    
+    @Override
+    public void registerJenaModelChangedListener(ModelChangedListener changeListener)
+            throws RDFServiceException {
+        this.longTermRDFService.registerJenaModelChangedListener(changeListener);
+    }
+
+    @Override
+    public void unregisterJenaModelChangedListener(ModelChangedListener changeListener)
+            throws RDFServiceException {
+        this.longTermRDFService.unregisterJenaModelChangedListener(changeListener);
     }
 
 }

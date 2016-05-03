@@ -73,6 +73,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils.MergeResult;
@@ -706,14 +707,13 @@ public class JenaIngestController extends BaseEditController {
     
     private void doClearModel(String modelName, ModelMaker modelMaker) {
         Model m = modelMaker.getModel(modelName);
-        OntModel o = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM,m);
+        OntModel o = VitroModelFactory.createOntologyModel(m);
         o.enterCriticalSection(Lock.WRITE);
         try {
-            o.removeAll(null,null,null);
+            o.removeAll();
         } finally {
             o.leaveCriticalSection();
         }
-        // removeAll() doesn't work with the listeners!
     }
     
     private void doLoadRDFData(String modelName, String docLoc, String filePath, String language, ModelMaker modelMaker) {

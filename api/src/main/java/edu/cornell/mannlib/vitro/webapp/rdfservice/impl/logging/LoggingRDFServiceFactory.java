@@ -2,6 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging;
 
+import com.hp.hpl.jena.rdf.model.ModelChangedListener;
+
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -40,6 +42,18 @@ public class LoggingRDFServiceFactory implements RDFServiceFactory {
 		factory.unregisterListener(changeListener);
 	}
 
+	@Override
+    public void registerJenaModelChangedListener(ModelChangedListener changeListener)
+            throws RDFServiceException {
+        factory.registerJenaModelChangedListener(changeListener);
+    }
+
+    @Override
+    public void unregisterJenaModelChangedListener(ModelChangedListener changeListener)
+            throws RDFServiceException {
+        factory.unregisterJenaModelChangedListener(changeListener);
+    }
+    
 	@Override
 	public String toString() {
 		return "LoggingRDFServiceFactory[factory=" + factory + "]";

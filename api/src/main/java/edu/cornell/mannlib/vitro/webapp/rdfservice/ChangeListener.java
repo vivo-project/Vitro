@@ -9,21 +9,12 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice;
 
 public interface ChangeListener {		
 	/**
-	 * Override this to listen to all statements added to the RDF store. 
+	 * Override this to listen to each model change 
 	 * 
-	 * @param serializedTriple - the added statement in n3 format
-	 * @param graphURI - the graph to which the statement was added
+	 * @param modelChange - the object representing the model change
 	 */
-	public void addedStatement(String serializedTriple, String graphURI);
-	
-	/**
-	 * Override this to listen to all statements removed from the RDF store. 
-	 * 
-	 * @param serializedTriple - the removed statement in n3 format
-	 * @param graphURI - the graph from which the statement was removed
-	 */
-	public void removedStatement(String serializedTriple, String graphURI);
-	
+	public void notifyModelChange(ModelChange modelChange);
+		
 	/**
 	 * Override this to listen to events pertaining to the given graphURI. 
 	 * 

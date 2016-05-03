@@ -10,14 +10,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
-import com.hp.hpl.jena.rdf.model.NodeIterator;
-import com.hp.hpl.jena.rdf.model.Property;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -31,6 +28,8 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.NodeIterator;
+import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.ResourceFactory;
@@ -47,6 +46,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 
 public class ABoxRecomputer {
 
@@ -62,7 +62,7 @@ public class ABoxRecomputer {
     private volatile boolean recomputing = false;
     private boolean stopRequested = false;
 
-    private final int BATCH_SIZE = 100;
+    private final int BATCH_SIZE = 500;
     private final int REPORTING_INTERVAL = 1000;
 
     /**
@@ -92,9 +92,9 @@ public class ABoxRecomputer {
     }
 
     /**
-     * Recompute all inferences.
+     * Recompute all individuals
      */
-    public void recompute() {	
+    public void recompute() {
         synchronized (lock1) {
             if (recomputing) {
                 return;
@@ -103,49 +103,80 @@ public class ABoxRecomputer {
             }
         }
         try {
-            if  (searchIndexer != null) {
+            if (searchIndexer != null) {
                 searchIndexer.pause();
                 // Register now that we want to rebuild the index when we unpause
                 // This allows the indexer to optimize behaviour whilst paused
                 searchIndexer.rebuildIndex();
             }
+            log.info("Recomputing ABox inferences.");
+            log.info("Finding individuals in ABox.");
+            Queue<String>individualURIs = this.getAllIndividualURIs();
+            log.info("Recomputing inferences for " + individualURIs.size() + " individuals");
             // Create a type cache for this execution and pass it to the recompute function
             // Ensures that caches are only valid for the length of one recompute
-            recomputeABox(new TypeCaches());
+            recomputeIndividuals(individualURIs, new TypeCaches());
+            log.info("Finished recomputing inferences");
         } finally {
-            if  (searchIndexer != null) {
+            if(searchIndexer != null) {
                 searchIndexer.unpause();
             }
             synchronized (lock1) {
-                recomputing = false;	    		
+                recomputing = false;                
+            }
+        }
+    }
+    
+    /**
+     * Recompute inferences for specified collection of individual URIs, 
+     * or all URIs if parameter is null
+     */
+    public void recompute(Queue<String> individualURIs) {	
+        boolean sizableRecompute = (individualURIs.size() > 20);
+        try {
+            if(sizableRecompute && searchIndexer != null) { 
+                searchIndexer.pause();
+            }
+            recomputeIndividuals(individualURIs);
+        } finally {
+            if (sizableRecompute && searchIndexer != null) {
+                searchIndexer.unpause();
             }
         }
     }
 
     /*
-     * Recompute the entire ABox inference graph.
+     * Recompute the ABox inference graph for the specified collection of
+     * individual URIs
      */
-    protected void recomputeABox(TypeCaches caches) {
-        log.info("Recomputing ABox inferences.");
-        log.info("Finding individuals in ABox.");
-        Collection<String> individuals = this.getAllIndividualURIs();
-        log.info("Recomputing inferences for " + individuals.size() + " individuals");
+    private void recomputeIndividuals(Queue<String> individuals) {
+        recomputeIndividuals(individuals, new TypeCaches());
+    }
+    
+    /*
+     * Recompute the ABox inference graph for the specified collection of
+     * individual URIs
+     */
+    protected void recomputeIndividuals(Queue<String> individuals, TypeCaches caches) {
+        if (individuals == null) {
+            return;
+        }
         long start = System.currentTimeMillis();
+        int size = individuals.size();
         int numInds = 0;
         Model rebuildModel = ModelFactory.createDefaultModel();
         Model additionalInferences = ModelFactory.createDefaultModel();
         List<String> individualsInBatch = new ArrayList<String>();
-        Iterator<String> individualIt = individuals.iterator();
-        while (individualIt.hasNext()) {
-            String individualURI = individualIt.next();
+        while (!individuals.isEmpty()) {
+            String individualURI = individuals.poll();
             try {
                 additionalInferences.add(recomputeIndividual(
-                        individualURI, rebuildModel, caches));
+                        individualURI, rebuildModel, caches, individuals));
                 numInds++;
                 individualsInBatch.add(individualURI);
                 boolean batchFilled = (numInds % BATCH_SIZE) == 0;
                 boolean reportingInterval = (numInds % REPORTING_INTERVAL) == 0;
-                if (batchFilled || !individualIt.hasNext()) {
+                if (batchFilled || individuals.isEmpty()) {
                     log.debug(rebuildModel.size() + " total inferences");
                     updateInferenceModel(rebuildModel, individualsInBatch);
                     rebuildModel.removeAll();
@@ -153,11 +184,11 @@ public class ABoxRecomputer {
                 }
                 if (reportingInterval) {
                     log.info("Still recomputing inferences (" 
-                            + numInds + "/" + individuals.size() + " individuals)");
+                            + numInds + "/" + size + " individuals)");
                     log.info((System.currentTimeMillis() - start) / numInds + " ms per individual");
                 }
                 if (stopRequested) {
-                    log.info("a stopRequested signal was received during recomputeABox. Halting Processing.");
+                    log.info("a stopRequested signal was received during recomputeIndividuals. Halting Processing.");
                     return;
                 }
             } catch (Exception e) {
@@ -165,7 +196,7 @@ public class ABoxRecomputer {
             }
         }
         if(additionalInferences.size() > 0) {
-            log.info("Writing additional inferences generated by reasoner plugins.");
+            log.debug("Writing additional inferences generated by reasoner plugins.");
             ChangeSet change = rdfService.manufactureChangeSet();
             change.addAddition(makeN3InputStream(additionalInferences), 
                     RDFService.ModelSerializationFormat.N3, ModelNames.ABOX_INFERENCES);
@@ -175,20 +206,20 @@ public class ABoxRecomputer {
                 log.error("Unable to write additional inferences from reasoner plugins", e);
             }
         }
-        log.info("Finished recomputing inferences");
     }
 
     private static final boolean RUN_PLUGINS = true;
     private static final boolean SKIP_PLUGINS = !RUN_PLUGINS;
 
     private Model recomputeIndividual(String individualURI, 
-            Model rebuildModel, TypeCaches caches) throws RDFServiceException {
+            Model rebuildModel, TypeCaches caches, Collection<String> individualQueue) 
+                    throws RDFServiceException {
         long start = System.currentTimeMillis();
         Model assertions = getAssertions(individualURI);
-        log.trace((System.currentTimeMillis() - start) + " ms to get assertions.");
+        log.debug((System.currentTimeMillis() - start) + " ms to get assertions.");
+        long prevRebuildSize = (simpleReasoner.getSameAsEnabled()) ? rebuildModel.size() : 0;
         Model additionalInferences = recomputeIndividual(
                 individualURI, null, assertions, rebuildModel, caches, RUN_PLUGINS);
-
         if (simpleReasoner.getSameAsEnabled()) {
             Set<String> sameAsInds = getSameAsIndividuals(individualURI);
             for (String sameAsInd : sameAsInds) {
@@ -201,7 +232,15 @@ public class ABoxRecomputer {
                 Resource indRes = ResourceFactory.createResource(individualURI);
                 Resource sameAsIndRes = ResourceFactory.createResource(sameAsInd); 
                 if(!assertions.contains(indRes, OWL.sameAs, sameAsIndRes)) {
-                    rebuildModel.add(indRes, OWL.sameAs, sameAsIndRes);
+                    if(!rebuildModel.contains(indRes, OWL.sameAs, sameAsIndRes)) {
+                        individualQueue.add(sameAsInd);
+                        rebuildModel.add(indRes, OWL.sameAs, sameAsIndRes);
+                    }
+                }
+            }
+            if(rebuildModel.size() - prevRebuildSize > 0) {
+                for (String sameAsInd : sameAsInds) {
+                    individualQueue.add(sameAsInd);
                 }
             }
         }
@@ -330,7 +369,6 @@ public class ABoxRecomputer {
             mostSpecificTypes = getMostSpecificTypes(individual, assertedTypes);
             caches.cacheMostSpecificTypes(key, mostSpecificTypes);
         }
-
         return mostSpecificTypes;
     }
 
@@ -343,6 +381,8 @@ public class ABoxRecomputer {
                 "    FILTER NOT EXISTS { \n" +
                 "        <" + individual.getURI() + "> a ?type2 . \n" +
                 "        ?type2 <" + RDFS.subClassOf.getURI() + "> ?type. \n" +
+                "        FILTER (?type != ?type2) \n" +
+                "        FILTER NOT EXISTS { ?type <" + OWL.equivalentClass + "> ?type2 } \n" +
                 "    } \n" +
                 "    FILTER NOT EXISTS { \n" +
                 "        <" + individual.getURI() + "> <" + VitroVocabulary.MOST_SPECIFIC_TYPE + "> ?type \n" +
@@ -395,8 +435,8 @@ public class ABoxRecomputer {
     /*
      * Get the URIs for all individuals in the system
      */
-    protected Collection<String> getAllIndividualURIs() {
-        HashSet<String> individualURIs = new HashSet<String>();
+    protected Queue<String> getAllIndividualURIs() {
+        Queue<String> individualURIs = new IndividualURIQueue<String>();
         List<String> classList = new ArrayList<String>();
         tboxModel.enterCriticalSection(Lock.READ);
         try {
@@ -420,7 +460,7 @@ public class ABoxRecomputer {
         return individualURIs;
     }
 
-    protected void getIndividualURIs(String queryString, Set<String> individuals) {
+    protected void getIndividualURIs(String queryString, Queue<String> individuals) {
         int batchSize = 50000;
         int offset = 0;
         boolean done = false;
@@ -507,7 +547,7 @@ public class ABoxRecomputer {
         return new ByteArrayInputStream(out.toByteArray());
     }
 
-    private Set<String> getSameAsIndividuals(String individualURI) {
+    public Set<String> getSameAsIndividuals(String individualURI) {
         HashSet<String> sameAsInds = new HashSet<String>();
         sameAsInds.add(individualURI);
         getSameAsIndividuals(individualURI, sameAsInds);
@@ -519,14 +559,18 @@ public class ABoxRecomputer {
         try {
             final List<String> addedURIs = new ArrayList<String>();
             StringBuilder builder = new StringBuilder();
-
             builder.append("SELECT\n")
                     .append("   ?object\n")
-                    .append("WHERE\n")
-                    .append("{\n")
-                    .append("   <" + individualUri + "> <" + OWL.sameAs + "> ?object .\n")
+                    .append("WHERE {\n")
+                    .append("    GRAPH ?g { \n")
+                    .append("        {\n")
+                    .append("            <" + individualUri + "> <" + OWL.sameAs + "> ?object .\n")
+                    .append("        } UNION {\n")
+                    .append("            ?object <" + OWL.sameAs + "> <" + individualUri + "> .\n")
+                    .append("        }\n")
+                    .append("    } \n")
+                    .append("    FILTER (?g != <" + ModelNames.ABOX_INFERENCES + ">)\n") 
                     .append("}\n");
-
             rdfService.sparqlSelectQuery(builder.toString(), new ResultSetConsumer() {
                 @Override
                 protected void processQuerySolution(QuerySolution qs) {
@@ -537,37 +581,11 @@ public class ABoxRecomputer {
                     }
                 }
             });
-
-            for (String indUri : addedURIs) {
-                getSameAsIndividuals(indUri, sameAsInds);
-            }
-
-            addedURIs.clear();
-            builder = new StringBuilder();
-
-            builder.append("SELECT\n")
-                    .append("   ?subject\n")
-                    .append("WHERE\n")
-                    .append("{\n")
-                    .append("   ?subject <" + OWL.sameAs + "> <" + individualUri + "> .\n")
-                    .append("}\n");
-
-            rdfService.sparqlSelectQuery(builder.toString(), new ResultSetConsumer() {
-                @Override
-                protected void processQuerySolution(QuerySolution qs) {
-                    Resource object = qs.getResource("subject");
-                    if (object != null && !sameAsInds.contains(object.getURI())) {
-                        sameAsInds.add(object.getURI());
-                        addedURIs.add(object.getURI());
-                    }
-                }
-            });
-
             for (String indUri : addedURIs) {
                 getSameAsIndividuals(indUri, sameAsInds);
             }
         } catch (RDFServiceException e) {
-
+            log.error(e,e);
         }
     }
 

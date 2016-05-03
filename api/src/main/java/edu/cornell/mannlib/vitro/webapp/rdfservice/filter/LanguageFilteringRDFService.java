@@ -12,7 +12,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -22,6 +21,7 @@ import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
@@ -30,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 
 public class LanguageFilteringRDFService implements RDFService {
@@ -440,7 +441,6 @@ public class LanguageFilteringRDFService implements RDFService {
     @Override
     public void registerListener(ChangeListener changeListener)
             throws RDFServiceException {
-        // TODO Auto-generated method stub
         s.registerListener(changeListener);
     }
 
@@ -449,6 +449,19 @@ public class LanguageFilteringRDFService implements RDFService {
             throws RDFServiceException {
         s.unregisterListener(changeListener);
     }
+    
+    @Override
+    public void registerJenaModelChangedListener(ModelChangedListener changeListener)
+            throws RDFServiceException {
+        s.registerJenaModelChangedListener(changeListener);
+    }
+
+    @Override
+    public void unregisterJenaModelChangedListener(ModelChangedListener changeListener)
+            throws RDFServiceException {
+        s.unregisterJenaModelChangedListener(changeListener);
+    }
+
 
     @Override
     public ChangeSet manufactureChangeSet() {
