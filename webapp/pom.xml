@@ -27,6 +27,12 @@
                 <configuration>
                     <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
                     <archiveClasses>false</archiveClasses>
+                    <webResources>
+                        <resource>
+                            <directory>src/main/webResources</directory>
+                            <filtering>true</filtering>
+                        </resource>
+                    </webResources>
                 </configuration>
             </plugin>
         </plugins>
