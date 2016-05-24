@@ -98,7 +98,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
      	
     	//Check if create new and return specific edit configuration from that generator.
     	if(DefaultAddMissingIndividualFormGenerator.isCreateNewIndividual(vreq, session)) {
-    		DefaultAddMissingIndividualFormGenerator generator = new DefaultAddMissingIndividualFormGenerator();
+    		DefaultAddMissingIndividualFormGenerator generator = DefaultAddMissingIndividualFormGenerator.create();
     		return generator.getEditConfiguration(vreq, session);
     	}
     	    

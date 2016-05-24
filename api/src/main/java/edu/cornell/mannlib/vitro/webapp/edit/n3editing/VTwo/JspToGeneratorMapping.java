@@ -30,7 +30,7 @@ public class JspToGeneratorMapping {
         map.put("dateTimeValueForm.jsp",
                 edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DateTimeValueFormGenerator.class.getName());
         map.put("defaultAddMissingIndividualForm.jsp",
-                edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultAddMissingIndividualFormGenerator.class.getName());
+                edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultAddMissingIndividualFormGenerator.getImplementationName());
         map.put("defaultDatapropForm.jsp",
                 edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDataPropertyFormGenerator.class.getName());
         map.put("defaultObjPropForm.jsp",

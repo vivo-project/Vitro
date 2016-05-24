@@ -47,13 +47,13 @@ public class IndividualSearchResult extends BaseTemplateModel {
                 Constructor ctor = resultClass.getDeclaredConstructor(Individual.class, VitroRequest.class);
                 models.add((IndividualSearchResult)ctor.newInstance(individual, vreq));
             } catch (NoSuchMethodException e) {
-                e.printStackTrace();
+                log.error("Unable to create IndividualSearchResult", e);
             } catch (InstantiationException e) {
-                e.printStackTrace();
+                log.error("Unable to create IndividualSearchResult", e);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                log.error("Unable to create IndividualSearchResult", e);
             } catch (InvocationTargetException e) {
-                e.printStackTrace();
+                log.error("Unable to create IndividualSearchResult", e);
             }
         }
         return models;
