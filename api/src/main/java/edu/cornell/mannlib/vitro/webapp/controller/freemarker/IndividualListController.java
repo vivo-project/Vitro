@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividualBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -100,7 +101,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
                 List<ListedIndividual> indsTm = new ArrayList<ListedIndividual>();
                 if (inds != null) {
                     for ( Individual ind : inds ) {
-                        indsTm.add(new ListedIndividual(ind,vreq));
+                        indsTm.add(ListedIndividualBuilder.build(ind,vreq));
                     }
                 }
                 body.put("individuals", indsTm);    

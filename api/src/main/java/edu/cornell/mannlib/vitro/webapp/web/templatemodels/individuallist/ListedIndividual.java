@@ -12,8 +12,7 @@ public class ListedIndividual extends BaseListedIndividual {
 
     private static final Log log = LogFactory.getLog(ListedIndividual.class);
     
-    public ListedIndividual(Individual individual, VitroRequest vreq) {
+    ListedIndividual(Individual individual, VitroRequest vreq) {
         super(individual, vreq);
     }
-
 }
