@@ -46,31 +46,13 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 	protected static String objectVarName = "newIndividual";
 	private static HashMap<String,String> defaultsForXSDtypes ;
 
-	private static Class defaultGeneratorClass = DefaultAddMissingIndividualFormGenerator.class;
-
 	static {
 		defaultsForXSDtypes = new HashMap<String,String>();
 		//defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","2001-01-01T12:00:00");
 		defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","#Unparseable datetime defaults to now");
 	}
 
-	protected DefaultAddMissingIndividualFormGenerator() { }
-
-	public static final DefaultAddMissingIndividualFormGenerator create() {
-		try {
-			return (DefaultAddMissingIndividualFormGenerator) defaultGeneratorClass.newInstance();
-		} catch (InstantiationException e) {
-			throw new IllegalStateException("Unable to create DefaultAddMissingIndividualFormGenerator", e);
-		} catch (IllegalAccessException e) {
-			throw new IllegalStateException("Unable to create DefaultAddMissingIndividualFormGenerator", e);
-		}
-	}
-
-	public static final String getImplementationName() {
-		return defaultGeneratorClass.getName();
-	}
-	  
-	//Method which checks whether this particular generator should be employed  
+	//Method which checks whether this particular generator should be employed
 	public static final boolean isCreateNewIndividual(VitroRequest vreq, HttpSession session) {
 		String command = vreq.getParameter("cmd");
 		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
@@ -479,12 +461,5 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     }
 
 	public void addFormSpecificData(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
-	}
-
-
-	protected static void registerGeneratorClass(Class clazz) {
-		if (DefaultAddMissingIndividualFormGenerator.class.isAssignableFrom(clazz)) {
-			defaultGeneratorClass = clazz;
-		}
 	}
 }

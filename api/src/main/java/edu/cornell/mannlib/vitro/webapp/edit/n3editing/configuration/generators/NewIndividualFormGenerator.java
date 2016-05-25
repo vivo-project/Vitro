@@ -37,11 +37,11 @@ public class NewIndividualFormGenerator implements EditConfigurationGenerator {
 	private String template = "newIndividualForm.ftl";
 	
 	private static HashMap<String,String> defaultsForXSDtypes ;
-	  static {
+	static {
 		defaultsForXSDtypes = new HashMap<String,String>();
 		//defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","2001-01-01T12:00:00");
 		defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","#Unparseable datetime defaults to now");
-	  }
+	}
 	  
     @Override
     public EditConfigurationVTwo getEditConfiguration(VitroRequest vreq, HttpSession session) {

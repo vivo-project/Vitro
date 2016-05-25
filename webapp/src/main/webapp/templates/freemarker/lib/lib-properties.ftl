@@ -4,7 +4,7 @@
     Macros and functions for working with properties and property lists
 ------------------------------------------------------------------------------>
 
-<#include "lib-properties-classes.ftl" />
+<#import "lib-generator-classes.ftl" as generators />
 
 <#-- Return true iff there are statements for this property -->
 <#function hasStatements propertyGroups propertyName>
@@ -304,7 +304,7 @@ name will be used as the label. -->
     	<#if editable>
     		<#assign imageAlt = "${i18n().manage}" />
     		<#assign linkTitle = "${i18n().manage_list_of_labels}">
-    		<#assign labelLink= "${urls.base}/editRequestDispatch?subjectUri=${individualUri}&editForm=${class_ManageLabelsGenerator}&predicateUri=${labelPropertyUri}${extraParameters}">
+    		<#assign labelLink= "${urls.base}/editRequestDispatch?subjectUri=${individualUri}&editForm=${generators.ManageLabelsGenerator}&predicateUri=${labelPropertyUri}${extraParameters}">
     	<#else>
 			<#assign linkTitle = "${i18n().view_list_of_labels}">
 			<#assign imageAlt = "${i18n().view}" /> 

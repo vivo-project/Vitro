@@ -3,6 +3,7 @@
 <#-- Template for Site Administration data input panel -->
 
 <#import "lib-form.ftl" as form>
+<#import "lib-generator-classes.ftl" as generators />
 
 <#if dataInput?has_content>
     <section class="pageBodyGroup" role="region">
@@ -12,7 +13,7 @@
             <select id="VClassURI" name="typeOfNew" class="form-item long-options" role="select">
                 <@form.optionGroups groups=dataInput.groupedClassOptions />
             </select>
-            <input type="hidden" name="editForm" value="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.NewIndividualFormGenerator" role="input" />
+            <input type="hidden" name="editForm" value="${generators.NewIndividualFormGenerator}" role="input" />
             <input type="submit" id="submit" value="${i18n().add_individual_of_class}" role="button" />
         </form>
         

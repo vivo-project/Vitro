@@ -30,7 +30,7 @@ public class JspToGeneratorMapping {
         map.put("dateTimeValueForm.jsp",
                 edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DateTimeValueFormGenerator.class.getName());
         map.put("defaultAddMissingIndividualForm.jsp",
-                edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultAddMissingIndividualFormGenerator.getImplementationName());
+                edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultAddMissingIndividualFormGenerator.class.getName());
         map.put("defaultDatapropForm.jsp",
                 edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.DefaultDataPropertyFormGenerator.class.getName());
         map.put("defaultObjPropForm.jsp",
@@ -55,5 +55,19 @@ public class JspToGeneratorMapping {
         } catch (Throwable th){
             log.error( "could not load VIVO jsp mappings",th );
         }                                       
+    }
+
+    public static <T> T createFor(String jsp, Class<T> clazz) {
+        try {
+            if (jspsToGenerators.containsKey(jsp)) {
+                Class classDefinition = Class.forName(jspsToGenerators.get(jsp));
+                if (clazz.isAssignableFrom(classDefinition)) {
+                    return (T) classDefinition.newInstance();
+                }
+            }
+        } catch (Throwable th) {
+        }
+
+        return null;
     }
 }
