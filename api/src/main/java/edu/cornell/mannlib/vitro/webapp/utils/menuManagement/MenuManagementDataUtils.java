@@ -16,13 +16,23 @@ import org.apache.commons.logging.LogFactory;
 public class MenuManagementDataUtils {
     private static final Log log = LogFactory.getLog(MenuManagementDataUtils.class);
 
+    private static IMenuManagementDataUtils impl = null;
+
     //Data that is to be returned to template that does not involve data getters
     //e.g. what are the current class groups, etc.
     public static void includeRequiredSystemData(ServletContext context, Map<String, Object> templateData) {
-    	
-    	
+    	if (impl != null) {
+            impl.includeRequiredSystemData(context, templateData);
+        }
+    }
+
+    public static void setImplementation(IMenuManagementDataUtils impl) {
+        MenuManagementDataUtils.impl = impl;
     }
     
 
+    public interface IMenuManagementDataUtils {
+        public void includeRequiredSystemData(ServletContext context, Map<String, Object> templateData);
+    }
     
 }

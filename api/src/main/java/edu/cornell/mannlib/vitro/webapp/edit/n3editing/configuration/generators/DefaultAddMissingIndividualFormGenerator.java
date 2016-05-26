@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.searchresult.IndividualSearchResult;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,8 +35,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
  *
  */
 public class DefaultAddMissingIndividualFormGenerator implements EditConfigurationGenerator {
-	
-	private Log log = LogFactory.getLog(DefaultAddMissingIndividualFormGenerator.class);
+	private static final Log log = LogFactory.getLog(DefaultAddMissingIndividualFormGenerator.class);
 	private boolean isObjectPropForm = false;
 	private String subjectUri = null;
 	private String predicateUri = null;
@@ -43,16 +43,17 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 
 	private String template = "defaultAddMissingIndividualForm.ftl";
 	private static String createCommand = "create";
-	private static String objectVarName = "newIndividual";
+	protected static String objectVarName = "newIndividual";
 	private static HashMap<String,String> defaultsForXSDtypes ;
-	  static {
+
+	static {
 		defaultsForXSDtypes = new HashMap<String,String>();
 		//defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","2001-01-01T12:00:00");
 		defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","#Unparseable datetime defaults to now");
-	  }
-	  
-	//Method which checks whether this particular generator should be employed  
-	public static boolean isCreateNewIndividual(VitroRequest vreq, HttpSession session) {
+	}
+
+	//Method which checks whether this particular generator should be employed
+	public static final boolean isCreateNewIndividual(VitroRequest vreq, HttpSession session) {
 		String command = vreq.getParameter("cmd");
 		String predicateUri = EditConfigurationUtils.getPredicateUri(vreq);
 		//This method also looks at domain and range uris and so is different than just getting the
@@ -97,7 +98,10 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	
     	//set fields
     	setFields(editConfiguration, vreq, EditConfigurationUtils.getPredicateUri(vreq));
-    	
+
+		//form specific data
+		addFormSpecificData(editConfiguration, vreq);
+
     	//add preprocesoors
     	addPreprocessors(vreq, editConfiguration);
 
@@ -116,7 +120,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	return editConfiguration;
     }
     
-    private Map<String, String> generateNewResources(VitroRequest vreq) {
+    protected Map<String, String> generateNewResources(VitroRequest vreq) {
 		HashMap<String, String> newResources = new HashMap<String, String>();
 		//Null triggers default namespace
 		newResources.put(objectVarName, null);
@@ -210,14 +214,14 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	return n3ForEdit;
     }
     
-    private List<String> getN3Prefixes() {
+    protected List<String> getN3Prefixes() {
     	List<String> prefixStrings = new ArrayList<String>();
     	prefixStrings.add("@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .");
     	prefixStrings.add("@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .");
     	return prefixStrings;
     }
     
-    private String getN3PrefixesAsString() {
+    protected String getN3PrefixesAsString() {
     	String prefixes = StringUtils.join(getN3Prefixes(), "\n");
     	return prefixes;
     }
@@ -226,7 +230,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	return "?" + objectVarName + " rdfs:label ?name .";
     }
     
-    private List<String> generateN3Optional(VitroRequest vreq) {
+    protected List<String> generateN3Optional(VitroRequest vreq) {
     	//flag uri and asserted types need to be added here
     	List<String> n3Optional = new ArrayList<String>();
     	n3Optional.add("?" + objectVarName + " ?inverseProp ?subject .");
@@ -268,7 +272,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     //n3 should look as follows
     //?subject ?predicate ?objectVar 
     
-    private void setUrisAndLiteralsOnForm(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
+    protected void setUrisAndLiteralsOnForm(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
     	List<String> urisOnForm = new ArrayList<String>();
     	List<String> literalsOnForm = new ArrayList<String>();
     	literalsOnForm.add("name");
@@ -308,7 +312,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     }
 
     
-    private void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) {
+    protected void setFields(EditConfigurationVTwo editConfiguration, VitroRequest vreq, String predicateUri) {
     	Map<String, FieldVTwo> fields = new HashMap<String, FieldVTwo>();
     	if(EditConfigurationUtils.isObjectProperty(EditConfigurationUtils.getPredicateUri(vreq), vreq)) {
     		    			      
@@ -391,7 +395,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	return (typeOfNew != null && !typeOfNew.isEmpty());
     }
     
-    private String getTypeOfNew(VitroRequest vreq) {
+    protected String getTypeOfNew(VitroRequest vreq) {
     	return  vreq.getParameter("typeOfNew");
     }
     // The default object proepty form offers the option to create a new item
@@ -456,7 +460,6 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 
     }
 
-    
-
-
+	public void addFormSpecificData(EditConfigurationVTwo editConfiguration, VitroRequest vreq) {
+	}
 }

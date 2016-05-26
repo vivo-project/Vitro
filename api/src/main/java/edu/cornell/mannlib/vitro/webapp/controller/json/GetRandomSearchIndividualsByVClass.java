@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModelBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -72,7 +73,7 @@ public class GetRandomSearchIndividualsByVClass extends GetSearchIndividualsByVC
 
 		Map<String, Object> modelMap = new HashMap<String, Object>();
 		modelMap.put("individual",
-				new IndividualTemplateModel(individual, vreq));
+				IndividualTemplateModelBuilder.build(individual, vreq));
 		modelMap.put("vclass", vclassName);
 
 		ShortViewService svs = ShortViewServiceSetup.getService(ctx);

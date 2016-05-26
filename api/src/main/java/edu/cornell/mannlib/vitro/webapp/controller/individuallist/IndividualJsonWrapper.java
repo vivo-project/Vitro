@@ -20,6 +20,12 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * This will be overridden in VIVO so we can have more info in the display.
  */
 public class IndividualJsonWrapper {
+	private static AddJSONFields addJSONFields = null;
+
+	public static void setAddJSONFields(AddJSONFields add) {
+		addJSONFields = add;
+	}
+
 	static JSONObject packageIndividualAsJson(VitroRequest vreq, Individual ind)
 			throws JSONException {
 		// need an unfiltered dao to get firstnames and lastnames
@@ -33,6 +39,9 @@ public class IndividualJsonWrapper {
 		jo.put("imageUrl", ind.getImageUrl());
 		jo.put("profileUrl", UrlBuilder.getIndividualProfileUrl(ind, vreq));
 		jo.put("mostSpecificTypes", getMostSpecificTypes(ind, fullWdf));
+		if (addJSONFields != null) {
+			addJSONFields.add(jo, vreq, ind);
+		}
 		return jo;
 	}
 
@@ -45,4 +54,7 @@ public class IndividualJsonWrapper {
 		return mostSpecificTypes.values();
 	}
 
+	public interface AddJSONFields {
+		public void add(JSONObject jo, VitroRequest vreq, Individual ind) throws JSONException;
+	}
 }

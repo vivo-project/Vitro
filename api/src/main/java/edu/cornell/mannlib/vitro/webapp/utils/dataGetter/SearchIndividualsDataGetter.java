@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividualBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -183,7 +184,7 @@ public class SearchIndividualsDataGetter extends DataGetterBase implements DataG
 	        List<ListedIndividual> indsTm = new ArrayList<ListedIndividual>();
 	        if (inds != null) {
 	            for ( Individual ind : inds ) {
-	                indsTm.add(new ListedIndividual(ind,vreq));
+	                indsTm.add(ListedIndividualBuilder.build(ind,vreq));
 	            }
 	        }
 	        body.put("individuals", indsTm);    

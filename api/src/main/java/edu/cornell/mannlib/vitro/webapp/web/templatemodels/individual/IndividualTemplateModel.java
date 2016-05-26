@@ -12,8 +12,7 @@ public class IndividualTemplateModel extends BaseIndividualTemplateModel {
 
     private static final Log log = LogFactory.getLog(IndividualTemplateModel.class);
     
-    public IndividualTemplateModel(Individual individual, VitroRequest vreq) {
+    IndividualTemplateModel(Individual individual, VitroRequest vreq) {
         super(individual, vreq);
     }
-    
 }

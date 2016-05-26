@@ -56,4 +56,18 @@ public class JspToGeneratorMapping {
             log.error( "could not load VIVO jsp mappings",th );
         }                                       
     }
+
+    public static <T> T createFor(String jsp, Class<T> clazz) {
+        try {
+            if (jspsToGenerators.containsKey(jsp)) {
+                Class classDefinition = Class.forName(jspsToGenerators.get(jsp));
+                if (clazz.isAssignableFrom(classDefinition)) {
+                    return (T) classDefinition.newInstance();
+                }
+            }
+        } catch (Throwable th) {
+        }
+
+        return null;
+    }
 }

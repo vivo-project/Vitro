@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import com.hp.hpl.jena.rdf.model.RDFNode;
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModelBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -268,7 +269,7 @@ class IndividualResponseBuilder {
 	private IndividualTemplateModel getIndividualTemplateModel(
 			Individual individual) {
 		//individual.sortForDisplay();
-		return new IndividualTemplateModel(individual, vreq);
+		return IndividualTemplateModelBuilder.build(individual, vreq);
 	}
 		
     private TemplateModel wrap(Object obj, BeansWrapper wrapper) throws TemplateModelException {

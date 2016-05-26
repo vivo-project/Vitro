@@ -30,7 +30,7 @@ public abstract class BaseListedIndividual extends BaseTemplateModel {
     public static List<ListedIndividual> getIndividualTemplateModels(List<Individual> individuals, VitroRequest vreq) {
         List<ListedIndividual> models = new ArrayList<ListedIndividual>(individuals.size());
         for (Individual individual : individuals) {
-          models.add(new ListedIndividual(individual, vreq));
+          models.add(ListedIndividualBuilder.build(individual, vreq));
         }  
         return models;
     }

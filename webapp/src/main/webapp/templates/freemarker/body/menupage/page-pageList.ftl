@@ -1,5 +1,7 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
+<#import "lib-generator-classes.ftl" as generators />
+
 <div>
 
 <#if pages?has_content >  
@@ -25,7 +27,7 @@
   <form id="addIndividualClass" action="${urls.base}/editRequestDispatch" method="get">
       <input type="hidden" name="typeOfNew" value="http://vitro.mannlib.cornell.edu/ontologies/display/1.1#Page">              
       <input type="hidden" name="switchToDisplayModel" value="1">
-      <input type="hidden" name="editForm" value="edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.NewIndividualFormGenerator" role="input">
+      <input type="hidden" name="editForm" value="${generators.NewIndividualFormGenerator}" role="input">
       <input type="submit" id="submit" value="${i18n().add_page}" role="button">
   </form>
 

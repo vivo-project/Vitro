@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.JspToGeneratorMapping;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -98,7 +99,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
      	
     	//Check if create new and return specific edit configuration from that generator.
     	if(DefaultAddMissingIndividualFormGenerator.isCreateNewIndividual(vreq, session)) {
-    		DefaultAddMissingIndividualFormGenerator generator = new DefaultAddMissingIndividualFormGenerator();
+			EditConfigurationGenerator generator = JspToGeneratorMapping.createFor("defaultAddMissingIndividualForm.jsp", DefaultAddMissingIndividualFormGenerator.class);
     		return generator.getEditConfiguration(vreq, session);
     	}
     	    
