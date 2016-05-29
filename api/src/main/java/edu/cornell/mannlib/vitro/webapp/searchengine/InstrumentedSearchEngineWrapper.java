@@ -26,7 +26,6 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocument;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResultDocumentList;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
 
 /**
  * Manages the life-cycle of the SearchEngine. Adds logging, controlled by
@@ -40,25 +39,10 @@ public class InstrumentedSearchEngineWrapper implements SearchEngine {
 
 	private volatile LifecycleState lifecycleState = NEW;
 
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#wraps")
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#wraps", minOccurs = 1, maxOccurs = 1)
 	public void setInnerEngine(SearchEngine inner) {
-		if (innerEngine == null) {
-			innerEngine = inner;
-		} else {
-			throw new IllegalStateException(
-					"Configuration includes multiple SearchEngine instancess: "
-							+ innerEngine + ", and " + inner);
-		}
+		innerEngine = inner;
 	}
-
-	@Validation
-	public void validate() throws Exception {
-		if (innerEngine == null) {
-			throw new IllegalStateException(
-					"Configuration did not include a wrapped SearchEngine.");
-		}
-	}
-
 
 	/**
 	 * Complain unless ACTIVE.
@@ -222,13 +206,13 @@ public class InstrumentedSearchEngineWrapper implements SearchEngine {
 			return count;
 		}
 	}
-	
+
 	// ----------------------------------------------------------------------
 	// Helper classes
 	// ----------------------------------------------------------------------
 
-	
-	private static class SearchResponseForDocumentCount implements SearchResponse {
+	private static class SearchResponseForDocumentCount implements
+			SearchResponse {
 		private final int count;
 
 		public SearchResponseForDocumentCount(int count) {
@@ -254,28 +238,29 @@ public class InstrumentedSearchEngineWrapper implements SearchEngine {
 		public List<SearchFacetField> getFacetFields() {
 			return Collections.emptyList();
 		}
-		
-		private class EmptyDocumentListWithCount implements SearchResultDocumentList {
-				@Override
-				public Iterator<SearchResultDocument> iterator() {
-					return Collections.emptyIterator();
-				}
-				
-				@Override
-				public int size() {
-					return 0;
-				}
-				
-				@Override
-				public long getNumFound() {
-					return count;
-				}
-				
-				@Override
-				public SearchResultDocument get(int i) {
-					throw new ArrayIndexOutOfBoundsException(i);
-				}
+
+		private class EmptyDocumentListWithCount implements
+				SearchResultDocumentList {
+			@Override
+			public Iterator<SearchResultDocument> iterator() {
+				return Collections.emptyIterator();
+			}
+
+			@Override
+			public int size() {
+				return 0;
+			}
+
+			@Override
+			public long getNumFound() {
+				return count;
+			}
+
+			@Override
+			public SearchResultDocument get(int i) {
+				throw new ArrayIndexOutOfBoundsException(i);
+			}
 		}
 	}
-	
+
 }
