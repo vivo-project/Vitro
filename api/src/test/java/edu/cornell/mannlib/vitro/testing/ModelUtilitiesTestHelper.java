@@ -31,6 +31,11 @@ public class ModelUtilitiesTestHelper {
 				createResource(classUri));
 	}
 
+	public static Statement objectProperty(String subjectUri, String propertyUri) {
+		return createStatement(createResource(subjectUri),
+				createProperty(propertyUri), createResource());
+	}
+
 	public static Statement objectProperty(String subjectUri,
 			String propertyUri, String objectUri) {
 		return createStatement(createResource(subjectUri),
