@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.SendFailedException;
@@ -256,13 +257,13 @@ public class ContactMailController extends FreemarkerHttpServlet {
         MimeMessage msg = new MimeMessage( s );
         //System.out.println("trying to send message from servlet");
 
-        // Set the from address
+        // Set the reply address
         try {
-            msg.setFrom( new InternetAddress( webuseremail, webusername ));
+            msg.setReplyTo( new Address[] { new InternetAddress( webuseremail, webusername ) } );
         } catch (UnsupportedEncodingException e) {
-        	log.error("Can't set message sender with personal name " + webusername + 
+        	log.error("Can't set message reply with personal name " + webusername +
         			" due to UnsupportedEncodingException");
-            msg.setFrom( new InternetAddress( webuseremail ) );
+//            msg.setFrom( new InternetAddress( webuseremail ) );
         }
 
         // Set the recipient address
@@ -271,6 +272,13 @@ public class ContactMailController extends FreemarkerHttpServlet {
             address[i] = new InternetAddress(recipients[i]);
         }
         msg.setRecipients( Message.RecipientType.TO, address );
+
+		// Set the from address
+		if (address != null && address.length > 0) {
+			msg.setFrom(address[0]);
+		} else {
+            msg.setFrom( new InternetAddress( webuseremail ) );
+		}
 
         // Set the subject and text
         msg.setSubject( deliveryfrom );

@@ -188,8 +188,15 @@ public class JenaIngestController extends BaseEditController {
             request.setAttribute("bodyJsp",INGEST_MENU_JSP);
         }
         
-        maker = getModelMaker(vreq); 
-        request.setAttribute("modelNames", maker.listModels().toList());
+        maker = getModelMaker(vreq);
+        List<String> modelNames = maker.listModels().toList();
+        for (int mnIdx = modelNames.size() - 1; mnIdx > -1; mnIdx--) {
+            if (!modelNames.get(mnIdx).startsWith("http")) {
+                modelNames.remove(mnIdx);
+            }
+        }
+
+        request.setAttribute("modelNames", modelNames);
    
         RequestDispatcher rd = request.getRequestDispatcher(
                 Controllers.BASIC_JSP);      

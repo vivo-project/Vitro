@@ -304,7 +304,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 				if (statusCode > 399) {
 					log.error("response " + statusCode + " to query. \n");
 					log.debug("update string: \n" + queryStr);
-					throw new RDFServiceException("Unable to perform SPARQL UPDATE");
+					throw new RDFServiceException("Unable to perform SPARQL SELECT");
 				}
 
 				try (InputStream in = response.getEntity().getContent()) {
