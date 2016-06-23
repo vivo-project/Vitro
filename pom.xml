@@ -58,7 +58,13 @@
 
     <profiles>
         <profile>
-            <id>vitro-dev</id>
+            <id>doclint-java8-disable</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <properties>
+                <javadoc.opts>-Xdoclint:none</javadoc.opts>
+            </properties>
         </profile>
         <profile>
             <id>release</id>
@@ -91,6 +97,7 @@
                         </executions>
                         <configuration>
                             <quiet>true</quiet>
+                            <additionalparam>${javadoc.opts}</additionalparam>
                         </configuration>
                     </plugin>
                     <plugin>
