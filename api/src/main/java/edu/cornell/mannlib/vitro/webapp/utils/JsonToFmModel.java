@@ -52,7 +52,7 @@ public final class JsonToFmModel
     /**
      * Convert JSON Object string to Freemarker-compatible data model
      * 
-     * @param jsonString
+     * @param jsonString JSON string
      * @return model
      * @throws JSONException
      */
@@ -63,7 +63,7 @@ public final class JsonToFmModel
     }
     
     /**
-     * JSONObject is an unordered collection of name/value pairs -> convert to Map (equivalent to Freemarker "hash")
+     * JSONObject is an unordered collection of name/value pairs -&gt; convert to Map (equivalent to Freemarker "hash")
      */
     @SuppressWarnings("unchecked")
     public static Map<String, Object> convertJSONObjectToMap(JSONObject jo) throws JSONException
@@ -105,7 +105,7 @@ public final class JsonToFmModel
     /**
      * Convert JSON Array string to Freemarker-compatible data model
      * 
-     * @param jsonString
+     * @param jsonString JSON String
      * @return model
      * @throws JSONException
      */
@@ -118,7 +118,7 @@ public final class JsonToFmModel
     }
     
     /**
-     * JSONArray is an ordered sequence of values -> convert to List (equivalent to Freemarker "sequence")
+     * JSONArray is an ordered sequence of values -&gt; convert to List (equivalent to Freemarker "sequence")
      */
     public static List<Object> convertJSONArrayToList(JSONArray ja) throws JSONException
     {

@@ -36,49 +36,49 @@ import java.io.Writer;
  * A JSONObject is an unordered collection of name/value pairs. Its
  * external form is a string wrapped in curly braces with colons between the
  * names and values, and commas between the values and names. The internal form
- * is an object having <code>get</code> and <code>opt</code> methods for
- * accessing the values by name, and <code>put</code> methods for adding or
+ * is an object having {@code get} and {@code opt} methods for
+ * accessing the values by name, and {@code put} methods for adding or
  * replacing values by name. The values can be any of these types:
- * <code>Boolean</code>, <code>JSONArray</code>, <code>JSONObject</code>,
- * <code>Number</code>, <code>String</code>, or the <code>JSONObject.NULL</code>
+ * {@code Boolean}, {@code JSONArray}, {@code JSONObject},
+ * {@code Number}, {@code String}, or the {@code JSONObject.NULL}
  * object. A JSONObject constructor can be used to convert an external form
  * JSON text into an internal form whose values can be retrieved with the
- * <code>get</code> and <code>opt</code> methods, or to convert values into a
- * JSON text using the <code>put</code> and <code>toString</code> methods.
- * A <code>get</code> method returns a value if one can be found, and throws an
- * exception if one cannot be found. An <code>opt</code> method returns a
+ * {@code get} and {@code opt} methods, or to convert values into a
+ * JSON text using the {@code put} and {@code toString} methods.
+ * A {@code get} method returns a value if one can be found, and throws an
+ * exception if one cannot be found. An {@code opt} method returns a
  * default value instead of throwing an exception, and so is useful for
  * obtaining optional values.
  * <p>
- * The generic <code>get()</code> and <code>opt()</code> methods return an
+ * The generic {@code get()} and {@code opt()} methods return an
  * object, which you can cast or query for type. There are also typed
- * <code>get</code> and <code>opt</code> methods that do type checking and type
+ * {@code get} and {@code opt} methods that do type checking and type
  * coersion for you.
  * <p>
- * The <code>put</code> methods adds values to an object. For example, <pre>
+ * The {@code put} methods adds values to an object. For example, <pre>
  *     myString = new JSONObject().put("JSON", "Hello, World!").toString();</pre>
- * produces the string <code>{"JSON": "Hello, World"}</code>.
+ * produces the string {@code {"JSON": "Hello, World"}}.
  * <p>
- * The texts produced by the <code>toString</code> methods strictly conform to
+ * The texts produced by the {@code toString} methods strictly conform to
  * the JSON sysntax rules.
  * The constructors are more forgiving in the texts they will accept:
  * <ul>
- * <li>An extra <code>,</code>&nbsp;<small>(comma)</small> may appear just
+ * <li>An extra {@code ,}&nbsp;<small>(comma)</small> may appear just
  *     before the closing brace.</li>
- * <li>Strings may be quoted with <code>'</code>&nbsp;<small>(single
+ * <li>Strings may be quoted with {@code '}&nbsp;<small>(single
  *     quote)</small>.</li>
  * <li>Strings do not need to be quoted at all if they do not begin with a quote
  *     or single quote, and if they do not contain leading or trailing spaces,
  *     and if they do not contain any of these characters:
- *     <code>{ } [ ] / \ : , = ; #</code> and if they do not look like numbers
- *     and if they are not the reserved words <code>true</code>,
- *     <code>false</code>, or <code>null</code>.</li>
- * <li>Keys can be followed by <code>=</code> or <code>=></code> as well as
- *     by <code>:</code>.</li>
- * <li>Values can be followed by <code>;</code> <small>(semicolon)</small> as
- *     well as by <code>,</code> <small>(comma)</small>.</li>
- * <li>Numbers may have the <code>0-</code> <small>(octal)</small> or
- *     <code>0x-</code> <small>(hex)</small> prefix.</li>
+ *     {@code { } [ ] / \ : , = ; #} and if they do not look like numbers
+ *     and if they are not the reserved words {@code true},
+ *     {@code false}, or {@code null}.</li>
+ * <li>Keys can be followed by {@code =} or {@code =>} as well as
+ *     by {@code :}.</li>
+ * <li>Values can be followed by {@code ;} <small>(semicolon)</small> as
+ *     well as by {@code ,} <small>(comma)</small>.</li>
+ * <li>Numbers may have the {@code 0-} <small>(octal)</small> or
+ *     {@code 0x-} <small>(hex)</small> prefix.</li>
  * <li>Comments written in the slashshlash, slashstar, and hash conventions
  *     will be ignored.</li>
  * </ul>
@@ -133,9 +133,9 @@ public class JSONObject {
 
     /**
      * It is sometimes more convenient and less ambiguous to have a
-     * <code>NULL</code> object than to use Java's <code>null</code> value.
-     * <code>JSONObject.NULL.equals(null)</code> returns <code>true</code>.
-     * <code>JSONObject.NULL.toString()</code> returns <code>"null"</code>.
+     * {@code NULL} object than to use Java's {@code null} value.
+     * {@code JSONObject.NULL.equals(null)} returns {@code true}.
+     * {@code JSONObject.NULL.toString()} returns {@code "null"}.
      */
     public static final Object NULL = new Null();
 
@@ -267,8 +267,8 @@ public class JSONObject {
      * Construct a JSONObject from a string.
      * This is the most commonly used JSONObject constructor.
      * @param string    A string beginning
-     *  with <code>{</code>&nbsp;<small>(left brace)</small> and ending
-     *  with <code>}</code>&nbsp;<small>(right brace)</small>.
+     *  with {@code {}&nbsp;<small>(left brace)</small> and ending
+     *  with {@code }}&nbsp;<small>(right brace)</small>.
      * @exception JSONException If there is a syntax error in the source string.
      */
     public JSONObject(String string) throws JSONException {
@@ -908,7 +908,7 @@ public class JSONObject {
 
     /**
      * Produce a string in double quotes with backslash sequences in all the
-     * right places. A backslash will be inserted within </, allowing JSON
+     * right places. A backslash will be inserted, allowing JSON
      * text to be delivered in HTML. In JSON text, a string cannot contain a
      * control character or an unescaped quote or backslash.
      * @param string A String
@@ -1031,8 +1031,8 @@ public class JSONObject {
      *
      * @return a printable, displayable, portable, transmittable
      *  representation of the object, beginning
-     *  with <code>{</code>&nbsp;<small>(left brace)</small> and ending
-     *  with <code>}</code>&nbsp;<small>(right brace)</small>.
+     *  with {@code {}&nbsp;<small>(left brace)</small> and ending
+     *  with {@code }}&nbsp;<small>(right brace)</small>.
      */
     public String toString() {
         try {
@@ -1064,8 +1064,8 @@ public class JSONObject {
      *  indentation.
      * @return a printable, displayable, portable, transmittable
      *  representation of the object, beginning
-     *  with <code>{</code>&nbsp;<small>(left brace)</small> and ending
-     *  with <code>}</code>&nbsp;<small>(right brace)</small>.
+     *  with {@code {}&nbsp;<small>(left brace)</small> and ending
+     *  with {@code }}&nbsp;<small>(right brace)</small>.
      * @throws JSONException If the object contains an invalid number.
      */
     public String toString(int indentFactor) throws JSONException {
@@ -1082,8 +1082,8 @@ public class JSONObject {
      * @param indent The indentation of the top level.
      * @return a printable, displayable, transmittable
      *  representation of the object, beginning
-     *  with <code>{</code>&nbsp;<small>(left brace)</small> and ending
-     *  with <code>}</code>&nbsp;<small>(right brace)</small>.
+     *  with {@code {}&nbsp;<small>(left brace)</small> and ending
+     *  with {@code }}&nbsp;<small>(right brace)</small>.
      * @throws JSONException If the object contains an invalid number.
      */
     String toString(int indentFactor, int indent) throws JSONException {
@@ -1142,8 +1142,8 @@ public class JSONObject {
      * @param value The value to be serialized.
      * @return a printable, displayable, transmittable
      *  representation of the object, beginning
-     *  with <code>{</code>&nbsp;<small>(left brace)</small> and ending
-     *  with <code>}</code>&nbsp;<small>(right brace)</small>.
+     *  with {@code {}&nbsp;<small>(left brace)</small> and ending
+     *  with {@code }}&nbsp;<small>(right brace)</small>.
      * @throws JSONException If the value is or contains an invalid number.
      */
     static String valueToString(Object value) throws JSONException {
@@ -1183,8 +1183,8 @@ public class JSONObject {
      * @param indent The indentation of the top level.
      * @return a printable, displayable, transmittable
      *  representation of the object, beginning
-     *  with <code>{</code>&nbsp;<small>(left brace)</small> and ending
-     *  with <code>}</code>&nbsp;<small>(right brace)</small>.
+     *  with {@code {}&nbsp;<small>(left brace)</small> and ending
+     *  with {@code }}&nbsp;<small>(right brace)</small>.
      * @throws JSONException If the object contains an invalid number.
      */
      static String valueToString(Object value, int indentFactor, int indent)

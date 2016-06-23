@@ -13,7 +13,7 @@ public class Test {
 
     /**
      * Entry point.
-     * @param args
+     * @param args Command line argumments
      */
     public static void main(String args[]) {
         Iterator it;

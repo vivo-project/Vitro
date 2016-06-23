@@ -179,7 +179,7 @@ public class MultiValueEditSubmission {
     }
     /**
      * need to generate something like
-     *  "09:10:11"^^<http://www.w3.org/2001/XMLSchema#time>
+     *  {@code "09:10:11"^^<http://www.w3.org/2001/XMLSchema#time>}
      */ 
     public Literal getTime(Map<String,String[]> queryParameters,String fieldName) {
         List<String> hour = Arrays.asList(queryParameters.get("hour" + fieldName));

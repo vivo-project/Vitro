@@ -19,9 +19,8 @@ public class DedupAndExtract {
 	/**
 	 * Returns a model where redundant individuals that are sameAs one another are smushed
 	 * using URIs in preferred namespaces where possible.
-	 * @param model
-	 * @param preferredIndividualNamespace
-	 * @return
+	 * @param model Jena Model
+	 * @param preferredNamespace Preferred namespace
 	 */
 	public Model dedupAndExtract( Model model, String preferredNamespace ) {
 		

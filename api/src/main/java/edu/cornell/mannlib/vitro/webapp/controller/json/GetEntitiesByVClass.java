@@ -33,13 +33,14 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * If there are more entities the last item on the returned array will be an object
  * with no id property. It will look like this:
  *
+ * {@code
  * {"resultGroup":0,
  *  "resultKey":"2WEK2306",
  *  "nextUrl":"http://caruso.mannlib.cornell.edu:8080/vitro/dataservice?getEntitiesByVClass=1&resultKey=2WEK2306&resultGroup=1&vclassId=null",
  *  "entsInVClass":1752,
  *  "nextResultGroup":1,
  *  "standardReplySize":256}
- *
+ * }
  */
 public class GetEntitiesByVClass extends JsonArrayProducer {
 	private static final Log log = LogFactory.getLog(GetEntitiesByVClass.class);

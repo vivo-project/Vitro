@@ -40,8 +40,6 @@ public class Tags extends BaseTemplateModel {
      * that exposes certain write methods, instead of the configuration's object wrapper,
      * which doesn't. The templates can then add stylesheets and scripts to the lists
      * by calling their add() methods.
-     * @param Tags tags
-     * @return TemplateModel
      */
     static public class TagsWrapper extends BeansWrapper {
         

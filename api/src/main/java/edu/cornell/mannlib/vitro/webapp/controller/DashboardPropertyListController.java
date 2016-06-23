@@ -48,8 +48,6 @@ public class DashboardPropertyListController extends VitroHttpServlet {
      *
      * Expected Attributes:
      * entity - set to entity to display properties for.
-     *
-     * @author bdc34, then jc55
      */
     
     private static final Log log = LogFactory.getLog(DashboardPropertyListController.class.getName());

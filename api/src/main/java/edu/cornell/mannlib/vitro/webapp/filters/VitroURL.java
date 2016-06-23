@@ -156,9 +156,8 @@ class VitroURL {
      * This seems like a huge problem.  We will only correctly handle odd things 
      * as a query parameter 'uri' in the last position.
      *  
-     * @param queryStr
-     * @return
-     */    
+     * @param queryStr Querst string
+     */
     protected List<String[]> parseQueryParams(String queryStr) {
         List<String[]> queryParamList = new ArrayList<String[]>();
         if (queryStr == null) {

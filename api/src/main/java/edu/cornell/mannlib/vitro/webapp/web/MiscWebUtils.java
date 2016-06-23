@@ -65,8 +65,8 @@ public class MiscWebUtils {
      * Gets an attribute from the request, if it is not null, and of Class String
      * print it to req.out, otherwise throw an exception.
      *
-     * @param req
-     * @param attribute
+     * @param request Servlet Request
+     * @param attribute Attribute name
      */
     public static String writeAttribute(HttpServletRequest request,  String attribute)
     throws JspException{
@@ -140,8 +140,7 @@ public class MiscWebUtils {
 	
     /**
      * returns a table of the req attributes
-     * @param req
-     * @return
+     * @param req Servlet Request
      */
     public static String getRequestAttributes( HttpServletRequest req){
         String val = "<table>";
@@ -260,9 +259,8 @@ public class MiscWebUtils {
     /**
         This isfrom org.json.simple.JSONObject
 
-     * " => \" , \ => \\
-	 * @param s
-	 * @return
+     * {@code " => \" , \ => \\ }
+	 * @param s String to escape
 	 */
 	public static String escape(String s){
 		if(s==null)

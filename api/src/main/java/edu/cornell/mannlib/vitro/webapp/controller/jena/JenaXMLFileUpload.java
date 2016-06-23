@@ -229,8 +229,7 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 
 	/**
 	 * Save files to baseDirectoryForFiles and return a list of File objects.
-	 * @param fileStreams
-	 * @return
+	 * @param fileStreams File streams to process
 	 * @throws ServletException
 	 */
 	private List<File> saveFiles( Map<String, List<FileItem>> fileStreams ) throws ServletException{

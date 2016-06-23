@@ -32,13 +32,13 @@ import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
  * <p>
  * The path of the request should be the "alias URL" of the desired file. We
  * need to:
+ * </p>
  * <ul>
  * <li>Use the alias URL to find the URI of the file bytestream object.</li>
  * <li>Find the file surrogate object to get the MIME type of the file, and
  * confirm the filename.</li>
  * <li>Set the MIME type on the output stream and serve the bytes.</li>
  * </ul>
- * </p>
  * <p>
  * If the request is superficially correct, but no such file can be found,
  * return a 404. If there is a break in the data structures within the model or

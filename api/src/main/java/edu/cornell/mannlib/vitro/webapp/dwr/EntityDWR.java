@@ -33,7 +33,7 @@ public class EntityDWR {
 
     /**
      *  Insets a new entity into the Vitro system.
-     *  @returns < 1 if failed, entityId if success.
+     *  @return &lt; 1 if failed, entityId if success.
      */
     public String insertNewEntity(Individual ent ){
     	try {
@@ -47,8 +47,6 @@ public class EntityDWR {
     /**
      ********************************************************
      * Gets an Entity object for a given entities.id.
-     * @param entityId
-     * @return
      */
     public Individual entityByURI(String entityURI){
         WebContext ctx = WebContextFactory.get();

@@ -451,7 +451,7 @@ public class WebappDaoFactoryJena implements WebappDaoFactory {
     
     /**
      * Method for creating a copy - does not pass the same object
-     * @param base
+     * @param base DAO Factory
      */
     public WebappDaoFactoryJena (WebappDaoFactoryJena base) {
     	// Not sure if selector somehow has greater longevity so 

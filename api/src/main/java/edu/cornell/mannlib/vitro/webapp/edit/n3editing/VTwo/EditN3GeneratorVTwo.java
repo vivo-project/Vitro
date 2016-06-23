@@ -34,7 +34,7 @@ public class EditN3GeneratorVTwo {
      * This takes into account multiple values that would be returned from a select list.
      * subInUris should no longer be used.
      * 
-     * It's important that the map contain String to List<String> mapping.  
+     * It's important that the map contain String to List&lt;String&gt; mapping.
      * 
      * Before values are sent in, all of the values for a variable should be placed within an array.
      * 

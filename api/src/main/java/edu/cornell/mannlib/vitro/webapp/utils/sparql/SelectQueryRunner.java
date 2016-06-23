@@ -16,7 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 /**
  * A conversational tool for handling SPARQL queries.
  * 
- * <pre>
+ * {@code
  * Examples:
  *   List<String> values = createQueryContext(rdfService, queryString)
  *                             .bindVariableToUri("uri", uri)
@@ -29,7 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
  *   List<Map<String, String> map = createQueryContext(rdfService, q)
  *                             .execute()
  *                             .getStringFields();
- * </pre>
+ * }
  * 
  * The execute() method does not actually execute the query: it merely sets it
  * up syntactically.

@@ -78,7 +78,6 @@ public class ExtendedRdfAssembler {
 	}
 
 	/**
-	 * @return
 	 */
 	public ResponseValues assembleRdf() {
 		OntModel ontModel = vreq.getJenaOntModel();

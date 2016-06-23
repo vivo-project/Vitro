@@ -247,8 +247,7 @@ public class N3EditUtils {
 
     /**
      * Strips from a string any characters that are not valid in XML 1.0
-     * @param in
-     * @return
+     * @param in String to strip characters from
      */
     public static String stripInvalidXMLChars(String in) {
         if (in == null) {

@@ -140,11 +140,11 @@ public class Cookie {
     }
 
     /**
-     * Convert <code>%</code><i>hh</i> sequences to single characters, and
+     * Convert {@code %}<i>hh</i> sequences to single characters, and
      * convert plus to space.
      * @param s A string that may contain
-     *      <code>+</code>&nbsp;<small>(plus)</small> and
-     *      <code>%</code><i>hh</i> sequences.
+     *      {@code +}&nbsp;<small>(plus)</small> and
+     *      {@code %}<i>hh</i> sequences.
      * @return The unescaped string.
      */
     public static String unescape(String s) {

@@ -347,7 +347,6 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 
     /**
      * Get the class groups represented for the individuals in the documents.
-     * @param qtxt 
      */
     private List<VClassGroupSearchLink> getClassGroupsLinks(VitroRequest vreq, VClassGroupDao grpDao, SearchResultDocumentList docs, SearchResponse rsp, String qtxt) {                                 
         Map<String,Long> cgURItoCount = new HashMap<String,Long>();
@@ -604,8 +603,6 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 
     /**
      * Makes a message to display to user for a bad search term.
-     * @param queryText
-     * @param exceptionMsg
      */
     private String makeBadSearchMessage(String querytext, String exceptionMsg, VitroRequest vreq){
         String rv = "";

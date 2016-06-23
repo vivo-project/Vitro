@@ -55,9 +55,7 @@ public class ABoxUpdater {
 	 * 
 	 * Constructor 
 	 *  
-	 * @param   oldTboxModel - previous version of the ontology
-	 * @param   newTboxModel - new version of the ontology
-	 * @param   aboxModel    - the knowledge base to be updated
+	 * @param   settings     - Update settings
 	 * @param   logger       - for writing to the change log
 	 *                         and the error log.
 	 * @param   record       - for writing to the additions model 

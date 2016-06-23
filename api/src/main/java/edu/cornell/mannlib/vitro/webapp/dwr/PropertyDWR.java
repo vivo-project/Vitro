@@ -49,7 +49,7 @@ public class PropertyDWR {
 
     /**
      * Gets only unhidden properties.
-     * @returns Collection of PropertyInstance objs
+     * @return Collection of PropertyInstance objs
      */
     public Collection getAllPropInstByVClass(String classURI){
         WebContext ctx = WebContextFactory.get();

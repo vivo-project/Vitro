@@ -89,8 +89,7 @@ public class RDFServiceGraphBulkUpdater implements BulkUpdateHandler {
     /**
      * Returns a pair of models.  The first contains any statement containing at 
      * least one blank node.  The second contains all remaining statements.
-     * @param g
-     * @return
+     * @param g Graph
      */
     
     private Model[] separateStatementsWithBlankNodes(Graph g) {

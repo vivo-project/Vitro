@@ -60,10 +60,8 @@ public class TBoxUpdater {
     /**
      * 
      * Constructor 
-     *  
-     * @param   oldTboxAnnotationsModel - previous version of the annotations in the ontology
-     * @param   newTboxAnnotationsModel - new version of the annotations in the ontology
-     * @param   siteModel    - the knowledge base to be updated
+     *
+     * @param   settings     - update settings
      * @param   logger       - for writing to the change log
      *                         and the error log.
      * @param   record       - for writing to the additions model 

@@ -22,8 +22,7 @@ public class JenaOntologyLoader {
      * This should load the system with classes, data properties and
      * object properties that the vitro systems needs.
      *  
-     * @return
-     * @throws Exception 
+     * @throws Exception
      */
     OntModel loadSystemAndUsers() throws Exception{        
         Model model = ModelFactory.createDefaultModel();        
@@ -42,8 +41,7 @@ public class JenaOntologyLoader {
      * Loads a owl file into the ontModel.  Looks for files on classpath.
      * example: loadSpecialVivoModel("/testontologies/smallVivo-20070809.owl") 
      * 
-     * @param junk
-     * @return
+     * @param junk Junk value
      * @throws IOException
      */
     OntModel loadSpecialVivoModel(String junk) throws IOException{

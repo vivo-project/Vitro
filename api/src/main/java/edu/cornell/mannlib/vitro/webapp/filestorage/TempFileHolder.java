@@ -31,7 +31,7 @@ public class TempFileHolder implements HttpSessionBindingListener {
 	private static final Log log = LogFactory.getLog(TempFileHolder.class);
 
 	/**
-	 * Create a {@link TempFileHolder} holding the given {@link FileInfo}, and
+	 * Create a  holding the given {@link FileInfo}, and
 	 * attach it to the session with the given attribute name.
 	 * 
 	 * If an attribute with this name already exists, it is replaced.
@@ -52,11 +52,11 @@ public class TempFileHolder implements HttpSessionBindingListener {
 	}
 
 	/**
-	 * Get the {@link TempFileHolder} which is stored as an attribute on this
+	 * Get the  which is stored as an attribute on this
 	 * session, extract the {@link FileInfo} from it, and remove it from the
 	 * session.
 	 * 
-	 * If there is no such attribute, of if it is not a {@link TempFileHolder},
+	 * If there is no such attribute, of if it is not a ,
 	 * return null.
 	 */
 	public static FileInfo remove(HttpSession session, String attributeName) {
@@ -92,8 +92,6 @@ public class TempFileHolder implements HttpSessionBindingListener {
 	/**
 	 * Gets the {@link FileInfo} payload, and removes it so the file won't be
 	 * deleted when the value is unbound.
-	 * 
-	 * @return
 	 */
 	private FileInfo extractFileInfo() {
 		FileInfo result = this.fileInfo;
@@ -103,8 +101,7 @@ public class TempFileHolder implements HttpSessionBindingListener {
 
 	/**
 	 * When attached to the session, do nothing.
-	 * 
-	 * @see HttpSessionBindingListener#valueBound(HttpSessionBindingEvent)
+	 *
 	 */
 	@Override
 	public void valueBound(HttpSessionBindingEvent event) {
@@ -115,8 +112,7 @@ public class TempFileHolder implements HttpSessionBindingListener {
 	 * When removed from the session, if the {@link #fileInfo} is not empty,
 	 * delete the file. If you had wanted this file, you should have called
 	 * {@link #remove(HttpSession, String) remove}.
-	 * 
-	 * @see HttpSessionBindingListener#valueUnbound(HttpSessionBindingEvent)
+	 *
 	 */
 	@Override
 	public void valueUnbound(HttpSessionBindingEvent event) {

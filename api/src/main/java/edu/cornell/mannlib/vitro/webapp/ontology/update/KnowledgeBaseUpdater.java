@@ -145,11 +145,10 @@ public class KnowledgeBaseUpdater {
      * data, for changes that cannot be expressed as simple property
      * or class additions, deletions, or renamings.
      * Blank nodes created by the queries are given random URIs.
-     * @param sparqlConstructDir
-     * @param readModel
-     * @param writeModel
-     * @param add (add = true; retract = false)
-     */
+     * @param sparqlConstructDir Sparql CONSTRUCT
+	 * @param rdfService RDF Service to use
+	 * @param add (add = true; retract = false)
+	 */
     private void performSparqlConstructs(String sparqlConstructDir, 
             RDFService rdfService,
             boolean add)   throws IOException {
@@ -362,7 +361,7 @@ public class KnowledgeBaseUpdater {
 	
 	/**
 	 * loads a SPARQL ASK query from a text file
-	 * @param filePath
+	 * @param filePath Path of a file
 	 * @return the query string or null if file not found
 	 */
 	public static String loadSparqlQuery(String filePath) throws IOException {

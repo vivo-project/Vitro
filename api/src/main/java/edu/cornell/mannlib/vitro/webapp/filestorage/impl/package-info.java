@@ -6,6 +6,7 @@
  * <h1>Relationship to PairTree</h1>
  * <p>
  * The system incorporates a number of ideas from the PairTree specification,
+ * </p>
  * <ul>
  * <li>
  * The basic pairtree algorithm -
@@ -45,18 +46,17 @@
  * "shorty" directory names may be up to 3 characters long, not 2.
  * </li>
  * </ul>
- * </p>
  * <h1>Directory structure</h1>
  * <p>
  * A typical structure would look like this:
- * <pre>
+ * {@code
  * + basedir
  * |
  * +--+ file_storage_namespaces.properties
  * |
  * +--+ file_storage_root
- * </pre>
- * The <code>file_storage_root</code> directory contains the subdirectories
+ * }
+ * The {@code file_storage_root} directory contains the subdirectories
  * that implement the encoded IDs, and the final directory for each ID will
  * contain a single file that corresponds to that ID.
  * </p>
@@ -71,23 +71,24 @@
  * For example, the sytem might be initialized with a "namespace" of
  * "http://vivo.mydomain.edu/file/". If that is the only namespace, it will
  * be internally assigned a prefix of "a", so a URI like this:
+ * </p>
  * <pre>http://vivo.mydomain.edu/file/n3424/myPhoto.jpg</pre>
  * would be converted to this:
  * <pre>a~n3424/myPhoto.jpg</pre>
- * </p>
  * <p>
  * The namespaces and their assigned prefixes are stored in a properties file
  * when the structure is initialized. When the structure is re-opened, the
  * file is read to find the correct prefixes. The file
  * might look like this:
+ * </p>
  * <pre>
  * a = http://the.first.namespace/
  * b = http://the.second.namespace/
  * </pre>
- * </p>
  * <h1>ID encoding</h1>
  * <p>
  * This is a multi-step process:
+ * </p>
  * <ul>
  * <li>
  * <strong>Namespace recognition</strong> -
@@ -139,17 +140,12 @@
  * </li>
  * </ul>
  * Examples:
- * <br/><code>ark:/13030/xt12t3</code> becomes
- * <code>ark/+=1/303/0=x/t12/t3</code>
- * <br/><code>http://n2t.info/urn:nbn:se:kb:repos-1</code> becomes
- * <code>htt/p+=/=n2/t,i/nfo/=ur/n+n/bn+/se+/kb+/rep/os-/1</code>
- * <br/><code>what-the-*@?#!^!~?</code> becomes
- * <code>wha/t-t/he-/^2a/@^3/f#!/^5e/!^7/e^3/f</code>
- * <br/><code>http://vivo.myDomain.edu/file/n3424</code> with namespace
- * <code>http://vivo.myDomain.edu/file/</code> and prefix
- * <code>a</code> becomes
- * <code>a~n/342/4</code>
- * </p>
+ * {@code ark:/13030/xt12t3} becomes {@code ark/+=1/303/0=x/t12/t3}
+ * {@code http://n2t.info/urn:nbn:se:kb:repos-1} becomes {@code htt/p+=/=n2/t,i/nfo/=ur/n+n/bn+/se+/kb+/rep/os-/1}
+ * {@code what-the-*@?#!^!~?} becomes {@code wha/t-t/he-/^2a/@^3/f#!/^5e/!^7/e^3/f}
+ * {@code http://vivo.myDomain.edu/file/n3424} with namespace
+ * {@code http://vivo.myDomain.edu/file/} and prefix
+ * {@code a} becomes {@code a~n/342/4}
  * <h1>Filename encoding</h1>
  * <p>
  * The name of the file is encoded as needed to guard against illegal
@@ -161,9 +157,6 @@
  * "common character encoding" steps used for ID encoding, except that
  * periods are not encoded.
  * </p>
- * <hr/>
- * <hr/>
- * <hr/>
  * <h2>
  * 	This was summarized in a post to the vivo-dev-all list on 11/29/2010
  * </h2>
@@ -186,19 +179,19 @@
  * </p>
  * <p>
  * 	Let's consider a file with this information:
+ * </p>
  * 	<pre>
  * 		URI = http://vivo.mydomain.edu/individual/n3156
  * 		Filename = lily1.jpg
  * 	</pre>
- * </p>
  * <p>
  * 	We want to turn the URI into the directory path, but the URI contains
  * 	prohibited characters. Using a PairTree-like character substitution,
  * 	we might store it at this path:
+ * </p>
  * 	<pre>
  * 		/usr/local/vivo/uploads/file_storage_root/http+==vivo.mydomain.edu=individual=n3156/lily1.jpg
  * 	</pre>
- * </p>
  * <p>
  * 	Using that scheme would mean that each file sits in its own directory
  * 	under the storage root. At a large institution, there might be hundreds of
@@ -212,15 +205,16 @@
  * 	per directory. In practice, the number will be considerably smaller.
  *
  * 	So then it would look like this:
+ * </p>
  * 	<pre>
  * 		/usr/local/vivo/uploads/file_storage_root/htt/p+=/=vi/vo./myd/oma/in./edu/=in/div/idu/al=/n31/56/lily1.jpg
  * 	</pre>
- * </p>
  * <p>
  * 	But almost all of our URIs will start with the same namespace, so the
  * 	namespace just adds unnecessary and unhelpful depth to the directory tree.
  * 	We assign a single-character prefix to that namespace, using the
  * 	file_storage_namespaces.properties file in the uploads directory, like this:
+ * </p>
  * 	<pre>
  * 		a = http://vivo.mydomain.edu/individual/
  * 	</pre>
@@ -232,9 +226,9 @@
  * 	<pre>
  * 		/usr/local/vivo/uploads/file_storage_root/a~n/315/6/lily1.jpg
  * 	</pre>
- * </p>
  * <p>
  * 	So what we hope we have implemented is a system where:
+ * </p>
  * 	<ul>
  * 		<li>Files are stored by URI and filename.</li>
  * 		<li>File paths are constructed to limit the maximum number of files in a directory.</li>
@@ -244,9 +238,9 @@
  * 		<li>Frequently-used namespaces on the URIs can be collapsed to short prefix sequences.</li>
  * 		<li>URIs with unrecognized namespaces will not cause problems.</li>
  * 	</ul>
- * </p>
  * <p>
  * 	By the way, almost all of this is implemented in
+ * </p>
  * 	<pre>
  * 		edu.cornell.mannlib.vitro.webapp.filestorage.impl.FileStorageHelper
  * 	</pre>
@@ -254,6 +248,5 @@
  * 	<pre>
  * 		edu.cornell.mannlib.vitro.webapp.filestorage.impl.FileStorageHelperTest
  * 	</pre>
- * </p>
  */
 package edu.cornell.mannlib.vitro.webapp.filestorage.impl;

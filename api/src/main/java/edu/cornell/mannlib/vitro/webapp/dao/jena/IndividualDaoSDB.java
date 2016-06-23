@@ -308,7 +308,7 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     /**
      * fills in the Individual objects needed for any ObjectPropertyStatements 
      * attached to the specified individual.
-     * @param entity
+     * @param entity An individual
      */
     private void fillIndividualsForObjectPropertyStatements(Individual entity){
         getOntModel().enterCriticalSection(Lock.READ);

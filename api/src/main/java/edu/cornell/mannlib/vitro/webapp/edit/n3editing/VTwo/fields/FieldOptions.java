@@ -20,7 +20,7 @@ public interface FieldOptions {
      * Any object that are needed to get the options should
      * be passed in the constructor of the implementation.
      * 
-     * @return return a map of value->label for the options. 
+     * @return return a map of value-&gt;label for the options.
      * Should never return null.
      * 
      * @throws Exception 

@@ -32,7 +32,6 @@ import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileAlreadyExistsExc
 
 /**
  * Test the FileStorage methods. The zero-argument constructor was tested in
- * {@link FileStorageFactoryTest}.
  */
 public class FileStorageImplTest extends AbstractTestClass {
 	private static final List<String> EMPTY_NAMESPACES = Collections

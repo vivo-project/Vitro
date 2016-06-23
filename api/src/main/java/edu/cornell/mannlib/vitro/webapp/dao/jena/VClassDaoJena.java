@@ -493,7 +493,6 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
      * of determining whether something is a root class.
      * We also avoid ClassCastExceptions deep in Jena-land by eschewing Jena's 
      * listSuperClasses() method.
-     * @author bjl23
      */
     private Iterator<OntClass> smarterListHierarchyRootClasses(OntModel ontModel, String ontologyURI) {
         List<OntClass> rootClassList = new ArrayList<OntClass>();

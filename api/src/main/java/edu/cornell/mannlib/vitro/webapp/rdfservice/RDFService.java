@@ -141,8 +141,8 @@ public interface RDFService {
 	/**
 	 * Returns a list of all the graph URIs in the RDF store.
 	 * 
-	 * @return  List<String> - list of all the named graph URIs in the RDF store. 
-	 *                         Return an empty list of there no named graphs in
+	 * @return  list of all the named graph URIs in the RDF store.
+	 *          Return an empty list of there no named graphs in
 	 *                         the store. 
 	 */
 	public List<String> getGraphURIs() throws RDFServiceException;

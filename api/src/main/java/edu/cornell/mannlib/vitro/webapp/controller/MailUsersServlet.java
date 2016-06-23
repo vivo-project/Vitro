@@ -226,7 +226,7 @@ public class MailUsersServlet extends VitroHttpServlet {
     }
 
     /** Intended to mangle url so it can get through spam filtering
-     *    http://host/dir/servlet?param=value ->  host: dir/servlet?param=value */
+     *    http://host/dir/servlet?param=value -&gt;  host: dir/servlet?param=value */
     public String stripProtocol( String in ){
         if( in == null )
             return "";

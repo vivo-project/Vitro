@@ -125,9 +125,9 @@ public class GrefineMqlreadServlet extends VitroHttpServlet {
 
 	/**
 	 * Construct json from query String
-	 * @param query
-	 * @param subjectUriList
-	 * @param propertyUriMap
+	 * @param query Query
+	 * @param subjectUriList Subject URIs
+	 * @param propertyUriMap Property maps
 	 */
 	private void parseQuery(String query, ArrayList<String> subjectUriList, Map<String, JSONArray> propertyUriMap) {
 		try {

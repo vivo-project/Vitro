@@ -172,9 +172,8 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 	/**
 	 * Returns a default JSON response.
 	 * 
-	 * @param req
-	 * @param resp
-	 * @return
+	 * @param req Servlet Request
+	 * @param resp Servlet Response
 	 * @throws ServletException
 	 */
 	protected JSONObject getMetadata(HttpServletRequest req, HttpServletResponse resp, String defaultNamespace,

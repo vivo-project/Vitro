@@ -253,7 +253,6 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     
     /**
      * adds a single ObjectPropertyStatement object to Property's object property statements List.
-     * @param e2e
      */
     public final void addObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt){
         if( objPropertyStmt == null ) return;

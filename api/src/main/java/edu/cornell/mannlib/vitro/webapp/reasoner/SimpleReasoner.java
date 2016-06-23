@@ -82,12 +82,12 @@ public class SimpleReasoner extends StatementListener
 
 	/**
 	 * @param tboxModel - input.  This model contains both asserted and inferred TBox axioms
-	 * @param aboxModel - input.  This model contains asserted ABox statements
+	 * @param rdfService - input.  An RDF Service
 	 * @param inferenceModel - output. This is the model in which inferred (materialized) 
      *  ABox statements are maintained (added or retracted).
 	 * @param inferenceRebuildModel - output. This the model is temporarily used when the 
      *  whole ABox inference model is rebuilt
-	 * @param inferenceScratchpadModel - output. This the model is temporarily used when 
+	 * @param scratchpadModel - output. This the model is temporarily used when
      *  the whole ABox inference model is rebuilt
      * @param searchIndexer - output. If not null, the indexer will be paused before the 
      *  ABox inference model is rebuilt and unpaused when the rebuild is complete.

@@ -15,6 +15,7 @@ import freemarker.core.Environment;
  * 
  *  It is intended to be used like this:
  *  
+ *  {@code
  *  <@widget name="DateTime" dateTime="2010-11-23T11:03:23" >
  *    The year is ${year}
  *    The month is ${month}
@@ -23,6 +24,7 @@ import freemarker.core.Environment;
  *    The second is ${second}
  *    precision of date entered: ${precisionUri}    
  *  </@widget>
+ *  }
  *  
  * @author bdc34
  *

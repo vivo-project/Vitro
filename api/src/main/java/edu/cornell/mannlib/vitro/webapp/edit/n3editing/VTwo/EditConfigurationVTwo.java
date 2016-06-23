@@ -449,7 +449,6 @@ public class EditConfigurationVTwo {
     }
 
     /** Return a copy of the value so that the configuration is not modified by external code.
-     * @return
      */
     public List<String> getN3Required() {
         return EditConfigurationUtils.copy(n3Required);
@@ -471,7 +470,6 @@ public class EditConfigurationVTwo {
     	 this.n3Required.addAll(Arrays.asList( n3RequiredStrsInput ));  
     }
      /** return a copy of the value so that the configuration is not modified by external code.
-     * @return
      */
     public List<String> getN3Optional() {
          return EditConfigurationUtils.copy( n3Optional );
@@ -600,7 +598,6 @@ public class EditConfigurationVTwo {
     }
 
     /** Return a copy of the value so that the configuration is not modified by external code.
-     * @return
      */
     public Map<String, String> getSparqlForAdditionalUrisInScope() {        
         return copyMap(sparqlForAdditionalUrisInScope);        
@@ -611,7 +608,6 @@ public class EditConfigurationVTwo {
     }
 
      /** Return a copy of the value so that the configuration is not modified by external code.
-     * @return
      */
     public Map<String, String> getSparqlForAdditionalLiteralsInScope() {        
         return copyMap(sparqlForAdditionalLiteralsInScope);        
@@ -650,7 +646,6 @@ public class EditConfigurationVTwo {
     }
 
      /** return a copy of the value so that the configuration is not modified by external code.
-     * @return
      */
     public Map<String, String> getSparqlForExistingLiterals() {
         return copyMap(sparqlForExistingLiterals);        
@@ -661,7 +656,6 @@ public class EditConfigurationVTwo {
     }
 
      /** return a copy of the value so that the configuration is not modified by external code.
-     * @return
      */
     public Map<String, String> getSparqlForExistingUris() {         
         return copyMap(sparqlForExistingUris);        

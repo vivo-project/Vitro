@@ -86,7 +86,7 @@ public abstract class ResultSetConsumer {
 
         /**
          * Helper method that calls the processQuerySolution on an embedded ResultSetConsumer
-         * @param qs
+         * @param qs Query solution
          */
         protected void chainProcessQuerySolution(QuerySolution qs) {
             if (innerConsumer != null) {
@@ -135,7 +135,6 @@ public abstract class ResultSetConsumer {
 
         /**
          * Were any results found
-         * @return
          */
         public boolean hasResult() {
             return hasResult;

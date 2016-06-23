@@ -20,11 +20,11 @@ import freemarker.template.utility.DeepUnwrap;
  * implements TemplateMethodModel, you can pass arguments to it for formatting.
  * 
  * So if the string is "His name is {0}!", then these references could be used:
- * 
+ * {@code
  * ${string} ==> "His name is {0}!"
  * 
  * ${string("Bozo")} ==> "His name is Bozo!"
- * 
+ * }
  * Note that the format of the message is determined by java.text.MessageFormat,
  * so argument indices start at 0 and you can escape a substring by wrapping it
  * in apostrophes.

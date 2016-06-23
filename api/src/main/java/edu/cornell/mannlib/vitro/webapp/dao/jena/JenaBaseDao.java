@@ -461,9 +461,10 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 
     /**
      * convenience method
-     * @param ind
-     * @param dataprop
-     * @param value
+     * @param res Resource
+     * @param dataprop Datatype property
+     * @param value Date
+     * @param model Jena Model
      */
     protected synchronized void addPropertyDateValue(Resource res, DatatypeProperty dataprop, Date value, Model model) {
         if (dataprop != null && value != null) {
@@ -916,7 +917,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     
     /**
      * Checks a URI for validity.  Jena models can store invalid URIs, but this causes RDF/XML output serialization to fail.
-     * @param uri
+     * @param uri URI
      * @return null if URI is good, otherwise an error message String
      */
     protected String checkURI( String uri ) {
@@ -1047,8 +1048,8 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     
     /**
      * Returns additions and retractions to perform
-     * @param ontRes
-     * @param ontModel
+     * @param ontRes Ontology resource
+     * @param ontModel Ontology model
      * @return Model[] where [0] is retractions and [1] is additions
      */
     protected Model[] getSmartRemoval(OntResource ontRes, OntModel ontModel) {

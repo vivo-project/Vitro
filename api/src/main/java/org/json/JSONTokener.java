@@ -202,8 +202,8 @@ public class JSONTokener {
      * allow strings in single quotes, but an implementation is allowed to
      * accept them.
      * @param quote The quoting character, either
-     *      <code>"</code>&nbsp;<small>(double quote)</small> or
-     *      <code>'</code>&nbsp;<small>(single quote)</small>.
+     *      {@code "}&nbsp;<small>(double quote)</small> or
+     *      {@code '}&nbsp;<small>(single quote)</small>.
      * @return      A String.
      * @throws JSONException Unterminated string.
      */

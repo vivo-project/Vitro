@@ -34,7 +34,7 @@ public class OntologyChangeParser {
 	}
 		
 	/**
-	 * @param args
+	 * @param diffPath Diff path
 	 * @throws IOException 
 	 */
 	

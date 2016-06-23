@@ -81,7 +81,7 @@ public class MakeTidy {
 		}
 
 		/**
-		 * We don't want to log a partial line, so {@link #flush()} does
+		 * We don't want to log a partial line, so does
 		 * nothing.
 		 */
 		@Override

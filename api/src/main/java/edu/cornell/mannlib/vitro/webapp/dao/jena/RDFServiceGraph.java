@@ -60,7 +60,7 @@ public class RDFServiceGraph implements GraphWithPerform {
 
     /**
      * Returns a SparqlGraph for the union of named graphs in a remote repository 
-     * @param endpointURI
+     * @param rdfService RDF Service
      */
     public RDFServiceGraph(RDFService rdfService) {
         this(rdfService, null);
@@ -68,8 +68,8 @@ public class RDFServiceGraph implements GraphWithPerform {
     
     /**
      * Returns a SparqlGraph for a particular named graph in a remote repository 
-     * @param endpointURI
-     * @param graphURI
+     * @param rdfService RDFService
+     * @param graphURI Graph URI
      */
     public RDFServiceGraph(RDFService rdfService, String graphURI) {
        this.rdfService = rdfService;
