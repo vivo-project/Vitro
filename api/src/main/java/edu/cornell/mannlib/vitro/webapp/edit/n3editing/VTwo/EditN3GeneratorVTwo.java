@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -78,8 +79,14 @@ public class EditN3GeneratorVTwo {
         }         
     }
   
-    private boolean containsNullOrEmpty(List<String> values) {        
-        return values != null && ( values.contains(null) || values.contains("") );       
+    private boolean containsNullOrEmpty(List<String> values) {
+    	//return values != null && ( values.contains(null) || values.contains("") );
+    	if(values == null) return true ;
+    	if(values.isEmpty()) return true ;
+    	for(String str : values) {
+            if(StringUtils.isBlank(str)) return true ;
+        }
+        return false;
     }
 
     /**
