@@ -80,9 +80,7 @@ public class EditN3GeneratorVTwo {
     }
   
     private boolean containsNullOrEmpty(List<String> values) {
-    	//return values != null && ( values.contains(null) || values.contains("") );
-    	if(values == null) return true ;
-    	if(values.isEmpty()) return true ;
+    	if(values == null || values.isEmpty()) return true ;
     	for(String str : values) {
             if(StringUtils.isBlank(str)) return true ;
         }
