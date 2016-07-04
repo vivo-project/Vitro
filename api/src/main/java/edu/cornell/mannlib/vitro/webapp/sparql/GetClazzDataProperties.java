@@ -22,9 +22,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 
 /**
  * This servlet gets all the data properties for a given subject.
- * 
- * @param vClassURI
- * @author yuysun
  */
 
 public class GetClazzDataProperties extends BaseEditController {

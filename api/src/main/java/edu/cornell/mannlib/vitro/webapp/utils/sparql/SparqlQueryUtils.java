@@ -58,7 +58,7 @@ public class SparqlQueryUtils {
 	
 	/**
 	 * A convenience method to attempt parsing a query string with various syntaxes
-	 * @param queryString
+	 * @param queryString Query String
 	 * @return Query
 	 */
 	public static Query create(String queryString) {

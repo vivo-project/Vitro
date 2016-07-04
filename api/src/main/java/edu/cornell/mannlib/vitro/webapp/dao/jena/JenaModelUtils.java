@@ -60,7 +60,7 @@ public class JenaModelUtils {
      * an ontology.  Also creates annotations to place each root class and all 
      * of its children in the appropriate groups.  In the case of multiple 
      * inheritance, classgroup assignment will be arbitrary.
-     * @param wadf
+     * @param wadf DAO Factory
      * @param tboxModel containing ontology classes
      * @return resultArray of OntModels, where resultArray[0] is the model containing
      * the triples about the classgroups, and resultArray[1] is the model containing

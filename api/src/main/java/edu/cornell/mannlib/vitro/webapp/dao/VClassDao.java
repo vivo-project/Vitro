@@ -89,15 +89,15 @@ public interface VClassDao {
     void addVClassesToGroups(List <VClassGroup> groups );
     
     /**
-     * @param vc1
-     * @param vc2
+     * @param vc1 VCLass
+     * @param vc2 VClass
      * @return true if vc1 subClassOf vc2
      */
     boolean isSubClassOf(VClass vc1, VClass vc2);
     
     /**
-     * @param vc1
-     * @param vc2
+     * @param vclassURI1 VClass URI
+     * @param vclassURI2 VClass URI
      * @return true if vc1 subClassOf vc2
      */
     boolean isSubClassOf(String vclassURI1, String vclassURI2);

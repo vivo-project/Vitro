@@ -294,7 +294,7 @@ public abstract class ObjectPropertyTemplateModel extends PropertyTemplateModel 
     
     /** The SPARQL query results may contain duplicate rows for a single object, if there are multiple solutions 
      * to the entire query. Remove duplicates here by arbitrarily selecting only the first row returned.
-     * @param List<Map<String, String>> data
+     * @param data The data to deduplicate
      */
     protected void removeDuplicates(List<Map<String, String>> data) {
         String objectVariableName = getObjectKey();

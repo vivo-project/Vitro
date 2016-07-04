@@ -412,7 +412,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 
 	/**
 	 * Find named classes to which a restriction "applies"
-	 * @param   resourceURI  identifier of a class
+	 * @param   ontClass Ontology class
 	 * @return  set of class URIs
 	 * 
 	 * Note: this method assumes that the caller holds a read lock on
@@ -461,7 +461,7 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 
     /**
      * requires SPARQL 1.1 (or ARQ) property path support
-     * @param vclassURI
+     * @param vclassURI VClass URI
      * @return list of property resources with union domains that include the vclass
      */
     protected List<Resource> getPropertiesWithAppropriateDomainFor(String vclassURI) {

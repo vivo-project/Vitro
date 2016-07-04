@@ -32,8 +32,7 @@ public interface WebappDaoFactory {
 	/**
 	 * Check if a given URI string exists in the system:
 	 * checks for the following conditions: URI found as subject in a statement or an object or as a property
-	 * @param uriStr
-	 * @return
+	 * @param uriStr URI String
 	 */
 	public boolean hasExistingURI(String uriStr);
 	
@@ -54,15 +53,13 @@ public interface WebappDaoFactory {
     /**
      * Copy this DAO factory to a new object associated with the specified user 
      * URI, or return the same factory if a user-aware version cannot be used.
-     * @param userURI
-     * @return
+     * @param userURI User URI
      */
     public WebappDaoFactory getUserAwareDaoFactory(String userURI);
 
     /**
      * Return URI of user associated with this WebappDaoFactory, 
      * or null if not applicable.
-     * @return
      */
     public String getUserURI();
 

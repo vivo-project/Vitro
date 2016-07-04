@@ -32,12 +32,12 @@ import java.io.StringWriter;
  * added, so the results are ready for transmission or storage. Each instance of
  * JSONStringer can produce one JSON text.
  * <p>
- * A JSONStringer instance provides a <code>value</code> method for appending
+ * A JSONStringer instance provides a {@code value} method for appending
  * values to the
- * text, and a <code>key</code>
- * method for adding keys before values in objects. There are <code>array</code>
- * and <code>endArray</code> methods that make and bound array values, and
- * <code>object</code> and <code>endObject</code> methods which make and bound
+ * text, and a {@code key}
+ * method for adding keys before values in objects. There are {@code array}
+ * and {@code endArray} methods that make and bound array values, and
+ * {@code object} and {@code endObject} methods which make and bound
  * object values. All of these methods return the JSONWriter instance,
  * permitting cascade style. For example, <pre>
  * myString = new JSONStringer()
@@ -48,7 +48,7 @@ import java.io.StringWriter;
  *     .toString();</pre> which produces the string <pre>
  * {"JSON":"Hello, World!"}</pre>
  * <p>
- * The first method called must be <code>array</code> or <code>object</code>.
+ * The first method called must be {@code array} or {@code object}.
  * There are no methods for adding commas or colons. JSONStringer adds them for
  * you. Objects and arrays can be nested up to 20 levels deep.
  * <p>
@@ -66,10 +66,10 @@ public class JSONStringer extends JSONWriter {
 
     /**
      * Return the JSON text. This method is used to obtain the product of the
-     * JSONStringer instance. It will return <code>null</code> if there was a
+     * JSONStringer instance. It will return {@code null} if there was a
      * problem in the construction of the JSON text (such as the calls to
-     * <code>array</code> were not properly balanced with calls to
-     * <code>endArray</code>).
+     * {@code array} were not properly balanced with calls to
+     * {@code endArray}).
      * @return The JSON text.
      */
     public String toString() {

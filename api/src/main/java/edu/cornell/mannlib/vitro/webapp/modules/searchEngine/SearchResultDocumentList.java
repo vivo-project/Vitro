@@ -22,7 +22,6 @@ public interface SearchResultDocumentList extends
 	 * Retrieve the i'th document, starting with 0.
 	 * 
 	 * @throws ArrayIndexOutOfBoundsException
-	 *             if i < 0 or i >= size()
 	 */
 	SearchResultDocument get(int i);
 

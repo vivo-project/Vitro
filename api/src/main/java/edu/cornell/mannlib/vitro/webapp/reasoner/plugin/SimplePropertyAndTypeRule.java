@@ -18,7 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 
 /**
  * handles rules of the form
- * assertedProp(?x, ?y) ^ type(?x) -> inferredProp(?x, ?y)
+ * assertedProp(?x, ?y) ^ type(?x) -&gt; inferredProp(?x, ?y)
  *	
  * @author bjl23
  *

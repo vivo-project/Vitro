@@ -54,8 +54,6 @@ public class FileStorageHelper {
 
 	/**
 	 * Encode the filename as needed to guard against illegal characters.
-	 * 
-	 * @see edu.cornell.mannlib.vitro.webapp.utils.filestorage
 	 */
 	public static String encodeName(String filename) {
 		String hexed = addHexEncoding(filename);
@@ -149,8 +147,6 @@ public class FileStorageHelper {
 
 	/**
 	 * Restore the filename to its original form, removing the encoding.
-	 * 
-	 * @see edu.cornell.mannlib.vitro.webapp.utils.filestorage
 	 */
 	public static String decodeName(String stored) {
 		String unexcluded = unexcludeWindowsReservedNames(stored);
@@ -228,8 +224,6 @@ public class FileStorageHelper {
 	 * namespace is translated to its prefix, and illegal characters are
 	 * encoded. The resulting string is broken up into 3-character directory
 	 * names (or less). Windows reserved words are prefixed with tilde.
-	 * 
-	 * @see edu.cornell.mannlib.vitro.webapp.utils.filestorage
 	 */
 	public static String id2Path(String id, Map<Character, String> namespacesMap) {
 		char prefix = 0;
@@ -305,8 +299,6 @@ public class FileStorageHelper {
 	/**
 	 * Translate the object ID and the file storage root directory into a full
 	 * path to the directory that would represent that ID.
-	 * 
-	 * @see edu.cornell.mannlib.vitro.webapp.utils.filestorage
 	 */
 	public static File getPathToIdDirectory(String id,
 			Map<Character, String> namespacesMap, File rootDir) {
@@ -316,8 +308,6 @@ public class FileStorageHelper {
 	/**
 	 * Translate the object ID, the file storage root directory and the filename
 	 * into a full path to where the file would be stored.
-	 * 
-	 * @see edu.cornell.mannlib.vitro.webapp.utils.filestorage
 	 */
 	public static File getFullPath(File rootDir, String id, String filename,
 			Map<Character, String> namespacesMap) {

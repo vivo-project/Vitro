@@ -30,7 +30,7 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
     
     /**
      * Create an RDFService to access a single default graph
-     * @param model
+     * @param model Jena Model
      */
     public RDFServiceModel(Model model) {
         this.model = model;
@@ -38,7 +38,7 @@ public class RDFServiceModel extends RDFServiceJena implements RDFService {
     
     /**
      * Create an RDFService to access a Jena Dataset
-     * @param dataset
+     * @param dataset Jena Dataset
      */
     public RDFServiceModel(Dataset dataset) {
         this.dataset = dataset;

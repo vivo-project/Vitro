@@ -46,7 +46,6 @@ public class PostEditCleanupController extends FreemarkerHttpServlet{
 	 * Returns a redirect after an edit.
 	 * @param vreq - should have an edit configuration in attributes or session
 	 * @param entityToReturnTo - may be null
-	 * @return
 	 */
     protected static ResponseValues doPostEditRedirect( VitroRequest vreq , String entityToReturnTo){
         EditConfigurationVTwo editConfig = EditConfigurationVTwo.getConfigFromSession(vreq.getSession(), vreq);      

@@ -60,7 +60,7 @@ public class SparqlGraph implements GraphWithPerform {
     
     /**
      * Returns a SparqlGraph for the union of named graphs in a remote repository 
-     * @param endpointURI
+     * @param endpointURI Endpoint URI
      */
     public SparqlGraph(String endpointURI) {
         this(endpointURI, null);
@@ -68,8 +68,8 @@ public class SparqlGraph implements GraphWithPerform {
     
     /**
      * Returns a SparqlGraph for a particular named graph in a remote repository 
-     * @param endpointURI
-     * @param graphURI
+     * @param endpointURI Endpoint URI
+     * @param graphURI Graph URI
      */
     public SparqlGraph(String endpointURI, String graphURI) {
        this.endpointURI = endpointURI;

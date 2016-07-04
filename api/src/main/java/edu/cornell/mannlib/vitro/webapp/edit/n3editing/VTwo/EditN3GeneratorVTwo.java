@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -34,7 +35,7 @@ public class EditN3GeneratorVTwo {
      * This takes into account multiple values that would be returned from a select list.
      * subInUris should no longer be used.
      * 
-     * It's important that the map contain String to List<String> mapping.  
+     * It's important that the map contain String to List&lt;String&gt; mapping.
      * 
      * Before values are sent in, all of the values for a variable should be placed within an array.
      * 
@@ -78,8 +79,12 @@ public class EditN3GeneratorVTwo {
         }         
     }
   
-    private boolean containsNullOrEmpty(List<String> values) {        
-        return values != null && ( values.contains(null) || values.contains("") );       
+    private boolean containsNullOrEmpty(List<String> values) {
+    	if(values == null || values.isEmpty()) return true ;
+    	for(String str : values) {
+            if(StringUtils.isBlank(str)) return true ;
+        }
+        return false;
     }
 
     /**

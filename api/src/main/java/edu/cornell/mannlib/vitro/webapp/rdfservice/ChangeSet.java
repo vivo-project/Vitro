@@ -33,8 +33,7 @@ public interface ChangeSet {
 	public void setPreconditionQueryType(RDFService.SPARQLQueryType queryType);
 
 	/**   
-	 * @return List<ModelChange> - list of model changes           
-	 */		
+	 */
 	public List<ModelChange> getModelChanges();
 	
 	/**   
@@ -104,16 +103,12 @@ public interface ChangeSet {
     /**
      * Returns a list of events to pass to any change listeners in 
      * advance of the change set additions and retractions being performed.
-     * 
-     * @return List<Object>
      */
 	public List<Object> getPreChangeEvents();
 	
     /**
      * Returns a list of events to pass to any change listeners after 
      * the change set additions and retractions are performed.
-     * 
-     * @return List<Object>
      */
     public List<Object> getPostChangeEvents();
     

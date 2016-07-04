@@ -152,7 +152,6 @@ public class VClassGroup extends LinkedList <VClass> implements Comparable<VClas
     
     /**
      * Sorts VClassGroup objects by group rank, then alphanumeric.
-     * @author bdc34 modified by jc55, bjl23
      * @return a negative integer, zero, or a positive integer as the
      *         first argument is less than, equal to, or greater than the
      *         second. 

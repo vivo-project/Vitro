@@ -106,7 +106,7 @@ public class ImageUploadHelper {
 	 * The image must be present and non-empty, and must have a mime-type that
 	 * represents an image we support.
 	 * 
-	 * We rely on the fact that a {@link FileUploadServletRequest} will always
+	 * We rely on the fact that a FileUploadServletRequest will always
 	 * have a map of {@link FileItem}s, even if it is empty. However, that map
 	 * may not contain the field that we want, or that field may contain an
 	 * empty file.

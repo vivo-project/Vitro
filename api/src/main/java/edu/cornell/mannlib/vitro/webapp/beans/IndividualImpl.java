@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 public class IndividualImpl extends BaseResourceBean implements Individual, Comparable<Individual> {
 	/**
 	 * This can be used as a "not initialized" indicator for a property that
-	 * could validly be set to <code>null</code>. If <code>get()</code> is
+	 * could validly be set to {@code null}. If {@code get()} is
 	 * called on such a property, and the property has this value, the correct
 	 * value can be fetched and cached.
 	 */

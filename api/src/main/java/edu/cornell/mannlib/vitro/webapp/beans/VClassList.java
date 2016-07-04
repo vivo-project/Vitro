@@ -46,7 +46,6 @@ public class VClassList extends VClass {
     }
     /**
      * override this if you want a different sorting.
-     * @return
      */
     public Comparator<Individual> getCompare(){
         return new Comparator<Individual>(){

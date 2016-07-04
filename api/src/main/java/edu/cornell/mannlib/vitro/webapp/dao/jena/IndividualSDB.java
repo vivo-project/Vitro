@@ -508,7 +508,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     	dataset.getLock().enterCriticalSection(Lock.READ);
     	try {
     		String valuesOfProperty = 
-    			"SELECT ?object" +
+    			"SELECT ?object " +
     			"WHERE{ <" + this.individualURI + "> <" + 
     			        propertyURI + "> ?object } \n";
     		ResultSet values = QueryExecutionFactory.create(

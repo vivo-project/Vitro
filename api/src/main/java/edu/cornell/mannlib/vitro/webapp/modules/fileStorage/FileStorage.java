@@ -28,7 +28,7 @@ public interface FileStorage extends Application.Module {
 	 * If a file exists with this ID, get its name.
 	 * 
 	 * @return The name of the file (un-encoded) if it exists, or
-	 *         <code>null</code> if it does not.
+	 *         {@code null} if it does not.
 	 */
 	String getFilename(String id) throws IOException;
 
@@ -47,7 +47,7 @@ public interface FileStorage extends Application.Module {
 	 * If a file exists with this ID, it will be deleted, regardless of the file
 	 * name. If no such file exists, no action is taken, no exception is thrown.
 	 * 
-	 * @return <code>true<code> if a file existed, <code>false</code> otherwise.
+	 * @return {@code true} if a file existed, {@code false} otherwise.
 	 */
 	boolean deleteFile(String id) throws IOException;
 }

@@ -84,8 +84,7 @@ public class JaiImageProcessorTester extends Frame {
 	}
 
 	/**
-	 * @param thumbStream
-	 * @return
+	 * @param thumbStream Thumbnail stream
 	 * @throws IOException
 	 * @throws FileNotFoundException
 	 */

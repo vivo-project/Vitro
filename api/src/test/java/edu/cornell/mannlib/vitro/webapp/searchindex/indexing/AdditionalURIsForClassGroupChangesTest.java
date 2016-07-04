@@ -32,7 +32,6 @@ public class AdditionalURIsForClassGroupChangesTest {
     }
 
     /**
-     * Test method for {@link edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForClassGroupChanges#findAdditionalURIsToIndex(com.hp.hpl.jena.rdf.model.Statement)}.
      */
     @Test
     public void testFindAdditionalURIsToIndex() {

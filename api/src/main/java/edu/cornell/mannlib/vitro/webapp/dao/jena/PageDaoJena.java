@@ -370,8 +370,7 @@ public class PageDaoJena extends JenaBaseDao implements PageDao {
      * Gets a URI for display:forClassGroup for the specified page.
      * Only one value is expected in the model.
      * This may return null if there is no ClassGroup associated with the page. 
-     * @param pageUri
-     * @return
+     * @param pageUri Page URI
      */
     @Override
     public String getClassGroupPage(String pageUri) {        

@@ -27,7 +27,7 @@ public interface RequiresActions {
      * calling this method would then have the ability to
      * deny the action if it is not authorized. 
      * 
-     * @param vreq
+     * @param vreq Vitro request
      * @return Should not be null. Return Actions.AUTHORIZED
      * if no authorization is required to do use the object.
      */

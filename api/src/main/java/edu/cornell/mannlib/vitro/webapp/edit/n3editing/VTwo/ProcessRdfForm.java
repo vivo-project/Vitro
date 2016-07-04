@@ -274,7 +274,7 @@ public class ProcessRdfForm {
     /**
      * Parse the n3Strings to a List of RDF Model objects.
      * 
-     * @param n3Strings
+     * @param n3Strings N3 Strings to parse
      * @param parseType if OPTIONAL, then don't throw exceptions on errors
      * If REQUIRED, then throw exceptions on errors.
      * @throws Exception 

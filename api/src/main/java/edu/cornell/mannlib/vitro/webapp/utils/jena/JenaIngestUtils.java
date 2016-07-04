@@ -50,9 +50,9 @@ public class JenaIngestUtils {
     private Random random = new Random(System.currentTimeMillis());
 
     /**
-     * Returns a new copy of the input model with blank nodes renamed with namespaceEtc plus a random int. 
-     * @param namespaceEtc
-     * @return
+     * Returns a new copy of the input model with blank nodes renamed with namespaceEtc plus a random int.
+     * @param inModel input Jena Model
+     * @param namespaceEtc Namespace
      */
     public Model renameBNodes(Model inModel, String namespaceEtc) {    
         return renameBNodes(inModel, namespaceEtc, null);
@@ -61,8 +61,8 @@ public class JenaIngestUtils {
     /**
      * Returns a new copy of the input model with blank nodes renamed with namespaceEtc plus a random int.
      * Will prevent URI collisions with supplied dedupModel 
-     * @param namespaceEtc
-     * @return
+     * @param inModel input Jena Model
+     * @param namespaceEtc Namespace
      */
     public Model renameBNodes(Model inModel, String namespaceEtc, Model dedupModel) {
         Model outModel = ModelFactory.createDefaultModel();
@@ -361,11 +361,11 @@ public class JenaIngestUtils {
      * Splits values for a given data property URI on a supplied regex and 
      * asserts each value using newPropertyURI.  New statements returned in
      * a Jena Model.  Split values may be optionally trim()ed.
-     * @param inModel
-     * @param propertyURI
-     * @param splitRegex
-     * @param newPropertyURI
-     * @param trim
+     * @param inModel Input Jena model
+     * @param propertyURI URI for property
+     * @param splitRegex Regex for split
+     * @param newPropertyURI URI for new property
+     * @param trim Flag to trim property
      * @return outModel
      */
     public Model splitPropertyValues(Model inModel, String propertyURI, String splitRegex, String newPropertyURI, boolean trim) {
@@ -418,9 +418,8 @@ public class JenaIngestUtils {
     /**
      * A simple resource smusher based on a supplied inverse-functional property.  
      * A new model containing only resources about the smushed statements is returned.
-     * @param inModel
-     * @param prop
-     * @return
+     * @param inModel Input Jena model
+     * @param prop Property
      */
     public Model smushResources(Model inModel, Property prop) { 
         Model outModel = ModelFactory.createDefaultModel();
@@ -480,9 +479,8 @@ public class JenaIngestUtils {
     /**
      * Returns a model where redundant individuals that are sameAs one another are smushed
      * using URIs in preferred namespaces where possible.
-     * @param model
-     * @param preferredIndividualNamespace
-     * @return
+     * @param model Jena Model
+     * @param preferredNamespace Preferred Namespace
      */
     public Model dedupAndExtract( Model model, String preferredNamespace ) {
         Model extractsModel = ModelFactory.createDefaultModel();
@@ -622,7 +620,6 @@ public class JenaIngestUtils {
      * @param baseOntModel The model containing the relevant statements
      * @param tboxOntModel The model containing class and property data
      * @param usePrimaryLabelOnly If true, discard rdfs:labels from uri2.  Otherwise retain.
-     * @return
      */
     public MergeResult doMerge(String uri1, String uri2, OntModel baseOntModel, 
             OntModel tboxOntModel, boolean usePrimaryLabelOnly){

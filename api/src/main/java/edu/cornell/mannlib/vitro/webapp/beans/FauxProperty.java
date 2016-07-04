@@ -43,14 +43,14 @@ public class FauxProperty extends BaseResourceBean implements ResourceBean,
 	private String customListView;
 
 	/**
-	 * Arguments are in this order to mimic the relationship: subject ==>
-	 * property ==> object
+	 * Arguments are in this order to mimic the relationship: subject ==&gt;
+	 * property ==&gt; object
 	 * 
 	 * @param domainURI
 	 *            URI of the subject class. May be null.
 	 * @param baseURI
 	 *            URI of the property. May not be null.
-	 * @param rangeUri
+	 * @param rangeURI
 	 *            URI of the object class. May be null.
 	 */
 	public FauxProperty(String domainURI, String baseURI, String rangeURI) {

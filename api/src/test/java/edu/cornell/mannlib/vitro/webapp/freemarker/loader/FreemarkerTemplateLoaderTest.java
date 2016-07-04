@@ -261,9 +261,8 @@ public class FreemarkerTemplateLoaderTest {
 	 *            template we are looking for
 	 * @param expectedHowMany
 	 *            How many matches do we expect?
-	 * @param expectedBestFit
+	 * @param expectedBestFitString
 	 *            What should the best match turn out to be?
-	 * @throws IOException
 	 */
 	private void assertMatches(String searchTerm, int expectedHowMany,
 			String expectedBestFitString) {

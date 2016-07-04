@@ -48,7 +48,7 @@ public class StackTraceLayout extends Layout {
 
 	/**
 	 * The StackTraceLayout does not handle the throwable contained within
-	 * LoggingEvents. Thus, it returns <code>true</code>.
+	 * LoggingEvents. Thus, it returns {@code true}.
 	 */
 	@Override
 	public boolean ignoresThrowable() {

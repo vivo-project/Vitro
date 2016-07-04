@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
 
  * Here is what needs to go into the web.xml:
  *
+ * {@code
     <filter>
         <filter-name>JSession Strip Filter</filter-name>
         <filter-class>edu.cornell.mannlib.vitro.filters.JSessionStripFilter</filter-class>
@@ -32,7 +33,7 @@ import org.apache.commons.logging.LogFactory;
         <url-pattern>/*</url-pattern>
         <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
-
+    }
  * some of this code is from URLRewriteFilter
  */
 public class JSessionStripFilter implements Filter {

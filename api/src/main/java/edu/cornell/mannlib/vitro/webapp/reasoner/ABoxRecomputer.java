@@ -249,8 +249,8 @@ public class ABoxRecomputer {
 
     /**
      * Adds inferences to temporary rebuildmodel
-     * @param individualURI
-     * @param rebuildModel
+     * @param individualURI The individual
+     * @param rebuildModel The rebuild model
      * @return any additional inferences produced by plugins that affect other 
      *         individuals
      */

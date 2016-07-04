@@ -28,8 +28,8 @@ public class VClassDWR {
      * add proprties form.
      *
      *
-     * @param vclassId - vclass we want to make a property for
-     * @param propertyId - property we want to use
+     * @param vclassURI - vclass we want to make a property for
+     * @param propertyURI - property we want to use
      * @param filterOutUninstanciated - if true filter out any vclasses with zero instances.
      * @return a list of VClass objects, one for each vclass that could be in the
      * relation indicated by the parameters.

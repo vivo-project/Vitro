@@ -77,7 +77,7 @@ public interface SearchIndexer extends Application.Module {
 	 * If called before startup or while paused, the task will be queued. If
 	 * called after shutdown, this has no effect.
 	 * 
-	 * @param urls
+	 * @param changes
 	 *            if null or empty, this call has no effect.
 	 */
 	void scheduleUpdatesForStatements(List<Statement> changes);

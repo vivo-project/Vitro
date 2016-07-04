@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
  * RDF literal statement without including the whole literal in the parameters.
  *
  * ex.
- * http://fake.com/delete?sub="http://bob"&pred="http://hasNickName"&stmtHash="23443434"
+ * {@code http://fake.com/delete?sub="http://bob"&pred="http://hasNickName"&stmtHash="23443434"}
  *
  * This could request the deletion of a the statement for Bob's nickname where the 
  * literal matched the hash 23443434.
@@ -39,7 +39,7 @@ public class RdfLiteralHash {
     /**
      * Make a hash based on individual, property, literal and (lang or datatype).
      * 
-     * @param stmt
+     * @param stmt Data statement
      * @return a value between MIN_INTEGER and MAX_INTEGER 
      */
     public static int makeRdfLiteralHash( DataPropertyStatement stmt ){
@@ -72,9 +72,8 @@ public class RdfLiteralHash {
 
 
     /**
-     * @param stmt
-     * @param hash
-     * @return
+     * @param stmt Data statement
+     * @param hash Hash
      */
     public static boolean doesStmtMatchHash( DataPropertyStatement stmt, int hash){ 
         if( stmt == null )
@@ -92,9 +91,9 @@ public class RdfLiteralHash {
     
     /**
      * Forward to either getDataPropertyStmtByHash or getRdfsLabelStatementByHash, depending on the property.
-     * @param subjectUri, 
-     * @param predicateUri, 
-     * @param hash
+     * @param subjectUri  Subject URI
+     * @param predicateUri  Predicate URI
+     * @param hash Hash
      * @param model, may not be null
      * @return a DataPropertyStatement if found or null if not found
      */

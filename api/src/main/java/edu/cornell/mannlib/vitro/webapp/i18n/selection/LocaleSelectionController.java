@@ -21,10 +21,11 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 /**
+ * {@code
  * Call this at /selectLocale&selection=[locale_string]
  * 
  * For example: /selectLocale&selection=en_US or /selectLocale&selection=es
- * 
+ * }
  * Write an error to the log (and to DisplayMessage) if the selection is not
  * syntactically valid.
  * 

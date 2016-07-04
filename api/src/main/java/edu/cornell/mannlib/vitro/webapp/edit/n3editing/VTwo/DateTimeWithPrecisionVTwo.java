@@ -26,7 +26,7 @@ import freemarker.template.Configuration;
 /**
  * This is intended to work in conjunction with a template to create the HTML for a 
  * datetime with precision and to convert the submitted parameters into 
- * varname -> Literal and varname -> URI maps.
+ * varname -&gt; Literal and varname -&gt; URI maps.
  * 
  * The variables that get passed to the template are defined in:
  * DateTimeWithPrecision.getMapForTemplate() 

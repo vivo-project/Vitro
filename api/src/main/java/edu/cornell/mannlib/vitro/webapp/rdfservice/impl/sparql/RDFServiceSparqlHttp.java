@@ -48,10 +48,8 @@ public class RDFServiceSparqlHttp extends RDFServiceSparql {
 	 * Performs a SPARQL construct query against the knowledge base. The query may have
 	 * an embedded graph identifier.
 	 * 
-	 * @param String query - the SPARQL query to be executed against the RDF store
-	 * @param RDFService.ModelSerializationFormat resultFormat - type of serialization for RDF result of the SPARQL query
-	 * @param OutputStream outputStream - the result of the query
-	 * 
+	 * @param queryStr - the SPARQL query to be executed against the RDF store
+	 * @param resultFormat - type of serialization for RDF result of the SPARQL query
 	 */
 	@Override
 	public InputStream sparqlConstructQuery(String queryStr,
@@ -89,8 +87,8 @@ public class RDFServiceSparqlHttp extends RDFServiceSparql {
 	 * Performs a SPARQL describe query against the knowledge base. The query may have
 	 * an embedded graph identifier.
 	 * 
-	 * @param String query - the SPARQL query to be executed against the RDF store
-	 * @param RDFService.ModelSerializationFormat resultFormat - type of serialization for RDF result of the SPARQL query
+	 * @param queryStr - the SPARQL query to be executed against the RDF store
+	 * @param resultFormat - type of serialization for RDF result of the SPARQL query
 	 * 
 	 * @return InputStream - the result of the query
 	 * 
@@ -118,8 +116,8 @@ public class RDFServiceSparqlHttp extends RDFServiceSparql {
 	 * Performs a SPARQL select query against the knowledge base. The query may have
 	 * an embedded graph identifier.
 	 * 
-	 * @param String query - the SPARQL query to be executed against the RDF store
-	 * @param RDFService.ResultFormat resultFormat - format for the result of the Select query
+	 * @param queryStr - the SPARQL query to be executed against the RDF store
+	 * @param resultFormat - format for the result of the Select query
 	 * 
 	 * @return InputStream - the result of the query
 	 * 
@@ -174,7 +172,7 @@ public class RDFServiceSparqlHttp extends RDFServiceSparql {
 	 * Performs a SPARQL ASK query against the knowledge base. The query may have
 	 * an embedded graph identifier.
 	 * 
-	 * @param String query - the SPARQL query to be executed against the RDF store
+	 * @param queryStr - the SPARQL query to be executed against the RDF store
 	 * 
 	 * @return  boolean - the result of the SPARQL query 
 	 */

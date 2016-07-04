@@ -85,7 +85,7 @@ public class GetAllPrefix extends BaseEditController {
 	 * Returns a map of prefixes for use in building queries.  Will manufacture a 
 	 * prefix for any namespace that doesn't have an associated owl:Ontology resource
 	 * with a prefix annotation  
-	 * @param wadf
+	 * @param wadf DAO Factory
 	 * @return map of prefix strings to namespace URIs
 	 */
 	private Map<String, String> getPrefixMap(WebappDaoFactory wadf) {
@@ -135,8 +135,8 @@ public class GetAllPrefix extends BaseEditController {
 	
 	/**
 	 * Makes the markup for a prefix option
-	 * @param prefix
-	 * @param URI
+	 * @param prefix Prefix
+	 * @param URI URI
 	 * @return option string
 	 */
 	private String makeOption(String prefix, String URI) {

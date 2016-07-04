@@ -295,8 +295,7 @@ public abstract class RDFServiceImpl implements RDFService {
     /**
      * Returns a pair of models.  The first contains any statement containing at 
      * least one blank node.  The second contains all remaining statements.
-     * @param g
-     * @return
+     * @param gm Jena model
      */
     
     protected Model[] separateStatementsWithBlankNodes(Model gm) {

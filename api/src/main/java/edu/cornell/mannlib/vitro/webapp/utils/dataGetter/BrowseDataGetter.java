@@ -143,7 +143,9 @@ public class BrowseDataGetter extends DataGetterBase implements DataGetter {
    
     /**
      * Gets a list of all VClassGroups with vclasses with individual counts.
-     * @param params2 
+     * @param request current VitroRequest
+     * @param params a parameter map
+     * @param context current servlet context
      */
     protected Map<String,Object> getAllClassGroupData(VitroRequest request, Map params, ServletContext context){
         Map<String,Object> map = new HashMap<String,Object>();                  

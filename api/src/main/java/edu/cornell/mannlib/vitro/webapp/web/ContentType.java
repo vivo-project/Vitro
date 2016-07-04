@@ -245,13 +245,13 @@ public class ContentType implements Serializable {
   * based on the "Accept" header from a servlet request.
   *
   * @param acceptHeader       "Accept" header value from a servlet request (not
-  *                           <code>null</code>)
+  *                           {@code null})
   * @param actualContentTypes actual content types in descending order of
   *                           preference (non-empty, and each entry is of the
   *                           form "type/subtype" without the wildcard char
-  *                           '*') or <code>null</code> if no "Accept" header
+  *                           '*') or {@code null} if no "Accept" header
   *                           was specified
-  * @return the best content type to use (or <code>null</code> on no match).
+  * @return the best content type to use (or {@code null} on no match).
   */
  public static ContentType getBestContentType(String acceptHeader,
      List<ContentType> actualContentTypes) {
@@ -332,7 +332,7 @@ public class ContentType implements Serializable {
  * 
  * From suggestions by Tim Berners-Lee at http://www.w3.org/DesignIssues/Conneg
  * 
- * @param clentAcceptsTypes types the client can accept with Q weights.
+ * @param clientAcceptsTypes types the client can accept with Q weights.
  * @param serverTypes types the server can provide with Q weights.
  * @return returns content type of best match or null if no match.
  */
@@ -355,7 +355,7 @@ public class ContentType implements Serializable {
  /**
   * This method was added by Brian Caruso of the VIVO project. March 15 2011.
   * 
-  * @param acceptHeader
+  * @param acceptHeader Accept header
   * @return the types and the q values from the accept header
   */
  public static Map<String,Float> getTypesAndQ(String acceptHeader){
@@ -514,7 +514,7 @@ public class ContentType implements Serializable {
  /**
   * Makes the object immutable and returns it.
   *
-  * This should at least be used when keeping a {@link ContentType} instance as
+  * This should at least be used when keeping an instance as
   * a static.
   */
  public ContentType lock() {

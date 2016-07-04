@@ -26,7 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 
 /**
  * handles rules of the form
- * assertedProp1(?x, ?y) ^ assertedProp2(?y, ?z) -> inferredProp(?x, ?z)
+ * assertedProp1(?x, ?y) ^ assertedProp2(?y, ?z) -&gt; inferredProp(?x, ?z)
  * 
  */
 public abstract class SimpleBridgingRule implements ReasonerPlugin {

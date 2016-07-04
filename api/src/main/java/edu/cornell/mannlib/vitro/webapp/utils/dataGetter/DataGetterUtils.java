@@ -352,9 +352,6 @@ public class DataGetterUtils {
     
     /***
      * For the page, get the actual Data Getters to be employed.
-     * @throws ClassNotFoundException 
-     * @throws IllegalAccessException 
-     * @throws InstantiationException 
      */
     /*
     public static List<PageDataGetter> DataGetterObjects(VitroRequest vreq, String pageUri) throws InstantiationException, IllegalAccessException, ClassNotFoundException {

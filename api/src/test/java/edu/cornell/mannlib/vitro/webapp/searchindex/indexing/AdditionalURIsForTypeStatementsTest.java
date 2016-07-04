@@ -25,7 +25,6 @@ public class AdditionalURIsForTypeStatementsTest {
     }
 
     /**
-     * Test method for {@link edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForTypeStatements#findAdditionalURIsToIndex(com.hp.hpl.jena.rdf.model.Statement)}.
      */
     @Test
     public void testFindAdditionalURIsToIndex() {
