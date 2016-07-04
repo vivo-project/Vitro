@@ -49,6 +49,12 @@ public class ModelUtilitiesTestHelper {
 	}
 
 	public static Statement dataProperty(String subjectUri, String propertyUri,
+			Float objectValue) {
+		return createStatement(createResource(subjectUri),
+				createProperty(propertyUri), createTypedLiteral(objectValue));
+	}
+
+	public static Statement dataProperty(String subjectUri, String propertyUri,
 			Object objectValue, XSDDatatype dataType) {
 		return createStatement(createResource(subjectUri),
 				createProperty(propertyUri),
