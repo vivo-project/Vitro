@@ -2,9 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -34,6 +32,10 @@ public class QueryHolderTest extends AbstractTestClass {
 			+ SOME_URI + ">} WHERE {?s ?p <" + SOME_URI + ">}";
 	private static final String LITERAL_BOUND_SQUEEZED = "CONSTRUCT {?s ?p \""
 			+ SOME_LITERAL + "\"} WHERE {?s ?p \"" + SOME_LITERAL + "\"}";
+
+	private static final String FIND_IN_SELECT_CLAUSE = "SELECT ?s ?p ?bindMe WHERE { ?s ?p ?bindMe }";
+	private static final String URI_BOUND_IN_SELECT_CLAUSE = "SELECT ?s ?p ?bindMe WHERE { ?s ?p <"
+			+ SOME_URI + "> }";
 
 	// ----------------------------------------------------------------------
 	// The tests
@@ -96,14 +98,14 @@ public class QueryHolderTest extends AbstractTestClass {
 
 	@Test
 	public void bindToPlainLiteral_findsOne_bindsIt() {
-		bindToLiteral(FIND_ONCE, "bindMe", SOME_LITERAL).yields(
-				LITERAL_BOUND_ONCE);
+		bindToLiteral(FIND_ONCE, "bindMe", SOME_LITERAL)
+				.yields(LITERAL_BOUND_ONCE);
 	}
 
 	@Test
 	public void bindToPlainLiteral_findsTwo_bindsBoth() {
-		bindToLiteral(FIND_TWICE, "find_twice", SOME_LITERAL).yields(
-				LITERAL_BOUND_TWICE);
+		bindToLiteral(FIND_TWICE, "find_twice", SOME_LITERAL)
+				.yields(LITERAL_BOUND_TWICE);
 	}
 
 	@Test
@@ -113,8 +115,14 @@ public class QueryHolderTest extends AbstractTestClass {
 
 	@Test
 	public void bindToPlainLiteral_notFooledByPunctuation() {
-		bindToLiteral(SQUEEZED, "squeeze", SOME_LITERAL).yields(
-				LITERAL_BOUND_SQUEEZED);
+		bindToLiteral(SQUEEZED, "squeeze", SOME_LITERAL)
+				.yields(LITERAL_BOUND_SQUEEZED);
+	}
+
+	@Test
+	public void variableInSelectClauseIsLeftAlone() {
+		bindToUri(FIND_IN_SELECT_CLAUSE, "bindMe", SOME_URI)
+				.yields(URI_BOUND_IN_SELECT_CLAUSE);
 	}
 
 	// ----------------------------------------------------------------------

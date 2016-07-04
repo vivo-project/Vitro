@@ -30,15 +30,28 @@ public class QueryHolder {
 	public QueryHolder bindToUri(String name, String uri) {
 		String regex = "\\?" + name + "\\b";
 		String replacement = "<" + uri + ">";
-		String bound = queryString.replaceAll(regex, replacement);
+		String bound = replaceWithinBraces(regex, replacement);
 		return new QueryHolder(bound);
 	}
 
 	public QueryHolder bindToPlainLiteral(String name, String value) {
 		String regex = "\\?" + name + "\\b";
 		String replacement = '"' + value + '"';
-		String bound = queryString.replaceAll(regex, replacement);
+		String bound = replaceWithinBraces(regex, replacement);
 		return new QueryHolder(bound);
+	}
+
+	private String replaceWithinBraces(String regex, String replacement) {
+		int openBrace = queryString.indexOf('{');
+		int closeBrace = queryString.lastIndexOf('}');
+		if (openBrace == -1 || closeBrace == -1) {
+			return queryString;
+		} else {
+			String prefix = queryString.substring(0, openBrace);
+			String suffix = queryString.substring(closeBrace);
+			String patterns = queryString.substring(openBrace, closeBrace);
+			return prefix + patterns.replaceAll(regex, replacement) + suffix;
+		}
 	}
 
 	@Override
