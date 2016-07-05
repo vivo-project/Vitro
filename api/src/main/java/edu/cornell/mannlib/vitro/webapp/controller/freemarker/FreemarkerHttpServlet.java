@@ -464,6 +464,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         map.put("stylesheets", new Tags().wrap());
         map.put("scripts", new Tags().wrap());
         map.put("headScripts", new Tags().wrap());
+        map.put("metaTags", new Tags().wrap());
 
         return map;        
     }  
