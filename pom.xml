@@ -70,6 +70,28 @@
 
     <profiles>
         <profile>
+            <id>installer</id>
+            <activation>
+                <property>
+                    <name>!vitro-installer-dir</name>
+                </property>
+            </activation>
+            <modules>
+                <module>installer</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>external-installer</id>
+            <activation>
+                <property>
+                    <name>vitro-installer-dir</name>
+                </property>
+            </activation>
+            <modules>
+                <module>${vitro-installer-dir}</module>
+            </modules>
+        </profile>
+        <profile>
             <id>doclint-java8-disable</id>
             <activation>
                 <jdk>[1.8,)</jdk>
