@@ -177,25 +177,23 @@ name will be used as the label. -->
     </#if>
 </#macro>
 <#macro editLink propertyLocalName propertyName statement rangeUri="">
-<#if propertyLocalName?contains("ARG_2000028")>
-    <#if rangeUri?contains("Address")>
-        <#local url = statement.editUrl + "&addressUri=" + "${statement.address!}">
-    <#elseif rangeUri?contains("Telephone") || rangeUri?contains("Fax")>
-        <#local url = statement.editUrl + "&phoneUri=" + "${statement.phone!}">
-    <#elseif rangeUri?contains("Work") || rangeUri?contains("Email")>
-        <#local url = statement.editUrl + "&emailUri=" + "${statement.email!}">
-    <#elseif rangeUri?contains("Name")>
-        <#local url = statement.editUrl + "&fullNameUri=" + "${statement.fullName!}">
-    <#elseif rangeUri?contains("Title")>
-        <#local url = statement.editUrl + "&titleUri=" + "${statement.title!}">
-    </#if>
-<#else>
-    <#local url = statement.editUrl>
-</#if>
-    <#if url?has_content>
+	<#local url = statement.editUrl>
+	<#if url?has_content>
+		<#if propertyLocalName?contains("ARG_2000028")>
+		    <#if rangeUri?contains("Address")>
+		        <#local url = url + "&addressUri=" + "${statement.address!}">
+		    <#elseif rangeUri?contains("Telephone") || rangeUri?contains("Fax")>
+		        <#local url = url + "&phoneUri=" + "${statement.phone!}">
+		    <#elseif rangeUri?contains("Work") || rangeUri?contains("Email")>
+		        <#local url = url + "&emailUri=" + "${statement.email!}">
+		    <#elseif rangeUri?contains("Name")>
+		        <#local url = url + "&fullNameUri=" + "${statement.fullName!}">
+		    <#elseif rangeUri?contains("Title")>
+		        <#local url = url + "&titleUri=" + "${statement.title!}">
+		    </#if>
+		</#if>
         <@showEditLink propertyLocalName url />
     </#if>
-
 </#macro>
 
 <#macro showEditLink propertyLocalName url>
