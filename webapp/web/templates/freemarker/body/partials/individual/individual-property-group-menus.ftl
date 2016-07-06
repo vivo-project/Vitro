@@ -19,7 +19,7 @@
                         	<#assign groupnameHtmlId = p.createPropertyGroupHtmlId(groupname) >
                             <#-- capitalize will capitalize each word in the name; cap_first only the first. We may need a custom
                             function to capitalize all except function words. -->
-                            <li role="listitem"><a href="#${groupnameHtmlId?replace("/","-")}" title="${i18n().group_name}">${groupname?capitalize}</a></li>
+                            <li role="listitem"><a href="#${groupnameHtmlId}" title="${i18n().group_name}">${groupname?capitalize}</a></li>
                         </#if>
                       </#if>
                     </#list>
@@ -44,7 +44,7 @@
         <#if groupName?has_content>
     		<#--the function replaces spaces in the name with underscores, also called for the property group menu-->
         	<#assign groupNameHtmlId = p.createPropertyGroupHtmlId(groupName) >
-            <h2 id="${groupNameHtmlId?replace("/","-")}">${groupName?capitalize}</h2>
+            <h2 id="${groupNameHtmlId}">${groupName?capitalize}</h2>
         <#else>
             <h2 id="properties">${i18n().properties_capitalized}</h2>
         </#if>
