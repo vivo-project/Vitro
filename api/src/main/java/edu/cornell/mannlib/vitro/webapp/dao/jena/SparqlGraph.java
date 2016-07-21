@@ -45,6 +45,7 @@ import com.hp.hpl.jena.util.iterator.SingletonIterator;
 import com.hp.hpl.jena.util.iterator.WrappedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
+import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 
 public class SparqlGraph implements GraphWithPerform {
@@ -97,7 +98,7 @@ public class SparqlGraph implements GraphWithPerform {
             meth.addHeader("Content-Type", "application/x-www-form-urlencoded");
             meth.setEntity(new UrlEncodedFormEntity(Arrays.asList(
                     new BasicNameValuePair("update", updateString))));
-            HttpResponse response = httpClient.execute(meth);
+            HttpResponse response = httpClient.execute(meth, new BasicHttpContext());
             try {
                 int statusCode = response.getStatusLine().getStatusCode();
                 if (statusCode > 399) {

@@ -32,6 +32,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
+import org.apache.http.util.EntityUtils;
 
 /**
  * Do some quick checks to see whether the OpenSocial stuff is configured and
@@ -384,8 +385,12 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 			try {
 				log.debug("Trying to connect to Shindig");
 				HttpResponse response = httpClient.execute(method);
-				statusCode = response.getStatusLine().getStatusCode();
-				log.debug("HTTP status was " + statusCode);
+				try {
+					statusCode = response.getStatusLine().getStatusCode();
+					log.debug("HTTP status was " + statusCode);
+				} finally {
+					EntityUtils.consume(response.getEntity());
+				}
 			} catch (SocketTimeoutException e) {
 				// Catch the exception so we can retry this.
 				// Save the status so we know why we failed.

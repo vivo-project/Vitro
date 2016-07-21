@@ -932,7 +932,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 			}
 		}
 
-		return null;
+		return new BasicHttpContext();
 	}
 
 	protected UsernamePasswordCredentials getCredentials() {
