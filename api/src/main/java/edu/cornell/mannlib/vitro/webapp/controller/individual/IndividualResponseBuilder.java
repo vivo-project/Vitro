@@ -181,7 +181,7 @@ class IndividualResponseBuilder {
         ConfigurationProperties properties = ConfigurationProperties.getBean(vreq);
 
         if (properties != null) {
-            String enabled        = properties.getProperty("resource.altmetric"); //, "enabled"
+            String enabled        = properties.getProperty("resource.altmetric", "enabled");
             String displayTo      = properties.getProperty("resource.altmetric.displayto", "right");
             String badgeType      = properties.getProperty("resource.altmetric.badge-type", "donut");
             String badgeHideEmpty = properties.getProperty("resource.altmetric.hide-no-mentions", "true");
