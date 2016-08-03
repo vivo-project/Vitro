@@ -2,23 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb;
 
-import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_DRIVER_CLASS;
-import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_MAXACTIVE;
-import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_MAXIDLE;
-import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_TESTONBORROW;
-import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_TESTONRETURN;
-import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_TYPE;
-import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_VALIDATION_QUERY;
-import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.MINIMUM_MAXACTIVE;
-import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_DRIVER_CLASS_NAME;
-import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_MAX_ACTIVE;
-import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_MAX_IDLE;
-import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_PASSWORD;
-import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_TYPE;
-import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_URL;
-import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_USERNAME;
-import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_VALIDATION_QUERY;
-
 import java.beans.PropertyVetoException;
 
 import javax.servlet.ServletContext;
@@ -30,6 +13,27 @@ import org.apache.commons.logging.LogFactory;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_DRIVER_CLASS;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_MAXACTIVE;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_MAXIDLE;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_MAX_IDLE_TIME;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_MAX_IDLE_TIME_EXCESS;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_TESTONBORROW;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_TESTONRETURN;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_TYPE;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.DEFAULT_VALIDATION_QUERY;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.MINIMUM_MAXACTIVE;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_DRIVER_CLASS_NAME;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_MAX_ACTIVE;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_MAX_IDLE;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_MAX_IDLE_TIME;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_MAX_IDLE_TIME_EXCESS;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_PASSWORD;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_TYPE;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_URL;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_USERNAME;
+import static edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb.ContentTripleSourceSDB.PROPERTY_DB_VALIDATION_QUERY;
 
 /**
  * Create a DataSource on the SDB database.
@@ -53,8 +57,8 @@ public class SDBDataSource {
 			cpds.setPassword(configProps.getProperty(PROPERTY_DB_PASSWORD));
 			cpds.setMaxPoolSize(getMaxActive());
 			cpds.setMinPoolSize(getMaxIdle());
-			cpds.setMaxIdleTime(43200); // s
-			cpds.setMaxIdleTimeExcessConnections(300);
+			cpds.setMaxIdleTime(getMaxIdleTime());
+			cpds.setMaxIdleTimeExcessConnections(getMaxIdleTimeExcess());
 			cpds.setAcquireIncrement(5);
 			cpds.setNumHelperThreads(6);
 			cpds.setTestConnectionOnCheckout(DEFAULT_TESTONBORROW);
@@ -118,19 +122,30 @@ public class SDBDataSource {
 
 	private int getMaxIdle() {
 		int maxIdleInt = Math.max(getMaxActive() / 4, DEFAULT_MAXIDLE);
-		String maxIdleStr = configProps.getProperty(PROPERTY_DB_MAX_IDLE);
+		return getPropertyAsInt(PROPERTY_DB_MAX_IDLE, maxIdleInt);
+	}
 
-		if (StringUtils.isEmpty(maxIdleStr)) {
-			return maxIdleInt;
+	private int getMaxIdleTime() {
+		return getPropertyAsInt(PROPERTY_DB_MAX_IDLE_TIME, DEFAULT_MAX_IDLE_TIME);
+	}
+
+	private int getMaxIdleTimeExcess() {
+		return getPropertyAsInt(PROPERTY_DB_MAX_IDLE_TIME_EXCESS, DEFAULT_MAX_IDLE_TIME_EXCESS);
+	}
+
+	private int getPropertyAsInt(String prop, int defaultValue) {
+		String propStr = configProps.getProperty(prop);
+
+		if (StringUtils.isEmpty(propStr)) {
+			return defaultValue;
 		}
 
 		try {
-			return Integer.parseInt(maxIdleStr);
+			return Integer.parseInt(propStr);
 		} catch (NumberFormatException nfe) {
 			log.error("Unable to parse connection pool maxIdle setting "
-					+ maxIdleStr + " as an integer");
-			return maxIdleInt;
+					+ propStr + " as an integer");
+			return defaultValue;
 		}
 	}
-
 }

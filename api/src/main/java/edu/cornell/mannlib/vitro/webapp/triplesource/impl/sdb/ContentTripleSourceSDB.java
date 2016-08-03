@@ -65,6 +65,8 @@ public class ContentTripleSourceSDB extends ContentTripleSource {
 	static final String PROPERTY_DB_TYPE = "VitroConnection.DataSource.dbtype";
 	static final String PROPERTY_DB_MAX_ACTIVE = "VitroConnection.DataSource.pool.maxActive";
 	static final String PROPERTY_DB_MAX_IDLE = "VitroConnection.DataSource.pool.maxIdle";
+	static final String PROPERTY_DB_MAX_IDLE_TIME = "VitroConnection.DataSource.pool.maxIdleTime";
+	static final String PROPERTY_DB_MAX_IDLE_TIME_EXCESS = "VitroConnection.DataSource.pool.maxIdleTimeExcess";
 	static final String PROPERTY_DB_VALIDATION_QUERY = "VitroConnection.DataSource.validationQuery";
 	static final String PROPERTY_DB_SDB_LAYOUT = "VitroConnection.DataSource.sdb.layout";
 
@@ -76,6 +78,9 @@ public class ContentTripleSourceSDB extends ContentTripleSource {
 	static final int DEFAULT_MAXACTIVE = 40; // ms
 	static final int MINIMUM_MAXACTIVE = 20; // ms
 	static final int DEFAULT_MAXIDLE = 10; // ms
+
+	static final int DEFAULT_MAX_IDLE_TIME = 1800; // seconds
+	static final int DEFAULT_MAX_IDLE_TIME_EXCESS = 300; // seconds
 
 	static final boolean DEFAULT_TESTONBORROW = true;
 	static final boolean DEFAULT_TESTONRETURN = true;
