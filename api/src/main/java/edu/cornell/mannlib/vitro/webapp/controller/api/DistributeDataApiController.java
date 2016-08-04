@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,6 +48,13 @@ public class DistributeDataApiController extends VitroApiServlet {
 			+ "   ?distributor :actionName ?action . \n" //
 			+ "} \n";
 
+	private static final String PERMITTED_ORIGINS_FOR_DISTRIBUTOR = ""
+			+ "PREFIX : <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#> \n"
+			+ "SELECT ?permitted  \n" //
+			+ "WHERE { \n" //
+			+ "   ?uri :permitsCorsFrom ?permitted . \n" //
+			+ "} \n";
+
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
@@ -55,6 +63,7 @@ public class DistributeDataApiController extends VitroApiServlet {
 
 			String uri = findDistributorForAction(req, model);
 			DataDistributor instance = instantiateDistributor(req, uri, model);
+			checkForAcceptableCorsRequest(req, resp, uri, model);
 			runIt(req, resp, instance);
 		} catch (NoSuchActionException e) {
 			do400BadRequest(e.getMessage(), resp);
@@ -109,6 +118,29 @@ public class DistributeDataApiController extends VitroApiServlet {
 		}
 	}
 
+	private void checkForAcceptableCorsRequest(HttpServletRequest req,
+			HttpServletResponse resp, String distributorUri, Model model) {
+		String requestingOrigin = req.getHeader("ORIGIN");
+		if (StringUtils.isBlank(requestingOrigin)) {
+			return;
+		}
+
+		List<String> permittedOrigins = createSelectQueryContext(model,
+				PERMITTED_ORIGINS_FOR_DISTRIBUTOR)
+						.bindVariableToUri("uri", distributorUri).execute()
+						.toStringFields("permitted").flatten();
+
+		for (String permitted : permittedOrigins) {
+			if (permitted.equals("*")) {
+				resp.addHeader("Access-Control-Allow-Origin", "*");
+				return;
+			} else if (permitted.equalsIgnoreCase(requestingOrigin)) {
+				resp.addHeader("Access-Control-Allow-Origin", requestingOrigin);
+				return;
+			}
+		}
+	}
+
 	private void runIt(HttpServletRequest req, HttpServletResponse resp,
 			DataDistributor instance) throws DataDistributorException {
 		try {
@@ -154,4 +186,5 @@ public class DistributeDataApiController extends VitroApiServlet {
 			throws ServletException, IOException {
 		doGet(req, resp);
 	}
+
 }
