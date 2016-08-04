@@ -16,9 +16,9 @@ import com.hp.hpl.jena.query.ResultSet;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ProxyRelationshipSelectionBuilder.ItemInfo;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ProxyRelationshipSelectionBuilder.Relationship;
 import edu.cornell.mannlib.vitro.webapp.controller.accounts.manageproxies.ProxyRelationshipSelectionCriteria.ProxyRelationshipView;
-import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
-import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner.QueryParser;
-import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.SparqlQueryUtils;
+import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.ResultSetParser;
+import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.SparqlQueryRunner;
 
 /**
  * A class which will accept a ProxyRelationshipSelectionCriteria and produce a
@@ -94,8 +94,9 @@ public class ProxyRelationshipSelector {
 				PREFIX_LINES);
 		qString = replaceFilterClauses(qString);
 
-		int count = new SparqlQueryRunner(context.userAccountsModel)
-				.executeSelect(new CountQueryParser(), qString);
+		int count = SparqlQueryRunner
+				.createSelectQueryContext(context.userAccountsModel, qString)
+				.execute().parse(new CountQueryParser());
 
 		log.debug("result count: " + count);
 		builder.count = count;
@@ -136,9 +137,9 @@ public class ProxyRelationshipSelector {
 				.replace("%offset%", offset());
 		qString = replaceFilterClauses(qString);
 
-		List<Relationship> relationships = new SparqlQueryRunner(
-				context.userAccountsModel).executeSelect(
-				new ProxyBasicsParser(), qString);
+		List<Relationship> relationships = SparqlQueryRunner
+				.createSelectQueryContext(context.userAccountsModel, qString)
+				.execute().parse(new ProxyBasicsParser());
 		log.debug("getProxyBasics returns: " + relationships);
 		builder.relationships.addAll(relationships);
 	}
@@ -177,8 +178,9 @@ public class ProxyRelationshipSelector {
 						.replace("%matchingProperty%", context.matchingProperty)
 						.replace("%externalAuthId%", proxy.externalAuthId);
 
-				ItemInfo expansion = new SparqlQueryRunner(context.unionModel)
-						.executeSelect(new ExpandProxyParser(), qString);
+				ItemInfo expansion = SparqlQueryRunner
+						.createSelectQueryContext(context.unionModel, qString)
+						.execute().parse(new ExpandProxyParser());
 				proxy.classLabel = expansion.classLabel;
 				proxy.imageUrl = expansion.imageUrl;
 			}
@@ -199,9 +201,10 @@ public class ProxyRelationshipSelector {
 				String qString = QUERY_RELATIONSHIPS.replace("%prefixes%",
 						PREFIX_LINES).replace("%proxyUri%", proxy.uri);
 
-				List<String> profileUris = new SparqlQueryRunner(
-						context.userAccountsModel).executeSelect(
-						new RelationshipsParser(), qString);
+				List<String> profileUris = SparqlQueryRunner
+						.createSelectQueryContext(context.userAccountsModel,
+								qString).execute()
+						.parse(new RelationshipsParser());
 
 				for (String profileUri : profileUris) {
 					r.profileInfos
@@ -235,8 +238,9 @@ public class ProxyRelationshipSelector {
 				String qString = QUERY_EXPAND_PROFILE.replace("%prefixes%",
 						PREFIX_LINES).replace("%profileUri%", profile.uri);
 
-				ItemInfo expansion = new SparqlQueryRunner(context.unionModel)
-						.executeSelect(new ExpandProfileParser(), qString);
+				ItemInfo expansion = SparqlQueryRunner
+						.createSelectQueryContext(context.unionModel, qString)
+						.execute().parse(new ExpandProfileParser());
 				profile.label = expansion.label;
 				profile.classLabel = expansion.classLabel;
 				profile.imageUrl = expansion.imageUrl;
@@ -285,7 +289,7 @@ public class ProxyRelationshipSelector {
 	// ----------------------------------------------------------------------
 
 	private static class ProxyBasicsParser extends
-			QueryParser<List<Relationship>> {
+			ResultSetParser<List<Relationship>> {
 		@Override
 		protected List<Relationship> defaultValue() {
 			return Collections.emptyList();
@@ -318,7 +322,7 @@ public class ProxyRelationshipSelector {
 		}
 	}
 
-	private static class CountQueryParser extends QueryParser<Integer> {
+	private static class CountQueryParser extends ResultSetParser<Integer> {
 		@Override
 		protected Integer defaultValue() {
 			return 0;
@@ -342,7 +346,7 @@ public class ProxyRelationshipSelector {
 		}
 	}
 
-	private static class ExpandProxyParser extends QueryParser<ItemInfo> {
+	private static class ExpandProxyParser extends ResultSetParser<ItemInfo> {
 		@Override
 		protected ItemInfo defaultValue() {
 			return new ItemInfo();
@@ -367,7 +371,8 @@ public class ProxyRelationshipSelector {
 		}
 	}
 
-	private static class RelationshipsParser extends QueryParser<List<String>> {
+	private static class RelationshipsParser extends
+			ResultSetParser<List<String>> {
 		@Override
 		protected List<String> defaultValue() {
 			return Collections.emptyList();
@@ -388,7 +393,7 @@ public class ProxyRelationshipSelector {
 		}
 	}
 
-	private static class ExpandProfileParser extends QueryParser<ItemInfo> {
+	private static class ExpandProfileParser extends ResultSetParser<ItemInfo> {
 		@Override
 		protected ItemInfo defaultValue() {
 			return new ItemInfo();

@@ -10,9 +10,9 @@ import com.hp.hpl.jena.query.QueryParseException;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.http.AcceptHeaderParsingException;
 import edu.cornell.mannlib.vitro.webapp.utils.http.NotAcceptableException;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.SparqlQueryUtils;
 
 /**
  * The base class for the SPARQL query API.
