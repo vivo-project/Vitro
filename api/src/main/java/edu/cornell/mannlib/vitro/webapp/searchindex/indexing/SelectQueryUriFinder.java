@@ -74,7 +74,7 @@ public class SelectQueryUriFinder implements IndexingUriFinder,
 		label = l;
 	}
 
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasSelectQuery")
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasSelectQuery", minOccurs = 1)
 	public void addQuery(String query) {
 		queries.add(query);
 	}
@@ -88,10 +88,6 @@ public class SelectQueryUriFinder implements IndexingUriFinder,
 	public void validate() {
 		if (label == null) {
 			label = this.getClass().getSimpleName() + ":" + this.hashCode();
-		}
-		if (queries.isEmpty()) {
-			throw new IllegalStateException(
-					"Configuration contains no queries for " + label);
 		}
 	}
 

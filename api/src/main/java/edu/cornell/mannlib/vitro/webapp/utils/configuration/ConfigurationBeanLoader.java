@@ -116,6 +116,7 @@ public class ConfigurationBeanLoader {
 			WrappedInstance<T> wrapper = InstanceWrapper.wrap(parsedRdf
 					.getConcreteClass());
 			wrapper.satisfyInterfaces(ctx, req);
+			wrapper.checkCardinality(parsedRdf.getPropertyStatements());
 			wrapper.setProperties(this, parsedRdf.getPropertyStatements());
 			wrapper.validate();
 			return wrapper.getInstance();
