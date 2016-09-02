@@ -162,8 +162,10 @@ public class FileGraphSetup implements ServletContextListener {
                     String fn = p.getFileName().toString().toLowerCase();
                     if ( fn.endsWith(".nt") ) {
                         model.read( fis, null, "N-TRIPLE" );
-                    } else if ( fn.endsWith(".n3") || fn.endsWith(".ttl") ) {
-                        model.read( fis, null, "N3" );
+                    } else if ( fn.endsWith(".n3") ) {
+                        model.read(fis, null, "N3");
+                    } else if ( fn.endsWith(".ttl") ) {
+                        model.read(fis, null, "TURTLE");
                     } else if ( fn.endsWith(".owl") || fn.endsWith(".rdf") || fn.endsWith(".xml") ) {
                         model.read( fis, null, "RDF/XML" );
                     } else if ( fn.endsWith(".md") ) {
