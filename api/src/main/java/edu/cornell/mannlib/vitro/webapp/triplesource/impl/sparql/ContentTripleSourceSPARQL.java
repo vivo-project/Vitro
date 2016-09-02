@@ -2,8 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.triplesource.impl.sparql;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.ModelMaker;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.ModelMaker;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceModelMaker;

@@ -2,7 +2,7 @@
 
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@ page import="com.hp.hpl.jena.rdf.model.Model"%>
+<%@ page import="org.apache.jena.rdf.model.Model"%>
 
 <h2>Individual Not Found</h2>
 

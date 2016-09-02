@@ -24,14 +24,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.ontology.DatatypeProperty;
-import com.hp.hpl.jena.ontology.ObjectProperty;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.vocabulary.RDFS;
-import com.hp.hpl.jena.vocabulary.XSD;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.ontology.DatatypeProperty;
+import org.apache.jena.ontology.ObjectProperty;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.XSD;
 import com.ibm.icu.util.Calendar;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
@@ -531,7 +531,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
     		//Individual event
 	    	Resource eventIndividual = sessionOntModel.createResource(individualPrefix + deleteEventName);
 	    	//Event is of type DeleteEvent
-	    	Statement rType = sessionOntModel.createStatement(eventIndividual, com.hp.hpl.jena.vocabulary.RDF.type, deleteEventType);
+	    	Statement rType = sessionOntModel.createStatement(eventIndividual, org.apache.jena.vocabulary.RDF.type, deleteEventType);
 	    	sessionOntModel.add(rType);
 	    	//Add properties to individual - deleteDateTime, deletedBy, forDataSet, forFile
 	    	DatatypeProperty dateTimeProp = sessionOntModel.createDatatypeProperty(deleteNs + "deleteDateTime");

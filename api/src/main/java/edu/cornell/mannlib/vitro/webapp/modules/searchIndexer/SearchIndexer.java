@@ -5,7 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.modules.searchIndexer;
 import java.util.Collection;
 import java.util.List;
 
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;

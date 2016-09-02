@@ -16,8 +16,8 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.query.QuerySolution;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.query.QuerySolution;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.ajax.AbstractAjaxResponder;

@@ -39,22 +39,22 @@ import org.apache.http.protocol.HttpContext;
 import org.apache.http.util.EntityUtils;
 import org.apache.jena.riot.RDFDataMgr;
 
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.ResultSetFactory;
-import com.hp.hpl.jena.query.ResultSetFormatter;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.sparql.core.Quad;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.query.ResultSetFormatter;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.sparql.core.Quad;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
@@ -701,7 +701,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 			ResultSet rs = qe.execSelect();
 			while (rs.hasNext()) {
 				QuerySolution qs = rs.next();
-				com.hp.hpl.jena.rdf.model.Resource s = qs.getResource("s");
+				org.apache.jena.rdf.model.Resource s = qs.getResource("s");
 				String treeFinder = makeDescribe(s);
 				Query treeFinderQuery = QueryFactory.create(treeFinder);
 				QueryExecution qee = QueryExecutionFactory.create(treeFinderQuery, blankNodeModel);
@@ -720,8 +720,8 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 							RDFNode n = stmt.getObject();
 							Model m2 = ModelFactory.createDefaultModel();
 							if (n.isResource()) {
-								com.hp.hpl.jena.rdf.model.Resource s2 =
-										(com.hp.hpl.jena.rdf.model.Resource) n;
+								org.apache.jena.rdf.model.Resource s2 =
+										(org.apache.jena.rdf.model.Resource) n;
 								// now run yet another describe query
 								String smallerTree = makeDescribe(s2);
 								Query smallerTreeQuery = QueryFactory.create(smallerTree);
@@ -787,8 +787,8 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		if (originalSize == 1)
 			return stmts;
 		List <Statement> remaining = stmts;
-		ConcurrentLinkedQueue<com.hp.hpl.jena.rdf.model.Resource> subjQueue =
-				new ConcurrentLinkedQueue<com.hp.hpl.jena.rdf.model.Resource>();
+		ConcurrentLinkedQueue<org.apache.jena.rdf.model.Resource> subjQueue =
+				new ConcurrentLinkedQueue<org.apache.jena.rdf.model.Resource>();
 		for(Statement stmt : remaining) {
 			if(stmt.getSubject().isURIResource()) {
 				subjQueue.add(stmt.getSubject());
@@ -803,13 +803,13 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 				subjQueue.add(remaining.get(0).getSubject());
 			}
 			while(!subjQueue.isEmpty()) {
-				com.hp.hpl.jena.rdf.model.Resource subj = subjQueue.poll();
+				org.apache.jena.rdf.model.Resource subj = subjQueue.poll();
 				List<Statement> temp = new ArrayList<Statement>();
 				for (Statement stmt : remaining) {
 					if(stmt.getSubject().equals(subj)) {
 						output.add(stmt);
 						if (stmt.getObject().isResource()) {
-							subjQueue.add((com.hp.hpl.jena.rdf.model.Resource) stmt.getObject());
+							subjQueue.add((org.apache.jena.rdf.model.Resource) stmt.getObject());
 						}
 					} else {
 						temp.add(stmt);
@@ -847,7 +847,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		}
 	}
 
-	private String makeDescribe(com.hp.hpl.jena.rdf.model.Resource s) {
+	private String makeDescribe(org.apache.jena.rdf.model.Resource s) {
 		StringBuffer query = new StringBuffer("DESCRIBE <") ;
 		if (s.isAnon()) {
 			query.append("_:" + s.getId().toString());

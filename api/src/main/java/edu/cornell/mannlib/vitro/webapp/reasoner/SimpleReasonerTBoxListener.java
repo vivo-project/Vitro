@@ -7,8 +7,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.rdf.listeners.StatementListener;
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.rdf.listeners.StatementListener;
+import org.apache.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;

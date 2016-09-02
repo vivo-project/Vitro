@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntResource;
-import com.hp.hpl.jena.ontology.ProfileException;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntResource;
+import org.apache.jena.ontology.ProfileException;
+import org.apache.jena.shared.Lock;
+import org.apache.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
@@ -39,7 +39,7 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
     	}
     }
     
-    private com.hp.hpl.jena.ontology.Ontology getOntology(String ontologyURI, 
+    private org.apache.jena.ontology.Ontology getOntology(String ontologyURI,
                                                           OntModel ontModel) {
     	
     	// Something non-ideal happens here.  There are places in the code that
@@ -55,7 +55,7 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
     	// mark if an ontology resource is not found at the specified URI.
     	try {
     		ontModel.enterCriticalSection(Lock.READ);
-    		com.hp.hpl.jena.ontology.Ontology o = ontModel.getOntology(
+    		org.apache.jena.ontology.Ontology o = ontModel.getOntology(
     				ontologyURI);
     		if (o != null) {
     			return o;
@@ -75,7 +75,7 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
     public void deleteOntology(Ontology ontology, OntModel ontModel) {
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
-            com.hp.hpl.jena.ontology.Ontology o = getOntology(ontology.getURI(),ontModel);
+            org.apache.jena.ontology.Ontology o = getOntology(ontology.getURI(),ontModel);
             if (o == null) {
                 o = ontModel.getOntology(adjustOntologyURI(ontology.getURI()));
             }
@@ -135,7 +135,7 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
     		String ontologyURI = adjustAndValidateOntologyURI(ontology.getURI());
             ontModel.enterCriticalSection(Lock.WRITE);
             try {
-                com.hp.hpl.jena.ontology.Ontology o = ontModel.createOntology(ontologyURI);
+                org.apache.jena.ontology.Ontology o = ontModel.createOntology(ontologyURI);
                 if (ontology.getName() != null && ontology.getName().length()>0) {
                     o.setLabel(ontology.getName(), getDefaultLanguage());
                 }
@@ -168,7 +168,7 @@ public class OntologyDaoJena extends JenaBaseDao implements OntologyDao {
         ontModel.enterCriticalSection(Lock.WRITE);
         if (ontology != null && ontology.getURI() != null && ontology.getURI().length()>0) {
             try {
-                com.hp.hpl.jena.ontology.Ontology o = getOntology(ontology.getURI(),ontModel);
+                org.apache.jena.ontology.Ontology o = getOntology(ontology.getURI(),ontModel);
                 if (o == null) {
                     log.error("OntologyDaoJena.updateOntology() could not find ontology "+ontology.getURI()+" in Jena model");
                 } else {

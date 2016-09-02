@@ -2,8 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice;
 
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
 
 import java.util.List;
 

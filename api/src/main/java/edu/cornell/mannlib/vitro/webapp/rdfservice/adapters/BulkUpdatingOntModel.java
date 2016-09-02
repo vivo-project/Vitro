@@ -4,7 +4,9 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.adapters;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Reader;
+import java.io.Writer;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
@@ -12,21 +14,22 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.graph.BulkUpdateHandler;
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.graph.impl.GraphWithPerform;
-import com.hp.hpl.jena.graph.impl.WrappedBulkUpdateHandler;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFReaderF;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.rdf.model.impl.RDFReaderFImpl;
-import com.hp.hpl.jena.rdf.model.impl.StatementImpl;
-import com.hp.hpl.jena.shared.WrappedIOException;
-import com.hp.hpl.jena.util.iterator.Map1;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.GraphUtil;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.graph.impl.GraphWithPerform;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFReaderF;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.impl.RDFReaderFImpl;
+import org.apache.jena.rdf.model.impl.StatementImpl;
+import org.apache.jena.shared.WrappedIOException;
+import org.apache.jena.util.iterator.Map1;
 
 /**
  * A model that still handles bulk updates in the old-fashioned way: with a
@@ -38,49 +41,20 @@ public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
 
 	private static final RDFReaderF readerFactory = new RDFReaderFImpl();
 
-	private final BulkUpdateHandler buh;
-
 	public BulkUpdatingOntModel(OntModel inner) {
 		super(inner);
-		this.buh = inner.getGraph().getBulkUpdateHandler();
-	}
-
-	@SuppressWarnings("deprecation")
-	private static BulkUpdateHandler getWrappedBulkUpdateHandler(Graph graph) {
-		if (graph instanceof GraphWithPerform) {
-			return new WrappedBulkUpdateHandler((GraphWithPerform) graph,
-					graph.getBulkUpdateHandler());
-		} else {
-			try {
-				throw new IllegalStateException();
-			} catch (IllegalStateException e) {
-				log.warn("Graph is not an instance of GraphWithPerform", e);
-			}
-			return graph.getBulkUpdateHandler();
-		}
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
 	public Model add(StmtIterator iter) {
 		try {
-			buh.add(asTriples(iter));
+			this.getGraph().getTransactionHandler().begin();
+			GraphUtil.add(this.getGraph(), asTriples(iter));
+			this.getGraph().getTransactionHandler().commit();
 		} finally {
 			iter.close();
 		}
-		return this;
-	}
-
-	@Override
-	public Model add(Model m) {
-		return add(m, false);
-	}
-
-	@Deprecated
-	@Override
-	public Model add(Model m, boolean suppressReifications) {
-		// suppressReifications is a no-op.
-		buh.add(m.getGraph());
 		return this;
 	}
 
@@ -89,7 +63,9 @@ public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
 	public Model read(String url) {
 		Model m = ModelFactory.createDefaultModel();
 		readerFactory.getReader().read(m, url);
-		buh.add(m.getGraph());
+		this.getGraph().getTransactionHandler().begin();
+		GraphUtil.addInto(this.getGraph(), m.getGraph());
+		this.getGraph().getTransactionHandler().commit();
 		return this;
 	}
 
@@ -98,7 +74,9 @@ public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
 	public Model read(Reader reader, String base) {
 		Model m = ModelFactory.createDefaultModel();
 		readerFactory.getReader().read(m, reader, base);
-		buh.add(m.getGraph());
+		this.getGraph().getTransactionHandler().begin();
+		GraphUtil.addInto(this.getGraph(), m.getGraph());
+		this.getGraph().getTransactionHandler().commit();
 		return this;
 	}
 
@@ -107,7 +85,9 @@ public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
 	public Model read(InputStream reader, String base) {
 		Model m = ModelFactory.createDefaultModel();
 		readerFactory.getReader().read(m, reader, base);
-		buh.add(m.getGraph());
+		this.getGraph().getTransactionHandler().begin();
+		GraphUtil.addInto(this.getGraph(), m.getGraph());
+		this.getGraph().getTransactionHandler().commit();
 		return this;
 	}
 
@@ -116,7 +96,9 @@ public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
 	public Model read(String url, String lang) {
 		Model m = ModelFactory.createDefaultModel();
 		readerFactory.getReader(lang).read(m, url);
-		buh.add(m.getGraph());
+		this.getGraph().getTransactionHandler().begin();
+		GraphUtil.addInto(this.getGraph(), m.getGraph());
+		this.getGraph().getTransactionHandler().commit();
 		return this;
 	}
 
@@ -142,7 +124,9 @@ public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
 	public Model read(Reader reader, String base, String lang) {
 		Model m = ModelFactory.createDefaultModel();
 		readerFactory.getReader(lang).read(m, reader, base);
-		buh.add(m.getGraph());
+		this.getGraph().getTransactionHandler().begin();
+		GraphUtil.addInto(this.getGraph(), m.getGraph());
+		this.getGraph().getTransactionHandler().commit();
 		return this;
 	}
 
@@ -151,40 +135,27 @@ public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
 	public Model read(InputStream reader, String base, String lang) {
 		Model m = ModelFactory.createDefaultModel();
 		readerFactory.getReader(lang).read(m, reader, base);
-		buh.add(m.getGraph());
+		this.getGraph().getTransactionHandler().begin();
+		GraphUtil.addInto(this.getGraph(), m.getGraph());
+		this.getGraph().getTransactionHandler().commit();
 		return this;
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
 	public Model remove(StmtIterator iter) {
-		buh.delete(asTriples(iter));
-		return this;
-	}
-
-	@Override
-	public Model remove(Model m) {
-		return remove(m, false);
-	}
-
-	@Override
-	@Deprecated
-	public Model remove(Model m, boolean suppressReifications) {
-		buh.delete(m.getGraph());
-		return this;
-	}
-
-	@SuppressWarnings("deprecation")
-	@Override
-	public Model removeAll() {
-		buh.removeAll();
+		this.getGraph().getTransactionHandler().begin();
+		GraphUtil.delete(this.getGraph(), asTriples(iter));
+		this.getGraph().getTransactionHandler().commit();
 		return this;
 	}
 
 	@SuppressWarnings("deprecation")
 	@Override
 	public Model add(Statement[] statements) {
-		buh.add(StatementImpl.asTriples(statements));
+		this.getGraph().getTransactionHandler().begin();
+		GraphUtil.add(this.getGraph(), StatementImpl.asTriples(statements));
+		this.getGraph().getTransactionHandler().commit();
 		return this;
 	}
 
@@ -197,7 +168,9 @@ public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
 	@SuppressWarnings("deprecation")
 	@Override
 	public Model remove(Statement[] statements) {
-		buh.delete(StatementImpl.asTriples(statements));
+		this.getGraph().getTransactionHandler().begin();
+		GraphUtil.delete(this.getGraph(), StatementImpl.asTriples(statements));
+		this.getGraph().getTransactionHandler().commit();
 		return this;
 	}
 
@@ -213,9 +186,8 @@ public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
 
 	private Map1<Statement, Triple> mapAsTriple = new Map1<Statement, Triple>() {
 		@Override
-		public Triple map1(Statement s) {
-			return s.asTriple();
+		public Triple apply(Statement statement) {
+			return statement.asTriple();
 		}
 	};
-
 }

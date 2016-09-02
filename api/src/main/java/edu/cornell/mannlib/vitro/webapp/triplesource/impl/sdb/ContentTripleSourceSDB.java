@@ -16,16 +16,16 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.ModelMaker;
-import com.hp.hpl.jena.sdb.SDB;
-import com.hp.hpl.jena.sdb.SDBFactory;
-import com.hp.hpl.jena.sdb.Store;
-import com.hp.hpl.jena.sdb.StoreDesc;
-import com.hp.hpl.jena.sdb.sql.SDBConnection;
-import com.hp.hpl.jena.sdb.store.DatabaseType;
-import com.hp.hpl.jena.sdb.store.LayoutType;
-import com.hp.hpl.jena.sdb.util.StoreUtils;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.ModelMaker;
+import org.apache.jena.sdb.SDB;
+import org.apache.jena.sdb.SDBFactory;
+import org.apache.jena.sdb.Store;
+import org.apache.jena.sdb.StoreDesc;
+import org.apache.jena.sdb.sql.SDBConnection;
+import org.apache.jena.sdb.store.DatabaseType;
+import org.apache.jena.sdb.store.LayoutType;
+import org.apache.jena.sdb.util.StoreUtils;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;

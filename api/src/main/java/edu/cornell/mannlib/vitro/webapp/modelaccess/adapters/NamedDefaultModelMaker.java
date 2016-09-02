@@ -7,10 +7,10 @@ import java.util.Collections;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelMaker;
-import com.hp.hpl.jena.rdf.model.ModelReader;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelMaker;
+import org.apache.jena.rdf.model.ModelReader;
+import org.apache.jena.util.iterator.ExtendedIterator;
 
 /**
  * This model maker allows you to refer to the default model by a name.

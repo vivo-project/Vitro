@@ -82,7 +82,7 @@ public class StackTraceUtility {
 		ListIterator<StackTraceElement> iter = list.listIterator();
 		while (iter.hasNext()) {
 			StackTraceElement ste = iter.next();
-			if (ste.getClassName().startsWith("com.hp.hpl.jena.")) {
+			if (ste.getClassName().startsWith("org.apache.jena.")) {
 				iter.remove();
 			}
 		}

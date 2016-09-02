@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.hp.hpl.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.VitroModelFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;

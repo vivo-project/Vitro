@@ -8,7 +8,7 @@
 <% request.setAttribute("requestedActions", SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION); %>
 <vitro:confirmAuthorization />
 
-<%@ page import="com.hp.hpl.jena.rdf.model.Model"%>
+<%@ page import="org.apache.jena.rdf.model.Model"%>
 
 <h2><a class="ingestMenu" href="ingest">Ingest Menu</a> > Merge Individuals</h2>
 

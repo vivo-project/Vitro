@@ -18,31 +18,29 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 
-import com.hp.hpl.jena.graph.BulkUpdateHandler;
-import com.hp.hpl.jena.graph.Capabilities;
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.GraphEventManager;
-import com.hp.hpl.jena.graph.GraphStatisticsHandler;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.TransactionHandler;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.graph.TripleMatch;
-import com.hp.hpl.jena.graph.impl.GraphWithPerform;
-import com.hp.hpl.jena.graph.impl.SimpleEventManager;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.shared.AddDeniedException;
-import com.hp.hpl.jena.shared.DeleteDeniedException;
-import com.hp.hpl.jena.shared.PrefixMapping;
-import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
-import com.hp.hpl.jena.sparql.resultset.ResultSetMem;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
-import com.hp.hpl.jena.util.iterator.SingletonIterator;
-import com.hp.hpl.jena.util.iterator.WrappedIterator;
+import org.apache.jena.graph.Capabilities;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.GraphEventManager;
+import org.apache.jena.graph.GraphStatisticsHandler;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.TransactionHandler;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.graph.impl.GraphWithPerform;
+import org.apache.jena.graph.impl.SimpleEventManager;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.shared.AddDeniedException;
+import org.apache.jena.shared.DeleteDeniedException;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.shared.impl.PrefixMappingImpl;
+import org.apache.jena.sparql.resultset.ResultSetMem;
+import org.apache.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.util.iterator.SingletonIterator;
+import org.apache.jena.util.iterator.WrappedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 import org.apache.http.protocol.BasicHttpContext;
@@ -55,7 +53,6 @@ public class SparqlGraph implements GraphWithPerform {
     private HttpClient httpClient;
     private static final Log log = LogFactory.getLog(SparqlGraph.class);
     
-    private BulkUpdateHandler bulkUpdateHandler;
     private PrefixMapping prefixMapping = new PrefixMappingImpl();
     private GraphEventManager eventManager;
     
@@ -200,7 +197,13 @@ public class SparqlGraph implements GraphWithPerform {
         performDelete(arg0);
     }
 
-	@Override
+    @Override
+    public ExtendedIterator<Triple> find(Triple triple) {
+        //log.info("find(TripleMatch) " + arg0);
+        return find(triple.getSubject(), triple.getPredicate(), triple.getObject());
+    }
+
+    @Override
 	public void clear() {
 		removeAll();
 	}
@@ -215,13 +218,6 @@ public class SparqlGraph implements GraphWithPerform {
     @Override
     public boolean dependsOn(Graph arg0) {
         return false; // who knows?
-    }
-
-    @Override
-    public ExtendedIterator<Triple> find(TripleMatch arg0) {
-        //log.info("find(TripleMatch) " + arg0);
-        Triple t = arg0.asTriple();
-        return find(t.getSubject(), t.getPredicate(), t.getObject());
     }
 
     public static String sparqlNode(Node node, String varName) {
@@ -316,15 +312,6 @@ public class SparqlGraph implements GraphWithPerform {
         return (node == null || node.isVariable() || node == Node.ANY);
     }
     
-    @Override
-    @Deprecated
-    public BulkUpdateHandler getBulkUpdateHandler() {
-        if (this.bulkUpdateHandler == null) {
-            this.bulkUpdateHandler = new SparqlGraphBulkUpdater(this);
-        }
-        return this.bulkUpdateHandler;
-    }
-
     @Override
     public Capabilities getCapabilities() {
         return capabilities;
@@ -468,7 +455,7 @@ public class SparqlGraph implements GraphWithPerform {
     /*
      * 
      * see http://www.python.org/doc/2.5.2/ref/strings.html
-     * or see jena's n3 grammar jena/src/com/hp/hpl/jena/n3/n3.g
+     * or see jena's n3 grammar jena/src/org.apache/jena/n3/n3.g
      */ 
     protected static void pyString(StringBuffer sbuff, String s)
     {

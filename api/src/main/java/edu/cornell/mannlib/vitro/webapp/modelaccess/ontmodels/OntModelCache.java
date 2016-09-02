@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.modelaccess.ontmodels;
 
 import java.util.SortedSet;
 
-import com.hp.hpl.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModel;
 
 /**
  * A source for OntModels from the triple-store. The contract is this:

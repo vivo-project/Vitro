@@ -11,17 +11,17 @@ import java.util.ListIterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.ontology.Individual;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.ontology.Individual;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.shared.Lock;
+import org.apache.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vitro.webapp.beans.IndividualImpl;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -115,9 +115,9 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
 		            	for (Iterator stmtIt = closeIt; stmtIt.hasNext(); ) {
 		            		Statement stmt = (Statement) stmtIt.next();
 		            		Resource subjRes = stmt.getSubject();
-		            		if (subjRes.canAs(com.hp.hpl.jena.ontology.ObjectProperty.class)) {
+		            		if (subjRes.canAs(org.apache.jena.ontology.ObjectProperty.class)) {
 		            			properties.add(opDao.getObjectPropertyByURI(subjRes.getURI()));
-		            		} else if (subjRes.canAs(com.hp.hpl.jena.ontology.DatatypeProperty.class)) {
+		            		} else if (subjRes.canAs(org.apache.jena.ontology.DatatypeProperty.class)) {
 		            			properties.add(dpDao.getDataPropertyByURI(subjRes.getURI()));
 		            		}
 		            	}
@@ -170,7 +170,7 @@ public class PropertyGroupDaoJena extends JenaBaseDao implements PropertyGroupDa
     	if (groupURI != null) {
 	        getOntModel().enterCriticalSection(Lock.WRITE);
 	        try {
-	        	com.hp.hpl.jena.ontology.Individual groupJenaInd = 
+	        	org.apache.jena.ontology.Individual groupJenaInd =
 	        	        getOntModel().getIndividual(groupURI);
 	            try {
 	                groupJenaInd.addProperty(DISPLAY_RANK, Integer.toString(

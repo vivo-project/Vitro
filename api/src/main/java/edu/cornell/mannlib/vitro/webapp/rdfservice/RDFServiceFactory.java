@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice;
 
-import com.hp.hpl.jena.rdf.model.ModelChangedListener;
+import org.apache.jena.rdf.model.ModelChangedListener;
 
 public interface RDFServiceFactory {
 

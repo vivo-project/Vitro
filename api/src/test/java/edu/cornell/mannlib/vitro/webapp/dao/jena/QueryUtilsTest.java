@@ -15,10 +15,10 @@ import java.util.Map;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.hp.hpl.jena.query.QuerySolutionMap;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 

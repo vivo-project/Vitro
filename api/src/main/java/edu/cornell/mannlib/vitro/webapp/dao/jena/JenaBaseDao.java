@@ -19,33 +19,33 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.jena.iri.IRI;
 import org.apache.jena.iri.IRIFactory;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.ontology.DatatypeProperty;
-import com.hp.hpl.jena.ontology.ObjectProperty;
-import com.hp.hpl.jena.ontology.OntClass;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntResource;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.Syntax;
-import com.hp.hpl.jena.rdf.model.AnonId;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.NodeIterator;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.ontology.DatatypeProperty;
+import org.apache.jena.ontology.ObjectProperty;
+import org.apache.jena.ontology.OntClass;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntResource;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.Syntax;
+import org.apache.jena.rdf.model.AnonId;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.shared.Lock;
+import org.apache.jena.util.iterator.ClosableIterator;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -948,7 +948,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     		if (vitroURIStr.indexOf(PSEUDO_BNODE_NS)==0) {
     			String idStr = vitroURIStr.split("#")[1];
     			log.debug("Trying to get bnode " + idStr);
-    			RDFNode rdfNode = ontModel.getRDFNode(NodeFactory.createAnon(AnonId.create(idStr)));
+    			RDFNode rdfNode = ontModel.getRDFNode(NodeFactory.createAnon(idStr));
     			if ( (rdfNode != null) && (rdfNode.canAs(OntClass.class)) ) {
     			    log.debug("found it");
     				cls = rdfNode.as(OntClass.class);
@@ -976,7 +976,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 
     protected Node makeNodeForURI(String vitroURIStr) {
     	if (vitroURIStr.indexOf(PSEUDO_BNODE_NS)==0) {
-			return NodeFactory.createAnon(AnonId.create(vitroURIStr.split("#")[1]));
+			return NodeFactory.createAnon(vitroURIStr.split("#")[1]);
     	} else {
     		return NodeFactory.createURI(vitroURIStr);
     	}

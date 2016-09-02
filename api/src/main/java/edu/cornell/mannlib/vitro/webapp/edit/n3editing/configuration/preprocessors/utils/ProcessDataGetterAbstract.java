@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.hp.hpl.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Literal;
 
 //Returns the appropriate n3 based on data getter
 public abstract class ProcessDataGetterAbstract implements ProcessDataGetterN3 {

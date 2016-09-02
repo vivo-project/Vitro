@@ -9,19 +9,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ReadWrite;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.shared.LockMRSW;
-import com.hp.hpl.jena.sparql.core.DatasetGraph;
-import com.hp.hpl.jena.sparql.core.Quad;
-import com.hp.hpl.jena.sparql.util.Context;
-import com.hp.hpl.jena.util.iterator.SingletonIterator;
-import com.hp.hpl.jena.util.iterator.WrappedIterator;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ReadWrite;
+import org.apache.jena.shared.Lock;
+import org.apache.jena.shared.LockMRSW;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.Quad;
+import org.apache.jena.sparql.util.Context;
+import org.apache.jena.util.iterator.SingletonIterator;
+import org.apache.jena.util.iterator.WrappedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -31,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 public class RDFServiceDatasetGraph implements DatasetGraph {
 
     private RDFService rdfService;
+    private RDFServiceGraph defaultGraph;
     private Lock lock = new LockMRSW();
     private Context context = new Context() ;
     private Map<String, RDFServiceGraph> graphCache = new ConcurrentHashMap<String, RDFServiceGraph>();
@@ -38,16 +39,58 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
     
     public RDFServiceDatasetGraph(RDFService rdfService) {
         this.rdfService = rdfService;
+        this.defaultGraph = new RDFServiceGraph(rdfService);
     }
 
     public Map<String, RDFServiceGraph> getGraphCache() {
         return graphCache;
     }
-    
-    public void begin(ReadWrite mode) {
+
+    @Override
+    public synchronized void begin(ReadWrite mode) {
         this.transactionMode = mode;
+        graphCache.clear();
     }
-    
+
+    @Override
+    public synchronized void commit() {
+        this.transactionMode = null;
+        if (supportsTransactions(defaultGraph)) {
+            defaultGraph.getTransactionHandler().commit();
+        }
+
+        for (RDFServiceGraph graph : graphCache.values()) {
+            if (supportsTransactions(graph)) {
+                graph.getTransactionHandler().commit();
+            }
+
+        }
+
+        graphCache.clear();
+    }
+
+    @Override
+    public synchronized void abort() {
+        this.transactionMode = null;
+        if (supportsTransactions(defaultGraph)) {
+            defaultGraph.getTransactionHandler().abort();
+        }
+
+        for (RDFServiceGraph graph : graphCache.values()) {
+            if (supportsTransactions(graph)) {
+                graph.getTransactionHandler().abort();
+            }
+
+        }
+
+        graphCache.clear();
+    }
+
+    @Override
+    public boolean isInTransaction() {
+        return false;
+    }
+
     public void end() {
         this.transactionMode = null;
     }
@@ -58,7 +101,7 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
     
     private Graph getGraphFor(Node g) {
         return (g == Node.ANY) 
-                ? new RDFServiceGraph(rdfService) 
+                ? defaultGraph
                 : getGraph(g);
     }
     
@@ -83,8 +126,23 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
     }
 
     @Override
+    public boolean supportsTransactions() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsTransactionAbort() {
+        return true;
+    }
+
+    @Override
     public boolean contains(Quad arg0) {
         return getGraphFor(arg0).contains(new Triple(arg0.getSubject(), arg0.getPredicate(), arg0.getObject()));
+    }
+
+    @Override
+    public void clear() {
+
     }
 
     @Override
@@ -94,8 +152,7 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
 
     @Override
     public boolean containsGraph(Node arg0) {
-        // TODO Auto-generated method stub
-        return true;
+        return getGraphFor(arg0) != null;
     }
 
     @Override
@@ -185,7 +242,7 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
 
     @Override
     public RDFServiceGraph getDefaultGraph() {
-        return new RDFServiceGraph(rdfService);
+        return defaultGraph;
     }
     
     @Override

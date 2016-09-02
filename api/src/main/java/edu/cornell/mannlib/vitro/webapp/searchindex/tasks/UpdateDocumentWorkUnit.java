@@ -24,8 +24,8 @@ import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 import org.jsoup.Jsoup;
 
-import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;

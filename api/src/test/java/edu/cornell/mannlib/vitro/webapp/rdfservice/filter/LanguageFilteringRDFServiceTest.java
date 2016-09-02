@@ -20,9 +20,9 @@ import org.apache.log4j.Level;
 import org.junit.Before;
 import org.junit.Test;
 
-import stubs.com.hp.hpl.jena.rdf.model.LiteralStub;
+import stubs.org.apache.jena.rdf.model.LiteralStub;
 
-import com.hp.hpl.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Literal;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 

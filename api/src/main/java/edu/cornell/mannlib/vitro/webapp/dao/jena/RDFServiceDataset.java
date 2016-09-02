@@ -8,17 +8,17 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.graph.TransactionHandler;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.LabelExistsException;
-import com.hp.hpl.jena.query.ReadWrite;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.sparql.core.DatasetGraph;
-import com.hp.hpl.jena.sparql.util.Context;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.TransactionHandler;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.LabelExistsException;
+import org.apache.jena.query.ReadWrite;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.shared.Lock;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.util.Context;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
@@ -118,11 +118,12 @@ public class RDFServiceDataset implements Dataset {
 
 	@Override
 	public boolean supportsTransactions() {
-		if (g.getDefaultGraph().getTransactionHandler() == null) {
-		    return false;
-		} else {
-		    return g.getDefaultGraph().getTransactionHandler().transactionsSupported();
-		}
+		return g.supportsTransactions();
+	}
+
+	@Override
+	public boolean supportsTransactionAbort() {
+		return g.supportsTransactionAbort();
 	}
 
 	@Override
@@ -139,32 +140,16 @@ public class RDFServiceDataset implements Dataset {
 	public void begin(ReadWrite arg0) {
 	    this.transactionMode = arg0;
 	    g.begin(arg0);
-	    for(String graphURI : g.getGraphCache().keySet()) {
-            Graph graph = g.getGraphCache().get(graphURI);
-            if (supportsTransactions(graph)) {
-                graph.getTransactionHandler().begin();
-            }
-        }
 	}
 
 	@Override
 	public void commit() {
-	    for(String graphURI : g.getGraphCache().keySet()) {
-            Graph graph = g.getGraphCache().get(graphURI);
-            if(supportsTransactions(graph)) {
-                graph.getTransactionHandler().commit();
-            }
-        }
+		g.commit();
 	}
 
 	@Override
 	public void abort() {
-	    for(String graphURI : g.getGraphCache().keySet()) {
-            Graph graph = g.getGraphCache().get(graphURI);
-            if(supportsTransactions(graph)) {
-                graph.getTransactionHandler().abort();
-            }
-        }
+		g.abort();
 	}
 
 	@Override

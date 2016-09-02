@@ -5,8 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.searchindex.indexing;
 import java.util.Collections;
 import java.util.List;
 
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder;
 

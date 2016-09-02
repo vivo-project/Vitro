@@ -11,34 +11,34 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.hp.hpl.jena.datatypes.RDFDatatype;
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.rdf.model.Alt;
-import com.hp.hpl.jena.rdf.model.AnonId;
-import com.hp.hpl.jena.rdf.model.Bag;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelChangedListener;
-import com.hp.hpl.jena.rdf.model.NodeIterator;
-import com.hp.hpl.jena.rdf.model.NsIterator;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFList;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.RDFReader;
-import com.hp.hpl.jena.rdf.model.RDFWriter;
-import com.hp.hpl.jena.rdf.model.RSIterator;
-import com.hp.hpl.jena.rdf.model.ReifiedStatement;
-import com.hp.hpl.jena.rdf.model.ResIterator;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Selector;
-import com.hp.hpl.jena.rdf.model.Seq;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.shared.Command;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.shared.PrefixMapping;
+import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.rdf.model.Alt;
+import org.apache.jena.rdf.model.AnonId;
+import org.apache.jena.rdf.model.Bag;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelChangedListener;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.NsIterator;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFList;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.RDFReader;
+import org.apache.jena.rdf.model.RDFWriter;
+import org.apache.jena.rdf.model.RSIterator;
+import org.apache.jena.rdf.model.ReifiedStatement;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Selector;
+import org.apache.jena.rdf.model.Seq;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.shared.Command;
+import org.apache.jena.shared.Lock;
+import org.apache.jena.shared.PrefixMapping;
 
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
@@ -66,7 +66,7 @@ public abstract class AbstractModelDecorator implements Model {
 
 	@Override
 	@Deprecated
-	public Resource getResource(String uri, com.hp.hpl.jena.rdf.model.ResourceF f) {
+	public Resource getResource(String uri, org.apache.jena.rdf.model.ResourceF f) {
 		return inner.getResource(uri, f);
 	}
 
@@ -122,13 +122,13 @@ public abstract class AbstractModelDecorator implements Model {
 
 	@Override
 	@Deprecated
-	public Resource createResource(com.hp.hpl.jena.rdf.model.ResourceF f) {
+	public Resource createResource(org.apache.jena.rdf.model.ResourceF f) {
 		return inner.createResource(f);
 	}
 
 	@Override
 	@Deprecated
-	public Resource createResource(String uri, com.hp.hpl.jena.rdf.model.ResourceF f) {
+	public Resource createResource(String uri, org.apache.jena.rdf.model.ResourceF f) {
 		return inner.createResource(uri, f);
 	}
 
@@ -365,6 +365,16 @@ public abstract class AbstractModelDecorator implements Model {
 	}
 
 	@Override
+	public void resetRDFReaderF() {
+		inner.resetRDFReaderF();
+	}
+
+	@Override
+	public String removeReader(String s) throws IllegalArgumentException {
+		return inner.removeReader(s);
+	}
+
+	@Override
 	public RDFWriter getWriter() {
 		return inner.getWriter();
 	}
@@ -377,6 +387,16 @@ public abstract class AbstractModelDecorator implements Model {
 	@Override
 	public String setWriterClassName(String lang, String className) {
 		return inner.setWriterClassName(lang, className);
+	}
+
+	@Override
+	public void resetRDFWriterF() {
+		inner.resetRDFWriterF();
+	}
+
+	@Override
+	public String removeWriter(String s) throws IllegalArgumentException {
+		return inner.removeWriter(s);
 	}
 
 	@Override
@@ -476,12 +496,6 @@ public abstract class AbstractModelDecorator implements Model {
 	}
 
 	@Override
-	@Deprecated
-	public Model remove(Model m, boolean suppressReifications) {
-		return inner.remove(m, suppressReifications);
-	}
-
-	@Override
 	public StmtIterator listLiteralStatements(Resource subject,
 			Property predicate, boolean object) {
 		return inner.listLiteralStatements(subject, predicate, object);
@@ -490,6 +504,12 @@ public abstract class AbstractModelDecorator implements Model {
 	@Override
 	public StmtIterator listLiteralStatements(Resource subject,
 			Property predicate, char object) {
+		return inner.listLiteralStatements(subject, predicate, object);
+	}
+
+	@Override
+	public StmtIterator listLiteralStatements(Resource subject,
+											  Property predicate, int object) {
 		return inner.listLiteralStatements(subject, predicate, object);
 	}
 
@@ -749,12 +769,6 @@ public abstract class AbstractModelDecorator implements Model {
 	}
 
 	@Override
-	@Deprecated
-	public Model add(Model m, boolean suppressReifications) {
-		return inner.add(m, suppressReifications);
-	}
-
-	@Override
 	public Model read(String url) {
 		return inner.read(url);
 	}
@@ -962,12 +976,6 @@ public abstract class AbstractModelDecorator implements Model {
 	@Override
 	public RSIterator listReifiedStatements(Statement st) {
 		return inner.listReifiedStatements(st);
-	}
-
-	@Override
-	@Deprecated
-	public com.hp.hpl.jena.shared.ReificationStyle getReificationStyle() {
-		return inner.getReificationStyle();
 	}
 
 	@Override

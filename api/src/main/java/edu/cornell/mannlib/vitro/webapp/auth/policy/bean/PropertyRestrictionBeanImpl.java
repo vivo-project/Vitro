@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.rdf.model.impl.Util;
+import org.apache.jena.rdf.model.impl.Util;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionLevels.Which;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
@@ -225,7 +225,7 @@ public class PropertyRestrictionBeanImpl extends PropertyRestrictionBean {
 	}
 
 	private String namespace(String uri) {
-		return uri.substring(0, Util.splitNamespace(uri));
+		return uri.substring(0, Util.splitNamespaceXML(uri));
 	}
 
 	@Override

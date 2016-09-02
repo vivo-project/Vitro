@@ -2,11 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.listeners.StatementListener;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.listeners.StatementListener;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Statement;
 
 /**
  * This ModelChangedListener will accumulate all statements added to

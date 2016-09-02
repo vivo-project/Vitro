@@ -7,7 +7,7 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.FULL_UNION
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSERTIONS;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_INFERENCES;
 
-import com.hp.hpl.jena.rdf.model.ModelMaker;
+import org.apache.jena.rdf.model.ModelMaker;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.NamedDefaultModelMaker;
 

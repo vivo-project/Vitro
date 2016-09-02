@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.hp.hpl.jena.rdf.model.impl.Util;
+import org.apache.jena.rdf.model.impl.Util;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionBean;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionLevels;
@@ -66,7 +66,7 @@ public class PropertyRestrictionBeanStub extends PropertyRestrictionBean {
 	}
 
 	private String namespace(String uri) {
-		return uri.substring(0, Util.splitNamespace(uri));
+		return uri.substring(0, Util.splitNamespaceXML(uri));
 	}
 
 	private boolean isPermittedProperty(String uri) {

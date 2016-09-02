@@ -15,8 +15,8 @@ import org.apache.commons.logging.LogFactory;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import fedora.client.FedoraClient;

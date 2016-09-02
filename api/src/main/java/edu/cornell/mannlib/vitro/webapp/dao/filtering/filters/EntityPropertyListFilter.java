@@ -13,13 +13,13 @@ import java.util.Set;
 
 import net.sf.jga.fn.UnaryFunctor;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.shared.Lock;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -30,7 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 
 public class EntityPropertyListFilter extends UnaryFunctor<List<Property>, List<Property>> {
 
-	private static final com.hp.hpl.jena.rdf.model.Property MASKS_PROPERTY = ResourceFactory.createProperty(VitroVocabulary.MASKS_PROPERTY);
+	private static final org.apache.jena.rdf.model.Property MASKS_PROPERTY = ResourceFactory.createProperty(VitroVocabulary.MASKS_PROPERTY);
 	private Map<String,Collection<String>> propertyMaskMap;
 	
 	public EntityPropertyListFilter(OntModel ontModel) {

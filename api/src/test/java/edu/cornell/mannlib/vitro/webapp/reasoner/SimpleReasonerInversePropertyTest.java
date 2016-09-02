@@ -11,13 +11,13 @@ import stubs.edu.cornell.mannlib.vitro.webapp.modules.ApplicationStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineStub;
 import stubs.javax.servlet.ServletContextStub;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.ontology.OntProperty;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.OWL;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.ontology.OntProperty;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 

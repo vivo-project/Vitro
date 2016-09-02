@@ -1,7 +1,7 @@
 <%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
 
-<%@ page import="com.hp.hpl.jena.rdf.model.ModelMaker"%>
-<%@ page import="com.hp.hpl.jena.rdf.model.Model"%>
+<%@ page import="org.apache.jena.rdf.model.ModelMaker"%>
+<%@ page import="org.apache.jena.rdf.model.Model"%>
 <%@ page import="java.util.Iterator"%>
 <%@ page import="java.net.URLEncoder"%>
 <%@ page import="java.util.List"%>

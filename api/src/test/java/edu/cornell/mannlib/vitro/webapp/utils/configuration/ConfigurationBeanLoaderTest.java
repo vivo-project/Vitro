@@ -2,8 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
-import static com.hp.hpl.jena.datatypes.xsd.XSDDatatype.XSDfloat;
-import static com.hp.hpl.jena.datatypes.xsd.XSDDatatype.XSDstring;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDfloat;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDstring;
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.dataProperty;
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.model;
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.objectProperty;
@@ -29,8 +29,8 @@ import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
 import stubs.javax.servlet.http.HttpSessionStub;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;

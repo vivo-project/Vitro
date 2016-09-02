@@ -8,7 +8,8 @@ import java.util.regex.Pattern;
 import javax.json.JsonObject;
 import javax.json.JsonString;
 
-import org.apache.jena.riot.out.EscapeStr;
+import org.apache.jena.atlas.lib.EscapeStr;
+
 
 /**
  * A representation of an RDF Node, read from one format of a result set, and

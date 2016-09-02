@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import com.hp.hpl.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModel;
 
 /**
  * Interface for retrieving RDF (Ont)models containing certain types of data.

@@ -1,20 +1,20 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
-package stubs.com.hp.hpl.jena.rdf.model.ModelMaker;
+package stubs.org.apache.jena.rdf.model.ModelMaker;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import com.hp.hpl.jena.graph.GraphMaker;
-import com.hp.hpl.jena.graph.impl.SimpleGraphMaker;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelMaker;
-import com.hp.hpl.jena.rdf.model.ModelReader;
-import com.hp.hpl.jena.shared.AlreadyExistsException;
-import com.hp.hpl.jena.shared.CannotCreateException;
-import com.hp.hpl.jena.shared.DoesNotExistException;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
-import com.hp.hpl.jena.util.iterator.WrappedIterator;
+import org.apache.jena.graph.GraphMaker;
+import org.apache.jena.graph.impl.SimpleGraphMaker;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelMaker;
+import org.apache.jena.rdf.model.ModelReader;
+import org.apache.jena.shared.AlreadyExistsException;
+import org.apache.jena.shared.CannotCreateException;
+import org.apache.jena.shared.DoesNotExistException;
+import org.apache.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.util.iterator.WrappedIterator;
 
 /**
  * A ModelMaker stub, but is it strict or relaxed? Choose one of the

@@ -5,7 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual;
 import java.util.List;
 import java.util.Objects;
 
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;

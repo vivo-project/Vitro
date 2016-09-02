@@ -4,8 +4,8 @@ package edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection;
 
 import java.util.Objects;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.shared.Lock;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.shared.Lock;
 
 /**
  * Makes it easy to use a Jena Model in a try-with-resources block. At the end

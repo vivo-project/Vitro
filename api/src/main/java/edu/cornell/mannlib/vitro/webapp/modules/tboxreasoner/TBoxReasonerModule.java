@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.modules.tboxreasoner;
 
 import java.util.List;
 
-import com.hp.hpl.jena.ontology.Restriction;
+import org.apache.jena.ontology.Restriction;
 
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 

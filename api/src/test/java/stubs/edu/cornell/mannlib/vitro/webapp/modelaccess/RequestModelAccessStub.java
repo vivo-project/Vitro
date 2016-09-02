@@ -5,8 +5,8 @@ package stubs.edu.cornell.mannlib.vitro.webapp.modelaccess;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.query.Dataset;
 
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntModelSelector;

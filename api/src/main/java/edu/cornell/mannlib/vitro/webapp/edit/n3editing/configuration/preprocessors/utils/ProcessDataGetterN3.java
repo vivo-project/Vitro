@@ -9,8 +9,8 @@ import java.util.Map;
 import net.sf.json.JSONObject;
 import javax.servlet.ServletContext;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Literal;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.Literal;
 
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 
