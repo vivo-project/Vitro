@@ -35,7 +35,7 @@ public class VitroModelFactory {
 		Graph graph = model.getGraph();
 		Model bareModel = new ModelCom(graph);
 		OntModel ontModel = new OntModelImpl(OWL_MEM, bareModel);
-		return new BulkUpdatingOntModel(ontModel);
+		return ontModel;
 	}
 
 	public static Model createUnion(Model baseModel, Model plusModel) {
@@ -45,7 +45,7 @@ public class VitroModelFactory {
 				plusGraph);
 
 		Model unionModel = ModelFactory.createModelForGraph(unionGraph);
-		return new BulkUpdatingModel(unionModel);
+		return unionModel;
 	}
 
 	public static OntModel createUnion(OntModel baseModel, OntModel plusModel) {
@@ -57,11 +57,11 @@ public class VitroModelFactory {
 		Model unionModel = ModelFactory.createModelForGraph(unionGraph);
 		OntModel unionOntModel = ModelFactory.createOntologyModel(OWL_MEM,
 				unionModel);
-		return new BulkUpdatingOntModel(unionOntModel);
+		return unionOntModel;
 	}
 
 	public static Model createModelForGraph(Graph g) {
-		return new BulkUpdatingModel(ModelFactory.createModelForGraph(g));
+		return ModelFactory.createModelForGraph(g);
 	}
 
 	private static class BulkUpdatingUnion extends Union {

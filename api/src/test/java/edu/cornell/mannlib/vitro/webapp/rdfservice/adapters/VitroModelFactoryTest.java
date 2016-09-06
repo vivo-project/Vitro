@@ -244,8 +244,8 @@ public class VitroModelFactoryTest extends AbstractTestClass {
 	public void addMultipleToVitroOntModel() {
 		omg = new VitroOntModelGroup();
 		omg.om.add(MULTIPLE_STATEMENTS);
-		new MethodCalls().add(omg.g, "performAdd", "performAdd")
-				.add(omg.l, "addedStatements")
+		new MethodCalls().add(omg.g, "add", "add")
+				.add(omg.l, "addedStatement", "addedStatement")
 				.add(omg.ol, "addedStatements").test();
 	}
 
@@ -346,8 +346,8 @@ public class VitroModelFactoryTest extends AbstractTestClass {
 	public void addMultipleToVitroUnion() {
 		umg = new VitroUnionModelGroup();
 		umg.m.add(MULTIPLE_STATEMENTS);
-		new MethodCalls().add(umg.base.g, "performAdd", "performAdd")
-				.add(umg.base.l, "addedStatements")
+		new MethodCalls().add(umg.base.g, "add", "add")
+				.add(umg.base.l, "addedStatement", "addedStatement")
 				.add(umg.plus.g).add(umg.plus.l)
 				.add(umg.l, "addedStatements").test();
 	}
@@ -452,8 +452,8 @@ public class VitroModelFactoryTest extends AbstractTestClass {
 	public void addMultipleToVitroOntUnion() {
 		uomg = new VitroUnionOntModelGroup();
 		uomg.om.add(MULTIPLE_STATEMENTS);
-		new MethodCalls().add(uomg.base.g, "performAdd", "performAdd")
-				.add(uomg.base.l, "addedStatements")
+		new MethodCalls().add(uomg.base.g, "add", "add")
+				.add(uomg.base.l, "addedStatement", "addedStatement")
 				.add(uomg.plus.g).add(uomg.plus.l)
 				.add(uomg.l, "addedStatements").test();
 	}
@@ -567,9 +567,9 @@ public class VitroModelFactoryTest extends AbstractTestClass {
 		omumg = new VitroOntModelUnionModelGroup();
 		omumg.om.add(MULTIPLE_STATEMENTS);
 		new MethodCalls().add(omumg.om, "add").add(omumg.ol, "addedStatements")
-				.add(omumg.union.base.g, "performAdd", "performAdd")
+				.add(omumg.union.base.g, "add", "add")
 				.add(omumg.union.base.m)
-				.add(omumg.union.base.l, "addedStatements")
+				.add(omumg.union.base.l, "addedStatement", "addedStatement")
 				.add(omumg.union.plus.g)
 				.add(omumg.union.plus.m).add(omumg.union.plus.l).test();
 	}

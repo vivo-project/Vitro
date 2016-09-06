@@ -48,18 +48,17 @@ public class RdfLiteralHash {
         
         if( stmt.getDatapropURI() == null || stmt.getDatapropURI().trim().length() == 0)
             throw new Error("Cannot make a hash for a statement with no predicate URI");
-        
-        String language = "9876NONE";
+
+        String langOrDatatype = "9876NONE";
         if( stmt.getLanguage() != null && stmt.getLanguage().trim().length() > 0){
-           language = stmt.getLanguage();
-       }
+            langOrDatatype = stmt.getLanguage();
+        }else{
+            if( stmt.getDatatypeURI() != null && stmt.getDatatypeURI().trim().length() > 0){
+                langOrDatatype = stmt.getDatatypeURI();
+            }
+        }
 
-        String datatype = "9876NONE";
-       if( stmt.getDatatypeURI() != null && stmt.getDatatypeURI().trim().length() > 0){
-           datatype = stmt.getDatatypeURI();
-       }
-
-        String hashMe = language + "_" + datatype + "_" + stmt.getIndividualURI() + "_" + stmt.getDatapropURI() + "_" + stmt.getData();
+        String hashMe = langOrDatatype + "_" + stmt.getIndividualURI() + "_" + stmt.getDatapropURI() + "_" + stmt.getData();
         if( log.isDebugEnabled() )
             log.debug("got hash " + hashMe.hashCode() + " for String '" + hashMe + "'");
         return hashMe.hashCode();

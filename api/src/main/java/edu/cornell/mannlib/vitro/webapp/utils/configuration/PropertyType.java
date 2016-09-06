@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.datatypes.xsd.impl.RDFLangString;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
@@ -68,7 +69,7 @@ public enum PropertyType {
 		if (object.isLiteral()) {
 			Literal literal = object.asLiteral();
 			RDFDatatype datatype = literal.getDatatype();
-			if (datatype == null || datatype.equals(XSDstring)) {
+			if (datatype == null || datatype.equals(XSDstring) || datatype.equals(RDFLangString.rdfLangString)) {
 				return STRING;
 			}
 			if (datatype.equals(XSDfloat)) {
