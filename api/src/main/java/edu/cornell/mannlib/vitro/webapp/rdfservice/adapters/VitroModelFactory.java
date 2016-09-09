@@ -35,33 +35,34 @@ public class VitroModelFactory {
 		Graph graph = model.getGraph();
 		Model bareModel = new ModelCom(graph);
 		OntModel ontModel = new OntModelImpl(OWL_MEM, bareModel);
-		return ontModel;
+		return new BulkUpdatingOntModel(ontModel);
 	}
 
 	public static Model createUnion(Model baseModel, Model plusModel) {
 		Graph baseGraph = baseModel.getGraph();
 		Graph plusGraph = plusModel.getGraph();
-		BulkUpdatingUnion unionGraph = new BulkUpdatingUnion(baseGraph,
-				plusGraph);
+
+		BulkUpdatingUnion unionGraph = new BulkUpdatingUnion(baseGraph, plusGraph);
 
 		Model unionModel = ModelFactory.createModelForGraph(unionGraph);
-		return unionModel;
+
+		return new BulkUpdatingModel(unionModel);
 	}
 
 	public static OntModel createUnion(OntModel baseModel, OntModel plusModel) {
 		Graph baseGraph = baseModel.getGraph();
 		Graph plusGraph = plusModel.getGraph();
-		BulkUpdatingUnion unionGraph = new BulkUpdatingUnion(baseGraph,
-				plusGraph);
+
+		BulkUpdatingUnion unionGraph = new BulkUpdatingUnion(baseGraph, plusGraph);
 
 		Model unionModel = ModelFactory.createModelForGraph(unionGraph);
-		OntModel unionOntModel = ModelFactory.createOntologyModel(OWL_MEM,
-				unionModel);
-		return unionOntModel;
+		OntModel unionOntModel = ModelFactory.createOntologyModel(OWL_MEM, unionModel);
+
+		return new BulkUpdatingOntModel(unionOntModel);
 	}
 
 	public static Model createModelForGraph(Graph g) {
-		return ModelFactory.createModelForGraph(g);
+		return new BulkUpdatingModel(ModelFactory.createModelForGraph(g));
 	}
 
 	private static class BulkUpdatingUnion extends Union {
@@ -76,7 +77,5 @@ public class VitroModelFactory {
 					+ ToString.graphToString(L) + ", R="
 					+ ToString.graphToString(R) + "]";
 		}
-
-		
 	}
 }
