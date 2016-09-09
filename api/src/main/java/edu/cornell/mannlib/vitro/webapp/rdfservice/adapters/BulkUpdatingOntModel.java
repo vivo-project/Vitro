@@ -24,12 +24,22 @@ import java.util.List;
 
 public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
     private static final RDFReaderF readerFactory = new RDFReaderFImpl();
-    private Graph graph;
     private AbstractBulkUpdater updater;
 
     protected BulkUpdatingOntModel(OntModel m) {
         super(m);
-        graph = m.getGraph();
+        Graph graph = m.getGraph();
+        if (graph instanceof RDFServiceGraph) {
+            updater = new RDFServiceBulkUpdater((RDFServiceGraph)graph);
+        } else if (graph instanceof SparqlGraph) {
+            updater = new SparqlBulkUpdater((SparqlGraph)graph);
+        } else {
+            updater  = null;
+        }
+    }
+
+    protected BulkUpdatingOntModel(OntModel m, Graph graph) {
+        super(m);
         if (graph instanceof RDFServiceGraph) {
             updater = new RDFServiceBulkUpdater((RDFServiceGraph)graph);
         } else if (graph instanceof SparqlGraph) {

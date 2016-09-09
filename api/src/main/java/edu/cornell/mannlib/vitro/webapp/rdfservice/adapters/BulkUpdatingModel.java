@@ -27,12 +27,22 @@ import java.util.List;
 
 public class BulkUpdatingModel extends AbstractModelDecorator {
     private static final RDFReaderF readerFactory = new RDFReaderFImpl();
-    private Graph graph;
     private AbstractBulkUpdater updater;
 
     protected BulkUpdatingModel(Model m) {
         super(m);
-        graph = m.getGraph();
+        Graph graph = m.getGraph();
+        if (graph instanceof RDFServiceGraph) {
+            updater = new RDFServiceBulkUpdater((RDFServiceGraph)graph);
+        } else if (graph instanceof SparqlGraph) {
+            updater = new SparqlBulkUpdater((SparqlGraph)graph);
+        } else {
+            updater  = null;
+        }
+    }
+
+    protected BulkUpdatingModel(Model m, Graph graph) {
+        super(m);
         if (graph instanceof RDFServiceGraph) {
             updater = new RDFServiceBulkUpdater((RDFServiceGraph)graph);
         } else if (graph instanceof SparqlGraph) {
