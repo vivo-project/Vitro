@@ -168,10 +168,20 @@ public class SparqlQueryApiExecutorTest extends AbstractTestClass {
 			+ "    <j.0:predicate rdf:resource=\"http://here.edu/object\"/>\n"
 			+ "  </rdf:Description>\n" //
 			+ "</rdf:RDF>\n";
-	private static final String CONSTRUCT_RESULT_JSONLD = "["
-			+ "{\"@id\":\"http://here.edu/object\"},"
-			+ "{\"@id\":\"http://here.edu/subject\",\"http://here.edu/predicate\":[{\"@id\":\"http://here.edu/object\"}]}"
-			+ "]";
+	private static final String CONSTRUCT_RESULT_JSONLD = "{\n" +
+			"  \"@id\" : \"http://here.edu/subject\",\n" +
+			"  \"predicate\" : \"http://here.edu/object\",\n" +
+			"  \"@context\" : {\n" +
+			"    \"predicate\" : {\n" +
+			"      \"@id\" : \"http://here.edu/predicate\",\n" +
+			"      \"@type\" : \"@id\"\n" +
+			"    },\n" +
+			"    \"rdf\" : \"http://www.w3.org/1999/02/22-rdf-syntax-ns#\",\n" +
+			"    \"owl\" : \"http://www.w3.org/2002/07/owl#\",\n" +
+			"    \"xsd\" : \"http://www.w3.org/2001/XMLSchema#\",\n" +
+			"    \"rdfs\" : \"http://www.w3.org/2000/01/rdf-schema#\"\n" +
+			"  }\n" +
+			"}\n";
 
 	private static final String DESCRIBE_ALL_QUERY = "DESCRIBE <http://here.edu/subject>";
 	private static final String DESCRIBE_RESULT_TEXT = "<http://here.edu/subject> "
@@ -202,10 +212,20 @@ public class SparqlQueryApiExecutorTest extends AbstractTestClass {
 			+ "<http://here.edu/subject>\n" //
 			+ "      <http://here.edu/predicate>\n" //
 			+ "              <http://here.edu/object> .\n";
-	private static final String DESCRIBE_RESULT_JSONLD = "["
-			+ "{\"@id\":\"http://here.edu/object\"},"
-			+ "{\"@id\":\"http://here.edu/subject\",\"http://here.edu/predicate\":[{\"@id\":\"http://here.edu/object\"}]}"
-			+ "]";
+	private static final String DESCRIBE_RESULT_JSONLD =  "{\n" +
+			"  \"@id\" : \"http://here.edu/subject\",\n" +
+			"  \"predicate\" : \"http://here.edu/object\",\n" +
+			"  \"@context\" : {\n" +
+			"    \"predicate\" : {\n" +
+			"      \"@id\" : \"http://here.edu/predicate\",\n" +
+			"      \"@type\" : \"@id\"\n" +
+			"    },\n" +
+			"    \"rdf\" : \"http://www.w3.org/1999/02/22-rdf-syntax-ns#\",\n" +
+			"    \"owl\" : \"http://www.w3.org/2002/07/owl#\",\n" +
+			"    \"xsd\" : \"http://www.w3.org/2001/XMLSchema#\",\n" +
+			"    \"rdfs\" : \"http://www.w3.org/2000/01/rdf-schema#\"\n" +
+			"  }\n" +
+			"}\n";
 
 	private OntModel model;
 	private RDFService rdfService;
