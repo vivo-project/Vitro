@@ -16,7 +16,6 @@ import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Selector;
-import org.apache.jena.rdf.model.SimpleSelector;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
@@ -192,7 +191,42 @@ public class RDFServiceVirtuoso extends RDFServiceSparql {
 				// If the object is a numeric literal
 				if (object.isLiteral() &&  isNumeric(object.asLiteral().getDatatypeURI())) {
 					// Find a matching statement in the triple store, based on normalized numeric values
-					StmtIterator matching = fromTripleStoreModel.listStatements(new VirtuosoDoubleSelector(subject.asResource(), predicate, object));
+					StmtIterator matching = fromTripleStoreModel.listStatements(new Selector() {
+						@Override
+						public boolean test(Statement statement) {
+							RDFNode objectToMatch = statement.getObject();
+
+							// Both values are numeric, so compare them as parsed doubles
+							if (objectToMatch.isLiteral()) {
+								String num1 = object.asLiteral().getString();
+								String num2 = objectToMatch.asLiteral().getString();
+
+								return Double.parseDouble(num1) == Double.parseDouble(num2);
+							}
+
+							return false;
+						}
+
+						@Override
+						public boolean isSimple() {
+							return false;
+						}
+
+						@Override
+						public Resource getSubject() {
+							return subject.asResource();
+						}
+
+						@Override
+						public Property getPredicate() {
+							return predicate;
+						}
+
+						@Override
+						public RDFNode getObject() {
+							return null;
+						}
+					});
 
 					// For every matching statement
 					// Rewrite the object as the one in the file model (they are the same, just differ in datatype)
