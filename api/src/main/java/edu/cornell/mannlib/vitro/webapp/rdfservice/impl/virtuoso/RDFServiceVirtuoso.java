@@ -192,8 +192,7 @@ public class RDFServiceVirtuoso extends RDFServiceSparql {
 				// If the object is a numeric literal
 				if (object.isLiteral() &&  isNumeric(object.asLiteral().getDatatypeURI())) {
 					// Find a matching statement in the triple store, based on normalized numeric values
-					double num = Double.parseDouble(object.asLiteral().getString());
-					StmtIterator matching = fromTripleStoreModel.listStatements(subject.asResource(), predicate, fromTripleStoreModel.createTypedLiteral(num));
+					StmtIterator matching = fromTripleStoreModel.listStatements(new VirtuosoDoubleSelector(subject.asResource(), predicate, object));
 
 					// For every matching statement
 					// Rewrite the object as the one in the file model (they are the same, just differ in datatype)
