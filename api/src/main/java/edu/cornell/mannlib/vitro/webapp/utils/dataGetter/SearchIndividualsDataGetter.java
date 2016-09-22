@@ -177,7 +177,7 @@ public class SearchIndividualsDataGetter extends DataGetterBase implements DataG
 	                vclass.getURI(), 
 	                page, 
 	                alpha, 
-	                vreq.getWebappDaoFactory().getIndividualDao());                                
+	                vreq);                                
 	        body.putAll(vcResults.asFreemarkerMap());
 	
 	        List<Individual> inds = vcResults.getEntities();
