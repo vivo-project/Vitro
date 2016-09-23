@@ -67,7 +67,7 @@
     <#-- Paging controls -->
     <#if (pagingLinks?size > 0)>
         <div class="searchpages">
-            Pages: 
+            ${i18n().pages}: 
             <#if prevPage??><a class="prev" href="${prevPage}" title="${i18n().previous}">${i18n().previous}</a></#if>
             <#list pagingLinks as link>
                 <#if link.url??>
