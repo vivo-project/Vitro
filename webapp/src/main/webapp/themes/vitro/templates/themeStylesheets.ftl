@@ -1,3 +1,3 @@
 <#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
 
-<title>${(title?html)!siteName!}</title>
+<link rel="stylesheet" href="${urls.theme}/css/screen.css" />

@@ -9,12 +9,15 @@
     </head>
     
     <body class="${bodyClasses!}">
-        <#include "identity.ftl">
-        <#include "search.ftl">
+        <header id="branding" role="banner">
+            <#include "identity.ftl">
+            <#include "search.ftl">
+        </header>
         <#include "menu.ftl">
-        
-        ${body}
-        
+
+        <div id="wrapper-content" role="main">
+            ${body}
+        </div>
         <#include "footer.ftl">
     </body>
 </html>
