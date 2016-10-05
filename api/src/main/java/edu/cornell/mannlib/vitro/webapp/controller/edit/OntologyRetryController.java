@@ -11,6 +11,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -113,8 +114,6 @@ public class OntologyRetryController extends BaseEditController {
 
         FormUtils.populateFormFromBean(ontologyForEditing,action,foo,epo.getBadValueMap());
 
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("formJsp","/templates/edit/specific/ontology_retry.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");
         request.setAttribute("title","Ontology Editing Form");
@@ -123,7 +122,7 @@ public class OntologyRetryController extends BaseEditController {
         setRequestAttributes(request,epo);
 
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, "/templates/edit/formBasic.jsp");
         } catch (Exception e) {
             log.error("OntologyRetryContro" +
                     "ller could not forward to view.");

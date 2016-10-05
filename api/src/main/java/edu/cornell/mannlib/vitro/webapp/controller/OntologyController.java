@@ -12,6 +12,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -245,10 +246,7 @@ public class OntologyController extends VitroHttpServlet{
             + "<script language='JavaScript' type='text/javascript' src='js/toggle.js'></script>";
         req.setAttribute("css",css);
 
-        req.setAttribute("bodyJsp","/"+Controllers.ENTITY_NOT_FOUND_JSP);
-
-        RequestDispatcher rd = req.getRequestDispatcher(Controllers.BASIC_JSP);
-        rd.forward(req,res);
+		JSPPageHandler.renderBasicPage(req, res, "/"+Controllers.ENTITY_NOT_FOUND_JSP);
     }
 	
 	

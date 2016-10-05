@@ -11,6 +11,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -100,10 +101,8 @@ public class SparqlQueryBuilderServlet extends BaseEditController {
     }
 
     private void doHelp(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-            req.setAttribute("title","SPARQL Query Builder");
-            req.setAttribute("bodyJsp", "/admin/sparql.jsp");
-            
-            RequestDispatcher rd = req.getRequestDispatcher("/"+Controllers.BASIC_JSP);
-            rd.forward(req,res);
+        req.setAttribute("title","SPARQL Query Builder");
+
+        JSPPageHandler.renderBasicPage(req, res, "/admin/sparql.jsp");
     }
 }

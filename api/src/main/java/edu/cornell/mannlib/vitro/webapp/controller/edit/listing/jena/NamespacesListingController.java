@@ -10,6 +10,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Literal;
@@ -90,10 +91,8 @@ public class NamespacesListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(3));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Recognized Namespaces");
-        request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
-            rd.forward(request,response);
+			JSPPageHandler.renderBasicPage(request, response, Controllers.HORIZONTAL_JSP);
         } catch (Throwable t) {
             t.printStackTrace();
         }

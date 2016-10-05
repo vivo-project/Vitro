@@ -12,6 +12,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -85,8 +86,6 @@ public class ApplicationBeanRetryController extends BaseEditController {
         epo.setFormObject(foo);
         FormUtils.populateFormFromBean(applicationForEditing, epo.getAction(), foo);
    
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("bodyJsp","/templates/edit/formContact.jsp");
         request.setAttribute("formJsp","/templates/edit/specific/applicationBean_retry.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");
         request.setAttribute("title","Site Information");
@@ -95,7 +94,7 @@ public class ApplicationBeanRetryController extends BaseEditController {
         setRequestAttributes(request,epo);
 
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, "/templates/edit/formContact.jsp");
         } catch (Exception e) {
             log.error(e, e);
         }

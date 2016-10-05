@@ -12,6 +12,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -224,15 +225,13 @@ public class PropertyEditController extends BaseEditController {
         sortForPickList(fauxProps, vreq);
         request.setAttribute("fauxproperties", fauxProps);
         
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("propertyWebapp", p);
-        request.setAttribute("bodyJsp","/templates/edit/specific/props_edit.jsp");
         request.setAttribute("title","Object Property Control Panel");
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, "/templates/edit/specific/props_edit.jsp");
         } catch (Exception e) {
             log.error("PropertyEditController could not forward to view.");
             log.error(e.getMessage());

@@ -8,6 +8,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -86,8 +87,6 @@ public class DatatypeRetryController extends BaseEditController {
         //for now, this is also making the value hash - need to separate this out
 
 
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");
         request.setAttribute("formJsp","/templates/edit/specific/datatype_retry.jsp");
         request.setAttribute("title","Datatype Editing Form");
@@ -96,7 +95,7 @@ public class DatatypeRetryController extends BaseEditController {
         setRequestAttributes(request,epo);
 
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, "/templates/edit/formBasic.jsp");
         } catch (Exception e) {
             log.error("VclassRetryContro" +
                     "ller could not forward to view.");

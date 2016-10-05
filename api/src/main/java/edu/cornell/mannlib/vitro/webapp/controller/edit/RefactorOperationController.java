@@ -17,6 +17,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -71,8 +72,6 @@ public class RefactorOperationController extends BaseEditController {
         }
 		VitroRequest vreq = new VitroRequest(request);
 
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("bodyJsp", Controllers.CHECK_DATATYPE_PROPERTIES);
         request.setAttribute("title","Check Datatype Properties");
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
         
@@ -172,7 +171,7 @@ public class RefactorOperationController extends BaseEditController {
 		}
 		request.setAttribute("results", results);
 		try {
-            rd.forward(request, response);
+			JSPPageHandler.renderBasicPage(request, response, Controllers.CHECK_DATATYPE_PROPERTIES);
         } catch (Exception e) {
             log.error(this.getClass().getName()+" could not forward to view.");
             log.error(e.getMessage());

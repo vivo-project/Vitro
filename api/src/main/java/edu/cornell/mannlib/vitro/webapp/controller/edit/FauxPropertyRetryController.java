@@ -20,6 +20,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -65,7 +66,6 @@ public class FauxPropertyRetryController extends BaseEditController {
 		EpoPopulator populator = new EpoPopulator(req, epo);
 		populator.populate();
 
-		req.setAttribute("bodyJsp", "/templates/edit/formBasic.jsp");
 		req.setAttribute("colspan", "5");
 		req.setAttribute("formJsp",
 				"/templates/edit/specific/fauxProperty_retry.jsp");
@@ -75,9 +75,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 		setRequestAttributes(req, epo);
 
 		try {
-			RequestDispatcher rd = req
-					.getRequestDispatcher(Controllers.BASIC_JSP);
-			rd.forward(req, response);
+			JSPPageHandler.renderBasicPage(req, response, "/templates/edit/formBasic.jsp");
 		} catch (Exception e) {
 			log.error("Could not forward to view.");
 			log.error(e.getMessage());

@@ -18,6 +18,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -256,10 +257,8 @@ public class JenaExportController extends BaseEditController {
 	}
 	
 	private void prepareExportSelectionPage( VitroRequest vreq, HttpServletResponse response ) {
-		vreq.setAttribute( "bodyJsp", Controllers.EXPORT_SELECTION_JSP );
-		RequestDispatcher dispatcher = vreq.getRequestDispatcher( Controllers.BASIC_JSP );
 		try {
-			dispatcher.forward( vreq, response );
+			JSPPageHandler.renderBasicPage(vreq, response, Controllers.EXPORT_SELECTION_JSP );
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

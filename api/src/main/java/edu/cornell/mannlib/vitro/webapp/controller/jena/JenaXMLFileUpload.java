@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import net.sf.saxon.s9api.Processor;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.Serializer;
@@ -142,15 +143,13 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
         request.setAttribute("statementCount", count);        	
 		
 		request.setAttribute("title","Uploaded files and converted to RDF");
-		request.setAttribute("bodyJsp","/jenaIngest/xmlFileUploadSuccess.jsp");
-		
+
 		request.setAttribute("fileItems",vreq.getFiles());				
 
-		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
-            rd.forward(request, resp);
+			JSPPageHandler.renderBasicPage(request, resp, "/jenaIngest/xmlFileUploadSuccess.jsp");
         } catch (Exception e) {
             System.out.println(this.getClass().getName()+" could not forward to view.");
             System.out.println(e.getMessage());
@@ -170,16 +169,14 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 		
 		//make a form for uploading a file
 		request.setAttribute("title","Upload file and convert to RDF");
-		request.setAttribute("bodyJsp","/jenaIngest/xmlFileUpload.jsp");
-		
+
 		request.setAttribute("modelNames", getModelMaker(vreq).listModels().toList());
 		request.setAttribute("models", null);				
 
-		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+vreq.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
-            rd.forward(request, response);
+			JSPPageHandler.renderBasicPage(request, response, "/jenaIngest/xmlFileUpload.jsp");
         } catch (Exception e) {
             System.out.println(this.getClass().getName()+" could not forward to view.");
             System.out.println(e.getMessage());

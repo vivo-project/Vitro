@@ -13,6 +13,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -181,8 +182,6 @@ public class PropertyRetryController extends BaseEditController {
 
         FormUtils.populateFormFromBean(propertyForEditing,action,foo,epo.getBadValueMap());
 
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("colspan","5");
         request.setAttribute("formJsp","/templates/edit/specific/property_retry.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");
@@ -191,7 +190,7 @@ public class PropertyRetryController extends BaseEditController {
         setRequestAttributes(request,epo);
 
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, "/templates/edit/formBasic.jsp");
         } catch (Exception e) {
             log.error("PropertyRetryController could not forward to view.");
             log.error(e.getMessage());

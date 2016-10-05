@@ -9,6 +9,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.jena.ontology.AllValuesFromRestriction;
 import org.apache.jena.ontology.CardinalityRestriction;
 import org.apache.jena.ontology.HasValueRestriction;
@@ -107,10 +108,8 @@ public class RestrictionsListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(5));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Restrictions");
-        request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
-            rd.forward(request,response);
+			JSPPageHandler.renderBasicPage(request, response, Controllers.HORIZONTAL_JSP);
         } catch (Throwable t) {
             t.printStackTrace();
         }

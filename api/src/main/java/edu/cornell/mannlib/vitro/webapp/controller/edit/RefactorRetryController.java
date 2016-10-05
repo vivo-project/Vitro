@@ -10,6 +10,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -107,7 +108,7 @@ public class RefactorRetryController extends BaseEditController {
 	    VitroRequest vreq = new VitroRequest(request);
 	    
 	    String modeStr = request.getParameter("mode");
-	    
+
 	    if (modeStr != null) {
 	    	if (modeStr.equals("renameResource")) {
 	    		doRenameResource(vreq, response, epo);
@@ -118,11 +119,10 @@ public class RefactorRetryController extends BaseEditController {
 	    	}
 	    }
 
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         setRequestAttributes(request,epo);
 
         try {
-            rd.forward(request, response);
+			JSPPageHandler.renderBasicPage(request, response, "/templates/edit/formBasic.jsp");
         } catch (Exception e) {
             log.error(this.getClass().getName()+" could not forward to view.");
             log.error(e.getMessage());

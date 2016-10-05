@@ -15,6 +15,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -205,14 +206,12 @@ public class DashboardPropertyListController extends VitroHttpServlet {
             }
             req.setAttribute("entity",subject);
 
-            RequestDispatcher rd = req.getRequestDispatcher(Controllers.DASHBOARD_PROP_LIST_JSP);
-            rd.include(req,res);
+            JSPPageHandler.renderPlainInclude(req, res, Controllers.DASHBOARD_PROP_LIST_JSP);
         } catch (HelpException help){
             doHelp(res);
         } catch (Throwable e) {
             req.setAttribute("javax.servlet.jsp.jspException",e);
-            RequestDispatcher rd = req.getRequestDispatcher("/error.jsp");
-            rd.forward(req, res);
+            JSPPageHandler.renderPlainPage(req, res, "/error.jsp");
         }
     }
 

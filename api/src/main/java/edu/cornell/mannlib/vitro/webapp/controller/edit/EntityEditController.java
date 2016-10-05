@@ -14,6 +14,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,11 +53,9 @@ public class EntityEditController extends BaseEditController {
         Individual ent = vreq.getUnfilteredAssertionsWebappDaoFactory().getIndividualDao().getIndividualByURI(entURI);
         if (ent == null) {
         	try {
-        		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        		request.setAttribute("bodyJsp","/jenaIngest/notfound.jsp");
         		request.setAttribute("title","Individual Not Found");
         		request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+application.getThemeDir()+"css/edit.css\"/>");
-        		rd.forward(request, response);
+                JSPPageHandler.renderBasicPage(request, response, "/jenaIngest/notfound.jsp");
             } catch (Exception e) {
                 log.error("EntityEditController could not forward to view.");
                 log.error(e.getMessage());
@@ -194,16 +193,14 @@ public class EntityEditController extends BaseEditController {
 
         epo.setFormObject(foo);
 
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("entityWebapp", ent);
-        request.setAttribute("bodyJsp","/templates/edit/specific/ents_edit.jsp");
         request.setAttribute("title","Individual Control Panel");
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+application.getThemeDir()+"css/edit.css\"/>");
         request.setAttribute("scripts", "/templates/edit/specific/ents_edit_head.jsp");
 
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, "/templates/edit/specific/ents_edit.jsp");
         } catch (Exception e) {
             log.error("EntityEditController could not forward to view.");
             log.error(e.getMessage());
