@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.util.HashMap;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,7 +17,6 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vedit.util.FormUtils;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;

@@ -14,7 +14,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -35,7 +34,6 @@ import org.apache.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;

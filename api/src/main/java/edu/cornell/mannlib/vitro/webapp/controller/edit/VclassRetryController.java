@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,7 +28,6 @@ import edu.cornell.mannlib.vedit.validator.impl.XMLNameValidator;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;

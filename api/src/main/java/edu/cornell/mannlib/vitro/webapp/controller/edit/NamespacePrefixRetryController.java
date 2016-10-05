@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,7 +12,6 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 
 public class NamespacePrefixRetryController extends BaseEditController {
 	

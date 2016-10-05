@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit.listing.jena;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 

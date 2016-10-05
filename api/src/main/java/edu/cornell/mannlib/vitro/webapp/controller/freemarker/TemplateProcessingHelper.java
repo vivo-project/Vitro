@@ -26,7 +26,7 @@ public class TemplateProcessingHelper {
     
     private Configuration config = null;
     
-    public TemplateProcessingHelper(HttpServletRequest request, ServletContext context) {
+    public TemplateProcessingHelper(HttpServletRequest request) {
         this.config = FreemarkerConfiguration.getConfig(request);
     }
     
