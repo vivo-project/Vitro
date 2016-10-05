@@ -13,12 +13,12 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Properties;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -191,9 +191,7 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
                  req.setAttribute("dataseturi", datasetUri);
             	 boolean success = deleteFile(req, entity, iwDao, sessionOntModel);
             	 req.setAttribute("deletesuccess", (success)?"success":"error");
-            	 req.setAttribute("bodyJsp", "/edit/fileDeleteConfirm.jsp");
-            	 RequestDispatcher rd = req.getRequestDispatcher(Controllers.BASIC_JSP);
- 	             rd.forward(req, res);
+                 JSPPageHandler.renderBasicPage(req, res, "/edit/fileDeleteConfirm.jsp");
             }
             else{
 	            //check if the data stream exists in the fedora repository
@@ -206,14 +204,11 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
 	                   
 	            
 	            //forward to form     
-	            req.setAttribute("bodyJsp","/fileupload/datastreamModification.jsp");
-	            RequestDispatcher rd = req.getRequestDispatcher(Controllers.BASIC_JSP);
-	            rd.forward(req, res);
+                JSPPageHandler.renderBasicPage(req, res, "/fileupload/datastreamModification.jsp");
             }
         }catch(FdcException ex){
             req.setAttribute("errors", ex.getMessage());
-            RequestDispatcher rd = req.getRequestDispatcher("/edit/fileUploadError.jsp");
-            rd.forward(req, res);
+            JSPPageHandler.renderPlainPage(req, res, "/edit/fileUploadError.jsp");
             return;
         }
     }
@@ -470,13 +465,10 @@ public class FedoraDatastreamController extends VitroHttpServlet implements Cons
             }
             
             //forward to form     
-            req.setAttribute("bodyJsp","/fileupload/datastreamModificationSuccess.jsp");            
-            RequestDispatcher rd = req.getRequestDispatcher(Controllers.BASIC_JSP);
-            rd.forward(req, res);
+            JSPPageHandler.renderBasicPage(req, res, "/fileupload/datastreamModificationSuccess.jsp");
         }catch(FdcException ex){
             rawRequest.setAttribute("errors", ex.getMessage());
-            RequestDispatcher rd = rawRequest.getRequestDispatcher("/edit/fileUploadError.jsp");
-            rd.forward(rawRequest, res);
+            JSPPageHandler.renderPlainPage(rawRequest, res, "/edit/fileUploadError.jsp");
             return;
         }
     }

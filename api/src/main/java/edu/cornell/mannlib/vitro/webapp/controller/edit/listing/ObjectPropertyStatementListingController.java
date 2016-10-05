@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 
 public class ObjectPropertyStatementListingController extends
 		BaseEditController {
@@ -156,7 +156,6 @@ public class ObjectPropertyStatementListingController extends
         }
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Object Property Statements");
-        request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
         // new way of adding more than one button
         List <ButtonForm> buttons = new ArrayList<ButtonForm>();
         HashMap<String,String> newPropParams=new HashMap<String,String>();
@@ -173,9 +172,8 @@ public class ObjectPropertyStatementListingController extends
         request.setAttribute("horizontalJspAddButtonText", "Add new object property");
         request.setAttribute("horizontalJspAddButtonControllerParam", "Property");
         */
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
-            rd.forward(request,response);
+            JSPPageHandler.renderBasicPage(request, response, Controllers.HORIZONTAL_JSP);
         } catch (Throwable t) {
             t.printStackTrace();
         }

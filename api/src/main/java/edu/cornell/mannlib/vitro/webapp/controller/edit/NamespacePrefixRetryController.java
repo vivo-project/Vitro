@@ -2,17 +2,16 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 
 public class NamespacePrefixRetryController extends BaseEditController {
 	
@@ -35,16 +34,14 @@ public class NamespacePrefixRetryController extends BaseEditController {
         	request.setAttribute("_action","insert");
         }
 				
-	       RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
 	       request.setAttribute("editAction","namespacePrefixOp");
-	        request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
 	        request.setAttribute("scripts","/templates/edit/formBasic.js");
         	request.setAttribute("formJsp","/templates/edit/specific/namespacePrefix_retry.jsp");
         	request.setAttribute("title","Edit Namespace Prefix Mapping");
 	        setRequestAttributes(request,epo);
 
 	        try {
-	            rd.forward(request, response);
+				JSPPageHandler.renderBasicPage(request, response, "/templates/edit/formBasic.jsp");
 	        } catch (Exception e) {
 	            log.error(this.getClass().getName()+" could not forward to view.");
 	            log.error(e.getMessage());

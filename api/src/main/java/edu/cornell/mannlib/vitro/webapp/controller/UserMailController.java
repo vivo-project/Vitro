@@ -4,13 +4,13 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 
 import java.io.IOException;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 
 /**
  *  Controller for comments ("contact us") page
@@ -33,12 +33,10 @@ public class UserMailController extends VitroHttpServlet{
         //this try block passes any errors to error.jsp
             if (!FreemarkerEmailFactory.isConfigured(request)) {
                 request.setAttribute("title", "Mail All Users Form");
-                request.setAttribute("bodyJsp", "/contact_err.jsp");// <<< this is where the body gets set
 				request.setAttribute("ERR",
 						"This application has not yet been configured to send mail. "
 								+ "Email properties must be specified in the configuration properties file.");
-                RequestDispatcher errd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-                errd.forward(request, response);
+                JSPPageHandler.renderBasicPage(request, response, "/contact_err.jsp");// <<< this is where the body gets set
             }
             ApplicationBean appBean=vreq.getAppBean();
 
@@ -51,19 +49,13 @@ public class UserMailController extends VitroHttpServlet{
                 request.getSession().setAttribute("commentsFormReferer",request.getHeader("Referer"));
 
             request.setAttribute("title", appBean.getApplicationName()+" Mail Users Form");
-            request.setAttribute("bodyJsp", "/templates/parts/emailUsers.jsp");// <<< this is where the body gets set
-
-            RequestDispatcher rd =
-                request.getRequestDispatcher(Controllers.BASIC_JSP);
-            rd.forward(request, response);
-
+            JSPPageHandler.renderBasicPage(request, response, "/templates/parts/emailUsers.jsp");// <<< this is where the body gets set
         } catch (Throwable e) {
             // This is how we use an error.jsp
             //it expects javax.servlet.jsp.jspException to be set to the
             //exception so that it can display the info out of that.
             request.setAttribute("javax.servlet.jsp.jspException", e);
-            RequestDispatcher rd = request.getRequestDispatcher("/error.jsp");
-            rd.include(request, response);
+            JSPPageHandler.renderPlainInclude(request, response, "/error.jsp");
         }
     }
 }

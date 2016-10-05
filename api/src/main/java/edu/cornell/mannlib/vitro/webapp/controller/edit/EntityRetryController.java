@@ -8,17 +8,16 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -290,8 +289,6 @@ public class EntityRetryController extends BaseEditController {
 
         ApplicationBean appBean = vreq.getAppBean();
         
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("formJsp","/templates/edit/specific/entity_retry.jsp");
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("title","Individual Editing Form");
@@ -303,7 +300,7 @@ public class EntityRetryController extends BaseEditController {
         request.setAttribute("unqualifiedClassName","Individual");
         setRequestAttributes(request,epo);
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, "/templates/edit/formBasic.jsp");
         } catch (Exception e) {
             log.error("EntityRetryController could not forward to view.");
             log.error(e.getMessage());

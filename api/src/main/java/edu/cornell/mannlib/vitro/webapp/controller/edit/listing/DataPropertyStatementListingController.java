@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit.listing;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,6 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 
 public class DataPropertyStatementListingController extends BaseEditController {
 
@@ -101,10 +101,8 @@ public class DataPropertyStatementListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(4));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Data Property Statements");
-        request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
-            rd.forward(request,response);
+            JSPPageHandler.renderBasicPage(request, response, Controllers.HORIZONTAL_JSP);
         } catch (Throwable t) {
             t.printStackTrace();
         }

@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -23,7 +23,6 @@ import edu.cornell.mannlib.vedit.validator.Validator;
 import edu.cornell.mannlib.vedit.validator.impl.RequiredFieldValidator;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
@@ -104,8 +103,6 @@ public class PropertyGroupRetryController extends BaseEditController {
 
         FormUtils.populateFormFromBean(propertyGroupForEditing,action,foo,epo.getBadValueMap());
 
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("formJsp","/templates/edit/specific/propertyGroup_retry.jsp");
         request.setAttribute("scripts","/templates/edit/formBasic.js");
         request.setAttribute("title","Property Group Editing Form");
@@ -114,7 +111,7 @@ public class PropertyGroupRetryController extends BaseEditController {
         setRequestAttributes(request,epo);
 
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, "/templates/edit/formBasic.jsp");
         } catch (Exception e) {
             log.error("PropertyGroupRetryController could not forward to view.");
             log.error(e.getMessage());

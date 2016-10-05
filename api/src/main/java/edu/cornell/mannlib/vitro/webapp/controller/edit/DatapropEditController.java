@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -24,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
@@ -74,8 +73,6 @@ public class DatapropEditController extends BaseEditController {
         results.add("custom entry form");     // column 16
         results.add("URI");                   // column 17
         results.add("publish level");         // column 18
-
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
 
         results.add(dp.getPickListName()); // column 1
         results.add(dp.getPublicName() == null ? "(no public label)" : dp.getPublicName()); // column 2
@@ -180,12 +177,11 @@ public class DatapropEditController extends BaseEditController {
         
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("datatypeProperty", dp);
-        request.setAttribute("bodyJsp","/templates/edit/specific/dataprops_edit.jsp");
         request.setAttribute("title","Data Property Control Panel");
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+appBean.getThemeDir()+"css/edit.css\"/>");
 
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, "/templates/edit/specific/dataprops_edit.jsp");
         } catch (Exception e) {
             log.error("DatapropEditController could not forward to view.");
             log.error(e.getMessage());
