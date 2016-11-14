@@ -226,7 +226,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	return prefixes;
     }
     
-    private String getN3ForName() {
+    protected String getN3ForName() {
     	return "?" + objectVarName + " rdfs:label ?name .";
     }
     
