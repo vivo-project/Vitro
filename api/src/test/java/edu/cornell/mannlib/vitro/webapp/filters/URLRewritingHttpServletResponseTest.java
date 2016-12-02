@@ -58,8 +58,8 @@ public class URLRewritingHttpServletResponseTest {
     
     
     @Test
-    public void test40984(){ urlEncodingStyleA( "/vivo/js/jquery.js",
-    "/vivo/js/jquery.js"); }
+    public void test40984(){ urlEncodingStyleA( "/vivo/js/jquery-1.12.4.min.js",
+    "/vivo/js/jquery-1.12.4.min.js"); }
 
     @Test
     public void test40988(){ urlEncodingStyleA(
@@ -289,8 +289,8 @@ public class URLRewritingHttpServletResponseTest {
     public void test39472(){ urlEncodingStyleA(
     "/vivo/js/extensions/String.js", "/vivo/js/extensions/String.js"); }
     @Test
-    public void test394730(){ urlEncodingStyleA( "/vivo/js/jquery.js",
-    "/vivo/js/jquery.js"); }
+    public void test394730(){ urlEncodingStyleA( "/vivo/js/jquery-1.12.4.min.js",
+    "/vivo/js/jquery-1.12.4.min.js"); }
     @Test
     public void test39473(){ urlEncodingStyleA(
     "/vivo/js/jquery_plugins/jquery.bgiframe.pack.js",
@@ -304,8 +304,8 @@ public class URLRewritingHttpServletResponseTest {
     "/vivo/js/jquery_plugins/ui.datepicker.js",
     "/vivo/js/jquery_plugins/ui.datepicker.js"); }
     @Test
-    public void test14958(){ urlEncodingStyleA( "/vivo/js/jquery.js",
-    "/vivo/js/jquery.js"); }
+    public void test14958(){ urlEncodingStyleA( "/vivo/js/jquery-1.12.4.min.js",
+    "/vivo/js/jquery-1.12.4.min.js"); }
     @Test
     public void test14968(){ urlEncodingStyleA(
     "/vivo/js/jquery_plugins/getURLParam.js",
@@ -375,8 +375,8 @@ public class URLRewritingHttpServletResponseTest {
     public void test18516(){ urlEncodingStyleA(
     "/vivo/js/extensions/String.js", "/vivo/js/extensions/String.js"); }
     @Test
-    public void test18543(){ urlEncodingStyleA( "/vivo/js/jquery.js",
-    "/vivo/js/jquery.js"); }
+    public void test18543(){ urlEncodingStyleA( "/vivo/js/jquery-1.12.4.min.js",
+    "/vivo/js/jquery-1.12.4.min.js"); }
     @Test
     public void test185440(){ urlEncodingStyleA(
     "/vivo/js/jquery_plugins/jquery.bgiframe.pack.js",
@@ -412,8 +412,8 @@ public class URLRewritingHttpServletResponseTest {
     public void test271590(){ urlEncodingStyleA(
     "/vivo/js/extensions/String.js", "/vivo/js/extensions/String.js"); }
     @Test
-    public void test27159(){ urlEncodingStyleA( "/vivo/js/jquery.js",
-    "/vivo/js/jquery.js"); }
+    public void test27159(){ urlEncodingStyleA( "/vivo/js/jquery-1.12.4.min.js",
+    "/vivo/js/jquery-1.12.4.min.js"); }
     @Test
     public void test27160(){ urlEncodingStyleA(
     "/vivo/js/jquery_plugins/jquery.bgiframe.pack.js",
@@ -438,8 +438,8 @@ public class URLRewritingHttpServletResponseTest {
     public void test148510(){ urlEncodingStyleA(
     "/vivo/js/extensions/String.js", "/vivo/js/extensions/String.js"); }
     @Test
-    public void test14851(){ urlEncodingStyleA( "/vivo/js/jquery.js",
-    "/vivo/js/jquery.js"); }
+    public void test14851(){ urlEncodingStyleA( "/vivo/js/jquery-1.12.4.min.js",
+    "/vivo/js/jquery-1.12.4.min.js"); }
     @Test
     public void test14852(){ urlEncodingStyleA(
     "/vivo/js/jquery_plugins/jquery.bgiframe.pack.js",
@@ -482,8 +482,8 @@ public class URLRewritingHttpServletResponseTest {
     public void test43760(){ urlEncodingStyleA(
     "/vivo/js/extensions/String.js", "/vivo/js/extensions/String.js"); }
     @Test
-    public void test437610(){ urlEncodingStyleA( "/vivo/js/jquery.js",
-    "/vivo/js/jquery.js"); }
+    public void test437610(){ urlEncodingStyleA( "/vivo/js/jquery-1.12.4.min.js",
+    "/vivo/js/jquery-1.12.4.min.js"); }
     @Test
     public void test43761(){ urlEncodingStyleA(
     "/vivo/js/jquery_plugins/jquery.bgiframe.pack.js",
@@ -540,8 +540,8 @@ public class URLRewritingHttpServletResponseTest {
     public void test14565(){ urlEncodingStyleA(
     "/vivo/js/extensions/String.js", "/vivo/js/extensions/String.js"); }
     @Test
-    public void test145650(){ urlEncodingStyleA( "/vivo/js/jquery.js",
-    "/vivo/js/jquery.js"); }
+    public void test145650(){ urlEncodingStyleA( "/vivo/js/jquery-1.12.4.min.js",
+    "/vivo/js/jquery-1.12.4.min.js"); }
     @Test
     public void test145660(){ urlEncodingStyleA(
     "/vivo/js/jquery_plugins/jquery.bgiframe.pack.js",
@@ -580,8 +580,8 @@ public class URLRewritingHttpServletResponseTest {
     public void test29084(){ urlEncodingStyleA(
     "/vivo/js/extensions/String.js", "/vivo/js/extensions/String.js"); }
     @Test
-    public void test29085(){ urlEncodingStyleA( "/vivo/js/jquery.js",
-    "/vivo/js/jquery.js"); }
+    public void test29085(){ urlEncodingStyleA( "/vivo/js/jquery-1.12.4.min.js",
+    "/vivo/js/jquery-1.12.4.min.js"); }
     @Test
     public void test290860(){ urlEncodingStyleA(
     "/vivo/js/jquery_plugins/jquery.bgiframe.pack.js",
@@ -599,8 +599,8 @@ public class URLRewritingHttpServletResponseTest {
     
 
     @Test
-    public void test35560(){ urlEncodingStyleB( "/js/jquery.js",
-    "/js/jquery.js"); }
+    public void test35560(){ urlEncodingStyleB( "/js/jquery-1.12.4.min.js",
+    "/js/jquery-1.12.4.min.js"); }
     @Test
     public void test35562(){ urlEncodingStyleB(
     "/js/jquery_plugins/getURLParam.js",

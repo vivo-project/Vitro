@@ -90,7 +90,8 @@ public class UrlBuilder {
     
     public enum JavaScript {
         CUSTOM_FORM_UTILS("/js/customFormUtils.js"),
-        JQUERY("/js/jquery.js"),
+        JQUERY("/js/jquery-1.12.4.min.js"),
+        JQUERY_MIGRATE("/js/jquery-migrate-1.4.1.js"),
         JQUERY_UI("/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"),
         UTILS("/js/utils.js");
         
