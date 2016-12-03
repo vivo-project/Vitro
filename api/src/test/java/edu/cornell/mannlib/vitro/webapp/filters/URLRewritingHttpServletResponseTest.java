@@ -347,8 +347,8 @@ public class URLRewritingHttpServletResponseTest {
     "/vivo/js/imageUpload/imageUploadUtils.js"); }
     @Test
     public void test184670(){ urlEncodingStyleA(
-    "/vivo/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css",
-    "/vivo/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css"); }
+    "/vivo/js/jquery-ui/css/smoothness/jquery-ui-1.12.1.css",
+    "/vivo/js/jquery-ui/css/smoothness/jquery-ui-1.12.1.css"); }
     @Test
     public void test18467(){ urlEncodingStyleA(
     "/vivo/edit/forms/css/customForm.css",
@@ -391,8 +391,8 @@ public class URLRewritingHttpServletResponseTest {
     "/vivo/js/jquery_plugins/ui.datepicker.js"); }
     @Test
     public void test18546(){ urlEncodingStyleA(
-    "/vivo/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js",
-    "/vivo/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"); }
+    "/vivo/js/jquery-ui/js/jquery-ui-1.12.1.min.js",
+    "/vivo/js/jquery-ui/js/jquery-ui-1.12.1.min.js"); }
     @Test
     public void test185470(){ urlEncodingStyleA(
     "/vivo/js/customFormUtils.js", "/vivo/js/customFormUtils.js"); }
@@ -454,8 +454,8 @@ public class URLRewritingHttpServletResponseTest {
     "/vivo/js/jquery_plugins/ui.datepicker.js"); }
     @Test
     public void test43748(){ urlEncodingStyleA(
-    "/vivo/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css",
-    "/vivo/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css"); }
+    "/vivo/js/jquery-ui/css/smoothness/jquery-ui-1.12.1.css",
+    "/vivo/js/jquery-ui/css/smoothness/jquery-ui-1.12.1.css"); }
     @Test
     public void test43749(){ urlEncodingStyleA(
     "/vivo/edit/forms/css/customForm.css",
@@ -498,8 +498,8 @@ public class URLRewritingHttpServletResponseTest {
     "/vivo/js/jquery_plugins/ui.datepicker.js"); }
     @Test
     public void test43763(){ urlEncodingStyleA(
-    "/vivo/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js",
-    "/vivo/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"); }
+    "/vivo/js/jquery-ui/js/jquery-ui-1.12.1.min.js",
+    "/vivo/js/jquery-ui/js/jquery-ui-1.12.1.min.js"); }
     @Test
     public void test437640(){ urlEncodingStyleA(
     "/vivo/js/customFormUtils.js", "/vivo/js/customFormUtils.js"); }
@@ -509,8 +509,8 @@ public class URLRewritingHttpServletResponseTest {
     "/vivo/edit/forms/js/customFormWithAutocomplete.js"); }
     @Test
     public void test14550(){ urlEncodingStyleA(
-    "/vivo/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css",
-    "/vivo/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css"); }
+    "/vivo/js/jquery-ui/css/smoothness/jquery-ui-1.12.1.css",
+    "/vivo/js/jquery-ui/css/smoothness/jquery-ui-1.12.1.css"); }
     @Test
     public void test14551(){ urlEncodingStyleA(
     "/vivo/edit/forms/css/customForm.css",
@@ -556,8 +556,8 @@ public class URLRewritingHttpServletResponseTest {
     "/vivo/js/jquery_plugins/ui.datepicker.js"); }
     @Test
     public void test145680(){ urlEncodingStyleA(
-    "/vivo/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js",
-    "/vivo/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"); }
+    "/vivo/js/jquery-ui/js/jquery-ui-1.12.1.min.js",
+    "/vivo/js/jquery-ui/js/jquery-ui-1.12.1.min.js"); }
     @Test
     public void test14568(){ urlEncodingStyleA(
     "/vivo/js/customFormUtils.js", "/vivo/js/customFormUtils.js"); }
