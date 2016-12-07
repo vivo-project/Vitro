@@ -32,10 +32,10 @@ var processIndividualsForClassesDataGetterContent = {
 		var numberSelected = classesSelected.length;
 		var i;
 		//Uncheck all since default is checked
-		pageContentSection.find("input[name='classInClassGroup']").removeAttr("checked");
+		pageContentSection.find("input[name='classInClassGroup']").prop("checked", null);
 		for(i = 0; i < numberSelected; i++) {
 			var classSelected = classesSelected[i];
-			pageContentSection.find("input[name='classInClassGroup'][value='" + classSelected + "']").attr("checked", "checked");
+			pageContentSection.find("input[name='classInClassGroup'][value='" + classSelected + "']").prop("checked", "checked");
 		}
 		//If number of classes selected is not equal to total number of classes, uncheck all
 		
@@ -45,7 +45,7 @@ var processIndividualsForClassesDataGetterContent = {
 	    	if(resultsClasses != null) {
 	    		var numberClasses = resultsClasses.length;
 	    		if(numberClasses != numberSelected) {
-	    			pageContentSection.find("input[name='allSelected']").removeAttr("checked");
+	    			pageContentSection.find("input[name='allSelected']").prop("checked", null);
 	    		}
 	    	}
 		}

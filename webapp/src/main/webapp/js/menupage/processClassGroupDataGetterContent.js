@@ -95,19 +95,19 @@ var processClassGroupDataGetterContent = {
         pageContentSection.find('input:checkbox[name=allSelected]').click(function(){
              if ( this.checked ) {
              // if checked, select all the checkboxes for this particular section
-            $(this).closest("ul").find('input:checkbox[name=classInClassGroup]').attr('checked','checked');
-             //$('input:checkbox[name=classInClassGroup]').attr('checked','checked');
+            $(this).closest("ul").find('input:checkbox[name=classInClassGroup]').prop('checked','checked');
+             //$('input:checkbox[name=classInClassGroup]').prop('checked','checked');
 
              } else {
              // if not checked, deselect all the checkboxes
-                 $(this).closest("ul").find('input:checkbox[name=classInClassGroup]').removeAttr('checked');
+                 $(this).closest("ul").find('input:checkbox[name=classInClassGroup]').prop('checked', null);
 
-              // $('input:checkbox[name=classInClassGroup]').removeAttr('checked');
+              // $('input:checkbox[name=classInClassGroup]').prop('checked', null);
              }
         });
 
         pageContentSection.find('input:checkbox[name=classInClassGroup]').click(function(){
-            $(this).closest("ul").find('input:checkbox[name=allSelected]').removeAttr('checked');
+            $(this).closest("ul").find('input:checkbox[name=allSelected]').prop('checked', null);
         });
     },
     bindEventHandlers:function(pageContentSection) {
