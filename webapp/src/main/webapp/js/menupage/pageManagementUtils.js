@@ -138,8 +138,8 @@ var pageManagementUtils = {
 	},
 	initDisplay: function(){
 		//right side components
-	    this.contentTypeSelectOptions.eq(0).attr('selected', 'selected');
-	    $('select#selectClassGroup option').eq(0).attr('selected', 'selected');
+	    this.contentTypeSelectOptions.eq(0).prop('selected', 'selected');
+	    $('select#selectClassGroup option').eq(0).prop('selected', 'selected');
 	    
 	    //Why would you want to hide this? This hides everything
 	   // $("section#pageDetails").hide();
@@ -243,7 +243,7 @@ var pageManagementUtils = {
             pageManagementUtils.classGroupSection.hide();
             pageManagementUtils.fixedHTMLSection.hide();
             pageManagementUtils.sparqlQuerySection.hide();
-            pageManagementUtils.contentTypeSelectOptions.eq(0).attr('selected', 'selected');
+            pageManagementUtils.contentTypeSelectOptions.eq(0).prop('selected', 'selected');
             pageManagementUtils.contentTypeSelect.focus();
             pageManagementUtils.adjustSaveButtonHeight();
             pageManagementUtils.checkSelfContainedRadio();
@@ -287,7 +287,7 @@ var pageManagementUtils = {
 		pageManagementUtils.sparqlQuerySection.hide();
 		pageManagementUtils.searchIndividualsSection.hide();
 		//Reset main content type drop-down
-		pageManagementUtils.contentTypeSelectOptions.eq(0).attr('selected', 'selected');
+		pageManagementUtils.contentTypeSelectOptions.eq(0).prop('selected', 'selected');
 		if ( pageManagementUtils.leftSideDiv.css("height") != undefined ) {
 			pageManagementUtils.leftSideDiv.css("height","");
 			if ( pageManagementUtils.leftSideDiv.height() < pageManagementUtils.rightSideDiv.height() ) {
@@ -442,7 +442,7 @@ var pageManagementUtils = {
         });
 		$el.find("textarea").val("");
 		//resetting class group section as well so selection is reset if type changes
-		$el.find("select option:eq(0)").attr("selected", "selected");
+		$el.find("select option:eq(0)").prop("selected", "selected");
 		
 	},
 	checkTemplateForMultipleContent:function(contentTypeSelected) {
@@ -698,7 +698,7 @@ var pageManagementUtils = {
     	//doing this in clear inputs instead which will be triggered
     	//every time content type is changed AS well as on  more content button after
     	//original content is cloned and stored
-    	//$('select#selectClassGroup option').eq(0).attr('selected', 'selected');
+    	//$('select#selectClassGroup option').eq(0).prop('selected', 'selected');
     	 pageManagementUtils.classesForClassGroup.addClass('hidden');
     },
     chooseClassGroup: function() {        
