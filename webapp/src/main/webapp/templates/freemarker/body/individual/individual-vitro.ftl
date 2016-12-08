@@ -109,5 +109,5 @@ ${scripts.add('<script type="text/javascript" src="${urls.base}/js/imageUpload/i
               '<script type="text/javascript" src="${urls.base}/js/individual/individualUriRdf.js"></script>')}
 
 <script type="text/javascript">
-    i18n_confirmDelete = "${i18n().confirm_delete}"
+    i18n_confirmDelete = "${i18n().confirm_delete}";
 </script>
