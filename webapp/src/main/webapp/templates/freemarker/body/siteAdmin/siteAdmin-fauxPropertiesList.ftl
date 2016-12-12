@@ -103,9 +103,7 @@
 </section>
 
 <script language="javascript" type="text/javascript" >
-    var i18nStrings = {
-        '',
-    };
+    var i18nStrings = { };
 </script>
 
 
