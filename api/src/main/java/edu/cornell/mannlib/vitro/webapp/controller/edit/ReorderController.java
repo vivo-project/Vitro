@@ -32,6 +32,8 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 
+import java.io.IOException;
+
 /**
  * This controller receives Ajax requests for reordering a list of individuals. 
  * Parameters:
@@ -102,10 +104,13 @@ public class ReorderController extends VitroAjaxController {
         // This may not be the most efficient way. Should we instead build up a Model of retractions and additions, so
         // we only hit the database once?
         reorderIndividuals(individualUris, vreq, rankPredicate);
-       
-        
-        response.setStatus(SC_OK);
-        
+
+       response.setStatus(SC_OK);
+       try {
+           response.getWriter().write("{}");
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
     }
     
     private void reorderIndividuals(String[] individualUris, VitroRequest vreq, String rankPredicate) {
