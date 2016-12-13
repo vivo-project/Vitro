@@ -41,16 +41,16 @@ $(document).ready(function(){
     $('input:checkbox[name=delete-all]').click(function(){
          if ( this.checked ) {
          // if checked, select all the checkboxes
-         $('input:checkbox[name=deleteAccount]').attr('checked','checked');
+         $('input:checkbox[name=deleteAccount]').prop('checked','checked');
             
          } else {
          // if not checked, deselect all the checkboxes
-           $('input:checkbox[name=deleteAccount]').removeAttr('checked');
+           $('input:checkbox[name=deleteAccount]').prop('checked', null);
          }
     });
     
     $('input:checkbox[name=deleteAccount]').click(function(){
-        $('input:checkbox[name=delete-all]').removeAttr('checked');
+        $('input:checkbox[name=delete-all]').prop('checked', null);
     });
       
     // Confirmation alert for account deletion in userAccounts-list.ftl template
