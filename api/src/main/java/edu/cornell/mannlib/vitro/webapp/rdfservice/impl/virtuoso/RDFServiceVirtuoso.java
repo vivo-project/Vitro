@@ -127,12 +127,7 @@ public class RDFServiceVirtuoso extends RDFServiceSparql {
 	private HttpPost createHttpRequest(String updateString) {
 		HttpPost meth = new HttpPost(updateEndpointURI);
 		meth.addHeader("Content-Type", "application/sparql-query");
-		try {
-			meth.setEntity(new StringEntity(updateString, "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			// UTF-8 is unsupported?
-			throw new RuntimeException(e);
-		}
+		meth.setEntity(new StringEntity(updateString, "UTF-8"));
 		return meth;
 	}
 

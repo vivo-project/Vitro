@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -521,6 +522,16 @@ public class RDFServiceGraph implements GraphWithPerform {
         @Override
         public Object executeInTransaction(Command arg0) {
             // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public void execute(Runnable runnable) {
+
+        }
+
+        @Override
+        public <T> T calculate(Supplier<T> supplier) {
             return null;
         }
 
