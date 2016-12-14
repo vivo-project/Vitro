@@ -63,7 +63,7 @@
     
     private Model describeBnode(String bnodeId) {
         String describeQueryStr = 
-            "PREFIX afn: <http://jena.hpl.hp.com/ARQ/function#> \n\n" +
+            "PREFIX afn: <http://jena.apache.org/ARQ/function#> \n\n" +
             "DESCRIBE ?bnode \n" +
             "WHERE { \n" +
             "    FILTER(afn:bnode(?bnode) = \"" + bnodeId + "\")\n" +

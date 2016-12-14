@@ -262,7 +262,7 @@ public class JenaModelUtils {
         dataset.getLock().enterCriticalSection(Lock.READ);
         try {
             StringBuffer buff = new StringBuffer();
-            buff.append("PREFIX afn: <http://jena.hpl.hp.com/ARQ/function#> \n")
+            buff.append("PREFIX afn: <http://jena.apache.org/ARQ/function#> \n")
             .append("CONSTRUCT { \n")
             .append("  ?res <" + property.getURI() + "> ?o } WHERE { \n");
             if (graphURI != null) {
@@ -294,7 +294,7 @@ public class JenaModelUtils {
         
         StringBuffer describeQueryStrBuff = new StringBuffer() 
             .append("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n")
-            .append("PREFIX afn: <http://jena.hpl.hp.com/ARQ/function#> \n")
+            .append("PREFIX afn: <http://jena.apache.org/ARQ/function#> \n")
             .append("DESCRIBE ?res WHERE { \n");
             if (graphURI != null) {
                 describeQueryStrBuff
