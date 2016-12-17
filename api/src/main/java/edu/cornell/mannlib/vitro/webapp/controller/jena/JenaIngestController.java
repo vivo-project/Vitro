@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.semanticweb.owlapi.reasoner.InconsistentOntologyException;
@@ -861,7 +861,7 @@ public class JenaIngestController extends BaseEditController {
                 Individual ind = jenaOntModel.getIndividual(savedQueryURIStr);
                 log.debug("Using query "+savedQueryURIStr);
                 queryStr = ( (Literal) ind.getPropertyValue(queryStrProp)).getLexicalForm();
-                queryStr = StringEscapeUtils.unescapeHtml(queryStr); // !!! We need to turn off automatic HTML-escaping for data property editing.
+                queryStr = StringEscapeUtils.UNESCAPE_HTML4.translate(queryStr); // !!! We need to turn off automatic HTML-escaping for data property editing.
             } finally {
                 jenaOntModel.leaveCriticalSection();
             }

@@ -15,7 +15,7 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_TB
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

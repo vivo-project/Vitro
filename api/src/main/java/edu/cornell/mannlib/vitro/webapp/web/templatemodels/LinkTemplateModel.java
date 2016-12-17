@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder.ParamMap;
@@ -42,7 +42,7 @@ public class LinkTemplateModel extends BaseTemplateModel {
     }
 
     protected void setText(String text) {
-        this.text = StringEscapeUtils.escapeHtml(text);
+        this.text = StringEscapeUtils.ESCAPE_HTML4.translate(text);
     }
     
     /* Template properties */

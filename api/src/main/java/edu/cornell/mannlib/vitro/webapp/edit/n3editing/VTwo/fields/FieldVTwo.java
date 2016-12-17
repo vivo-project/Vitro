@@ -5,8 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.BaseEditElementVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditElementVTwo;

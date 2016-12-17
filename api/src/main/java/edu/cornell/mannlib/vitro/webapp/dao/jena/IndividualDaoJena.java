@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -605,12 +605,12 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 
     public Collection<String> getAllIndividualUris() {
         //this is implemented in IndivdiualSDB
-        throw new NotImplementedException();
+        throw new NotImplementedException("");
     }  
 
     public Iterator<String> getUpdatedSinceIterator(long updatedSince){
         //this is implemented in IndivdiualSDB
-        throw new NotImplementedException();
+        throw new NotImplementedException("");
     }
 
     public boolean isIndividualOfClass(String vclassURI, String indURI) {
