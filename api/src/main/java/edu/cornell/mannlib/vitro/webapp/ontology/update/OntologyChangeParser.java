@@ -5,14 +5,16 @@ package edu.cornell.mannlib.vitro.webapp.ontology.update;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.skife.csv.CSVReader;
-import org.skife.csv.SimpleReader;
 
 import edu.cornell.mannlib.vitro.webapp.ontology.update.AtomicOntologyChange.AtomicChangeType;
 
@@ -35,7 +37,6 @@ public class OntologyChangeParser {
 		
 	/**
 	 * @param diffPath Diff path
-	 * @throws IOException 
 	 */
 	
 	@SuppressWarnings({ "unchecked", "null", "static-access" })
@@ -50,52 +51,53 @@ public class OntologyChangeParser {
 		String destinationURI = null;
 		StringTokenizer stArr = null; 
 		FileInputStream in = new FileInputStream(new File(diffPath));
-		CSVReader readFile = new SimpleReader();
-		readFile.setSeperator('\t');
-		
-		List<String[]> rows = readFile.parse(in);
-		
-		for(int rowNum = 0; rowNum < rows.size(); rowNum++){
-			
-			String[] cols = rows.get(rowNum);
-			if (cols.length != 5) {
-				logger.logError("Invalid PromptDiff data at row " + (rowNum + 1) 
-					   + ". Expected 5 columns; found " + cols.length );
+
+		CSVParser readFile = new CSVParser(new InputStreamReader(in),
+				CSVFormat.DEFAULT.withRecordSeparator('\t'));
+
+		int rowNum = 0;
+		for (CSVRecord record : readFile) {
+			rowNum++;
+			if (record.size() != 5) {
+				logger.logError("Invalid PromptDiff data at row " + (rowNum)
+					   + ". Expected 5 columns; found " + record.size() );
 			} else {
-		
+				String col = null;
 				changeObj = new AtomicOntologyChange();
-				
-				if (cols[0] != null && cols[0].length() > 0) {
-					changeObj.setSourceURI(cols[0]);
-				}
-				
-				if (cols[1] != null && cols[1].length() > 0) {
-					changeObj.setDestinationURI(cols[1]);
+
+				col = record.get(0);
+				if (col != null && col.length() > 0) {
+					changeObj.setSourceURI(col);
 				}
 
-				if (cols[4] != null && cols[4].length() > 0) {
-                  changeObj.setNotes(cols[4]);
+				col = record.get(1);
+				if (col != null && col.length() > 0) {
+					changeObj.setDestinationURI(col);
+				}
+
+				col = record.get(4);
+				if (col != null && col.length() > 0) {
+                  changeObj.setNotes(col);
                 }
 
-				if ("Yes".equals(cols[2])) {
+				if ("Yes".equals(record.get(2))) {
 					changeObj.setAtomicChangeType(AtomicChangeType.RENAME);
-				} else if ("Delete".equals(cols[3])) {
+				} else if ("Delete".equals(record.get(3))) {
 					changeObj.setAtomicChangeType(AtomicChangeType.DELETE); 
-				} else if ("Add".equals(cols[3])) {
+				} else if ("Add".equals(record.get(3))) {
 					changeObj.setAtomicChangeType(AtomicChangeType.ADD);
 				} else {
 					logger.logError("Invalid rename or change type data: '" +
-							cols[2] + " " + cols[3] + "'");
+							record.get(2) + " " + record.get(3) + "'");
 				}
-				
-				
+
 			    log.debug(changeObj);
 				
 				changeObjects.add(changeObj);
-					
 			}
-			
 		}
+
+		readFile.close();
 		
 		if (changeObjects.size() == 0) {
 			logger.log("No ABox updates are required.");

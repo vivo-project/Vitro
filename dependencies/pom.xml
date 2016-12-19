@@ -112,6 +112,11 @@
             <version>3.4</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
             <version>1.1.1</version>
@@ -241,12 +246,6 @@
             <groupId>org.apache.taglibs</groupId>
             <artifactId>taglibs-standard-impl</artifactId>
             <version>1.2.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.vivoweb.dependencies</groupId>
-            <artifactId>csv</artifactId>
-            <version>1.0</version>
         </dependency>
 
         <dependency>
