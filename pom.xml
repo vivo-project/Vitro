@@ -248,14 +248,6 @@
         </pluginManagement>
     </build>
 
-    <repositories>
-        <repository>
-            <id>vivo-dependencies</id>
-            <name>VIVO Dependencies</name>
-            <url>https://raw.github.com/vivo-project/dependencies/master/</url>
-        </repository>
-    </repositories>
-
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
