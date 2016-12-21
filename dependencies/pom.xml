@@ -157,18 +157,65 @@
             <groupId>net.sourceforge.owlapi</groupId>
             <artifactId>jfact</artifactId>
             <version>4.0.4</version>
+            <!-- Exclude OWLAPI OSGi bundle and include separately -->
+            <exclusions>
+                <exclusion>
+                    <groupId>net.sourceforge.owlapi</groupId>
+                    <artifactId>owlapi-distribution</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Include all OWALPI JARs that are in the OSGi bundle -->
+        <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-api</artifactId>
+            <version>4.2.7</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
-            <artifactId>owlapi-distribution</artifactId>
+            <artifactId>owlapi-apibinding</artifactId>
             <version>4.2.7</version>
-            <!-- See semargl-rdfa, guidce -->
-            <!-- exclusions>
-                <exclusion>
-                    <groupId>*</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions -->
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-fixers</artifactId>
+            <version>4.2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-impl</artifactId>
+            <version>4.2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-parsers</artifactId>
+            <version>4.2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-rio</artifactId>
+            <version>4.2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-compatibility</artifactId>
+            <version>4.2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-tools</artifactId>
+            <version>4.2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.owlapi</groupId>
+            <artifactId>owlapi-apibinding</artifactId>
+            <version>4.2.7</version>
+        </dependency>
+        <!-- Force updated Jackson core used by dependencies, otherwise we get an incompatible version -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.7.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
