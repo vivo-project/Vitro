@@ -83,49 +83,42 @@ public class RDFServiceBasedRequestProcessorForTPFs
                    final long limit )
         {
 //            CONSTRUCT { ?s ?p ?o . } WHERE { VALUES (?p) { (<http://www.w3.org/2002/07/owl#intersectionOf>) } ?s ?p ?o }  ORDER BY ?s ?p ?o LIMIT 100
+//            CONSTRUCT WHERE { ?s (<http://www.w3.org/2002/07/owl#intersectionOf>) ?o }  ORDER BY ?s ?o LIMIT 100
 
 
-            StringBuilder valuesVars = new StringBuilder();
-            StringBuilder valuesData = new StringBuilder();
-            StringBuilder countWhere = new StringBuilder();
+            StringBuilder whereClause = new StringBuilder();
+            StringBuilder orderBy = new StringBuilder();
 
             if ( ! subject.isVariable() ) {
-                valuesVars.append(" ?s");
-                appendNode(valuesData.append(' '), subject.asConstantTerm());
-                appendNode(countWhere.append(' '), subject.asConstantTerm());
+                appendNode(whereClause.append(' '), subject.asConstantTerm());
             } else {
-                countWhere.append(" ?s");
+                whereClause.append(" ?s");
+                orderBy.append(" ?s");
             }
 
             if ( ! predicate.isVariable() ) {
-                valuesVars.append(" ?p");
-                appendNode(valuesData.append(' '), predicate.asConstantTerm());
-                appendNode(countWhere.append(' '), predicate.asConstantTerm());
+                appendNode(whereClause.append(' '), predicate.asConstantTerm());
             } else {
-                countWhere.append(" ?p");
+                whereClause.append(" ?p");
+                orderBy.append(" ?p");
             }
 
             if ( ! object.isVariable() ) {
-                valuesVars.append(" ?o");
-                appendNode(valuesData.append(' '), object.asConstantTerm());
-                appendNode(countWhere.append(' '), object.asConstantTerm());
+                appendNode(whereClause.append(' '), object.asConstantTerm());
             } else {
-                countWhere.append(" ?o");
+                whereClause.append(" ?o");
+                orderBy.append(" ?o");
             }
 
             StringBuilder constructQuery = new StringBuilder();
 
-            constructQuery.append("CONSTRUCT { ?s ?p ?o . } WHERE { ");
+            constructQuery.append("CONSTRUCT WHERE { ");
+            constructQuery.append(whereClause.toString());
+            constructQuery.append(" }");
 
-            if (valuesVars.length() > 0) {
-                constructQuery.append(" VALUES (");
-                constructQuery.append(valuesVars.toString());
-                constructQuery.append(") { (");
-                constructQuery.append(valuesData.toString());
-                constructQuery.append(") }");
+            if (orderBy.length() > 0) {
+                constructQuery.append(" ORDER BY").append(orderBy.toString());
             }
-
-            constructQuery.append(" ?s ?p ?o }  ORDER BY ?s ?p ?o");
 
             if (limit > 0) {
                 constructQuery.append(" LIMIT ").append(limit);
@@ -151,7 +144,7 @@ public class RDFServiceBasedRequestProcessorForTPFs
             long size = triples.size();
             long estimate = -1;
 
-            String boundCount = "SELECT (COUNT(?s) AS ?count) WHERE { " + countWhere.toString() + " }";
+            String boundCount = "SELECT (COUNT(*) AS ?count) WHERE { " + whereClause.toString() + " }";
             try {
                 CountConsumer countConsumer = new CountConsumer();
                 rdfService.sparqlSelectQuery(boundCount, countConsumer);
