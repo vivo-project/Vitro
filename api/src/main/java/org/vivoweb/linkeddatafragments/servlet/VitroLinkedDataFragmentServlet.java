@@ -1,7 +1,9 @@
 package org.vivoweb.linkeddatafragments.servlet;
 
 import com.google.gson.JsonObject;
+import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
+import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import org.apache.commons.io.IOUtils;
@@ -38,6 +40,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 /**
@@ -74,8 +77,10 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
             RDFService rdfService = ModelAccess.on(ctx).getRDFService();
             RDFServiceBasedRequestProcessorForTPFs.setRDFService(rdfService);
 
+            OntologyDao dao = ModelAccess.on(ctx).getWebappDaoFactory().getOntologyDao();
+
             // load the configuration
-            config = new ConfigReader(new StringReader(getConfigJson()));
+            config = new ConfigReader(new StringReader(getConfigJson(dao)));
 
             // register data source types
             for ( Entry<String,IDataSourceType> typeEntry : config.getDataSourceTypes().entrySet() ) {
@@ -211,7 +216,7 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
         }
     }
 
-    private String getConfigJson() {
+    private String getConfigJson(OntologyDao dao) {
         StringBuilder configJson = new StringBuilder();
         configJson.append("{\n");
         configJson.append("  \"title\": \"Linked Data Fragments server\",\n");
@@ -229,16 +234,26 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
         configJson.append("  },\n");
         configJson.append("\n");
         configJson.append("  \"prefixes\": {\n");
-        configJson.append("    \"rdf\":         \"http://www.w3.org/1999/02/22-rdf-syntax-ns#\",\n");
-        configJson.append("    \"rdfs\":        \"http://www.w3.org/2000/01/rdf-schema#\",\n");
-        configJson.append("    \"xsd\":         \"http://www.w3.org/2001/XMLSchema#\",\n");
-        configJson.append("    \"dc\":          \"http://purl.org/dc/terms/\",\n");
-        configJson.append("    \"foaf\":        \"http://xmlns.com/foaf/0.1/\",\n");
-        configJson.append("    \"dbpedia\":     \"http://dbpedia.org/resource/\",\n");
-        configJson.append("    \"dbpedia-owl\": \"http://dbpedia.org/ontology/\",\n");
-        configJson.append("    \"dbpprop\":     \"http://dbpedia.org/property/\",\n");
-        configJson.append("    \"hydra\":       \"http://www.w3.org/ns/hydra/core#\",\n");
-        configJson.append("    \"void\":        \"http://rdfs.org/ns/void#\"\n");
+
+        List<Ontology> onts = dao.getAllOntologies();
+        if (onts != null) {
+            boolean first = true;
+            for (Ontology ont : onts) {
+                if (first) {
+                    first = false;
+                } else {
+                    configJson.append(",\n");
+                }
+
+                configJson.append("    \"");
+                configJson.append(ont.getPrefix());
+                configJson.append("\":         \"");
+                configJson.append(ont.getURI());
+                configJson.append("\"");
+            }
+        }
+
+
         configJson.append("  }\n");
         configJson.append("}\n");
 

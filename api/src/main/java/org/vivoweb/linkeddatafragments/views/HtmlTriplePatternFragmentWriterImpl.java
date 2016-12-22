@@ -84,6 +84,7 @@ public class HtmlTriplePatternFragmentWriterImpl extends TriplePatternFragmentWr
         Map data = new HashMap();
         
         // base.ftl.html
+        data.put("homePath", (contextPath != null ? contextPath : "") + "tpf");
         data.put("assetsPath", (contextPath != null ? contextPath : "") + "tpf/assets/");
         data.put("header", datasource.getTitle());
         data.put("date", new Date());
