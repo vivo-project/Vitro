@@ -1243,6 +1243,16 @@
     <url-pattern>/selectLocale</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <display-name>TpfServlet</display-name>
+    <servlet-name>TpfServlet</servlet-name>
+    <servlet-class>org.vivoweb.linkeddatafragments.servlet.VitroLinkedDataFragmentServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>TpfServlet</servlet-name>
+    <url-pattern>/tpf/*</url-pattern>
+  </servlet-mapping>
+
   <!-- ==================== mime types ============================== -->
   
   <mime-mapping>
