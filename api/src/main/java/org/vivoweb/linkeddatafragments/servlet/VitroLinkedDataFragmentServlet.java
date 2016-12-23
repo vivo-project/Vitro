@@ -186,6 +186,7 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
                 fragment = dataSource.getRequestProcessor()
                                   .createRequestedFragment( ldfRequest );
 
+                response.setHeader("Access-Control-Allow-Origin", "*");
                 writer.writeFragment(response.getOutputStream(), dataSource, fragment, ldfRequest);
             
             } catch (DataSourceNotFoundException ex) {
@@ -234,25 +235,32 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
         configJson.append("  },\n");
         configJson.append("\n");
         configJson.append("  \"prefixes\": {\n");
+        configJson.append("    \"rdf\":         \"http://www.w3.org/1999/02/22-rdf-syntax-ns#\",\n");
+        configJson.append("    \"rdfs\":        \"http://www.w3.org/2000/01/rdf-schema#\",\n");
+        configJson.append("    \"hydra\": \"http://www.w3.org/ns/hydra/core#\",\n");
+        configJson.append("    \"void\":        \"http://rdfs.org/ns/void#\"");
 
         List<Ontology> onts = dao.getAllOntologies();
         if (onts != null) {
-            boolean first = true;
             for (Ontology ont : onts) {
-                if (first) {
-                    first = false;
-                } else {
-                    configJson.append(",\n");
-                }
+                switch (ont.getPrefix()) {
+                    case "rdf":
+                    case "rdfs":
+                    case "hydra":
+                    case "void":
+                        break;
 
-                configJson.append("    \"");
-                configJson.append(ont.getPrefix());
-                configJson.append("\":         \"");
-                configJson.append(ont.getURI());
-                configJson.append("\"");
+                    default:
+                        configJson.append(",\n");
+                        configJson.append("    \"");
+                        configJson.append(ont.getPrefix());
+                        configJson.append("\":         \"");
+                        configJson.append(ont.getURI());
+                        configJson.append("\"");
+                        break;
+                }
             }
         }
-
 
         configJson.append("  }\n");
         configJson.append("}\n");
