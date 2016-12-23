@@ -137,7 +137,8 @@ public class HtmlTriplePatternFragmentWriterImpl extends TriplePatternFragmentWr
     @Override
     public void writeNotFound(ServletOutputStream outputStream, HttpServletRequest request) throws Exception {
         Map data = new HashMap();
-        data.put("assetsPath", "assets/");
+        data.put("homePath", (contextPath != null ? contextPath : "") + "tpf");
+        data.put("assetsPath", (contextPath != null ? contextPath : "") + "tpf/assets/");
         data.put("datasources", getDatasources());
         data.put("date", new Date());
         data.put("url", request.getRequestURL().toString());
@@ -148,7 +149,8 @@ public class HtmlTriplePatternFragmentWriterImpl extends TriplePatternFragmentWr
     @Override
     public void writeError(ServletOutputStream outputStream, Exception ex)  throws Exception {
         Map data = new HashMap();
-        data.put("assetsPath", "assets/");
+        data.put("homePath", (contextPath != null ? contextPath : "") + "tpf");
+        data.put("assetsPath", (contextPath != null ? contextPath : "") + "tpf/assets/");
         data.put("date", new Date());
         data.put("error", ex);
 
