@@ -12,7 +12,7 @@
         <label for="${component}>"
                about="#${component}" property="hydra:variable" lang="">${component}</label>
        <input class="uri" id="${component}" name="${component}"
-              about="#${component}" property="hydra:property" resource="rdf:${component}" value="${(query[component])!""}" />
+              about="#${component}" property="hydra:property" resource="rdf:${component}" value="${(query[component]?html)!""}" />
       </li>
 </#list>
     </ul>

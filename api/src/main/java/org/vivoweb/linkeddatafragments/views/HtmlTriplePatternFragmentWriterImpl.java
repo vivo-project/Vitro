@@ -7,6 +7,7 @@ import freemarker.template.TemplateExceptionHandler;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.impl.LiteralImpl;
 import org.linkeddatafragments.datasource.IDataSource;
 import org.linkeddatafragments.datasource.index.IndexDataSource;
 import org.linkeddatafragments.fragments.ILinkedDataFragment;
@@ -122,16 +123,24 @@ public class HtmlTriplePatternFragmentWriterImpl extends TriplePatternFragmentWr
         
         // Compose query object
         Map query = new HashMap();
-        query.put("subject", !tpfRequest.getSubject().isVariable() ? tpfRequest.getSubject().asConstantTerm() : "");
-        query.put("predicate", !tpfRequest.getPredicate().isVariable() ? tpfRequest.getPredicate().asConstantTerm() : "");
-        query.put("object", !tpfRequest.getObject().isVariable() ? tpfRequest.getObject().asConstantTerm() : "");
+        query.put("subject", !tpfRequest.getSubject().isVariable() ? handleCT(tpfRequest.getSubject().asConstantTerm()) : "");
+        query.put("predicate", !tpfRequest.getPredicate().isVariable() ? handleCT(tpfRequest.getPredicate().asConstantTerm()) : "");
+        query.put("object", !tpfRequest.getObject().isVariable() ? handleCT(tpfRequest.getObject().asConstantTerm()) : "");
         data.put("query", query);
-       
+
         // Get the template (uses cache internally)
         Template temp = datasource instanceof IndexDataSource ? indexTemplate : datasourceTemplate;
 
         // Merge data-model with template
         temp.process(data, new OutputStreamWriter(outputStream));
+    }
+
+    private Object handleCT(Object obj) {
+        if (obj instanceof LiteralImpl) {
+            return ((LiteralImpl)obj).asNode().toString();
+        }
+
+        return obj;
     }
 
     @Override
