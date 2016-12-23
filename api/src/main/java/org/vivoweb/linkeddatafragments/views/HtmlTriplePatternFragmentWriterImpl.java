@@ -4,13 +4,18 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import org.apache.jena.atlas.io.StringWriterI;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.LiteralImpl;
+import org.apache.jena.riot.out.NodeFormatter;
+import org.apache.jena.riot.out.NodeFormatterTTL;
 import org.linkeddatafragments.datasource.IDataSource;
 import org.linkeddatafragments.datasource.index.IndexDataSource;
 import org.linkeddatafragments.fragments.ILinkedDataFragment;
+import org.linkeddatafragments.fragments.tpf.ITriplePatternElement;
 import org.linkeddatafragments.fragments.tpf.ITriplePatternFragment;
 import org.linkeddatafragments.fragments.tpf.ITriplePatternFragmentRequest;
 import org.linkeddatafragments.views.ILinkedDataFragmentWriter;
@@ -126,6 +131,7 @@ public class HtmlTriplePatternFragmentWriterImpl extends TriplePatternFragmentWr
         query.put("subject", !tpfRequest.getSubject().isVariable() ? handleCT(tpfRequest.getSubject().asConstantTerm()) : "");
         query.put("predicate", !tpfRequest.getPredicate().isVariable() ? handleCT(tpfRequest.getPredicate().asConstantTerm()) : "");
         query.put("object", !tpfRequest.getObject().isVariable() ? handleCT(tpfRequest.getObject().asConstantTerm()) : "");
+        query.put("pattern", makeQueryPattern(tpfRequest));
         data.put("query", query);
 
         // Get the template (uses cache internally)
@@ -133,6 +139,53 @@ public class HtmlTriplePatternFragmentWriterImpl extends TriplePatternFragmentWr
 
         // Merge data-model with template
         temp.process(data, new OutputStreamWriter(outputStream));
+    }
+
+    private String makeQueryPattern(ITriplePatternFragmentRequest tpfRequest) {
+        StringBuilder pattern = new StringBuilder();
+
+        ITriplePatternElement<RDFNode,String,String> subject   = tpfRequest.getSubject();
+        ITriplePatternElement<RDFNode,String,String> predicate = tpfRequest.getPredicate();
+        ITriplePatternElement<RDFNode,String,String> object    = tpfRequest.getObject();
+
+        pattern.append("{");
+
+        if ( ! subject.isVariable() ) {
+            appendNode(pattern.append(' '), subject.asConstantTerm());
+        } else {
+            pattern.append(" ?s");
+        }
+
+
+        if ( ! predicate.isVariable() ) {
+            appendNode(pattern.append(' '), predicate.asConstantTerm());
+        } else {
+            pattern.append(" ?p");
+        }
+
+        if ( ! object.isVariable() ) {
+            appendNode(pattern.append(' '), object.asConstantTerm());
+        } else {
+            pattern.append(" ?o");
+        }
+
+        pattern.append(" }");
+        return pattern.toString();
+    }
+
+    private void appendNode(StringBuilder builder, RDFNode node) {
+        if (node.isLiteral()) {
+            builder.append(literalToString(node.asLiteral()));
+        } else if (node.isURIResource()) {
+            builder.append('<' + node.asResource().getURI() + '>');
+        }
+    }
+
+    private String literalToString(Literal l) {
+        StringWriterI sw = new StringWriterI();
+        NodeFormatter fmt = new NodeFormatterTTL(null, null);
+        fmt.formatLiteral(sw, l.asNode());
+        return sw.toString();
     }
 
     private Object handleCT(Object obj) {

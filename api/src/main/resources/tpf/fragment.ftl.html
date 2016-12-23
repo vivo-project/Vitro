@@ -23,7 +23,7 @@
 </form>
 </div>
 
-<h3>Matches in ${datasource.getTitle()} for <em class="pattern">${ (query.getPatternString())!"" }</em></h3>
+<h3>Matches in ${datasource.getTitle()} for <em class="pattern">${ (query["pattern"]?html)!"" }</em></h3>
 
 <div class="counts">
 <#if (triples?size > 0)>
