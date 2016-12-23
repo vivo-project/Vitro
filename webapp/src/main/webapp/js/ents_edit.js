@@ -1,15 +1,15 @@
 /* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 /* this code uses:
-   dwrutil in util.js
+   dwr.util in util.js
    vitro.js
    detect.js
 */
 dojo.require("dojo.io.*");
 dojo.require("dojo.event.*");
 
-//DWREngine.setErrorHandler(function(data){alert("DWREngine error: " + data);});
-//DWREngine.setWarningHandler(function(data){alert("DWREngine warning: " + data);});
+//dwr.engine.setErrorHandler(function(data){alert("dwr.engine error: " + data);});
+//dwr.engine.setWarningHandler(function(data){alert("dwr.engine warning: " + data);});
 
 /*
   ents_edit.js has several tasks:
@@ -68,7 +68,7 @@ function update( )   {
   clearProp();
   updateTable();
   updateEntityAndPropHash();
-  var but = $("newPropButton");
+  var but = dwr.util.byId("newPropButton");
   if( but ) { but.disabled = false; }
 }
 
@@ -78,11 +78,11 @@ function clearProp()  {
   var clearMap={sunrise:"",sunset: ""};
   editingNewProp = false;
   gVClassUri = null;
-  DWRUtil.setValues( clearMap );
-  clear($("propertyList"));
-  clear($("vClassList"));
+  dwr.util.setValues( clearMap );
+  clear(dwr.util.byId("propertyList"));
+  clear(dwr.util.byId("vClassList"));
 
-  var ele = $("entitiesList");
+  var ele = dwr.util.byId("entitiesList");
   while( ele != null && ele.length > 0){
     ele.remove(0);
   }
@@ -102,7 +102,7 @@ function updateEntityAndPropHash(){
     //once we set the gEntity we can get the ents2ents properties.
     //PropertyDWR.getAllPropInstByVClass(setPropertyHash, entityObj.VClassURI );
     if( entityObj != null && 'URI' in entityObj )
-        PropertyDWR.getAllPossiblePropInstForIndividual(setPropertyHash, entityObj.URI);
+        PropertyDWR.getAllPossiblePropInstForIndividual(entityObj.URI, { callback:setPropertyHash });
     //else
         //alert("could not find an individual, usually this means that there is no type for the URI"); 
   };
@@ -126,7 +126,7 @@ function updateEntityAndPropHash(){
   };
   
   //get the gEntity and then build the gPropertyHash
-  EntityDWR.entityByURI(setGEntity, gEntityURI);
+  EntityDWR.entityByURI(gEntityURI, { callback:setGEntity });
 }
 
 /*****************************************************************
@@ -139,7 +139,7 @@ function doNoPropsWarning(){
 		"The button you have clicked adds a new object property statement relating this individual " +
 		"to another individual.  If you are looking to add new object properties to the " +
 		"system, look under the 'About' menu.");
-	var but = $("newPropButton");
+	var but = dwr.util.byId("newPropButton");
   	if( but ) { but.disabled = true; }
 }
 
@@ -149,18 +149,18 @@ because dwr calls are async we have a callback
 function updateTable(callback) {
   var cb = callback;
   function fillTable(props)  {
-     DWRUtil.removeAllRows("propbody");
+     dwr.util.removeAllRows("propbody");
      /* This makes the row that gets added to the ents_edit form for each ents2ents object.  */
-     addRows($("propbody"), props,
+     addRows(dwr.util.byId("propbody"), props,
              [getDomain, getProperty, getRange, getEdit, getDelete],
              makeTr);  
-     var newPropTr = $("justwritenTr");
+     var newPropTr = dwr.util.byId("justwritenTr");
      if( newPropTr != null ){
        Fat.fade_element( "justwritenTr" );
      }
      if(cb !== undefined && cb !== null ) { cb(); }
   }
-  PropertyDWR.getExistingProperties(fillTable,gEntityURI);
+  PropertyDWR.getExistingProperties(gEntityURI, { callback: fillTable });
 }
 
 /**************************************************************************/
@@ -252,7 +252,7 @@ var makeTr = (function(){ /* outer func */
 /* called when Edit button is clicked */
 function editTable(inputElement, subjectURI, predicateURI, objectURI){
     var rowIndex = inputElement.parentNode.parentNode.rowIndex-1 ;
-    var table = $("propbody");
+    var table = dwr.util.byId("propbody");
     table.deleteRow( rowIndex );
     table.insertRow(rowIndex);
     table.rows[rowIndex].insertCell(0);
@@ -261,7 +261,7 @@ function editTable(inputElement, subjectURI, predicateURI, objectURI){
     table.rows[rowIndex].cells[0].colSpan = tableMaxColspan( table );
     vform.style.display="block";
 
-    PropertyDWR.getProperty(fillForm, subjectURI, predicateURI, objectURI);
+    PropertyDWR.getProperty(subjectURI, predicateURI, objectURI, { callback: fillForm });
     inputElement.parentNode.parentNode.style.display="none";
 }
 
@@ -270,7 +270,7 @@ function deleteProp( subjectURI, predicateURI, objectURI, objectName, predicateN
   if( PropertyDWR.deleteProp ){
     if (confirm("Are you sure you want to delete the property\n"
                  + objectName + " " + predicateName + "?")) {
-      PropertyDWR.deleteProp(update, subjectURI, predicateURI, objectURI);
+      PropertyDWR.deleteProp(subjectURI, predicateURI, objectURI, { callback:update });
     }
   } else {
     alert("Deletion of object property statements is disabled.");
@@ -312,7 +312,7 @@ function newProp() {
     	fillForm( newP );
     	editingNewProp = true;
     	fillRangeVClassList();
-    	var table = $("propbody");
+    	var table = dwr.util.byId("propbody");
         var tr = table.insertRow(0);
     	tr.id = "newrow";
     	appendPropForm( tr, tableMaxColspan( table ) );
@@ -331,7 +331,7 @@ function fillForm(aprop)  {
   gProperty = aprop;
   var vclass = gProperty.domainClass;
   
-  DWRUtil.setValues(gProperty);
+  dwr.util.setValues(gProperty);
 
   toggleDisabled("newPropButton");
   
@@ -346,7 +346,7 @@ function fillPropList(classId) {
   /* This function fills up the form's select list with options 
      Notice that the option id is the propertyid + 'D' or 'R'
      so that domain and range properties can be distinguished  */
-  var propList = $("propertyList");
+  var propList = dwr.util.byId("propertyList");
   clear(propList);
 
   //add properties as options
@@ -383,10 +383,10 @@ function fillPropList(classId) {
 *****************************************************************/
 function fillRangeVClassList( propId ){
   //If propId is null then the one on the property select list will be used
-  if( propId == null ) { propId = DWRUtil.getValue("propertyList");}
+  if( propId == null ) { propId = dwr.util.getValue("propertyList");}
 	
   //clear the list and put the loading message up
-  var vclassListEle = $("vClassList");
+  var vclassListEle = dwr.util.byId("vClassList");
   clear(vclassListEle);
   vclassListEle.options[vclassListEle.options.length] = new Option("Loading...",-10);
   //vclassListEle.options[0].selected = true;
@@ -394,11 +394,11 @@ function fillRangeVClassList( propId ){
 	
   var prop = gPropertyHash[propId];	
 	
-  VClassDWR.getVClasses(
-                        function(vclasses){ 
-                          addVClassOptions( vclasses );             
-                        },
-                        prop.domainClassURI, prop.propertyURI, prop.subjectSide);
+  VClassDWR.getVClasses(prop.domainClassURI, prop.propertyURI, prop.subjectSide,
+                          function(vclasses){
+                              addVClassOptions( vclasses );
+                          }
+                    );
 }		
 	
 /****************************************************************
@@ -406,14 +406,14 @@ function fillRangeVClassList( propId ){
  the entitiesList.
  ****************************************************************/
 function addVClassOptions( vclassArray  ){
-  //  DWRUtil.addOptions("entitiesList",null);
-  var vclassEle = $("vClassList");
+  //  dwr.util.addOptions("entitiesList",null);
+  var vclassEle = dwr.util.byId("vClassList");
   clear( vclassEle );
   vclassEle.disabled = false;
 
   if( vclassArray == null || vclassArray.length < 1){
     vclassEle.disabled = true;
-    entsEle = $("entitiesList");
+    entsEle = dwr.util.byId("entitiesList");
     clear(entsEle);
     var msg="There are no entities defined yet that could fill this role";
     var opt = new Option(msg,-1);
@@ -435,15 +435,15 @@ function addVClassOptions( vclassArray  ){
                
   //attempt to set the selected option to the current vclass
   var vclassURI = null;
-  var prop = gPropertyHash[ DWRUtil.getValue("propertyList") ];
+  var prop = gPropertyHash[ dwr.util.getValue("propertyList") ];
   if( gProperty.propertyURI == prop.propertyURI ){
     vclassURI = gProperty.rangeClassURI;
 
-    DWRUtil.setValue(vclassEle, vclassURI );
+    dwr.util.setValue(vclassEle, vclassURI );
     //here we were unable to set the vclass select option to the vclassid
     //of the entity.  this means that the vclass of the entity is not one that
     //is permited by the PropertyInheritance and other restrictions.
-    if( DWRUtil.getValue(vclassEle) != vclassURI){
+    if( dwr.util.getValue(vclassEle) != vclassURI){
         alert("This entity's class does not match the class of this property.  This is usually the "+
               "result of the class of the entity having been changed.  Properties that were added when " +
               "this entity had the old class still reflect that value.\n" +
@@ -461,15 +461,15 @@ function addVClassOptions( vclassArray  ){
 *****************************************************************/
 function fillEntsList( vclassEle ){
   if( vclassEle == null )
-      vclassEle = $("vClassList");     
-  var vclassUri =  DWRUtil.getValue( vclassEle );
+      vclassEle = dwr.util.byId("vClassList");
+  var vclassUri =  dwr.util.getValue( vclassEle );
 
   if( vclassUri == gVClassUri )
     return;
   else
     gVClassUri = vclassUri;
     
-  var entsListEle = $("entitiesList");
+  var entsListEle = dwr.util.byId("entitiesList");
   clear(entsListEle);
   entityOptToSelect = null;
     
@@ -494,7 +494,7 @@ function fillEntsList( vclassEle ){
      },
     load: function(type, data, evt){
        //clear here since we will be using addEntOptions for multiple adds
-//       var entsListEle = $("entitiesList");
+//       var entsListEle = dwr.util.byId("entitiesList");
 //        clear(entsListEle);
        addEntOptions(data, -1);
     },
@@ -509,7 +509,7 @@ function fillEntsList( vclassEle ){
 
 /** add entities in entArray as options elements to select element "Individual" */
 function addEntOptions( entArray ){
-  var entsListEle = $("entitiesList");
+  var entsListEle = dwr.util.byId("entitiesList");
 
     if( entArray == null || entArray.length == 0){
         clear(entsListEle);
@@ -623,12 +623,12 @@ function writeProp()  {
     return;
   }
   if( !validateForm() ) { return; }
-  var prop = gPropertyHash[DWRUtil.getValue("propertyList")];
+  var prop = gPropertyHash[dwr.util.getValue("propertyList")];
   var newP = {};
   var oldP = gProperty;
   newP.propertyURI = prop.propertyURI;
 
-  var selected = DWRUtil.getValue("entitiesList");
+  var selected = dwr.util.getValue("entitiesList");
   newP.subjectEntURI= gEntity.URI;
   newP.objectEntURI = selected ;
   
@@ -639,16 +639,17 @@ function writeProp()  {
 
   if( editingNewProp ){    
     newP.ents2entsId = -1;
-    PropertyDWR.insertProp(callback, newP );
+    PropertyDWR.insertProp(newP, { callback:callback } );
   } else {
       var afterDelete=
               function(result){
-                  PropertyDWR.insertProp(callback, newP);
+                  PropertyDWR.insertProp(newP, { callback:callback });
               };
-      PropertyDWR.deleteProp(afterDelete,
+      PropertyDWR.deleteProp(
               gProperty.subjectEntURI,
               gProperty.propertyURI,
-              gProperty.objectEntURI);
+              gProperty.objectEntURI,
+          { callback:afterDelete });
   }
 }
 
@@ -657,10 +658,10 @@ addEvent(window, 'load', update);
 
 /********************* some utilities ***********************************/
 /* this clones the property edit from a div on the ents_edit.jsp */
-function getForm(){  return $("propeditdiv").cloneNode(true); }
+function getForm(){  return dwr.util.byId("propeditdiv").cloneNode(true); }
 
 /* a function to display a lot of info about an object */
-function disy( obj, note ){ alert( (note!==null?note:"") + DWRUtil.toDescriptiveString(obj, 3));}
+function disy( obj, note ){ alert( (note!==null?note:"") + dwr.util.toDescriptiveString(obj, 3));}
 
 /* attempts to get the URI of the entity being edited */
 function getEntityUriFromPage(){

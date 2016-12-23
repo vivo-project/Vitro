@@ -62,7 +62,6 @@ public class PropertyGroup extends BaseResourceBean implements Comparable<Proper
 
     /**
      * Sorts PropertyGroup objects by group rank, then alphanumeric.
-     * @author bdc34 modified by jc55, bjl23
      */
     public int compareTo(PropertyGroup o2) {
     	Collator collator = Collator.getInstance();

@@ -8,7 +8,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import com.hp.hpl.jena.ontology.OntDocumentManager;
+import org.apache.jena.ontology.OntDocumentManager;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;

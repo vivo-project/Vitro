@@ -10,14 +10,14 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Selector;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Selector;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceDataset;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import org.apache.commons.io.IOUtils;
@@ -127,12 +127,7 @@ public class RDFServiceVirtuoso extends RDFServiceSparql {
 	private HttpPost createHttpRequest(String updateString) {
 		HttpPost meth = new HttpPost(updateEndpointURI);
 		meth.addHeader("Content-Type", "application/sparql-query");
-		try {
-			meth.setEntity(new StringEntity(updateString, "UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			// UTF-8 is unsupported?
-			throw new RuntimeException(e);
-		}
+		meth.setEntity(new StringEntity(updateString, "UTF-8"));
 		return meth;
 	}
 

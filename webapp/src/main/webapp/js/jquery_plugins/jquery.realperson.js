@@ -176,7 +176,7 @@ $.fn.realperson = function(options) {
 /* Initialise the real person functionality. */
 $.realperson = new RealPerson(); // singleton instance
 
-$('.realperson-challenge').live('click', function() {
+$( document ).on('click', '.realperson-challenge', function() {
 	$(this).next().next().realperson('change');
 });
 

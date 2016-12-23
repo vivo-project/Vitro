@@ -9,10 +9,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -28,7 +28,6 @@ import edu.cornell.mannlib.vedit.validator.impl.XMLNameValidator;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.edit.utils.RoleLevelOptionsSetup;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
@@ -159,8 +158,6 @@ public class VclassRetryController extends BaseEditController {
 
         FormUtils.populateFormFromBean(vclassForEditing,action,foo,epo.getBadValueMap());
 
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-        request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
         request.setAttribute("formJsp","/templates/edit/specific/vclass_retry.jsp");
         request.setAttribute("colspan","4");
         request.setAttribute("scripts","/templates/edit/formBasic.js");
@@ -170,7 +167,7 @@ public class VclassRetryController extends BaseEditController {
         setRequestAttributes(request,epo);
 
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, "/templates/edit/formBasic.jsp");
         } catch (Exception e) {
             log.error("VclassRetryController could not forward to view.", e);
             throw new RuntimeException(e);

@@ -37,8 +37,8 @@ import org.apache.commons.logging.LogFactory;
  * 
  * The List of FileItems includes both "formField" items and "file" items. As
  * with the usual parameters on a request, we can have more than one value with
- * the same name. So this creates a map of <String, List<String>> to hold the
- * parameters, and a map of <String, List<FileItem>> to hold the files.
+ * the same name. So this creates a map of &lt;String, List&lt;String&gt;&gt; to hold the
+ * parameters, and a map of &lt;String, List&lt;FileItem&gt;&gt; to hold the files.
  * 
  * The parameters will be available to the wrapper through the normal methods.
  * The files will be available as an attribute that holds the map. Also, a

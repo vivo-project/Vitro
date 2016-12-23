@@ -17,7 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -143,7 +143,9 @@ public class BrowseDataGetter extends DataGetterBase implements DataGetter {
    
     /**
      * Gets a list of all VClassGroups with vclasses with individual counts.
-     * @param params2 
+     * @param request current VitroRequest
+     * @param params a parameter map
+     * @param context current servlet context
      */
     protected Map<String,Object> getAllClassGroupData(VitroRequest request, Map params, ServletContext context){
         Map<String,Object> map = new HashMap<String,Object>();                  

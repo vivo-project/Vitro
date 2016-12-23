@@ -15,9 +15,9 @@ import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
@@ -26,7 +26,7 @@ import freemarker.template.Configuration;
 /**
  * This is intended to work in conjunction with a template to create the HTML for a 
  * datetime with precision and to convert the submitted parameters into 
- * varname -> Literal and varname -> URI maps.
+ * varname -&gt; Literal and varname -&gt; URI maps.
  * 
  * The variables that get passed to the template are defined in:
  * DateTimeWithPrecision.getMapForTemplate() 

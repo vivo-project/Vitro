@@ -155,7 +155,7 @@ public class DataProperty extends Property implements Comparable<DataProperty>, 
 
     /**
      * adds a single DataPropertyStatement object to a DatatypeProperty's DataPropertyStatements list.
-     * @param dataPropertyStmt
+     * @param dataPropertyStmt  Data property statement
      */
 
     public void addDataPropertyStatement(DataPropertyStatement dataPropertyStmt){

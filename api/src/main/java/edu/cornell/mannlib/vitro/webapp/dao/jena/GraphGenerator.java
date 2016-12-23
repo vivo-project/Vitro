@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import com.hp.hpl.jena.graph.Graph;
+import org.apache.jena.graph.Graph;
 
 public interface GraphGenerator {
 

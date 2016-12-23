@@ -2,16 +2,17 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
-import static com.hp.hpl.jena.datatypes.xsd.XSDDatatype.XSDfloat;
-import static com.hp.hpl.jena.datatypes.xsd.XSDDatatype.XSDstring;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDfloat;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDstring;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import com.hp.hpl.jena.datatypes.RDFDatatype;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.datatypes.xsd.impl.RDFLangString;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Statement;
 
 /**
  * An enumeration of the types of properties that the ConfigurationBeanLoader
@@ -70,7 +71,7 @@ public enum PropertyType {
 		if (object.isLiteral()) {
 			Literal literal = object.asLiteral();
 			RDFDatatype datatype = literal.getDatatype();
-			if (datatype == null || datatype.equals(XSDstring)) {
+			if (datatype == null || datatype.equals(XSDstring) || datatype.equals(RDFLangString.rdfLangString)) {
 				return STRING;
 			}
 			if (datatype.equals(XSDfloat)) {

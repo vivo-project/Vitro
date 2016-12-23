@@ -5,12 +5,14 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 /*
  * Servlet that only specifies a template, without putting any data
@@ -33,7 +35,7 @@ public class StaticPageController extends FreemarkerHttpServlet {
         String requestedUrl = vreq.getServletPath();
         String title = null;
         if (requestedUrl.equals("/login")) {
-            title = "Log in to " + siteName;
+            title = StringUtils.capitalize(I18n.text(vreq, "log_in")) + " - " + siteName;
         }
         return title;
     }

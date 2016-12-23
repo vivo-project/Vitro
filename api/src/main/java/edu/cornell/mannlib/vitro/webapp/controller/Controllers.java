@@ -39,7 +39,6 @@ public class Controllers {
     
     public static final String TAB = "/index.jsp";
 
-    public static final String BASIC_JSP = "/templates/page/basicPage.jsp";
     public static final String DEBUG_JSP = "/templates/page/debug.jsp";
     public static final Object BODY_MSG = "/templates/page/bodyMsg.jsp";
     

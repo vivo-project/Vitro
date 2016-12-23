@@ -30,7 +30,7 @@ function init(){
 
 function update(){ //updates moniker list when type is changed
 
-  DWRUtil.useLoadingMessage();
+  dwr.util.useLoadingMessage();
 
   EntityDWR.monikers(createList,  document.getElementById("field2Value").value );
   
@@ -50,7 +50,7 @@ function createList(data) { //puts options in moniker select list
   var opt = new Option("[new moniker]","");
   ele.options[ele.options.length] = opt;
 
-  DWRUtil.setValue("monikerSelect",getCurrentMoniker()); // getCurrentMoniker() is defined on jsp
+  dwr.util.setValue("monikerSelect",getCurrentMoniker()); // getCurrentMoniker() is defined on jsp
 
   checkMonikers();
 }
@@ -96,7 +96,7 @@ function fillList(id, data, selectedtext) {
 
   for (var i = 0; i < data.length; i++)    {
 
-    var text = DWRUtil.toDescriptiveString(data[i]);
+    var text = dwr.util.toDescriptiveString(data[i]);
 
     var value = text;
 

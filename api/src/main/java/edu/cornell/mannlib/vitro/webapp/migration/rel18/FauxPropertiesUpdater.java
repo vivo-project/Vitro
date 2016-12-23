@@ -2,9 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.migration.rel18;
 
-import static com.hp.hpl.jena.rdf.model.ResourceFactory.createPlainLiteral;
-import static com.hp.hpl.jena.rdf.model.ResourceFactory.createProperty;
-import static com.hp.hpl.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.vitroURI;
 
 import java.io.FileInputStream;
@@ -15,9 +15,9 @@ import java.nio.file.Paths;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextListener;
 
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;

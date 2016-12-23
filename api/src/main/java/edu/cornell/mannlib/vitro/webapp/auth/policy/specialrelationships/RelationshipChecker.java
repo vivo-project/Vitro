@@ -8,14 +8,14 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.Selector;
-import com.hp.hpl.jena.rdf.model.SimpleSelector;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.shared.Lock;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Selector;
+import org.apache.jena.rdf.model.SimpleSelector;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.BasicPolicyDecision;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.ifaces.Authorization;
@@ -56,7 +56,7 @@ public class RelationshipChecker {
 
 	/**
 	 * Is this resource a member of this type? That is, is there an statement of
-	 * the form: <resourceUri> rdfs:type <typeUri>
+	 * the form: {@code <resourceUri> rdfs:type <typeUri> }
 	 */
 	public boolean isResourceOfType(String resourceUri, String typeUri) {
 		Selector selector = createSelector(resourceUri,
@@ -86,7 +86,7 @@ public class RelationshipChecker {
 	/**
 	 * Get a list of the object URIs that satisfy this statement:
 	 * 
-	 * <resourceUri> <propertyUri> <objectUri>
+	 * {@code <resourceUri> <propertyUri> <objectUri> }
 	 * 
 	 * May return an empty list, but never returns null.
 	 */
@@ -117,9 +117,9 @@ public class RelationshipChecker {
 	/**
 	 * Get a list of the object URIs that satisfy these statements:
 	 * 
-	 * <resourceUri> <linkUri> <contextNodeUri>
+	 * {@code <resourceUri> <linkUri> <contextNodeUri> }
 	 * 
-	 * <contextNodeUri> <propertyUri> <objectUri>
+	 * {@code <contextNodeUri> <propertyUri> <objectUri> }
 	 * 
 	 * May return an empty list, but never returns null.
 	 */
@@ -161,11 +161,11 @@ public class RelationshipChecker {
 	 * 
 	 * So we're looking for object URIs that statisfy these statements:
 	 * 
-	 * <resourceUri> <property1Uri> <linkNodeUri>
+	 * {@code <resourceUri> <property1Uri> <linkNodeUri> }
 	 * 
-	 * <linkNodeUri> rdfs:type <linkNodeTypeUri>
+	 * {@code <linkNodeUri> rdfs:type <linkNodeTypeUri> }
 	 * 
-	 * <linkNodeUri> <property2Uri> <objectUri>
+	 * {@code <linkNodeUri> <property2Uri> <objectUri> }
 	 */
 	public List<String> getObjectsThroughLinkingNode(String resourceUri,
 			String property1Uri, String linkNodeTypeUri, String property2Uri) {

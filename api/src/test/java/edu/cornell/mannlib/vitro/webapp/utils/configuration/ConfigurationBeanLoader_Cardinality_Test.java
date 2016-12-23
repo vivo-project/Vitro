@@ -10,9 +10,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Set;
 
+import org.apache.jena.rdf.model.Statement;
 import org.junit.Test;
-
-import com.hp.hpl.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.InstanceWrapper.InstanceWrapperException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.WrappedInstance.CardinalityException;

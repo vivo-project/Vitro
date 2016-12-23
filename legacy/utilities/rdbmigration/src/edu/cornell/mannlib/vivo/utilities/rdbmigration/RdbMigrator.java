@@ -19,14 +19,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import com.hp.hpl.jena.db.DBConnection;
-import com.hp.hpl.jena.db.GraphRDB;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.sparql.core.DatasetGraph;
-import com.hp.hpl.jena.tdb.TDBFactory;
+import org.apache.jena.db.DBConnection;
+import org.apache.jena.db.GraphRDB;
+import org.apache.jena.graph.Node;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.tdb.TDBFactory;
 
 /**
  * A free-standing application that walks the user through the process of

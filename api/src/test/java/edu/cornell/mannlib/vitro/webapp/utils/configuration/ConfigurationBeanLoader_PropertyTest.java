@@ -8,9 +8,8 @@ import static edu.cornell.mannlib.vitro.webapp.utils.configuration.Configuration
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.apache.jena.rdf.model.Statement;
 import org.junit.Test;
-
-import com.hp.hpl.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.InstanceWrapper.InstanceWrapperException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.PropertyType.PropertyTypeException;

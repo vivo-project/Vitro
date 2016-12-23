@@ -11,9 +11,9 @@ import org.junit.Test;
 
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccessStub;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
@@ -32,7 +32,6 @@ public class AdditionalURIsForClassGroupChangesTest {
     }
 
     /**
-     * Test method for {@link edu.cornell.mannlib.vitro.webapp.search.indexing.AdditionalURIsForClassGroupChanges#findAdditionalURIsToIndex(com.hp.hpl.jena.rdf.model.Statement)}.
      */
     @Test
     public void testFindAdditionalURIsToIndex() {

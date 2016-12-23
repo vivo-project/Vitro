@@ -15,7 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.RoleRestrictedProperty;
 
@@ -253,7 +253,6 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
     
     /**
      * adds a single ObjectPropertyStatement object to Property's object property statements List.
-     * @param e2e
      */
     public final void addObjectPropertyStatement(ObjectPropertyStatement objPropertyStmt){
         if( objPropertyStmt == null ) return;

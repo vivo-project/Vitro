@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividualBuilder;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -22,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.individuallist.IndividualListResults;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineException;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils;
@@ -94,7 +95,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
                         vclass.getURI(), 
                         page, 
                         alpha, 
-                        vreq.getWebappDaoFactory().getIndividualDao());                                
+                        vreq);                                
                 body.putAll(vcResults.asFreemarkerMap());
 
                 List<Individual> inds = vcResults.getEntities();
@@ -148,12 +149,12 @@ public class IndividualListController extends FreemarkerHttpServlet {
         return SearchQueryUtils.getPageParameter(request);
     }
     
-    public static IndividualListResults getResultsForVClass(String vclassURI, int page, String alpha, IndividualDao indDao) 
+    public static IndividualListResults getResultsForVClass(String vclassURI, int page, String alpha, VitroRequest vreq) 
     throws SearchException{
    	 	try{
             List<String> classUris = Collections.singletonList(vclassURI);
-			IndividualListQueryResults results = buildAndExecuteVClassQuery(classUris, alpha, page, INDIVIDUALS_PER_PAGE, indDao);
-	        return getResultsForVClassQuery(results, page, INDIVIDUALS_PER_PAGE, alpha);
+			IndividualListQueryResults results = buildAndExecuteVClassQuery(classUris, alpha, page, INDIVIDUALS_PER_PAGE, vreq.getWebappDaoFactory().getIndividualDao());
+	        return getResultsForVClassQuery(results, page, INDIVIDUALS_PER_PAGE, alpha, vreq);
    	 	} catch (SearchEngineException e) {
    	 	    String msg = "An error occurred retrieving results for vclass query";
    	 	    log.error(msg, e);
@@ -165,31 +166,31 @@ public class IndividualListController extends FreemarkerHttpServlet {
 	    }
     }
     
-    public static IndividualListResults getResultsForVClassIntersections(List<String> vclassURIs, int page, int pageSize, String alpha, IndividualDao indDao) {
+    public static IndividualListResults getResultsForVClassIntersections(List<String> vclassURIs, int page, int pageSize, String alpha, VitroRequest vreq) {
         try{
-            IndividualListQueryResults results = buildAndExecuteVClassQuery(vclassURIs, alpha, page, pageSize, indDao);
-	        return getResultsForVClassQuery(results, page, pageSize, alpha);
+            IndividualListQueryResults results = buildAndExecuteVClassQuery(vclassURIs, alpha, page, pageSize, vreq.getWebappDaoFactory().getIndividualDao());
+	        return getResultsForVClassQuery(results, page, pageSize, alpha, vreq);
         } catch(Throwable th) {
        	    log.error("Error retrieving individuals corresponding to intersection multiple classes." + vclassURIs.toString(), th);
        	    return IndividualListResults.EMPTY;
         }
     }
 	
-    public static IndividualListResults getRandomResultsForVClass(String vclassURI, int page, int pageSize, IndividualDao indDao) {
+    public static IndividualListResults getRandomResultsForVClass(String vclassURI, int page, int pageSize, VitroRequest vreq) {
    	 	try{
             List<String> classUris = Collections.singletonList(vclassURI);
-			IndividualListQueryResults results = buildAndExecuteRandomVClassQuery(classUris, page, pageSize, indDao);
-	        return getResultsForVClassQuery(results, page, pageSize, "");
+			IndividualListQueryResults results = buildAndExecuteRandomVClassQuery(classUris, page, pageSize, vreq.getWebappDaoFactory().getIndividualDao());
+	        return getResultsForVClassQuery(results, page, pageSize, "", vreq);
    	 	} catch(Throwable th) {
 	   		log.error("An error occurred retrieving random results for vclass query", th);
 	   		return IndividualListResults.EMPTY;
 	    }
     }
 
-	private static IndividualListResults getResultsForVClassQuery(IndividualListQueryResults results, int page, int pageSize, String alpha) {
+	private static IndividualListResults getResultsForVClassQuery(IndividualListQueryResults results, int page, int pageSize, String alpha, VitroRequest vreq) {
         long hitCount = results.getHitCount();
         if ( hitCount > pageSize ){
-        	return new IndividualListResults(hitCount, results.getIndividuals(), alpha, true, makePagesList(hitCount, pageSize, page));
+        	return new IndividualListResults(hitCount, results.getIndividuals(), alpha, true, makePagesList(hitCount, pageSize, page, vreq));
         }else{
         	return new IndividualListResults(hitCount, results.getIndividuals(), alpha, false, Collections.<PageRecord>emptyList());
         }
@@ -221,7 +222,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
 	}
 
     
-    public static List<PageRecord> makePagesList( long size, int pageSize,  int selectedPage ) {        
+    public static List<PageRecord> makePagesList( long size, int pageSize,  int selectedPage , VitroRequest vreq) {        
 
         List<PageRecord> records = new ArrayList<PageRecord>( MAX_PAGES + 1 );
         int requiredPages = (int) (size/pageSize) ;
@@ -234,7 +235,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
             for(int page = 1; page < requiredPages && page <= MAX_PAGES ; page++ ){
                 records.add( new PageRecord( "page=" + page, Integer.toString(page), Integer.toString(page), selectedPage == page ) );            
             }
-            records.add( new PageRecord( "page="+ (MAX_PAGES+1), Integer.toString(MAX_PAGES+1), "more...", false));
+            records.add( new PageRecord( "page="+ (MAX_PAGES+1), Integer.toString(MAX_PAGES+1), I18n.text(vreq, "paging_link_more"), false));
         }else if( requiredPages > MAX_PAGES && selectedPage+1 > MAX_PAGES && selectedPage < requiredPages - MAX_PAGES){
             //the selected pages is in the middle of the list of page
             int startPage = selectedPage - MAX_PAGES / 2;
@@ -242,7 +243,7 @@ public class IndividualListController extends FreemarkerHttpServlet {
             for(int page = startPage; page <= endPage ; page++ ){
                 records.add( new PageRecord( "page=" + page, Integer.toString(page), Integer.toString(page), selectedPage == page ) );            
             }
-            records.add( new PageRecord( "page="+ (endPage+1), Integer.toString(endPage+1), "more...", false));
+            records.add( new PageRecord( "page="+ (endPage+1), Integer.toString(endPage+1), I18n.text(vreq, "paging_link_more"), false));
         }else if ( requiredPages > MAX_PAGES && selectedPage > requiredPages - MAX_PAGES ){
             //the selected page is in the end of the list 
             int startPage = requiredPages - MAX_PAGES;      

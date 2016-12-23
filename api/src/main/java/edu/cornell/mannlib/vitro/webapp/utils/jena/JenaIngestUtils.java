@@ -18,26 +18,26 @@ import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.FunctionalProperty;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ModelMaker;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.ResIterator;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.ResourceUtils;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
-import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.ontology.FunctionalProperty;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.ModelMaker;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.shared.Lock;
+import org.apache.jena.util.ResourceUtils;
+import org.apache.jena.util.iterator.ClosableIterator;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
@@ -50,9 +50,9 @@ public class JenaIngestUtils {
     private Random random = new Random(System.currentTimeMillis());
 
     /**
-     * Returns a new copy of the input model with blank nodes renamed with namespaceEtc plus a random int. 
-     * @param namespaceEtc
-     * @return
+     * Returns a new copy of the input model with blank nodes renamed with namespaceEtc plus a random int.
+     * @param inModel input Jena Model
+     * @param namespaceEtc Namespace
      */
     public Model renameBNodes(Model inModel, String namespaceEtc) {    
         return renameBNodes(inModel, namespaceEtc, null);
@@ -61,8 +61,8 @@ public class JenaIngestUtils {
     /**
      * Returns a new copy of the input model with blank nodes renamed with namespaceEtc plus a random int.
      * Will prevent URI collisions with supplied dedupModel 
-     * @param namespaceEtc
-     * @return
+     * @param inModel input Jena Model
+     * @param namespaceEtc Namespace
      */
     public Model renameBNodes(Model inModel, String namespaceEtc, Model dedupModel) {
         Model outModel = ModelFactory.createDefaultModel();
@@ -361,11 +361,11 @@ public class JenaIngestUtils {
      * Splits values for a given data property URI on a supplied regex and 
      * asserts each value using newPropertyURI.  New statements returned in
      * a Jena Model.  Split values may be optionally trim()ed.
-     * @param inModel
-     * @param propertyURI
-     * @param splitRegex
-     * @param newPropertyURI
-     * @param trim
+     * @param inModel Input Jena model
+     * @param propertyURI URI for property
+     * @param splitRegex Regex for split
+     * @param newPropertyURI URI for new property
+     * @param trim Flag to trim property
      * @return outModel
      */
     public Model splitPropertyValues(Model inModel, String propertyURI, String splitRegex, String newPropertyURI, boolean trim) {
@@ -418,9 +418,8 @@ public class JenaIngestUtils {
     /**
      * A simple resource smusher based on a supplied inverse-functional property.  
      * A new model containing only resources about the smushed statements is returned.
-     * @param inModel
-     * @param prop
-     * @return
+     * @param inModel Input Jena model
+     * @param prop Property
      */
     public Model smushResources(Model inModel, Property prop) { 
         Model outModel = ModelFactory.createDefaultModel();
@@ -480,9 +479,8 @@ public class JenaIngestUtils {
     /**
      * Returns a model where redundant individuals that are sameAs one another are smushed
      * using URIs in preferred namespaces where possible.
-     * @param model
-     * @param preferredIndividualNamespace
-     * @return
+     * @param model Jena Model
+     * @param preferredNamespace Preferred Namespace
      */
     public Model dedupAndExtract( Model model, String preferredNamespace ) {
         Model extractsModel = ModelFactory.createDefaultModel();
@@ -622,7 +620,6 @@ public class JenaIngestUtils {
      * @param baseOntModel The model containing the relevant statements
      * @param tboxOntModel The model containing class and property data
      * @param usePrimaryLabelOnly If true, discard rdfs:labels from uri2.  Otherwise retain.
-     * @return
      */
     public MergeResult doMerge(String uri1, String uri2, OntModel baseOntModel, 
             OntModel tboxOntModel, boolean usePrimaryLabelOnly){

@@ -334,6 +334,10 @@ name will be used as the label. -->
 
 <#--Property group names may have spaces in them, replace spaces with underscores for html id/hash-->
 <#function createPropertyGroupHtmlId propertyGroupName>
-	<#return propertyGroupName?replace(" ", "_")>
+    <#local groupName = propertyGroupName?replace(" ", "_")>
+    <#local groupName = groupName?replace("/", "-slash-")>
+    <#local groupName = groupName?replace(",", "-comma-")>
+    <#local groupName = groupName?replace("&", "-and-")>
+    <#return groupName>
 </#function>
 

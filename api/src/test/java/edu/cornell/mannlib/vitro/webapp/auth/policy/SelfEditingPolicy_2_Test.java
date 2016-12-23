@@ -13,9 +13,9 @@ import org.junit.Test;
 import stubs.edu.cornell.mannlib.vitro.webapp.auth.policy.bean.PropertyRestrictionBeanStub;
 import stubs.javax.servlet.ServletContextStub;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ArrayIdentifierBundle;

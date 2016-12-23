@@ -8,7 +8,7 @@
 <list-view-config>
     <query-select>
         PREFIX display: &lt;http://vitro.mannlib.cornell.edu/ontologies/display/1.1#&gt;
-        PREFIX afn:  &lt;http://jena.hpl.hp.com/ARQ/function#&gt;
+        PREFIX afn:  &lt;http://jena.apache.org/ARQ/function#&gt;
         
         SELECT ?menuItem
                (afn:localname(?menuItem) AS ?menuItemName)

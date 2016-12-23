@@ -5,11 +5,11 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
@@ -23,7 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
  * RDF literal statement without including the whole literal in the parameters.
  *
  * ex.
- * http://fake.com/delete?sub="http://bob"&pred="http://hasNickName"&stmtHash="23443434"
+ * {@code http://fake.com/delete?sub="http://bob"&pred="http://hasNickName"&stmtHash="23443434"}
  *
  * This could request the deletion of a the statement for Bob's nickname where the 
  * literal matched the hash 23443434.
@@ -39,30 +39,24 @@ public class RdfLiteralHash {
     /**
      * Make a hash based on individual, property, literal and (lang or datatype).
      * 
-     * @param stmt
+     * @param stmt Data statement
      * @return a value between MIN_INTEGER and MAX_INTEGER 
      */
     public static int makeRdfLiteralHash( DataPropertyStatement stmt ){
-        if( (stmt.getLanguage() != null && stmt.getLanguage().trim().length() > 0) 
-            && 
-            (stmt.getDatatypeURI() != null && stmt.getDatatypeURI().trim().length() > 0  ) )
-            throw new Error("DataPropertyStatement should not have both a language " +
-                    "and a datatype; lang: '" + stmt.getLanguage() + "' datatype: '"+ stmt.getDatatypeURI() + "'");
-            
         if( stmt.getIndividualURI() == null || stmt.getIndividualURI().trim().length() == 0 )
             throw new Error("Cannot make a hash for a statement with no subject URI");
         
         if( stmt.getDatapropURI() == null || stmt.getDatapropURI().trim().length() == 0)
             throw new Error("Cannot make a hash for a statement with no predicate URI");
-        
+
         String langOrDatatype = "9876NONE";
         if( stmt.getLanguage() != null && stmt.getLanguage().trim().length() > 0){
-           langOrDatatype = stmt.getLanguage();
-       }else{
-           if( stmt.getDatatypeURI() != null && stmt.getDatatypeURI().trim().length() > 0){
-               langOrDatatype = stmt.getDatatypeURI();
-           }
-       }
+            langOrDatatype = stmt.getLanguage();
+        }else{
+            if( stmt.getDatatypeURI() != null && stmt.getDatatypeURI().trim().length() > 0){
+                langOrDatatype = stmt.getDatatypeURI();
+            }
+        }
 
         String hashMe = langOrDatatype + "_" + stmt.getIndividualURI() + "_" + stmt.getDatapropURI() + "_" + stmt.getData();
         if( log.isDebugEnabled() )
@@ -72,9 +66,8 @@ public class RdfLiteralHash {
 
 
     /**
-     * @param stmt
-     * @param hash
-     * @return
+     * @param stmt Data statement
+     * @param hash Hash
      */
     public static boolean doesStmtMatchHash( DataPropertyStatement stmt, int hash){ 
         if( stmt == null )
@@ -92,9 +85,9 @@ public class RdfLiteralHash {
     
     /**
      * Forward to either getDataPropertyStmtByHash or getRdfsLabelStatementByHash, depending on the property.
-     * @param subjectUri, 
-     * @param predicateUri, 
-     * @param hash
+     * @param subjectUri  Subject URI
+     * @param predicateUri  Predicate URI
+     * @param hash Hash
      * @param model, may not be null
      * @return a DataPropertyStatement if found or null if not found
      */

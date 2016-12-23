@@ -4,10 +4,10 @@ package edu.cornell.mannlib.vitro.webapp.tboxreasoner;
 
 import java.util.List;
 
-import com.hp.hpl.jena.ontology.DatatypeProperty;
-import com.hp.hpl.jena.ontology.ObjectProperty;
-import com.hp.hpl.jena.ontology.Restriction;
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.ontology.DatatypeProperty;
+import org.apache.jena.ontology.ObjectProperty;
+import org.apache.jena.ontology.Restriction;
+import org.apache.jena.rdf.model.Statement;
 
 /**
  * The functionality of a TBox reasoner.

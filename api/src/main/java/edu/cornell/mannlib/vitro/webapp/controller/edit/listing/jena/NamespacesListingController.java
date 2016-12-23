@@ -6,17 +6,17 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.hp.hpl.jena.ontology.Individual;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
+import org.apache.jena.ontology.Individual;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.shared.Lock;
+import org.apache.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
@@ -90,10 +90,8 @@ public class NamespacesListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(3));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Recognized Namespaces");
-        request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
-            rd.forward(request,response);
+			JSPPageHandler.renderBasicPage(request, response, Controllers.HORIZONTAL_JSP);
         } catch (Throwable t) {
             t.printStackTrace();
         }

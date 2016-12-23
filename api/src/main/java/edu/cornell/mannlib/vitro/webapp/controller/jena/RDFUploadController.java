@@ -14,27 +14,26 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ModelMaker;
-import com.hp.hpl.jena.shared.JenaException;
-import com.hp.hpl.jena.shared.Lock;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.ModelMaker;
+import org.apache.jena.shared.JenaException;
+import org.apache.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.JenaModelUtils;
@@ -223,15 +222,11 @@ public class RDFUploadController extends JenaIngestController {
         } else {
             request.setAttribute("uploadDesc", "RDF upload successful.");
         }
-        
-        RequestDispatcher rd = request.getRequestDispatcher(
-                Controllers.BASIC_JSP);
-        request.setAttribute(
-                "bodyJsp", "/templates/edit/specific/upload_rdf_result.jsp");
+
         request.setAttribute("title","Ingest RDF Data");
 
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, "/templates/edit/specific/upload_rdf_result.jsp");
         } catch (Exception e) {
             log.error("Could not forward to view: " + e.getLocalizedMessage());            
         }
@@ -274,10 +269,11 @@ public class RDFUploadController extends JenaIngestController {
         String docLoc = request.getParameter("docLoc");
         String languageStr = request.getParameter("language");
         ModelMaker maker = getModelMaker(request);
-        
+
+        String bodyJsp;
         if (modelName == null) {
             request.setAttribute("title","Load RDF Data");
-            request.setAttribute("bodyJsp",LOAD_RDF_DATA_JSP);  
+            bodyJsp = LOAD_RDF_DATA_JSP;
         } else {          
             RDFService rdfService = getRDFService(request, maker, modelName);
             try {
@@ -286,14 +282,11 @@ public class RDFUploadController extends JenaIngestController {
                 rdfService.close();
             }
             WhichService modelType = getModelType(request);
-            showModelList(request, maker, modelType);
+            bodyJsp = showModelList(request, maker, modelType);
         } 
         
-        RequestDispatcher rd = request.getRequestDispatcher(
-                Controllers.BASIC_JSP);      
-
         try {
-            rd.forward(request, response);
+            JSPPageHandler.renderBasicPage(request, response, bodyJsp);
         } catch (Exception e) {
             String errMsg = " could not forward to view.";
             log.error(errMsg, e);
@@ -448,16 +441,13 @@ public class RDFUploadController extends JenaIngestController {
                                                     throws ServletException{
          VitroRequest vreq = new VitroRequest(req);
          req.setAttribute("title","RDF Upload Error ");
-         req.setAttribute("bodyJsp","/jsp/fileUploadError.jsp");
          req.setAttribute("errors", errrorMsg);
          
-         RequestDispatcher rd = req.getRequestDispatcher(
-                 Controllers.BASIC_JSP);      
-         req.setAttribute("css", 
+         req.setAttribute("css",
                  "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + 
                  vreq.getAppBean().getThemeDir() + "css/edit.css\"/>");
          try {
-             rd.forward(req, response);
+             JSPPageHandler.renderBasicPage(req, response, "/jsp/fileUploadError.jsp");
          } catch (IOException e1) {
              log.error(e1);
              throw new ServletException(e1);

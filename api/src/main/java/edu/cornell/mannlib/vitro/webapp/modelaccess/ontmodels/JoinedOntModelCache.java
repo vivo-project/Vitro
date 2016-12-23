@@ -10,7 +10,7 @@ import java.util.TreeSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 

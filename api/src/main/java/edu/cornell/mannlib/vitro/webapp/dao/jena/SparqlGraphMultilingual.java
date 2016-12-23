@@ -8,18 +8,17 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.graph.TripleMatch;
-import com.hp.hpl.jena.graph.impl.GraphWithPerform;
-import com.hp.hpl.jena.shared.AddDeniedException;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
-import com.hp.hpl.jena.util.iterator.WrappedIterator;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.graph.impl.GraphWithPerform;
+import org.apache.jena.shared.AddDeniedException;
+import org.apache.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.util.iterator.WrappedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
@@ -59,13 +58,6 @@ public class SparqlGraphMultilingual extends SparqlGraph implements GraphWithPer
             log.info("adding original triple " + t);
             super.performAdd(t);
         }
-    }
-    
-    @Override
-    public ExtendedIterator<Triple> find(TripleMatch arg0) {
-        //log.info("find(TripleMatch) " + arg0);
-        Triple t = arg0.asTriple();
-        return find(t.getSubject(), t.getPredicate(), t.getObject());
     }
     
     @Override

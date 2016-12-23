@@ -14,20 +14,20 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.shared.JenaException;
-import com.hp.hpl.jena.shared.Lock;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.shared.JenaException;
+import org.apache.jena.shared.Lock;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
@@ -256,10 +256,8 @@ public class JenaExportController extends BaseEditController {
 	}
 	
 	private void prepareExportSelectionPage( VitroRequest vreq, HttpServletResponse response ) {
-		vreq.setAttribute( "bodyJsp", Controllers.EXPORT_SELECTION_JSP );
-		RequestDispatcher dispatcher = vreq.getRequestDispatcher( Controllers.BASIC_JSP );
 		try {
-			dispatcher.forward( vreq, response );
+			JSPPageHandler.renderBasicPage(vreq, response, Controllers.EXPORT_SELECTION_JSP );
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

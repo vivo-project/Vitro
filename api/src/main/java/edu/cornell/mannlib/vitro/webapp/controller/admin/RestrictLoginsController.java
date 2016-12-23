@@ -16,6 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServ
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 /**
  * Offer the user the ability to apply a RestrictedAuthenticator or revert to a
@@ -80,7 +81,7 @@ public class RestrictLoginsController extends FreemarkerHttpServlet {
 			boolean restricted = figureCurrentlyState() == State.RESTRICTED;
 
 			Map<String, Object> body = new HashMap<String, Object>();
-			body.put("title", "Restrict Logins");
+			body.put("title", I18n.text(vreq, "restrict_logins"));
 			body.put("restricted", restricted);
 			if (!MESSAGE_NO_MESSAGE.equals(messageCode)) {
 				body.put(messageCode, Boolean.TRUE);

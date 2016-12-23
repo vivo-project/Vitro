@@ -14,14 +14,14 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.query.QueryParseException;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.query.QueryParseException;
+import org.apache.jena.rdf.model.ModelFactory;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -168,10 +168,20 @@ public class SparqlQueryApiExecutorTest extends AbstractTestClass {
 			+ "    <j.0:predicate rdf:resource=\"http://here.edu/object\"/>\n"
 			+ "  </rdf:Description>\n" //
 			+ "</rdf:RDF>\n";
-	private static final String CONSTRUCT_RESULT_JSONLD = "["
-			+ "{\"@id\":\"http://here.edu/object\"},"
-			+ "{\"@id\":\"http://here.edu/subject\",\"http://here.edu/predicate\":[{\"@id\":\"http://here.edu/object\"}]}"
-			+ "]";
+	private static final String CONSTRUCT_RESULT_JSONLD = "{\n" +
+			"  \"@id\" : \"http://here.edu/subject\",\n" +
+			"  \"predicate\" : \"http://here.edu/object\",\n" +
+			"  \"@context\" : {\n" +
+			"    \"predicate\" : {\n" +
+			"      \"@id\" : \"http://here.edu/predicate\",\n" +
+			"      \"@type\" : \"@id\"\n" +
+			"    },\n" +
+			"    \"rdf\" : \"http://www.w3.org/1999/02/22-rdf-syntax-ns#\",\n" +
+			"    \"owl\" : \"http://www.w3.org/2002/07/owl#\",\n" +
+			"    \"xsd\" : \"http://www.w3.org/2001/XMLSchema#\",\n" +
+			"    \"rdfs\" : \"http://www.w3.org/2000/01/rdf-schema#\"\n" +
+			"  }\n" +
+			"}\n";
 
 	private static final String DESCRIBE_ALL_QUERY = "DESCRIBE <http://here.edu/subject>";
 	private static final String DESCRIBE_RESULT_TEXT = "<http://here.edu/subject> "
@@ -202,10 +212,20 @@ public class SparqlQueryApiExecutorTest extends AbstractTestClass {
 			+ "<http://here.edu/subject>\n" //
 			+ "      <http://here.edu/predicate>\n" //
 			+ "              <http://here.edu/object> .\n";
-	private static final String DESCRIBE_RESULT_JSONLD = "["
-			+ "{\"@id\":\"http://here.edu/object\"},"
-			+ "{\"@id\":\"http://here.edu/subject\",\"http://here.edu/predicate\":[{\"@id\":\"http://here.edu/object\"}]}"
-			+ "]";
+	private static final String DESCRIBE_RESULT_JSONLD =  "{\n" +
+			"  \"@id\" : \"http://here.edu/subject\",\n" +
+			"  \"predicate\" : \"http://here.edu/object\",\n" +
+			"  \"@context\" : {\n" +
+			"    \"predicate\" : {\n" +
+			"      \"@id\" : \"http://here.edu/predicate\",\n" +
+			"      \"@type\" : \"@id\"\n" +
+			"    },\n" +
+			"    \"rdf\" : \"http://www.w3.org/1999/02/22-rdf-syntax-ns#\",\n" +
+			"    \"owl\" : \"http://www.w3.org/2002/07/owl#\",\n" +
+			"    \"xsd\" : \"http://www.w3.org/2001/XMLSchema#\",\n" +
+			"    \"rdfs\" : \"http://www.w3.org/2000/01/rdf-schema#\"\n" +
+			"  }\n" +
+			"}\n";
 
 	private OntModel model;
 	private RDFService rdfService;

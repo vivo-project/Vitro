@@ -11,7 +11,7 @@ import javax.servlet.jsp.JspWriter;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 public class EditTag extends TagSupport {
     private String name = null;

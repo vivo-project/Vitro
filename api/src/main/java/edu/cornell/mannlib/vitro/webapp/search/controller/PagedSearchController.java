@@ -18,7 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -262,8 +262,8 @@ public class PagedSearchController extends FreemarkerHttpServlet {
                     .getIndividualTemplateModels(individuals, vreq));
 
             body.put("querytext", queryText);
-            body.put("title", queryText + " - " + appBean.getApplicationName()
-                    + " Search Results");
+            body.put("title", new StringBuilder().append(appBean.getApplicationName()).append(" - ").
+                    append(I18n.text(vreq, "search_results_for")).append(" '").append(queryText).append("'").toString());
             
             body.put("hitCount", hitCount);
             body.put("startIndex", startIndex);
@@ -347,7 +347,6 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 
     /**
      * Get the class groups represented for the individuals in the documents.
-     * @param qtxt 
      */
     private List<VClassGroupSearchLink> getClassGroupsLinks(VitroRequest vreq, VClassGroupDao grpDao, SearchResultDocumentList docs, SearchResponse rsp, String qtxt) {                                 
         Map<String,Long> cgURItoCount = new HashMap<String,Long>();
@@ -604,8 +603,6 @@ public class PagedSearchController extends FreemarkerHttpServlet {
 
     /**
      * Makes a message to display to user for a bad search term.
-     * @param queryText
-     * @param exceptionMsg
      */
     private String makeBadSearchMessage(String querytext, String exceptionMsg, VitroRequest vreq){
         String rv = "";

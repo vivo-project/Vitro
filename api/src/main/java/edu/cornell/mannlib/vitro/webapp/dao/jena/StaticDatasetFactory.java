@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import com.hp.hpl.jena.query.Dataset;
+import org.apache.jena.query.Dataset;
 
 public class StaticDatasetFactory implements DatasetWrapperFactory {
     

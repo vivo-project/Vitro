@@ -252,8 +252,6 @@ public class FileStorageImpl {
 	// ----------------------------------------------------------------------
 
 	/**
-	 * {@inheritDoc}
-	 * 
 	 * <p>
 	 * Before creating the file, we may need to create one or more parent
 	 * directories to put it in.
@@ -302,8 +300,6 @@ public class FileStorageImpl {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * 
 	 * <p>
 	 * If deleting this file leaves its parent directory empty, that directory
 	 * will be deleted. This repeats, up to (but not including) the root
@@ -409,7 +405,6 @@ public class FileStorageImpl {
 	}
 
 	/**
-	 * {@inheritDoc}
 	 */
 	public InputStream getInputStream(String id, String filename)
 			throws IOException {

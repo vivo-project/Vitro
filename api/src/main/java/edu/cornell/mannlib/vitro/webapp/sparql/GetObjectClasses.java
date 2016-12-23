@@ -24,9 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
 /**
  * This servlet gets all the range classes for a given predicate.
- * 
- * @param predicate
- * @author yuysun
  */
 
 public class GetObjectClasses extends BaseEditController {

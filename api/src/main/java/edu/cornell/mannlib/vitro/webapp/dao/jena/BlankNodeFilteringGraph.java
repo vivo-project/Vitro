@@ -5,20 +5,18 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.hp.hpl.jena.graph.BulkUpdateHandler;
-import com.hp.hpl.jena.graph.Capabilities;
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.GraphEventManager;
-import com.hp.hpl.jena.graph.GraphStatisticsHandler;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.TransactionHandler;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.graph.TripleMatch;
-import com.hp.hpl.jena.shared.AddDeniedException;
-import com.hp.hpl.jena.shared.DeleteDeniedException;
-import com.hp.hpl.jena.shared.PrefixMapping;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
-import com.hp.hpl.jena.util.iterator.WrappedIterator;
+import org.apache.jena.graph.Capabilities;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.GraphEventManager;
+import org.apache.jena.graph.GraphStatisticsHandler;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.TransactionHandler;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.shared.AddDeniedException;
+import org.apache.jena.shared.DeleteDeniedException;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.util.iterator.WrappedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
@@ -56,6 +54,11 @@ public class BlankNodeFilteringGraph implements Graph {
 	}
 
 	@Override
+	public ExtendedIterator<Triple> find(Triple triple) {
+		return find(triple.getSubject(), triple.getPredicate(), triple.getObject());
+	}
+
+	@Override
 	public boolean dependsOn(Graph arg0) {
 		return graph.dependsOn(arg0);
 	}
@@ -75,18 +78,6 @@ public class BlankNodeFilteringGraph implements Graph {
 		}
 		
         return WrappedIterator.create(nbTripList.iterator());
-	}
-
-	@Override
-	public ExtendedIterator<Triple> find(TripleMatch tripleMatch) {
-	     Triple t = tripleMatch.asTriple();
-	     return find(t.getSubject(), t.getPredicate(), t.getObject());
-	}
-
-	@Override
-	@Deprecated
-	public BulkUpdateHandler getBulkUpdateHandler() {
-		return graph.getBulkUpdateHandler();
 	}
 
 	@Override

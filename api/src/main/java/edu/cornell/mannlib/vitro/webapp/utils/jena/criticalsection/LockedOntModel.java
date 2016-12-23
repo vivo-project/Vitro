@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection;
 
-import com.hp.hpl.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.AbstractOntModelDecorator;
 

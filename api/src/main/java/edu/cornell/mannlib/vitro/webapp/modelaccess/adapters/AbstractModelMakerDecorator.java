@@ -2,11 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.modelaccess.adapters;
 
-import com.hp.hpl.jena.graph.GraphMaker;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelMaker;
-import com.hp.hpl.jena.rdf.model.ModelReader;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.graph.GraphMaker;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelMaker;
+import org.apache.jena.rdf.model.ModelReader;
+import org.apache.jena.util.iterator.ExtendedIterator;
 
 /**
  * Extend this to add decorator functionality to a ModelMaker. The sub-class can

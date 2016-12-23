@@ -16,10 +16,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
-import com.hp.hpl.jena.vocabulary.XSD;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.XSD;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
@@ -85,7 +85,7 @@ public class GetAllPrefix extends BaseEditController {
 	 * Returns a map of prefixes for use in building queries.  Will manufacture a 
 	 * prefix for any namespace that doesn't have an associated owl:Ontology resource
 	 * with a prefix annotation  
-	 * @param wadf
+	 * @param wadf DAO Factory
 	 * @return map of prefix strings to namespace URIs
 	 */
 	private Map<String, String> getPrefixMap(WebappDaoFactory wadf) {
@@ -135,8 +135,8 @@ public class GetAllPrefix extends BaseEditController {
 	
 	/**
 	 * Makes the markup for a prefix option
-	 * @param prefix
-	 * @param URI
+	 * @param prefix Prefix
+	 * @param URI URI
 	 * @return option string
 	 */
 	private String makeOption(String prefix, String URI) {

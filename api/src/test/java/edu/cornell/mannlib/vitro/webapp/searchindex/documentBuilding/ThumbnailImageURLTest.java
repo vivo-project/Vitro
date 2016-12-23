@@ -16,9 +16,9 @@ import stubs.edu.cornell.mannlib.vitro.webapp.modules.ApplicationStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchEngineStub;
 import stubs.javax.servlet.ServletContextStub;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.impl.RDFDefaultErrorHandler;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.impl.RDFDefaultErrorHandler;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;

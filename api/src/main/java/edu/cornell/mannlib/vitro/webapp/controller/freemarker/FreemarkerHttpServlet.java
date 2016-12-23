@@ -17,14 +17,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import com.github.jsonldjava.core.JSONLD;
-import com.github.jsonldjava.core.JSONLDProcessingError;
-import com.github.jsonldjava.impl.JenaRDFParser;
-import com.github.jsonldjava.utils.JSONUtils;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.policy.PolicyHelper;
@@ -325,28 +320,17 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         String mediaType = values.getContentType().getMediaType();
         response.setContentType(mediaType);
                 
-        if ( JSON_MIMETYPE.equals(mediaType) || JSON_LD_MIMETYPE.equals(mediaType)){
-            //json-ld is not supported by jena v2.6.4
-            try {   
-                JenaRDFParser parser = new JenaRDFParser();
-                Object json = JSONLD.fromRDF( values.getModel() , parser);
-                JSONUtils.write(response.getWriter(), json);
-            } catch (JSONLDProcessingError e) {
-               throw new IOException("Could not convert from Jena model to JSON-LD", e);
-            }           
-        }else{
-            String format = "";
-            if ( RDFXML_MIMETYPE.equals(mediaType)) {
-                format = "RDF/XML";
-            } else if( N3_MIMETYPE.equals(mediaType)) {
-                format = "N3";
-            } else if ( TTL_MIMETYPE.equals(mediaType)) {
-                format ="TTL";
-            }
-            values.getModel().write( response.getOutputStream(), format );
+        String format = "";
+        if ( RDFXML_MIMETYPE.equals(mediaType)) {
+            format = "RDF/XML";
+        } else if( N3_MIMETYPE.equals(mediaType)) {
+            format = "N3";
+        } else if ( TTL_MIMETYPE.equals(mediaType)) {
+            format = "TTL";
+        } else if ( JSON_MIMETYPE.equals(mediaType) || JSON_LD_MIMETYPE.equals(mediaType)) {
+            format = "JSON-LD";
         }
-        
-              
+        values.getModel().write( response.getOutputStream(), format );
     }
 
     protected void doException(VitroRequest vreq, HttpServletResponse response, 
@@ -429,8 +413,6 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
      *  shared variables in the Configuration. (Though we could reset them like other 
      *  shared variables. These variables are not needed outside the page and body templates,
      *  however. If they are needed elsewhere, add to shared variables.
-     *  @param VitroRequest vreq
-     *  @return Map<String, Object>
      */
     // RY This is protected instead of private so FreeMarkerComponentGenerator can access.
     // Once we don't need that (i.e., jsps have been eliminated) it can be made private.
@@ -466,6 +448,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
         map.put("stylesheets", new Tags().wrap());
         map.put("scripts", new Tags().wrap());
         map.put("headScripts", new Tags().wrap());
+        map.put("metaTags", new Tags().wrap());
 
         return map;        
     }  
@@ -506,8 +489,8 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
     }
 
     protected StringWriter processTemplate(String templateName, Map<String, Object> map, 
-            HttpServletRequest request) throws TemplateProcessingException {    
-        TemplateProcessingHelper helper = new TemplateProcessingHelper(request, getServletContext());
+            HttpServletRequest request) throws TemplateProcessingException {
+        TemplateProcessingHelper helper = new TemplateProcessingHelper(request);
         return helper.processTemplate(templateName, map);
     }
     

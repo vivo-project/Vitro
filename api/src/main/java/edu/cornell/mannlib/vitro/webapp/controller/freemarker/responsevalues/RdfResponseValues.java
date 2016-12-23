@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 

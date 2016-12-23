@@ -66,8 +66,6 @@ import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchResultsParser;
  * 
  * An unconditional request may mean that there is no external cache, or that
  * the cache doesn't have a copy of this particular page.
- * 
- * @see http://tools.ietf.org/pdf/rfc2616
  */
 public class CachingResponseFilter implements Filter {
 	private static final Log log = LogFactory

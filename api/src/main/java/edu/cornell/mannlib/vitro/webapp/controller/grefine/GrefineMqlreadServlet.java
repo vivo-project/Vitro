@@ -24,7 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 
-import com.hp.hpl.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Literal;
 
 /**
  * This servlet is for servicing Google Refine's
@@ -125,9 +125,9 @@ public class GrefineMqlreadServlet extends VitroHttpServlet {
 
 	/**
 	 * Construct json from query String
-	 * @param query
-	 * @param subjectUriList
-	 * @param propertyUriMap
+	 * @param query Query
+	 * @param subjectUriList Subject URIs
+	 * @param propertyUriMap Property maps
 	 */
 	private void parseQuery(String query, ArrayList<String> subjectUriList, Map<String, JSONArray> propertyUriMap) {
 		try {

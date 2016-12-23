@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
  * relative to the i18n directory. Again, a file in the theme will override one
  * in the application.
  * 
- * If a property has a value (after overriding) of "@@file <filepath>", the
+ * If a property has a value (after overriding) of "@@file &lt;filepath&gt;", the
  * bundle looks for the file relative to the i18n directory of the theme, then
  * relative to the i18n directory of the application. If the file is not found
  * in either location, a warning is written to the log and the property will

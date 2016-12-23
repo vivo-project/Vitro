@@ -5,7 +5,7 @@
 <#assign strings = i18n() />
 
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/autocomplete.css" />',
-                   '<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />')}
+                   '<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.12.1.css" />')}
 <section id="externalAuthMatchId">
     <div id="associateProfileBackgroundOne">
         <div id="alignExternalAuthId">
@@ -85,7 +85,8 @@ var associateProfileFieldsData = {
 };
 </script>
 
-${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery.js"></script>',
-              '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>',
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-1.12.4.min.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/jquery-migrate-1.4.1.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.12.1.min.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/account/accountAssociateProfile.js"></script>')}   
 

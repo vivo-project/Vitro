@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.LocaleUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.LocaleUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -21,10 +21,11 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 /**
+ * {@code
  * Call this at /selectLocale&selection=[locale_string]
  * 
  * For example: /selectLocale&selection=en_US or /selectLocale&selection=es
- * 
+ * }
  * Write an error to the log (and to DisplayMessage) if the selection is not
  * syntactically valid.
  * 

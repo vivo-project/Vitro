@@ -2,8 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
-import static com.hp.hpl.jena.rdf.model.ResourceFactory.createResource;
-import static com.hp.hpl.jena.rdf.model.ResourceFactory.createStatement;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
 import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.fromJavaUri;
 import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.isJavaUri;
 import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.toJavaUri;
@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Selector;
-import com.hp.hpl.jena.rdf.model.SimpleSelector;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Selector;
+import org.apache.jena.rdf.model.SimpleSelector;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.PropertyType.PropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.PropertyType.PropertyTypeException;

@@ -6,8 +6,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelChangedListener;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelChangedListener;
 
 /**
  * Interface for API to write, read, and update Vitro's RDF store, with support 
@@ -141,8 +141,8 @@ public interface RDFService {
 	/**
 	 * Returns a list of all the graph URIs in the RDF store.
 	 * 
-	 * @return  List<String> - list of all the named graph URIs in the RDF store. 
-	 *                         Return an empty list of there no named graphs in
+	 * @return  list of all the named graph URIs in the RDF store.
+	 *          Return an empty list of there no named graphs in
 	 *                         the store. 
 	 */
 	public List<String> getGraphURIs() throws RDFServiceException;

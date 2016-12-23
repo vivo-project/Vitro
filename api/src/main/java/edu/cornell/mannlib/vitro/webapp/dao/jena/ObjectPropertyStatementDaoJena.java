@@ -7,35 +7,39 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.QuerySolutionMap;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.Syntax;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntResource;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.QuerySolutionMap;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.Syntax;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.shared.Lock;
+import org.apache.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vitro.webapp.beans.FauxProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -74,7 +78,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,objPropertyStmt.getSubjectURI()));
         try {
             Resource s = ontModel.getResource(objPropertyStmt.getSubjectURI());
-            com.hp.hpl.jena.rdf.model.Property p = ontModel.getProperty(objPropertyStmt.getPropertyURI());
+            org.apache.jena.rdf.model.Property p = ontModel.getProperty(objPropertyStmt.getPropertyURI());
             Resource o = ontModel.getResource(objPropertyStmt.getObjectURI());
             if ((s != null) && (p != null) && (o != null)) {
                 ontModel.remove(s,p,o);
@@ -252,7 +256,7 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
         getOntModel().getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,objPropertyStmt.getSubjectURI()));
         try {
             Resource s = ontModel.getResource(objPropertyStmt.getSubjectURI());
-            com.hp.hpl.jena.rdf.model.Property p = ontModel.getProperty(objPropertyStmt.getPropertyURI());
+            org.apache.jena.rdf.model.Property p = ontModel.getProperty(objPropertyStmt.getPropertyURI());
             Resource o = ontModel.getResource(objPropertyStmt.getObjectURI());
             if ((s != null) && (p != null) && (o != null)) {
                 ontModel.add(s,p,o);
@@ -503,7 +507,8 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             return Collections.emptyMap();
         }        
         
-        Map<String, String> types = new LinkedHashMap<String, String>();
+        Map<String, String> result = new LinkedHashMap<String, String>();
+        Map<String, List<Literal>> types = new LinkedHashMap<String, List<Literal>>();
         DatasetWrapper w = dwf.getDatasetWrapper();
         Dataset dataset = w.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
@@ -521,16 +526,24 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                 }
                 
                 RDFNode labelNode = soln.get("label");
-                String label = null;
-                if (labelNode.isLiteral()) {
-                    label = labelNode.asLiteral().getLexicalForm();
-                }
-                
-                if (StringUtils.isNotBlank(type) && StringUtils.isNotBlank(label)) {
-                    types.put(type, label);
+                if (StringUtils.isNotBlank(type) && labelNode.isLiteral()) {
+                	
+                	List<Literal> langLabels = types.get(type);
+                	if (null == langLabels) {
+                		types.put(type, langLabels = new ArrayList<Literal>());
+                	}
+                	langLabels.add(labelNode.asLiteral());
+                    
                 }
             }
-            return types;
+            
+            // choose labels corresponding to preferred languages
+            Set<Entry<String, List<Literal>>> typeEntries = types.entrySet();
+            for (Entry<String, List<Literal>> current : typeEntries) {
+            	result.put(current.getKey(), tryLiteralForPreferredLanguages(current.getValue()).getLexicalForm());
+            }
+            
+            return result;
             
         } catch (Exception e) {
             log.error("Error getting most specific types for subject " + subjectUri);

@@ -63,7 +63,7 @@
     
     private Model describeBnode(String bnodeId) {
         String describeQueryStr = 
-            "PREFIX afn: <http://jena.hpl.hp.com/ARQ/function#> \n\n" +
+            "PREFIX afn: <http://jena.apache.org/ARQ/function#> \n\n" +
             "DESCRIBE ?bnode \n" +
             "WHERE { \n" +
             "    FILTER(afn:bnode(?bnode) = \"" + bnodeId + "\")\n" +
@@ -87,25 +87,25 @@
 %>
 
 
-<%@page import="com.hp.hpl.jena.ontology.OntModel"%>
-<%@page import="com.hp.hpl.jena.shared.Lock"%>
-<%@page import="com.hp.hpl.jena.query.Syntax"%>
-<%@page import="com.hp.hpl.jena.query.Query"%>
-<%@page import="com.hp.hpl.jena.query.QueryFactory"%>
-<%@page import="com.hp.hpl.jena.query.QueryExecutionFactory"%>
-<%@page import="com.hp.hpl.jena.rdf.model.ModelFactory"%>
-<%@page import="com.hp.hpl.jena.rdf.model.Model"%>
-<%@page import="com.hp.hpl.jena.query.QueryExecution"%>
+<%@page import="org.apache.jena.ontology.OntModel"%>
+<%@page import="org.apache.jena.shared.Lock"%>
+<%@page import="org.apache.jena.query.Syntax"%>
+<%@page import="org.apache.jena.query.Query"%>
+<%@page import="org.apache.jena.query.QueryFactory"%>
+<%@page import="org.apache.jena.query.QueryExecutionFactory"%>
+<%@page import="org.apache.jena.rdf.model.ModelFactory"%>
+<%@page import="org.apache.jena.rdf.model.Model"%>
+<%@page import="org.apache.jena.query.QueryExecution"%>
 <%@page import="java.util.Arrays"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>
-<%@page import="com.hp.hpl.jena.rdf.model.Resource"%>
-<%@page import="com.hp.hpl.jena.rdf.model.Property"%>
-<%@page import="com.hp.hpl.jena.rdf.model.AnonId"%>
+<%@page import="org.apache.jena.rdf.model.Resource"%>
+<%@page import="org.apache.jena.rdf.model.Property"%>
+<%@page import="org.apache.jena.rdf.model.AnonId"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.dao.jena.JenaBaseDao"%>
 <%@page import="java.util.Iterator"%>
-<%@page import="com.hp.hpl.jena.ontology.Restriction"%>
-<%@page import="com.hp.hpl.jena.vocabulary.OWL"%><html>
+<%@page import="org.apache.jena.ontology.Restriction"%>
+<%@page import="org.apache.jena.vocabulary.OWL"%><html>
 <head>
     <title>Remove Bad Restrictions</title>
 </head>

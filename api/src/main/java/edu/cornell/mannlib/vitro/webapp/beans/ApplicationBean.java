@@ -182,7 +182,6 @@ public class ApplicationBean {
     /**
      * Directory to find the images.  Subdirectories include css, jsp and site_icons.
      * Example: "themes/enhanced/"
-     * @return
      */
     public String getThemeDir(){
     	if (themeInfo.isValidThemeDir(themeDir)) {

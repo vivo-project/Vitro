@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import edu.cornell.mannlib.vitro.webapp.web.templatemodels.Tags;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -46,6 +47,7 @@ public abstract class Widget {
             map.put("stylesheets", dataModel.get("stylesheets"));
             map.put("scripts", dataModel.get("scripts"));
             map.put("headScripts", dataModel.get("headScripts"));
+            map.put("metaTags", new Tags().wrap());
             map.put("urls", dataModel.get("urls"));
         } catch (TemplateModelException e) {
             log.error("Error getting asset values from data model.");

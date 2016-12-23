@@ -2,8 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.sdb.sql.SDBConnection;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.sdb.sql.SDBConnection;
 
 public class DatasetWrapper {
 

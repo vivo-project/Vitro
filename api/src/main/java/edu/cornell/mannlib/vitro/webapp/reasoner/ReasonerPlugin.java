@@ -2,9 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Statement;
 
 public interface ReasonerPlugin {
 

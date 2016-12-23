@@ -3,10 +3,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="vitro" uri="/WEB-INF/tlds/VitroUtils.tld" %>
 
-<%@ page import="com.hp.hpl.jena.ontology.Individual" %>
-<%@ page import="com.hp.hpl.jena.ontology.OntModel" %>
-<%@ page import="com.hp.hpl.jena.rdf.model.ModelMaker" %>
-<%@ page import="com.hp.hpl.jena.shared.Lock" %>
+<%@ page import="org.apache.jena.ontology.Individual" %>
+<%@ page import="org.apache.jena.ontology.OntModel" %>
+<%@ page import="org.apache.jena.rdf.model.ModelMaker" %>
+<%@ page import="org.apache.jena.shared.Lock" %>
 <%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.net.URLEncoder" %>

@@ -19,10 +19,10 @@ public interface ObjectPropertyDao extends PropertyDao {
      * Use this method to supply a base ObjectProperty whose fields will be updated
      * as necessary to correspond to the configuration for the specified Domain
      * and Range.  
-     * @param objectPropertyURI
-     * @param domainURI
-     * @param rangeURI
-     * @param base
+     * @param objectPropertyURI Object Property URI
+     * @param domainURI Domain URI
+     * @param rangeURI Range URI
+     * @param base Object property
      * @return ObjectProperty
      */
     public ObjectProperty getObjectPropertyByURIs(String objectPropertyURI, String domainURI, String rangeURI, ObjectProperty base);

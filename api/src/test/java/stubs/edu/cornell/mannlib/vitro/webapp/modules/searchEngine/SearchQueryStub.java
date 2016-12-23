@@ -13,14 +13,13 @@ public class SearchQueryStub extends BaseSearchQuery {
 	// ----------------------------------------------------------------------
 
 	/**
-	 * @param queryText
 	 */
 	public SearchQueryStub() {
 		super();
 	}
 
 	/**
-	 * @param queryText
+	 * @param queryText Query text
 	 */
 	public SearchQueryStub(String queryText) {
 		super();

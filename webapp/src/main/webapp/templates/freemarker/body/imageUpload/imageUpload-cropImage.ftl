@@ -2,7 +2,8 @@
 
 <#-- Crop the replacement main image for an Individual, to produce a thumbnail. -->
 
-${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery.js"></script>',
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-1.12.4.min.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/jquery-migrate-1.4.1.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/jcrop/jquery.Jcrop.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/imageUpload/cropImage.js"></script>')}
 

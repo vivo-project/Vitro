@@ -11,12 +11,12 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.searchresult.IndividualSearchResult;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Literal;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.Literal;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -226,7 +226,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	return prefixes;
     }
     
-    private String getN3ForName() {
+    protected String getN3ForName() {
     	return "?" + objectVarName + " rdfs:label ?name .";
     }
     

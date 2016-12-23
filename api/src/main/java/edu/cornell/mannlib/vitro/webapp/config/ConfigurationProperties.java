@@ -125,7 +125,7 @@ public abstract class ConfigurationProperties {
 	// ----------------------------------------------------------------------
 
 	/**
-	 * Get the value of the property, or <code>null</code> if the property has
+	 * Get the value of the property, or {@code null} if the property has
 	 * not been assigned a value.
 	 */
 	public abstract String getProperty(String key);

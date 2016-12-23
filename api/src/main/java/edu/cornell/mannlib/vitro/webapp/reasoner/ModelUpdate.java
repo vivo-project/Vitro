@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.reasoner;
 
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.Statement;
 
 
 public class ModelUpdate {

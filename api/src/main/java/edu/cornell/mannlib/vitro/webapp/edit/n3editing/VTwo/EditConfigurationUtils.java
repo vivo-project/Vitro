@@ -14,8 +14,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Literal;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.Literal;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
@@ -302,7 +302,6 @@ public class EditConfigurationUtils {
         return copyList;
    }        
     
-    /** Make a copy of a Map<String,String> */
     public static Map<String,String> copyMap(Map<String,String> source) {
         HashMap<String, String> map = new HashMap<String, String>();
         Set<String> keys = map.keySet();
@@ -315,7 +314,6 @@ public class EditConfigurationUtils {
         return map;
     }
     
-    /** Make a copy of a Map<String,List<String>> */
     public static Map<String, List<String>> copyListMap(Map<String, List<String>> source) {
         HashMap<String, List<String>> map = new HashMap<String, List<String>>();
         Set<String> keys = map.keySet();
@@ -326,7 +324,6 @@ public class EditConfigurationUtils {
         return map;
     }    
 
-    
     public static EditConfigurationVTwo getEditConfiguration(HttpServletRequest request) {
         HttpSession session = request.getSession();
         EditConfigurationVTwo editConfiguration = EditConfigurationVTwo.getConfigFromSession(session, request);     

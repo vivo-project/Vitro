@@ -13,29 +13,29 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.commons.lang.NotImplementedException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntClass;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntResource;
-import com.hp.hpl.jena.ontology.UnionClass;
-import com.hp.hpl.jena.rdf.model.AnonId;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.ResIterator;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.ontology.OntClass;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntResource;
+import org.apache.jena.ontology.UnionClass;
+import org.apache.jena.rdf.model.AnonId;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.ResIterator;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.shared.Lock;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -220,7 +220,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         try {
          
             entURI = new String(preferredURI);          
-            com.hp.hpl.jena.ontology.Individual test = ontModel.getIndividual(entURI);
+            org.apache.jena.ontology.Individual test = ontModel.getIndividual(entURI);
             int count = 0;
             while (test != null) {
                 ++count;
@@ -230,7 +230,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
             
             try {
                 ontModel.getBaseModel().notifyEvent(new IndividualCreationEvent(getWebappDaoFactory().getUserURI(),true,entURI));
-                com.hp.hpl.jena.ontology.Individual ind = ontModel.createIndividual(entURI,cls);
+                org.apache.jena.ontology.Individual ind = ontModel.createIndividual(entURI,cls);
                 if (ent.getName() != null) {
                     ind.setLabel(ent.getName(), getDefaultLanguage());
                 }
@@ -287,7 +287,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
             ontModel.getBaseModel().notifyEvent(new IndividualUpdateEvent(getWebappDaoFactory().getUserURI(),true,ent.getURI()));
-            com.hp.hpl.jena.ontology.Individual ind = ontModel.getIndividual(ent.getURI());
+            org.apache.jena.ontology.Individual ind = ontModel.getIndividual(ent.getURI());
             if (ind != null) {
                 if (ent.getName() != null && ( (ind.getLabel(getDefaultLanguage())==null) || (ind.getLabel(getDefaultLanguage())!=null && ent.getName()!=null && !ent.getName().equals(ind.getLabel(getDefaultLanguage())) ) ) ) {
                 	
@@ -360,7 +360,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
     public void markModified(Individual ind, OntModel ontModel) {
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
-            com.hp.hpl.jena.ontology.Individual jind = ontModel.getIndividual(ind.getURI());
+            org.apache.jena.ontology.Individual jind = ontModel.getIndividual(ind.getURI());
             if (jind != null) {
                 updatePropertyDateTimeValue(jind,MODTIME,Calendar.getInstance().getTime(),ontModel);
             }
@@ -493,7 +493,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 
                 String subUri = ((Resource)sub).getURI();
                 if( ! individualsMap.containsKey(subUri)){
-                    com.hp.hpl.jena.ontology.Individual ind = getOntModel().getIndividual(subUri);
+                    org.apache.jena.ontology.Individual ind = getOntModel().getIndividual(subUri);
                     individualsMap.put(subUri,new IndividualJena(ind, getWebappDaoFactory()));
                 }
             }
@@ -518,7 +518,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 
                 String subUri = ((Resource)sub).getURI();
                 if( ! individualsMap.containsKey(subUri)){
-                    com.hp.hpl.jena.ontology.Individual ind = getOntModel().getIndividual(subUri);
+                    org.apache.jena.ontology.Individual ind = getOntModel().getIndividual(subUri);
                     individualsMap.put(subUri,new IndividualJena(ind, getWebappDaoFactory()));
                 }                
             }
@@ -543,7 +543,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 
                 String subUri = ((Resource)sub).getURI();
                 if( ! individualsMap.containsKey(subUri)){
-                    com.hp.hpl.jena.ontology.Individual ind = getOntModel().getIndividual(subUri);
+                    org.apache.jena.ontology.Individual ind = getOntModel().getIndividual(subUri);
                     individualsMap.put(subUri,new IndividualJena(ind, getWebappDaoFactory()));
                 }                
             }
@@ -593,7 +593,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 if ( st.getURI() == null ) { // check to make sure this node isn't null
                     continue;
                 }
-                com.hp.hpl.jena.ontology.Individual ind = getOntModel().getIndividual(st.getURI());
+                org.apache.jena.ontology.Individual ind = getOntModel().getIndividual(st.getURI());
                 inds.add(new IndividualJena(ind, getWebappDaoFactory()));
             }
         } finally {
@@ -605,12 +605,12 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 
     public Collection<String> getAllIndividualUris() {
         //this is implemented in IndivdiualSDB
-        throw new NotImplementedException();
+        throw new NotImplementedException("");
     }  
 
     public Iterator<String> getUpdatedSinceIterator(long updatedSince){
         //this is implemented in IndivdiualSDB
-        throw new NotImplementedException();
+        throw new NotImplementedException("");
     }
 
     public boolean isIndividualOfClass(String vclassURI, String indURI) {

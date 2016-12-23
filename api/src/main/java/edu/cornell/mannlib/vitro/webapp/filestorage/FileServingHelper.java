@@ -106,7 +106,7 @@ public class FileServingHelper {
 	 * replacing the file prefix with the default namespace.
 	 * </p>
 	 * 
-	 * @return the URI, or <code>null</code> if the URL couldn't be translated.
+	 * @return the URI, or {@code null} if the URL couldn't be translated.
 	 */
 	public static String getBytestreamUri(String path, ServletContext ctx) {
 		if (path == null) {

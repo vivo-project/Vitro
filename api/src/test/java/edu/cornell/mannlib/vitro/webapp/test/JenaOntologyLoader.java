@@ -5,10 +5,10 @@ package edu.cornell.mannlib.vitro.webapp.test;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
 
 /**
  * this is a class to load owl files for testing.
@@ -22,8 +22,7 @@ public class JenaOntologyLoader {
      * This should load the system with classes, data properties and
      * object properties that the vitro systems needs.
      *  
-     * @return
-     * @throws Exception 
+     * @throws Exception
      */
     OntModel loadSystemAndUsers() throws Exception{        
         Model model = ModelFactory.createDefaultModel();        
@@ -42,8 +41,7 @@ public class JenaOntologyLoader {
      * Loads a owl file into the ontModel.  Looks for files on classpath.
      * example: loadSpecialVivoModel("/testontologies/smallVivo-20070809.owl") 
      * 
-     * @param junk
-     * @return
+     * @param junk Junk value
      * @throws IOException
      */
     OntModel loadSpecialVivoModel(String junk) throws IOException{

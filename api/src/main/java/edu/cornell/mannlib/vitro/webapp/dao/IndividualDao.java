@@ -22,22 +22,21 @@ public interface IndividualDao {
 
     /**
      * Adds the specified Individual to the specified VClass (i.e. adds rdf:type).
-     * @param individualURI
-     * @param vclassURI
+     * @param individualURI Individual URI
+     * @param vclassURI URI for VClass
      */
     public abstract void addVClass(String individualURI, String vclassURI);
     
     /**
      * Removes the specified Individual from the specificed VClass (i.e. retracts rdf:type)
-     * @param individualURI
-     * @param vclassURI
+     * @param individualURI Individual URI
+     * @param vclassURI URI for VCLass
      */
     public abstract void removeVClass(String individualURI, String vclassURI);
     
     /**
      * Returns a list of all the Individuals in the specified VClass.
-     * @param vclass
-     * @return
+     * @param vclass VClass
      */
     public abstract List <Individual> getIndividualsByVClass(VClass vclass);
 
@@ -53,7 +52,7 @@ public interface IndividualDao {
             int quantity);
 
     /**
-     * @returns new individual URI  if success.
+     * @return new individual URI  if success.
      */
     public abstract String insertNewIndividual(Individual individual) throws InsertException;
 
@@ -65,7 +64,7 @@ public interface IndividualDao {
 
     /**
      * deletes a single individual from the knowledge base.
-     * @param id
+     * @param individualURI URI of an individual
      * @return 0 on failed
      */
     public abstract int deleteIndividual(String individualURI);
@@ -78,7 +77,7 @@ public interface IndividualDao {
      * Get a row from the entities table and make an Entity.
      * PropertiesList will not be filled out.
      * VClass will be filled out.
-     * @param entityId
+     * @param individualURI URI for Individual
      * @return an Entity object or null if not found.
      */
     public abstract Individual getIndividualByURI(String individualURI);

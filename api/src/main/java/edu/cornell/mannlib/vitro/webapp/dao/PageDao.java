@@ -10,14 +10,11 @@ public interface PageDao {
     
     /**
      * Returns a list of urlMappings to URIs.
-     * 
-     * @return
      */
     Map<String, String> getPageMappings();
     
     /**
      * Returns URI of home page.
-     * @return
      */
     String getHomePageUri();
    

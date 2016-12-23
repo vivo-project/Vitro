@@ -5,7 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 
 /**
  * Interface that is intended to be used with N3 Editing to 

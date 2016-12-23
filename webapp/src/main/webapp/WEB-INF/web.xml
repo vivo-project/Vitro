@@ -939,7 +939,7 @@
 
   <servlet>
     <servlet-name>dwr-invoker</servlet-name>
-    <servlet-class>uk.ltd.getahead.dwr.DWRServlet</servlet-class>
+    <servlet-class>org.directwebremoting.servlet.DwrServlet</servlet-class>
     <init-param>
       <param-name>debug</param-name>
       <param-value>true</param-value>
@@ -1324,11 +1324,6 @@
     <taglib>
       <taglib-uri>http://vitro.mannlib.cornell.edu/vitro/tags</taglib-uri>
       <taglib-location>/WEB-INF/tlds/vitroForm.tld</taglib-location>
-    </taglib>
-
-    <taglib>
-      <taglib-uri>http://mannlib.cornell.edu/vitro/ListSparqlTag/0.1/</taglib-uri>
-      <taglib-location>/WEB-INF/tlds/ListSparqlTag.tld</taglib-location>
     </taglib>
 
     <taglib>

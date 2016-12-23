@@ -4,24 +4,25 @@ package edu.cornell.mannlib.vitro.webapp.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.skife.csv.CSVReader;
-import org.skife.csv.SimpleReader;
-
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.ontology.DatatypeProperty;
-import com.hp.hpl.jena.ontology.Individual;
-import com.hp.hpl.jena.ontology.OntClass;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.ontology.DatatypeProperty;
+import org.apache.jena.ontology.Individual;
+import org.apache.jena.ontology.OntClass;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -34,11 +35,11 @@ public class Csv2Rdf {
 	private String individualNameBase;
 	private String propertyNameBase;
 	private char separatorChar;
-    private char[] quoteChars;
+    private char quoteChar;
 	
-    public Csv2Rdf(char[] quoteChars, String namespace, String tboxNamespace, String typeName) {
+    public Csv2Rdf(char quoteChar, String namespace, String tboxNamespace, String typeName) {
     	this.separatorChar = ',';
-		this.quoteChars = quoteChars;
+		this.quoteChar = quoteChar;
 		this.namespace = namespace;
 		this.tboxNamespace = tboxNamespace;
 		this.typeName = typeName;
@@ -46,9 +47,9 @@ public class Csv2Rdf {
 		this.propertyNameBase = individualNameBase+"_";
 	}
     
-	public Csv2Rdf(char separatorChar, char[] quoteChars, String namespace, String tboxNamespace, String typeName) {
+	public Csv2Rdf(char separatorChar, char quoteChar, String namespace, String tboxNamespace, String typeName) {
 		this.separatorChar = separatorChar;
-		this.quoteChars = quoteChars;
+		this.quoteChar = quoteChar;
 		this.namespace = namespace;
 		this.tboxNamespace = tboxNamespace;
 		this.typeName = typeName;
@@ -66,47 +67,48 @@ public class Csv2Rdf {
         ontModel.addSubModel(tboxOntModel);
         OntClass theClass = tboxOntModel.createClass(tboxNamespace+typeName);
 
-		CSVReader cReader = new SimpleReader();
-		cReader.setSeperator(separatorChar);
-		cReader.setQuoteCharacters(quoteChars);	
-
-		URIGenerator uriGen = (wadf != null && destination != null) 
+		URIGenerator uriGen = (wadf != null && destination != null)
 				? new RandomURIGenerator(wadf, destination)
-		        : new SequentialURIGenerator();
-		
-		List<String[]> fileRows = cReader.parse(fis);
-		
-        String[] columnHeaders = fileRows.get(0);
+				: new SequentialURIGenerator();
 
-        DatatypeProperty[] dpArray = new DatatypeProperty[columnHeaders.length];
+		CSVParser cReader = new CSVParser(new InputStreamReader(fis),
+				CSVFormat.DEFAULT.withRecordSeparator(separatorChar)
+								.withQuote(quoteChar));
 
-        for (int i=0; i<columnHeaders.length; i++) {
-            dpArray[i] = tboxOntModel.createDatatypeProperty(tboxNamespace+propertyNameBase+columnHeaders[i].replaceAll("\\W",""));
-        }
-        Individual ind = null;
-        for (int row=1; row<fileRows.size(); row++) {    	
-        	String uri = uriGen.getNextURI();
-        	if(uri!=null)
-        		ind = ontModel.createIndividual(uri,theClass);
-        	else
-        		ind = ontModel.createIndividual(theClass);
-	        String[] cols = fileRows.get(row);
-	        for (int col=0; col<cols.length; col++) {
-				String value = cols[col].trim();
-	            if (value.length()>0) {
-	                ind.addProperty(dpArray[col], value); // no longer using: , XSDDatatype.XSDstring);
-	                // TODO: specification of datatypes for columns
-	            }
-	        }
-        }
-        
+		DatatypeProperty[] dpArray = null;
+
+		for (CSVRecord cRecord : cReader) {
+			if (dpArray == null) {
+				dpArray = new DatatypeProperty[cRecord.size()];
+
+				for (int i = 0; i < dpArray.length; i++) {
+					dpArray[i] = tboxOntModel.createDatatypeProperty(tboxNamespace+propertyNameBase+cRecord.get(i).replaceAll("\\W",""));
+				}
+			} else {
+				Individual ind = null;
+				String uri = uriGen.getNextURI();
+				if (uri!=null) {
+					ind = ontModel.createIndividual(uri, theClass);
+				} else {
+					ind = ontModel.createIndividual(theClass);
+				}
+				for (int col = 0; col<cRecord.size() && col < dpArray.length; col++) {
+					String value = cRecord.get(col).trim();
+					if (value.length()>0) {
+						ind.addProperty(dpArray[col], value); // no longer using: , XSDDatatype.XSDstring);
+						// TODO: specification of datatypes for columns
+					}
+				}
+			}
+		}
+
+		cReader.close();
         ontModel.removeSubModel(tboxOntModel);
 		
 		Model[] resultModels = new Model[2];
 		resultModels[0] = ontModel;
 		resultModels[1] = tboxOntModel;
 		return resultModels;
-		
 	}
 	
 	private interface URIGenerator {

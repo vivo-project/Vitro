@@ -5,24 +5,24 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit.listing.jena;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.hp.hpl.jena.ontology.AllValuesFromRestriction;
-import com.hp.hpl.jena.ontology.CardinalityRestriction;
-import com.hp.hpl.jena.ontology.HasValueRestriction;
-import com.hp.hpl.jena.ontology.MaxCardinalityRestriction;
-import com.hp.hpl.jena.ontology.MinCardinalityRestriction;
-import com.hp.hpl.jena.ontology.OntClass;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.Restriction;
-import com.hp.hpl.jena.ontology.SomeValuesFromRestriction;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
+import org.apache.jena.ontology.AllValuesFromRestriction;
+import org.apache.jena.ontology.CardinalityRestriction;
+import org.apache.jena.ontology.HasValueRestriction;
+import org.apache.jena.ontology.MaxCardinalityRestriction;
+import org.apache.jena.ontology.MinCardinalityRestriction;
+import org.apache.jena.ontology.OntClass;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.Restriction;
+import org.apache.jena.ontology.SomeValuesFromRestriction;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.shared.Lock;
+import org.apache.jena.util.iterator.ClosableIterator;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
@@ -107,10 +107,8 @@ public class RestrictionsListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(5));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title","Restrictions");
-        request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
-            rd.forward(request,response);
+			JSPPageHandler.renderBasicPage(request, response, Controllers.HORIZONTAL_JSP);
         } catch (Throwable t) {
             t.printStackTrace();
         }

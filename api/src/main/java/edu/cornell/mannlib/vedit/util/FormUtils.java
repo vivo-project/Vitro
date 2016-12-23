@@ -370,8 +370,7 @@ public class FormUtils {
     /**
      * Decodes a Base-64-encoded String of format 
      * key:value;key2:value2;key3:value, and puts the keys and values in a Map
-     * @param params
-     * @return
+     * @param params Parameters
      */
     public static Map beanParamMapFromString(String params) {
         String[] param = params.split(";");

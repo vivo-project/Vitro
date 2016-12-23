@@ -5,18 +5,18 @@ package edu.cornell.mannlib.vitro.webapp.controller;
 import java.io.IOException;
 import java.util.HashMap;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.query.Syntax;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.sparql.resultset.ResultsFormat;
+import org.apache.jena.query.Syntax;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.sparql.resultset.ResultsFormat;
 
 import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
@@ -100,10 +100,8 @@ public class SparqlQueryBuilderServlet extends BaseEditController {
     }
 
     private void doHelp(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-            req.setAttribute("title","SPARQL Query Builder");
-            req.setAttribute("bodyJsp", "/admin/sparql.jsp");
-            
-            RequestDispatcher rd = req.getRequestDispatcher("/"+Controllers.BASIC_JSP);
-            rd.forward(req,res);
+        req.setAttribute("title","SPARQL Query Builder");
+
+        JSPPageHandler.renderBasicPage(req, res, "/admin/sparql.jsp");
     }
 }

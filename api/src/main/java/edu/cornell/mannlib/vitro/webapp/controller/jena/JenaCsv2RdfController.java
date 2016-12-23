@@ -10,20 +10,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelMaker;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelMaker;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.utils.Csv2Rdf;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
@@ -67,7 +66,8 @@ public class JenaCsv2RdfController extends JenaIngestController {
 		
 		String actionStr = request.getParameter("action");
 		actionStr = (actionStr != null) ? actionStr : "";
-		
+
+		String bodyJsp = CSV2RDF_JSP;
 		if ("csv2rdf".equals(actionStr)) {
 			String csvUrl = request.getParameter("csvUrl");
 			if (!csvUrl.isEmpty() || !filePath.isEmpty()) {
@@ -92,19 +92,18 @@ public class JenaCsv2RdfController extends JenaIngestController {
 				request.setAttribute("csv2rdf", csv2rdf);
 				request.setAttribute("destinationModelName", destinationModelNameStr);
 				request.setAttribute("title","URI Select");
-				request.setAttribute("bodyJsp", CSV2RDF_SELECT_URI_JSP);
+				bodyJsp = CSV2RDF_SELECT_URI_JSP;
 			} else {
 				request.setAttribute("title","Convert CSV to RDF");
-				request.setAttribute("bodyJsp",CSV2RDF_JSP);
+				bodyJsp = CSV2RDF_JSP;
 			}
 		}
 		
 
-		RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);      
         request.setAttribute("css", "<link rel=\"stylesheet\" type=\"text/css\" href=\""+request.getAppBean().getThemeDir()+"css/edit.css\"/>");
 
         try {
-            rd.forward(request, response);
+			JSPPageHandler.renderBasicPage(request, response, bodyJsp);
         } catch (Exception e) {
         	throw new RuntimeException(e);
         }		
@@ -127,15 +126,13 @@ public class JenaCsv2RdfController extends JenaIngestController {
             throws ServletException {
         VitroRequest vreq = new VitroRequest(req);
         req.setAttribute("title", "CSV to RDF Error ");
-        req.setAttribute("bodyJsp", "/jsp/fileUploadError.jsp");
         req.setAttribute("errors", errrorMsg);
 
-        RequestDispatcher rd = req.getRequestDispatcher(Controllers.BASIC_JSP);
         req.setAttribute("css",
                 "<link rel=\"stylesheet\" type=\"text/css\" href=\""
                         + vreq.getAppBean().getThemeDir() + "css/edit.css\"/>");
         try {
-            rd.forward(req, response);
+			JSPPageHandler.renderBasicPage(req, response, "/jsp/fileUploadError.jsp");
         } catch (IOException e1) {
             log.error(e1);
             throw new ServletException(e1);
@@ -144,7 +141,7 @@ public class JenaCsv2RdfController extends JenaIngestController {
     }
 
 	 public Model doExecuteCsv2Rdf(VitroRequest vreq, FileItem fileStream, String filePath) throws Exception {
-			char[] quoteChars = {'"'};
+			char quoteChar = '"';
 			String namespace = "";
 			String tboxNamespace = vreq.getParameter("tboxNamespace");
 			String typeName = vreq.getParameter("typeName");
@@ -165,7 +162,7 @@ public class JenaCsv2RdfController extends JenaIngestController {
 				separatorChar = '\t';
 			}
 			
-			Csv2Rdf c2r = new Csv2Rdf(separatorChar, quoteChars,namespace,tboxNamespace,typeName);
+			Csv2Rdf c2r = new Csv2Rdf(separatorChar, quoteChar,namespace,tboxNamespace,typeName);
 			
 			InputStream is = null;
 			

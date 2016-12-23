@@ -11,37 +11,37 @@ import java.util.List;
 import java.util.Map;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.ontology.ConversionException;
-import com.hp.hpl.jena.ontology.DatatypeProperty;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.ontology.OntProperty;
-import com.hp.hpl.jena.ontology.OntResource;
-import com.hp.hpl.jena.ontology.ProfileException;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
-import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.ontology.ConversionException;
+import org.apache.jena.ontology.DatatypeProperty;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.ontology.OntProperty;
+import org.apache.jena.ontology.OntResource;
+import org.apache.jena.ontology.ProfileException;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.shared.Lock;
+import org.apache.jena.util.iterator.ClosableIterator;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.auth.policy.bean.RoleRestrictedProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
@@ -257,7 +257,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 	            ClosableIterator opIt = getOntModel().listObjectProperties();
 	            try {
 	                while (opIt.hasNext()) {
-	                    com.hp.hpl.jena.ontology.ObjectProperty op = (com.hp.hpl.jena.ontology.ObjectProperty) opIt.next();
+	                    org.apache.jena.ontology.ObjectProperty op = (org.apache.jena.ontology.ObjectProperty) opIt.next();
 	                    if (!NONUSER_NAMESPACES.contains(op.getNameSpace()))
 	                    props.add(propertyFromOntProperty(op));
 	                }
@@ -539,8 +539,8 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 	    	if (errMsgStr != null) {
 	    		throw new InsertException(errMsgStr);
 	    	}
-	        com.hp.hpl.jena.ontology.ObjectProperty p = ontModel.createObjectProperty(prop.getURI());
-	        com.hp.hpl.jena.ontology.ObjectProperty inv = null;
+	        org.apache.jena.ontology.ObjectProperty p = ontModel.createObjectProperty(prop.getURI());
+	        org.apache.jena.ontology.ObjectProperty inv = null;
 	        if (hasInverse(prop)) {
 	        	log.debug("non-null inverse URI: " +prop.getURIInverse());	        	
 	        	errMsgStr = getWebappDaoFactory().checkURIForEditableEntity(prop.getURIInverse());
@@ -571,11 +571,11 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
 	        getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),true));     
-	        com.hp.hpl.jena.ontology.ObjectProperty p = ontModel.getObjectProperty(prop.getURI());
+	        org.apache.jena.ontology.ObjectProperty p = ontModel.getObjectProperty(prop.getURI());
 	        if (p == null) {
 	            return;
 	        }
-	        com.hp.hpl.jena.ontology.ObjectProperty inv = null;
+	        org.apache.jena.ontology.ObjectProperty inv = null;
 	        if (hasInverse(prop)) {
 			    try {
 		            	inv = ontModel.getObjectProperty(prop.getURIInverse());
@@ -613,7 +613,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     	try {
 	        String parentURI = prop.getParentURI();
 	        if (parentURI != null) {
-		        com.hp.hpl.jena.ontology.ObjectProperty parent = ontModel.getObjectProperty(prop.getParentURI());
+		        org.apache.jena.ontology.ObjectProperty parent = ontModel.getObjectProperty(prop.getParentURI());
 		        if (parent != null) {
 		        	
 		        	if (!p.hasSuperProperty(parent, true)) {
@@ -850,7 +850,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                 while (propIt.hasNext()) {
                 	Resource res = (Resource) propIt.next();
                 	if (res.canAs(OntProperty.class)) {
-	                    com.hp.hpl.jena.ontology.OntProperty op = res.as(OntProperty.class);
+	                    org.apache.jena.ontology.OntProperty op = res.as(OntProperty.class);
 	                    boolean isRoot = false;
 	                    Iterator parentIt = op.listSuperProperties();
 	                    if (parentIt != null) {

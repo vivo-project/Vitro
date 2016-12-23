@@ -5,9 +5,9 @@ package edu.cornell.mannlib.vitro.webapp.tboxreasoner;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
 public class ReasonerConfiguration {
 	

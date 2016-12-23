@@ -12,12 +12,12 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.impl.ModelCom;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.impl.ModelCom;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
@@ -65,8 +65,8 @@ public class MiscWebUtils {
      * Gets an attribute from the request, if it is not null, and of Class String
      * print it to req.out, otherwise throw an exception.
      *
-     * @param req
-     * @param attribute
+     * @param request Servlet Request
+     * @param attribute Attribute name
      */
     public static String writeAttribute(HttpServletRequest request,  String attribute)
     throws JspException{
@@ -140,8 +140,7 @@ public class MiscWebUtils {
 	
     /**
      * returns a table of the req attributes
-     * @param req
-     * @return
+     * @param req Servlet Request
      */
     public static String getRequestAttributes( HttpServletRequest req){
         String val = "<table>";
@@ -154,7 +153,7 @@ public class MiscWebUtils {
                 Object obj = req.getAttribute(name);
                 value = (obj instanceof Model || obj instanceof ModelCom) ? "[Jena model object]" :
                 	(obj == null) ? "[null]" : 
-                		StringEscapeUtils.escapeHtml(obj.toString());
+                		StringEscapeUtils.ESCAPE_HTML4.translate(obj.toString());
             }catch(Exception ex){
                 value = "unable to get value" ;
             }  catch (Error er){
@@ -178,7 +177,7 @@ public class MiscWebUtils {
             try{
                 Object obj = req.getParameter(name);
                 value = (obj == null) ? "[null]" : 
-                	StringEscapeUtils.escapeHtml(obj.toString());
+                	StringEscapeUtils.ESCAPE_HTML4.translate(obj.toString());
             }catch(Exception ex){
                 value = "unable to get value" ;
             }  catch (Error er){
@@ -202,7 +201,7 @@ public class MiscWebUtils {
                 Object obj = req.getSession().getAttribute(name);
                 value = (obj instanceof Model || obj instanceof ModelCom) ? "[Jena model object]" :
                 	(obj == null) ? "[null]" : 
-                		StringEscapeUtils.escapeHtml(obj.toString());
+                		StringEscapeUtils.ESCAPE_HTML4.translate(obj.toString());
             }catch(Exception ex){
                 value = "unable to get value" ;
             }  catch (Error er){
@@ -260,9 +259,8 @@ public class MiscWebUtils {
     /**
         This isfrom org.json.simple.JSONObject
 
-     * " => \" , \ => \\
-	 * @param s
-	 * @return
+     * {@code " => \" , \ => \\ }
+	 * @param s String to escape
 	 */
 	public static String escape(String s){
 		if(s==null)

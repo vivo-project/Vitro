@@ -33,7 +33,7 @@ public class VitroVocabulary {
     public static final String OWL_ONTOLOGY = OWL+"Ontology";
     public static final String OWL_THING = OWL+"Thing";
     
-    public static final String AFN = "http://jena.hpl.hp.com/ARQ/function#";
+    public static final String AFN = "http://jena.apache.org/ARQ/function#";
 
     public static final String label = vitroURI + "label";
     
