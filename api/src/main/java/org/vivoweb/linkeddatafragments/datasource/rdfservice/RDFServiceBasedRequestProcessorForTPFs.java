@@ -82,17 +82,16 @@ public class RDFServiceBasedRequestProcessorForTPFs
                    final long offset,
                    final long limit )
         {
-//            CONSTRUCT { ?s ?p ?o . } WHERE { VALUES (?p) { (<http://www.w3.org/2002/07/owl#intersectionOf>) } ?s ?p ?o }  ORDER BY ?s ?p ?o LIMIT 100
-//            CONSTRUCT WHERE { ?s (<http://www.w3.org/2002/07/owl#intersectionOf>) ?o }  ORDER BY ?s ?o LIMIT 100
-
-
             StringBuilder whereClause = new StringBuilder();
+            StringBuilder filter = new StringBuilder();
             StringBuilder orderBy = new StringBuilder();
 
             if ( ! subject.isVariable() ) {
                 appendNode(whereClause.append(' '), subject.asConstantTerm());
             } else {
                 whereClause.append(" ?s");
+                if (filter.length() > 0) { filter.append(" && "); }
+                filter.append("!isBlank(?s)");
                 orderBy.append(" ?s");
             }
 
@@ -100,6 +99,8 @@ public class RDFServiceBasedRequestProcessorForTPFs
                 appendNode(whereClause.append(' '), predicate.asConstantTerm());
             } else {
                 whereClause.append(" ?p");
+                if (filter.length() > 0) { filter.append(" && "); }
+                filter.append("!isBlank(?p)");
                 orderBy.append(" ?p");
             }
 
@@ -107,13 +108,20 @@ public class RDFServiceBasedRequestProcessorForTPFs
                 appendNode(whereClause.append(' '), object.asConstantTerm());
             } else {
                 whereClause.append(" ?o");
+                if (filter.length() > 0) { filter.append(" && "); }
+                filter.append("!isBlank(?o)");
                 orderBy.append(" ?o");
             }
 
             StringBuilder constructQuery = new StringBuilder();
 
-            constructQuery.append("CONSTRUCT WHERE { ");
+            constructQuery.append("CONSTRUCT { ");
             constructQuery.append(whereClause.toString());
+            constructQuery.append(" } WHERE { ");
+            constructQuery.append(whereClause.toString()).append(" . ");
+            if (filter.length() > 0) {
+                constructQuery.append(" FILTER(").append(filter.toString()).append(")");
+            }
             constructQuery.append(" }");
 
             if (orderBy.length() > 0) {
@@ -144,10 +152,17 @@ public class RDFServiceBasedRequestProcessorForTPFs
             long size = triples.size();
             long estimate = -1;
 
-            String boundCount = "SELECT (COUNT(*) AS ?count) WHERE { " + whereClause.toString() + " }";
+            StringBuilder count = new StringBuilder();
+            count.append("SELECT (COUNT(*) AS ?count) WHERE { ");
+            count.append(whereClause.toString());
+            count.append(" . ");
+            if (filter.length() > 0) {
+                count.append(" FILTER(").append(filter.toString()).append(") ");
+            }
+            count.append(" }");
             try {
                 CountConsumer countConsumer = new CountConsumer();
-                rdfService.sparqlSelectQuery(boundCount, countConsumer);
+                rdfService.sparqlSelectQuery(count.toString(), countConsumer);
                 estimate = countConsumer.estimate;
             } catch (RDFServiceException e) {
                 return createEmptyTriplePatternFragment();
