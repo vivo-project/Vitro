@@ -38,24 +38,24 @@
             <artifactId>cglib</artifactId>
             <version>2.2</version>
         </dependency>
-        <dependency>
             <!-- Added for runtime -->
+        <!-- dependency>
             <groupId>com.servlets</groupId>
             <artifactId>cos</artifactId>
             <version>05Nov2002</version>
-        </dependency>
-        <dependency>
+        </dependency -->
             <!-- Added for runtime -->
+        <!-- dependency>
             <groupId>org.apache.cxf.xjc-utils</groupId>
             <artifactId>cxf-xjc-runtime</artifactId>
             <version>2.6.2</version>
-        </dependency>
-        <dependency>
+        </dependency -->
             <!-- Added for runtime -->
+        <!-- dependency>
             <groupId>org.apache.cxf.xjcplugins</groupId>
             <artifactId>cxf-xjc-ts</artifactId>
             <version>2.6.2</version>
-        </dependency>
+        </dependency -->
         <!-- Added for runtime -->
         <!-- dependency>
             <groupId>dom4j</groupId>
