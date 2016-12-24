@@ -68,7 +68,7 @@ public class EditN3GeneratorVTwo {
                 }
                 log.debug("The original value String is " + values.toString());                
                 
-                String valueString = org.apache.commons.lang.StringUtils.join(values,
+                String valueString = org.apache.commons.lang3.StringUtils.join(values,
                         ">, <");                                
                 valueString = "<" + valueString + ">";                
                 log.debug("The multiUri value String is " + valueString);
@@ -233,7 +233,7 @@ public class EditN3GeneratorVTwo {
                 log.debug("value of literal for " + var + " was null");        
         	}
         }
-        String valueString = org.apache.commons.lang.StringUtils.join(n3Values, ",");
+        String valueString = org.apache.commons.lang3.StringUtils.join(n3Values, ",");
         
         //Substitute it in to n3
         String varRegex = "\\?" + var + "(?=\\p{Punct}|\\p{Space}|$)";

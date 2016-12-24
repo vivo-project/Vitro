@@ -1,6 +1,6 @@
 package org.linkeddatafragments.util;
 
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.linkeddatafragments.exceptions.NoRegisteredMimeTypesException;
 
@@ -278,7 +278,7 @@ public final class MIMEParse
 
         FitnessAndQuality lastOne = weightedMatches
                 .get(weightedMatches.size() - 1);
-        return NumberUtils.compare(lastOne.quality, 0) != 0 ? lastOne.mimeType : supported.get(0);
+        return Float.compare(lastOne.quality, 0.0f) != 0 ? lastOne.mimeType : supported.get(0);
     }
     
     /**
