@@ -333,18 +333,10 @@ public class AutocompleteController extends VitroAjaxController {
             return label;
         }
 
-        public String getJsonLabel() {
-            return JSONObject.quote(label);
-        }
-
         public String getUri() {
             return uri;
         }
 
-        public String getJsonUri() {
-            return JSONObject.quote(uri);
-        }
-        
         public String getMsType() {
             return msType;
         }
@@ -360,11 +352,6 @@ public class AutocompleteController extends VitroAjaxController {
 			return theType;
 		}
 
-        public String getJsonMsType() {
-            return JSONObject.quote(msType);
-        }
-        
-        
         //Simply passing in the array in the map converts it to a string and not to an array
         //which is what we want so need to convert to an object instad
         JSONObject toJSONObject() {

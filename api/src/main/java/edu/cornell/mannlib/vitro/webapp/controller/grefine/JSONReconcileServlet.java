@@ -470,16 +470,8 @@ public class JSONReconcileServlet extends VitroHttpServlet {
             return label;
         }
         
-        public String getJsonLabel() {
-            return JSONObject.quote(label);
-        }
-        
         public String getUri() {
             return uri;
-        }
-        
-        public String getJsonUri() {
-            return JSONObject.quote(uri);
         }
         
         Map<String, String> toMap() {
