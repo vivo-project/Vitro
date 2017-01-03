@@ -32,7 +32,7 @@ import javax.servlet.ServletContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -99,7 +99,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 	private Set<IndexingUriFinder> uriFinders;
 	private WebappDaoFactory wadf;
 
-    private boolean rebuildOnUnpause = false;
+	private boolean rebuildOnUnpause = false;
 
 	private volatile int paused = 0;
 
@@ -110,25 +110,14 @@ public class SearchIndexerImpl implements SearchIndexer {
 	// ConfigurationBeanLoader methods.
 	// ----------------------------------------------------------------------
 
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#threadPoolSize")
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#threadPoolSize", minOccurs = 1, maxOccurs = 1)
 	public void setThreadPoolSize(String size) {
-		if (threadPoolSize == null) {
-			threadPoolSize = Integer.parseInt(size);
-		} else {
-			throw new IllegalStateException(
-					"Configuration includes multiple values for threadPoolSize: "
-							+ threadPoolSize + ", and " + size);
-		}
+		threadPoolSize = Integer.parseInt(size);
 	}
 
 	@Validation
 	public void validate() throws Exception {
-		if (threadPoolSize == null) {
-			throw new IllegalStateException(
-					"Configuration did not include a value for threadPoolSize.");
-		} else {
-			this.pool = new WorkerThreadPool(threadPoolSize);
-		}
+		this.pool = new WorkerThreadPool(threadPoolSize);
 	}
 
 	// ----------------------------------------------------------------------
@@ -241,7 +230,7 @@ public class SearchIndexerImpl implements SearchIndexer {
 		}
 	}
 
-	private synchronized  void schedulePendingUris() {
+	private synchronized void schedulePendingUris() {
 		if (paused == 0 && pendingUris.size() > 0) {
 			scheduleUpdatesForUris(pendingUris);
 			pendingUris = new ArrayList<>();
@@ -278,13 +267,14 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (changes == null || changes.isEmpty()) {
 			return;
 		}
-        if (paused > 0) {
+		if (paused > 0) {
 			if (addToPendingStatements(changes)) {
 				return;
 			}
-        }
+		}
 
-		scheduler.scheduleTask(new UpdateStatementsTask(new IndexerConfigImpl(this), changes));
+		scheduler.scheduleTask(new UpdateStatementsTask(new IndexerConfigImpl(
+				this), changes));
 		log.debug("Scheduled updates for " + changes.size() + " statements.");
 	}
 
@@ -306,13 +296,14 @@ public class SearchIndexerImpl implements SearchIndexer {
 		if (uris == null || uris.isEmpty()) {
 			return;
 		}
-        if (paused > 0) {
+		if (paused > 0) {
 			if (pendingUris.addAll(uris)) {
 				return;
 			}
-        }
+		}
 
-		scheduler.scheduleTask(new UpdateUrisTask(new IndexerConfigImpl(this), uris));
+		scheduler.scheduleTask(new UpdateUrisTask(new IndexerConfigImpl(this),
+				uris));
 		log.debug("Scheduled updates for " + uris.size() + " uris.");
 	}
 
@@ -332,13 +323,14 @@ public class SearchIndexerImpl implements SearchIndexer {
 			return;
 		}
 		fireEvent(REBUILD_REQUESTED);
-        if (paused > 0) {
+		if (paused > 0) {
 			// Make sure that we are rebuilding when we unpause
 			// and don't bother noting any other changes until unpaused
-            rebuildOnUnpause = true;
-            return;
-        }
-		scheduler.scheduleTask(new RebuildIndexTask(new IndexerConfigImpl(this)));
+			rebuildOnUnpause = true;
+			return;
+		}
+		scheduler
+				.scheduleTask(new RebuildIndexTask(new IndexerConfigImpl(this)));
 		log.debug("Scheduled a full rebuild.");
 	}
 
@@ -447,13 +439,13 @@ public class SearchIndexerImpl implements SearchIndexer {
 		}
 
 		public synchronized void scheduleTask(Task task) {
-            if (!started) {
-                deferredQueue.add(task);
-                log.debug("added task to deferred queue: " + task);
-            } else {
+			if (!started) {
+				deferredQueue.add(task);
+				log.debug("added task to deferred queue: " + task);
+			} else {
 				taskQueue.scheduleTask(task);
 				log.debug("added task to task queue: " + task);
-            }
+			}
 		}
 
 		public synchronized void start() {
@@ -463,8 +455,9 @@ public class SearchIndexerImpl implements SearchIndexer {
 
 		private void processDeferredTasks() {
 			for (Task task : deferredQueue) {
-                taskQueue.scheduleTask(task);
-				log.debug("moved task from deferred queue to task queue: " + task);
+				taskQueue.scheduleTask(task);
+				log.debug("moved task from deferred queue to task queue: "
+						+ task);
 			}
 			deferredQueue.clear();
 		}

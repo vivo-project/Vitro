@@ -7,7 +7,7 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_DI
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.DISPLAY_TBOX;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.USER_ACCOUNTS;
 
-import com.hp.hpl.jena.rdf.model.ModelMaker;
+import org.apache.jena.rdf.model.ModelMaker;
 
 /**
  * A triple source for configuration models.

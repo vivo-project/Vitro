@@ -2,27 +2,20 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner;
 
-import static com.hp.hpl.jena.datatypes.xsd.XSDDatatype.XSDinteger;
-import static com.hp.hpl.jena.datatypes.xsd.XSDDatatype.XSDlong;
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.dataProperty;
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.model;
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.objectProperty;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDinteger;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDlong;
 import static org.junit.Assert.assertEquals;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Model;
 import org.apache.log4j.Level;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 

@@ -5,21 +5,19 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.graph.BulkUpdateHandler;
-import com.hp.hpl.jena.graph.Capabilities;
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.GraphEventManager;
-import com.hp.hpl.jena.graph.GraphStatisticsHandler;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.TransactionHandler;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.graph.TripleMatch;
-import com.hp.hpl.jena.shared.AddDeniedException;
-import com.hp.hpl.jena.shared.DeleteDeniedException;
-import com.hp.hpl.jena.shared.PrefixMapping;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
-import com.hp.hpl.jena.vocabulary.DCTerms;
-import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.jena.graph.Capabilities;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.GraphEventManager;
+import org.apache.jena.graph.GraphStatisticsHandler;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.TransactionHandler;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.shared.AddDeniedException;
+import org.apache.jena.shared.DeleteDeniedException;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.vocabulary.DCTerms;
+import org.apache.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
@@ -100,7 +98,18 @@ public class RegeneratingGraph implements Graph, Regenerable {
             g.delete(arg0);
         }
 	}
-	
+
+	@Override
+	public ExtendedIterator<Triple> find(Triple triple) {
+		try {
+			regenerateIfClosed();
+			return g.find(triple);
+		} catch (Exception e) {
+			regenerate();
+			return g.find(triple);
+		}
+	}
+
 	@Override
 	public boolean dependsOn(Graph arg0) {
 		try {
@@ -113,17 +122,6 @@ public class RegeneratingGraph implements Graph, Regenerable {
 	}
 
 	@Override
-	public ExtendedIterator<Triple> find(TripleMatch arg0) {
-		try {
-			regenerateIfClosed();
-            return g.find(arg0);
-        } catch (Exception e) {
-            regenerate();
-            return g.find(arg0);
-        }
-	}
-
-	@Override
 	public ExtendedIterator<Triple> find(Node arg0, Node arg1, Node arg2) {
 		try {
 			regenerateIfClosed();
@@ -131,19 +129,6 @@ public class RegeneratingGraph implements Graph, Regenerable {
         } catch (Exception e) {
             regenerate();
             return g.find(arg0,arg1,arg2);
-        }
-	}
-	
-	@Override
-	@Deprecated
-	public BulkUpdateHandler getBulkUpdateHandler() {
-		try {
-			regenerateIfClosed();
-			sendTestQuery();
-            return g.getBulkUpdateHandler();
-        } catch (Exception e) {
-            regenerate();
-            return g.getBulkUpdateHandler();
         }
 	}
 

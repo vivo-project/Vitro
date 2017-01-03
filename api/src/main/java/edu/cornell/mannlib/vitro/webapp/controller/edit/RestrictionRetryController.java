@@ -6,15 +6,15 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
@@ -24,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
 import edu.cornell.mannlib.vitro.webapp.beans.ResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
-import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
@@ -91,8 +90,6 @@ public class RestrictionRetryController extends BaseEditController {
 				request.setAttribute("specificRestrictionForm", "cardinalityRestriction_retry.jsp");
 			} 
 			
-	        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
-	        request.setAttribute("bodyJsp","/templates/edit/formBasic.jsp");
 	        request.setAttribute("formJsp","/templates/edit/specific/restriction_retry.jsp");
 	        request.setAttribute("scripts","/templates/edit/formBasic.js");
 	        request.setAttribute("title","Add Restriction");
@@ -100,7 +97,7 @@ public class RestrictionRetryController extends BaseEditController {
 	        setRequestAttributes(request,epo);
 	
 	        try {
-	            rd.forward(request, response);
+				JSPPageHandler.renderBasicPage(request, response, "/templates/edit/formBasic.jsp");
 	        } catch (Exception e) {
 	            log.error(this.getClass().getName()+"PropertyRetryController could not forward to view.");
 	            log.error(e.getMessage());

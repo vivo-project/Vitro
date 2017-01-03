@@ -5,11 +5,11 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.DataPropertyStatementImpl;
@@ -43,26 +43,20 @@ public class RdfLiteralHash {
      * @return a value between MIN_INTEGER and MAX_INTEGER 
      */
     public static int makeRdfLiteralHash( DataPropertyStatement stmt ){
-        if( (stmt.getLanguage() != null && stmt.getLanguage().trim().length() > 0) 
-            && 
-            (stmt.getDatatypeURI() != null && stmt.getDatatypeURI().trim().length() > 0  ) )
-            throw new Error("DataPropertyStatement should not have both a language " +
-                    "and a datatype; lang: '" + stmt.getLanguage() + "' datatype: '"+ stmt.getDatatypeURI() + "'");
-            
         if( stmt.getIndividualURI() == null || stmt.getIndividualURI().trim().length() == 0 )
             throw new Error("Cannot make a hash for a statement with no subject URI");
         
         if( stmt.getDatapropURI() == null || stmt.getDatapropURI().trim().length() == 0)
             throw new Error("Cannot make a hash for a statement with no predicate URI");
-        
+
         String langOrDatatype = "9876NONE";
         if( stmt.getLanguage() != null && stmt.getLanguage().trim().length() > 0){
-           langOrDatatype = stmt.getLanguage();
-       }else{
-           if( stmt.getDatatypeURI() != null && stmt.getDatatypeURI().trim().length() > 0){
-               langOrDatatype = stmt.getDatatypeURI();
-           }
-       }
+            langOrDatatype = stmt.getLanguage();
+        }else{
+            if( stmt.getDatatypeURI() != null && stmt.getDatatypeURI().trim().length() > 0){
+                langOrDatatype = stmt.getDatatypeURI();
+            }
+        }
 
         String hashMe = langOrDatatype + "_" + stmt.getIndividualURI() + "_" + stmt.getDatapropURI() + "_" + stmt.getData();
         if( log.isDebugEnabled() )

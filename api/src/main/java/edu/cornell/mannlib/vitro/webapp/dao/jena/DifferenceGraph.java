@@ -4,20 +4,18 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.Set;
 
-import com.hp.hpl.jena.graph.BulkUpdateHandler;
-import com.hp.hpl.jena.graph.Capabilities;
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.GraphEventManager;
-import com.hp.hpl.jena.graph.GraphStatisticsHandler;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.TransactionHandler;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.graph.TripleMatch;
-import com.hp.hpl.jena.shared.AddDeniedException;
-import com.hp.hpl.jena.shared.DeleteDeniedException;
-import com.hp.hpl.jena.shared.PrefixMapping;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
-import com.hp.hpl.jena.util.iterator.WrappedIterator;
+import org.apache.jena.graph.Capabilities;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.GraphEventManager;
+import org.apache.jena.graph.GraphStatisticsHandler;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.TransactionHandler;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.shared.AddDeniedException;
+import org.apache.jena.shared.DeleteDeniedException;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.util.iterator.WrappedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
@@ -51,7 +49,12 @@ public class DifferenceGraph implements Graph {
         g.delete(arg0);
     }
 
-	@Override
+    @Override
+    public ExtendedIterator<Triple> find(Triple triple) {
+        return find(triple.getSubject(), triple.getPredicate(), triple.getObject());
+    }
+
+    @Override
 	public void remove(Node arg0, Node arg1, Node arg2) {
 		g.remove(arg0, arg1, arg2);
 	}
@@ -62,23 +65,10 @@ public class DifferenceGraph implements Graph {
     }
 
     @Override
-    public ExtendedIterator<Triple> find(TripleMatch arg0) {
-        Set<Triple> tripSet = g.find(arg0).toSet();
-        tripSet.removeAll(subtract.find(arg0).toSet());
-        return WrappedIterator.create(tripSet.iterator());
-    }
-
-    @Override
     public ExtendedIterator<Triple> find(Node arg0, Node arg1, Node arg2) {
         Set<Triple> tripSet = g.find(arg0, arg1, arg2).toSet();
         tripSet.removeAll(subtract.find(arg0, arg1, arg2).toSet());
         return WrappedIterator.create(tripSet.iterator());
-    }
-
-    @Override
-    @Deprecated
-    public BulkUpdateHandler getBulkUpdateHandler() {
-        return g.getBulkUpdateHandler();
     }
 
     @Override

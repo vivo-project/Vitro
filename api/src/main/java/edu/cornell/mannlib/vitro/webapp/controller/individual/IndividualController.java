@@ -21,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Exc
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.RedirectResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
 /**
  * Handles requests for entity information.
@@ -74,7 +75,7 @@ public class IndividualController extends FreemarkerHttpServlet {
 				 * If we can't figure out what individual you want, or if there
 				 * is no such individual, show an informative error page.
 				 */
-				return doNotFound();
+				return doNotFound(vreq);
 			case BYTESTREAM_REDIRECT:
 				/*
 				 * If the Individual requested is a FileBytestream, redirect
@@ -116,10 +117,10 @@ public class IndividualController extends FreemarkerHttpServlet {
 				new IndividualRequestAnalysisContextImpl(vreq)).analyze();
 	}
 
-	private ResponseValues doNotFound() {
+	private ResponseValues doNotFound(VitroRequest vreq) {
 		Map<String, Object> body = new HashMap<String, Object>();
-		body.put("title", "Individual Not Found");
-		body.put("errorMessage", "The individual was not found in the system.");
+		body.put("title", I18n.text(vreq, "individual_not_found"));
+		body.put("errorMessage", I18n.text(vreq, "individual_not_found_msg"));
 
 		return new TemplateResponseValues(TEMPLATE_HELP, body,
 				HttpServletResponse.SC_NOT_FOUND);

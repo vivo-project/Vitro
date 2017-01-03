@@ -6,8 +6,8 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichServ
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelMaker;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelMaker;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;

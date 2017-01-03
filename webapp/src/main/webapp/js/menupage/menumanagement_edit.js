@@ -77,16 +77,16 @@ var menuManagementEdit = {
         $('input:checkbox[name=allSelected]').click(function(){
              if ( this.checked ) {
              // if checked, select all the checkboxes
-             $('input:checkbox[name=classInClassGroup]').attr('checked','checked');
+             $('input:checkbox[name=classInClassGroup]').prop('checked','checked');
 
              } else {
              // if not checked, deselect all the checkboxes
-               $('input:checkbox[name=classInClassGroup]').removeAttr('checked');
+               $('input:checkbox[name=classInClassGroup]').prop('checked', null);
              }
         });
 
         $('input:checkbox[name=classInClassGroup]').click(function(){
-            $('input:checkbox[name=allSelected]').removeAttr('checked');
+            $('input:checkbox[name=allSelected]').prop('checked', null);
         });
     },
     validateMenuItemForm: function() {

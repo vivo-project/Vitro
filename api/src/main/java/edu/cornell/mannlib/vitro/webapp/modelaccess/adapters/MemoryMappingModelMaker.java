@@ -5,10 +5,10 @@ package edu.cornell.mannlib.vitro.webapp.modelaccess.adapters;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelMaker;
-import com.hp.hpl.jena.rdf.model.ModelReader;
-import com.hp.hpl.jena.shared.AlreadyExistsException;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelMaker;
+import org.apache.jena.rdf.model.ModelReader;
+import org.apache.jena.shared.AlreadyExistsException;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.MemoryMappedModel;
 

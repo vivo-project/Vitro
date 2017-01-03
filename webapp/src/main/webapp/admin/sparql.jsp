@@ -1,6 +1,6 @@
 <!-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
-<%@page import="com.hp.hpl.jena.vocabulary.OWL"%>
-<%@page import="com.hp.hpl.jena.rdf.model.ModelMaker"%>
+<%@page import="org.apache.jena.vocabulary.OWL"%>
+<%@page import="org.apache.jena.rdf.model.ModelMaker"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess"%>
 <%@ page import="edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.WhichService"%>
 <%@page import="java.util.Iterator"%>

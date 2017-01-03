@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
-import static com.hp.hpl.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 import java.util.Objects;
 

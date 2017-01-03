@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.compose.Polyadic;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.compose.Polyadic;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 

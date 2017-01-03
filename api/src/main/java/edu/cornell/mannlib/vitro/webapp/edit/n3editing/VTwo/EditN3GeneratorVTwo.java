@@ -11,13 +11,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.vocabulary.XSD;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.vocabulary.XSD;
 
 /**
  * Builds the N3 strings for the given EditConfiguration, model
@@ -68,7 +68,7 @@ public class EditN3GeneratorVTwo {
                 }
                 log.debug("The original value String is " + values.toString());                
                 
-                String valueString = org.apache.commons.lang.StringUtils.join(values,
+                String valueString = org.apache.commons.lang3.StringUtils.join(values,
                         ">, <");                                
                 valueString = "<" + valueString + ">";                
                 log.debug("The multiUri value String is " + valueString);
@@ -184,7 +184,7 @@ public class EditN3GeneratorVTwo {
         try{
         if( literal.getValue() == null )
             log.debug("value of literal for " + var + " was null");        
-        }catch(com.hp.hpl.jena.datatypes.DatatypeFormatException ex){           
+        }catch(org.apache.jena.datatypes.DatatypeFormatException ex){
             log.debug("value for " + var + " " + ex.getMessage());
         }        
         
@@ -233,7 +233,7 @@ public class EditN3GeneratorVTwo {
                 log.debug("value of literal for " + var + " was null");        
         	}
         }
-        String valueString = org.apache.commons.lang.StringUtils.join(n3Values, ",");
+        String valueString = org.apache.commons.lang3.StringUtils.join(n3Values, ",");
         
         //Substitute it in to n3
         String varRegex = "\\?" + var + "(?=\\p{Punct}|\\p{Space}|$)";
@@ -274,7 +274,7 @@ public class EditN3GeneratorVTwo {
      *
      * The following methods are from 
      * HP's Jena project ver 2.5.5   
-     * Found in file Jena-2.5.5/src/com/hp/hpl/jena/n3/N3JenaWriterCommon.java 
+     * Found in file Jena-2.5.5/src/org.apache/jena/n3/N3JenaWriterCommon.java
      *
      * The following copyright statement applies to these methods.
      */
@@ -384,7 +384,7 @@ public class EditN3GeneratorVTwo {
     /*
      * 
      * see http://www.python.org/doc/2.5.2/ref/strings.html
-     * or see jena's n3 grammar jena/src/com/hp/hpl/jena/n3/n3.g
+     * or see jena's n3 grammar jena/src/org.apache/jena/n3/n3.g
      */ 
     protected static void pyString(StringBuffer sbuff, String s)
     {

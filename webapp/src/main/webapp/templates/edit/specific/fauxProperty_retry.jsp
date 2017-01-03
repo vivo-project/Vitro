@@ -35,7 +35,7 @@
         <select name="DomainURI"><form:option name="DomainURI"/></select>
     </td>
     <td valign="top" colspan="2">
-        <b>Range class</b><br />
+        <b>Range class*</b><br />
         <select name="RangeURI" ><form:option name="RangeURI"/></select>
         <c:set var="RangeURIError"><form:error name="RangeURI"/></c:set>
         <c:if test="${!empty RangeURIError}">

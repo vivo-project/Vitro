@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.beans;
 
 import java.util.Date;
 
-import com.hp.hpl.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Property;
 
 /**
  * a class representing a particular instance of a data property

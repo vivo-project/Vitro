@@ -10,11 +10,7 @@ import java.util.Collection;
 
 import org.apache.commons.io.IOUtils;
 
-import com.github.jsonldjava.core.JSONLD;
-import com.github.jsonldjava.core.JSONLDProcessingError;
-import com.github.jsonldjava.impl.JenaRDFParser;
-import com.github.jsonldjava.utils.JSONUtils;
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -56,15 +52,7 @@ abstract class SparqlQueryApiRdfProducer extends SparqlQueryApiExecutor {
 		if (mediaType.isNativeFormat()) {
 			IOUtils.copy(rawResult, out);
 		} else if (mediaType.getJenaResponseFormat().equals("JSON")) {
-			// JSON-LD is a special case, since jena 2.6.4 doesn't support it.
-			try {
-				JenaRDFParser parser = new JenaRDFParser();
-				Object json = JSONLD.fromRDF(parseToModel(rawResult), parser);
-				JSONUtils.write(new OutputStreamWriter(out, "UTF-8"), json);
-			} catch (JSONLDProcessingError e) {
-				throw new RDFServiceException(
-						"Could not convert from Jena model to JSON-LD", e);
-			}
+			parseToModel(rawResult).write(out, "JSON-LD");
 		} else {
 			parseToModel(rawResult).write(out,
 					mediaType.getJenaResponseFormat());

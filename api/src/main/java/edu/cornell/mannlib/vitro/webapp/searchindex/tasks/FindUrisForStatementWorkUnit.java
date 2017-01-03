@@ -5,7 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.searchindex.tasks;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinderList;
 

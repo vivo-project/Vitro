@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.searchindex.indexing;
 
 import java.util.Set;
 
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.Statement;
 
 /**
  * An ordered list of IndexingUriFinder objects, in a handy package.

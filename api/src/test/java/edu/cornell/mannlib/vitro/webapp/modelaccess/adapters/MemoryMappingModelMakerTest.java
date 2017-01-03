@@ -17,16 +17,16 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import stubs.com.hp.hpl.jena.rdf.model.ModelMaker.ModelMakerStub;
+import stubs.org.apache.jena.rdf.model.ModelMaker.ModelMakerStub;
 
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.impl.CollectionGraph;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.impl.CollectionGraph;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 

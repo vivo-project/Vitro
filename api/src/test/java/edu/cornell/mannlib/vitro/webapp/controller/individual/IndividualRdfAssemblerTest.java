@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.individual;
 
-import static com.hp.hpl.jena.ontology.OntModelSpec.OWL_MEM;
+import static org.apache.jena.ontology.OntModelSpec.OWL_MEM;
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.LABEL;
 import static edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary.RDF_TYPE;
 import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.LanguageOption.LANGUAGE_NEUTRAL;
@@ -28,13 +28,13 @@ import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
 import stubs.javax.servlet.http.HttpSessionStub;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;

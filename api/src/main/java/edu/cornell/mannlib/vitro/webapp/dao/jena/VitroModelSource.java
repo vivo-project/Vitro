@@ -3,11 +3,11 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import javax.servlet.ServletContext;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelReader;
-import com.hp.hpl.jena.rdf.model.ModelSource;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelReader;
+import org.apache.jena.rdf.model.ModelSource;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;

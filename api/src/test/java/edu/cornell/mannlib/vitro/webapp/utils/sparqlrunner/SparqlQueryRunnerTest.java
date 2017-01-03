@@ -17,10 +17,9 @@ import java.util.List;
 
 import org.apache.jena.atlas.json.JSON;
 import org.apache.jena.atlas.json.JsonObject;
+import org.apache.jena.rdf.model.Model;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.hp.hpl.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;

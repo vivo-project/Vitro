@@ -10,7 +10,7 @@ import javax.servlet.ServletContextListener;
 
 import net.sf.jga.fn.UnaryFunctor;
 
-import com.hp.hpl.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModel;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.dao.filtering.filters.EntityPropertyListFilter;

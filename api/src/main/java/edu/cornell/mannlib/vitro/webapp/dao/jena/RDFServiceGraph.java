@@ -7,34 +7,33 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.graph.BulkUpdateHandler;
-import com.hp.hpl.jena.graph.Capabilities;
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.graph.GraphEventManager;
-import com.hp.hpl.jena.graph.GraphStatisticsHandler;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.TransactionHandler;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.graph.TripleMatch;
-import com.hp.hpl.jena.graph.impl.GraphWithPerform;
-import com.hp.hpl.jena.graph.impl.SimpleEventManager;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.rdf.listeners.StatementListener;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.shared.AddDeniedException;
-import com.hp.hpl.jena.shared.Command;
-import com.hp.hpl.jena.shared.DeleteDeniedException;
-import com.hp.hpl.jena.shared.PrefixMapping;
-import com.hp.hpl.jena.shared.impl.PrefixMappingImpl;
-import com.hp.hpl.jena.util.iterator.ExtendedIterator;
-import com.hp.hpl.jena.util.iterator.SingletonIterator;
-import com.hp.hpl.jena.util.iterator.WrappedIterator;
+import org.apache.jena.graph.Capabilities;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.graph.GraphEventManager;
+import org.apache.jena.graph.GraphStatisticsHandler;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.TransactionHandler;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.graph.impl.GraphWithPerform;
+import org.apache.jena.graph.impl.SimpleEventManager;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.rdf.listeners.StatementListener;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.shared.AddDeniedException;
+import org.apache.jena.shared.Command;
+import org.apache.jena.shared.DeleteDeniedException;
+import org.apache.jena.shared.PrefixMapping;
+import org.apache.jena.shared.impl.PrefixMappingImpl;
+import org.apache.jena.util.iterator.ExtendedIterator;
+import org.apache.jena.util.iterator.SingletonIterator;
+import org.apache.jena.util.iterator.WrappedIterator;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
@@ -50,7 +49,6 @@ public class RDFServiceGraph implements GraphWithPerform {
     private String graphURI;
     private static final Log log = LogFactory.getLog(RDFServiceGraph.class);
     
-    private BulkUpdateHandler bulkUpdateHandler;
     private PrefixMapping prefixMapping = new PrefixMappingImpl();
     private GraphEventManager eventManager;
     
@@ -262,7 +260,12 @@ public class RDFServiceGraph implements GraphWithPerform {
         performDelete(arg0);
     }
 
-	@Override
+    @Override
+    public ExtendedIterator<Triple> find(Triple triple) {
+        return find(triple.getSubject(), triple.getPredicate(), triple.getObject());
+    }
+
+    @Override
 	public void remove(Node subject, Node predicate, Node object) {
 		for (Triple t : find(subject, predicate, object).toList()) {
 			delete(t);
@@ -272,13 +275,6 @@ public class RDFServiceGraph implements GraphWithPerform {
     @Override
     public boolean dependsOn(Graph arg0) {
         return false; // who knows?
-    }
-
-    @Override
-    public ExtendedIterator<Triple> find(TripleMatch arg0) {
-        //log.info("find(TripleMatch) " + arg0);
-        Triple t = arg0.asTriple();
-        return find(t.getSubject(), t.getPredicate(), t.getObject());
     }
 
     public static String sparqlNode(Node node, String varName) {
@@ -400,15 +396,6 @@ public class RDFServiceGraph implements GraphWithPerform {
         return (node == null || node.isVariable() || node == Node.ANY);
     }
     
-    @Override
-    @Deprecated
-    public BulkUpdateHandler getBulkUpdateHandler() {
-        if (this.bulkUpdateHandler == null) {
-            this.bulkUpdateHandler = new RDFServiceGraphBulkUpdater(this);
-        }
-        return this.bulkUpdateHandler;
-    }
-
     @Override
     public Capabilities getCapabilities() {
         return capabilities;
@@ -539,6 +526,16 @@ public class RDFServiceGraph implements GraphWithPerform {
         }
 
         @Override
+        public void execute(Runnable runnable) {
+
+        }
+
+        @Override
+        public <T> T calculate(Supplier<T> supplier) {
+            return null;
+        }
+
+        @Override
         public boolean transactionsSupported() {
             return true;
         }  
@@ -555,7 +552,7 @@ public class RDFServiceGraph implements GraphWithPerform {
     /*
      * 
      * see http://www.python.org/doc/2.5.2/ref/strings.html
-     * or see jena's n3 grammar jena/src/com/hp/hpl/jena/n3/n3.g
+     * or see jena's n3 grammar jena/src/org.apache/jena/n3/n3.g
      */ 
     protected static void pyString(StringBuffer sbuff, String s)
     {

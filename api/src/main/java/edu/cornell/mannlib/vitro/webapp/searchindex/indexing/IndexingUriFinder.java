@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.searchindex.indexing;
 
 import java.util.List;
 
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.Statement;
 
 /**
  * Interface to use with IndexBuilder to find more URIs to index given a changed

@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.web.beanswrappers;
 
 import java.lang.reflect.Method;
 
+import freemarker.ext.beans.MethodAppearanceFineTuner;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,35 +27,35 @@ public class ReadOnlyBeansWrapper extends BeansWrapper {
     public ReadOnlyBeansWrapper() {
         // Start by exposing all safe methods.
         setExposureLevel(EXPOSE_SAFE);
-    }
-    
-    @SuppressWarnings("rawtypes")
-    @Override
-    protected void finetuneMethodAppearance(Class cls, Method method, MethodAppearanceDecision decision) {
-        
-        // How to define a setter? This is a weak approximation: a method whose name
-        // starts with "set" or returns void.
-        if ( method.getName().startsWith("set") ) {
-            decision.setExposeMethodAs(null);
-            
-        } else if ( method.getReturnType().getName().equals("void") ) {
-            decision.setExposeMethodAs(null);
-            
-        } else {
-            
-            Class<?> declaringClass = method.getDeclaringClass();
-            if (declaringClass.equals(java.lang.Object.class)) {
-                decision.setExposeMethodAs(null);
-                
-            } else {
-                Package pkg = declaringClass.getPackage();
-                if (pkg.getName().equals("java.util")) {
-                    decision.setExposeMethodAs(null);
+        setMethodAppearanceFineTuner(new MethodAppearanceFineTuner() {
+            @Override
+            public void process(MethodAppearanceDecisionInput methodAppearanceDecisionInput, MethodAppearanceDecision methodAppearanceDecision) {
+                Method method = methodAppearanceDecisionInput.getMethod();
+                // How to define a setter? This is a weak approximation: a method whose name
+                // starts with "set" or returns void.
+                if ( method.getName().startsWith("set") ) {
+                    methodAppearanceDecision.setExposeMethodAs(null);
+
+                } else if ( method.getReturnType().getName().equals("void") ) {
+                    methodAppearanceDecision.setExposeMethodAs(null);
+
+                } else {
+
+                    Class<?> declaringClass = method.getDeclaringClass();
+                    if (declaringClass.equals(java.lang.Object.class)) {
+                        methodAppearanceDecision.setExposeMethodAs(null);
+
+                    } else {
+                        Package pkg = declaringClass.getPackage();
+                        if (pkg.getName().equals("java.util")) {
+                            methodAppearanceDecision.setExposeMethodAs(null);
+                        }
+                    }
                 }
             }
-        }
+        });
     }
-    
+
 // For exposing a method as a property (when it's not named getX or isX). Note that this is not
 // just a syntactic change in the template from X() to X, but also makes the value get precomputed.
 //    private void exposeAsProperty(Method method, MethodAppearanceDecision decision)  {

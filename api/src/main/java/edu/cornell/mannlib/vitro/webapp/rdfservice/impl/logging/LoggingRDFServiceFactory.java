@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.logging;
 
-import com.hp.hpl.jena.rdf.model.ModelChangedListener;
+import org.apache.jena.rdf.model.ModelChangedListener;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;

@@ -8,7 +8,7 @@ import java.util.List;
 
 import net.sf.jga.algorithms.Filter;
 
-import com.hp.hpl.jena.ontology.DatatypeProperty;
+import org.apache.jena.ontology.DatatypeProperty;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;

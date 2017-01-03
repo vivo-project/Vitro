@@ -2,7 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
-import static com.hp.hpl.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 
 import java.util.HashSet;
 import java.util.List;
@@ -12,9 +12,9 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockableModel;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection.LockedModel;
@@ -116,6 +116,7 @@ public class ConfigurationBeanLoader {
 			WrappedInstance<T> wrapper = InstanceWrapper.wrap(parsedRdf
 					.getConcreteClass());
 			wrapper.satisfyInterfaces(ctx, req);
+			wrapper.checkCardinality(parsedRdf.getPropertyStatements());
 			wrapper.setProperties(this, parsedRdf.getPropertyStatements());
 			wrapper.validate();
 			return wrapper.getInstance();

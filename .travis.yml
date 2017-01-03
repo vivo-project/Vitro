@@ -1,9 +1,17 @@
 language: java
 sudo: false
 
+jdk:
+  - oraclejdk8
+
 env:
   # Give Maven 1GB of memory to work with
   - MAVEN_OPTS=-Xmx1024M
+
+cache:
+  directories:
+  - .autoconf
+  - $HOME/.m2
 
 install:
   - "echo 'Skipping install stage, dependencies will be downloaded during build and test stages.'"

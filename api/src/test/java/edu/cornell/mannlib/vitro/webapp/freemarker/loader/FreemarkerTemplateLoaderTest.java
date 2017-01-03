@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.SortedSet;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.freemarker.loader.FreemarkerTemplateLoader.PathPieces;

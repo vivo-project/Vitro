@@ -2,21 +2,21 @@
 
 package edu.cornell.mannlib.vitro.testing;
 
-import static com.hp.hpl.jena.rdf.model.ResourceFactory.createLangLiteral;
-import static com.hp.hpl.jena.rdf.model.ResourceFactory.createPlainLiteral;
-import static com.hp.hpl.jena.rdf.model.ResourceFactory.createProperty;
-import static com.hp.hpl.jena.rdf.model.ResourceFactory.createResource;
-import static com.hp.hpl.jena.rdf.model.ResourceFactory.createStatement;
-import static com.hp.hpl.jena.rdf.model.ResourceFactory.createTypedLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.createLangLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.createPlainLiteral;
+import static org.apache.jena.rdf.model.ResourceFactory.createProperty;
+import static org.apache.jena.rdf.model.ResourceFactory.createResource;
+import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
+import static org.apache.jena.rdf.model.ResourceFactory.createTypedLiteral;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.vocabulary.RDF;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.vocabulary.RDF;
 
 /**
  * Just some helper methods for Test classes that work with models.
@@ -46,6 +46,12 @@ public class ModelUtilitiesTestHelper {
 			String objectValue) {
 		return createStatement(createResource(subjectUri),
 				createProperty(propertyUri), createPlainLiteral(objectValue));
+	}
+
+	public static Statement dataProperty(String subjectUri, String propertyUri,
+			Float objectValue) {
+		return createStatement(createResource(subjectUri),
+				createProperty(propertyUri), createTypedLiteral(objectValue));
 	}
 
 	public static Statement dataProperty(String subjectUri, String propertyUri,

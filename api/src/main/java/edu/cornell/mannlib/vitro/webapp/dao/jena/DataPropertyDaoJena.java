@@ -13,34 +13,34 @@ import java.util.List;
 import java.util.Map;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.AllValuesFromRestriction;
-import com.hp.hpl.jena.ontology.DatatypeProperty;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntProperty;
-import com.hp.hpl.jena.ontology.OntResource;
-import com.hp.hpl.jena.ontology.ProfileException;
-import com.hp.hpl.jena.ontology.Restriction;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.rdf.model.Statement;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.util.iterator.ClosableIterator;
-import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.ontology.AllValuesFromRestriction;
+import org.apache.jena.ontology.DatatypeProperty;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntProperty;
+import org.apache.jena.ontology.OntResource;
+import org.apache.jena.ontology.ProfileException;
+import org.apache.jena.ontology.Restriction;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.shared.Lock;
+import org.apache.jena.util.iterator.ClosableIterator;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
@@ -90,7 +90,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
     	OntModel ontModel = getOntModelSelector().getTBoxModel();
     	ontModel.enterCriticalSection(Lock.WRITE);
     	try {
-	        com.hp.hpl.jena.ontology.OntResource ind = ontModel.getOntResource(dataPropertyURI);
+	        org.apache.jena.ontology.OntResource ind = ontModel.getOntResource(dataPropertyURI);
 	        if( ind != null ){
 	            ontModel.add(ind, DATAPROPERTY_ISEXTERNALID, "TRUE");
 	            return true;
@@ -277,7 +277,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
 	            ClosableIterator dataprops = ontModel.listDatatypeProperties();
 	            try {
 	                while (dataprops.hasNext()) {
-	                    com.hp.hpl.jena.ontology.DatatypeProperty jDataprop = (com.hp.hpl.jena.ontology.DatatypeProperty) dataprops.next();
+	                    org.apache.jena.ontology.DatatypeProperty jDataprop = (org.apache.jena.ontology.DatatypeProperty) dataprops.next();
 	                    DataProperty dataprop = datapropFromOntProperty(jDataprop);
 	                    if (dataprop != null && !(NONUSER_NAMESPACES.contains(dataprop.getNamespace())))
 	                        allDataprops.add(dataprop);
@@ -303,7 +303,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             ClosableIterator dataprops = ontModel.listDatatypeProperties();
             try {
                 while (dataprops.hasNext()) {
-                    com.hp.hpl.jena.ontology.DatatypeProperty jDataprop = (com.hp.hpl.jena.ontology.DatatypeProperty) dataprops.next();
+                    org.apache.jena.ontology.DatatypeProperty jDataprop = (org.apache.jena.ontology.DatatypeProperty) dataprops.next();
                     DataProperty dataprop = datapropFromOntProperty(jDataprop);
                     if (dataprop != null && ontModel.contains(jDataprop, DATAPROPERTY_ISEXTERNALID, ResourceFactory.createTypedLiteral(true)))
                         allDataprops.add(dataprop);
@@ -492,7 +492,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         	if (errMsgStr != null) {
         		throw new InsertException(errMsgStr);
         	}
-            com.hp.hpl.jena.ontology.DatatypeProperty jDataprop = ontModel.createDatatypeProperty(dtp.getURI());
+            org.apache.jena.ontology.DatatypeProperty jDataprop = ontModel.createDatatypeProperty(dtp.getURI());
             if (dtp.getPublicName() != null && dtp.getPublicName().length() > 0) {
             	jDataprop.setLabel(dtp.getPublicName(), getDefaultLanguage());
             } else {
@@ -563,7 +563,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
         	getOntModel().getBaseModel().notifyEvent(new EditEvent(getWebappDaoFactory().getUserURI(),true));
-            com.hp.hpl.jena.ontology.DatatypeProperty jDataprop = ontModel.getDatatypeProperty(dtp.getURI());
+            org.apache.jena.ontology.DatatypeProperty jDataprop = ontModel.getDatatypeProperty(dtp.getURI());
             
             updateRDFSLabel(jDataprop, dtp.getPublicName());
             
@@ -617,7 +617,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
             ClosableIterator propIt = ontModel.listDatatypeProperties();
             try {
                 while (propIt.hasNext()) {
-                    com.hp.hpl.jena.ontology.DatatypeProperty op = (com.hp.hpl.jena.ontology.DatatypeProperty) propIt.next();
+                    org.apache.jena.ontology.DatatypeProperty op = (org.apache.jena.ontology.DatatypeProperty) propIt.next();
                     boolean isRoot = false;
                     Iterator parentIt = op.listSuperProperties();
                     if (parentIt != null) {

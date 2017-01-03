@@ -11,26 +11,26 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.Individual;
-import com.hp.hpl.jena.ontology.OntClass;
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.OntModelSpec;
-import com.hp.hpl.jena.query.Dataset;
-import com.hp.hpl.jena.query.DatasetFactory;
-import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
-import com.hp.hpl.jena.shared.Lock;
-import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
+import org.apache.jena.ontology.Individual;
+import org.apache.jena.ontology.OntClass;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.query.Dataset;
+import org.apache.jena.query.DatasetFactory;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.query.QueryFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.shared.Lock;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
@@ -262,7 +262,7 @@ public class JenaModelUtils {
         dataset.getLock().enterCriticalSection(Lock.READ);
         try {
             StringBuffer buff = new StringBuffer();
-            buff.append("PREFIX afn: <http://jena.hpl.hp.com/ARQ/function#> \n")
+            buff.append("PREFIX afn: <http://jena.apache.org/ARQ/function#> \n")
             .append("CONSTRUCT { \n")
             .append("  ?res <" + property.getURI() + "> ?o } WHERE { \n");
             if (graphURI != null) {
@@ -294,7 +294,7 @@ public class JenaModelUtils {
         
         StringBuffer describeQueryStrBuff = new StringBuffer() 
             .append("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n")
-            .append("PREFIX afn: <http://jena.hpl.hp.com/ARQ/function#> \n")
+            .append("PREFIX afn: <http://jena.apache.org/ARQ/function#> \n")
             .append("DESCRIBE ?res WHERE { \n");
             if (graphURI != null) {
                 describeQueryStrBuff

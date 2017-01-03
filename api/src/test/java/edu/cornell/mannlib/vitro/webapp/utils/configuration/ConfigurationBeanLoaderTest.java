@@ -2,10 +2,9 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
-import static com.hp.hpl.jena.datatypes.xsd.XSDDatatype.XSDfloat;
-import static com.hp.hpl.jena.datatypes.xsd.XSDDatatype.XSDstring;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDfloat;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDstring;
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.dataProperty;
-import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.model;
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.objectProperty;
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.typeStatement;
 import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.toJavaUri;
@@ -20,7 +19,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -29,19 +27,16 @@ import stubs.javax.servlet.ServletContextStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
 import stubs.javax.servlet.http.HttpSessionStub;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Statement;
 
-import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ModelAccessFactory;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationRdfParser.InvalidConfigurationRdfException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.InstanceWrapper.InstanceWrapperException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.PropertyType.PropertyTypeException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.WrappedInstance.NoSuchPropertyMethodException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.WrappedInstance.ResourceUnavailableException;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.WrappedInstance.ValidationFailedException;
 
 /**
  * TODO
@@ -50,47 +45,8 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.WrappedInstance.Vali
  * instances by URIs, so if a property refers to a created instance, we just
  * pass it in.
  */
-public class ConfigurationBeanLoaderTest extends AbstractTestClass {
-	private static final String GENERIC_INSTANCE_URI = "http://mytest.edu/some_instance";
-	private static final String GENERIC_PROPERTY_URI = "http://mytest.edu/some_property";
-
-	private static final String SIMPLE_SUCCESS_INSTANCE_URI = "http://mytest.edu/simple_success_instance";
-
-	private static final String FULL_SUCCESS_INSTANCE_URI = "http://mytest.edu/full_success_instance";
-	private static final String FULL_SUCCESS_BOOST_PROPERTY = "http://mydomain.edu/hasBoost";
-	private static final String FULL_SUCCESS_TEXT_PROPERTY = "http://mydomain.edu/hasText";
-	private static final String FULL_SUCCESS_HELPER_PROPERTY = "http://mydomain.edu/hasHelper";
-	private static final String FULL_SUCCESS_HELPER_INSTANCE_URI = "http://mytest.edu/full_success_helper_instance";
-
-	private ServletContextStub ctx;
-	private HttpSessionStub session;
-	private HttpServletRequestStub req;
-
-	private Model model;
-
-	private ConfigurationBeanLoader loader;
-	private ConfigurationBeanLoader noRequestLoader;
-	private ConfigurationBeanLoader noContextLoader;
-
-	@Before
-	public void setup() {
-		ctx = new ServletContextStub();
-
-		session = new HttpSessionStub();
-		session.setServletContext(ctx);
-
-		req = new HttpServletRequestStub();
-		req.setSession(session);
-
-		@SuppressWarnings("unused")
-		ModelAccessFactory maf = new ModelAccessFactoryStub();
-
-		model = model();
-
-		loader = new ConfigurationBeanLoader(model, req);
-		noRequestLoader = new ConfigurationBeanLoader(model, ctx);
-		noContextLoader = new ConfigurationBeanLoader(model);
-	}
+public class ConfigurationBeanLoaderTest extends
+		ConfigurationBeanLoaderTestBase {
 
 	// ----------------------------------------------------------------------
 	// Constructor tests
@@ -303,276 +259,6 @@ public class ConfigurationBeanLoaderTest extends AbstractTestClass {
 				throw new IllegalStateException(
 						"The constructor throws an exception.");
 			}
-		}
-	}
-
-	// --------------------------------------------
-
-	@Test
-	public void propertyMethodHasNoParameter_throwsException()
-			throws ConfigurationBeanLoaderException {
-		model.add(typeStatement(GENERIC_INSTANCE_URI,
-				toJavaUri(NoParameterOnPropertyMethod.class)));
-
-		expectSimpleFailure(
-				NoParameterOnPropertyMethod.class,
-				throwable(ConfigurationBeanLoaderException.class,
-						"Failed to load"),
-				throwable(InstanceWrapperException.class,
-						"must accept exactly one parameter"));
-	}
-
-	public static class NoParameterOnPropertyMethod {
-		@Property(uri = GENERIC_PROPERTY_URI)
-		public void methodTakesNoParameters() {
-			// Not suitable as a property method.
-		}
-	}
-
-	// --------------------------------------------
-
-	@Test
-	public void propertyMethodHasMultipleParameters_throwsException()
-			throws ConfigurationBeanLoaderException {
-		model.add(typeStatement(GENERIC_INSTANCE_URI,
-				toJavaUri(MultipleParametersOnPropertyMethod.class)));
-
-		expectSimpleFailure(
-				MultipleParametersOnPropertyMethod.class,
-				throwable(ConfigurationBeanLoaderException.class,
-						"Failed to load"),
-				throwable(InstanceWrapperException.class,
-						"must accept exactly one parameter"));
-	}
-
-	public static class MultipleParametersOnPropertyMethod {
-		@SuppressWarnings("unused")
-		@Property(uri = GENERIC_PROPERTY_URI)
-		public void methodTakesMultipleParameters(String s, Float f) {
-			// Not suitable as a property method.
-		}
-	}
-
-	// --------------------------------------------
-
-	@Test
-	public void propertyMethodHasInvalidParameter_throwsException()
-			throws ConfigurationBeanLoaderException {
-		model.add(typeStatement(GENERIC_INSTANCE_URI,
-				toJavaUri(InvalidParameterOnPropertyMethod.class)));
-
-		expectSimpleFailure(
-				InvalidParameterOnPropertyMethod.class,
-				throwable(ConfigurationBeanLoaderException.class,
-						"Failed to load"),
-				throwable(InstanceWrapperException.class,
-						"Failed to create the PropertyMethod"));
-	}
-
-	public static class InvalidParameterOnPropertyMethod {
-		@SuppressWarnings("unused")
-		@Property(uri = GENERIC_PROPERTY_URI)
-		public void methodTakesInvalidParameters(byte b) {
-			// Not suitable as a property method.
-		}
-	}
-
-	// --------------------------------------------
-
-	@Test
-	public void propertyMethodDoesNotReturnVoid_throwsException()
-			throws ConfigurationBeanLoaderException {
-		model.add(typeStatement(GENERIC_INSTANCE_URI,
-				toJavaUri(PropertyMethodMustReturnVoid.class)));
-
-		expectSimpleFailure(
-				PropertyMethodMustReturnVoid.class,
-				throwable(ConfigurationBeanLoaderException.class,
-						"Failed to load"),
-				throwable(InstanceWrapperException.class, "should return void"));
-	}
-
-	public static class PropertyMethodMustReturnVoid {
-		@Property(uri = GENERIC_PROPERTY_URI)
-		public String methodReturnIsNotVoid(String s) {
-			// Not suitable as a property method.
-			return s;
-		}
-	}
-
-	// --------------------------------------------
-
-	@Test
-	public void propertyMethodNotAccessible_throwsException()
-			throws ConfigurationBeanLoaderException {
-		model.add(typeStatement(GENERIC_INSTANCE_URI,
-				toJavaUri(PropertyMethodIsPrivate.class)));
-		model.add(dataProperty(GENERIC_INSTANCE_URI, GENERIC_PROPERTY_URI,
-				"can't store in a private method."));
-
-		expectSimpleFailure(
-				PropertyMethodIsPrivate.class,
-				throwable(ConfigurationBeanLoaderException.class,
-						"Failed to load"),
-				throwable(PropertyTypeException.class,
-						"Property method failed."));
-	}
-
-	public static class PropertyMethodIsPrivate {
-		@SuppressWarnings("unused")
-		@Property(uri = GENERIC_PROPERTY_URI)
-		private void methodReturnIsNotVoid(String s) {
-			// Not suitable as a property method.
-		}
-	}
-
-	// --------------------------------------------
-
-	@Test
-	public void propertyMethodThrowsException_throwsException()
-			throws ConfigurationBeanLoaderException {
-		model.add(typeStatement(GENERIC_INSTANCE_URI,
-				toJavaUri(PropertyMethodFails.class)));
-		model.add(dataProperty(GENERIC_INSTANCE_URI, GENERIC_PROPERTY_URI,
-				"exception while loading."));
-
-		expectSimpleFailure(
-				PropertyMethodFails.class,
-				throwable(ConfigurationBeanLoaderException.class,
-						"Failed to load"),
-				throwable(PropertyTypeException.class,
-						"Property method failed."));
-	}
-
-	public static class PropertyMethodFails {
-		@SuppressWarnings("unused")
-		@Property(uri = GENERIC_PROPERTY_URI)
-		public void methodThrowsException(String s) {
-			if (true) {
-				throw new RuntimeException("property method fails.");
-			}
-		}
-	}
-
-	// --------------------------------------------
-
-	@Test
-	public void propertyMethodDuplicateUri_throwsException()
-			throws ConfigurationBeanLoaderException {
-		model.add(typeStatement(GENERIC_INSTANCE_URI,
-				toJavaUri(TwoMethodsWithSameUri.class)));
-
-		expectSimpleFailure(
-				TwoMethodsWithSameUri.class,
-				throwable(ConfigurationBeanLoaderException.class,
-						"Failed to load"),
-				throwable(InstanceWrapperException.class,
-						"methods have the same URI"));
-	}
-
-	public static class TwoMethodsWithSameUri {
-		@SuppressWarnings("unused")
-		@Property(uri = GENERIC_PROPERTY_URI)
-		public void firstProperty(String s) {
-			// Nothing to do
-		}
-
-		@SuppressWarnings("unused")
-		@Property(uri = GENERIC_PROPERTY_URI)
-		public void secondProperty(String s) {
-			// Nothing to do
-		}
-	}
-
-	// --------------------------------------------
-
-	@Test
-	public void validationMethodHasParameters_throwsException()
-			throws ConfigurationBeanLoaderException {
-		model.add(typeStatement(GENERIC_INSTANCE_URI,
-				toJavaUri(ValidationMethodWithParameter.class)));
-
-		expectSimpleFailure(
-				ValidationMethodWithParameter.class,
-				throwable(ConfigurationBeanLoaderException.class,
-						"Failed to load"),
-				throwable(InstanceWrapperException.class,
-						"should not have parameters"));
-	}
-
-	public static class ValidationMethodWithParameter {
-		@SuppressWarnings("unused")
-		@Validation
-		public void validateWithParameter(String s) {
-			// Nothing to do
-		}
-	}
-
-	// --------------------------------------------
-
-	@Test
-	public void validationMethodDoesNotReturnVoid_throwsException()
-			throws ConfigurationBeanLoaderException {
-		model.add(typeStatement(GENERIC_INSTANCE_URI,
-				toJavaUri(ValidationMethodShouldReturnVoid.class)));
-
-		expectSimpleFailure(
-				ValidationMethodShouldReturnVoid.class,
-				throwable(ConfigurationBeanLoaderException.class,
-						"Failed to load"),
-				throwable(InstanceWrapperException.class, "should return void"));
-	}
-
-	public static class ValidationMethodShouldReturnVoid {
-		@Validation
-		public String validateWithReturnType() {
-			return "Hi there!";
-		}
-	}
-
-	// --------------------------------------------
-
-	@Test
-	public void validationMethodNotAccessible_throwsException()
-			throws ConfigurationBeanLoaderException {
-		model.add(typeStatement(GENERIC_INSTANCE_URI,
-				toJavaUri(ValidationMethodIsPrivate.class)));
-
-		expectSimpleFailure(
-				ValidationMethodIsPrivate.class,
-				throwable(ConfigurationBeanLoaderException.class,
-						"Failed to load"),
-				throwable(ValidationFailedException.class,
-						"Error executing validation method"));
-	}
-
-	public static class ValidationMethodIsPrivate {
-		@Validation
-		private void validateIsPrivate() {
-			// private method
-		}
-	}
-
-	// --------------------------------------------
-
-	@Test
-	public void validationMethodThrowsException_throwsException()
-			throws ConfigurationBeanLoaderException {
-		model.add(typeStatement(GENERIC_INSTANCE_URI,
-				toJavaUri(ValidationThrowsException.class)));
-
-		expectSimpleFailure(
-				ValidationThrowsException.class,
-				throwable(ConfigurationBeanLoaderException.class,
-						"Failed to load"),
-				throwable(ValidationFailedException.class,
-						"Error executing validation method"));
-	}
-
-	public static class ValidationThrowsException {
-		@Validation
-		public void validateFails() {
-			throw new RuntimeException("from validation method");
 		}
 	}
 
@@ -1041,6 +727,7 @@ public class ConfigurationBeanLoaderTest extends AbstractTestClass {
 	// Additional tests
 	// ----------------------------------------------------------------------
 
+	@SuppressWarnings("unused")
 	@Test
 	@Ignore
 	// TODO
@@ -1049,6 +736,7 @@ public class ConfigurationBeanLoaderTest extends AbstractTestClass {
 		fail("circularReferencesAreNotFatal not implemented");
 	}
 
+	@SuppressWarnings("unused")
 	@Test
 	@Ignore
 	// TODO deals with circularity.
@@ -1057,50 +745,13 @@ public class ConfigurationBeanLoaderTest extends AbstractTestClass {
 		fail("subordinateObjectCantBeLoaded_leavesNoAccessibleInstanceOfParent not implemented");
 	}
 
+	@SuppressWarnings("unused")
 	@Test
 	@Ignore
 	// TODO deals with circularity.
 	public void parentObjectCantBeLoaded_leavesNoAccessibleInstanceOfSubordinate()
 			throws ConfigurationBeanLoaderException {
 		fail("parentObjectCantBeLoaded_leavesNoAccessibleInstanceOfSubordinate not implemented");
-	}
-
-	// ----------------------------------------------------------------------
-	// Helper methods for simple failure
-	// ----------------------------------------------------------------------
-
-	private void expectSimpleFailure(Class<?> failureClass,
-			ExpectedThrowable expected, ExpectedThrowable cause)
-			throws ConfigurationBeanLoaderException {
-		expectException(expected.getClazz(), expected.getMessageSubstring(),
-				cause.getClazz(), cause.getMessageSubstring());
-
-		@SuppressWarnings("unused")
-		Object unused = loader.loadInstance(GENERIC_INSTANCE_URI, failureClass);
-	}
-
-	private ExpectedThrowable throwable(Class<? extends Throwable> clazz,
-			String messageSubstring) {
-		return new ExpectedThrowable(clazz, messageSubstring);
-	}
-
-	private static class ExpectedThrowable {
-		private final Class<? extends Throwable> clazz;
-		private final String messageSubstring;
-
-		public ExpectedThrowable(Class<? extends Throwable> clazz,
-				String messageSubstring) {
-			this.clazz = clazz;
-			this.messageSubstring = messageSubstring;
-		}
-
-		public Class<? extends Throwable> getClazz() {
-			return clazz;
-		}
-
-		public String getMessageSubstring() {
-			return messageSubstring;
-		}
 	}
 
 }

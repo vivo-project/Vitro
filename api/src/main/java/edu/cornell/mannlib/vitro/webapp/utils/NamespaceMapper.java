@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.utils;
 
 import java.util.List;
 
-import com.hp.hpl.jena.rdf.model.ModelChangedListener;
+import org.apache.jena.rdf.model.ModelChangedListener;
 
 public interface NamespaceMapper extends ModelChangedListener {
 

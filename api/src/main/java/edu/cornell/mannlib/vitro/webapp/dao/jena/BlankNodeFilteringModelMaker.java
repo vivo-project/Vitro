@@ -5,12 +5,12 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.graph.Graph;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ModelMaker;
-import com.hp.hpl.jena.rdf.model.ModelReader;
-import com.hp.hpl.jena.shared.CannotCreateException;
+import org.apache.jena.graph.Graph;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.ModelMaker;
+import org.apache.jena.rdf.model.ModelReader;
+import org.apache.jena.shared.CannotCreateException;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.adapters.AbstractModelMakerDecorator;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;

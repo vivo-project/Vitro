@@ -17,9 +17,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.shared.Lock;
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.shared.Lock;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
@@ -138,7 +138,7 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
         for( String param : parameters){
             try{
                 StringReader reader = new StringReader(param);
-                Model model = com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();          
+                Model model = org.apache.jena.rdf.model.ModelFactory.createDefaultModel();
                 model.read(reader, null, format);
                 models.add(model);
             }catch(Error ex){
@@ -155,7 +155,7 @@ public class PrimitiveRdfEdit extends VitroAjaxController {
 
 	/** Package access to allow for unit testing. */
 	Model mergeModels(Set<Model> additions) {
-		Model a = com.hp.hpl.jena.rdf.model.ModelFactory.createDefaultModel();
+		Model a = org.apache.jena.rdf.model.ModelFactory.createDefaultModel();
 		for (Model m : additions) {
 			a.add(m);
 		}

@@ -4,15 +4,15 @@ package edu.cornell.mannlib.vitro.webapp.utils.sparql;
 
 import java.util.Iterator;
 
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.sparql.core.Quad;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.sparql.core.Quad;
 
 /**
  * Helper classes for producing N-Triples or N-Quads from ResultSets
@@ -83,7 +83,7 @@ public class ResultSetIterators {
 		public static Node toNode(RDFNode rdfNode) {
 			if (rdfNode.isAnon()) {
 				Resource a = rdfNode.asResource();
-				return NodeFactory.createAnon(a.getId());
+				return NodeFactory.createAnon();
 			}
 			if (rdfNode.isLiteral()) {
 				Literal l = rdfNode.asLiteral();

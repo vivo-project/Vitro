@@ -4,7 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 
 import java.util.Map;
 import java.util.List;
-import com.hp.hpl.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Literal;
 
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.MultiValueEditSubmission;

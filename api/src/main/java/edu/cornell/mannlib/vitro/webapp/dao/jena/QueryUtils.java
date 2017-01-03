@@ -9,21 +9,24 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.ResultSetFactory;
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.Resource;
+import org.apache.jena.atlas.io.StringWriterI;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFactory;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
+import org.apache.jena.riot.out.NodeFormatter;
+import org.apache.jena.riot.out.NodeFormatterTTL;
 
 /** 
  * Utilities for executing queries and working with query results. 
@@ -195,14 +198,10 @@ public class QueryUtils {
 	}
 
 	private static String literalToString(Literal l) {
-		StringBuilder buffer = new StringBuilder();
-		buffer.append('"').append(l.getLexicalForm()).append('"');
-		if (l.getDatatypeURI() != null) {
-			buffer.append("^^<").append(l.getDatatypeURI()).append(">");
-		} else if (StringUtils.isNotEmpty(l.getLanguage())) {
-			buffer.append("@").append(l.getLanguage());
-		}
-		return buffer.toString();
+        StringWriterI sw = new StringWriterI();
+        NodeFormatter fmt = new NodeFormatterTTL(null, null);
+        fmt.formatLiteral(sw, l.asNode());
+        return sw.toString();
 	}
 
 

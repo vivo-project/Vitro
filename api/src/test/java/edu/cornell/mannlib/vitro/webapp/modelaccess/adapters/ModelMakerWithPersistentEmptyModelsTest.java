@@ -14,15 +14,15 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-import stubs.com.hp.hpl.jena.rdf.model.ModelMaker.ModelMakerStub;
+import stubs.org.apache.jena.rdf.model.ModelMaker.ModelMakerStub;
 
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.ModelMaker;
-import com.hp.hpl.jena.rdf.model.ModelReader;
-import com.hp.hpl.jena.shared.AlreadyExistsException;
-import com.hp.hpl.jena.shared.CannotCreateException;
-import com.hp.hpl.jena.shared.DoesNotExistException;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.ModelMaker;
+import org.apache.jena.rdf.model.ModelReader;
+import org.apache.jena.shared.AlreadyExistsException;
+import org.apache.jena.shared.CannotCreateException;
+import org.apache.jena.shared.DoesNotExistException;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 

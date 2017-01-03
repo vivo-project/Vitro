@@ -2,9 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.jena.criticalsection;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.AbstractModelDecorator;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.StmtIterator;
 
 /**
  * A model that is easy to use in a try-with-resources code block. It can only
@@ -21,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.adapters.AbstractModelDecorat
  */
 public class LockedModel extends AbstractModelDecorator implements
 		AutoCloseable {
-
 	/**
 	 * Should only be created by LockableModel.
 	 */

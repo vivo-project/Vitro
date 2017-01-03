@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 
 public class IndividualsListingController extends BaseEditController {
 
@@ -102,7 +102,6 @@ public class IndividualsListingController extends BaseEditController {
         request.setAttribute("columncount",new Integer(3));
         request.setAttribute("suppressquery","true");
         request.setAttribute("title", "Individuals in Class "+ ( (vc != null) ? vc.getName() : vclassURI ) );
-        request.setAttribute("bodyJsp", Controllers.HORIZONTAL_JSP);
 
         // new individual button
         List <ButtonForm> buttons = new ArrayList<ButtonForm>();
@@ -113,9 +112,8 @@ public class IndividualsListingController extends BaseEditController {
         buttons.add(newIndividualButton);
         request.setAttribute("topButtons", buttons);
           
-        RequestDispatcher rd = request.getRequestDispatcher(Controllers.BASIC_JSP);
         try {
-            rd.forward(request,response);
+            JSPPageHandler.renderBasicPage(request, response, Controllers.HORIZONTAL_JSP);
         } catch (Throwable t) {
             t.printStackTrace();
         }

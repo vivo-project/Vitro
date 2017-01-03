@@ -7,7 +7,7 @@ import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.vocabulary.XSD;
+import org.apache.jena.vocabulary.XSD;
 
 /* This class is used to order authorships on the add author form. It should be removed in favor of using whatever 
  * method is used to order authorships on the publication profile page instead. I've implemented this due to 

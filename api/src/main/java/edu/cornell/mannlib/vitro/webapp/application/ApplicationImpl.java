@@ -8,7 +8,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import com.hp.hpl.jena.ontology.OntDocumentManager;
+import org.apache.jena.ontology.OntDocumentManager;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
@@ -25,7 +25,6 @@ import edu.cornell.mannlib.vitro.webapp.startup.ComponentStartupStatusImpl;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 import edu.cornell.mannlib.vitro.webapp.triplesource.impl.BasicCombinedTripleSource;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.Property;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.Validation;
 
 /**
  * The basic implementation of the Application interface.
@@ -69,15 +68,9 @@ public class ApplicationImpl implements Application {
 		return searchEngine;
 	}
 
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasSearchEngine")
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasSearchEngine", minOccurs = 1, maxOccurs = 1)
 	public void setSearchEngine(SearchEngine se) {
-		if (searchEngine == null) {
-			searchEngine = se;
-		} else {
-			throw new IllegalStateException(
-					"Configuration includes multiple SearchEngine instances: "
-							+ searchEngine + ", and " + se);
-		}
+		searchEngine = se;
 	}
 
 	@Override
@@ -85,15 +78,9 @@ public class ApplicationImpl implements Application {
 		return searchIndexer;
 	}
 
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasSearchIndexer")
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasSearchIndexer", minOccurs = 1, maxOccurs = 1)
 	public void setSearchIndexer(SearchIndexer si) {
-		if (searchIndexer == null) {
-			searchIndexer = si;
-		} else {
-			throw new IllegalStateException(
-					"Configuration includes multiple SearchIndexer instances: "
-							+ searchIndexer + ", and " + si);
-		}
+		searchIndexer = si;
 	}
 
 	@Override
@@ -101,15 +88,9 @@ public class ApplicationImpl implements Application {
 		return imageProcessor;
 	}
 
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasImageProcessor")
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasImageProcessor", minOccurs = 1, maxOccurs = 1)
 	public void setImageProcessor(ImageProcessor ip) {
-		if (imageProcessor == null) {
-			imageProcessor = ip;
-		} else {
-			throw new IllegalStateException(
-					"Configuration includes multiple ImageProcessor instances: "
-							+ imageProcessor + ", and " + ip);
-		}
+		imageProcessor = ip;
 	}
 
 	@Override
@@ -117,15 +98,9 @@ public class ApplicationImpl implements Application {
 		return fileStorage;
 	}
 
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasFileStorage")
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasFileStorage", minOccurs = 1, maxOccurs = 1)
 	public void setFileStorage(FileStorage fs) {
-		if (fileStorage == null) {
-			fileStorage = fs;
-		} else {
-			throw new IllegalStateException(
-					"Configuration includes multiple FileStorage instances: "
-							+ fileStorage + ", and " + fs);
-		}
+		fileStorage = fs;
 	}
 
 	@Override
@@ -133,15 +108,9 @@ public class ApplicationImpl implements Application {
 		return contentTripleSource;
 	}
 
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasContentTripleSource")
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasContentTripleSource", minOccurs = 1, maxOccurs = 1)
 	public void setContentTripleSource(ContentTripleSource source) {
-		if (contentTripleSource == null) {
-			contentTripleSource = source;
-		} else {
-			throw new IllegalStateException(
-					"Configuration includes multiple instances of ContentTripleSource: "
-							+ contentTripleSource + ", and " + source);
-		}
+		contentTripleSource = source;
 	}
 
 	@Override
@@ -149,15 +118,9 @@ public class ApplicationImpl implements Application {
 		return configurationTripleSource;
 	}
 
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasConfigurationTripleSource")
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasConfigurationTripleSource", minOccurs = 1, maxOccurs = 1)
 	public void setConfigurationTripleSource(ConfigurationTripleSource source) {
-		if (configurationTripleSource == null) {
-			configurationTripleSource = source;
-		} else {
-			throw new IllegalStateException(
-					"Configuration includes multiple instances of ConfigurationTripleSource: "
-							+ configurationTripleSource + ", and " + source);
-		}
+		configurationTripleSource = source;
 	}
 
 	@Override
@@ -165,47 +128,9 @@ public class ApplicationImpl implements Application {
 		return tboxReasonerModule;
 	}
 
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasTBoxReasonerModule")
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasTBoxReasonerModule", minOccurs = 1, maxOccurs = 1)
 	public void setTBoxReasonerModule(TBoxReasonerModule module) {
-		if (tboxReasonerModule == null) {
-			tboxReasonerModule = module;
-		} else {
-			throw new IllegalStateException(
-					"Configuration includes multiple instances of TBoxReasonerModule: "
-							+ tboxReasonerModule + ", and " + module);
-		}
-	}
-
-	@Validation
-	public void validate() throws Exception {
-		if (searchEngine == null) {
-			throw new IllegalStateException(
-					"Configuration did not include a SearchEngine.");
-		}
-		if (searchIndexer == null) {
-			throw new IllegalStateException(
-					"Configuration did not include a SearchIndexer.");
-		}
-		if (imageProcessor == null) {
-			throw new IllegalStateException(
-					"Configuration did not include an ImageProcessor.");
-		}
-		if (fileStorage == null) {
-			throw new IllegalStateException(
-					"Configuration did not include a FileStorage.");
-		}
-		if (contentTripleSource == null) {
-			throw new IllegalStateException(
-					"Configuration did not include a ContentTripleSource.");
-		}
-		if (configurationTripleSource == null) {
-			throw new IllegalStateException(
-					"Configuration did not include a ConfigurationTripleSource.");
-		}
-		if (tboxReasonerModule == null) {
-			throw new IllegalStateException(
-					"Configuration did not include a TBoxReasonerModule.");
-		}
+		tboxReasonerModule = module;
 	}
 
 	@Override

@@ -17,27 +17,18 @@ public class FieldBooster implements DocumentModifier {
 	private final List<String> fieldNames = new ArrayList<>();
 	private volatile Float boost;
 
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasTargetField")
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasTargetField", minOccurs = 1)
 	public void addTargetField(String fieldName) {
 		fieldNames.add(fieldName);
 	}
 
-	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasBoost")
+	@Property(uri = "http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#hasBoost", minOccurs = 1)
 	public void setBoost(float boost) {
 		this.boost = boost;
 	}
 
 	@Validation
 	public void validate() {
-		if (boost == null) {
-			throw new IllegalStateException(
-					"Configuration did not include a boost value.");
-		}
-		if (fieldNames.isEmpty()) {
-			throw new IllegalStateException(
-					"Configuration did not include a target field.");
-		}
-
 		Set<String> uniqueFieldNames = new HashSet<>(fieldNames);
 		List<String> duplicateFieldNames = new ArrayList<>(fieldNames);
 		for (String fn : uniqueFieldNames) {

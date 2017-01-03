@@ -8,14 +8,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.rdf.model.Literal;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.Property;
-import com.hp.hpl.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.ResourceFactory;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest;
@@ -273,7 +273,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
                         Property prop = ResourceFactory.createProperty(predicateUri);
                         predicateLocalName = prop.getLocalName();
                     
-                    }catch (com.hp.hpl.jena.shared.InvalidPropertyURIException e){                  
+                    }catch (org.apache.jena.shared.InvalidPropertyURIException e){
                         log.debug("could not convert predicateUri into a valid URI",e);
                     }                               
                 }

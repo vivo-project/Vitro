@@ -196,10 +196,11 @@ var i18nStrings = {
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/css/account/account.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/customForm.css" />')}
 ${stylesheets.add('<link rel="stylesheet" href="${urls.base}/edit/forms/css/autocomplete.css" />')}
-${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.8.9.custom.css" />')}
+${stylesheets.add('<link rel="stylesheet" href="${urls.base}/js/jquery-ui/css/smoothness/jquery-ui-1.12.1.css" />')}
 
-${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery.js"></script>',
-              '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.8.9.custom.min.js"></script>')}
+${scripts.add('<script type="text/javascript" src="${urls.base}/js/jquery-1.12.4.min.js"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/jquery-migrate-1.4.1"></script>',
+              '<script type="text/javascript" src="${urls.base}/js/jquery-ui/js/jquery-ui-1.12.1.min.js"></script>')}
 ${scripts.add('<script type="text/javascript" src="${urls.base}/js/account/proxyUtils.js"></script>',
               '<script type="text/javascript" src="${urls.base}/js/account/accountProxyCommon.js"></script>',   
               '<script type="text/javascript" src="${urls.base}/js/account/accountProxyItemsPanel.js"></script>')}   

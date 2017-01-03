@@ -7,8 +7,8 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.hp.hpl.jena.rdf.model.ModelChangedListener;
-import com.hp.hpl.jena.sdb.StoreDesc;
+import org.apache.jena.rdf.model.ModelChangedListener;
+import org.apache.jena.sdb.StoreDesc;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;

@@ -2,7 +2,7 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ page isErrorPage="true" %>
-<%@ page import="com.oreilly.servlet.ServletUtils,edu.cornell.mannlib.vitro.webapp.web.*" %>
+<%@ page import="edu.cornell.mannlib.vitro.webapp.web.*" %>
 <%@page import="edu.cornell.mannlib.vitro.webapp.controller.VitroRequest"%>
 <%@page import="edu.cornell.mannlib.vitro.webapp.beans.ApplicationBean"%>
 <%@page import="org.apache.commons.logging.Log"%>
@@ -46,7 +46,10 @@
 
                 <div>
                 <% try{ %>
-                    <h3>Trace:</h3><pre><%= ServletUtils.getStackTraceAsString(exception) %></pre>
+                    <h3>Trace:</h3>
+                    <pre><jsp:scriptlet>
+                        exception.printStackTrace(new java.io.PrintWriter(out));
+                    </jsp:scriptlet></pre>
                 <% }catch (Exception e){ %>
                     No trace is available.
                 <% } %>
