@@ -36,9 +36,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.http.AcceptHeaderParsingException;
 import edu.cornell.mannlib.vitro.webapp.utils.http.NotAcceptableException;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.SparqlQueryUtils;
 
 /**
  * Present the SPARQL Query form, and execute the queries.
