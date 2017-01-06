@@ -17,8 +17,6 @@ import net.sf.jga.algorithms.Filter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
