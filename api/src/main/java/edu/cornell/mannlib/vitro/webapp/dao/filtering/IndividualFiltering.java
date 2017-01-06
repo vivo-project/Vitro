@@ -421,11 +421,6 @@ public class IndividualFiltering implements Individual {
     }
 
     @Override
-    public JSONObject toJSON() throws JSONException {
-        return _innerIndividual.toJSON();
-    }
-
-    @Override
     public RoleLevel getHiddenFromDisplayBelowRoleLevel() {
         return _innerIndividual.getHiddenFromDisplayBelowRoleLevel();
     }

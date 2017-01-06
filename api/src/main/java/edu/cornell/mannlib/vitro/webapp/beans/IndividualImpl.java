@@ -11,9 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 
@@ -319,11 +316,6 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
          "vClassId"
     };
 
-
-    public JSONObject toJSON() throws JSONException {
-        JSONObject jsonObj = new JSONObject(this, INCLUDED_IN_JSON);
-        return jsonObj;
-    }
 
    public int compareTo(Individual o2) {
        Collator collator = Collator.getInstance();

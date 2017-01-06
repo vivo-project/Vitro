@@ -472,11 +472,6 @@ public class IndividualStub implements Individual {
 	}
 
 	@Override
-	public JSONObject toJSON() throws JSONException {
-		throw new RuntimeException("Individual.toJSON() not implemented.");
-	}
-
-	@Override
 	public Float getSearchBoost() {
 		throw new RuntimeException(
 				"Individual.getSearchBoost() not implemented.");

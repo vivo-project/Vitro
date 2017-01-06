@@ -6,9 +6,6 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 /**
  * User: bdc34
  * Date: Oct 18, 2007
@@ -97,8 +94,6 @@ public interface Individual extends ResourceBean, Comparable<Individual> {
 
     void sortForDisplay();
 
-    JSONObject toJSON() throws JSONException;
-    
     Float getSearchBoost();
     void setSearchBoost( Float boost );
     
