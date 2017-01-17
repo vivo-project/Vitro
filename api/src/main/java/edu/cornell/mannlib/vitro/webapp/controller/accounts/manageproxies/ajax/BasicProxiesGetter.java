@@ -11,10 +11,10 @@ import java.util.Map;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.QuerySolution;
@@ -68,7 +68,7 @@ public class BasicProxiesGetter extends AbstractAjaxResponder {
 	}
 
 	@Override
-	public String prepareResponse() throws IOException, JSONException {
+	public String prepareResponse() throws IOException, JsonMappingException {
 		log.debug("search term is '" + term + "'");
 		if (term.isEmpty()) {
 			return EMPTY_RESPONSE;
@@ -76,7 +76,7 @@ public class BasicProxiesGetter extends AbstractAjaxResponder {
 			String cleanTerm = SparqlQueryUtils.escapeForRegex(term);
 			String queryStr = QUERY_BASIC_PROXIES.replace("%term%", cleanTerm);
 
-			JSONArray jsonArray = SparqlQueryRunner
+			ArrayNode jsonArray = SparqlQueryRunner
 					.createSelectQueryContext(userAccountsModel, queryStr)
 					.execute()
 					.parse(new BasicProxyInfoParser(placeholderImageUrl));

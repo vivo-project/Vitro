@@ -17,9 +17,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
@@ -80,7 +80,7 @@ public class BasicProfilesGetter extends AbstractAjaxResponder {
 	}
 
 	@Override
-	public String prepareResponse() throws IOException, JSONException {
+	public String prepareResponse() throws IOException, JsonMappingException {
 		log.debug("search term is '" + term + "'");
 		if (this.term.isEmpty() || this.profileTypes.isEmpty()) {
 			return EMPTY_RESPONSE;

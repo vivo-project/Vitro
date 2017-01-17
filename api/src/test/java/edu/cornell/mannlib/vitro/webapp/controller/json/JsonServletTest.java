@@ -11,6 +11,10 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.log4j.Level;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -214,42 +218,46 @@ public class JsonServletTest extends AbstractTestClass {
 	 */
 	private void assertFailureWithErrorMessage(String expected) {
 		try {
-			JSONObject result = new JSONObject(resp.getOutput());
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode result = mapper.readTree(resp.getOutput());
 			assertEquals("errorMessage", expected,
 					getFieldValue(result, "errorMessage"));
 			assertEquals("status", SC_INTERNAL_SERVER_ERROR, resp.getStatus());
-		} catch (JSONException e) {
+		} catch (IOException e) {
 			fail(e.toString());
 		}
 	}
 
 	private void assertSuccessWithIndividuals(String vclassId, int count) {
 		try {
-			JSONObject actual = new JSONObject(resp.getOutput());
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode actual = mapper.readTree(resp.getOutput());
 			assertEquals("errorMessage", "",
 					getFieldValue(actual, "errorMessage"));
 			assertEquals("count", count, getFieldValue(actual, "totalCount"));
 
-			JSONObject vclassObj = (JSONObject) getFieldValue(actual, "vclass");
+			JsonNode vclassObj = (JsonNode) getFieldValue(actual, "vclass");
 			assertEquals("vclass name", vclassId.split("://")[1],
 					getFieldValue(vclassObj, "name"));
 			assertEquals("vclass uri", vclassId,
 					getFieldValue(vclassObj, "URI"));
 
 			assertEquals("status", SC_OK, resp.getStatus());
-		} catch (JSONException e) {
+		} catch (IOException e) {
 			fail(e.toString());
 		}
 	}
 
-	private Object getFieldValue(JSONObject json, String fieldName) {
-		try {
-			assertEquals("find " + fieldName, true, json.has(fieldName));
-			return json.get(fieldName);
-		} catch (JSONException e) {
-			fail(e.toString());
-			return -1;
+	private Object getFieldValue(JsonNode json, String fieldName) {
+		assertEquals("find " + fieldName, true, json.has(fieldName));
+		JsonNode value = json.get(fieldName);
+		if (value instanceof IntNode) {
+			return ((IntNode) value).asInt();
+		} else if (value instanceof TextNode) {
+			return value.asText();
 		}
+
+		return value;
 	}
 
 }

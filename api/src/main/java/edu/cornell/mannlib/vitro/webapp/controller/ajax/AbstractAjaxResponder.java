@@ -13,10 +13,12 @@ import java.util.Map;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
@@ -60,7 +62,7 @@ public abstract class AbstractAjaxResponder {
 	}
 
 	protected abstract String prepareResponse() throws IOException,
-			JSONException;
+			JsonMappingException;
 
 	protected String getStringParameter(String key, String defaultValue) {
 		String value = vreq.getParameter(key);
@@ -81,9 +83,14 @@ public abstract class AbstractAjaxResponder {
 	 * objects with fields.
 	 */
 	protected String assembleJsonResponse(List<Map<String, String>> maps) {
-		JSONArray jsonArray = new JSONArray();
+		ObjectMapper mapper = new ObjectMapper();
+		ArrayNode jsonArray = mapper.createArrayNode();
 		for (Map<String, String> map : maps) {
-			jsonArray.put(map);
+			ObjectNode node = mapper.createObjectNode();
+			for (Map.Entry<String, String> entry : map.entrySet()) {
+				node.put(entry.getKey(), entry.getValue());
+			}
+			jsonArray.add(node);
 		}
 		return jsonArray.toString();
 	}
@@ -93,19 +100,25 @@ public abstract class AbstractAjaxResponder {
 	 * implement "parseSolutionRow()"
 	 */
 	protected abstract static class JsonArrayParser extends
-			ResultSetParser<JSONArray> {
+			ResultSetParser<ArrayNode> {
+
+		private static ObjectMapper MAPPER = new ObjectMapper();
 		@Override
-		protected JSONArray defaultValue() {
-			return new JSONArray();
+		protected ArrayNode defaultValue() {
+			return MAPPER.createArrayNode();
 		}
 
 		@Override
-		protected JSONArray parseResults(String queryStr, ResultSet results) {
-			JSONArray jsonArray = new JSONArray();
+		protected ArrayNode parseResults(String queryStr, ResultSet results) {
+			ArrayNode jsonArray = MAPPER.createArrayNode();
 			while (results.hasNext()) {
 				Map<String, String> map = parseSolutionRow(results.next());
 				if (map != null) {
-					jsonArray.put(map);
+					ObjectNode node = MAPPER.createObjectNode();
+					for (Map.Entry<String, String> entry : map.entrySet()) {
+						node.put(entry.getKey(), entry.getValue());
+					}
+					jsonArray.add(node);
 				}
 			}
 			return jsonArray;

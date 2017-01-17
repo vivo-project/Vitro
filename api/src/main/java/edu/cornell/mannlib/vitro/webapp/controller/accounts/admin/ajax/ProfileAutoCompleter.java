@@ -18,9 +18,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.Query;
@@ -107,7 +107,7 @@ class ProfileAutoCompleter extends AbstractAjaxResponder implements
 	}
 
 	@Override
-	public String prepareResponse() throws IOException, JSONException {
+	public String prepareResponse() throws IOException, JsonMappingException {
 		if (term.isEmpty()) {
 			return EMPTY_RESPONSE;
 		}

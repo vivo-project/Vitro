@@ -9,10 +9,10 @@ import java.util.Map;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
-import org.json.JSONException;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -42,7 +42,7 @@ public class MoreProfileInfo extends AbstractAjaxResponder {
 	}
 
 	@Override
-	public String prepareResponse() throws IOException, JSONException {
+	public String prepareResponse() throws IOException, JsonMappingException {
 		log.debug("profile URI is '" + profileUri + "'");
 		if (profileUri.isEmpty()) {
 			return EMPTY_RESPONSE;

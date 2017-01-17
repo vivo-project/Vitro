@@ -8,6 +8,7 @@ import java.util.List;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -56,14 +57,18 @@ class ExternalAuthChecker extends AbstractAjaxResponder {
 	}
 
 	@Override
-	public String prepareResponse() throws IOException, JSONException {
-		if (someoneElseIsUsingThisExternalAuthId()) {
-			return respondExternalAuthIdAlreadyUsed();
-		}
+	public String prepareResponse() throws IOException, JsonMappingException {
+		try {
+			if (someoneElseIsUsingThisExternalAuthId()) {
+				return respondExternalAuthIdAlreadyUsed();
+			}
 
-		checkForMatchingProfile();
-		if (matchingProfile != null) {
-			return respondWithMatchingProfile();
+			checkForMatchingProfile();
+			if (matchingProfile != null) {
+				return respondWithMatchingProfile();
+			}
+		} catch (JSONException ex) {
+			throw new JsonMappingException("",ex);
 		}
 
 		return EMPTY_RESPONSE;

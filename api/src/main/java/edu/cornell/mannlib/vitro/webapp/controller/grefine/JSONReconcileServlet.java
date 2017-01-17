@@ -15,12 +15,18 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.jsonldjava.utils.Obj;
+import edu.cornell.mannlib.vitro.webapp.utils.JacksonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
@@ -68,7 +74,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 		try {
 			if (vreq.getParameter("query") != null
 					|| vreq.getParameter("queries") != null) {
-				JSONObject qJson = getResult(vreq, req, resp);
+				ObjectNode qJson = getResult(vreq, req, resp);
 				log.debug("result: " + qJson.toString());
 				String responseStr = (vreq.getParameter("callback") == null) ? qJson
 						.toString() : vreq.getParameter("callback") + "("
@@ -87,7 +93,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				}
 				defaultTypeList = ConfigurationProperties.getBean(req).getProperty("Vitro.reconcile.defaultTypeList");
 				serverName = req.getServerName();
-				JSONObject metaJson = getMetadata(req, resp, defaultNamespace, defaultTypeList, serverName, serverPort);
+				JsonNode metaJson = getMetadata(req, resp, defaultNamespace, defaultTypeList, serverName, serverPort);
 				String callbackStr = (vreq.getParameter("callback") == null) ? ""
 						: vreq.getParameter("callback");
 				ServletOutputStream out = resp.getOutputStream();
@@ -98,11 +104,11 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 		}
 	}
 
-	private JSONObject getResult(VitroRequest vreq, HttpServletRequest req,
+	private ObjectNode getResult(VitroRequest vreq, HttpServletRequest req,
 			HttpServletResponse resp) throws ServletException {
 
-		HashMap<String, JSONObject> searchWithTypeMap = new HashMap<String, JSONObject>();
-		HashMap<String, JSONObject> searchNoTypeMap = new HashMap<String, JSONObject>();
+		HashMap<String, ObjectNode> searchWithTypeMap = new HashMap<String, ObjectNode>();
+		HashMap<String, ObjectNode> searchNoTypeMap = new HashMap<String, ObjectNode>();
 		ArrayList<String> queries = new ArrayList<String>();
 		Object qObj = vreq.getParameter("queries");
 
@@ -124,21 +130,22 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 		try {
 			for (int i = 0; i < queries.size(); i++) {
 				String queryStr = queries.get(i);
-				JSONObject json = new JSONObject(queryStr);
+				ObjectMapper mapper = new ObjectMapper();
+				JsonNode json = mapper.readTree(queryStr);
 
 				if (json.has("query")) { // single query
 					if (json.has("type")) {
-						searchWithTypeMap.put("query", json);
+						searchWithTypeMap.put("query", (ObjectNode)json);
 					} else {
 						// user did not specify a type
-						searchNoTypeMap.put("query", json);
+						searchNoTypeMap.put("query", (ObjectNode)json);
 					}
 				} else { // multiple queries
-					for (Iterator<String> iter = json.keys(); iter.hasNext();) {
-						ArrayList<JSONObject> jsonList = new ArrayList<JSONObject>();
+					for (Iterator<String> iter = json.fieldNames(); iter.hasNext();) {
+						ArrayList<ObjectNode> jsonList = new ArrayList<ObjectNode>();
 						String key = iter.next();
 						Object obj = json.get(key);
-						JSONObject jsonLvl2 = (JSONObject) obj;
+						ObjectNode jsonLvl2 = (ObjectNode) obj;
 						if (jsonLvl2.has("query")) {
 							if (jsonLvl2.has("type")) {
 								searchWithTypeMap.put(key, jsonLvl2);
@@ -150,14 +157,18 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 					}
 				}
 			}
-		} catch (JSONException ex) {
-			log.error("JSONException: " + ex);
-			throw new ServletException("JSONReconcileServlet JSONException: "
+		} catch (JsonMappingException ex) {
+			log.error("JsonMappingException: " + ex);
+			throw new ServletException("JSONReconcileServlet JsonMappingException: "
+					+ ex);
+		} catch (IOException ex) {
+			log.error("IOException: " + ex);
+			throw new ServletException("JSONReconcileServlet IOException: "
 					+ ex);
 		}
 
 		// Run index search
-		JSONObject qJson = null;
+		ObjectNode qJson = null;
 		if (searchWithTypeMap.size() > 0) {
 			qJson = runSearch(searchWithTypeMap);
 		} else {
@@ -174,65 +185,62 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 	 * 
 	 * @param req Servlet Request
 	 * @param resp Servlet Response
-	 * @throws ServletException
 	 */
-	protected JSONObject getMetadata(HttpServletRequest req, HttpServletResponse resp, String defaultNamespace,
+	protected JsonNode getMetadata(HttpServletRequest req, HttpServletResponse resp, String defaultNamespace,
 			String defaultTypeList, String serverName, int serverPort) throws ServletException {
 
-		JSONObject json = new JSONObject();
-		try {
-			json.put("name", "VIVO Reconciliation Service");
-			if (defaultNamespace != null) {
-				json.put("identifierSpace", defaultNamespace);
-				json.put("schemaSpace", defaultNamespace);
-			}
-			JSONObject viewJson = new JSONObject();
-			StringBuffer urlBuf = new StringBuffer();
-			urlBuf.append("http://" + serverName);
-			if (serverPort == 8080) {
-				urlBuf.append(":" + serverPort);
-			}
-			if (req.getContextPath() != null) {
-				urlBuf.append(req.getContextPath());
-			}
-			viewJson.put("url", urlBuf.toString() + "/individual?uri={{id}}");
-			json.put("view", viewJson);
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode json = mapper.createObjectNode();
 
-			// parse defaultTypeList from runtime.properties
-			if (defaultTypeList != null) {
-				String[] splitList = defaultTypeList.split(";");
-				String[][] idNameArray = new String[splitList.length][splitList.length];
-				for(int i = 0; i<splitList.length; i++) {
-					idNameArray[i] = splitList[i].split(",");
-				}
-				// process and add to json defaultTypes
-				JSONArray defaultTypesJsonArr = new JSONArray();
-				for (int i = 0; i<idNameArray.length; i++) {
-					JSONObject defaultTypesJson = new JSONObject();
-					defaultTypesJson.put("id", idNameArray[i][0].trim());
-					defaultTypesJson.put("name", idNameArray[i][1].trim());
-					defaultTypesJsonArr.put(defaultTypesJson);
-				}
-				json.put("defaultTypes", defaultTypesJsonArr);
+		json.put("name", "VIVO Reconciliation Service");
+		if (defaultNamespace != null) {
+			json.put("identifierSpace", defaultNamespace);
+			json.put("schemaSpace", defaultNamespace);
+		}
+		ObjectNode viewJson = mapper.createObjectNode();
+		StringBuffer urlBuf = new StringBuffer();
+		urlBuf.append("http://" + serverName);
+		if (serverPort == 8080) {
+			urlBuf.append(":" + serverPort);
+		}
+		if (req.getContextPath() != null) {
+			urlBuf.append(req.getContextPath());
+		}
+		viewJson.put("url", urlBuf.toString() + "/individual?uri={{id}}");
+		json.put("view", viewJson);
+
+		// parse defaultTypeList from runtime.properties
+		if (defaultTypeList != null) {
+			String[] splitList = defaultTypeList.split(";");
+			String[][] idNameArray = new String[splitList.length][splitList.length];
+			for(int i = 0; i<splitList.length; i++) {
+				idNameArray[i] = splitList[i].split(",");
 			}
-		} catch (JSONException ex) {
-			throw new ServletException(
-					"JSONReconcileServlet: Could not create metadata: " + ex);
+			// process and add to json defaultTypes
+			ArrayNode defaultTypesJsonArr = mapper.createArrayNode();
+			for (int i = 0; i<idNameArray.length; i++) {
+				ObjectNode defaultTypesJson = mapper.createObjectNode();
+				defaultTypesJson.put("id", idNameArray[i][0].trim());
+				defaultTypesJson.put("name", idNameArray[i][1].trim());
+				defaultTypesJsonArr.add(defaultTypesJson);
+			}
+			json.put("defaultTypes", defaultTypesJsonArr);
 		}
 
 		return json;
 	}
 
-	private JSONObject runSearch(HashMap<String, JSONObject> currMap) throws ServletException {
-		JSONObject qJson = new JSONObject();
+	private ObjectNode runSearch(HashMap<String, ObjectNode> currMap) throws ServletException {
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode qJson = mapper.createObjectNode();
 		
 		try {
 
-			for (Map.Entry<String, JSONObject> entry : currMap.entrySet()) {
-				JSONObject resultAllJson = new JSONObject();
+			for (Map.Entry<String, ObjectNode> entry : currMap.entrySet()) {
+				ObjectNode resultAllJson = mapper.createObjectNode();
 				String key = entry.getKey();
-				JSONObject json = entry.getValue();
-				String queryVal = json.getString("query");
+				ObjectNode json = entry.getValue();
+				String queryVal = JacksonUtil.getAsString(json, "query");
 
 				// System.out.println("query: " + json.toString());
 				
@@ -243,22 +251,22 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				ArrayList<String[]> propertiesList = new ArrayList<String[]>();
 
 				if (json.has("type")) {
-					searchType = json.getString("type");
+					searchType = JacksonUtil.getAsString(json, "type");
 				}
 				if (json.has("limit")) {
-					limit = json.getInt("limit");
+					limit = JacksonUtil.getAsInt(json, "limit");
 				}
 				if (json.has("type_strict")) { // Not sure what this variable
 												// represents. Skip for now.
-					typeStrict = json.getString("type_strict");
+					typeStrict = JacksonUtil.getAsString(json, "type_strict");
 				}
 				if (json.has("properties")) {
-					JSONArray properties = json.getJSONArray("properties");
-					for (int i = 0; i < properties.length(); i++) {
+					ArrayNode properties = json.withArray("properties");
+					for (int i = 0; i < properties.size(); i++) {
 						String[] pvPair = new String[2];
-						JSONObject jsonProperty = properties.getJSONObject(i);
-						String pid = jsonProperty.getString("pid");
-						String v = jsonProperty.getString("v");
+						JsonNode jsonProperty = properties.get(1);
+						String pid = JacksonUtil.getAsString(jsonProperty, "pid");
+						String v = JacksonUtil.getAsString(jsonProperty, "v");
 						if (pid != null && v != null) {
 							pvPair[0] = pid;
 							pvPair[1] = v;
@@ -268,7 +276,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				}
 
 				// begin search
-				JSONArray resultJsonArr = new JSONArray();
+				ArrayNode resultJsonArr = mapper.createArrayNode();
 
 	            SearchQuery query = getQuery(queryVal, searchType, limit, propertiesList);
 	            SearchResponse queryResponse = null;
@@ -297,14 +305,14 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 	                        SearchResult result = new SearchResult(name, uri);
 	                        
 	                        // populate result for Google Refine
-							JSONObject resultJson = new JSONObject();
-							resultJson.put("score", doc.getFirstValue("score"));
+							ObjectNode resultJson = mapper.createObjectNode();
+							resultJson.putPOJO("score", doc.getFirstValue("score"));
 							String modUri = result.getUri().replace("#", "%23");
 							resultJson.put("id", modUri);
 							resultJson.put("name", result.getLabel());
 							
 							Collection<Object> rdfTypes = doc.getFieldValues(VitroSearchTermNames.RDFTYPE);
-							JSONArray typesJsonArr = new JSONArray();
+							ArrayNode typesJsonArr = mapper.createArrayNode();
 							if (rdfTypes != null) {
 
 								for (Object rdfType : rdfTypes) {
@@ -315,17 +323,17 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 									int lastIndex2 = type.lastIndexOf('/') + 1;
 									String typeName = type.substring(lastIndex2);
 									typeName = typeName.replace("#", ":");
-									JSONObject typesJson = new JSONObject();
+									ObjectNode typesJson = mapper.createObjectNode();
 									typesJson.put("id", type);
 									typesJson.put("name", typeName);
-									typesJsonArr.put(typesJson);
+									typesJsonArr.add(typesJson);
 
 								}
 							}
 
 							resultJson.put("type", typesJsonArr);
 							resultJson.put("match", "false");
-							resultJsonArr.put(resultJson);
+							resultJsonArr.add(resultJson);
 
 						} catch (Exception e) {
 							log.error("problem getting usable individuals from search "
@@ -340,12 +348,12 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				// System.out.println("results: " + qJson.toString());
 			}
 
-		} catch (JSONException ex) {
-			log.error("JSONException: " + ex);
-			throw new ServletException("JSONReconcileServlet JSONException: "
+		} catch (JsonMappingException ex) {
+			log.error("JsonMappingException: " + ex);
+			throw new ServletException("JSONReconcileServlet JsonMappingException: "
 					+ ex);
 		} catch (SearchEngineException ex) {
-			log.error("JSONException: " + ex);
+			log.error("SearchEngineException: " + ex);
 			throw new ServletException("JSONReconcileServlet SearchEngineException: "
 					+ ex);
 		}
