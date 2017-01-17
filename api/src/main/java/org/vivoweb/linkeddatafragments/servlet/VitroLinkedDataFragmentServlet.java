@@ -149,10 +149,10 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
-        int fileNamePos = request.getRequestURI().toLowerCase().lastIndexOf("/tpf/assets/");
+        int fileNamePos = request.getRequestURI().toLowerCase().lastIndexOf("tpf/assets/");
         if (fileNamePos > 0) {
             try {
-                String fileName = request.getRequestURI().substring(fileNamePos + 12);
+                String fileName = request.getRequestURI().substring(fileNamePos + 11);
                 InputStream in = VitroLinkedDataFragmentServlet.class.getResourceAsStream(fileName);
                 if (in != null) {
                     IOUtils.copy(in, response.getOutputStream());
@@ -243,21 +243,23 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
         List<Ontology> onts = dao.getAllOntologies();
         if (onts != null) {
             for (Ontology ont : onts) {
-                switch (ont.getPrefix()) {
-                    case "rdf":
-                    case "rdfs":
-                    case "hydra":
-                    case "void":
-                        break;
+                if (ont != null && ont.getPrefix() != null) {
+                    switch (ont.getPrefix()) {
+                        case "rdf":
+                        case "rdfs":
+                        case "hydra":
+                        case "void":
+                            break;
 
-                    default:
-                        configJson.append(",\n");
-                        configJson.append("    \"");
-                        configJson.append(ont.getPrefix());
-                        configJson.append("\":         \"");
-                        configJson.append(ont.getURI());
-                        configJson.append("\"");
-                        break;
+                        default:
+                            configJson.append(",\n");
+                            configJson.append("    \"");
+                            configJson.append(ont.getPrefix());
+                            configJson.append("\":         \"");
+                            configJson.append(ont.getURI());
+                            configJson.append("\"");
+                            break;
+                    }
                 }
             }
         }
