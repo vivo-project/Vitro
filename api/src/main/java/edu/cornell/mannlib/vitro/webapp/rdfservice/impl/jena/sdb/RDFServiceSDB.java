@@ -4,20 +4,32 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.sdb;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.datatypes.TypeMapper;
+import org.apache.jena.datatypes.xsd.XSDDatatype;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.sdb.SDBFactory;
 import org.apache.jena.sdb.Store;
 import org.apache.jena.sdb.StoreDesc;
+import org.apache.jena.sdb.layout2.ValueType;
 import org.apache.jena.sdb.sql.SDBConnection;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
@@ -28,6 +40,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.RDFServiceJena;
+import org.apache.jena.sdb.store.LayoutType;
 
 public class RDFServiceSDB extends RDFServiceJena implements RDFService {
 
@@ -147,8 +160,83 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
         // This used to execute against the default model if the query included an OPTIONAL
         // However, in recent Jena this turns out to be much slower than executing against the dataset directly
     }
-    
-    @Override 
+
+    @Override
+    public Model getTriples(RDFNode subject, RDFNode predicate, RDFNode object, long limit, long offset) throws RDFServiceException {
+        if (subject != null || predicate != null || object != null) {
+            return super.getTriples(subject, predicate, object, limit, offset);
+        }
+
+        if (LayoutType.LayoutTripleNodesHash.equals(storeDesc.getLayout())) {
+            Model triples = ModelFactory.createDefaultModel();
+
+            SDBConnection sdbConn = getSDBConnection();
+            try {
+                Statement stmt = sdbConn.getSqlConnection().createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT \n" +
+                        "N1.lex      AS s_lex,\n" +
+                        "N1.lang     AS s_lang,\n" +
+                        "N1.datatype AS s_datatype,\n" +
+                        "N1.type     AS s_type,\n" +
+                        "N2.lex      AS p_lex,\n" +
+                        "N2.lang     AS p_lang,\n" +
+                        "N2.datatype AS p_datatype,\n" +
+                        "N2.type     AS p_type,\n" +
+                        "N3.lex      AS o_lex,\n" +
+                        "N3.lang     AS o_lang,\n" +
+                        "N3.datatype AS o_datatype,\n" +
+                        "N3.type     AS o_type\n" +
+                        "FROM\n" +
+                        "(SELECT DISTINCT s,p,o FROM Quads ORDER BY s,p,o " +
+                        (limit > 0 ? "LIMIT " + limit : "") +
+                        (offset > 0 ? " OFFSET " + offset : "") + ") Q\n" +
+                        "LEFT OUTER JOIN\n" +
+                        "\tNodes AS N1\n" +
+                        "ON ( Q.s = N1.hash )\n" +
+                        "LEFT OUTER JOIN\n" +
+                        "\tNodes AS N2\n" +
+                        "ON ( Q.p = N2.hash )\n" +
+                        "LEFT OUTER JOIN\n" +
+                        "\tNodes AS N3\n" +
+                        "ON ( Q.o = N3.hash )");
+
+                while (rs.next()) {
+                    Node subjectNode = makeNode(
+                        rs.getString("s_lex"),
+                        rs.getString("s_lang"),
+                        rs.getString("s_datatype"),
+                        rs.getInt("s_type"));
+
+                    Node predicateNode = makeNode(
+                            rs.getString("p_lex"),
+                            rs.getString("p_lang"),
+                            rs.getString("p_datatype"),
+                            rs.getInt("p_type"));
+
+                    Node objectNode = makeNode(
+                            rs.getString("o_lex"),
+                            rs.getString("o_lang"),
+                            rs.getString("o_datatype"),
+                            rs.getInt("o_type"));
+
+                    triples.add(
+                        triples.asStatement(Triple.create(subjectNode, predicateNode, objectNode))
+                    );
+                }
+
+            } catch (SQLException sqle) {
+                throw new RDFServiceException("Unable to retrieve triples", sqle);
+            }finally {
+                close(sdbConn);
+            }
+
+            return triples;
+        }
+
+        return null;
+    }
+
+    @Override
     public void close() {
         if (conn != null) {
             try {
@@ -159,4 +247,28 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
         }
     }
 
+    private static Node makeNode(String lex, String datatype, String lang, int vType) {
+        switch(vType) {
+            case 1:
+                return NodeFactory.createBlankNode(lex);
+            case 2:
+                return NodeFactory.createURI(lex);
+            case 3:
+                return NodeFactory.createLiteral(lex, lang);
+            case 4:
+                return NodeFactory.createLiteral(lex, XSDDatatype.XSDstring);
+            case 5:
+                return NodeFactory.createLiteral(lex, XSDDatatype.XSDinteger);
+            case 6:
+                return NodeFactory.createLiteral(lex, XSDDatatype.XSDdouble);
+            case 7:
+                return NodeFactory.createLiteral(lex, XSDDatatype.XSDdateTime);
+            case 8:
+                RDFDatatype dt = TypeMapper.getInstance().getSafeTypeByName(datatype);
+                return NodeFactory.createLiteral(lex, dt);
+            default:
+                log.warn("Unrecognized: (" + lex + ", " + lang + ", " + vType + ")");
+                return NodeFactory.createLiteral("UNRECOGNIZED");
+        }
+    }
 }

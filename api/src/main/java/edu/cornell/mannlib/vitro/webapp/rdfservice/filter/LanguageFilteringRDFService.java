@@ -469,6 +469,16 @@ public class LanguageFilteringRDFService implements RDFService {
     }
 
     @Override
+    public long countTriples(RDFNode subject, RDFNode predicate, RDFNode object) throws RDFServiceException {
+        return s.countTriples(subject, predicate, object);
+    }
+
+    @Override
+    public Model getTriples(RDFNode subject, RDFNode predicate, RDFNode object, long limit, long offset) throws RDFServiceException {
+        return s.getTriples(subject, predicate, object, limit, offset);
+    }
+
+    @Override
     public void close() {
         s.close();            
     }
