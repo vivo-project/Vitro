@@ -9,10 +9,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
@@ -58,17 +58,13 @@ class ExternalAuthChecker extends AbstractAjaxResponder {
 
 	@Override
 	public String prepareResponse() throws IOException, JsonMappingException {
-		try {
-			if (someoneElseIsUsingThisExternalAuthId()) {
-				return respondExternalAuthIdAlreadyUsed();
-			}
+		if (someoneElseIsUsingThisExternalAuthId()) {
+			return respondExternalAuthIdAlreadyUsed();
+		}
 
-			checkForMatchingProfile();
-			if (matchingProfile != null) {
-				return respondWithMatchingProfile();
-			}
-		} catch (JSONException ex) {
-			throw new JsonMappingException("",ex);
+		checkForMatchingProfile();
+		if (matchingProfile != null) {
+			return respondWithMatchingProfile();
 		}
 
 		return EMPTY_RESPONSE;
@@ -98,8 +94,8 @@ class ExternalAuthChecker extends AbstractAjaxResponder {
 		return true;
 	}
 
-	private String respondExternalAuthIdAlreadyUsed() throws JSONException {
-		JSONObject jsonObject = new JSONObject();
+	private String respondExternalAuthIdAlreadyUsed() {
+		ObjectNode jsonObject = new ObjectMapper().createObjectNode();
 		jsonObject.put(RESPONSE_ID_IN_USE, true);
 		return jsonObject.toString();
 	}
@@ -115,12 +111,12 @@ class ExternalAuthChecker extends AbstractAjaxResponder {
 		this.matchingProfile = inds.get(0);
 	}
 
-	private String respondWithMatchingProfile() throws JSONException {
+	private String respondWithMatchingProfile() {
 		String uri = matchingProfile.getURI();
 		String url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
 		String label = matchingProfile.getRdfsLabel();
 
-		JSONObject jsonObject = new JSONObject();
+		ObjectNode jsonObject = new ObjectMapper().createObjectNode();
 		jsonObject.put(RESPONSE_MATCHES_PROFILE, true);
 		jsonObject.put(RESPONSE_PROFILE_URI, uri);
 		jsonObject.put(RESPONSE_PROFILE_URL, url);
