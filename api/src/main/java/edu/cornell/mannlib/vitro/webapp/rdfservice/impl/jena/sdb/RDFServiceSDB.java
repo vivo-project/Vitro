@@ -40,6 +40,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.RDFServiceJena;
+import org.apache.jena.sdb.store.DatabaseType;
 import org.apache.jena.sdb.store.LayoutType;
 
 public class RDFServiceSDB extends RDFServiceJena implements RDFService {
@@ -162,12 +163,41 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
     }
 
     @Override
+    public long countTriples(RDFNode subject, RDFNode predicate, RDFNode object) throws RDFServiceException {
+        if (subject != null || predicate != null || object != null) {
+            return super.countTriples(subject, predicate, object);
+        }
+
+        if (DatabaseType.MySQL.equals(storeDesc.getDbType()) &&
+            LayoutType.LayoutTripleNodesHash.equals(storeDesc.getLayout())) {
+            SDBConnection sdbConn = getSDBConnection();
+            try {
+                Statement stmt = sdbConn.getSqlConnection().createStatement();
+                ResultSet rs = stmt.executeQuery("SELECT count(DISTINCT s,p,o) AS tcount FROM Quads");
+                while (rs.next()) {
+                    return rs.getLong("tcount");
+                }
+            } catch (SQLException sqle) {
+                throw new RDFServiceException("Unable to retrieve triples", sqle);
+            } finally {
+                close(sdbConn);
+            }
+        } else {
+            return super.countTriples(subject, predicate, object);
+        }
+
+        return 0;
+    }
+
+    @Override
     public Model getTriples(RDFNode subject, RDFNode predicate, RDFNode object, long limit, long offset) throws RDFServiceException {
         if (subject != null || predicate != null || object != null) {
             return super.getTriples(subject, predicate, object, limit, offset);
         }
 
-        if (LayoutType.LayoutTripleNodesHash.equals(storeDesc.getLayout())) {
+
+        if (DatabaseType.MySQL.equals(storeDesc.getDbType()) &&
+            LayoutType.LayoutTripleNodesHash.equals(storeDesc.getLayout())) {
             Model triples = ModelFactory.createDefaultModel();
 
             SDBConnection sdbConn = getSDBConnection();
@@ -231,9 +261,9 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
             }
 
             return triples;
+        } else {
+            return super.getTriples(subject, predicate, object, limit, offset);
         }
-
-        return null;
     }
 
     @Override

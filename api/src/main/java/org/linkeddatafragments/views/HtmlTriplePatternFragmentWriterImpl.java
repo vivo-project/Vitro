@@ -106,7 +106,7 @@ public class HtmlTriplePatternFragmentWriterImpl extends TriplePatternFragmentWr
         // Calculate start and end triple number
         Long start = ((tpfRequest.getPageNumber() - 1) * fragment.getMaxPageSize()) + 1;
         data.put("start", start);
-        data.put("end", start + (triples.size() < fragment.getMaxPageSize() ? triples.size() : fragment.getMaxPageSize()));
+        data.put("end", (start - 1) + (triples.size() < fragment.getMaxPageSize() ? triples.size() : fragment.getMaxPageSize()));
         
         // Compose query object
         Map query = new HashMap();
