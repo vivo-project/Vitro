@@ -10,6 +10,7 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -29,6 +30,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.sdb.SDBFactory;
 import org.apache.jena.sdb.Store;
 import org.apache.jena.sdb.StoreDesc;
+import org.apache.jena.sdb.layout2.NodeLayout2;
 import org.apache.jena.sdb.layout2.ValueType;
 import org.apache.jena.sdb.sql.SDBConnection;
 
@@ -164,106 +166,112 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
 
     @Override
     public long countTriples(RDFNode subject, RDFNode predicate, RDFNode object) throws RDFServiceException {
-        if (subject != null || predicate != null || object != null) {
-            return super.countTriples(subject, predicate, object);
-        }
-
-        if (DatabaseType.MySQL.equals(storeDesc.getDbType()) &&
-            LayoutType.LayoutTripleNodesHash.equals(storeDesc.getLayout())) {
-            SDBConnection sdbConn = getSDBConnection();
-            try {
-                Statement stmt = sdbConn.getSqlConnection().createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT count(DISTINCT s,p,o) AS tcount FROM Quads");
-                while (rs.next()) {
-                    return rs.getLong("tcount");
+        if (LayoutType.LayoutTripleNodesHash.equals(storeDesc.getLayout())) {
+            if (DatabaseType.MySQL.equals(storeDesc.getDbType()) ||
+                DatabaseType.PostgreSQL.equals(storeDesc.getDbType())) {
+                SDBConnection sdbConn = getSDBConnection();
+                try {
+                    String whereClause = makeWhereClause(subject, predicate, object);
+                    Statement stmt = sdbConn.getSqlConnection().createStatement();
+                    ResultSet rs = stmt.executeQuery("SELECT count(DISTINCT s,p,o) AS tcount FROM Quads" + (StringUtils.isEmpty(whereClause) ? "" : " WHERE " + whereClause));
+                    try {
+                        while (rs.next()) {
+                            return rs.getLong("tcount");
+                        }
+                    } finally {
+                        rs.close();
+                    }
+                } catch (SQLException sqle) {
+                    throw new RDFServiceException("Unable to retrieve triples", sqle);
+                } finally {
+                    close(sdbConn);
                 }
-            } catch (SQLException sqle) {
-                throw new RDFServiceException("Unable to retrieve triples", sqle);
-            } finally {
-                close(sdbConn);
             }
         } else {
             return super.countTriples(subject, predicate, object);
         }
 
-        return 0;
+        return super.countTriples(subject, predicate, object);
     }
 
     @Override
     public Model getTriples(RDFNode subject, RDFNode predicate, RDFNode object, long limit, long offset) throws RDFServiceException {
-        if (subject != null || predicate != null || object != null) {
-            return super.getTriples(subject, predicate, object, limit, offset);
-        }
+        if (LayoutType.LayoutTripleNodesHash.equals(storeDesc.getLayout())) {
+            if (DatabaseType.MySQL.equals(storeDesc.getDbType()) ||
+                DatabaseType.PostgreSQL.equals(storeDesc.getDbType())) {
+                Model triples = ModelFactory.createDefaultModel();
 
+                SDBConnection sdbConn = getSDBConnection();
+                try {
+                    String whereClause = makeWhereClause(subject, predicate, object);
+                    Statement stmt = sdbConn.getSqlConnection().createStatement();
+                    ResultSet rs = stmt.executeQuery("SELECT \n" +
+                            "N1.lex      AS s_lex,\n" +
+                            "N1.lang     AS s_lang,\n" +
+                            "N1.datatype AS s_datatype,\n" +
+                            "N1.type     AS s_type,\n" +
+                            "N2.lex      AS p_lex,\n" +
+                            "N2.lang     AS p_lang,\n" +
+                            "N2.datatype AS p_datatype,\n" +
+                            "N2.type     AS p_type,\n" +
+                            "N3.lex      AS o_lex,\n" +
+                            "N3.lang     AS o_lang,\n" +
+                            "N3.datatype AS o_datatype,\n" +
+                            "N3.type     AS o_type\n" +
+                            "FROM\n" +
+                            "(SELECT DISTINCT s,p,o FROM Quads" +
+                            (StringUtils.isEmpty(whereClause) ? "" : " WHERE " + whereClause) +
+                            " ORDER BY s,p,o " +
+                            (limit > 0 ? "LIMIT " + limit : "") +
+                            (offset > 0 ? " OFFSET " + offset : "") + ") Q\n" +
+                            "LEFT OUTER JOIN\n" +
+                            "\tNodes AS N1\n" +
+                            "ON ( Q.s = N1.hash )\n" +
+                            "LEFT OUTER JOIN\n" +
+                            "\tNodes AS N2\n" +
+                            "ON ( Q.p = N2.hash )\n" +
+                            "LEFT OUTER JOIN\n" +
+                            "\tNodes AS N3\n" +
+                            "ON ( Q.o = N3.hash )");
 
-        if (DatabaseType.MySQL.equals(storeDesc.getDbType()) &&
-            LayoutType.LayoutTripleNodesHash.equals(storeDesc.getLayout())) {
-            Model triples = ModelFactory.createDefaultModel();
+                    try {
+                        while (rs.next()) {
+                            Node subjectNode = makeNode(
+                                    rs.getString("s_lex"),
+                                    rs.getString("s_datatype"),
+                                    rs.getString("s_lang"),
+                                    ValueType.lookup(rs.getInt("s_type")));
 
-            SDBConnection sdbConn = getSDBConnection();
-            try {
-                Statement stmt = sdbConn.getSqlConnection().createStatement();
-                ResultSet rs = stmt.executeQuery("SELECT \n" +
-                        "N1.lex      AS s_lex,\n" +
-                        "N1.lang     AS s_lang,\n" +
-                        "N1.datatype AS s_datatype,\n" +
-                        "N1.type     AS s_type,\n" +
-                        "N2.lex      AS p_lex,\n" +
-                        "N2.lang     AS p_lang,\n" +
-                        "N2.datatype AS p_datatype,\n" +
-                        "N2.type     AS p_type,\n" +
-                        "N3.lex      AS o_lex,\n" +
-                        "N3.lang     AS o_lang,\n" +
-                        "N3.datatype AS o_datatype,\n" +
-                        "N3.type     AS o_type\n" +
-                        "FROM\n" +
-                        "(SELECT DISTINCT s,p,o FROM Quads ORDER BY s,p,o " +
-                        (limit > 0 ? "LIMIT " + limit : "") +
-                        (offset > 0 ? " OFFSET " + offset : "") + ") Q\n" +
-                        "LEFT OUTER JOIN\n" +
-                        "\tNodes AS N1\n" +
-                        "ON ( Q.s = N1.hash )\n" +
-                        "LEFT OUTER JOIN\n" +
-                        "\tNodes AS N2\n" +
-                        "ON ( Q.p = N2.hash )\n" +
-                        "LEFT OUTER JOIN\n" +
-                        "\tNodes AS N3\n" +
-                        "ON ( Q.o = N3.hash )");
+                            Node predicateNode = makeNode(
+                                    rs.getString("p_lex"),
+                                    rs.getString("p_datatype"),
+                                    rs.getString("p_lang"),
+                                    ValueType.lookup(rs.getInt("p_type")));
 
-                while (rs.next()) {
-                    Node subjectNode = makeNode(
-                        rs.getString("s_lex"),
-                        rs.getString("s_lang"),
-                        rs.getString("s_datatype"),
-                        rs.getInt("s_type"));
+                            Node objectNode = makeNode(
+                                    rs.getString("o_lex"),
+                                    rs.getString("o_datatype"),
+                                    rs.getString("o_lang"),
+                                    ValueType.lookup(rs.getInt("o_type")));
 
-                    Node predicateNode = makeNode(
-                            rs.getString("p_lex"),
-                            rs.getString("p_lang"),
-                            rs.getString("p_datatype"),
-                            rs.getInt("p_type"));
-
-                    Node objectNode = makeNode(
-                            rs.getString("o_lex"),
-                            rs.getString("o_lang"),
-                            rs.getString("o_datatype"),
-                            rs.getInt("o_type"));
-
-                    triples.add(
-                        triples.asStatement(Triple.create(subjectNode, predicateNode, objectNode))
-                    );
+                            triples.add(
+                                    triples.asStatement(Triple.create(subjectNode, predicateNode, objectNode))
+                            );
+                        }
+                    } finally {
+                        rs.close();
+                    }
+                } catch (SQLException sqle) {
+                    throw new RDFServiceException("Unable to retrieve triples", sqle);
+                } finally {
+                    close(sdbConn);
                 }
 
-            } catch (SQLException sqle) {
-                throw new RDFServiceException("Unable to retrieve triples", sqle);
-            }finally {
-                close(sdbConn);
+                return triples;
             }
-
-            return triples;
-        } else {
-            return super.getTriples(subject, predicate, object, limit, offset);
         }
+
+        return super.getTriples(subject, predicate, object, limit, offset);
     }
 
     @Override
@@ -277,28 +285,55 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
         }
     }
 
-    private static Node makeNode(String lex, String datatype, String lang, int vType) {
+    // Copied from Jena SQLBridge2
+    private static Node makeNode(String lex, String datatype, String lang, ValueType vType) {
         switch(vType) {
-            case 1:
+            case BNODE:
                 return NodeFactory.createBlankNode(lex);
-            case 2:
+            case URI:
                 return NodeFactory.createURI(lex);
-            case 3:
+            case STRING:
                 return NodeFactory.createLiteral(lex, lang);
-            case 4:
+            case XSDSTRING:
                 return NodeFactory.createLiteral(lex, XSDDatatype.XSDstring);
-            case 5:
+            case INTEGER:
                 return NodeFactory.createLiteral(lex, XSDDatatype.XSDinteger);
-            case 6:
+            case DOUBLE:
                 return NodeFactory.createLiteral(lex, XSDDatatype.XSDdouble);
-            case 7:
+            case DATETIME:
                 return NodeFactory.createLiteral(lex, XSDDatatype.XSDdateTime);
-            case 8:
+            case OTHER:
                 RDFDatatype dt = TypeMapper.getInstance().getSafeTypeByName(datatype);
                 return NodeFactory.createLiteral(lex, dt);
             default:
                 log.warn("Unrecognized: (" + lex + ", " + lang + ", " + vType + ")");
                 return NodeFactory.createLiteral("UNRECOGNIZED");
         }
+    }
+
+    private String makeWhereClause(RDFNode subject, RDFNode predicate, RDFNode object) {
+        StringBuilder whereClause = new StringBuilder();
+        if (subject != null) {
+            if (whereClause.length() > 0) {
+                whereClause.append(" AND ");
+            }
+            whereClause.append("s=").append(NodeLayout2.hash(subject.asNode()));
+        }
+
+        if (predicate != null) {
+            if (whereClause.length() > 0) {
+                whereClause.append(" AND ");
+            }
+            whereClause.append("p=").append(NodeLayout2.hash(predicate.asNode()));
+        }
+
+        if (object != null) {
+            if (whereClause.length() > 0) {
+                whereClause.append(" AND ");
+            }
+            whereClause.append("o=").append(NodeLayout2.hash(object.asNode()));
+        }
+
+        return whereClause.length() > 0 ? whereClause.toString() : null;
     }
 }
