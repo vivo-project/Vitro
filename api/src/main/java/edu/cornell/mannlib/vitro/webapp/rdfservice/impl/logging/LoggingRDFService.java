@@ -14,11 +14,12 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 
 /**
  * This RDFService wrapper adds instrumentation to the time-consuming methods of
  * the inner RDFService.
- * 
+ *
  * For the other methods, it just delegates to the inner RDFService.
  */
 public class LoggingRDFService implements RDFService {
@@ -42,7 +43,7 @@ public class LoggingRDFService implements RDFService {
 
 	@Override
 	public InputStream sparqlConstructQuery(String query,
-			ModelSerializationFormat resultFormat) throws RDFServiceException {
+											ModelSerializationFormat resultFormat) throws RDFServiceException {
 		try (RDFServiceLogger l = new RDFServiceLogger(resultFormat, query)) {
 			return innerService.sparqlConstructQuery(query, resultFormat);
 		}
@@ -57,7 +58,7 @@ public class LoggingRDFService implements RDFService {
 
 	@Override
 	public InputStream sparqlDescribeQuery(String query,
-			ModelSerializationFormat resultFormat) throws RDFServiceException {
+										   ModelSerializationFormat resultFormat) throws RDFServiceException {
 		try (RDFServiceLogger l = new RDFServiceLogger(resultFormat, query)) {
 			return innerService.sparqlDescribeQuery(query, resultFormat);
 		}
@@ -104,8 +105,8 @@ public class LoggingRDFService implements RDFService {
 
 	@Override
 	public boolean isEquivalentGraph(String graphURI,
-			InputStream serializedGraph,
-			ModelSerializationFormat serializationFormat)
+									 InputStream serializedGraph,
+									 ModelSerializationFormat serializationFormat)
 			throws RDFServiceException {
 		try (RDFServiceLogger l = new RDFServiceLogger(graphURI)) {
 			return innerService.isEquivalentGraph(graphURI, serializedGraph,
@@ -134,7 +135,7 @@ public class LoggingRDFService implements RDFService {
 
 	@Override
 	public void newIndividual(String individualURI, String individualTypeURI,
-			String graphURI) throws RDFServiceException {
+							  String graphURI) throws RDFServiceException {
 		innerService.newIndividual(individualURI, individualTypeURI, graphURI);
 	}
 
@@ -167,19 +168,29 @@ public class LoggingRDFService implements RDFService {
 
 	@Override
 	public void registerJenaModelChangedListener(ModelChangedListener changeListener)
-	        throws RDFServiceException {
-	    innerService.registerJenaModelChangedListener(changeListener);
+			throws RDFServiceException {
+		innerService.registerJenaModelChangedListener(changeListener);
 	}
 
 	@Override
 	public void unregisterJenaModelChangedListener(ModelChangedListener changeListener)
-	        throws RDFServiceException {
-	    innerService.unregisterJenaModelChangedListener(changeListener);
+			throws RDFServiceException {
+		innerService.unregisterJenaModelChangedListener(changeListener);
 	}
 
 	@Override
 	public ChangeSet manufactureChangeSet() {
 		return innerService.manufactureChangeSet();
+	}
+
+	@Override
+	public long countTriples(RDFNode subject, RDFNode predicate, RDFNode object) throws RDFServiceException {
+		return innerService.countTriples(subject, predicate, object);
+	}
+
+	@Override
+	public Model getTriples(RDFNode subject, RDFNode predicate, RDFNode object, long limit, long offset) throws RDFServiceException {
+		return innerService.getTriples(subject, predicate, object, limit, offset);
 	}
 
 	@Override

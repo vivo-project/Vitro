@@ -1,0 +1,122 @@
+<li>
+    <label>Example queries</label>
+    <select class="query" style="display: none;"><option></option><option value="SELECT ?movie ?title ?name
+WHERE {
+  ?movie dbpedia-owl:starring [ rdfs:label &quot;Brad Pitt&quot;@en ];
+         rdfs:label ?title;
+         dbpedia-owl:director [ rdfs:label ?name ].
+  FILTER LANGMATCHES(LANG(?title), &quot;EN&quot;)
+  FILTER LANGMATCHES(LANG(?name),  &quot;EN&quot;)
+}">Directors of movies starring Brad Pitt</option><option value="SELECT DISTINCT ?entity WHERE {
+  ?entity a dbpedia-owl:Airport;
+          dbpprop:cityServed dbpedia:Italy.
+}">Airports in Italy</option><option value="SELECT ?name ?deathDate WHERE {
+  ?person a dbpedia-owl:Artist;
+          rdfs:label ?name;
+          dbpedia-owl:birthPlace [ rdfs:label &quot;York&quot;@en ].
+  FILTER LANGMATCHES(LANG(?name),  &quot;EN&quot;)
+  OPTIONAL { ?person dbpprop:dateOfDeath ?deathDate. }
+}">Artists born in York</option><option value="CONSTRUCT {
+  ?artist a dbpedia-owl:Artist.
+  ?artist dbpedia-owl:birthDate ?date.
+}
+WHERE {
+  ?artist dbpedia-owl:influencedBy dbpedia:Pablo_Picasso.
+  ?artist a dbpedia-owl:Artist.
+  ?artist dbpedia-owl:birthDate ?date.
+}">Artists influenced by Picasso</option><option value="SELECT DISTINCT ?book ?author
+WHERE {
+  ?book rdf:type dbpedia-owl:Book;
+        dbpedia-owl:author ?author.
+}
+LIMIT 100">Authors of books</option><option value="SELECT ?award WHERE {
+  ?award a dbpedia-owl:Award;
+         dbpprop:country [ dbpedia-owl:language dbpedia:Dutch_language ].
+}">Award ceremonies in Dutch speaking countries</option><option value="SELECT DISTINCT ?performer ?name WHERE {
+  ?work dbpedia-owl:writer dbpedia:Michael_Jackson;
+        dbpedia-owl:musicalArtist ?performer.
+  OPTIONAL {
+    ?performer rdfs:label ?name.
+    FILTER LANGMATCHES(LANG(?name), &quot;EN&quot;)
+  }
+}">Bands Michael Jackson wrote a song for</option><option value="SELECT ?software ?company WHERE {
+  ?software dbpedia-owl:developer ?company.
+  ?company dbpedia-owl:locationCountry [ rdfs:label &quot;Belgium&quot;@en ].
+}">Belgian software</option><option value="PREFIX yago: &lt;http://dbpedia.org/class/yago/&gt;
+SELECT ?person
+WHERE {
+  ?person a yago:Carpenters, yago:PeopleExecutedByCrucifixion.
+}">Carpenters killed by crucifixion</option><option value="PREFIX dbpedia-owl: &lt;http://dbpedia.org/ontology/&gt;
+SELECT ?actor ?cause
+WHERE {
+  ?actor dbpedia-owl:deathCause ?cause.
+  ?actor dc:subject &lt;http://dbpedia.org/resource/Category:American_male_film_actors&gt;
+}">Death causes of male American actors</option><option value="SELECT ?dessert ?fruit
+WHERE {
+  ?dessert dbpedia-owl:type &lt;http://dbpedia.org/resource/Dessert&gt;;
+           dbpedia-owl:ingredient ?fruit.
+  ?fruit dbpedia-owl:kingdom &lt;http://dbpedia.org/resource/Plant&gt;.
+}">Desserts made with plants</option><option value="SELECT DISTINCT ?device WHERE {
+  dbpedia:Raspberry_Pi dbpprop:os ?operatingSystem.
+  ?device a dbpedia-owl:Device;
+          dbpprop:os ?operatingSystem.
+  FILTER (!(?device = dbpedia:Raspberry_Pi))
+}">Devices with the same OS as the Raspberry Pi</option><option value="SELECT DISTINCT ?entity ?event
+WHERE {
+  ?entity a dbpedia-owl:Event;
+          rdfs:label ?event;
+          ?predicate &lt;http://dbpedia.org/resource/Trentino&gt; .
+  FILTER(langMatches(lang(?event), &quot;EN&quot;))
+}">Events that took place in the Trentino region</option><option value="SELECT ?titleEng ?title
+WHERE {
+    ?movie dbpprop:starring [ rdfs:label &quot;Natalie Portman&quot;@en ];
+           rdfs:label ?titleEng, ?title.
+    FILTER LANGMATCHES(LANG(?titleEng), &quot;EN&quot;)
+    FILTER (!LANGMATCHES(LANG(?title), &quot;EN&quot;))
+}">Foreign titles of Natalie Portman movies</option><option value="SELECT ?indDish ?belDish ?ingredient
+WHERE {
+  ?indDish a dbpedia-owl:Food;
+           dbpedia-owl:origin dbpedia:India;
+           dbpedia-owl:ingredient ?ingredient.
+  ?belDish a dbpedia-owl:Food;
+           dbpedia-owl:origin dbpedia:Belgium;
+           dbpedia-owl:ingredient ?ingredient.
+}">Indian dishes that have ingredients in common with Belgian dishes</option><option value="SELECT DISTINCT ?artist ?band ?bandName WHERE {
+  { &lt;http://dbpedia.org/resource/Queen_(band)&gt; dbpedia-owl:bandMember ?artist. }
+  UNION
+  { &lt;http://dbpedia.org/resource/Queen_(band)&gt; dbpedia-owl:formerBandMember ?artist. }
+  ?band dbpedia-owl:formerBandMember ?artist;
+        rdfs:label ?bandName.
+  FILTER (?band != &lt;http://dbpedia.org/resource/Queen_(band)&gt;)
+}">Other bands of Queen members</option><option value="SELECT DISTINCT ?person
+WHERE {
+  dbpedia:Jesus dc:subject ?common.
+  ?person a foaf:Person;
+          dc:subject ?common.
+}
+LIMIT 1000">People who have something in common with Jesus</option><option value="SELECT ?place ?relation
+WHERE {
+  ?place rdf:type dbpedia-owl:Settlement;
+         ?relation dbpedia:Barack_Obama;
+}">Places that have something to do with Barack Obama</option><option value="SELECT ?clubName ?playerName WHERE {
+  ?club a dbpedia-owl:SoccerClub;
+        dbpedia-owl:ground ?city;
+        rdfs:label ?clubName.
+  ?player dbpedia-owl:team ?club;
+          dbpedia-owl:birthPlace ?city;
+          rdfs:label ?playerName.
+  ?city dbpedia-owl:country dbpedia:Spain.
+
+  FILTER LANGMATCHES(LANG(?clubName), &quot;EN&quot;)
+  FILTER LANGMATCHES(LANG(?playerName), &quot;EN&quot;)
+}">Soccer players born in their club's city</option><option value="SELECT ?entity ?label ?comment
+WHERE {
+  ?entity a dbpedia-owl:MythologicalFigure;
+          rdfs:label ?label;
+          dc:subject &lt;http://dbpedia.org/resource/Category:Women_in_Greek_mythology&gt;;
+          rdfs:comment ?comment
+
+  FILTER(langMatches(lang(?label), &quot;EN&quot;))
+  FILTER(langMatches(lang(?comment), &quot;EN&quot;))
+}">Women in Greek mythology</option></select><div class="chosen chosen-single" style="width: 430px;" title=""><a class="chosen-single chosen-default" tabindex="-1"><span> </span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off"></div><ul class="chosen-results"></ul></div></div>
+</li>

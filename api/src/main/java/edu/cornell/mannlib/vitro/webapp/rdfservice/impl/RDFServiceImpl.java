@@ -18,12 +18,18 @@ import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.QueryParseException;
+import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.Syntax;
+import com.hp.hpl.jena.rdf.model.Literal;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelChangedListener;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import org.apache.jena.atlas.io.StringWriterI;
+import org.apache.jena.riot.out.NodeFormatter;
+import org.apache.jena.riot.out.NodeFormatterTTL;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
@@ -34,95 +40,96 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
+import org.vivoweb.linkeddatafragments.datasource.rdfservice.RDFServiceBasedRequestProcessorForTPFs;
 
 public abstract class RDFServiceImpl implements RDFService {
-	
-	private static final Log log = LogFactory.getLog(RDFServiceImpl.class);
-	protected static final String BNODE_ROOT_QUERY = 
-	        "SELECT DISTINCT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s } FILTER (!isBlank(?s) || !bound(?ss)) }";
-	
-	protected String defaultWriteGraphURI;
-	protected List<ChangeListener> registeredListeners = new CopyOnWriteArrayList<ChangeListener>();
-	protected List<ModelChangedListener> registeredJenaListeners = new CopyOnWriteArrayList<ModelChangedListener>();
-    	
-	@Override
-	public void newIndividual(String individualURI, 
-			                  String individualTypeURI) throws RDFServiceException {
-	
-       newIndividual(individualURI, individualTypeURI, defaultWriteGraphURI);
-	}
-		
+
+    private static final Log log = LogFactory.getLog(RDFServiceImpl.class);
+    protected static final String BNODE_ROOT_QUERY =
+            "SELECT DISTINCT ?s WHERE { ?s ?p ?o OPTIONAL { ?ss ?pp ?s } FILTER (!isBlank(?s) || !bound(?ss)) }";
+
+    protected String defaultWriteGraphURI;
+    protected List<ChangeListener> registeredListeners = new CopyOnWriteArrayList<ChangeListener>();
+    protected List<ModelChangedListener> registeredJenaListeners = new CopyOnWriteArrayList<ModelChangedListener>();
+
     @Override
-    public void newIndividual(String individualURI, 
-                              String individualTypeURI, 
+    public void newIndividual(String individualURI,
+                              String individualTypeURI) throws RDFServiceException {
+
+        newIndividual(individualURI, individualTypeURI, defaultWriteGraphURI);
+    }
+
+    @Override
+    public void newIndividual(String individualURI,
+                              String individualTypeURI,
                               String graphURI) throws RDFServiceException {
-    
-       StringBuffer containsQuery = new StringBuffer("ASK { \n");
-       if (graphURI != null) {
-           containsQuery.append("  GRAPH <" + graphURI + "> { ");
-       }
-       containsQuery.append("<");   
-       containsQuery.append(individualURI);
-       containsQuery.append("> ");  
-       containsQuery.append("?p ?o");
-       if (graphURI != null) {
-           containsQuery.append(" } \n");
-       }
-       containsQuery.append("\n}");
-       
-       if (sparqlAskQuery(containsQuery.toString())) {
+
+        StringBuffer containsQuery = new StringBuffer("ASK { \n");
+        if (graphURI != null) {
+            containsQuery.append("  GRAPH <" + graphURI + "> { ");
+        }
+        containsQuery.append("<");
+        containsQuery.append(individualURI);
+        containsQuery.append("> ");
+        containsQuery.append("?p ?o");
+        if (graphURI != null) {
+            containsQuery.append(" } \n");
+        }
+        containsQuery.append("\n}");
+
+        if (sparqlAskQuery(containsQuery.toString())) {
             throw new RDFServiceException("individual already exists");
-       } else {
+        } else {
             Triple triple = new Triple(NodeFactory.createURI(individualURI), RDF.type.asNode(), NodeFactory.createURI(individualTypeURI));
             //addTriple(triple, graphURI);
             ChangeSet cs = this.manufactureChangeSet();
             cs.addAddition(new ByteArrayInputStream(
                     sparqlTriple(triple).getBytes()), ModelSerializationFormat.N3, graphURI);
             changeSetUpdate(cs);
-       }    
+        }
     }
-	
-	@Override
-	public String getDefaultWriteGraphURI() throws RDFServiceException {
+
+    @Override
+    public String getDefaultWriteGraphURI() throws RDFServiceException {
         return defaultWriteGraphURI;
-	}
-		
-	@Override
-	public synchronized void registerListener(ChangeListener changeListener) throws RDFServiceException {
-		if (!registeredListeners.contains(changeListener)) {
-		   registeredListeners.add(changeListener);
-		}
-	}
-	
-	@Override
-	public synchronized void unregisterListener(ChangeListener changeListener) throws RDFServiceException {
-		registeredListeners.remove(changeListener);
-	}
-	
-	@Override
-	public synchronized void registerJenaModelChangedListener(ModelChangedListener changeListener) throws RDFServiceException {
-	    if (!registeredJenaListeners.contains(changeListener)) {
-	        registeredJenaListeners.add(changeListener);
-	    }
-	}
+    }
 
-	@Override
-	public synchronized void unregisterJenaModelChangedListener(ModelChangedListener changeListener) throws RDFServiceException {
-	    registeredJenaListeners.remove(changeListener);
-	}
+    @Override
+    public synchronized void registerListener(ChangeListener changeListener) throws RDFServiceException {
+        if (!registeredListeners.contains(changeListener)) {
+            registeredListeners.add(changeListener);
+        }
+    }
 
-	public synchronized List<ChangeListener> getRegisteredListeners() {
-	    return this.registeredListeners;
-	}
-	
-	public synchronized List<ModelChangedListener> getRegisteredJenaModelChangedListeners() {
-	    return this.registeredJenaListeners;
-	}
-	
-	@Override
-	public ChangeSet manufactureChangeSet() {
-		return new ChangeSetImpl();
-	}    
+    @Override
+    public synchronized void unregisterListener(ChangeListener changeListener) throws RDFServiceException {
+        registeredListeners.remove(changeListener);
+    }
+
+    @Override
+    public synchronized void registerJenaModelChangedListener(ModelChangedListener changeListener) throws RDFServiceException {
+        if (!registeredJenaListeners.contains(changeListener)) {
+            registeredJenaListeners.add(changeListener);
+        }
+    }
+
+    @Override
+    public synchronized void unregisterJenaModelChangedListener(ModelChangedListener changeListener) throws RDFServiceException {
+        registeredJenaListeners.remove(changeListener);
+    }
+
+    public synchronized List<ChangeListener> getRegisteredListeners() {
+        return this.registeredListeners;
+    }
+
+    public synchronized List<ModelChangedListener> getRegisteredJenaModelChangedListeners() {
+        return this.registeredJenaListeners;
+    }
+
+    @Override
+    public ChangeSet manufactureChangeSet() {
+        return new ChangeSetImpl();
+    }
 
     protected void notifyListenersOfChanges(ChangeSet changeSet)
             throws IOException {
@@ -133,7 +140,7 @@ public abstract class RDFServiceImpl implements RDFService {
             notifyListeners(modelChange);
         }
     }
-	
+
     protected void notifyListeners(ModelChange modelChange) throws IOException {
         modelChange.getSerializedModel().reset();
         Iterator<ChangeListener> iter = registeredListeners.iterator();
@@ -149,25 +156,25 @@ public abstract class RDFServiceImpl implements RDFService {
         Model tempModel = ModelFactory.createDefaultModel();
         Iterator<ModelChangedListener> jenaIter = registeredJenaListeners.iterator();
         while (jenaIter.hasNext()) {
-            ModelChangedListener listener = jenaIter.next(); 
+            ModelChangedListener listener = jenaIter.next();
             log.debug("\t" + listener.getClass().getSimpleName());
             tempModel.register(listener);
         }
         if (Operation.ADD.equals(modelChange.getOperation())) {
             tempModel.read(modelChange.getSerializedModel(), null,
-                   RDFServiceUtils.getSerializationFormatString(
-                           modelChange.getSerializationFormat())); 
+                    RDFServiceUtils.getSerializationFormatString(
+                            modelChange.getSerializationFormat()));
         } else if (Operation.REMOVE.equals(modelChange.getOperation())) {
             tempModel.remove(RDFServiceUtils.parseModel(
-                    modelChange.getSerializedModel(), 
+                    modelChange.getSerializedModel(),
                     modelChange.getSerializationFormat()));
         }
         while (jenaIter.hasNext()) {
             tempModel.unregister(jenaIter.next());
         }
     }
-    
-    public void notifyListenersOfEvent(Object event) {       
+
+    public void notifyListenersOfEvent(Object event) {
         Iterator<ChangeListener> iter = registeredListeners.iterator();
         while (iter.hasNext()) {
             ChangeListener listener = iter.next();
@@ -179,11 +186,11 @@ public abstract class RDFServiceImpl implements RDFService {
             ModelChangedListener listener = jenaIter.next();
             listener.notifyEvent(null, event);
         }
-    }    
-    
-    protected boolean isPreconditionSatisfied(String query, 
-            RDFService.SPARQLQueryType queryType)
-                    throws RDFServiceException {
+    }
+
+    protected boolean isPreconditionSatisfied(String query,
+                                              RDFService.SPARQLQueryType queryType)
+            throws RDFServiceException {
         Model model = ModelFactory.createDefaultModel();
         switch (queryType) {
             case DESCRIBE:
@@ -197,19 +204,19 @@ public abstract class RDFServiceImpl implements RDFService {
             case ASK:
                 return sparqlAskQuery(query);
             default:
-                throw new RDFServiceException("unrecognized SPARQL query type");  
-        }       
+                throw new RDFServiceException("unrecognized SPARQL query type");
+        }
     }
 
     protected static String getSerializationFormatString(RDFService.ModelSerializationFormat format) {
         switch (format) {
-            case RDFXML: 
+            case RDFXML:
                 return "RDF/XML";
-            case N3: 
+            case N3:
                 return "TTL";
-            case NTRIPLE: 
-                return "N-TRIPLE";    
-            default: 
+            case NTRIPLE:
+                return "N-TRIPLE";
+            default:
                 log.error("unexpected format in getFormatString");
                 return null;
         }
@@ -232,7 +239,7 @@ public abstract class RDFServiceImpl implements RDFService {
         return serializedTriple.toString();
 
     }
-    
+
     protected static String sparqlNodeUpdate(Node node, String varName) {
         if (node.isBlank()) {
             return "_:" + node.getBlankNodeLabel().replaceAll("\\W", "");
@@ -264,9 +271,9 @@ public abstract class RDFServiceImpl implements RDFService {
             return varName;
         }
     }
-       
-     // see http://www.python.org/doc/2.5.2/ref/strings.html
-     // or see jena's n3 grammar jena/src/com/hp/hpl/jena/n3/n3.g  
+
+    // see http://www.python.org/doc/2.5.2/ref/strings.html
+    // or see jena's n3 grammar jena/src/com/hp/hpl/jena/n3/n3.g
     protected static void pyString(StringBuffer sbuff, String s)  {
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
@@ -277,27 +284,27 @@ public abstract class RDFServiceImpl implements RDFService {
                 sbuff.append('\\') ;
                 sbuff.append(c) ;
                 continue ;
-            }            
+            }
 
-            // Whitespace                        
+            // Whitespace
             if (c == '\n'){ sbuff.append("\\n");continue; }
             if (c == '\t'){ sbuff.append("\\t");continue; }
             if (c == '\r'){ sbuff.append("\\r");continue; }
-            if (c == '\f'){ sbuff.append("\\f");continue; }                            
+            if (c == '\f'){ sbuff.append("\\f");continue; }
             if (c == '\b'){ sbuff.append("\\b");continue; }
             if( c == 7 )  { sbuff.append("\\a");continue; }
-            
+
             // Output as is (subject to UTF-8 encoding on output that is)
             sbuff.append(c) ;
         }
     }
-    
+
     /**
-     * Returns a pair of models.  The first contains any statement containing at 
+     * Returns a pair of models.  The first contains any statement containing at
      * least one blank node.  The second contains all remaining statements.
      * @param gm Jena model
      */
-    
+
     protected Model[] separateStatementsWithBlankNodes(Model gm) {
         Model blankNodeModel = ModelFactory.createDefaultModel();
         Model nonBlankNodeModel = ModelFactory.createDefaultModel();
@@ -315,30 +322,146 @@ public abstract class RDFServiceImpl implements RDFService {
         result[1] = nonBlankNodeModel;
         return result;
     }
-    
+
     protected Query createQuery(String queryString) throws RDFServiceException {
         List<Syntax> syntaxes = Arrays.asList(
-                Syntax.defaultQuerySyntax, Syntax.syntaxSPARQL_11, 
+                Syntax.defaultQuerySyntax, Syntax.syntaxSPARQL_11,
                 Syntax.syntaxSPARQL_10, Syntax.syntaxSPARQL, Syntax.syntaxARQ);
         Query q = null;
-        Iterator<Syntax> syntaxIt = syntaxes.iterator(); 
+        Iterator<Syntax> syntaxIt = syntaxes.iterator();
         while (q == null) {
             Syntax syntax = syntaxIt.next();
             try {
-               q = QueryFactory.create(queryString, syntax);  
+                q = QueryFactory.create(queryString, syntax);
             } catch (QueryParseException e) {
-               if (!syntaxIt.hasNext()) {
-					throw new RDFServiceException("Failed to parse query \""
-							+ queryString + "\"", e);
-               }
+                if (!syntaxIt.hasNext()) {
+                    throw new RDFServiceException("Failed to parse query \""
+                            + queryString + "\"", e);
+                }
             }
         }
         return q;
     }
 
-	@Override
-	public String toString() {
-		return ToString.simpleName(this) + "[" + ToString.hashHex(this) + "]";
-	}
-    
+    @Override
+    public String toString() {
+        return ToString.simpleName(this) + "[" + ToString.hashHex(this) + "]";
+    }
+
+    @Override
+    public long countTriples(RDFNode subject, RDFNode predicate, RDFNode object) throws RDFServiceException {
+        StringBuilder whereClause = new StringBuilder();
+        StringBuilder orderBy = new StringBuilder();
+
+        if ( subject != null ) {
+            appendNode(whereClause.append(' '), subject);
+        } else {
+            whereClause.append(" ?s");
+            orderBy.append(" ?s");
+        }
+
+        if ( predicate != null ) {
+            appendNode(whereClause.append(' '), predicate);
+        } else {
+            whereClause.append(" ?p");
+            orderBy.append(" ?p");
+        }
+
+        if ( object != null ) {
+            appendNode(whereClause.append(' '), object);
+        } else {
+            whereClause.append(" ?o");
+            orderBy.append(" ?o");
+        }
+
+        long estimate = -1;
+
+        StringBuilder count = new StringBuilder();
+        count.append("SELECT (COUNT(*) AS ?count) WHERE { ");
+        count.append(whereClause.toString());
+        count.append(" . ");
+        count.append(" }");
+        CountConsumer countConsumer = new CountConsumer();
+        this.sparqlSelectQuery(count.toString(), countConsumer);
+        return countConsumer.count;
+    }
+
+    @Override
+    public Model getTriples(RDFNode subject, RDFNode predicate, RDFNode object, long limit, long offset) throws RDFServiceException {
+        StringBuilder whereClause = new StringBuilder();
+        StringBuilder orderBy = new StringBuilder();
+
+        if ( subject != null ) {
+            appendNode(whereClause.append(' '), subject);
+        } else {
+            whereClause.append(" ?s");
+            orderBy.append(" ?s");
+        }
+
+        if ( predicate != null ) {
+            appendNode(whereClause.append(' '), predicate);
+        } else {
+            whereClause.append(" ?p");
+            orderBy.append(" ?p");
+        }
+
+        if ( object != null ) {
+            appendNode(whereClause.append(' '), object);
+        } else {
+            whereClause.append(" ?o");
+            orderBy.append(" ?o");
+        }
+
+        StringBuilder constructQuery = new StringBuilder();
+
+        constructQuery.append("CONSTRUCT { ");
+        constructQuery.append(whereClause.toString());
+        constructQuery.append(" } WHERE { ");
+        constructQuery.append(whereClause.toString()).append(" . ");
+        constructQuery.append(" }");
+
+        if (orderBy.length() > 0) {
+            constructQuery.append(" ORDER BY").append(orderBy.toString());
+        }
+
+        if (limit > 0) {
+            constructQuery.append(" LIMIT ").append(limit);
+        }
+
+        if (offset > 0) {
+            constructQuery.append(" OFFSET ").append(offset);
+        }
+
+        Model triples = ModelFactory.createDefaultModel();
+        this.sparqlConstructQuery(constructQuery.toString(), triples);
+
+        return triples;
+    }
+
+    private void appendNode(StringBuilder builder, RDFNode node) {
+        if (node.isLiteral()) {
+            builder.append(literalToString(node.asLiteral()));
+        } else if (node.isURIResource()) {
+            builder.append('<' + node.asResource().getURI() + '>');
+        }
+    }
+
+    private String literalToString(Literal l) {
+        StringWriterI sw = new StringWriterI();
+        NodeFormatter fmt = new NodeFormatterTTL(null, null);
+        fmt.formatLiteral(sw, l.asNode());
+        return sw.toString();
+    }
+
+    class CountConsumer extends ResultSetConsumer {
+        public long count = -1;
+
+        @Override
+        protected void processQuerySolution(QuerySolution qs) {
+            if (count == -1) {
+                Literal literal = qs.getLiteral("count");
+                count = literal.getLong();
+            }
+        }
+    }
 }

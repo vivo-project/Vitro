@@ -16,6 +16,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceFactory;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
+import com.hp.hpl.jena.rdf.model.RDFNode;
 
 /**
  * An RDFServiceFactory that always returns the same RDFService object
@@ -25,45 +26,45 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 public class RDFServiceFactorySingle implements RDFServiceFactory {
 
     private RDFService rdfService;
-    
+
     public RDFServiceFactorySingle(RDFService rdfService) {
         this.rdfService = new UnclosableRDFService(rdfService);
     }
-    
+
     @Override
     public RDFService getRDFService() {
         return this.rdfService;
     }
-    
-    @Override 
+
+    @Override
     public RDFService getShortTermRDFService() {
         return this.rdfService;
     }
-    
+
     @Override
     public void registerListener(ChangeListener listener) throws RDFServiceException {
         this.rdfService.registerListener(listener);
     }
-    
+
     @Override
     public void unregisterListener(ChangeListener listener) throws RDFServiceException {
         this.rdfService.unregisterListener(listener);
     }
-    
+
     @Override
     public void registerJenaModelChangedListener(ModelChangedListener listener) throws RDFServiceException {
         this.rdfService.registerJenaModelChangedListener(listener);
     }
-    
+
     @Override
     public void unregisterJenaModelChangedListener(ModelChangedListener listener) throws RDFServiceException {
         this.rdfService.unregisterJenaModelChangedListener(listener);
     }
-    
+
     public class UnclosableRDFService implements RDFService {
-        
+
         private RDFService s;
-        
+
         public UnclosableRDFService(RDFService rdfService) {
             this.s = rdfService;
         }
@@ -82,14 +83,14 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
 
         @Override
         public void newIndividual(String individualURI,
-                String individualTypeURI, String graphURI)
+                                  String individualTypeURI, String graphURI)
                 throws RDFServiceException {
             s.newIndividual(individualURI, individualTypeURI, graphURI);
         }
 
         @Override
         public InputStream sparqlConstructQuery(String query,
-                ModelSerializationFormat resultFormat)
+                                                ModelSerializationFormat resultFormat)
                 throws RDFServiceException {
             return s.sparqlConstructQuery(query, resultFormat);
         }
@@ -102,14 +103,14 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
 
         @Override
         public InputStream sparqlDescribeQuery(String query,
-                ModelSerializationFormat resultFormat)
+                                               ModelSerializationFormat resultFormat)
                 throws RDFServiceException {
             return s.sparqlDescribeQuery(query, resultFormat);
         }
 
         @Override
         public InputStream sparqlSelectQuery(String query,
-                ResultFormat resultFormat) throws RDFServiceException {
+                                             ResultFormat resultFormat) throws RDFServiceException {
             return s.sparqlSelectQuery(query, resultFormat);
         }
 
@@ -139,23 +140,23 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
         }
 
         @Override
-    	public void serializeAll(OutputStream outputStream)
-    			throws RDFServiceException {
-        	s.serializeAll(outputStream);
-    	}
+        public void serializeAll(OutputStream outputStream)
+                throws RDFServiceException {
+            s.serializeAll(outputStream);
+        }
 
-    	@Override
-    	public void serializeGraph(String graphURI, OutputStream outputStream)
-    			throws RDFServiceException {
-    		s.serializeGraph(graphURI, outputStream);
-    	}
+        @Override
+        public void serializeGraph(String graphURI, OutputStream outputStream)
+                throws RDFServiceException {
+            s.serializeGraph(graphURI, outputStream);
+        }
 
-    	@Override
-    	public boolean isEquivalentGraph(String graphURI,
-    			InputStream serializedGraph,
-    			ModelSerializationFormat serializationFormat) throws RDFServiceException {
-    		return s.isEquivalentGraph(graphURI, serializedGraph, serializationFormat);
-    	}
+        @Override
+        public boolean isEquivalentGraph(String graphURI,
+                                         InputStream serializedGraph,
+                                         ModelSerializationFormat serializationFormat) throws RDFServiceException {
+            return s.isEquivalentGraph(graphURI, serializedGraph, serializationFormat);
+        }
 
         @Override
         public boolean isEquivalentGraph(String graphURI,
@@ -174,7 +175,7 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
                 throws RDFServiceException {
             s.unregisterListener(changeListener);
         }
-        
+
         @Override
         public void registerJenaModelChangedListener(ModelChangedListener changeListener)
                 throws RDFServiceException {
@@ -193,15 +194,25 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
         }
 
         @Override
+        public long countTriples(RDFNode subject, RDFNode predicate, RDFNode object) throws RDFServiceException {
+            return s.countTriples(subject, predicate, object);
+        }
+
+        @Override
+        public Model getTriples(RDFNode subject, RDFNode predicate, RDFNode object, long limit, long offset) throws RDFServiceException {
+            return s.getTriples(subject, predicate, object, limit, offset);
+        }
+
+        @Override
         public void close() {
             // Don't close s.  It's being used by everybody.
         }
-        
-		@Override
-		public String toString() {
-			return ToString.simpleName(this) + "[" + ToString.hashHex(this)
-					+ ", inner=" + s + "]";
-		}
+
+        @Override
+        public String toString() {
+            return ToString.simpleName(this) + "[" + ToString.hashHex(this)
+                    + ", inner=" + s + "]";
+        }
 
     }
 
