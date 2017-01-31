@@ -12,18 +12,24 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.apache.jena.atlas.io.StringWriterI;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QueryParseException;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.Syntax;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelChangedListener;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.riot.out.NodeFormatter;
+import org.apache.jena.riot.out.NodeFormatterTTL;
 import org.apache.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
@@ -34,6 +40,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
+import org.vivoweb.linkeddatafragments.datasource.rdfservice.RDFServiceBasedRequestProcessorForTPFs;
 
 public abstract class RDFServiceImpl implements RDFService {
 	
@@ -340,5 +347,121 @@ public abstract class RDFServiceImpl implements RDFService {
 	public String toString() {
 		return ToString.simpleName(this) + "[" + ToString.hashHex(this) + "]";
 	}
-    
+
+    @Override
+    public long countTriples(RDFNode subject, RDFNode predicate, RDFNode object) throws RDFServiceException {
+        StringBuilder whereClause = new StringBuilder();
+        StringBuilder orderBy = new StringBuilder();
+
+        if ( subject != null ) {
+            appendNode(whereClause.append(' '), subject);
+        } else {
+            whereClause.append(" ?s");
+            orderBy.append(" ?s");
+        }
+
+        if ( predicate != null ) {
+            appendNode(whereClause.append(' '), predicate);
+        } else {
+            whereClause.append(" ?p");
+            orderBy.append(" ?p");
+        }
+
+        if ( object != null ) {
+            appendNode(whereClause.append(' '), object);
+        } else {
+            whereClause.append(" ?o");
+            orderBy.append(" ?o");
+        }
+
+        long estimate = -1;
+
+        StringBuilder count = new StringBuilder();
+        count.append("SELECT (COUNT(*) AS ?count) WHERE { ");
+        count.append(whereClause.toString());
+        count.append(" . ");
+        count.append(" }");
+        CountConsumer countConsumer = new CountConsumer();
+        this.sparqlSelectQuery(count.toString(), countConsumer);
+        return countConsumer.count;
+    }
+
+    @Override
+    public Model getTriples(RDFNode subject, RDFNode predicate, RDFNode object, long limit, long offset) throws RDFServiceException {
+        StringBuilder whereClause = new StringBuilder();
+        StringBuilder orderBy = new StringBuilder();
+
+        if ( subject != null ) {
+            appendNode(whereClause.append(' '), subject);
+        } else {
+            whereClause.append(" ?s");
+            orderBy.append(" ?s");
+        }
+
+        if ( predicate != null ) {
+            appendNode(whereClause.append(' '), predicate);
+        } else {
+            whereClause.append(" ?p");
+            orderBy.append(" ?p");
+        }
+
+        if ( object != null ) {
+            appendNode(whereClause.append(' '), object);
+        } else {
+            whereClause.append(" ?o");
+            orderBy.append(" ?o");
+        }
+
+        StringBuilder constructQuery = new StringBuilder();
+
+        constructQuery.append("CONSTRUCT { ");
+        constructQuery.append(whereClause.toString());
+        constructQuery.append(" } WHERE { ");
+        constructQuery.append(whereClause.toString()).append(" . ");
+        constructQuery.append(" }");
+
+        if (orderBy.length() > 0) {
+            constructQuery.append(" ORDER BY").append(orderBy.toString());
+        }
+
+        if (limit > 0) {
+            constructQuery.append(" LIMIT ").append(limit);
+        }
+
+        if (offset > 0) {
+            constructQuery.append(" OFFSET ").append(offset);
+        }
+
+        Model triples = ModelFactory.createDefaultModel();
+        this.sparqlConstructQuery(constructQuery.toString(), triples);
+
+        return triples;
+    }
+
+    private void appendNode(StringBuilder builder, RDFNode node) {
+        if (node.isLiteral()) {
+            builder.append(literalToString(node.asLiteral()));
+        } else if (node.isURIResource()) {
+            builder.append('<' + node.asResource().getURI() + '>');
+        }
+    }
+
+    private String literalToString(Literal l) {
+        StringWriterI sw = new StringWriterI();
+        NodeFormatter fmt = new NodeFormatterTTL(null, null);
+        fmt.formatLiteral(sw, l.asNode());
+        return sw.toString();
+    }
+
+    class CountConsumer extends ResultSetConsumer {
+        public long count = -1;
+
+        @Override
+        protected void processQuerySolution(QuerySolution qs) {
+            if (count == -1) {
+                Literal literal = qs.getLiteral("count");
+                count = literal.getLong();
+            }
+        }
+    }
 }
