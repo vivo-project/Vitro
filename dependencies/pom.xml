@@ -209,6 +209,12 @@
             <artifactId>jackson-core</artifactId>
             <version>2.7.4</version>
         </dependency>
+        <!-- Needed for ORCID? -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>fluent-hc</artifactId>
+            <version>4.5.2</version>
+        </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
