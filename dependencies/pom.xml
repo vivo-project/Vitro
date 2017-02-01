@@ -261,6 +261,11 @@
             <version>2.3.23</version>
         </dependency>
         <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>jtidy</artifactId>
             <version>r8-20060801</version>
@@ -298,11 +303,11 @@
             <version>1.2.1</version>
         </dependency>
 
-        <dependency>
+        <!-- dependency>
             <groupId>javax.json</groupId>
             <artifactId>javax.json-api</artifactId>
             <version>1.0</version>
-        </dependency>
+        </dependency -->
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
