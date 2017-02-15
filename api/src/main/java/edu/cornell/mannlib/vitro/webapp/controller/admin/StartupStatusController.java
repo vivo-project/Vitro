@@ -11,6 +11,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 
 /**
@@ -27,7 +28,7 @@ public class StartupStatusController extends FreemarkerHttpServlet {
 	protected ResponseValues processRequest(VitroRequest vreq) {
 		Map<String, Object> body = new HashMap<String, Object>();
 
-		body.put("title", "Startup Status");
+		body.put("title", I18n.text(vreq, "startup_status"));
 		body.put("status", StartupStatus.getBean(getServletContext()));
 		body.put("contextPath", getContextPath());
 		body.put("applicationName", getApplicationName(vreq));

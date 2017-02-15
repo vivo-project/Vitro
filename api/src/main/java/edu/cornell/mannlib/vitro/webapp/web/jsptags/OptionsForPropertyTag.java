@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -95,11 +95,11 @@ public class OptionsForPropertyTag extends TagSupport {
             for( Individual ind : individuals ){
                 String uri = ind.getURI()  ;
                 if( uri != null ){
-                    out.print("<option value=\"" + StringEscapeUtils.escapeHtml( uri ) + '"');
+                    out.print("<option value=\"" + StringEscapeUtils.ESCAPE_HTML4.translate( uri ) + '"');
                     if( uri.equals(getSelectedUri()))
                         out.print(" selected=\"selected\"");
                     out.print('>');
-                    out.print(StringEscapeUtils.escapeHtml( ind.getName() ));
+                    out.print(StringEscapeUtils.ESCAPE_HTML4.translate( ind.getName() ));
                     out.println("</option>");
                     ++optionsCount;
                 }

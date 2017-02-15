@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.imageprocessor.imageio;
 
-import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
 import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
@@ -10,11 +9,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.imageio.ImageIO;
-import javax.media.jai.JAI;
-import javax.media.jai.RenderedOp;
-import javax.media.jai.operator.BandSelectDescriptor;
-import javax.media.jai.operator.StreamDescriptor;
-import javax.media.jai.util.ImagingListener;
+import javax.imageio.stream.ImageInputStream;
+import javax.imageio.stream.MemoryCacheImageInputStream;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
@@ -55,8 +51,8 @@ public class IIOImageProcessor implements ImageProcessor {
 	 */
 	@Override
 	public void startup(Application application, ComponentStartupStatus ss) {
-		JAI.getDefaultInstance().setImagingListener(
-				new NonNoisyImagingListener());
+//		JAI.getDefaultInstance().setImagingListener(
+//				new NonNoisyImagingListener());
 	}
 
 	@Override
@@ -66,7 +62,7 @@ public class IIOImageProcessor implements ImageProcessor {
 
 	@Override
 	public Dimensions getDimensions(InputStream imageStream) throws ImageProcessorException, IOException {
-		MemoryCacheSeekableStream stream = new MemoryCacheSeekableStream(imageStream);
+		ImageInputStream stream = new MemoryCacheImageInputStream(imageStream);
 		BufferedImage image = ImageIO.read(stream);
 		return new Dimensions(image.getWidth(), image.getHeight());
 	}
@@ -80,7 +76,7 @@ public class IIOImageProcessor implements ImageProcessor {
 			CropRectangle crop, Dimensions limits)
 			throws ImageProcessorException, IOException {
 		try {
-			MemoryCacheSeekableStream stream = new MemoryCacheSeekableStream(mainImageStream);
+			ImageInputStream stream = new MemoryCacheImageInputStream(mainImageStream);
 			BufferedImage mainImage = ImageIO.read(stream);
 
 			BufferedImage bufferedImage = new BufferedImage(mainImage.getWidth(), mainImage.getHeight(), BufferedImage.TYPE_3BYTE_BGR); // BufferedImage.TYPE_INT_RGB
@@ -176,33 +172,4 @@ public class IIOImageProcessor implements ImageProcessor {
 		ImageIO.write(image, "JPG", bytes);
 		return bytes.toByteArray();
 	}
-
-	/**
-	 * This ImagingListener means that Java Advanced Imaging won't dump an
-	 * exception log to System.out. It writes to the log, instead.
-	 * 
-	 * Further, since the lack of native accelerator classes isn't an error, it
-	 * is written as a simple log message.
-	 */
-	static class NonNoisyImagingListener implements ImagingListener {
-		@Override
-		public boolean errorOccurred(String message, Throwable thrown,
-				Object where, boolean isRetryable) throws RuntimeException {
-			if (thrown instanceof RuntimeException) {
-				throw (RuntimeException) thrown;
-			}
-			if ((thrown instanceof NoClassDefFoundError)
-					&& (thrown.getMessage()
-							.contains("com/sun/medialib/mlib/Image"))) {
-				log.info("Java Advanced Imaging: Could not find mediaLib "
-						+ "accelerator wrapper classes. "
-						+ "Continuing in pure Java mode.");
-				return false;
-			}
-			log.error(thrown, thrown);
-			return false;
-		}
-
-	}
-
 }

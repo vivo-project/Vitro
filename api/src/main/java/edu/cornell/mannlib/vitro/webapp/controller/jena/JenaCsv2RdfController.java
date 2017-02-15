@@ -141,7 +141,7 @@ public class JenaCsv2RdfController extends JenaIngestController {
     }
 
 	 public Model doExecuteCsv2Rdf(VitroRequest vreq, FileItem fileStream, String filePath) throws Exception {
-			char[] quoteChars = {'"'};
+			char quoteChar = '"';
 			String namespace = "";
 			String tboxNamespace = vreq.getParameter("tboxNamespace");
 			String typeName = vreq.getParameter("typeName");
@@ -162,7 +162,7 @@ public class JenaCsv2RdfController extends JenaIngestController {
 				separatorChar = '\t';
 			}
 			
-			Csv2Rdf c2r = new Csv2Rdf(separatorChar, quoteChars,namespace,tboxNamespace,typeName);
+			Csv2Rdf c2r = new Csv2Rdf(separatorChar, quoteChar,namespace,tboxNamespace,typeName);
 			
 			InputStream is = null;
 			

@@ -54,7 +54,7 @@ function encodeUrl(pstrString) {
 */
 function addRows(ele, data, cellFuncs, rowFunc) {
   var frag = document.createDocumentFragment();
-  if (DWRUtil._isArray(data))    {
+  if (dwr.util._isArray(data))    {
     for (var i = 0; i < data.length; i++) {
       frag.appendChild( makeRow( data[i], cellFuncs, rowFunc) );
     }
@@ -77,9 +77,9 @@ function makeRow( row, cellFuncs, rowFunc){
     var func = cellFuncs[j]
       var td
       var reply = func(row)
-      if (DWRUtil._isHTMLElement(reply, "td")) {
+      if (dwr.util._isHTMLElement(reply, "td")) {
         td = reply;
-      } else if (DWRUtil._isHTMLElement(reply, "a")) {
+      } else if (dwr.util._isHTMLElement(reply, "a")) {
         td = document.createElement("td");
         td.appendChild( reply );
       } else {
@@ -91,7 +91,7 @@ function makeRow( row, cellFuncs, rowFunc){
   return tr;
 }
 
-/** added this from the DWRUtil.js */
+/** added this from the dwr.util.js */
 isDate = function(data) {     
     return (data && data.toUTCString) ? true : false; 
 };
@@ -147,8 +147,8 @@ function date2iso8601( jdate ){
 function setDateValue(ele, date, date2StrFunc){  
   if( date == null || ! isDate(date)) { return; }
   if( date2StrFunc == null ) { date2StrFunc = date2iso8601; }
-  ele = $(ele);
-  DWRUtil.setValue(ele, date2StrFunc( date ));  
+  ele = dwr.util.byId(ele);
+  dwr.util.setValue(ele, date2StrFunc( date ));
 }
 
 /* removes all children and if it can, removes options */
@@ -160,7 +160,7 @@ function clear(ele){
 }
 
 function hideElementById(eleId){
-  var ele = $(eleId);
+  var ele = dwr.util.byId(eleId);
   if( ele != null ){  ele.style.display="none"; } 
 }
 
@@ -168,7 +168,7 @@ function makeEntLinkElement(entityURI, text){
   link = document.createElement("a");
   link.href = "entityEdit?uri=" + encodeUrl(entityURI);
   link.innerHTML = text;
-  //DWRUtil.setValue(link, "test" + text);
+  //dwr.util.setValue(link, "test" + text);
   return link;
 }
 
@@ -375,7 +375,7 @@ function adjustIFrameSize(id) {
 }
 
 function toggleDisabled(ele){
-  ele = $(ele);
+  ele = dwr.util.byId(ele);
   if(ele == null) {return;}
   ele.disabled = !ele.disabled ;
 }
@@ -403,16 +403,16 @@ and returns a value for use in the select option value.
 textFun is a function that takes one parameter, an object,
 and returns a value for use in the select option text.
 
-This is based on the code in DWRUtil but lacks the error checking.
+This is based on the code in dwr.util but lacks the error checking.
  */
 addOptions = function(ele, data, valueFunc, textFunc) {
   var orig = ele;
-  ele = $(ele);
+  ele = dwr.util.byId(ele);
   if (ele == null) {
-    DWRUtil.debug("addOptions() can't find an element with id: " + orig + ".");
+    dwr.util.debug("addOptions() can't find an element with id: " + orig + ".");
     return;
   }
-  var useOptions = DWRUtil._isHTMLElement(ele, "select");  
+  var useOptions = dwr.util._isHTMLElement(ele, "select");
   if (data == null) return;
 
   var text;

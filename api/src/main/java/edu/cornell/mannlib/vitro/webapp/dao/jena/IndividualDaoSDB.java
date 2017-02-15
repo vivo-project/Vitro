@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.joda.time.DateTime;

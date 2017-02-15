@@ -24,7 +24,7 @@ import org.apache.jena.query.ResultSet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
-import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryRunner;
+import edu.cornell.mannlib.vitro.webapp.utils.sparqlrunner.ResultSetParser;
 
 /**
  * A base class for AJAX responder objects, to be instantiated and invoked by
@@ -82,7 +82,7 @@ public abstract class AbstractAjaxResponder {
 	 */
 	protected String assembleJsonResponse(List<Map<String, String>> maps) {
 		JSONArray jsonArray = new JSONArray();
-		for (Map<String, String> map: maps) {
+		for (Map<String, String> map : maps) {
 			jsonArray.put(map);
 		}
 		return jsonArray.toString();
@@ -93,7 +93,7 @@ public abstract class AbstractAjaxResponder {
 	 * implement "parseSolutionRow()"
 	 */
 	protected abstract static class JsonArrayParser extends
-			SparqlQueryRunner.QueryParser<JSONArray> {
+			ResultSetParser<JSONArray> {
 		@Override
 		protected JSONArray defaultValue() {
 			return new JSONArray();

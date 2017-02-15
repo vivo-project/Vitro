@@ -8,7 +8,7 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.JspWriter;
 import edu.cornell.mannlib.vedit.beans.FormObject;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import edu.cornell.mannlib.vedit.tags.EditTag;
 
 public class ValueTag extends EditTag {
@@ -35,7 +35,7 @@ public class ValueTag extends EditTag {
             if (values != null){
                 String value = (String) values.get(name);
                 if (value != null)
-                    out.print(StringEscapeUtils.escapeHtml(value));
+                    out.print(StringEscapeUtils.ESCAPE_HTML4.translate(value));
             } else {
                 System.out.println("ValueTag unable to get HashMap of form values");
             }

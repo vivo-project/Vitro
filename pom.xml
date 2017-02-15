@@ -7,7 +7,7 @@
 
     <groupId>org.vivoweb</groupId>
     <artifactId>vitro-project</artifactId>
-    <version>1.9.0-SNAPSHOT</version>
+    <version>1.10.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Vitro</name>
@@ -166,8 +166,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
@@ -247,14 +247,6 @@
             </plugins>
         </pluginManagement>
     </build>
-
-    <repositories>
-        <repository>
-            <id>vivo-dependencies</id>
-            <name>VIVO Dependencies</name>
-            <url>https://raw.github.com/vivo-project/dependencies/master/</url>
-        </repository>
-    </repositories>
 
     <distributionManagement>
         <snapshotRepository>

@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelChangedListener;
+import org.apache.jena.rdf.model.RDFNode;
 
 /**
  * Interface for API to write, read, and update Vitro's RDF store, with support 
@@ -247,7 +248,11 @@ public interface RDFService {
 	 * 
 	 * @return ChangeSet an empty ChangeSet object
 	 */
-	public ChangeSet manufactureChangeSet();	
+	public ChangeSet manufactureChangeSet();
+
+	public long countTriples(RDFNode subject, RDFNode predicate, RDFNode object) throws RDFServiceException;
+
+	public Model getTriples(RDFNode subject, RDFNode predicate, RDFNode object, long limit, long offset) throws RDFServiceException;
 		
 	/**
      * Frees any resources held by this RDFService object

@@ -6,7 +6,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.apache.jena.ontology.OntModel;
 

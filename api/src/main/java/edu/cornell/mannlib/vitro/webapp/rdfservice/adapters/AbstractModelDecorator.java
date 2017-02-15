@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.graph.Graph;
@@ -1078,4 +1079,33 @@ public abstract class AbstractModelDecorator implements Model {
 		return inner.isClosed();
 	}
 
+	@Override
+	public Statement getRequiredProperty(Resource resource, Property property, String s) {
+		return inner.getRequiredProperty(resource, property, s);
+	}
+
+	@Override
+	public Statement getProperty(Resource resource, Property property, String s) {
+		return inner.getProperty(resource, property, s);
+	}
+
+	@Override
+	public void executeInTxn(Runnable runnable) {
+		inner.executeInTxn(runnable);
+	}
+
+	@Override
+	public <T> T calculateInTxn(Supplier<T> supplier) {
+		return inner.calculateInTxn(supplier);
+	}
+
+	@Override
+	public PrefixMapping clearNsPrefixMap() {
+		return inner.clearNsPrefixMap();
+	}
+
+	@Override
+	public int numPrefixes() {
+		return inner.numPrefixes();
+	}
 }

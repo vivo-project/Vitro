@@ -20,7 +20,7 @@
 	var urlsBase = '${urls.base}';
 </script>
 
-	<img id="downloadIcon" src="images/download-icon.png" alt="Download Results" title="Download Results" />
+	<img id="downloadIcon" src="images/download-icon.png" alt="${i18n().download_results}" title="${i18n().download_results}" />
 <#-- <span id="downloadResults" style="float:left"></span>  -->
 </h2>
 
@@ -42,7 +42,7 @@
     <#if classLinks?has_content>
         <div class="searchTOC">
             <#if classGroupName?has_content>
-                <h4>${i18n().limit} ${classGroupName} to</h4>
+                <h4>${i18n().limit} ${classGroupName} ${i18n().to}</h4>
             <#else>
                 <h4>${i18n().limit_to}</h4>
             </#if>
@@ -67,7 +67,7 @@
     <#-- Paging controls -->
     <#if (pagingLinks?size > 0)>
         <div class="searchpages">
-            Pages: 
+            ${i18n().pages}: 
             <#if prevPage??><a class="prev" href="${prevPage}" title="${i18n().previous}">${i18n().previous}</a></#if>
             <#list pagingLinks as link>
                 <#if link.url??>
@@ -109,10 +109,11 @@
 </div> <!-- end contentsBrowseGroup -->
 
 ${stylesheets.add('<link rel="stylesheet" href="//code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />',
-  				  '<link rel="stylesheet" href="${urls.base}/css/search.css" />')}
+  				  '<link rel="stylesheet" href="${urls.base}/css/search.css" />',
+                  '<link rel="stylesheet" type="text/css" href="${urls.base}/css/jquery_plugins/qtip/jquery.qtip.min.css" />')}
 
 ${headScripts.add('<script src="//code.jquery.com/ui/1.10.3/jquery-ui.js"></script>',
-				  '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/qtip/jquery.qtip-1.0.0-rc3.min.js"></script>',
+				  '<script type="text/javascript" src="${urls.base}/js/jquery_plugins/qtip/jquery.qtip.min.js"></script>',
                   '<script type="text/javascript" src="${urls.base}/js/tiny_mce/tiny_mce.js"></script>'
                   )}
 

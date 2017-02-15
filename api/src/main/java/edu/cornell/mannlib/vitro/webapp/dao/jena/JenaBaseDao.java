@@ -868,6 +868,28 @@ public class JenaBaseDao extends JenaBaseDaoCon {
         return label;
     }
     
+    /**
+     * Searches for literal in preferred language.
+     * @param labels
+     * 				the literals to search; must not be null
+     * @return the literal in preferred language if its containing in given list; 
+     * otherwise the first entry will returned; returns null if an empty list was given 
+     */
+    protected Literal tryLiteralForPreferredLanguages(List<Literal> labels) {
+    	
+    	// search for literal of preferred language
+    	for (Literal literal : labels) {
+	    	for (String lang : PREFERRED_LANGUAGES) {
+	    		if (lang.equals(literal.getLanguage())) {
+	    			return literal;
+	    		}
+	    	}
+    	}
+
+    	// return first literal as last resort
+    	return 0 == labels.size() ? null : labels.get(0);
+    }
+    
     private Literal tryPropertyForPreferredLanguages( OntResource r, Property p, boolean alsoTryNoLang ) {
     	Literal label = null;
 	    List<RDFNode> labels = r.listPropertyValues(p).toList();
@@ -1149,7 +1171,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     	
     	String describeQueryStr =    "DESCRIBE <" + res.getURI() + ">" ;
     	
-//    	?	"PREFIX afn: <http://jena.hpl.hp.com/ARQ/function#> \n\n" +
+//    	?	"PREFIX afn: <http://jena.apache.org/ARQ/function#> \n\n" +
 //    		"DESCRIBE ?bnode \n" +
 //    	    "WHERE { \n" +
 //    		"    FILTER(afn:bnode(?bnode) = \"" + res.getId().toString() + "\")\n" +

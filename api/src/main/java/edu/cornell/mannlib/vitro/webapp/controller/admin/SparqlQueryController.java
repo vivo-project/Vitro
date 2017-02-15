@@ -16,7 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,9 +36,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.utils.SparqlQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.http.AcceptHeaderParsingException;
 import edu.cornell.mannlib.vitro.webapp.utils.http.NotAcceptableException;
+import edu.cornell.mannlib.vitro.webapp.utils.sparql.SparqlQueryUtils;
 
 /**
  * Present the SPARQL Query form, and execute the queries.

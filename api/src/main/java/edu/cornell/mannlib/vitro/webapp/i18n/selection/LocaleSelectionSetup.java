@@ -10,8 +10,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.commons.lang.LocaleUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.LocaleUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -132,6 +132,12 @@ public class LocaleSelectionSetup implements ServletContextListener {
 
 	private Locale buildLocale(String localeString)
 			throws IllegalArgumentException {
+
+		// Replicate exception from lang2 with empty strings
+		if ("".equals(localeString)) {
+			throw new IllegalArgumentException("Invalid locale format");
+		}
+
 		Locale locale = LocaleUtils.toLocale(localeString);
 
 		if (!"es_GO".equals(localeString) && // No complaint about bogus locale

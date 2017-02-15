@@ -27,7 +27,7 @@ import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.DynamicField;
 import edu.cornell.mannlib.vedit.beans.DynamicFieldRow;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 import edu.cornell.mannlib.vedit.tags.EditTag;
 
 public class DynamicFieldsTag extends EditTag {

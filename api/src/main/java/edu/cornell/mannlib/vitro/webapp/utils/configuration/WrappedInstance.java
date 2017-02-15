@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -64,6 +65,45 @@ public class WrappedInstance<T> {
 	}
 
 	/**
+	 * The loader provides the distilled property statements from the RDF. Check
+	 * that they satisfy the cardinality requested on their methods.
+	 */
+	public void checkCardinality(Set<PropertyStatement> propertyStatements)
+			throws CardinalityException {
+		Map<String, Integer> statementCounts = countPropertyStatementsByPredicateUri(propertyStatements);
+		for (PropertyMethod pm : propertyMethods.values()) {
+			Integer c = statementCounts.get(pm.getPropertyUri());
+			int count = (c == null) ? 0 : c;
+			if (count < pm.getMinOccurs()) {
+				throw new CardinalityException("Expecting at least "
+						+ pm.getMinOccurs() + " values for '"
+						+ pm.getPropertyUri() + "', but found " + count + ".");
+			}
+			if (count > pm.getMaxOccurs()) {
+				throw new CardinalityException("Expecting no more than "
+						+ pm.getMaxOccurs() + " values for '"
+						+ pm.getPropertyUri() + "', but found " + count + ".");
+			}
+		}
+		statementCounts.hashCode();
+	}
+
+	private Map<String, Integer> countPropertyStatementsByPredicateUri(
+			Set<PropertyStatement> propertyStatements) {
+		Map<String, Integer> statementCounts = new HashMap<>();
+		for (String pmPredicateUri : propertyMethods.keySet()) {
+			int count = 0;
+			for (PropertyStatement ps : propertyStatements) {
+				if (ps.getPredicateUri().equals(pmPredicateUri)) {
+					count++;
+				}
+			}
+			statementCounts.put(pmPredicateUri, count);
+		}
+		return statementCounts;
+	}
+
+	/**
 	 * The loader provides the distilled property statements from the RDF, to
 	 * populate the instance.
 	 */
@@ -76,7 +116,6 @@ public class WrappedInstance<T> {
 			if (pm == null) {
 				throw new NoSuchPropertyMethodException(ps);
 			}
-
 			pm.confirmCompatible(ps);
 
 			if (ps instanceof ResourcePropertyStatement) {
@@ -129,6 +168,12 @@ public class WrappedInstance<T> {
 	public static class NoSuchPropertyMethodException extends Exception {
 		public NoSuchPropertyMethodException(PropertyStatement ps) {
 			super("No property method for '" + ps.getPredicateUri() + "'");
+		}
+	}
+
+	public static class CardinalityException extends Exception {
+		public CardinalityException(String message) {
+			super(message);
 		}
 	}
 

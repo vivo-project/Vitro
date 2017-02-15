@@ -7,7 +7,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.JspWriter;
 import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.tags.EditTag;
-import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 /** This tag allows validation error messages to be displayed on a form JSP **/
 public class ErrorTag extends EditTag {
@@ -29,7 +29,7 @@ public class ErrorTag extends EditTag {
             }
 
             if (errors != null){
-                out.print(StringEscapeUtils.escapeHtml((String) errors));
+                out.print(StringEscapeUtils.ESCAPE_HTML4.translate((String) errors));
             }
 
         } catch(Exception ex) {

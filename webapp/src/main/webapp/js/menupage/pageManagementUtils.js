@@ -138,8 +138,8 @@ var pageManagementUtils = {
 	},
 	initDisplay: function(){
 		//right side components
-	    this.contentTypeSelectOptions.eq(0).attr('selected', 'selected');
-	    $('select#selectClassGroup option').eq(0).attr('selected', 'selected');
+	    this.contentTypeSelectOptions.eq(0).prop('selected', 'selected');
+	    $('select#selectClassGroup option').eq(0).prop('selected', 'selected');
 	    
 	    //Why would you want to hide this? This hides everything
 	   // $("section#pageDetails").hide();
@@ -152,11 +152,11 @@ var pageManagementUtils = {
 	    //left side components
 	    //These depend on whether or not this is an existing item or not
 	    if(this.isAdd()) {
-	    	this.defaultTemplateRadio.attr('checked',true);
+	    	this.defaultTemplateRadio.prop('checked',true);
 	    	//disable save button
 	    	this.disablePageSave();
 	    	if(!this.isAddMenuItem()) {
-		    	this.isMenuCheckbox.attr('checked',false);
+		    	this.isMenuCheckbox.prop('checked',false);
 		    	this.menuSection.hide();
 	    	}
 	    }
@@ -243,7 +243,7 @@ var pageManagementUtils = {
             pageManagementUtils.classGroupSection.hide();
             pageManagementUtils.fixedHTMLSection.hide();
             pageManagementUtils.sparqlQuerySection.hide();
-            pageManagementUtils.contentTypeSelectOptions.eq(0).attr('selected', 'selected');
+            pageManagementUtils.contentTypeSelectOptions.eq(0).prop('selected', 'selected');
             pageManagementUtils.contentTypeSelect.focus();
             pageManagementUtils.adjustSaveButtonHeight();
             pageManagementUtils.checkSelfContainedRadio();
@@ -287,7 +287,7 @@ var pageManagementUtils = {
 		pageManagementUtils.sparqlQuerySection.hide();
 		pageManagementUtils.searchIndividualsSection.hide();
 		//Reset main content type drop-down
-		pageManagementUtils.contentTypeSelectOptions.eq(0).attr('selected', 'selected');
+		pageManagementUtils.contentTypeSelectOptions.eq(0).prop('selected', 'selected');
 		if ( pageManagementUtils.leftSideDiv.css("height") != undefined ) {
 			pageManagementUtils.leftSideDiv.css("height","");
 			if ( pageManagementUtils.leftSideDiv.height() < pageManagementUtils.rightSideDiv.height() ) {
@@ -442,7 +442,7 @@ var pageManagementUtils = {
         });
 		$el.find("textarea").val("");
 		//resetting class group section as well so selection is reset if type changes
-		$el.find("select option:eq(0)").attr("selected", "selected");
+		$el.find("select option:eq(0)").prop("selected", "selected");
 		
 	},
 	checkTemplateForMultipleContent:function(contentTypeSelected) {
@@ -454,7 +454,7 @@ var pageManagementUtils = {
 	    		//alert the user that they should be picking custom template instead
 	    		alert(pageManagementUtils.multipleContentWithDefaultTemplateError);
 	    		//pick custom template
-	    		 $('input:radio[name=selectedTemplate][value="custom"]').attr("checked", true);
+	    		 $('input:radio[name=selectedTemplate][value="custom"]').prop("checked", true);
 	    		 pageManagementUtils.handleSelectCustomTemplate();  
 
 	    	}
@@ -698,7 +698,7 @@ var pageManagementUtils = {
     	//doing this in clear inputs instead which will be triggered
     	//every time content type is changed AS well as on  more content button after
     	//original content is cloned and stored
-    	//$('select#selectClassGroup option').eq(0).attr('selected', 'selected');
+    	//$('select#selectClassGroup option').eq(0).prop('selected', 'selected');
     	 pageManagementUtils.classesForClassGroup.addClass('hidden');
     },
     chooseClassGroup: function() {        
@@ -761,19 +761,19 @@ var pageManagementUtils = {
         $('input:checkbox[name=allSelected]').click(function(){
              if ( this.checked ) {
              // if checked, select all the checkboxes for this particular section
-            $(this).closest("ul").find('input:checkbox[name=classInClassGroup]').attr('checked','checked');
-             //$('input:checkbox[name=classInClassGroup]').attr('checked','checked');
+            $(this).closest("ul").find('input:checkbox[name=classInClassGroup]').prop('checked','checked');
+             //$('input:checkbox[name=classInClassGroup]').prop('checked','checked');
 
              } else {
              // if not checked, deselect all the checkboxes
-                 $(this).closest("ul").find('input:checkbox[name=classInClassGroup]').removeAttr('checked');
+                 $(this).closest("ul").find('input:checkbox[name=classInClassGroup]').prop('checked', null);
 
-              // $('input:checkbox[name=classInClassGroup]').removeAttr('checked');
+              // $('input:checkbox[name=classInClassGroup]').prop('checked', null);
              }
         });
 
         $('input:checkbox[name=classInClassGroup]').click(function(){
-            $(this).closest("ul").find('input:checkbox[name=allSelected]').removeAttr('checked');
+            $(this).closest("ul").find('input:checkbox[name=allSelected]').prop('checked', null);
         });
     }, //This is SPECIFIC to VIVO so should be moved there
     updateInternalClassMessage:function(classGroupName) { //User has changed content type 

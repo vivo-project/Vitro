@@ -7,16 +7,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.OntResource;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -26,6 +29,7 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.query.Syntax;
+import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
@@ -503,7 +507,8 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
             return Collections.emptyMap();
         }        
         
-        Map<String, String> types = new LinkedHashMap<String, String>();
+        Map<String, String> result = new LinkedHashMap<String, String>();
+        Map<String, List<Literal>> types = new LinkedHashMap<String, List<Literal>>();
         DatasetWrapper w = dwf.getDatasetWrapper();
         Dataset dataset = w.getDataset();
         dataset.getLock().enterCriticalSection(Lock.READ);
@@ -521,16 +526,24 @@ public class ObjectPropertyStatementDaoJena extends JenaBaseDao implements Objec
                 }
                 
                 RDFNode labelNode = soln.get("label");
-                String label = null;
-                if (labelNode.isLiteral()) {
-                    label = labelNode.asLiteral().getLexicalForm();
-                }
-                
-                if (StringUtils.isNotBlank(type) && StringUtils.isNotBlank(label)) {
-                    types.put(type, label);
+                if (StringUtils.isNotBlank(type) && labelNode.isLiteral()) {
+                	
+                	List<Literal> langLabels = types.get(type);
+                	if (null == langLabels) {
+                		types.put(type, langLabels = new ArrayList<Literal>());
+                	}
+                	langLabels.add(labelNode.asLiteral());
+                    
                 }
             }
-            return types;
+            
+            // choose labels corresponding to preferred languages
+            Set<Entry<String, List<Literal>>> typeEntries = types.entrySet();
+            for (Entry<String, List<Literal>> current : typeEntries) {
+            	result.put(current.getKey(), tryLiteralForPreferredLanguages(current.getValue()).getLexicalForm());
+            }
+            
+            return result;
             
         } catch (Exception e) {
             log.error("Error getting most specific types for subject " + subjectUri);

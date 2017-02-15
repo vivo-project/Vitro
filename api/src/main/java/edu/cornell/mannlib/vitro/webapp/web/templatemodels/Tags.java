@@ -5,7 +5,8 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
 
-import org.apache.commons.lang.StringUtils;
+import freemarker.ext.beans.MethodAppearanceFineTuner;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -46,20 +47,19 @@ public class Tags extends BaseTemplateModel {
         public TagsWrapper() {
             // Start by exposing all safe methods.
             setExposureLevel(EXPOSE_SAFE);
-        }
-        
-        @SuppressWarnings("rawtypes")
-        @Override
-        protected void finetuneMethodAppearance(Class cls, Method method, MethodAppearanceDecision decision) {
-            
-            try {
-                String methodName = method.getName();
-                if ( ! ( methodName.equals("add") || methodName.equals("list")) ) {
-                    decision.setExposeMethodAs(null);
+            setMethodAppearanceFineTuner(new MethodAppearanceFineTuner() {
+                @Override
+                public void process(MethodAppearanceDecisionInput methodAppearanceDecisionInput, MethodAppearanceDecision methodAppearanceDecision) {
+                    try {
+                        String methodName = methodAppearanceDecisionInput.getMethod().getName();
+                        if ( ! ( methodName.equals("add") || methodName.equals("list")) ) {
+                            methodAppearanceDecision.setExposeMethodAs(null);
+                        }
+                    } catch (Exception e) {
+                        log.error(e, e);
+                    }
                 }
-            } catch (Exception e) {
-                log.error(e, e);
-            }
+            });
         }
     }
     

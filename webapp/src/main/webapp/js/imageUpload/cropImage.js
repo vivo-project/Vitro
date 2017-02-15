@@ -2,7 +2,7 @@
 
 (function($) {
 
-	$(window).load(function(){
+	$(window).on("load", function(){
 
 		var jcrop_api = $.Jcrop('#cropbox',{
 			/*onChange: showPreview,*/
@@ -35,10 +35,10 @@
 					marginTop: '-' + Math.round(ry * coords.y) + 'px'
 				});
 
-				$('input[name=x]').val(coords.x);
-				$('input[name=y]').val(coords.y);
-				$('input[name=w]').val(coords.w);
-				$('input[name=h]').val(coords.h);			
+				$('input[name=x]').val(Math.round(coords.x));
+				$('input[name=y]').val(Math.round(coords.y));
+				$('input[name=w]').val(Math.round(coords.w));
+				$('input[name=h]').val(Math.round(coords.h));
 			}
 		};
 		

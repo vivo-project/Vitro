@@ -14,7 +14,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -27,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
+import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
 /**
@@ -188,23 +189,23 @@ public class PageController extends FreemarkerHttpServlet{
 
     private ResponseValues doError(VitroRequest vreq) {
         Map<String, Object> body = new HashMap<String, Object>();
-        body.put("title","Page could not be created");
-        body.put("errorMessage", "There was an error while creating the page, please check the logs.");        
+        body.put("title", I18n.text(vreq, "page_not_created"));
+        body.put("errorMessage", I18n.text(vreq, "page_not_created_msg"));        
         return new TemplateResponseValues(Template.TITLED_ERROR_MESSAGE.toString(), body, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 
     private ResponseValues doNotFound(VitroRequest vreq) {
         Map<String, Object> body = new HashMap<String, Object>();
-        body.put("title","Page Not Found");
-        body.put("errorMessage", "The page was not found in the system.");        
+        body.put("title", I18n.text(vreq, "page_not_found"));
+        body.put("errorMessage", I18n.text(vreq, "page_not_found_msg"));        
         return new TemplateResponseValues(Template.TITLED_ERROR_MESSAGE.toString(), body, HttpServletResponse.SC_NOT_FOUND);
     }
 
 
     private ResponseValues doNoPageSpecified(VitroRequest vreq) {
         Map<String, Object> body = new HashMap<String, Object>();
-        body.put("title","No page URI specified");
-        body.put("errorMessage", "Could not generate page beacause it was unclear what page was being requested.  A URL mapping may be missing.");        
+        body.put("title",I18n.text(vreq, "page_uri_missing"));
+        body.put("errorMessage", I18n.text(vreq, "page_uri_missing_msg"));        
         return new TemplateResponseValues(Template.TITLED_ERROR_MESSAGE.toString(), body, HttpServletResponse.SC_NOT_FOUND);
     }
     

@@ -11,7 +11,7 @@ import java.util.Map;
 import javax.servlet.http.HttpSession;
 
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.searchresult.IndividualSearchResult;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -226,7 +226,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	return prefixes;
     }
     
-    private String getN3ForName() {
+    protected String getN3ForName() {
     	return "?" + objectVarName + " rdfs:label ?name .";
     }
     
