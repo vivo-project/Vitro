@@ -11,6 +11,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.sdb.SDBFactory;
 import org.apache.jena.sdb.Store;
 import org.apache.jena.sdb.StoreDesc;
@@ -148,7 +149,7 @@ public class ApplicationStores {
                 if (configurationDataset.supportsTransactions()) {
                     configurationDataset.begin(ReadWrite.WRITE) ;
                 }
-                RDFDataMgr.read(configurationDataset, inputStream, Lang.NQUADS);
+                RDFDataMgr.read(configurationDataset, inputStream, Lang.TRIG);
                 inputStream.close();
                 if (configurationDataset.supportsTransactions()) {
                     configurationDataset.commit();
@@ -168,7 +169,7 @@ public class ApplicationStores {
                 if (contentDataset.supportsTransactions()) {
                     contentDataset.begin(ReadWrite.WRITE);
                 }
-                RDFDataMgr.read(contentDataset, inputStream, Lang.NQUADS);
+                RDFDataMgr.read(contentDataset, inputStream, Lang.TRIG);
                 inputStream.close();
                 if (contentDataset.supportsTransactions()) {
                     contentDataset.commit();
@@ -185,7 +186,7 @@ public class ApplicationStores {
         if (configurationDataset != null) {
             try {
                 OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(output, false));
-                RDFDataMgr.write(outputStream, configurationDataset, Lang.NQUADS);
+                RDFDataMgr.write(outputStream, configurationDataset, RDFFormat.TRIG_BLOCKS);
                 outputStream.close();
             } catch (FileNotFoundException e) {
                 throw new RuntimeException("Unable to write configuration file");
@@ -199,7 +200,7 @@ public class ApplicationStores {
         if (contentDataset != null) {
             try {
                 OutputStream outputStream = new BufferedOutputStream(new FileOutputStream(output, false));
-                RDFDataMgr.write(outputStream, contentDataset, Lang.NQUADS);
+                RDFDataMgr.write(outputStream, contentDataset, RDFFormat.TRIG_BLOCKS);
                 outputStream.close();
             } catch (FileNotFoundException e) {
                 throw new RuntimeException("Unable to write content file");

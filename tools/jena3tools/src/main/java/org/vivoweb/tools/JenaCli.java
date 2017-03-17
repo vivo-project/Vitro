@@ -41,8 +41,8 @@ public class JenaCli {
                 }
             }
 
-            File contentDump = Utils.resolveFile(options.homeDir, "dumps/content.nq");
-            File configurationDump = Utils.resolveFile(options.homeDir, "dumps/configuration.nq");
+            File contentDump = Utils.resolveFile(options.homeDir, "dumps/content.trig");
+            File configurationDump = Utils.resolveFile(options.homeDir, "dumps/configuration.trig");
 
             if (options.exportMode) {
                 if (!options.force) {
