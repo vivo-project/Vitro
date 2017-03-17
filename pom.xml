@@ -65,6 +65,7 @@
         <module>dependencies</module>
         <module>webapp</module>
         <module>solr</module>
+        <module>tools</module>
         <module>home</module>
     </modules>
 
