@@ -7,6 +7,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.jena.query.QuerySolutionMap;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Literal;
+import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.log4j.lf5.util.StreamUtils;
 
@@ -594,10 +597,14 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 	@Override
 	public boolean isEquivalentGraph(String graphURI, InputStream serializedGraph, 
 			ModelSerializationFormat serializationFormat) throws RDFServiceException {
-		Model fileModel = RDFServiceUtils.parseModel(serializedGraph, serializationFormat);
-		Model tripleStoreModel = new RDFServiceDataset(this).getNamedModel(graphURI);
-		Model fromTripleStoreModel = ModelFactory.createDefaultModel().add(tripleStoreModel);
-		return fileModel.isIsomorphicWith(fromTripleStoreModel);
+
+        Model fileModel = RDFServiceUtils.parseModel(serializedGraph, serializationFormat);
+
+        DatasetWrapper dw = getDatasetWrapper();
+        Dataset d = dw.getDataset();
+        Model tripleStoreModel = d.getNamedModel(graphURI);
+
+        return fileModel.isIsomorphicWith(tripleStoreModel);
 	}
 
     /**
@@ -607,12 +614,11 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     @Override
     public boolean isEquivalentGraph(String graphURI, Model graph) throws RDFServiceException {
         // Retrieve the graph to compare
-        Model tripleStoreModel = new RDFServiceDataset(this).getNamedModel(graphURI);
+        DatasetWrapper dw = getDatasetWrapper();
+        Dataset d = dw.getDataset();
+        Model tripleStoreModel = d.getNamedModel(graphURI);
 
-        // Load the entire graph into memory (faster comparison)
-        Model fromTripleStoreModel = ModelFactory.createDefaultModel().add(tripleStoreModel);
-
-        return graph.isIsomorphicWith(fromTripleStoreModel);
+        return graph.isIsomorphicWith(tripleStoreModel);
     }
 
     @Override
