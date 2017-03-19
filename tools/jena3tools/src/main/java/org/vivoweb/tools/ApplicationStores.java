@@ -291,6 +291,12 @@ public class ApplicationStores {
             String url = props.getProperty(PROPERTY_DB_URL);
             String user = props.getProperty(PROPERTY_DB_USERNAME);
             String pass = props.getProperty(PROPERTY_DB_PASSWORD);
+
+            String dbtypeStr = props.getProperty(PROPERTY_DB_TYPE, DEFAULT_TYPE);
+            if (DEFAULT_TYPE.equals(dbtypeStr) && !url.contains("?")) {
+                url += "?useUnicode=yes&characterEncoding=utf8";
+            }
+            
             return DriverManager.getConnection(url, user, pass);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Unable to create JDBC connection");
