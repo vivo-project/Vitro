@@ -14,7 +14,7 @@ import org.apache.log4j.spi.LoggingEvent;
  * 
  * <pre>
  * log4j.appender.RiotAppender=org.apache.log4j.RollingFileAppender 
- * log4j.appender.RiotAppender.File= $${catalina.home}/logs/${webapp.name}.riot.log
+ * log4j.appender.RiotAppender.File= $${catalina.base}/logs/${webapp.name}.riot.log
  * log4j.appender.RiotAppender.MaxFileSize=10MB 
  * log4j.appender.RiotAppender.MaxBackupIndex=10 
  * log4j.appender.RiotAppender.layout=edu.cornell.mannlib.vitro.webapp.utils.logging.StackTraceLayout 
