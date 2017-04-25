@@ -2,11 +2,14 @@
 
 package stubs.edu.cornell.mannlib.vitro.webapp.dao;
 
-import java.util.ArrayList;
+import static java.util.stream.Collectors.toList;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.common.base.Objects;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -25,47 +28,86 @@ public class DataPropertyDaoStub implements DataPropertyDao {
 	// ----------------------------------------------------------------------
 	// Stub infrastructure
 	// ----------------------------------------------------------------------
-	
-	private final Map<String, DataProperty> dpMap = new HashMap<String, DataProperty>();
+
+	private static class DataPropertyHolder {
+		final DataProperty dprop;
+		final String parentUri;
+
+		DataPropertyHolder(DataProperty dprop, String parentUri) {
+			this.dprop = dprop;
+			this.parentUri = parentUri;
+		}
+
+		public DataProperty getDataProperty() {
+			return dprop;
+		}
+
+		public String getParentUri() {
+			return parentUri;
+		}
+
+		boolean isRoot() {
+			return parentUri == null;
+		}
+
+		boolean inOntology(String ontologyUri) {
+			return Objects.equal(ontologyUri, dprop.getNamespace());
+		}
+	}
+
+	private final Map<String, DataPropertyHolder> dataPropertyMap = new HashMap<>();
+
 	private final Map<String, String> configFilesMap = new HashMap<String, String>();
-	
+
 	public void addDataProperty(DataProperty dataProperty) {
+		addDataProperty(dataProperty, null);
+	}
+
+	public void addDataProperty(DataProperty dataProperty, String parentUri) {
 		if (dataProperty == null) {
 			throw new NullPointerException("dataProperty may not be null.");
 		}
-		
+
 		String uri = dataProperty.getURI();
 		if (uri == null) {
 			throw new NullPointerException("uri may not be null.");
 		}
-		
-		dpMap.put(uri, dataProperty);
+
+		dataPropertyMap.put(uri,
+				new DataPropertyHolder(dataProperty, parentUri));
 	}
 
-	public void setCustomListViewConfigFileName(DataProperty property, String filename) {
+	public void setCustomListViewConfigFileName(DataProperty property,
+			String filename) {
 		if (property == null) {
 			throw new NullPointerException("property may not be null.");
 		}
-		
+
 		String uri = property.getURI();
 		if (uri == null) {
 			throw new NullPointerException("uri may not be null.");
 		}
-		
+
 		configFilesMap.put(uri, filename);
 	}
+
 	// ----------------------------------------------------------------------
 	// Stub methods
 	// ----------------------------------------------------------------------
 
 	@Override
 	public List<DataProperty> getAllDataProperties() {
-		return new ArrayList<>(dpMap.values());
+		return dataPropertyMap.values().stream()
+				.map(DataPropertyHolder::getDataProperty).collect(toList());
 	}
 
 	@Override
 	public DataProperty getDataPropertyByURI(String dataPropertyURI) {
-		return dpMap.get(dataPropertyURI);
+		if (dataPropertyMap.containsKey(dataPropertyURI)) {
+			return dataPropertyMap.get(dataPropertyURI).getDataProperty();
+		} else {
+			return null;
+		}
 	}
 
 	@Override
@@ -79,6 +121,20 @@ public class DataPropertyDaoStub implements DataPropertyDao {
 		}
 		return configFilesMap.get(uri);
 	}
+
+	@Override
+	public List<DataProperty> getRootDataProperties() {
+		return dataPropertyMap.values().stream().filter(DataPropertyHolder::isRoot)
+				.map(DataPropertyHolder::getDataProperty).collect(toList());
+	}
+
+	@Override
+	public List<String> getSubPropertyURIs(String propertyURI) {
+		return dataPropertyMap.values().stream()
+				.filter(dph -> propertyURI.equals(dph.getParentUri()))
+				.map(dph -> dph.getDataProperty().getURI()).collect(toList());
+	}
+
 	// ----------------------------------------------------------------------
 	// Un-implemented methods
 	// ----------------------------------------------------------------------
@@ -102,7 +158,8 @@ public class DataPropertyDaoStub implements DataPropertyDao {
 	}
 
 	@Override
-	public void removeSuperproperty(String propertyURI, String superpropertyURI) {
+	public void removeSuperproperty(String propertyURI,
+			String superpropertyURI) {
 		throw new RuntimeException(
 				"PropertyDao.removeSuperproperty() not implemented.");
 	}
@@ -160,19 +217,14 @@ public class DataPropertyDaoStub implements DataPropertyDao {
 	}
 
 	@Override
-	public List<String> getSubPropertyURIs(String propertyURI) {
-		throw new RuntimeException(
-				"PropertyDao.getSubPropertyURIs() not implemented.");
-	}
-
-	@Override
 	public List<String> getAllSubPropertyURIs(String propertyURI) {
 		throw new RuntimeException(
 				"PropertyDao.getAllSubPropertyURIs() not implemented.");
 	}
 
 	@Override
-	public List<String> getSuperPropertyURIs(String propertyURI, boolean direct) {
+	public List<String> getSuperPropertyURIs(String propertyURI,
+			boolean direct) {
 		throw new RuntimeException(
 				"PropertyDao.getSuperPropertyURIs() not implemented.");
 	}
@@ -190,7 +242,8 @@ public class DataPropertyDaoStub implements DataPropertyDao {
 	}
 
 	@Override
-	public List<VClass> getClassesWithRestrictionOnProperty(String propertyURI) {
+	public List<VClass> getClassesWithRestrictionOnProperty(
+			String propertyURI) {
 		throw new RuntimeException(
 				"PropertyDao.getClassesWithRestrictionOnProperty() not implemented.");
 	}
@@ -250,12 +303,6 @@ public class DataPropertyDaoStub implements DataPropertyDao {
 	public void deleteDataProperty(String dataPropertyURI) {
 		throw new RuntimeException(
 				"DataPropertyDao.deleteDataProperty() not implemented.");
-	}
-
-	@Override
-	public List<DataProperty> getRootDataProperties() {
-		throw new RuntimeException(
-				"DataPropertyDao.getRootDataProperties() not implemented.");
 	}
 
 	@Override
