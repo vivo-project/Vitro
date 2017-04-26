@@ -10,6 +10,8 @@ import java.text.Collator;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -32,28 +34,17 @@ import stubs.javax.servlet.http.HttpServletRequestStub;
  */
 public class ListDatatypePropertiesControllerTest
 		extends ListControllerTestBase {
-	private static final String BASIC_JSON_EXPECTED = "" //
-			+ "{ \n" //
-			+ "  \"name\" : \"<a href='datapropEdit?uri=http%3A%2F%2Fdata.property%2Fone'>One_pick</a>\", \n" //
-			+ "  \"data\" : { \n" //
-			+ "    \"internalName\" : \"One_pick\", \n" //
-			+ "    \"domainVClass\" : \"\", \n" //
-			+ "    \"rangeVClass\" : \"\", \n" //
-			+ "    \"group\" : \"unspecified\" \n" //
-			+ "  } \n" //
-			+ "}, \n" //
-			+ "{ \n" //
-			+ "  \"name\" : \"<a href='datapropEdit?uri=http%3A%2F%2Fdata.property%2Ftwo'>Two_pick</a>\", \n" //
-			+ "  \"data\" : { \n" //
-			+ "    \"internalName\" : \"Two_pick\", \n" //
-			+ "    \"domainVClass\" : \"domain\", \n" //
-			+ "    \"rangeVClass\" : \"range_name\", \n" //
-			+ "    \"group\" : \"unknown group\" \n" //
-			+ "  } \n" //
-			+ "} \n" //
-	;
+	private static final ArrayNode BASIC_JSON_RESPONSE = arrayOf( //
+			propertyListNode(
+					"<a href='datapropEdit?uri=http%3A%2F%2Fdata.property%2Fone'>One_pick</a>",
+					"One_pick", "", "", "unspecified"),
+			propertyListNode(
+					"<a href='datapropEdit?uri=http%3A%2F%2Fdata.property%2Ftwo'>Two_pick</a>",
+					"Two_pick", "domain", "range_name", "unknown group"));
 
-	private static final String NO_DATA_PROPERTIES = "{\"name\":\"No data properties found\"}";
+	private static final ArrayNode NO_DATA_RESPONSE = arrayOf(
+			mapper.createObjectNode().put("name", "No data properties found"));
+
 	private static final String RANGE_VCLASS_URI = "http://v.class/range";
 	private static final String DOMAIN_VCLASS_URI = "http://v.class/domain";
 	private static final String PROPERTY_GROUP_URI = "http://prop.group/group1";
@@ -106,12 +97,12 @@ public class ListDatatypePropertiesControllerTest
 
 		vcdao.setVClass(vclass(DOMAIN_VCLASS_URI));
 
-		assertMatchingJson(controller, req, BASIC_JSON_EXPECTED);
+		assertMatchingJson(controller, req, BASIC_JSON_RESPONSE);
 	}
 
 	@Test
 	public void noDataProperties() throws Exception {
-		assertMatchingJson(controller, req, NO_DATA_PROPERTIES);
+		assertMatchingJson(controller, req, NO_DATA_RESPONSE);
 	}
 
 	// ----------------------------------------------------------------------

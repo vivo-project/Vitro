@@ -10,6 +10,8 @@ import java.text.Collator;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -30,78 +32,33 @@ import stubs.javax.servlet.http.HttpServletRequestStub;
  * the branches in the JSON generation code, so there's that.
  */
 public class ShowClassHierarchyControllerTest extends ListControllerTestBase {
-	private static final String EXPECTED_JSON_FULL = "" //
-			+ "{ \n " //
-			+ "  \"name\" : \"<a href='vclassEdit?uri=http%3A%2F%2Ftest1%2Fvclass1'>TestOne</a>\", \n " //
-			+ "  \"data\" : { \n " //
-			+ "    \"shortDef\" : \"My favorite class\", \n " //
-			+ "    \"classGroup\" : \"TheGroup\", \n " //
-			+ "    \"ontology\" : \"OntoMania\" \n " //
-			+ "  }, \n " //
-			+ "  \"children\" : [] \n " //
-			+ "}, \n " //
-			+ "{ \n " //
-			+ "  \"name\" : \"<a href='vclassEdit?uri=http%3A%2F%2Ftest2%2FvclassParent'>vclassParent</a>\", \n " //
-			+ "  \"data\" : { \n " //
-			+ "    \"shortDef\" : \"\", \n " //
-			+ "    \"classGroup\" : \"\", \n " //
-			+ "    \"ontology\" : \"http://test2/\" \n " //
-			+ "  }, \n " //
-			+ "  \"children\" : [ \n " //
-			+ "    { \n " //
-			+ "      \"name\" : \"<a href='vclassEdit?uri=http%3A%2F%2Ftest3%2FvclassChild1'>Child One</a>\", \n " //
-			+ "      \"data\" : { \n " //
-			+ "        \"shortDef\" : \"\", \n " //
-			+ "        \"classGroup\" : \"\", \n " //
-			+ "        \"ontology\" : \"http://test3/\" \n " //
-			+ "      }, \n " //
-			+ "      \"children\" : [ \n " //
-			+ "        { \n " //
-			+ "          \"name\" : \"<a href='vclassEdit?uri=http%3A%2F%2Ftest3%2FvclassGrandchild'>vclassGrandchild</a>\", \n " //
-			+ "          \"data\" : { \n " //
-			+ "            \"shortDef\" : \"\", \n " //
-			+ "            \"classGroup\" : \"\", \n " //
-			+ "            \"ontology\" : \"http://test3/\" \n " //
-			+ "          }, \n " //
-			+ "          \"children\" : [] \n " //
-			+ "        } \n " //
-			+ "      ] \n " //
-			+ "    }, \n " //
-			+ "    { \n " //
-			+ "      \"name\" : \"<a href='vclassEdit?uri=http%3A%2F%2Ftest2%2FvclassChild2'>Child Two</a>\", \n " //
-			+ "      \"data\" : { \n " //
-			+ "        \"shortDef\" : \"\", \n " //
-			+ "        \"classGroup\" : \"\", \n " //
-			+ "        \"ontology\" : \"http://test2/\" \n " //
-			+ "      }, \n " //
-			+ "      \"children\" : [] \n " //
-			+ "    } \n " //
-			+ "  ] \n " //
-			+ "} \n " //
-	;
-	private static final String EXPECTED_JSON_RESTRICTED_TO_TEST2 = "" //
-			+ "{ \n " //
-			+ "  \"name\" : \"<a href='vclassEdit?uri=http%3A%2F%2Ftest2%2FvclassParent'>vclassParent</a>\", \n " //
-			+ "  \"data\" : { \n " //
-			+ "    \"shortDef\" : \"\", \n " //
-			+ "    \"classGroup\" : \"\", \n " //
-			+ "    \"ontology\" : \"http://test2/\" \n " //
-			+ "  }, \n " //
-			+ "  \"children\" : [ \n " //
-			+ "    { \n " //
-			+ "      \"name\" : \"<a href='vclassEdit?uri=http%3A%2F%2Ftest2%2FvclassChild2'>Child Two</a>\", \n " //
-			+ "      \"data\" : { \n " //
-			+ "        \"shortDef\" : \"\", \n " //
-			+ "        \"classGroup\" : \"\", \n " //
-			+ "        \"ontology\" : \"http://test2/\" \n " //
-			+ "      }, \n " //
-			+ "      \"children\" : [] \n " //
-			+ "    } \n " //
-			+ "  ] \n " //
-			+ "} \n " //
-	;
-;
-	
+	private static final ArrayNode JSON_FULL_RESPONSE = arrayOf(
+			vclassHierarchyNode(
+					"<a href='vclassEdit?uri=http%3A%2F%2Ftest1%2Fvclass1'>TestOne</a>",
+					"My favorite class", "TheGroup", "OntoMania"),
+			vclassHierarchyNode(
+					"<a href='vclassEdit?uri=http%3A%2F%2Ftest2%2FvclassParent'>vclassParent</a>",
+					"", "", "http://test2/",
+					vclassHierarchyNode(
+							"<a href='vclassEdit?uri=http%3A%2F%2Ftest3%2FvclassChild1'>Child One</a>",
+							"", "", "http://test3/",
+							vclassHierarchyNode(
+									"<a href='vclassEdit?uri=http%3A%2F%2Ftest3%2FvclassGrandchild'>vclassGrandchild</a>",
+									"", "", "http://test3/")),
+					vclassHierarchyNode(
+							"<a href='vclassEdit?uri=http%3A%2F%2Ftest2%2FvclassChild2'>Child Two</a>",
+							"", "", "http://test2/")));
+
+	private static final ArrayNode JSON_RESTRICTED_TO_TEST2_RESPONSE = arrayOf(
+			vclassHierarchyNode(
+					"<a href='vclassEdit?uri=http%3A%2F%2Ftest2%2FvclassParent'>vclassParent</a>",
+					"", "", "http://test2/",
+					vclassHierarchyNode(
+							"<a href='vclassEdit?uri=http%3A%2F%2Ftest2%2FvclassChild2'>Child Two</a>",
+							"", "", "http://test2/")));
+
+	private static final ArrayNode JSON_EMPTY_RESPONSE = arrayOf();
+
 	private static final String VCLASS_URI_1 = "http://test1/vclass1";
 	private static final String VCLASS_URI_PARENT = "http://test2/vclassParent";
 	private static final String VCLASS_URI_CHILD_1 = "http://test3/vclassChild1";
@@ -165,21 +122,21 @@ public class ShowClassHierarchyControllerTest extends ListControllerTestBase {
 
 	@Test
 	public void basicJsonTest() throws Exception {
-		assertMatchingJson(controller, req, EXPECTED_JSON_FULL);
+		assertMatchingJson(controller, req, JSON_FULL_RESPONSE);
 	}
 
 	@Test
 	public void restrictByOntology() throws Exception {
 		req.addParameter("ontologyUri", "http://test2/");
-		assertMatchingJson(controller, req, EXPECTED_JSON_RESTRICTED_TO_TEST2);
+		assertMatchingJson(controller, req, JSON_RESTRICTED_TO_TEST2_RESPONSE);
 	}
 
 	@Test
 	public void restrictToNothing() throws Exception {
 		req.addParameter("ontologyUri", "http://BOGUS/");
-		assertMatchingJson(controller, req, "");
+		assertMatchingJson(controller, req, JSON_EMPTY_RESPONSE);
 	}
-	
+
 	// ----------------------------------------------------------------------
 	// Helper methods
 	// ----------------------------------------------------------------------

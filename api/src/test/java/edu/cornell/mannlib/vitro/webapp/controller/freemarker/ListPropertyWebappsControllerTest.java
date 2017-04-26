@@ -12,6 +12,8 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
@@ -34,27 +36,16 @@ import stubs.javax.servlet.http.HttpServletRequestStub;
  * the branches in the JSON generation code, so there's that.
  */
 public class ListPropertyWebappsControllerTest extends ListControllerTestBase {
-	private static final String NO_PROPERTIES = "{\"name\" : \"No object properties found\"}";
-	private static final String BASIC_JSON_EXPECTED = "" //
-			+ "{ \n" //
-			+ "  \"name\" : \"<a href='./propertyEdit?uri=http%3A%2F%2Fobject.property%2Fop1'>ObjectProp1</a>\", \n" //
-			+ "  \"data\" : { \n" //
-			+ "    \"internalName\" : \"op1\", \n" //
-			+ "    \"domainVClass\" : \"\", \n" //
-			+ "    \"rangeVClass\" : \"\", \n" //
-			+ "    \"group\" : \"unspecified\" \n" //
-			+ "  } \n" //
-			+ "}, \n" //
-			+ "{ \n" //
-			+ "  \"name\" : \"<a href='./propertyEdit?uri=http%3A%2F%2Fobject.property%2Fop2'>ObjectProp2</a>\", \n" //
-			+ "  \"data\" : { \n" //
-			+ "    \"internalName\" : \"op2\", \n" //
-			+ "    \"domainVClass\" : \"DomainClass\", \n" //
-			+ "    \"rangeVClass\" : \"RangeClass\", \n" //
-			+ "    \"group\" : \"PropGroup\" \n" //
-			+ "  } \n" //
-			+ "} \n" //
-	;
+	private static final ArrayNode NO_PROPERTIES_RESPONSE = arrayOf(mapper
+			.createObjectNode().put("name", "No object properties found"));
+
+	private static final ArrayNode BASIC_JSON_RESPONSE = arrayOf(
+			propertyListNode(
+					"<a href='./propertyEdit?uri=http%3A%2F%2Fobject.property%2Fop1'>ObjectProp1</a>",
+					"op1", "", "", "unspecified"),
+			propertyListNode(
+					"<a href='./propertyEdit?uri=http%3A%2F%2Fobject.property%2Fop2'>ObjectProp2</a>",
+					"op2", "DomainClass", "RangeClass", "PropGroup"));
 
 	private static final String PROPERTY_GROUP_URI = "http://group/group1";
 	private static final String DOMAIN_CLASS_URI = "http://domain/d1";
@@ -99,7 +90,7 @@ public class ListPropertyWebappsControllerTest extends ListControllerTestBase {
 
 	@Test
 	public void nothingFound() throws Exception {
-		assertMatchingJson(controller, req, NO_PROPERTIES);
+		assertMatchingJson(controller, req, NO_PROPERTIES_RESPONSE);
 	}
 
 	@Test
@@ -116,7 +107,7 @@ public class ListPropertyWebappsControllerTest extends ListControllerTestBase {
 		pgdao.addPropertyGroup(
 				propertyGroup(PROPERTY_GROUP_URI, "PropGroup", 1));
 
-		assertMatchingJson(controller, req, BASIC_JSON_EXPECTED);
+		assertMatchingJson(controller, req, BASIC_JSON_RESPONSE);
 	}
 
 	// ----------------------------------------------------------------------

@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -19,26 +21,111 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
  * TODO
  */
 public class ListControllerTestBase extends AbstractTestClass {
+	protected static ObjectMapper mapper = new ObjectMapper();
+
+	/**
+	 * Create a JSON array from nodes.
+	 */
+	protected static ArrayNode arrayOf(JsonNode... nodes) {
+		ArrayNode array = mapper.createArrayNode();
+		for (JsonNode node : nodes) {
+			array.add(node);
+		}
+		return array;
+	}
+
+	/**
+	 * Show a DataProperty or an ObjectProperty in a list.
+	 */
+	protected static ObjectNode propertyListNode(String name,
+			String internalName, String domainVClass, String rangeVClass,
+			String group) {
+		ObjectNode propNode = mapper.createObjectNode().put("name", name);
+		propNode.putObject("data").put("internalName", internalName)
+				.put("domainVClass", domainVClass)
+				.put("rangeVClass", rangeVClass).put("group", group);
+		return propNode;
+	}
+
+	/**
+	 * Show a DataProperty or an ObjectProperty in a hierarchy.
+	 */
+	protected static ObjectNode propertyHierarchyNode(String name,
+			String internalName, String domainVClass, String rangeVClass,
+			String group, ObjectNode... children) {
+		ObjectNode propNode = propertyListNode(name, internalName, domainVClass,
+				rangeVClass, group);
+		propNode.set("children", arrayOf(children));
+		return propNode;
+	}
+
+	/**
+	 * Show a VClass in a list.
+	 */
+	protected static ObjectNode vclassListNode(String name, String shortDef,
+			String classGroup, String ontology) {
+		ObjectNode vcNode = mapper.createObjectNode().put("name", name);
+		vcNode.putObject("data").put("shortDef", shortDef)
+				.put("classGroup", classGroup).put("ontology", ontology);
+		return vcNode;
+	}
+
+	/**
+	 * Show a VClass in a hierarchy.
+	 */
+	protected static ObjectNode vclassHierarchyNode(String name,
+			String shortDef, String classGroup, String ontology,
+			ObjectNode... children) {
+		ObjectNode vcNode = vclassListNode(name, shortDef, classGroup,
+				ontology);
+		vcNode.set("children", arrayOf(children));
+		return vcNode;
+	}
+
+	/**
+	 * Show a ClassGroup or PropertyGroup in a list.
+	 */
+	protected static ObjectNode groupListNode(String name, String displayRank,
+			ObjectNode... children) {
+		ObjectNode gNode = mapper.createObjectNode().put("name", name);
+		gNode.putObject("data").put("displayRank", displayRank);
+		gNode.set("children", arrayOf(children));
+		return gNode;
+	}
+
+	/**
+	 * Show a Class or Property as part of a Group.
+	 */
+	protected static ObjectNode groupMemberNode(String name, String shortDef,
+			ObjectNode... children) {
+		ObjectNode memberNode = mapper.createObjectNode().put("name", name);
+		memberNode.putObject("data").put("shortDef", shortDef);
+		memberNode.set("children", arrayOf(children));
+		return memberNode;
+	}
+
 	/**
 	 * Based on the fact that each of these controllers returns a
 	 * TemplateResponseValues object with a "jsonTree" in the body map.
 	 *
 	 * That jsonTree would be an standard JSON array, except that it is missing
-	 * the enclosing brackets, so our expected result is also missing the
-	 * brackets.
+	 * the enclosing brackets, so we need to add them before comparing to the
+	 * expected value.
 	 * 
 	 * Add the brackets, read the strings, and compare.
 	 */
 	protected static void assertMatchingJson(FreemarkerHttpServlet controller,
-			HttpServletRequest req, String expectedString) throws Exception {
+			HttpServletRequest req, JsonNode expected) throws Exception {
 		String jsonString = getJsonFromController(controller, req);
-
-		ObjectMapper mapper = new ObjectMapper();
-		JsonNode expected = mapper.readTree("[" + expectedString + "]");
 		JsonNode actual = mapper.readTree("[" + jsonString + "]");
 		assertEquals(expected, actual);
 	}
 
+	/**
+	 * Some of the controllers have edge cases that produce invalid JSON, even
+	 * when wrapped in enclosing brackets. For those cases, call this method,
+	 * massage the result to form valid JSON, and call assertKlugedJson().
+	 */
 	protected static String getJsonFromController(
 			FreemarkerHttpServlet controller, HttpServletRequest req)
 			throws Exception {
@@ -53,13 +140,11 @@ public class ListControllerTestBase extends AbstractTestClass {
 	}
 
 	/**
-	 * Some of the edge cases do not return valid JSON, so we need to force a
-	 * match.
+	 * If it was necessary to manipulate the response from the controller, this
+	 * is how to test it.
 	 */
-	protected static void assertKlugedJson(String expectedString,
+	protected void assertKlugedJson(JsonNode expected,
 			String klugedActualString) throws Exception {
-		ObjectMapper mapper = new ObjectMapper();
-		JsonNode expected = mapper.readTree("[" + expectedString + "]");
 		JsonNode actual = mapper.readTree("[" + klugedActualString + "]");
 		assertEquals(expected, actual);
 	}

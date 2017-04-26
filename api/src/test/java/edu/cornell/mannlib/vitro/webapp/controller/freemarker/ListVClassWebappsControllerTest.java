@@ -9,6 +9,8 @@ import java.text.Collator;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -29,24 +31,11 @@ import stubs.javax.servlet.http.HttpServletRequestStub;
  * the branches in the JSON generation code, so there's that.
  */
 public class ListVClassWebappsControllerTest extends ListControllerTestBase {
-	private static final String BASIC_JSON_EXPECTED = "" //
-			+ "{ \n" //
-			+ "  \"name\" : \"<a href='./vclassEdit?uri=http%3A%2F%2Fontology2%2Fvclass2'>ClassTwo</a>\", \n" //
-			+ "  \"data\" : { \n" //
-			+ "    \"shortDef\" : \"Short definition.\", \n" //
-			+ "    \"classGroup\" : \"Group\", \n" //
-			+ "    \"ontology\" : \"OntOntOnt\" \n" //
-			+ "  } \n" //
-			+ "}, \n" //
-			+ "{ \n" //
-			+ "  \"name\" : \"\", \n" //
-			+ "  \"data\": { \n" //
-			+ "    \"shortDef\" : \"\", \n" //
-			+ "    \"classGroup\" : \"\", \n" //
-			+ "    \"ontology\" : \"http://ontology1/\" \n" //
-			+ "  } \n" //
-			+ "} \n" //
-	;
+	private static final ArrayNode BASIC_JSON_RESPONSE = arrayOf(
+			vclassListNode(
+					"<a href='./vclassEdit?uri=http%3A%2F%2Fontology2%2Fvclass2'>ClassTwo</a>",
+					"Short definition.", "Group", "OntOntOnt"),
+			vclassListNode("", "", "", "http://ontology1/"));
 
 	private static final String ONTOLOGY_URI_2 = "http://ontology2/";
 
@@ -99,12 +88,13 @@ public class ListVClassWebappsControllerTest extends ListControllerTestBase {
 
 		vcgdao.setGroups(vclassGroup(CLASS_GROUP_URI, "Group"));
 
-		// The MISSING NAME part of the response is not valid JSON unless we kluge it.
+		// The MISSING NAME part of the response is not valid JSON unless we
+		// kluge it.
 		String rawResponse = getJsonFromController(controller, req);
 		String kluged = rawResponse.replace("\"\"\"", "\"\",\"");
-		assertKlugedJson(BASIC_JSON_EXPECTED, kluged);
-		
-//		assertMatchingJson(controller, req, BASIC_JSON_EXPECTED);
+		assertKlugedJson(BASIC_JSON_RESPONSE, kluged);
+
+		// assertMatchingJson(controller, req, BASIC_JSON_RESPONSE);
 	}
 
 	// ----------------------------------------------------------------------

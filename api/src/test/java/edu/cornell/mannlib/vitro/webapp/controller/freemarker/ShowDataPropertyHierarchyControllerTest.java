@@ -11,6 +11,8 @@ import java.text.Collator;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Datatype;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
@@ -34,52 +36,22 @@ import stubs.javax.servlet.http.HttpServletRequestStub;
  */
 public class ShowDataPropertyHierarchyControllerTest
 		extends ListControllerTestBase {
-	private static final String NO_DATA_JSON = "" //
-			+ "{ \n " //
-			+ "  \"name\" : \"<a href='datapropEdit?uri=nullfake'>ullfake</a>\", \n " //
-			+ "  \"data\" : { \n " //
-			+ "    \"internalName\" : \"ullfake\", \n " //
-			+ "    \"domainVClass\" : \"\", \n " //
-			+ "    \"rangeVClass\" : \"\", \n " //
-			+ "    \"group\" : \"unspecified\" \n " //
-			+ "  }, \n " //
-			+ "  \"children\" : [] \n " //
-			+ "} \n " //
-	;
+	private static final ArrayNode NO_DATA_RESPONSE = arrayOf( //
+			propertyHierarchyNode(
+					"<a href='datapropEdit?uri=nullfake'>ullfake</a>",
+					"ullfake", "", "", "unspecified"));
 
-	private static final String BASIC_JSON_EXPECTED = "" //
-			+ "{ \n " //
-			+ "  \"name\" : \"<a href='datapropEdit?uri=http%3A%2F%2Ftest%2FdataProperty1'>dataProperty1</a>\", \n " //
-			+ "  \"data\" : { \n " //
-			+ "    \"internalName\" : \"dataProperty1\", \n " //
-			+ "    \"domainVClass\" : \"\", \n " //
-			+ "    \"rangeVClass\" : \"\", \n " //
-			+ "    \"group\" : \"unspecified\" \n " //
-			+ "  }, \n " //
-			+ "  \"children\" : [ \n " //
-			+ "    { \n " //
-			+ "      \"name\" : \"<a href='datapropEdit?uri=http%3A%2F%2Ftest%2FdataProperty2'>dataProperty2</a>\", \n " //
-			+ "      \"data\" : { \n " //
-			+ "        \"internalName\" : \"dataProperty2\", \n " //
-			+ "        \"domainVClass\" : \"\", \n " //
-			+ "        \"rangeVClass\" : \"\", \n " //
-			+ "        \"group\" : \"unspecified\" \n " //
-			+ "      }, \n " //
-			+ "      \"children\" : [] \n " //
-			+ "    }, \n " //
-			+ "    { \n " //
-			+ "      \"name\" : \"<a href='datapropEdit?uri=http%3A%2F%2Ftest%2FdataProperty3'>Property Three</a>\", \n " //
-			+ "      \"data\" : { \n " //
-			+ "        \"internalName\" : \"Property Three\", \n " //
-			+ "        \"domainVClass\" : \"domain1\", \n " //
-			+ "        \"rangeVClass\" : \"A_range\", \n " //
-			+ "        \"group\" : \"PropGroup\" \n " //
-			+ "      }, \n " //
-			+ "      \"children\" : [] \n " //
-			+ "    } \n " //
-			+ "  ] \n " //
-			+ "} \n " //
-	;
+	private static final ArrayNode BASIC_JSON_RESPONSE = arrayOf( //
+			propertyHierarchyNode(
+					"<a href='datapropEdit?uri=http%3A%2F%2Ftest%2FdataProperty1'>dataProperty1</a>",
+					"dataProperty1", "", "", "unspecified",
+					propertyHierarchyNode(
+							"<a href='datapropEdit?uri=http%3A%2F%2Ftest%2FdataProperty2'>dataProperty2</a>",
+							"dataProperty2", "", "", "unspecified"),
+					propertyHierarchyNode(
+							"<a href='datapropEdit?uri=http%3A%2F%2Ftest%2FdataProperty3'>Property Three</a>",
+							"Property Three", "domain1", "A_range",
+							"PropGroup")));
 
 	private static final String DP_URI_1 = "http://test/dataProperty1";
 	private static final String DP_URI_2 = "http://test/dataProperty2";
@@ -135,9 +107,9 @@ public class ShowDataPropertyHierarchyControllerTest
 		// The NO DATA response is not valid JSON unless we kluge it.
 		String rawResponse = getJsonFromController(controller, req);
 		String kluged = rawResponse + "]}";
-		assertKlugedJson(NO_DATA_JSON, kluged);
+		assertKlugedJson(NO_DATA_RESPONSE, kluged);
 
-		// assertMatchingJson(controller, req, NO_DATA_JSON);
+		// assertMatchingJson(controller, req, NO_DATA_RESPONSE);
 	}
 
 	@Test
@@ -149,7 +121,7 @@ public class ShowDataPropertyHierarchyControllerTest
 		ddao.addDatatype(datatype(RANGE_DATATYPE_URI, "A_range"));
 		pgdao.addPropertyGroup(propertyGroup(GROUP_URI, "PropGroup"));
 		vcdao.setVClass(vclass(DOMAIN_CLASS_URI, "The_domain"));
-		assertMatchingJson(controller, req, BASIC_JSON_EXPECTED);
+		assertMatchingJson(controller, req, BASIC_JSON_RESPONSE);
 	}
 
 	// ----------------------------------------------------------------------

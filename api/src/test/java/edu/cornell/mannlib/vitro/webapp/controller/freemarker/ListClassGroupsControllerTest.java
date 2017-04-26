@@ -7,6 +7,8 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.PolicyOpt
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import stubs.edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDaoStub;
@@ -29,52 +31,26 @@ import stubs.javax.servlet.http.HttpServletRequestStub;
  * the branches in the JSON generation code, so there's that.
  */
 public class ListClassGroupsControllerTest extends ListControllerTestBase {
-	private static final String BASIC_JSON_EXPECTED = "" //
-			+ "{ " //
-			+ "  \"name\": \"<a href='./editForm?uri=http%3A%2F%2Fthe.class.groups%2Fgroup1&amp;controller=Classgroup'>Group1<\\/a>\", " //
-			+ "  \"data\": { " //
-			+ "    \"displayRank\": \"99\"" //
-			+ "  }, " //
-			+ "  \"children\": [" //
-			+ "    { " //
-			+ "      \"name\": \"<a href='vclassEdit?uri=http%3A%2F%2Fthe.classes%2Fclass1a'>Class1A<\\/a>\", " //
-			+ "      \"data\": { " //
-			+ "        \"shortDef\": \"\"" //
-			+ "      }, " //
-			+ "      \"children\": [] " //
-			+ "    }" //
-			+ "  ] " //
-			+ "} , " //
-			+ "{ " //
-			+ "  \"name\": \"<a href='./editForm?uri=http%3A%2F%2Fthe.class.groups%2Fgroup2&amp;controller=Classgroup'>(unnamed group)<\\/a>\", " //
-			+ "  \"data\": { " //
-			+ "    \"displayRank\": \"\"" //
-			+ "  }, " //
-			+ "  \"children\": [" //
-			+ "    { " //
-			+ "      \"name\": \"<a href='vclassEdit?uri=http%3A%2F%2Fthe.classes%2Fclass2a'>Class2A<\\/a>\", " //
-			+ "      \"data\": { " //
-			+ "        \"shortDef\": \"\"" //
-			+ "      }, " //
-			+ "      \"children\": [] " //
-			+ "    } , " //
-			+ "    { " //
-			+ "      \"name\": \"<a href='vclassEdit?uri=http%3A%2F%2Fthe.classes%2Fclass2b'>Class2B<\\/a>\"," //
-			+ "      \"data\": {" //
-			+ "        \"shortDef\": \"\"" //
-			+ "      }, " //
-			+ "      \"children\": [] " //
-			+ "    }" //
-			+ "  ] " //
-			+ "}, " //
-			+ "{ " //
-			+ "  \"name\": \"<a href='./editForm?uri=http%3A%2F%2Fthe.class.groups%2Fgroup3&amp;controller=Classgroup'>Group3<\\/a>\", " //
-			+ "  \"data\": { " //
-			+ "    \"displayRank\": \"15\"" //
-			+ "  }, " //
-			+ "  \"children\": [] " //
-			+ "}"; //
-	
+	private static ArrayNode BASIC_JSON_RESPONSE = arrayOf(
+			groupListNode(
+					"<a href='./editForm?uri=http%3A%2F%2Fthe.class.groups%2Fgroup1&amp;controller=Classgroup'>Group1</a>",
+					"99",
+					groupMemberNode(
+							"<a href='vclassEdit?uri=http%3A%2F%2Fthe.classes%2Fclass1a'>Class1A</a>",
+							"")),
+			groupListNode(
+					"<a href='./editForm?uri=http%3A%2F%2Fthe.class.groups%2Fgroup2&amp;controller=Classgroup'>(unnamed group)</a>",
+					"",
+					groupMemberNode(
+							"<a href='vclassEdit?uri=http%3A%2F%2Fthe.classes%2Fclass2a'>Class2A</a>",
+							""),
+					groupMemberNode(
+							"<a href='vclassEdit?uri=http%3A%2F%2Fthe.classes%2Fclass2b'>Class2B</a>",
+							"")),
+			groupListNode(
+					"<a href='./editForm?uri=http%3A%2F%2Fthe.class.groups%2Fgroup3&amp;controller=Classgroup'>Group3</a>",
+					"15"));
+
 	private ListClassGroupsController controller;
 	private HttpServletRequestStub req;
 	private ModelAccessFactoryStub modelsFactory;
@@ -84,7 +60,7 @@ public class ListClassGroupsControllerTest extends ListControllerTestBase {
 	@Before
 	public void setup() {
 		controller = new ListClassGroupsController();
-		
+
 		req = new HttpServletRequestStub();
 
 		vcgDao = new VClassGroupDaoStub();
@@ -116,7 +92,7 @@ public class ListClassGroupsControllerTest extends ListControllerTestBase {
 								"Class2B")),
 				vClassGroup("http://the.class.groups/group3", "Group3", 15));
 
-		assertMatchingJson(controller, req, BASIC_JSON_EXPECTED);
+		assertMatchingJson(controller, req, BASIC_JSON_RESPONSE);
 	}
 
 	// ----------------------------------------------------------------------

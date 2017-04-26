@@ -10,6 +10,8 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
@@ -28,41 +30,22 @@ import stubs.javax.servlet.http.HttpServletRequestStub;
  * the branches in the JSON generation code, so there's that.
  */
 public class ListPropertyGroupsControllerTest extends ListControllerTestBase {
-	private static final String BASIC_JSON_EXPECTED = "" //
-			+ "{ \n" //
-			+ "  \"name\" : \"<a href='./editForm?uri=http%3A%2F%2Fproperty.group%2Fgroup1&amp;controller=PropertyGroup'>(unnamed group)</a>\", \n" //
-			+ "  \"data\" : { \n" //
-			+ "    \"displayRank\" : \"\" \n" //
-			+ "  }, \n" //
-			+ "  \"children\" : [] \n" //
-			+ "},{ \n" //
-			+ "  \"name\" : \"<a href='./editForm?uri=http%3A%2F%2Fproperty.group%2Fgroup2&amp;controller=PropertyGroup'>Group2</a>\", \n" //
-			+ "  \"data\" : { \n" //
-			+ "    \"displayRank\" : \"2\" \n" //
-			+ "  }, \n" //
-			+ "  \"children\" : [ \n" //
-			+ "    { \n" //
-			+ "      \"name\" : \"<a href='propertyEdit?uri=http%3A%2F%2Fproperty%2Fprop'>PlainProp</a>\", \n" //
-			+ "      \"data\" : { \n" //
-			+ "        \"shortDef\" : \"\" \n" //
-			+ "      }, \n" //
-			+ "      \"children\" : [] \n" //
-			+ "    },{ \n" //
-			+ "      \"name\" : \"<a href='propertyEdit?uri=http%3A%2F%2Fproperty%2FobjectProp'>ObjectProp</a>\", \n" //
-			+ "      \"data\" : { \n" //
-			+ "        \"shortDef\" : \"\" \n" //
-			+ "      }, \n" //
-			+ "      \"children\" : [] \n" //
-			+ "    },{ \n" //
-			+ "      \"name\" : \"<a href='datapropEdit?uri=http%3A%2F%2Fproperty%2FdataProp'>DataProp</a>\", \n" //
-			+ "      \"data\" : { \n" //
-			+ "        \"shortDef\" : \"\" \n" //
-			+ "      }, \n" //
-			+ "      \"children\" : [] \n" //
-			+ "    } \n" //
-			+ "  ] \n" //
-			+ "} \n" //
-	;
+	private static final ArrayNode BASIC_JSON_RESPONSE = arrayOf(
+			groupListNode(
+					"<a href='./editForm?uri=http%3A%2F%2Fproperty.group%2Fgroup1&amp;controller=PropertyGroup'>(unnamed group)</a>",
+					""),
+			groupListNode(
+					"<a href='./editForm?uri=http%3A%2F%2Fproperty.group%2Fgroup2&amp;controller=PropertyGroup'>Group2</a>",
+					"2",
+					groupMemberNode(
+							"<a href='propertyEdit?uri=http%3A%2F%2Fproperty%2Fprop'>PlainProp</a>",
+							""),
+					groupMemberNode(
+							"<a href='propertyEdit?uri=http%3A%2F%2Fproperty%2FobjectProp'>ObjectProp</a>",
+							""),
+					groupMemberNode(
+							"<a href='datapropEdit?uri=http%3A%2F%2Fproperty%2FdataProp'>DataProp</a>",
+							"")));
 
 	private ListPropertyGroupsController controller;
 	private HttpServletRequestStub req;
@@ -97,7 +80,7 @@ public class ListPropertyGroupsControllerTest extends ListControllerTestBase {
 
 	@Test
 	public void basicJsonTest() throws Exception {
-		assertMatchingJson(controller, req, BASIC_JSON_EXPECTED);
+		assertMatchingJson(controller, req, BASIC_JSON_RESPONSE);
 	}
 
 	// ----------------------------------------------------------------------
