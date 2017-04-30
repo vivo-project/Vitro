@@ -8,8 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.json.util.JSONUtils;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,6 +22,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
+import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 
 public class ListPropertyGroupsController extends FreemarkerHttpServlet {
 
@@ -62,9 +61,9 @@ public class ListPropertyGroupsController extends FreemarkerHttpServlet {
                             publicName = "(unnamed group)";
                         }           
                         try {
-                            json += "{ \"name\": " + JSONUtils.quote("<a href='./editForm?uri="+URLEncoder.encode(pg.getURI(),"UTF-8")+"&amp;controller=PropertyGroup'>" + publicName + "</a>") + ", ";
+                            json += "{ \"name\": " + JacksonUtils.quote("<a href='./editForm?uri="+URLEncoder.encode(pg.getURI(),"UTF-8")+"&amp;controller=PropertyGroup'>" + publicName + "</a>") + ", ";
                         } catch (Exception e) {
-                            json += "{ \"name\": " + JSONUtils.quote(publicName) + ", ";
+                            json += "{ \"name\": " + JacksonUtils.quote(publicName) + ", ";
                         }
                         Integer t;
 
@@ -89,10 +88,10 @@ public class ListPropertyGroupsController extends FreemarkerHttpServlet {
                                 }
                                 if (prop.getURI() != null) {
                                     try {
-                                        json += "{ \"name\": " + JSONUtils.quote("<a href='" + controllerStr 
+                                        json += "{ \"name\": " + JacksonUtils.quote("<a href='" + controllerStr 
                                              + "?uri="+URLEncoder.encode(prop.getURI(),"UTF-8")+"'>"+ nameStr +"</a>") + ", ";
                                     } catch (Exception e) {
-                                        json += JSONUtils.quote(nameStr) + ", ";
+                                        json += JacksonUtils.quote(nameStr) + ", ";
                                     }
                                 } else {
                                     json += "\"\", ";

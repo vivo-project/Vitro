@@ -11,8 +11,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.json.util.JSONUtils;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
+import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
 public class ListPropertyWebappsController extends FreemarkerHttpServlet {
@@ -154,27 +153,27 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
                         String propNameStr = ShowObjectPropertyHierarchyController.getDisplayLabel(prop);
 
                         try {
-                            json += "{ \"name\": " + JSONUtils.quote("<a href='./propertyEdit?uri="+URLEncoder.encode(prop.getURI())+"'>" 
+                            json += "{ \"name\": " + JacksonUtils.quote("<a href='./propertyEdit?uri="+URLEncoder.encode(prop.getURI())+"'>" 
                                  + propNameStr + "</a>") + ", "; 
                          } catch (Exception e) {
                              json += "{ \"name\": \"" + propNameStr + "\", "; 
                          }
                     
-                         json += "\"data\": { \"internalName\": " + JSONUtils.quote(prop.getLocalNameWithPrefix()) + ", "; 
+                         json += "\"data\": { \"internalName\": " + JacksonUtils.quote(prop.getLocalNameWithPrefix()) + ", "; 
                     
                          ObjectProperty opLangNeut = opDaoLangNeut.getObjectPropertyByURI(prop.getURI());
                          if(opLangNeut == null) {
                              opLangNeut = prop;
                          }
                          String domainStr = getVClassNameFromURI(opLangNeut.getDomainVClassURI(), vcDao, vcDaoLangNeut); 
-                         json += "\"domainVClass\": " + JSONUtils.quote(domainStr) + ", " ;
+                         json += "\"domainVClass\": " + JacksonUtils.quote(domainStr) + ", " ;
                     
                          String rangeStr = getVClassNameFromURI(opLangNeut.getRangeVClassURI(), vcDao, vcDaoLangNeut);
-                         json += "\"rangeVClass\": " + JSONUtils.quote(rangeStr) + ", " ; 
+                         json += "\"rangeVClass\": " + JacksonUtils.quote(rangeStr) + ", " ; 
                     
                          if (prop.getGroupURI() != null) {
                              PropertyGroup pGroup = pgDao.getGroupByURI(prop.getGroupURI());
-                             json += "\"group\": " + JSONUtils.quote((pGroup == null) ? "unknown group" : pGroup.getName()) + " } } " ; 
+                             json += "\"group\": " + JacksonUtils.quote((pGroup == null) ? "unknown group" : pGroup.getName()) + " } } " ; 
                          } else {
                              json += "\"group\": \"unspecified\" } }" ;
                          }

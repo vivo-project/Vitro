@@ -8,8 +8,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.json.util.JSONUtils;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 
 
 public class ListVClassWebappsController extends FreemarkerHttpServlet {
@@ -90,15 +89,15 @@ public class ListVClassWebappsController extends FreemarkerHttpServlet {
                 if ( (ontologyURI==null) || ( (ontologyURI != null) && (cls.getNamespace()!=null) && (ontologyURI.equals(cls.getNamespace())) ) ) {
 	                if (cls.getName() != null)
 	                    try {
-	                        json += "{ \"name\": " + JSONUtils.quote("<a href='./vclassEdit?uri="+URLEncoder.encode(cls.getURI(),"UTF-8")+"'>"+cls.getPickListName()+"</a>") + ", ";
+	                        json += "{ \"name\": " + JacksonUtils.quote("<a href='./vclassEdit?uri="+URLEncoder.encode(cls.getURI(),"UTF-8")+"'>"+cls.getPickListName()+"</a>") + ", ";
 	                    } catch (Exception e) {
-	                        json += "{ \"name\": " + JSONUtils.quote(cls.getPickListName()) + ", ";
+	                        json += "{ \"name\": " + JacksonUtils.quote(cls.getPickListName()) + ", ";
 	                    }
 	                else
 	                    json += "{ \"name\": \"\"";
 	                String shortDef = (cls.getShortDef() == null) ? "" : cls.getShortDef();
 	                
-	                json += "\"data\": { \"shortDef\": " + JSONUtils.quote(shortDef) + ", ";
+	                json += "\"data\": { \"shortDef\": " + JacksonUtils.quote(shortDef) + ", ";
 
 	                // get group name
 	                WebappDaoFactory wadf = vreq.getUnfilteredWebappDaoFactory();
@@ -113,7 +112,7 @@ public class ListVClassWebappsController extends FreemarkerHttpServlet {
 	                	}
 	                }
                     
-                    json += "\"classGroup\": " + JSONUtils.quote(groupName) + ", ";
+                    json += "\"classGroup\": " + JacksonUtils.quote(groupName) + ", ";
 
 	                // get ontology name
 	                OntologyDao ontDao = wadf.getOntologyDao();
@@ -122,7 +121,7 @@ public class ListVClassWebappsController extends FreemarkerHttpServlet {
 	                if (ont != null && ont.getName() != null) {
 	                    ontName = ont.getName();
 	                }
-	                json += "\"ontology\": " + JSONUtils.quote(ontName) + "} }";
+	                json += "\"ontology\": " + JacksonUtils.quote(ontName) + "} }";
 	                
 	                counter++;
 

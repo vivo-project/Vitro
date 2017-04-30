@@ -7,8 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.json.util.JSONUtils;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
+import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
 
@@ -61,9 +60,9 @@ public class ListClassGroupsController extends FreemarkerHttpServlet {
                         publicName = "(unnamed group)";
                     }           
                     try {
-                        json += "{ \"name\": " + JSONUtils.quote("<a href='./editForm?uri="+URLEncoder.encode(vcg.getURI())+"&amp;controller=Classgroup'>"+publicName+"</a>") + ", ";
+                        json += "{ \"name\": " + JacksonUtils.quote("<a href='./editForm?uri="+URLEncoder.encode(vcg.getURI())+"&amp;controller=Classgroup'>"+publicName+"</a>") + ", ";
                     } catch (Exception e) {
-                        json += "{ \"name\": " + JSONUtils.quote(publicName) + ", ";
+                        json += "{ \"name\": " + JacksonUtils.quote(publicName) + ", ";
                     }
                     Integer t;
                     
@@ -77,16 +76,16 @@ public class ListClassGroupsController extends FreemarkerHttpServlet {
                             VClass vcw = classIt.next();
                             if (vcw.getName() != null && vcw.getURI() != null) {
                                 try {
-                                    json += "{ \"name\": " + JSONUtils.quote("<a href='vclassEdit?uri="+URLEncoder.encode(vcw.getURI())+"'>"+vcw.getName()+"</a>") + ", ";
+                                    json += "{ \"name\": " + JacksonUtils.quote("<a href='vclassEdit?uri="+URLEncoder.encode(vcw.getURI())+"'>"+vcw.getName()+"</a>") + ", ";
                                 } catch (Exception e) {
-                                    json += "" + JSONUtils.quote(vcw.getName()) + ", ";
+                                    json += "" + JacksonUtils.quote(vcw.getName()) + ", ";
                                 }
                             } else {
                                 json += "\"\", ";
                             }
 
                             String shortDefStr = (vcw.getShortDef() == null) ? "" : vcw.getShortDef();
-                            json += "\"data\": { \"shortDef\": " + JSONUtils.quote(shortDefStr) + "}, \"children\": [] ";
+                            json += "\"data\": { \"shortDef\": " + JacksonUtils.quote(shortDefStr) + "}, \"children\": [] ";
                             if (classIt.hasNext())
                                 json += "} , ";
                             else 
