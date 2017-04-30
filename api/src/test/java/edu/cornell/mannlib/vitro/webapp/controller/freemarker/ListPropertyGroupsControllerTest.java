@@ -10,7 +10,7 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
@@ -22,30 +22,69 @@ import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub
 import stubs.javax.servlet.http.HttpServletRequestStub;
 
 /**
- * Not a well-formed set of unit tests. Rather, this simply captures one output
- * from the Controller, so we can be sure that it's the same when we change JSON
- * engines.
+ * Not a well-formed set of unit tests. But it's a pretty good exercise of the
+ * different possibilities in the output stage.
  * 
- * On the other hand, the data is chosen in such a way as to exercise many of
- * the branches in the JSON generation code, so there's that.
+ * Test plan:
+ * 
+ * <pre>
+ * No data - roots is null -- NONSENSICAL
+ * No data - roots is empty
+ * 
+ * name
+ * no name - (unnamed group)
+ * 
+ * display rank
+ * no display rank
+ * 
+ * no child properties
+ * child property is data property
+ * child properti is object property
+ * 
+ * child data property has no name
+ * child data property has name
+ * child object property has no domainPublic
+ * child object property has domainPublic
+ * 
+ * G1 no name, displayRank, no classes
+ * G2 name, no displayRank, classes
+ * G2DP1 no name, no shortDef
+ * G2DP2 name, shortdef 
+ * G2OP1 no domainPublic, no shortDef
+ * G2OP2 domainPublic, shortdef 
+ * 
+ * Try once with no data
+ * Try with all data
+ * </pre>
  */
+
 public class ListPropertyGroupsControllerTest extends ListControllerTestBase {
-	private static final ArrayNode BASIC_JSON_RESPONSE = arrayOf(
-			groupListNode(
-					"<a href='./editForm?uri=http%3A%2F%2Fproperty.group%2Fgroup1&amp;controller=PropertyGroup'>(unnamed group)</a>",
-					""),
-			groupListNode(
-					"<a href='./editForm?uri=http%3A%2F%2Fproperty.group%2Fgroup2&amp;controller=PropertyGroup'>Group2</a>",
-					"2",
-					groupMemberNode(
-							"<a href='propertyEdit?uri=http%3A%2F%2Fproperty%2Fprop'>PlainProp</a>",
+	private static final String LINK_FORMAT_GROUP = "<a href='./editForm?uri=%s&amp;controller=PropertyGroup'>%s</a>";
+	private static final String LINK_FORMAT_DATA_PROPERTY = "<a href='datapropEdit?uri=%s'>%s</a>";
+	private static final String LINK_FORMAT_OBJECT_PROPERTY = "<a href='propertyEdit?uri=%s'>%s</a>";
+	private static final String GROUP1 = "http://ont1/group1";
+	private static final String GROUP2 = "http://ont1/group2";
+	private static final String DP1 = "http://ont1/dp1";
+	private static final String DP2 = "http://ont1/dp2";
+	private static final String OP1 = "http://ont1/op1";
+	private static final String OP2 = "http://ont1/op2";
+	private static final String DP2_NAME = "A second data property";
+	private static final String OP2_DOMAIN_PUBLIC = "The second domain";
+	private static final int GROUP1_RANK = 5;
+	private static final String GROUP2_NAME = "The Second Group";
+
+	private static final JsonNode JSON_EMPTY_RESPONSE = arrayOf();
+
+	private static final JsonNode JSON_FULL_RESPONSE = arrayOf(
+			groupListNode(LINK_FORMAT_GROUP, GROUP2, GROUP2_NAME, "",
+					groupMemberNode(LINK_FORMAT_DATA_PROPERTY, DP1, null, ""),
+					groupMemberNode(LINK_FORMAT_DATA_PROPERTY, DP2, DP2_NAME,
 							""),
-					groupMemberNode(
-							"<a href='propertyEdit?uri=http%3A%2F%2Fproperty%2FobjectProp'>ObjectProp</a>",
-							""),
-					groupMemberNode(
-							"<a href='datapropEdit?uri=http%3A%2F%2Fproperty%2FdataProp'>DataProp</a>",
-							"")));
+					groupMemberNode(LINK_FORMAT_OBJECT_PROPERTY, OP1, null, ""),
+					groupMemberNode(LINK_FORMAT_OBJECT_PROPERTY, OP2,
+							OP2_DOMAIN_PUBLIC, "")),
+			groupListNode(LINK_FORMAT_GROUP, GROUP1, "(unnamed group)",
+					"" + GROUP1_RANK));
 
 	private ListPropertyGroupsController controller;
 	private HttpServletRequestStub req;
@@ -60,12 +99,6 @@ public class ListPropertyGroupsControllerTest extends ListControllerTestBase {
 		req = new HttpServletRequestStub();
 
 		pgdao = new PropertyGroupDaoStub();
-		pgdao.addPropertyGroup(
-				propertyGroup("http://property.group/group1", "", -1));
-		pgdao.addPropertyGroup(propertyGroup("http://property.group/group2",
-				"Group2", 2, property("http://property/prop", "PlainProp"),
-				objectProperty("http://property/objectProp", "ObjectProp"),
-				dataProperty("http://property/dataProp", "DataProp")));
 
 		wadf = new WebappDaoFactoryStub();
 		wadf.setPropertyGroupDao(pgdao);
@@ -79,13 +112,36 @@ public class ListPropertyGroupsControllerTest extends ListControllerTestBase {
 	// ----------------------------------------------------------------------
 
 	@Test
+	public void noData() throws Exception {
+		assertMatchingJson(controller, req, JSON_EMPTY_RESPONSE);
+	}
+
+	@Test
 	public void basicJsonTest() throws Exception {
-		assertMatchingJson(controller, req, BASIC_JSON_RESPONSE);
+		populate();
+
+		// /*
+		// * The controller attempts to handle the case of a class with no name,
+		// * but instead it returns invalid json.
+		// */
+		// String rawResponse = getJsonFromController(controller, req);
+		// String kluged = rawResponse.replace("[\"\"", "[ {\"name\": \"\"");
+		// assertKlugedJson(JSON_FULL_RESPONSE, kluged);
+
+		assertMatchingJson(controller, req, JSON_FULL_RESPONSE);
 	}
 
 	// ----------------------------------------------------------------------
 	// Helper methods
 	// ----------------------------------------------------------------------
+
+	private void populate() {
+		pgdao.addPropertyGroup(propertyGroup(GROUP1, "", GROUP1_RANK));
+		pgdao.addPropertyGroup(
+				propertyGroup(GROUP2, GROUP2_NAME, -1, dataProperty(DP1, null),
+						dataProperty(DP2, DP2_NAME), objectProperty(OP1, null),
+						objectProperty(OP2, OP2_DOMAIN_PUBLIC)));
+	}
 
 	private PropertyGroup propertyGroup(String uri, String name,
 			int displayRank, Property... properties) {
@@ -95,13 +151,6 @@ public class ListPropertyGroupsControllerTest extends ListControllerTestBase {
 		pg.setDisplayRank(displayRank);
 		pg.setPropertyList(new ArrayList<>(Arrays.asList(properties)));
 		return pg;
-	}
-
-	private Property property(String uri, String name) {
-		Property p = new Property();
-		p.setURI(uri);
-		p.setLabel(name);
-		return p;
 	}
 
 	private ObjectProperty objectProperty(String uri, String name) {

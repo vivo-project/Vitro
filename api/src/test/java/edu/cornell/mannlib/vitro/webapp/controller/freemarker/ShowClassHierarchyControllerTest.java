@@ -10,6 +10,7 @@ import java.text.Collator;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
@@ -24,48 +25,89 @@ import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub
 import stubs.javax.servlet.http.HttpServletRequestStub;
 
 /**
- * Not a well-formed set of unit tests. Rather, this simply captures one output
- * from the Controller, so we can be sure that it's the same when we change JSON
- * engines.
+ * Not a well-formed set of unit tests. But it's a pretty good exercise of the
+ * different possibilities in the output stage.
  * 
- * On the other hand, the data is chosen in such a way as to exercise many of
- * the branches in the JSON generation code, so there's that.
+ * Test plan:
+ * 
+ * <pre>
+ * No data - roots is null -- NONSENSICAL
+ * No data - roots is empty
+ * 
+ * Ontology is not specified
+ * Ontology is specified and matches
+ * Ontology is specified and does not match
+ * VClass does not match Ontology, but has child properties that do.
+ * 
+ * pickListName
+ * no pickListName
+ * 
+ * shortDef
+ * no shortDef
+ * 
+ * Group no group URI
+ * Group no group for URI
+ * Group no name
+ * Group has a name
+ * 
+ * No ontology for namespace
+ * Ontology but no name
+ * Ontology with name
+ * 
+ * DP_1A Ont1, no pickListName, no shortDef, no GroupURI, no matching Ontology
+ * DP_1B Ont2, pickListName, shortDef, no group for GroupURI, ontology has no name
+ * DP_1B2A Ont3, pickListName, shortDef, group has no name, ontology with name
+ * DP_1B2B Ont1, pickListName, shortDef, group with name, no matching Ontology
+ * 
+ * Try once with no data
+ * Try with all data and no ontology specified
+ * Try with all data and Ont1, Ont2, Ont3
+ * </pre>
  */
 public class ShowClassHierarchyControllerTest extends ListControllerTestBase {
-	private static final ArrayNode JSON_FULL_RESPONSE = arrayOf(
-			vclassHierarchyNode(
-					"<a href='vclassEdit?uri=http%3A%2F%2Ftest1%2Fvclass1'>TestOne</a>",
-					"My favorite class", "TheGroup", "OntoMania"),
-			vclassHierarchyNode(
-					"<a href='vclassEdit?uri=http%3A%2F%2Ftest2%2FvclassParent'>vclassParent</a>",
-					"", "", "http://test2/",
-					vclassHierarchyNode(
-							"<a href='vclassEdit?uri=http%3A%2F%2Ftest3%2FvclassChild1'>Child One</a>",
-							"", "", "http://test3/",
-							vclassHierarchyNode(
-									"<a href='vclassEdit?uri=http%3A%2F%2Ftest3%2FvclassGrandchild'>vclassGrandchild</a>",
-									"", "", "http://test3/")),
-					vclassHierarchyNode(
-							"<a href='vclassEdit?uri=http%3A%2F%2Ftest2%2FvclassChild2'>Child Two</a>",
-							"", "", "http://test2/")));
+	private static final String PATH = "vclassEdit";
+	private static final String ONT1 = "http://ont1/";
+	private static final String ONT2 = "http://ont2/";
+	private static final String ONT3 = "http://ont3/";
+	private static final String ONT3_NAME = "Fabulous Ontology";
+	private static final String URI_GREATAUNT = ONT1 + "greatAunt";
+	private static final String URI_GRANDMOTHER = ONT2 + "grandmother";
+	private static final String URI_AUNT = ONT3 + "aunt";
+	private static final String URI_MOTHER = ONT1 + "mother";
+	private static final String NAME_GRANDMOTHER = "GrandMother";
+	private static final String NAME_AUNT = "Aunt";
+	private static final String NAME_MOTHER = "Mother";
+	private static final String SHORT_DEF_GRANDMOTHER = "My GrandMother";
+	private static final String SHORT_DEF_AUNT = "My Aunt";
+	private static final String SHORT_DEF_MOTHER = "My Mother";
+	private static final String GROUP_NONE = "http://domain/noSuchGroup";
+	private static final String GROUP_NO_NAME = "http://domain/groupWithNoName";
+	private static final String GROUP_W_NAME = "http://domain/namedGroup";
+	private static final String NAME_GROUP = "The Groupsters";
 
-	private static final ArrayNode JSON_RESTRICTED_TO_TEST2_RESPONSE = arrayOf(
-			vclassHierarchyNode(
-					"<a href='vclassEdit?uri=http%3A%2F%2Ftest2%2FvclassParent'>vclassParent</a>",
-					"", "", "http://test2/",
-					vclassHierarchyNode(
-							"<a href='vclassEdit?uri=http%3A%2F%2Ftest2%2FvclassChild2'>Child Two</a>",
-							"", "", "http://test2/")));
+	private static final ArrayNode JSON_EMPTY_RESPONSE = arrayOf(
+			vclassHierarchyNode(PATH,
+					"http://www.w3.org/1999/02/22-rdf-syntax-ns#Resource",
+					"Resource", "", "",
+					"http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
 
-	private static final ArrayNode JSON_EMPTY_RESPONSE = arrayOf();
+	private static final JsonNode RESPONSE_UNFILTERED = arrayOf(
+			vclassHierarchyNode(PATH,URI_GRANDMOTHER, NAME_GRANDMOTHER,
+					SHORT_DEF_GRANDMOTHER, "", ONT2,
+					vclassHierarchyNode(PATH,URI_AUNT, NAME_AUNT, SHORT_DEF_AUNT, "",
+							ONT3_NAME),
+					vclassHierarchyNode(PATH,URI_MOTHER, NAME_MOTHER,
+							SHORT_DEF_MOTHER, NAME_GROUP, ONT1)),
+			vclassHierarchyNode(PATH,URI_GREATAUNT, "greatAunt", "", "", ONT1));
 
-	private static final String VCLASS_URI_1 = "http://test1/vclass1";
-	private static final String VCLASS_URI_PARENT = "http://test2/vclassParent";
-	private static final String VCLASS_URI_CHILD_1 = "http://test3/vclassChild1";
-	private static final String VCLASS_URI_CHILD_2 = "http://test2/vclassChild2";
-	private static final String VCLASS_URI_GRANDCHIILD = "http://test3/vclassGrandchild";
+	private static final JsonNode RESPONSE_FILTERED_BY_ONT1 = arrayOf(
+			vclassHierarchyNode(PATH,URI_GREATAUNT, "greatAunt", "", "", ONT1));
 
-	private static final String VCLASS_GROUP_URI_1 = "http://test1/vclassGroup";
+	private static final JsonNode RESPONSE_FILTERED_BY_ONT2 = arrayOf(
+			vclassHierarchyNode(PATH,URI_GRANDMOTHER, NAME_GRANDMOTHER,
+					SHORT_DEF_GRANDMOTHER, "", ONT2));
+
+	private static final JsonNode RESPONSE_FILTERED_BY_ONT3 = arrayOf();
 
 	private ShowClassHierarchyController controller;
 
@@ -99,21 +141,6 @@ public class ShowClassHierarchyControllerTest extends ListControllerTestBase {
 		modelsFactory.get(req).setWebappDaoFactory(wadf, POLICY_NEUTRAL);
 		modelsFactory.get(req).setWebappDaoFactory(wadf, POLICY_NEUTRAL,
 				ASSERTIONS_ONLY);
-
-		VClassGroup vclassGroup = vclassGroup(VCLASS_GROUP_URI_1, "TheGroup");
-		vcgdao.setGroups(vclassGroup);
-
-		ontdao.insertNewOntology(ontology("http://test1/", "OntoMania"));
-
-		vcdao.setVClass(vclass(VCLASS_URI_1, "TestOne", vclassGroup,
-				"My favorite class"));
-
-		vcdao.setVClass(vclass(VCLASS_URI_PARENT));
-		vcdao.setVClass(vclass(VCLASS_URI_CHILD_1, "Child One"),
-				VCLASS_URI_PARENT);
-		vcdao.setVClass(vclass(VCLASS_URI_CHILD_2, "Child Two"),
-				VCLASS_URI_PARENT);
-		vcdao.setVClass(vclass(VCLASS_URI_GRANDCHIILD), VCLASS_URI_CHILD_1);
 	}
 
 	// ----------------------------------------------------------------------
@@ -121,44 +148,68 @@ public class ShowClassHierarchyControllerTest extends ListControllerTestBase {
 	// ----------------------------------------------------------------------
 
 	@Test
-	public void basicJsonTest() throws Exception {
-		assertMatchingJson(controller, req, JSON_FULL_RESPONSE);
-	}
-
-	@Test
-	public void restrictByOntology() throws Exception {
-		req.addParameter("ontologyUri", "http://test2/");
-		assertMatchingJson(controller, req, JSON_RESTRICTED_TO_TEST2_RESPONSE);
-	}
-
-	@Test
-	public void restrictToNothing() throws Exception {
-		req.addParameter("ontologyUri", "http://BOGUS/");
+	public void noData() throws Exception {
 		assertMatchingJson(controller, req, JSON_EMPTY_RESPONSE);
+	}
+
+	@Test
+	public void unfiltered() throws Exception {
+		populate();
+		assertMatchingJson(controller, req, RESPONSE_UNFILTERED);
+	}
+
+	@Test
+	public void filteredByOnt1() throws Exception {
+		populate();
+		req.addParameter("ontologyUri", ONT1);
+		assertMatchingJson(controller, req, RESPONSE_FILTERED_BY_ONT1);
+	}
+
+	@Test
+	public void filteredByOnt2() throws Exception {
+		populate();
+		req.addParameter("ontologyUri", ONT2);
+		assertMatchingJson(controller, req, RESPONSE_FILTERED_BY_ONT2);
+	}
+
+	@Test
+	public void filteredByOnt3() throws Exception {
+		populate();
+		req.addParameter("ontologyUri", ONT3);
+		assertMatchingJson(controller, req, RESPONSE_FILTERED_BY_ONT3);
 	}
 
 	// ----------------------------------------------------------------------
 	// Helper methods
 	// ----------------------------------------------------------------------
-	private VClass vclass(String uri) {
+
+	private void populate() {
+		ontdao.insertNewOntology(ontology(ONT2, null));
+		ontdao.insertNewOntology(ontology(ONT3, ONT3_NAME));
+		vcgdao.setGroups(vclassGroup(GROUP_NO_NAME, null));
+		vcgdao.setGroups(vclassGroup(GROUP_W_NAME, NAME_GROUP));
+		vcdao.setVClass(vclass(URI_GREATAUNT, null, null, null));
+		vcdao.setVClass(vclass(URI_GRANDMOTHER, NAME_GRANDMOTHER, GROUP_NONE,
+				SHORT_DEF_GRANDMOTHER));
+		vcdao.setVClass(
+				vclass(URI_AUNT, NAME_AUNT, GROUP_NO_NAME, SHORT_DEF_AUNT),
+				URI_GRANDMOTHER);
+		vcdao.setVClass(
+				vclass(URI_MOTHER, NAME_MOTHER, GROUP_W_NAME, SHORT_DEF_MOTHER),
+				URI_GRANDMOTHER);
+	}
+
+	private VClass vclass(String uri, String name, String groupUri,
+			String shortDef) {
 		VClass vc = new VClass();
 		vc.setURI(uri);
-		return vc;
-	}
-
-	private VClass vclass(String uri, String name) {
-		VClass vc = vclass(uri);
 		vc.setPickListName(name);
-		return vc;
-	}
-
-	private VClass vclass(String uri, String name, VClassGroup vcg,
-			String shortDef) {
-		VClass vc = vclass(uri);
-		vc.setPickListName(name);
-		vc.setGroupURI(vcg.getURI());
-		vcg.add(vc);
 		vc.setShortDef(shortDef);
+		vc.setGroupURI(groupUri);
+		VClassGroup group = vcgdao.getGroupByURI(groupUri);
+		if (group != null) {
+			group.add(vc);
+		}
 		return vc;
 	}
 

@@ -5,6 +5,9 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import javax.servlet.http.HttpServletRequest;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,7 +21,11 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
 /**
- * TODO
+ * Some useful methods for assembling JSON structures that will match the test
+ * results.
+ * 
+ * Also, some methods for running the tests, with and without kluging the
+ * results.
  */
 public class ListControllerTestBase extends AbstractTestClass {
 	protected static ObjectMapper mapper = new ObjectMapper();
@@ -37,10 +44,12 @@ public class ListControllerTestBase extends AbstractTestClass {
 	/**
 	 * Show a DataProperty or an ObjectProperty in a list.
 	 */
-	protected static ObjectNode propertyListNode(String name,
-			String internalName, String domainVClass, String rangeVClass,
-			String group) {
-		ObjectNode propNode = mapper.createObjectNode().put("name", name);
+	protected static ObjectNode propertyListNode(String path, String uri,
+			String name, String internalName, String domainVClass,
+			String rangeVClass, String group) {
+		String nameString = String.format("<a href='%s?uri=%s'>%s</a>", path,
+				urlEncode(uri), name);
+		ObjectNode propNode = mapper.createObjectNode().put("name", nameString);
 		propNode.putObject("data").put("internalName", internalName)
 				.put("domainVClass", domainVClass)
 				.put("rangeVClass", rangeVClass).put("group", group);
@@ -50,11 +59,11 @@ public class ListControllerTestBase extends AbstractTestClass {
 	/**
 	 * Show a DataProperty or an ObjectProperty in a hierarchy.
 	 */
-	protected static ObjectNode propertyHierarchyNode(String name,
-			String internalName, String domainVClass, String rangeVClass,
-			String group, ObjectNode... children) {
-		ObjectNode propNode = propertyListNode(name, internalName, domainVClass,
-				rangeVClass, group);
+	protected static ObjectNode propertyHierarchyNode(String path, String uri,
+			String name, String internalName, String domainVClass,
+			String rangeVClass, String group, ObjectNode... children) {
+		ObjectNode propNode = propertyListNode(path, uri, name, internalName,
+				domainVClass, rangeVClass, group);
 		propNode.set("children", arrayOf(children));
 		return propNode;
 	}
@@ -62,9 +71,22 @@ public class ListControllerTestBase extends AbstractTestClass {
 	/**
 	 * Show a VClass in a list.
 	 */
-	protected static ObjectNode vclassListNode(String name, String shortDef,
-			String classGroup, String ontology) {
+	protected static ObjectNode degenerateVclassListNode(String name,
+			String shortDef, String classGroup, String ontology) {
 		ObjectNode vcNode = mapper.createObjectNode().put("name", name);
+		vcNode.putObject("data").put("shortDef", shortDef)
+				.put("classGroup", classGroup).put("ontology", ontology);
+		return vcNode;
+	}
+
+	/**
+	 * Show a VClass in a list.
+	 */
+	protected static ObjectNode vclassListNode(String path, String uri,
+			String name, String shortDef, String classGroup, String ontology) {
+		String nameString = String.format("<a href='%s?uri=%s'>%s</a>", path,
+				urlEncode(uri), name);
+		ObjectNode vcNode = mapper.createObjectNode().put("name", nameString);
 		vcNode.putObject("data").put("shortDef", shortDef)
 				.put("classGroup", classGroup).put("ontology", ontology);
 		return vcNode;
@@ -73,11 +95,11 @@ public class ListControllerTestBase extends AbstractTestClass {
 	/**
 	 * Show a VClass in a hierarchy.
 	 */
-	protected static ObjectNode vclassHierarchyNode(String name,
-			String shortDef, String classGroup, String ontology,
+	protected static ObjectNode vclassHierarchyNode(String path, String uri,
+			String name, String shortDef, String classGroup, String ontology,
 			ObjectNode... children) {
-		ObjectNode vcNode = vclassListNode(name, shortDef, classGroup,
-				ontology);
+		ObjectNode vcNode = vclassListNode(path, uri, name, shortDef,
+				classGroup, ontology);
 		vcNode.set("children", arrayOf(children));
 		return vcNode;
 	}
@@ -85,9 +107,10 @@ public class ListControllerTestBase extends AbstractTestClass {
 	/**
 	 * Show a ClassGroup or PropertyGroup in a list.
 	 */
-	protected static ObjectNode groupListNode(String name, String displayRank,
-			ObjectNode... children) {
-		ObjectNode gNode = mapper.createObjectNode().put("name", name);
+	protected static ObjectNode groupListNode(String linkFormat, String uri,
+			String name, String displayRank, ObjectNode... children) {
+		String nameString = String.format(linkFormat, urlEncode(uri), name);
+		ObjectNode gNode = mapper.createObjectNode().put("name", nameString);
 		gNode.putObject("data").put("displayRank", displayRank);
 		gNode.set("children", arrayOf(children));
 		return gNode;
@@ -96,9 +119,11 @@ public class ListControllerTestBase extends AbstractTestClass {
 	/**
 	 * Show a Class or Property as part of a Group.
 	 */
-	protected static ObjectNode groupMemberNode(String name, String shortDef,
-			ObjectNode... children) {
-		ObjectNode memberNode = mapper.createObjectNode().put("name", name);
+	protected static ObjectNode groupMemberNode(String linkFormat, String uri,
+			String name, String shortDef, ObjectNode... children) {
+		String nameString = String.format(linkFormat, urlEncode(uri), name);
+		ObjectNode memberNode = mapper.createObjectNode().put("name",
+				nameString);
 		memberNode.putObject("data").put("shortDef", shortDef);
 		memberNode.set("children", arrayOf(children));
 		return memberNode;
@@ -149,4 +174,12 @@ public class ListControllerTestBase extends AbstractTestClass {
 		assertEquals(expected, actual);
 	}
 
+	private static String urlEncode(String uri) {
+		try {
+			return URLEncoder.encode(uri, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return uri;
+		}
+	}
 }
