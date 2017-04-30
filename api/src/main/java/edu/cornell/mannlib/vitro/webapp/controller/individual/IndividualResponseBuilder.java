@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.jena.rdf.model.RDFNode;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModelBuilder;
@@ -88,6 +87,7 @@ class IndividualResponseBuilder {
 		body.put("verbosePropertySwitch", getVerbosePropertyValues());
 
         addAltMetricOptions(body);
+        addPlumPrintOptions(body);
 
 		//Execute data getters that might apply to this individual, e.g. because of the class of the individual
 		try{
@@ -198,6 +198,27 @@ class IndividualResponseBuilder {
                 }
                 body.put("altmetricPopover", badgePopover);
                 body.put("altmetricDetails", badgeDetails);
+            }
+        }
+    }
+
+    private void addPlumPrintOptions(Map<String, Object> body) {
+        ConfigurationProperties properties = ConfigurationProperties.getBean(vreq);
+
+        if (properties != null) {
+            String enabled = properties.getProperty("resource.plum-print", "disabled");
+            String displayTo = properties.getProperty("resource.plum-print.displayto", "right");
+            String printHideEmpty = properties.getProperty("resource.plum-print.hide-when-empty", "true");
+            String printPopover = properties.getProperty("resource.plum-print.popover", "right");
+            String printSize = properties.getProperty("resource.plum-print.size", "medium");
+
+            if (!"disabled".equalsIgnoreCase(enabled)) {
+                body.put("plumPrintEnabled", true);
+
+                body.put("plumPrintDisplayTo", displayTo);
+                body.put("plumPrintHideEmpty", "true".equalsIgnoreCase(printHideEmpty) ? "true" : "false");
+                body.put("plumPrintPopover", printPopover);
+                body.put("plumPrintSize", printSize);
             }
         }
     }
