@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <header id="branding" role="banner">
     <h1 class="vivo-logo"><a href="${urls.home}" title="${siteName}"><span class="displace">${siteName}</span></a></h1>

@@ -1,4 +1,4 @@
-# $This file is distributed under the terms of the license in /doc/license.txt$ 
+# $This file is distributed under the terms of the license in LICENSE$ 
 
 # All instances of a class can be excluded from the search index by adding a 
 # vitroDisplay:excludeClass property between vitroDisplay:SearchIndex and the 

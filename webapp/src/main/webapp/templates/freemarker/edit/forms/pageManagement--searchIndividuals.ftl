@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 <#--This contains the template for the Search Index class individuals content type that is to be cloned and used in page management-->
 <#assign classGroup = pageData.classGroup />
 <#assign classGroups = pageData.classGroups />

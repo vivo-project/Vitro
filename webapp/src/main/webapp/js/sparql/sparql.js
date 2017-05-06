@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 			var namespaces = {
 //                  now handled in GetAllPrefix.java
 //					rdf		:	"http://www.w3.org/1999/02/22-rdf-syntax-ns#",

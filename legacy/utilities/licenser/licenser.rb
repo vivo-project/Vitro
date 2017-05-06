@@ -17,7 +17,7 @@ require 'licenser_stats'
 
 class Licenser
 
-  MAGIC_STRING = '$This file is distributed under the terms of the license in /doc/license.txt$'
+  MAGIC_STRING = '$This file is distributed under the terms of the license in LICENSE$'
 
   # ------------------------------------------------------------------------------------
   private
