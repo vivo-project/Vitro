@@ -13,7 +13,7 @@ import stubs.javax.servlet.ServletContextStub;
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;
 import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
 
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 /**
  * Test the I18N functionality.

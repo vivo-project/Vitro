@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
   
 /*Display bubble message letting the user knows that it is necessary to create class groups and associate classes with class groups when there is no individual classes to select in Data Input section and 
 hide it when there are classes*/

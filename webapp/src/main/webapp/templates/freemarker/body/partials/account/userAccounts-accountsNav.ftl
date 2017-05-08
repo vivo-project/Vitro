@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <#-----------------------------------------------------------------------------
     Macro for generating number of accounts, pagination, accounts per page, 

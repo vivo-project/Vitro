@@ -1,4 +1,4 @@
-# $This file is distributed under the terms of the license in /doc/license.txt$ 
+# $This file is distributed under the terms of the license in LICENSE$ 
 
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
