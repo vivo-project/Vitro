@@ -5,13 +5,11 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocess
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.servlet.ServletContext;
 
-import net.sf.json.JSONObject;
+import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -20,6 +18,9 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 //Returns the appropriate n3 based on data getter
@@ -136,10 +137,10 @@ public  class ProcessFixedHTMLN3 extends ProcessDataGetterAbstract {
    //Method to create a JSON object with existing values to return to form
    //There may be a better way to do this without having to run the query twice
    //TODO: Refactor code if required
-   public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context) {
-	   JSONObject jObject = new JSONObject();
-	   jObject.element("dataGetterClass", classType);
-	   jObject.element(classTypeVarBase, classType);
+   public ObjectNode getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context) {
+	   ObjectNode jObject = new ObjectMapper().createObjectNode();
+	   jObject.put("dataGetterClass", classType);
+	   jObject.put(classTypeVarBase, classType);
 	   String querystr = getExistingValuesSparqlQuery(dataGetterURI);
 	   QueryExecution qe = null;
        try{
@@ -152,9 +153,9 @@ public  class ProcessFixedHTMLN3 extends ProcessDataGetterAbstract {
         	   Literal htmlValueLiteral = qs.getLiteral("htmlValue");
         	   String htmlValueString = htmlValueLiteral.getString();
         	   htmlValueString = this.replaceQuotes(htmlValueString);
-        	   jObject.element("saveToVar", saveToVarLiteral.getString());
+        	   jObject.put("saveToVar", saveToVarLiteral.getString());
         	   //TODO: Handle single and double quotes within string and escape properlyu
-        	   jObject.element("htmlValue", htmlValueString);
+        	   jObject.put("htmlValue", htmlValueString);
            }
        } catch(Exception ex) {
     	   log.error("Exception occurred in retrieving existing values with query " + querystr, ex);

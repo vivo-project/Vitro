@@ -8,12 +8,8 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -22,6 +18,10 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Resource;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -153,10 +153,10 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
 	   return query;
    }
    
-   public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context) {
-	   JSONObject jObject = new JSONObject();
-	   jObject.element("dataGetterClass", classType);
-	   jObject.element(classTypeVarBase, classType);
+   public ObjectNode getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context) {
+	   ObjectNode jObject = new ObjectMapper().createObjectNode();
+	   jObject.put("dataGetterClass", classType);
+	   jObject.put(classTypeVarBase, classType);
 	   //Get class group
 	   getExistingClassGroup(dataGetterURI, jObject, queryModel);
 	   //Get classes within class group
@@ -164,7 +164,7 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
 	   return jObject;
    }
    
-   private void getExistingClassGroup(String dataGetterURI, JSONObject jObject, OntModel queryModel) {
+   private void getExistingClassGroup(String dataGetterURI, ObjectNode jObject, OntModel queryModel) {
 	   String querystr = getExistingValuesClassGroup(dataGetterURI);
 	   QueryExecution qe = null;
        try{
@@ -175,7 +175,7 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
         	   QuerySolution qs = results.nextSolution();
         	   Resource classGroupResource = qs.getResource("classGroup");
         	   //Put both literals in existing literals
-        	   jObject.element(classGroupVarBase, classGroupResource.getURI());
+        	   jObject.put(classGroupVarBase, classGroupResource.getURI());
            }
        } catch(Exception ex) {
     	   log.error("Exception occurred in retrieving existing values with query " + querystr, ex);
@@ -186,10 +186,10 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
    
    //Assumes JSON Object received will have the class group resource URI within it
    //TODO: Refactor to take advantage of existing code that uses OTHER JSON library
-   protected void getExistingClassesInClassGroup(ServletContext context, String dataGetterURI, JSONObject jObject) {
+   protected void getExistingClassesInClassGroup(ServletContext context, String dataGetterURI, ObjectNode jObject) {
 	   //Check for class group resource within json object
-	   if(jObject.containsKey(classGroupVarBase)) {
-		   String classGroupURI = jObject.getString(classGroupVarBase);
+	   if(jObject.has(classGroupVarBase)) {
+		   String classGroupURI = jObject.get(classGroupVarBase).asText();
 		   //Get classes for classGroupURI and include in 
 		   VClassGroupCache vcgc = VClassGroupCache.getVClassGroupCache(context);
 		   VClassGroup group = vcgc.getGroup(classGroupURI);
@@ -201,20 +201,21 @@ public  class ProcessClassGroupDataGetterN3 extends ProcessDataGetterAbstract {
    
    //JSONObject will include results JSON object that will include classes JSON Arrya as well as
    //class group information
-   protected void populateClassesInClassGroupJSON(JSONObject jObject, VClassGroup group) {
-	   JSONArray classes = new JSONArray();
+   protected void populateClassesInClassGroupJSON(ObjectNode jObject, VClassGroup group) {
+	   ObjectMapper mapper = new ObjectMapper();
+	   ArrayNode classes = mapper.createArrayNode();
        for( VClass vc : group){
-           JSONObject vcObj = new JSONObject();
-           vcObj.element("name", vc.getName());
-           vcObj.element("URI", vc.getURI());
+           ObjectNode vcObj = mapper.createObjectNode();
+           vcObj.put("name", vc.getName());
+           vcObj.put("URI", vc.getURI());
            classes.add(vcObj);
        }
-       JSONObject results = new JSONObject();
+       ObjectNode results = mapper.createObjectNode();
       
-       results.element("classes", classes);                
-       results.element("classGroupName", group.getPublicName());
-       results.element("classGroupUri", group.getURI());
-       jObject.element("results", results);
+       results.set("classes", classes);                
+       results.put("classGroupName", group.getPublicName());
+       results.put("classGroupUri", group.getURI());
+       jObject.set("results", results);
    }
 }
 

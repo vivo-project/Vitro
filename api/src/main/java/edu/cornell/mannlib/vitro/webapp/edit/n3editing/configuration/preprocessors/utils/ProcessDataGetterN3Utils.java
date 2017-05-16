@@ -5,10 +5,10 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocess
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 
-import net.sf.json.JSONObject;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /*
  * This class determines what n3 should be returned for a particular data getter and can be overwritten or extended in VIVO. 
@@ -16,7 +16,7 @@ import org.apache.commons.logging.LogFactory;
 public class ProcessDataGetterN3Utils {
     private static final Log log = LogFactory.getLog(ProcessDataGetterN3Utils.class);
     
-    public static ProcessDataGetterN3 getDataGetterProcessorN3(String dataGetterClass, JSONObject jsonObject) {
+    public static ProcessDataGetterN3 getDataGetterProcessorN3(String dataGetterClass, ObjectNode jsonObject) {
     	HashMap<String, String> map = ProcessDataGetterN3Map.getDataGetterTypeToProcessorMap();
     	//
     	if(map.containsKey(dataGetterClass)) {
@@ -32,7 +32,7 @@ public class ProcessDataGetterN3Utils {
     	return null;
     }
     
-    private static ProcessDataGetterN3 instantiateClass(String processorClass, JSONObject jsonObject) {
+    private static ProcessDataGetterN3 instantiateClass(String processorClass, ObjectNode jsonObject) {
     	ProcessDataGetterN3 pn = null;
     	try {
 	    	Class<?> clz = Class.forName(processorClass);
