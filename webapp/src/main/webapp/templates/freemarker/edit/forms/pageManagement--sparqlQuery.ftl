@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 <#--This contains the template for the Sparql Query content type that is to be cloned and used in page management-->
 <section id="sparqlQuery" class="contentSectionContainer">
     <label id="variableLabel" for="variable">${i18n().variable_name_all_caps}<span class="requiredHint"> *</span></label>

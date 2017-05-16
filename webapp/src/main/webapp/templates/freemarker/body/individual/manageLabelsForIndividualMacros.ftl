@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 <#--LabelsSorted is a hash keyed by language name where the value is a list of LabelInformation class objects-->
 <#macro displayExistingLabelsForLanguage lang labelsSorted editable editGenerator="" displayRemoveLink=true>
 	<#--get label information for this language-->
