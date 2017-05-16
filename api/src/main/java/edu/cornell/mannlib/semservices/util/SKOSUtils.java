@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 /* We are no longer using the SKOS API since Vitro has moved to V 4.0 of OWL API which does not appear to be compatible.
  This file will contain methods used for reading SKOS as XML and parsing it for the properties

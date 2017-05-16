@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 $.extend(this, i18nStringsFixedHtml);
 //Process sparql data getter and provide a json object with the necessary information
