@@ -2,15 +2,14 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+
+import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -20,12 +19,12 @@ import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Resource;
-import javax.servlet.ServletContext;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
 //Returns the appropriate n3 based on data getter
 public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
 	private static String classType = "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.SparqlQueryDataGetter";
@@ -157,10 +156,10 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
 
 
    
-   public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context) {
-	   JSONObject jObject = new JSONObject();
-	   jObject.element("dataGetterClass", classType);
-	   jObject.element(classTypeVarBase, classType);
+   public ObjectNode getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context) {
+	   ObjectNode jObject = new ObjectMapper().createObjectNode();
+	   jObject.put("dataGetterClass", classType);
+	   jObject.put(classTypeVarBase, classType);
 	   String querystr = getExistingValuesSparqlQuery(dataGetterURI);
 	   QueryExecution qe = null;
        try{
@@ -179,12 +178,12 @@ public  class ProcessSparqlDataGetterN3 extends ProcessDataGetterAbstract {
         	   //or incorrect html
         	   queryString = replaceQuotes(queryString);
         	   Resource queryModelResource = qs.getResource("queryModel");
-        	   jObject.element("saveToVar", saveToVarLiteral.getString());
-        	   jObject.element("query",queryString);
+        	   jObject.put("saveToVar", saveToVarLiteral.getString());
+        	   jObject.put("query", queryString);
         	   if(queryModelResource != null) {
-        	   jObject.element("queryModel", queryModelResource.getURI());
+        	   jObject.put("queryModel", queryModelResource.getURI());
         	   } else {
-            	   jObject.element("queryModel", "");
+            	   jObject.put("queryModel", "");
 
         	   }
            }

@@ -2,15 +2,15 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.json.JSONObject;
 import javax.servlet.ServletContext;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Literal;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 
@@ -36,7 +36,7 @@ public interface ProcessDataGetterN3 {
     public Map<String, List<Literal>> retrieveExistingLiteralValues();
     public Map<String, List<String>> retrieveExistingUriValues();
     public void populateExistingValues(String dataGetterURI, int counter, OntModel queryModel);
-    public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context);
+    public ObjectNode getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context);
     public String replaceEncodedQuotesWithEscapedQuotes(String inputStr);
 
 }
