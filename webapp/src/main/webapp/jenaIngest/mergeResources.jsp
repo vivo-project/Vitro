@@ -1,4 +1,4 @@
-<%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
+<%-- $This file is distributed under the terms of the license in LICENSE$ --%>
 
 <%@ page import="org.apache.jena.rdf.model.ModelMaker"%>
 <%@ page import="org.apache.jena.rdf.model.Model"%>

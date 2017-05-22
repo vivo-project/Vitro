@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <h1 class="vitro-logo"><a title="${siteName}" href="${urls.home}"><span class="displace">${siteName}</span></a></h1>
 <#-- Since we are using a graphic text for the tagline, we won't render ${siteTagline}

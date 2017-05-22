@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <#-- This is an example of how we could call this macro from a custom form if we end up
 implementing this like the other freemarker "widgets". For now I just have this here as
