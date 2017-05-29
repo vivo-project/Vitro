@@ -8,12 +8,20 @@
 
 <#include "stylesheets.ftl">
 
+<#include "themeStylesheets.ftl">
+
 <#include "headScripts.ftl">
+
+<!--[if (gte IE 6)&(lte IE 8)]>
+<script type="text/javascript" src="${urls.base}/js/selectivizr.js"></script>
+<![endif]-->
 
 <#if metaTags??>
     ${metaTags.list()}
 </#if>
 
-<#-- Inject head content specified in the controller. Currently this is used only to generate an rdf link on 
+<#-- Inject head content specified in the controller. Currently this is used only to generate an rdf link on
 an individual profile page. -->
 ${headContent!}
+
+<link rel="shortcut icon" type="image/x-icon" href="${urls.base}/favicon.ico">

@@ -38,15 +38,14 @@ public class OntologyDaoStub implements OntologyDao {
 		return new ArrayList<Ontology>(ontologies.values());
 	}
 
+	@Override
+	public Ontology getOntologyByURI(String ontologyURI) {
+		return ontologies.get(ontologyURI);
+	}
+
 	// ----------------------------------------------------------------------
 	// Un-implemented methods
 	// ----------------------------------------------------------------------
-
-	@Override
-	public Ontology getOntologyByURI(String ontologyURI) {
-		throw new RuntimeException(
-				"OntologyDaoStub.getOntologyByURI() not implemented.");
-	}
 
 	@Override
 	public void updateOntology(Ontology ontology) {

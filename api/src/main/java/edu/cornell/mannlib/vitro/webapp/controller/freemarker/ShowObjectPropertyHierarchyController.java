@@ -12,8 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.json.util.JSONUtils;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -28,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
 public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet {
@@ -210,11 +209,11 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
             
             String nameStr = getDisplayLabel(op) == null ? "(no name)" : getDisplayLabel(op);
 
-        	tempString += JSONUtils.quote(
+        	tempString += JacksonUtils.quote(
         	        "<a href='propertyEdit?uri=" + URLEncoder.encode(
         	                op.getURI()) + "'>" + nameStr + "</a>") + ", ";
              
-            tempString += "\"data\": { \"internalName\": " + JSONUtils.quote(
+            tempString += "\"data\": { \"internalName\": " + JacksonUtils.quote(
                     op.getLocalNameWithPrefix()) + ", ";
             
             ObjectProperty opLangNeut = opDaoLangNeut.getObjectPropertyByURI(op.getURI());
@@ -225,18 +224,18 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
             String rangeStr = getVClassNameFromURI(opLangNeut.getRangeVClassURI(), vcDao, vcDaoLangNeut);
             
             try {
-            	tempString += "\"domainVClass\": " + JSONUtils.quote(domainStr) + ", " ;
+            	tempString += "\"domainVClass\": " + JacksonUtils.quote(domainStr) + ", " ;
             } catch (NullPointerException e) {
             	tempString += "\"domainVClass\": \"\",";
             }
             try {
-            	tempString += "\"rangeVClass\": " + JSONUtils.quote(rangeStr) + ", " ;
+            	tempString += "\"rangeVClass\": " + JacksonUtils.quote(rangeStr) + ", " ;
             } catch (NullPointerException e) {
             	tempString += "\"rangeVClass\": \"\",";
             }
             if (op.getGroupURI() != null) {
                 PropertyGroup pGroup = pgDao.getGroupByURI(op.getGroupURI());
-                tempString += "\"group\": " + JSONUtils.quote(
+                tempString += "\"group\": " + JacksonUtils.quote(
                         (pGroup == null) ? "unknown group" : pGroup.getName());
             } else {
                 tempString += "\"group\": \"unspecified\"";

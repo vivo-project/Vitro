@@ -2,23 +2,18 @@
 
 <#import "lib-list.ftl" as l>
 
-<div id="footer">
-
-    <#if urls.bannerImage??>
-        <img class="footerLogo" src="${urls.bannerImage}" alt="${siteTagline!}" />
-    </#if>
-    
-    <div class="footerLinks">
-        <ul class="otherNav">  
-            <@l.firstLastList> 
-                <#include "subMenuLinks.ftl">
-            </@l.firstLastList>
-        </ul>
-    </div>
-
+<footer role="contentinfo">
     <#include "copyright.ftl">
 
-    ${i18n().all_rights_reserved} <a href="${urls.termsOfUse}" title="${i18n().terms_of_use}">${i18n().terms_of_use}</a>
+    <nav role="navigation">
+        <ul id="footer-nav" role="list">
+            <li role="listitem"><a href="${urls.about}" title="${i18n().about}">${i18n().about}</a></li>
+        <#if urls.contact??>
+            <li role="listitem"><a href="${urls.contact}" title="${i18n().contact_us}">${i18n().contact_us}</a></li>
+        </#if>
+            <li role="listitem"><a href="http://www.vivoweb.org/support" target="blank" title="${i18n().support}">${i18n().support}</a></li>
+        </ul>
+    </nav>
+</footer>
 
-    <#include "version.ftl">
-</div>
+<#include "scripts.ftl">

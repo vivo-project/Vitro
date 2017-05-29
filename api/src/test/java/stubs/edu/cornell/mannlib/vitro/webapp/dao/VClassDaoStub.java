@@ -2,9 +2,15 @@
 
 package stubs.edu.cornell.mannlib.vitro.webapp.dao;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.jena.vocabulary.RDF;
+
+import com.google.common.base.Objects;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -13,47 +19,94 @@ import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
 public class VClassDaoStub implements VClassDao {
-// ----------------------------------------------------------------------
-// Stub infrastructure
-// ----------------------------------------------------------------------
+	// ----------------------------------------------------------------------
+	// Stub infrastructure
+	// ----------------------------------------------------------------------
 
-	private final Map<String, VClass> vclassesByUri = new HashMap<String, VClass>();
-	
-	public void setVClass(String uri, VClass vclass) {
-		vclassesByUri.put(uri, vclass);
+	private static class VClassHolder {
+		final VClass vclass;
+		final String parentUri;
+
+		VClassHolder(VClass vclass, String parentUri) {
+			this.vclass = vclass;
+			this.parentUri = parentUri;
+		}
+
+		public VClass getVclass() {
+			return vclass;
+		}
+
+		public String getParentUri() {
+			return parentUri;
+		}
+
+		boolean isRoot() {
+			return parentUri == null;
+		}
+
+		boolean inOntology(String ontologyUri) {
+			return Objects.equal(ontologyUri, vclass.getNamespace());
+		}
 	}
-	
-// ----------------------------------------------------------------------
-// Stub methods
-// ----------------------------------------------------------------------
+
+	private final Map<String, VClassHolder> vclassMap = new HashMap<>();
+
+	public void setVClass(VClass vclass) {
+		setVClass(vclass, null);
+	}
+
+	public void setVClass(VClass vclass, String parentUri) {
+		vclassMap.put(vclass.getURI(), new VClassHolder(vclass, parentUri));
+	}
+
+	// ----------------------------------------------------------------------
+	// Stub methods
+	// ----------------------------------------------------------------------
+
+	@Override
+	public List<VClass> getAllVclasses() {
+		return vclassMap.values().stream().map(VClassHolder::getVclass)
+				.collect(toList());
+	}
+
+	// Only direct (one-hop) sub-classes.
+	@Override
+	public List<String> getSubClassURIs(String classURI) {
+		return vclassMap.values().stream()
+				.filter(vch -> vch.parentUri == classURI)
+				.map(vch -> vch.getVclass().getURI()).collect(toList());
+	}
 
 	@Override
 	public VClass getVClassByURI(String URI) {
-		return vclassesByUri.get(URI);
+		VClassHolder vch = vclassMap.get(URI);
+		return vch == null ? null : vch.getVclass();
 	}
-
-// ----------------------------------------------------------------------
-// Un-implemented methods
-// ----------------------------------------------------------------------
-
 
 	@Override
 	public List<VClass> getRootClasses() {
-		throw new RuntimeException(
-				"VClassDaoStub.getRootClasses() not implemented.");
+		return vclassMap.values().stream().filter(VClassHolder::isRoot)
+				.map(VClassHolder::getVclass).collect(toList());
 	}
 
 	@Override
 	public List<VClass> getOntologyRootClasses(String ontologyURI) {
-		throw new RuntimeException(
-				"VClassDaoStub.getOntologyRootClasses() not implemented.");
+		return getRootClasses().stream()
+				.filter(vc -> Objects.equal(ontologyURI, vc.getNamespace()))
+				.collect(toList());
 	}
 
 	@Override
-	public List<VClass> getAllVclasses() {
-		throw new RuntimeException(
-				"VClassDaoStub.getAllVclasses() not implemented.");
+	public VClass getTopConcept() {
+		VClass top = new VClass();
+		top.setURI(RDF.getURI() + "Resource");
+		top.setName(top.getLocalName());
+		return top;
 	}
+
+	// ----------------------------------------------------------------------
+	// Un-implemented methods
+	// ----------------------------------------------------------------------
 
 	@Override
 	public List<String> getDisjointWithClassURIs(String vclassURI) {
@@ -116,7 +169,8 @@ public class VClassDaoStub implements VClassDao {
 	}
 
 	@Override
-	public void removeDisjointWithClass(String classURI, String disjointClassURI) {
+	public void removeDisjointWithClass(String classURI,
+			String disjointClassURI) {
 		throw new RuntimeException(
 				"VClassDaoStub.removeDisjointWithClass() not implemented.");
 	}
@@ -134,15 +188,10 @@ public class VClassDaoStub implements VClassDao {
 	}
 
 	@Override
-	public void removeEquivalentClass(String classURI, String equivalentClassURI) {
+	public void removeEquivalentClass(String classURI,
+			String equivalentClassURI) {
 		throw new RuntimeException(
 				"VClassDaoStub.removeEquivalentClass() not implemented.");
-	}
-
-	@Override
-	public List<String> getSubClassURIs(String classURI) {
-		throw new RuntimeException(
-				"VClassDaoStub.getSubClassURIs() not implemented.");
 	}
 
 	@Override
@@ -249,12 +298,6 @@ public class VClassDaoStub implements VClassDao {
 	public boolean isSubClassOf(String vclassURI1, String vclassURI2) {
 		throw new RuntimeException(
 				"VClassDaoStub.isSubClassOf() not implemented.");
-	}
-
-	@Override
-	public VClass getTopConcept() {
-		throw new RuntimeException(
-				"VClassDaoStub.getTopConcept() not implemented.");
 	}
 
 	@Override

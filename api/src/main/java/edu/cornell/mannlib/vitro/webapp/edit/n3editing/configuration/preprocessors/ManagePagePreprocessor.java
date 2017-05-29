@@ -8,14 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.rdf.model.Literal;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.BaseEditSubmissionPreprocessorVTwo;
@@ -27,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigu
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators.ManagePageGenerator;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils.ProcessDataGetterN3Utils;
+import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 public class ManagePagePreprocessor extends
 		BaseEditSubmissionPreprocessorVTwo {
 
@@ -39,7 +39,7 @@ public class ManagePagePreprocessor extends
 	private static Map<String, List<String>> transformedLiteralsFromForm = null;
 	private static Map<String, List<String>> urisFromForm = null;
 	private static List<String> pageContentUnits = null;//String submission from form
-	private static List<JSONObject> pageContentUnitsJSON = null;//converted to JSON objects that can be read
+	private static List<ObjectNode> pageContentUnitsJSON = null;//converted to JSON objects that can be read
 	// String datatype
 
 	// Will be editing the edit configuration as well as edit submission here
@@ -131,7 +131,7 @@ public class ManagePagePreprocessor extends
 	private void processDataGetters() {
 		convertToJson();
 		int counter = 0;
-		for(JSONObject jsonObject:pageContentUnitsJSON) {
+		for(ObjectNode jsonObject:pageContentUnitsJSON) {
 			String dataGetterClass = getDataGetterClass(jsonObject);
 			ProcessDataGetterN3 pn = ProcessDataGetterN3Utils.getDataGetterProcessorN3(dataGetterClass, jsonObject);
 			//UPDATE: using class type to indicate class type/ could also get it from 
@@ -175,12 +175,12 @@ public class ManagePagePreprocessor extends
 
 	private void convertToJson() {
 		//Iterate through list of inputs
-		pageContentUnitsJSON = new ArrayList<JSONObject>();
+		pageContentUnitsJSON = new ArrayList<ObjectNode>();
 		//page content units might return null in case self-contained template is selected
 		//otherwise there should be page content units returned from the form
 		if(pageContentUnits != null) {
 			for(String pageContentUnit: pageContentUnits) {
-				JSONObject jsonObject = (JSONObject) JSONSerializer.toJSON( pageContentUnit );
+				ObjectNode jsonObject = (ObjectNode) JacksonUtils.parseJson(pageContentUnit);
 				pageContentUnitsJSON.add(jsonObject);
 			}
 		}
@@ -190,29 +190,29 @@ public class ManagePagePreprocessor extends
 	//Each field name will correspond to the names of the fileds/uris on form/literals on form
 	//generated here
 
-	private void addInputsToSubmission(ProcessDataGetterN3 pn, int counter, JSONObject jsonObject) {
+	private void addInputsToSubmission(ProcessDataGetterN3 pn, int counter, ObjectNode jsonObject) {
 		 List<String> literalLabels = pn.getLiteralVarNamesBase();
 		 List<String> uriLabels = pn.getUriVarNamesBase();
 		 
 		 for(String literalLabel:literalLabels) {
 			 List<String> literalValues = new ArrayList<String>();
-			 Object jsonValue = jsonObject.get(literalLabel);
+			 JsonNode jsonValue = jsonObject.get(literalLabel);
 			//Var names will depend on which data getter object this is on the page, so depends on counter
 			 String submissionLiteralName = pn.getVarName(literalLabel, counter);
 			 //Single value
-			 if(jsonValue instanceof String) {
+			 if(jsonValue.isTextual()) {
 				 //TODO: Deal with multiple submission values
 				 //This retrieves the value for this particular json object
-				 String jsonString = jsonObject.getString(literalLabel);
+				 String jsonString = jsonObject.get(literalLabel).asText();
 				 jsonString = pn.replaceEncodedQuotesWithEscapedQuotes(jsonString);
 				 literalValues.add(jsonString);
-			 } else if(jsonValue instanceof JSONArray) {
-				 JSONArray values = jsonObject.getJSONArray(literalLabel);
-				 literalValues = (List<String>) JSONSerializer.toJava(values);
+			 } else if(jsonValue.isArray()) {
+				 ArrayNode values = (ArrayNode) jsonObject.get(literalLabel);
+				 literalValues = JacksonUtils.jsonArrayToStrings(values);
 				 //Replacing encoded quotes here as well
 				 this.replaceEncodedQuotesInList(pn, literalValues);
-			 } else if(jsonValue instanceof Boolean) {
-				 Boolean booleanValue = jsonObject.getBoolean(literalLabel);
+			 } else if(jsonValue.isBoolean()) {
+				 Boolean booleanValue = jsonObject.get(literalLabel).asBoolean();
 				 //Adds string version
 				 literalValues.add(booleanValue.toString());
 			 }
@@ -227,19 +227,19 @@ public class ManagePagePreprocessor extends
 		 
 		 for(String uriLabel:uriLabels) {
 			 List<String> uriValues = new ArrayList<String>();
-			 Object jsonValue = jsonObject.get(uriLabel);
+			 JsonNode jsonValue = jsonObject.get(uriLabel);
 			//Var names will depend on which data getter object this is on the page, so depends on counter
 			 String submissionUriName = pn.getVarName(uriLabel, counter);
 			 //if single value, then, add to values
-			 if(jsonValue instanceof String) {
+			 if(jsonValue.isTextual()) {
 				 //Var names will depend on which data getter object this is on the page, so depends on counter
 				 //This retrieves the value for this particular json object and adds to list
-				 uriValues.add(jsonObject.getString(uriLabel));
+				 uriValues.add(jsonObject.get(uriLabel).asText());
 
-			 } else if(jsonValue instanceof JSONArray) {
+			 } else if(jsonValue.isArray()) {
 				 //multiple values
-				 JSONArray values = jsonObject.getJSONArray(uriLabel);
-				 uriValues = (List<String>) JSONSerializer.toJava(values);
+				 ArrayNode values = (ArrayNode) jsonObject.get(uriLabel);
+				 uriValues = JacksonUtils.jsonArrayToStrings(values);
 				
 			 } else {
 				 //This may include JSON Objects but no way to deal with these right now
@@ -257,8 +257,8 @@ public class ManagePagePreprocessor extends
 			 //Although this is editing an existing page, new content might have been added which would not include
 			 //existing data getter URIs, so important to check whether the key exists within the json object in the first place
 			 String dataGetterURISubmissionName = pn.getDataGetterVarName(counter);
-			 if(jsonObject.containsKey("URI")) {
-				 String URIValue = jsonObject.getString("URI");
+			 if(jsonObject.has("URI")) {
+				 String URIValue = jsonObject.get("URI").asText();
 				 if(URIValue != null) {
 					 log.debug("Existing URI for data getter found: " + URIValue);
 					 submission.addUriToForm(editConfiguration, dataGetterURISubmissionName, new String[]{URIValue});
@@ -366,8 +366,8 @@ public class ManagePagePreprocessor extends
 	
 	
 	//Each JSON Object will indicate the type of the data getter within it
-	private String getDataGetterClass(JSONObject jsonObject) {
-		String javaURI = jsonObject.getString("dataGetterClass");
+	private String getDataGetterClass(ObjectNode jsonObject) {
+		String javaURI = jsonObject.get("dataGetterClass").asText();
 		return getQualifiedDataGetterName(javaURI);
 		
 		

@@ -2,16 +2,14 @@
 
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.preprocessors.utils;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+
+import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -19,16 +17,15 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Resource;
-import javax.servlet.ServletContext;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields.FieldVTwo;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
 //Returns the appropriate n3 for selection of classes from within class group
 public  class ProcessIndividualsForClassesDataGetterN3 extends ProcessClassGroupDataGetterN3 {
 	private static String classType = "java:edu.cornell.mannlib.vitro.webapp.utils.dataGetter.IndividualsForClassesDataGetter";
@@ -174,11 +171,11 @@ public  class ProcessIndividualsForClassesDataGetterN3 extends ProcessClassGroup
    }
 
    
-   public JSONObject getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context) {
-	   JSONObject jObject = new JSONObject();
-	   jObject.element("dataGetterClass", classType);
+   public ObjectNode getExistingValuesJSON(String dataGetterURI, OntModel queryModel, ServletContext context) {
+	   ObjectNode jObject = new ObjectMapper().createObjectNode();
+	   jObject.put("dataGetterClass", classType);
 	   //Update to include class type as variable
-	   jObject.element(classTypeVarBase, classType);
+	   jObject.put(classTypeVarBase, classType);
 	   //Get selected class group and which classes were selected
 	   getExistingClassGroupAndIndividuals(dataGetterURI, jObject, queryModel);
 	   //Get all classes within the class group
@@ -186,14 +183,14 @@ public  class ProcessIndividualsForClassesDataGetterN3 extends ProcessClassGroup
 	   return jObject;
    }
    
-   private void getExistingClassGroupAndIndividuals(String dataGetterURI, JSONObject jObject, OntModel queryModel) {
+   private void getExistingClassGroupAndIndividuals(String dataGetterURI, ObjectNode jObject, OntModel queryModel) {
 	   String querystr = getExistingValuesIndividualsForClasses(dataGetterURI);
 	   QueryExecution qe = null;
        try{
            Query query = QueryFactory.create(querystr);
            qe = QueryExecutionFactory.create(query, queryModel);
            ResultSet results = qe.execSelect();
-           JSONArray individualsForClasses = new JSONArray();
+           ArrayNode individualsForClasses = new ObjectMapper().createArrayNode();
            String classGroupURI = null;
            while( results.hasNext()){
         	   QuerySolution qs = results.nextSolution();
@@ -207,9 +204,9 @@ public  class ProcessIndividualsForClassesDataGetterN3 extends ProcessClassGroup
         	   
            }
            
-          jObject.element("classGroup", classGroupURI);
+          jObject.put("classGroup", classGroupURI);
           //this is a json array
-          jObject.element(individualClassVarNameBase, individualsForClasses);
+          jObject.set(individualClassVarNameBase, individualsForClasses);
        } catch(Exception ex) {
     	   log.error("Exception occurred in retrieving existing values with query " + querystr, ex);
        }

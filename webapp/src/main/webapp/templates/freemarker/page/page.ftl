@@ -7,8 +7,10 @@
 <body class="${bodyClasses!}">
     <div id="wrap" class="container">
         <div id="header">
-        
-            <#include "identity.ftl">
+
+            <header id="branding" role="banner">
+                <#include "identity.ftl">
+            </header>
             
             <#-- Note to UI team: do not change this div without also making the corresponding change in menu.jsp -->
             <div id="navAndSearch" class="block">
@@ -21,21 +23,16 @@
 
         <hr class="hidden" />
 
-        <div id="contentwrap"> 
-            <#if flash?has_content>
-                <div id="flash-message">
-                    ${flash}
-                </div>
-            </#if>
-            
+        <div id="contentwrap">
+            <#include "flash.html">
+
             <div id="content">                      
                 ${body}
             </div> <!-- content -->
         </div> <!-- contentwrap -->
     
         <#include "footer.ftl">
-                                      
-    </div> <!-- wrap --> 
+    </div> <!-- wrap -->
     
     <#include "scripts.ftl"> 
 </body>

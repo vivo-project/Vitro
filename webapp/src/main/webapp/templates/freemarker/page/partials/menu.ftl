@@ -9,10 +9,3 @@
         </#list>
     </ul>
 </nav>
-
-<div id="wrapper-content" role="main">        
-    <#if flash?has_content>
-        <section id="flash-message" role="alert">
-            ${flash}
-        </section>
-    </#if>
