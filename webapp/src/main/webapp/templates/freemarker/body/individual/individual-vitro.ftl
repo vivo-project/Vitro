@@ -16,7 +16,9 @@
 
 <#-- Default individual profile page template -->
 <#--@dumpAll /-->
+<#include "individual-adminPanel.ftl">
 <section id="individual-intro" class="vcard" role="region" <@mf.sectionSchema individual/>>
+
     <section id="share-contact" role="region">
         <#-- Image -->
         <#assign individualImage>
@@ -34,7 +36,6 @@
     </section>
     <!-- start section individual-info -->
     <section id="individual-info" ${infoClass!} role="region">
-        <#include "individual-adminPanel.ftl">
 
         <#if individualProductExtensionPreHeader??>
             ${individualProductExtensionPreHeader}
