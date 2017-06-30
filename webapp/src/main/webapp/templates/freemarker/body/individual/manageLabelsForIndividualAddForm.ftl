@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 <#--The form for adding a new label-->
 <form id="addLabelForm" name="addLabelForm" class="customForm" action="${submitUrl}">
    <h2>${i18n().add_label}</h2>

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.individual;
 
@@ -206,7 +206,7 @@ class IndividualResponseBuilder {
         ConfigurationProperties properties = ConfigurationProperties.getBean(vreq);
 
         if (properties != null) {
-            String enabled = properties.getProperty("resource.plum-print", "enabled");
+            String enabled = properties.getProperty("resource.plum-print", "disabled");
             String displayTo = properties.getProperty("resource.plum-print.displayto", "right");
             String printHideEmpty = properties.getProperty("resource.plum-print.hide-when-empty", "true");
             String printPopover = properties.getProperty("resource.plum-print.popover", "right");

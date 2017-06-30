@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <#include "developer.ftl">
 
@@ -9,10 +9,3 @@
         </#list>
     </ul>
 </nav>
-
-<div id="wrapper-content" role="main">        
-    <#if flash?has_content>
-        <section id="flash-message" role="alert">
-            ${flash}
-        </section>
-    </#if>

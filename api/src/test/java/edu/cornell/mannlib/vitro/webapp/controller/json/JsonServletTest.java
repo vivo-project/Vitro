@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.json;
 
@@ -196,7 +196,7 @@ public class JsonServletTest extends AbstractTestClass {
 		setLoggerLevel(JsonServlet.class, Level.FATAL);
 		setLoggerLevel(ModelAccess.class, Level.ERROR);
 		String vclassId = "http://myVclass";
-		vcDao.setVClass(vclassId, new VClass(vclassId));
+		vcDao.setVClass(new VClass(vclassId));
 		req.addParameter(GET_SEARCH_INDIVIDUALS_BY_VCLASS, "true");
 		req.addParameter(VCLASS_ID, vclassId);
 

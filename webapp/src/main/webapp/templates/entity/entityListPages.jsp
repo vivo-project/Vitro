@@ -1,4 +1,4 @@
-<%-- $This file is distributed under the terms of the license in /doc/license.txt$ --%>
+<%-- $This file is distributed under the terms of the license in LICENSE$ --%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%><%/* this odd thing points to something in web.xml */ %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>

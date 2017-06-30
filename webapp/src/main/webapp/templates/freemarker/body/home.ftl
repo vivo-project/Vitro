@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <#-- Template for home page body contents. This file is deliberately empty, for use by themes that define a full
 page template for the home page and do not use a separate body template. The HomePageController defines a 

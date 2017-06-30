@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
@@ -10,11 +10,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.json.util.JSONUtils;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.jena.vocabulary.OWL;
 
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
@@ -29,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
+import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 
 
 public class ShowClassHierarchyController extends FreemarkerHttpServlet {
@@ -196,16 +194,16 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
                 tempString += "}, { \"name\": ";
             }
             try {
-                tempString += JSONUtils.quote("<a href='vclassEdit?uri=" + 
+                tempString += JacksonUtils.quote("<a href='vclassEdit?uri=" + 
                         URLEncoder.encode(vcw.getURI(),"UTF-8") + "'>" + 
                         vcw.getPickListName() + "</a>") +", ";
             } catch (Exception e) {
-                 tempString += JSONUtils.quote(((vcw.getPickListName() == null) 
+                 tempString += JacksonUtils.quote(((vcw.getPickListName() == null) 
                          ? "" : vcw.getPickListName())) + ", ";
             }
 
             String shortDef = ((vcw.getShortDef() == null) ? "" : vcw.getShortDef()) ;
-            tempString += "\"data\": { \"shortDef\": " + JSONUtils.quote(shortDef) + ", ";
+            tempString += "\"data\": { \"shortDef\": " + JacksonUtils.quote(shortDef) + ", ";
 
             // Get group name if it exists
             VClassGroupDao groupDao= wadf.getVClassGroupDao();
@@ -218,7 +216,7 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
             		groupName = classGroup.getPublicName();
             	}
             }
-            tempString += "\"classGroup\": " + JSONUtils.quote(
+            tempString += "\"classGroup\": " + JacksonUtils.quote(
                     (groupName == null) ? "" : groupName) + ", ";
             // Get ontology name
             OntologyDao ontDao = wadf.getOntologyDao();
@@ -227,7 +225,7 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
             if (ont != null && ont.getName() != null) {
                 ontName = ont.getName();
             }
-            tempString += "\"ontology\": " + JSONUtils.quote(
+            tempString += "\"ontology\": " + JacksonUtils.quote(
                     (ontName == null) ? "" : ontName) + "}, \"children\": [";
 
             previous_posn = position;

@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <#import "lib-list.ftl" as l>
 
@@ -9,12 +9,15 @@
     </head>
     
     <body class="${bodyClasses!}">
-        <#include "identity.ftl">
-        <#include "search.ftl">
+        <header id="branding" role="banner">
+            <#include "identity.ftl">
+            <#include "search.ftl">
+        </header>
         <#include "menu.ftl">
-        
-        ${body}
-        
+
+        <div id="wrapper-content" role="main">
+            ${body}
+        </div>
         <#include "footer.ftl">
     </body>
 </html>

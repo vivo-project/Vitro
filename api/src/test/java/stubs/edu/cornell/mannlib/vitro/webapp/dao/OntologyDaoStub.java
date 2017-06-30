@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package stubs.edu.cornell.mannlib.vitro.webapp.dao;
 
@@ -38,15 +38,14 @@ public class OntologyDaoStub implements OntologyDao {
 		return new ArrayList<Ontology>(ontologies.values());
 	}
 
+	@Override
+	public Ontology getOntologyByURI(String ontologyURI) {
+		return ontologies.get(ontologyURI);
+	}
+
 	// ----------------------------------------------------------------------
 	// Un-implemented methods
 	// ----------------------------------------------------------------------
-
-	@Override
-	public Ontology getOntologyByURI(String ontologyURI) {
-		throw new RuntimeException(
-				"OntologyDaoStub.getOntologyByURI() not implemented.");
-	}
 
 	@Override
 	public void updateOntology(Ontology ontology) {

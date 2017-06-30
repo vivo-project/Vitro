@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 $(document).ready(function(){
 
@@ -7,7 +7,7 @@ $(document).ready(function(){
     // fade out welcome-message when user logs in
     jQuery.extend(this, i18nStrings);
     
-    jQuery('section#welcome-message').css('display', 'block').delay(2000).fadeOut(1500);
+    jQuery('section#welcome-message').css('display', 'block').delay(2000).fadeOut(1500, function() { jQuery('section#welcome-msg-container').remove(); });
     
     // fade in flash-message when user logs out
     jQuery('section#flash-message').css('display', 'none').fadeIn(1500);

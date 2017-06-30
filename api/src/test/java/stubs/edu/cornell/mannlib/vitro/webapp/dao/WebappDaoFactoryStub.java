@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package stubs.edu.cornell.mannlib.vitro.webapp.dao;
 
@@ -38,14 +38,18 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	private String defaultNamespace;
 	private ApplicationDao applicationDao;
 	private DataPropertyDao dataPropertyDao;
+	private DatatypeDao datatypeDao;
+	private FauxPropertyDao fauxPropertyDao;
 	private IndividualDao individualDao;
 	private MenuDao menuDao;
 	private ObjectPropertyDao objectPropertyDao;
 	private ObjectPropertyStatementDao objectPropertyStatementDao;
-	private FauxPropertyDao fauxPropertyDao;
 	private OntologyDao ontologyDao;
+	private PropertyGroupDao propertyGroupDao;
+	private PropertyInstanceDao propertyInstanceDao;
 	private UserAccountsDao userAccountsDao;
 	private VClassDao vClassDao;
+	private VClassGroupDao vClassGroupDao;
 
 	public void setDefaultNamespace(String defaultNamespace) {
 		this.defaultNamespace = defaultNamespace;
@@ -57,6 +61,14 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 
 	public void setDataPropertyDao(DataPropertyDao dataPropertyDao) {
 		this.dataPropertyDao = dataPropertyDao;
+	}
+
+	public void setDatatypeDao(DatatypeDao datatypeDao) {
+		this.datatypeDao = datatypeDao;
+	}
+
+	public void setFauxPropertyDao(FauxPropertyDao fauxPropertyDao) {
+		this.fauxPropertyDao = fauxPropertyDao;
 	}
 
 	public void setIndividualDao(IndividualDao individualDao) {
@@ -76,12 +88,17 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 		this.objectPropertyStatementDao = objectPropertyStatementDao;
 	}
 
-	public void setFauxPropertyDao(FauxPropertyDao fauxPropertyDao) {
-		this.fauxPropertyDao = fauxPropertyDao;
-	}
-
 	public void setOntologyDao(OntologyDao ontologyDao) {
 		this.ontologyDao = ontologyDao;
+	}
+
+	public void setPropertyGroupDao(PropertyGroupDao propertyGroupDao) {
+		this.propertyGroupDao = propertyGroupDao;
+	}
+
+	public void setPropertyInstanceDao(
+			PropertyInstanceDao propertyInstanceDao) {
+		this.propertyInstanceDao = propertyInstanceDao;
 	}
 
 	public void setUserAccountsDao(UserAccountsDao userAccountsDao) {
@@ -90,6 +107,10 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 
 	public void setVClassDao(VClassDao vClassDao) {
 		this.vClassDao = vClassDao;
+	}
+
+	public void setVClassGroupDao(VClassGroupDao vClassGroupDao) {
+		this.vClassGroupDao = vClassGroupDao;
 	}
 
 	// ----------------------------------------------------------------------
@@ -109,6 +130,11 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	@Override
 	public DataPropertyDao getDataPropertyDao() {
 		return this.dataPropertyDao;
+	}
+
+	@Override
+	public DatatypeDao getDatatypeDao() {
+		return this.datatypeDao;
 	}
 
 	@Override
@@ -142,6 +168,16 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	}
 
 	@Override
+	public PropertyGroupDao getPropertyGroupDao() {
+		return this.propertyGroupDao;
+	}
+
+	@Override
+	public PropertyInstanceDao getPropertyInstanceDao() {
+		return this.propertyInstanceDao;
+	}
+
+	@Override
 	public UserAccountsDao getUserAccountsDao() {
 		return this.userAccountsDao;
 	}
@@ -149,6 +185,11 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	@Override
 	public VClassDao getVClassDao() {
 		return this.vClassDao;
+	}
+
+	@Override
+	public VClassGroupDao getVClassGroupDao() {
+		return this.vClassGroupDao;
 	}
 
 	// ----------------------------------------------------------------------
@@ -204,12 +245,6 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	}
 
 	@Override
-	public DatatypeDao getDatatypeDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getDatatypeDao() not implemented.");
-	}
-
-	@Override
 	public DataPropertyStatementDao getDataPropertyStatementDao() {
 		throw new RuntimeException(
 				"WebappDaoFactory.getDataPropertyStatementDao() not implemented.");
@@ -219,24 +254,6 @@ public class WebappDaoFactoryStub implements WebappDaoFactory {
 	public DisplayModelDao getDisplayModelDao() {
 		throw new RuntimeException(
 				"WebappDaoFactory.getDisplayModelDao() not implemented.");
-	}
-
-	@Override
-	public VClassGroupDao getVClassGroupDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getVClassGroupDao() not implemented.");
-	}
-
-	@Override
-	public PropertyGroupDao getPropertyGroupDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getPropertyGroupDao() not implemented.");
-	}
-
-	@Override
-	public PropertyInstanceDao getPropertyInstanceDao() {
-		throw new RuntimeException(
-				"WebappDaoFactory.getPropertyInstanceDao() not implemented.");
 	}
 
 	@Override

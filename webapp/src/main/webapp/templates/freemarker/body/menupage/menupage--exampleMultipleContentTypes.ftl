@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 <#--This is an example of including multiple content types in the same template, 
     this combines the default templates for Fixed HTML, Class groups and Search Individuals in one template-->
 <#include "menupage-checkForData.ftl">

@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in /doc/license.txt$ */
+/* $This file is distributed under the terms of the license in LICENSE$ */
 
 package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 
@@ -8,8 +8,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import net.sf.json.util.JSONUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
+import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
 public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
@@ -211,11 +210,11 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
                             ? dp.getURI() == null 
                                     ? "(no name)" : dp.getURI() : dp.getName() : dp.getPickListName();
   
-            tempString += JSONUtils.quote(
+            tempString += JacksonUtils.quote(
                     "<a href='datapropEdit?uri=" + URLEncoder.encode(
                             dp.getURI()) + "'>" + nameStr + "</a>") + ", ";                 
 
-            tempString += "\"data\": { \"internalName\": " + JSONUtils.quote(
+            tempString += "\"data\": { \"internalName\": " + JacksonUtils.quote(
                     dp.getPickListName()) + ", ";
 
             DataProperty dpLangNeut = dpDaoLangNeut.getDataPropertyByURI(dp.getURI());
@@ -225,20 +224,20 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
             String domainStr = getVClassNameFromURI(dpLangNeut.getDomainVClassURI(), vcDao, vcDaoLangNeut);
             
             try {
-            	tempString += "\"domainVClass\": " + JSONUtils.quote(domainStr) + ", " ;
+            	tempString += "\"domainVClass\": " + JacksonUtils.quote(domainStr) + ", " ;
             } catch (NullPointerException e) {
             	tempString += "\"domainVClass\": \"\",";
             }
             try {
             	Datatype rangeDatatype = dDao.getDatatypeByURI(dp.getRangeDatatypeURI());
                 String rangeDatatypeStr = (rangeDatatype==null)?dp.getRangeDatatypeURI():rangeDatatype.getName();
-            	tempString += "\"rangeVClass\": " + JSONUtils.quote((rangeDatatypeStr != null) ? rangeDatatypeStr : "") + ", " ; 
+            	tempString += "\"rangeVClass\": " + JacksonUtils.quote((rangeDatatypeStr != null) ? rangeDatatypeStr : "") + ", " ; 
             } catch (NullPointerException e) {
             	tempString += "\"rangeVClass\": \"\",";
             }
             if (dp.getGroupURI() != null) {
                 PropertyGroup pGroup = pgDao.getGroupByURI(dp.getGroupURI());
-                tempString += "\"group\": " + JSONUtils.quote((pGroup == null) ? "unknown group" : pGroup.getName()); 
+                tempString += "\"group\": " + JacksonUtils.quote((pGroup == null) ? "unknown group" : pGroup.getName()); 
             } else {
                 tempString += "\"group\": \"unspecified\"";
             }

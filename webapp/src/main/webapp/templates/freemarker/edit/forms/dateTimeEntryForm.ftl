@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <fieldset class="dateTime">              
   <input type="hidden" id="literal" name="literal" value="${literalValues}" role="input"/>

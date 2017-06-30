@@ -1,4 +1,4 @@
-<#-- $This file is distributed under the terms of the license in /doc/license.txt$ -->
+<#-- $This file is distributed under the terms of the license in LICENSE$ -->
 
 <#assign actionText = "${i18n().add_new}" />
 <#if editConfiguration.dataPropertyStatement?has_content>
