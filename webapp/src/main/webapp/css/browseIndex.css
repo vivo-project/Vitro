@@ -15,9 +15,6 @@
     display: inline-block;
     padding-right: 2px;
 }
-.pagination li.selectedNavPage {
-    font-size: 1em;
-}
 .rdfLink {
     padding-left: .5em;
     font-size: .8em;
