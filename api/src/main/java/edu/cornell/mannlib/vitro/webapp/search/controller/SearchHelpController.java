@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Enumeration;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -30,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 
+@WebServlet(name = "SearchHelpController", urlPatterns = {"/searchHelp"} )
 public class SearchHelpController extends FreemarkerHttpServlet {
 
     private static final Log log = LogFactory.getLog(SearchHelpController.class.getName());

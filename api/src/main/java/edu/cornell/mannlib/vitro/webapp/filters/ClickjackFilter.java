@@ -4,12 +4,14 @@ package edu.cornell.mannlib.vitro.webapp.filters;
 
 import java.io.IOException;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -20,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
  * http://blogs.msdn.com/sdl/archive/2009/02/05/clickjacking-defense-in-ie8.aspx,
  * https://www.owasp.org/index.php/ClickjackFilter_for_Java_EE
  */
+@WebFilter(filterName = "ClickjackFilter", urlPatterns = {"/*"}, dispatcherTypes = {DispatcherType.REQUEST, DispatcherType.FORWARD})
 public class ClickjackFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,

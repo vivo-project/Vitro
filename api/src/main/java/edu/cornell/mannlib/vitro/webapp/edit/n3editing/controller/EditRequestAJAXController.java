@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.controller;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -30,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.log.LogUtils;
  * form.  Try adding the behavior logic to the code that generates the
  * EditConfiguration for the form.  
  */
+@WebServlet(name = "EditRequestAJAX", urlPatterns = {"/editRequestAJAX"} )
 public class EditRequestAJAXController extends VitroHttpServlet {
     private static final long serialVersionUID = 1L;
     public static Log log = LogFactory.getLog(EditRequestDispatchController.class);

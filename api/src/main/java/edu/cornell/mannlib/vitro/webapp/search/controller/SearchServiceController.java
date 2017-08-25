@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
@@ -30,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchIndexer.SearchIndexer;
  * Accepts requests to update a set of URIs in the search index.
  */
 @SuppressWarnings("serial")
+@WebServlet(name = "SearchServiceController", urlPatterns = {"/searchService/*"})
 public class SearchServiceController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(SearchServiceController.class);

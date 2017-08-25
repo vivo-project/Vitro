@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 import java.io.IOException;
 import java.util.HashMap;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.Classes2Classes;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 
+@WebServlet(name = "Classes2ClassesOperationController", urlPatterns = {"/classes2ClassesOp"} )
 public class Classes2ClassesOperationController extends BaseEditController {
 
     private static final Log log = LogFactory.getLog(Classes2ClassesOperationController.class.getName());

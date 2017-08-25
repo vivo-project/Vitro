@@ -24,6 +24,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 
+import javax.servlet.annotation.WebServlet;
+
+@WebServlet(name = "ListPropertyGroupsController", urlPatterns = {"/listPropertyGroups"} )
 public class ListPropertyGroupsController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;

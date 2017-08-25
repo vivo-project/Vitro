@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.log.LogUtils;
  *
  * Moved most of the logic into a group of JsonProducer classes. jeb228
  */
+@WebServlet(name = "JSONService", urlPatterns = {"/dataservice"} )
 public class JsonServlet extends VitroHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(JsonServlet.class);

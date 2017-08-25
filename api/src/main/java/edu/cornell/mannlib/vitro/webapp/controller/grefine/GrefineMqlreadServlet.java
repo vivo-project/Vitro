@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,6 +35,7 @@ import org.apache.jena.rdf.model.Literal;
  * @author Eliza Chan (elc2013@med.cornell.edu)
  * 
  */
+@WebServlet(name = "Google Refine Mqlread Service", urlPatterns = {"/grefineMqlread"} )
 public class GrefineMqlreadServlet extends VitroHttpServlet {
 	
 	private static final long serialVersionUID = 1L;

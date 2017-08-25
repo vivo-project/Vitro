@@ -17,6 +17,7 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,6 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.dao.UserAccountsDao;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 
+@WebServlet(name = "mailusers", urlPatterns = {"/mailusers"}, loadOnStartup = 5)
 public class MailUsersServlet extends VitroHttpServlet {
 	private static final Log log = LogFactory.getLog(MailUsersServlet.class);
 	

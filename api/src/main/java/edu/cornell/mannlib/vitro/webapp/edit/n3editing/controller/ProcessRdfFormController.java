@@ -38,12 +38,15 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.RdfLiteralHash;
 
+import javax.servlet.annotation.WebServlet;
+
 /**
  * This servlet will convert a request to an EditSubmission, 
  * find the EditConfiguration associated with the request, 
  * use ProcessRdfForm to process these to a set of RDF additions and retractions,
  * the apply these to the models. 
  */
+@WebServlet(name = "ProcessRdfFormController", urlPatterns = {"/edit/process"} )
 public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	
     private Log log = LogFactory.getLog(ProcessRdfFormController.class);

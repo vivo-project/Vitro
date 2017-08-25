@@ -14,10 +14,13 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
+import javax.servlet.annotation.WebServlet;
+
 /*
  * Servlet that only specifies a template, without putting any data
  * into the template model. Page content is fully specified in the template.
  */
+@WebServlet(name = "StaticPageController", urlPatterns = {"/login"} )
 public class StaticPageController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;

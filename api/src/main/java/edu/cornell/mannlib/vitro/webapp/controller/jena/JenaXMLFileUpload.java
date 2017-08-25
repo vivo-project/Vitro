@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
@@ -36,7 +37,8 @@ import org.apache.jena.shared.Lock;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
-public class JenaXMLFileUpload  extends JenaIngestController  {	
+@WebServlet(name = "JenaXMLFileUpload", urlPatterns = {"/jenaXmlFileUpload/*"} )
+public class JenaXMLFileUpload  extends JenaIngestController  {
 	Log log = LogFactory.getLog(JenaXMLFileUpload.class);
 	private String baseDirectoryForFiles;
 	private int maxFileSize = 1024 * 1024 * 500;

@@ -13,6 +13,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -57,6 +58,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.servlet.setup.FileGraphSetup;
 
+@WebServlet(name = "RefactorOperationController", urlPatterns = {"/refactorOp"} )
 public class RefactorOperationController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(RefactorOperationController.class.getName());

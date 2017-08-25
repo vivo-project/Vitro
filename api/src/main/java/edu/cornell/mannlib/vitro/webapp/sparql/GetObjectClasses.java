@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
  * This servlet gets all the range classes for a given predicate.
  */
 
+@WebServlet(name = "GetObjectClasses", urlPatterns = {"/admin/getObjectClasses"})
 public class GetObjectClasses extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(GetObjectClasses.class);

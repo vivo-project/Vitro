@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -24,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
  * This servlet gets all the data properties for a given subject.
  */
 
+@WebServlet(name = "GetClazzDataProperties", urlPatterns = {"/admin/getClazzDataProperties"})
 public class GetClazzDataProperties extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(GetClazzDataProperties.class);

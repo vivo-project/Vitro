@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit.listing.jena;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -37,6 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
+@WebServlet(name = "RestrictionsListingController", urlPatterns = {"/listRestrictions"} )
 public class RestrictionsListingController extends BaseEditController {
 
 	private static String LAMBDA = "";

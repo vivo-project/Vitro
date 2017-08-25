@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
 import java.io.IOException;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,6 +23,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.DatatypeDao;
 
 
+@WebServlet(name = "DatatypeRetryController", urlPatterns = {"/datatype_retry"} )
 public class DatatypeRetryController extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(DatatypeRetryController.class.getName());

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -38,6 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
  * . 
  */
 
+@WebServlet(name = "DataAutocompleteController", urlPatterns = {"/dataautocomplete"} )
 public class DataAutocompleteController extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;

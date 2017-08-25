@@ -28,9 +28,12 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individuallist.ListedIndividual;
 
+import javax.servlet.annotation.WebServlet;
+
 /** 
  * Generates a list of individuals for display in a template 
  */
+@WebServlet(name = "IndividualListController", urlPatterns = {"/individuallist"} )
 public class IndividualListController extends FreemarkerHttpServlet {
   
     private static final long serialVersionUID = 1L;   

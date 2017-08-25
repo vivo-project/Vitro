@@ -29,6 +29,7 @@ import org.vivoweb.linkeddatafragments.datasource.rdfservice.RDFServiceDataSourc
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,6 +47,7 @@ import java.util.Map.Entry;
 /**
  * Servlet that responds with a Linked Data Fragment.
  */
+@WebServlet(name = "TpfServlet", urlPatterns = {"/tpf/*"})
 public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
 
     private final static long serialVersionUID = 1L;

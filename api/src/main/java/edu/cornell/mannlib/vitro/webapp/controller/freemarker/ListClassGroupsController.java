@@ -22,7 +22,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
+import javax.servlet.annotation.WebServlet;
 
+
+@WebServlet(name = "ListClassGroupsController", urlPatterns = {"/listGroups"} )
 public class ListClassGroupsController extends FreemarkerHttpServlet {
 
     private static final Log log = LogFactory.getLog(ListClassGroupsController.class.getName());

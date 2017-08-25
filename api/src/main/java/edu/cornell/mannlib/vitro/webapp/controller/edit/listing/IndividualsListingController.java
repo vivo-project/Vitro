@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 
+@WebServlet(name = "IndividualsListingController", urlPatterns = {"/listIndividuals"} )
 public class IndividualsListingController extends BaseEditController {
 
     //private static final int MAX_INDIVIDUALS = 50;

@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.jena;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,6 +14,7 @@ import edu.cornell.mannlib.vedit.controller.BaseEditController;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
+@WebServlet(name = "RDFUploadFormController", urlPatterns = {"/uploadRDFForm"} )
 public class RDFUploadFormController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(RDFUploadFormController.class.getName());

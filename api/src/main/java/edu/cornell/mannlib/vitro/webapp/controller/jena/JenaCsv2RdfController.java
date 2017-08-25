@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -28,6 +29,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.Csv2Rdf;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaIngestUtils;
 
 
+@WebServlet(name = "JenaCsv2RdfController", urlPatterns = {"/csv2rdf"} )
 public class JenaCsv2RdfController extends JenaIngestController {
 	Log log = LogFactory.getLog( JenaCsv2RdfController.class );
     

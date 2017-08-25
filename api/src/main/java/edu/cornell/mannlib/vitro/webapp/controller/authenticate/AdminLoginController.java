@@ -23,6 +23,8 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Red
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
+import javax.servlet.annotation.WebServlet;
+
 /**
  * Provide a "hidden" login page for systems where the Login Widget has been
  * modified to only show the link to an External Authentication system.
@@ -30,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
  * This page is only hidden because there is no link to it. Anyone who knows the
  * URL can come here, but they need to pass Internal Authentication to proceed.
  */
+@WebServlet(name = "adminLogin", urlPatterns = {"/admin/login"})
 public class AdminLoginController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(AdminLoginController.class);

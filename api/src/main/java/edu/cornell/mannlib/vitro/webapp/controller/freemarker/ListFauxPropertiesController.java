@@ -23,6 +23,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.FauxPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
 
+import javax.servlet.annotation.WebServlet;
+
+@WebServlet(name = "ListFauxPropertiesController", urlPatterns = {"/listFauxProperties"} )
 public class ListFauxPropertiesController extends FreemarkerHttpServlet {
 
 	private static final Log log = LogFactory.getLog(ListFauxPropertiesController.class.getName());

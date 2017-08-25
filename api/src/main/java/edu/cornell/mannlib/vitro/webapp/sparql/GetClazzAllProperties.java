@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,6 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
  * This servlet gets all the properties for a given subject.
  */
 
+@WebServlet(name = "GetClazzAllProperties", urlPatterns = {"/admin/getClazzAllProperties"})
 public class GetClazzAllProperties extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(GetClazzAllProperties.class);

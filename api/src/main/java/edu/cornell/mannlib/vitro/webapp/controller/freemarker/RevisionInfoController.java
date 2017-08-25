@@ -12,9 +12,12 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
+import javax.servlet.annotation.WebServlet;
+
 /**
  * Display the detailed revision information.
  */
+@WebServlet(name = "RevisionInfoController", urlPatterns = {"/revisionInfo"} )
 public class RevisionInfoController extends FreemarkerHttpServlet {
 	private static final long serialVersionUID = 1L;
     private static final String TEMPLATE_DEFAULT = "revisionInfo.ftl";

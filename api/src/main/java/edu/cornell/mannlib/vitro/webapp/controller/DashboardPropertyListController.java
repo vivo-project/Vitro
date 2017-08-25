@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -36,6 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * @author bdc34
  *
  */
+@WebServlet(name = "DashboardPropertyListController", urlPatterns = {"/dashboardPropList"} )
 public class DashboardPropertyListController extends VitroHttpServlet {
 
     /**

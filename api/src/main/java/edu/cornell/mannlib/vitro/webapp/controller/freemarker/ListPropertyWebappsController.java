@@ -33,6 +33,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
+import javax.servlet.annotation.WebServlet;
+
+@WebServlet(name = "ListPropertyWebappsController", urlPatterns = {"/listPropertyWebapps"} )
 public class ListPropertyWebappsController extends FreemarkerHttpServlet {
     private static Log log = LogFactory.getLog( ListPropertyWebappsController.class );
 

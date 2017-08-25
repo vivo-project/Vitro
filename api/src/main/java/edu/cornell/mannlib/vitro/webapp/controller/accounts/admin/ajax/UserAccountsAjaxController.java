@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.accounts.admin.ajax;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -18,6 +19,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.ajax.VitroAjaxController;
 /**
  * Handle the AJAX functions that are specific to the UserAccounts pages.
  */
+@WebServlet(name = "AccountsAjax", urlPatterns = {"/accountsAjax/*"} )
 public class UserAccountsAjaxController extends VitroAjaxController {
 	private static final Log log = LogFactory
 			.getLog(UserAccountsAjaxController.class);

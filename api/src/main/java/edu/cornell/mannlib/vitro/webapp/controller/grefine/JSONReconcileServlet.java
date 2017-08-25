@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -41,6 +42,7 @@ import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
  * @author Eliza Chan (elc2013@med.cornell.edu)
  * 
  */
+@WebServlet(name = "JSON Reconcile Service", urlPatterns = {"/reconcile"} )
 public class JSONReconcileServlet extends VitroHttpServlet {
 
 	private static final String PARAM_QUERY = "term";

@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.freemarker;
 import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.UNAUTHORIZED;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
@@ -38,6 +39,7 @@ import edu.cornell.mannlib.vitro.webapp.web.images.PlaceholderUtil;
 /**
  * Handle adding, replacing or deleting the main image on an Individual.
  */
+@WebServlet(name = "ImageUploadController", urlPatterns = {"/uploadImages"} )
 public class ImageUploadController extends FreemarkerHttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Log log = LogFactory

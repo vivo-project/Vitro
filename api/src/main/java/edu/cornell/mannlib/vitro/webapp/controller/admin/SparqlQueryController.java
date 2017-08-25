@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -43,6 +44,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.sparql.SparqlQueryUtils;
 /**
  * Present the SPARQL Query form, and execute the queries.
  */
+@WebServlet(name = "SparqlQuery", urlPatterns = {"/admin/sparqlquery"})
 public class SparqlQueryController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(SparqlQueryController.class);

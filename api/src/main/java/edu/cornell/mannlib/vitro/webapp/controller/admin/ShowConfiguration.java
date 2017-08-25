@@ -16,9 +16,12 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServ
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
+import javax.servlet.annotation.WebServlet;
+
 /**
  * Show the current ConfigurationProperties and the Java system properties.
  */
+@WebServlet(name = "ShowConfiguration", urlPatterns = {"/admin/showConfiguration"} )
 public class ShowConfiguration extends FreemarkerHttpServlet {
 	@Override
 	protected AuthorizationRequest requiredActions(VitroRequest vreq) {

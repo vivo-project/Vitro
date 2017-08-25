@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 import java.io.IOException;
 import java.util.HashMap;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,6 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao;
 
+@WebServlet(name = "Properties2PropertiesOperationController", urlPatterns = {"/props2PropsOp"} )
 public class Properties2PropertiesOperationController extends
 		BaseEditController {
 	

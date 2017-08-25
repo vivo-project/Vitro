@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 
+@WebServlet(name = "ObjectPropertyStatementListingController", urlPatterns = {"/listObjectPropertyStatements"} )
 public class ObjectPropertyStatementListingController extends
 		BaseEditController {
 	

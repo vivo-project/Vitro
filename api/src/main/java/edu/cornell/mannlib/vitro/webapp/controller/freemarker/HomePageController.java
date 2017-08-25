@@ -17,6 +17,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetter;
 import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
 
+import javax.servlet.annotation.WebServlet;
+
+@WebServlet(name = "HomePageController", urlPatterns = {"/home"} )
 public class HomePageController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;

@@ -16,6 +16,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Red
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
+import javax.servlet.annotation.WebServlet;
+
+@WebServlet(name = "GadgetController", urlPatterns = {"/orng/*"})
 public class GadgetController extends FreemarkerHttpServlet {
 	
     private static final long serialVersionUID = 1L;

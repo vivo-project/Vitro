@@ -28,6 +28,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
+import javax.servlet.annotation.WebServlet;
+
+@WebServlet(name = "ShowDataPropertyHierarchyController", urlPatterns = {"/showDataPropertyHierarchy"} )
 public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
 
 	private static final Log log = LogFactory.getLog(ShowDataPropertyHierarchyController.class.getName());

@@ -2,6 +2,7 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.edit;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 /**
  * Provide a means for programmatic logout.
  */
+@WebServlet(name = "logout", urlPatterns = {"/logout"})
 public class Logout extends HttpServlet {
 	private static final Log log = LogFactory.getLog(Logout.class.getName());
 

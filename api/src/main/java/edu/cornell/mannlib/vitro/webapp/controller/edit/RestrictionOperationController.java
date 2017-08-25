@@ -7,6 +7,7 @@ import static edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames.TBOX_ASSER
 import java.util.HashMap;
 import java.util.Iterator;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -33,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
+@WebServlet(name = "RestrictionOperationController", urlPatterns = {"/addRestriction"} )
 public class RestrictionOperationController extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(RestrictionOperationController.class.getName());

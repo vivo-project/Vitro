@@ -10,6 +10,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
@@ -36,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
     }
  * some of this code is from URLRewriteFilter
  */
+@WebFilter(filterName = "JSession Strip Filter", urlPatterns = {"/*"})
 public class JSessionStripFilter implements Filter {
     private FilterConfig filterConfig = null;
 

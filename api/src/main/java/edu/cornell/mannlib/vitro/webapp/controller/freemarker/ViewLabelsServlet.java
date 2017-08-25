@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -39,6 +40,7 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DataProper
 
 /*Servlet to view all labels in various languages for individual*/
 
+@WebServlet(name = "ViewLabelsServlet", urlPatterns = {"/viewLabels"} )
 public class ViewLabelsServlet extends FreemarkerHttpServlet{
     private static final Log log = LogFactory.getLog(ViewLabelsServlet.class.getName());
     

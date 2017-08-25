@@ -28,7 +28,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 
+import javax.servlet.annotation.WebServlet;
 
+
+@WebServlet(name = "ShowClassHierarchyController", urlPatterns = {"/showClassHierarchy"} )
 public class ShowClassHierarchyController extends FreemarkerHttpServlet {
 
     private static final Log log = LogFactory.getLog(ShowClassHierarchyController.class.getName());

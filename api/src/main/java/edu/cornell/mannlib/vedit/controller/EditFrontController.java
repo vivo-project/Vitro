@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vedit.controller;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
+
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +23,7 @@ import java.io.IOException;
  * @author bjl23
  *
  */
+@WebServlet(name = "EditFrontController", urlPatterns = {"/editForm"} )
 public class EditFrontController extends VitroHttpServlet {
     private static final Log log = LogFactory.getLog(EditFrontController.class.getName());
     private static final String CONTROLLER_PKG = "edu.cornell.mannlib.vitro.webapp.controller.edit";

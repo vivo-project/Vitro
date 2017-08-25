@@ -15,10 +15,13 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.email.FreemarkerEmailFactory;
 
+import javax.servlet.annotation.WebServlet;
+
 /**
  *  Controller for comments ("contact us") page
  *  * @author bjl23
  */
+@WebServlet(name = "ContactFormController", urlPatterns = {"/contact"} )
 public class ContactFormController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;

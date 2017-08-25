@@ -233,7 +233,7 @@ public class MultipartRequestWrapper extends HttpServletRequestWrapper {
 	 * Look in the map of parsed parameters. Make a protective copy.
 	 */
 	@Override
-	public Enumeration<?> getParameterNames() {
+	public Enumeration<String> getParameterNames() {
 		return Collections.enumeration(new HashSet<>(parameters.keySet()));
 	}
 

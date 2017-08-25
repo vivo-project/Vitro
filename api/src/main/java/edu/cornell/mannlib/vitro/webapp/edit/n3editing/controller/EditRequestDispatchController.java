@@ -7,6 +7,7 @@ import static edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigura
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -47,6 +48,7 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.MultiValueEditSu
  * form.  Try adding the behavior logic to the code that generates the
  * EditConfiguration for the form.  
  */
+@WebServlet(name = "EditRequestDispatch", urlPatterns = {"/editRequestDispatch"} )
 public class EditRequestDispatchController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     public static Log log = LogFactory.getLog(EditRequestDispatchController.class);

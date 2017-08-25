@@ -8,6 +8,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,6 +30,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
  * 
  * The result is delivered in JSON format.
  */
+@WebServlet(name = "ajaxSparqlQuery", urlPatterns = {"/ajax/sparqlQuery"} )
 public class SparqlQueryAjaxController extends VitroAjaxController {
 	private static final Log log = LogFactory
 			.getLog(SparqlQueryAjaxController.class);

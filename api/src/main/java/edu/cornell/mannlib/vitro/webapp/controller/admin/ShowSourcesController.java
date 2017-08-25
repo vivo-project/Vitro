@@ -34,6 +34,8 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ComplexStringFormatter;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
 
+import javax.servlet.annotation.WebServlet;
+
 /**
  * Show the details of where our RDF data is coming from. What are the
  * structures that supply the triples?
@@ -103,6 +105,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
  * At the same time, write these to the log as INFO messages, without the fancy formatting.
  * </pre>
  */
+@WebServlet(name = "ShowRDFSources", urlPatterns = {"/admin/showSources"} )
 public class ShowSourcesController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(ShowSourcesController.class);

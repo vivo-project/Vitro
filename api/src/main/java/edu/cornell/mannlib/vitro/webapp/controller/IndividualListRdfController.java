@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -37,6 +38,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.http.AcceptHeaderParsingException;
 import edu.cornell.mannlib.vitro.webapp.utils.http.NotAcceptableException;
 
+@WebServlet(name = "IndividualListRdf", urlPatterns = {"/listrdf/*"} )
 public class IndividualListRdfController extends VitroApiServlet {
 	private static final Log log = LogFactory
 			.getLog(IndividualListRdfController.class);

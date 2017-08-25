@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -40,6 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * @author Eliza Chan (elc2013@med.cornell.edu)
  * 
  */
+@WebServlet(name = "Google Refine Property List Service", urlPatterns = {"/get_properties_of_type"} )
 public class GrefinePropertyListServlet extends VitroHttpServlet {
 
 	private int MAXDEPTH = 7;

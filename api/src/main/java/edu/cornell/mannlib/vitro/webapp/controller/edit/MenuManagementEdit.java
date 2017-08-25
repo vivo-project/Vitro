@@ -8,6 +8,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
  *Process edits from display model editing, so form should submit to this page which should
  *then process the parameters and then make the necessary changes to the model.
  */
+@WebServlet(name = "MenuManagementEdit", urlPatterns = {"/menuManagementEdit"} )
 public class MenuManagementEdit extends VitroHttpServlet {
    private static final String CMD_PARAM = "cmd";   
    private final static String REORDER_PARAM_VALUE = "Reorder";

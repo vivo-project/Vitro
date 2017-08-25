@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -80,6 +81,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.WorkflowOntology;
 import edu.cornell.mannlib.vitro.webapp.utils.sparql.SparqlQueryUtils;
 
+@WebServlet(name = "JenaIngestController", urlPatterns = {"/ingest"} )
 public class JenaIngestController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(JenaIngestController.class);
     

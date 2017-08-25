@@ -18,6 +18,7 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -42,6 +43,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginLogoutEvent;
 
+@WebServlet(name = "authenticate", urlPatterns = {"/authenticate"})
 public class Authenticate extends VitroHttpServlet {
 	private static final Log log = LogFactory.getLog(Authenticate.class
 			.getName());

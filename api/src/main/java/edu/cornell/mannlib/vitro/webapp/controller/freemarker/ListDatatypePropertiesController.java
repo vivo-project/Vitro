@@ -29,6 +29,9 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
 import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 import edu.cornell.mannlib.vitro.webapp.web.URLEncoder;
 
+import javax.servlet.annotation.WebServlet;
+
+@WebServlet(name = "ListDatatypePropertiesController", urlPatterns = {"/listDatatypeProperties"} )
 public class ListDatatypePropertiesController extends FreemarkerHttpServlet {
 
     private static Log log = LogFactory.getLog( ListDatatypePropertiesController.class );

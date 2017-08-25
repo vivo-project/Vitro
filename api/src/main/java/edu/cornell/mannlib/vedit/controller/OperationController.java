@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,6 +28,7 @@ import edu.cornell.mannlib.vedit.util.OperationUtils;
 import edu.cornell.mannlib.vedit.validator.ValidationObject;
 import edu.cornell.mannlib.vedit.validator.Validator;
 
+@WebServlet(name = "OperationController", urlPatterns = {"/doEdit"} )
 public class OperationController extends BaseEditController {
 	
     private static final Log log = LogFactory.getLog(OperationController.class.getName());

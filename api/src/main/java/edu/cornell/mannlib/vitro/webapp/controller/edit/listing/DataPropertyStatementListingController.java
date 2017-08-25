@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit.listing;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -20,6 +21,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 
+@WebServlet(name = "DataPropertyStatementListingController", urlPatterns = {"/listDataPropertyStatements"} )
 public class DataPropertyStatementListingController extends BaseEditController {
 
    public void doGet(HttpServletRequest request, HttpServletResponse response) {
