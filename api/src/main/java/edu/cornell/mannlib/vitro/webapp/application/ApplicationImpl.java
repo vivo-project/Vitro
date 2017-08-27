@@ -171,14 +171,17 @@ public class ApplicationImpl implements Application {
 			ss.info(this, "Started the ContentTripleSource: "
 					+ contentTripleSource);
 
-			ConfigurationTripleSource configurationTripleSource = app
-					.getConfigurationTripleSource();
-			configurationTripleSource.startup(app, css);
-			ss.info(this, "Started the ConfigurationTripleSource: "
-					+ configurationTripleSource);
+			// Ensure that we haven't failed setting up the content triple store before continuing
+			if (!ss.isStartupAborted()) {
+				ConfigurationTripleSource configurationTripleSource = app
+						.getConfigurationTripleSource();
+				configurationTripleSource.startup(app, css);
+				ss.info(this, "Started the ConfigurationTripleSource: "
+						+ configurationTripleSource);
 
-			configureJena();
-			prepareCombinedTripleSource(app, ctx);
+				configureJena();
+				prepareCombinedTripleSource(app, ctx);
+			}
 		}
 
 		private void configureJena() {
