@@ -56,7 +56,12 @@ public class RDFServiceDataset implements Dataset {
         return RDFServiceGraph.createRDFServiceModel(g.getDefaultGraph());
     }
 
-    @Override
+	@Override
+	public Model getUnionModel() {
+		return RDFServiceGraph.createRDFServiceModel(g.getUnionGraph());
+	}
+
+	@Override
     public Lock getLock() {
         return g.getLock();
     }

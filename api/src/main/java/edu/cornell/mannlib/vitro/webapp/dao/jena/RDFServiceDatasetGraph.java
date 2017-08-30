@@ -259,7 +259,12 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
             return graph;
         }
     }
-    
+
+    @Override
+    public RDFServiceGraph getUnionGraph() {
+        return defaultGraph;
+    }
+
     private boolean supportsTransactions(Graph graph) {
         return (graph.getTransactionHandler() != null 
                 && graph.getTransactionHandler().transactionsSupported());
