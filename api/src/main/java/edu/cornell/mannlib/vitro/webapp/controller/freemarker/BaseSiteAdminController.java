@@ -41,41 +41,46 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
     private static final List<AdminUrl> siteMaintenanceUrls = new ArrayList<>();
     private static final List<AdminUrl> siteConfigData = new ArrayList<>();
 
-    public static void registerSiteMaintenanceUrl(String key, String url, AuthorizationRequest permission) {
+    public static void registerSiteMaintenanceUrl(String key, String url, ParamMap urlParams, AuthorizationRequest permission) {
         AdminUrl adminUrl = new AdminUrl();
 
         adminUrl.key = key;
         adminUrl.url = url;
+        adminUrl.urlParams = urlParams;
         adminUrl.permission = permission;
 
         siteMaintenanceUrls.add(adminUrl);
     }
 
-    public static void registerSiteConfigData(String key, String url, AuthorizationRequest permission) {
+    public static void registerSiteConfigData(String key, String url, ParamMap urlParams, AuthorizationRequest permission) {
         AdminUrl adminUrl = new AdminUrl();
 
         adminUrl.key = key;
         adminUrl.url = url;
+        adminUrl.urlParams = urlParams;
         adminUrl.permission = permission;
 
         siteConfigData.add(adminUrl);
     }
 
     static {
-        registerSiteMaintenanceUrl("recomputeInferences", UrlBuilder.getUrl("/RecomputeInferences"), SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTION);
-        registerSiteMaintenanceUrl("rebuildSearchIndex", UrlBuilder.getUrl("/SearchIndex"), IndexController.REQUIRED_ACTIONS);
-        registerSiteMaintenanceUrl("startupStatus", UrlBuilder.getUrl("/startupStatus"), SimplePermission.SEE_STARTUP_STATUS.ACTION);
-        registerSiteMaintenanceUrl("restrictLogins", UrlBuilder.getUrl("/admin/restrictLogins"), SimplePermission.LOGIN_DURING_MAINTENANCE.ACTION);
-        registerSiteMaintenanceUrl("activateDeveloperPanel", "javascript:new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel({developer_enabled: true});", SimplePermission.ENABLE_DEVELOPER_PANEL.ACTION);
+        registerSiteMaintenanceUrl("recomputeInferences", "/RecomputeInferences", null, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTION);
+        registerSiteMaintenanceUrl("rebuildSearchIndex", "/SearchIndex", null, IndexController.REQUIRED_ACTIONS);
+        registerSiteMaintenanceUrl("startupStatus", "/startupStatus", null, SimplePermission.SEE_STARTUP_STATUS.ACTION);
+        registerSiteMaintenanceUrl("restrictLogins", "/admin/restrictLogins", null, SimplePermission.LOGIN_DURING_MAINTENANCE.ACTION);
+        registerSiteMaintenanceUrl("activateDeveloperPanel", "javascript:new DeveloperPanel(developerAjaxUrl).setupDeveloperPanel({developer_enabled: true});", null, SimplePermission.ENABLE_DEVELOPER_PANEL.ACTION);
 
-        registerSiteConfigData("userAccounts", UrlBuilder.getUrl("/accountsAdmin"), SimplePermission.MANAGE_USER_ACCOUNTS.ACTION);
-        registerSiteConfigData("manageProxies", UrlBuilder.getUrl("/manageProxies"), SimplePermission.MANAGE_PROXIES.ACTION);
-        registerSiteConfigData("siteInfo", UrlBuilder.getUrl("/editForm", "controller", "ApplicationBean"), SimplePermission.EDIT_SITE_INFORMATION.ACTION);
+        registerSiteConfigData("userAccounts", "/accountsAdmin", null, SimplePermission.MANAGE_USER_ACCOUNTS.ACTION);
+        registerSiteConfigData("manageProxies", "/manageProxies", null, SimplePermission.MANAGE_PROXIES.ACTION);
+
+        registerSiteConfigData("siteInfo", "/editForm", new ParamMap(new String[] {"controller", "ApplicationBean"}), SimplePermission.EDIT_SITE_INFORMATION.ACTION);
+
         //TODO: Add specific permissions for page management
-        registerSiteConfigData("menuManagement", UrlBuilder.getUrl("/individual",
+        registerSiteConfigData("menuManagement", "/individual", new ParamMap(new String[] {
                 "uri", "http://vitro.mannlib.cornell.edu/ontologies/display/1.1#DefaultMenu",
-                "switchToDisplayModel", "true"), SimplePermission.MANAGE_MENUS.ACTION);
-        registerSiteConfigData("pageManagement", UrlBuilder.getUrl("/pageList"), SimplePermission.MANAGE_MENUS.ACTION);
+                "switchToDisplayModel", "true" }), SimplePermission.MANAGE_MENUS.ACTION);
+
+        registerSiteConfigData("pageManagement", "/pageList", null, SimplePermission.MANAGE_MENUS.ACTION);
     }
     
     @Override
@@ -108,7 +113,15 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
         for (AdminUrl adminUrl : siteMaintenanceUrls) {
             if (adminUrl.permission == null || PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTION)) {
-                urls.put(adminUrl.key, adminUrl.url);
+                if (adminUrl.url.startsWith("javascript:")) {
+                    urls.put(adminUrl.key, adminUrl.url);
+                } else {
+                    if (adminUrl.urlParams != null) {
+                        urls.put(adminUrl.key, UrlBuilder.getUrl(adminUrl.url, adminUrl.urlParams));
+                    } else {
+                        urls.put(adminUrl.key, UrlBuilder.getUrl(adminUrl.url));
+                    }
+                }
             }
         }
 
@@ -163,7 +176,15 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
 
         for (AdminUrl adminUrl : siteConfigData) {
             if (adminUrl.permission == null || PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTION)) {
-                data.put(adminUrl.key, adminUrl.url);
+                if (adminUrl.url.startsWith("javascript:")) {
+                    data.put(adminUrl.key, adminUrl.url);
+                } else {
+                    if (adminUrl.urlParams != null) {
+                        data.put(adminUrl.key, UrlBuilder.getUrl(adminUrl.url, adminUrl.urlParams));
+                    } else {
+                        data.put(adminUrl.key, UrlBuilder.getUrl(adminUrl.url));
+                    }
+                }
             }
         }
 
@@ -230,6 +251,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
     final static class AdminUrl {
         String key;
         String url;
+        ParamMap urlParams;
         AuthorizationRequest permission;
     }
 }
