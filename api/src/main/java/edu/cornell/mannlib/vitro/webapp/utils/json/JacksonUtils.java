@@ -59,6 +59,14 @@ public class JacksonUtils {
 		return strings;
 	}
 
+	public static String getString(JsonNode node, String name) {
+		if (node.has(name)) {
+			return node.get(name).asText();
+		}
+
+		return null;
+	}
+
 	public static class JacksonUtilsException extends RuntimeException {
 
 		public JacksonUtilsException() {

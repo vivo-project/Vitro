@@ -18,11 +18,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import org.apache.jena.vocabulary.OWL;
 
@@ -81,8 +81,8 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 				
 
 				// Construct json String
-				JSONObject completeJson = new JSONObject();
-				JSONArray propertiesJsonArr = new JSONArray();
+				ObjectNode completeJson = JsonNodeFactory.instance.objectNode();
+				ArrayNode propertiesJsonArr = JsonNodeFactory.instance.arrayNode();
 				if (classPropertiesMap.size() > 0) {
 					for (Iterator<VClass> iter = classPropertiesMap.keySet().iterator(); iter.hasNext();) { // add results to schema
 						VClass vc = (VClass) iter.next();
@@ -95,24 +95,24 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 								//System.out.println("--- uri: " + prop.getURI());
 								//System.out.println("--- name: " + nameStr);
 					        	// top level
-								JSONObject propertiesItemJson = new JSONObject();
-								JSONObject rootSchemaJson = new JSONObject();
+								ObjectNode propertiesItemJson = JsonNodeFactory.instance.objectNode();
+								ObjectNode rootSchemaJson = JsonNodeFactory.instance.objectNode();
 								rootSchemaJson.put("id", vc.getURI());
 								rootSchemaJson.put("name", vc.getName());
-								rootSchemaJson.put("alias", new JSONArray());
+								rootSchemaJson.put("alias", JsonNodeFactory.instance.arrayNode());
 								propertiesItemJson.put("schema", rootSchemaJson);
 								// second level
 								propertiesItemJson.put("id", prop.getURI());
 								propertiesItemJson.put("name", nameStr);
-								propertiesItemJson.put("alias", new JSONArray());
+								propertiesItemJson.put("alias", JsonNodeFactory.instance.arrayNode());
 
-								JSONObject expectsJson = new JSONObject();
+								ObjectNode expectsJson = JsonNodeFactory.instance.objectNode();
 								expectsJson.put("id", prop.getURI());
 								expectsJson.put("name", nameStr);
-								expectsJson.put("alias", new JSONArray());
+								expectsJson.put("alias", JsonNodeFactory.instance.arrayNode());
 								propertiesItemJson.put("expects", expectsJson);
 								
-								propertiesJsonArr.put(propertiesItemJson);
+								propertiesJsonArr.add(propertiesItemJson);
 						}
 					}
 				}
@@ -154,30 +154,30 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 							for (DataProperty prop: vcProps) {
 								String nameStr = prop.getPublicName()==null ? prop.getName()==null ? null : prop.getName() : prop.getPublicName();
 						        	// top level
-									JSONObject propertiesItemJson = new JSONObject();
+									ObjectNode propertiesItemJson = JsonNodeFactory.instance.objectNode();
 									
-									JSONObject rootSchemaJson = new JSONObject();
+									ObjectNode rootSchemaJson = JsonNodeFactory.instance.objectNode();
 									rootSchemaJson.put("id", topClass.getURI());
 									rootSchemaJson.put("name", topClass.getName());
-									rootSchemaJson.put("alias", new JSONArray());
+									rootSchemaJson.put("alias", JsonNodeFactory.instance.arrayNode());
 									propertiesItemJson.put("schema", rootSchemaJson);
 
 									// second level
 									propertiesItemJson.put("id", vc.getURI());
 									propertiesItemJson.put("name", vc.getName());
-									propertiesItemJson.put("alias", new JSONArray());
+									propertiesItemJson.put("alias", JsonNodeFactory.instance.arrayNode());
 																		
 									propertiesItemJson.put("id2", prop.getURI());
 									propertiesItemJson.put("name2", nameStr);
-									propertiesItemJson.put("alias2", new JSONArray());
+									propertiesItemJson.put("alias2", JsonNodeFactory.instance.arrayNode());
 									
-									JSONObject expectsJson = new JSONObject();
+									ObjectNode expectsJson = JsonNodeFactory.instance.objectNode();
 									expectsJson.put("id", prop.getURI());
 									expectsJson.put("name", nameStr);
-									expectsJson.put("alias", new JSONArray());
+									expectsJson.put("alias", JsonNodeFactory.instance.arrayNode());
 									propertiesItemJson.put("expects", expectsJson);
 									
-									propertiesJsonArr.put(propertiesItemJson);
+									propertiesJsonArr.add(propertiesItemJson);
 							}
 						}
 						
