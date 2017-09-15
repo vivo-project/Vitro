@@ -5,8 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.json.JsonObject;
-import javax.json.JsonString;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import org.apache.jena.atlas.lib.EscapeStr;
 
@@ -16,7 +15,7 @@ import org.apache.jena.atlas.lib.EscapeStr;
  * able to write to a different format.
  */
 public abstract class DumpNode {
-	public static DumpNode fromJson(JsonObject json) throws BadNodeException {
+	public static DumpNode fromJson(JsonNode json) throws BadNodeException {
 		if (json == null) {
 			return new DumpNullNode();
 		}
@@ -74,9 +73,9 @@ public abstract class DumpNode {
 		return (s == null) ? null : EscapeStr.unescapeStr(s);
 	}
 
-	private static String getString(JsonObject json, String name) {
-		JsonString jsString = json.getJsonString(name);
-		return (jsString == null) ? null : json.getString(name);
+	private static String getString(JsonNode json, String name) {
+		JsonNode node = json.get(name);
+		return node == null ? null : node.asText();
 	}
 
 	public abstract String getValue();

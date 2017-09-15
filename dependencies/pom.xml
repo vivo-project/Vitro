@@ -203,6 +203,11 @@
             <artifactId>jackson-core</artifactId>
             <version>2.7.4</version>
         </dependency>
+        <!-- dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr353</artifactId>
+            <version>2.7.4</version>
+        </dependency -->
         <!-- Needed for ORCID? -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -255,11 +260,6 @@
             <version>2.3.23</version>
         </dependency>
         <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.json</artifactId>
-            <version>1.0.4</version>
-        </dependency>
-        <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>jtidy</artifactId>
             <version>r8-20060801</version>
@@ -297,11 +297,6 @@
             <version>1.2.1</version>
         </dependency>
 
-        <!-- dependency>
-            <groupId>javax.json</groupId>
-            <artifactId>javax.json-api</artifactId>
-            <version>1.0</version>
-        </dependency -->
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
