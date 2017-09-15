@@ -12,9 +12,10 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.DatasetFactory;
@@ -107,7 +108,10 @@ public class DataAutocompleteController extends VitroAjaxController {
 	    		String dataValue = dataLiteral.getString();
 	    		outputResults.add(dataValue);
 	    	}
-	        JSONArray jsonArray = new JSONArray(outputResults);
+	        ArrayNode jsonArray = JsonNodeFactory.instance.arrayNode();
+			for (String res : outputResults) {
+				jsonArray.add(res);
+			}
 	        try {
 	        	response.getWriter().write(jsonArray.toString());
 	        } catch (Throwable e) {
