@@ -11,9 +11,10 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Level;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -149,19 +150,16 @@ public class JsonServletTest extends AbstractTestClass {
 	 */
 	@Ignore
 	@Test
-	public void vclassesClassgroupNotRecognized() throws ServletException,
-			IOException {
+	public void vclassesClassgroupNotRecognized() throws ServletException, IOException {
 		req.addParameter(GET_VCLASSES_FOR_VCLASS_GROUP, "true");
 		req.addParameter("classgroupUri", "http://bogusUri");
 		servlet.service(req, resp);
 		assertEquals("empty response", "", resp.getOutput());
-		assertEquals("status=failure", SC_INTERNAL_SERVER_ERROR,
-				resp.getStatus());
+		assertEquals("status=failure", SC_INTERNAL_SERVER_ERROR, resp.getStatus());
 	}
 
 	@Test
-	public void individualsByClassNoVClass() throws ServletException,
-			IOException {
+	public void individualsByClassNoVClass() throws ServletException, IOException {
 		setLoggerLevel(JsonServlet.class, Level.FATAL);
 		setLoggerLevel(JsonObjectProducer.class, Level.FATAL);
 		req.addParameter(GET_SEARCH_INDIVIDUALS_BY_VCLASS, "true");
@@ -171,8 +169,7 @@ public class JsonServletTest extends AbstractTestClass {
 	}
 
 	@Test
-	public void individualsByClassUnrecognizedVClass() throws ServletException,
-			IOException {
+	public void individualsByClassUnrecognizedVClass() throws ServletException, IOException {
 		setLoggerLevel(JsonServlet.class, Level.FATAL);
 		setLoggerLevel(JsonObjectProducer.class, Level.FATAL);
 		String vclassId = "http://bogusVclass";
@@ -191,8 +188,7 @@ public class JsonServletTest extends AbstractTestClass {
 	 * is required as a response to a request.
 	 */
 	@Test
-	public void individualsByClassNoIndividuals() throws ServletException,
-			IOException {
+	public void individualsByClassNoIndividuals() throws ServletException, IOException {
 		setLoggerLevel(JsonServlet.class, Level.FATAL);
 		setLoggerLevel(ModelAccess.class, Level.ERROR);
 		String vclassId = "http://myVclass";
@@ -214,42 +210,39 @@ public class JsonServletTest extends AbstractTestClass {
 	 */
 	private void assertFailureWithErrorMessage(String expected) {
 		try {
-			JSONObject result = new JSONObject(resp.getOutput());
-			assertEquals("errorMessage", expected,
-					getFieldValue(result, "errorMessage"));
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode result = mapper.readTree(resp.getOutput());
+			assertEquals("errorMessage", expected, getFieldValue(result, "errorMessage").asText());
 			assertEquals("status", SC_INTERNAL_SERVER_ERROR, resp.getStatus());
-		} catch (JSONException e) {
+		} catch (JsonProcessingException e) {
+			fail(e.toString());
+		} catch (IOException e) {
 			fail(e.toString());
 		}
 	}
 
 	private void assertSuccessWithIndividuals(String vclassId, int count) {
 		try {
-			JSONObject actual = new JSONObject(resp.getOutput());
-			assertEquals("errorMessage", "",
-					getFieldValue(actual, "errorMessage"));
-			assertEquals("count", count, getFieldValue(actual, "totalCount"));
+			ObjectMapper mapper = new ObjectMapper();
+			JsonNode actual = mapper.readTree(resp.getOutput());
+			assertEquals("errorMessage", "", getFieldValue(actual, "errorMessage").asText());
+			assertEquals("count", count, getFieldValue(actual, "totalCount").asInt());
 
-			JSONObject vclassObj = (JSONObject) getFieldValue(actual, "vclass");
-			assertEquals("vclass name", vclassId.split("://")[1],
-					getFieldValue(vclassObj, "name"));
-			assertEquals("vclass uri", vclassId,
-					getFieldValue(vclassObj, "URI"));
+			JsonNode vclassObj = getFieldValue(actual, "vclass");
+			assertEquals("vclass name", vclassId.split("://")[1], getFieldValue(vclassObj, "name").asText());
+			assertEquals("vclass uri", vclassId, getFieldValue(vclassObj, "URI").asText());
 
 			assertEquals("status", SC_OK, resp.getStatus());
-		} catch (JSONException e) {
+		} catch (JsonProcessingException e) {
+			fail(e.toString());
+		} catch (IOException e) {
 			fail(e.toString());
 		}
 	}
 
-	private Object getFieldValue(JSONObject json, String fieldName) {
-		try {
-			assertEquals("find " + fieldName, true, json.has(fieldName));
-			return json.get(fieldName);
-		} catch (JSONException e) {
-			fail(e.toString());
-			return -1;
-		}
+	private JsonNode getFieldValue(JsonNode json, String fieldName) {
+		assertEquals("find " + fieldName, true, json.has(fieldName));
+		return json.get(fieldName);
 	}
 
 }
