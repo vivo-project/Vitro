@@ -13,10 +13,11 @@ import java.util.Map;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
@@ -59,8 +60,7 @@ public abstract class AbstractAjaxResponder {
 		}
 	}
 
-	protected abstract String prepareResponse() throws IOException,
-			JSONException;
+	protected abstract String prepareResponse() throws IOException;
 
 	protected String getStringParameter(String key, String defaultValue) {
 		String value = vreq.getParameter(key);
@@ -81,9 +81,13 @@ public abstract class AbstractAjaxResponder {
 	 * objects with fields.
 	 */
 	protected String assembleJsonResponse(List<Map<String, String>> maps) {
-		JSONArray jsonArray = new JSONArray();
+		ArrayNode jsonArray = JsonNodeFactory.instance.arrayNode();
 		for (Map<String, String> map : maps) {
-			jsonArray.put(map);
+			ObjectNode jsonObj = JsonNodeFactory.instance.objectNode();
+			for (Map.Entry<String, String> entry : map.entrySet()) {
+				jsonObj.put(entry.getKey(), entry.getValue());
+			}
+			jsonArray.add(jsonObj);
 		}
 		return jsonArray.toString();
 	}
@@ -93,19 +97,23 @@ public abstract class AbstractAjaxResponder {
 	 * implement "parseSolutionRow()"
 	 */
 	protected abstract static class JsonArrayParser extends
-			ResultSetParser<JSONArray> {
+			ResultSetParser<ArrayNode> {
 		@Override
-		protected JSONArray defaultValue() {
-			return new JSONArray();
+		protected ArrayNode defaultValue() {
+			return JsonNodeFactory.instance.arrayNode();
 		}
 
 		@Override
-		protected JSONArray parseResults(String queryStr, ResultSet results) {
-			JSONArray jsonArray = new JSONArray();
+		protected ArrayNode parseResults(String queryStr, ResultSet results) {
+			ArrayNode jsonArray = JsonNodeFactory.instance.arrayNode();
 			while (results.hasNext()) {
 				Map<String, String> map = parseSolutionRow(results.next());
 				if (map != null) {
-					jsonArray.put(map);
+					ObjectNode jsonObj = JsonNodeFactory.instance.objectNode();
+					for (Map.Entry<String, String> entry : map.entrySet()) {
+						jsonObj.put(entry.getKey(), entry.getValue());
+					}
+					jsonArray.add(jsonObj);
 				}
 			}
 			return jsonArray;

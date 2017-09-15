@@ -11,9 +11,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.filestorage.model.ImageInfo;
 
@@ -313,15 +313,11 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
         Collections.sort(getObjectPropertyList(), new ObjectProperty.DisplayComparator());
     }
 
-    public static final String [] INCLUDED_IN_JSON = {
-         "URI",
-         "name",
-         "vClassId"
-    };
-
-
-    public JSONObject toJSON() throws JSONException {
-        JSONObject jsonObj = new JSONObject(this, INCLUDED_IN_JSON);
+    public JsonNode toJSON() {
+        ObjectNode jsonObj = JsonNodeFactory.instance.objectNode();
+        jsonObj.put("URI", this.URI);
+        jsonObj.put("name", this.name);
+        jsonObj.put("vClassId", this.vClassURI);
         return jsonObj;
     }
 
