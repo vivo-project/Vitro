@@ -15,11 +15,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.RequestIdentifiers;
@@ -189,20 +190,26 @@ public class OpenSocialManager {
 
 	// JSON Helper Functions
 	public static String buildJSONPersonIds(List<String> personIds,
-			String message) throws JSONException {
-		JSONObject json = new JSONObject();
+			String message) {
+		ObjectMapper mapper = new ObjectMapper();
+		ObjectNode json = mapper.createObjectNode();
 		json.put("message", message);
-		json.put("personIds", personIds);
+
+		ArrayNode persons = mapper.createArrayNode();
+		for (String personId : personIds) {
+			persons.add(personId);
+		}
+		json.put("personIds", persons);
 		return json.toString();
 	}
 	
-	public static String buildJSONPersonIds(String personId, String message) throws JSONException {
+	public static String buildJSONPersonIds(String personId, String message) {
 		List<String> personIds = new ArrayList<String>();
 		personIds.add(personId);
 		return buildJSONPersonIds(personIds, message);
 	}
 
-	public static String buildJSONPersonIds(Individual ind, String message) throws JSONException {
+	public static String buildJSONPersonIds(Individual ind, String message) {
 		List<String> personIds = new ArrayList<String>();
 		personIds.add(ind.getURI());
 		return buildJSONPersonIds(personIds, message);

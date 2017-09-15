@@ -8,10 +8,12 @@ import java.io.Writer;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
@@ -42,10 +44,10 @@ public abstract class JsonObjectProducer extends JsonProducer {
 	 * Sub-classes implement this method. Given the request, produce a JSON
 	 * object as the result.
 	 */
-	protected abstract JSONObject process() throws Exception;
+	protected abstract ObjectNode process() throws Exception;
 
 	public final void process(HttpServletResponse resp) throws IOException {
-		JSONObject jsonObject = null;
+		ObjectNode jsonObject = null;
 		String errorMessage = "";
 
 		try {
@@ -57,20 +59,16 @@ public abstract class JsonObjectProducer extends JsonProducer {
 		}
 
 		if (jsonObject == null) {
-			jsonObject = new JSONObject();
+			jsonObject = JsonNodeFactory.instance.objectNode();
 		}
 
 		log.debug("Response to JSON request: " + jsonObject.toString());
 
-		try {
-			resp.setCharacterEncoding("UTF-8");
-			resp.setContentType("application/json;charset=UTF-8");
-			Writer writer = resp.getWriter();
+		resp.setCharacterEncoding("UTF-8");
+		resp.setContentType("application/json;charset=UTF-8");
+		Writer writer = resp.getWriter();
 
-			jsonObject.put("errorMessage", errorMessage);
-			writer.write(jsonObject.toString());
-		} catch (JSONException e) {
-			log.error(e, e);
-		}
+		jsonObject.put("errorMessage", errorMessage);
+		writer.write(jsonObject.toString());
 	}
 }

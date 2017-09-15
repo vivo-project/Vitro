@@ -11,7 +11,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModelBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
@@ -133,8 +132,6 @@ class IndividualResponseBuilder {
 	        if (openSocialManager.isVisible()) {
 	        	body.put("bodyOnload", "my.init();");
 	        }
-        } catch (JSONException e) {
-            log.error("JSONException in doTemplate()", e);
         } catch (IOException e) {
         	log.error("IOException in doTemplate()", e);
         } catch (SQLException e) {

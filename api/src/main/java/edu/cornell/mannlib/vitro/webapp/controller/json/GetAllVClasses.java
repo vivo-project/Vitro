@@ -6,9 +6,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -28,8 +31,8 @@ public class GetAllVClasses extends JsonObjectProducer {
 	}
 
 	@Override
-	protected JSONObject process() throws Exception {                
-        JSONObject map = new JSONObject();           
+	protected ObjectNode process() throws Exception {
+        ObjectNode map = JsonNodeFactory.instance.objectNode();
         //Get all VClassGroups
         List<VClass> vclasses = new ArrayList<VClass>();     
         VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
@@ -43,10 +46,10 @@ public class GetAllVClasses extends JsonObjectProducer {
        
         //Sort vclass by name
         Collections.sort(vclasses);
-   	 	ArrayList<JSONObject> classes = new ArrayList<JSONObject>(vclasses.size());
+        ArrayNode classes = JsonNodeFactory.instance.arrayNode();
 
         for(VClass vc: vclasses) {
-        	JSONObject vcObj = new JSONObject();
+        	ObjectNode vcObj = JsonNodeFactory.instance.objectNode();
         	vcObj.put("name", vc.getName());
         	vcObj.put("URI", vc.getURI());
         	classes.add(vcObj);            

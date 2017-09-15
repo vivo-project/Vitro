@@ -12,9 +12,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONObject;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.rdf.model.Model;
@@ -139,7 +140,7 @@ public class MenuManagementEdit extends VitroHttpServlet {
     
     private void sendReorderResponse(String errorMessage, HttpServletResponse resp) {
     	try{
-			JSONObject rObj = new JSONObject();
+			ObjectNode rObj = JsonNodeFactory.instance.objectNode();
 			resp.setCharacterEncoding("UTF-8");
 			resp.setContentType("application/json;charset=UTF-8");
       

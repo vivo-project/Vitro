@@ -11,9 +11,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -82,7 +82,7 @@ public class JsonServlet extends VitroHttpServlet {
     }
     
 
-    public static JSONObject getSearchIndividualsByVClass(String vclassURI, HttpServletRequest req) throws Exception {
+    public static ObjectNode getSearchIndividualsByVClass(String vclassURI, HttpServletRequest req) throws Exception {
         List<String> vclassURIs = Collections.singletonList(vclassURI);
         VitroRequest vreq = new VitroRequest(req);        
         
@@ -91,7 +91,7 @@ public class JsonServlet extends VitroHttpServlet {
         return IndividualListResultsUtils.wrapIndividualListResultsInJson(vcResults, vreq, false);                    
     }
 
-    public static JSONObject getSearchIndividualsByVClasses(List<String> vclassURIs, HttpServletRequest req) throws Exception {
+    public static ObjectNode getSearchIndividualsByVClasses(List<String> vclassURIs, HttpServletRequest req) throws Exception {
    	 	VitroRequest vreq = new VitroRequest(req);   
    	 	log.debug("Retrieve search results for vclasses" + vclassURIs.toString());
         IndividualListResults vcResults = getSearchVClassIntersectionResults(vclassURIs, vreq);
@@ -126,7 +126,7 @@ public class JsonServlet extends VitroHttpServlet {
             return value;            
     }
     
-    public static JSONObject getRandomSearchIndividualsByVClass(String vclassURI, HttpServletRequest req) throws Exception {
+    public static ObjectNode getRandomSearchIndividualsByVClass(String vclassURI, HttpServletRequest req) throws Exception {
         VitroRequest vreq = new VitroRequest(req);        
         
         IndividualListResults vcResults = getRandomSearchVClassResults(vclassURI, vreq);

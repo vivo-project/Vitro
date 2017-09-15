@@ -28,10 +28,9 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 //import java.util.regex.Pattern;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 //import org.springframework.extensions.surf.util.ISO8601DateFormat;
 
 /**
@@ -50,43 +49,26 @@ public final class JsonToFmModel
 //    public static boolean autoConvertISO8601 = true;
     
     /**
-     * Convert JSON Object string to Freemarker-compatible data model
-     * 
-     * @param jsonString JSON string
-     * @return model
-     * @throws JSONException
-     */
-    public static Map<String, Object> convertJSONObjectToMap(String jsonString) throws JSONException
-    {
-        JSONObject jo = new JSONObject(new JSONTokener(jsonString));
-        return convertJSONObjectToMap(jo);
-    }
-    
-    /**
      * JSONObject is an unordered collection of name/value pairs -&gt; convert to Map (equivalent to Freemarker "hash")
      */
     @SuppressWarnings("unchecked")
-    public static Map<String, Object> convertJSONObjectToMap(JSONObject jo) throws JSONException
+    public static Map<String, Object> convertJSONObjectToMap(ObjectNode jo)
     {
         Map<String, Object> model = new HashMap<String, Object>();
-        
-        Iterator<String> itr = (Iterator<String>)jo.keys();
+
+        Iterator<String> itr = (Iterator<String>)jo.fieldNames();
         while (itr.hasNext())
         {
             String key = (String)itr.next();
             
             Object o = jo.get(key);
-            if (o instanceof JSONObject)
+            if (o instanceof ObjectNode)
             {
-                model.put(key, convertJSONObjectToMap((JSONObject)o));
+                model.put(key, convertJSONObjectToMap((ObjectNode)o));
             }
-            else if (o instanceof JSONArray)
+            else if (o instanceof ArrayNode)
             {
-                model.put(key, convertJSONArrayToList((JSONArray)o));
-            }
-            else if (o == JSONObject.NULL)
-            {
-                model.put(key, null); // note: http://freemarker.org/docs/dgui_template_exp.html#dgui_template_exp_missing
+                model.put(key, convertJSONArrayToList((ArrayNode)o));
             }
             else
             {
@@ -103,42 +85,23 @@ public final class JsonToFmModel
     }
    
     /**
-     * Convert JSON Array string to Freemarker-compatible data model
-     * 
-     * @param jsonString JSON String
-     * @return model
-     * @throws JSONException
-     */
-    public static Map<String, Object> convertJSONArrayToMap(String jsonString) throws JSONException
-    {
-        Map<String, Object> model = new HashMap<String, Object>();
-        JSONArray ja = new JSONArray(new JSONTokener(jsonString));
-        model.put(ROOT_ARRAY, convertJSONArrayToList(ja));
-        return model;
-    }
-    
-    /**
      * JSONArray is an ordered sequence of values -&gt; convert to List (equivalent to Freemarker "sequence")
      */
-    public static List<Object> convertJSONArrayToList(JSONArray ja) throws JSONException
+    public static List<Object> convertJSONArrayToList(ArrayNode ja)
     {
         List<Object> model = new ArrayList<Object>();
-       
-        for (int i = 0; i < ja.length(); i++)
+
+        for (int i = 0; i < ja.size(); i++)
         {
-            Object o = ja.get(i);
-            
-            if (o instanceof JSONArray)
+            JsonNode o = ja.get(i);
+
+            if (o instanceof ArrayNode)
             {
-                model.add(convertJSONArrayToList((JSONArray)o));
+                model.add(convertJSONArrayToList((ArrayNode) o));
             }
-            else if (o instanceof JSONObject)
+            else if (o instanceof ObjectNode)
             {
-                model.add(convertJSONObjectToMap((JSONObject)o));
-            }
-            else if (o == JSONObject.NULL)
-            {
-                model.add(null);
+                model.add(convertJSONObjectToMap((ObjectNode) o));
             }
             else
             {

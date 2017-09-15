@@ -6,12 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModelBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -37,8 +36,8 @@ public class GetRandomSearchIndividualsByVClass extends GetSearchIndividualsByVC
 	 * Search for individuals by VClass. 
 	 */
 	@Override
-	protected JSONObject process() throws Exception {
-		JSONObject rObj = null;
+	protected ObjectNode process() throws Exception {
+		ObjectNode rObj = null;
 		
 		//This gets the first vclass value and sets that as display type.
 		List<String> vclassIds = super.getVclassIds(vreq);
@@ -57,13 +56,13 @@ public class GetRandomSearchIndividualsByVClass extends GetSearchIndividualsByVC
 	 * Look through the return object. For each individual, render the short
 	 * view and insert the resulting HTML into the object.
 	 */
-	private void addShortViewRenderings(JSONObject rObj) throws JSONException {
-		JSONArray individuals = rObj.getJSONArray("individuals");
-		String vclassName = rObj.getJSONObject("vclass").getString("name");
-		for (int i = 0; i < individuals.length(); i++) {
-			JSONObject individual = individuals.getJSONObject(i);
+	private void addShortViewRenderings(ObjectNode rObj) {
+		ArrayNode individuals = (ArrayNode) rObj.get("individuals");
+		String vclassName = rObj.get("vclass").get("name").asText();
+		for (int i = 0; i < individuals.size(); i++) {
+			ObjectNode individual = (ObjectNode) individuals.get(i);
 			individual.put("shortViewHtml",
-					renderShortView(individual.getString("URI"), vclassName));
+					renderShortView(individual.get("URI").asText(), vclassName));
 		}
 	}
 

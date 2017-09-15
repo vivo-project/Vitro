@@ -8,12 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -34,9 +35,10 @@ public class IndividualListResultsUtils {
 	 * Process results related to VClass or vclasses. Handles both single and
 	 * multiple vclasses being sent.
 	 */
-	public static JSONObject wrapIndividualListResultsInJson(IndividualListResults results, VitroRequest vreq,
-			boolean multipleVclasses) {
-		JSONObject rObj = new JSONObject();
+	public static ObjectNode wrapIndividualListResultsInJson(IndividualListResults results, VitroRequest vreq,
+															 boolean multipleVclasses) {
+
+		ObjectNode rObj = JsonNodeFactory.instance.objectNode();
 
 		if (log.isDebugEnabled()) {
 			dumpParametersFromRequest(vreq);
@@ -91,47 +93,44 @@ public class IndividualListResultsUtils {
 		return list;
 	}
 
-	private static JSONObject packageVClassAsJson(VClass vclass)
-			throws JSONException {
-		JSONObject jvclass = new JSONObject();
+	private static ObjectNode packageVClassAsJson(VClass vclass) {
+		ObjectNode jvclass = JsonNodeFactory.instance.objectNode();
 		jvclass.put("URI", vclass.getURI());
 		jvclass.put("name", vclass.getName());
 		return jvclass;
 	}
 
-	private static JSONArray packageLettersAsJson() throws JSONException,
-			UnsupportedEncodingException {
+	private static ArrayNode packageLettersAsJson() throws UnsupportedEncodingException {
 		List<String> letters = Controllers.getLetters();
-		JSONArray jletters = new JSONArray();
+		ArrayNode jletters = JsonNodeFactory.instance.arrayNode();
 		for (String s : letters) {
-			JSONObject jo = new JSONObject();
+			ObjectNode jo = JsonNodeFactory.instance.objectNode();
 			jo.put("text", s);
 			jo.put("param", "alpha=" + URLEncoder.encode(s, "UTF-8"));
-			jletters.put(jo);
+			jletters.add(jo);
 		}
 		return jletters;
 	}
 
-	private static JSONArray packagePageRecordsAsJson(List<PageRecord> pages)
-			throws JSONException {
-		JSONArray wpages = new JSONArray();
+	private static ArrayNode packagePageRecordsAsJson(List<PageRecord> pages) {
+		ArrayNode wpages = JsonNodeFactory.instance.arrayNode();
 		for (PageRecord pr : pages) {
-			JSONObject p = new JSONObject();
+			ObjectNode p = JsonNodeFactory.instance.objectNode();
 			p.put("text", pr.text);
 			p.put("param", pr.param);
 			p.put("index", pr.index);
-			wpages.put(p);
+			wpages.add(p);
 		}
 		return wpages;
 	}
 
-	private static JSONArray packageIndividualsAsJson(VitroRequest vreq,
-			List<Individual> inds) throws JSONException {
+	private static ArrayNode packageIndividualsAsJson(VitroRequest vreq,
+			List<Individual> inds) {
 		log.debug("Number of individuals returned from request: " + inds.size());
 
-		JSONArray jInds = new JSONArray();
+		ArrayNode jInds = JsonNodeFactory.instance.arrayNode();
 		for (Individual ind : inds) {
-			jInds.put(IndividualJsonWrapper.packageIndividualAsJson(vreq, ind));
+			jInds.add(IndividualJsonWrapper.packageIndividualAsJson(vreq, ind));
 		}
 		return jInds;
 	}
