@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vedit.tags;
 import java.util.HashMap;
 
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.JspWriter;
 import edu.cornell.mannlib.vedit.beans.FormObject;
 import org.apache.commons.lang3.StringEscapeUtils;

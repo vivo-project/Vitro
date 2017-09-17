@@ -144,8 +144,7 @@ public class ProgramLogin extends HttpServlet {
 				}
 				recordLoginWithPasswordChange();
 				sendSuccess(MESSAGE_SUCCESS_FIRST_TIME);
-				return;
-			}
+            }
 
 		}
 

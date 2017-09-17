@@ -250,8 +250,7 @@ public class FreemarkerHttpServlet extends VitroHttpServlet  {
 		// This method does a redirect if the required authorizations are 
 		// not met (and they won't be), so just return.
 		isAuthorizedToDisplayPage(vreq, response, values.getUnauthorizedAction());
-		return;
-	}
+    }
 
 	protected void doTemplate(VitroRequest vreq, HttpServletResponse response, 
             ResponseValues values) throws TemplateProcessingException {

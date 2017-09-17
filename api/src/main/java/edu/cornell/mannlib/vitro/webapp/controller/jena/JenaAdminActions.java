@@ -163,7 +163,7 @@ public class JenaAdminActions extends BaseEditController {
     }
     
 	private String testWriteXML() {
-		StringBuffer output = new StringBuffer();
+		StringBuilder output = new StringBuilder();
 		output.append("<html><head><title>Test Write XML</title></head><body><pre>\n");
 		OntModel model = ModelAccess.on(getServletContext()).getOntModel();
 		Model tmp = ModelFactory.createDefaultModel();
@@ -177,10 +177,10 @@ public class JenaAdminActions extends BaseEditController {
 					valid = false;
 					output.append("-----\n");
 					output.append("Unable to write statement as RDF/XML:\n");
-					output.append("Subject : \n"+stmt.getSubject().getURI());
-					output.append("Subject : \n"+stmt.getPredicate().getURI());
+					output.append("Subject : \n").append(stmt.getSubject().getURI());
+					output.append("Subject : \n").append(stmt.getPredicate().getURI());
 					String objectStr = (stmt.getObject().isLiteral()) ? ((Literal)stmt.getObject()).getLexicalForm() : ((Resource)stmt.getObject()).getURI();
-					output.append("Subject : \n"+objectStr);
+					output.append("Subject : \n").append(objectStr);
 					output.append("Exception: \n");
 					e.printStackTrace();
 				}
@@ -250,16 +250,20 @@ public class JenaAdminActions extends BaseEditController {
         VitroRequest request = new VitroRequest(req);
         String actionStr = request.getParameter("action");
 
-        if (actionStr.equals("printRestrictions")) {
-        	printRestrictions();
-        } else if (actionStr.equals("outputTbox")) {
-        	outputTbox(response);
-        } else if (actionStr.equals("testWriteXML")) {
-        	try {
-        		response.getWriter().write(testWriteXML());
-        	} catch ( IOException ioe ) {
-        		throw new RuntimeException( ioe );
-        	}
+		switch (actionStr) {
+			case "printRestrictions":
+				printRestrictions();
+				break;
+			case "outputTbox":
+				outputTbox(response);
+				break;
+			case "testWriteXML":
+				try {
+					response.getWriter().write(testWriteXML());
+				} catch (IOException ioe) {
+					throw new RuntimeException(ioe);
+				}
+				break;
 		}
         
         if (actionStr.equals("checkURIs")) { 

@@ -303,11 +303,11 @@ public class JenaIngestController extends BaseEditController {
         } catch (org.apache.jena.shared.CannotEncodeCharacterException cece) {
             // there's got to be a better way to do this
             byte[] badCharBytes = String.valueOf(cece.getBadChar()).getBytes();
-            String errorMsg = "Cannot encode character with byte values: (decimal) ";
+            StringBuilder errorMsg = new StringBuilder("Cannot encode character with byte values: (decimal) ");
             for (int i=0; i<badCharBytes.length; i++) {
-                errorMsg += badCharBytes[i];
+                errorMsg.append(badCharBytes[i]);
             }
-            throw new RuntimeException(errorMsg, cece);
+            throw new RuntimeException(errorMsg.toString(), cece);
         } catch (Exception e) {
             log.error(e, e);
         } finally {

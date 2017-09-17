@@ -69,15 +69,15 @@ public class GetAllPrefix extends BaseEditController {
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();
-		String respo = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-		respo += "<options>";
+		StringBuilder respo = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		respo.append("<options>");
 		List<String> prefixList = new ArrayList<String>();
 		prefixList.addAll(prefixMap.keySet());
 		Collections.sort(prefixList, vreq.getCollator());
 		for (String prefix : prefixList) {
-		    respo += makeOption(prefix, prefixMap.get(prefix));
+		    respo.append(makeOption(prefix, prefixMap.get(prefix)));
 		}
-		respo += "</options>";
+		respo.append("</options>");
 		out.println(respo);
 		out.flush();
 		out.close();

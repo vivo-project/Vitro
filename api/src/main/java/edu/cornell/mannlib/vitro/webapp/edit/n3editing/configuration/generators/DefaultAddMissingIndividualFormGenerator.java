@@ -10,7 +10,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.searchresult.IndividualSearchResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -63,8 +62,8 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 		if(objProp != null) {
 			return(objProp.getOfferCreateNewOption() && 
 					(
-							(command != null && command.equals(createCommand)) || 
-							objProp.getSelectFromExisting() == false
+							(command != null && command.equals(createCommand)) ||
+									!objProp.getSelectFromExisting()
 					)
 				);
 		}
@@ -434,7 +433,7 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	return (isEditOfExistingStmt 
     			&& "create".equals(command)) 
     	       && (objectProp != null)
-    	       && (objectProp.getOfferCreateNewOption() == true);                
+    	       && (objectProp.getOfferCreateNewOption());
     }
     
     private boolean isForwardToCreateButEdit(VitroRequest vreq) {
@@ -444,8 +443,8 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
     	return (isEditOfExistingStmt 
     			&& (! "create".equals(command))
     			&& (objectProp != null) 
-    	       && (objectProp.getOfferCreateNewOption() == true) 
-    	       && (objectProp.getSelectFromExisting() == false)
+    	       && (objectProp.getOfferCreateNewOption())
+    	       && (!objectProp.getSelectFromExisting())
     	     );
     }
     

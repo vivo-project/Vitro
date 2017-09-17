@@ -143,20 +143,17 @@ public class GetClazzAllProperties extends BaseEditController {
 				}
 			}
 		}
-		String respo = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-		respo += "<options>";
+		StringBuilder respo = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		respo.append("<options>");
 		Object[] keys = hm.keySet().toArray();
 		Arrays.sort(keys);
 		for (int i = 0; i < keys.length; i++) {
 			String key = (String) keys[i];
 			String value = hm.get(key);
 
-			respo += "<option>" + "<key>" + key + "</key>" + "<value>"
-					+ value.substring(0, value.length() - 1) + "</value>"
-					+ "<type>" + value.charAt(value.length() - 1) + "</type>"
-					+ "</option>";
+			respo.append("<option>" + "<key>").append(key).append("</key>").append("<value>").append(value.substring(0, value.length() - 1)).append("</value>").append("<type>").append(value.charAt(value.length() - 1)).append("</type>").append("</option>");
 		}
-		respo += "</options>";
+		respo.append("</options>");
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();

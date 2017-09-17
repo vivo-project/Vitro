@@ -83,7 +83,6 @@ public class DataAutocompleteController extends VitroAjaxController {
             Model model = getModel(vreq);
             Query query = SparqlUtils.createQuery(sparqlQuery);
 			outputResults(response, query, model);
-			return;
         } catch(AjaxControllerException ex) {
         	log.error(ex, ex);
 			response.sendError(ex.getStatusCode());

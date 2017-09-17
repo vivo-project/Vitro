@@ -11,7 +11,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.jena.graph.Graph;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.graph.TransactionHandler;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.LabelExistsException;
 import org.apache.jena.query.ReadWrite;

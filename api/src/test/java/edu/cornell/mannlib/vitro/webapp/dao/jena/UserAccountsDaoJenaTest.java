@@ -208,11 +208,11 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		StmtIterator stmts = ontModel.listStatements(
 				ontModel.getResource(URI_USER1), null, (RDFNode) null);
 		if (stmts.hasNext()) {
-			String message = "Expecting no statements to remain in the model, but found:\n";
+			StringBuilder message = new StringBuilder("Expecting no statements to remain in the model, but found:\n");
 			while (stmts.hasNext()) {
-				message += "   " + formatStatement(stmts.next()) + "\n";
+				message.append("   ").append(formatStatement(stmts.next())).append("\n");
 			}
-			fail(message);
+			fail(message.toString());
 		}
 	}
 

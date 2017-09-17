@@ -106,7 +106,7 @@ public class JenaExportController extends BaseEditController {
 		String formatParam = vreq.getParameter("format");
 		String subgraphParam = vreq.getParameter("subgraph");
 		String assertedOrInferredParam = vreq.getParameter("assertedOrInferred");
-		String ontologyURI = vreq.getParameter("ontologyURI");
+		StringBuilder ontologyURI = new StringBuilder(vreq.getParameter("ontologyURI"));
 		
 		Model model = null;
 		OntModel ontModel = ModelFactory.createOntologyModel();
@@ -114,12 +114,13 @@ public class JenaExportController extends BaseEditController {
 		if(!subgraphParam.equalsIgnoreCase("tbox") 
 				&& !subgraphParam.equalsIgnoreCase("abox") 
 				&& !subgraphParam.equalsIgnoreCase("full")){
-			ontologyURI = subgraphParam;
+			ontologyURI = new StringBuilder(subgraphParam);
 			subgraphParam = "tbox";
-			char[] uri =  ontologyURI.toCharArray();
-			ontologyURI="";
-			for(int i =0; i < uri.length-1;i++)
-				ontologyURI = ontologyURI + uri[i];
+			char[] uri =  ontologyURI.toString().toCharArray();
+			ontologyURI = new StringBuilder();
+			for(int i =0; i < uri.length-1;i++) {
+				ontologyURI.append(uri[i]);
+			}
 		}
 	
 		if( "abox".equals(subgraphParam)){
@@ -141,7 +142,7 @@ public class JenaExportController extends BaseEditController {
 		        // only those statements that are in the inferred graph
 		        Model tempModel = xutil.extractTBox(
 		        		ModelAccess.on(getServletContext()).getOntModel(TBOX_UNION),
-		                ontologyURI);
+						ontologyURI.toString());
 		        Model inferenceModel = ModelAccess.on(getServletContext()).getOntModel(TBOX_INFERENCES);
 		        inferenceModel.enterCriticalSection(Lock.READ);
 		        try {
@@ -152,17 +153,17 @@ public class JenaExportController extends BaseEditController {
 		    } else if ("full".equals(assertedOrInferredParam)) {
                 model = xutil.extractTBox(
                 		ModelAccess.on(getServletContext()).getOntModel(TBOX_UNION),
-                        ontologyURI);		        
+						ontologyURI.toString());
 		    } else {
                 model = xutil.extractTBox(
-                        ModelAccess.on(getServletContext()).getOntModel(TBOX_ASSERTIONS), ontologyURI);              		        
+                        ModelAccess.on(getServletContext()).getOntModel(TBOX_ASSERTIONS), ontologyURI.toString());
 		    }
 			
 		}
 		else if("full".equals(subgraphParam)){
 			if("inferred".equals(assertedOrInferredParam)){
 				ontModel = xutil.extractTBox(
-						dataset, ontologyURI, ABOX_INFERENCES);
+						dataset, ontologyURI.toString(), ABOX_INFERENCES);
 				ontModel.addSubModel(ModelAccess.on(getServletContext()).getOntModel(ABOX_INFERENCES));
 				ontModel.addSubModel(ModelAccess.on(getServletContext()).getOntModel(TBOX_INFERENCES));
 			}
@@ -214,23 +215,31 @@ public class JenaExportController extends BaseEditController {
 	}
 	
 	private void setHeaders(HttpServletResponse response, String formatParam) {
-	       if ( formatParam == null ) {
-	            formatParam = "RDF/XML-ABBREV";  // default
-	        }
-	        String mime = formatToMimetype.get( formatParam );
-	        if ( mime == null ) {
-	            throw new RuntimeException( "Unsupported RDF format " + formatParam);
-	        }
-	        
-	        response.setContentType( mime );
-	        if(mime.equals("application/rdf+xml"))
-	            response.setHeader("content-disposition", "attachment; filename=" + "export.rdf");
-	        else if(mime.equals("text/n3"))
-	            response.setHeader("content-disposition", "attachment; filename=" + "export.n3");
-	        else if(mime.equals("text/plain"))
-	            response.setHeader("content-disposition", "attachment; filename=" + "export.txt");
-	        else if(mime.equals("application/x-turtle"))
-	            response.setHeader("content-disposition", "attachment; filename=" + "export.ttl");
+		if ( formatParam == null ) {
+			formatParam = "RDF/XML-ABBREV";  // default
+		}
+
+		String mime = formatToMimetype.get( formatParam );
+		if ( mime == null ) {
+			throw new RuntimeException( "Unsupported RDF format " + formatParam);
+		}
+
+		response.setContentType( mime );
+
+		switch (mime) {
+			case "application/rdf+xml":
+				response.setHeader("content-disposition", "attachment; filename=" + "export.rdf");
+				break;
+			case "text/n3":
+				response.setHeader("content-disposition", "attachment; filename=" + "export.n3");
+				break;
+			case "text/plain":
+				response.setHeader("content-disposition", "attachment; filename=" + "export.txt");
+				break;
+			case "application/x-turtle":
+				response.setHeader("content-disposition", "attachment; filename=" + "export.ttl");
+				break;
+		}
 	}
 	
 	private void outputSparqlConstruct(String queryStr, String formatParam, 
@@ -248,10 +257,8 @@ public class JenaExportController extends BaseEditController {
 	        IOUtils.copy(in, out);
 	        out.flush();
 	        out.close();
-	    } catch (RDFServiceException e) {
+	    } catch (RDFServiceException | IOException e) {
 	        throw new RuntimeException(e);
-	    } catch (IOException ioe) {
-	        throw new RuntimeException(ioe);
 	    } finally {
 	        rdfService.close();
 	    }	    

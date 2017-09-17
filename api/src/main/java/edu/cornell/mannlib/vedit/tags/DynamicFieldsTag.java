@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Iterator;
 
 import java.io.File;
-import java.io.BufferedOutputStream;
 import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.BufferedInputStream;
@@ -16,18 +15,14 @@ import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.JspWriter;
-import javax.servlet.ServletException;
+
 import edu.cornell.mannlib.vedit.beans.FormObject;
 import edu.cornell.mannlib.vedit.beans.DynamicField;
 import edu.cornell.mannlib.vedit.beans.DynamicFieldRow;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringEscapeUtils;
 import edu.cornell.mannlib.vedit.tags.EditTag;
 
 public class DynamicFieldsTag extends EditTag {
@@ -63,7 +58,7 @@ public class DynamicFieldsTag extends EditTag {
             int templateStart = -1;
             int postStart = -1;
 
-            InputStream fis = new FileInputStream (pageContext.getServletContext().getRealPath(new String())+PATH_SEP+MARKUP_FILE_PATH+usePage);
+            InputStream fis = new FileInputStream (pageContext.getServletContext().getRealPath("")+PATH_SEP+MARKUP_FILE_PATH+usePage);
             InputStream bis = new BufferedInputStream(fis);
             BufferedReader in = new BufferedReader(new InputStreamReader(bis));
             List<String> lines = new ArrayList<String>();
@@ -83,9 +78,9 @@ public class DynamicFieldsTag extends EditTag {
             }
             in.close();
 
-            StringBuffer preMarkupB = new StringBuffer();
-            StringBuffer postMarkupB = new StringBuffer();
-            StringBuffer templateMarkupB = new StringBuffer();
+            StringBuilder preMarkupB = new StringBuilder();
+            StringBuilder postMarkupB = new StringBuilder();
+            StringBuilder templateMarkupB = new StringBuilder();
 
             if (templateStart>preStart  && preStart>0) {
                 for (int i=preStart+1; i<templateStart; i++) {
@@ -119,16 +114,16 @@ public class DynamicFieldsTag extends EditTag {
             postMarkup = postMarkupB.toString();
 
         } catch (FileNotFoundException e) {
-            System.out.println("DynamicFieldsTag could not find markup file at "+pageContext.getServletContext().getRealPath(new String())+"\\"+MARKUP_FILE_PATH+usePage);
+            System.out.println("DynamicFieldsTag could not find markup file at "+pageContext.getServletContext().getRealPath("")+"\\"+MARKUP_FILE_PATH+usePage);
         } catch (IOException ioe) {
-            System.out.println("DynamicFieldsTag encountered IOException reading "+pageContext.getServletContext().getRealPath(new String())+"\\"+MARKUP_FILE_PATH+usePage);
+            System.out.println("DynamicFieldsTag encountered IOException reading "+pageContext.getServletContext().getRealPath("")+"\\"+MARKUP_FILE_PATH+usePage);
         }
 
     }
 
     public String strReplace(String input, String pattern, String replacement) {
         String[] piece = input.split(pattern);
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
         for (int i=0; i<piece.length; i++) {
             output.append(piece[i]);
             if (i<piece.length-1)
@@ -149,7 +144,7 @@ public class DynamicFieldsTag extends EditTag {
                 int i = 9899;
                 while (dynIt.hasNext()) {
                     DynamicField dynf = dynIt.next();
-                    StringBuffer genTaName = new StringBuffer().append("_").append(dynf.getTable()).append("_");
+                    StringBuilder genTaName = new StringBuilder().append("_").append(dynf.getTable()).append("_");
                     genTaName.append("-1").append("_");
                     Iterator pparamIt = dynf.getRowTemplate().getParameterMap().keySet().iterator();
                     while(pparamIt.hasNext()) {
@@ -160,7 +155,7 @@ public class DynamicFieldsTag extends EditTag {
                     }
 
 
-                    String preWithVars = new String(preMarkup);
+                    String preWithVars = preMarkup;
                     preWithVars = strReplace(preWithVars,type+"NN",Integer.toString(i));
                     preWithVars = strReplace(preWithVars,"\\$genTaName",genTaName.toString());
                     preWithVars = strReplace(preWithVars,"\\$fieldName",dynf.getName());
@@ -174,7 +169,7 @@ public class DynamicFieldsTag extends EditTag {
                         if (row.getValue()==null)
                             row.setValue("");
                         if (row.getValue().length()>0) {
-                            StringBuffer taName = new StringBuffer().append("_").append(dynf.getTable()).append("_");
+                            StringBuilder taName = new StringBuilder().append("_").append(dynf.getTable()).append("_");
                             taName.append(row.getId()).append("_");
                             Iterator paramIt = row.getParameterMap().keySet().iterator();
                             while(paramIt.hasNext()) {
@@ -184,7 +179,7 @@ public class DynamicFieldsTag extends EditTag {
                                 taName.append(key).append(":").append(new String(valueInBase64)).append(";");
                             }
                             if (row.getValue().length()>0) {
-                                String templateWithVars = new String(templateMarkup);
+                                String templateWithVars = templateMarkup;
                                 templateWithVars = strReplace(templateWithVars,type+"NN",Integer.toString(i));
                                 templateWithVars = strReplace(templateWithVars,"\\$taName",taName.toString());
                                 templateWithVars = strReplace(templateWithVars,"\\$\\$",row.getValue());
@@ -199,14 +194,14 @@ public class DynamicFieldsTag extends EditTag {
                 // output the row template for the javascript to clone
 
                 out.println("<!-- row template inserted by DynamicFieldsTag  -->");
-                String hiddenTemplatePreMarkup = new String(preMarkup);
+                String hiddenTemplatePreMarkup = preMarkup;
                 // bit of a hack to hide the template from the user:
                 hiddenTemplatePreMarkup = strReplace(hiddenTemplatePreMarkup,"display\\:none\\;","");
                 hiddenTemplatePreMarkup = strReplace(hiddenTemplatePreMarkup,"display\\:block\\;","");
                 hiddenTemplatePreMarkup = strReplace(hiddenTemplatePreMarkup,"display\\:inline\\;","");
                 hiddenTemplatePreMarkup = strReplace(hiddenTemplatePreMarkup,"style\\=\\\"","style=\"display:none;");
                 out.print(hiddenTemplatePreMarkup);
-                String hiddenTemplateTemplateMarkup = new String(templateMarkup);
+                String hiddenTemplateTemplateMarkup = templateMarkup;
                 hiddenTemplateTemplateMarkup = strReplace(hiddenTemplateTemplateMarkup, "\\$\\$", "");
                 out.print(hiddenTemplateTemplateMarkup);
                 out.print(postMarkup);

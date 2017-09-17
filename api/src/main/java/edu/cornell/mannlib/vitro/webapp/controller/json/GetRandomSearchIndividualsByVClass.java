@@ -18,7 +18,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewService;
 import edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewService.ShortViewContext;
 import edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewServiceSetup;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 
 /**
  * Does a Solr search for individuals, and uses the short view to render each of

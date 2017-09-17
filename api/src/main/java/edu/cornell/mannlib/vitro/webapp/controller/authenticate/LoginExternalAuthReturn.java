@@ -104,14 +104,12 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 			getAuthenticator(req).recordLoginAgainstUserAccount(userAccount,
 					AuthenticationSource.EXTERNAL);
 			new LoginRedirector(req, afterLoginUrl).redirectLoggedInUser(resp);
-			return;
-		} catch (LoginNotPermitted e) {
+        } catch (LoginNotPermitted e) {
 			// should have been caught by isUserPermittedToLogin()
 			log.debug("Logins disabled for " + userAccount);
 			complainAndReturnToReferrer(req, resp, ATTRIBUTE_REFERRER,
 					messageLoginDisabled(req));
-			return;
-		}
+        }
 	}
 
 	@Override

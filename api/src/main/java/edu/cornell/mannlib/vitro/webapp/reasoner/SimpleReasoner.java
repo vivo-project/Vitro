@@ -24,10 +24,8 @@ import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelChangedListener;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.ResIterator;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
@@ -989,8 +987,7 @@ public class SimpleReasoner extends StatementListener
 		}
 	
 		setMostSpecificTypes(individual, typeURIs, inferenceModel);
-	    return;	
-	}
+    }
 	
 	protected void setMostSpecificTypes(Resource individual, HashSet<String> typeURIs, Model inferenceModel) {
 		
@@ -1027,10 +1024,9 @@ public class SimpleReasoner extends StatementListener
 			String typeURI = typeIter.next();
 			Statement mstStmt = ResourceFactory.createStatement(individual,mostSpecificType,ResourceFactory.createResource(typeURI));
 			addInference(mstStmt,inferenceModel,true);
-		}		
-		
-        return;
-	}
+		}
+
+    }
 	
 	protected List<Resource> getParents(Resource cls, OntModel tboxModel) {
 		

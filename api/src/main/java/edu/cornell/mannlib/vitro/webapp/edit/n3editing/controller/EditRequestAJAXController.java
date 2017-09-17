@@ -84,14 +84,10 @@ public class EditRequestAJAXController extends VitroHttpServlet {
             Class classDefinition = Class.forName(editConfGeneratorName);
             object = classDefinition.newInstance();
             EditConfigurationVTwoGenerator = (EditConfigurationAJAXGenerator) object;
-        } catch (InstantiationException e) {
+        } catch (InstantiationException | ClassNotFoundException | IllegalAccessException e) {
             System.out.println(e);
-        } catch (IllegalAccessException e) {
-            System.out.println(e);
-        } catch (ClassNotFoundException e) {
-            System.out.println(e);
-        }    	
-        
+        }
+
         if(EditConfigurationVTwoGenerator == null){
         	throw new Error("Could not find EditConfigurationVTwoGenerator " + editConfGeneratorName);        	
         } else {

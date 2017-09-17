@@ -7,14 +7,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -153,7 +149,7 @@ public class IndividualsViaObjectPropetyOptions implements FieldOptions {
     private HashSet<String> getApplicableVClassURIs(Individual subject, WebappDaoFactory wDaoFact) {
         HashSet<String> vclassesURIs = new HashSet<String>();
         if (!rangeTypes.isEmpty()) {
-            StringBuffer rangeBuff = new StringBuffer();
+            StringBuilder rangeBuff = new StringBuilder();
             for (VClass rangeType : rangeTypes) {
                 vclassesURIs.add(rangeType.getURI());
                 rangeBuff.append(rangeType.getURI()).append(", ");

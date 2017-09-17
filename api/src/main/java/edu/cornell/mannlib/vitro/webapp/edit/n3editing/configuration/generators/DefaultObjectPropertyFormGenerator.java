@@ -340,8 +340,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
     		this.processObjectPropForm(vreq, editConfiguration);
     	} else {
     		log.debug("This is a data property: " + predicateUri);
-    		return;
-    	}
+        }
     }    
 
     
@@ -538,7 +537,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
         	types = new ArrayList<VClass>();
         }
 		
-        StringBuffer typesBuff = new StringBuffer();
+        StringBuilder typesBuff = new StringBuilder();
         for (VClass type : types) {
             if (type.getURI() != null) {
                 typesBuff.append(type.getURI()).append(",");

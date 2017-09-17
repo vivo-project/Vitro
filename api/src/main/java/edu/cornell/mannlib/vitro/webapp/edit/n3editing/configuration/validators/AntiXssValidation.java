@@ -92,9 +92,7 @@ public class AntiXssValidation implements N3ValidatorVTwo{
             String error = null;
             try {
                 error = literalHasXSS( editSub.getLiteralsFromForm().get(fieldName) );
-            } catch (ScanException e) {
-                error = e.getMessage();
-            } catch (PolicyException e) {
+            } catch (ScanException | PolicyException e) {
                 error = e.getMessage();
             }
             if( error != null ){                        
@@ -109,9 +107,7 @@ public class AntiXssValidation implements N3ValidatorVTwo{
             String error;
             try {
                 error = uriHasXSS( editSub.getUrisFromForm().get(fieldName));
-            } catch (ScanException e) {
-                error = e.getMessage();
-            } catch (PolicyException e) {
+            } catch (ScanException | PolicyException e) {
                 error = e.getMessage();
             }
             if( error != null ){

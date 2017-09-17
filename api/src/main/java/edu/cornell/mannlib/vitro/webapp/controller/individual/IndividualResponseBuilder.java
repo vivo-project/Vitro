@@ -265,18 +265,18 @@ class IndividualResponseBuilder {
                - Much simpler is to just create an anchor element. This has the added advantage that the
                  browser doesn't ask to resend the form data when reloading the page.
              */
-            String url = vreq.getRequestURI() + "?verbose=" + !verboseValue;
+            StringBuilder url = new StringBuilder(vreq.getRequestURI() + "?verbose=" + !verboseValue);
             // Append request query string, except for current verbose value, to url
             String queryString = vreq.getQueryString();
             if (queryString != null) {
                 String[] params = queryString.split("&");
                 for (String param : params) {
                     if (! param.startsWith("verbose=")) {
-                        url += "&" + param;
+                        url.append("&").append(param);
                     }
                 }
             }
-            map.put("url", url);            
+            map.put("url", url.toString());
         } else {
             vreq.getSession().setAttribute("verbosePropertyDisplay", false);
         }

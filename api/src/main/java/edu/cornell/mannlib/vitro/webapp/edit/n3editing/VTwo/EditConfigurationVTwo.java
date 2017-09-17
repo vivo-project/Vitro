@@ -618,9 +618,9 @@ public class EditConfigurationVTwo {
         Map<String, String> dest = new HashMap<String, String>();        
         for( String key : source.keySet()){
             if( source.get(key) != null )
-                dest.put(new String(key), source.get(key));
+                dest.put(key, source.get(key));
             else 
-                dest.put(new String(key), null);
+                dest.put(key, null);
         }
         return dest;
     }

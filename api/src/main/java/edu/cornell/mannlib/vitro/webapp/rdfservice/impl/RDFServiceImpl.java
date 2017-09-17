@@ -40,7 +40,6 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
-import org.vivoweb.linkeddatafragments.datasource.rdfservice.RDFServiceBasedRequestProcessorForTPFs;
 
 public abstract class RDFServiceImpl implements RDFService {
 	
@@ -64,9 +63,9 @@ public abstract class RDFServiceImpl implements RDFService {
                               String individualTypeURI, 
                               String graphURI) throws RDFServiceException {
     
-       StringBuffer containsQuery = new StringBuffer("ASK { \n");
+       StringBuilder containsQuery = new StringBuilder("ASK { \n");
        if (graphURI != null) {
-           containsQuery.append("  GRAPH <" + graphURI + "> { ");
+           containsQuery.append("  GRAPH <").append(graphURI).append("> { ");
        }
        containsQuery.append("<");   
        containsQuery.append(individualURI);
@@ -229,7 +228,7 @@ public abstract class RDFServiceImpl implements RDFService {
     }
 
     protected static String sparqlTriple(Triple triple) {
-        StringBuffer serializedTriple = new StringBuffer();
+        StringBuilder serializedTriple = new StringBuilder();
         serializedTriple.append(sparqlNodeUpdate(triple.getSubject(), ""));
         serializedTriple.append(" ");
         serializedTriple.append(sparqlNodeUpdate(triple.getPredicate(), ""));
@@ -254,7 +253,7 @@ public abstract class RDFServiceImpl implements RDFService {
         } else if (node.isBlank()) {
             return "<fake:blank>"; // or throw exception?
         } else if (node.isURI()) {
-            StringBuffer uriBuff = new StringBuffer();
+            StringBuilder uriBuff = new StringBuilder();
             return uriBuff.append("<").append(node.getURI()).append(">").toString();
         } else if (node.isLiteral()) {
             StringBuffer literalBuff = new StringBuffer();
@@ -442,7 +441,7 @@ public abstract class RDFServiceImpl implements RDFService {
         if (node.isLiteral()) {
             builder.append(literalToString(node.asLiteral()));
         } else if (node.isURIResource()) {
-            builder.append('<' + node.asResource().getURI() + '>');
+            builder.append('<').append(node.asResource().getURI()).append('>');
         }
     }
 

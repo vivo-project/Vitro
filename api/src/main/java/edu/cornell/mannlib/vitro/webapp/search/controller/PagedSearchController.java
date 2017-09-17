@@ -452,12 +452,12 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     
     private String getSnippet(SearchResultDocument doc, SearchResponse response) {
         String docId = doc.getStringValue(VitroSearchTermNames.DOCID);
-        StringBuffer text = new StringBuffer();
+        StringBuilder text = new StringBuilder();
         Map<String, Map<String, List<String>>> highlights = response.getHighlighting();
         if (highlights != null && highlights.get(docId) != null) {
             List<String> snippets = highlights.get(docId).get(VitroSearchTermNames.ALLTEXT);
             if (snippets != null && snippets.size() > 0) {
-                text.append("... " + snippets.get(0) + " ...");
+                text.append("... ").append(snippets.get(0)).append(" ...");
             }       
         }
         return text.toString();
@@ -649,11 +649,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     protected boolean isRequestedFormatXml(VitroRequest req){
         if( req != null ){
             String param = req.getParameter(PARAM_XML_REQUEST);
-            if( param != null && "1".equals(param)){
-                return true;
-            }else{
-                return false;
-            }
+            return param != null && "1".equals(param);
         }else{
             return false;
         }
@@ -662,11 +658,7 @@ public class PagedSearchController extends FreemarkerHttpServlet {
     protected boolean isRequestedFormatCSV(VitroRequest req){
         if( req != null ){
             String param = req.getParameter(PARAM_CSV_REQUEST);
-            if( param != null && "1".equals(param)){
-                return true;
-            }else{
-                return false;
-            }
+            return param != null && "1".equals(param);
         }else{
             return false;
         }

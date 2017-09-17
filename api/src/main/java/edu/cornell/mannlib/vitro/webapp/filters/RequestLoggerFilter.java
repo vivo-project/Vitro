@@ -34,7 +34,7 @@ public class RequestLoggerFilter implements Filter {
 		try {
 			if (request instanceof HttpServletRequest) {
 				HttpServletRequest theRequest = (HttpServletRequest) request;
-				StringBuffer requestedLocation = new StringBuffer();
+				StringBuilder requestedLocation = new StringBuilder();
 				requestedLocation.append(theRequest.getLocalName()).append(":");
 				requestedLocation.append(theRequest.getLocalPort());
 				requestedLocation.append(theRequest.getRequestURI());

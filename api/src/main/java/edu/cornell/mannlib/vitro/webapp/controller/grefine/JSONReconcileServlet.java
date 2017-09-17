@@ -198,10 +198,10 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			json.put("schemaSpace", defaultNamespace);
 		}
 		ObjectNode viewJson = JsonNodeFactory.instance.objectNode();
-		StringBuffer urlBuf = new StringBuffer();
-		urlBuf.append("http://" + serverName);
+		StringBuilder urlBuf = new StringBuilder();
+		urlBuf.append("http://").append(serverName);
 		if (serverPort == 8080) {
-			urlBuf.append(":" + serverPort);
+			urlBuf.append(":").append(serverPort);
 		}
 		if (req.getContextPath() != null) {
 			urlBuf.append(req.getContextPath());

@@ -24,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchInputField;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchQuery.Order;
 import edu.cornell.mannlib.vitro.webapp.modules.searchEngine.SearchResponse;
-import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchFacetField;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchFacetField.BaseCount;
 import edu.cornell.mannlib.vitro.webapp.searchengine.base.BaseSearchResponse;

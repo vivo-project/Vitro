@@ -5,8 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.filters;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletResponse;
-
 import org.junit.Assert;
 
 import org.junit.Test;

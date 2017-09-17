@@ -28,7 +28,6 @@ import freemarker.ext.beans.CollectionModel;
 import freemarker.ext.beans.SimpleMethodModel;
 import freemarker.ext.beans.StringModel;
 import freemarker.ext.beans.WrapperExtractor;
-import freemarker.template.Configuration;
 import freemarker.template.ObjectWrapper;
 import freemarker.template.SimpleScalar;
 import freemarker.template.Template;

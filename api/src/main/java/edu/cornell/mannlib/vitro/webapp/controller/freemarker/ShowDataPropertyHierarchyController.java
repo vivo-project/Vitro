@@ -84,7 +84,7 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
             pgDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getPropertyGroupDao();
             dDao = vreq.getUnfilteredAssertionsWebappDaoFactory().getDatatypeDao();
 
-            String json = new String();
+            StringBuilder json = new StringBuilder();
 
             String ontologyUri = vreq.getParameter("ontologyUri");
             String startPropertyUri = vreq.getParameter("propertyUri");
@@ -111,23 +111,23 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
                     String notFoundMessage = "<strong>No data properties found.</strong>"; 
                     dp.setName(notFoundMessage);
                     dp.setName(notFoundMessage);
-                    json += addDataPropertyDataToResultsList(dp, 0, ontologyUri, counter);
+                    json.append(addDataPropertyDataToResultsList(dp, 0, ontologyUri, counter));
                 } else {
                     while (rootIt.hasNext()) {
                         DataProperty root = rootIt.next();
                         if ( (ontologyUri==null) || ( (ontologyUri!=null) && (root.getNamespace()!=null) && (ontologyUri.equals(root.getNamespace())) ) ) {
-                    	    json += addChildren(root, 0, ontologyUri, counter, vreq);
+                    	    json.append(addChildren(root, 0, ontologyUri, counter, vreq));
                     	    counter += 1;
                 	    }
                     }	
                     int length = json.length();
                     if ( length > 0 ) {
-                        json += " }"; 
+                        json.append(" }");
                     }
                 }
             }
 
-            body.put("jsonTree",json);
+            body.put("jsonTree", json.toString());
         
         } catch (Throwable t) {
             t.printStackTrace();
@@ -142,8 +142,8 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
     	}
         String details = addDataPropertyDataToResultsList(parent, position, ontologyUri, counter);
         int length = details.length();
-        String leaves = "";
-        leaves += details;
+        StringBuilder leaves = new StringBuilder();
+        leaves.append(details);
         List<String> childURIstrs = dpDao.getSubPropertyURIs(parent.getURI());
         if ( (childURIstrs.size() > 0) && (position < MAXDEPTH) ) {
             List<DataProperty> childProps = new ArrayList<DataProperty>();
@@ -157,22 +157,24 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
             Iterator<DataProperty> childPropIt = childProps.iterator();
             while (childPropIt.hasNext()) {
                 DataProperty child = childPropIt.next();
-                leaves += addChildren(child, position+1, ontologyUri, counter, vreq);
+                leaves.append(addChildren(child, position + 1, ontologyUri, counter, vreq));
                 if (!childPropIt.hasNext()) {
                     if ( ontologyUri == null ) {
-                        leaves += " }] ";
+                        leaves.append(" }] ");
                     }
                     else if ( ontologyUri != null && length > 0 ) {
                         // need this for when we show the classes associated with an ontology
                         String ending = leaves.substring(leaves.length() - 2, leaves.length());
-                        if ( ending.equals("] ") ) {
-                            leaves += "}]";
-                        }
-                        else if  ( ending.equals(" [") ){
-                            leaves += "] ";
-                        }
-                        else {
-                            leaves += "}]";
+                        switch (ending) {
+                            case "] ":
+                                leaves.append("}]");
+                                break;
+                            case " [":
+                                leaves.append("] ");
+                                break;
+                            default:
+                                leaves.append("}]");
+                                break;
                         }
                     }
                 }
@@ -180,13 +182,13 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
         }
         else {
             if ( ontologyUri == null ) {
-                 leaves += "] ";
+                 leaves.append("] ");
             }
             else if ( ontologyUri != null && length > 0 ) {
-                 leaves += "] ";
+                 leaves.append("] ");
             }
         }
-        return leaves;
+        return leaves.toString();
     }
 
     private String addDataPropertyDataToResultsList(DataProperty dp, int position, String ontologyUri, int counter) {

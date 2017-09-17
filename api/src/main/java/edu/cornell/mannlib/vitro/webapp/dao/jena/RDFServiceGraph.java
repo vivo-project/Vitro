@@ -87,12 +87,11 @@ public class RDFServiceGraph implements GraphWithPerform {
         performAdd(arg0);
     }
     
-    private String serialize(Triple t) {
-        StringBuffer sb = new StringBuffer();
-        sb.append(sparqlNodeUpdate(t.getSubject(), "")).append(" ") 
+    private StringBuilder serialize(StringBuilder sb, Triple t) {
+        sb.append(sparqlNodeUpdate(t.getSubject(), "")).append(" ")
                .append(sparqlNodeUpdate(t.getPredicate(), "")).append(" ") 
                .append(sparqlNodeUpdate(t.getObject(), "")).append(" .");
-        return sb.toString();
+        return sb;
     }
         
     private synchronized void flush() {                                
@@ -117,12 +116,12 @@ public class RDFServiceGraph implements GraphWithPerform {
     }
     
     private synchronized String serializeGraph(Graph graph) {
-        String triples = "";
+        StringBuilder sb = new StringBuilder();
         Iterator<Triple> tripIt = graph.find(null, null, null);
         while(tripIt.hasNext()) {
-            triples += " \n" + serialize(tripIt.next());
+            serialize(sb.append(" \n"), tripIt.next());
         }
-        return triples;
+        return sb.toString();
     }
     
     @Override
@@ -132,7 +131,7 @@ public class RDFServiceGraph implements GraphWithPerform {
         } else {
             ChangeSet changeSet = rdfService.manufactureChangeSet();
             try {
-                changeSet.addAddition(RDFServiceUtils.toInputStream(serialize(t)),
+                changeSet.addAddition(RDFServiceUtils.toInputStream(serialize(new StringBuilder(), t).toString()),
                         RDFService.ModelSerializationFormat.N3, graphURI);
                 rdfService.changeSetUpdate(changeSet);
             } catch (RDFServiceException rdfse) {
@@ -156,7 +155,7 @@ public class RDFServiceGraph implements GraphWithPerform {
         } else {
             ChangeSet changeSet = rdfService.manufactureChangeSet();
             try {
-                changeSet.addRemoval(RDFServiceUtils.toInputStream(serialize(t)),
+                changeSet.addRemoval(RDFServiceUtils.toInputStream(serialize(new StringBuilder(), t).toString()),
                         RDFService.ModelSerializationFormat.N3, graphURI);
                 rdfService.changeSetUpdate(changeSet);
             } catch (RDFServiceException rdfse) {
@@ -221,9 +220,9 @@ public class RDFServiceGraph implements GraphWithPerform {
 				|| (object != null && object.isBlank())) {
             return false;
         }
-        StringBuffer containsQuery = new StringBuffer("SELECT * WHERE { \n");
+        StringBuilder containsQuery = new StringBuilder("SELECT * WHERE { \n");
         if (graphURI != null) {
-            containsQuery.append("  GRAPH <" + graphURI + "> { ");
+            containsQuery.append("  GRAPH <").append(graphURI).append("> { ");
         }
         containsQuery.append(sparqlNode(subject, "?s"))
         .append(" ")
@@ -283,7 +282,7 @@ public class RDFServiceGraph implements GraphWithPerform {
         } else if (node.isBlank()) {
             return "<fake:blank>"; // or throw exception?
         } else if (node.isURI()) {
-            StringBuffer uriBuff = new StringBuffer();
+            StringBuilder uriBuff = new StringBuilder();
             return uriBuff.append("<").append(node.getURI()).append(">").toString();
         } else if (node.isLiteral()) {
             StringBuffer literalBuff = new StringBuffer();
@@ -326,9 +325,9 @@ public class RDFServiceGraph implements GraphWithPerform {
                 return WrappedIterator.create(Collections.<Triple>emptyIterator());
             }
         }
-        StringBuffer findQuery = new StringBuffer("SELECT * WHERE { \n");
+        StringBuilder findQuery = new StringBuilder("SELECT * WHERE { \n");
         if (graphURI != null) {
-            findQuery.append("  GRAPH <" + graphURI + "> { ");
+            findQuery.append("  GRAPH <").append(graphURI).append("> { ");
         }
         findQuery.append(sparqlNode(subject, "?s"))
         .append(" ")

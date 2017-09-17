@@ -3,8 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.web.jsptags;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
@@ -13,9 +11,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
-import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * This tag will build an option list for individuals of a VClass.

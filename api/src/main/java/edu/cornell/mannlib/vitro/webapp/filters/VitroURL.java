@@ -7,6 +7,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -130,9 +131,7 @@ class VitroURL {
         }
         // TODO: rewrite the chunk above with lists in mind. 
         List<String> strList = new ArrayList<String>();
-        for (int i=0; i<splitStr.length; i++) {
-            strList.add(splitStr[i]);
-        }
+        Collections.addAll(strList, splitStr);
         return strList;
     }   
     
@@ -238,7 +237,7 @@ class VitroURL {
     }
     
     public String toString() {
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
             try {
             if (this.protocol != null) {
                 out.append(this.protocol);

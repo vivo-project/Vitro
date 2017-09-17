@@ -87,12 +87,12 @@ public class GadgetController extends FreemarkerHttpServlet {
         
         try {
 	        OpenSocialManager openSocialManager = new OpenSocialManager(vreq, "gadgetSandbox");
-	        String gadgetURLS = "";
+	        StringBuilder gadgetURLS = new StringBuilder();
 	        for (GadgetSpec gadget : openSocialManager.getAllDBGadgets(false).values())
 	        {
-	            gadgetURLS += gadget.getGadgetURL() + System.getProperty("line.separator");
+	            gadgetURLS.append(gadget.getGadgetURL()).append(System.getProperty("line.separator"));
 	        }
-	        body.put("gadgetURLS", gadgetURLS);
+	        body.put("gadgetURLS", gadgetURLS.toString());
 	        body.put(OpenSocialManager.TAG_NAME, openSocialManager);
         } catch (IOException e) {
             log.error("IOException in doTemplate()", e);

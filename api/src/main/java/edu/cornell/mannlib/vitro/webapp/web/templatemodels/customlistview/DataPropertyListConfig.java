@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.web.templatemodels.customlistview;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +17,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DataPropertyTemplateModel;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DataPropertyTemplateModel.ConfigError;
 import freemarker.cache.TemplateLoader;
-import freemarker.template.Configuration;
 
 public class DataPropertyListConfig {  
     private static final Log log = LogFactory.getLog(DataPropertyListConfig.class);

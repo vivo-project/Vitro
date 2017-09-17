@@ -1,7 +1,6 @@
 /* $This file is distributed under the terms of the license in LICENSE$ */
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.fields;
 
-import java.text.Collator;
 import java.util.Comparator;
 
 import org.apache.commons.logging.Log;
@@ -75,7 +74,7 @@ public class IndividualsViaObjectPropertyByRankOptions extends IndividualsViaObj
         	int displayRank1 = getDisplayRank(ind1);
         	int displayRank2 = getDisplayRank(ind2);
         	//Get display ranks 
-        	return (displayRank1 > displayRank2 ? 1: (displayRank1 == displayRank2? 0: -1));
+        	return (Integer.compare(displayRank1, displayRank2));
         	//TODO: Incorporate sparql query here to retrieve the ranks
         	//This qualifies as neither a data property or an object property so will need to access
         	//using sparql query

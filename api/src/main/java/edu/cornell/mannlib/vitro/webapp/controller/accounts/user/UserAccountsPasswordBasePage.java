@@ -121,8 +121,7 @@ public abstract class UserAccountsPasswordBasePage extends UserAccountsPage {
 						+ "' when already logged in as '" + currentUserEmail
 						+ "'");
 				bogusMessage = alreadyLoggedInMessage(currentUserEmail);
-				return;
-			}
+            }
 		}
 	}
 

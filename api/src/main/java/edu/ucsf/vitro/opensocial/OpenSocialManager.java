@@ -263,12 +263,11 @@ public class OpenSocialManager {
 	}
 
 	public String getIdToUrlMapJavascript() {
-		String retval = "var idToUrlMap = {";
+		StringBuilder retval = new StringBuilder("var idToUrlMap = {");
 		for (PreparedGadget gadget : gadgets) {
 			// retval += gadget.GetAppId() + ":'" + gadget.GetGadgetURL() +
 			// "', ";
-			retval += "'remote_iframe_" + gadget.getAppId() + "':'"
-					+ gadget.getGadgetURL() + "', ";
+			retval.append("'remote_iframe_").append(gadget.getAppId()).append("':'").append(gadget.getGadgetURL()).append("', ");
 		}
 		return retval.substring(0, retval.length() - 2) + "};";
 	}
@@ -340,15 +339,15 @@ public class OpenSocialManager {
 
 		// Receive the encoded content.
 		int bytes = 0;
-		String page = "";
+		StringBuilder page = new StringBuilder();
 		byte[] bytesReceived = new byte[256];
 
 		// The following will block until the page is transmitted.
 		while ((bytes = s.getInputStream().read(bytesReceived)) > 0) {
-			page += new String(bytesReceived, 0, bytes);
+			page.append(new String(bytesReceived, 0, bytes));
 		};
 
-		return page;
+		return page.toString();
 	}
 	
 	public String getContainerJavascriptSrc() {
@@ -359,38 +358,29 @@ public class OpenSocialManager {
 
 	public String getGadgetJavascript() {
 		String lineSeparator = System.getProperty("line.separator");
-		String gadgetScriptText = "var my = {};" + lineSeparator
+		StringBuilder gadgetScriptText = new StringBuilder("var my = {};" + lineSeparator
 				+ "my.gadgetSpec = function(appId, name, url, secureToken, view, chrome_id, opt_params, visible_scope) {"
 				+ lineSeparator + "this.appId = appId;" + lineSeparator
 				+ "this.name = name;" + lineSeparator + "this.url = url;"
 				+ lineSeparator + "this.secureToken = secureToken;"
 				+ lineSeparator + "this.view = view || 'default';"
-				+ lineSeparator + "this.chrome_id = chrome_id;" 
+				+ lineSeparator + "this.chrome_id = chrome_id;"
 				+ lineSeparator + "this.opt_params = opt_params;" + lineSeparator
 				+ "this.visible_scope = visible_scope;" + lineSeparator + "};"
-				+ lineSeparator + "my.pubsubData = {};" + lineSeparator;
+				+ lineSeparator + "my.pubsubData = {};" + lineSeparator);
 		for (String key : getPubsubData().keySet()) {
-			gadgetScriptText += "my.pubsubData['" + key + "'] = '"
-					+ getPubsubData().get(key) + "';" + lineSeparator;
+			gadgetScriptText.append("my.pubsubData['").append(key).append("'] = '").append(getPubsubData().get(key)).append("';").append(lineSeparator);
 		}
-		gadgetScriptText += "my.openSocialURL = '"
-				+ configuration.getProperty(SHINDIG_URL_PROP) + "';"
-				+ lineSeparator + "my.debug = " + (isDebug() ? "1" : "0") + ";"
-				+ lineSeparator + "my.noCache = " + (noCache() ? "1" : "0")
-				+ ";" + lineSeparator + "my.gadgets = [";
+		gadgetScriptText.append("my.openSocialURL = '").append(configuration.getProperty(SHINDIG_URL_PROP)).append("';").append(lineSeparator).append("my.debug = ").append(isDebug() ? "1" : "0").append(";").append(lineSeparator).append("my.noCache = ").append(noCache() ? "1" : "0").append(";").append(lineSeparator).append("my.gadgets = [");
 		for (PreparedGadget gadget : getVisibleGadgets()) {
-			gadgetScriptText += "new my.gadgetSpec(" + gadget.getAppId() + ",'"
-					+ gadget.getName() + "','" + gadget.getGadgetURL() + "','"
-					+ gadget.getSecurityToken() + "','" + gadget.getView()
-					+ "','" + gadget.getChromeId() + "'," + gadget.getOptParams() + ",'"
-					+ gadget.getGadgetSpec().getVisibleScope() + "'), ";
+			gadgetScriptText.append("new my.gadgetSpec(").append(gadget.getAppId()).append(",'").append(gadget.getName()).append("','").append(gadget.getGadgetURL()).append("','").append(gadget.getSecurityToken()).append("','").append(gadget.getView()).append("','").append(gadget.getChromeId()).append("',").append(gadget.getOptParams()).append(",'").append(gadget.getGadgetSpec().getVisibleScope()).append("'), ");
 		}
-		gadgetScriptText = gadgetScriptText.substring(0,
+		gadgetScriptText = new StringBuilder(gadgetScriptText.substring(0,
 				gadgetScriptText.length() - 2)
 				+ "];"
-				+ lineSeparator;
+				+ lineSeparator);
 
-		return gadgetScriptText;
+		return gadgetScriptText.toString();
 	}
 	
 	Map<String, GadgetSpec> getAllDBGadgets(boolean useCache) throws SQLException 

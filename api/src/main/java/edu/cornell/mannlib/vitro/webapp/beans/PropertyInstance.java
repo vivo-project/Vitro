@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
-import java.util.Date;
-
 /**
    Represents a Vitro object property instance.  It includes values
    from the entities, object property statements, properties, and ent2relationships tables

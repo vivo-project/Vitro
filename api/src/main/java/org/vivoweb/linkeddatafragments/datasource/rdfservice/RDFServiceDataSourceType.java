@@ -5,8 +5,6 @@ import org.linkeddatafragments.datasource.IDataSource;
 import org.linkeddatafragments.datasource.IDataSourceType;
 import org.linkeddatafragments.exceptions.DataSourceCreationException;
 
-import java.io.File;
-
 /**
  * The type of Triple Pattern Fragment data sources that are backed by
  * a Jena TDB instance.

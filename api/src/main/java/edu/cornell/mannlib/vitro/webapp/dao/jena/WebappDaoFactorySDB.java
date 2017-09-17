@@ -21,7 +21,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryConfig;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelNames;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
-import edu.cornell.mannlib.vitro.webapp.servlet.setup.SimpleReasonerSetup;
 
 public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	 
@@ -115,7 +114,7 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	
 	public static String getFilterBlock(String[] graphVars, 
 	                                    SDBDatasetMode datasetMode) {
-	    StringBuffer filterBlock = new StringBuffer();
+	    StringBuilder filterBlock = new StringBuilder();
 	    for (int i = 0; i < graphVars.length; i++) {
 	        switch (datasetMode) {
 	            case ASSERTIONS_ONLY :  

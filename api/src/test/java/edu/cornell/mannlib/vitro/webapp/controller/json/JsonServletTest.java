@@ -11,7 +11,6 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.log4j.Level;
@@ -214,8 +213,6 @@ public class JsonServletTest extends AbstractTestClass {
 			JsonNode result = mapper.readTree(resp.getOutput());
 			assertEquals("errorMessage", expected, getFieldValue(result, "errorMessage").asText());
 			assertEquals("status", SC_INTERNAL_SERVER_ERROR, resp.getStatus());
-		} catch (JsonProcessingException e) {
-			fail(e.toString());
 		} catch (IOException e) {
 			fail(e.toString());
 		}
@@ -233,8 +230,6 @@ public class JsonServletTest extends AbstractTestClass {
 			assertEquals("vclass uri", vclassId, getFieldValue(vclassObj, "URI").asText());
 
 			assertEquals("status", SC_OK, resp.getStatus());
-		} catch (JsonProcessingException e) {
-			fail(e.toString());
 		} catch (IOException e) {
 			fail(e.toString());
 		}

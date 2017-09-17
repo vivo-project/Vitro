@@ -83,7 +83,7 @@ public class ResultSetIterators {
 		public static Node toNode(RDFNode rdfNode) {
 			if (rdfNode.isAnon()) {
 				Resource a = rdfNode.asResource();
-				return NodeFactory.createAnon();
+				return NodeFactory.createBlankNode();
 			}
 			if (rdfNode.isLiteral()) {
 				Literal l = rdfNode.asLiteral();

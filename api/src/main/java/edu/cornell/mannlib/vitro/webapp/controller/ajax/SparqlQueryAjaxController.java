@@ -61,8 +61,7 @@ public class SparqlQueryAjaxController extends VitroAjaxController {
 			String queryParam = locateQueryParam(vreq);
 			Query query = SparqlUtils.createQuery(queryParam);
 			SparqlUtils.executeQuery(response, query, model);
-			return;
-		} catch (AjaxControllerException e) {
+        } catch (AjaxControllerException e) {
 			log.error(e.getMessage());
 			response.sendError(e.getStatusCode());
 		}

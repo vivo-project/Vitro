@@ -333,12 +333,9 @@ public class GroupedPropertyList extends BaseTemplateModel {
 								possibleOP.getURI(),
 								fudgeBlankNodeInRange(possibleOP.getRangeVClassURI())))) {
 			return true;
-		} else if (!(possibleOP instanceof FauxObjectPropertyWrapper) && 
-			         populatedOP.getURI().equals(possibleOP.getURI())) { // If not faux property, ignore range difference
-			return true;
-		} else {
-			return false;
-		}
+		} else // If not faux property, ignore range difference
+            return !(possibleOP instanceof FauxObjectPropertyWrapper) &&
+                    populatedOP.getURI().equals(possibleOP.getURI());
     }
 	
 	private String fudgeBlankNodeInDomain(String rawDomainUri) {

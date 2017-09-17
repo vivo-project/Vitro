@@ -35,12 +35,10 @@ import org.apache.jena.vocabulary.OWL;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.controller.freemarker.IndividualListController;
 import edu.cornell.mannlib.vitro.webapp.dao.DisplayVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupsForRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.VClassGroupCache;
-import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchQueryUtils;
 
 
 public class DataGetterUtils {

@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,7 +21,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServ
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 
 /**

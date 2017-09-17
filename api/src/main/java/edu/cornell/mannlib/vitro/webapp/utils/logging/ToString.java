@@ -127,7 +127,7 @@ public class ToString {
 	}
 
 	public static boolean isVitroClass(Object o) {
-		return (o == null) ? false : o.getClass().getName()
+		return (o != null) && o.getClass().getName()
 				.startsWith("edu.cornell");
 	}
 

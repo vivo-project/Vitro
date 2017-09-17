@@ -50,60 +50,60 @@ public class ListClassGroupsController extends FreemarkerHttpServlet {
 
             List<VClassGroup> groups = dao.getPublicGroupsWithVClasses(); 
 
-            String json = new String();
+            StringBuilder json = new StringBuilder();
             int counter = 0;
 
             if (groups != null) {
             	for(VClassGroup vcg: groups) {
                     if ( counter > 0 ) {
-                        json += ", ";
+                        json.append(", ");
                     }
                     String publicName = vcg.getPublicName();
                     if ( StringUtils.isBlank(publicName) ) {
                         publicName = "(unnamed group)";
                     }           
                     try {
-                        json += "{ \"name\": " + JacksonUtils.quote("<a href='./editForm?uri="+URLEncoder.encode(vcg.getURI())+"&amp;controller=Classgroup'>"+publicName+"</a>") + ", ";
+                        json.append("{ \"name\": ").append(JacksonUtils.quote("<a href='./editForm?uri=" + URLEncoder.encode(vcg.getURI()) + "&amp;controller=Classgroup'>" + publicName + "</a>")).append(", ");
                     } catch (Exception e) {
-                        json += "{ \"name\": " + JacksonUtils.quote(publicName) + ", ";
+                        json.append("{ \"name\": ").append(JacksonUtils.quote(publicName)).append(", ");
                     }
                     Integer t;
                     
-                    json += "\"data\": { \"displayRank\": \"" + (((t = Integer.valueOf(vcg.getDisplayRank())) != -1) ? t.toString() : "") + "\"}, ";
+                    json.append("\"data\": { \"displayRank\": \"").append(((t = Integer.valueOf(vcg.getDisplayRank())) != -1) ? t.toString() : "").append("\"}, ");
                     
                     List<VClass> classList = vcg.getVitroClassList();
                     if (classList != null && classList.size()>0) {
-                        json += "\"children\": [";
+                        json.append("\"children\": [");
                         Iterator<VClass> classIt = classList.iterator();
                         while (classIt.hasNext()) {
                             VClass vcw = classIt.next();
                             if (vcw.getName() != null && vcw.getURI() != null) {
                                 try {
-                                    json += "{ \"name\": " + JacksonUtils.quote("<a href='vclassEdit?uri="+URLEncoder.encode(vcw.getURI())+"'>"+vcw.getName()+"</a>") + ", ";
+                                    json.append("{ \"name\": ").append(JacksonUtils.quote("<a href='vclassEdit?uri=" + URLEncoder.encode(vcw.getURI()) + "'>" + vcw.getName() + "</a>")).append(", ");
                                 } catch (Exception e) {
-                                    json += "" + JacksonUtils.quote(vcw.getName()) + ", ";
+                                    json.append("").append(JacksonUtils.quote(vcw.getName())).append(", ");
                                 }
                             } else {
-                                json += "\"\", ";
+                                json.append("\"\", ");
                             }
 
                             String shortDefStr = (vcw.getShortDef() == null) ? "" : vcw.getShortDef();
-                            json += "\"data\": { \"shortDef\": " + JacksonUtils.quote(shortDefStr) + "}, \"children\": [] ";
+                            json.append("\"data\": { \"shortDef\": ").append(JacksonUtils.quote(shortDefStr)).append("}, \"children\": [] ");
                             if (classIt.hasNext())
-                                json += "} , ";
+                                json.append("} , ");
                             else 
-                                json += "}] ";
+                                json.append("}] ");
                         }
                     }
                     else {
-                        json += "\"children\": [] ";
+                        json.append("\"children\": [] ");
                     }
-                    json += "} ";
+                    json.append("} ");
                     counter += 1;
                 }
             }
 
-            body.put("jsonTree",json);
+            body.put("jsonTree", json.toString());
 
         } catch (Throwable t) {
                 t.printStackTrace();

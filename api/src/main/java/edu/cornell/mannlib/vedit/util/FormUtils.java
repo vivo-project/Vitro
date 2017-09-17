@@ -226,7 +226,7 @@ public class FormUtils {
             Option sOpt = new Option();
             sOpt.setValue(selectedValue);
             if (selectedBody == null || selectedBody.length() == 0)
-                sOpt.setBody(selectedValue.toString());
+                sOpt.setBody(selectedValue);
             else
                 sOpt.setBody(selectedBody);
             sOpt.setSelected(true);

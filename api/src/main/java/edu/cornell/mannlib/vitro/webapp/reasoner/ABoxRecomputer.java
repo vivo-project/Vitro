@@ -498,14 +498,12 @@ public class ABoxRecomputer {
     protected void addInferenceStatementsFor(String individualUri, Model addTo) throws RDFServiceException {
         StringBuilder builder = new StringBuilder();
         builder.append("CONSTRUCT\n")
-                .append("{\n")
-                .append("   <" + individualUri + "> ?p ?o .\n")
+                .append("{\n").append("   <").append(individualUri).append("> ?p ?o .\n")
                 .append("}\n")
                 .append("WHERE\n")
                 .append("{\n")
                 .append("   GRAPH <").append(ModelNames.ABOX_INFERENCES).append(">\n")
-                .append("   {\n")
-                .append("       <" + individualUri + "> ?p ?o .\n")
+                .append("   {\n").append("       <").append(individualUri).append("> ?p ?o .\n")
                 .append("   }\n")
                 .append("}\n");
 
@@ -563,10 +561,8 @@ public class ABoxRecomputer {
                     .append("   ?object\n")
                     .append("WHERE {\n")
                     .append("    GRAPH ?g { \n")
-                    .append("        {\n")
-                    .append("            <" + individualUri + "> <" + OWL.sameAs + "> ?object .\n")
-                    .append("        } UNION {\n")
-                    .append("            ?object <" + OWL.sameAs + "> <" + individualUri + "> .\n")
+                    .append("        {\n").append("            <").append(individualUri).append("> <").append(OWL.sameAs).append("> ?object .\n")
+                    .append("        } UNION {\n").append("            ?object <").append(OWL.sameAs).append("> <").append(individualUri).append("> .\n")
                     .append("        }\n")
                     .append("    } \n")
                     .append("    FILTER (?g != <" + ModelNames.ABOX_INFERENCES + ">)\n") 

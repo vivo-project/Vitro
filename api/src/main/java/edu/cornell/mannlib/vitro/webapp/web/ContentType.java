@@ -614,7 +614,7 @@ public class ContentType implements Serializable {
  @Override
  public String toString() {
 
-   StringBuffer sb = new StringBuffer();
+   StringBuilder sb = new StringBuilder();
    sb.append(type);
    sb.append("/");
    sb.append(subType);
@@ -632,7 +632,7 @@ public class ContentType implements Serializable {
      if (tokenMatcher.matches()) {
        sb.append(value);
      } else {
-       sb.append("\"" + value + "\"");
+       sb.append("\"").append(value).append("\"");
      }
    }
    return sb.toString();

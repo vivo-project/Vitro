@@ -3,6 +3,8 @@
 package edu.cornell.mannlib.vedit.validator.impl;
 
 import edu.cornell.mannlib.vedit.validator.*;
+
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -17,17 +19,17 @@ public class EnumValuesValidator implements Validator {
         } else {
             vo.setValid(false);
             if (legalValues.size()<7){
-                String msgString = "Please enter one of ";
+                StringBuilder msgString = new StringBuilder("Please enter one of ");
                 Iterator valuesIt = legalValues.iterator();
                 while (valuesIt.hasNext()) {
                     String legalValue = (String) valuesIt.next();
-                    msgString += "'"+legalValue+"'";
+                    msgString.append("'").append(legalValue).append("'");
                     if (valuesIt.hasNext())
-                        msgString += ", ";
+                        msgString.append(", ");
                     else
-                        msgString += ".";
+                        msgString.append(".");
                 }
-                vo.setMessage(msgString);
+                vo.setMessage(msgString.toString());
             }
             else {
                 vo.setMessage("Please enter a legal value.");
@@ -38,7 +40,6 @@ public class EnumValuesValidator implements Validator {
     }
 
     public EnumValuesValidator (String[] legalValues){
-        for (int i=0; i<legalValues.length; i++)
-            this.legalValues.add(legalValues[i]);
+        Collections.addAll(this.legalValues, legalValues);
     }
 }

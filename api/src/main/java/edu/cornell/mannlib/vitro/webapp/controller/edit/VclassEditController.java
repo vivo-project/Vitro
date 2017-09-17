@@ -179,7 +179,7 @@ public class VclassEditController extends BaseEditController {
         foo.setOptionLists(OptionMap);
         epo.setFormObject(foo);
 
-        boolean instantiable = (vcl.getURI().equals(OWL.Nothing.getURI())) ? false : true;
+        boolean instantiable = !vcl.getURI().equals(OWL.Nothing.getURI());
         
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("vclassWebapp", vcl);

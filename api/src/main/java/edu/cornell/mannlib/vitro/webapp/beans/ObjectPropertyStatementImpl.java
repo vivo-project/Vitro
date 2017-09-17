@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.beans;
 
 import java.util.Comparator;
-import java.util.Date;
 
 /**
  * a class representing a particular instance of an object property

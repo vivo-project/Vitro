@@ -22,11 +22,6 @@ import java.util.Set;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
-import stubs.javax.servlet.ServletContextStub;
-import stubs.javax.servlet.http.HttpServletRequestStub;
-import stubs.javax.servlet.http.HttpSessionStub;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
 

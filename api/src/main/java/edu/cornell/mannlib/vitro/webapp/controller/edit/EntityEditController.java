@@ -95,7 +95,7 @@ public class EntityEditController extends BaseEditController {
         }
         results.add(rName);
         
-        String classStr = "";
+        StringBuilder classStr = new StringBuilder();
         List<VClass> classList = inferredEnt.getVClasses(false);
         sortForPickList(classList, vreq);
         if (classList != null) {
@@ -109,13 +109,13 @@ public class EntityEditController extends BaseEditController {
 	            } catch (Exception e) {
 	                rClassName = vc.getLocalNameWithPrefix();
 	            }
-	            classStr += rClassName;
+	            classStr.append(rClassName);
 	            if (classIt.hasNext()) {
-	            	classStr += ", ";
+	            	classStr.append(", ");
 	            }
 	        }
         }
-        results.add(classStr);
+        results.add(classStr.toString());
                 
 		results.add(ent.getHiddenFromDisplayBelowRoleLevel() == null ? "unspecified"
 				: ent.getHiddenFromDisplayBelowRoleLevel().getDisplayLabel());
@@ -147,7 +147,7 @@ public class EntityEditController extends BaseEditController {
                 Iterator<DataPropertyStatement> externalIdIt = ent.getExternalIds().iterator();
                 while (externalIdIt.hasNext()) {
                     DataPropertyStatement eid = externalIdIt.next();
-                    String multiplexedString = new String ("DatapropURI:" + new String(Base64.encodeBase64(eid.getDatapropURI().getBytes())) + ";" + "Data:" + new String(Base64.encodeBase64(eid.getData().getBytes())));
+                    String multiplexedString = "DatapropURI:" + new String(Base64.encodeBase64(eid.getDatapropURI().getBytes())) + ";" + "Data:" + new String(Base64.encodeBase64(eid.getData().getBytes()));
                     externalIdOptionList.add(new Option(multiplexedString, eid.getData()));
                 }
             }
@@ -172,7 +172,7 @@ public class EntityEditController extends BaseEditController {
             Iterator<PropertyInstance> epiIt = epiColl.iterator();
             while (epiIt.hasNext()) {
                 PropertyInstance pi = epiIt.next();
-                String multiplexedString = new String ("PropertyURI:" + new String(Base64.encodeBase64(pi.getPropertyURI().getBytes())) + ";" + "ObjectEntURI:" + new String(Base64.encodeBase64(pi.getObjectEntURI().getBytes())));
+                String multiplexedString = "PropertyURI:" + new String(Base64.encodeBase64(pi.getPropertyURI().getBytes())) + ";" + "ObjectEntURI:" + new String(Base64.encodeBase64(pi.getObjectEntURI().getBytes()));
                 epiOptionList.add(new Option(multiplexedString, pi.getDomainPublic()+" "+pi.getObjectName()));
             }
             OptionMap.put("ExistingPropertyInstances", epiOptionList);

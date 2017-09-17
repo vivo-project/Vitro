@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.web.templatemodels;
 
-import java.lang.reflect.Method;
 import java.util.LinkedHashSet;
 
 import freemarker.ext.beans.MethodAppearanceFineTuner;

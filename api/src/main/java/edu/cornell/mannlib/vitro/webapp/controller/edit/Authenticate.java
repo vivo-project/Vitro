@@ -351,8 +351,7 @@ public class Authenticate extends VitroHttpServlet {
 				// This should have been caught by isUserPermittedToLogin()
 				bean.setMessage(request, ERROR,
 						"logins_disabled_for_maintenance");
-				return;
-			}
+            }
 		}
 	}
 
@@ -413,8 +412,7 @@ public class Authenticate extends VitroHttpServlet {
 		} catch (LoginNotPermitted e) {
 			// This should have been caught by isUserPermittedToLogin()
 			bean.setMessage(request, ERROR, "logins_disabled_for_maintenance");
-			return;
-		}
+        }
 	}
 
 	/**
@@ -497,8 +495,7 @@ public class Authenticate extends VitroHttpServlet {
 		String loginProcessPage = LoginProcessBean.getBean(vreq)
 				.getLoginPageUrl();
 		response.sendRedirect(loginProcessPage);
-		return;
-	}
+    }
 
 	/**
 	 * Exit: user has completed the login. Redirect appropriately and clear the

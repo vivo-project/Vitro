@@ -171,7 +171,7 @@ public class KnowledgeBaseUpdater {
             if(sparqlFile.isDirectory()) {
                 continue;
             }
-            StringBuffer fileContents = new StringBuffer();
+            StringBuilder fileContents = new StringBuilder();
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(sparqlFile));
                 String ln;
@@ -371,7 +371,7 @@ public class KnowledgeBaseUpdater {
 			throw new RuntimeException("SPARQL file not found at " + filePath);
 		}
 		BufferedReader reader = new BufferedReader(new FileReader(file));
-		StringBuffer fileContents = new StringBuffer();
+		StringBuilder fileContents = new StringBuilder();
 		String ln;		
 		while ((ln = reader.readLine()) != null) {
 			fileContents.append(ln).append('\n');

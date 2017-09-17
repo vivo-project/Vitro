@@ -152,10 +152,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
         DataProperty dp = wdf.getDataPropertyDao().getDataPropertyByURI(
                 editConfig.getPredicateUri());
         if (dp != null) {
-            if (dp.getDisplayLimit() == 1 /* || dp.isFunctional() */)
-                return false;
-            else
-                return true;
+			return dp.getDisplayLimit() != 1;
         }
         return false;
 
@@ -231,10 +228,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	        	 Collections.sort(newValue);
 	         }
 	         if (orgValue != null && newValue != null) {
-	             if (orgValue.equals(newValue))
-	                 return false;
-	             else
-	                 return true;
+				 return !orgValue.equals(newValue);
 	         }
 
 	         List<Literal> orgLit = editConfig.getLiteralsInScope().get(fieldName);

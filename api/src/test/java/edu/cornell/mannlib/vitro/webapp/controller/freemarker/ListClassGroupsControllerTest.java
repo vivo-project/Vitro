@@ -16,6 +16,8 @@ import stubs.edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactoryStub;
 import stubs.edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccessFactoryStub;
 import stubs.javax.servlet.http.HttpServletRequestStub;
 
+import java.util.Collections;
+
 /**
  * Not a well-formed set of unit tests. But it's a pretty good exercise of the
  * different possibilities in the output stage.
@@ -132,9 +134,7 @@ public class ListClassGroupsControllerTest extends ListControllerTestBase {
 	private VClassGroup vClassGroup(String uri, String name, int rank,
 			VClass... vClasses) {
 		VClassGroup group = new VClassGroup(uri, name, rank);
-		for (VClass vClass : vClasses) {
-			group.add(vClass);
-		}
+		Collections.addAll(group, vClasses);
 		return group;
 	}
 

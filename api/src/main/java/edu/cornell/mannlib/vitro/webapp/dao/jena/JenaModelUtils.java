@@ -261,14 +261,13 @@ public class JenaModelUtils {
                             Resource property) {
         dataset.getLock().enterCriticalSection(Lock.READ);
         try {
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             buff.append("PREFIX afn: <http://jena.apache.org/ARQ/function#> \n")
-            .append("CONSTRUCT { \n")
-            .append("  ?res <" + property.getURI() + "> ?o } WHERE { \n");
+                    .append("CONSTRUCT { \n").append("  ?res <").append(property.getURI()).append("> ?o } WHERE { \n");
             if (graphURI != null) {
-                buff.append("    GRAPH " + graphURI + " { \n");
+                buff.append("    GRAPH ").append(graphURI).append(" { \n");
             }
-            buff.append("      ?res <" + property.getURI() + "> ?o \n");
+            buff.append("      ?res <").append(property.getURI()).append("> ?o \n");
             buff.append(getNamespaceFilter(namespace));
             if (graphURI != null) {
                 buff.append("    } \n");
@@ -292,13 +291,12 @@ public class JenaModelUtils {
         
     private String makeDescribeQueryStr( String typeURI, String namespace, String graphURI ) {
         
-        StringBuffer describeQueryStrBuff = new StringBuffer() 
+        StringBuilder describeQueryStrBuff = new StringBuilder()
             .append("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n")
             .append("PREFIX afn: <http://jena.apache.org/ARQ/function#> \n")
             .append("DESCRIBE ?res WHERE { \n");
             if (graphURI != null) {
-                describeQueryStrBuff
-                .append("GRAPH " + graphURI + "{ \n");
+                describeQueryStrBuff.append("GRAPH ").append(graphURI).append("{ \n");
             }
             describeQueryStrBuff
             .append("    ?res rdf:type <").append(typeURI).append("> . \n");
@@ -320,7 +318,7 @@ public class JenaModelUtils {
     }
     
     private String getNamespaceFilter(String namespace) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         if (namespace == null) {
             // exclude resources in the Vitro internal namespace or in the 
             // OWL namespace, but allow all others

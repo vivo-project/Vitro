@@ -256,9 +256,7 @@ public class FreemarkerEmailFactory {
 								+ factory.getSmtpHost() + "'.");
 			} catch (NotConfiguredException e) {
 				ss.info(this, e.getMessage());
-			} catch (BadPropertyValueException e) {
-				ss.warning(this, e.getMessage());
-			} catch (InvalidSmtpHost e) {
+			} catch (BadPropertyValueException | InvalidSmtpHost e) {
 				ss.warning(this, e.getMessage());
 			} catch (Exception e) {
 				ss.warning(this,

@@ -492,14 +492,18 @@ public class RefactorOperationController extends BaseEditController {
         
         if (vreq.getParameter("_cancel") == null) {
 	        if (modeStr != null) {
-	        	
-	        	if (modeStr.equals("renameResource")) {
-	        		redirectStr = doRenameResource(vreq, response, epo);
-	        	} else if (modeStr.equals("movePropertyStatements")) {
-	        		doMovePropertyStatements(vreq, response, epo);
-	        	} else if (modeStr.equals("moveInstances")) {
-	        		doMoveInstances(vreq, response, epo);
-	        	} 
+
+				switch (modeStr) {
+					case "renameResource":
+						redirectStr = doRenameResource(vreq, response, epo);
+						break;
+					case "movePropertyStatements":
+						doMovePropertyStatements(vreq, response, epo);
+						break;
+					case "moveInstances":
+						doMoveInstances(vreq, response, epo);
+						break;
+				}
 	        }
         }
         

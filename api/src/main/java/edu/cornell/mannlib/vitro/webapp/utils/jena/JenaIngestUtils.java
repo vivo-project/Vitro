@@ -18,7 +18,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.apache.jena.ontology.FunctionalProperty;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Literal;
@@ -40,7 +39,6 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class JenaIngestUtils {
@@ -262,7 +260,7 @@ public class JenaIngestUtils {
             } finally {
                 closeIt.close();
             }
-            if (duplicate == false) {
+            if (!duplicate) {
                 closeIt = model.listStatements((Resource)null, (Property)null, res);
                 try {
                     if (closeIt.hasNext()) {
@@ -808,7 +806,7 @@ public class JenaIngestUtils {
         boolean uriIsGood = false;
         int attempts = 0;
 
-        while( uriIsGood == false && attempts < 30 ){            
+        while(!uriIsGood && attempts < 30 ){
             uri = newNamespace + "n" + random.nextInt( Math.min(Integer.MAX_VALUE,(int)Math.pow(2,attempts + 13)) );            
             errMsg = wdf.checkURI(uri);
             if(  errMsg != null)

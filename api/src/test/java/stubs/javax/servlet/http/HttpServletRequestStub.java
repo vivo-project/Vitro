@@ -210,10 +210,10 @@ public class HttpServletRequestStub implements HttpServletRequest {
 			return null;
 		}
 
-		String qs = "";
+		StringBuilder qs = new StringBuilder();
 		for (String key : parameters.keySet()) {
 			for (String value : parameters.get(key)) {
-				qs += "&" + key + "=" + URLEncoder.encode(value);
+				qs.append("&").append(key).append("=").append(URLEncoder.encode(value));
 			}
 		}
 		return "?" + qs.substring(1);

@@ -2,7 +2,7 @@
 
 <%
 
-request.setAttribute("dwrDisabled", new Boolean(false));
+request.setAttribute("dwrDisabled", Boolean.FALSE);
 String context = request.getContextPath();
 
 %>

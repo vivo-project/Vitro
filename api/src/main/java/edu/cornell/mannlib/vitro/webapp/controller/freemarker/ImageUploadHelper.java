@@ -164,9 +164,6 @@ public class ImageUploadHelper {
 					fileInfo);
 
 			return fileInfo;
-		} catch (FileAlreadyExistsException e) {
-			throw new IllegalStateException("Can't create the new image file.",
-					e);
 		} catch (IOException e) {
 			throw new IllegalStateException("Can't create the new image file.",
 					e);

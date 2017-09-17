@@ -36,8 +36,6 @@ import org.apache.jena.sdb.sql.SDBConnection;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DatasetWrapper;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.StaticDatasetFactory;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.event.BulkUpdateEvent;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeListener;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ChangeSet;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
@@ -175,7 +173,7 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
                     Statement stmt = sdbConn.getSqlConnection().createStatement();
                     ResultSet rs = stmt.executeQuery("SELECT count(DISTINCT s,p,o) AS tcount FROM Quads" + (StringUtils.isEmpty(whereClause) ? "" : " WHERE " + whereClause));
                     try {
-                        while (rs.next()) {
+                        if (rs.next()) {
                             return rs.getLong("tcount");
                         }
                     } finally {

@@ -72,8 +72,8 @@ public class GetAllClasses extends BaseEditController {
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();
-		String respo = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-		respo += "<options>";
+		StringBuilder respo = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		respo.append("<options>");
 
 		while (classGroupIt.hasNext()) {
 			VClassGroup group = (VClassGroup) classGroupIt.next();
@@ -81,12 +81,10 @@ public class GetAllClasses extends BaseEditController {
 			Iterator classIt = classes.iterator();
 			while (classIt.hasNext()) {
 				VClass clazz = (VClass) classIt.next();
-				respo += "<option>" + "<key>" + clazz.getPickListName()
-						+ "</key>" + "<value>" + clazz.getURI() + "</value>"
-						+ "</option>";
+				respo.append("<option>" + "<key>").append(clazz.getPickListName()).append("</key>").append("<value>").append(clazz.getURI()).append("</value>").append("</option>");
 			}
 		}
-		respo += "</options>";
+		respo.append("</options>");
 		out.println(respo);
 		out.flush();
 		out.close();

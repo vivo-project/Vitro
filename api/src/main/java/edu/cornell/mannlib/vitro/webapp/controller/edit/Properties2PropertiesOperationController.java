@@ -102,14 +102,11 @@ public class Properties2PropertiesOperationController extends
 		        }
 		    }
 
-	    } catch (RuntimeException e) {
+	    } catch (RuntimeException | Error e) {
 	        log.error("Unable to perform edit operation: ", e);
 	        throw e;
-	    } catch (Error err) {
-	    	log.error("Unable to perform edit operation: ", err);
-	    	throw err;
 	    }
-        
+
     }
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) {

@@ -219,12 +219,12 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         ontModel.enterCriticalSection(Lock.WRITE);
         try {
          
-            entURI = new String(preferredURI);          
+            entURI = preferredURI;
             org.apache.jena.ontology.Individual test = ontModel.getIndividual(entURI);
             int count = 0;
             while (test != null) {
                 ++count;
-                entURI = new String(preferredURI) + count;
+                entURI = preferredURI + count;
                 test = ontModel.getIndividual(entURI);
             }
             
@@ -677,7 +677,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
 		
 		int attempts = 0;
 		
-		while( uriIsGood == false && attempts < 30 ){	
+		while(!uriIsGood && attempts < 30 ){
 			log.debug("While loop: Uri is good false, attempt=" + attempts);
 			String localName = "n" + random.nextInt( Math.min(Integer.MAX_VALUE,(int)Math.pow(2,attempts + 13)) );
 			uri = namespace + localName;

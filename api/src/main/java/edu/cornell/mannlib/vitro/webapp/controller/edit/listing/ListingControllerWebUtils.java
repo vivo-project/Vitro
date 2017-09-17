@@ -29,17 +29,17 @@ public class ListingControllerWebUtils {
 	}
 	
 	public static synchronized String formatVClassLinks(List<VClass> vList) {
-	    String linksStr="";
+	    StringBuilder linksStr= new StringBuilder();
 	    if (vList!=null) {
 	        int count=0;
 	        for (Object obj : vList) {
 	        	try {
-	                if (count>0) linksStr += " | ";
+	                if (count>0) linksStr.append(" | ");
 		            VClass vclass = (VClass) obj;
 		            try {
-		                linksStr += "<a href=\"vclassEdit?uri="+URLEncoder.encode(vclass.getURI(),"UTF-8")+"\">"+vclass.getName()+"</a>";
+		                linksStr.append("<a href=\"vclassEdit?uri=").append(URLEncoder.encode(vclass.getURI(), "UTF-8")).append("\">").append(vclass.getName()).append("</a>");
 		            } catch (UnsupportedEncodingException e) {
-		                linksStr += vclass.getName();
+		                linksStr.append(vclass.getName());
 		            }
 	                ++count;
 	        	} catch (Exception e) {
@@ -49,7 +49,7 @@ public class ListingControllerWebUtils {
 	        	}
 	        }
 	    }
-	    return linksStr;
+	    return linksStr.toString();
 	}
 	
 }

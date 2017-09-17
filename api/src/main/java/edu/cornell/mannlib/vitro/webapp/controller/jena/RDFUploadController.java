@@ -453,8 +453,7 @@ public class RDFUploadController extends JenaIngestController {
          } catch (IOException e1) {
              log.error(e1);
              throw new ServletException(e1);
-         }            
-         return;
+         }
      }
      
      private OntModel getABoxModel(ServletContext ctx) {   

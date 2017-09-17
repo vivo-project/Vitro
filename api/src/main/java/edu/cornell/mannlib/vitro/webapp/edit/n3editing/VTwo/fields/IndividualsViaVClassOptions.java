@@ -76,11 +76,11 @@ public class IndividualsViaVClassOptions implements FieldOptions {
     
     
     private Map<? extends String, ? extends String> notFoundMsg() {
-        String msg = "No individuals found for "+ (vclassURIs.size() > 1?"types":"type");
+        StringBuilder msg = new StringBuilder("No individuals found for " + (vclassURIs.size() > 1 ? "types" : "type"));
         for( String uri : vclassURIs ){
-            msg += " " + uri;
+            msg.append(" ").append(uri);
         }
-        return Collections.singletonMap("", msg);
+        return Collections.singletonMap("", msg.toString());
     }
 
     protected Map<String,Individual> getIndividualsForClass(String vclassURI, WebappDaoFactory wDaoFact ){

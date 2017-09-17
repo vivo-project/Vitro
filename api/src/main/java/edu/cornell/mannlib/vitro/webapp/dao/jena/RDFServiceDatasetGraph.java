@@ -190,11 +190,11 @@ public class RDFServiceDatasetGraph implements DatasetGraph {
                 return WrappedIterator.create(Collections.<Quad>emptyIterator());
             }
         }
-        StringBuffer findQuery = new StringBuffer("SELECT * WHERE { \n");
+        StringBuilder findQuery = new StringBuilder("SELECT * WHERE { \n");
         String graphURI = !isVar(graph) ? graph.getURI() : null;
         findQuery.append("  GRAPH ");
         if (graphURI != null) {
-            findQuery.append("  <" + graphURI + ">");
+            findQuery.append("  <").append(graphURI).append(">");
         } else {
             findQuery.append("?g");
         }

@@ -104,30 +104,30 @@ public class MailUsersServlet extends VitroHttpServlet {
        comments=comments.trim();
         //Removed spam filtering code
 
-        StringBuffer msgBuf = new StringBuffer(); // contains the intro copy for the body of the email message
+        StringBuilder msgBuf = new StringBuilder(); // contains the intro copy for the body of the email message
         String lineSeparator = System.getProperty("line.separator"); // \r\n on windows, \n on unix
         // from MyLibrary
         msgBuf.setLength(0);
         //msgBuf.append("Content-Type: text/html; charset='us-ascii'" + lineSeparator);
-        msgBuf.append("<html>" + lineSeparator );
-        msgBuf.append("<head>" + lineSeparator );
-        msgBuf.append("<style>a {text-decoration: none}</style>" + lineSeparator );
-        msgBuf.append("<title>" + deliveryfrom + "</title>" + lineSeparator );
-        msgBuf.append("</head>" + lineSeparator );
-        msgBuf.append("<body>" + lineSeparator );
-        msgBuf.append("<h4>" + deliveryfrom + "</h4>" + lineSeparator );
-        msgBuf.append("<h4>From: "+webusername +" (" + webuseremail + ")"+" at IP address "+request.getRemoteAddr()+"</h4>"+lineSeparator);
+        msgBuf.append("<html>").append(lineSeparator);
+        msgBuf.append("<head>").append(lineSeparator);
+        msgBuf.append("<style>a {text-decoration: none}</style>").append(lineSeparator);
+        msgBuf.append("<title>").append(deliveryfrom).append("</title>").append(lineSeparator);
+        msgBuf.append("</head>").append(lineSeparator);
+        msgBuf.append("<body>").append(lineSeparator);
+        msgBuf.append("<h4>").append(deliveryfrom).append("</h4>").append(lineSeparator);
+        msgBuf.append("<h4>From: ").append(webusername).append(" (").append(webuseremail).append(")").append(" at IP address ").append(request.getRemoteAddr()).append("</h4>").append(lineSeparator);
 
         //Don't need any 'likely viewing page' portion to be emailed out to the others
 
-        msgBuf.append(lineSeparator + "</i></p><h3>Comments:</h3>" + lineSeparator );
+        msgBuf.append(lineSeparator).append("</i></p><h3>Comments:</h3>").append(lineSeparator);
         if (comments==null || comments.equals("")) {
             msgBuf.append("<p>BLANK MESSAGE</p>");
         } else {
-            msgBuf.append("<p>"+comments+"</p>");
+            msgBuf.append("<p>").append(comments).append("</p>");
         }
-        msgBuf.append("</body>" + lineSeparator );
-        msgBuf.append("</html>" + lineSeparator );
+        msgBuf.append("</body>").append(lineSeparator);
+        msgBuf.append("</html>").append(lineSeparator);
 
         String msgText = msgBuf.toString();
 

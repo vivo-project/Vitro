@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.edit;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.jena.rdf.model.Literal;

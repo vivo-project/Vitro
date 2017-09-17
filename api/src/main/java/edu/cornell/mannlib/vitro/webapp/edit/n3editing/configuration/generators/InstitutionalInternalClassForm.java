@@ -3,6 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.generators;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.servlet.http.HttpSession;
 
@@ -49,9 +50,7 @@ public class InstitutionalInternalClassForm extends BaseEditConfigurationGenerat
     public class StringList extends ArrayList<String>{
         public StringList( String ... strings){
             super();
-            for( String str: strings){
-                this.add(str);
-            }            
+            Collections.addAll(this, strings);
         }
     }
 }

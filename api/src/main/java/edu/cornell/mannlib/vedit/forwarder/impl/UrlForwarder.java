@@ -4,11 +4,8 @@ package edu.cornell.mannlib.vedit.forwarder.impl;
 
 import java.io.IOException;
 
-import java.net.URLEncoder;
-
 import edu.cornell.mannlib.vedit.forwarder.PageForwarder;
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
-import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

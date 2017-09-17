@@ -126,7 +126,7 @@ public final class JsonToFmModel
     @SuppressWarnings("unchecked")
     private static StringBuffer toStringBuffer(Map<String, Object> unsortedMap, int indent)
     {      
-        StringBuffer tabs = new StringBuffer();
+        StringBuilder tabs = new StringBuilder();
         for (int i = 0; i < indent; i++)
         {
             tabs.append("\t");

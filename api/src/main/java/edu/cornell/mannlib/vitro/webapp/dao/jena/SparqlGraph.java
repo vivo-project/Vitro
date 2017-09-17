@@ -14,8 +14,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 
 import org.apache.jena.graph.Capabilities;
@@ -175,9 +173,9 @@ public class SparqlGraph implements GraphWithPerform {
 				|| (object != null && object.isBlank())) {
             return false;
         }
-        StringBuffer containsQuery = new StringBuffer("ASK { \n");
+        StringBuilder containsQuery = new StringBuilder("ASK { \n");
         if (graphURI != null) {
-            containsQuery.append("  GRAPH <" + graphURI + "> { ");
+            containsQuery.append("  GRAPH <").append(graphURI).append("> { ");
         }
         containsQuery.append(sparqlNode(subject, "?s"))
         .append(" ")
@@ -226,7 +224,7 @@ public class SparqlGraph implements GraphWithPerform {
         } else if (node.isBlank()) {
             return "<fake:blank>"; // or throw exception?
         } else if (node.isURI()) {
-            StringBuffer uriBuff = new StringBuffer();
+            StringBuilder uriBuff = new StringBuilder();
             return uriBuff.append("<").append(node.getURI()).append(">").toString();
         } else if (node.isLiteral()) {
             StringBuffer literalBuff = new StringBuffer();
@@ -269,9 +267,9 @@ public class SparqlGraph implements GraphWithPerform {
                 return WrappedIterator.create(Collections.<Triple>emptyIterator());
             }
         }
-        StringBuffer findQuery = new StringBuffer("SELECT * WHERE { \n");
+        StringBuilder findQuery = new StringBuilder("SELECT * WHERE { \n");
         if (graphURI != null) {
-            findQuery.append("  GRAPH <" + graphURI + "> { ");
+            findQuery.append("  GRAPH <").append(graphURI).append("> { ");
         }
         findQuery.append(sparqlNode(subject, "?s"))
         .append(" ")
@@ -415,11 +413,8 @@ public class SparqlGraph implements GraphWithPerform {
     
     private boolean execAsk(String queryStr) {
         Query askQuery = QueryFactory.create(queryStr);
-        QueryExecution qe = QueryExecutionFactory.sparqlService(endpointURI, askQuery);
-        try {
+        try (QueryExecution qe = QueryExecutionFactory.sparqlService(endpointURI, askQuery)) {
             return qe.execAsk();
-        } finally {
-            qe.close();
         }
     }
     
@@ -444,11 +439,8 @@ public class SparqlGraph implements GraphWithPerform {
 //        log.info((System.currentTimeMillis() - startTime1) + " to execute via sesame");
         
         Query askQuery = QueryFactory.create(queryStr);
-        QueryExecution qe = QueryExecutionFactory.sparqlService(endpointURI, askQuery);
-        try {
+        try (QueryExecution qe = QueryExecutionFactory.sparqlService(endpointURI, askQuery)) {
             return new ResultSetMem(qe.execSelect());
-        } finally {
-            qe.close();
         }
     }
     

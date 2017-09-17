@@ -32,7 +32,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.Controllers;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
-import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess.ReasoningOption;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class BaseEditController extends VitroHttpServlet {

@@ -139,7 +139,6 @@ public class JenaCsv2RdfController extends JenaIngestController {
             log.error(e1);
             throw new ServletException(e1);
         }
-        return;
     }
 
 	 public Model doExecuteCsv2Rdf(VitroRequest vreq, FileItem fileStream, String filePath) throws Exception {

@@ -155,8 +155,10 @@ public class IndividualFiltering implements Individual {
         // predicate + range class combination is allowed even if the predicate is
         // hidden on its own.
         
+        return _innerIndividual.getPopulatedObjectPropertyList();
+
         // Will revisit filtering at this level if it turns out to be truly necessary.
-        
+/*
         List<ObjectProperty> outOProps = new ArrayList<ObjectProperty>();
         List<ObjectProperty> oProps = _innerIndividual.getPopulatedObjectPropertyList();
 		for (ObjectProperty op: oProps) {
@@ -166,6 +168,7 @@ public class IndividualFiltering implements Individual {
 			}
         }
         return outOProps;
+*/
     }
 
     /* ********************* methods that need delegated filtering *************** */

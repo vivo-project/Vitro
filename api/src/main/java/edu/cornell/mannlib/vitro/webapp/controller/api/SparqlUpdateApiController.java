@@ -9,7 +9,6 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 import java.io.IOException;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;

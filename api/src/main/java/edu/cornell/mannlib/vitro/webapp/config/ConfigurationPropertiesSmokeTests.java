@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.config;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 

@@ -109,9 +109,7 @@ public class StringResultsMappingTest extends AbstractTestClass {
 	@SafeVarargs
 	private static <T> List<T> list(T... items) {
 		List<T> l = new ArrayList<>();
-		for (T item : items) {
-			l.add(item);
-		}
+		Collections.addAll(l, items);
 		return l;
 	}
 

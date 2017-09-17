@@ -3,9 +3,7 @@
 package edu.cornell.mannlib.vitro.webapp.dao;
 
 import java.util.Collection;
-import java.util.Iterator;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstance;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyInstanceIface;
 

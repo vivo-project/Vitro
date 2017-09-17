@@ -72,11 +72,10 @@ public class GetObjectClasses extends BaseEditController {
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();
-		String respo = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-		respo += "<options>";
+		StringBuilder respo = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		respo.append("<options>");
 		if (vClass != null) {
-			respo += "<option>" + "<key>" + vClass.getPickListName() + "</key>"
-					+ "<value>" + vClass.getURI() + "</value>" + "</option>";
+			respo.append("<option>" + "<key>").append(vClass.getPickListName()).append("</key>").append("<value>").append(vClass.getURI()).append("</value>").append("</option>");
 		} else {
 			List classGroups = vreq.getUnfilteredWebappDaoFactory()
 					.getVClassGroupDao().getPublicGroupsWithVClasses(true,
@@ -91,9 +90,7 @@ public class GetObjectClasses extends BaseEditController {
 				Iterator classIt = classes.iterator();
 				while (classIt.hasNext()) {
 					VClass clazz = (VClass) classIt.next();
-					respo += "<option>" + "<key>" + clazz.getPickListName()
-							+ "</key>" + "<value>" + clazz.getURI()
-							+ "</value>" + "</option>";
+					respo.append("<option>" + "<key>").append(clazz.getPickListName()).append("</key>").append("<value>").append(clazz.getURI()).append("</value>").append("</option>");
 				}
 			}
 		}
@@ -122,7 +119,7 @@ public class GetObjectClasses extends BaseEditController {
 		 * 
 		 * }
 		 */
-		respo += "</options>";
+		respo.append("</options>");
 		out.println(respo);
 		out.flush();
 		out.close();

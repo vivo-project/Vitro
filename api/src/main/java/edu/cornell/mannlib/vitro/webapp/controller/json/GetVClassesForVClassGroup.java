@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.json;
 
-import java.util.ArrayList;
-
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;

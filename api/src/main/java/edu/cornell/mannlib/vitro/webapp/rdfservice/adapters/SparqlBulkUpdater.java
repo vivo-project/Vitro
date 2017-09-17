@@ -42,11 +42,11 @@ public class SparqlBulkUpdater extends AbstractBulkUpdater {
                 if (count % testLimit == 0 || !stmtIt.hasNext()) {
                     StringWriter sw = new StringWriter();
                     m.write(sw, "N-TRIPLE");
-                    StringBuffer updateStringBuff = new StringBuffer();
+                    StringBuilder updateStringBuff = new StringBuilder();
                     String graphURI = graph.getGraphURI();
-                    updateStringBuff.append(verb + " DATA { " + ((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" ));
+                    updateStringBuff.append(verb).append(" DATA { ").append((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "");
                     updateStringBuff.append(sw);
-                    updateStringBuff.append(((graphURI != null) ? " } " : "") + " }");
+                    updateStringBuff.append((graphURI != null) ? " } " : "").append(" }");
 
                     String updateString = updateStringBuff.toString();
 

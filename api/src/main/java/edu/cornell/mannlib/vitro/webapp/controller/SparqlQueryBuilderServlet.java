@@ -87,7 +87,6 @@ public class SparqlQueryBuilderServlet extends BaseEditController {
         }
 
         doHelp(request,response);
-        return;
     }
     
     private void doNoModelInContext(HttpServletRequest request, HttpServletResponse res){

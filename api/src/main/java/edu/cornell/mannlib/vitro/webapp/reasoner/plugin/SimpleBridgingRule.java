@@ -100,7 +100,7 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
 	}
 
 	private Query createQuery(String queryString, Statement stmt, Statement statement2) {
-       String queryStr = new String(queryString);
+       String queryStr = queryString;
         if (stmt.getPredicate().equals(assertedProp1)) {
             queryStr = queryStr.replace(
                     "?x", "<" + stmt.getSubject().getURI() + ">");

@@ -12,7 +12,6 @@ import org.apache.jena.rdf.model.RDFReaderF;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.RDFReaderFImpl;
-import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.shared.WrappedIOException;
 import org.apache.jena.sparql.graph.GraphFactory;
 

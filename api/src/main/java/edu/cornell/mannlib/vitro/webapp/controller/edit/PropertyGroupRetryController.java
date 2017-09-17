@@ -67,7 +67,7 @@ public class PropertyGroupRetryController extends BaseEditController {
                 }
                 if (propertyGroupForEditing == null) {
                     // UTF-8 expected due to URIEncoding on Connector element in server.xml
-                    String uriToFind = new String(request.getParameter("uri"));
+                    String uriToFind = request.getParameter("uri");
                     propertyGroupForEditing = (PropertyGroup)pgDao.getGroupByURI(uriToFind);
                 }
             } else {

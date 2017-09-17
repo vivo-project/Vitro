@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.json;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

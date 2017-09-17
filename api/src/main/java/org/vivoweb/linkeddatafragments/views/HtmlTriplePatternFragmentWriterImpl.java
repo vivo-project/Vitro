@@ -177,7 +177,7 @@ public class HtmlTriplePatternFragmentWriterImpl extends TriplePatternFragmentWr
         if (node.isLiteral()) {
             builder.append(literalToString(node.asLiteral()));
         } else if (node.isURIResource()) {
-            builder.append('<' + node.asResource().getURI() + '>');
+            builder.append('<').append(node.asResource().getURI()).append('>');
         }
     }
 

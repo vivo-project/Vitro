@@ -76,7 +76,7 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
         } else {
         	vcDao = vreq.getUnfilteredWebappDaoFactory().getVClassDao();
         }
-        String json = new String();
+        StringBuilder json = new StringBuilder();
 
         String ontologyUri = vreq.getParameter("ontologyUri");
         String startClassUri = vreq.getParameter("vclassUri");
@@ -104,22 +104,22 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
         if (!rootIt.hasNext()) {
             VClass vcw = new VClass();
             vcw.setName("<strong>No classes found.</strong>");
-            json += addVClassDataToResultsList(vreq.getUnfilteredWebappDaoFactory(), vcw,0,ontologyUri,counter);
+            json.append(addVClassDataToResultsList(vreq.getUnfilteredWebappDaoFactory(), vcw, 0, ontologyUri, counter));
         } else {
             while (rootIt.hasNext()) {
                 VClass root = (VClass) rootIt.next();
 	            if (root != null) {
-	                json += addChildren(vreq.getUnfilteredWebappDaoFactory(), 
-	                        root, 0, ontologyUri, counter, vreq);
+	                json.append(addChildren(vreq.getUnfilteredWebappDaoFactory(),
+                            root, 0, ontologyUri, counter, vreq));
 	                counter += 1;
                 }
             }
             int length = json.length();
             if ( length > 0 ) {
-                json += " }"; 
+                json.append(" }");
             }
         }
-        body.put("jsonTree",json);
+        body.put("jsonTree", json.toString());
         
         return new TemplateResponseValues(TEMPLATE_NAME, body);
     }
@@ -129,8 +129,8 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
         String rowElts = addVClassDataToResultsList(wadf, parent, position, ontologyUri, counter);
     	int childShift = (rowElts.length() > 0) ? 1 : 0;  // if addVClassDataToResultsList filtered out the result, don't shift the children over 
         int length = rowElts.length();
-        String leaves = "";
-        leaves += rowElts;
+        StringBuilder leaves = new StringBuilder();
+        leaves.append(rowElts);
         List<String> childURIstrs = vcDao.getSubClassURIs(parent.getURI());
         if ((childURIstrs.size()>0) && position<MAXDEPTH) {
             List<VClass> childClasses = new ArrayList<VClass>();
@@ -148,22 +148,24 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
             Iterator<VClass> childClassIt = childClasses.iterator();
             while (childClassIt.hasNext()) {
                 VClass child = (VClass) childClassIt.next();
-                leaves += addChildren(wadf, child, position + childShift, ontologyUri, counter, vreq);
+                leaves.append(addChildren(wadf, child, position + childShift, ontologyUri, counter, vreq));
                 if (!childClassIt.hasNext()) {
                     if ( ontologyUri == null ) {
-                        leaves += " }] ";
+                        leaves.append(" }] ");
                     }
                     else if ( ontologyUri != null && length > 0 ) {
                         // need this for when we show the classes associated with an ontology
                         String ending = leaves.substring(leaves.length() - 2, leaves.length());
-                        if ( ending.equals("] ") ) {
-                            leaves += "}]";
-                        }
-                        else if  ( ending.equals(" [") ){
-                            leaves += "] ";
-                        }
-                        else {
-                            leaves += "}]";
+                        switch (ending) {
+                            case "] ":
+                                leaves.append("}]");
+                                break;
+                            case " [":
+                                leaves.append("] ");
+                                break;
+                            default:
+                                leaves.append("}]");
+                                break;
                         }
                     }
                 }
@@ -171,13 +173,13 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
         }
         else {
             if ( ontologyUri == null ) {
-                 leaves += "] ";
+                 leaves.append("] ");
             }
             else if ( ontologyUri != null && length > 0 ) {
-                 leaves += "] ";
+                 leaves.append("] ");
             }
         }
-        return leaves;
+        return leaves.toString();
     }
 
     private String addVClassDataToResultsList(WebappDaoFactory wadf, VClass vcw, int position, String ontologyUri, int counter) {

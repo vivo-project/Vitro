@@ -76,7 +76,7 @@ public class ListVClassWebappsController extends FreemarkerHttpServlet {
         	}
 
         }
-        String json = new String();
+        StringBuilder json = new StringBuilder();
         int counter = 0;
 
         String ontologyURI = vreq.getParameter("ontologyUri");
@@ -86,21 +86,21 @@ public class ListVClassWebappsController extends FreemarkerHttpServlet {
             Iterator<VClass> classesIt = classes.iterator();
             while (classesIt.hasNext()) {
                 if ( counter > 0 ) {
-                    json += ", ";
+                    json.append(", ");
                 }
                 VClass cls = (VClass) classesIt.next();
                 if ( (ontologyURI==null) || ( (ontologyURI != null) && (cls.getNamespace()!=null) && (ontologyURI.equals(cls.getNamespace())) ) ) {
 	                if (cls.getName() != null)
 	                    try {
-	                        json += "{ \"name\": " + JacksonUtils.quote("<a href='./vclassEdit?uri="+URLEncoder.encode(cls.getURI(),"UTF-8")+"'>"+cls.getPickListName()+"</a>") + ", ";
+	                        json.append("{ \"name\": ").append(JacksonUtils.quote("<a href='./vclassEdit?uri=" + URLEncoder.encode(cls.getURI(), "UTF-8") + "'>" + cls.getPickListName() + "</a>")).append(", ");
 	                    } catch (Exception e) {
-	                        json += "{ \"name\": " + JacksonUtils.quote(cls.getPickListName()) + ", ";
+	                        json.append("{ \"name\": ").append(JacksonUtils.quote(cls.getPickListName())).append(", ");
 	                    }
 	                else
-	                    json += "{ \"name\": \"\"";
+	                    json.append("{ \"name\": \"\"");
 	                String shortDef = (cls.getShortDef() == null) ? "" : cls.getShortDef();
 	                
-	                json += "\"data\": { \"shortDef\": " + JacksonUtils.quote(shortDef) + ", ";
+	                json.append("\"data\": { \"shortDef\": ").append(JacksonUtils.quote(shortDef)).append(", ");
 
 	                // get group name
 	                WebappDaoFactory wadf = vreq.getUnfilteredWebappDaoFactory();
@@ -115,7 +115,7 @@ public class ListVClassWebappsController extends FreemarkerHttpServlet {
 	                	}
 	                }
                     
-                    json += "\"classGroup\": " + JacksonUtils.quote(groupName) + ", ";
+                    json.append("\"classGroup\": ").append(JacksonUtils.quote(groupName)).append(", ");
 
 	                // get ontology name
 	                OntologyDao ontDao = wadf.getOntologyDao();
@@ -124,13 +124,13 @@ public class ListVClassWebappsController extends FreemarkerHttpServlet {
 	                if (ont != null && ont.getName() != null) {
 	                    ontName = ont.getName();
 	                }
-	                json += "\"ontology\": " + JacksonUtils.quote(ontName) + "} }";
+	                json.append("\"ontology\": ").append(JacksonUtils.quote(ontName)).append("} }");
 	                
 	                counter++;
 
                }
             }
-            body.put("jsonTree",json);
+            body.put("jsonTree", json.toString());
         }      
         
         return new TemplateResponseValues(TEMPLATE_NAME, body);

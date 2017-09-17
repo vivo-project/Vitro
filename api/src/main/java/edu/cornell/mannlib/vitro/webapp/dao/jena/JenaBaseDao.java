@@ -32,7 +32,6 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.Syntax;
-import org.apache.jena.rdf.model.AnonId;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -217,12 +216,12 @@ public class JenaBaseDao extends JenaBaseDaoCon {
                 }
             }
             if ( (existingValue!=null && value == null) || (existingValue!=null && value != null && !(existingValue.equals(value)))
-                    || (existingValue!=null && existingValue == false && keepOnlyIfTrue)) {
+                    || (existingValue!=null && !existingValue && keepOnlyIfTrue)) {
                 model.removeAll(res, dataprop, null);
             }
             if ( (existingValue==null && value != null) || (existingValue!=null && value != null && !(existingValue.equals(value)) ) ) {
                 if (keepOnlyIfTrue) {
-                    if (value==true) {
+                    if (value) {
                         model.add(res, dataprop, model.createTypedLiteral(value));
                     }
                 } else {
@@ -970,7 +969,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     		if (vitroURIStr.indexOf(PSEUDO_BNODE_NS)==0) {
     			String idStr = vitroURIStr.split("#")[1];
     			log.debug("Trying to get bnode " + idStr);
-    			RDFNode rdfNode = ontModel.getRDFNode(NodeFactory.createAnon(idStr));
+    			RDFNode rdfNode = ontModel.getRDFNode(NodeFactory.createBlankNode(idStr));
     			if ( (rdfNode != null) && (rdfNode.canAs(OntClass.class)) ) {
     			    log.debug("found it");
     				cls = rdfNode.as(OntClass.class);
@@ -998,7 +997,7 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 
     protected Node makeNodeForURI(String vitroURIStr) {
     	if (vitroURIStr.indexOf(PSEUDO_BNODE_NS)==0) {
-			return NodeFactory.createAnon(vitroURIStr.split("#")[1]);
+			return NodeFactory.createBlankNode(vitroURIStr.split("#")[1]);
     	} else {
     		return NodeFactory.createURI(vitroURIStr);
     	}

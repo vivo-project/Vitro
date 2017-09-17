@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.freemarker.config;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -127,9 +128,7 @@ public class FreemarkerConfigurationImpl extends Configuration {
 
 	private String[] joinNames(Set<String> nameSet, String[] nameArray) {
 		Set<String> allNames = new HashSet<>(nameSet);
-		for (String n : nameArray) {
-			allNames.add(n);
-		}
+		Collections.addAll(allNames, nameArray);
 		return (String[]) allNames.toArray();
 	}
 

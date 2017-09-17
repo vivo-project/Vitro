@@ -51,8 +51,8 @@ public class GetClazzObjectProperties extends BaseEditController {
 			return;
 		}
 
-		String respo = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-		respo += "<options>";
+		StringBuilder respo = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		respo.append("<options>");
 
 		ObjectPropertyDao odao = vreq.getUnfilteredWebappDaoFactory()
 				.getObjectPropertyDao();
@@ -90,13 +90,11 @@ public class GetClazzObjectProperties extends BaseEditController {
 				ObjectProperty oprop = (ObjectProperty) odao
 						.getObjectPropertyByURI(pi.getPropertyURI());
 				if (oprop != null) {
-					respo += "<option>" + "<key>" + oprop.getLocalName()
-							+ "</key>" + "<value>" + oprop.getURI()
-							+ "</value>" + "</option>";
+					respo.append("<option>" + "<key>").append(oprop.getLocalName()).append("</key>").append("<value>").append(oprop.getURI()).append("</value>").append("</option>");
 				}
 			}
 		}
-		respo += "</options>";
+		respo.append("</options>");
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();

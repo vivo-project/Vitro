@@ -189,14 +189,11 @@ public class ProgramLoginTest extends AbstractTestClass {
 
 		try {
 			servlet.doGet(request, response);
-		} catch (ServletException e) {
-			log.error(e, e);
-			fail(e.toString());
-		} catch (IOException e) {
+		} catch (ServletException | IOException e) {
 			log.error(e, e);
 			fail(e.toString());
 		}
-	}
+    }
 
 	private void assert403() {
 		assertEquals("status", 403, response.getStatus());

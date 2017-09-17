@@ -4,25 +4,20 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.adapters;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import org.apache.jena.graph.Graph;
-import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFReaderF;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.RDFReaderFImpl;
-import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.shared.WrappedIOException;
 import org.apache.jena.sparql.graph.GraphFactory;
-import org.apache.jena.util.iterator.Map1;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.List;
 
 public class BulkUpdatingModel extends AbstractModelDecorator {

@@ -139,51 +139,51 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
         	    sortForPickList(props, vreq);
             }
 
-            String json = new String();
+            StringBuilder json = new StringBuilder();
             int counter = 0;
 
             if (props != null) {
                 if (props.size()==0) {
-                    json = "{ \"name\": \"" + noResultsMsgStr + "\" }";
+                    json = new StringBuilder("{ \"name\": \"" + noResultsMsgStr + "\" }");
                 } else {
                     Iterator<ObjectProperty> propsIt = props.iterator();
                     while (propsIt.hasNext()) {
                         if ( counter > 0 ) {
-                            json += ", ";
+                            json.append(", ");
                         }
                         ObjectProperty prop = propsIt.next();
                     
                         String propNameStr = ShowObjectPropertyHierarchyController.getDisplayLabel(prop);
 
                         try {
-                            json += "{ \"name\": " + JacksonUtils.quote("<a href='./propertyEdit?uri="+URLEncoder.encode(prop.getURI())+"'>" 
-                                 + propNameStr + "</a>") + ", "; 
+                            json.append("{ \"name\": ").append(JacksonUtils.quote("<a href='./propertyEdit?uri=" + URLEncoder.encode(prop.getURI()) + "'>"
+                                    + propNameStr + "</a>")).append(", ");
                          } catch (Exception e) {
-                             json += "{ \"name\": \"" + propNameStr + "\", "; 
+                             json.append("{ \"name\": \"").append(propNameStr).append("\", ");
                          }
                     
-                         json += "\"data\": { \"internalName\": " + JacksonUtils.quote(prop.getLocalNameWithPrefix()) + ", "; 
+                         json.append("\"data\": { \"internalName\": ").append(JacksonUtils.quote(prop.getLocalNameWithPrefix())).append(", ");
                     
                          ObjectProperty opLangNeut = opDaoLangNeut.getObjectPropertyByURI(prop.getURI());
                          if(opLangNeut == null) {
                              opLangNeut = prop;
                          }
                          String domainStr = getVClassNameFromURI(opLangNeut.getDomainVClassURI(), vcDao, vcDaoLangNeut); 
-                         json += "\"domainVClass\": " + JacksonUtils.quote(domainStr) + ", " ;
+                         json.append("\"domainVClass\": ").append(JacksonUtils.quote(domainStr)).append(", ");
                     
                          String rangeStr = getVClassNameFromURI(opLangNeut.getRangeVClassURI(), vcDao, vcDaoLangNeut);
-                         json += "\"rangeVClass\": " + JacksonUtils.quote(rangeStr) + ", " ; 
+                         json.append("\"rangeVClass\": ").append(JacksonUtils.quote(rangeStr)).append(", ");
                     
                          if (prop.getGroupURI() != null) {
                              PropertyGroup pGroup = pgDao.getGroupByURI(prop.getGroupURI());
-                             json += "\"group\": " + JacksonUtils.quote((pGroup == null) ? "unknown group" : pGroup.getName()) + " } } " ; 
+                             json.append("\"group\": ").append(JacksonUtils.quote((pGroup == null) ? "unknown group" : pGroup.getName())).append(" } } ");
                          } else {
-                             json += "\"group\": \"unspecified\" } }" ;
+                             json.append("\"group\": \"unspecified\" } }");
                          }
                          counter += 1;
                      }
                  }
-                 body.put("jsonTree",json);
+                 body.put("jsonTree", json.toString());
              }
 
         } catch (Throwable t) {

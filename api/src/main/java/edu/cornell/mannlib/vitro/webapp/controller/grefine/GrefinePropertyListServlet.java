@@ -91,7 +91,7 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 
 						ArrayList<DataProperty> vcProps = (ArrayList<DataProperty>)classPropertiesMap.get(vc);
 						for (DataProperty prop: vcProps) {
-							String nameStr = prop.getPublicName()==null ? prop.getName()==null ? null : prop.getName() : prop.getPublicName();
+							String nameStr = prop.getPublicName()==null ? prop.getName() : prop.getPublicName();
 								//System.out.println("--- uri: " + prop.getURI());
 								//System.out.println("--- name: " + nameStr);
 					        	// top level
@@ -152,7 +152,7 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 							VClass vc = (VClass) iter.next();
 							ArrayList<DataProperty> vcProps = (ArrayList<DataProperty>)lvl2ClassPropertiesMap.get(vc);
 							for (DataProperty prop: vcProps) {
-								String nameStr = prop.getPublicName()==null ? prop.getName()==null ? null : prop.getName() : prop.getPublicName();
+								String nameStr = prop.getPublicName()==null ? prop.getName() : prop.getPublicName();
 						        	// top level
 									ObjectNode propertiesItemJson = JsonNodeFactory.instance.objectNode();
 									
@@ -222,7 +222,7 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 
         	Collections.sort(props);
         	for (DataProperty prop: props) {
-        		String nameStr = prop.getPublicName()==null ? prop.getName()==null ? null : prop.getName() : prop.getPublicName();
+        		String nameStr = prop.getPublicName()==null ? prop.getName() : prop.getPublicName();
 				if (nameStr != null) {
             		if (prop.getDomainClassURI() != null) {
             			VClass vc = vcDao.getVClassByURI(prop.getDomainClassURI());

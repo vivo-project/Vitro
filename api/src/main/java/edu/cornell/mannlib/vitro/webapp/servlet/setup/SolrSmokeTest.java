@@ -20,7 +20,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -110,8 +109,7 @@ public class SolrSmokeTest implements ServletContextListener {
 				reportGoodPing();
 			} catch (SolrProblemException e) {
 				reportPingProblem(e);
-				return;
-			}
+            }
 		}
 
 		private void reportSuccess() {

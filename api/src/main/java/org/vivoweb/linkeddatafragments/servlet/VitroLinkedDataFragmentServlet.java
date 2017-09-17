@@ -23,18 +23,15 @@ import org.linkeddatafragments.views.ILinkedDataFragmentWriter;
 import org.vivoweb.linkeddatafragments.views.HtmlTriplePatternFragmentWriterImpl;
 import org.vivoweb.linkeddatafragments.views.LinkedDataFragmentWriterFactory;
 import org.vivoweb.linkeddatafragments.datasource.rdfservice.RDFServiceBasedRequestProcessorForTPFs;
-import org.vivoweb.linkeddatafragments.datasource.rdfservice.RDFServiceDataSource;
 import org.vivoweb.linkeddatafragments.datasource.rdfservice.RDFServiceDataSourceType;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -225,7 +222,7 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
         configJson.append("  \"title\": \"Linked Data Fragments server\",\n");
         configJson.append("\n");
         configJson.append("  \"datasourcetypes\": {\n");
-        configJson.append("    \"RDFServiceDatasource\": \"" + RDFServiceDataSourceType.class.getCanonicalName() + "\"\n");
+        configJson.append("    \"RDFServiceDatasource\": \"").append(RDFServiceDataSourceType.class.getCanonicalName()).append("\"\n");
         configJson.append("  },\n");
         configJson.append("\n");
         configJson.append("  \"datasources\": {\n");
