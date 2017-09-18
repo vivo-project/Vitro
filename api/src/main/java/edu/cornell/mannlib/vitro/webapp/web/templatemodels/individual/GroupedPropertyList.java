@@ -219,7 +219,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
 
     protected void sort(List<Property> propertyList) {
         try {
-            Collections.sort(propertyList, new PropertyRanker(vreq));
+            propertyList.sort(new PropertyRanker(vreq));
         } catch (Exception ex) {
             log.error("Exception sorting merged property list: "
                     + ex.getMessage());

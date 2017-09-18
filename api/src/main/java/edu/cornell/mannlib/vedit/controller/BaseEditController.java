@@ -182,7 +182,7 @@ public class BaseEditController extends VitroHttpServlet {
         }
         
                 
-       Collections.sort(bodyVal, new ListComparator(vreq.getCollator()));
+       bodyVal.sort(new ListComparator(vreq.getCollator()));
         for (String aBodyVal : bodyVal) {
             options.add(hashMap.get(aBodyVal));
         }

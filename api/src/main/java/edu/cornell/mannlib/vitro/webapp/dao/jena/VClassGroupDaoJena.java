@@ -251,11 +251,11 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
     }
 
     public void sortGroupList(List<VClassGroup> groupList) {
-        Collections.sort(groupList, new Comparator<VClassGroup>() {
+        groupList.sort(new Comparator<VClassGroup>() {
             public int compare(VClassGroup first, VClassGroup second) {
-                if (first!=null) {
-                    if (second!=null) {
-                        return (first.getDisplayRank()-second.getDisplayRank());
+                if (first != null) {
+                    if (second != null) {
+                        return (first.getDisplayRank() - second.getDisplayRank());
                     } else {
                         log.error("error--2nd VClassGroup is null in VClassGroupDao.getGroupList().compare()");
                     }

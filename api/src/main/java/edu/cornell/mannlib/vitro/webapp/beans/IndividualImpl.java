@@ -308,7 +308,7 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
 
     protected void sortPropertiesForDisplay( ){
         //here we sort the Property objects
-        Collections.sort(getObjectPropertyList(), new ObjectProperty.DisplayComparator());
+        getObjectPropertyList().sort(new ObjectProperty.DisplayComparator());
     }
 
     public JsonNode toJSON() {

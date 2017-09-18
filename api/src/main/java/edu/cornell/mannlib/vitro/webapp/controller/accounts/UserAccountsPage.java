@@ -60,12 +60,12 @@ public abstract class UserAccountsPage extends AbstractPageHandler {
 			}
 		}
 
-		Collections.sort(list, new Comparator<PermissionSet>() {
-			@Override
-			public int compare(PermissionSet ps1, PermissionSet ps2) {
-				return ps1.getUri().compareTo(ps2.getUri());
-			}
-		});
+		list.sort(new Comparator<PermissionSet>() {
+            @Override
+            public int compare(PermissionSet ps1, PermissionSet ps2) {
+                return ps1.getUri().compareTo(ps2.getUri());
+            }
+        });
 		return list;
 	}
 

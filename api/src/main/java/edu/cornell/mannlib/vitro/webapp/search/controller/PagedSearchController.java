@@ -416,10 +416,11 @@ public class PagedSearchController extends FreemarkerHttpServlet {
         }
         
         
-        Collections.sort(classes, new Comparator<VClass>(){
-            public int compare(VClass o1, VClass o2) {                
+        classes.sort(new Comparator<VClass>() {
+            public int compare(VClass o1, VClass o2) {
                 return o1.compareTo(o2);
-            }});
+            }
+        });
         
         List<VClassSearchLink> vClassLinks = new ArrayList<VClassSearchLink>(classes.size());
         for (VClass vc : classes) {                        

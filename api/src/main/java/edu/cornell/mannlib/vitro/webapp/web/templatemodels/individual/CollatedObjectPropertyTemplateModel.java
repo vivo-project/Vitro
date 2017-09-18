@@ -167,7 +167,7 @@ public class CollatedObjectPropertyTemplateModel extends
 				filteredList.add(outerMap);
 			} else {
 				//Subclass variable should already reflect most specifick types but there may be more than one most specific type
-				Collections.sort(dataForThisObject, new DataComparatorBySubclass());
+				dataForThisObject.sort(new DataComparatorBySubclass());
 				filteredList.add(dataForThisObject.get(0));
 			}
 		}

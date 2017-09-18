@@ -244,8 +244,7 @@ public class FauxPropertyRetryController extends BaseEditController {
 		private List<Option> createClassGroupOptionList() {
 			List<Option> groupOptList = getGroupOptList(beanForEditing
 					.getGroupURI());
-			Collections.sort(groupOptList,
-					new OptionsBodyComparator(req.getCollator()));
+			groupOptList.sort(new OptionsBodyComparator(req.getCollator()));
 			groupOptList.add(0, new Option("", "none"));
 			return groupOptList;
 		}
@@ -322,12 +321,12 @@ public class FauxPropertyRetryController extends BaseEditController {
 					list.add(option);
 				}
 			}
-			Collections.sort(list, new Comparator<Option>() {
-				@Override
-				public int compare(Option o1, Option o2) {
-					return o1.getBody().compareTo(o2.getBody());
-				}
-			});
+			list.sort(new Comparator<Option>() {
+                @Override
+                public int compare(Option o1, Option o2) {
+                    return o1.getBody().compareTo(o2.getBody());
+                }
+            });
 		}
 
 		private static class OptionsBodyComparator implements

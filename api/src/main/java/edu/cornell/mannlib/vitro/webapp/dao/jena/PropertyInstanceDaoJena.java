@@ -121,7 +121,7 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
 	    		propInsts.add(propInst);
 	    	}
     	}
-    	Collections.sort(propInsts, new PropInstSorter());
+    	propInsts.sort(new PropInstSorter());
     	return propInsts;
     }
 

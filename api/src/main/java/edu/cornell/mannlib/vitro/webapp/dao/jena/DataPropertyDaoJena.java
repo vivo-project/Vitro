@@ -164,7 +164,7 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
         }
 
         List<DataProperty> dataprops = new ArrayList<DataProperty>(hash.values());
-        Collections.sort(dataprops, new DataPropertyRanker());
+        dataprops.sort(new DataPropertyRanker());
         return dataprops;
     }
 

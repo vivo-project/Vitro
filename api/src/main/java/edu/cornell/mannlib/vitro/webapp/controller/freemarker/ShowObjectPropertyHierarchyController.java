@@ -102,7 +102,7 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
             } else {
                 roots = opDao.getRootObjectProperties();
                 if (roots!=null){
-                    Collections.sort(roots, new ObjectPropertyAlphaComparator(vreq)); // sorts by domain public
+                    roots.sort(new ObjectPropertyAlphaComparator(vreq)); // sorts by domain public
                 }
             }
 

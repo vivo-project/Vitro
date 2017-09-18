@@ -225,7 +225,7 @@ public class LanguageFilteringRDFServiceTest extends AbstractTestClass {
 		log.debug("before sorting: "
 				+ languagesFromLiterals(listOfRowIndexedLiterals));
 		Comparator<Object> comparator = buildRowIndexedLiteralSortByLang();
-		Collections.sort(listOfRowIndexedLiterals, comparator);
+		listOfRowIndexedLiterals.sort(comparator);
 	}
 
 	private void assertLanguageOrder(String message) {

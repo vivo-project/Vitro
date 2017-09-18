@@ -94,8 +94,8 @@ public class StringResultsMappingTest extends AbstractTestClass {
 	// ----------------------------------------------------------------------
 
 	private <T> void assertEquivalentUnorderedLists(List<T> list1, List<T> list2) {
-		Collections.sort(list1, new ArbitraryOrder<>());
-		Collections.sort(list2, new ArbitraryOrder<>());
+		list1.sort(new ArbitraryOrder<>());
+		list2.sort(new ArbitraryOrder<>());
 		assertEquals(list1, list2);
 	}
 

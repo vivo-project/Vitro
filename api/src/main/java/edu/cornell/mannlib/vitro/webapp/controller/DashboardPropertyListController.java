@@ -157,7 +157,7 @@ public class DashboardPropertyListController extends VitroHttpServlet {
             
             if (mergedPropertyList!=null) {
                 try {
-                    Collections.sort(mergedPropertyList,new PropertyRanker(vreq));
+                    mergedPropertyList.sort(new PropertyRanker(vreq));
                 } catch (Exception ex) {
                     log.error("Exception sorting merged property list: " + ex.getMessage());
                 }
@@ -276,7 +276,7 @@ public class DashboardPropertyListController extends VitroHttpServlet {
              }
              if (pg.getPropertyList().size()>1) {
                  try {
-                     Collections.sort(pg.getPropertyList(),new Property.DisplayComparatorIgnoringPropertyGroup());
+                     pg.getPropertyList().sort(new Property.DisplayComparatorIgnoringPropertyGroup());
                  } catch (Exception ex) {
                      log.error("Exception sorting property group "+pg.getName()+" property list: "+ex.getMessage());
                  }

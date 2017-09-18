@@ -463,7 +463,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
                 }
             };
             try {
-                Collections.sort(objPropStmtsList, fieldComp);
+                objPropStmtsList.sort(fieldComp);
             } catch (Exception e) {
                 log.error("Exception sorting object property statements for object property "+prop.getURI());
             }
@@ -562,7 +562,7 @@ public class ObjectProperty extends Property implements Comparable<ObjectPropert
                 }
             };
             try {
-                Collections.sort(objPropStmtsList, dpComp);
+                objPropStmtsList.sort(dpComp);
             } catch (Exception e) {
                 log.error("Exception sorting object property statements " +
                           "for object property " + prop.getURI(), e);

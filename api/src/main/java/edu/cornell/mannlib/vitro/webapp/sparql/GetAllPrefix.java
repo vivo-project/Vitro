@@ -73,7 +73,7 @@ public class GetAllPrefix extends BaseEditController {
 		respo.append("<options>");
 		List<String> prefixList = new ArrayList<String>();
 		prefixList.addAll(prefixMap.keySet());
-		Collections.sort(prefixList, vreq.getCollator());
+		prefixList.sort(vreq.getCollator());
 		for (String prefix : prefixList) {
 		    respo.append(makeOption(prefix, prefixMap.get(prefix)));
 		}

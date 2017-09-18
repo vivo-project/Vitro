@@ -114,7 +114,7 @@ public class ViewLabelsServlet extends FreemarkerHttpServlet{
   		LabelInformationComparator lic = new LabelInformationComparator();
   		for(String languageName: labelsHash.keySet()) {
   			List<LabelInformation> labelInfo = labelsHash.get(languageName);
-  			Collections.sort(labelInfo, lic);
+  			labelInfo.sort(lic);
   		}
   		return labelsHash;
   		

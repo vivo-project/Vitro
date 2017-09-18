@@ -202,9 +202,9 @@ public class VClassDaoFiltering extends BaseFiltering implements VClassDao{
             vcg.setLocalName("0");
             vcg.setPublicName("Browse Categories");
             vcg.addAll( this.getAllVclasses() );
-            java.util.Collections.sort(vcg.getVitroClassList(),new Comparator(){
-                public int compare(Object o1, Object o2){
-                    return ((VClass)o1).getName().compareTo(((VClass)o2).getName());
+            vcg.getVitroClassList().sort(new Comparator() {
+                public int compare(Object o1, Object o2) {
+                    return ((VClass) o1).getName().compareTo(((VClass) o2).getName());
                 }
             });
             groups.add(vcg);

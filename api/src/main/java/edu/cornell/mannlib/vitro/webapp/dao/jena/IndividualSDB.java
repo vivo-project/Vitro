@@ -1038,7 +1038,7 @@ public class IndividualSDB extends IndividualImpl implements Individual {
                 }
             };
             try {
-                Collections.sort(getObjectPropertyStatements(), comp);
+                getObjectPropertyStatements().sort(comp);
             } catch (Exception e) {
                 log.error("Exception sorting object property statements for object property "+this.getURI());
             }

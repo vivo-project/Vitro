@@ -450,7 +450,7 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 			getOntModel().leaveCriticalSection();
 		}
 
-		Collections.sort(list, new PermissionSetsByUri());
+		list.sort(new PermissionSetsByUri());
 
 		return list;
 	}

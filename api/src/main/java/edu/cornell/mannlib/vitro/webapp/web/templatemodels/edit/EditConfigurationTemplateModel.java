@@ -622,7 +622,7 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
             x[1] = hmap.get(key);
             objectsToSort.add(x);
         }
-        Collections.sort(objectsToSort, new MapComparator());
+        objectsToSort.sort(new MapComparator());
 
         HashMap<String,String> map = new LinkedHashMap<String,String>(objectsToSort.size());
         for (String[] pair:objectsToSort) {

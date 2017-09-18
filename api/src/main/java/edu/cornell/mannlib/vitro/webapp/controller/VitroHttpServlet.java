@@ -205,7 +205,7 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 	
 	protected void sortForPickList(List<? extends ResourceBean> beans, 
 	        VitroRequest vreq) {
-	    Collections.sort(beans, new PickListSorter(vreq));
+	    beans.sort(new PickListSorter(vreq));
 	}
 	
 	protected class PickListSorter implements Comparator<ResourceBean> {

@@ -119,7 +119,7 @@ public class LanguageFilteringRDFService implements RDFService {
                 if (candidatesForRemoval.size() == 1) {
                     continue;
                 }
-                Collections.sort(candidatesForRemoval, new StatementSortByLang());
+                candidatesForRemoval.sort(new StatementSortByLang());
                 log.debug("sorted statements: " + showSortedStatements(candidatesForRemoval));
                 Iterator<Statement> candIt = candidatesForRemoval.iterator();
                 String langRegister = null;
@@ -197,7 +197,7 @@ public class LanguageFilteringRDFService implements RDFService {
                 if (candidatesForRemoval.size() == 1) {
                     continue;
                 }
-                Collections.sort(candidatesForRemoval, new RowIndexedLiteralSortByLang());
+                candidatesForRemoval.sort(new RowIndexedLiteralSortByLang());
                 log.debug("sorted RowIndexedLiterals: " + showSortedRILs(candidatesForRemoval));
                 Iterator<RowIndexedLiteral> candIt = candidatesForRemoval.iterator();
                 String langRegister = null;
@@ -290,7 +290,7 @@ public class LanguageFilteringRDFService implements RDFService {
                         if (candidatesForRemoval.size() == 1) {
                             continue;
                         }
-                        Collections.sort(candidatesForRemoval, new RowIndexedLiteralSortByLang());
+                        candidatesForRemoval.sort(new RowIndexedLiteralSortByLang());
                         log.debug("sorted RowIndexedLiterals: " + showSortedRILs(candidatesForRemoval));
                         Iterator<RowIndexedLiteral> candIt = candidatesForRemoval.iterator();
                         String langRegister = null;

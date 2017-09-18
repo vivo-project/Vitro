@@ -267,7 +267,7 @@ public class FormUtils {
         	}
 		}
 		
-		Collections.sort(options, (o1, o2) -> o1.getBody().compareTo(o2.getBody()));
+		options.sort((o1, o2) -> o1.getBody().compareTo(o2.getBody()));
 		
 		return options;
 	}

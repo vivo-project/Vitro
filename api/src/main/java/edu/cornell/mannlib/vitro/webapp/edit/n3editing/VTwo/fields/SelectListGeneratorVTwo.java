@@ -75,7 +75,7 @@ public class SelectListGeneratorVTwo {
         	comparator = new MapPairsComparator(vreq);
         }
         
-        Collections.sort(objectsToSort, comparator);
+        objectsToSort.sort(comparator);
 
         HashMap<String,String> map = new LinkedHashMap<String,String>(objectsToSort.size());
         for (String[] pair:objectsToSort) {

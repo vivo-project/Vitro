@@ -896,18 +896,18 @@ public class JenaBaseDao extends JenaBaseDaoCon {
 	    }
 
 	    // Sort by lexical value to guarantee consistent results
-	    Collections.sort(labels, new Comparator<RDFNode>() {
-	        public int compare(RDFNode left, RDFNode right) {
-	            if (left == null) {
-	                return (right == null) ? 0 : -1;
-	            }
-	            if ( left.isLiteral() && right.isLiteral()) {
-	                return ((Literal) left).getLexicalForm().compareTo(((Literal) right).getLexicalForm());
-	            } 
-	            // Can't sort meaningfully if both are not literals
-	            return 0;	            
-	        }
-	    });
+	    labels.sort(new Comparator<RDFNode>() {
+            public int compare(RDFNode left, RDFNode right) {
+                if (left == null) {
+                    return (right == null) ? 0 : -1;
+                }
+                if (left.isLiteral() && right.isLiteral()) {
+                    return ((Literal) left).getLexicalForm().compareTo(((Literal) right).getLexicalForm());
+                }
+                // Can't sort meaningfully if both are not literals
+                return 0;
+            }
+        });
 	    
 	    for (String lang : PREFERRED_LANGUAGES) {
 	    	label = getLabel(lang,labels);
