@@ -207,7 +207,7 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 				XsltTransformer t = xsltExec.load();
 				//this is how to set parameters:
 				//t.setParameter(new QName("someparametername"), new XdmAtomicValue(10));				
-				Serializer out = new Serializer();
+				Serializer out = new Processor(false).newSerializer();
 				out.setOutputProperty(Serializer.Property.METHOD, "xml");
 				out.setOutputProperty(Serializer.Property.INDENT, "yes");
 				File outFile = new File(file.getAbsolutePath() + ".rdfxml");

@@ -112,19 +112,9 @@
             <version>3.4</version>
         </dependency>
         <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2.2</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
-            <artifactId>commons-csv</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>1.1.1</version>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.1</version>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
@@ -145,7 +135,7 @@
         <dependency>
             <groupId>net.sf.saxon</groupId>
             <artifactId>Saxon-HE</artifactId>
-            <version>9.6.0-7</version>
+            <version>9.8.0-4</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
@@ -159,6 +149,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- OWLAPI should match the version used by JFact -->
         <!-- Include all OWALPI JARs that are in the OSGi bundle -->
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
@@ -180,12 +171,12 @@
         <dependency>
             <groupId>org.semarglproject</groupId>
             <artifactId>semargl-core</artifactId>
-            <version>0.6.1</version>
+            <version>0.7</version>
         </dependency>
         <dependency>
             <groupId>org.semarglproject</groupId>
             <artifactId>semargl-rdfa</artifactId>
-            <version>0.6.1</version>
+            <version>0.7</version>
         </dependency>
         <!-- Needed for ORCID? -->
         <dependency>
@@ -226,7 +217,7 @@
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
-            <version>4.7.2</version>
+            <version>4.10.4</version>
         </dependency>
         <dependency>
             <groupId>org.directwebremoting</groupId>

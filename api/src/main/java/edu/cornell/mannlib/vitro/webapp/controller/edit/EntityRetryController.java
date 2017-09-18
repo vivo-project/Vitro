@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
-import org.apache.commons.collections.map.ListOrderedMap;
+import org.apache.commons.collections4.map.ListOrderedMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -230,7 +230,7 @@ public class EntityRetryController extends BaseEditController {
             }
 
             List<DynamicField> dynamicFields = new ArrayList();
-            Iterator<String> dpHashIt = dpMap.orderedMapIterator();
+            Iterator<String> dpHashIt = dpMap.mapIterator();
             while (dpHashIt.hasNext()) {
                 String uri = dpHashIt.next();
                 DataProperty dp = (DataProperty) dpMap.get(uri);
