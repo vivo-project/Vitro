@@ -69,17 +69,15 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
         HashSet<String> nonExternalIdPropURISet = new HashSet<String>();
         if (ind != null) {
             Collection<DataPropertyStatement> dpsColl = getWebappDaoFactory().getDataPropertyStatementDao().getDataPropertyStatementsForIndividualByDataPropertyURI(ind, dataPropertyURI);
-            Iterator<DataPropertyStatement> dpsIt = dpsColl.iterator();
-            while (dpsIt.hasNext()) {
-                DataPropertyStatement dps = dpsIt.next();
+            for (DataPropertyStatement dps : dpsColl) {
                 if (externalIdPropURISet.contains(dps.getDatapropURI())) {
                     externalIdStatements.add(dps);
                 } else if (!nonExternalIdPropURISet.contains(dps.getDatapropURI())) {
-                	OntModel tboxOntModel = getOntModelSelector().getTBoxModel();
+                    OntModel tboxOntModel = getOntModelSelector().getTBoxModel();
                     tboxOntModel.enterCriticalSection(Lock.READ);
                     try {
                         Resource dataprop = tboxOntModel.getResource(dps.getDatapropURI());
-                        if (dataprop != null && (tboxOntModel.contains(dataprop, DATAPROPERTY_ISEXTERNALID, ResourceFactory.createTypedLiteral(true)) || tboxOntModel.contains(dataprop, DATAPROPERTY_ISEXTERNALID, "TRUE") )) {
+                        if (dataprop != null && (tboxOntModel.contains(dataprop, DATAPROPERTY_ISEXTERNALID, ResourceFactory.createTypedLiteral(true)) || tboxOntModel.contains(dataprop, DATAPROPERTY_ISEXTERNALID, "TRUE"))) {
                             externalIdPropURISet.add(dps.getDatapropURI());
                             externalIdStatements.add(dps);
                         } else {

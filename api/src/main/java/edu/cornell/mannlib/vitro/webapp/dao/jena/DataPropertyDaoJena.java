@@ -633,13 +633,11 @@ public class DataPropertyDaoJena extends PropertyDaoJena implements
                     		isRoot = true;
                     	} else {
                     		isRoot = true;
-                    	    Iterator<Property> pit = parentList.iterator();
-                    	    while (pit.hasNext()) {
-                    	    	Property pt = pit.next();
-                    	    	if ( (!pt.equals(op)) && (!(ontModel.contains(op,OWL.equivalentProperty,pt)) || (ontModel.contains(pt,OWL.equivalentProperty,op))) ) {
-                    	    		isRoot = false;
-                    	    	}
-                    	    }
+                            for (Property pt : parentList) {
+                                if ((!pt.equals(op)) && (!(ontModel.contains(op, OWL.equivalentProperty, pt)) || (ontModel.contains(pt, OWL.equivalentProperty, op)))) {
+                                    isRoot = false;
+                                }
+                            }
                     	} 
                     } else {
                     	isRoot = true;

@@ -83,53 +83,52 @@ public class ListVClassWebappsController extends FreemarkerHttpServlet {
 
         if (classes != null) {
             sortForPickList(classes, vreq);
-            Iterator<VClass> classesIt = classes.iterator();
-            while (classesIt.hasNext()) {
-                if ( counter > 0 ) {
-                    json.append(", ");
-                }
-                VClass cls = (VClass) classesIt.next();
-                if ( (ontologyURI==null) || ( (ontologyURI != null) && (cls.getNamespace()!=null) && (ontologyURI.equals(cls.getNamespace())) ) ) {
-	                if (cls.getName() != null)
-	                    try {
-	                        json.append("{ \"name\": ").append(JacksonUtils.quote("<a href='./vclassEdit?uri=" + URLEncoder.encode(cls.getURI(), "UTF-8") + "'>" + cls.getPickListName() + "</a>")).append(", ");
-	                    } catch (Exception e) {
-	                        json.append("{ \"name\": ").append(JacksonUtils.quote(cls.getPickListName())).append(", ");
-	                    }
-	                else
-	                    json.append("{ \"name\": \"\"");
-	                String shortDef = (cls.getShortDef() == null) ? "" : cls.getShortDef();
-	                
-	                json.append("\"data\": { \"shortDef\": ").append(JacksonUtils.quote(shortDef)).append(", ");
+			for (VClass aClass : classes) {
+				if (counter > 0) {
+					json.append(", ");
+				}
+				VClass cls = aClass;
+				if ((ontologyURI == null) || ((ontologyURI != null) && (cls.getNamespace() != null) && (ontologyURI.equals(cls.getNamespace())))) {
+					if (cls.getName() != null)
+						try {
+							json.append("{ \"name\": ").append(JacksonUtils.quote("<a href='./vclassEdit?uri=" + URLEncoder.encode(cls.getURI(), "UTF-8") + "'>" + cls.getPickListName() + "</a>")).append(", ");
+						} catch (Exception e) {
+							json.append("{ \"name\": ").append(JacksonUtils.quote(cls.getPickListName())).append(", ");
+						}
+					else
+						json.append("{ \"name\": \"\"");
+					String shortDef = (cls.getShortDef() == null) ? "" : cls.getShortDef();
 
-	                // get group name
-	                WebappDaoFactory wadf = vreq.getUnfilteredWebappDaoFactory();
-	                VClassGroupDao groupDao= wadf.getVClassGroupDao();
-	                String groupURI = cls.getGroupURI();                
-	                String groupName = "";
-	                VClassGroup classGroup = null;
-	                if(groupURI != null) { 
-	                	classGroup = groupDao.getGroupByURI(groupURI);
-	                	if (classGroup!=null) {
-	                	    groupName = classGroup.getPublicName();
-	                	}
-	                }
-                    
-                    json.append("\"classGroup\": ").append(JacksonUtils.quote(groupName)).append(", ");
+					json.append("\"data\": { \"shortDef\": ").append(JacksonUtils.quote(shortDef)).append(", ");
 
-	                // get ontology name
-	                OntologyDao ontDao = wadf.getOntologyDao();
-	                String ontName = cls.getNamespace();
-	                Ontology ont = ontDao.getOntologyByURI(ontName);
-	                if (ont != null && ont.getName() != null) {
-	                    ontName = ont.getName();
-	                }
-	                json.append("\"ontology\": ").append(JacksonUtils.quote(ontName)).append("} }");
-	                
-	                counter++;
+					// get group name
+					WebappDaoFactory wadf = vreq.getUnfilteredWebappDaoFactory();
+					VClassGroupDao groupDao = wadf.getVClassGroupDao();
+					String groupURI = cls.getGroupURI();
+					String groupName = "";
+					VClassGroup classGroup = null;
+					if (groupURI != null) {
+						classGroup = groupDao.getGroupByURI(groupURI);
+						if (classGroup != null) {
+							groupName = classGroup.getPublicName();
+						}
+					}
 
-               }
-            }
+					json.append("\"classGroup\": ").append(JacksonUtils.quote(groupName)).append(", ");
+
+					// get ontology name
+					OntologyDao ontDao = wadf.getOntologyDao();
+					String ontName = cls.getNamespace();
+					Ontology ont = ontDao.getOntologyByURI(ontName);
+					if (ont != null && ont.getName() != null) {
+						ontName = ont.getName();
+					}
+					json.append("\"ontology\": ").append(JacksonUtils.quote(ontName)).append("} }");
+
+					counter++;
+
+				}
+			}
             body.put("jsonTree", json.toString());
         }      
         

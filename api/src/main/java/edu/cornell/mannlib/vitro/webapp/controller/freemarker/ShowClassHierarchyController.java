@@ -134,15 +134,14 @@ public class ShowClassHierarchyController extends FreemarkerHttpServlet {
         List<String> childURIstrs = vcDao.getSubClassURIs(parent.getURI());
         if ((childURIstrs.size()>0) && position<MAXDEPTH) {
             List<VClass> childClasses = new ArrayList<VClass>();
-            Iterator<String> childURIstrIt = childURIstrs.iterator();
-            while (childURIstrIt.hasNext()) {
-                String URIstr = childURIstrIt.next();
+            for (String URIstr : childURIstrs) {
                 try {
                     VClass child = vcDao.getVClassByURI(URIstr);
                     if (!child.getURI().equals(OWL.Nothing.getURI())) {
-                    	childClasses.add(child);
+                        childClasses.add(child);
                     }
-                } catch (Exception e) {}
+                } catch (Exception e) {
+                }
             }
             sortForPickList(childClasses, vreq);
             Iterator<VClass> childClassIt = childClasses.iterator();

@@ -178,19 +178,16 @@ public class BaseEditController extends VitroHttpServlet {
 
        List<String> bodyVal = new ArrayList<String>();
        List<Option> options = new ArrayList<Option>();
-       Iterator<Option> itr = optionList.iterator();
-        while(itr.hasNext()){
-            Option option = itr.next();
-            hashMap.put(option.getBody(),option);
-           bodyVal.add(option.getBody());
+        for (Option option : optionList) {
+            hashMap.put(option.getBody(), option);
+            bodyVal.add(option.getBody());
         }
         
                 
        Collections.sort(bodyVal, new ListComparator(vreq.getCollator()));
-       ListIterator<String> itrStr = bodyVal.listIterator();
-       while(itrStr.hasNext()){
-           options.add(hashMap.get(itrStr.next()));
-       }
+        for (String aBodyVal : bodyVal) {
+            options.add(hashMap.get(aBodyVal));
+        }
        return options;
    }
     

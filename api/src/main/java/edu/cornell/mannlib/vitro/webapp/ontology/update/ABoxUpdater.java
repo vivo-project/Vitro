@@ -90,29 +90,25 @@ public class ABoxUpdater {
 	 *  knowledge base.                  
 	 */
 	public void processClassChanges(List<AtomicOntologyChange> changes) throws IOException {
-		
-		Iterator<AtomicOntologyChange> iter = changes.iterator();
-		
-		while (iter.hasNext()) {
-			AtomicOntologyChange change = iter.next();
 
-			switch (change.getAtomicChangeType()){
-			   case ADD:
-				  addClass(change);
-			      break;
-			   case DELETE:
-				  if ("Delete".equals(change.getNotes())) {
-				     deleteIndividualsOfType(change);
-				  } else {
-					 renameClassToParent(change);
-				  }
-			      break;
-			   case RENAME:
-				  renameClass(change);
-			      break;
-			   default:
-				  logger.logError("unexpected change type indicator: " + change.getAtomicChangeType());
-		    }		
+		for (AtomicOntologyChange change : changes) {
+			switch (change.getAtomicChangeType()) {
+				case ADD:
+					addClass(change);
+					break;
+				case DELETE:
+					if ("Delete".equals(change.getNotes())) {
+						deleteIndividualsOfType(change);
+					} else {
+						renameClassToParent(change);
+					}
+					break;
+				case RENAME:
+					renameClass(change);
+					break;
+				default:
+					logger.logError("unexpected change type indicator: " + change.getAtomicChangeType());
+			}
 		}
 	}
 
@@ -235,35 +231,31 @@ public class ABoxUpdater {
 		if (namedClassList.isEmpty()) {
 			namedClassList.add(OWL_THING);
 		}
-		
-		Iterator<OntClass> classIter = namedClassList.iterator();
-		
-		while (classIter.hasNext()) {
-			OntClass parentOfAddedClass = classIter.next();
 
+		for (OntClass parentOfAddedClass : namedClassList) {
 			if (!parentOfAddedClass.equals(OWL.Thing)) {
-				
-			    Iterator<String> graphIt = dataset.listNames();
-	            while(graphIt.hasNext()) {
-	                String graph = graphIt.next();
-	                if(!KnowledgeBaseUpdater.isUpdatableABoxGraph(graph)){
-	                    continue;
-	                }
-			        Model aboxModel = dataset.getNamedModel(graph);
-			            
-    				StmtIterator stmtIter = aboxModel.listStatements(null, RDF.type, parentOfAddedClass);
-    				
-    				int count = stmtIter.toList().size();
-    					
+
+				Iterator<String> graphIt = dataset.listNames();
+				while (graphIt.hasNext()) {
+					String graph = graphIt.next();
+					if (!KnowledgeBaseUpdater.isUpdatableABoxGraph(graph)) {
+						continue;
+					}
+					Model aboxModel = dataset.getNamedModel(graph);
+
+					StmtIterator stmtIter = aboxModel.listStatements(null, RDF.type, parentOfAddedClass);
+
+					int count = stmtIter.toList().size();
+
 					if (count > 0) {
 						//TODO - take out the detailed logging after our internal testing is completed.
-				        logger.log("There " + ((count > 1) ? "are" : "is") + " " + count + " individual" + ((count > 1) ? "s" : "")  + " in the model that " + ((count > 1) ? "are" : "is") + " of type " + parentOfAddedClass.getURI() + "," +
-				        		    " and a new subclass of that class has been added: " + addedClass.getURI() + ". " +
-				        		    "Please review " + ((count > 1) ? "these" : "this") + " individual" + ((count > 1) ? "s" : "") + " to see whether " + ((count > 1) ? "they" : "it") + " should be of type: " +  addedClass.getURI() );
+						logger.log("There " + ((count > 1) ? "are" : "is") + " " + count + " individual" + ((count > 1) ? "s" : "") + " in the model that " + ((count > 1) ? "are" : "is") + " of type " + parentOfAddedClass.getURI() + "," +
+								" and a new subclass of that class has been added: " + addedClass.getURI() + ". " +
+								"Please review " + ((count > 1) ? "these" : "this") + " individual" + ((count > 1) ? "s" : "") + " to see whether " + ((count > 1) ? "they" : "it") + " should be of type: " + addedClass.getURI());
 					}
-				
-	            }
-			}			
+
+				}
+			}
 		}
 	}
 
@@ -414,36 +406,34 @@ public class ABoxUpdater {
 	}
 	
 	public void processPropertyChanges(List<AtomicOntologyChange> changes) throws IOException {
-				
-		Iterator<AtomicOntologyChange> propItr = changes.iterator();
-		while(propItr.hasNext()){
-			AtomicOntologyChange propChangeObj = propItr.next();
+
+		for (AtomicOntologyChange propChangeObj : changes) {
 			log.debug("processing " + propChangeObj);
 			try {
-			    if (propChangeObj.getAtomicChangeType() == null) {
-			        log.error("Missing change type; skipping " + propChangeObj);
-			        continue;
-			    }
-    			switch (propChangeObj.getAtomicChangeType()){
-    			  case ADD: 
-    			   log.debug("add");
-    			   addProperty(propChangeObj);
-    			   break;
-    			case DELETE: 
-    			   log.debug("delete");
-    			   deleteProperty(propChangeObj);
-    			   break;
-    			case RENAME: 
-    			   log.debug("rename");
-    			   renameProperty(propChangeObj);
-    			   break;
-    			default: 
-    			   log.debug("unknown");
-    			   logger.logError("unexpected change type indicator: " + propChangeObj.getAtomicChangeType());
-    			   break;
-    		    }	
+				if (propChangeObj.getAtomicChangeType() == null) {
+					log.error("Missing change type; skipping " + propChangeObj);
+					continue;
+				}
+				switch (propChangeObj.getAtomicChangeType()) {
+					case ADD:
+						log.debug("add");
+						addProperty(propChangeObj);
+						break;
+					case DELETE:
+						log.debug("delete");
+						deleteProperty(propChangeObj);
+						break;
+					case RENAME:
+						log.debug("rename");
+						renameProperty(propChangeObj);
+						break;
+					default:
+						log.debug("unknown");
+						logger.logError("unexpected change type indicator: " + propChangeObj.getAtomicChangeType());
+						break;
+				}
 			} catch (Exception e) {
-			    log.error(e,e);
+				log.error(e, e);
 			}
 		}
 	}

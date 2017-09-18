@@ -497,9 +497,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
             }
 
             List<ObjectProperty> props = new ArrayList<ObjectProperty>();
-            Iterator<String> keyIt = hash.keySet().iterator();
-            while (keyIt.hasNext()) {
-                Object key = keyIt.next();
+            for (String key : hash.keySet()) {
                 props.add(hash.get(key));
             }
             return props;

@@ -202,18 +202,16 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 		HashMap<VClass, List<DataProperty>> classPropertiesMap = new HashMap<VClass, List<DataProperty>>();
 		List<DataProperty> props = new ArrayList<DataProperty>();
 		VClass topVc = vcDao.getVClassByURI(uri);
-	        Collection <DataProperty> dataProps = dao.getDataPropertiesForVClass(uri);
-	        Iterator<DataProperty> dataPropIt = dataProps.iterator();
-	        while (dataPropIt.hasNext()) {
-	            DataProperty dp = dataPropIt.next();
-	            if (!(propURIs.contains(dp.getURI()))) {
-	                propURIs.add(dp.getURI());
-	                DataProperty prop = dao.getDataPropertyByURI(dp.getURI());
-	                if (prop != null) {
-	                    props.add(prop);
-	                }
-	            }
-	        }
+		Collection <DataProperty> dataProps = dao.getDataPropertiesForVClass(uri);
+		for (DataProperty dp : dataProps) {
+			if (!(propURIs.contains(dp.getURI()))) {
+				propURIs.add(dp.getURI());
+				DataProperty prop = dao.getDataPropertyByURI(dp.getURI());
+				if (prop != null) {
+					props.add(prop);
+				}
+			}
+		}
         
     	
         if (props.size() > 0) {
@@ -256,22 +254,21 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 	        List childURIstrs = vcDao.getSubClassURIs(parent.getURI());
 	        if ((childURIstrs.size()>0) && position<MAXDEPTH) {
 	            List childClasses = new ArrayList();
-	            Iterator childURIstrIt = childURIstrs.iterator();
-	            while (childURIstrIt.hasNext()) {
-	                String URIstr = (String) childURIstrIt.next();
-	                try {
-		                VClass child = (VClass) vcDao.getVClassByURI(URIstr);
-		                if (!child.getURI().equals(OWL.Nothing.getURI())) {
-		                	childClasses.add(child);
-		                }
-	                } catch (Exception e) {}
-	            }
+				for (Object childURIstr : childURIstrs) {
+					String URIstr = (String) childURIstr;
+					try {
+						VClass child = (VClass) vcDao.getVClassByURI(URIstr);
+						if (!child.getURI().equals(OWL.Nothing.getURI())) {
+							childClasses.add(child);
+						}
+					} catch (Exception e) {
+					}
+				}
 	            Collections.sort(childClasses);
-	            Iterator childClassIt = childClasses.iterator();
-	            while (childClassIt.hasNext()) {
-	                VClass child = (VClass) childClassIt.next();
-	                addChildren(vcDao, wadf, child, list, position + childShift, ontologyUri);
-	            }
+				for (Object childClass : childClasses) {
+					VClass child = (VClass) childClass;
+					addChildren(vcDao, wadf, child, list, position + childShift, ontologyUri);
+				}
 
 	        }
 

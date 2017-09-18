@@ -162,15 +162,13 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     }
 
     private void getAllSubPropertyURIs(String propertyURI, HashSet<String> subtree){
-        List<String> directSubproperties = getSubPropertyURIs(propertyURI);     
-        Iterator<String> it=directSubproperties.iterator();
-        while(it.hasNext()){
-            String uri = it.next();
-            if (!subtree.contains(uri)) {
-            	subtree.add(uri);
-            	getAllSubPropertyURIs(uri,subtree);
-            }
-        }
+        List<String> directSubproperties = getSubPropertyURIs(propertyURI);
+		for (String uri : directSubproperties) {
+			if (!subtree.contains(uri)) {
+				subtree.add(uri);
+				getAllSubPropertyURIs(uri, subtree);
+			}
+		}
     }
 
     @Override
@@ -205,15 +203,13 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     }
 
     private void getAllSuperPropertyURIs(String propertyURI, HashSet<String> subtree){
-        List<String> directSuperproperties = getSuperPropertyURIs(propertyURI,true);     
-        Iterator<String> it=directSuperproperties.iterator();
-        while(it.hasNext()){
-            String uri = it.next();
-            if (!subtree.contains(uri)) {
-            	subtree.add(uri);
-            	getAllSuperPropertyURIs(uri,subtree);
-            }
-        }
+        List<String> directSuperproperties = getSuperPropertyURIs(propertyURI,true);
+		for (String uri : directSuperproperties) {
+			if (!subtree.contains(uri)) {
+				subtree.add(uri);
+				getAllSuperPropertyURIs(uri, subtree);
+			}
+		}
     }
 
     @Override
@@ -420,18 +416,14 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
   
         List<OntClass> classList = ontClass.listEquivalentClasses().toList();
         classList.addAll(ontClass.listSubClasses().toList());
-        
-        Iterator<OntClass> it = classList.iterator();
-		         
-        while (it.hasNext()) {
-        	OntClass oc = it.next();
-        	
-        	if (!oc.isAnon()) {
-        		classSet.add(oc.getURI());
-        	} else {
-        	    classSet.addAll(getRestrictedClasses(oc));
-        	}
-        }
+
+		for (OntClass oc : classList) {
+			if (!oc.isAnon()) {
+				classSet.add(oc.getURI());
+			} else {
+				classSet.addAll(getRestrictedClasses(oc));
+			}
+		}
         		
         return classSet;
     }

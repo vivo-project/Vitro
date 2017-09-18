@@ -190,11 +190,9 @@ public class VClassDaoFiltering extends BaseFiltering implements VClassDao{
         }
     }
 
-    public void addVClassesToGroups(List groups) {
+    public void addVClassesToGroups(List<VClassGroup> groups) {
         if ((groups != null) && (groups.size()>0)) {
-            Iterator groupIt = groups.iterator();
-            while (groupIt.hasNext()) {
-                VClassGroup g = (VClassGroup) groupIt.next();
+            for (VClassGroup g : groups) {
                 this.addVClassesToGroup(g);
             }
         } else {

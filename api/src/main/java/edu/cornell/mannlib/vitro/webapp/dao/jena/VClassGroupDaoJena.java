@@ -87,9 +87,7 @@ public class VClassGroupDaoJena extends JenaBaseDao implements VClassGroupDao {
                 groupIt.close();
             }
             Collections.sort(groups);
-            Iterator<VClassGroup> groupsIt = groups.iterator();
-            while (groupsIt.hasNext()) {
-                VClassGroup group = groupsIt.next();
+            for (VClassGroup group : groups) {
                 map.put(group.getPublicName(), group);
             }
             return map;

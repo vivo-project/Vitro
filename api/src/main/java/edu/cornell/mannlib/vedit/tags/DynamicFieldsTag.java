@@ -162,27 +162,26 @@ public class DynamicFieldsTag extends EditTag {
 
                     out.print(preWithVars);
 
-                    Iterator<DynamicFieldRow> rowIt = dynf.getRowList().iterator();
-                     while (rowIt.hasNext()) {
+                    for (DynamicFieldRow dynamicFieldRow : dynf.getRowList()) {
                         ++i;
-                        DynamicFieldRow row = rowIt.next();
-                        if (row.getValue()==null)
+                        DynamicFieldRow row = dynamicFieldRow;
+                        if (row.getValue() == null)
                             row.setValue("");
-                        if (row.getValue().length()>0) {
+                        if (row.getValue().length() > 0) {
                             StringBuilder taName = new StringBuilder().append("_").append(dynf.getTable()).append("_");
                             taName.append(row.getId()).append("_");
                             Iterator paramIt = row.getParameterMap().keySet().iterator();
-                            while(paramIt.hasNext()) {
+                            while (paramIt.hasNext()) {
                                 String key = (String) paramIt.next();
                                 String value = (String) row.getParameterMap().get(key);
                                 byte[] valueInBase64 = Base64.encodeBase64(value.getBytes());
                                 taName.append(key).append(":").append(new String(valueInBase64)).append(";");
                             }
-                            if (row.getValue().length()>0) {
+                            if (row.getValue().length() > 0) {
                                 String templateWithVars = templateMarkup;
-                                templateWithVars = strReplace(templateWithVars,type+"NN",Integer.toString(i));
-                                templateWithVars = strReplace(templateWithVars,"\\$taName",taName.toString());
-                                templateWithVars = strReplace(templateWithVars,"\\$\\$",row.getValue());
+                                templateWithVars = strReplace(templateWithVars, type + "NN", Integer.toString(i));
+                                templateWithVars = strReplace(templateWithVars, "\\$taName", taName.toString());
+                                templateWithVars = strReplace(templateWithVars, "\\$\\$", row.getValue());
                                 out.print(templateWithVars);
                             }
                         }

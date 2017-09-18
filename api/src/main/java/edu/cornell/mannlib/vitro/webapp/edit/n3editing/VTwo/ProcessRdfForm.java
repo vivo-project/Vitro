@@ -463,16 +463,14 @@ public class ProcessRdfForm {
 	   Map<String, List<String>> newUris = new HashMap<String, List<String>>();
 	   //Check if any values from the submission have the "force new uri" value
 	   //TODO: Check how to handle multiple new resource values
-	   Iterator<String> keyIterator = urisFromForm.keySet().iterator();
-	   while(keyIterator.hasNext()) {
-		   String key = keyIterator.next();
-		   if(urisFromForm.get(key).contains(EditConfigurationConstants.NEW_URI_SENTINEL)) {
-			   String newUri = urisForNewResources.get(key);
-			   List<String> newUrisForKey = new ArrayList<String>();
-			   newUrisForKey.add(newUri);
-			   newUris.put(key, newUrisForKey);
-		   }
-	   }
+       for (String key : urisFromForm.keySet()) {
+           if (urisFromForm.get(key).contains(EditConfigurationConstants.NEW_URI_SENTINEL)) {
+               String newUri = urisForNewResources.get(key);
+               List<String> newUrisForKey = new ArrayList<String>();
+               newUrisForKey.add(newUri);
+               newUris.put(key, newUrisForKey);
+           }
+       }
 	   if(newUris.size() > 0) {
 		   substituteInMultiURIs(newUris, requiredAsserts, optionalAsserts, uRLToReturnTo);
 	   }

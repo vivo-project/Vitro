@@ -146,42 +146,41 @@ public class ListPropertyWebappsController extends FreemarkerHttpServlet {
                 if (props.size()==0) {
                     json = new StringBuilder("{ \"name\": \"" + noResultsMsgStr + "\" }");
                 } else {
-                    Iterator<ObjectProperty> propsIt = props.iterator();
-                    while (propsIt.hasNext()) {
-                        if ( counter > 0 ) {
+                    for (ObjectProperty prop1 : props) {
+                        if (counter > 0) {
                             json.append(", ");
                         }
-                        ObjectProperty prop = propsIt.next();
-                    
+                        ObjectProperty prop = prop1;
+
                         String propNameStr = ShowObjectPropertyHierarchyController.getDisplayLabel(prop);
 
                         try {
                             json.append("{ \"name\": ").append(JacksonUtils.quote("<a href='./propertyEdit?uri=" + URLEncoder.encode(prop.getURI()) + "'>"
                                     + propNameStr + "</a>")).append(", ");
-                         } catch (Exception e) {
-                             json.append("{ \"name\": \"").append(propNameStr).append("\", ");
-                         }
-                    
-                         json.append("\"data\": { \"internalName\": ").append(JacksonUtils.quote(prop.getLocalNameWithPrefix())).append(", ");
-                    
-                         ObjectProperty opLangNeut = opDaoLangNeut.getObjectPropertyByURI(prop.getURI());
-                         if(opLangNeut == null) {
-                             opLangNeut = prop;
-                         }
-                         String domainStr = getVClassNameFromURI(opLangNeut.getDomainVClassURI(), vcDao, vcDaoLangNeut); 
-                         json.append("\"domainVClass\": ").append(JacksonUtils.quote(domainStr)).append(", ");
-                    
-                         String rangeStr = getVClassNameFromURI(opLangNeut.getRangeVClassURI(), vcDao, vcDaoLangNeut);
-                         json.append("\"rangeVClass\": ").append(JacksonUtils.quote(rangeStr)).append(", ");
-                    
-                         if (prop.getGroupURI() != null) {
-                             PropertyGroup pGroup = pgDao.getGroupByURI(prop.getGroupURI());
-                             json.append("\"group\": ").append(JacksonUtils.quote((pGroup == null) ? "unknown group" : pGroup.getName())).append(" } } ");
-                         } else {
-                             json.append("\"group\": \"unspecified\" } }");
-                         }
-                         counter += 1;
-                     }
+                        } catch (Exception e) {
+                            json.append("{ \"name\": \"").append(propNameStr).append("\", ");
+                        }
+
+                        json.append("\"data\": { \"internalName\": ").append(JacksonUtils.quote(prop.getLocalNameWithPrefix())).append(", ");
+
+                        ObjectProperty opLangNeut = opDaoLangNeut.getObjectPropertyByURI(prop.getURI());
+                        if (opLangNeut == null) {
+                            opLangNeut = prop;
+                        }
+                        String domainStr = getVClassNameFromURI(opLangNeut.getDomainVClassURI(), vcDao, vcDaoLangNeut);
+                        json.append("\"domainVClass\": ").append(JacksonUtils.quote(domainStr)).append(", ");
+
+                        String rangeStr = getVClassNameFromURI(opLangNeut.getRangeVClassURI(), vcDao, vcDaoLangNeut);
+                        json.append("\"rangeVClass\": ").append(JacksonUtils.quote(rangeStr)).append(", ");
+
+                        if (prop.getGroupURI() != null) {
+                            PropertyGroup pGroup = pgDao.getGroupByURI(prop.getGroupURI());
+                            json.append("\"group\": ").append(JacksonUtils.quote((pGroup == null) ? "unknown group" : pGroup.getName())).append(" } } ");
+                        } else {
+                            json.append("\"group\": \"unspecified\" } }");
+                        }
+                        counter += 1;
+                    }
                  }
                  body.put("jsonTree", json.toString());
              }

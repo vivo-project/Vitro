@@ -500,9 +500,7 @@ public class JenaIngestController extends BaseEditController {
         List<Ontology> ontologiesObj = daoObj.getAllOntologies();
         List<String> prefixList = new ArrayList<>();       
         if(ontologiesObj !=null && ontologiesObj.size()>0){
-            Iterator<Ontology> ontItr = ontologiesObj.iterator();
-            while(ontItr.hasNext()){
-                Ontology ont = ontItr.next();
+            for (Ontology ont : ontologiesObj) {
                 prefixList.add(ont.getPrefix() == null ? "(not yet specified)" : ont.getPrefix());
                 prefixList.add(ont.getURI() == null ? "" : ont.getURI());
             }

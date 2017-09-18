@@ -197,18 +197,16 @@ public class PagedSearchController extends FreemarkerHttpServlet {
             }            
             
             List<Individual> individuals = new ArrayList<Individual>(docs.size());
-            Iterator<SearchResultDocument> docIter = docs.iterator();
-            while( docIter.hasNext() ){
-                try {                                    
-                    SearchResultDocument doc = docIter.next();
-                    String uri = doc.getStringValue(VitroSearchTermNames.URI);                    
+            for (SearchResultDocument doc : docs) {
+                try {
+                    String uri = doc.getStringValue(VitroSearchTermNames.URI);
                     Individual ind = iDao.getIndividualByURI(uri);
-                    if(ind != null) {
-                      ind.setSearchSnippet( getSnippet(doc, response) );
-                      individuals.add(ind);
+                    if (ind != null) {
+                        ind.setSearchSnippet(getSnippet(doc, response));
+                        individuals.add(ind);
                     }
-                } catch(Exception e) {
-                    log.error("Problem getting usable individuals from search hits. ",e);
+                } catch (Exception e) {
+                    log.error("Problem getting usable individuals from search hits. ", e);
                 }
             }          
   

@@ -301,10 +301,8 @@ public class IndividualImpl extends BaseResourceBean implements Individual, Comp
     protected void sortEnts2EntsForDisplay(){
         if( getObjectPropertyList() == null ) return;
 
-        Iterator it = getObjectPropertyList().iterator();
-        while(it.hasNext()){
-            ObjectProperty prop = (ObjectProperty)it.next();
-            prop.sortObjectPropertyStatementsForDisplay(prop,prop.getObjectPropertyStatements());
+        for (ObjectProperty prop : getObjectPropertyList()) {
+            prop.sortObjectPropertyStatementsForDisplay(prop, prop.getObjectPropertyStatements());
         }
     }
 

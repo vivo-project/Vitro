@@ -39,12 +39,10 @@ public class IndividualDataPropertyStatementProcessor implements ChangeListener 
 
     private void processDataprops (EditProcessObject epo) {
         HashSet<String> deletedDataPropertyURIs = new HashSet<String>();
-        Map dpm = datapropParameterMap(epo.getRequestParameterMap());
+        Map<String, String[]> dpm = datapropParameterMap(epo.getRequestParameterMap());
         DataPropertyStatementDao dataPropertyStatementDao = (DataPropertyStatementDao)epo.getAdditionalDaoMap().get("DataPropertyStatement");
-        Iterator dpmIt = dpm.keySet().iterator();
-        while (dpmIt.hasNext()) {
-            String key = (String) dpmIt.next();
-            String[] data = (String[])dpm.get(key);
+        for (String key : dpm.keySet()) {
+            String[] data = (String[]) dpm.get(key);
             for (String aData : data) {
                 String[] keyArg = key.split("_");
                 String rowId = keyArg[2];
@@ -105,13 +103,11 @@ public class IndividualDataPropertyStatementProcessor implements ChangeListener 
     }
 
     // might want to roll this into the other thing
-    private HashMap datapropParameterMap(Map requestParameterMap) {
-        HashMap dpm = new HashMap();
-        Iterator paramIt = requestParameterMap.keySet().iterator();
-        while (paramIt.hasNext()) {
-            String key = (String) paramIt.next();
+    private Map<String, String[]> datapropParameterMap(Map<String, String[]> requestParameterMap) {
+        Map<String, String[]> dpm = new HashMap<String, String[]>();
+        for (String key : requestParameterMap.keySet()) {
             if (key.startsWith("_DataPropertyStatement")) {
-                dpm.put(key,requestParameterMap.get(key));
+                dpm.put(key, requestParameterMap.get(key));
             }
         }
         return dpm;

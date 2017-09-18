@@ -142,9 +142,7 @@ public abstract class RDFServiceImpl implements RDFService {
 	
     protected void notifyListeners(ModelChange modelChange) throws IOException {
         modelChange.getSerializedModel().reset();
-        Iterator<ChangeListener> iter = registeredListeners.iterator();
-        while (iter.hasNext()) {
-            ChangeListener listener = iter.next();
+        for (ChangeListener listener : registeredListeners) {
             listener.notifyModelChange(modelChange);
         }
         log.debug(registeredJenaListeners.size() + " registered Jena listeners");
@@ -173,16 +171,12 @@ public abstract class RDFServiceImpl implements RDFService {
         }
     }
     
-    public void notifyListenersOfEvent(Object event) {       
-        Iterator<ChangeListener> iter = registeredListeners.iterator();
-        while (iter.hasNext()) {
-            ChangeListener listener = iter.next();
+    public void notifyListenersOfEvent(Object event) {
+        for (ChangeListener listener : registeredListeners) {
             // TODO what is the graphURI parameter for?
             listener.notifyEvent(null, event);
         }
-        Iterator<ModelChangedListener> jenaIter = registeredJenaListeners.iterator();
-        while (jenaIter.hasNext()) {
-            ModelChangedListener listener = jenaIter.next();
+        for (ModelChangedListener listener : registeredJenaListeners) {
             listener.notifyEvent(null, event);
         }
     }    

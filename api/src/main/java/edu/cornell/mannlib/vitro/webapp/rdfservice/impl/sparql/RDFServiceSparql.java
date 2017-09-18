@@ -178,9 +178,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		        this.notifyListenersOfEvent(o);
 			}
 
-			Iterator<ModelChange> csIt = changeSet.getModelChanges().iterator();
-			while (csIt.hasNext()) {
-				ModelChange modelChange = csIt.next();
+			for (ModelChange modelChange : changeSet.getModelChanges()) {
 				if (!modelChange.getSerializedModel().markSupported()) {
 					byte[] bytes = IOUtils.toByteArray(modelChange.getSerializedModel());
 					modelChange.setSerializedModel(new ByteArrayInputStream(bytes));

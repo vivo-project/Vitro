@@ -403,9 +403,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
         query.addFields(VitroSearchTermNames.NAME_RAW, VitroSearchTermNames.URI, "*", "score"); // fields to retrieve
  
 		// if propertiesList has elements, add extra queries to query
-		Iterator<String[]> it = propertiesList.iterator();
-		while (it.hasNext()) {
-			String[] pvPair = it.next();
+		for (String[] pvPair : propertiesList) {
 			query.addFilterQueries(tokenizeNameQuery(pvPair[1]), VitroSearchTermNames.RDFTYPE + ":\"" + pvPair[0] + "\"");
 		}       
 

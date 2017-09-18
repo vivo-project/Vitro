@@ -77,10 +77,8 @@ public class GetAllClasses extends BaseEditController {
 
 		while (classGroupIt.hasNext()) {
 			VClassGroup group = (VClassGroup) classGroupIt.next();
-			List classes = group.getVitroClassList();
-			Iterator classIt = classes.iterator();
-			while (classIt.hasNext()) {
-				VClass clazz = (VClass) classIt.next();
+			List<VClass> classes = group.getVitroClassList();
+			for (VClass clazz : classes) {
 				respo.append("<option>" + "<key>").append(clazz.getPickListName()).append("</key>").append("<value>").append(clazz.getURI()).append("</value>").append("</option>");
 			}
 		}

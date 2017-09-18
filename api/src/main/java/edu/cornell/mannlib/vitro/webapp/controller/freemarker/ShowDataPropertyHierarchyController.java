@@ -147,9 +147,7 @@ public class ShowDataPropertyHierarchyController extends FreemarkerHttpServlet {
         List<String> childURIstrs = dpDao.getSubPropertyURIs(parent.getURI());
         if ( (childURIstrs.size() > 0) && (position < MAXDEPTH) ) {
             List<DataProperty> childProps = new ArrayList<DataProperty>();
-            Iterator<String> childURIstrIt = childURIstrs.iterator();
-            while (childURIstrIt.hasNext()) {
-                String URIstr = childURIstrIt.next();
+            for (String URIstr : childURIstrs) {
                 DataProperty child = dpDao.getDataPropertyByURI(URIstr);
                 childProps.add(child);
             }

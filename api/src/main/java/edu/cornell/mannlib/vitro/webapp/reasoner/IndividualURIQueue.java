@@ -73,13 +73,11 @@ public class IndividualURIQueue<E> implements Queue<E> {
     @Override
     public synchronized boolean retainAll(Collection<?> c) {
         boolean changed = false;
-        Iterator<E> it = m.keySet().iterator();
-        while(it.hasNext()) {
-            E e = it.next();
-            if(!c.contains(e)) {
-               m.remove(e);
-               q.remove(e);
-               changed = true;
+        for (E e : m.keySet()) {
+            if (!c.contains(e)) {
+                m.remove(e);
+                q.remove(e);
+                changed = true;
             }
         }
         return changed;

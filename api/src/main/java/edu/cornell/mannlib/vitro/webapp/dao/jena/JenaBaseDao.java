@@ -771,20 +771,18 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     }
     
     private Literal getLabel(String lang, List<RDFNode>labelList) {
-    	Iterator<RDFNode> labelIt = labelList.iterator();
-    	while (labelIt.hasNext()) {
-    		RDFNode label = labelIt.next();
-    		if (label.isLiteral()) {
-    			Literal labelLit = ((Literal)label);
-    			String labelLanguage = labelLit.getLanguage();
-    			if ( (labelLanguage == null) && (lang == null || lang.isEmpty()) ) {
-    				return labelLit;
-    			}
-    			if ( (lang != null) && (lang.equals(labelLanguage)) ) {
-    				return labelLit;
-    			}
-    		}
-    	}
+        for (RDFNode label : labelList) {
+            if (label.isLiteral()) {
+                Literal labelLit = ((Literal) label);
+                String labelLanguage = labelLit.getLanguage();
+                if ((labelLanguage == null) && (lang == null || lang.isEmpty())) {
+                    return labelLit;
+                }
+                if ((lang != null) && (lang.equals(labelLanguage))) {
+                    return labelLit;
+                }
+            }
+        }
     	return null;
     }
     
@@ -1019,22 +1017,20 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     	}
     	// Now for each value, work backwards and see if it has an alternate path to the original resource.
     	// If not, add it to the list of direct values.
-    	Iterator<Resource> possibleValueIt = possibleValueSet.iterator();
-    	while (possibleValueIt.hasNext()) {
-    		Resource possibleRes = possibleValueIt.next();
-    		StmtIterator pStmtIt = getOntModel().listStatements((Resource)null, prop, possibleRes);
-    		boolean hasAlternatePath = false;
-        	while (stmtIt.hasNext()) {
-        		Statement stmt = stmtIt.nextStatement();
-        		if (possibleValueSet.contains(stmt.getSubject())) {
-        			hasAlternatePath = true;
-        			break;
-        		}
-        	}
-        	if (!hasAlternatePath) {
-        		directValueList.add(possibleRes);
-        	}
-    	}
+        for (Resource possibleRes : possibleValueSet) {
+            StmtIterator pStmtIt = getOntModel().listStatements((Resource) null, prop, possibleRes);
+            boolean hasAlternatePath = false;
+            while (stmtIt.hasNext()) {
+                Statement stmt = stmtIt.nextStatement();
+                if (possibleValueSet.contains(stmt.getSubject())) {
+                    hasAlternatePath = true;
+                    break;
+                }
+            }
+            if (!hasAlternatePath) {
+                directValueList.add(possibleRes);
+            }
+        }
     	return directValueList;
     }
     
@@ -1048,22 +1044,20 @@ public class JenaBaseDao extends JenaBaseDaoCon {
     		possibleSubjectSet.add(stmt.getSubject());
     		
     	}
-    	Iterator<Resource> possibleSubjectIt = possibleSubjectSet.iterator();
-    	while (possibleSubjectIt.hasNext()) {
-    		Resource possibleRes = possibleSubjectIt.next();
-    		StmtIterator pStmtIt = getOntModel().listStatements(possibleRes, prop, (RDFNode)null);
-    		boolean hasAlternatePath = false;
-        	while (stmtIt.hasNext()) {
-        		Statement stmt = stmtIt.nextStatement();
-        		if (stmt.getObject().isResource() && possibleSubjectSet.contains(stmt.getObject())) {
-        			hasAlternatePath = true;
-        			break;
-        		}
-        	}
-        	if (!hasAlternatePath) {
-        		directSubjectList.add(possibleRes);
-        	}
-    	}
+        for (Resource possibleRes : possibleSubjectSet) {
+            StmtIterator pStmtIt = getOntModel().listStatements(possibleRes, prop, (RDFNode) null);
+            boolean hasAlternatePath = false;
+            while (stmtIt.hasNext()) {
+                Statement stmt = stmtIt.nextStatement();
+                if (stmt.getObject().isResource() && possibleSubjectSet.contains(stmt.getObject())) {
+                    hasAlternatePath = true;
+                    break;
+                }
+            }
+            if (!hasAlternatePath) {
+                directSubjectList.add(possibleRes);
+            }
+        }
     	return directSubjectList;
     }
     

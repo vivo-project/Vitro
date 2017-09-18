@@ -144,9 +144,7 @@ public class EntityEditController extends BaseEditController {
         try {
             List<Option> externalIdOptionList = new LinkedList<Option>();
             if (ent.getExternalIds() != null) {
-                Iterator<DataPropertyStatement> externalIdIt = ent.getExternalIds().iterator();
-                while (externalIdIt.hasNext()) {
-                    DataPropertyStatement eid = externalIdIt.next();
+                for (DataPropertyStatement eid : ent.getExternalIds()) {
                     String multiplexedString = "DatapropURI:" + new String(Base64.encodeBase64(eid.getDatapropURI().getBytes())) + ";" + "Data:" + new String(Base64.encodeBase64(eid.getData().getBytes()));
                     externalIdOptionList.add(new Option(multiplexedString, eid.getData()));
                 }
@@ -169,11 +167,9 @@ public class EntityEditController extends BaseEditController {
         try {
             List epiOptionList = new LinkedList();
             Collection<PropertyInstance> epiColl = piDao.getExistingProperties(ent.getURI(),null);
-            Iterator<PropertyInstance> epiIt = epiColl.iterator();
-            while (epiIt.hasNext()) {
-                PropertyInstance pi = epiIt.next();
+            for (PropertyInstance pi : epiColl) {
                 String multiplexedString = "PropertyURI:" + new String(Base64.encodeBase64(pi.getPropertyURI().getBytes())) + ";" + "ObjectEntURI:" + new String(Base64.encodeBase64(pi.getObjectEntURI().getBytes()));
-                epiOptionList.add(new Option(multiplexedString, pi.getDomainPublic()+" "+pi.getObjectName()));
+                epiOptionList.add(new Option(multiplexedString, pi.getDomainPublic() + " " + pi.getObjectName()));
             }
             OptionMap.put("ExistingPropertyInstances", epiOptionList);
         } catch (Exception e) {

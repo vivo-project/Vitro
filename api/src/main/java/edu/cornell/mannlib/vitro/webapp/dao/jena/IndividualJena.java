@@ -517,15 +517,13 @@ public class IndividualJena extends IndividualImpl implements Individual {
     protected void sortEnts2EntsForDisplay(){
         if( getObjectPropertyList() == null ) return;
 
-        Iterator it = getObjectPropertyList().iterator();
-        while(it.hasNext()){
-            ObjectProperty prop = (ObjectProperty)it.next();
-        /*  if (prop.getObjectIndividualSortPropertyURI()==null) {
+		for (ObjectProperty prop : getObjectPropertyList()) {
+			/*  if (prop.getObjectIndividualSortPropertyURI()==null) {
             	prop.sortObjectPropertyStatementsForDisplay(prop,prop.getObjectPropertyStatements());
             } else {*/
-            	prop.sortObjectPropertyStatementsForDisplay(prop,prop.getObjectPropertyStatements());
+			prop.sortObjectPropertyStatementsForDisplay(prop, prop.getObjectPropertyStatements());
         /*  }*/
-        }
+		}
     }
     
     private Collator collator = Collator.getInstance();

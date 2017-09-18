@@ -410,13 +410,11 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
     }
 
     public void getAllSubClassURIs(String classURI, HashSet<String> subtree){
-        List<String> directSubclasses = getSubClassURIs(classURI);     
-        Iterator<String> it=directSubclasses.iterator();
-        while(it.hasNext()){
-            String uri = it.next();
+        List<String> directSubclasses = getSubClassURIs(classURI);
+        for (String uri : directSubclasses) {
             if (!subtree.contains(uri)) {
                 subtree.add(uri);
-                getAllSubClassURIs(uri,subtree);
+                getAllSubClassURIs(uri, subtree);
             }
         }
     }
@@ -449,13 +447,11 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
     }
 
     public void getAllSuperClassURIs(String classURI, HashSet<String> subtree){
-        List<String> directSuperclasses = getSuperClassURIs(classURI, true);     
-        Iterator<String> it=directSuperclasses.iterator();
-        while(it.hasNext()){
-            String uri = it.next();
+        List<String> directSuperclasses = getSuperClassURIs(classURI, true);
+        for (String uri : directSuperclasses) {
             if (!subtree.contains(uri)) {
                 subtree.add(uri);
-                getAllSuperClassURIs(uri,subtree);
+                getAllSuperClassURIs(uri, subtree);
             }
         }
     }
@@ -787,13 +783,11 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
 						// if this model infers types based on the taxonomy, adding the subclasses will only
 						// waste time for no benefit
 						if (!isUnderlyingStoreReasoned()) {
-                        	Iterator classURIs = getAllSubClassURIs(getClassURIStr(superclass)).iterator();
-                        	while (classURIs.hasNext()) {
-                            	String classURI = (String) classURIs.next();
-                            	VClass vClass = getVClassByURI(classURI);
-                            	if (vClass != null)
-                            	    vClasses.add(vClass);
-                        	}
+                            for (String classURI : getAllSubClassURIs(getClassURIStr(superclass))) {
+                                VClass vClass = getVClassByURI(classURI);
+                                if (vClass != null)
+                                    vClasses.add(vClass);
+                            }
 						} 
                     }
                 }
@@ -919,12 +913,10 @@ public class VClassDaoJena extends JenaBaseDao implements VClassDao {
         getOntModel().enterCriticalSection(Lock.READ);
         try {
             if (groups != null) {
-                Iterator groupIt = groups.iterator();
-                while (groupIt.hasNext()) {
-                    VClassGroup g = (VClassGroup) groupIt.next();
+                for (VClassGroup g : groups) {
                     addVClassesToGroup(g);
                 }
-            } 
+            }
         } finally {
             getOntModel().leaveCriticalSection();
         }

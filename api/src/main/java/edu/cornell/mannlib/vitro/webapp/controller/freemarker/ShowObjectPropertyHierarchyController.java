@@ -151,9 +151,7 @@ public class ShowObjectPropertyHierarchyController extends FreemarkerHttpServlet
         List<String> childURIstrs = opDao.getSubPropertyURIs(parent.getURI());
         if ( (childURIstrs.size() > 0) && (position < MAXDEPTH) ) {
             List<ObjectProperty> childProps = new ArrayList<ObjectProperty>();
-            Iterator<String> childURIstrIt = childURIstrs.iterator();
-            while (childURIstrIt.hasNext()) {
-                String URIstr = childURIstrIt.next();
+            for (String URIstr : childURIstrs) {
                 ObjectProperty child = opDao.getObjectPropertyByURI(URIstr);
                 childProps.add(child);
             }

@@ -211,25 +211,21 @@ public class EntityRetryController extends BaseEditController {
         Collections.sort(allApplicableDataprops);
         
         if (allApplicableDataprops != null) {
-            Iterator<DataProperty> datapropsIt = allApplicableDataprops.iterator();
 
-            while (datapropsIt.hasNext()){
-                DataProperty d = datapropsIt.next();
+            for (DataProperty d : allApplicableDataprops) {
                 if (!dpMap.containsKey(d.getURI())) {
-                    dpMap.put(d.getURI(),d);
+                    dpMap.put(d.getURI(), d);
                 }
-				
+
             }
 
             if (individualForEditing.getDataPropertyList() != null) {
-                Iterator<DataProperty> existingDps = individualForEditing.getDataPropertyList().iterator();
-                while (existingDps.hasNext()) {
-                    DataProperty existingDp = existingDps.next();
-					// Since the edit form begins with a "name" field, which gets saved as the rdfs:label,
-					// do not want to include the label as well. 
-					if ( !existingDp.getPublicName().equals("label") ) {
-						dpMap.put(existingDp.getURI(),existingDp);
-					}
+                for (DataProperty existingDp : individualForEditing.getDataPropertyList()) {
+                    // Since the edit form begins with a "name" field, which gets saved as the rdfs:label,
+                    // do not want to include the label as well.
+                    if (!existingDp.getPublicName().equals("label")) {
+                        dpMap.put(existingDp.getURI(), existingDp);
+                    }
                 }
             }
 
@@ -249,9 +245,7 @@ public class EntityRetryController extends BaseEditController {
                 rowTemplate.setParameterMap(parameterMap);
                 dynamo.setRowTemplate(rowTemplate);
                 try {
-                    Iterator<DataPropertyStatement> existingValues = dp.getDataPropertyStatements().iterator();
-                    while (existingValues.hasNext()) {
-                        DataPropertyStatement existingValue = existingValues.next();
+                    for (DataPropertyStatement existingValue : dp.getDataPropertyStatements()) {
                         DynamicFieldRow row = new DynamicFieldRow();
                         //TODO: UGH
                         //row.setId(existingValue.getId());

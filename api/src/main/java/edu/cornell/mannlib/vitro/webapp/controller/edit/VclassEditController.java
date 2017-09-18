@@ -203,9 +203,7 @@ public class VclassEditController extends BaseEditController {
     
     private List<VClass> getVClassesForURIList(List<String> vclassURIs, VClassDao vcDao) {
         List<VClass> vclasses = new ArrayList<VClass>();
-        Iterator<String> urIt = vclassURIs.iterator();
-        while (urIt.hasNext()) {
-            String vclassURI = urIt.next();
+        for (String vclassURI : vclassURIs) {
             VClass vclass = vcDao.getVClassByURI(vclassURI);
             if (vclass != null) {
                 vclasses.add(vclass);

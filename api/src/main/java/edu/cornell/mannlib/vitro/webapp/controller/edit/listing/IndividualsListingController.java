@@ -55,7 +55,7 @@ public class IndividualsListingController extends BaseEditController {
         String vclassURI = request.getParameter("VClassURI");
         VClass vc = vcDao.getVClassByURI(vclassURI);
         
-        List inds = dao.getIndividualsByVClassURI(vclassURI);
+        List<Individual> inds = dao.getIndividualsByVClassURI(vclassURI);
         //List inds = dao.getIndividualsByVClassURI(vclassURI,1,MAX_INDIVIDUALS);
 
         ArrayList results = new ArrayList();
@@ -64,16 +64,13 @@ public class IndividualsListingController extends BaseEditController {
         results.add("class");
 
         if (inds != null && inds.size()>0) {
-            Iterator indsIt = inds.iterator();
-            while (indsIt.hasNext()) {
-                Individual ind = (Individual) indsIt.next();
-
+            for (Individual ind : inds) {
                 results.add("XX");
 
                 if (ind.getName() != null) {
                     try {
-                        String individualName = (ind.getName()==null || ind.getName().length()==0) ? ind.getURI() : ind.getName();
-                        results.add("<a href=\"./entityEdit?uri="+URLEncoder.encode(ind.getURI(),"UTF-8")+"\">"+individualName+"</a>");
+                        String individualName = (ind.getName() == null || ind.getName().length() == 0) ? ind.getURI() : ind.getName();
+                        results.add("<a href=\"./entityEdit?uri=" + URLEncoder.encode(ind.getURI(), "UTF-8") + "\">" + individualName + "</a>");
                     } catch (Exception e) {
                         results.add(ind.getName());
                     }
@@ -84,8 +81,8 @@ public class IndividualsListingController extends BaseEditController {
 
                 if (vc != null) {
                     try {
-                        String vclassName = (vc.getName()==null || vc.getName().length()==0) ? vc.getURI() : vc.getName();
-                        results.add("<a href=\"./vclassEdit?uri="+URLEncoder.encode(vc.getURI(),"UTF-8")+"\">"+vclassName+"</a>");
+                        String vclassName = (vc.getName() == null || vc.getName().length() == 0) ? vc.getURI() : vc.getName();
+                        results.add("<a href=\"./vclassEdit?uri=" + URLEncoder.encode(vc.getURI(), "UTF-8") + "\">" + vclassName + "</a>");
                     } catch (Exception e) {
                         results.add(vc.getName());
                     }

@@ -426,20 +426,18 @@ public class VClassJenaTest {
     }
     
     private String getLabel2(String lang, List<RDFNode>labelList) {
-    	Iterator<RDFNode> labelIt = labelList.iterator();
-    	while (labelIt.hasNext()) {
-    		RDFNode label = labelIt.next();
-    		if (label.isLiteral()) {
-    			Literal labelLit = ((Literal)label);
-    			String labelLanguage = labelLit.getLanguage();
-    			if ( (labelLanguage==null) && (lang==null) ) {
-    				return labelLit.getLexicalForm();
-    			}
-    			if ( (lang != null) && (lang.equals(labelLanguage)) ) {
-    				return labelLit.getLexicalForm();
-    			}
-    		}
-    	}
+		for (RDFNode label : labelList) {
+			if (label.isLiteral()) {
+				Literal labelLit = ((Literal) label);
+				String labelLanguage = labelLit.getLanguage();
+				if ((labelLanguage == null) && (lang == null)) {
+					return labelLit.getLexicalForm();
+				}
+				if ((lang != null) && (lang.equals(labelLanguage))) {
+					return labelLit.getLexicalForm();
+				}
+			}
+		}
     	return null;
     }
     
