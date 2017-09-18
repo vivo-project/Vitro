@@ -480,7 +480,7 @@ class Stemmer
             outputStr.append(u);
         }
 
-        return outputStr == null || outputStr.length() == 0 ? null : outputStr.toString().trim();
+        return outputStr.length() == 0 ? null : outputStr.toString().trim();
     }
 
 /*

@@ -294,28 +294,17 @@ public class OpenSocialManager {
 
 	public void postActivity(int userId, String title, String body,
 			String xtraId1Type, String xtraId1Value) throws SQLException {
-		Connection conn = null;
-		Statement stmt = null;
 		String sqlCommand = "INSERT INTO orng_activity (userId, activity, xtraId1Type, xtraId1Value) VALUES ('"
 				+ userId +  "','<activity xmlns=\"http://ns.opensocial.org/2008/opensocial\"><postedTime>"
 				+ System.currentTimeMillis() + "</postedTime><title>" + title + "</title>" 
 				+ (body != null ? "<body>" + body + "</body>" : "") + "</activity>','"
-				+ xtraId1Type + "','" + xtraId1Value + "');";		
-		try {
-			conn = dataSource.getConnection();
-			stmt = conn.createStatement();
-			stmt.executeUpdate(sqlCommand);
-		} finally {
-			try {
-				stmt.close();
-			} catch (Exception e) {
-			}
-			try {
-				conn.close();
-			} catch (Exception e) {
+				+ xtraId1Type + "','" + xtraId1Value + "');";
+
+		try (Connection conn = dataSource.getConnection()) {
+			try (Statement stmt = conn.createStatement()) {
+				stmt.executeUpdate(sqlCommand);
 			}
 		}
-			
 	}
 
 	private String socketSendReceive(String viewer, String owner, String gadget)
@@ -388,41 +377,24 @@ public class OpenSocialManager {
 		Map<String, GadgetSpec> allDBGadgets = useCache ? gadgetCache : null;		
 		if (allDBGadgets == null) {
 			allDBGadgets = new HashMap<String, GadgetSpec>();
-			Connection conn = null;
-			Statement stmt = null;
-			ResultSet rset = null;
-			try {
-	
-				String sqlCommand = "select appId, name, url, channels, enabled from orng_apps";
-	
-				conn = dataSource.getConnection();
-				stmt = conn.createStatement();
-				rset = stmt.executeQuery(sqlCommand);
-	
-				while (rset.next()) {
-					String channelsStr = rset.getString(4);
-					List<String> channels = Arrays.asList(channelsStr != null && channelsStr.length() > 0 ? channelsStr.split(" ") : new String[0]);
-					GadgetSpec spec = new GadgetSpec(rset.getInt(1),
-							rset.getString(2), rset.getString(3), channels, dataSource, rset.getBoolean(5), false);
-					String gadgetFileName = getGadgetFileNameFromURL(rset.getString(3));
-	
-					allDBGadgets.put(gadgetFileName, spec);
-				}
-			} 
-			finally {
-				try {
-					rset.close();
-				} catch (Exception e) {
-				}
-				try {
-					stmt.close();
-				} catch (Exception e) {
-				}
-				try {
-					conn.close();
-				} catch (Exception e) {
+			String sqlCommand = "select appId, name, url, channels, enabled from orng_apps";
+
+			try (Connection conn = dataSource.getConnection()) {
+				try (Statement stmt = conn.createStatement()) {
+					try (ResultSet rset = stmt.executeQuery(sqlCommand)) {
+						while (rset.next()) {
+							String channelsStr = rset.getString(4);
+							List<String> channels = Arrays.asList(channelsStr != null && channelsStr.length() > 0 ? channelsStr.split(" ") : new String[0]);
+							GadgetSpec spec = new GadgetSpec(rset.getInt(1),
+									rset.getString(2), rset.getString(3), channels, dataSource, rset.getBoolean(5), false);
+							String gadgetFileName = getGadgetFileNameFromURL(rset.getString(3));
+
+							allDBGadgets.put(gadgetFileName, spec);
+						}
+					}
 				}
 			}
+
 			if (useCache) {
 				gadgetCache = allDBGadgets;
 			}
