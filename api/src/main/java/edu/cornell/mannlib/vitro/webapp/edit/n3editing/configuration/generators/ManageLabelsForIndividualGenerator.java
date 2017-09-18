@@ -18,6 +18,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -251,7 +252,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 			//for selection when creating a new label
 			//The assumption here is we don't want to allow the user to add a new label when a label
 			//already exists in that language
-			if(languageName != "untyped" && !existingLabelsLanguageNames.contains(languageName)) {
+			if(!"untyped".equals(languageName) && !existingLabelsLanguageNames.contains(languageName)) {
 				availableLocales.add(localeInfo);
 			}
 		}
@@ -302,7 +303,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 		for(Literal l: labels) {
 			String languageTag = l.getLanguage();
 			String languageName = "";
-			if(languageTag == "") {
+			if(StringUtils.isEmpty(languageTag)) {
 				languageName = "untyped";
 			}
 			else if(localeCodeToNameMap.containsKey(languageTag)) {
@@ -311,7 +312,7 @@ public class ManageLabelsForIndividualGenerator extends BaseEditConfigurationGen
 				log.warn("This language tag " + languageTag + " does not have corresponding name in the system and was not processed");
 			}
 			
-			if(languageName != "") {
+			if(!StringUtils.isEmpty(languageName)) {
 				if(!labelsHash.containsKey(languageName)) {
 					labelsHash.put(languageName, new ArrayList<LabelInformation>());
 				}

@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpResponse;
@@ -233,7 +234,7 @@ public class SparqlGraph implements GraphWithPerform {
             literalBuff.append("\"");
             if (node.getLiteralDatatypeURI() != null) {
                 literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
-            } else if (node.getLiteralLanguage() != null && node.getLiteralLanguage() != "") {
+            } else if (!StringUtils.isEmpty(node.getLiteralLanguage())) {
                 literalBuff.append("@").append(node.getLiteralLanguage());
             }
             return literalBuff.toString();

@@ -101,7 +101,7 @@ public class GadgetSpec {
 			if ('R' == req.getOwnerReq()) {
 				show &= isRegisteredTo(ownerId, ds);
 			} else if ('S' == req.getOwnerReq()) {
-				show &= (viewerId == ownerId);
+				show &= (viewerId.equals(ownerId));
 			}
 		}
 		return show;

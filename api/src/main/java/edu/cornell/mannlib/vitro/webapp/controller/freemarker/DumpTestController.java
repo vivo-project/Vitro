@@ -191,7 +191,7 @@ public class DumpTestController extends FreemarkerHttpServlet {
         }
         
         public String getName(String which) {
-            return which == "first" ? firstName : lastName;
+            return "first".equals(which) ? firstName : lastName;
         }
         
         public String getMiddleName() {

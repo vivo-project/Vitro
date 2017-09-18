@@ -17,6 +17,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -86,7 +87,7 @@ public class ViewLabelsServlet extends FreemarkerHttpServlet{
   		for(Literal l: labels) {
   			String languageTag = l.getLanguage();
   			String languageName = "";
-  			if(languageTag == "") {
+  			if(StringUtils.isEmpty(languageTag)) {
   				languageName = "untyped";
   			}
   			else if(localeCodeToNameMap.containsKey(languageTag)) {
@@ -95,7 +96,7 @@ public class ViewLabelsServlet extends FreemarkerHttpServlet{
   				log.warn("This language tag " + languageTag + " does not have corresponding name in the system and was not processed");
   			}
   			
-  			if(languageName != "") {
+  			if(!StringUtils.isEmpty(languageName)) {
   				if(!labelsHash.containsKey(languageName)) {
   					labelsHash.put(languageName, new ArrayList<LabelInformation>());
   				}

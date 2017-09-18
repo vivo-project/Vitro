@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Supplier;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -291,7 +292,7 @@ public class RDFServiceGraph implements GraphWithPerform {
             literalBuff.append("\"");
             if (node.getLiteralDatatypeURI() != null) {
                 literalBuff.append("^^<").append(node.getLiteralDatatypeURI()).append(">");
-            } else if (node.getLiteralLanguage() != null && node.getLiteralLanguage() != "") {
+            } else if (!StringUtils.isEmpty(node.getLiteralLanguage())) {
                 literalBuff.append("@").append(node.getLiteralLanguage());
             }
             return literalBuff.toString();
