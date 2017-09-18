@@ -84,8 +84,21 @@ public class SDBDataSource {
 
 		// Ensure that MySQL handles unicode properly, else all kinds of
 		// horrible nastiness ensues.
-		if (DEFAULT_TYPE.equals(getDbType()) && !url.contains("?")) {
-			url += "?useUnicode=yes&characterEncoding=utf8";
+		if (DEFAULT_TYPE.equals(getDbType())) {
+			if (!url.contains("?")) {
+				url += "?useUnicode=yes&characterEncoding=utf8&nullNamePatternMatchesAll=true";
+			} else {
+				String urlLwr = url.toLowerCase();
+				if (!urlLwr.contains("useunicode")) {
+					url += "&useUnicode=yes";
+				}
+				if (urlLwr.contains("characterencoding")) {
+					url += "&characterEncoding=utf8";
+				}
+				if (urlLwr.contains("nullnamepatternmatchesall")) {
+					url += "&nullNamePatternMatchesAll=true";
+				}
+			}
 		}
 
 		return url;
