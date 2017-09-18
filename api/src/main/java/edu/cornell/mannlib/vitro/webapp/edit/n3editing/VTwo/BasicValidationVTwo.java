@@ -60,11 +60,12 @@ public class BasicValidationVTwo {
                 	StringBuilder validateMsg = null;
                 	for(String value: values){
                 		String thisValidateMsg = validate(validationType,value);
-                		if(validateMsg != null && thisValidateMsg != null) {
-                			validateMsg.append(", ").append(thisValidateMsg);
+                        if (thisValidateMsg != null) {
+                            if (validateMsg != null) {
+                			    validateMsg.append(", ").append(thisValidateMsg);
                 		} else {
-                			validateMsg = new StringBuilder(thisValidateMsg);
-
+                                validateMsg = new StringBuilder(thisValidateMsg);
+                            }
                 		}
                 	}
                     if( validateMsg != null) {
