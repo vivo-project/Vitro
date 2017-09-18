@@ -134,8 +134,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 		}
 
 		try {
-			for (int i = 0; i < queries.size(); i++) {
-				String queryStr = queries.get(i);
+			for (String queryStr : queries) {
 				ObjectMapper mapper = new ObjectMapper();
 				JsonNode json = mapper.readTree(queryStr);
 
@@ -147,7 +146,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 						searchNoTypeMap.put(INTERNAL_QUERY_NAME, json);
 					}
 				} else { // multiple queries
-					for (Iterator<String> iter = json.fieldNames(); iter.hasNext();) {
+					for (Iterator<String> iter = json.fieldNames(); iter.hasNext(); ) {
 						ArrayList<JsonNode> jsonList = new ArrayList<JsonNode>();
 						String key = iter.next();
 						JsonNode jsonLvl2 = json.get(key);
@@ -218,10 +217,10 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 			}
 			// process and add to json defaultTypes
 			ArrayNode defaultTypesJsonArr = JsonNodeFactory.instance.arrayNode();
-			for (int i = 0; i<idNameArray.length; i++) {
+			for (String[] anIdNameArray : idNameArray) {
 				ObjectNode defaultTypesJson = JsonNodeFactory.instance.objectNode();
-				defaultTypesJson.put("id", idNameArray[i][0].trim());
-				defaultTypesJson.put("name", idNameArray[i][1].trim());
+				defaultTypesJson.put("id", anIdNameArray[0].trim());
+				defaultTypesJson.put("name", anIdNameArray[1].trim());
 				defaultTypesJsonArr.add(defaultTypesJson);
 			}
 			json.put("defaultTypes", defaultTypesJsonArr);

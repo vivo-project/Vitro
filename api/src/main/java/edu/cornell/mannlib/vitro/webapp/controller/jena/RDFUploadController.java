@@ -393,15 +393,14 @@ public class RDFUploadController extends JenaIngestController {
                     files = new File[1];
                     files[0] = file;
                 }
-                for (int i=0; i<files.length; i++) {
-                    File currentFile = files[i];
+                for (File currentFile : files) {
                     log.debug("Reading file " + currentFile.getName());
                     try {
-                        readIntoModel(fileStream.getInputStream(), language, 
+                        readIntoModel(fileStream.getInputStream(), language,
                                 rdfService, modelName);
                         fileStream.delete();
                     } catch (IOException ioe) {
-                        String errMsg = "Error loading RDF from " + 
+                        String errMsg = "Error loading RDF from " +
                                 currentFile.getName();
                         log.error(errMsg, ioe);
                         throw new RuntimeException(errMsg, ioe);

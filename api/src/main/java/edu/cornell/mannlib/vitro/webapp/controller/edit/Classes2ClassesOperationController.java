@@ -72,43 +72,43 @@ public class Classes2ClassesOperationController extends BaseEditController {
 	                if ((subclassURIstrs != null) && (subclassURIstrs.length > 1)) {
 	                    String superclassURIstr = request.getParameter("SuperclassURI");
 	                    if (superclassURIstr != null) {
-	                        for (int i=0; i<subclassURIstrs.length; i++) {
+                            for (String subclassURIstr : subclassURIstrs) {
                                 switch (modeStr) {
                                     case "disjointWith":
-                                        vcDao.removeDisjointWithClass(superclassURIstr, subclassURIstrs[i]);
+                                        vcDao.removeDisjointWithClass(superclassURIstr, subclassURIstr);
                                         break;
                                     case "equivalentClass":
-                                        vcDao.removeEquivalentClass(superclassURIstr, subclassURIstrs[i]);
+                                        vcDao.removeEquivalentClass(superclassURIstr, subclassURIstr);
                                         break;
                                     default:
                                         Classes2Classes c2c = new Classes2Classes();
-                                        c2c.setSubclassURI(subclassURIstrs[i]);
+                                        c2c.setSubclassURI(subclassURIstr);
                                         c2c.setSuperclassURI(superclassURIstr);
                                         vcDao.deleteClasses2Classes(c2c);
                                         break;
                                 }
-	                        }
+                            }
 	                    }
 	                } else {
 	                    String subclassURIstr = subclassURIstrs[0];
 	                    String[] superclassURIstrs = request.getParameterValues("SuperclassURI");
 	                    if (superclassURIstrs != null) {
-	                        for (int i=0; i<superclassURIstrs.length; i++) {
+                            for (String superclassURIstr : superclassURIstrs) {
                                 switch (modeStr) {
                                     case "disjointWith":
-                                        vcDao.removeDisjointWithClass(superclassURIstrs[i], subclassURIstr);
+                                        vcDao.removeDisjointWithClass(superclassURIstr, subclassURIstr);
                                         break;
                                     case "equivalentClass":
-                                        vcDao.removeEquivalentClass(subclassURIstr, superclassURIstrs[i]);
+                                        vcDao.removeEquivalentClass(subclassURIstr, superclassURIstr);
                                         break;
                                     default:
                                         Classes2Classes c2c = new Classes2Classes();
-                                        c2c.setSuperclassURI(superclassURIstrs[i]);
+                                        c2c.setSuperclassURI(superclassURIstr);
                                         c2c.setSubclassURI(subclassURIstr);
                                         vcDao.deleteClasses2Classes(c2c);
                                         break;
                                 }
-	                        }
+                            }
 	                    }
 	                }
 	            } else if (request.getParameter("operation").equals("add")) {

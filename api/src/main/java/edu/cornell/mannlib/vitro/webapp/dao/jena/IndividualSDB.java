@@ -602,12 +602,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     		if (this.propertyList == null) {
     			getObjectPropertyList();
     		}
-    		for (Iterator i = this.propertyList.iterator(); i.hasNext();) { 
-    			ObjectProperty op = (ObjectProperty) i.next();
-    			if (op.getURI() != null) {
-    				map.put(op.getURI(), op);
-    			}
-    		}
+			for (ObjectProperty op : this.propertyList) {
+				if (op.getURI() != null) {
+					map.put(op.getURI(), op);
+				}
+			}
     		this.objectPropertyMap = map;
     		return map;    		
     	}
@@ -660,12 +659,11 @@ public class IndividualSDB extends IndividualImpl implements Individual {
     		if (this.datatypePropertyList == null) {
     			getDataPropertyList();
     		}
-    		for (Iterator i = this.datatypePropertyList.iterator(); i.hasNext();) { 
-    			DataProperty dp = (DataProperty) i.next();
-    			if (dp.getURI() != null) {
-    				map.put(dp.getURI(), dp);
-    			}
-    		}
+			for (DataProperty dp : this.datatypePropertyList) {
+				if (dp.getURI() != null) {
+					map.put(dp.getURI(), dp);
+				}
+			}
     		this.dataPropertyMap = map;
     		return map;    		
     	}

@@ -310,9 +310,8 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 	}
 
     @Override
-	public void removeEquivalentProperty(Property property,
-			Property equivalentProperty) {
-		removeEquivalentProperty(property, equivalentProperty);
+	public void removeEquivalentProperty(Property property, Property equivalentProperty) {
+		removeEquivalentProperty(property.getURI(), equivalentProperty.getURI());
 	}
 	
 	protected void removeABoxStatementsWithPredicate(Property predicate) {

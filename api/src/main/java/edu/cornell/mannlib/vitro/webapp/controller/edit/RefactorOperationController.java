@@ -141,9 +141,8 @@ public class RefactorOperationController extends BaseEditController {
 											results.add("    With:      "+goodState.toString());
 											fixed++;
 										}
-										for(int i = 0; i<queue.size(); i++)
-										{
-											ontModel.add(queue.get(i));
+										for (Statement aQueue : queue) {
+											ontModel.add(aQueue);
 										}
 										ontModel.remove(toRemove);
 										badStatements.close();
@@ -267,9 +266,9 @@ public class RefactorOperationController extends BaseEditController {
 		if ( (refererStr = epo.getReferer()) != null) {
 			String controllerStr = null;
 			String[] controllers = {"entityEdit", "propertyEdit", "datapropEdit", "ontologyEdit", "vclassEdit"};
-			for (int i=0; i<controllers.length; i++) {
-				if (refererStr.indexOf(controllers[i]) > -1) {
-					controllerStr = controllers[i];
+			for (String controller : controllers) {
+				if (refererStr.indexOf(controller) > -1) {
+					controllerStr = controller;
 				}
 			}
 			if (controllerStr != null) {

@@ -211,7 +211,7 @@ public class EntityEditController extends BaseEditController {
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
     	log.trace("Please don't POST to the "+this.getClass().getName()+". Use GET instead as there should be no change of state.");
-        doPost(request,response);
+        doGet(request,response);
     }
 
 }

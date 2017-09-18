@@ -43,13 +43,6 @@ public class DefaultAddMissingIndividualFormGenerator implements EditConfigurati
 	private String template = "defaultAddMissingIndividualForm.ftl";
 	private static String createCommand = "create";
 	protected static String objectVarName = "newIndividual";
-	private static HashMap<String,String> defaultsForXSDtypes ;
-
-	static {
-		defaultsForXSDtypes = new HashMap<String,String>();
-		//defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","2001-01-01T12:00:00");
-		defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","#Unparseable datetime defaults to now");
-	}
 
 	//Method which checks whether this particular generator should be employed
 	public static final boolean isCreateNewIndividual(VitroRequest vreq, HttpSession session) {

@@ -120,9 +120,9 @@ class VitroURL {
             if (len>0) {
                 String[] temp = new String[len];
                 int tempI = 0;
-                for (int i=0; i<splitStr.length; i++) {
-                    if (!splitStr[i].equals("")) {
-                        temp[tempI] = splitStr[i];
+                for (String aSplitStr : splitStr) {
+                    if (!aSplitStr.equals("")) {
+                        temp[tempI] = aSplitStr;
                         tempI++;
                     }
                 }

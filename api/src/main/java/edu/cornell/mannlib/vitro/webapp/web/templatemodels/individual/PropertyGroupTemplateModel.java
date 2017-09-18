@@ -116,10 +116,9 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
     @Override
 	public String toString(){
         StringBuilder ptmStr = new StringBuilder();
-        for( int i=0; i < properties.size() ; i ++ ){
-            PropertyTemplateModel ptm = properties.get(i);
+        for (PropertyTemplateModel ptm : properties) {
             String spacer = "\n  ";
-            if( ptm != null )
+            if (ptm != null)
                 ptmStr.append(spacer).append(ptm.toString());
         }
         return String.format("\nPropertyGroupTemplateModel %s[%s] ",name, ptmStr.toString());

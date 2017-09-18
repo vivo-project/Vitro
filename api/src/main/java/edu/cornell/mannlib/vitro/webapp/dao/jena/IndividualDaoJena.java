@@ -236,8 +236,7 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                 }
                 List<VClass> vclasses = ent.getVClasses(false);
                 if (vclasses != null) {
-                    for (Iterator<VClass> typeIt = vclasses.iterator(); typeIt.hasNext(); ) {
-                        VClass vc = typeIt.next();
+                    for (VClass vc : vclasses) {
                         ind.addRDFType(ResourceFactory.createResource(vc.getURI()));
                     }
                 }
@@ -316,24 +315,21 @@ public class IndividualDaoJena extends JenaBaseDao implements IndividualDao {
                     if (vcl == null) {
                         conservativeTypeDeletion = true; // if the bean has null here instead of an empty list, we don't want to trust it and just start deleting any existing types.  So we'll just update the Vitro flag-related types and leave the rest alone.
                     } else {
-                        for (Iterator<VClass> typeIt = vcl.iterator(); typeIt.hasNext(); ) {
-                            VClass vc = typeIt.next();
+                        for (VClass vc : vcl) {
                             newTypeURIsSet.add(vc.getURI());
                         }
                     }
                 } catch (Exception e) {
                     log.error(e, e);
                 }
-                for (Iterator<String> oldIt = oldTypeURIsSet.iterator(); oldIt.hasNext();) {
-                    String uri = oldIt.next();
+                for (String uri : oldTypeURIsSet) {
                     if (!newTypeURIsSet.contains(uri)) {
-                        if ( (!conservativeTypeDeletion) || (uri.indexOf(VitroVocabulary.vitroURI) == 0) ) {
+                        if ((!conservativeTypeDeletion) || (uri.indexOf(VitroVocabulary.vitroURI) == 0)) {
                             ind.removeRDFType(ResourceFactory.createResource(uri));
                         }
                     }
                 }
-                for (Iterator<String> newIt = newTypeURIsSet.iterator(); newIt.hasNext();) {
-                    String uri = newIt.next();
+                for (String uri : newTypeURIsSet) {
                     if (!oldTypeURIsSet.contains(uri)) {
                         ind.addRDFType(ResourceFactory.createResource(uri));
                     }

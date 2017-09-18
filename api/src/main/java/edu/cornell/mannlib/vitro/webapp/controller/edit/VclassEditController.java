@@ -100,12 +100,12 @@ public class VclassEditController extends BaseEditController {
         
         boolean foundComment = false;
         StringBuffer commSb = null;
-        for (Iterator<String> commIt = request.getUnfilteredWebappDaoFactory().getCommentsForResource(vcl.getURI()).iterator(); commIt.hasNext();) { 
-            if (commSb==null) {
+        for (String s : request.getUnfilteredWebappDaoFactory().getCommentsForResource(vcl.getURI())) {
+            if (commSb == null) {
                 commSb = new StringBuffer();
-                foundComment=true;
+                foundComment = true;
             }
-            commSb.append(commIt.next()).append(" ");
+            commSb.append(s).append(" ");
         }
         if (!foundComment) {
             commSb = new StringBuffer("no comments yet");

@@ -93,11 +93,9 @@ public class JenaModelUtils {
             try {                    
                 List<VClass> rootClasses = myWebappDaoFactory.getVClassDao()
                         .getRootClasses();
-                for (Iterator<VClass> rootClassIt = rootClasses.iterator(); 
-                        rootClassIt.hasNext(); ) {
-                    VClass rootClass = rootClassIt.next();	                    
+                for (VClass rootClass : rootClasses) {
                     Individual classGroup = modelForClassgroups.createIndividual(
-                            wadf.getDefaultNamespace() + "vitroClassGroup" + 
+                            wadf.getDefaultNamespace() + "vitroClassGroup" +
                                     rootClass.getLocalName(), classGroupClass);
                     classGroup.setLabel(rootClass.getName(), null);
 
@@ -105,16 +103,14 @@ public class JenaModelUtils {
                             rootClass.getURI());
                     modelForClassgroupAnnotations.add(
                             rootClassRes, inClassGroupProperty, classGroup);
-                    for (Iterator<String> childIt = myWebappDaoFactory.getVClassDao()
-                            .getAllSubClassURIs(rootClass.getURI()).iterator(); 
-                            childIt.hasNext(); ) {
-                        String childURI = childIt.next();
+                    for (String childURI : myWebappDaoFactory.getVClassDao()
+                            .getAllSubClassURIs(rootClass.getURI())) {
                         Resource childClass = modelForClassgroupAnnotations
                                 .getResource(childURI);
                         if (!modelForClassgroupAnnotations.contains(
                                 childClass, inClassGroupProperty, (RDFNode) null)) {
-                            childClass.addProperty(inClassGroupProperty, classGroup);    
-                        }          
+                            childClass.addProperty(inClassGroupProperty, classGroup);
+                        }
                     }
                 }
             } catch (Exception e) {

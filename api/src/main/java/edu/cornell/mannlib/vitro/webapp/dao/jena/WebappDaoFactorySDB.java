@@ -115,37 +115,37 @@ public class WebappDaoFactorySDB extends WebappDaoFactoryJena {
 	public static String getFilterBlock(String[] graphVars, 
 	                                    SDBDatasetMode datasetMode) {
 	    StringBuilder filterBlock = new StringBuilder();
-	    for (int i = 0; i < graphVars.length; i++) {
-	        switch (datasetMode) {
-	            case ASSERTIONS_ONLY :  
-	                    filterBlock.append("FILTER (")
-	                        .append("(!bound(").append(graphVars[i])
-	                        .append(")) || (")
-	                        .append(graphVars[i])
-	                        .append(" != <")
-	                        .append(ModelNames.ABOX_INFERENCES)
-	                        .append("> ")
-	                        .append("&& ").append(graphVars[i]).append(" != <")
-	                        .append(ModelNames.TBOX_INFERENCES)
-	                        .append(">")
-	                        .append(") ) \n");
-	                    break;
-	            case INFERENCES_ONLY :  
-                    filterBlock.append("FILTER (")
-                        .append("(!bound(").append(graphVars[i])
-                        .append(")) || (")
-                        .append(graphVars[i])
-                        .append(" = <")
-                        .append(ModelNames.ABOX_INFERENCES)
-                        .append("> || ").append(graphVars[i])
-                        .append(" = <")
-                        .append(ModelNames.TBOX_INFERENCES)
-                        .append(">) )\n");
-                    break;
-	            default:
-	                break;
-	        }
-	    }
+		for (String graphVar : graphVars) {
+			switch (datasetMode) {
+				case ASSERTIONS_ONLY:
+					filterBlock.append("FILTER (")
+							.append("(!bound(").append(graphVar)
+							.append(")) || (")
+							.append(graphVar)
+							.append(" != <")
+							.append(ModelNames.ABOX_INFERENCES)
+							.append("> ")
+							.append("&& ").append(graphVar).append(" != <")
+							.append(ModelNames.TBOX_INFERENCES)
+							.append(">")
+							.append(") ) \n");
+					break;
+				case INFERENCES_ONLY:
+					filterBlock.append("FILTER (")
+							.append("(!bound(").append(graphVar)
+							.append(")) || (")
+							.append(graphVar)
+							.append(" = <")
+							.append(ModelNames.ABOX_INFERENCES)
+							.append("> || ").append(graphVar)
+							.append(" = <")
+							.append(ModelNames.TBOX_INFERENCES)
+							.append(">) )\n");
+					break;
+				default:
+					break;
+			}
+		}
 	    return filterBlock.toString();
 	}
 	

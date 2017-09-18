@@ -39,11 +39,11 @@ public class VClassGroupDaoStub implements VClassGroupDao {
 	public List<VClassGroup> getPublicGroupsWithVClasses() {
 		List<VClassGroup> list = new ArrayList<>();
 		for (VClassGroup group: groups) {
-			if (!group.isEmpty()) {
+			if (group != null) {
 				list.add(group);
 			}
 		}
-		return groups;
+		return list;
 	}
 
 	// ----------------------------------------------------------------------

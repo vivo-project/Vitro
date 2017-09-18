@@ -28,9 +28,9 @@ public class IndividualsViaVClassOptions implements FieldOptions {
             throw new Exception("vclassURIs must not be null or empty ");
                 
         this.vclassURIs = new ArrayList<String>(vclassURIs.length);
-        for(int i=0;i<vclassURIs.length;i++){
-            if( vclassURIs[i] != null && !vclassURIs[i].trim().isEmpty() )
-                this.vclassURIs.add(vclassURIs[i]);
+        for (String vclassURI : vclassURIs) {
+            if (vclassURI != null && !vclassURI.trim().isEmpty())
+                this.vclassURIs.add(vclassURI);
         }                              
     }
 

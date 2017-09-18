@@ -82,16 +82,16 @@ public class DataPropertyStatementListingController extends BaseEditController {
         DataProperty dp = dpDao.getDataPropertyByURI(propURIStr);        
         
         int count = 0;
-        
-        for (Iterator<DataPropertyStatement> i = dpsDao.getDataPropertyStatements(dp,startAt,endAt).iterator(); i.hasNext();) {
-        	count++;
-        	DataPropertyStatement dps = i.next();
-        	Individual subj = iDao.getIndividualByURI(dps.getIndividualURI());
-        	results.add("XX");
-        	results.add(ListingControllerWebUtils.formatIndividualLink(subj));
-        	results.add(dp.getPublicName());
-        	results.add(dps.getData());
-        }
+
+       for (DataPropertyStatement dataPropertyStatement : dpsDao.getDataPropertyStatements(dp, startAt, endAt)) {
+           count++;
+           DataPropertyStatement dps = dataPropertyStatement;
+           Individual subj = iDao.getIndividualByURI(dps.getIndividualURI());
+           results.add("XX");
+           results.add(ListingControllerWebUtils.formatIndividualLink(subj));
+           results.add(dp.getPublicName());
+           results.add(dps.getData());
+       }
         
         if (count == 0) {
         	results.add("XX");

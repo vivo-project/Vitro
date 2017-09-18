@@ -383,8 +383,8 @@ public class JenaIngestUtils {
                         Literal lit = (Literal) obj;
                         String unsplitStr = lit.getLexicalForm();
                         String[] splitPieces = delimiterPattern.split(unsplitStr);
-                        for (int i=0; i<splitPieces.length; i++) {
-                            String newLexicalForm = splitPieces[i];
+                        for (String splitPiece : splitPieces) {
+                            String newLexicalForm = splitPiece;
                             if (trim) {
                                 newLexicalForm = newLexicalForm.trim();
                             }
@@ -399,7 +399,7 @@ public class JenaIngestUtils {
                                         newLiteral = outModel.createLiteral(newLexicalForm);
                                     }
                                 }
-                                outModel.add(subj,newProp,newLiteral);
+                                outModel.add(subj, newProp, newLiteral);
                             }
                         }
                     }

@@ -230,10 +230,9 @@ public class JenaAdminActions extends BaseEditController {
     				}
     			}
     		}
-    		for (Iterator<Statement> removeIt = statementsToRemove.iterator(); removeIt.hasNext(); ) {
-    			Statement stmt = removeIt.next();
-    			memoryModel.remove(stmt);
-    		}
+			for (Statement stmt : statementsToRemove) {
+				memoryModel.remove(stmt);
+			}
     	} finally {
     		memoryModel.leaveCriticalSection();
     	}

@@ -301,8 +301,8 @@ public class StartupManagerTest extends AbstractTestClass {
 			return "";
 		}
 		StringBuilder result = new StringBuilder();
-		for (int i = 0; i < classes.length; i++) {
-			result.append(classes[i].getName()).append('\n');
+		for (Class<?> aClass : classes) {
+			result.append(aClass.getName()).append('\n');
 		}
 		return result.toString();
 	}

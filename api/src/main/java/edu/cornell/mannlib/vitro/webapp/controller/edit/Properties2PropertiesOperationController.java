@@ -128,25 +128,25 @@ public class Properties2PropertiesOperationController extends
             if ((subpropertyURIstrs != null) && (subpropertyURIstrs.length > 1)) {
                 String superpropertyURIstr = request.getParameter("SuperpropertyURI");
                 if (superpropertyURIstr != null) {
-                    for (int i=0; i<subpropertyURIstrs.length; i++) {
-                    	if (modeStr.equals("equivalentProperty")) {
-                    		opDao.removeEquivalentProperty(superpropertyURIstr, subpropertyURIstrs[i]);
-                    	} else {
-                    		opDao.removeSuperproperty(subpropertyURIstrs[i], superpropertyURIstr);
-                    	}
-                    }
+					for (String subpropertyURIstr : subpropertyURIstrs) {
+						if (modeStr.equals("equivalentProperty")) {
+							opDao.removeEquivalentProperty(superpropertyURIstr, subpropertyURIstr);
+						} else {
+							opDao.removeSuperproperty(subpropertyURIstr, superpropertyURIstr);
+						}
+					}
                 }
             } else {
                 String subpropertyURIstr = subpropertyURIstrs[0];
                 String[] superpropertyURIstrs = request.getParameterValues("SuperpropertyURI");
                 if (superpropertyURIstrs != null) {
-                    for (int i=0; i<superpropertyURIstrs.length; i++) {
-                    	if (modeStr.equals("equivalentProperty")) {
-                        	opDao.removeEquivalentProperty(subpropertyURIstr,superpropertyURIstrs[i]);
-                        } else {
-                        	opDao.removeSuperproperty(subpropertyURIstr,superpropertyURIstrs[i]);
-                    	}
-                    }
+					for (String superpropertyURIstr : superpropertyURIstrs) {
+						if (modeStr.equals("equivalentProperty")) {
+							opDao.removeEquivalentProperty(subpropertyURIstr, superpropertyURIstr);
+						} else {
+							opDao.removeSuperproperty(subpropertyURIstr, superpropertyURIstr);
+						}
+					}
                 }
             }
         } else if (operation == ADD) {

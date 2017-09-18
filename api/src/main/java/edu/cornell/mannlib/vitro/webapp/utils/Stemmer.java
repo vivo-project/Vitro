@@ -548,9 +548,9 @@ public class Stemmer
    {
       char[] w = new char[501];
       Stemmer s = new Stemmer();
-      for (int i = 0; i < args.length; i++) {
-         log.trace( StemString( args[i], 100 ));
-     }
+       for (String arg : args) {
+           log.trace(StemString(arg, 100));
+       }
    }
   
    

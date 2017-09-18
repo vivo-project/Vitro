@@ -148,9 +148,8 @@ public final class JsonToFmModel
             {
                 sb.append(tabs).append("[\n");
                 List l = (List)entry.getValue();
-                for (int i = 0; i < l.size(); i++)
-                {
-                    sb.append(tabs).append(l.get(i)).append(":").append((l.get(i) != null) ? l.get(i).getClass() : "null").append("\n");
+                for (Object aL : l) {
+                    sb.append(tabs).append(aL).append(":").append((aL != null) ? aL.getClass() : "null").append("\n");
                 }
                 sb.append(tabs).append("]\n");
             }

@@ -549,8 +549,8 @@ class Stemmer
    {
       char[] w = new char[501];
       Stemmer s = new Stemmer();
-      for (int i = 0; i < args.length; i++) {
-    	  System.out.println( StemString( args[i], 100 ));
-     }
+       for (String arg : args) {
+           System.out.println(StemString(arg, 100));
+       }
    }
 }

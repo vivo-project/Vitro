@@ -29,13 +29,7 @@ public class DefaultDeleteGenerator extends BaseEditConfigurationGenerator imple
 	private DataPropertyStatement dps = null;
 	private String dataLiteral = null;
 	private String template = "confirmDeletePropertyForm.ftl";
-	private static HashMap<String,String> defaultsForXSDtypes ;
-	  static {
-		defaultsForXSDtypes = new HashMap<String,String>();
-		//defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","2001-01-01T12:00:00");
-		defaultsForXSDtypes.put("http://www.w3.org/2001/XMLSchema#dateTime","#Unparseable datetime defaults to now");
-	  }
-	  
+
 	//In this case, simply return the edit configuration currently saved in session
 	//Since this is forwarding from another form, an edit configuration should already exist in session
     @Override

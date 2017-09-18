@@ -350,27 +350,23 @@ public abstract class RDFServiceImpl implements RDFService {
     @Override
     public long countTriples(RDFNode subject, RDFNode predicate, RDFNode object) throws RDFServiceException {
         StringBuilder whereClause = new StringBuilder();
-        StringBuilder orderBy = new StringBuilder();
 
         if ( subject != null ) {
             appendNode(whereClause.append(' '), subject);
         } else {
             whereClause.append(" ?s");
-            orderBy.append(" ?s");
         }
 
         if ( predicate != null ) {
             appendNode(whereClause.append(' '), predicate);
         } else {
             whereClause.append(" ?p");
-            orderBy.append(" ?p");
         }
 
         if ( object != null ) {
             appendNode(whereClause.append(' '), object);
         } else {
             whereClause.append(" ?o");
-            orderBy.append(" ?o");
         }
 
         long estimate = -1;

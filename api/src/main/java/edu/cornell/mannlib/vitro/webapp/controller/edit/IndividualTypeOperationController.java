@@ -67,9 +67,9 @@ public class IndividualTypeOperationController extends BaseEditController {
 	                String[] typeURIstrs = request.getParameterValues("TypeURI");
 	                String individualURIstr = request.getParameter("individualURI");
 	                    if (individualURIstr != null) {
-	                        for (int i=0; i<typeURIstrs.length; i++) {                        	
-	                            dao.removeVClass(individualURIstr, typeURIstrs[i]);
-	                        }
+                            for (String typeURIstr : typeURIstrs) {
+                                dao.removeVClass(individualURIstr, typeURIstr);
+                            }
 	                    }
 	            } else if (request.getParameter("operation").equals("add")) {
 		                dao.addVClass(request.getParameter("individualURI"),request.getParameter("TypeURI"));
