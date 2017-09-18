@@ -267,11 +267,7 @@ public class FormUtils {
         	}
 		}
 		
-		Collections.sort(options, new Comparator<Option>() {
-			@Override
-			public int compare(Option o1, Option o2) {
-				return o1.getBody().compareTo(o2.getBody());
-			}});
+		Collections.sort(options, (o1, o2) -> o1.getBody().compareTo(o2.getBody()));
 		
 		return options;
 	}
@@ -367,9 +363,9 @@ public class FormUtils {
      * key:value;key2:value2;key3:value, and puts the keys and values in a Map
      * @param params Parameters
      */
-    public static Map beanParamMapFromString(String params) {
+    public static Map<String, String> beanParamMapFromString(String params) {
         String[] param = params.split(";");
-        Map beanParamMap = new HashMap();
+        Map<String, String> beanParamMap = new HashMap<String, String>();
         for (String aParam : param) {
             String[] p = aParam.split(":");
             beanParamMap.put(p[0], new String(Base64.decodeBase64(p[1].getBytes())));

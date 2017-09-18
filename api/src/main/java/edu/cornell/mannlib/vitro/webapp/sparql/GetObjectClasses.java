@@ -77,19 +77,15 @@ public class GetObjectClasses extends BaseEditController {
 		if (vClass != null) {
 			respo.append("<option>" + "<key>").append(vClass.getPickListName()).append("</key>").append("<value>").append(vClass.getURI()).append("</value>").append("</option>");
 		} else {
-			List classGroups = vreq.getUnfilteredWebappDaoFactory()
+			List<VClassGroup> classGroups = vreq.getUnfilteredWebappDaoFactory()
 					.getVClassGroupDao().getPublicGroupsWithVClasses(true,
 							true, false); // order by displayRank, include
 											// uninstantiated classes, don't get
 											// the counts of individuals
 
-			Iterator classGroupIt = classGroups.iterator();
-			while (classGroupIt.hasNext()) {
-				VClassGroup group = (VClassGroup) classGroupIt.next();
-				List classes = group.getVitroClassList();
-				Iterator classIt = classes.iterator();
-				while (classIt.hasNext()) {
-					VClass clazz = (VClass) classIt.next();
+			for (VClassGroup group : classGroups) {
+				List<VClass> classes = group.getVitroClassList();
+				for (VClass clazz : classes) {
 					respo.append("<option>" + "<key>").append(clazz.getPickListName()).append("</key>").append("<value>").append(clazz.getURI()).append("</value>").append("</option>");
 				}
 			}

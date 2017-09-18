@@ -474,15 +474,13 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
     }
     
 
-    public List<ObjectProperty> getObjectPropertiesForObjectPropertyStatements(List objPropertyStmts) {
+    public List<ObjectProperty> getObjectPropertiesForObjectPropertyStatements(List<ObjectPropertyStatement> objPropertyStmts) {
         if( objPropertyStmts == null || objPropertyStmts.size() < 1) return new ArrayList();
         HashMap<String,ObjectProperty> hash = new HashMap<String,ObjectProperty>();
         String uris ="";
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            Iterator it = objPropertyStmts.iterator();
-            while(it.hasNext()){
-                ObjectPropertyStatement objPropertyStmt = (ObjectPropertyStatement)it.next();
+            for (ObjectPropertyStatement objPropertyStmt : objPropertyStmts) {
                 if (hash.containsKey(objPropertyStmt.getPropertyURI())) {
                     ObjectProperty p = hash.get(objPropertyStmt.getPropertyURI());
                     p.addObjectPropertyStatement(objPropertyStmt);
@@ -490,7 +488,7 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
                     OntProperty op = getOntModel().getOntProperty(objPropertyStmt.getPropertyURI());
                     if (op != null) {
                         ObjectProperty p = propertyFromOntProperty(op);
-                        hash.put(p.getURI(),p);
+                        hash.put(p.getURI(), p);
                         p.addObjectPropertyStatement(objPropertyStmt);
                     }
                 }
@@ -873,13 +871,11 @@ public class ObjectPropertyDaoJena extends PropertyDaoJena implements ObjectProp
 	                    		isRoot = true;
 	                    	} else {
 	                    		isRoot = true;
-	                    	    Iterator<? extends Property> pit = parentList.iterator();
-	                    	    while (pit.hasNext()) {
-	                    	    	Property pt = pit.next();
-	                    	    	if ( (!pt.equals(op)) && (!(getOntModel().contains(op,OWL.equivalentProperty,pt)) || (getOntModel().contains(pt,OWL.equivalentProperty,op))) ) {
-	                    	    		isRoot = false;
-	                    	    	}
-	                    	    }
+                                for (Property pt : parentList) {
+                                    if ((!pt.equals(op)) && (!(getOntModel().contains(op, OWL.equivalentProperty, pt)) || (getOntModel().contains(pt, OWL.equivalentProperty, op)))) {
+                                        isRoot = false;
+                                    }
+                                }
 	                    	} 
 	                    } else {
 	                    	isRoot = true;

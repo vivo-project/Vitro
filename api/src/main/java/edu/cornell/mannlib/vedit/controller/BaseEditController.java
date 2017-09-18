@@ -136,10 +136,8 @@ public class BaseEditController extends VitroHttpServlet {
             String value = "";
             if (key.equals(MULTIPLEXED_PARAMETER_NAME)) {
                 String multiplexedStr = request.getParameterValues(key)[0];
-                Map paramMap = FormUtils.beanParamMapFromString(multiplexedStr);
-                Iterator paramIt = paramMap.keySet().iterator();
-                while (paramIt.hasNext()) {
-                    String param = (String) paramIt.next();
+                Map<String, String> paramMap = FormUtils.beanParamMapFromString(multiplexedStr);
+                for (String param : paramMap.keySet()) {
                     String demultiplexedValue = (String) paramMap.get(param);
                     FormUtils.beanSet(bean, param, demultiplexedValue);
                 }

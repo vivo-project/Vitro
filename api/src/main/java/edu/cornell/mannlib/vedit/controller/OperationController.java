@@ -205,12 +205,8 @@ public class OperationController extends BaseEditController {
     
     private void runPreprocessors(EditProcessObject epo, Object newObj) {
     	if (epo.getPreProcessorList() != null && epo.getPreProcessorList().size()>0) {
-            Iterator preIt = epo.getPreProcessorList().iterator();
-            while (preIt.hasNext()) {
-                try {
-                	EditPreProcessor epp = (EditPreProcessor) preIt.next();
-                	epp.process(newObj, epo);
-                } catch (ClassCastException e) {}
+            for (EditPreProcessor epp : epo.getPreProcessorList()) {
+                epp.process(newObj, epo);
             }
         }
     }
@@ -329,9 +325,7 @@ public class OperationController extends BaseEditController {
     private void notifyChangeListeners(EditProcessObject epo, String action) {
     	List<ChangeListener> changeListeners = epo.getChangeListenerList();
         if (changeListeners != null){
-            Iterator<ChangeListener> changeIt = changeListeners.iterator();
-            while (changeIt.hasNext()) {
-                ChangeListener cl = changeIt.next();
+            for (ChangeListener cl : changeListeners) {
                 switch (action) {
                     case "insert":
                         cl.doInserted(epo.getNewBean(), epo);
