@@ -5,7 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.dao.jena;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.sdb.SDBFactory;
