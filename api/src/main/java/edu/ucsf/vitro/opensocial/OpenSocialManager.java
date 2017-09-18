@@ -240,9 +240,7 @@ public class OpenSocialManager {
 				}
 			}
 		}
-		for (PreparedGadget gadget : removedGadgets) {
-			gadgets.remove(gadget);
-		}
+		gadgets.removeAll(removedGadgets);
 	}
 
 	public void removeGadget(String name) {

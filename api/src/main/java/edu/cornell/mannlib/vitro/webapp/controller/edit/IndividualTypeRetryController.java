@@ -66,10 +66,7 @@ public class IndividualTypeRetryController extends BaseEditController {
 			    continue;
 			}
 			prohibitedURIset.add(vc.getURI());
-			for (Iterator<String> djURIIt = vcDao.getDisjointWithClassURIs(vc.getURI()).iterator(); djURIIt.hasNext(); ) {
-				String djURI = djURIIt.next();
-	            prohibitedURIset.add(djURI);
-			}
+			prohibitedURIset.addAll(vcDao.getDisjointWithClassURIs(vc.getURI()));
 		}
 		
 		List<VClass> eligibleVClasses = new ArrayList<VClass>();

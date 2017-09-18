@@ -679,9 +679,7 @@ private String getExistingIsSelfContainedTemplateQuery() {
         VClassGroupsForRequest vcgc = VClassGroupCache.getVClassGroups(vreq);
         List<VClassGroup> groups = vcgc.getGroups();
         for(VClassGroup vcg: groups) {
-             for( VClass vc : vcg){
-                 vclasses.add(vc);
-             }
+			vclasses.addAll(vcg);
             
         }
        

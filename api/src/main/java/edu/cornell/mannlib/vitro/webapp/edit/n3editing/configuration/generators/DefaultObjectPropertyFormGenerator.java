@@ -145,9 +145,7 @@ public class DefaultObjectPropertyFormGenerator implements EditConfigurationGene
 	   		    if (!rangeVClass.isUnion()) {
 	   		        types.add(rangeVClass);    
 	   		    } else {
-	   		        for (VClass unionComponent : rangeVClass.getUnionComponents()) {
-	   		            types.add(unionComponent);
-	   		        }
+					types.addAll(rangeVClass.getUnionComponents());
 	   		    }
 	   		    return types;
    		    } else {

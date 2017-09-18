@@ -133,9 +133,7 @@ public class JenaAdminActions extends BaseEditController {
     				typeSet.add((Resource) stmt.getObject());
     			}
     		}
-    		for (Resource classRes : ontModel.listClasses().toList()) {
-    			typeSet.add(classRes);
-    		}
+			typeSet.addAll(ontModel.listClasses().toList());
     		for (Resource ontClass : typeSet) {
     			if (!ontClass.isAnon()) { // Only query for named classes
     				System.out.println("Describing "+ontClass.getURI());

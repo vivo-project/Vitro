@@ -207,9 +207,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		
 	    public static List<String> makeListCopy(List<String> list) {
 	    	List<String> copyOfN3 = new ArrayList<String>();
-            for( String str : list){
-                copyOfN3.add(str);
-            }
+			copyOfN3.addAll(list);
             return copyOfN3;
 	    }
 	     

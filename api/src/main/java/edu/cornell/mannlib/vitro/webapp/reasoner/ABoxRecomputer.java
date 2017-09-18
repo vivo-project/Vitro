@@ -239,9 +239,7 @@ public class ABoxRecomputer {
                 }
             }
             if(rebuildModel.size() - prevRebuildSize > 0) {
-                for (String sameAsInd : sameAsInds) {
-                    individualQueue.add(sameAsInd);
-                }
+                individualQueue.addAll(sameAsInds);
             }
         }
         return additionalInferences;

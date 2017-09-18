@@ -296,9 +296,7 @@ public class EditConfigurationUtils {
 	   /** Make a copy of list of Strings. */
     public static List<String> copy(List<String> list) {
         List<String> copyList = new ArrayList<String>();
-        for(String l: list) {
-            copyList.add(l);
-        }
+        copyList.addAll(list);
         return copyList;
    }        
     
