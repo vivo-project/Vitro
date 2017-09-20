@@ -86,17 +86,23 @@ public class SDBDataSource {
 		// horrible nastiness ensues.
 		if (DEFAULT_TYPE.equals(getDbType())) {
 			if (!url.contains("?")) {
-				url += "?useUnicode=yes&characterEncoding=utf8&nullNamePatternMatchesAll=true";
+				url += "?useUnicode=yes&characterEncoding=utf8&nullNamePatternMatchesAll=true&cachePrepStmts=true&useServerPrepStmts=true";
 			} else {
 				String urlLwr = url.toLowerCase();
 				if (!urlLwr.contains("useunicode")) {
 					url += "&useUnicode=yes";
 				}
-				if (urlLwr.contains("characterencoding")) {
+				if (!urlLwr.contains("characterencoding")) {
 					url += "&characterEncoding=utf8";
 				}
-				if (urlLwr.contains("nullnamepatternmatchesall")) {
+				if (!urlLwr.contains("nullnamepatternmatchesall")) {
 					url += "&nullNamePatternMatchesAll=true";
+				}
+				if (!urlLwr.contains("cacheprepstmts")) {
+					url += "&cachePrepStmts=true";
+				}
+				if (!urlLwr.contains("useserverprepstmts")) {
+					url += "&useServerPrepStmts=true";
 				}
 			}
 		}
