@@ -20,24 +20,24 @@
     <name>Vitro Dependencies</name>
 
     <dependencies>
-        <dependency>
-            <!-- Added for runtime -->
+        <!-- Added for runtime, or just EasyMock -->
+        <!-- dependency>
             <groupId>asm</groupId>
             <artifactId>asm</artifactId>
             <version>3.1</version>
-        </dependency>
-        <dependency>
-            <!-- Added for runtime, was 1.6 -->
+        </dependency -->
+        <!-- Added for runtime, was 1.6 - was used by Pellet, still needed? -->
+        <!-- dependency>
             <groupId>com.github.ansell.aterms</groupId>
             <artifactId>aterm-java</artifactId>
             <version>1.8.2</version>
-        </dependency>
-        <dependency>
-            <!-- Added for runtime -->
+        </dependency -->
+        <!-- Added for runtime, used by Jackson databind, was used by EasyMock -->
+        <!-- dependency>
             <groupId>cglib</groupId>
             <artifactId>cglib</artifactId>
             <version>2.2</version>
-        </dependency>
+        </dependency -->
             <!-- Added for runtime -->
         <!-- dependency>
             <groupId>com.servlets</groupId>
