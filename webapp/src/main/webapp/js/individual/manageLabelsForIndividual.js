@@ -78,7 +78,7 @@ var manageLabels = {
         	//if language selected, allow submission, otherwise disallow
         	var selectedLanguage = manageLabels.labelLanguage.val();
         	if(selectedLanguage != "") {
-        		manageLabels.submit.attr('disabled', '');
+        		manageLabels.submit.attr('disabled', false);
         		manageLabels.submit.removeClass('disabledSubmit');      
         	} else {
         		manageLabels.submit.attr('disabled', 'disabled');
