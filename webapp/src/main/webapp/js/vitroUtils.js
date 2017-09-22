@@ -10,7 +10,9 @@ $(document).ready(function(){
     jQuery('section#welcome-message').css('display', 'block').delay(2000).fadeOut(1500, function() { jQuery('section#welcome-msg-container').remove(); });
     
     // fade in flash-message when user logs out
-    jQuery('section#flash-message').css('display', 'none').fadeIn(1500);
+    jQuery('section#flash-message').css('display', 'none').fadeIn(1500, function() {
+        $(this).delay(2000).fadeOut(1500, function() { jQuery('section#flash-msg-container').remove(); });
+    });
     
     /////////////////////////////
      // Home search filter
