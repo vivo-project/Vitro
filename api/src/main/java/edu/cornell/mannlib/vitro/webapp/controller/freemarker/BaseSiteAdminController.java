@@ -112,7 +112,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
         Map<String, Object> urls = new HashMap<>();
 
         for (AdminUrl adminUrl : siteMaintenanceUrls) {
-            if (adminUrl.permission == null || PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTION)) {
+            if (adminUrl.permission == null || PolicyHelper.isAuthorizedForActions(vreq, adminUrl.permission)) {
                 if (adminUrl.url.startsWith("javascript:")) {
                     urls.put(adminUrl.key, adminUrl.url);
                 } else {
@@ -175,7 +175,7 @@ public class BaseSiteAdminController extends FreemarkerHttpServlet {
         Map<String, Object> data = new HashMap<String, Object>();
 
         for (AdminUrl adminUrl : siteConfigData) {
-            if (adminUrl.permission == null || PolicyHelper.isAuthorizedForActions(vreq, SimplePermission.USE_MISCELLANEOUS_ADMIN_PAGES.ACTION)) {
+            if (adminUrl.permission == null || PolicyHelper.isAuthorizedForActions(vreq, adminUrl.permission)) {
                 if (adminUrl.url.startsWith("javascript:")) {
                     data.put(adminUrl.key, adminUrl.url);
                 } else {
