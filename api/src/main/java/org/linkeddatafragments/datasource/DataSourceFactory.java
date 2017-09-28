@@ -1,6 +1,6 @@
 package org.linkeddatafragments.datasource;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.linkeddatafragments.exceptions.DataSourceCreationException;
 import org.linkeddatafragments.exceptions.UnknownDataSourceTypeException;
 
@@ -18,12 +18,12 @@ public class DataSourceFactory {
      * @return datasource interface
      * @throws DataSourceCreationException 
      */
-    public static IDataSource create(JsonObject config) throws DataSourceCreationException {
-        String title = config.getAsJsonPrimitive("title").getAsString();
-        String description = config.getAsJsonPrimitive("description").getAsString();
-        String typeName = config.getAsJsonPrimitive("type").getAsString();
+    public static IDataSource create(JsonNode config) throws DataSourceCreationException {
+        String title = config.get("title").asText();
+        String description = config.get("description").asText();
+        String typeName = config.get("type").asText();
         
-        JsonObject settings = config.getAsJsonObject("settings");
+        JsonNode settings = config.get("settings");
 
         final IDataSourceType type = DataSourceTypesRegistry.getType(typeName);
         if ( type == null )

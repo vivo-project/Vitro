@@ -1,6 +1,6 @@
 package org.vivoweb.linkeddatafragments.servlet;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
@@ -90,7 +90,7 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
             }
 
             // register data sources
-            for (Entry<String, JsonObject> dataSource : config.getDataSources().entrySet()) {
+            for (Entry<String, JsonNode> dataSource : config.getDataSources().entrySet()) {
                 dataSources.put(dataSource.getKey(), DataSourceFactory.create(dataSource.getValue()));
             }
 

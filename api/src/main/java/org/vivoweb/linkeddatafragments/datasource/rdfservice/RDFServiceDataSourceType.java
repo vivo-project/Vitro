@@ -1,6 +1,6 @@
 package org.vivoweb.linkeddatafragments.datasource.rdfservice;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.linkeddatafragments.datasource.IDataSource;
 import org.linkeddatafragments.datasource.IDataSourceType;
 import org.linkeddatafragments.exceptions.DataSourceCreationException;
@@ -16,7 +16,7 @@ public class RDFServiceDataSourceType implements IDataSourceType
     @Override
     public IDataSource createDataSource( final String title,
                                          final String description,
-                                         final JsonObject settings )
+                                         final JsonNode settings )
                                                      throws DataSourceCreationException
     {
         try {

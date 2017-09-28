@@ -1,6 +1,6 @@
 package org.linkeddatafragments.datasource.tdb;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.linkeddatafragments.datasource.IDataSource;
 import org.linkeddatafragments.datasource.IDataSourceType;
 import org.linkeddatafragments.exceptions.DataSourceCreationException;
@@ -18,10 +18,10 @@ public class JenaTDBDataSourceType implements IDataSourceType
     @Override
     public IDataSource createDataSource( final String title,
                                          final String description,
-                                         final JsonObject settings )
+                                         final JsonNode settings )
                                                      throws DataSourceCreationException
     {
-        final String dname = settings.getAsJsonPrimitive("directory").getAsString();
+        final String dname = settings.get("directory").asText();
         final File dir = new File( dname );
 
         try {
