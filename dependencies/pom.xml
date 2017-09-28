@@ -68,22 +68,22 @@
         <dependency>
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
-            <version>3.4.4</version>
+            <version>59.1</version>
         </dependency>
         <dependency>
             <groupId>com.twelvemonkeys.imageio</groupId>
             <artifactId>imageio-jpeg</artifactId>
-            <version>3.3.1</version>
+            <version>3.3.2</version>
         </dependency>
         <dependency>
             <groupId>com.twelvemonkeys.imageio</groupId>
             <artifactId>imageio-tiff</artifactId>
-            <version>3.3.1</version>
+            <version>3.3.2</version>
         </dependency>
         <dependency>
             <groupId>com.twelvemonkeys.servlet</groupId>
             <artifactId>servlet</artifactId>
-            <version>3.3.1</version>
+            <version>3.3.2</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -149,12 +149,12 @@
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
             <artifactId>owlapi-api</artifactId>
-            <version>5.0.4</version>
+            <version>5.1.1</version>
         </dependency>
         <dependency>
             <groupId>net.sourceforge.owlapi</groupId>
             <artifactId>owlapi-apibinding</artifactId>
-            <version>5.0.4</version>
+            <version>5.1.1</version>
             <!-- Exclude rio binding as we don't use Sesame -->
             <exclusions>
                 <exclusion>
@@ -213,11 +213,6 @@
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
             <version>2.3.23</version>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>jtidy</artifactId>
-            <version>r8-20060801</version>
         </dependency>
         <dependency>
             <groupId>org.jsoup</groupId>
