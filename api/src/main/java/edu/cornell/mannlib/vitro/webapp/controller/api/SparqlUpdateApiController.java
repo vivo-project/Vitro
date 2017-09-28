@@ -82,11 +82,11 @@ public class SparqlUpdateApiController extends VitroApiServlet {
 			throw new ParseException("No 'update' parameter.");
 		}
 
-		if (!StringUtils.containsIgnoreCase(update, "GRAPH")) {
+		if (!StringUtils.containsIgnoreCase(update, "GRAPH") && !StringUtils.containsIgnoreCase(update, "WITH")) {
 			if (log.isDebugEnabled()) {
-				log.debug("No GRAPH uri in '" + update + "'");
+				log.debug("No GRAPH or WITH uri in '" + update + "'");
 			}
-			throw new ParseException("SPARQL update must specify a GRAPH URI.");
+			throw new ParseException("SPARQL update must specify a GRAPH ( or WITH) URI.");
 		}
 
 		try {
