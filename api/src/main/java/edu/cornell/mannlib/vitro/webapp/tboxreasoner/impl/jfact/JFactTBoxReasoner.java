@@ -17,7 +17,6 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.owlapi.reasoner.OWLReasonerConfiguration;
 import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
-import org.semarglproject.vocab.OWL;
 
 import uk.ac.manchester.cs.jfact.JFactFactory;
 
@@ -38,6 +37,8 @@ import edu.cornell.mannlib.vitro.webapp.tboxreasoner.ReasonerStatementPattern;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxChanges;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.TBoxReasoner;
 import edu.cornell.mannlib.vitro.webapp.tboxreasoner.impl.TBoxInferencesAccumulator;
+
+import static org.semanticweb.owlapi.vocab.OWLRDFVocabulary.OWL_AXIOM;
 
 /**
  * An implementation of the JFact reasoner for the TBox.
@@ -97,7 +98,7 @@ public class JFactTBoxReasoner implements
 	
 	private void clearEmptyAxiomStatements() {
 		//Check and see if the model has any empty axiom statements and if so, remove them
-		StmtIterator axiomStatements = filteredAssertionsModel.listStatements(null, RDF.type, ResourceFactory.createResource(OWL.AXIOM));
+		StmtIterator axiomStatements = filteredAssertionsModel.listStatements(null, RDF.type, ResourceFactory.createResource(OWL_AXIOM.toString()));
 		List<Statement> removeStatements = new ArrayList<Statement>();
 		while(axiomStatements.hasNext()) {
 			Statement axiomStatement = axiomStatements.nextStatement();

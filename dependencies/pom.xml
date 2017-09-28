@@ -163,16 +163,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.semarglproject</groupId>
-            <artifactId>semargl-core</artifactId>
-            <version>0.7</version>
-        </dependency>
-        <dependency>
-            <groupId>org.semarglproject</groupId>
-            <artifactId>semargl-rdfa</artifactId>
-            <version>0.7</version>
-        </dependency>
         <!-- Needed for ORCID? -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
