@@ -120,7 +120,8 @@ name will be used as the label. -->
     </#if>
     -->
     <#if editable> 
-        <h2 id="${property.localName!}" title="${property.publicDescription!}">${label}  ${addLink!} ${verboseDisplay!}</h2>         
+        <h2 id="${property.localName!}" title="${property.publicDescription!}">${label}  ${addLink!}</h2>
+        ${verboseDisplay!}
     </#if>
 </#macro>
 
