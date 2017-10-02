@@ -143,7 +143,7 @@ public class VitroResourceBundle extends ResourceBundle {
 		if (props == null) {
 			throw new FileNotFoundException("Property file not found at '" + defaultsPath + "' or '" + propertiesPath + "'");
 		}
-		props = loadProperties(props, locateFile(joinPath(appI18nPath, "local_" + resourceName)));
+		props = loadProperties(props, locateFile(joinPath("/local/i18n/", resourceName)));
 
 		return props;
 	}
