@@ -177,6 +177,17 @@
             <groupId>org.apache.jena</groupId>
             <artifactId>jena-arq</artifactId>
             <version>3.4.0</version>
+            <exclusions>
+                <!-- Exclude OSGi bundles from jsonld-java -->
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient-osgi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpcore-osgi</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.jena</groupId>
@@ -242,23 +253,4 @@
             <version>1.6.0</version>
         </dependency>
     </dependencies>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.github.jsonld-java</groupId>
-                <artifactId>jsonld-java</artifactId>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.httpcomponents</groupId>
-                        <artifactId>httpclient-osgi</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.httpcomponents</groupId>
-                        <artifactId>httpcore-osgi</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 </project>
