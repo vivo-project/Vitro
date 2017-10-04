@@ -356,7 +356,7 @@ public class IndividualRdfAssembler {
 	}
 
 	private Literal createDateLiteral(OntModel o) {
-		String date = new SimpleDateFormat("YYYY-MM-dd'T'HH:mm:ss")
+		String date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
 				.format(new Date());
 		return o.createTypedLiteral(date, XSDDatatype.XSDdateTime);
 	}

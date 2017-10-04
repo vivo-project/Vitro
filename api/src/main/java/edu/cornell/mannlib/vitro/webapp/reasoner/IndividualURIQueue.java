@@ -34,14 +34,14 @@ public class IndividualURIQueue<E> implements Queue<E> {
     
     @Override
     public boolean contains(Object o) {
-        return m.contains(o);
+        return m.containsKey(o);
     }
     
     @Override
     public boolean containsAll(Collection<?> c) {
         boolean contains = true;
         for(Object e : c) {
-            contains |= m.contains(e);
+            contains |= m.containsKey(e);
         }
         return contains;
     }

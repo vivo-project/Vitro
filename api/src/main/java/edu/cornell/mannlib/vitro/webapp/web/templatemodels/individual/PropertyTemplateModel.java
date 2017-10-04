@@ -50,7 +50,6 @@ public abstract class PropertyTemplateModel extends BaseTemplateModel {
         propertyUri = property.getURI();
         localName = property.getLocalName();
         this.name = name;
-		this.displayLimit = displayLimit;
         addUrl = "";
         
         fauxProperty = isFauxProperty(property);

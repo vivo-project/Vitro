@@ -153,7 +153,7 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
         } catch (Exception e) {
             System.out.println(this.getClass().getName()+" could not forward to view.");
             System.out.println(e.getMessage());
-            System.out.println(e.getStackTrace());
+            e.printStackTrace(System.out);
         }
 	}
 	
@@ -180,7 +180,7 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
         } catch (Exception e) {
             System.out.println(this.getClass().getName()+" could not forward to view.");
             System.out.println(e.getMessage());
-            System.out.println(e.getStackTrace());
+			e.printStackTrace(System.out);
         }
 		
 	}

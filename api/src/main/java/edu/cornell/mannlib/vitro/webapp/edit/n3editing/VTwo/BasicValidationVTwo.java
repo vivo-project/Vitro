@@ -271,7 +271,7 @@ public class BasicValidationVTwo {
         if( unknown.isEmpty() )
             return ;
 
-        throw new Error( "Unknown basic validators: " + unknown.toArray());
+        throw new Error( "Unknown basic validators: " + Arrays.toString(unknown.toArray()));
     }
     
     private static boolean isEmpty(String value) {
