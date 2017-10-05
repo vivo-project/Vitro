@@ -218,15 +218,11 @@ public class ABoxRecomputer {
         Model assertions = getAssertions(individualURI);
         log.debug((System.currentTimeMillis() - start) + " ms to get assertions.");
         long prevRebuildSize = (simpleReasoner.getSameAsEnabled()) ? rebuildModel.size() : 0;
-        Model additionalInferences = recomputeIndividual(
-                individualURI, null, assertions, rebuildModel, caches, RUN_PLUGINS);
         if (simpleReasoner.getSameAsEnabled()) {
             Set<String> sameAsInds = getSameAsIndividuals(individualURI);
             for (String sameAsInd : sameAsInds) {
                 // sameAs for plugins is handled by the SimpleReasoner
                 Model sameAsIndAssertions = getAssertions(sameAsInd);
-                recomputeIndividual(
-                        sameAsInd, individualURI, sameAsIndAssertions, rebuildModel, caches, SKIP_PLUGINS);
                 rebuildModel.add(
                         rewriteInferences(getAssertions(sameAsInd), individualURI));
                 Resource indRes = ResourceFactory.createResource(individualURI);
@@ -242,6 +238,8 @@ public class ABoxRecomputer {
                 individualQueue.addAll(sameAsInds);
             }
         }
+        Model additionalInferences = recomputeIndividual(
+                individualURI, null, assertions, rebuildModel, caches, RUN_PLUGINS);
         return additionalInferences;
     }
 
@@ -262,6 +260,7 @@ public class ABoxRecomputer {
         long start = System.currentTimeMillis();
         Model types = ModelFactory.createDefaultModel();
         types.add(assertions.listStatements(null, RDF.type, (RDFNode) null));
+        types.add(rebuildModel.listStatements(null, RDF.type, (RDFNode) null));
         Model inferredTypes = rewriteInferences(getInferredTypes(individual, types, caches), aliasURI);
         rebuildModel.add(inferredTypes);
         log.trace((System.currentTimeMillis() - start) + " to infer " + inferredTypes.size() + " types");
