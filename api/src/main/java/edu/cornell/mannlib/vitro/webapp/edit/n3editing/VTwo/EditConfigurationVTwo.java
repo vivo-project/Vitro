@@ -615,12 +615,9 @@ public class EditConfigurationVTwo {
     
     private Map<String,String> copyMap(Map<String,String> source){
         if( source == null ) return null;
-        Map<String, String> dest = new HashMap<String, String>();        
-        for( String key : source.keySet()){
-            if( source.get(key) != null )
-                dest.put(key, source.get(key));
-            else 
-                dest.put(key, null);
+        Map<String, String> dest = new HashMap<String, String>();
+        for( Map.Entry<String, String> entry : source.entrySet()) {
+            dest.put(entry.getKey(), entry.getValue());
         }
         return dest;
     }
@@ -900,14 +897,14 @@ public class EditConfigurationVTwo {
         if( log.isDebugEnabled()){
             log.debug(msg);
             log.debug("literalsInScope:");
-            for( String key: literalsInScope.keySet() ){
-                String val = literalsInScope.get(key).toString();
-                log.debug( key + " " + val );
+            for( Map.Entry<String, List<Literal>> entry: literalsInScope.entrySet() ){
+                String val = entry.getValue().toString();
+                log.debug( entry.getKey() + " " + val );
             }
             log.debug("uris in scope: " );
-            for( String key: urisInScope.keySet() ){
-                String val = urisInScope.get(key).toString();
-                log.debug( key + " " + val );
+            for( Map.Entry<String, List<String>> entry : urisInScope.entrySet() ){
+                String val = entry.getValue().toString();
+                log.debug( entry.getKey() + " " + val );
             }
         }
     }

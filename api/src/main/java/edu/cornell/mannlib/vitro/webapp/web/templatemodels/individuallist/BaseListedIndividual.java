@@ -64,10 +64,10 @@ public abstract class BaseListedIndividual extends BaseTemplateModel {
         Map<String, String> types = opsDao.getMostSpecificTypesInClassgroupsForIndividual(individual.getURI()); 
         List<String> typeLabels = new ArrayList<String>(types.size());
         String displayedType = (String) vreq.getAttribute("displayType");
-        for (String type : types.keySet()) {
+        for (Map.Entry<String, String> entry : types.entrySet()) {
             // Don't display a mostSpecificType that is the same as the type being displayed on the page
-            if ( ! type.equals(displayedType) ) {
-                typeLabels.add(types.get(type));
+            if ( !entry.getKey().equals(displayedType) ) {
+                typeLabels.add(entry.getValue());
             }
         }
         return typeLabels;

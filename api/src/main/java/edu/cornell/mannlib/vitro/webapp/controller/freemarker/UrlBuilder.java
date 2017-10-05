@@ -146,7 +146,7 @@ public class UrlBuilder {
         } 
         
         public ParamMap(List<String> strings) {
-            this((String[]) strings.toArray());
+            this(strings.toArray(new String[strings.size()]));
         }
         
         public ParamMap(Map<String, String> map) {
@@ -162,8 +162,8 @@ public class UrlBuilder {
         }
         
         public void put(ParamMap params) {
-            for (String key: params.keySet()) {
-                put(key, params.get(key));
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                put(entry.getKey(), entry.getValue());
             }
         }
         
@@ -210,8 +210,8 @@ public class UrlBuilder {
     private static String addParams(String url, ParamMap params, String glue) {
         if (params.size() > 0) {
             StringBuilder sb = new StringBuilder(url);
-            for (String key: params.keySet()) {
-                String value = params.get(key);
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                String value = entry.getValue();
                 // rjy7 Some users might require nulls to be converted to empty
                 // string, others to eliminate params with null values.
                 // Here we convert to empty string to prevent an exception
@@ -219,7 +219,7 @@ public class UrlBuilder {
                 // to remove null values or convert to empty strings, whichever
                 // is desired in the particular instance.
                 value = (value == null) ? "" : urlEncode(value);
-                sb.append(glue).append(key).append("=").append(value);
+                sb.append(glue).append(entry.getKey()).append("=").append(value);
                 glue = "&";
             }
             url = sb.toString();

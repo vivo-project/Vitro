@@ -256,10 +256,9 @@ public class VitroHttpServlet extends HttpServlet implements MultipartRequestWra
 		@SuppressWarnings("unchecked")
 		Map<String, String[]> map = req.getParameterMap();
 		
-		for (String key : map.keySet()) {
-			String[] values = map.get(key);
-			subclassLog.debug("Parameter '" + key + "' = "
-					+ Arrays.deepToString(values));
+		for (Map.Entry<String,String[]> entry : map.entrySet()) {
+			subclassLog.debug("Parameter '" + entry.getKey() + "' = "
+					+ Arrays.deepToString(entry.getValue()));
 		}
 	}
 }

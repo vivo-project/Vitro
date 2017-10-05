@@ -21,6 +21,7 @@ public class BaseSearchResultDocument implements SearchResultDocument {
 		this.uniqueId = uniqueId;
 		
 		Map<String, Collection<Object>> map = new HashMap<>();
+		// fieldValuesMap does not support .entrySet()
 		for (String name : fieldValuesMap.keySet()) {
 			map.put(name, Collections.unmodifiableList(new ArrayList<>(
 					fieldValuesMap.get(name))));

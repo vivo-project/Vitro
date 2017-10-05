@@ -76,8 +76,8 @@ public class DeveloperSettings {
 		}
 
 		Map<Key, String> fromRequest = new HashMap<>();
-		for (String key : parameterMap.keySet()) {
-			fromRequest.put(Key.fromElementId(key), parameterMap.get(key)[0]);
+		for (Map.Entry<String, String[]>entry : parameterMap.entrySet()) {
+			fromRequest.put(Key.fromElementId(entry.getKey()), entry.getValue()[0]);
 		}
 		update(fromRequest);
 	}
@@ -179,8 +179,8 @@ public class DeveloperSettings {
 	/* For debugging. */
 	private void dumpParameterMap(Map<String, String[]> parameterMap) {
 		Map<String, List<String>> map = new HashMap<>();
-		for (String key : parameterMap.keySet()) {
-			map.put(key, Arrays.asList(parameterMap.get(key)));
+		for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
+			map.put(entry.getKey(), Arrays.asList(entry.getValue()));
 		}
 		log.debug("Parameter map: " + map);
 	}

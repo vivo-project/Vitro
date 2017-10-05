@@ -445,13 +445,12 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	String objectUri = EditConfigurationUtils.getObjectUri(vreq);
 		
 		//Set data map
-		Map params = vreq.getParameterMap();
-		for (Object key : params.keySet()) {
-	        String keyString = (String) key; //key.toString()
-	        if (keyString.startsWith("statement_")) {
-	            keyString = keyString.replaceFirst("statement_", "");
-	            String value = ( (String[]) params.get(key))[0];
-	            statementDisplay.put(keyString, value);
+		Map<String, String[]> params = vreq.getParameterMap();
+		for (Map.Entry<String, String[]> entry : params.entrySet()) {
+			String key = entry.getKey();
+	        if (key.startsWith("statement_")) {
+	            key = key.replaceFirst("statement_", "");
+	            statementDisplay.put(key, entry.getValue()[0]);
 	        }
 	    }
 		
@@ -616,10 +615,10 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     public Map<String,String> getSortedMap(Map<String,String> hmap){
         // first make temporary list of String arrays holding both the key and its corresponding value, so that the list can be sorted with a decent comparator
         List<String[]> objectsToSort = new ArrayList<String[]>(hmap.size());
-        for (String key:hmap.keySet()) {
+        for (Map.Entry<String, String> entry : hmap.entrySet()) {
             String[] x = new String[2];
-            x[0] = key;
-            x[1] = hmap.get(key);
+            x[0] = entry.getKey();
+            x[1] = entry.getValue();
             objectsToSort.add(x);
         }
         objectsToSort.sort(new MapComparator());
@@ -769,9 +768,8 @@ public class EditConfigurationTemplateModel extends BaseTemplateModel {
     	Map<String, String> generatedHtml = new HashMap<String, String>();
     	Map<String, FieldVTwo> fieldMap = editConfig.getFields();
     	//Check if any of the fields have edit elements and should be generated
-    	Set<String> keySet = fieldMap.keySet();
-    	for(String key: keySet) {
-    		FieldVTwo field = fieldMap.get(key);
+    	for(Map.Entry<String, FieldVTwo> entry : fieldMap.entrySet()) {
+    		FieldVTwo field = entry.getValue();
     		EditElementVTwo editElement = field.getEditElement();
     		String fieldName = field.getName();
     		if(editElement != null) {

@@ -36,8 +36,6 @@ public class UpdateUrisInIndex {
 
 	/**
 	 * Web service for update in search index of a list of URIs.
-	 * 
-	 * @throws IOException
 	 */
 	protected int doUpdateUris(HttpServletRequest req, SearchIndexer indexer)
 			throws ServletException, IOException {
@@ -49,9 +47,9 @@ public class UpdateUrisInIndex {
 		Charset enc = getEncoding(req);
 
 		int uriCount = 0;
-		for (String name : map.keySet()) {
-			for (FileItem item : map.get(name)) {
-				log.debug("Found " + item.getSize() + " byte file for '" + name + "'");
+		for (Map.Entry<String, List<FileItem>> entry : map.entrySet()) {
+			for (FileItem item : entry.getValue()) {
+				log.debug("Found " + item.getSize() + " byte file for '" + entry.getKey() + "'");
 				uriCount += processFileItem(indexer, item, enc);
 			}
 		}

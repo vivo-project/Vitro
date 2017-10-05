@@ -266,9 +266,9 @@ public class EditConfigurationUtils {
     public static Map<String, List<String>> transformLiteralMap(Map<String, List<Literal>> map) {
     	Map<String, List<String>> literalMapStringValues = new HashMap<String, List<String>>();
     	
-    	for(String key: map.keySet() ) {
-    		List<String> stringValues = transformLiteralListToStringList(map.get(key));
-    		literalMapStringValues.put(key, stringValues);
+    	for(Map.Entry<String, List<Literal>> entry: map.entrySet() ) {
+    		List<String> stringValues = transformLiteralListToStringList(entry.getValue());
+    		literalMapStringValues.put(entry.getKey(), stringValues);
     	}
     	return literalMapStringValues;
     }
@@ -314,10 +314,8 @@ public class EditConfigurationUtils {
     
     public static Map<String, List<String>> copyListMap(Map<String, List<String>> source) {
         HashMap<String, List<String>> map = new HashMap<String, List<String>>();
-        Set<String> keys = map.keySet();
-        for(String key: keys) {
-            List<String> vals = map.get(key);
-            map.put(key, copy(vals));
+        for(Map.Entry<String, List<String>> entry : map.entrySet()) {
+            map.put(entry.getKey(), copy(entry.getValue()));
         }
         return map;
     }    

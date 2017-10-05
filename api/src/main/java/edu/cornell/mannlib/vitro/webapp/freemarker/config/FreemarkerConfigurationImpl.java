@@ -129,7 +129,7 @@ public class FreemarkerConfigurationImpl extends Configuration {
 	private String[] joinNames(Set<String> nameSet, String[] nameArray) {
 		Set<String> allNames = new HashSet<>(nameSet);
 		Collections.addAll(allNames, nameArray);
-		return (String[]) allNames.toArray();
+		return allNames.toArray(new String[allNames.size()]);
 	}
 
 	// ----------------------------------------------------------------------

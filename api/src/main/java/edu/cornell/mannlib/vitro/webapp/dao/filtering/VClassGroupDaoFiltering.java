@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -36,11 +37,10 @@ public class VClassGroupDaoFiltering extends BaseFiltering implements VClassGrou
 
     public LinkedHashMap<String, VClassGroup> getClassGroupMap() {
         LinkedHashMap<String, VClassGroup> lhm = innerDao.getClassGroupMap();
-        Set<String> keys = lhm.keySet();
-        for( String key : keys){
-            VClassGroup vcg = (VClassGroup)lhm.get(key);
+        for( Map.Entry<String, VClassGroup> entry : lhm.entrySet()){
+            VClassGroup vcg = entry.getValue();
             if( vcg == null || !filters.getVClassGroupFilter().fn(vcg) ){
-                lhm.remove(key);
+                lhm.remove(entry.getKey());
             }
         }
         return lhm;

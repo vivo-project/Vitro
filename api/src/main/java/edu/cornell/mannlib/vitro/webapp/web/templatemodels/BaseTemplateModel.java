@@ -66,8 +66,8 @@ public abstract class BaseTemplateModel {
      * a map.  Map may be modified. 
      */
     protected <T> void cleanMapValuesForDisplay( Map<T,String> map){
-        for( T key : map.keySet() ){
-            map.put(key, simpleScriptStripper(map.get(key)) );
+        for( Map.Entry<T,String> entry : map.entrySet() ){
+            map.put(entry.getKey(), simpleScriptStripper(entry.getValue()) );
         }
     }
 

@@ -129,27 +129,6 @@ public class VClassGroup extends LinkedList <VClass> implements Comparable<VClas
         return getPublicName() + " URI(" + getURI() + ") with " + size();
     }
 
-    public static void removeEmptyClassGroups(Map groups){
-        if( groups == null) return;
-
-        List keysToRemove = new LinkedList();
-
-        Iterator it = groups.keySet().iterator();
-        while(it.hasNext()){
-            Object key = it.next();
-            Object grp = groups.get(key);
-            if(grp != null && grp instanceof AbstractCollection){
-                if( ((AbstractCollection)grp).isEmpty())
-                    keysToRemove.add(key);
-            }
-        }
-
-        it = keysToRemove.iterator();
-        while(it.hasNext()){
-            groups.remove(it.next());
-        }
-    }
-    
     /**
      * Sorts VClassGroup objects by group rank, then alphanumeric.
      * @return a negative integer, zero, or a positive integer as the

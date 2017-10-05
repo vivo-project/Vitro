@@ -137,19 +137,16 @@ public class BaseEditController extends VitroHttpServlet {
             if (key.equals(MULTIPLEXED_PARAMETER_NAME)) {
                 String multiplexedStr = request.getParameterValues(key)[0];
                 Map<String, String> paramMap = FormUtils.beanParamMapFromString(multiplexedStr);
-                for (String param : paramMap.keySet()) {
-                    String demultiplexedValue = (String) paramMap.get(param);
-                    FormUtils.beanSet(bean, param, demultiplexedValue);
+                for (Map.Entry<String, String> entry : paramMap.entrySet()) {
+                    FormUtils.beanSet(bean, entry.getKey(), entry.getValue());
                 }
-
             } else {
-                try {
-                    value = (String) request.getParameterValues(key)[0];
-                } catch (ClassCastException cce) {
-                    try {
-                        value = ((Integer) params.get(key)).toString();
-                    } catch (ClassCastException ccf) {
-                        log.error("populateBeanFromParams() could not cast parameter name to String");
+                String[] values = request.getParameterValues(key);
+                if (values != null && value.length() > 0) {
+                    value = values[0];
+                } else {
+                    if (params.get(key) instanceof Integer) {
+                        value = ((Integer)params.get(key)).toString();
                     }
                 }
                 FormUtils.beanSet(bean, key, value);

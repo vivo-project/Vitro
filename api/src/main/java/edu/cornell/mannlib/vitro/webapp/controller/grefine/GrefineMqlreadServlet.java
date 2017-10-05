@@ -15,6 +15,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -154,9 +155,9 @@ public class GrefineMqlreadServlet extends VitroHttpServlet {
 								ArrayNode subjectUriUriArr = (ArrayNode) subjectUriObj;
 								for (int k=0; k<subjectUriUriArr.size(); k++) {
 									// e.g. http://vivo.med.cornell.edu/individual/cwid-jsd2002
-									Object subjectUriUriObj = subjectUriUriArr.get(k);
-									if (subjectUriUriObj instanceof String) {
-										subjectUriList.add((String)subjectUriUriObj);
+									JsonNode subjectUriUriObj = subjectUriUriArr.get(k);
+									if (subjectUriUriObj.isTextual()) {
+										subjectUriList.add(subjectUriUriObj.asText());
 									}
 								}
 							}

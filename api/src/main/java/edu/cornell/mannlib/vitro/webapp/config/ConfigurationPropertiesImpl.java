@@ -58,8 +58,8 @@ public class ConfigurationPropertiesImpl extends ConfigurationProperties {
 	}
 
 	private void trimWhiteSpaceFromValues(Map<String, String> map) {
-		for (String key : map.keySet()) {
-			map.put(key, map.get(key).trim());
+		for (Map.Entry<String, String> entry : map.entrySet()) {
+			map.put(entry.getKey(), entry.getValue().trim());
 		}
 	}
 

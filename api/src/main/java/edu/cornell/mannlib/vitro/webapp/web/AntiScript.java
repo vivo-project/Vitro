@@ -66,9 +66,9 @@ public class AntiScript {
      * type String.
      */
     public static <T> void cleanMapValues( Map<T,String> map ){
-        for( T key : map.keySet() ){            
-            map.put(key, cleanText(map.get(key)) );
-        }        
+        for (Map.Entry<T,String> entry : map.entrySet()) {
+            map.put(entry.getKey(), cleanText(entry.getValue()));
+        }
     }
     
     /**

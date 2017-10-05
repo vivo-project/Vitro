@@ -50,15 +50,13 @@ public class BasicValidationVTwo {
     public Map<String,String> validateUris(Map<String,List<String>> varNamesToValues){
         HashMap<String,String> errors = new HashMap<String,String>();
         
-        for( String name : varNamesToValues.keySet()){
-        	
-            List<String> values = varNamesToValues.get(name);
-            List<String> validations = varsToValidations.get(name);
+        for( Map.Entry<String, List<String>> entry : varNamesToValues.entrySet()){
+            List<String> validations = varsToValidations.get(entry.getKey());
             if( validations!= null){
                 for( String validationType : validations){
                 	//Appending validate message if same field has multiple values 
                 	StringBuilder validateMsg = null;
-                	for(String value: values){
+                	for(String value: entry.getValue()){
                 		String thisValidateMsg = validate(validationType,value);
                         if (thisValidateMsg != null) {
                             if (validateMsg != null) {
@@ -69,7 +67,7 @@ public class BasicValidationVTwo {
                 		}
                 	}
                     if( validateMsg != null) {
-                        errors.put(name, validateMsg.toString());
+                        errors.put(entry.getKey(), validateMsg.toString());
                     }    
                 }
             }
@@ -256,10 +254,10 @@ public class BasicValidationVTwo {
 
     private void checkValidations(){
         List<String> unknown = new ArrayList<String>();
-        for( String key : varsToValidations.keySet()){
-            if( varsToValidations.get(key) == null )
+        for( Map.Entry<String, List<String>> entry : varsToValidations.entrySet()){
+            if( entry.getValue() == null )
                 continue;            
-            for( String validator : varsToValidations.get(key)){
+            for( String validator : entry.getValue()) {
                 if( ! basicValidations.contains( validator)) {
                     if ( ! ( ( validator != null) &&  
                          ( validator.indexOf( "datatype:" ) == 0 ) ) ) {

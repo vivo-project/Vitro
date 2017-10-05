@@ -341,12 +341,12 @@ public class ContentType implements Serializable {
          Map<String, Float> serverTypes) {
      float maxQ = 0.0f;
      String type = null;
-     for( String serverType:  serverTypes.keySet()){
-         float serverQ = serverTypes.get(serverType);
-         Float clientQ = clientAcceptsTypes.get(serverType);
+     for (Map.Entry<String, Float> entry : serverTypes.entrySet()){
+         float serverQ = entry.getValue();
+         Float clientQ = clientAcceptsTypes.get(entry.getKey());
          if( clientQ != null && ((serverQ * clientQ)+ 0.001) > (maxQ + 0.001) ){
              maxQ = (serverQ * clientQ);
-             type = serverType;
+             type = entry.getKey();
          }
      }     
      return type;
@@ -618,16 +618,15 @@ public class ContentType implements Serializable {
    sb.append(type);
    sb.append("/");
    sb.append(subType);
-   for (String name : attributes.keySet()) {
-
+   for (Map.Entry<String, String> entry : attributes.entrySet()) {
      // Don't include any inferred charset attribute in output.
-     if (inferredCharset && ATTR_CHARSET.equals(name)) {
+     if (inferredCharset && ATTR_CHARSET.equals(entry.getKey())) {
        continue;
      }
      sb.append(";");
-     sb.append(name);
+     sb.append(entry.getKey());
      sb.append("=");
-     String value = attributes.get(name);
+     String value = entry.getValue();
      Matcher tokenMatcher = TOKEN_PATTERN.matcher(value);
      if (tokenMatcher.matches()) {
        sb.append(value);
