@@ -4,7 +4,7 @@
 
 <div id="content" class="sparqlform">
     <h2>SPARQL Query</h2>
-    <form action='${submitUrl}' method="get">
+    <form action='${submitUrl}?posted' method="post">
         <h3>Query:</h3>
 
         <textarea name='query' rows='30' cols='100' class="span-23 maxWidth" id="query-area">${sampleQuery}</textarea>
