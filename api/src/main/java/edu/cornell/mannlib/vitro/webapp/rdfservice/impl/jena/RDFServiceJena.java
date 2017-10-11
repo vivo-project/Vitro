@@ -61,6 +61,9 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 
     protected abstract DatasetWrapper getDatasetWrapper();
 
+    protected volatile boolean rebuildGraphURICache = true;
+    private final List<String> graphURIs = new ArrayList<>();
+
     @Override
     public abstract boolean changeSetUpdate(ChangeSet changeSet) throws RDFServiceException;
 
@@ -527,18 +530,29 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 
     @Override
     public List<String> getGraphURIs() throws RDFServiceException {
-        DatasetWrapper dw = getDatasetWrapper();
-        try {
-            Dataset d = dw.getDataset();
-            List<String> graphURIs = new ArrayList<String>();
-            Iterator<String> nameIt = d.listNames();
-            while (nameIt.hasNext()) {
-                graphURIs.add(nameIt.next());
+        if (rebuildGraphURICache) {
+            synchronized (RDFServiceJena.class) {
+                if (rebuildGraphURICache) {
+                    rebuildGraphURICache = false;
+                    graphURIs.clear();
+
+                    DatasetWrapper dw = getDatasetWrapper();
+                    try {
+                        Dataset d = dw.getDataset();
+                        List<String> graphURIs = new ArrayList<String>();
+                        Iterator<String> nameIt = d.listNames();
+                        while (nameIt.hasNext()) {
+                            graphURIs.add(nameIt.next());
+                        }
+                        return graphURIs;
+                    } finally {
+                        dw.close();
+                    }
+                }
             }
-            return graphURIs;
-        } finally {
-            dw.close();
         }
+
+        return graphURIs;
     }
 
     @Override

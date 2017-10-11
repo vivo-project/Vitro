@@ -113,6 +113,7 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
             abortTransaction(sdbConn);
             throw new RDFServiceException(e);
         } finally {
+            rebuildGraphURICache = true;
             close(sdbConn);
         }
     }
