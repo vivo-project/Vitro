@@ -239,7 +239,7 @@
                 <artifactId>maven-site-plugin</artifactId>
                 <configuration>
                     <skip>${maven-site-plugin.skip}</skip>
-                    <stagingDirectory>${stagingBase}vitro/</stagingDirectory>
+                    <stagingDirectory>${stagingBase}/vitro/${project.version}</stagingDirectory>
                 </configuration>
             </plugin>
         </plugins>
