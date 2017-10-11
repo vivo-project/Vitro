@@ -514,7 +514,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		}
 	}
 
-	public void addModel(Model model, String graphURI) throws RDFServiceException {
+	private void addModel(Model model, String graphURI) throws RDFServiceException {
 		try {
 		    long start = System.currentTimeMillis();
 			verbModel(model, graphURI, "INSERT");
@@ -524,7 +524,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		}
 	}
 
-	public void deleteModel(Model model, String graphURI) throws RDFServiceException {
+	private void deleteModel(Model model, String graphURI) throws RDFServiceException {
 		try {
 			verbModel(model, graphURI, "DELETE");
 		} finally {

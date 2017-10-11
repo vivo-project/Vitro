@@ -88,6 +88,8 @@ public class RDFServiceTDB extends RDFServiceJena {
 		} catch (Exception e) {
 			log.error(e, e);
 			throw new RDFServiceException(e);
+		} finally {
+			rebuildGraphURICache = true;
 		}
 	}
 
