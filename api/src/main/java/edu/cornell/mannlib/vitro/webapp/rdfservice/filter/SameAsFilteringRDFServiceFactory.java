@@ -307,6 +307,11 @@ public class SameAsFilteringRDFServiceFactory implements RDFServiceFactory {
         }
 
         @Override
+        public boolean preferPreciseOptionals() {
+            return s.preferPreciseOptionals();
+        }
+
+        @Override
         public void close() {
             s.close();
         }

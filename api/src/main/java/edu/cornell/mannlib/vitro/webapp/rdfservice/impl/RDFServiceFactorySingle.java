@@ -204,6 +204,11 @@ public class RDFServiceFactorySingle implements RDFServiceFactory {
         }
 
         @Override
+        public boolean preferPreciseOptionals() {
+            return s.preferPreciseOptionals();
+        }
+
+        @Override
         public void close() {
             // Don't close s.  It's being used by everybody.
         }

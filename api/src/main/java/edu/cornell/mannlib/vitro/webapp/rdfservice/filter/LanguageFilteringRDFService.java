@@ -471,6 +471,11 @@ public class LanguageFilteringRDFService implements RDFService {
     }
 
     @Override
+    public boolean preferPreciseOptionals() {
+        return s.preferPreciseOptionals();
+    }
+
+    @Override
     public void close() {
         s.close();            
     }

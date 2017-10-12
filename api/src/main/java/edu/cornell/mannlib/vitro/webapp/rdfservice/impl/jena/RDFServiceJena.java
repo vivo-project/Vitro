@@ -692,6 +692,10 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         }
     }
 
+    @Override
+    public boolean preferPreciseOptionals() {
+        return false;
+    }
 
     @Override
     public void close() {

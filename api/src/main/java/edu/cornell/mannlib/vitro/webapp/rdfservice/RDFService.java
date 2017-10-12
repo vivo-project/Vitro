@@ -253,6 +253,8 @@ public interface RDFService {
 	public long countTriples(RDFNode subject, RDFNode predicate, RDFNode object) throws RDFServiceException;
 
 	public Model getTriples(RDFNode subject, RDFNode predicate, RDFNode object, long limit, long offset) throws RDFServiceException;
+
+	public boolean preferPreciseOptionals();
 		
 	/**
      * Frees any resources held by this RDFService object

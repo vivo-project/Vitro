@@ -909,6 +909,11 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		return graph.isIsomorphicWith(fromTripleStoreModel);
 	}
 
+	@Override
+	public boolean preferPreciseOptionals() {
+		return false;
+	}
+
 	protected HttpContext getContext(HttpRequestBase request) {
 		UsernamePasswordCredentials credentials = getCredentials();
 		if (credentials != null) {

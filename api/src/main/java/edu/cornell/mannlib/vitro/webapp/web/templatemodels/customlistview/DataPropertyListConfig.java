@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Set;
 
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,7 +37,7 @@ public class DataPropertyListConfig {
     private final DataPropertyTemplateModel dptm;
     private final VitroRequest vreq;
     private final TemplateLoader templateLoader;
-    
+
     private boolean isDefaultConfig;
     private Set<String> constructQueries;
     private String selectQuery;
@@ -45,7 +46,6 @@ public class DataPropertyListConfig {
     public DataPropertyListConfig(DataPropertyTemplateModel dptm, TemplateLoader templateLoader, VitroRequest vreq, 
     		DataProperty dp, boolean editing) 
         throws InvalidConfigurationException {
-    	
     	this.dptm = dptm;
     	this.vreq = vreq;
     	WebappDaoFactory wadf = vreq.getWebappDaoFactory();
@@ -125,7 +125,7 @@ public class DataPropertyListConfig {
 			FileReader reader = new FileReader(configFilePath);
 			CustomListViewConfigFile configFileContents = new CustomListViewConfigFile(reader);
 			
-			selectQuery = configFileContents.getSelectQuery(false, editing);
+			selectQuery = configFileContents.getSelectQuery(false, editing, ListConfigUtils.getUsePreciseSubquery(vreq));
 			templateName = configFileContents.getTemplateName();
 			constructQueries = configFileContents.getConstructQueries();
 

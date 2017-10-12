@@ -274,6 +274,11 @@ public class RDFServiceSDB extends RDFServiceJena implements RDFService {
     }
 
     @Override
+    public boolean preferPreciseOptionals() {
+        return true;
+    }
+
+    @Override
     public void close() {
         if (conn != null) {
             try {
