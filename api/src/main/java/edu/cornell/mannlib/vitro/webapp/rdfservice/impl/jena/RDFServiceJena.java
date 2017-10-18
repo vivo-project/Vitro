@@ -539,7 +539,6 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
                     DatasetWrapper dw = getDatasetWrapper();
                     try {
                         Dataset d = dw.getDataset();
-                        List<String> graphURIs = new ArrayList<String>();
                         Iterator<String> nameIt = d.listNames();
                         while (nameIt.hasNext()) {
                             graphURIs.add(nameIt.next());
