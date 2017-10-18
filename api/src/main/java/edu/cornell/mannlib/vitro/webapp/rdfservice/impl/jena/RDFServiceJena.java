@@ -533,18 +533,18 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         if (rebuildGraphURICache) {
             synchronized (RDFServiceJena.class) {
                 if (rebuildGraphURICache) {
-                    rebuildGraphURICache = false;
-                    graphURIs.clear();
 
                     DatasetWrapper dw = getDatasetWrapper();
                     try {
                         Dataset d = dw.getDataset();
                         Iterator<String> nameIt = d.listNames();
+                        graphURIs.clear();
                         while (nameIt.hasNext()) {
                             graphURIs.add(nameIt.next());
                         }
                         return graphURIs;
                     } finally {
+                        rebuildGraphURICache = false;
                         dw.close();
                     }
                 }
