@@ -26,24 +26,33 @@ public class BulkUpdatingModel extends AbstractModelDecorator {
 
     protected BulkUpdatingModel(Model m) {
         super(m);
-        Graph graph = m.getGraph();
-        if (graph instanceof RDFServiceGraph) {
-            updater = new RDFServiceBulkUpdater((RDFServiceGraph)graph);
-        } else if (graph instanceof SparqlGraph) {
-            updater = new SparqlBulkUpdater((SparqlGraph)graph);
+        if (m instanceof BulkUpdatingModel) {
+            this.updater = ((BulkUpdatingModel) m).updater;
         } else {
-            updater  = null;
+            Graph graph = GraphUtils.unwrapUnionGraphs(m.getGraph());
+            if (graph instanceof RDFServiceGraph) {
+                updater = new RDFServiceBulkUpdater((RDFServiceGraph) graph);
+            } else if (graph instanceof SparqlGraph) {
+                updater = new SparqlBulkUpdater((SparqlGraph) graph);
+            } else {
+                updater = null;
+            }
         }
     }
 
-    protected BulkUpdatingModel(Model m, Graph graph) {
+    protected BulkUpdatingModel(Model m, Model baseModel) {
         super(m);
-        if (graph instanceof RDFServiceGraph) {
-            updater = new RDFServiceBulkUpdater((RDFServiceGraph)graph);
-        } else if (graph instanceof SparqlGraph) {
-            updater = new SparqlBulkUpdater((SparqlGraph)graph);
+        if (baseModel instanceof BulkUpdatingModel) {
+            this.updater = ((BulkUpdatingModel) baseModel).updater;
         } else {
-            updater  = null;
+            Graph graph = GraphUtils.unwrapUnionGraphs(baseModel.getGraph());
+            if (graph instanceof RDFServiceGraph) {
+                updater = new RDFServiceBulkUpdater((RDFServiceGraph) graph);
+            } else if (graph instanceof SparqlGraph) {
+                updater = new SparqlBulkUpdater((SparqlGraph) graph);
+            } else {
+                updater = null;
+            }
         }
     }
 

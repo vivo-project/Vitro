@@ -27,24 +27,33 @@ public class BulkUpdatingOntModel extends AbstractOntModelDecorator {
 
     protected BulkUpdatingOntModel(OntModel m) {
         super(m);
-        Graph graph = m.getGraph();
-        if (graph instanceof RDFServiceGraph) {
-            updater = new RDFServiceBulkUpdater((RDFServiceGraph)graph);
-        } else if (graph instanceof SparqlGraph) {
-            updater = new SparqlBulkUpdater((SparqlGraph)graph);
+        if (m instanceof BulkUpdatingOntModel) {
+            this.updater = ((BulkUpdatingOntModel) m).updater;
         } else {
-            updater  = null;
+            Graph graph = GraphUtils.unwrapUnionGraphs(m.getGraph());
+            if (graph instanceof RDFServiceGraph) {
+                updater = new RDFServiceBulkUpdater((RDFServiceGraph) graph);
+            } else if (graph instanceof SparqlGraph) {
+                updater = new SparqlBulkUpdater((SparqlGraph) graph);
+            } else {
+                updater = null;
+            }
         }
     }
 
-    protected BulkUpdatingOntModel(OntModel m, Graph graph) {
+    protected BulkUpdatingOntModel(OntModel m, OntModel baseModel) {
         super(m);
-        if (graph instanceof RDFServiceGraph) {
-            updater = new RDFServiceBulkUpdater((RDFServiceGraph)graph);
-        } else if (graph instanceof SparqlGraph) {
-            updater = new SparqlBulkUpdater((SparqlGraph)graph);
+        if (baseModel instanceof BulkUpdatingOntModel) {
+            this.updater = ((BulkUpdatingOntModel) baseModel).updater;
         } else {
-            updater  = null;
+            Graph graph = GraphUtils.unwrapUnionGraphs(baseModel.getGraph());
+            if (graph instanceof RDFServiceGraph) {
+                updater = new RDFServiceBulkUpdater((RDFServiceGraph) graph);
+            } else if (graph instanceof SparqlGraph) {
+                updater = new SparqlBulkUpdater((SparqlGraph) graph);
+            } else {
+                updater = null;
+            }
         }
     }
 
