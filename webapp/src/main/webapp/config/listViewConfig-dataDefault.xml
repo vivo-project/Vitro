@@ -15,13 +15,5 @@
         } ORDER BY ?value
     </query-select>
 
-    <query-construct>        
-        CONSTRUCT {
-            ?subject ?property ?value 
-        } WHERE {
-                ?subject ?property ?value
-        }
-    </query-construct>
-    
     <template>propStatement-dataDefault.ftl</template>
 </list-view-config>

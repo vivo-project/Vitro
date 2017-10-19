@@ -39,7 +39,10 @@ public class FoafNameToRdfsLabelPreprocessor implements ModelChangePreprocessor 
 				"?individualVcard <http://www.w3.org/2006/vcard/ns#hasName> ?fullName ." +
 				"?fullName <http://www.w3.org/2006/vcard/ns#givenName> ?firstName ." +
 				"?fullName <http://www.w3.org/2006/vcard/ns#familyName> ?lastName ." +
-				"OPTIONAL {?subject <http://vivoweb.org/ontology/core#middleName> ?middleName .}" +  
+				"OPTIONAL {" +
+				"?subject <http://purl.obolibrary.org/obo/ARG_2000028>  ?individualVcard ." +
+				"?individualVcard <http://www.w3.org/2006/vcard/ns#hasName> ?fullName ." +
+				"?fullName <http://vivoweb.org/ontology/core#middleName> ?middleName .}" +
 				"}";
 		return queryStr;
 	}
