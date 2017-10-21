@@ -203,7 +203,7 @@ class IndividualResponseBuilder {
         ConfigurationProperties properties = ConfigurationProperties.getBean(vreq);
 
         if (properties != null) {
-            String enabled = properties.getProperty("resource.plum-print", "disabled");
+            String enabled = properties.getProperty("resource.plum-print", "enabled");
             String displayTo = properties.getProperty("resource.plum-print.displayto", "right");
             String printHideEmpty = properties.getProperty("resource.plum-print.hide-when-empty", "true");
             String printPopover = properties.getProperty("resource.plum-print.popover", "right");
