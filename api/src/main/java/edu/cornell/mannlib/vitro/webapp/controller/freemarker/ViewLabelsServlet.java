@@ -13,32 +13,31 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Literal;
-import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
-import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ExceptionResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigurationVTwo;
 import edu.cornell.mannlib.vitro.webapp.i18n.selection.SelectedLocale;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.DataPropertyStatementTemplateModel;
 
 
 /*Servlet to view all labels in various languages for individual*/
 
+@WebServlet(name = "ViewLabelsServlet", urlPatterns = {"/viewLabels"} )
 public class ViewLabelsServlet extends FreemarkerHttpServlet{
     private static final Log log = LogFactory.getLog(ViewLabelsServlet.class.getName());
     
@@ -88,7 +87,7 @@ public class ViewLabelsServlet extends FreemarkerHttpServlet{
   		for(Literal l: labels) {
   			String languageTag = l.getLanguage();
   			String languageName = "";
-  			if(languageTag == "") {
+  			if(StringUtils.isEmpty(languageTag)) {
   				languageName = "untyped";
   			}
   			else if(localeCodeToNameMap.containsKey(languageTag)) {
@@ -97,7 +96,7 @@ public class ViewLabelsServlet extends FreemarkerHttpServlet{
   				log.warn("This language tag " + languageTag + " does not have corresponding name in the system and was not processed");
   			}
   			
-  			if(languageName != "") {
+  			if(!StringUtils.isEmpty(languageName)) {
   				if(!labelsHash.containsKey(languageName)) {
   					labelsHash.put(languageName, new ArrayList<LabelInformation>());
   				}
@@ -116,7 +115,7 @@ public class ViewLabelsServlet extends FreemarkerHttpServlet{
   		LabelInformationComparator lic = new LabelInformationComparator();
   		for(String languageName: labelsHash.keySet()) {
   			List<LabelInformation> labelInfo = labelsHash.get(languageName);
-  			Collections.sort(labelInfo, lic);
+  			labelInfo.sort(lic);
   		}
   		return labelsHash;
   		

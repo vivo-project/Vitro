@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 /**
  * Handles requests for entity information.
  */
+@WebServlet(name = "individual", urlPatterns = {"/display","/display/*","/entity","/entity/*","/individual","/individual/*"})
 public class IndividualController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(IndividualController.class);

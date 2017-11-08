@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
-import java.util.Date;
-
 public interface PropertyInstanceIface {
 //needed for PropertyInstance
 //object property statements

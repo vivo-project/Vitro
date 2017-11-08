@@ -5,12 +5,10 @@ package edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,7 +24,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.DependentResourceDeleteJena;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.event.EditEvent;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.configuration.EditConfigurationConstants;
-import edu.cornell.mannlib.vitro.webapp.edit.n3editing.controller.ProcessRdfFormController.Utilities;
 
 /**
  * The goal of this class is to provide processing from 
@@ -295,9 +292,9 @@ public class ProcessRdfForm {
             }
         }
         
-        String errors = "";
+        StringBuilder errors = new StringBuilder();
         for( String errorMsg : errorMessages){
-            errors += errorMsg + '\n';
+            errors.append(errorMsg).append('\n');
         }
         
        if( !errorMessages.isEmpty() ){
@@ -311,7 +308,7 @@ public class ProcessRdfForm {
                     "remain unfilled out and then the optional N3 does not get values subsituted in from" +
                     "the form submission values.  It may also be the case that there are unintentional " +
                     "syntax errors the optional N3." );
-               log.debug( errors );                            
+               log.debug(errors.toString());
            }
        }
               
@@ -331,11 +328,11 @@ public class ProcessRdfForm {
     
     private void logSubstitueN3(String msg, List<String> n3, String label){
         if( n3 == null || n3.size() == 0) return;        
-        String out = label + ":\n";
+        StringBuilder out = new StringBuilder(label + ":\n");
         for( String str : n3 ){
-            out += "    " + str + "\n";
+            out.append("    ").append(str).append("\n");
         }                      
-        log.debug(out);
+        log.debug(out.toString());
     }
     
 	private static Map<String, String> getSubPedObjVarMap(
@@ -466,16 +463,14 @@ public class ProcessRdfForm {
 	   Map<String, List<String>> newUris = new HashMap<String, List<String>>();
 	   //Check if any values from the submission have the "force new uri" value
 	   //TODO: Check how to handle multiple new resource values
-	   Iterator<String> keyIterator = urisFromForm.keySet().iterator();
-	   while(keyIterator.hasNext()) {
-		   String key = keyIterator.next().toString();
-		   if(urisFromForm.get(key).contains(EditConfigurationConstants.NEW_URI_SENTINEL)) {
-			   String newUri = urisForNewResources.get(key);
-			   List<String> newUrisForKey = new ArrayList<String>();
-			   newUrisForKey.add(newUri);
-			   newUris.put(key, newUrisForKey);
-		   }
-	   }
+       for (String key : urisFromForm.keySet()) {
+           if (urisFromForm.get(key).contains(EditConfigurationConstants.NEW_URI_SENTINEL)) {
+               String newUri = urisForNewResources.get(key);
+               List<String> newUrisForKey = new ArrayList<String>();
+               newUrisForKey.add(newUri);
+               newUris.put(key, newUrisForKey);
+           }
+       }
 	   if(newUris.size() > 0) {
 		   substituteInMultiURIs(newUris, requiredAsserts, optionalAsserts, uRLToReturnTo);
 	   }

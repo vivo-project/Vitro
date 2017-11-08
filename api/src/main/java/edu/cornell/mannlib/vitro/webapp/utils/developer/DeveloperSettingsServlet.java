@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -35,6 +36,7 @@ import edu.cornell.mannlib.vitro.webapp.services.freemarker.FreemarkerProcessing
  * is only a statement that developer mode is enabled. Otherwise, it
  * is a full panel (collapsed at first).
  */
+@WebServlet(name = "DeveloperAjax", urlPatterns = {"/admin/developerAjax"} )
 public class DeveloperSettingsServlet extends VitroAjaxController {
 	private static final Log log = LogFactory
 			.getLog(DeveloperSettingsServlet.class);

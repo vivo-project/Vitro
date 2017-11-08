@@ -27,12 +27,12 @@ public class ExcludeBasedOnTypeNamespace implements SearchIndexExcluder {
 	
 	@Validation
 	public void compileRegexPattern() {
-        String nsOrPattern = "";
+        StringBuilder nsOrPattern = new StringBuilder();
         for( int i=0; i<namespaces.size(); i++){
             String ns = namespaces.get(i);
-            nsOrPattern = nsOrPattern + (i!=0?"|":"") + Pattern.quote(ns) + "[^/#]*$";            
+            nsOrPattern.append(i != 0 ? "|" : "").append(Pattern.quote(ns)).append("[^/#]*$");
         }
-        this.nsRegexPattern = Pattern.compile(nsOrPattern);
+        this.nsRegexPattern = Pattern.compile(nsOrPattern.toString());
 	}
 
 

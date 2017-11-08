@@ -7,6 +7,7 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
@@ -42,6 +43,7 @@ import java.io.IOException;
  * @author rjy7
  *
  */
+@WebServlet(name = "ReorderController", urlPatterns = {"/edit/reorder"} )
 public class ReorderController extends VitroAjaxController {
 
     private static final long serialVersionUID = 1L;

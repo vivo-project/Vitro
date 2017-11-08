@@ -31,28 +31,27 @@ public class RdfTypeOptions implements FieldOptions {
             String fieldName, 
             WebappDaoFactory wdf) {        
         Map<String,String> uriToLabel = new HashMap<String,String>();
-        
-        for(int i=0;i<typeURIs.length; i++){
-            String uri = typeURIs[i];
-            VClass vc = wdf.getVClassDao().getVClassByURI( uri );
-            if( vc == null ){
-                uriToLabel.put(uri,uri);
+
+        for (String uri : typeURIs) {
+            VClass vc = wdf.getVClassDao().getVClassByURI(uri);
+            if (vc == null) {
+                uriToLabel.put(uri, uri);
                 continue;
             }
-            
-            uriToLabel.put(uri,vc.getPickListName());
-            List<String> subclassUris = wdf.getVClassDao().getAllSubClassURIs( uri );
-            if( subclassUris == null )
+
+            uriToLabel.put(uri, vc.getPickListName());
+            List<String> subclassUris = wdf.getVClassDao().getAllSubClassURIs(uri);
+            if (subclassUris == null)
                 continue;
-            
-            for( String subUri : subclassUris ){
-                VClass subVc = wdf.getVClassDao().getVClassByURI( subUri );
-                if( vc != null ){
-                    uriToLabel.put(subUri,subVc.getPickListName());
-                }else{
-                    uriToLabel.put(subUri,subUri);
+
+            for (String subUri : subclassUris) {
+                VClass subVc = wdf.getVClassDao().getVClassByURI(subUri);
+                if (vc != null) {
+                    uriToLabel.put(subUri, subVc.getPickListName());
+                } else {
+                    uriToLabel.put(subUri, subUri);
                 }
-            }            
+            }
         }
         
         return uriToLabel;

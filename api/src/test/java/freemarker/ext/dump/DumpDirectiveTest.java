@@ -1063,9 +1063,7 @@ public class DumpDirectiveTest {
         }
          
         public void setFavoriteColors(String...colors) {
-            for (String color : colors) {
-                favoriteColors.add(color);
-            }
+            Collections.addAll(favoriteColors, colors);
         }
         
 //        void setDegrees(Map<String, String> degrees) {
@@ -1087,7 +1085,7 @@ public class DumpDirectiveTest {
         }
         
         public String getName(String which) {
-            return which == "first" ? firstName : lastName;
+            return "first".equals(which) ? firstName : lastName;
         }
         
         public String getMiddleName() {

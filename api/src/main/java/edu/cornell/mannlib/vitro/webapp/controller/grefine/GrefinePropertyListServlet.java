@@ -14,14 +14,15 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import org.apache.jena.vocabulary.OWL;
 
@@ -40,6 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * @author Eliza Chan (elc2013@med.cornell.edu)
  * 
  */
+@WebServlet(name = "Google Refine Property List Service", urlPatterns = {"/get_properties_of_type"} )
 public class GrefinePropertyListServlet extends VitroHttpServlet {
 
 	private int MAXDEPTH = 7;
@@ -79,38 +81,37 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 				
 
 				// Construct json String
-				JSONObject completeJson = new JSONObject();
-				JSONArray propertiesJsonArr = new JSONArray();
+				ObjectNode completeJson = JsonNodeFactory.instance.objectNode();
+				ArrayNode propertiesJsonArr = JsonNodeFactory.instance.arrayNode();
 				if (classPropertiesMap.size() > 0) {
-					for (Iterator<VClass> iter = classPropertiesMap.keySet().iterator(); iter.hasNext();) { // add results to schema
-						VClass vc = (VClass) iter.next();
+					for (VClass vc : classPropertiesMap.keySet()) { // add results to schema
 						//System.out.println("vc uri: " + vc.getURI());
 						//System.out.println("vc name: " + vc.getName());	
 
-						ArrayList<DataProperty> vcProps = (ArrayList<DataProperty>)classPropertiesMap.get(vc);
-						for (DataProperty prop: vcProps) {
-							String nameStr = prop.getPublicName()==null ? prop.getName()==null ? null : prop.getName() : prop.getPublicName();
-								//System.out.println("--- uri: " + prop.getURI());
-								//System.out.println("--- name: " + nameStr);
-					        	// top level
-								JSONObject propertiesItemJson = new JSONObject();
-								JSONObject rootSchemaJson = new JSONObject();
-								rootSchemaJson.put("id", vc.getURI());
-								rootSchemaJson.put("name", vc.getName());
-								rootSchemaJson.put("alias", new JSONArray());
-								propertiesItemJson.put("schema", rootSchemaJson);
-								// second level
-								propertiesItemJson.put("id", prop.getURI());
-								propertiesItemJson.put("name", nameStr);
-								propertiesItemJson.put("alias", new JSONArray());
+						ArrayList<DataProperty> vcProps = (ArrayList<DataProperty>) classPropertiesMap.get(vc);
+						for (DataProperty prop : vcProps) {
+							String nameStr = prop.getPublicName() == null ? prop.getName() : prop.getPublicName();
+							//System.out.println("--- uri: " + prop.getURI());
+							//System.out.println("--- name: " + nameStr);
+							// top level
+							ObjectNode propertiesItemJson = JsonNodeFactory.instance.objectNode();
+							ObjectNode rootSchemaJson = JsonNodeFactory.instance.objectNode();
+							rootSchemaJson.put("id", vc.getURI());
+							rootSchemaJson.put("name", vc.getName());
+							rootSchemaJson.put("alias", JsonNodeFactory.instance.arrayNode());
+							propertiesItemJson.put("schema", rootSchemaJson);
+							// second level
+							propertiesItemJson.put("id", prop.getURI());
+							propertiesItemJson.put("name", nameStr);
+							propertiesItemJson.put("alias", JsonNodeFactory.instance.arrayNode());
 
-								JSONObject expectsJson = new JSONObject();
-								expectsJson.put("id", prop.getURI());
-								expectsJson.put("name", nameStr);
-								expectsJson.put("alias", new JSONArray());
-								propertiesItemJson.put("expects", expectsJson);
-								
-								propertiesJsonArr.put(propertiesItemJson);
+							ObjectNode expectsJson = JsonNodeFactory.instance.objectNode();
+							expectsJson.put("id", prop.getURI());
+							expectsJson.put("name", nameStr);
+							expectsJson.put("alias", JsonNodeFactory.instance.arrayNode());
+							propertiesItemJson.put("expects", expectsJson);
+
+							propertiesJsonArr.add(propertiesItemJson);
 						}
 					}
 				}
@@ -146,36 +147,35 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 					HashMap<VClass, List<DataProperty>> lvl2ClassPropertiesMap = 
 						populateClassPropertiesMap(vcDao, dao, lvl2Class.getURI(), propURIs);	
 					if (lvl2ClassPropertiesMap.size() > 0) {
-						for (Iterator<VClass> iter = lvl2ClassPropertiesMap.keySet().iterator(); iter.hasNext();) { // add results to schema
-							VClass vc = (VClass) iter.next();
-							ArrayList<DataProperty> vcProps = (ArrayList<DataProperty>)lvl2ClassPropertiesMap.get(vc);
-							for (DataProperty prop: vcProps) {
-								String nameStr = prop.getPublicName()==null ? prop.getName()==null ? null : prop.getName() : prop.getPublicName();
-						        	// top level
-									JSONObject propertiesItemJson = new JSONObject();
-									
-									JSONObject rootSchemaJson = new JSONObject();
-									rootSchemaJson.put("id", topClass.getURI());
-									rootSchemaJson.put("name", topClass.getName());
-									rootSchemaJson.put("alias", new JSONArray());
-									propertiesItemJson.put("schema", rootSchemaJson);
+						for (VClass vc : lvl2ClassPropertiesMap.keySet()) { // add results to schema
+							ArrayList<DataProperty> vcProps = (ArrayList<DataProperty>) lvl2ClassPropertiesMap.get(vc);
+							for (DataProperty prop : vcProps) {
+								String nameStr = prop.getPublicName() == null ? prop.getName() : prop.getPublicName();
+								// top level
+								ObjectNode propertiesItemJson = JsonNodeFactory.instance.objectNode();
 
-									// second level
-									propertiesItemJson.put("id", vc.getURI());
-									propertiesItemJson.put("name", vc.getName());
-									propertiesItemJson.put("alias", new JSONArray());
-																		
-									propertiesItemJson.put("id2", prop.getURI());
-									propertiesItemJson.put("name2", nameStr);
-									propertiesItemJson.put("alias2", new JSONArray());
-									
-									JSONObject expectsJson = new JSONObject();
-									expectsJson.put("id", prop.getURI());
-									expectsJson.put("name", nameStr);
-									expectsJson.put("alias", new JSONArray());
-									propertiesItemJson.put("expects", expectsJson);
-									
-									propertiesJsonArr.put(propertiesItemJson);
+								ObjectNode rootSchemaJson = JsonNodeFactory.instance.objectNode();
+								rootSchemaJson.put("id", topClass.getURI());
+								rootSchemaJson.put("name", topClass.getName());
+								rootSchemaJson.put("alias", JsonNodeFactory.instance.arrayNode());
+								propertiesItemJson.put("schema", rootSchemaJson);
+
+								// second level
+								propertiesItemJson.put("id", vc.getURI());
+								propertiesItemJson.put("name", vc.getName());
+								propertiesItemJson.put("alias", JsonNodeFactory.instance.arrayNode());
+
+								propertiesItemJson.put("id2", prop.getURI());
+								propertiesItemJson.put("name2", nameStr);
+								propertiesItemJson.put("alias2", JsonNodeFactory.instance.arrayNode());
+
+								ObjectNode expectsJson = JsonNodeFactory.instance.objectNode();
+								expectsJson.put("id", prop.getURI());
+								expectsJson.put("name", nameStr);
+								expectsJson.put("alias", JsonNodeFactory.instance.arrayNode());
+								propertiesItemJson.put("expects", expectsJson);
+
+								propertiesJsonArr.add(propertiesItemJson);
 							}
 						}
 						
@@ -202,25 +202,23 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 		HashMap<VClass, List<DataProperty>> classPropertiesMap = new HashMap<VClass, List<DataProperty>>();
 		List<DataProperty> props = new ArrayList<DataProperty>();
 		VClass topVc = vcDao.getVClassByURI(uri);
-	        Collection <DataProperty> dataProps = dao.getDataPropertiesForVClass(uri);
-	        Iterator<DataProperty> dataPropIt = dataProps.iterator();
-	        while (dataPropIt.hasNext()) {
-	            DataProperty dp = dataPropIt.next();
-	            if (!(propURIs.contains(dp.getURI()))) {
-	                propURIs.add(dp.getURI());
-	                DataProperty prop = dao.getDataPropertyByURI(dp.getURI());
-	                if (prop != null) {
-	                    props.add(prop);
-	                }
-	            }
-	        }
+		Collection <DataProperty> dataProps = dao.getDataPropertiesForVClass(uri);
+		for (DataProperty dp : dataProps) {
+			if (!(propURIs.contains(dp.getURI()))) {
+				propURIs.add(dp.getURI());
+				DataProperty prop = dao.getDataPropertyByURI(dp.getURI());
+				if (prop != null) {
+					props.add(prop);
+				}
+			}
+		}
         
     	
         if (props.size() > 0) {
 
         	Collections.sort(props);
         	for (DataProperty prop: props) {
-        		String nameStr = prop.getPublicName()==null ? prop.getName()==null ? null : prop.getName() : prop.getPublicName();
+        		String nameStr = prop.getPublicName()==null ? prop.getName() : prop.getPublicName();
 				if (nameStr != null) {
             		if (prop.getDomainClassURI() != null) {
             			VClass vc = vcDao.getVClassByURI(prop.getDomainClassURI());
@@ -256,22 +254,21 @@ public class GrefinePropertyListServlet extends VitroHttpServlet {
 	        List childURIstrs = vcDao.getSubClassURIs(parent.getURI());
 	        if ((childURIstrs.size()>0) && position<MAXDEPTH) {
 	            List childClasses = new ArrayList();
-	            Iterator childURIstrIt = childURIstrs.iterator();
-	            while (childURIstrIt.hasNext()) {
-	                String URIstr = (String) childURIstrIt.next();
-	                try {
-		                VClass child = (VClass) vcDao.getVClassByURI(URIstr);
-		                if (!child.getURI().equals(OWL.Nothing.getURI())) {
-		                	childClasses.add(child);
-		                }
-	                } catch (Exception e) {}
-	            }
+				for (Object childURIstr : childURIstrs) {
+					String URIstr = (String) childURIstr;
+					try {
+						VClass child = (VClass) vcDao.getVClassByURI(URIstr);
+						if (!child.getURI().equals(OWL.Nothing.getURI())) {
+							childClasses.add(child);
+						}
+					} catch (Exception e) {
+					}
+				}
 	            Collections.sort(childClasses);
-	            Iterator childClassIt = childClasses.iterator();
-	            while (childClassIt.hasNext()) {
-	                VClass child = (VClass) childClassIt.next();
-	                addChildren(vcDao, wadf, child, list, position + childShift, ontologyUri);
-	            }
+				for (Object childClass : childClasses) {
+					VClass child = (VClass) childClass;
+					addChildren(vcDao, wadf, child, list, position + childShift, ontologyUri);
+				}
 
 	        }
 

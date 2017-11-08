@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -32,6 +33,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassDao;
  * This servlet gets all the object properties for a given subject.
  */
 
+@WebServlet(name = "GetClazzObjectProperties", urlPatterns = {"/admin/getClazzObjectProperties"})
 public class GetClazzObjectProperties extends BaseEditController {
 	private static final Log log = LogFactory.getLog(GetClazzObjectProperties.class);
 
@@ -49,8 +51,8 @@ public class GetClazzObjectProperties extends BaseEditController {
 			return;
 		}
 
-		String respo = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-		respo += "<options>";
+		StringBuilder respo = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		respo.append("<options>");
 
 		ObjectPropertyDao odao = vreq.getUnfilteredWebappDaoFactory()
 				.getObjectPropertyDao();
@@ -88,13 +90,11 @@ public class GetClazzObjectProperties extends BaseEditController {
 				ObjectProperty oprop = (ObjectProperty) odao
 						.getObjectPropertyByURI(pi.getPropertyURI());
 				if (oprop != null) {
-					respo += "<option>" + "<key>" + oprop.getLocalName()
-							+ "</key>" + "<value>" + oprop.getURI()
-							+ "</value>" + "</option>";
+					respo.append("<option>" + "<key>").append(oprop.getLocalName()).append("</key>").append("<value>").append(oprop.getURI()).append("</value>").append("</option>");
 				}
 			}
 		}
-		respo += "</options>";
+		respo.append("</options>");
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();

@@ -5,15 +5,11 @@ package edu.cornell.mannlib.vitro.webapp.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.List;
 import java.util.Random;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.jena.datatypes.xsd.XSDDatatype;
 import org.apache.jena.ontology.DatatypeProperty;
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
@@ -24,7 +20,6 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class Csv2Rdf {
@@ -132,7 +127,7 @@ public class Csv2Rdf {
 			String uri = null;
 	        int attempts = 0;
 			if(namespace!=null && !namespace.isEmpty()){
-        		while( uriIsGood == false && attempts < 30 ){	
+        		while(!uriIsGood && attempts < 30 ){
         			uri = namespace+individualNameBase+random.nextInt( Math.min(Integer.MAX_VALUE,(int)Math.pow(2,attempts + 13)) );
         			String errMsg = wadf.checkURI(uri);
         			Resource res = ResourceFactory.createResource(uri);

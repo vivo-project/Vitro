@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -40,6 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.dataGetter.DataGetterUtils;
  *    
  * See implementations of PageDataGetter for more variables. 
  */
+@WebServlet(name = "PageController", urlPatterns = "/pageController")
 public class PageController extends FreemarkerHttpServlet{
     private static final Log log = LogFactory.getLog(PageController.class);
     

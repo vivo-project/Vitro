@@ -12,15 +12,19 @@ import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
@@ -41,7 +45,10 @@ import edu.cornell.mannlib.vitro.webapp.search.VitroSearchTermNames;
  * @author Eliza Chan (elc2013@med.cornell.edu)
  * 
  */
+@WebServlet(name = "JSON Reconcile Service", urlPatterns = {"/reconcile"} )
 public class JSONReconcileServlet extends VitroHttpServlet {
+
+	private static final String INTERNAL_QUERY_NAME = "A0B1C2";
 
 	private static final String PARAM_QUERY = "term";
     private static final long serialVersionUID = 1L;
@@ -68,7 +75,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 		try {
 			if (vreq.getParameter("query") != null
 					|| vreq.getParameter("queries") != null) {
-				JSONObject qJson = getResult(vreq, req, resp);
+				ObjectNode qJson = getResult(vreq, req, resp);
 				log.debug("result: " + qJson.toString());
 				String responseStr = (vreq.getParameter("callback") == null) ? qJson
 						.toString() : vreq.getParameter("callback") + "("
@@ -87,7 +94,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				}
 				defaultTypeList = ConfigurationProperties.getBean(req).getProperty("Vitro.reconcile.defaultTypeList");
 				serverName = req.getServerName();
-				JSONObject metaJson = getMetadata(req, resp, defaultNamespace, defaultTypeList, serverName, serverPort);
+				ObjectNode metaJson = getMetadata(req, resp, defaultNamespace, defaultTypeList, serverName, serverPort);
 				String callbackStr = (vreq.getParameter("callback") == null) ? ""
 						: vreq.getParameter("callback");
 				ServletOutputStream out = resp.getOutputStream();
@@ -98,16 +105,21 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 		}
 	}
 
-	private JSONObject getResult(VitroRequest vreq, HttpServletRequest req,
+	private ObjectNode getResult(VitroRequest vreq, HttpServletRequest req,
 			HttpServletResponse resp) throws ServletException {
 
-		HashMap<String, JSONObject> searchWithTypeMap = new HashMap<String, JSONObject>();
-		HashMap<String, JSONObject> searchNoTypeMap = new HashMap<String, JSONObject>();
+		HashMap<String, JsonNode> searchWithTypeMap = new HashMap<String, JsonNode>();
+		HashMap<String, JsonNode> searchNoTypeMap = new HashMap<String, JsonNode>();
 		ArrayList<String> queries = new ArrayList<String>();
 		Object qObj = vreq.getParameter("queries");
 
 		if (qObj == null) {
 			qObj = vreq.getParameter("query");
+			if (qObj instanceof String) {
+				if (!((String)qObj).contains("{")) {
+					qObj = "{ \"query\" : \"" + qObj + "\" }";
+				}
+			}
 		}
 
 		if (qObj != null && qObj instanceof String) {
@@ -122,23 +134,22 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 		}
 
 		try {
-			for (int i = 0; i < queries.size(); i++) {
-				String queryStr = queries.get(i);
-				JSONObject json = new JSONObject(queryStr);
+			for (String queryStr : queries) {
+				ObjectMapper mapper = new ObjectMapper();
+				JsonNode json = mapper.readTree(queryStr);
 
 				if (json.has("query")) { // single query
 					if (json.has("type")) {
-						searchWithTypeMap.put("query", json);
+						searchWithTypeMap.put(INTERNAL_QUERY_NAME, json);
 					} else {
 						// user did not specify a type
-						searchNoTypeMap.put("query", json);
+						searchNoTypeMap.put(INTERNAL_QUERY_NAME, json);
 					}
 				} else { // multiple queries
-					for (Iterator<String> iter = json.keys(); iter.hasNext();) {
-						ArrayList<JSONObject> jsonList = new ArrayList<JSONObject>();
+					for (Iterator<String> iter = json.fieldNames(); iter.hasNext(); ) {
+						ArrayList<JsonNode> jsonList = new ArrayList<JsonNode>();
 						String key = iter.next();
-						Object obj = json.get(key);
-						JSONObject jsonLvl2 = (JSONObject) obj;
+						JsonNode jsonLvl2 = json.get(key);
 						if (jsonLvl2.has("query")) {
 							if (jsonLvl2.has("type")) {
 								searchWithTypeMap.put(key, jsonLvl2);
@@ -150,14 +161,14 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 					}
 				}
 			}
-		} catch (JSONException ex) {
+		} catch (IOException ex) {
 			log.error("JSONException: " + ex);
 			throw new ServletException("JSONReconcileServlet JSONException: "
 					+ ex);
 		}
 
 		// Run index search
-		JSONObject qJson = null;
+		ObjectNode qJson = null;
 		if (searchWithTypeMap.size() > 0) {
 			qJson = runSearch(searchWithTypeMap);
 		} else {
@@ -174,65 +185,60 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 	 * 
 	 * @param req Servlet Request
 	 * @param resp Servlet Response
-	 * @throws ServletException
 	 */
-	protected JSONObject getMetadata(HttpServletRequest req, HttpServletResponse resp, String defaultNamespace,
-			String defaultTypeList, String serverName, int serverPort) throws ServletException {
+	protected ObjectNode getMetadata(HttpServletRequest req, HttpServletResponse resp, String defaultNamespace,
+									 String defaultTypeList, String serverName, int serverPort) throws ServletException {
 
-		JSONObject json = new JSONObject();
-		try {
-			json.put("name", "VIVO Reconciliation Service");
-			if (defaultNamespace != null) {
-				json.put("identifierSpace", defaultNamespace);
-				json.put("schemaSpace", defaultNamespace);
-			}
-			JSONObject viewJson = new JSONObject();
-			StringBuffer urlBuf = new StringBuffer();
-			urlBuf.append("http://" + serverName);
-			if (serverPort == 8080) {
-				urlBuf.append(":" + serverPort);
-			}
-			if (req.getContextPath() != null) {
-				urlBuf.append(req.getContextPath());
-			}
-			viewJson.put("url", urlBuf.toString() + "/individual?uri={{id}}");
-			json.put("view", viewJson);
+		ObjectNode json = JsonNodeFactory.instance.objectNode();
 
-			// parse defaultTypeList from runtime.properties
-			if (defaultTypeList != null) {
-				String[] splitList = defaultTypeList.split(";");
-				String[][] idNameArray = new String[splitList.length][splitList.length];
-				for(int i = 0; i<splitList.length; i++) {
-					idNameArray[i] = splitList[i].split(",");
-				}
-				// process and add to json defaultTypes
-				JSONArray defaultTypesJsonArr = new JSONArray();
-				for (int i = 0; i<idNameArray.length; i++) {
-					JSONObject defaultTypesJson = new JSONObject();
-					defaultTypesJson.put("id", idNameArray[i][0].trim());
-					defaultTypesJson.put("name", idNameArray[i][1].trim());
-					defaultTypesJsonArr.put(defaultTypesJson);
-				}
-				json.put("defaultTypes", defaultTypesJsonArr);
+		json.put("name", "VIVO Reconciliation Service");
+		if (defaultNamespace != null) {
+			json.put("identifierSpace", defaultNamespace);
+			json.put("schemaSpace", defaultNamespace);
+		}
+		ObjectNode viewJson = JsonNodeFactory.instance.objectNode();
+		StringBuilder urlBuf = new StringBuilder();
+		urlBuf.append("http://").append(serverName);
+		if (serverPort == 8080) {
+			urlBuf.append(":").append(serverPort);
+		}
+		if (req.getContextPath() != null) {
+			urlBuf.append(req.getContextPath());
+		}
+		viewJson.put("url", urlBuf.toString() + "/individual?uri={{id}}");
+		json.put("view", viewJson);
+
+		// parse defaultTypeList from runtime.properties
+		if (defaultTypeList != null) {
+			String[] splitList = defaultTypeList.split(";");
+			String[][] idNameArray = new String[splitList.length][splitList.length];
+			for(int i = 0; i<splitList.length; i++) {
+				idNameArray[i] = splitList[i].split(",");
 			}
-		} catch (JSONException ex) {
-			throw new ServletException(
-					"JSONReconcileServlet: Could not create metadata: " + ex);
+			// process and add to json defaultTypes
+			ArrayNode defaultTypesJsonArr = JsonNodeFactory.instance.arrayNode();
+			for (String[] anIdNameArray : idNameArray) {
+				ObjectNode defaultTypesJson = JsonNodeFactory.instance.objectNode();
+				defaultTypesJson.put("id", anIdNameArray[0].trim());
+				defaultTypesJson.put("name", anIdNameArray[1].trim());
+				defaultTypesJsonArr.add(defaultTypesJson);
+			}
+			json.put("defaultTypes", defaultTypesJsonArr);
 		}
 
 		return json;
 	}
 
-	private JSONObject runSearch(HashMap<String, JSONObject> currMap) throws ServletException {
-		JSONObject qJson = new JSONObject();
+	private ObjectNode runSearch(HashMap<String, JsonNode> currMap) throws ServletException {
+		ObjectNode qJson = JsonNodeFactory.instance.objectNode();
 		
 		try {
 
-			for (Map.Entry<String, JSONObject> entry : currMap.entrySet()) {
-				JSONObject resultAllJson = new JSONObject();
+			for (Map.Entry<String, JsonNode> entry : currMap.entrySet()) {
+				ObjectNode resultAllJson = JsonNodeFactory.instance.objectNode();
 				String key = entry.getKey();
-				JSONObject json = entry.getValue();
-				String queryVal = json.getString("query");
+				JsonNode json = entry.getValue();
+				String queryVal = json.get("query").asText();
 
 				// System.out.println("query: " + json.toString());
 				
@@ -243,32 +249,35 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				ArrayList<String[]> propertiesList = new ArrayList<String[]>();
 
 				if (json.has("type")) {
-					searchType = json.getString("type");
+					searchType = json.get("type").asText();
 				}
 				if (json.has("limit")) {
-					limit = json.getInt("limit");
+					limit = json.get("limit").asInt();
 				}
 				if (json.has("type_strict")) { // Not sure what this variable
 												// represents. Skip for now.
-					typeStrict = json.getString("type_strict");
+					typeStrict = json.get("type_strict").asText();
 				}
 				if (json.has("properties")) {
-					JSONArray properties = json.getJSONArray("properties");
-					for (int i = 0; i < properties.length(); i++) {
-						String[] pvPair = new String[2];
-						JSONObject jsonProperty = properties.getJSONObject(i);
-						String pid = jsonProperty.getString("pid");
-						String v = jsonProperty.getString("v");
-						if (pid != null && v != null) {
-							pvPair[0] = pid;
-							pvPair[1] = v;
-							propertiesList.add(pvPair);
+					JsonNode propertiesNode = json.get("properties");
+					if (propertiesNode instanceof ArrayNode) {
+						ArrayNode properties = (ArrayNode)propertiesNode;
+						for (int i = 0; i < properties.size(); i++) {
+							String[] pvPair = new String[2];
+							JsonNode jsonProperty = properties.get(i);
+							String pid = JacksonUtils.getString(jsonProperty, "pid");
+							String v = JacksonUtils.getString(jsonProperty, "v");
+							if (pid != null && v != null) {
+								pvPair[0] = pid;
+								pvPair[1] = v;
+								propertiesList.add(pvPair);
+							}
 						}
 					}
 				}
 
 				// begin search
-				JSONArray resultJsonArr = new JSONArray();
+				ArrayNode resultJsonArr = JsonNodeFactory.instance.arrayNode();
 
 	            SearchQuery query = getQuery(queryVal, searchType, limit, propertiesList);
 	            SearchResponse queryResponse = null;
@@ -297,14 +306,19 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 	                        SearchResult result = new SearchResult(name, uri);
 	                        
 	                        // populate result for Google Refine
-							JSONObject resultJson = new JSONObject();
-							resultJson.put("score", doc.getFirstValue("score"));
+							ObjectNode resultJson = JsonNodeFactory.instance.objectNode();
+							Object score = doc.getFirstValue("score");
+							if (score instanceof Double) {
+								resultJson.put("score", (Double)score);
+							} else if (score instanceof Float) {
+								resultJson.put("score", (Float)score);
+							}
 							String modUri = result.getUri().replace("#", "%23");
 							resultJson.put("id", modUri);
 							resultJson.put("name", result.getLabel());
 							
 							Collection<Object> rdfTypes = doc.getFieldValues(VitroSearchTermNames.RDFTYPE);
-							JSONArray typesJsonArr = new JSONArray();
+							ArrayNode typesJsonArr = JsonNodeFactory.instance.arrayNode();
 							if (rdfTypes != null) {
 
 								for (Object rdfType : rdfTypes) {
@@ -315,17 +329,17 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 									int lastIndex2 = type.lastIndexOf('/') + 1;
 									String typeName = type.substring(lastIndex2);
 									typeName = typeName.replace("#", ":");
-									JSONObject typesJson = new JSONObject();
+									ObjectNode typesJson = JsonNodeFactory.instance.objectNode();
 									typesJson.put("id", type);
 									typesJson.put("name", typeName);
-									typesJsonArr.put(typesJson);
+									typesJsonArr.add(typesJson);
 
 								}
 							}
 
 							resultJson.put("type", typesJsonArr);
 							resultJson.put("match", "false");
-							resultJsonArr.put(resultJson);
+							resultJsonArr.add(resultJson);
 
 						} catch (Exception e) {
 							log.error("problem getting usable individuals from search "
@@ -340,14 +354,14 @@ public class JSONReconcileServlet extends VitroHttpServlet {
 				// System.out.println("results: " + qJson.toString());
 			}
 
-		} catch (JSONException ex) {
-			log.error("JSONException: " + ex);
-			throw new ServletException("JSONReconcileServlet JSONException: "
-					+ ex);
 		} catch (SearchEngineException ex) {
 			log.error("JSONException: " + ex);
 			throw new ServletException("JSONReconcileServlet SearchEngineException: "
 					+ ex);
+		}
+
+		if (qJson.has(INTERNAL_QUERY_NAME)) {
+			return (ObjectNode)qJson.get(INTERNAL_QUERY_NAME);
 		}
 
 		return qJson;
@@ -389,9 +403,7 @@ public class JSONReconcileServlet extends VitroHttpServlet {
         query.addFields(VitroSearchTermNames.NAME_RAW, VitroSearchTermNames.URI, "*", "score"); // fields to retrieve
  
 		// if propertiesList has elements, add extra queries to query
-		Iterator<String[]> it = propertiesList.iterator();
-		while (it.hasNext()) {
-			String[] pvPair = it.next();
+		for (String[] pvPair : propertiesList) {
 			query.addFilterQueries(tokenizeNameQuery(pvPair[1]), VitroSearchTermNames.RDFTYPE + ":\"" + pvPair[0] + "\"");
 		}       
 

@@ -33,7 +33,7 @@ public class JsonSet extends BodyTagSupport {
 	private String escape(String s){
 		if(s==null)
 			return null;
-		StringBuffer sb=new StringBuffer();
+		StringBuilder sb=new StringBuilder();
 		for(int i=0;i<s.length();i++){
 			char ch=s.charAt(i);
 			switch(ch){

@@ -2,16 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import org.apache.log4j.Level;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.impl.RDFDefaultErrorHandler;
 import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.testing.AbstractTestClass;

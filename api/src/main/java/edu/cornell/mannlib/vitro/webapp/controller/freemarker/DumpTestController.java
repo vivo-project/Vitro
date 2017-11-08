@@ -6,6 +6,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -172,9 +173,7 @@ public class DumpTestController extends FreemarkerHttpServlet {
         }
          
         public void setFavoriteColors(String...colors) {
-            for (String color : colors) {
-                favoriteColors.add(color);
-            }
+            Collections.addAll(favoriteColors, colors);
         }
 
         float getSalary() {
@@ -192,7 +191,7 @@ public class DumpTestController extends FreemarkerHttpServlet {
         }
         
         public String getName(String which) {
-            return which == "first" ? firstName : lastName;
+            return "first".equals(which) ? firstName : lastName;
         }
         
         public String getMiddleName() {

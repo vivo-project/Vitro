@@ -1,6 +1,6 @@
 package org.vivoweb.linkeddatafragments.servlet;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
 import edu.cornell.mannlib.vitro.webapp.beans.Ontology;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroHttpServlet;
 import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
@@ -23,17 +23,15 @@ import org.linkeddatafragments.views.ILinkedDataFragmentWriter;
 import org.vivoweb.linkeddatafragments.views.HtmlTriplePatternFragmentWriterImpl;
 import org.vivoweb.linkeddatafragments.views.LinkedDataFragmentWriterFactory;
 import org.vivoweb.linkeddatafragments.datasource.rdfservice.RDFServiceBasedRequestProcessorForTPFs;
-import org.vivoweb.linkeddatafragments.datasource.rdfservice.RDFServiceDataSource;
 import org.vivoweb.linkeddatafragments.datasource.rdfservice.RDFServiceDataSourceType;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -46,6 +44,7 @@ import java.util.Map.Entry;
 /**
  * Servlet that responds with a Linked Data Fragment.
  */
+@WebServlet(name = "TpfServlet", urlPatterns = {"/tpf/*"})
 public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
 
     private final static long serialVersionUID = 1L;
@@ -91,7 +90,7 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
             }
 
             // register data sources
-            for (Entry<String, JsonObject> dataSource : config.getDataSources().entrySet()) {
+            for (Entry<String, JsonNode> dataSource : config.getDataSources().entrySet()) {
                 dataSources.put(dataSource.getKey(), DataSourceFactory.create(dataSource.getValue()));
             }
 
@@ -223,7 +222,7 @@ public class VitroLinkedDataFragmentServlet extends VitroHttpServlet {
         configJson.append("  \"title\": \"Linked Data Fragments server\",\n");
         configJson.append("\n");
         configJson.append("  \"datasourcetypes\": {\n");
-        configJson.append("    \"RDFServiceDatasource\": \"" + RDFServiceDataSourceType.class.getCanonicalName() + "\"\n");
+        configJson.append("    \"RDFServiceDatasource\": \"").append(RDFServiceDataSourceType.class.getCanonicalName()).append("\"\n");
         configJson.append("  },\n");
         configJson.append("\n");
         configJson.append("  \"datasources\": {\n");

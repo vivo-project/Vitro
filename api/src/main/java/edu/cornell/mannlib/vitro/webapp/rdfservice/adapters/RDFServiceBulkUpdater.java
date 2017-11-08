@@ -8,7 +8,6 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import org.apache.jena.graph.GraphEvents;
-import org.apache.jena.graph.Node;
 import org.apache.jena.rdf.model.Model;
 
 import java.io.ByteArrayInputStream;
@@ -57,11 +56,11 @@ public class RDFServiceBulkUpdater extends AbstractBulkUpdater {
 
         String findPattern = "?s ?p ?o";
 
-        StringBuffer findQuery = new StringBuffer("CONSTRUCT { ")
+        StringBuilder findQuery = new StringBuilder("CONSTRUCT { ")
                 .append(findPattern)
                 .append(" } WHERE { \n");
         if (graphURI != null) {
-            findQuery.append("  GRAPH <" + graphURI + "> { ");
+            findQuery.append("  GRAPH <").append(graphURI).append("> { ");
         }
         findQuery.append(findPattern);
         if (graphURI != null) {

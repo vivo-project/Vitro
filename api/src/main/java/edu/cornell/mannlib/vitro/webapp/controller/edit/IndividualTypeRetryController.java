@@ -60,16 +60,12 @@ public class IndividualTypeRetryController extends BaseEditController {
 	    sortForPickList(allVClasses, vreq);
 			
 		Set<String> prohibitedURIset = new HashSet<String>();
-		for (Iterator<VClass> indClassIt = ind.getVClasses(false).iterator(); indClassIt.hasNext(); ) {
-			VClass vc = indClassIt.next();
-			if(vc.isAnonymous()) {
-			    continue;
+		for (VClass vc : ind.getVClasses(false)) {
+			if (vc.isAnonymous()) {
+				continue;
 			}
 			prohibitedURIset.add(vc.getURI());
-			for (Iterator<String> djURIIt = vcDao.getDisjointWithClassURIs(vc.getURI()).iterator(); djURIIt.hasNext(); ) {
-				String djURI = djURIIt.next();
-	            prohibitedURIset.add(djURI);
-			}
+			prohibitedURIset.addAll(vcDao.getDisjointWithClassURIs(vc.getURI()));
 		}
 		
 		List<VClass> eligibleVClasses = new ArrayList<VClass>();

@@ -13,6 +13,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
+import javax.servlet.annotation.WebServlet;
+
+@WebServlet(name = "TermsOfUseController", urlPatterns = {"/termsOfUse"} )
 public class TermsOfUseController extends FreemarkerHttpServlet {
     
     private static final long serialVersionUID = 1L;

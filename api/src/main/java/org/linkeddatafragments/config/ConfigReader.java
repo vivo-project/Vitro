@@ -1,12 +1,14 @@
 package org.linkeddatafragments.config;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.linkeddatafragments.datasource.IDataSourceType;
 
+import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -18,7 +20,7 @@ import java.util.Map.Entry;
  */
 public class ConfigReader {
     private final Map<String, IDataSourceType> dataSourceTypes = new HashMap<>();
-    private final Map<String, JsonObject> dataSources = new HashMap<>();
+    private final Map<String, JsonNode> dataSources = new HashMap<>();
     private final Map<String, String> prefixes = new HashMap<>();
     private final String baseURL;
 
@@ -28,19 +30,34 @@ public class ConfigReader {
      * @param configReader the configuration
      */
     public ConfigReader(Reader configReader) {
-        JsonObject root = new JsonParser().parse(configReader).getAsJsonObject();
-        this.baseURL = root.has("baseURL") ? root.getAsJsonPrimitive("baseURL").getAsString() : null;
-        
-        for (Entry<String, JsonElement> entry : root.getAsJsonObject("datasourcetypes").entrySet()) {
-            final String className = entry.getValue().getAsString();
-            dataSourceTypes.put(entry.getKey(), initDataSouceType(className) );
-        }
-        for (Entry<String, JsonElement> entry : root.getAsJsonObject("datasources").entrySet()) {
-            JsonObject dataSource = entry.getValue().getAsJsonObject();
-            this.dataSources.put(entry.getKey(), dataSource);
-        }
-        for (Entry<String, JsonElement> entry : root.getAsJsonObject("prefixes").entrySet()) {
-            this.prefixes.put(entry.getKey(), entry.getValue().getAsString());
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = null;
+        try {
+            root = mapper.readTree(configReader);
+            this.baseURL = root.has("baseURL") ? root.get("baseURL").asText() : null;
+
+            Iterator<Entry<String, JsonNode>> iterator;
+
+            iterator = root.get("datasourcetypes").fields();
+            while (iterator.hasNext()) {
+                Entry<String, JsonNode> entry = iterator.next();
+                final String className = entry.getValue().asText();
+                dataSourceTypes.put(entry.getKey(), initDataSouceType(className) );
+            }
+
+            iterator = root.get("datasources").fields();
+            while (iterator.hasNext()) {
+                Entry<String, JsonNode> entry = iterator.next();
+                this.dataSources.put(entry.getKey(), entry.getValue());
+            }
+
+            iterator = root.get("prefixes").fields();
+            while (iterator.hasNext()) {
+                Entry<String, JsonNode> entry = iterator.next();
+                this.prefixes.put(entry.getKey(), entry.getValue().asText());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -58,7 +75,7 @@ public class ConfigReader {
      *
      * @return the data sources
      */
-    public Map<String, JsonObject> getDataSources() {
+    public Map<String, JsonNode> getDataSources() {
         return dataSources;
     }
 

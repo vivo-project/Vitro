@@ -6,14 +6,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -470,6 +475,8 @@ public class SparqlQueryApiExecutorTest extends AbstractTestClass {
 			assertEquivalentTurtle(message, expected, out.toString());
 		} else if (ACCEPT_N3.equals(acceptHeader)) {
 			assertEquivalentN3(message, expected, out.toString());
+		} else if (ACCEPT_JSON.equals(acceptHeader)) {
+			assertEquivalentJSON(message, expected, out.toString());
 		} else {
 			assertEqualsIgnoreWhiteSpace(message, expected, out.toString());
 		}
@@ -541,6 +548,18 @@ public class SparqlQueryApiExecutorTest extends AbstractTestClass {
 		return StringUtils.join(remainder, "\n");
 	}
 
+	private void assertEquivalentJSON(String message, String expected,
+									  String actual) {
+		ObjectMapper om = new ObjectMapper();
+		try {
+			Map<String, Object> expMap = (Map<String, Object>)(om.readValue(expected, Map.class));
+			Map<String, Object> actMap = (Map<String, Object>)(om.readValue(actual, Map.class));
+			assertEquals(message, expMap, actMap);
+		} catch (IOException e) {
+			assertEquals(message, expected.replaceAll("\\s+", " "),
+					actual.replaceAll("\\s+", " "));
+		}
+	}
 	private void assertEqualsIgnoreWhiteSpace(String message, String expected,
 			String actual) {
 		assertEquals(message, expected.replaceAll("\\s+", " "),

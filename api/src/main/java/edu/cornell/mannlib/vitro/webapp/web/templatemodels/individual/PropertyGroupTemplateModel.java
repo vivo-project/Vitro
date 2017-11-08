@@ -82,12 +82,9 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 	
 		RequestedAction dops = new DisplayObjectPropertyStatement(
 				subject.getURI(), op, SOME_URI);
-		if (PolicyHelper.isAuthorizedForActions(vreq, dops)) {
-			return true;
-		}
-		
-		return false;
-	}
+        return PolicyHelper.isAuthorizedForActions(vreq, dops);
+
+    }
 
 	/**
 	 * See if the property is permitted in its own right. If not, the property
@@ -103,12 +100,9 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 		DataPropertyStatementImpl dps = new DataPropertyStatementImpl(
 				subject.getURI(), dp.getURI(), SOME_LITERAL);
 		RequestedAction dops = new DisplayDataPropertyStatement(dps);
-		if (PolicyHelper.isAuthorizedForActions(vreq, dops)) {
-			return true;
-		}
-	
-		return false;
-	}
+        return PolicyHelper.isAuthorizedForActions(vreq, dops);
+
+    }
 
 	protected boolean isEmpty() {
         return properties.isEmpty();
@@ -121,14 +115,13 @@ public class PropertyGroupTemplateModel extends BaseTemplateModel {
 
     @Override
 	public String toString(){
-        String ptmStr ="";
-        for( int i=0; i < properties.size() ; i ++ ){
-            PropertyTemplateModel ptm = properties.get(i);
+        StringBuilder ptmStr = new StringBuilder();
+        for (PropertyTemplateModel ptm : properties) {
             String spacer = "\n  ";
-            if( ptm != null )
-                ptmStr = ptmStr + spacer + ptm.toString();
+            if (ptm != null)
+                ptmStr.append(spacer).append(ptm.toString());
         }
-        return String.format("\nPropertyGroupTemplateModel %s[%s] ",name, ptmStr );
+        return String.format("\nPropertyGroupTemplateModel %s[%s] ",name, ptmStr.toString());
     }
     
     /* Accessor methods for templates */

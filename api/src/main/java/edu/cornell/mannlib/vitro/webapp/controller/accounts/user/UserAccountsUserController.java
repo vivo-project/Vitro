@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.accounts.user;
 import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource.EXTERNAL;
 import static edu.cornell.mannlib.vitro.webapp.auth.requestedAction.AuthorizationRequest.AUTHORIZED;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
@@ -26,6 +27,7 @@ import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 /**
  * Parcel out the different actions required of the UserAccounts GUI.
  */
+@WebServlet(name = "AccountsUser", urlPatterns = {"/accounts/*"} )
 public class UserAccountsUserController extends FreemarkerHttpServlet {
 	private static final Log log = LogFactory
 			.getLog(UserAccountsUserController.class);

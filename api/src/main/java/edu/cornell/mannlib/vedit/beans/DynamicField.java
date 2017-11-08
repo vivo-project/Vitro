@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vedit.beans;
 
 import java.util.List;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class DynamicField {

@@ -37,7 +37,7 @@ public class VClassGroupDaoFiltering extends BaseFiltering implements VClassGrou
     public LinkedHashMap<String, VClassGroup> getClassGroupMap() {
         LinkedHashMap<String, VClassGroup> lhm = innerDao.getClassGroupMap();
         Set<String> keys = lhm.keySet();
-        for( Object key : keys){
+        for( String key : keys){
             VClassGroup vcg = (VClassGroup)lhm.get(key);
             if( vcg == null || !filters.getVClassGroupFilter().fn(vcg) ){
                 lhm.remove(key);

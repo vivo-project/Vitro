@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -30,6 +31,7 @@ import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 import edu.cornell.mannlib.vitro.webapp.web.ContentType;
 
+@WebServlet(name = "ontology", urlPatterns = {"/ontology/*"})
 public class OntologyController extends VitroHttpServlet{
     private static final Log log = LogFactory.getLog(OntologyController.class.getName());
     
@@ -56,8 +58,7 @@ public class OntologyController extends VitroHttpServlet{
    
        if( rdfFormat != null ){
         	doRdf(req, res, rdfFormat );
-        	return;
-        }         
+       }
 	}
 	
 	private static Pattern RDF_REQUEST = Pattern.compile("^/ontology/([^/]*)/([^/]*).rdf$");
@@ -157,8 +158,7 @@ public class OntologyController extends VitroHttpServlet{
         if( ! found ){
             //respond to HTTP outside of critical section
             doNotFound(req,res);
-            return;
-        } else {	
+        } else {
         	JenaOutputUtils.setNameSpacePrefixes(newModel,vreq.getWebappDaoFactory());
             res.setContentType(rdfFormat.getMediaType());
             String format = ""; 
@@ -169,8 +169,7 @@ public class OntologyController extends VitroHttpServlet{
             else if ( TTL_MIMETYPE.equals(rdfFormat.getMediaType()))
                 format ="TTL";
 		
-            newModel.write( res.getOutputStream(), format );		
-            return;
+            newModel.write( res.getOutputStream(), format );
         }
 	}
 	

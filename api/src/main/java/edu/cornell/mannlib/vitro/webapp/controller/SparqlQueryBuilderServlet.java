@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
  *  This servlet works as a RequestDispatcher to direct to the sparl query builder page.
  *  @author yuysun
  */
+@WebServlet(name = "SparlQueryBuilder", urlPatterns = {"/admin/sparqlquerybuilder"})
 public class SparqlQueryBuilderServlet extends BaseEditController {
 
     private static final Log log = LogFactory.getLog(SparqlQueryBuilderServlet.class.getName());
@@ -85,7 +87,6 @@ public class SparqlQueryBuilderServlet extends BaseEditController {
         }
 
         doHelp(request,response);
-        return;
     }
     
     private void doNoModelInContext(HttpServletRequest request, HttpServletResponse res){

@@ -18,10 +18,13 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Res
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
 
+import javax.servlet.annotation.WebServlet;
+
 /**
  * Offer the user the ability to apply a RestrictedAuthenticator or revert to a
  * BasicAuthenticator.
  */
+@WebServlet(name = "RestrictLogins", urlPatterns = {"/admin/restrictLogins"} )
 public class RestrictLoginsController extends FreemarkerHttpServlet {
 	public static final String PARAMETER_RESTRICT = "restrict";
 	public static final String PARAMETER_OPEN = "open";

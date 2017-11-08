@@ -18,6 +18,7 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -42,6 +43,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.State;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.LoginLogoutEvent;
 
+@WebServlet(name = "authenticate", urlPatterns = {"/authenticate"})
 public class Authenticate extends VitroHttpServlet {
 	private static final Log log = LogFactory.getLog(Authenticate.class
 			.getName());
@@ -349,8 +351,7 @@ public class Authenticate extends VitroHttpServlet {
 				// This should have been caught by isUserPermittedToLogin()
 				bean.setMessage(request, ERROR,
 						"logins_disabled_for_maintenance");
-				return;
-			}
+            }
 		}
 	}
 
@@ -411,8 +412,7 @@ public class Authenticate extends VitroHttpServlet {
 		} catch (LoginNotPermitted e) {
 			// This should have been caught by isUserPermittedToLogin()
 			bean.setMessage(request, ERROR, "logins_disabled_for_maintenance");
-			return;
-		}
+        }
 	}
 
 	/**
@@ -495,8 +495,7 @@ public class Authenticate extends VitroHttpServlet {
 		String loginProcessPage = LoginProcessBean.getBean(vreq)
 				.getLoginPageUrl();
 		response.sendRedirect(loginProcessPage);
-		return;
-	}
+    }
 
 	/**
 	 * Exit: user has completed the login. Redirect appropriately and clear the

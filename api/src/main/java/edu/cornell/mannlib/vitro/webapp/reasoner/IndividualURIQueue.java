@@ -34,14 +34,14 @@ public class IndividualURIQueue<E> implements Queue<E> {
     
     @Override
     public boolean contains(Object o) {
-        return m.contains(o);
+        return m.containsKey(o);
     }
     
     @Override
     public boolean containsAll(Collection<?> c) {
         boolean contains = true;
         for(Object e : c) {
-            contains |= m.contains(e);
+            contains |= m.containsKey(e);
         }
         return contains;
     }
@@ -73,13 +73,11 @@ public class IndividualURIQueue<E> implements Queue<E> {
     @Override
     public synchronized boolean retainAll(Collection<?> c) {
         boolean changed = false;
-        Iterator<E> it = m.keySet().iterator();
-        while(it.hasNext()) {
-            E e = it.next();
-            if(!c.contains(e)) {
-               m.remove(e);
-               q.remove(e);
-               changed = true;
+        for (E e : m.keySet()) {
+            if (!c.contains(e)) {
+                m.remove(e);
+                q.remove(e);
+                changed = true;
             }
         }
         return changed;

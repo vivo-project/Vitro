@@ -35,7 +35,7 @@ public class VClassList extends VClass {
     }
 
     public void sort(){
-        Collections.sort(getEntities(), getCompare() );
+        getEntities().sort(getCompare());
     }
 
     public int getSize(){

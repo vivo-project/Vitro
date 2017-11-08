@@ -18,9 +18,9 @@ import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.apache.jena.ontology.FunctionalProperty;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.rdf.model.AnonId;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -40,7 +40,6 @@ import org.apache.jena.vocabulary.RDF;
 import org.apache.jena.vocabulary.RDFS;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 
 public class JenaIngestUtils {
@@ -74,7 +73,7 @@ public class JenaIngestUtils {
         // the dedupUnionModel is so we can guard against reusing a URI in an 
         // existing model, as well as in the course of running this process
         inModel.enterCriticalSection(Lock.READ);
-        Set<String> doneSet = new HashSet<String>();
+        Set<AnonId> doneSet = new HashSet<AnonId>();
         try {
             outModel.add(inModel);
             ClosableIterator closeIt = inModel.listSubjects();
@@ -95,7 +94,7 @@ public class JenaIngestUtils {
                         if (stmt != null) {
                             Resource outRes = stmt.getSubject();
                             ResourceUtils.renameResource(outRes,getNextURI(namespaceEtc,dedupUnionModel));
-                            doneSet.add(res.getId().toString());
+                            doneSet.add(res.getId());
                         }
                     }
                 }
@@ -122,7 +121,7 @@ public class JenaIngestUtils {
                             if (stmt != null) {
                                 Resource outRes = stmt.getSubject();
                                 ResourceUtils.renameResource(outRes,getNextURI(namespaceEtc, dedupUnionModel));
-                                doneSet.add(res.getId().toString());
+                                doneSet.add(res.getId());
                             }
                         }
                     }
@@ -147,7 +146,7 @@ public class JenaIngestUtils {
         // the dedupUnionModel is so we can guard against reusing a URI in an 
         // existing model, as well as in the course of running this process
         inModel.enterCriticalSection(Lock.READ);
-        Set<String> doneSet = new HashSet<String>();
+        Set<AnonId> doneSet = new HashSet<AnonId>();
 
         try {
             outModel.add(inModel);
@@ -175,7 +174,7 @@ public class JenaIngestUtils {
                                                 : pattern + value;
                                         ResourceUtils.renameResource(outRes, namespaceEtc + suffix);
                             }
-                            doneSet.add(res.getId().toString());
+                            doneSet.add(res.getId());
                         }
                     }
                 }
@@ -193,13 +192,13 @@ public class JenaIngestUtils {
 
     public Map<String, LinkedList<String>> generatePropertyMap(List<Model> sourceModels, ModelMaker maker){
         Map<String,LinkedList<String>> propertyMap = Collections.synchronizedMap(new HashMap<String, LinkedList<String>>());
-        Set<String> doneList = new HashSet<String>();
+        Set<AnonId> doneSet = new HashSet<AnonId>();
         for(Model model : sourceModels) {
             ClosableIterator cItr = model.listSubjects();
             while(cItr.hasNext()){
                 Resource res = (Resource) cItr.next();
-                if(res.isAnon() && !doneList.contains(res.getId())){    
-                    doneList.add(res.getId().toString());
+                if(res.isAnon() && !doneSet.contains(res.getId())){
+                    doneSet.add(res.getId());
                     StmtIterator stmtItr = model.listStatements(res, (Property)null, (RDFNode)null);
                     while(stmtItr.hasNext()){
                         Statement stmt = stmtItr.next();
@@ -222,8 +221,8 @@ public class JenaIngestUtils {
                 RDFNode rdfn = (RDFNode) cItr.next();
                 if(rdfn.isResource()){
                     Resource res = (Resource)rdfn;
-                    if(res.isAnon() && !doneList.contains(res.getId())){
-                        doneList.add(res.getId().toString());
+                    if(res.isAnon() && !doneSet.contains(res.getId())){
+                        doneSet.add(res.getId());
                         StmtIterator stmtItr = model.listStatements(res, (Property)null, (RDFNode)null);
                         while(stmtItr.hasNext()){
                             Statement stmt = stmtItr.next();
@@ -262,7 +261,7 @@ public class JenaIngestUtils {
             } finally {
                 closeIt.close();
             }
-            if (duplicate == false) {
+            if (!duplicate) {
                 closeIt = model.listStatements((Resource)null, (Property)null, res);
                 try {
                     if (closeIt.hasNext()) {
@@ -385,8 +384,8 @@ public class JenaIngestUtils {
                         Literal lit = (Literal) obj;
                         String unsplitStr = lit.getLexicalForm();
                         String[] splitPieces = delimiterPattern.split(unsplitStr);
-                        for (int i=0; i<splitPieces.length; i++) {
-                            String newLexicalForm = splitPieces[i];
+                        for (String splitPiece : splitPieces) {
+                            String newLexicalForm = splitPiece;
                             if (trim) {
                                 newLexicalForm = newLexicalForm.trim();
                             }
@@ -401,7 +400,7 @@ public class JenaIngestUtils {
                                         newLiteral = outModel.createLiteral(newLexicalForm);
                                     }
                                 }
-                                outModel.add(subj,newProp,newLiteral);
+                                outModel.add(subj, newProp, newLiteral);
                             }
                         }
                     }
@@ -808,7 +807,7 @@ public class JenaIngestUtils {
         boolean uriIsGood = false;
         int attempts = 0;
 
-        while( uriIsGood == false && attempts < 30 ){            
+        while(!uriIsGood && attempts < 30 ){
             uri = newNamespace + "n" + random.nextInt( Math.min(Integer.MAX_VALUE,(int)Math.pow(2,attempts + 13)) );            
             errMsg = wdf.checkURI(uri);
             if(  errMsg != null)

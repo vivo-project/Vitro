@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 
@@ -48,26 +48,26 @@ public class SDBDataSource {
 		this.configProps = ConfigurationProperties.getBean(ctx);
 	}
 
-	public ComboPooledDataSource getDataSource() {
-		try {
-			ComboPooledDataSource cpds = new ComboPooledDataSource();
-			cpds.setDriverClass(getDbDriverClassName());
-			cpds.setJdbcUrl(getJdbcUrl());
-			cpds.setUser(configProps.getProperty(PROPERTY_DB_USERNAME));
-			cpds.setPassword(configProps.getProperty(PROPERTY_DB_PASSWORD));
-			cpds.setMaxPoolSize(getMaxActive());
-			cpds.setMinPoolSize(getMaxIdle());
-			cpds.setMaxIdleTime(getMaxIdleTime());
-			cpds.setMaxIdleTimeExcessConnections(getMaxIdleTimeExcess());
-			cpds.setAcquireIncrement(5);
-			cpds.setNumHelperThreads(6);
-			cpds.setTestConnectionOnCheckout(DEFAULT_TESTONBORROW);
-			cpds.setTestConnectionOnCheckin(DEFAULT_TESTONRETURN);
-			cpds.setPreferredTestQuery(getValidationQuery());
-			return cpds;
-		} catch (PropertyVetoException pve) {
-			throw new RuntimeException(pve);
-		}
+	public BasicDataSource getDataSource() {
+		BasicDataSource cpds = new BasicDataSource();
+		cpds.setDriverClassName(getDbDriverClassName());
+		cpds.setUrl(getJdbcUrl());
+		cpds.setUsername(configProps.getProperty(PROPERTY_DB_USERNAME));
+		cpds.setPassword(configProps.getProperty(PROPERTY_DB_PASSWORD));
+		cpds.setMaxTotal(getMaxActive());
+		cpds.setMaxIdle(getMaxIdle());
+		cpds.setMinEvictableIdleTimeMillis(getMaxIdleTime());
+		cpds.setTestOnBorrow(DEFAULT_TESTONBORROW);
+		cpds.setTestOnReturn(DEFAULT_TESTONRETURN);
+		cpds.setValidationQuery(getValidationQuery());
+		return cpds;
+//		try {
+//			cpds.setMaxIdleTimeExcessConnections(getMaxIdleTimeExcess());
+//			cpds.setAcquireIncrement(5);
+//			cpds.setNumHelperThreads(6);
+//		} catch (PropertyVetoException pve) {
+//			throw new RuntimeException(pve);
+//		}
 	}
 
 	private String getDbDriverClassName() {
@@ -84,8 +84,27 @@ public class SDBDataSource {
 
 		// Ensure that MySQL handles unicode properly, else all kinds of
 		// horrible nastiness ensues.
-		if (DEFAULT_TYPE.equals(getDbType()) && !url.contains("?")) {
-			url += "?useUnicode=yes&characterEncoding=utf8";
+		if (DEFAULT_TYPE.equals(getDbType())) {
+			if (!url.contains("?")) {
+				url += "?useUnicode=yes&characterEncoding=utf8&nullNamePatternMatchesAll=true&cachePrepStmts=true&useServerPrepStmts=true";
+			} else {
+				String urlLwr = url.toLowerCase();
+				if (!urlLwr.contains("useunicode")) {
+					url += "&useUnicode=yes";
+				}
+				if (!urlLwr.contains("characterencoding")) {
+					url += "&characterEncoding=utf8";
+				}
+				if (!urlLwr.contains("nullnamepatternmatchesall")) {
+					url += "&nullNamePatternMatchesAll=true";
+				}
+				if (!urlLwr.contains("cacheprepstmts")) {
+					url += "&cachePrepStmts=true";
+				}
+				if (!urlLwr.contains("useserverprepstmts")) {
+					url += "&useServerPrepStmts=true";
+				}
+			}
 		}
 
 		return url;

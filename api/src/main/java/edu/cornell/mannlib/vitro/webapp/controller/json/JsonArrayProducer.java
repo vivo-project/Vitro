@@ -8,9 +8,10 @@ import java.io.Writer;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
 
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
@@ -35,10 +36,10 @@ public abstract class JsonArrayProducer extends JsonProducer {
 	 * Sub-classes implement this method. Given the request, produce a JSON
 	 * object as the result.
 	 */
-	protected abstract JSONArray process() throws Exception;
+	protected abstract ArrayNode process() throws Exception;
 
 	public final void process(HttpServletResponse resp) throws IOException {
-		JSONArray jsonArray = null;
+		ArrayNode jsonArray = null;
 		try {
 			jsonArray = process();
 		} catch (Exception e) {
@@ -47,7 +48,7 @@ public abstract class JsonArrayProducer extends JsonProducer {
 		}
 
 		if (jsonArray == null) {
-			jsonArray = new JSONArray();
+			jsonArray = JsonNodeFactory.instance.arrayNode();
 		}
 
 		log.debug("Response to JSON request: " + jsonArray.toString());

@@ -126,8 +126,7 @@ public class UserAccountsFirstTimeExternalPage extends UserAccountsPage {
 		}
 		if (!Authenticator.getInstance(vreq).isUserPermittedToLogin(null)) {
 			bogusMessage = i18n.text("logins_disabled_for_maintenance");
-			return;
-		}
+        }
 	}
 
 	public boolean isBogus() {

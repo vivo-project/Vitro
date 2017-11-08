@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,6 +24,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.ObjectPropertyStatementDao;
 import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
 
+@WebServlet(name = "ObjectPropertyStatementListingController", urlPatterns = {"/listObjectPropertyStatements"} )
 public class ObjectPropertyStatementListingController extends
 		BaseEditController {
 	
@@ -113,30 +115,30 @@ public class ObjectPropertyStatementListingController extends
         int count = 0;
 
 
-        for (Iterator<ObjectPropertyStatement> i = opsDao.getObjectPropertyStatements(op,startAt,endAt).iterator(); i.hasNext();) {
-        	count++;
-        	ObjectPropertyStatement ops = i.next();
-        	Individual subj = iDao.getIndividualByURI(ops.getSubjectURI());
-        	Individual obj = iDao.getIndividualByURI(ops.getObjectURI());
-        	results.add("XX");
-        	results.add(ListingControllerWebUtils.formatIndividualLink(subj));
-        	if (showVClasses) {
-				try {
-					results.add(ListingControllerWebUtils.formatVClassLinks(subj.getVClasses(true)));
-				} catch (Exception e) {
-					results.add("?");
-				}
-			}
-        	results.add(op.getDomainPublic());
-        	results.add(ListingControllerWebUtils.formatIndividualLink(obj));
-            if (showVClasses) {
-				try {
-					results.add(ListingControllerWebUtils.formatVClassLinks(obj.getVClasses(true)));
-				} catch (Exception e) {
-					results.add("?");
-				}
-			}
-        }
+       for (ObjectPropertyStatement objectPropertyStatement : opsDao.getObjectPropertyStatements(op, startAt, endAt)) {
+           count++;
+           ObjectPropertyStatement ops = objectPropertyStatement;
+           Individual subj = iDao.getIndividualByURI(ops.getSubjectURI());
+           Individual obj = iDao.getIndividualByURI(ops.getObjectURI());
+           results.add("XX");
+           results.add(ListingControllerWebUtils.formatIndividualLink(subj));
+           if (showVClasses) {
+               try {
+                   results.add(ListingControllerWebUtils.formatVClassLinks(subj.getVClasses(true)));
+               } catch (Exception e) {
+                   results.add("?");
+               }
+           }
+           results.add(op.getDomainPublic());
+           results.add(ListingControllerWebUtils.formatIndividualLink(obj));
+           if (showVClasses) {
+               try {
+                   results.add(ListingControllerWebUtils.formatVClassLinks(obj.getVClasses(true)));
+               } catch (Exception e) {
+                   results.add("?");
+               }
+           }
+       }
         
         if (count == 0) {
         	results.add("XX");

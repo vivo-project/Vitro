@@ -4,7 +4,6 @@ package edu.cornell.mannlib.vitro.webapp.dao;
 
 import java.util.List;
 
-import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 
 public interface PropertyGroupDao {

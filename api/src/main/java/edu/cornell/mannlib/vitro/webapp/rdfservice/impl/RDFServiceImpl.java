@@ -40,7 +40,6 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import edu.cornell.mannlib.vitro.webapp.utils.logging.ToString;
-import org.vivoweb.linkeddatafragments.datasource.rdfservice.RDFServiceBasedRequestProcessorForTPFs;
 
 public abstract class RDFServiceImpl implements RDFService {
 	
@@ -64,9 +63,9 @@ public abstract class RDFServiceImpl implements RDFService {
                               String individualTypeURI, 
                               String graphURI) throws RDFServiceException {
     
-       StringBuffer containsQuery = new StringBuffer("ASK { \n");
+       StringBuilder containsQuery = new StringBuilder("ASK { \n");
        if (graphURI != null) {
-           containsQuery.append("  GRAPH <" + graphURI + "> { ");
+           containsQuery.append("  GRAPH <").append(graphURI).append("> { ");
        }
        containsQuery.append("<");   
        containsQuery.append(individualURI);
@@ -143,9 +142,7 @@ public abstract class RDFServiceImpl implements RDFService {
 	
     protected void notifyListeners(ModelChange modelChange) throws IOException {
         modelChange.getSerializedModel().reset();
-        Iterator<ChangeListener> iter = registeredListeners.iterator();
-        while (iter.hasNext()) {
-            ChangeListener listener = iter.next();
+        for (ChangeListener listener : registeredListeners) {
             listener.notifyModelChange(modelChange);
         }
         log.debug(registeredJenaListeners.size() + " registered Jena listeners");
@@ -174,16 +171,12 @@ public abstract class RDFServiceImpl implements RDFService {
         }
     }
     
-    public void notifyListenersOfEvent(Object event) {       
-        Iterator<ChangeListener> iter = registeredListeners.iterator();
-        while (iter.hasNext()) {
-            ChangeListener listener = iter.next();
+    public void notifyListenersOfEvent(Object event) {
+        for (ChangeListener listener : registeredListeners) {
             // TODO what is the graphURI parameter for?
             listener.notifyEvent(null, event);
         }
-        Iterator<ModelChangedListener> jenaIter = registeredJenaListeners.iterator();
-        while (jenaIter.hasNext()) {
-            ModelChangedListener listener = jenaIter.next();
+        for (ModelChangedListener listener : registeredJenaListeners) {
             listener.notifyEvent(null, event);
         }
     }    
@@ -229,7 +222,7 @@ public abstract class RDFServiceImpl implements RDFService {
     }
 
     protected static String sparqlTriple(Triple triple) {
-        StringBuffer serializedTriple = new StringBuffer();
+        StringBuilder serializedTriple = new StringBuilder();
         serializedTriple.append(sparqlNodeUpdate(triple.getSubject(), ""));
         serializedTriple.append(" ");
         serializedTriple.append(sparqlNodeUpdate(triple.getPredicate(), ""));
@@ -254,7 +247,7 @@ public abstract class RDFServiceImpl implements RDFService {
         } else if (node.isBlank()) {
             return "<fake:blank>"; // or throw exception?
         } else if (node.isURI()) {
-            StringBuffer uriBuff = new StringBuffer();
+            StringBuilder uriBuff = new StringBuilder();
             return uriBuff.append("<").append(node.getURI()).append(">").toString();
         } else if (node.isLiteral()) {
             StringBuffer literalBuff = new StringBuffer();
@@ -351,27 +344,23 @@ public abstract class RDFServiceImpl implements RDFService {
     @Override
     public long countTriples(RDFNode subject, RDFNode predicate, RDFNode object) throws RDFServiceException {
         StringBuilder whereClause = new StringBuilder();
-        StringBuilder orderBy = new StringBuilder();
 
         if ( subject != null ) {
             appendNode(whereClause.append(' '), subject);
         } else {
             whereClause.append(" ?s");
-            orderBy.append(" ?s");
         }
 
         if ( predicate != null ) {
             appendNode(whereClause.append(' '), predicate);
         } else {
             whereClause.append(" ?p");
-            orderBy.append(" ?p");
         }
 
         if ( object != null ) {
             appendNode(whereClause.append(' '), object);
         } else {
             whereClause.append(" ?o");
-            orderBy.append(" ?o");
         }
 
         long estimate = -1;
@@ -442,7 +431,7 @@ public abstract class RDFServiceImpl implements RDFService {
         if (node.isLiteral()) {
             builder.append(literalToString(node.asLiteral()));
         } else if (node.isURIResource()) {
-            builder.append('<' + node.asResource().getURI() + '>');
+            builder.append('<').append(node.asResource().getURI()).append('>');
         }
     }
 

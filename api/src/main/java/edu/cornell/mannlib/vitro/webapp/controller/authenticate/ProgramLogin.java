@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.authenticate.Authenticator.Lo
  * Provide a means for programmatic login If they provide the right parameters,
  * log them in and send 200. Otherwise, send 403 error.
  */
+@WebServlet(name = "programLogin", urlPatterns = {"/programLogin"})
 public class ProgramLogin extends HttpServlet {
 	private static final Log log = LogFactory.getLog(ProgramLogin.class);
 
@@ -142,8 +144,7 @@ public class ProgramLogin extends HttpServlet {
 				}
 				recordLoginWithPasswordChange();
 				sendSuccess(MESSAGE_SUCCESS_FIRST_TIME);
-				return;
-			}
+            }
 
 		}
 

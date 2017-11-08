@@ -88,7 +88,7 @@ public class ThemeInfoSetup implements ServletContextListener {
 			}
 		}
 
-		Collections.sort(themeNames, String.CASE_INSENSITIVE_ORDER);
+		themeNames.sort(String.CASE_INSENSITIVE_ORDER);
 		return themeNames;
 	}
 

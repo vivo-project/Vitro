@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Level;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

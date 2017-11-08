@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ModelAccess;
 
+@WebServlet(name = "VclassEditController", urlPatterns = {"/vclassEdit"} )
 public class VclassEditController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(VclassEditController.class.getName());
@@ -98,12 +100,12 @@ public class VclassEditController extends BaseEditController {
         
         boolean foundComment = false;
         StringBuffer commSb = null;
-        for (Iterator<String> commIt = request.getUnfilteredWebappDaoFactory().getCommentsForResource(vcl.getURI()).iterator(); commIt.hasNext();) { 
-            if (commSb==null) {
+        for (String s : request.getUnfilteredWebappDaoFactory().getCommentsForResource(vcl.getURI())) {
+            if (commSb == null) {
                 commSb = new StringBuffer();
-                foundComment=true;
+                foundComment = true;
             }
-            commSb.append(commIt.next()).append(" ");
+            commSb.append(s).append(" ");
         }
         if (!foundComment) {
             commSb = new StringBuffer("no comments yet");
@@ -177,7 +179,7 @@ public class VclassEditController extends BaseEditController {
         foo.setOptionLists(OptionMap);
         epo.setFormObject(foo);
 
-        boolean instantiable = (vcl.getURI().equals(OWL.Nothing.getURI())) ? false : true;
+        boolean instantiable = !vcl.getURI().equals(OWL.Nothing.getURI());
         
         request.setAttribute("epoKey",epo.getKey());
         request.setAttribute("vclassWebapp", vcl);
@@ -201,9 +203,7 @@ public class VclassEditController extends BaseEditController {
     
     private List<VClass> getVClassesForURIList(List<String> vclassURIs, VClassDao vcDao) {
         List<VClass> vclasses = new ArrayList<VClass>();
-        Iterator<String> urIt = vclassURIs.iterator();
-        while (urIt.hasNext()) {
-            String vclassURI = urIt.next();
+        for (String vclassURI : vclassURIs) {
             VClass vclass = vcDao.getVClassByURI(vclassURI);
             if (vclass != null) {
                 vclasses.add(vclass);

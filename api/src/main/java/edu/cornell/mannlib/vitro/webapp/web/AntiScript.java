@@ -2,11 +2,8 @@
 
 package edu.cornell.mannlib.vitro.webapp.web;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
-
-import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,11 +48,9 @@ public class AntiScript {
         try {
             cr = as.scan(dirtyInput);
             return cr.getCleanHTML();
-        } catch (ScanException e) {
+        } catch (ScanException | PolicyException e) {
             log.error("Error while scanning HTML" ,e );
-        } catch (PolicyException e) {
-            log.error("Error while scanning HTML", e);
-        }        
+        }
         return "AntiScript: HTML caused scan error.";
     }
     
@@ -91,9 +86,6 @@ public class AntiScript {
                 newPolicy = Policy.getInstance( policyFile );                
                 log.debug("anti-script policy loaded successfully");
                 policy = newPolicy;
-            } catch (PolicyException e) {
-                log.error("Anti-Script policy not setup.", e);
-                return null;
             } catch (Throwable e) {
                 log.error("Anti-Script policy not setup.", e);
                 return null;

@@ -119,7 +119,7 @@ public class LanguageFilteringRDFService implements RDFService {
                 if (candidatesForRemoval.size() == 1) {
                     continue;
                 }
-                Collections.sort(candidatesForRemoval, new StatementSortByLang());
+                candidatesForRemoval.sort(new StatementSortByLang());
                 log.debug("sorted statements: " + showSortedStatements(candidatesForRemoval));
                 Iterator<Statement> candIt = candidatesForRemoval.iterator();
                 String langRegister = null;
@@ -171,10 +171,8 @@ public class LanguageFilteringRDFService implements RDFService {
                 s.sparqlSelectQuery(query, RDFService.ResultFormat.JSON));
         List<QuerySolution> solnList = getSolutionList(resultSet);
         List<String> vars = resultSet.getResultVars();
-        Iterator<String> varIt = vars.iterator();
-        while (varIt.hasNext()) {
-            String var = varIt.next();           
-            for (int i = 0 ; i < solnList.size(); i ++ ) {
+        for (String var : vars) {
+            for (int i = 0; i < solnList.size(); i++) {
                 QuerySolution s = solnList.get(i);
                 if (s == null) {
                     continue;
@@ -183,10 +181,10 @@ public class LanguageFilteringRDFService implements RDFService {
                 if (node == null || !node.isLiteral()) {
                     continue;
                 }
-                List<RowIndexedLiteral> candidatesForRemoval = 
+                List<RowIndexedLiteral> candidatesForRemoval =
                         new ArrayList<RowIndexedLiteral>();
                 candidatesForRemoval.add(new RowIndexedLiteral(node.asLiteral(), i));
-                for (int j = i + 1; j < solnList.size(); j ++) {
+                for (int j = i + 1; j < solnList.size(); j++) {
                     QuerySolution t = solnList.get(j);
                     if (t == null) {
                         continue;
@@ -199,12 +197,12 @@ public class LanguageFilteringRDFService implements RDFService {
                 if (candidatesForRemoval.size() == 1) {
                     continue;
                 }
-                Collections.sort(candidatesForRemoval, new RowIndexedLiteralSortByLang());
+                candidatesForRemoval.sort(new RowIndexedLiteralSortByLang());
                 log.debug("sorted RowIndexedLiterals: " + showSortedRILs(candidatesForRemoval));
                 Iterator<RowIndexedLiteral> candIt = candidatesForRemoval.iterator();
                 String langRegister = null;
                 boolean chuckRemaining = false;
-                while(candIt.hasNext()) {
+                while (candIt.hasNext()) {
                     RowIndexedLiteral rlit = candIt.next();
                     if (chuckRemaining) {
                         solnList.set(rlit.getIndex(), null);
@@ -218,9 +216,7 @@ public class LanguageFilteringRDFService implements RDFService {
             }
         }
         List<QuerySolution> compactedList = new ArrayList<QuerySolution>();
-        Iterator<QuerySolution> solIt = solnList.iterator();
-        while(solIt.hasNext()) {
-            QuerySolution soln = solIt.next();
+        for (QuerySolution soln : solnList) {
             if (soln != null) {
                 compactedList.add(soln);
             }
@@ -268,10 +264,8 @@ public class LanguageFilteringRDFService implements RDFService {
             protected void endProcessing() {
                 chainStartProcessing();
 
-                Iterator<String> varIt = vars.iterator();
-                while (varIt.hasNext()) {
-                    String var = varIt.next();
-                    for (int i = 0 ; i < solnList.size(); i ++ ) {
+                for (String var : vars) {
+                    for (int i = 0; i < solnList.size(); i++) {
                         QuerySolution s = solnList.get(i);
                         if (s == null) {
                             continue;
@@ -283,7 +277,7 @@ public class LanguageFilteringRDFService implements RDFService {
                         List<RowIndexedLiteral> candidatesForRemoval =
                                 new ArrayList<RowIndexedLiteral>();
                         candidatesForRemoval.add(new RowIndexedLiteral(node.asLiteral(), i));
-                        for (int j = i + 1; j < solnList.size(); j ++) {
+                        for (int j = i + 1; j < solnList.size(); j++) {
                             QuerySolution t = solnList.get(j);
                             if (t == null) {
                                 continue;
@@ -296,12 +290,12 @@ public class LanguageFilteringRDFService implements RDFService {
                         if (candidatesForRemoval.size() == 1) {
                             continue;
                         }
-                        Collections.sort(candidatesForRemoval, new RowIndexedLiteralSortByLang());
+                        candidatesForRemoval.sort(new RowIndexedLiteralSortByLang());
                         log.debug("sorted RowIndexedLiterals: " + showSortedRILs(candidatesForRemoval));
                         Iterator<RowIndexedLiteral> candIt = candidatesForRemoval.iterator();
                         String langRegister = null;
                         boolean chuckRemaining = false;
-                        while(candIt.hasNext()) {
+                        while (candIt.hasNext()) {
                             RowIndexedLiteral rlit = candIt.next();
                             if (chuckRemaining) {
                                 solnList.set(rlit.getIndex(), null);
@@ -315,9 +309,7 @@ public class LanguageFilteringRDFService implements RDFService {
                     }
                 }
 
-                Iterator<QuerySolution> solIt = solnList.iterator();
-                while(solIt.hasNext()) {
-                    QuerySolution soln = solIt.next();
+                for (QuerySolution soln : solnList) {
                     if (soln != null) {
                         chainProcessQuerySolution(soln);
                     }
@@ -476,6 +468,11 @@ public class LanguageFilteringRDFService implements RDFService {
     @Override
     public Model getTriples(RDFNode subject, RDFNode predicate, RDFNode object, long limit, long offset) throws RDFServiceException {
         return s.getTriples(subject, predicate, object, limit, offset);
+    }
+
+    @Override
+    public boolean preferPreciseOptionals() {
+        return s.preferPreciseOptionals();
     }
 
     @Override

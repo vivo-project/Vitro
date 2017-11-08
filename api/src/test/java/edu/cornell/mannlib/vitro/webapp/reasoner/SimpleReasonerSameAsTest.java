@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.reasoner;
 import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.jena.ontology.AnnotationProperty;
@@ -454,7 +455,7 @@ public class SimpleReasonerSameAsTest extends SimpleReasonerTBoxHelper {
 	 * adding and removing a type assertion for an individual who has
 	 * a sameAs individual.
 	 */
-	//@Test
+	@Test
 	public void tBoxTypeAssertion1() {
 		// Create a Tbox with a simple class hierarchy. B is a subclass of A.
 		OntModel tBox = createTBoxModel(); 
@@ -493,7 +494,7 @@ public class SimpleReasonerSameAsTest extends SimpleReasonerTBoxHelper {
 	 * adding and removing subclass assertion when there is an 
 	 * individual member who has a sameAs individual.
 	 */
-	//@Test
+	@Test
 	public void tBoxSubclassAssertion1() throws InterruptedException {
 		// Create a Tbox with a simple class hierarchy. B is a subclass of A.
 		OntModel tBox = createTBoxModel(); 
@@ -596,14 +597,16 @@ public class SimpleReasonerSameAsTest extends SimpleReasonerTBoxHelper {
 	 * test that mostSpecificType inferences propagate to sameAs 
 	 * individuals
 	 */
-	//@Test
+	@Test
 	public void mostSpecificTypeTest1() {
 		// Create a Tbox with a simple class hierarchy. B is a subclass of A.
 		OntModel tBox = createTBoxModel(); 
 		OntClass classA = createClass(tBox, "http://test.vivo/A", "class A"); 
-		OntClass classC = createClass(tBox, "http://test.vivo/B", "class C"); 
-		OntClass classD = createClass(tBox, "http://test.vivo/B", "class D"); 
-		OntClass classE = createClass(tBox, "http://test.vivo/B", "class E");
+		OntClass classC = createClass(tBox, "http://test.vivo/C", "class C");
+		OntClass classD = createClass(tBox, "http://test.vivo/D", "class D");
+		OntClass classE = createClass(tBox, "http://test.vivo/E", "class E");
+
+		// A is superclass of C, C is superclass of D and E
 		addSubclass(classA, classC);
 		addSubclass(classC, classD);
 		addSubclass(classC, classE);
@@ -626,22 +629,28 @@ public class SimpleReasonerSameAsTest extends SimpleReasonerTBoxHelper {
 		Resource b = aBox.createResource("http://test.vivo/b");
 		Resource c = aBox.createResource("http://test.vivo/c");
 		Resource d = aBox.createResource("http://test.vivo/d");
-		
+
+		// Assert a, b, c and d are the same
 		aBox.add(a, OWL.sameAs, b);
 		aBox.add(c, OWL.sameAs, b);
 		aBox.add(d, OWL.sameAs, a);		
-		
+
+		// Assert a is D, and d ic C
+		// All resources will therefore be C and D
 		aBox.add(a, RDF.type, classD);	
 		aBox.add(d, RDF.type, classC);
-		Assert.assertFalse(inf.contains(a,RDF.type,classD));
+
+		// All resources should be inferred as C and D, except a and d which have direct assertions
+		Assert.assertFalse(inf.contains(a,RDF.type,classD));	// D is asserted for a
 		Assert.assertTrue(inf.contains(a,RDF.type,classC));
 		Assert.assertTrue(inf.contains(b,RDF.type, classD));
 		Assert.assertTrue(inf.contains(b,RDF.type, classC));
 		Assert.assertTrue(inf.contains(c,RDF.type, classD));
 		Assert.assertTrue(inf.contains(c,RDF.type, classC));
 		Assert.assertTrue(inf.contains(d,RDF.type, classD));
-		Assert.assertFalse(inf.contains(d,RDF.type, classC));
-		
+		Assert.assertFalse(inf.contains(d,RDF.type, classC));	// C is asserted for d
+
+		// In all cases, mostSpecificType should be D, not C
 		Assert.assertTrue(inf.contains(a, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
 		Assert.assertTrue(inf.contains(b, mostSpecificType, ResourceFactory.createResource(classD.getURI())));
 		Assert.assertTrue(inf.contains(c, mostSpecificType, ResourceFactory.createResource(classD.getURI())));

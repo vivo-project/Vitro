@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.i18n.I18n;
  * Set the new Locale in the Session using SelectedLocale and return to the
  * referrer.
  */
+@WebServlet(name = "LocaleSelectionController", urlPatterns = {"/selectLocale"})
 public class LocaleSelectionController extends HttpServlet {
 	private static final Log log = LogFactory
 			.getLog(LocaleSelectionController.class);

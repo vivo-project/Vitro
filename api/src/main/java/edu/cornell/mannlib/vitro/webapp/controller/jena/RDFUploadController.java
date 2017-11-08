@@ -16,6 +16,7 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -50,6 +51,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.RDFServiceUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.impl.jena.model.RDFServiceModel;
 
+@WebServlet(name = "RDFUploadController", urlPatterns = {"/uploadRDF"} )
 public class RDFUploadController extends JenaIngestController {
     
     private static int maxFileSizeInBytes = 1024 * 1024 * 2000; //2000mb
@@ -391,15 +393,14 @@ public class RDFUploadController extends JenaIngestController {
                     files = new File[1];
                     files[0] = file;
                 }
-                for (int i=0; i<files.length; i++) {
-                    File currentFile = files[i];
+                for (File currentFile : files) {
                     log.debug("Reading file " + currentFile.getName());
                     try {
-                        readIntoModel(fileStream.getInputStream(), language, 
+                        readIntoModel(fileStream.getInputStream(), language,
                                 rdfService, modelName);
                         fileStream.delete();
                     } catch (IOException ioe) {
-                        String errMsg = "Error loading RDF from " + 
+                        String errMsg = "Error loading RDF from " +
                                 currentFile.getName();
                         log.error(errMsg, ioe);
                         throw new RuntimeException(errMsg, ioe);
@@ -451,8 +452,7 @@ public class RDFUploadController extends JenaIngestController {
          } catch (IOException e1) {
              log.error(e1);
              throw new ServletException(e1);
-         }            
-         return;
+         }
      }
      
      private OntModel getABoxModel(ServletContext ctx) {   

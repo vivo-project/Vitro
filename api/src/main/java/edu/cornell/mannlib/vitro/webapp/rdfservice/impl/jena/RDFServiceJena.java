@@ -60,7 +60,10 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     private final static Log log = LogFactory.getLog(RDFServiceJena.class);
         
     protected abstract DatasetWrapper getDatasetWrapper();
-    
+
+    protected volatile boolean rebuildGraphURICache = true;
+    private final List<String> graphURIs = new ArrayList<>();
+
     @Override
 	public abstract boolean changeSetUpdate(ChangeSet changeSet) throws RDFServiceException;
      
@@ -258,9 +261,9 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
     }
     
     private String makeDescribe(Resource s) {
-        StringBuffer query = new StringBuffer("DESCRIBE <") ;
+        StringBuilder query = new StringBuilder("DESCRIBE <") ;
         if (s.isAnon()) {
-            query.append("_:" + s.getId().toString());
+            query.append("_:").append(s.getId().toString());
         } else {
             query.append(s.getURI());
         }
@@ -283,7 +286,7 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         addStatementPatterns(stmts, queryBuff, !WHERE_CLAUSE);
         queryBuff.append("} WHERE { \n");
         if (graphURI != null) {
-            queryBuff.append("    GRAPH <" + graphURI + "> { \n");
+            queryBuff.append("    GRAPH <").append(graphURI).append("> { \n");
         }
         stmtIt = model.listStatements();
         stmts = stmtIt.toList();
@@ -376,10 +379,10 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
             patternBuff.append(" .\n");
             if (whereClause) {
                 if (t.getSubject().isBlank()) {
-                    patternBuff.append("    FILTER(isBlank(" + SparqlGraph.sparqlNodeDelete(t.getSubject(), null)).append(")) \n");
+                    patternBuff.append("    FILTER(isBlank(").append(SparqlGraph.sparqlNodeDelete(t.getSubject(), null)).append(")) \n");
                 }
                 if (t.getObject().isBlank()) {
-                    patternBuff.append("    FILTER(isBlank(" + SparqlGraph.sparqlNodeDelete(t.getObject(), null)).append(")) \n");
+                    patternBuff.append("    FILTER(isBlank(").append(SparqlGraph.sparqlNodeDelete(t.getObject(), null)).append(")) \n");
                 }
             }
         }
@@ -527,18 +530,27 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
 
     @Override
     public List<String> getGraphURIs() throws RDFServiceException {
-        DatasetWrapper dw = getDatasetWrapper();
-        try {
-            Dataset d = dw.getDataset();
-            List<String> graphURIs = new ArrayList<String>();
-            Iterator<String> nameIt = d.listNames();
-            while (nameIt.hasNext()) {
-                graphURIs.add(nameIt.next());
+        if (rebuildGraphURICache) {
+            synchronized (RDFServiceJena.class) {
+                if (rebuildGraphURICache) {
+                    DatasetWrapper dw = getDatasetWrapper();
+                    try {
+                        Dataset d = dw.getDataset();
+                        Iterator<String> nameIt = d.listNames();
+                        graphURIs.clear();
+                        while (nameIt.hasNext()) {
+                            graphURIs.add(nameIt.next());
+                        }
+                        return graphURIs;
+                    } finally {
+                        dw.close();
+                        rebuildGraphURICache = false;
+                    }
+                }
             }
-            return graphURIs;
-        } finally {
-            dw.close();
         }
+
+        return graphURIs;
     }
 
     @Override
@@ -679,6 +691,10 @@ public abstract class RDFServiceJena extends RDFServiceImpl implements RDFServic
         }
     }
 
+    @Override
+    public boolean preferPreciseOptionals() {
+        return false;
+    }
 
     @Override
     public void close() {

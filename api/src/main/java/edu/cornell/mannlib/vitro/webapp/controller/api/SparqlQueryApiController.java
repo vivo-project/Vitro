@@ -10,6 +10,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_ACCEPTABLE;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -40,6 +41,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.http.NotAcceptableException;
  * 500 Unknown error
  * </pre>
  */
+@WebServlet(name = "SparqlQueryApi", urlPatterns = {"/api/sparqlQuery"})
 public class SparqlQueryApiController extends VitroApiServlet {
 
 	private static final AuthorizationRequest REQUIRED_ACTIONS = SimplePermission.USE_SPARQL_QUERY_API.ACTION;

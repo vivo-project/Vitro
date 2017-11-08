@@ -13,12 +13,11 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import net.sf.jga.algorithms.Filter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean;
 import edu.cornell.mannlib.vitro.webapp.beans.BaseResourceBean.RoleLevel;
@@ -156,8 +155,10 @@ public class IndividualFiltering implements Individual {
         // predicate + range class combination is allowed even if the predicate is
         // hidden on its own.
         
+        return _innerIndividual.getPopulatedObjectPropertyList();
+
         // Will revisit filtering at this level if it turns out to be truly necessary.
-        
+/*
         List<ObjectProperty> outOProps = new ArrayList<ObjectProperty>();
         List<ObjectProperty> oProps = _innerIndividual.getPopulatedObjectPropertyList();
 		for (ObjectProperty op: oProps) {
@@ -167,6 +168,7 @@ public class IndividualFiltering implements Individual {
 			}
         }
         return outOProps;
+*/
     }
 
     /* ********************* methods that need delegated filtering *************** */
@@ -421,7 +423,7 @@ public class IndividualFiltering implements Individual {
     }
 
     @Override
-    public JSONObject toJSON() throws JSONException {
+    public JsonNode toJSON() {
         return _innerIndividual.toJSON();
     }
 

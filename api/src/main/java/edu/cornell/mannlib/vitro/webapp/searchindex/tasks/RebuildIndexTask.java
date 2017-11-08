@@ -112,6 +112,7 @@ public class RebuildIndexTask implements Task {
                 if (!isInterrupted()) {
                     deleteOutdatedDocuments();
                 }
+                finalizeIndexing();
             }
 
             status = buildStatus(REBUILDING, getDocumentCount());
@@ -135,11 +136,22 @@ public class RebuildIndexTask implements Task {
             UpdateUrisTask.runNow(uris, excluders, modifiers, indDao, listeners, pool);
         }
 
+        private void finalizeIndexing() {
+            try {
+                searchEngine.commit();
+            } catch (SearchEngineNotRespondingException e) {
+                log.warn("Failed to finalize search index: "
+                        + "the search engine is not responding.");
+            } catch (SearchEngineException e) {
+                log.warn("Failed to finalize "
+                        + "from the search index", e);
+            }
+        }
+
         private void deleteOutdatedDocuments() {
             String query = "indexedTime:[ * TO " + requestedAt.getTime() + " ]";
             try {
                 searchEngine.deleteByQuery(query);
-                searchEngine.commit();
             } catch (SearchEngineNotRespondingException e) {
                 log.warn("Failed to delete outdated documents from the search index: "
                         + "the search engine is not responding.");

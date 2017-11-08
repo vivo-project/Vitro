@@ -114,7 +114,7 @@ public class ManagePagePreprocessor extends
 			for(String uriName: uriKeys) {
 				//these values should never be overwritten or deleted
 				//if(uriName != "page" && uriName != "menuItem" && !uriName.startsWith("dataGetter")) {
-				if(uriName != "page") {
+				if(!"page".equals(uriName)) {
 					boolean hasuv = submission.hasUriValue(uriName);
 					if(!submission.hasUriValue(uriName)) {
 						submission.addUriToForm(editConfiguration, 

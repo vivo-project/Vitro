@@ -6,12 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModelBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
@@ -19,7 +18,6 @@ import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 import edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewService;
 import edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewService.ShortViewContext;
 import edu.cornell.mannlib.vitro.webapp.services.shortview.ShortViewServiceSetup;
-import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModel;
 
 /**
  * Does a search for individuals, and uses the short view to render each of
@@ -38,8 +36,8 @@ public class GetRenderedSearchIndividualsByVClass extends GetSearchIndividualsBy
 	 * information are in the request parameters.
 	 */
 	@Override
-	protected JSONObject process() throws Exception {
-		JSONObject rObj = null;
+	protected ObjectNode process() throws Exception {
+		ObjectNode rObj = null;
 		
 		//This gets the first vclass value and sets that as display type
 		List<String> vclassIds = super.getVclassIds(vreq);
@@ -65,13 +63,13 @@ public class GetRenderedSearchIndividualsByVClass extends GetSearchIndividualsBy
 	 * Look through the return object. For each individual, render the short
 	 * view and insert the resulting HTML into the object.
 	 */
-	private void addShortViewRenderings(JSONObject rObj) throws JSONException {
-		JSONArray individuals = rObj.getJSONArray("individuals");
-		String vclassName = rObj.getJSONObject("vclass").getString("name");
-		for (int i = 0; i < individuals.length(); i++) {
-			JSONObject individual = individuals.getJSONObject(i);
+	private void addShortViewRenderings(ObjectNode rObj) {
+		ArrayNode individuals = (ArrayNode) rObj.get("individuals");
+		String vclassName = rObj.get("vclass").get("name").asText();
+		for (int i = 0; i < individuals.size(); i++) {
+			ObjectNode individual = (ObjectNode) individuals.get(i);
 			individual.put("shortViewHtml",
-					renderShortView(individual.getString("URI"), vclassName));
+					renderShortView(individual.get("URI").asText(), vclassName));
 		}
 	}
 

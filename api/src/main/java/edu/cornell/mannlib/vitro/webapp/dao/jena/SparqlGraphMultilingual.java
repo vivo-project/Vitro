@@ -76,7 +76,7 @@ public class SparqlGraphMultilingual extends SparqlGraph implements GraphWithPer
             return WrappedIterator.create(tripList.iterator());
         }
         if (subject.isConcrete() && predicate.isConcrete() && !object.isConcrete()) {
-            Collections.sort(tripList, new TripleSortByLang());
+            tripList.sort(new TripleSortByLang());
             LinkedList<Triple> tripl = new LinkedList<Triple>();
             if (!tripList.get(0).getObject().isLiteral()) {
                 tripl.addAll(tripList);

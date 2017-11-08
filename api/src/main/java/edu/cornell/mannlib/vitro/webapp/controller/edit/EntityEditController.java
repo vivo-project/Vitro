@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -33,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyInstanceDao;
 
+@WebServlet(name = "EntityEditController", urlPatterns = {"/entityEdit"} )
 public class EntityEditController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(EntityEditController.class.getName());
@@ -93,7 +95,7 @@ public class EntityEditController extends BaseEditController {
         }
         results.add(rName);
         
-        String classStr = "";
+        StringBuilder classStr = new StringBuilder();
         List<VClass> classList = inferredEnt.getVClasses(false);
         sortForPickList(classList, vreq);
         if (classList != null) {
@@ -107,13 +109,13 @@ public class EntityEditController extends BaseEditController {
 	            } catch (Exception e) {
 	                rClassName = vc.getLocalNameWithPrefix();
 	            }
-	            classStr += rClassName;
+	            classStr.append(rClassName);
 	            if (classIt.hasNext()) {
-	            	classStr += ", ";
+	            	classStr.append(", ");
 	            }
 	        }
         }
-        results.add(classStr);
+        results.add(classStr.toString());
                 
 		results.add(ent.getHiddenFromDisplayBelowRoleLevel() == null ? "unspecified"
 				: ent.getHiddenFromDisplayBelowRoleLevel().getDisplayLabel());
@@ -142,10 +144,8 @@ public class EntityEditController extends BaseEditController {
         try {
             List<Option> externalIdOptionList = new LinkedList<Option>();
             if (ent.getExternalIds() != null) {
-                Iterator<DataPropertyStatement> externalIdIt = ent.getExternalIds().iterator();
-                while (externalIdIt.hasNext()) {
-                    DataPropertyStatement eid = externalIdIt.next();
-                    String multiplexedString = new String ("DatapropURI:" + new String(Base64.encodeBase64(eid.getDatapropURI().getBytes())) + ";" + "Data:" + new String(Base64.encodeBase64(eid.getData().getBytes())));
+                for (DataPropertyStatement eid : ent.getExternalIds()) {
+                    String multiplexedString = "DatapropURI:" + new String(Base64.encodeBase64(eid.getDatapropURI().getBytes())) + ";" + "Data:" + new String(Base64.encodeBase64(eid.getData().getBytes()));
                     externalIdOptionList.add(new Option(multiplexedString, eid.getData()));
                 }
             }
@@ -167,11 +167,9 @@ public class EntityEditController extends BaseEditController {
         try {
             List epiOptionList = new LinkedList();
             Collection<PropertyInstance> epiColl = piDao.getExistingProperties(ent.getURI(),null);
-            Iterator<PropertyInstance> epiIt = epiColl.iterator();
-            while (epiIt.hasNext()) {
-                PropertyInstance pi = epiIt.next();
-                String multiplexedString = new String ("PropertyURI:" + new String(Base64.encodeBase64(pi.getPropertyURI().getBytes())) + ";" + "ObjectEntURI:" + new String(Base64.encodeBase64(pi.getObjectEntURI().getBytes())));
-                epiOptionList.add(new Option(multiplexedString, pi.getDomainPublic()+" "+pi.getObjectName()));
+            for (PropertyInstance pi : epiColl) {
+                String multiplexedString = "PropertyURI:" + new String(Base64.encodeBase64(pi.getPropertyURI().getBytes())) + ";" + "ObjectEntURI:" + new String(Base64.encodeBase64(pi.getObjectEntURI().getBytes()));
+                epiOptionList.add(new Option(multiplexedString, pi.getDomainPublic() + " " + pi.getObjectName()));
             }
             OptionMap.put("ExistingPropertyInstances", epiOptionList);
         } catch (Exception e) {
@@ -209,7 +207,7 @@ public class EntityEditController extends BaseEditController {
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) {
     	log.trace("Please don't POST to the "+this.getClass().getName()+". Use GET instead as there should be no change of state.");
-        doPost(request,response);
+        doGet(request,response);
     }
 
 }

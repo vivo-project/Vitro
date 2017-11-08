@@ -576,13 +576,9 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
                 out = Integer.parseInt(vt[0]);
                 return true;
             }            
-        }catch(IndexOutOfBoundsException iex){
+        }catch(IndexOutOfBoundsException | NullPointerException | NumberFormatException iex){
             out =  null;
-        }catch(NumberFormatException nfe){
-            out =  null;
-        }catch(NullPointerException npe){
-            out = null;
-        }        
+        }
         return false;
     }
     
@@ -596,13 +592,9 @@ public class DateTimeWithPrecisionVTwo extends BaseEditElementVTwo {
                 out = null;
             else
                 out = Integer.parseInt(vt[0]);
-        }catch(IndexOutOfBoundsException iex){
+        }catch(IndexOutOfBoundsException | NullPointerException | NumberFormatException iex){
             out =  null;
-        }catch(NumberFormatException nfe){
-            out =  null;
-        }catch(NullPointerException npe){
-            out = null;
-        }        
+        }
         return out;
     }
 

@@ -58,7 +58,7 @@ public class WebappDaoFactoryConfig {
 	}
 	
 	public Map<FullPropertyKey, String> getCustomListViewConfigFileMap() {
-	    return this.getCustomListViewConfigFileMap();    
+	    return customListViewConfigFileMap;
 	}
 	
     public void setCustomListViewConfigFileMap(

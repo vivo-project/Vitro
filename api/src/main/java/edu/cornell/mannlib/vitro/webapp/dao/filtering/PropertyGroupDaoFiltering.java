@@ -2,17 +2,13 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.filtering;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import net.sf.jga.algorithms.Filter;
 
 import org.apache.jena.ontology.DatatypeProperty;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
-import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.PropertyGroup;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyGroupDao;
@@ -70,8 +66,7 @@ public class PropertyGroupDaoFiltering implements PropertyGroupDao {
         }
         
         grp.setPropertyList(filteredProps); //side effect 
-        return ;	    
-	}
+    }
 	
 	public List<PropertyGroup> getPublicGroups(boolean withProperties) {
 		List<PropertyGroup> groups =  innerDao.getPublicGroups(withProperties);

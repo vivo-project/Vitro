@@ -6,7 +6,7 @@
 
 <#if (!noData)>
     <section class="siteMap" role="region">
-        <div id="isotope-container">
+        <ul id="wookmark-container" style="position: relative;">
             <#list classGroups as classGroup>
                 <#assign groupSize = 0 >
                 <#assign classCount = 0 >
@@ -18,11 +18,11 @@
                         <#if (class.individualCount > 0)>
                             <#assign groupSize = groupSize + 1 >
                         </#if>
-                    </#list> 
- 
-                    <div class="class-group">             
-                        <h2>${classGroup.displayName}</h2>
-                        <ul role="list">
+                    </#list>
+
+                    <li class="wookmark-group" style="float: left;">
+                    <h2>${classGroup.displayName}</h2>
+                        <ul id="class-group-list" role="list">
                             <#list classGroup.classes as class> 
                                 <#-- Only render populated classes -->
                                 <#if (class.individualCount > 0)>
@@ -31,30 +31,24 @@
                                 </#if>
                                 <#if (classCount > 34) && (classCount < groupSize) && !splitGroup >
                                    <#assign splitGroup = true >
-                                   </ul></div>
-                                   <div class="class-group">
+                                   </ul></li>
+                                   <li class="class-group" style="float: left; width: 200px;">
                                        <h2>${classGroup.displayName} (${i18n().continued})</h2>
                                           <ul role="list">
                                 </#if>
                             </#list>
                         </ul>
-                    </div> <!-- end class-group -->
+                    </li> <!-- end class-group -->
                 </#if>
             </#list>
-          </div> <!-- end isotope-container -->
+          </ul> <!-- end isotope-container -->
     </section>
 
-    ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/isotope/jquery.isotope.min.js"></script>')}
+    ${headScripts.add('<script type="text/javascript" src="${urls.base}/js/jquery_plugins/wookmark.min.js"></script>')}
     <script>
-        var initHeight = $("#isotope-container").height();
-        initHeight = (initHeight/2.05) ;
-        $("#isotope-container").css("height",initHeight + "px");
-    </script>
-    <script>
-        $('#isotope-container').isotope({
-          // options
-          itemSelector : '.class-group',
-          layoutMode : 'fitColumns'
+        $('#wookmark-container').wookmark({
+            itemWidth: 290,
+            flexibleWidth: "30%"
         });
     </script>
 <#else>

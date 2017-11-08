@@ -5,8 +5,6 @@ import org.linkeddatafragments.datasource.IFragmentRequestProcessor;
 import org.linkeddatafragments.fragments.IFragmentRequestParser;
 import org.linkeddatafragments.fragments.tpf.TPFRequestParserForJenaBackends;
 
-import java.io.File;
-
 /**
  * Experimental Jena TDB-backed data source of Basic Linked Data Fragments.
  *

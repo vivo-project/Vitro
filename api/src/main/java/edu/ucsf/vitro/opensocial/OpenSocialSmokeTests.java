@@ -19,7 +19,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import edu.cornell.mannlib.vitro.webapp.utils.http.HttpClientFactory;
-import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,7 +27,6 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
@@ -337,7 +336,6 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 				} else {
 					ss.warning(listener, message, cause);
 				}
-				return;
 			}
 		}
 	}
@@ -472,7 +470,6 @@ public class OpenSocialSmokeTests implements ServletContextListener {
 				} else {
 					ss.warning(listener, message, cause);
 				}
-				return;
 			}
 		}
 	}

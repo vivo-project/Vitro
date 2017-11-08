@@ -5,13 +5,10 @@ package edu.cornell.mannlib.vedit.tags;
 import java.util.HashMap;
 
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.TagSupport;
-import javax.servlet.jsp.JspWriter;
 
 import edu.cornell.mannlib.vedit.beans.EditProcessObject;
 import edu.cornell.mannlib.vedit.beans.FormObject;
-import org.apache.commons.lang3.StringEscapeUtils;
 
 public class EditTag extends TagSupport {
     private String name = null;

@@ -296,9 +296,7 @@ public class EditConfigurationUtils {
 	   /** Make a copy of list of Strings. */
     public static List<String> copy(List<String> list) {
         List<String> copyList = new ArrayList<String>();
-        for(String l: list) {
-            copyList.add( new String (l) );
-        }
+        copyList.addAll(list);
         return copyList;
    }        
     
@@ -307,9 +305,9 @@ public class EditConfigurationUtils {
         Set<String> keys = map.keySet();
         for(String key: keys) {            
             if( source.get(key) != null )
-                map.put(new String(key), new String( source.get(key)) );
+                map.put(key, source.get(key));
             else
-                map.put(new String(key),null);
+                map.put(key,null);
         }
         return map;
     }
@@ -319,7 +317,7 @@ public class EditConfigurationUtils {
         Set<String> keys = map.keySet();
         for(String key: keys) {
             List<String> vals = map.get(key);
-            map.put(new String(key), copy(vals));
+            map.put(key, copy(vals));
         }
         return map;
     }    

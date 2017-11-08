@@ -2,7 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,7 +27,6 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.rdf.model.AnonId;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Property;
@@ -313,12 +311,9 @@ public class IndividualDaoSDB extends IndividualDaoJena {
     private void fillIndividualsForObjectPropertyStatements(Individual entity){
         getOntModel().enterCriticalSection(Lock.READ);
         try {
-            Iterator e2eIt = entity.getObjectPropertyStatements().iterator();
-            while (e2eIt.hasNext()) {
-                ObjectPropertyStatement e2e = 
-                		(ObjectPropertyStatement) e2eIt.next();
+            for (ObjectPropertyStatement e2e : entity.getObjectPropertyStatements()) {
                 e2e.setSubject(makeIndividual(e2e.getSubjectURI()));
-                e2e.setObject(makeIndividual(e2e.getObjectURI()));       
+                e2e.setObject(makeIndividual(e2e.getObjectURI()));
             }
         } finally {
             getOntModel().leaveCriticalSection();

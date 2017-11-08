@@ -11,6 +11,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author bjl23
  *
  */
+@WebFilter(filterName = "URL Rewriter Filter", urlPatterns = {"/*"})
 public class URLRewriterFilter implements Filter {
 
 	private ServletContext _context;

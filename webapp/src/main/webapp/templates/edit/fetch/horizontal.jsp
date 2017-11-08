@@ -118,7 +118,7 @@ if (topButtons!=null) {
                 }
 %>
 
-<tr>
+<tr class="row">
     <td class="rownumheader">#</td>
      <%             if ( !("XX".equals(thisResult) )) {
 %>

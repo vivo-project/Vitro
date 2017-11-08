@@ -70,7 +70,7 @@ public class VitroBackgroundThread extends Thread {
 
 	public void setWorkLevel(WorkLevel level, String... flags) {
 		log.debug("Set work level on '" + this.getName() + "' to " + level
-				+ ", flags=" + flags);
+				+ ", flags=" + Arrays.toString(flags));
 		stamp = new WorkLevelStamp(level, flags);
 	}
 

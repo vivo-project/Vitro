@@ -121,9 +121,7 @@ public class IndividualShortViewDirective extends BaseTemplateDirectiveModel {
 	private void renderErrorMessage(Individual individual) {
 		Environment env = Environment.getCurrentEnvironment();
 		try {
-			env.getOut().append(
-					"<span>Can't process the custom short view for "
-							+ individual.getName() + "</span>");
+			env.getOut().append("<span>Can't process the custom short view for ").append(individual.getName()).append("</span>");
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}

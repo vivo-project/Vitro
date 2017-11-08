@@ -5,14 +5,11 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.adapters;
 import java.util.List;
 import java.util.Set;
 
-import edu.cornell.mannlib.vitro.webapp.dao.jena.VitroModelSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelChangedListener;
-import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.StmtIteratorImpl;

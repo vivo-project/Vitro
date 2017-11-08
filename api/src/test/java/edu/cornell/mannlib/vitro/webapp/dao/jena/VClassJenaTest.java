@@ -320,27 +320,27 @@ public class VClassJenaTest {
 		    		}
 		    		return labelStr;
 		    	} else if (isBooleanClassExpression(cls)) {
-		    		String labelStr = "(";
+		    		StringBuilder labelStr = new StringBuilder("(");
 		    		if (cls.isComplementClass()) {
-		    			labelStr += "not ";
+		    			labelStr.append("not ");
 		    			ComplementClass ccls = (ComplementClass) cls.as(ComplementClass.class);
-		    			labelStr += getLabelForClass(ccls.getOperand(),withPrefix,forPickList,wadf);		    			
+		    			labelStr.append(getLabelForClass(ccls.getOperand(), withPrefix, forPickList, wadf));
 		    		} else if (cls.isIntersectionClass()) {
 		    			IntersectionClass icls = (IntersectionClass) cls.as(IntersectionClass.class);
 		    			for (Iterator operandIt = icls.listOperands(); operandIt.hasNext();) {
 		    				OntClass operand = (OntClass) operandIt.next();
-		    				labelStr += getLabelForClass(operand,withPrefix,forPickList,wadf);
+		    				labelStr.append(getLabelForClass(operand, withPrefix, forPickList, wadf));
 		    				if (operandIt.hasNext()) {
-		    					labelStr += " and ";
+		    					labelStr.append(" and ");
 		    				}
 		    			}
 		    		} else if (cls.isUnionClass()) {
 		    			UnionClass icls = (UnionClass) cls.as(UnionClass.class);
 		    			for (Iterator operandIt = icls.listOperands(); operandIt.hasNext();) {
 		    				OntClass operand = (OntClass) operandIt.next();
-		    				labelStr += getLabelForClass(operand,withPrefix,forPickList,wadf);
+		    				labelStr.append(getLabelForClass(operand, withPrefix, forPickList, wadf));
 		    				if (operandIt.hasNext()) {
-		    					labelStr += " or ";
+		    					labelStr.append(" or ");
 		    				}
 		    			}
 		    		}
@@ -426,20 +426,18 @@ public class VClassJenaTest {
     }
     
     private String getLabel2(String lang, List<RDFNode>labelList) {
-    	Iterator<RDFNode> labelIt = labelList.iterator();
-    	while (labelIt.hasNext()) {
-    		RDFNode label = labelIt.next();
-    		if (label.isLiteral()) {
-    			Literal labelLit = ((Literal)label);
-    			String labelLanguage = labelLit.getLanguage();
-    			if ( (labelLanguage==null) && (lang==null) ) {
-    				return labelLit.getLexicalForm();
-    			}
-    			if ( (lang != null) && (lang.equals(labelLanguage)) ) {
-    				return labelLit.getLexicalForm();
-    			}
-    		}
-    	}
+		for (RDFNode label : labelList) {
+			if (label.isLiteral()) {
+				Literal labelLit = ((Literal) label);
+				String labelLanguage = labelLit.getLanguage();
+				if ((labelLanguage == null) && (lang == null)) {
+					return labelLit.getLexicalForm();
+				}
+				if ((lang != null) && (lang.equals(labelLanguage))) {
+					return labelLit.getLexicalForm();
+				}
+			}
+		}
     	return null;
     }
     

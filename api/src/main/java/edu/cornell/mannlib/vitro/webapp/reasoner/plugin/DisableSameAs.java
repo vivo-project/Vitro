@@ -47,15 +47,13 @@ public class DisableSameAs implements ReasonerPlugin {
             Model aboxAssertionsModel, 
             Model aboxInferencesModel, 
             OntModel TBoxInferencesModel) {
-        return;
-	}
+    }
 	
 	
     public void removedABoxStatement(Statement stmt, 
             Model aboxAssertionsModel, 
             Model aboxInferencesModel, 
             OntModel TBoxInferencesModel) {
-        return;
     }
 	
 }

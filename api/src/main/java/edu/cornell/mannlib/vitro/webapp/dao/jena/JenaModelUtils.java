@@ -93,11 +93,9 @@ public class JenaModelUtils {
             try {                    
                 List<VClass> rootClasses = myWebappDaoFactory.getVClassDao()
                         .getRootClasses();
-                for (Iterator<VClass> rootClassIt = rootClasses.iterator(); 
-                        rootClassIt.hasNext(); ) {
-                    VClass rootClass = rootClassIt.next();	                    
+                for (VClass rootClass : rootClasses) {
                     Individual classGroup = modelForClassgroups.createIndividual(
-                            wadf.getDefaultNamespace() + "vitroClassGroup" + 
+                            wadf.getDefaultNamespace() + "vitroClassGroup" +
                                     rootClass.getLocalName(), classGroupClass);
                     classGroup.setLabel(rootClass.getName(), null);
 
@@ -105,16 +103,14 @@ public class JenaModelUtils {
                             rootClass.getURI());
                     modelForClassgroupAnnotations.add(
                             rootClassRes, inClassGroupProperty, classGroup);
-                    for (Iterator<String> childIt = myWebappDaoFactory.getVClassDao()
-                            .getAllSubClassURIs(rootClass.getURI()).iterator(); 
-                            childIt.hasNext(); ) {
-                        String childURI = childIt.next();
+                    for (String childURI : myWebappDaoFactory.getVClassDao()
+                            .getAllSubClassURIs(rootClass.getURI())) {
                         Resource childClass = modelForClassgroupAnnotations
                                 .getResource(childURI);
                         if (!modelForClassgroupAnnotations.contains(
                                 childClass, inClassGroupProperty, (RDFNode) null)) {
-                            childClass.addProperty(inClassGroupProperty, classGroup);    
-                        }          
+                            childClass.addProperty(inClassGroupProperty, classGroup);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -261,14 +257,13 @@ public class JenaModelUtils {
                             Resource property) {
         dataset.getLock().enterCriticalSection(Lock.READ);
         try {
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             buff.append("PREFIX afn: <http://jena.apache.org/ARQ/function#> \n")
-            .append("CONSTRUCT { \n")
-            .append("  ?res <" + property.getURI() + "> ?o } WHERE { \n");
+                    .append("CONSTRUCT { \n").append("  ?res <").append(property.getURI()).append("> ?o } WHERE { \n");
             if (graphURI != null) {
-                buff.append("    GRAPH " + graphURI + " { \n");
+                buff.append("    GRAPH ").append(graphURI).append(" { \n");
             }
-            buff.append("      ?res <" + property.getURI() + "> ?o \n");
+            buff.append("      ?res <").append(property.getURI()).append("> ?o \n");
             buff.append(getNamespaceFilter(namespace));
             if (graphURI != null) {
                 buff.append("    } \n");
@@ -292,13 +287,12 @@ public class JenaModelUtils {
         
     private String makeDescribeQueryStr( String typeURI, String namespace, String graphURI ) {
         
-        StringBuffer describeQueryStrBuff = new StringBuffer() 
+        StringBuilder describeQueryStrBuff = new StringBuilder()
             .append("PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> \n")
             .append("PREFIX afn: <http://jena.apache.org/ARQ/function#> \n")
             .append("DESCRIBE ?res WHERE { \n");
             if (graphURI != null) {
-                describeQueryStrBuff
-                .append("GRAPH " + graphURI + "{ \n");
+                describeQueryStrBuff.append("GRAPH ").append(graphURI).append("{ \n");
             }
             describeQueryStrBuff
             .append("    ?res rdf:type <").append(typeURI).append("> . \n");
@@ -320,7 +314,7 @@ public class JenaModelUtils {
     }
     
     private String getNamespaceFilter(String namespace) {
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         if (namespace == null) {
             // exclude resources in the Vitro internal namespace or in the 
             // OWL namespace, but allow all others

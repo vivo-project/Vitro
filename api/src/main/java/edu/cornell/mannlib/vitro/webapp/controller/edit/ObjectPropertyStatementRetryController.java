@@ -122,9 +122,7 @@ public class ObjectPropertyStatementRetryController extends BaseEditController {
         indList.addAll(possIndSet);
         sortForPickList(indList, vreq);
         List objectEntOptionList = new LinkedList();
-        Iterator<Individual> indIt = indList.iterator();
-        while (indIt.hasNext()) {
-            Individual objInd = indIt.next();
+        for (Individual objInd : indList) {
             Option objIndOpt = new Option(objInd.getURI(), objInd.getName());
             if (objectForEditing.getObjectEntURI() != null && objectForEditing.getObjectEntURI().equals(objInd.getURI())) {
                 objIndOpt.setSelected(true);

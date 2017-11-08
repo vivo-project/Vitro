@@ -73,8 +73,8 @@ public class Controllers {
         if (Controllers.letters == null) {
             char c[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
             Controllers.letters = new ArrayList<String>(c.length);
-            for (int i = 0; i < c.length; i++) {
-                letters.add("" + c[i]);
+            for (char aC : c) {
+                letters.add("" + aC);
             }
         }
         return Controllers.letters;

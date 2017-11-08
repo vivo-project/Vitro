@@ -24,10 +24,10 @@ public class UrlValidator implements Validator {
         IRIFactory factory = IRIFactory.jenaImplementation();
         IRI iri = factory.create((String) obj);
         if (iri.hasViolation(false) ) {
-            String errorStr = "";
+            StringBuilder errorStr = new StringBuilder();
             Iterator<Violation> violIt = iri.violations(false);
             while(violIt.hasNext()) {
-                errorStr += violIt.next().getShortMessage() + "  ";
+                errorStr.append(violIt.next().getShortMessage()).append("  ");
             }
             vo.setValid(false);
             vo.setMessage("Please enter a valid URL.  " + errorStr);

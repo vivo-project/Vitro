@@ -253,7 +253,7 @@ public class N3EditUtils {
         if (in == null) {
             return null;
         }
-        StringBuffer out = new StringBuffer();
+        StringBuilder out = new StringBuilder();
         for (int i = 0; i < in.length(); i++) {
             char c = in.charAt(i);
             if (!XMLChar.isInvalid(c)) {

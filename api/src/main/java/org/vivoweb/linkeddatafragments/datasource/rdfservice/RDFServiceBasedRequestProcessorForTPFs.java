@@ -1,23 +1,11 @@
 package org.vivoweb.linkeddatafragments.datasource.rdfservice;
 
-import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
-import edu.cornell.mannlib.vitro.webapp.dao.jena.QueryUtils;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.ResultSetConsumer;
 import org.apache.jena.atlas.io.StringWriterI;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.Dataset;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecution;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.QuerySolution;
-import org.apache.jena.query.QuerySolutionMap;
-import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.Literal;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
@@ -26,14 +14,10 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.out.NodeFormatter;
 import org.apache.jena.riot.out.NodeFormatterTTL;
-import org.apache.jena.tdb.TDBFactory;
 import org.linkeddatafragments.datasource.AbstractRequestProcessorForTriplePatterns;
-import org.linkeddatafragments.datasource.IFragmentRequestProcessor;
 import org.linkeddatafragments.fragments.ILinkedDataFragment;
 import org.linkeddatafragments.fragments.tpf.ITriplePatternElement;
 import org.linkeddatafragments.fragments.tpf.ITriplePatternFragmentRequest;
-
-import java.io.File;
 
 public class RDFServiceBasedRequestProcessorForTPFs
     extends AbstractRequestProcessorForTriplePatterns<RDFNode,String,String>
@@ -68,7 +52,7 @@ public class RDFServiceBasedRequestProcessorForTPFs
             if (node.isLiteral()) {
                 builder.append(literalToString(node.asLiteral()));
             } else if (node.isURIResource()) {
-                builder.append('<' + node.asResource().getURI() + '>');
+                builder.append('<').append(node.asResource().getURI()).append('>');
             }
         }
 

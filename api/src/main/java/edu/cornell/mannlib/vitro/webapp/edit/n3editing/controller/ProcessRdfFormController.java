@@ -38,12 +38,15 @@ import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.N3EditUtils;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.ProcessRdfForm;
 import edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.RdfLiteralHash;
 
+import javax.servlet.annotation.WebServlet;
+
 /**
  * This servlet will convert a request to an EditSubmission, 
  * find the EditConfiguration associated with the request, 
  * use ProcessRdfForm to process these to a set of RDF additions and retractions,
  * the apply these to the models. 
  */
+@WebServlet(name = "ProcessRdfFormController", urlPatterns = {"/edit/process"} )
 public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	
     private Log log = LogFactory.getLog(ProcessRdfFormController.class);
@@ -149,10 +152,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
         DataProperty dp = wdf.getDataPropertyDao().getDataPropertyByURI(
                 editConfig.getPredicateUri());
         if (dp != null) {
-            if (dp.getDisplayLimit() == 1 /* || dp.isFunctional() */)
-                return false;
-            else
-                return true;
+			return dp.getDisplayLimit() != 1;
         }
         return false;
 
@@ -207,9 +207,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 		
 	    public static List<String> makeListCopy(List<String> list) {
 	    	List<String> copyOfN3 = new ArrayList<String>();
-            for( String str : list){
-                copyOfN3.add(str);
-            }
+			copyOfN3.addAll(list);
             return copyOfN3;
 	    }
 	     
@@ -228,10 +226,7 @@ public class ProcessRdfFormController extends FreemarkerHttpServlet{
 	        	 Collections.sort(newValue);
 	         }
 	         if (orgValue != null && newValue != null) {
-	             if (orgValue.equals(newValue))
-	                 return false;
-	             else
-	                 return true;
+				 return !orgValue.equals(newValue);
 	         }
 
 	         List<Literal> orgLit = editConfig.getLiteralsInScope().get(fieldName);

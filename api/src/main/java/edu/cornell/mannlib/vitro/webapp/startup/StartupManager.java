@@ -156,16 +156,12 @@ public class StartupManager implements ServletContextListener {
 			ss.fatal(this, "Instance of '" + className
 					+ "' is not a ServletContextListener", e);
 			return null;
-		} catch (Exception e) {
-			ss.fatal(this, "Failed to instantiate listener: '" + className
-					+ "'", e);
-			return null;
-		} catch (ExceptionInInitializerError e) {
+		} catch (Exception | ExceptionInInitializerError e) {
 			ss.fatal(this, "Failed to instantiate listener: '" + className
 					+ "'", e);
 			return null;
 		}
-	}
+    }
 
 	/**
 	 * Call contextInitialized() on the listener.

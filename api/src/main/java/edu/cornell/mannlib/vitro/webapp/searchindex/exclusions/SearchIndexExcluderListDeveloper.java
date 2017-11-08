@@ -73,20 +73,20 @@ public class SearchIndexExcluderListDeveloper implements
 	 */
 	@Override
 	public void stopIndexing() {
-		String message = String.format(
+		StringBuilder message = new StringBuilder(String.format(
 				"Timings for %d excluders after %d calls:", timings.size(),
-				count.get());
+				count.get()));
 		for (ExcluderTiming timing : timings) {
 			int thisCount = timing.getCount();
 			int totalMillis = timing.getTotal();
 			float totalSeconds = totalMillis / 1000.0F;
 			int average = (thisCount == 0) ? 0 : totalMillis / thisCount;
-			message += String
+			message.append(String
 					.format("\n   count: %7d, total: %9.3fsec, average: %4dms-- %1.200s",
 							thisCount, totalSeconds, average,
-							timing.getExcluder());
+							timing.getExcluder()));
 		}
-		log.info(message);
+		log.info(message.toString());
 	}
 
 	private static class ExcluderTiming {

@@ -3,8 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,7 +26,6 @@ import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFactory;
 import org.apache.jena.query.Syntax;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
@@ -68,11 +65,11 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     
     protected static final String PREFIXES;
     static {
-        String prefixes = "";
+        StringBuilder prefixes = new StringBuilder();
         for (String key : NAMESPACES.keySet()) {
-            prefixes += "PREFIX " + key + ": <" + NAMESPACES.get(key) + ">\n";
+            prefixes.append("PREFIX ").append(key).append(": <").append(NAMESPACES.get(key)).append(">\n");
         }
-        PREFIXES = prefixes;
+        PREFIXES = prefixes.toString();
         log.debug("Query prefixes: " + PREFIXES);
     }
     
@@ -165,15 +162,13 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     }
 
     private void getAllSubPropertyURIs(String propertyURI, HashSet<String> subtree){
-        List<String> directSubproperties = getSubPropertyURIs(propertyURI);     
-        Iterator<String> it=directSubproperties.iterator();
-        while(it.hasNext()){
-            String uri = it.next();
-            if (!subtree.contains(uri)) {
-            	subtree.add(uri);
-            	getAllSubPropertyURIs(uri,subtree);
-            }
-        }
+        List<String> directSubproperties = getSubPropertyURIs(propertyURI);
+		for (String uri : directSubproperties) {
+			if (!subtree.contains(uri)) {
+				subtree.add(uri);
+				getAllSubPropertyURIs(uri, subtree);
+			}
+		}
     }
 
     @Override
@@ -208,15 +203,13 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
     }
 
     private void getAllSuperPropertyURIs(String propertyURI, HashSet<String> subtree){
-        List<String> directSuperproperties = getSuperPropertyURIs(propertyURI,true);     
-        Iterator<String> it=directSuperproperties.iterator();
-        while(it.hasNext()){
-            String uri = it.next();
-            if (!subtree.contains(uri)) {
-            	subtree.add(uri);
-            	getAllSuperPropertyURIs(uri,subtree);
-            }
-        }
+        List<String> directSuperproperties = getSuperPropertyURIs(propertyURI,true);
+		for (String uri : directSuperproperties) {
+			if (!subtree.contains(uri)) {
+				subtree.add(uri);
+				getAllSuperPropertyURIs(uri, subtree);
+			}
+		}
     }
 
     @Override
@@ -313,17 +306,15 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
 	}
 
     @Override
-	public void removeEquivalentProperty(Property property,
-			Property equivalentProperty) {
-		removeEquivalentProperty(property, equivalentProperty);
+	public void removeEquivalentProperty(Property property, Property equivalentProperty) {
+		removeEquivalentProperty(property.getURI(), equivalentProperty.getURI());
 	}
 	
 	protected void removeABoxStatementsWithPredicate(Property predicate) {
 		// DO NOT issue a removeAll() with a null (wildcard) in predicate position!
 		if (predicate == null) {
 			log.debug("Cannot remove ABox statements with a null predicate.");
-			return;
-		} else {
+        } else {
 			removeABoxStatementsWithPredicate(predicate.getURI());
 		}
 	}
@@ -425,18 +416,14 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
   
         List<OntClass> classList = ontClass.listEquivalentClasses().toList();
         classList.addAll(ontClass.listSubClasses().toList());
-        
-        Iterator<OntClass> it = classList.iterator();
-		         
-        while (it.hasNext()) {
-        	OntClass oc = it.next();
-        	
-        	if (!oc.isAnon()) {
-        		classSet.add(oc.getURI());
-        	} else {
-        	    classSet.addAll(getRestrictedClasses(oc));
-        	}
-        }
+
+		for (OntClass oc : classList) {
+			if (!oc.isAnon()) {
+				classSet.add(oc.getURI());
+			} else {
+				classSet.addAll(getRestrictedClasses(oc));
+			}
+		}
         		
         return classSet;
     }
@@ -902,32 +889,32 @@ public class PropertyDaoJena extends JenaBaseDao implements PropertyDao {
             return opList;
         }
         ObjectPropertyDao opDao = getWebappDaoFactory().getObjectPropertyDao();
-        String propQuery = "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
-                "PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
-                "PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
-                "SELECT ?property ?domain ?range WHERE { \n" +
-                "    ?context config:configContextFor ?property . \n" +
-                "    ?context config:qualifiedByDomain ?domain . \n" +
-                "    ?context config:qualifiedBy ?range . \n";
+        StringBuilder propQuery = new StringBuilder("PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> \n" +
+				"PREFIX config: <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationConfiguration#> \n" +
+				"PREFIX vitro: <http://vitro.mannlib.cornell.edu/ns/vitro/0.7#> \n" +
+				"SELECT ?property ?domain ?range WHERE { \n" +
+				"    ?context config:configContextFor ?property . \n" +
+				"    ?context config:qualifiedByDomain ?domain . \n" +
+				"    ?context config:qualifiedBy ?range . \n");
         for(PropertyInstance propInst : propInsts) {
-            propQuery += "    FILTER (?property != <" + propInst.getPropertyURI() + "> ) \n";
+            propQuery.append("    FILTER (?property != <").append(propInst.getPropertyURI()).append("> ) \n");
         }
         Iterator<VClass> classIt = vclasses.iterator();
         if(classIt.hasNext()) {
-            propQuery += "    FILTER ( \n";
-            propQuery += "        (?domain = <" + OWL.Thing.getURI() + "> )\n";
+            propQuery.append("    FILTER ( \n");
+            propQuery.append("        (?domain = <").append(OWL.Thing.getURI()).append("> )\n");
             while (classIt.hasNext()) {
                 VClass vclass = classIt.next();
                 if(vclass.isAnonymous()) {
                     continue;
                 }
-                propQuery += "       || (?domain = <" + vclass.getURI() + "> ) \n";
+                propQuery.append("       || (?domain = <").append(vclass.getURI()).append("> ) \n");
             }
-            propQuery += ") \n";
+            propQuery.append(") \n");
         }
-        propQuery += "} \n";
-        log.debug(propQuery);
-        Query q = QueryFactory.create(propQuery);
+        propQuery.append("} \n");
+        log.debug(propQuery.toString());
+        Query q = QueryFactory.create(propQuery.toString());
         QueryExecution qe = QueryExecutionFactory.create(
                 q, getOntModelSelector().getDisplayModel());
         try {

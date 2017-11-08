@@ -208,19 +208,24 @@ public class UrlBuilder {
     }
     
     private static String addParams(String url, ParamMap params, String glue) {
-        for (String key: params.keySet()) {
-            String value = params.get(key);
-            // rjy7 Some users might require nulls to be converted to empty
-            // string, others to eliminate params with null values.
-            // Here we convert to empty string to prevent an exception
-            // from UrlEncoder.encode() when passed a null. Callers are advised
-            // to remove null values or convert to empty strings, whichever
-            // is desired in the particular instance.
-            value = (value == null) ? "" : urlEncode(value);
-            url += glue + key + "=" + value;
-            glue = "&";
+        if (params.size() > 0) {
+            StringBuilder sb = new StringBuilder(url);
+            for (String key: params.keySet()) {
+                String value = params.get(key);
+                // rjy7 Some users might require nulls to be converted to empty
+                // string, others to eliminate params with null values.
+                // Here we convert to empty string to prevent an exception
+                // from UrlEncoder.encode() when passed a null. Callers are advised
+                // to remove null values or convert to empty strings, whichever
+                // is desired in the particular instance.
+                value = (value == null) ? "" : urlEncode(value);
+                sb.append(glue).append(key).append("=").append(value);
+                glue = "&";
+            }
+            url = sb.toString();
         }
-        return url;        
+
+        return url;
     }
     
     public static String addParams(String url, ParamMap params) {

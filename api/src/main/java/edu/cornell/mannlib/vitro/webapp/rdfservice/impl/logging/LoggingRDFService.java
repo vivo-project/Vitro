@@ -194,6 +194,11 @@ public class LoggingRDFService implements RDFService {
 	}
 
 	@Override
+	public boolean preferPreciseOptionals() {
+		return innerService.preferPreciseOptionals();
+	}
+
+	@Override
 	public void close() {
 		innerService.close();
 	}

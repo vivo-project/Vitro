@@ -12,6 +12,7 @@ import com.google.common.base.Objects;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty;
+import edu.cornell.mannlib.vitro.webapp.beans.ObjectPropertyStatement;
 import edu.cornell.mannlib.vitro.webapp.beans.Property;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.dao.InsertException;
@@ -257,7 +258,7 @@ public class ObjectPropertyDaoStub implements ObjectPropertyDao {
 
 	@Override
 	public List<ObjectProperty> getObjectPropertiesForObjectPropertyStatements(
-			List objectPropertyStatements) {
+			List<ObjectPropertyStatement> objectPropertyStatements) {
 		throw new RuntimeException(
 				"ObjectPropertyDaoStub.getObjectPropertiesForObjectPropertyStatements() not implemented.");
 	}

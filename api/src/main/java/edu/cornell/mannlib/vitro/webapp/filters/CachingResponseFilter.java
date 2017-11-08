@@ -15,10 +15,11 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.collections.EnumerationUtils;
+import org.apache.commons.collections4.EnumerationUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -67,6 +68,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.searchengine.SearchResultsParser;
  * An unconditional request may mean that there is no external cache, or that
  * the cache doesn't have a copy of this particular page.
  */
+@WebFilter(filterName = "Caching Response filter", urlPatterns = {"/*"})
 public class CachingResponseFilter implements Filter {
 	private static final Log log = LogFactory
 			.getLog(CachingResponseFilter.class);

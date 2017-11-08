@@ -67,7 +67,7 @@ public class ThumbnailImageURL implements DocumentModifier, ContextModelsUser {
     }
 
 	protected String runQueryForThumbnailLocation(Individual individual) {
-		StringBuffer result = new StringBuffer();
+		StringBuilder result = new StringBuilder();
 
 		String uri = "<" + individual.getURI() + "> ";
 		String query = QUERY_TEMPLATE.replaceAll("\\?uri", uri);
@@ -81,7 +81,7 @@ public class ThumbnailImageURL implements DocumentModifier, ContextModelsUser {
 					String name = iter.next();
 					RDFNode node = soln.get( name );
 					if( node != null ){
-						result.append("" + node.toString());
+						result.append("").append(node.toString());
 					}else{
 						log.info(name + " is null");
 					}                        

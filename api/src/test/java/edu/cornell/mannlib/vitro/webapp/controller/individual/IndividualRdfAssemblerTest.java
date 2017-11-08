@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections4.IteratorUtils;
 import org.apache.log4j.Level;
 import org.junit.Before;
 import org.junit.Test;

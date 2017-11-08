@@ -11,7 +11,6 @@ import org.apache.jena.rdf.model.RDFNode;
 import edu.cornell.mannlib.vitro.webapp.web.templatemodels.individual.IndividualTemplateModelBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
 
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
@@ -133,8 +132,6 @@ class IndividualResponseBuilder {
 	        if (openSocialManager.isVisible()) {
 	        	body.put("bodyOnload", "my.init();");
 	        }
-        } catch (JSONException e) {
-            log.error("JSONException in doTemplate()", e);
         } catch (IOException e) {
         	log.error("IOException in doTemplate()", e);
         } catch (SQLException e) {
@@ -206,7 +203,7 @@ class IndividualResponseBuilder {
         ConfigurationProperties properties = ConfigurationProperties.getBean(vreq);
 
         if (properties != null) {
-            String enabled = properties.getProperty("resource.plum-print", "disabled");
+            String enabled = properties.getProperty("resource.plum-print", "enabled");
             String displayTo = properties.getProperty("resource.plum-print.displayto", "right");
             String printHideEmpty = properties.getProperty("resource.plum-print.hide-when-empty", "true");
             String printPopover = properties.getProperty("resource.plum-print.popover", "right");
@@ -268,18 +265,18 @@ class IndividualResponseBuilder {
                - Much simpler is to just create an anchor element. This has the added advantage that the
                  browser doesn't ask to resend the form data when reloading the page.
              */
-            String url = vreq.getRequestURI() + "?verbose=" + !verboseValue;
+            StringBuilder url = new StringBuilder(vreq.getRequestURI() + "?verbose=" + !verboseValue);
             // Append request query string, except for current verbose value, to url
             String queryString = vreq.getQueryString();
             if (queryString != null) {
                 String[] params = queryString.split("&");
                 for (String param : params) {
                     if (! param.startsWith("verbose=")) {
-                        url += "&" + param;
+                        url.append("&").append(param);
                     }
                 }
             }
-            map.put("url", url);            
+            map.put("url", url.toString());
         } else {
             vreq.getSession().setAttribute("verbosePropertyDisplay", false);
         }

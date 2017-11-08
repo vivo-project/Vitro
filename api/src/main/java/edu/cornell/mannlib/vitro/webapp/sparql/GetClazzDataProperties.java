@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -24,6 +25,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.DataPropertyDao;
  * This servlet gets all the data properties for a given subject.
  */
 
+@WebServlet(name = "GetClazzDataProperties", urlPatterns = {"/admin/getClazzDataProperties"})
 public class GetClazzDataProperties extends BaseEditController {
 
 	private static final Log log = LogFactory.getLog(GetClazzDataProperties.class);
@@ -42,13 +44,11 @@ public class GetClazzDataProperties extends BaseEditController {
 			return;
 		}
 
-		String respo = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
-		respo += "<options>";
+		StringBuilder respo = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+		respo.append("<options>");
 
 		// Add rdfs:label to the list
-		respo += "<option>" + "<key>" + "label" + "</key>" + "<value>"
-				+ "http://www.w3.org/2000/01/rdf-schema#label" + "</value>"
-				+ "</option>";
+		respo.append("<option>" + "<key>" + "label" + "</key>" + "<value>" + "http://www.w3.org/2000/01/rdf-schema#label" + "</value>" + "</option>");
 
 		DataPropertyDao ddao = vreq.getUnfilteredWebappDaoFactory()
 				.getDataPropertyDao();
@@ -64,13 +64,11 @@ public class GetClazzDataProperties extends BaseEditController {
 				DataProperty dprop = (DataProperty) ddao
 						.getDataPropertyByURI(dp.getURI());
 				if (dprop != null) {
-					respo += "<option>" + "<key>" + dprop.getLocalName()
-							+ "</key>" + "<value>" + dprop.getURI()
-							+ "</value>" + "</option>";
+					respo.append("<option>" + "<key>").append(dprop.getLocalName()).append("</key>").append("<value>").append(dprop.getURI()).append("</value>").append("</option>");
 				}
 			}
 		}
-		respo += "</options>";
+		respo.append("</options>");
 		response.setContentType("text/xml");
 		response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();

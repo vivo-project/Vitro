@@ -2,8 +2,8 @@
 
 package edu.cornell.mannlib.vedit.tags;
 
-import org.apache.commons.collections.map.ListOrderedMap;
-import org.apache.commons.collections.OrderedMapIterator;
+import org.apache.commons.collections4.map.ListOrderedMap;
+import org.apache.commons.collections4.OrderedMapIterator;
 import java.util.List;
 import java.util.Iterator;
 import java.io.IOException;
@@ -51,7 +51,7 @@ public class OptionTag extends EditTag {
             } catch (ClassCastException e){
                 // maybe it's a ListOrderedMap of optgroups
                 optGroups = (ListOrderedMap) getFormObject().getOptionLists().get(name);
-                OrderedMapIterator ogKey = optGroups.orderedMapIterator();
+                OrderedMapIterator ogKey = optGroups.mapIterator();
                 while (ogKey.hasNext()) {
                     String optGroupName = (String) ogKey.next();
                     out.println("<optgroup label=\""+StringEscapeUtils.ESCAPE_HTML4.translate(optGroupName)+"\">");

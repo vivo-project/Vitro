@@ -127,8 +127,7 @@ public class UserAccountsEditPage extends UserAccountsPage {
 						+ "but is not authorized to do so. Logged in as: "
 						+ LoginStatusBean.getCurrentUser(vreq));
 				bogusMessage = getBogusStandardMessage(vreq);
-				return;
-			}
+            }
 		}
 	}
 

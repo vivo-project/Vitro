@@ -1,6 +1,6 @@
 package org.linkeddatafragments.datasource;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.linkeddatafragments.exceptions.DataSourceCreationException;
 
 /**
@@ -28,6 +28,6 @@ public interface IDataSourceType
      */
     IDataSource createDataSource(final String title,
                                  final String description,
-                                 final JsonObject settings)
+                                 final JsonNode settings)
                                                     throws DataSourceCreationException;
 }

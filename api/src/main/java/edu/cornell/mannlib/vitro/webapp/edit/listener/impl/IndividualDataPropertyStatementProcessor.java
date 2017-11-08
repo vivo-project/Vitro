@@ -39,13 +39,11 @@ public class IndividualDataPropertyStatementProcessor implements ChangeListener 
 
     private void processDataprops (EditProcessObject epo) {
         HashSet<String> deletedDataPropertyURIs = new HashSet<String>();
-        Map dpm = datapropParameterMap(epo.getRequestParameterMap());
+        Map<String, String[]> dpm = datapropParameterMap(epo.getRequestParameterMap());
         DataPropertyStatementDao dataPropertyStatementDao = (DataPropertyStatementDao)epo.getAdditionalDaoMap().get("DataPropertyStatement");
-        Iterator dpmIt = dpm.keySet().iterator();
-        while (dpmIt.hasNext()) {
-            String key = (String) dpmIt.next();
-            String[] data = (String[])dpm.get(key);
-            for (int dataRow=0; dataRow<data.length; ++dataRow){
+        for (String key : dpm.keySet()) {
+            String[] data = (String[]) dpm.get(key);
+            for (String aData : data) {
                 String[] keyArg = key.split("_");
                 String rowId = keyArg[2];
                 DataPropertyStatement dataPropertyStmt = new DataPropertyStatementImpl();
@@ -55,63 +53,61 @@ public class IndividualDataPropertyStatementProcessor implements ChangeListener 
                     dataPropertyStmt = new DataPropertyStatementImpl();
                 try {
                     Map beanParamMap = FormUtils.beanParamMapFromString(keyArg[3]);
-                    String dataPropertyURI = (String)beanParamMap.get("DatatypePropertyURI");
+                    String dataPropertyURI = (String) beanParamMap.get("DatatypePropertyURI");
                     if (!deletedDataPropertyURIs.contains(dataPropertyURI)) {
                         deletedDataPropertyURIs.add(dataPropertyURI);
-                        dataPropertyStatementDao.deleteDataPropertyStatementsForIndividualByDataProperty(((Individual)epo.getNewBean()).getURI(),dataPropertyURI);
+                        dataPropertyStatementDao.deleteDataPropertyStatementsForIndividualByDataProperty(((Individual) epo.getNewBean()).getURI(), dataPropertyURI);
                     }
                     dataPropertyStmt.setDatapropURI(dataPropertyURI);
                 } catch (Exception e) {
                     log.error("Messed up beanParamMap?");
                 }
-                dataPropertyStmt.setData(data[dataRow]);
+                dataPropertyStmt.setData(aData);
                 Individual individual = null;
                 // need to rethink this
-                if (((Individual)epo.getOriginalBean()).getURI() != null) {
-                	individual = (Individual) epo.getOriginalBean();
+                if (((Individual) epo.getOriginalBean()).getURI() != null) {
+                    individual = (Individual) epo.getOriginalBean();
                     dataPropertyStmt.setIndividualURI(individual.getURI());
                 } else {
-                	individual = (Individual) epo.getNewBean();
+                    individual = (Individual) epo.getNewBean();
                     dataPropertyStmt.setIndividualURI(individual.getURI());
                 }
-                if (dataPropertyStmt.getData().length()>0 && rowId != null) {
-                	
-            		DataPropertyDao dataPropertyDao = (DataPropertyDao)epo.getAdditionalDaoMap().get("DataProperty");
-            		DataProperty dp = dataPropertyDao.getDataPropertyByURI(dataPropertyStmt.getDatapropURI());
-            		if (dp != null) {
-	            		String rangeDatatypeURI = dataPropertyDao.getRequiredDatatypeURI(individual, dp);
-	            		if (rangeDatatypeURI != null) {
-	            			dataPropertyStmt.setDatatypeURI(rangeDatatypeURI);
-	            			String validationMsg = BasicValidationVTwo.validateAgainstDatatype(dataPropertyStmt.getData(), rangeDatatypeURI);
-	            			// Since this backend editing system is de facto deprecated,
-	            			// not worrying about implementing per-field validation
-	            			if (validationMsg != null) {
-	            				validationMsg = "'" + dataPropertyStmt.getData() + "'"  
-	            				    + " is invalid. "
-	            				    + validationMsg;
-	            				throw new RuntimeException(validationMsg);
-	            			}
-	            		}
-            		}
-                	
+                if (dataPropertyStmt.getData().length() > 0 && rowId != null) {
+
+                    DataPropertyDao dataPropertyDao = (DataPropertyDao) epo.getAdditionalDaoMap().get("DataProperty");
+                    DataProperty dp = dataPropertyDao.getDataPropertyByURI(dataPropertyStmt.getDatapropURI());
+                    if (dp != null) {
+                        String rangeDatatypeURI = dataPropertyDao.getRequiredDatatypeURI(individual, dp);
+                        if (rangeDatatypeURI != null) {
+                            dataPropertyStmt.setDatatypeURI(rangeDatatypeURI);
+                            String validationMsg = BasicValidationVTwo.validateAgainstDatatype(dataPropertyStmt.getData(), rangeDatatypeURI);
+                            // Since this backend editing system is de facto deprecated,
+                            // not worrying about implementing per-field validation
+                            if (validationMsg != null) {
+                                validationMsg = "'" + dataPropertyStmt.getData() + "'"
+                                        + " is invalid. "
+                                        + validationMsg;
+                                throw new RuntimeException(validationMsg);
+                            }
+                        }
+                    }
+
                     dataPropertyStatementDao.insertNewDataPropertyStatement(dataPropertyStmt);
                 } //else if (dataPropertyStmt.getData().length()>0 && rowId != null) {
-                    // dataPropertyStatementDao.updateDataPropertyStatement(dataPropertyStmt);
+                // dataPropertyStatementDao.updateDataPropertyStatement(dataPropertyStmt);
                 //} else if (dataPropertyStmt.getData().length()==0 && rowId != null) {
-                    // dataPropertyStatementDao.deleteDataPropertyStatement(dataPropertyStmt);
+                // dataPropertyStatementDao.deleteDataPropertyStatement(dataPropertyStmt);
                 //}
             }
         }
     }
 
     // might want to roll this into the other thing
-    private HashMap datapropParameterMap(Map requestParameterMap) {
-        HashMap dpm = new HashMap();
-        Iterator paramIt = requestParameterMap.keySet().iterator();
-        while (paramIt.hasNext()) {
-            String key = (String) paramIt.next();
+    private Map<String, String[]> datapropParameterMap(Map<String, String[]> requestParameterMap) {
+        Map<String, String[]> dpm = new HashMap<String, String[]>();
+        for (String key : requestParameterMap.keySet()) {
             if (key.startsWith("_DataPropertyStatement")) {
-                dpm.put(key,requestParameterMap.get(key));
+                dpm.put(key, requestParameterMap.get(key));
             }
         }
         return dpm;

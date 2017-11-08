@@ -16,6 +16,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Red
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
+import javax.servlet.annotation.WebServlet;
+
+@WebServlet(name = "GadgetController", urlPatterns = {"/orng/*"})
 public class GadgetController extends FreemarkerHttpServlet {
 	
     private static final long serialVersionUID = 1L;
@@ -84,12 +87,12 @@ public class GadgetController extends FreemarkerHttpServlet {
         
         try {
 	        OpenSocialManager openSocialManager = new OpenSocialManager(vreq, "gadgetSandbox");
-	        String gadgetURLS = "";
+	        StringBuilder gadgetURLS = new StringBuilder();
 	        for (GadgetSpec gadget : openSocialManager.getAllDBGadgets(false).values())
 	        {
-	            gadgetURLS += gadget.getGadgetURL() + System.getProperty("line.separator");
+	            gadgetURLS.append(gadget.getGadgetURL()).append(System.getProperty("line.separator"));
 	        }
-	        body.put("gadgetURLS", gadgetURLS);
+	        body.put("gadgetURLS", gadgetURLS.toString());
 	        body.put(OpenSocialManager.TAG_NAME, openSocialManager);
         } catch (IOException e) {
             log.error("IOException in doTemplate()", e);

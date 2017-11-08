@@ -66,7 +66,7 @@
                 ${start}&nbsp;-&nbsp;${end}
             </#if>
         <#elseif start??>
-            ${start} -
+            ${start}&nbsp;-
         <#elseif end??>
             <#if endAsRange>-&nbsp;</#if>${end}
         </#if>

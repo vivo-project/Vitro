@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import javax.servlet.ServletContext;
+import javax.servlet.annotation.WebServlet;
 
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
@@ -36,6 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
  * Show a summary of who is logged in and how they are to be treated by the
  * authorization system.
  */
+@WebServlet(name = "ShowAuth", urlPatterns = {"/admin/showAuth"} )
 public class ShowAuthController extends FreemarkerHttpServlet {
 
 	@Override

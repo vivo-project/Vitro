@@ -3,11 +3,11 @@
 package edu.cornell.mannlib.vitro.webapp.controller.datatools.dumprestore;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,7 +21,6 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.FreemarkerHttpServ
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService.ResultFormat;
 import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
 
 /**
@@ -35,6 +34,7 @@ import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFServiceException;
  * The first request, the selection and the redirected dump should all be GET
  * requests. A restore should be a POST request.
  */
+@WebServlet(name = "DumpRestoreController", urlPatterns = {"/dumpRestore/*"} )
 public class DumpRestoreController extends FreemarkerHttpServlet {
 
 	private static final RequestedAction REQUIRED_ACTION = SimplePermission.USE_ADVANCED_DATA_TOOLS_PAGES.ACTION;

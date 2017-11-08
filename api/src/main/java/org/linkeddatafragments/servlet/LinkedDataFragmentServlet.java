@@ -1,6 +1,6 @@
 package org.linkeddatafragments.servlet;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.jena.riot.Lang;
 import org.linkeddatafragments.config.ConfigReader;
 import org.linkeddatafragments.datasource.DataSourceFactory;
@@ -89,7 +89,7 @@ public class LinkedDataFragmentServlet extends HttpServlet {
             }
 
             // register data sources
-            for (Entry<String, JsonObject> dataSource : config.getDataSources().entrySet()) {
+            for (Entry<String, JsonNode> dataSource : config.getDataSources().entrySet()) {
                 dataSources.put(dataSource.getKey(), DataSourceFactory.create(dataSource.getValue()));
             }
 

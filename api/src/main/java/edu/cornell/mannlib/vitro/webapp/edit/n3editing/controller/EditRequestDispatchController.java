@@ -7,6 +7,7 @@ import static edu.cornell.mannlib.vitro.webapp.edit.n3editing.VTwo.EditConfigura
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -47,6 +48,7 @@ import edu.cornell.mannlib.vitro.webapp.web.templatemodels.edit.MultiValueEditSu
  * form.  Try adding the behavior logic to the code that generates the
  * EditConfiguration for the form.  
  */
+@WebServlet(name = "EditRequestDispatch", urlPatterns = {"/editRequestDispatch"} )
 public class EditRequestDispatchController extends FreemarkerHttpServlet {
     private static final long serialVersionUID = 1L;
     public static Log log = LogFactory.getLog(EditRequestDispatchController.class);
@@ -333,15 +335,11 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     	WebappDaoFactory wdf = vreq.getWebappDaoFactory();
     	//TODO: Check if any error conditions are not met here
     	//At this point, if there is a form paramter, we don't require a predicate uri
-    	if(formParam == null 
-    			&& predicateUri != null 
-    			&& !EditConfigurationUtils.isObjectProperty(predicateUri, vreq) 
-    			&& !isVitroLabel(predicateUri)
-    			&& !EditConfigurationUtils.isDataProperty(predicateUri, vreq))
-    	{
-    		return true;
-    	}
-    	return false;
+        return formParam == null
+                && predicateUri != null
+                && !EditConfigurationUtils.isObjectProperty(predicateUri, vreq)
+                && !isVitroLabel(predicateUri)
+                && !EditConfigurationUtils.isDataProperty(predicateUri, vreq);
     }
     
     private String getErrorMessage(VitroRequest vreq) {
@@ -385,10 +383,7 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
     //TODO: Check how to integrate deletion
     private boolean isDeleteForm(VitroRequest vreq) {
     	String command = vreq.getParameter("cmd");
-        if ("delete".equals(command)) {
-       	 	return true;
-        }
-        return false;
+        return "delete".equals(command);
     }
     
        
@@ -402,14 +397,10 @@ public class EditRequestDispatchController extends FreemarkerHttpServlet {
             Class classDefinition = Class.forName(editConfGeneratorName);
             object = classDefinition.newInstance();
             EditConfigurationVTwoGenerator = (EditConfigurationGenerator) object;
-        } catch (InstantiationException e) {
+        } catch (InstantiationException | ClassNotFoundException | IllegalAccessException e) {
             System.out.println(e);
-        } catch (IllegalAccessException e) {
-            System.out.println(e);
-        } catch (ClassNotFoundException e) {
-            System.out.println(e);
-        }    	
-        
+        }
+
         if(EditConfigurationVTwoGenerator == null){
         	throw new Error("Could not find EditConfigurationVTwoGenerator " + editConfGeneratorName);        	
         } else {

@@ -63,7 +63,7 @@ public class VitroFilterUtils {
 
         @Override
 		public List<Individual> fn(List<Individual> individuals) {
-            Collections.sort(individuals,comparator);
+            individuals.sort(comparator);
             return individuals;
         }
 

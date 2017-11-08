@@ -197,11 +197,7 @@ public abstract class Authenticator {
 
 			// InternetAddress permits a localname without hostname.
 			// Guard against that.
-			if (emailAddress.indexOf('@') == -1) {
-				return false;
-			}
-
-			return true;
+			return emailAddress.indexOf('@') != -1;
 		} catch (AddressException e) {
 			return false;
 		}

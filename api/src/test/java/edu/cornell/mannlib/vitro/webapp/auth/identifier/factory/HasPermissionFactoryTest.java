@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.auth.identifier.factory;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -245,9 +246,7 @@ public class HasPermissionFactoryTest extends AbstractTestClass {
 
 	private <T> List<T> list(T... elements) {
 		List<T> l = new ArrayList<T>();
-		for (T element : elements) {
-			l.add(element);
-		}
+		Collections.addAll(l, elements);
 		return l;
 	}
 

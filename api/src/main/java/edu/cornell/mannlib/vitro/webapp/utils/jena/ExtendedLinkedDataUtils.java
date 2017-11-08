@@ -68,7 +68,7 @@ public class ExtendedLinkedDataUtils {
 		try {
 			try {
 				reader = new BufferedReader(new FileReader(sparqlFile));
-				StringBuffer fileContents = new StringBuffer();
+				StringBuilder fileContents = new StringBuilder();
 				String ln;
 			
 				while ( (ln = reader.readLine()) != null) {

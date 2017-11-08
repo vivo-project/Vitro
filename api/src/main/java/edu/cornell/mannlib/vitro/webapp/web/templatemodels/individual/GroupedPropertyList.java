@@ -219,7 +219,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
 
     protected void sort(List<Property> propertyList) {
         try {
-            Collections.sort(propertyList, new PropertyRanker(vreq));
+            propertyList.sort(new PropertyRanker(vreq));
         } catch (Exception ex) {
             log.error("Exception sorting merged property list: "
                     + ex.getMessage());
@@ -333,12 +333,9 @@ public class GroupedPropertyList extends BaseTemplateModel {
 								possibleOP.getURI(),
 								fudgeBlankNodeInRange(possibleOP.getRangeVClassURI())))) {
 			return true;
-		} else if (!(possibleOP instanceof FauxObjectPropertyWrapper) && 
-			         populatedOP.getURI().equals(possibleOP.getURI())) { // If not faux property, ignore range difference
-			return true;
-		} else {
-			return false;
-		}
+		} else // If not faux property, ignore range difference
+            return !(possibleOP instanceof FauxObjectPropertyWrapper) &&
+                    populatedOP.getURI().equals(possibleOP.getURI());
     }
 	
 	private String fudgeBlankNodeInDomain(String rawDomainUri) {
@@ -647,9 +644,7 @@ public class GroupedPropertyList extends BaseTemplateModel {
     }
     
     public PropertyGroupTemplateModel pullPropertyGroup(String groupName) {
-        Iterator<PropertyGroupTemplateModel> groupIt = groups.iterator();
-        while (groupIt.hasNext()) {
-            PropertyGroupTemplateModel group = groupIt.next();
+        for (PropertyGroupTemplateModel group : groups) {
             if (groupName.equals(group.getName())) {
                 groups.remove(group);
                 return group;

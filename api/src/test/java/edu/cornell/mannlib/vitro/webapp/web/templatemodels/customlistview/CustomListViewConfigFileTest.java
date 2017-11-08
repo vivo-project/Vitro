@@ -236,7 +236,7 @@ public class CustomListViewConfigFileTest extends AbstractTestClass {
 			String selectQuery, String[] constructQueries, String templateName,
 			String postprocessorName) {
 		assertEquals("select query", selectQuery,
-				configFile.getSelectQuery(collated, editing));
+				configFile.getSelectQuery(collated, editing, true));
 		assertEquals("construct queries",
 				new HashSet<String>(Arrays.asList(constructQueries)),
 				configFile.getConstructQueries());

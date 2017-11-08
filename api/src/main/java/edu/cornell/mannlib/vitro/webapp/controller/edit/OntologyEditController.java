@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,6 +26,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.OntologyDao;
 import edu.cornell.mannlib.vitro.webapp.dao.VitroVocabulary;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.OntologyDaoJena;
 
+@WebServlet(name = "OntologyEditController", urlPatterns = {"/ontologyEdit"} )
 public class OntologyEditController extends BaseEditController {
     private static final Log log = LogFactory.getLog(OntologyEditController.class.getName());
 

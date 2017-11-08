@@ -14,11 +14,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.cornell.mannlib.vitro.webapp.utils.JSPPageHandler;
-import org.apache.commons.collections.map.ListOrderedMap;
+import org.apache.commons.collections4.map.ListOrderedMap;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -51,6 +52,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.edit.listener.impl.IndividualDataPropertyStatementProcessor;
 
+@WebServlet(name = "EntityRetryController", urlPatterns = {"/entity_retry"} )
 public class EntityRetryController extends BaseEditController {
 	
 	private static final Log log = LogFactory.getLog(EntityRetryController.class.getName());
@@ -209,30 +211,26 @@ public class EntityRetryController extends BaseEditController {
         Collections.sort(allApplicableDataprops);
         
         if (allApplicableDataprops != null) {
-            Iterator<DataProperty> datapropsIt = allApplicableDataprops.iterator();
 
-            while (datapropsIt.hasNext()){
-                DataProperty d = datapropsIt.next();
+            for (DataProperty d : allApplicableDataprops) {
                 if (!dpMap.containsKey(d.getURI())) {
-                    dpMap.put(d.getURI(),d);
+                    dpMap.put(d.getURI(), d);
                 }
-				
+
             }
 
             if (individualForEditing.getDataPropertyList() != null) {
-                Iterator<DataProperty> existingDps = individualForEditing.getDataPropertyList().iterator();
-                while (existingDps.hasNext()) {
-                    DataProperty existingDp = existingDps.next();
-					// Since the edit form begins with a "name" field, which gets saved as the rdfs:label,
-					// do not want to include the label as well. 
-					if ( !existingDp.getPublicName().equals("label") ) {
-						dpMap.put(existingDp.getURI(),existingDp);
-					}
+                for (DataProperty existingDp : individualForEditing.getDataPropertyList()) {
+                    // Since the edit form begins with a "name" field, which gets saved as the rdfs:label,
+                    // do not want to include the label as well.
+                    if (!existingDp.getPublicName().equals("label")) {
+                        dpMap.put(existingDp.getURI(), existingDp);
+                    }
                 }
             }
 
             List<DynamicField> dynamicFields = new ArrayList();
-            Iterator<String> dpHashIt = dpMap.orderedMapIterator();
+            Iterator<String> dpHashIt = dpMap.mapIterator();
             while (dpHashIt.hasNext()) {
                 String uri = dpHashIt.next();
                 DataProperty dp = (DataProperty) dpMap.get(uri);
@@ -247,9 +245,7 @@ public class EntityRetryController extends BaseEditController {
                 rowTemplate.setParameterMap(parameterMap);
                 dynamo.setRowTemplate(rowTemplate);
                 try {
-                    Iterator<DataPropertyStatement> existingValues = dp.getDataPropertyStatements().iterator();
-                    while (existingValues.hasNext()) {
-                        DataPropertyStatement existingValue = existingValues.next();
+                    for (DataPropertyStatement existingValue : dp.getDataPropertyStatements()) {
                         DynamicFieldRow row = new DynamicFieldRow();
                         //TODO: UGH
                         //row.setId(existingValue.getId());

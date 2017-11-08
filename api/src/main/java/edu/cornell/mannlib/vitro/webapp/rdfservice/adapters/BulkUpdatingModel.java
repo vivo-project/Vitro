@@ -4,25 +4,20 @@ package edu.cornell.mannlib.vitro.webapp.rdfservice.adapters;
 
 import edu.cornell.mannlib.vitro.webapp.dao.jena.RDFServiceGraph;
 import edu.cornell.mannlib.vitro.webapp.dao.jena.SparqlGraph;
-import edu.cornell.mannlib.vitro.webapp.rdfservice.RDFService;
 import org.apache.jena.graph.Graph;
-import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFReaderF;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.rdf.model.impl.RDFReaderFImpl;
-import org.apache.jena.rdf.model.impl.StatementImpl;
 import org.apache.jena.shared.WrappedIOException;
 import org.apache.jena.sparql.graph.GraphFactory;
-import org.apache.jena.util.iterator.Map1;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.List;
 
 public class BulkUpdatingModel extends AbstractModelDecorator {
@@ -31,24 +26,33 @@ public class BulkUpdatingModel extends AbstractModelDecorator {
 
     protected BulkUpdatingModel(Model m) {
         super(m);
-        Graph graph = m.getGraph();
-        if (graph instanceof RDFServiceGraph) {
-            updater = new RDFServiceBulkUpdater((RDFServiceGraph)graph);
-        } else if (graph instanceof SparqlGraph) {
-            updater = new SparqlBulkUpdater((SparqlGraph)graph);
+        if (m instanceof BulkUpdatingModel) {
+            this.updater = ((BulkUpdatingModel) m).updater;
         } else {
-            updater  = null;
+            Graph graph = GraphUtils.unwrapUnionGraphs(m.getGraph());
+            if (graph instanceof RDFServiceGraph) {
+                updater = new RDFServiceBulkUpdater((RDFServiceGraph) graph);
+            } else if (graph instanceof SparqlGraph) {
+                updater = new SparqlBulkUpdater((SparqlGraph) graph);
+            } else {
+                updater = null;
+            }
         }
     }
 
-    protected BulkUpdatingModel(Model m, Graph graph) {
+    protected BulkUpdatingModel(Model m, Model baseModel) {
         super(m);
-        if (graph instanceof RDFServiceGraph) {
-            updater = new RDFServiceBulkUpdater((RDFServiceGraph)graph);
-        } else if (graph instanceof SparqlGraph) {
-            updater = new SparqlBulkUpdater((SparqlGraph)graph);
+        if (baseModel instanceof BulkUpdatingModel) {
+            this.updater = ((BulkUpdatingModel) baseModel).updater;
         } else {
-            updater  = null;
+            Graph graph = GraphUtils.unwrapUnionGraphs(baseModel.getGraph());
+            if (graph instanceof RDFServiceGraph) {
+                updater = new RDFServiceBulkUpdater((RDFServiceGraph) graph);
+            } else if (graph instanceof SparqlGraph) {
+                updater = new SparqlBulkUpdater((SparqlGraph) graph);
+            } else {
+                updater = null;
+            }
         }
     }
 

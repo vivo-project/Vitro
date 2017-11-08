@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.controller.api.sparqlquery;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.Collection;
 
 import org.apache.commons.io.IOUtils;

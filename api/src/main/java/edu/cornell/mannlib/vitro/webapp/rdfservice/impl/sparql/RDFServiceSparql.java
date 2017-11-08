@@ -178,9 +178,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		        this.notifyListenersOfEvent(o);
 			}
 
-			Iterator<ModelChange> csIt = changeSet.getModelChanges().iterator();
-			while (csIt.hasNext()) {
-				ModelChange modelChange = csIt.next();
+			for (ModelChange modelChange : changeSet.getModelChanges()) {
 				if (!modelChange.getSerializedModel().markSupported()) {
 					byte[] bytes = IOUtils.toByteArray(modelChange.getSerializedModel());
 					modelChange.setSerializedModel(new ByteArrayInputStream(bytes));
@@ -331,10 +329,8 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 			} finally {
 				EntityUtils.consume(response.getEntity());
 			}
-		} catch (IOException ioe) {
+		} catch (IOException | URISyntaxException ioe) {
 			throw new RuntimeException(ioe);
-		} catch (URISyntaxException e) {
-			throw new RuntimeException(e);
 		}
 	}
 
@@ -361,10 +357,8 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 			} finally {
 				EntityUtils.consume(response.getEntity());
 			}
-		} catch (IOException ioe) {
+		} catch (IOException | URISyntaxException ioe) {
 			throw new RuntimeException(ioe);
-		} catch (URISyntaxException e) {
-			throw new RuntimeException(e);
 		}
 	}
 
@@ -520,7 +514,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		}
 	}
 
-	public void addModel(Model model, String graphURI) throws RDFServiceException {
+	private void addModel(Model model, String graphURI) throws RDFServiceException {
 		try {
 		    long start = System.currentTimeMillis();
 			verbModel(model, graphURI, "INSERT");
@@ -530,7 +524,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		}
 	}
 
-	public void deleteModel(Model model, String graphURI) throws RDFServiceException {
+	private void deleteModel(Model model, String graphURI) throws RDFServiceException {
 		try {
 			verbModel(model, graphURI, "DELETE");
 		} finally {
@@ -549,10 +543,10 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 				if (count % CHUNK_SIZE == 0 || !stmtIt.hasNext()) {
 					StringWriter sw = new StringWriter();
 					m.write(sw, "N-TRIPLE");
-					StringBuffer updateStringBuff = new StringBuffer();
-					updateStringBuff.append(verb + " DATA { " + ((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "" ));
+					StringBuilder updateStringBuff = new StringBuilder();
+					updateStringBuff.append(verb).append(" DATA { ").append((graphURI != null) ? "GRAPH <" + graphURI + "> { " : "");
 					updateStringBuff.append(sw);
-					updateStringBuff.append(((graphURI != null) ? " } " : "") + " }");
+					updateStringBuff.append((graphURI != null) ? " } " : "").append(" }");
 
 					String updateString = updateStringBuff.toString();
 
@@ -762,7 +756,7 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 
 		StringBuffer queryBuff = new StringBuffer();
 		if (graphURI != null) {
-			queryBuff.append("WITH <" + graphURI + "> \n");
+			queryBuff.append("WITH <").append(graphURI).append("> \n");
 		}
 		queryBuff.append("DELETE { \n");
 		List<Statement> stmts = stmtIt.toList();
@@ -838,19 +832,19 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 			patternBuff.append(" .\n");
 			if (whereClause) {
 				if (t.getSubject().isBlank()) {
-					patternBuff.append("    FILTER(isBlank(" + SparqlGraph.sparqlNodeDelete(t.getSubject(), null)).append(")) \n");
+					patternBuff.append("    FILTER(isBlank(").append(SparqlGraph.sparqlNodeDelete(t.getSubject(), null)).append(")) \n");
 				}
 				if (t.getObject().isBlank()) {
-					patternBuff.append("    FILTER(isBlank(" + SparqlGraph.sparqlNodeDelete(t.getObject(), null)).append(")) \n");
+					patternBuff.append("    FILTER(isBlank(").append(SparqlGraph.sparqlNodeDelete(t.getObject(), null)).append(")) \n");
 				}
 			}
 		}
 	}
 
 	private String makeDescribe(org.apache.jena.rdf.model.Resource s) {
-		StringBuffer query = new StringBuffer("DESCRIBE <") ;
+		StringBuilder query = new StringBuilder("DESCRIBE <") ;
 		if (s.isAnon()) {
-			query.append("_:" + s.getId().toString());
+			query.append("_:").append(s.getId().toString());
 		} else {
 			query.append(s.getURI());
 		}
@@ -913,6 +907,11 @@ public class RDFServiceSparql extends RDFServiceImpl implements RDFService {
 		Model tripleStoreModel = new RDFServiceDataset(this).getNamedModel(graphURI);
 		Model fromTripleStoreModel = ModelFactory.createDefaultModel().add(tripleStoreModel);
 		return graph.isIsomorphicWith(fromTripleStoreModel);
+	}
+
+	@Override
+	public boolean preferPreciseOptionals() {
+		return false;
 	}
 
 	protected HttpContext getContext(HttpRequestBase request) {

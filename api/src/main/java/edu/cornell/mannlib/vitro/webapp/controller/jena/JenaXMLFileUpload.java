@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.stream.StreamSource;
@@ -36,7 +37,8 @@ import org.apache.jena.shared.Lock;
 import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 
-public class JenaXMLFileUpload  extends JenaIngestController  {	
+@WebServlet(name = "JenaXMLFileUpload", urlPatterns = {"/jenaXmlFileUpload/*"} )
+public class JenaXMLFileUpload  extends JenaIngestController  {
 	Log log = LogFactory.getLog(JenaXMLFileUpload.class);
 	private String baseDirectoryForFiles;
 	private int maxFileSize = 1024 * 1024 * 500;
@@ -151,7 +153,7 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
         } catch (Exception e) {
             System.out.println(this.getClass().getName()+" could not forward to view.");
             System.out.println(e.getMessage());
-            System.out.println(e.getStackTrace());
+            e.printStackTrace(System.out);
         }
 	}
 	
@@ -178,7 +180,7 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
         } catch (Exception e) {
             System.out.println(this.getClass().getName()+" could not forward to view.");
             System.out.println(e.getMessage());
-            System.out.println(e.getStackTrace());
+			e.printStackTrace(System.out);
         }
 		
 	}
@@ -205,7 +207,7 @@ public class JenaXMLFileUpload  extends JenaIngestController  {
 				XsltTransformer t = xsltExec.load();
 				//this is how to set parameters:
 				//t.setParameter(new QName("someparametername"), new XdmAtomicValue(10));				
-				Serializer out = new Serializer();
+				Serializer out = new Processor(false).newSerializer();
 				out.setOutputProperty(Serializer.Property.METHOD, "xml");
 				out.setOutputProperty(Serializer.Property.INDENT, "yes");
 				File outFile = new File(file.getAbsolutePath() + ".rdfxml");

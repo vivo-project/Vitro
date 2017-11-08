@@ -5,7 +5,6 @@ package edu.cornell.mannlib.vitro.webapp.imageprocessor.jai;
 import edu.cornell.mannlib.vitro.webapp.imageprocessor.imageio.IIOImageProcessor;
 import edu.cornell.mannlib.vitro.webapp.modules.Application;
 import edu.cornell.mannlib.vitro.webapp.modules.ComponentStartupStatus;
-import edu.cornell.mannlib.vitro.webapp.modules.imageProcessor.ImageProcessor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

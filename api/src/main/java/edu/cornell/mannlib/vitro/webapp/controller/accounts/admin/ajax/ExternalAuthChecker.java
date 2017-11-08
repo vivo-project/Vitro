@@ -8,10 +8,10 @@ import java.util.List;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.SelfEditingConfiguration;
@@ -56,7 +56,7 @@ class ExternalAuthChecker extends AbstractAjaxResponder {
 	}
 
 	@Override
-	public String prepareResponse() throws IOException, JSONException {
+	public String prepareResponse() throws IOException {
 		if (someoneElseIsUsingThisExternalAuthId()) {
 			return respondExternalAuthIdAlreadyUsed();
 		}
@@ -93,8 +93,8 @@ class ExternalAuthChecker extends AbstractAjaxResponder {
 		return true;
 	}
 
-	private String respondExternalAuthIdAlreadyUsed() throws JSONException {
-		JSONObject jsonObject = new JSONObject();
+	private String respondExternalAuthIdAlreadyUsed() {
+		ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 		jsonObject.put(RESPONSE_ID_IN_USE, true);
 		return jsonObject.toString();
 	}
@@ -110,12 +110,12 @@ class ExternalAuthChecker extends AbstractAjaxResponder {
 		this.matchingProfile = inds.get(0);
 	}
 
-	private String respondWithMatchingProfile() throws JSONException {
+	private String respondWithMatchingProfile() {
 		String uri = matchingProfile.getURI();
 		String url = UrlBuilder.getIndividualProfileUrl(uri, vreq);
 		String label = matchingProfile.getRdfsLabel();
 
-		JSONObject jsonObject = new JSONObject();
+		ObjectNode jsonObject = JsonNodeFactory.instance.objectNode();
 		jsonObject.put(RESPONSE_MATCHES_PROFILE, true);
 		jsonObject.put(RESPONSE_PROFILE_URI, uri);
 		jsonObject.put(RESPONSE_PROFILE_URL, url);

@@ -87,7 +87,7 @@ public class OptionsForPropertyTag extends TagSupport {
             if( stmts == null ) throw new Exception("object properties for subject were null");
 
             individuals = removeIndividualsAlreadyInRange(individuals,stmts);
-            Collections.sort(individuals,new  compareEnts());
+            individuals.sort(new compareEnts());
 
             JspWriter out = pageContext.getOut();
 

@@ -3,8 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 
-import org.apache.jena.ontology.AnnotationProperty;
-import org.apache.jena.ontology.OntClass;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -20,7 +18,6 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.shared.Lock;
-import org.apache.jena.util.iterator.ClosableIterator;
 import org.apache.jena.vocabulary.RDF;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -88,7 +85,7 @@ public class VClassDaoSDB extends VClassDaoJena {
                                 		}
                                     	vcw.setEntityCount(count);
                                     	classIsInstantiated = (count > 0);
-                                    } else if (includeUninstantiatedClasses == false) {
+                                    } else if (!includeUninstantiatedClasses) {
                                         // Note: to support SDB models, may want to do this with 
                                         // SPARQL and LIMIT 1 if SDB can take advantage of it
                                     	Model aboxModel = getOntModelSelector().getABoxModel();

@@ -16,7 +16,6 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Level;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -226,7 +225,7 @@ public class LanguageFilteringRDFServiceTest extends AbstractTestClass {
 		log.debug("before sorting: "
 				+ languagesFromLiterals(listOfRowIndexedLiterals));
 		Comparator<Object> comparator = buildRowIndexedLiteralSortByLang();
-		Collections.sort(listOfRowIndexedLiterals, comparator);
+		listOfRowIndexedLiterals.sort(comparator);
 	}
 
 	private void assertLanguageOrder(String message) {

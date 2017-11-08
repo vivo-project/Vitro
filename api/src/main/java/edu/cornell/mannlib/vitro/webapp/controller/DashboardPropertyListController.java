@@ -11,6 +11,7 @@ import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -36,6 +37,7 @@ import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
  * @author bdc34
  *
  */
+@WebServlet(name = "DashboardPropertyListController", urlPatterns = {"/dashboardPropList"} )
 public class DashboardPropertyListController extends VitroHttpServlet {
 
     /**
@@ -155,7 +157,7 @@ public class DashboardPropertyListController extends VitroHttpServlet {
             
             if (mergedPropertyList!=null) {
                 try {
-                    Collections.sort(mergedPropertyList,new PropertyRanker(vreq));
+                    mergedPropertyList.sort(new PropertyRanker(vreq));
                 } catch (Exception ex) {
                     log.error("Exception sorting merged property list: " + ex.getMessage());
                 }
@@ -274,7 +276,7 @@ public class DashboardPropertyListController extends VitroHttpServlet {
              }
              if (pg.getPropertyList().size()>1) {
                  try {
-                     Collections.sort(pg.getPropertyList(),new Property.DisplayComparatorIgnoringPropertyGroup());
+                     pg.getPropertyList().sort(new Property.DisplayComparatorIgnoringPropertyGroup());
                  } catch (Exception ex) {
                      log.error("Exception sorting property group "+pg.getName()+" property list: "+ex.getMessage());
                  }

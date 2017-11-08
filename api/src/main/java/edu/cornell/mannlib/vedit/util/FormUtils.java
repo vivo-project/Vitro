@@ -73,43 +73,38 @@ public class FormUtils {
 
         Method[] meths = beanClass.getMethods();
 
-        for (int i=0; i<meths.length; i++) {
+        for (Method currMeth : meths) {
 
-            if (meths[i].getName().indexOf("set") == 0) {
+            if (currMeth.getName().indexOf("set") == 0) {
 
                 // we have a setter method
-                Method currMeth = meths[i];
                 Class[] currMethParamTypes = currMeth.getParameterTypes();
                 Class currMethType = currMethParamTypes[0];
-                
+
                 if (SUPPORTED_TYPE_LIST.contains(currMethType)) {
-                	//we only want people directly to type in ints, strings, and dates
-                	//of course, most of the ints are probably foreign keys anyway...
+                    //we only want people directly to type in ints, strings, and dates
+                    //of course, most of the ints are probably foreign keys anyway...
 
                     String elementName = currMeth.getName().substring(
-                    		3,currMeth.getName().length());
+                            3, currMeth.getName().length());
 
                     //see if there's something in the bean using
                     //the related getter method
-
-                    Class[] paramClass = new Class[1];
-                    paramClass[0] = currMethType;
                     try {
                         Method getter = beanClass.getMethod(
-                        		"get" + elementName, (Class[]) null);
+                                "get" + elementName, (Class[]) null);
                         Object existingData = null;
                         try {
                             existingData = getter.invoke(bean, (Object[]) null);
                         } catch (Exception e) {
-                            log.error ("Exception invoking getter method");
+                            log.error("Exception invoking getter method");
                         }
                         String value = "";
-                        if (existingData != null){
-                            if (existingData instanceof String){
+                        if (existingData != null) {
+                            if (existingData instanceof String) {
                                 value += existingData;
-                            }
-                            else if (!(existingData instanceof Integer 
-                            		&& (Integer)existingData < 0)) {
+                            } else if (!(existingData instanceof Integer
+                                    && (Integer) existingData < 0)) {
                                 value += existingData.toString();
                             }
                         }
@@ -226,7 +221,7 @@ public class FormUtils {
             Option sOpt = new Option();
             sOpt.setValue(selectedValue);
             if (selectedBody == null || selectedBody.length() == 0)
-                sOpt.setBody(selectedValue.toString());
+                sOpt.setBody(selectedValue);
             else
                 sOpt.setBody(selectedBody);
             sOpt.setSelected(true);
@@ -272,11 +267,7 @@ public class FormUtils {
         	}
 		}
 		
-		Collections.sort(options, new Comparator<Option>() {
-			@Override
-			public int compare(Option o1, Option o2) {
-				return o1.getBody().compareTo(o2.getBody());
-			}});
+		options.sort((o1, o2) -> o1.getBody().compareTo(o2.getBody()));
 		
 		return options;
 	}
@@ -372,12 +363,12 @@ public class FormUtils {
      * key:value;key2:value2;key3:value, and puts the keys and values in a Map
      * @param params Parameters
      */
-    public static Map beanParamMapFromString(String params) {
+    public static Map<String, String> beanParamMapFromString(String params) {
         String[] param = params.split(";");
-        Map beanParamMap = new HashMap();
-        for (int i=0; i<param.length; i++) {
-            String[] p = param[i].split(":");
-            beanParamMap.put(p[0],new String(Base64.decodeBase64(p[1].getBytes())));
+        Map<String, String> beanParamMap = new HashMap<String, String>();
+        for (String aParam : param) {
+            String[] p = aParam.split(":");
+            beanParamMap.put(p[0], new String(Base64.decodeBase64(p[1].getBytes())));
         }
         return beanParamMap;
     }

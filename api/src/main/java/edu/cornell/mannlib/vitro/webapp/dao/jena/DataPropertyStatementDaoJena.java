@@ -470,7 +470,7 @@ public class DataPropertyStatementDaoJena extends JenaBaseDao implements DataPro
                                                  String propertyUri,
                                                  Set<String> constructQueries) {
         
-        if (constructQueries == null) {
+        if (constructQueries == null || constructQueries.isEmpty() ) {
             return null;
         }
         

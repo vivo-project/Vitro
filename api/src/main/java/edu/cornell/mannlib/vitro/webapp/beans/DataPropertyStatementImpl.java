@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.beans;
 
-import java.util.Date;
-
 /**
  * a class representing an particular instance of a data property
  *

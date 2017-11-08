@@ -3,7 +3,6 @@
 package edu.cornell.mannlib.vitro.webapp.dao.jena;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -122,7 +121,7 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
 	    		propInsts.add(propInst);
 	    	}
     	}
-    	Collections.sort(propInsts, new PropInstSorter());
+    	propInsts.sort(new PropInstSorter());
     	return propInsts;
     }
 
@@ -149,13 +148,9 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
         List existingPropertyInstances = new ArrayList();
         if (ent.getObjectPropertyList()==null)
             return existingPropertyInstances;
-        Iterator objPropertyIter = ent.getObjectPropertyList().iterator();
-        while (objPropertyIter.hasNext()) {
-            edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty op = (edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty) objPropertyIter.next();
-            Iterator objPropertyStmtIter = op.getObjectPropertyStatements().iterator();
-            while (objPropertyStmtIter.hasNext()) {
-                ObjectPropertyStatement objPropertyStmt = (ObjectPropertyStatement) objPropertyStmtIter.next();
-                if (propertyURI==null || objPropertyStmt.getPropertyURI().equals(propertyURI)) {
+        for (edu.cornell.mannlib.vitro.webapp.beans.ObjectProperty op : ent.getObjectPropertyList()) {
+            for (ObjectPropertyStatement objPropertyStmt : op.getObjectPropertyStatements()) {
+                if (propertyURI == null || objPropertyStmt.getPropertyURI().equals(propertyURI)) {
                     PropertyInstance pi = new PropertyInstance();
                     pi.setSubjectSide(true);
                     pi.setSubjectEntURI(ent.getURI());
@@ -167,7 +162,7 @@ public class PropertyInstanceDaoJena extends PropertyDaoJena implements
                     pi.setObjectEntURI(objPropertyStmt.getObjectURI());
                     pi.setPropertyURI(objPropertyStmt.getPropertyURI());
                     if (objPropertyStmt.getProperty() != null) {
-                        pi.setDomainPublic( (objPropertyStmt.getProperty().getDomainPublic()!=null) ? objPropertyStmt.getProperty().getDomainPublic() : objPropertyStmt.getProperty().getLocalName() );
+                        pi.setDomainPublic((objPropertyStmt.getProperty().getDomainPublic() != null) ? objPropertyStmt.getProperty().getDomainPublic() : objPropertyStmt.getProperty().getLocalName());
                     } else {
                         pi.setDomainPublic(objPropertyStmt.getPropertyURI());
                     }

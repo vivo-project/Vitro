@@ -190,11 +190,9 @@ public class VClassDaoFiltering extends BaseFiltering implements VClassDao{
         }
     }
 
-    public void addVClassesToGroups(List groups) {
+    public void addVClassesToGroups(List<VClassGroup> groups) {
         if ((groups != null) && (groups.size()>0)) {
-            Iterator groupIt = groups.iterator();
-            while (groupIt.hasNext()) {
-                VClassGroup g = (VClassGroup) groupIt.next();
+            for (VClassGroup g : groups) {
                 this.addVClassesToGroup(g);
             }
         } else {
@@ -204,9 +202,9 @@ public class VClassDaoFiltering extends BaseFiltering implements VClassDao{
             vcg.setLocalName("0");
             vcg.setPublicName("Browse Categories");
             vcg.addAll( this.getAllVclasses() );
-            java.util.Collections.sort(vcg.getVitroClassList(),new Comparator(){
-                public int compare(Object o1, Object o2){
-                    return ((VClass)o1).getName().compareTo(((VClass)o2).getName());
+            vcg.getVitroClassList().sort(new Comparator() {
+                public int compare(Object o1, Object o2) {
+                    return ((VClass) o1).getName().compareTo(((VClass) o2).getName());
                 }
             });
             groups.add(vcg);
@@ -223,7 +221,6 @@ public class VClassDaoFiltering extends BaseFiltering implements VClassDao{
         if( out != null )
             vclass.setEntityCount(out.size());
         System.out.println(vclass.getURI() + " count: " + vclass.getEntityCount());
-        return;
     }
 
     private List<VClass> correctVClassCounts(List<VClass> vclasses){

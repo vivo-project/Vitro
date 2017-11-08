@@ -12,6 +12,7 @@ import java.net.URLDecoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -45,6 +46,7 @@ import edu.cornell.mannlib.vitro.webapp.modules.fileStorage.FileStorage;
  * the file system, return a 500.
  * </p>
  */
+@WebServlet(name = "serveFiles", urlPatterns = {"/file/*"})
 public class FileServingServlet extends VitroHttpServlet {
 	/** If we can't locate the requested image, use this one instead. */
 	private static final String PATH_MISSING_LINK_IMAGE = "/images/missingLink.png";

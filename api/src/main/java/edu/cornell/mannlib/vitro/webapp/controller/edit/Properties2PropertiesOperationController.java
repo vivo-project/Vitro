@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 import java.io.IOException;
 import java.util.HashMap;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,6 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.PropertyDao;
 
+@WebServlet(name = "Properties2PropertiesOperationController", urlPatterns = {"/props2PropsOp"} )
 public class Properties2PropertiesOperationController extends
 		BaseEditController {
 	
@@ -100,14 +102,11 @@ public class Properties2PropertiesOperationController extends
 		        }
 		    }
 
-	    } catch (RuntimeException e) {
+	    } catch (RuntimeException | Error e) {
 	        log.error("Unable to perform edit operation: ", e);
 	        throw e;
-	    } catch (Error err) {
-	    	log.error("Unable to perform edit operation: ", err);
-	    	throw err;
 	    }
-        
+
     }
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) {
@@ -129,25 +128,25 @@ public class Properties2PropertiesOperationController extends
             if ((subpropertyURIstrs != null) && (subpropertyURIstrs.length > 1)) {
                 String superpropertyURIstr = request.getParameter("SuperpropertyURI");
                 if (superpropertyURIstr != null) {
-                    for (int i=0; i<subpropertyURIstrs.length; i++) {
-                    	if (modeStr.equals("equivalentProperty")) {
-                    		opDao.removeEquivalentProperty(superpropertyURIstr, subpropertyURIstrs[i]);
-                    	} else {
-                    		opDao.removeSuperproperty(subpropertyURIstrs[i], superpropertyURIstr);
-                    	}
-                    }
+					for (String subpropertyURIstr : subpropertyURIstrs) {
+						if (modeStr.equals("equivalentProperty")) {
+							opDao.removeEquivalentProperty(superpropertyURIstr, subpropertyURIstr);
+						} else {
+							opDao.removeSuperproperty(subpropertyURIstr, superpropertyURIstr);
+						}
+					}
                 }
             } else {
                 String subpropertyURIstr = subpropertyURIstrs[0];
                 String[] superpropertyURIstrs = request.getParameterValues("SuperpropertyURI");
                 if (superpropertyURIstrs != null) {
-                    for (int i=0; i<superpropertyURIstrs.length; i++) {
-                    	if (modeStr.equals("equivalentProperty")) {
-                        	opDao.removeEquivalentProperty(subpropertyURIstr,superpropertyURIstrs[i]);
-                        } else {
-                        	opDao.removeSuperproperty(subpropertyURIstr,superpropertyURIstrs[i]);
-                    	}
-                    }
+					for (String superpropertyURIstr : superpropertyURIstrs) {
+						if (modeStr.equals("equivalentProperty")) {
+							opDao.removeEquivalentProperty(subpropertyURIstr, superpropertyURIstr);
+						} else {
+							opDao.removeSuperproperty(subpropertyURIstr, superpropertyURIstr);
+						}
+					}
                 }
             }
         } else if (operation == ADD) {

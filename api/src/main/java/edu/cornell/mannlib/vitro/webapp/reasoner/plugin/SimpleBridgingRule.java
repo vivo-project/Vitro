@@ -100,7 +100,7 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
 	}
 
 	private Query createQuery(String queryString, Statement stmt, Statement statement2) {
-       String queryStr = new String(queryString);
+       String queryStr = queryString;
         if (stmt.getPredicate().equals(assertedProp1)) {
             queryStr = queryStr.replace(
                     "?x", "<" + stmt.getSubject().getURI() + ">");
@@ -174,23 +174,21 @@ public abstract class SimpleBridgingRule implements ReasonerPlugin {
         } else if (stmt.getPredicate().equals(assertedProp2)) {
             z = stmt.getObject();
         }
-        Iterator<Statement> sit = aboxInferencesModel.listStatements(x, this.inferredProp, z).toList().iterator();
-        
-        while(sit.hasNext()) {
-        	Statement s = sit.next();
-        	Query ask = createQuery(this.retractionTestString, stmt, s);
-        	QueryExecution qe = QueryExecutionFactory.create(ask, aboxAssertionsModel);
-        	try {
-            	if (!qe.execAsk()) {
-                    if (log.isDebugEnabled()) {
-                        log.debug("==> removing " + s);
-                    }
-                    if (simpleReasoner != null) simpleReasoner.removeInference(s,aboxInferencesModel);            	    
-            	}
-        	} finally {
-        	    qe.close();
-        	}
-        }     
+
+		for (Statement s : aboxInferencesModel.listStatements(x, this.inferredProp, z).toList()) {
+			Query ask = createQuery(this.retractionTestString, stmt, s);
+			QueryExecution qe = QueryExecutionFactory.create(ask, aboxAssertionsModel);
+			try {
+				if (!qe.execAsk()) {
+					if (log.isDebugEnabled()) {
+						log.debug("==> removing " + s);
+					}
+					if (simpleReasoner != null) simpleReasoner.removeInference(s, aboxInferencesModel);
+				}
+			} finally {
+				qe.close();
+			}
+		}
     }
 	
     private boolean isRelevantPredicate(Statement stmt) {

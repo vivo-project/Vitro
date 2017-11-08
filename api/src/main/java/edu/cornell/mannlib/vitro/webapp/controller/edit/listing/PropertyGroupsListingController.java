@@ -74,7 +74,7 @@ public class PropertyGroupsListingController extends BaseEditController {
                 results.add("XX");
                 List<Property> propertyList = pg.getPropertyList();
                 if (propertyList != null && propertyList.size() > 0) {
-                	Collections.sort(propertyList, comparator);
+                	propertyList.sort(comparator);
                     results.add("+");
                     results.add("XX");
                     results.add("property");

@@ -508,8 +508,8 @@ public class UpdateKnowledgeBase {
 					"containing RDF files.");
 		}
 		File[] rdfFiles = directory.listFiles();
-		for (int i = 0; i < rdfFiles.length; i++) {
-			readFile(rdfFiles[i], om, directoryPath);
+		for (File rdfFile : rdfFiles) {
+			readFile(rdfFile, om, directoryPath);
 		}
 		return om;
 	}

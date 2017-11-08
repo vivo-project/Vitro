@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -80,6 +81,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.jena.JenaOutputUtils;
 import edu.cornell.mannlib.vitro.webapp.utils.jena.WorkflowOntology;
 import edu.cornell.mannlib.vitro.webapp.utils.sparql.SparqlQueryUtils;
 
+@WebServlet(name = "JenaIngestController", urlPatterns = {"/ingest"} )
 public class JenaIngestController extends BaseEditController {
 	private static final Log log = LogFactory.getLog(JenaIngestController.class);
     
@@ -301,11 +303,11 @@ public class JenaIngestController extends BaseEditController {
         } catch (org.apache.jena.shared.CannotEncodeCharacterException cece) {
             // there's got to be a better way to do this
             byte[] badCharBytes = String.valueOf(cece.getBadChar()).getBytes();
-            String errorMsg = "Cannot encode character with byte values: (decimal) ";
-            for (int i=0; i<badCharBytes.length; i++) {
-                errorMsg += badCharBytes[i];
+            StringBuilder errorMsg = new StringBuilder("Cannot encode character with byte values: (decimal) ");
+            for (byte badCharByte : badCharBytes) {
+                errorMsg.append(badCharByte);
             }
-            throw new RuntimeException(errorMsg, cece);
+            throw new RuntimeException(errorMsg.toString(), cece);
         } catch (Exception e) {
             log.error(e, e);
         } finally {
@@ -342,8 +344,8 @@ public class JenaIngestController extends BaseEditController {
         JenaIngestUtils utils = new JenaIngestUtils();
         if(sourceModel != null && sourceModel.length != 0) {
             List<Model> sourceModelList = new ArrayList<Model>();
-            for (int i = 0; i < sourceModel.length ; i++) {
-                Model m = maker.getModel(sourceModel[i]);
+            for (String aSourceModel : sourceModel) {
+                Model m = maker.getModel(aSourceModel);
                 if (m != null) {
                     sourceModelList.add(m);
                 }
@@ -498,9 +500,7 @@ public class JenaIngestController extends BaseEditController {
         List<Ontology> ontologiesObj = daoObj.getAllOntologies();
         List<String> prefixList = new ArrayList<>();       
         if(ontologiesObj !=null && ontologiesObj.size()>0){
-            Iterator<Ontology> ontItr = ontologiesObj.iterator();
-            while(ontItr.hasNext()){
-                Ontology ont = ontItr.next();
+            for (Ontology ont : ontologiesObj) {
                 prefixList.add(ont.getPrefix() == null ? "(not yet specified)" : ont.getPrefix());
                 prefixList.add(ont.getURI() == null ? "" : ont.getURI());
             }
@@ -738,9 +738,8 @@ public class JenaIngestController extends BaseEditController {
                     files = new File[1];
                     files[0] = file;
                 }
-                for (int i=0; i<files.length; i++) {
-                    File currentFile = files[i];
-                    log.info("Reading file "+currentFile.getName());
+                for (File currentFile : files) {
+                    log.info("Reading file " + currentFile.getName());
                     FileInputStream fis;
                     try {
                         fis = new FileInputStream(currentFile);
@@ -792,8 +791,8 @@ public class JenaIngestController extends BaseEditController {
             source.addSubModel(
                     (Model) vreq.getSession().getAttribute("csv2rdfResult")); 
         } else {
-            for (int i=0; i<sourceModel.length; i++) {
-                Model m = getModel(sourceModel[i],vreq);
+            for (String aSourceModel : sourceModel) {
+                Model m = getModel(aSourceModel, vreq);
                 source.addSubModel(m);
             }
         }
@@ -823,8 +822,8 @@ public class JenaIngestController extends BaseEditController {
     private void doSmushSingleModel(VitroRequest vreq) {
         OntModel source = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
         String[] sourceModel = vreq.getParameterValues("sourceModelName");
-        for (int i=0; i<sourceModel.length; i++) {
-            Model m = getModel(sourceModel[i],vreq);
+        for (String aSourceModel : sourceModel) {
+            Model m = getModel(aSourceModel, vreq);
             source.addSubModel(m);
         }
         Model destination = getModel(vreq.getParameter("destinationModelName"),vreq);
@@ -843,8 +842,8 @@ public class JenaIngestController extends BaseEditController {
 		OntModel jenaOntModel = ModelAccess.on(getServletContext()).getOntModel();
         OntModel source = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
         String[] sourceModel = vreq.getParameterValues("sourceModelName");
-        for (int i=0; i<sourceModel.length; i++) {
-            Model m = getModel(sourceModel[i],vreq);
+        for (String aSourceModel : sourceModel) {
+            Model m = getModel(aSourceModel, vreq);
             source.addSubModel(m);
         }
         Model destination = getModel(vreq.getParameter("destinationModelName"),vreq); 
@@ -922,8 +921,8 @@ public class JenaIngestController extends BaseEditController {
     public void doGenerateTBox(VitroRequest vreq) {
         OntModel source = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM);
         String[] sourceModel = vreq.getParameterValues("sourceModelName");
-        for (int i=0; i<sourceModel.length; i++) {
-            Model m = getModel(sourceModel[i],vreq);
+        for (String aSourceModel : sourceModel) {
+            Model m = getModel(aSourceModel, vreq);
             source.addSubModel(m);
         }
         String destinationModelStr = vreq.getParameter("destinationModelName");
@@ -1023,13 +1022,13 @@ public class JenaIngestController extends BaseEditController {
                         char[] cleanChars = new char[chars.length];
                         int cleanPos = 0;
                         boolean badChar = false;
-                        for (int i=0; i<chars.length; i++) {
-                            if (java.lang.Character.getNumericValue(chars[i])>31 && java.lang.Character.isDefined(chars[i])) {
-                                cleanChars[cleanPos] = chars[i];
+                        for (char aChar : chars) {
+                            if (Character.getNumericValue(aChar) > 31 && Character.isDefined(aChar)) {
+                                cleanChars[cleanPos] = aChar;
                                 cleanPos++;
                             } else {
                                 log.error("Bad char in " + lex);
-                                log.error("Numeric value " + java.lang.Character.getNumericValue(chars[i])); 
+                                log.error("Numeric value " + Character.getNumericValue(aChar));
                                 badChar = true;
                             }
                         }

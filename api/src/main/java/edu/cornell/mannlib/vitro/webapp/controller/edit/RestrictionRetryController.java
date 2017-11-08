@@ -66,29 +66,38 @@ public class RestrictionRetryController extends BaseEditController {
 					
 			epo.setFormObject(new FormObject());
 			epo.getFormObject().getOptionLists().put("onProperty", onPropertyList);
-			
-			if (restrictionTypeStr.equals("someValuesFrom")) {
-				request.setAttribute("specificRestrictionForm","someValuesFromRestriction_retry.jsp");
-				List<Option> optionList = (propertyType == OBJECT) 
-					? getValueClassOptionList(request)
-					: getValueDatatypeOptionList(request) ;
-				epo.getFormObject().getOptionLists().put("ValueClass",optionList);
-			} else if (restrictionTypeStr.equals("allValuesFrom")) {
-				request.setAttribute("specificRestrictionForm","allValuesFromRestriction_retry.jsp");
-				List<Option> optionList = (propertyType == OBJECT) 
-					? getValueClassOptionList(request)
-				    : getValueDatatypeOptionList(request) ;
-				epo.getFormObject().getOptionLists().put("ValueClass",optionList);
-			} else if (restrictionTypeStr.equals("hasValue")) {
-				request.setAttribute("specificRestrictionForm", "hasValueRestriction_retry.jsp");
-				if (propertyType == OBJECT) {
-					request.setAttribute("propertyType", "object");	
-				} else {
-					request.setAttribute("propertyType", "data");
-				}	
-			} else if (restrictionTypeStr.equals("minCardinality") || restrictionTypeStr.equals("maxCardinality") || restrictionTypeStr.equals("cardinality")) {
-				request.setAttribute("specificRestrictionForm", "cardinalityRestriction_retry.jsp");
-			} 
+
+			switch (restrictionTypeStr) {
+				case "someValuesFrom": {
+					request.setAttribute("specificRestrictionForm", "someValuesFromRestriction_retry.jsp");
+					List<Option> optionList = (propertyType == OBJECT)
+							? getValueClassOptionList(request)
+							: getValueDatatypeOptionList(request);
+					epo.getFormObject().getOptionLists().put("ValueClass", optionList);
+					break;
+				}
+				case "allValuesFrom": {
+					request.setAttribute("specificRestrictionForm", "allValuesFromRestriction_retry.jsp");
+					List<Option> optionList = (propertyType == OBJECT)
+							? getValueClassOptionList(request)
+							: getValueDatatypeOptionList(request);
+					epo.getFormObject().getOptionLists().put("ValueClass", optionList);
+					break;
+				}
+				case "hasValue":
+					request.setAttribute("specificRestrictionForm", "hasValueRestriction_retry.jsp");
+					if (propertyType == OBJECT) {
+						request.setAttribute("propertyType", "object");
+					} else {
+						request.setAttribute("propertyType", "data");
+					}
+					break;
+				case "minCardinality":
+				case "maxCardinality":
+				case "cardinality":
+					request.setAttribute("specificRestrictionForm", "cardinalityRestriction_retry.jsp");
+					break;
+			}
 			
 	        request.setAttribute("formJsp","/templates/edit/specific/restriction_retry.jsp");
 	        request.setAttribute("scripts","/templates/edit/formBasic.js");

@@ -18,6 +18,9 @@ import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.Tem
 import edu.cornell.mannlib.vitro.webapp.reasoner.SimpleReasoner;
 import edu.cornell.mannlib.vitro.webapp.utils.threads.VitroBackgroundThread;
 
+import javax.servlet.annotation.WebServlet;
+
+@WebServlet(name = "SimpleReasonerRecomputeController", urlPatterns = {"/RecomputeInferences"} )
 public class SimpleReasonerRecomputeController extends FreemarkerHttpServlet {
 
     private static final Log log = LogFactory.getLog(

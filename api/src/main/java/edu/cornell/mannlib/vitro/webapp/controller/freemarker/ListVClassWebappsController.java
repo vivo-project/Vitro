@@ -26,7 +26,10 @@ import edu.cornell.mannlib.vitro.webapp.dao.VClassGroupDao;
 import edu.cornell.mannlib.vitro.webapp.dao.WebappDaoFactory;
 import edu.cornell.mannlib.vitro.webapp.utils.json.JacksonUtils;
 
+import javax.servlet.annotation.WebServlet;
 
+
+@WebServlet(name = "ListVClassWebappsController", urlPatterns = {"/listVClassWebapps"} )
 public class ListVClassWebappsController extends FreemarkerHttpServlet {
 
     private static final Log log = LogFactory.getLog(ListVClassWebappsController.class.getName());
@@ -73,61 +76,60 @@ public class ListVClassWebappsController extends FreemarkerHttpServlet {
         	}
 
         }
-        String json = new String();
+        StringBuilder json = new StringBuilder();
         int counter = 0;
 
         String ontologyURI = vreq.getParameter("ontologyUri");
 
         if (classes != null) {
             sortForPickList(classes, vreq);
-            Iterator<VClass> classesIt = classes.iterator();
-            while (classesIt.hasNext()) {
-                if ( counter > 0 ) {
-                    json += ", ";
-                }
-                VClass cls = (VClass) classesIt.next();
-                if ( (ontologyURI==null) || ( (ontologyURI != null) && (cls.getNamespace()!=null) && (ontologyURI.equals(cls.getNamespace())) ) ) {
-	                if (cls.getName() != null)
-	                    try {
-	                        json += "{ \"name\": " + JacksonUtils.quote("<a href='./vclassEdit?uri="+URLEncoder.encode(cls.getURI(),"UTF-8")+"'>"+cls.getPickListName()+"</a>") + ", ";
-	                    } catch (Exception e) {
-	                        json += "{ \"name\": " + JacksonUtils.quote(cls.getPickListName()) + ", ";
-	                    }
-	                else
-	                    json += "{ \"name\": \"\"";
-	                String shortDef = (cls.getShortDef() == null) ? "" : cls.getShortDef();
-	                
-	                json += "\"data\": { \"shortDef\": " + JacksonUtils.quote(shortDef) + ", ";
+			for (VClass aClass : classes) {
+				if (counter > 0) {
+					json.append(", ");
+				}
+				VClass cls = aClass;
+				if ((ontologyURI == null) || ((ontologyURI != null) && (cls.getNamespace() != null) && (ontologyURI.equals(cls.getNamespace())))) {
+					if (cls.getName() != null)
+						try {
+							json.append("{ \"name\": ").append(JacksonUtils.quote("<a href='./vclassEdit?uri=" + URLEncoder.encode(cls.getURI(), "UTF-8") + "'>" + cls.getPickListName() + "</a>")).append(", ");
+						} catch (Exception e) {
+							json.append("{ \"name\": ").append(JacksonUtils.quote(cls.getPickListName())).append(", ");
+						}
+					else
+						json.append("{ \"name\": \"\"");
+					String shortDef = (cls.getShortDef() == null) ? "" : cls.getShortDef();
 
-	                // get group name
-	                WebappDaoFactory wadf = vreq.getUnfilteredWebappDaoFactory();
-	                VClassGroupDao groupDao= wadf.getVClassGroupDao();
-	                String groupURI = cls.getGroupURI();                
-	                String groupName = "";
-	                VClassGroup classGroup = null;
-	                if(groupURI != null) { 
-	                	classGroup = groupDao.getGroupByURI(groupURI);
-	                	if (classGroup!=null) {
-	                	    groupName = classGroup.getPublicName();
-	                	}
-	                }
-                    
-                    json += "\"classGroup\": " + JacksonUtils.quote(groupName) + ", ";
+					json.append("\"data\": { \"shortDef\": ").append(JacksonUtils.quote(shortDef)).append(", ");
 
-	                // get ontology name
-	                OntologyDao ontDao = wadf.getOntologyDao();
-	                String ontName = cls.getNamespace();
-	                Ontology ont = ontDao.getOntologyByURI(ontName);
-	                if (ont != null && ont.getName() != null) {
-	                    ontName = ont.getName();
-	                }
-	                json += "\"ontology\": " + JacksonUtils.quote(ontName) + "} }";
-	                
-	                counter++;
+					// get group name
+					WebappDaoFactory wadf = vreq.getUnfilteredWebappDaoFactory();
+					VClassGroupDao groupDao = wadf.getVClassGroupDao();
+					String groupURI = cls.getGroupURI();
+					String groupName = "";
+					VClassGroup classGroup = null;
+					if (groupURI != null) {
+						classGroup = groupDao.getGroupByURI(groupURI);
+						if (classGroup != null) {
+							groupName = classGroup.getPublicName();
+						}
+					}
 
-               }
-            }
-            body.put("jsonTree",json);
+					json.append("\"classGroup\": ").append(JacksonUtils.quote(groupName)).append(", ");
+
+					// get ontology name
+					OntologyDao ontDao = wadf.getOntologyDao();
+					String ontName = cls.getNamespace();
+					Ontology ont = ontDao.getOntologyByURI(ontName);
+					if (ont != null && ont.getName() != null) {
+						ontName = ont.getName();
+					}
+					json.append("\"ontology\": ").append(JacksonUtils.quote(ontName)).append("} }");
+
+					counter++;
+
+				}
+			}
+            body.put("jsonTree", json.toString());
         }      
         
         return new TemplateResponseValues(TEMPLATE_NAME, body);

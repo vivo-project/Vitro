@@ -2,11 +2,11 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.json;
 
-import java.util.ArrayList;
-
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
 import edu.cornell.mannlib.vitro.webapp.beans.VClassGroup;
@@ -26,8 +26,8 @@ public class GetVClassesForVClassGroup extends JsonObjectProducer {
 	}
 
 	@Override
-	protected JSONObject process() throws Exception {                
-        JSONObject map = new JSONObject();           
+	protected ObjectNode process() throws Exception {
+        ObjectNode map = JsonNodeFactory.instance.objectNode();
         String vcgUri = vreq.getParameter("classgroupUri");
         if( vcgUri == null ){
             throw new Exception("no URI passed for classgroupUri");
@@ -38,10 +38,10 @@ public class GetVClassesForVClassGroup extends JsonObjectProducer {
         if( vcg == null ){
             throw new Exception("Could not find vclassgroup: " + vcgUri);
         }        
-                        
-        ArrayList<JSONObject> classes = new ArrayList<JSONObject>(vcg.size());
+
+        ArrayNode classes = JsonNodeFactory.instance.arrayNode();
         for( VClass vc : vcg){
-            JSONObject vcObj = new JSONObject();
+            ObjectNode vcObj = JsonNodeFactory.instance.objectNode();
             vcObj.put("name", vc.getName());
             vcObj.put("URI", vc.getURI());
             vcObj.put("entityCount", vc.getEntityCount());

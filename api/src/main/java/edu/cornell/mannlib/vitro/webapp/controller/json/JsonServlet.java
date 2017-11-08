@@ -7,12 +7,13 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.DataProperty;
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
@@ -31,6 +32,7 @@ import edu.cornell.mannlib.vitro.webapp.utils.log.LogUtils;
  *
  * Moved most of the logic into a group of JsonProducer classes. jeb228
  */
+@WebServlet(name = "JSONService", urlPatterns = {"/dataservice"} )
 public class JsonServlet extends VitroHttpServlet {
     private static final long serialVersionUID = 1L;
     private static final Log log = LogFactory.getLog(JsonServlet.class);
@@ -80,7 +82,7 @@ public class JsonServlet extends VitroHttpServlet {
     }
     
 
-    public static JSONObject getSearchIndividualsByVClass(String vclassURI, HttpServletRequest req) throws Exception {
+    public static ObjectNode getSearchIndividualsByVClass(String vclassURI, HttpServletRequest req) throws Exception {
         List<String> vclassURIs = Collections.singletonList(vclassURI);
         VitroRequest vreq = new VitroRequest(req);        
         
@@ -89,7 +91,7 @@ public class JsonServlet extends VitroHttpServlet {
         return IndividualListResultsUtils.wrapIndividualListResultsInJson(vcResults, vreq, false);                    
     }
 
-    public static JSONObject getSearchIndividualsByVClasses(List<String> vclassURIs, HttpServletRequest req) throws Exception {
+    public static ObjectNode getSearchIndividualsByVClasses(List<String> vclassURIs, HttpServletRequest req) throws Exception {
    	 	VitroRequest vreq = new VitroRequest(req);   
    	 	log.debug("Retrieve search results for vclasses" + vclassURIs.toString());
         IndividualListResults vcResults = getSearchVClassIntersectionResults(vclassURIs, vreq);
@@ -124,7 +126,7 @@ public class JsonServlet extends VitroHttpServlet {
             return value;            
     }
     
-    public static JSONObject getRandomSearchIndividualsByVClass(String vclassURI, HttpServletRequest req) throws Exception {
+    public static ObjectNode getRandomSearchIndividualsByVClass(String vclassURI, HttpServletRequest req) throws Exception {
         VitroRequest vreq = new VitroRequest(req);        
         
         IndividualListResults vcResults = getRandomSearchVClassResults(vclassURI, vreq);

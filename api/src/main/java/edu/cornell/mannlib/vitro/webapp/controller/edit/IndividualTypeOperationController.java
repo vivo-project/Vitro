@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.edit;
 import java.io.IOException;
 import java.util.HashMap;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,6 +18,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.permissions.SimplePermission;
 import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.dao.IndividualDao;
 
+@WebServlet(name = "IndividualTypeOperationController", urlPatterns = {"/individualTypeOp"} )
 public class IndividualTypeOperationController extends BaseEditController {
 
     private static final Log log = LogFactory.getLog(IndividualTypeOperationController.class.getName());
@@ -65,9 +67,9 @@ public class IndividualTypeOperationController extends BaseEditController {
 	                String[] typeURIstrs = request.getParameterValues("TypeURI");
 	                String individualURIstr = request.getParameter("individualURI");
 	                    if (individualURIstr != null) {
-	                        for (int i=0; i<typeURIstrs.length; i++) {                        	
-	                            dao.removeVClass(individualURIstr, typeURIstrs[i]);
-	                        }
+                            for (String typeURIstr : typeURIstrs) {
+                                dao.removeVClass(individualURIstr, typeURIstr);
+                            }
 	                    }
 	            } else if (request.getParameter("operation").equals("add")) {
 		                dao.addVClass(request.getParameter("individualURI"),request.getParameter("TypeURI"));

@@ -11,11 +11,11 @@ import java.util.ListIterator;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import edu.cornell.mannlib.vitro.webapp.beans.Individual;
 import edu.cornell.mannlib.vitro.webapp.beans.VClass;
@@ -50,7 +50,7 @@ public class GetEntitiesByVClass extends JsonArrayProducer {
 	}
 
 	@Override
-	protected JSONArray process() throws ServletException {
+	protected ArrayNode process() throws ServletException {
         log.debug("in getEntitiesByVClass()");
         String vclassURI = vreq.getParameter("vclassURI");
         WebappDaoFactory daos = vreq.getUnfilteredWebappDaoFactory();
@@ -96,26 +96,22 @@ public class GetEntitiesByVClass extends JsonArrayProducer {
 
         
         //put all the entities on the JSON array
-        JSONArray ja =  individualsToJson( entsToReturn );
+        ArrayNode ja =  individualsToJson( entsToReturn );
         
         //put the responseGroup number on the end of the JSON array
         if( more ){
-            try{
-                JSONObject obj = new JSONObject();
-                obj.put("resultGroup", "true");
-                obj.put("size", count);
-                obj.put("total", numberOfEntsInVClass);
+            ObjectNode obj = JsonNodeFactory.instance.objectNode();
+            obj.put("resultGroup", "true");
+            obj.put("size", count);
+            obj.put("total", numberOfEntsInVClass);
 
-                StringBuffer nextUrlStr = vreq.getRequestURL();
-                nextUrlStr.append("?")
-                        .append("getEntitiesByVClass").append( "=1&" )
-                        .append("resultKey=").append( requestHash );
-                obj.put("nextUrl", nextUrlStr.toString());
+            StringBuffer nextUrlStr = vreq.getRequestURL();
+            nextUrlStr.append("?")
+                    .append("getEntitiesByVClass").append( "=1&" )
+                    .append("resultKey=").append( requestHash );
+            obj.put("nextUrl", nextUrlStr.toString());
 
-                ja.put(obj);
-            }catch(JSONException je ){
-                throw new ServletException("unable to create continuation as JSON: " + je.getMessage());
-            }
+            ja.add(obj);
         }
         
         log.debug("done with getEntitiesByVClass()");

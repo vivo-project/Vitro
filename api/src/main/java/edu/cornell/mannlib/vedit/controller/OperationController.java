@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,6 +28,7 @@ import edu.cornell.mannlib.vedit.util.OperationUtils;
 import edu.cornell.mannlib.vedit.validator.ValidationObject;
 import edu.cornell.mannlib.vedit.validator.Validator;
 
+@WebServlet(name = "OperationController", urlPatterns = {"/doEdit"} )
 public class OperationController extends BaseEditController {
 	
     private static final Log log = LogFactory.getLog(OperationController.class.getName());
@@ -127,27 +129,31 @@ public class OperationController extends BaseEditController {
             notifyChangeListeners(epo, action);
 
             /* send the user somewhere */
-            if (action.equals("insert")){
-                // Object[] args = new Object[1];
-                // args[0] = result;
-                // epo.setNewBean(epo.getGetMethod().invoke(facade,args));
-                PageForwarder pipf = epo.getPostInsertPageForwarder();
-                if (pipf != null){
-                    pipf.doForward(request,response,epo);
-                    return;
-                }
-            } else if (action.equals("update")){
-                PageForwarder pupf = epo.getPostUpdatePageForwarder();
-                if (pupf != null) {
-                    pupf.doForward(request,response,epo);
-                    return;
-                }
-            } else if (action.equals("delete")){
-                PageForwarder pdpf = epo.getPostDeletePageForwarder();
-                if (pdpf != null) {
-                    pdpf.doForward(request,response,epo);
-                    return;
-                }
+            switch (action) {
+                case "insert":
+                    // Object[] args = new Object[1];
+                    // args[0] = result;
+                    // epo.setNewBean(epo.getGetMethod().invoke(facade,args));
+                    PageForwarder pipf = epo.getPostInsertPageForwarder();
+                    if (pipf != null) {
+                        pipf.doForward(request, response, epo);
+                        return;
+                    }
+                    break;
+                case "update":
+                    PageForwarder pupf = epo.getPostUpdatePageForwarder();
+                    if (pupf != null) {
+                        pupf.doForward(request, response, epo);
+                        return;
+                    }
+                    break;
+                case "delete":
+                    PageForwarder pdpf = epo.getPostDeletePageForwarder();
+                    if (pdpf != null) {
+                        pdpf.doForward(request, response, epo);
+                        return;
+                    }
+                    break;
             }
 
             //if no page forwarder was set, just go back to referring page:
@@ -168,7 +174,6 @@ public class OperationController extends BaseEditController {
        
             try {
             	retry(request, response, epo);
-            	return;
             } catch (IOException ioe) {
             	log.error(this.getClass().getName() + " IOError on redirect: ", ioe);
             }
@@ -196,17 +201,12 @@ public class OperationController extends BaseEditController {
         } else {
         	response.sendRedirect(getDefaultLandingPage(request));
         }
-        return;
     }
     
     private void runPreprocessors(EditProcessObject epo, Object newObj) {
     	if (epo.getPreProcessorList() != null && epo.getPreProcessorList().size()>0) {
-            Iterator preIt = epo.getPreProcessorList().iterator();
-            while (preIt.hasNext()) {
-                try {
-                	EditPreProcessor epp = (EditPreProcessor) preIt.next();
-                	epp.process(newObj, epo);
-                } catch (ClassCastException e) {}
+            for (EditPreProcessor epp : epo.getPreProcessorList()) {
+                epp.process(newObj, epo);
             }
         }
     }
@@ -254,14 +254,14 @@ public class OperationController extends BaseEditController {
                     List validatorList = (List) epo.getValidatorMap().get(currParam);
                     if (validatorList != null) {
                         Iterator valIt = validatorList.iterator();
-                        String errMsg = "";
+                        StringBuilder errMsg = new StringBuilder();
                         while (valIt.hasNext()){
                             Validator val = (Validator)valIt.next();
                             ValidationObject vo = val.validate(currValue);
                             if (!vo.getValid()){
                                 valid = false;
                                 fieldValid = false;
-                                errMsg += vo.getMessage() + " ";
+                                errMsg.append(vo.getMessage()).append(" ");
                                 epo.getBadValueMap().put(currParam,currValue);
                             } else {
                                 try {
@@ -271,7 +271,7 @@ public class OperationController extends BaseEditController {
                             }
                         }
                         if (errMsg.length()>0) {
-                            epo.getErrMsgMap().put(currParam,errMsg);
+                            epo.getErrMsgMap().put(currParam, errMsg.toString());
                             log.info("doPost() putting error message "+errMsg+" for "+currParam);
                         }
                     }
@@ -325,15 +325,18 @@ public class OperationController extends BaseEditController {
     private void notifyChangeListeners(EditProcessObject epo, String action) {
     	List<ChangeListener> changeListeners = epo.getChangeListenerList();
         if (changeListeners != null){
-            Iterator<ChangeListener> changeIt = changeListeners.iterator();
-            while (changeIt.hasNext()) {
-                ChangeListener cl = changeIt.next();
-                if (action.equals("insert"))
-                    cl.doInserted(epo.getNewBean(),epo);
-                else if (action.equals("update"))
-                    cl.doUpdated(epo.getOriginalBean(),epo.getNewBean(),epo);
-                else if (action.equals("delete"))
-                    cl.doDeleted(epo.getOriginalBean(),epo);
+            for (ChangeListener cl : changeListeners) {
+                switch (action) {
+                    case "insert":
+                        cl.doInserted(epo.getNewBean(), epo);
+                        break;
+                    case "update":
+                        cl.doUpdated(epo.getOriginalBean(), epo.getNewBean(), epo);
+                        break;
+                    case "delete":
+                        cl.doDeleted(epo.getOriginalBean(), epo);
+                        break;
+                }
             }
         }
     }
@@ -497,8 +500,6 @@ public class OperationController extends BaseEditController {
                 } catch (InvocationTargetException f) {
                     log.error(f.getTargetException().getMessage());
                 }
-            } catch (NoSuchMethodException e) {
-                //log.error("doPost() could not find setId() method for "+partialClassName);
             } catch (Exception f) {
                 //log.error("doPost() could not set id of new bean.");
             }

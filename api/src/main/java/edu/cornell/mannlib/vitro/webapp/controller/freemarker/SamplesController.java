@@ -14,11 +14,14 @@ import edu.cornell.mannlib.vitro.webapp.controller.VitroRequest;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.ResponseValues;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.responsevalues.TemplateResponseValues;
 
+import javax.servlet.annotation.WebServlet;
+
 /**
  * Freemarker controller and template samples.
  * @author rjy7
  *
  */
+@WebServlet(name = "FreemarkerSamplesController", urlPatterns = {"/freemarkersamples"} )
 public class SamplesController extends FreemarkerHttpServlet {
 
     private static final long serialVersionUID = 1L;

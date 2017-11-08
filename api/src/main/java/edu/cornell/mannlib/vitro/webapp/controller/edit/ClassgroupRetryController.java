@@ -68,7 +68,7 @@ public class ClassgroupRetryController extends BaseEditController {
                 }
                 if (vclassGroupForEditing == null) {                    
                     //UTF-8 expected due to URIEncoding on Connector in server.xml
-                    String uriToFind = new String(request.getParameter("uri"));
+                    String uriToFind = request.getParameter("uri");
                     vclassGroupForEditing = (VClassGroup)cgDao.getGroupByURI(uriToFind);
                 }
             } else {

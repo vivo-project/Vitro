@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,6 +28,7 @@ import edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.Messag
  * Handle the return from the external authorization login server. If we are
  * successful, record the login. Otherwise, display the failure.
  */
+@WebServlet(name = "loginExternalAuthReturn", urlPatterns = {"/loginExternalAuthReturn"})
 public class LoginExternalAuthReturn extends BaseLoginServlet {
 	private static final Log log = LogFactory
 			.getLog(LoginExternalAuthReturn.class);
@@ -102,14 +104,12 @@ public class LoginExternalAuthReturn extends BaseLoginServlet {
 			getAuthenticator(req).recordLoginAgainstUserAccount(userAccount,
 					AuthenticationSource.EXTERNAL);
 			new LoginRedirector(req, afterLoginUrl).redirectLoggedInUser(resp);
-			return;
-		} catch (LoginNotPermitted e) {
+        } catch (LoginNotPermitted e) {
 			// should have been caught by isUserPermittedToLogin()
 			log.debug("Logins disabled for " + userAccount);
 			complainAndReturnToReferrer(req, resp, ATTRIBUTE_REFERRER,
 					messageLoginDisabled(req));
-			return;
-		}
+        }
 	}
 
 	@Override

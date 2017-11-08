@@ -3,9 +3,8 @@
 package edu.cornell.mannlib.vedit.tags;
 
 import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.TagSupport;
 import javax.servlet.jsp.JspWriter;
-import edu.cornell.mannlib.vedit.beans.FormObject;
+
 import edu.cornell.mannlib.vedit.tags.EditTag;
 import org.apache.commons.lang3.StringEscapeUtils;
 
