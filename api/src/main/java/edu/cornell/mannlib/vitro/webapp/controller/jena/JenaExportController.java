@@ -106,7 +106,10 @@ public class JenaExportController extends BaseEditController {
 		String formatParam = vreq.getParameter("format");
 		String subgraphParam = vreq.getParameter("subgraph");
 		String assertedOrInferredParam = vreq.getParameter("assertedOrInferred");
-		StringBuilder ontologyURI = new StringBuilder(vreq.getParameter("ontologyURI"));
+		StringBuilder ontologyURI = new StringBuilder();
+		if (vreq.getParameter("ontologyURI") != null) {
+			ontologyURI.append(vreq.getParameter("ontologyURI"));
+		}
 		
 		Model model = null;
 		OntModel ontModel = ModelFactory.createOntologyModel();

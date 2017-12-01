@@ -96,6 +96,7 @@ public class SparqlQueryController extends FreemarkerHttpServlet {
 				SimplePermission.USE_SPARQL_QUERY_PAGE.ACTION)) {
 			return;
 		}
+		resp.addHeader("X-XSS-Protection", "0");
 		if (req.getParameterMap().containsKey("query")) {
 			respondToQuery(req, resp);
 		} else {
