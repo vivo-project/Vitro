@@ -23,22 +23,22 @@ import edu.cornell.mannlib.vitro.webapp.startup.StartupStatus;
 /**
  * Locates the runtime configuration properties and stores them in the servlet
  * context.
- * 
+ *
  * This must be invoked before any listener that requires configuration
  * properties.
- * 
+ *
  * The properties are determined from a file called 'build.properties' in the
  * resources directory of the webapp, and a file called 'runtime.properties' in
  * the Vitro home directory. In case of conflict, runtime.properties wins.
- * 
+ *
  * The path to the Vitro home directory can be specifed by an JNDI value, or by
  * a System property, or by a property in build.properties, in that order. If
  * the Vitro home directory is specified in more than one way, a warning is
  * issued and the first value is used.
- * 
+ *
  * The value that was determined for 'vitro.home' is also included in the
  * ConfigurationProperties bean.
- * 
+ *
  * If build.properties or runtime.properties cannot be located or loaded, a
  * fatal error is registered to abort the startup.
  */
@@ -63,8 +63,11 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 				File vitroHomeDir = ApplicationUtils.instance()
 						.getHomeDirectory().getPath().toFile();
 
+				File vitroHomeDirConfig = new File(vitroHomeDir.getPath()
+						.concat(File.separator).concat("config"));
+
 				File runtimePropertiesFile = locateRuntimePropertiesFile(
-						vitroHomeDir, ss);
+						vitroHomeDir, vitroHomeDirConfig, ss);
 				stream = new FileInputStream(runtimePropertiesFile);
 
 				Map<String, String> preempts = createPreemptiveProperties(
@@ -90,13 +93,18 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 		}
 	}
 
-	private File locateRuntimePropertiesFile(File vitroHomeDir, StartupStatus ss) {
+	private File locateRuntimePropertiesFile(File vitroHomeDir,
+			File vitroHomeDirConfig, StartupStatus ss) {
+
 		File rpf = new File(vitroHomeDir, FILE_RUNTIME_PROPERTIES);
 
 		if (!rpf.exists()) {
+			rpf = new File(vitroHomeDirConfig, FILE_RUNTIME_PROPERTIES);
+		}
+		if (!rpf.exists()) {
 			throw new IllegalStateException("Did not find '"
 					+ FILE_RUNTIME_PROPERTIES + "' in vitro home directory '"
-					+ vitroHomeDir + "'");
+					+ vitroHomeDir + "' or config directory '" + vitroHomeDirConfig + "'");
 		}
 		if (!rpf.isFile()) {
 			throw new IllegalStateException("'" + rpf.getPath()
