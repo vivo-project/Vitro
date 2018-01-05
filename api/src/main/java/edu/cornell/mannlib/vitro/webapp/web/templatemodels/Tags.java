@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import edu.cornell.mannlib.vitro.webapp.controller.freemarker.UrlBuilder;
 import freemarker.ext.beans.BeansWrapper;
+import freemarker.template.Configuration;
 import freemarker.template.TemplateModel;
 import freemarker.template.TemplateModelException;
 
@@ -72,6 +73,8 @@ public class Tags extends BaseTemplateModel {
 	static public class TagsWrapper extends BeansWrapper {
 
 		public TagsWrapper() {
+			super(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
+			
 			// Start by exposing all safe methods.
 			setExposureLevel(EXPOSE_SAFE);
 		}
