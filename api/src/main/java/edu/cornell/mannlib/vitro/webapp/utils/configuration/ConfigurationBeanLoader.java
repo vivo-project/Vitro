@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -34,16 +35,42 @@ public class ConfigurationBeanLoader {
 		return JAVA_URI_PREFIX + clazz.getName();
 	}
 
+	public static String toCanonicalJavaUri(String uri) {
+		return uri.replace("#", ".");
+	}
+
 	public static boolean isJavaUri(String uri) {
 		return uri.startsWith(JAVA_URI_PREFIX);
 	}
 
-	public static String fromJavaUri(String uri) {
-		if (!isJavaUri(uri)) {
-			throw new IllegalArgumentException("Not a java class URI: '" + uri
-					+ "'");
+	public static Set<String> toPossibleJavaUris(Class<?> clazz) {
+		Set<String> set = new TreeSet<>();
+		String[] uriPieces = toJavaUri(clazz).split("\\.");
+		for (int hashIndex = 0; hashIndex < uriPieces.length; hashIndex++) {
+			set.add(joinWithPeriodsAndAHash(uriPieces, hashIndex));
 		}
-		return uri.substring(JAVA_URI_PREFIX.length());
+		return set;
+	}
+
+	private static String joinWithPeriodsAndAHash(String[] pieces,
+			int hashIndex) {
+		StringBuilder buffer = new StringBuilder(pieces[0]);
+		for (int i = 1; i < pieces.length; i++) {
+			buffer.append(i == hashIndex ? '#' : '.').append(pieces[i]);
+		}
+		return buffer.toString();
+	}
+
+	public static String classnameFromJavaUri(String uri) {
+		if (!isJavaUri(uri)) {
+			throw new IllegalArgumentException(
+					"Not a java class URI: '" + uri + "'");
+		}
+		return toCanonicalJavaUri(uri).substring(JAVA_URI_PREFIX.length());
+	}
+
+	public static boolean isMatchingJavaUri(String uri1, String uri2) {
+		return toCanonicalJavaUri(uri1).equals(toCanonicalJavaUri(uri2));
 	}
 
 	// ----------------------------------------------------------------------
@@ -85,9 +112,11 @@ public class ConfigurationBeanLoader {
 		this(new LockableModel(model), req);
 	}
 
-	public ConfigurationBeanLoader(LockableModel locking, HttpServletRequest req) {
-		this(locking, (req == null) ? null : req.getSession()
-				.getServletContext(), req);
+	public ConfigurationBeanLoader(LockableModel locking,
+			HttpServletRequest req) {
+		this(locking,
+				(req == null) ? null : req.getSession().getServletContext(),
+				req);
 	}
 
 	private ConfigurationBeanLoader(LockableModel locking, ServletContext ctx,
@@ -111,18 +140,18 @@ public class ConfigurationBeanLoader {
 		}
 
 		try {
-			ConfigurationRdf<T> parsedRdf = ConfigurationRdfParser.parse(
-					locking, uri, resultClass);
-			WrappedInstance<T> wrapper = InstanceWrapper.wrap(parsedRdf
-					.getConcreteClass());
+			ConfigurationRdf<T> parsedRdf = ConfigurationRdfParser
+					.parse(locking, uri, resultClass);
+			WrappedInstance<T> wrapper = InstanceWrapper
+					.wrap(parsedRdf.getConcreteClass());
 			wrapper.satisfyInterfaces(ctx, req);
 			wrapper.checkCardinality(parsedRdf.getPropertyStatements());
 			wrapper.setProperties(this, parsedRdf.getPropertyStatements());
 			wrapper.validate();
 			return wrapper.getInstance();
 		} catch (Exception e) {
-			throw new ConfigurationBeanLoaderException("Failed to load '" + uri
-					+ "'", e);
+			throw new ConfigurationBeanLoaderException(
+					"Failed to load '" + uri + "'", e);
 		}
 	}
 
@@ -133,11 +162,13 @@ public class ConfigurationBeanLoader {
 			throws ConfigurationBeanLoaderException {
 		Set<String> uris = new HashSet<>();
 		try (LockedModel m = locking.read()) {
-			List<Resource> resources = m.listResourcesWithProperty(RDF.type,
-					createResource(toJavaUri(resultClass))).toList();
-			for (Resource r : resources) {
-				if (r.isURIResource()) {
-					uris.add(r.getURI());
+			for (String typeUri : toPossibleJavaUris(resultClass)) {
+				List<Resource> resources = m.listResourcesWithProperty(RDF.type,
+						createResource(typeUri)).toList();
+				for (Resource r : resources) {
+					if (r.isURIResource()) {
+						uris.add(r.getURI());
+					}
 				}
 			}
 		}
