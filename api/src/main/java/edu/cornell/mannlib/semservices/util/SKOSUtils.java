@@ -1,4 +1,4 @@
-/* $This file is distributed under the terms of the license in LICENSE$ */
+/* $This file is distributed under the terms of the license in /doc/license.txt$ */
 
 /* We are no longer using the SKOS API since Vitro has moved to V 4.0 of OWL API which does not appear to be compatible.
  This file will contain methods used for reading SKOS as XML and parsing it for the properties
@@ -160,12 +160,18 @@ public class SKOSUtils {
 			// conceptURI);
 			concept.setCloseMatchURIList(closeMatchURIList);
 
+		 
 			// Notes may exist, in which case they should be employed
 			if (addNotes) {
-				List<String> notes = getNotesFromModel(conceptURI, model,
-						langTagValue);
+				List<String> notes = getNotesFromModel(conceptURI, model, langTagValue);
 				if (notes.size() > 0) {
 					concept.setDefinition(notes.get(0));
+				}
+			} else { // get definitions from skos:definition
+
+				List<String> definitions = getDefinitionFromModel(conceptURI, model, langTagValue);
+				if (definitions.size() > 0) {
+					concept.setDefinition(definitions.get(0));
 				}
 			}
 
@@ -219,12 +225,17 @@ public class SKOSUtils {
 		String propertyURI = "http://www.w3.org/2004/02/skos/core#note";
 		return getLabelsFromModel(conceptURI, propertyURI, model, langTagValue);
 	}
+	
+	private static List<String> getDefinitionFromModel(String conceptURI,
+			Model model, String langTagValue) {
+		String propertyURI = "http://www.w3.org/2004/02/skos/core#definition";
+		return getLabelsFromModel(conceptURI, propertyURI, model, langTagValue);
+	}
 
 	private static List<String> getCloseMatchURIsFromModel(String conceptURI,
 			Model model) {
 		String propertyURI = "http://www.w3.org/2004/02/skos/core#closeMatch";
-		return getRelatedURIsFromModel(conceptURI, propertyURI, model);
-
+		return getRelatedURIsFromModel(conceptURI, propertyURI, model); 
 	}
 
 	private static List<String> getExactMatchURIsFromModel(String conceptURI,
