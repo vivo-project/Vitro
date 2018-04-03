@@ -1,6 +1,8 @@
 @prefix : <http://vitro.mannlib.cornell.edu/ns/vitro/ApplicationSetup#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix searchIndex: <java:edu.cornell.mannlib.vitro.webapp.searchindex#> .
+
 
 #
 # configure the SearchIndexer
@@ -8,8 +10,8 @@
 
 # Individuals with these types will be excluded from the search index
 :searchExcluder_typeExcluder
-    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.ExcludeBasedOnType> ,
-        <java:edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluder> ;
+    a   searchIndex:exclusions.ExcludeBasedOnType ,
+        searchIndex:exclusions.SearchIndexExcluder ;
     :excludes
         "http://www.w3.org/2002/07/owl#AnnotationProperty" ,
         "http://www.w3.org/2002/07/owl#DatatypeProperty" ,
@@ -17,8 +19,8 @@
 
 # Individuals with types from these namespaces will be excluded from the search index.
 :searchExcluder_namespaceExcluder
-    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.ExcludeBasedOnNamespace> ,
-        <java:edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluder> ;
+    a   searchIndex:exclusions.ExcludeBasedOnNamespace ,
+        searchIndex:exclusions.SearchIndexExcluder ;
     :excludes
         "http://vitro.mannlib.cornell.edu/ns/vitro/0.7#" ,
         "http://vitro.mannlib.cornell.edu/ns/vitro/public#" ,
@@ -27,38 +29,38 @@
 
 # Individuals with URIs in these namespaces will be excluded from the search index.
 :searchExcluder_typeNamespaceExcluder
-    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.ExcludeBasedOnTypeNamespace> ,
-        <java:edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluder> ;
+    a   searchIndex:exclusions.ExcludeBasedOnTypeNamespace ,
+        searchIndex:exclusions.SearchIndexExcluder ;
     :excludes
         "http://vitro.mannlib.cornell.edu/ns/vitro/role#public" .
 
 :searchExcluder_syncingTypeExcluder
-    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SyncingExcludeBasedOnType> ,
-        <java:edu.cornell.mannlib.vitro.webapp.searchindex.exclusions.SearchIndexExcluder> .
+    a   searchIndex:exclusions.SyncingExcludeBasedOnType ,
+        searchIndex:exclusions.SearchIndexExcluder .
 
 # ------------------------------------
 
 :uriFinder_forDataProperties
-    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder> ,
-        <java:edu.cornell.mannlib.vitro.webapp.searchindex.indexing.AdditionalURIsForDataProperties> .
+    a   searchIndex:indexing.IndexingUriFinder ,
+        searchIndex:indexing.AdditionalURIsForDataProperties .
 
 :uriFinder_forObjectProperties
-    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder> ,
-        <java:edu.cornell.mannlib.vitro.webapp.searchindex.indexing.AdditionalURIsForObjectProperties> .
+    a   searchIndex:indexing.IndexingUriFinder ,
+        searchIndex:indexing.AdditionalURIsForObjectProperties .
 
 :uriFinder_forTypeStatements
-    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder> ,
-        <java:edu.cornell.mannlib.vitro.webapp.searchindex.indexing.AdditionalURIsForTypeStatements> .
+    a   searchIndex:indexing.IndexingUriFinder ,
+        searchIndex:indexing.AdditionalURIsForTypeStatements .
 
 :uriFinder_forClassGroupChange
-    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.indexing.IndexingUriFinder> ,
-        <java:edu.cornell.mannlib.vitro.webapp.searchindex.indexing.URIsForClassGroupChange> .
+    a   searchIndex:indexing.IndexingUriFinder ,
+        searchIndex:indexing.URIsForClassGroupChange .
 
 # ------------------------------------
 
 :documentModifier_AllNames
-    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.SelectQueryDocumentModifier> ,
-        <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier> ;
+    a   searchIndex:documentBuilding.SelectQueryDocumentModifier ,
+        searchIndex:documentBuilding.DocumentModifier ;
     rdfs:label "All labels are added to name fields." ;
     :hasTargetField "nameRaw" ;
     :hasSelectQuery """
@@ -70,8 +72,8 @@
         """ .
     
 :documentModifier_NameFieldBooster
-    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.FieldBooster> ,
-        <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier> ;
+    a   searchIndex:documentBuilding.FieldBooster ,
+        searchIndex:documentBuilding.DocumentModifier ;
     :hasTargetField "nameRaw" ;
     :hasTargetField "nameLowercase" ;
     :hasTargetField "nameUnstemmed" ;
@@ -79,5 +81,5 @@
     :hasBoost "1.2"^^xsd:float .
 
 :documentModifier_thumbnailImageUrl
-    a   <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.ThumbnailImageURL> ,
-        <java:edu.cornell.mannlib.vitro.webapp.searchindex.documentBuilding.DocumentModifier> .
+    a   searchIndex:documentBuilding.ThumbnailImageURL ,
+        searchIndex:documentBuilding.DocumentModifier .

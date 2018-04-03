@@ -15,8 +15,8 @@ import edu.cornell.mannlib.vitro.webapp.utils.configuration.WrappedInstance.Vali
 /**
  * Test the @Validation annotation.
  */
-public class ConfigurationBeanLoader_ValidationTest extends
-		ConfigurationBeanLoaderTestBase {
+public class ConfigurationBeanLoader_ValidationTest
+		extends ConfigurationBeanLoaderTestBase {
 	// --------------------------------------------
 
 	@Test
@@ -25,8 +25,7 @@ public class ConfigurationBeanLoader_ValidationTest extends
 		model.add(typeStatement(GENERIC_INSTANCE_URI,
 				toJavaUri(ValidationMethodWithParameter.class)));
 
-		expectSimpleFailure(
-				ValidationMethodWithParameter.class,
+		expectSimpleFailure(ValidationMethodWithParameter.class,
 				throwable(ConfigurationBeanLoaderException.class,
 						"Failed to load"),
 				throwable(InstanceWrapperException.class,
@@ -49,11 +48,11 @@ public class ConfigurationBeanLoader_ValidationTest extends
 		model.add(typeStatement(GENERIC_INSTANCE_URI,
 				toJavaUri(ValidationMethodShouldReturnVoid.class)));
 
-		expectSimpleFailure(
-				ValidationMethodShouldReturnVoid.class,
+		expectSimpleFailure(ValidationMethodShouldReturnVoid.class,
 				throwable(ConfigurationBeanLoaderException.class,
 						"Failed to load"),
-				throwable(InstanceWrapperException.class, "should return void"));
+				throwable(InstanceWrapperException.class,
+						"should return void"));
 	}
 
 	public static class ValidationMethodShouldReturnVoid {
@@ -71,8 +70,7 @@ public class ConfigurationBeanLoader_ValidationTest extends
 		model.add(typeStatement(GENERIC_INSTANCE_URI,
 				toJavaUri(ValidationMethodIsPrivate.class)));
 
-		expectSimpleFailure(
-				ValidationMethodIsPrivate.class,
+		expectSimpleFailure(ValidationMethodIsPrivate.class,
 				throwable(ConfigurationBeanLoaderException.class,
 						"Failed to load"),
 				throwable(ValidationFailedException.class,
@@ -94,8 +92,7 @@ public class ConfigurationBeanLoader_ValidationTest extends
 		model.add(typeStatement(GENERIC_INSTANCE_URI,
 				toJavaUri(ValidationThrowsException.class)));
 
-		expectSimpleFailure(
-				ValidationThrowsException.class,
+		expectSimpleFailure(ValidationThrowsException.class,
 				throwable(ConfigurationBeanLoaderException.class,
 						"Failed to load"),
 				throwable(ValidationFailedException.class,
@@ -144,8 +141,7 @@ public class ConfigurationBeanLoader_ValidationTest extends
 		model.add(typeStatement(GENERIC_INSTANCE_URI,
 				toJavaUri(ValidationOverValidationSubclass.class)));
 
-		expectSimpleFailure(
-				ValidationOverValidationSubclass.class,
+		expectSimpleFailure(ValidationOverValidationSubclass.class,
 				throwable(ConfigurationBeanLoaderException.class,
 						"Failed to load"),
 				throwable(InstanceWrapperException.class,
@@ -158,8 +154,7 @@ public class ConfigurationBeanLoader_ValidationTest extends
 		model.add(typeStatement(GENERIC_INSTANCE_URI,
 				toJavaUri(PlainOverValidationSubclass.class)));
 
-		expectSimpleFailure(
-				PlainOverValidationSubclass.class,
+		expectSimpleFailure(PlainOverValidationSubclass.class,
 				throwable(ConfigurationBeanLoaderException.class,
 						"Failed to load"),
 				throwable(InstanceWrapperException.class,
@@ -182,8 +177,8 @@ public class ConfigurationBeanLoader_ValidationTest extends
 		// Just want to see that the superclass validation is run.
 	}
 
-	public static class AdditionalValidationSubclass extends
-			ValidationSuperclass {
+	public static class AdditionalValidationSubclass
+			extends ValidationSuperclass {
 		public boolean validatorSubHasRun = false;
 
 		@Validation
@@ -195,8 +190,8 @@ public class ConfigurationBeanLoader_ValidationTest extends
 		}
 	}
 
-	public static class ValidationOverValidationSubclass extends
-			EmptyValidationSubclass {
+	public static class ValidationOverValidationSubclass
+			extends EmptyValidationSubclass {
 		@Override
 		@Validation
 		public void validatorSuper() {
@@ -204,8 +199,8 @@ public class ConfigurationBeanLoader_ValidationTest extends
 		}
 	}
 
-	public static class PlainOverValidationSubclass extends
-			ValidationSuperclass {
+	public static class PlainOverValidationSubclass
+			extends ValidationSuperclass {
 		@Override
 		public void validatorSuper() {
 			// Should fail

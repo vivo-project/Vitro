@@ -2,16 +2,18 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
+import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.classnameFromJavaUri;
+import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.isJavaUri;
+import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.isMatchingJavaUri;
+import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.toJavaUri;
 import static org.apache.jena.rdf.model.ResourceFactory.createResource;
 import static org.apache.jena.rdf.model.ResourceFactory.createStatement;
-import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.fromJavaUri;
-import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.isJavaUri;
-import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.toJavaUri;
 
 import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.jena.rdf.model.Property;
@@ -64,12 +66,20 @@ public class ConfigurationRdfParser {
 	private static void confirmEligibilityForResultClass(LockableModel locking,
 			String uri, Class<?> resultClass)
 			throws InvalidConfigurationRdfException {
-		Statement s = createStatement(createResource(uri), RDF.type,
-				createResource(toJavaUri(resultClass)));
+		String resultClassUri = toJavaUri(resultClass);
 		try (LockedModel m = locking.read()) {
-			if (!m.contains(s)) {
-				throw noTypeStatementForResultClass(s);
+			Set<RDFNode> types = //
+					m.listObjectsOfProperty(createResource(uri), RDF.type)
+							.toSet();
+			for (RDFNode typeNode : types) {
+				if (typeNode.isURIResource()) {
+					String typeUri = typeNode.asResource().getURI();
+					if (isMatchingJavaUri(resultClassUri, typeUri)) {
+						return;
+					}
+				}
 			}
+			throw noTypeStatementForResultClass(uri, resultClassUri);
 		}
 	}
 
@@ -78,9 +88,8 @@ public class ConfigurationRdfParser {
 		Set<PropertyStatement> set = new HashSet<>();
 
 		try (LockedModel m = locking.read()) {
-			List<Statement> rawStatements = m.listStatements(
-					m.getResource(uri), (Property) null, (RDFNode) null)
-					.toList();
+			List<Statement> rawStatements = m.listStatements(m.getResource(uri),
+					(Property) null, (RDFNode) null).toList();
 			if (rawStatements.isEmpty()) {
 				throw noRdfStatements(uri);
 			}
@@ -108,8 +117,9 @@ public class ConfigurationRdfParser {
 		Set<Class<? extends T>> concreteClasses = new HashSet<>();
 
 		try (LockedModel m = locking.read()) {
-			for (RDFNode node : m.listObjectsOfProperty(createResource(uri),
-					RDF.type).toSet()) {
+			for (RDFNode node : m
+					.listObjectsOfProperty(createResource(uri), RDF.type)
+					.toSet()) {
 				if (!node.isURIResource()) {
 					throw typeMustBeUriResource(node);
 				}
@@ -140,7 +150,7 @@ public class ConfigurationRdfParser {
 			if (!isJavaUri(typeUri)) {
 				return false;
 			}
-			Class<?> clazz = Class.forName(fromJavaUri(typeUri));
+			Class<?> clazz = Class.forName(classnameFromJavaUri(typeUri));
 			if (clazz.isInterface()) {
 				return false;
 			}
@@ -157,7 +167,7 @@ public class ConfigurationRdfParser {
 	private static <T> Class<? extends T> processTypeUri(String typeUri,
 			Class<T> resultClass) throws InvalidConfigurationRdfException {
 		try {
-			Class<?> clazz = Class.forName(fromJavaUri(typeUri));
+			Class<?> clazz = Class.forName(classnameFromJavaUri(typeUri));
 			if (!resultClass.isAssignableFrom(clazz)) {
 				throw notAssignable(resultClass, clazz);
 			}
@@ -180,22 +190,23 @@ public class ConfigurationRdfParser {
 				"The model contains no statements about '" + uri + "'");
 	}
 
-	private static InvalidConfigurationRdfException noConcreteClasses(String uri) {
+	private static InvalidConfigurationRdfException noConcreteClasses(
+			String uri) {
 		return new InvalidConfigurationRdfException(
 				"No concrete class is declared for '" + uri + "'");
 	}
 
 	private static InvalidConfigurationRdfException tooManyConcreteClasses(
 			String uri, Set<?> concreteClasses) {
-		return new InvalidConfigurationRdfException("'" + uri
-				+ "' is declared with more than one " + "concrete class: "
-				+ concreteClasses);
+		return new InvalidConfigurationRdfException(
+				"'" + uri + "' is declared with more than one "
+						+ "concrete class: " + concreteClasses);
 	}
 
 	private static InvalidConfigurationRdfException notAssignable(
 			Class<?> resultClass, Class<?> clazz) {
-		return new InvalidConfigurationRdfException(clazz
-				+ " cannot be assigned to " + resultClass);
+		return new InvalidConfigurationRdfException(
+				clazz + " cannot be assigned to " + resultClass);
 	}
 
 	private static InvalidConfigurationRdfException noZeroArgumentConstructor(
@@ -212,8 +223,8 @@ public class ConfigurationRdfParser {
 
 	private static InvalidConfigurationRdfException failedToLoadClass(
 			String typeUri, Throwable e) {
-		return new InvalidConfigurationRdfException("Can't load this type: '"
-				+ typeUri + "'", e);
+		return new InvalidConfigurationRdfException(
+				"Can't load this type: '" + typeUri + "'", e);
 	}
 
 	private static InvalidConfigurationRdfException typeMustBeUriResource(
@@ -223,15 +234,18 @@ public class ConfigurationRdfParser {
 	}
 
 	private static InvalidConfigurationRdfException noTypeStatementForResultClass(
-			Statement s) {
+			String uri, String resultClassUri) {
 		return new InvalidConfigurationRdfException(
-				"A type statement is required: '" + s);
+				"A type statement is required: '"
+						+ createStatement(createResource(uri), RDF.type,
+								createResource(resultClassUri)));
 	}
 
-	private static InvalidConfigurationRdfException noRdfStatements(String uri) {
-		return new InvalidConfigurationRdfException("'" + uri
-				+ "' does not appear as the subject of any "
-				+ "statements in the model.");
+	private static InvalidConfigurationRdfException noRdfStatements(
+			String uri) {
+		return new InvalidConfigurationRdfException(
+				"'" + uri + "' does not appear as the subject of any "
+						+ "statements in the model.");
 	}
 
 	public static class InvalidConfigurationRdfException extends Exception {
@@ -239,7 +253,8 @@ public class ConfigurationRdfParser {
 			super(message);
 		}
 
-		public InvalidConfigurationRdfException(String message, Throwable cause) {
+		public InvalidConfigurationRdfException(String message,
+				Throwable cause) {
 			super(message, cause);
 		}
 	}

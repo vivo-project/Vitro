@@ -70,7 +70,8 @@ public class WrappedInstance<T> {
 	 */
 	public void checkCardinality(Set<PropertyStatement> propertyStatements)
 			throws CardinalityException {
-		Map<String, Integer> statementCounts = countPropertyStatementsByPredicateUri(propertyStatements);
+		Map<String, Integer> statementCounts = countPropertyStatementsByPredicateUri(
+				propertyStatements);
 		for (PropertyMethod pm : propertyMethods.values()) {
 			Integer c = statementCounts.get(pm.getPropertyUri());
 			int count = (c == null) ? 0 : c;
@@ -109,12 +110,11 @@ public class WrappedInstance<T> {
 	 */
 	public void setProperties(ConfigurationBeanLoader loader,
 			Collection<PropertyStatement> propertyStatements)
-			throws PropertyTypeException, NoSuchPropertyMethodException,
-			ConfigurationBeanLoaderException {
+			throws PropertyTypeException, ConfigurationBeanLoaderException {
 		for (PropertyStatement ps : propertyStatements) {
 			PropertyMethod pm = propertyMethods.get(ps.getPredicateUri());
 			if (pm == null) {
-				throw new NoSuchPropertyMethodException(ps);
+				continue; // No method for this property? Ignore it.
 			}
 			pm.confirmCompatible(ps);
 
@@ -141,7 +141,8 @@ public class WrappedInstance<T> {
 			} catch (IllegalAccessException | IllegalArgumentException
 					| InvocationTargetException e) {
 				throw new ValidationFailedException(
-						"Error executing validation method '" + method + "'", e);
+						"Error executing validation method '" + method + "'",
+						e);
 			}
 		}
 	}
@@ -162,12 +163,6 @@ public class WrappedInstance<T> {
 	public static class ValidationFailedException extends Exception {
 		public ValidationFailedException(String message, Throwable cause) {
 			super(message, cause);
-		}
-	}
-
-	public static class NoSuchPropertyMethodException extends Exception {
-		public NoSuchPropertyMethodException(PropertyStatement ps) {
-			super("No property method for '" + ps.getPredicateUri() + "'");
 		}
 	}
 
