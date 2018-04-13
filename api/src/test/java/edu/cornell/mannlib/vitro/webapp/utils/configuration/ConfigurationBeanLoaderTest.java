@@ -2,12 +2,12 @@
 
 package edu.cornell.mannlib.vitro.webapp.utils.configuration;
 
-import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDfloat;
-import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDstring;
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.dataProperty;
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.objectProperty;
 import static edu.cornell.mannlib.vitro.testing.ModelUtilitiesTestHelper.typeStatement;
 import static edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationBeanLoader.toJavaUri;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDfloat;
+import static org.apache.jena.datatypes.xsd.XSDDatatype.XSDstring;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -19,18 +19,16 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Ignore;
-import org.junit.Test;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Statement;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import edu.cornell.mannlib.vitro.webapp.modelaccess.ContextModelAccess;
 import edu.cornell.mannlib.vitro.webapp.modelaccess.RequestModelAccess;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.ConfigurationRdfParser.InvalidConfigurationRdfException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.InstanceWrapper.InstanceWrapperException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.PropertyType.PropertyTypeException;
-import edu.cornell.mannlib.vitro.webapp.utils.configuration.WrappedInstance.NoSuchPropertyMethodException;
 import edu.cornell.mannlib.vitro.webapp.utils.configuration.WrappedInstance.ResourceUnavailableException;
 
 /**
@@ -310,24 +308,6 @@ public class ConfigurationBeanLoaderTest extends
 	// --------------------------------------------
 
 	@Test
-	public void tripleHasUnrecognizedProperty_throwsException()
-			throws ConfigurationBeanLoaderException {
-		model.add(typeStatement(GENERIC_INSTANCE_URI,
-				toJavaUri(SimpleSuccess.class)));
-		model.add(dataProperty(GENERIC_INSTANCE_URI,
-				"http://bogus.property/name", "No place to put it."));
-
-		expectSimpleFailure(
-				SimpleSuccess.class,
-				throwable(ConfigurationBeanLoaderException.class,
-						"Failed to load"),
-				throwable(NoSuchPropertyMethodException.class,
-						"No property method"));
-	}
-
-	// --------------------------------------------
-
-	@Test
 	public void valueTypeDoesNotMatchArgumentOfPropertyMethod_throwsException()
 			throws ConfigurationBeanLoaderException {
 		model.add(typeStatement(GENERIC_INSTANCE_URI,
@@ -395,10 +375,26 @@ public class ConfigurationBeanLoaderTest extends
 		assertNotNull(instance);
 	}
 
+	/**
+	 * Ignores unexpected properties
+	 */
+	@Test
+	public void simpleSuccessIgnoringExtraProperties() throws ConfigurationBeanLoaderException {
+		model.add(typeStatement(SIMPLE_SUCCESS_INSTANCE_URI,
+				toJavaUri(SimpleSuccess.class)));
+		model.add(dataProperty(SIMPLE_SUCCESS_INSTANCE_URI,
+				"http://surprise.property/name", "No matching method."));
+
+		SimpleSuccess instance = loader.loadInstance(
+				SIMPLE_SUCCESS_INSTANCE_URI, SimpleSuccess.class);
+		
+		assertNotNull(instance);
+	}
+	
 	public static class SimpleSuccess {
 		// Nothing of interest.
 	}
-
+	
 	// --------------------------------------------
 
 	/**

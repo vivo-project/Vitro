@@ -95,8 +95,36 @@ The principal methods are:
  + Search the graph for all individuals of type `resultClass`. For each such individual, call `loadInstance`. 
    Return a set containing the created instances. If no individuals are found, return an empty `Set`.
    
+### Specifying Java class URIs
+
+Java classes are specified as types in the configurations. The type URIs consist of `java:` and the fully-qualified class path and name. For example,
+
+```
+:application 
+      a   <java:edu.cornell.mannlib.vitro.webapp.application.ApplicationImpl> .
+```
+
+It would be nice to use prefixes to make URIs more readable. This doesn't 
+work with the scheme above, since none of the characters in the URI are valid 
+as delimiters of a prefix.
+
+For this reason, the loader will also recognize a type URI if one of the periods is replaced by a hash (`#`). So, this is equivalent to the previous example (note the `#` after `webapp`):
+
+```
+:application 
+      a   <java:edu.cornell.mannlib.vitro.webapp#application.ApplicationImpl> .
+```
+
+which implies that this is equivalent also:
+
+```
+@prefix javaWebapp: <java:edu.cornell.mannlib.vitro.webapp#>
+:application   a   javaWebapp:application.ApplicationImpl .
+
+```
+
 ### Restrictions on instantiated classes.
-Each class to be instantiated must have a niladic constructor.
+Each class to be instantiated must have a public niladic constructor.
 
 ### Property methods
 When the loader encounters a data property or an object property in a description, 
@@ -116,7 +144,8 @@ For example:
      
 In more detail:
 
-+ A class must contain exactly one method that serves each property URI in the description.
++ Each property URI in the description may be served by only one method in the class.
++ If a property URI in the description is not served by any method in the class, the loader will ignore that property.
 + The description need not include properies for all of the property methods in the class.
 + Each property method must be public, must have exactly one parameter, and must return null.
 + The name of the property method is immaterial, except that there must not be another method
@@ -159,7 +188,7 @@ Again, in detail:
 
 + Each validation method must be public, must accept no parameters, and must return null.
 + The name of the validation method is immaterial, except that there must not be another 
-+ method with the same name in the lass.
++ method with the same name in the class.
 + Validation methods in superclasses will be called, but may not be overridden in a subclass.
 
 ### Life cycle
