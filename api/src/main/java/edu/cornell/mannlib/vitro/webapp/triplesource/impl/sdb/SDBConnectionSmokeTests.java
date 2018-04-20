@@ -92,8 +92,8 @@ public class SDBConnectionSmokeTests {
 		connectionProps.put("user", username);
 		connectionProps.put("password", password);
 
-		try (Connection conn = DriverManager
-				.getConnection(url, connectionProps)) {
+		try{
+			 Connection conn = DriverManager.getConnection(url, connectionProps);
 			// We have an SQL connection - see if we have any XSD Strings in the database
 			String skip = props.getProperty("skip.Jena3StringTest", "false");
 			if (!Boolean.parseBoolean(skip)) {
@@ -125,10 +125,9 @@ public class SDBConnectionSmokeTests {
 			Properties connectionProps, String dbType) {
 		String testString = "ABC\u00CE\u0123";
 
-		try (Connection conn = DriverManager
-				.getConnection(url, connectionProps);
-				Statement stmt = conn.createStatement()) {
-
+		try  {
+			Connection conn = DriverManager.getConnection(url, connectionProps);
+			Statement stmt = conn.createStatement();
 			// Create the temporary table.
 			stmt.executeUpdate("CREATE TEMPORARY TABLE smoke_test (contents varchar(100))");
 
