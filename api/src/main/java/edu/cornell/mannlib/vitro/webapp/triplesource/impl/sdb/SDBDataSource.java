@@ -163,7 +163,7 @@ public class SDBDataSource {
 					url += "&useServerPrepStmts=true";
 				}
 				if (!urlLwr.contains("servertimezone")) {
-					url += "serverTimezone=UTC";
+					url += "&serverTimezone=UTC";
 				}
 			}
 		}
