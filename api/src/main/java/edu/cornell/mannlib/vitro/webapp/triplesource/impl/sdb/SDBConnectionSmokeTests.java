@@ -52,6 +52,10 @@ public class SDBConnectionSmokeTests {
 					+ PROPERTY_DB_URL + "'");
 			return;
 		}
+		
+		// Get the full URL, with options.
+		url = SDBDataSource.getJdbcUrl(props);
+		
 		String username = props.getProperty(PROPERTY_DB_USERNAME);
 		if (username == null || username.isEmpty()) {
 			ss.fatal("runtime.properties does not contain a value for '"

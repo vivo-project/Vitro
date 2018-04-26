@@ -2,8 +2,6 @@
 
 package edu.cornell.mannlib.vitro.webapp.triplesource.impl.sdb;
 
-import java.beans.PropertyVetoException;
-
 import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
@@ -51,7 +49,7 @@ public class SDBDataSource {
 	public BasicDataSource getDataSource() {
 		BasicDataSource cpds = new BasicDataSource();
 		cpds.setDriverClassName(getDbDriverClassName());
-		cpds.setUrl(getJdbcUrl());
+		cpds.setUrl(getJdbcUrl(configProps));
 		cpds.setUsername(configProps.getProperty(PROPERTY_DB_USERNAME));
 		cpds.setPassword(configProps.getProperty(PROPERTY_DB_PASSWORD));
 		cpds.setMaxTotal(getMaxActive());
@@ -73,41 +71,6 @@ public class SDBDataSource {
 	private String getDbDriverClassName() {
 		return configProps.getProperty(PROPERTY_DB_DRIVER_CLASS_NAME,
 				DEFAULT_DRIVER_CLASS);
-	}
-
-	private String getDbType() {
-		return configProps.getProperty(PROPERTY_DB_TYPE, DEFAULT_TYPE);
-	}
-
-	private String getJdbcUrl() {
-		String url = configProps.getProperty(PROPERTY_DB_URL);
-
-		// Ensure that MySQL handles unicode properly, else all kinds of
-		// horrible nastiness ensues.
-		if (DEFAULT_TYPE.equals(getDbType())) {
-			if (!url.contains("?")) {
-				url += "?useUnicode=yes&characterEncoding=utf8&nullNamePatternMatchesAll=true&cachePrepStmts=true&useServerPrepStmts=true";
-			} else {
-				String urlLwr = url.toLowerCase();
-				if (!urlLwr.contains("useunicode")) {
-					url += "&useUnicode=yes";
-				}
-				if (!urlLwr.contains("characterencoding")) {
-					url += "&characterEncoding=utf8";
-				}
-				if (!urlLwr.contains("nullnamepatternmatchesall")) {
-					url += "&nullNamePatternMatchesAll=true";
-				}
-				if (!urlLwr.contains("cacheprepstmts")) {
-					url += "&cachePrepStmts=true";
-				}
-				if (!urlLwr.contains("useserverprepstmts")) {
-					url += "&useServerPrepStmts=true";
-				}
-			}
-		}
-
-		return url;
 	}
 
 	private String getValidationQuery() {
@@ -167,4 +130,49 @@ public class SDBDataSource {
 			return defaultValue;
 		}
 	}
+	
+	/**
+	 * Get the JDBC URL, perhaps with special MySQL options.
+	 * 
+	 * This must be static and package-accessible so SDBConnectionSmokeTests can
+	 * use the same options.
+	 */
+	static String getJdbcUrl(ConfigurationProperties props) {
+		String url = props.getProperty(PROPERTY_DB_URL);
+
+		// Ensure that MySQL handles unicode properly, else all kinds of
+		// horrible nastiness ensues. Also, set some other handy options.
+		if (DEFAULT_TYPE.equals(getDbType(props))) {
+			if (!url.contains("?")) {
+				url += "?useUnicode=yes&characterEncoding=utf8&nullNamePatternMatchesAll=true&cachePrepStmts=true&useServerPrepStmts=true&serverTimezone=UTC";
+			} else {
+				String urlLwr = url.toLowerCase();
+				if (!urlLwr.contains("useunicode")) {
+					url += "&useUnicode=yes";
+				}
+				if (!urlLwr.contains("characterencoding")) {
+					url += "&characterEncoding=utf8";
+				}
+				if (!urlLwr.contains("nullnamepatternmatchesall")) {
+					url += "&nullNamePatternMatchesAll=true";
+				}
+				if (!urlLwr.contains("cacheprepstmts")) {
+					url += "&cachePrepStmts=true";
+				}
+				if (!urlLwr.contains("useserverprepstmts")) {
+					url += "&useServerPrepStmts=true";
+				}
+				if (!urlLwr.contains("servertimezone")) {
+					url += "serverTimezone=UTC";
+				}
+			}
+		}
+		return url;
+	}
+
+	private static String getDbType(ConfigurationProperties props) {
+		return props.getProperty(PROPERTY_DB_TYPE, DEFAULT_TYPE);
+	}
+	
+
 }
