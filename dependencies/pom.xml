@@ -252,5 +252,11 @@
             <artifactId>javax.mail</artifactId>
             <version>1.6.0</version>
         </dependency>
+        
+        <dependency>
+            <groupId>edu.cornell.library.scholars</groupId>
+            <artifactId>data-distribution-api-vivo_1_10</artifactId>
+            <version>1.1.1</version>
+        </dependency>
     </dependencies>
 </project>
