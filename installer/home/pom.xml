@@ -75,6 +75,7 @@
                                     <goal>copy-resources</goal>
                                 </goals>
                                 <configuration>
+                                	<encoding>UTF-8</encoding>
                                     <outputDirectory>${vitro-dir}</outputDirectory>
                                     <resources>
                                         <resource>
