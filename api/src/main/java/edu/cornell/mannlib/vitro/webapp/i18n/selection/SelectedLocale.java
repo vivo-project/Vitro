@@ -24,7 +24,7 @@ public abstract class SelectedLocale {
 	private static final Log log = LogFactory.getLog(SelectedLocale.class);
 
 	/** Use this attribute on both the ServletContext and the Session. */
-	public static final String ATTRIBUTE_NAME = "SELECTED_LOCALE";
+	protected static final String ATTRIBUTE_NAME = "SELECTED_LOCALE";
 
 	/**
 	 * Store the forced locale in the servlet context. Clear any selectable
