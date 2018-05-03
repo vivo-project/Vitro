@@ -29,6 +29,7 @@ public class ConfigurationPropertiesSmokeTests implements
 	private static final String PROPERTY_LANGUAGE_SELECTABLE = "languages.selectableLocales";
 	private static final String PROPERTY_LANGUAGE_FORCE = "languages.forceLocale";
 	private static final String PROPERTY_LANGUAGE_FILTER = "RDFService.languageFilter";
+	private static final String MULTIPLE_RPFS = "rp.multiple";
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -37,6 +38,7 @@ public class ConfigurationPropertiesSmokeTests implements
 		StartupStatus ss = StartupStatus.getBean(ctx);
 
 		checkDefaultNamespace(ctx, props, ss);
+		checkMultipleRPFs(ctx, props, ss);
 		checkLanguages(props, ss);
 	}
 
@@ -73,8 +75,34 @@ public class ConfigurationPropertiesSmokeTests implements
 	}
 
 	/**
+	 * Warn if runtime.properties exists in multiple locations
+	 * or is located vivo.home instead of vivo.home/config
+	 */
+	private void checkMultipleRPFs(ServletContext ctx,
+			ConfigurationProperties props, StartupStatus ss) {
+		String rpfStatus = props.getProperty(MULTIPLE_RPFS);
+
+		if (rpfStatus == "both") {
+			ss.warning(this,
+					"Deprecation warning: Files matching the name 'runtime.properties' "
+							+ "were found in both vivo.home and vivo.home/config. Using "
+							+ "the file in vivo.home. Future releases may require "
+							+ "runtime.properties be placed in vivo.home/config.");
+		}
+
+		if (rpfStatus == "home") {
+			ss.warning(this,
+					"Deprecation warning: runtime.properties was found in the "
+							+ "vivo.home directory. The recommended directory for "
+							+ "runtime.properties is now vivo.home/config. Future releases "
+							+ "may require runtime.properties be placed in "
+							+ "vivo.home/config.");
+		}
+	}
+
+	/**
 	 * Warn if we set up the languages incorrectly:
-	 * 
+	 *
 	 * Must build with a language in order to select languages. Can't select
 	 * languages and force language. Shouldn't build with language unless
 	 * language filtering is enabled.

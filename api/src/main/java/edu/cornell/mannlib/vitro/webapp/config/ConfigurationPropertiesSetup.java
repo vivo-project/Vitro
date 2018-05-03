@@ -52,6 +52,9 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 	/** Configuration property to store the Vitro home directory */
 	private static final String VHD_CONFIGURATION_PROPERTY = "vitro.home";
 
+	/** Configuration property used to determine if there are runtime.properties files in multiple locations **/
+	private static final String RP_MULTIPLE = "rp.multiple";
+
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		ServletContext ctx = sce.getServletContext();
@@ -66,12 +69,15 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 				File vitroHomeDirConfig = new File(vitroHomeDir.getPath()
 						.concat(File.separator).concat("config"));
 
+				String rpfLocation = findMultipleRuntimePropertiesFiles(
+						vitroHomeDir, vitroHomeDirConfig);
+
 				File runtimePropertiesFile = locateRuntimePropertiesFile(
 						vitroHomeDir, vitroHomeDirConfig, ss);
 				stream = new FileInputStream(runtimePropertiesFile);
 
 				Map<String, String> preempts = createPreemptiveProperties(
-						VHD_CONFIGURATION_PROPERTY, vitroHomeDir);
+						VHD_CONFIGURATION_PROPERTY, vitroHomeDir, RP_MULTIPLE, rpfLocation);
 
 				ConfigurationPropertiesImpl bean = new ConfigurationPropertiesImpl(
 						stream, preempts, new BuildProperties(ctx).getMap());
@@ -93,19 +99,36 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 		}
 	}
 
-	private File locateRuntimePropertiesFile(File vitroHomeDir,
-			File vitroHomeDirConfig, StartupStatus ss) {
+	private String findMultipleRuntimePropertiesFiles(File vitroHomeDir,
+			File vitroHomeDirConfig) {
 
 		File rpf = new File(vitroHomeDir, FILE_RUNTIME_PROPERTIES);
+		File rpfc = new File(vitroHomeDirConfig, FILE_RUNTIME_PROPERTIES);
 
-		if (!rpf.exists()) {
-			rpf = new File(vitroHomeDirConfig, FILE_RUNTIME_PROPERTIES);
-		}
-		if (!rpf.exists()) {
+		if (rpf.exists() && !rpfc.exists()) {
+			return "home";
+		} else if (rpf.exists() && rpfc.exists()) {
+			return "both";
+		} else if (rpfc.exists()) {
+			return "config";
+		} else {
 			throw new IllegalStateException("Did not find '"
 					+ FILE_RUNTIME_PROPERTIES + "' in vitro home directory '"
 					+ vitroHomeDir + "' or config directory '" + vitroHomeDirConfig + "'");
 		}
+	}
+
+
+	private File locateRuntimePropertiesFile(File vitroHomeDir,
+			File vitroHomeDirConfig, StartupStatus ss) {
+
+		File rpf = new File(vitroHomeDir, FILE_RUNTIME_PROPERTIES);
+		File rpfc = new File(vitroHomeDirConfig, FILE_RUNTIME_PROPERTIES);
+
+		if (!rpf.exists()) {
+			rpf = rpfc;
+		}
+
 		if (!rpf.isFile()) {
 			throw new IllegalStateException("'" + rpf.getPath()
 					+ "' is not a file.");
@@ -119,9 +142,11 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 	}
 
 	private Map<String, String> createPreemptiveProperties(
-			String propertyVitroHome, File vitroHomeDir) {
+			String propertyVitroHome, File vitroHomeDir, String propertyRpfMultiple,
+			String rpfLocation) {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put(propertyVitroHome, vitroHomeDir.getAbsolutePath());
+		map.put(propertyRpfMultiple, rpfLocation);
 		return map;
 	}
 
