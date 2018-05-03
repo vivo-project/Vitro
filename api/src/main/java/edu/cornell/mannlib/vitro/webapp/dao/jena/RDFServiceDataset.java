@@ -168,4 +168,9 @@ public class RDFServiceDataset implements Dataset {
 		return "RDFServiceDataset[" + ToString.hashHex(this) + ", " + g + "]";
 	}
 
+	@Override
+	public boolean isEmpty() {
+		return g.isEmpty();
+	}
+
 }
