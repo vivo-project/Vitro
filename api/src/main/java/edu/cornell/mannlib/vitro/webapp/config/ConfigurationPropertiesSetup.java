@@ -53,7 +53,7 @@ public class ConfigurationPropertiesSetup implements ServletContextListener {
 	private static final String VHD_CONFIGURATION_PROPERTY = "vitro.home";
 
 	/** Configuration property used to determine if there are runtime.properties files in multiple locations **/
-	private static final String RP_MULTIPLE = "rp.multiple";
+	static final String RP_MULTIPLE = "rp.multiple";
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
