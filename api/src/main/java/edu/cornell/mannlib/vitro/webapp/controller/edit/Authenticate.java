@@ -331,15 +331,31 @@ public class Authenticate extends VitroHttpServlet {
 			return;
 		}
 
+
 		if (!getAuthenticator(request).isUserPermittedToLogin(user)) {
 			bean.setMessage(request, ERROR, "logins_disabled_for_maintenance");
 			return;
 		}
 
-		if (!getAuthenticator(request).isCurrentPassword(user, password)) {
-			bean.setMessage(request, ERROR, "error_incorrect_credentials");
-			return;
+
+		if(getAuthenticator(request).md5HashIsNull(user)) {
+			if (!getAuthenticator(request).isCurrentPasswordArgon2(user, password)) {
+				bean.setMessage(request, ERROR, "error_incorrect_credentials");
+				return;
+			}
 		}
+		else {
+				if (!getAuthenticator(request).isCurrentPassword(user, password)) {
+					bean.setMessage(request, ERROR, "error_incorrect_credentials");
+					return;
+				}
+				else {
+					 user.setPasswordChangeRequired(true);
+					 user.setMd5Password("");
+				}
+			}
+
+
 
 		// Username and password are correct. What next?
 		if (user.isPasswordChangeRequired()) {
@@ -401,7 +417,7 @@ public class Authenticate extends VitroHttpServlet {
 
 		UserAccount user = getAuthenticator(request).getAccountForInternalAuth(
 				username);
-		if (getAuthenticator(request).isCurrentPassword(user, newPassword)) {
+		if (getAuthenticator(request).isCurrentPasswordArgon2(user, newPassword)) {
 			bean.setMessage(request, ERROR, "error_previous_password");
 			return;
 		}

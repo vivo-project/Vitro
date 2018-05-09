@@ -48,6 +48,7 @@ public class UserAccount {
 	private String firstName = ""; // Never null.
 	private String lastName = ""; // Never null.
 
+	private String argon2Password = ""; //Never null.
 	private String md5Password = ""; // Never null.
 	private String oldPassword = ""; // Never null.
 	private long passwordLinkExpires = 0L; // Never negative.
@@ -104,6 +105,14 @@ public class UserAccount {
 		this.lastName = nonNull(lastName, "");
 	}
 
+	public String getArgon2Password() {
+		return argon2Password;
+	}
+
+	public void setArgon2Password(String argo2Password) {
+		this.argon2Password = nonNull(argo2Password, "");
+	}
+
 	public String getMd5Password() {
 		return md5Password;
 	}
@@ -125,8 +134,9 @@ public class UserAccount {
 	}
 
 	public String getPasswordLinkExpiresHash() {
-		return limitStringLength(8, Authenticator.applyMd5Encoding(String
+		return limitStringLength(8, Authenticator.applyArgon2iEncoding(String
 				.valueOf(passwordLinkExpires)));
+		//applyMd5Encoding
 	}
 
 	public void setPasswordLinkExpires(long passwordLinkExpires) {

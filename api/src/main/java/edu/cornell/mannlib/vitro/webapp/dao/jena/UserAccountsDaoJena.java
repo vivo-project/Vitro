@@ -93,6 +93,7 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 					USERACCOUNT_EMAIL_ADDRESS));
 			u.setFirstName(getPropertyStringValue(r, USERACCOUNT_FIRST_NAME));
 			u.setLastName(getPropertyStringValue(r, USERACCOUNT_LAST_NAME));
+			u.setArgon2Password(getPropertyStringValue(r, USERACCOUNT_ARGON2_PASSWORD));
 			u.setMd5Password(getPropertyStringValue(r, USERACCOUNT_MD5_PASSWORD));
 			u.setOldPassword(getPropertyStringValue(r, USERACCOUNT_OLD_PASSWORD));
 			u.setPasswordLinkExpires(getPropertyLongValue(r,
@@ -225,6 +226,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 					userAccount.getLastName(), model);
 			addPropertyStringValue(res, USERACCOUNT_MD5_PASSWORD,
 					userAccount.getMd5Password(), model);
+			addPropertyStringValue(res, USERACCOUNT_ARGON2_PASSWORD,
+					userAccount.getArgon2Password(), model);
 			addPropertyStringValue(res, USERACCOUNT_OLD_PASSWORD,
 					userAccount.getOldPassword(), model);
 			addPropertyLongValue(res, USERACCOUNT_PASSWORD_LINK_EXPIRES,
@@ -288,6 +291,8 @@ public class UserAccountsDaoJena extends JenaBaseDao implements UserAccountsDao 
 					userAccount.getLastName(), model);
 			updatePropertyStringValue(res, USERACCOUNT_MD5_PASSWORD,
 					userAccount.getMd5Password(), model);
+			updatePropertyStringValue(res, USERACCOUNT_ARGON2_PASSWORD,
+					userAccount.getArgon2Password(), model);
 			updatePropertyStringValue(res, USERACCOUNT_OLD_PASSWORD,
 					userAccount.getOldPassword(), model);
 			updatePropertyLongValue(res, USERACCOUNT_PASSWORD_LINK_EXPIRES,

@@ -246,6 +246,7 @@ public class UserAccountsSelector {
 			user.setFirstName(ifLiteralPresent(solution, "firstName", ""));
 			user.setLastName(ifLiteralPresent(solution, "lastName", ""));
 			user.setMd5Password(ifLiteralPresent(solution, "pwd", ""));
+			user.setArgon2Password(ifLiteralPresent(solution, "pwd", ""));
 			user.setPasswordLinkExpires(ifLongPresent(solution, "expire", 0L));
 			user.setLoginCount(ifIntPresent(solution, "count", 0));
 			user.setLastLoginTime(ifLongPresent(solution, "lastLogin", 0));

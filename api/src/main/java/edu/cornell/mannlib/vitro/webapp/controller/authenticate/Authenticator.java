@@ -2,21 +2,23 @@
 
 package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
+import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
+import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
+import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
+import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
+import org.apache.commons.codec.binary.Hex;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
-import org.apache.commons.codec.binary.Hex;
-
-import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.ActiveIdentifierBundleFactories;
-import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
-import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 
 /**
  * The tool that a login process will use to interface with the user records in
@@ -55,14 +57,16 @@ public abstract class Authenticator {
 	 * 
 	 * If there is no factory, configure a Basic one.
 	 */
+	private static ConfigurationProperties cp;
 	public static Authenticator getInstance(HttpServletRequest request) {
-		ServletContext ctx = request.getSession().getServletContext();
+		 ServletContext ctx = request.getSession().getServletContext();
 		Object attribute = ctx.getAttribute(FACTORY_ATTRIBUTE_NAME);
 		if (!(attribute instanceof AuthenticatorFactory)) {
 			setAuthenticatorFactory(new BasicAuthenticator.Factory(), ctx);
 			attribute = ctx.getAttribute(FACTORY_ATTRIBUTE_NAME);
 		}
 		AuthenticatorFactory factory = (AuthenticatorFactory) attribute;
+		cp = ConfigurationProperties.getBean(ctx);
 
 		return factory.getInstance(request);
 	}
@@ -111,6 +115,17 @@ public abstract class Authenticator {
 	 */
 	public abstract boolean isCurrentPassword(UserAccount userAccount,
 			String clearTextPassword);
+
+
+	public abstract boolean isCurrentPasswordArgon2(UserAccount userAccount,
+											  String clearTextPassword);
+
+
+	/**
+	 *
+	 * Checks if the user still has got an MD5 Password
+	 */
+	public abstract boolean md5HashIsNull(UserAccount userAccount);
 
 	/**
 	 * Internal: record a new password for the user. Takes no action if the
@@ -178,6 +193,78 @@ public abstract class Authenticator {
 			// This can't happen with a normal Java runtime.
 			throw new RuntimeException(e);
 		}
+	}
+
+    /**
+     * Applies Argon2i hashing on a string.
+     * Used by tests only with pre-specified values because the configuration
+     * properties (runtime.properties) is not set at compile time.
+    **/
+
+	public static String applyArgon2iEncodingStub(String raw) {
+		Argon2 argon2 = Argon2Factory.create();
+		try {
+				return argon2.hash(200, 500, 1, raw);
+			} catch (Exception e) {
+			// This can't happen with a normal Java runtime.
+			throw new RuntimeException(e);
+		}
+	}
+
+    /**
+     * Applies Argon2i hashing on a string. Obtains the argon2i parameters
+     * from the configuration properties specified in the runtime.properties
+     * through this class "Authenticator".
+     **/
+
+	public static String applyArgon2iEncoding(String raw) {
+		Argon2 argon2 = Argon2Factory.create();
+		try {
+                if(cp.getProperty("argon2.time") != null && cp.getProperty("argon2.memory") !=null && cp.getProperty("argon2.parallelism")!=null)
+			return argon2.hash(Integer.parseInt(cp.getProperty("argon2.time")),
+					Integer.parseInt(cp.getProperty("argon2.memory")),
+					Integer.parseInt(cp.getProperty("argon2.parallelism")), raw);
+                else
+                    throw new RuntimeException("Parameters \"argon2.time\", \"argon2.memory\" and \"argon2.parallelism\" are either missing in the \"runtime.properties\" file or are not defined correctly");
+		} catch (Exception e) {
+			// This can't happen with a normal Java runtime.
+			throw new RuntimeException(e);
+		}
+	}
+
+
+
+    /**
+     * Applies Argon2i hashing on a string.
+     * When Vivo/Vitro is run for the first time the application needs to set
+     * the "root" account before a call is made to this class (Authenticator).
+     * In that case the configuration properties are passed along with the
+     * password string to this method.
+     **/
+
+	public static String applyArgon2iEncoding(ConfigurationProperties configProp, String raw) {
+		Argon2 argon2 = Argon2Factory.create();
+		try {
+			if(configProp.getProperty("argon2.time") != null && configProp.getProperty("argon2.memory") !=null && configProp.getProperty("argon2.parallelism")!=null)
+				return argon2.hash(Integer.parseInt(configProp.getProperty("argon2.time")),
+						Integer.parseInt(configProp.getProperty("argon2.memory")),
+						Integer.parseInt(configProp.getProperty("argon2.parallelism")), raw);
+			else
+				throw new RuntimeException("Parameters \"argon2.time\", \"argon2.memory\" and \"argon2.parallelism\" are either missing in the \"runtime.properties\" file or are not defined correctly");
+		} catch (Exception e) {
+			// This can't happen with a normal Java runtime.
+			throw new RuntimeException(e);
+		}
+	}
+
+    /**
+     Verifies the string against the Argon2i hash stored for a user account
+     */
+
+	public static boolean verifyArgon2iHash(String hash, String raw)
+	{
+		Argon2 argon2 = Argon2Factory.create();
+		return argon2.verify(hash, raw);
 	}
 
 	/**

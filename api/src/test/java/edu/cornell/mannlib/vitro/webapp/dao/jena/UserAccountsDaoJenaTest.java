@@ -91,19 +91,19 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 	@Before
 	public void createUserAccountValues() {
 		user1 = userAccount(URI_USER1, "email@able.edu", "Zack", "Roberts",
-				"garbage", "", 0L, false, 5, 12345678L, Status.ACTIVE, "user1",
+				"garbage", "" ,"", 0L, false, 5, 12345678L, Status.ACTIVE, "user1",
 				false, collection(URI_ROLE1), false, EMPTY);
-		userNew = userAccount("", "email@here", "Joe", "Blow", "XXXX", "YYYY",
+		userNew = userAccount("", "email@here", "Joe", "Blow", "XXXX","", "YYYY",
 				0L, false, 1, 0L, Status.ACTIVE, "jblow", false, EMPTY, false,
 				EMPTY);
 
-		userA = userAccount("", "aahern@here", "Alf", "Ahern", "XXXX", "YYYY",
+		userA = userAccount("", "aahern@here", "Alf", "Ahern", "XXXX", "", "YYYY",
 				0L, false, 1, 0L, Status.ACTIVE, "aahern", false, EMPTY, false,
 				collection(URI_PROFILE1));
-		userB = userAccount("", "email@here", "Betty", "Boop", "XXXX", "YYYY",
+		userB = userAccount("", "email@here", "Betty", "Boop", "XXXX", "", "YYYY",
 				0L, false, 1, 0L, Status.ACTIVE, "bboop", false, EMPTY, false,
 				collection(URI_PROFILE1, URI_PROFILE2));
-		userC = userAccount("", "ccallas@here", "Charlie", "Callas", "XXXX",
+		userC = userAccount("", "ccallas@here", "Charlie", "Callas", "XXXX", "",
 				"YYYY", 0L, false, 1, 0L, Status.ACTIVE, "ccallas", false,
 				EMPTY, false, collection(URI_PROFILE2));
 	}
@@ -179,7 +179,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 	@Test
 	public void updateUserAccountSuccess() {
 		UserAccount orig = userAccount(URI_USER1, "updatedEmail@able.edu",
-				"Ezekiel", "Roberts", "differentHash", "oldHash", 1L, false,
+				"Ezekiel", "Roberts", "differentHash", "", "oldHash", 1L, false,
 				43, 1020304050607080L, Status.ACTIVE, "updatedUser1", false,
 				collection(URI_ROLE1, URI_ROLE3), false, EMPTY);
 
@@ -379,7 +379,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 	}
 
 	private UserAccount userAccount(String uri, String emailAddress,
-			String firstName, String lastName, String md5Password,
+			String firstName, String lastName, String argon2Password, String md5Password,
 			String oldPassword, long passwordLinkExpires,
 			boolean passwordChangeRequired, int loginCount, long lastLoginTime,
 			Status status, String externalAuthId, boolean externalAuthOnly,
@@ -390,7 +390,9 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		ua.setEmailAddress(emailAddress);
 		ua.setFirstName(firstName);
 		ua.setLastName(lastName);
-		ua.setMd5Password(md5Password);
+		ua.setArgon2Password(argon2Password);
+		ua.setMd5Password("");
+		//ua.setMd5Password(md5Password);
 		ua.setOldPassword(oldPassword);
 		ua.setPasswordLinkExpires(passwordLinkExpires);
 		ua.setPasswordChangeRequired(passwordChangeRequired);
@@ -411,6 +413,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		out.setEmailAddress(in.getEmailAddress());
 		out.setFirstName(in.getFirstName());
 		out.setLastName(in.getLastName());
+		out.setArgon2Password(in.getArgon2Password());
 		out.setMd5Password(in.getMd5Password());
 		out.setOldPassword(in.getOldPassword());
 		out.setPasswordLinkExpires(in.getPasswordLinkExpires());
@@ -433,7 +436,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		assertEquals("email", e.getEmailAddress(), a.getEmailAddress());
 		assertEquals("first name", e.getFirstName(), a.getFirstName());
 		assertEquals("last name", e.getLastName(), a.getLastName());
-		assertEquals("password", e.getMd5Password(), a.getMd5Password());
+		assertEquals("password", e.getArgon2Password(), e.getArgon2Password());
 		assertEquals("old password", e.getOldPassword(), a.getOldPassword());
 		assertEquals("link expires", e.getPasswordLinkExpires(),
 				a.getPasswordLinkExpires());
