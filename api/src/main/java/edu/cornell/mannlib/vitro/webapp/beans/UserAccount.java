@@ -136,7 +136,6 @@ public class UserAccount {
 	public String getPasswordLinkExpiresHash() {
 		return limitStringLength(8, Authenticator.applyArgon2iEncoding(String
 				.valueOf(passwordLinkExpires)));
-		//applyMd5Encoding
 	}
 
 	public void setPasswordLinkExpires(long passwordLinkExpires) {
@@ -246,6 +245,7 @@ public class UserAccount {
 				+ (", firstName=" + firstName) + (", lastName=" + lastName)
 				+ (", md5password=" + md5Password)
 				+ (", oldPassword=" + oldPassword)
+				+ (", argon2password=" + argon2Password)
 				+ (", passwordLinkExpires=" + passwordLinkExpires)
 				+ (", passwordChangeRequired=" + passwordChangeRequired)
 				+ (", externalAuthOnly=" + externalAuthOnly)

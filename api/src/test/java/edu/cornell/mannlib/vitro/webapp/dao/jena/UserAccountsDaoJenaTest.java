@@ -104,7 +104,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 				0L, false, 1, 0L, Status.ACTIVE, "bboop", false, EMPTY, false,
 				collection(URI_PROFILE1, URI_PROFILE2));
 		userC = userAccount("", "ccallas@here", "Charlie", "Callas", "XXXX", "",
-				"YYYY", 0L, false, 1, 0L, Status.ACTIVE, "ccallas", false,
+				 "YYYY", 0L, false, 1, 0L, Status.ACTIVE, "ccallas", false,
 				EMPTY, false, collection(URI_PROFILE2));
 	}
 
@@ -392,7 +392,6 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		ua.setLastName(lastName);
 		ua.setArgon2Password(argon2Password);
 		ua.setMd5Password("");
-		//ua.setMd5Password(md5Password);
 		ua.setOldPassword(oldPassword);
 		ua.setPasswordLinkExpires(passwordLinkExpires);
 		ua.setPasswordChangeRequired(passwordChangeRequired);

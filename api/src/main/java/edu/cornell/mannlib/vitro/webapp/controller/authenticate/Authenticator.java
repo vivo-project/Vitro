@@ -59,7 +59,7 @@ public abstract class Authenticator {
 	 */
 	private static ConfigurationProperties cp;
 	public static Authenticator getInstance(HttpServletRequest request) {
-		 ServletContext ctx = request.getSession().getServletContext();
+		ServletContext ctx = request.getSession().getServletContext();
 		Object attribute = ctx.getAttribute(FACTORY_ATTRIBUTE_NAME);
 		if (!(attribute instanceof AuthenticatorFactory)) {
 			setAuthenticatorFactory(new BasicAuthenticator.Factory(), ctx);
@@ -117,6 +117,11 @@ public abstract class Authenticator {
 			String clearTextPassword);
 
 
+
+	/**
+	 * Does this UserAccount have this Argon2 password? False if the
+	 * userAccount is null.
+	 */
 	public abstract boolean isCurrentPasswordArgon2(UserAccount userAccount,
 											  String clearTextPassword);
 
@@ -220,13 +225,19 @@ public abstract class Authenticator {
 	public static String applyArgon2iEncoding(String raw) {
 		Argon2 argon2 = Argon2Factory.create();
 		try {
-                if(cp.getProperty("argon2.time") != null && cp.getProperty("argon2.memory") !=null && cp.getProperty("argon2.parallelism")!=null)
-			return argon2.hash(Integer.parseInt(cp.getProperty("argon2.time")),
-					Integer.parseInt(cp.getProperty("argon2.memory")),
-					Integer.parseInt(cp.getProperty("argon2.parallelism")), raw);
-                else
-                    throw new RuntimeException("Parameters \"argon2.time\", \"argon2.memory\" and \"argon2.parallelism\" are either missing in the \"runtime.properties\" file or are not defined correctly");
-		} catch (Exception e) {
+                if(cp.getProperty("argon2.time") != null && cp.getProperty("argon2.memory") !=null
+                        && cp.getProperty("argon2.parallelism")!=null) {
+                    return argon2.hash(Integer.parseInt(cp.getProperty("argon2.time")),
+                            Integer.parseInt(cp.getProperty("argon2.memory")),
+                            Integer.parseInt(cp.getProperty("argon2.parallelism")), raw);
+                }
+                else {
+                    throw new RuntimeException("Parameters \"argon2.time\", \"argon2.memory\" " +
+                            "and \"argon2.parallelism\" are either missing in the \"runtime.properties\"" +
+                            " file or are not defined correctly");
+                }
+		}
+		catch (Exception e) {
 			// This can't happen with a normal Java runtime.
 			throw new RuntimeException(e);
 		}
@@ -245,13 +256,19 @@ public abstract class Authenticator {
 	public static String applyArgon2iEncoding(ConfigurationProperties configProp, String raw) {
 		Argon2 argon2 = Argon2Factory.create();
 		try {
-			if(configProp.getProperty("argon2.time") != null && configProp.getProperty("argon2.memory") !=null && configProp.getProperty("argon2.parallelism")!=null)
-				return argon2.hash(Integer.parseInt(configProp.getProperty("argon2.time")),
-						Integer.parseInt(configProp.getProperty("argon2.memory")),
-						Integer.parseInt(configProp.getProperty("argon2.parallelism")), raw);
-			else
-				throw new RuntimeException("Parameters \"argon2.time\", \"argon2.memory\" and \"argon2.parallelism\" are either missing in the \"runtime.properties\" file or are not defined correctly");
-		} catch (Exception e) {
+			if(configProp.getProperty("argon2.time") != null && configProp.getProperty("argon2.memory") !=null
+                    && configProp.getProperty("argon2.parallelism")!=null) {
+                return argon2.hash(Integer.parseInt(configProp.getProperty("argon2.time")),
+                        Integer.parseInt(configProp.getProperty("argon2.memory")),
+                        Integer.parseInt(configProp.getProperty("argon2.parallelism")), raw);
+            }
+			else {
+                throw new RuntimeException("Parameters \"argon2.time\", \"argon2.memory\" " +
+                        "and \"argon2.parallelism\" are either missing in the \"runtime.properties\"" +
+                        " file or are not defined correctly");
+            }
+		}
+		catch (Exception e) {
 			// This can't happen with a normal Java runtime.
 			throw new RuntimeException(e);
 		}

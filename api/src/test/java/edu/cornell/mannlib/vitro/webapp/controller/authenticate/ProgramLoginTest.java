@@ -100,7 +100,6 @@ public class ProgramLoginTest extends AbstractTestClass {
 				.singleton(PermissionSets.URI_DBA));
 		user.setArgon2Password(Authenticator.applyArgon2iEncodingStub(password));
 		user.setMd5Password("");
-		//user.setMd5Password(Authenticator.applyMd5Encoding(password));
 		user.setLoginCount(loginCount);
 		user.setPasswordChangeRequired(loginCount == 0);
 		return user;
@@ -181,15 +180,12 @@ public class ProgramLoginTest extends AbstractTestClass {
 			String newPassword) {
 		if (email != null) {
 			request.addParameter(PARAM_EMAIL_ADDRESS, email);
-			System.out.println("1");
 		}
 		if (password != null) {
 			request.addParameter(PARAM_PASSWORD, password);
-			System.out.println("2");
 		}
 		if (newPassword != null) {
 			request.addParameter(PARAM_NEW_PASSWORD, newPassword);
-			System.out.println("3");
 		}
 
 		try {

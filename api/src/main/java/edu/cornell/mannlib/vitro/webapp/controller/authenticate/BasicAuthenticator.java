@@ -100,7 +100,8 @@ public class BasicAuthenticator extends Authenticator {
 
 	@Override
 	public boolean md5HashIsNull(UserAccount userAccount){
-		if(userAccount.getMd5Password().compareTo("")==0 || userAccount.getMd5Password()==null)
+		if(userAccount.getMd5Password().compareTo("")==0 ||
+				userAccount.getMd5Password()==null)
 			return  true;
 		else
 			return false;
@@ -109,17 +110,16 @@ public class BasicAuthenticator extends Authenticator {
 
 	@Override
 	public boolean isCurrentPasswordArgon2(UserAccount userAccount,
-									 String clearTextPassword) {
+										   String clearTextPassword) {
 		if (userAccount == null) {
 			return false;
 		}
 		if (clearTextPassword == null) {
 			return false;
 		}
-
-		return verifyArgon2iHash(userAccount.getArgon2Password(),clearTextPassword);
+		return verifyArgon2iHash(userAccount.getArgon2Password(),
+				clearTextPassword);
 	}
-
 
 
 	@Override
@@ -129,7 +129,8 @@ public class BasicAuthenticator extends Authenticator {
 			log.error("Trying to change password on null user.");
 			return;
 		}
-		userAccount.setArgon2Password((applyArgon2iEncoding(newClearTextPassword)));
+		userAccount.setArgon2Password((applyArgon2iEncoding(
+				newClearTextPassword)));
 		userAccount.setMd5Password("");
 		userAccount.setPasswordChangeRequired(false);
 		userAccount.setPasswordLinkExpires(0L);

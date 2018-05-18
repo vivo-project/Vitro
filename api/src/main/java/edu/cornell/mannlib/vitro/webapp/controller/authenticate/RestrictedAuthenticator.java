@@ -78,7 +78,8 @@ public class RestrictedAuthenticator extends Authenticator {
 
 	@Override
 	public boolean md5HashIsNull(UserAccount userAccount){
-		if(userAccount.getMd5Password().compareTo("")==0 || userAccount.getMd5Password()==null)
+		if(userAccount.getMd5Password().compareTo("")==0 ||
+				userAccount.getMd5Password()==null)
 			return  true;
 		else
 			return false;
@@ -94,8 +95,8 @@ public class RestrictedAuthenticator extends Authenticator {
 		if (clearTextPassword == null) {
 			return false;
 		}
-
-		return verifyArgon2iHash(userAccount.getArgon2Password(),clearTextPassword);
+		return verifyArgon2iHash(userAccount.getArgon2Password(),
+				clearTextPassword);
 	}
 
 

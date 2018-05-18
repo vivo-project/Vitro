@@ -169,7 +169,6 @@ public class ProgramLogin extends HttpServlet {
 					return false;
 				else {
 					userAccount.setPasswordChangeRequired(true);
-				//	userAccount.setMd5Password("");
 				}
 			}
 			return true;

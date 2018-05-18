@@ -339,21 +339,25 @@ public class Authenticate extends VitroHttpServlet {
 
 
 		if(getAuthenticator(request).md5HashIsNull(user)) {
-			if (!getAuthenticator(request).isCurrentPasswordArgon2(user, password)) {
-				bean.setMessage(request, ERROR, "error_incorrect_credentials");
+			if (!getAuthenticator(request)
+					.isCurrentPasswordArgon2(user, password)) {
+				bean.setMessage(request, ERROR,
+						"error_incorrect_credentials");
 				return;
 			}
 		}
 		else {
-				if (!getAuthenticator(request).isCurrentPassword(user, password)) {
-					bean.setMessage(request, ERROR, "error_incorrect_credentials");
+				if (!getAuthenticator(request)
+						.isCurrentPassword(user, password)) {
+					bean.setMessage(request, ERROR,
+							"error_incorrect_credentials");
 					return;
 				}
 				else {
 					 user.setPasswordChangeRequired(true);
 					 user.setMd5Password("");
 				}
-			}
+		}
 
 
 
