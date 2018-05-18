@@ -4,6 +4,12 @@ package edu.cornell.mannlib.vitro.webapp.config;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Arrays;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.Path;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -25,10 +31,11 @@ public class ConfigurationPropertiesSmokeTests implements
 			.getLog(ConfigurationPropertiesSmokeTests.class);
 
 	private static final String PROPERTY_DEFAULT_NAMESPACE = "Vitro.defaultNamespace";
-	private static final String PROPERTY_LANGUAGE_BUILD = "languages.addToBuild";
 	private static final String PROPERTY_LANGUAGE_SELECTABLE = "languages.selectableLocales";
 	private static final String PROPERTY_LANGUAGE_FORCE = "languages.forceLocale";
 	private static final String PROPERTY_LANGUAGE_FILTER = "RDFService.languageFilter";
+	private static final String VIVO_BUNDLE_PREFIX = "vivo_all_";
+	private static final String VITRO_BUNDLE_PREFIX = "all_";
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -38,7 +45,7 @@ public class ConfigurationPropertiesSmokeTests implements
 
 		checkDefaultNamespace(ctx, props, ss);
 		checkMultipleRPFs(ctx, props, ss);
-		checkLanguages(props, ss);
+		checkLanguages(ctx, props, ss);
 	}
 
 	/**
@@ -106,10 +113,7 @@ public class ConfigurationPropertiesSmokeTests implements
 	 * languages and force language. Shouldn't build with language unless
 	 * language filtering is enabled.
 	 */
-	private void checkLanguages(ConfigurationProperties props, StartupStatus ss) {
-		String buildString = props.getProperty(PROPERTY_LANGUAGE_BUILD);
-		boolean buildWithLanguages = StringUtils.isNotBlank(buildString);
-
+	private void checkLanguages(ServletContext ctx, ConfigurationProperties props, StartupStatus ss) {
 		String selectString = props.getProperty(PROPERTY_LANGUAGE_SELECTABLE);
 		boolean selectableLanguages = StringUtils.isNotBlank(selectString);
 
@@ -119,14 +123,46 @@ public class ConfigurationPropertiesSmokeTests implements
 		String filterString = props.getProperty(PROPERTY_LANGUAGE_FILTER,
 				"true");
 		boolean languageFilter = Boolean.valueOf(filterString);
+		String i18nDirPath = ctx.getRealPath("/i18n");
 
-		if (selectableLanguages && !buildWithLanguages) {
-			ss.warning(this, String.format("Problem with Language setup - "
-					+ "runtime.properties specifies a "
-					+ "list of selectable languages (%s = %s), but "
-					+ "build.properties did not include any languages with %s",
-					PROPERTY_LANGUAGE_SELECTABLE, selectString,
-					PROPERTY_LANGUAGE_BUILD));
+		if (i18nDirPath == null) {
+			throw new IllegalStateException(
+					"Application does not have an /i18n directory.");
+		}
+
+		List<String> i18nNames = null;
+
+		try {
+		  i18nNames = geti18nNames(i18nDirPath);
+		}
+		catch(java.io.IOException e) {
+		  e.printStackTrace();
+		}
+
+
+		log.debug("i18nNames: " + i18nNames);
+
+		if (i18nNames.isEmpty()) {
+			ss.fatal(this, "The application found no files in '"
+					+ i18nDirPath
+					+ "' .");
+		}
+		else {
+			ss.info(this, "Base language files loaded: " + i18nNames);
+		}
+
+		/* Make sure language files exist for values in the selectableLocales propery.
+		   The prefixes of vitro and vivo are hard coded into the app,
+		   so we can assume the bundle names must have the same file format */
+		List<String> selectableLanguagesList = Arrays.asList(selectString.split("\\s*,\\s*"));
+		for (String language : selectableLanguagesList) {
+			String vivoBundle = VIVO_BUNDLE_PREFIX + language + ".properties";
+			String vitroBundle = VITRO_BUNDLE_PREFIX + language + ".properties";
+		    if (!i18nNames.contains(vivoBundle) && !i18nNames.contains(vitroBundle)) {
+		      ss.warning(this, language + " was found in the value for "
+							+ PROPERTY_LANGUAGE_SELECTABLE + " but no corresponding "
+							+ "language file was found.");
+		    }
 		}
 
 		if (selectableLanguages && forceLanguage) {
@@ -138,15 +174,27 @@ public class ConfigurationPropertiesSmokeTests implements
 					PROPERTY_LANGUAGE_SELECTABLE, selectString));
 		}
 
-		if (buildWithLanguages && !languageFilter) {
+		if (selectableLanguages && !languageFilter) {
 			ss.warning(this, String.format("Problem with Language setup - "
-					+ "build.properties includes one or more additional "
+					+ "languages.selectableLocales in runtime.properties "
+					+ "includes one or more additional "
 					+ "languages (%s = %s), but runtime.properties has "
 					+ "disabled language filtering (%s = %s). This will "
 					+ "likely result in a mix of languages in the "
-					+ "application.", PROPERTY_LANGUAGE_BUILD, buildString,
+					+ "application.", PROPERTY_LANGUAGE_SELECTABLE, selectString,
 					PROPERTY_LANGUAGE_FILTER, filterString));
 		}
+	}
+
+	/** Create a list of the names of available language files. */
+	private List<String> geti18nNames(String i18nBaseDirPath) throws java.io.IOException {
+		List<String> i18nNames = Files.walk(Paths.get(i18nBaseDirPath))
+				.filter(Files::isRegularFile)
+				.map(Path::getFileName)
+				.map(p -> {return p.toString();})
+		    .collect(Collectors.toList());
+
+		return i18nNames;
 	}
 
 	@Override
