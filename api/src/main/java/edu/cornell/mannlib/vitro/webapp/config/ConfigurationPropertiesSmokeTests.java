@@ -4,6 +4,7 @@ package edu.cornell.mannlib.vitro.webapp.config;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Arrays;
 import java.nio.file.Files;
@@ -132,13 +133,7 @@ public class ConfigurationPropertiesSmokeTests implements
 
 		List<String> i18nNames = null;
 
-		try {
-		  i18nNames = geti18nNames(i18nDirPath);
-		}
-		catch(java.io.IOException e) {
-		  e.printStackTrace();
-		}
-
+		i18nNames = geti18nNames(i18nDirPath);
 
 		log.debug("i18nNames: " + i18nNames);
 
@@ -187,14 +182,16 @@ public class ConfigurationPropertiesSmokeTests implements
 	}
 
 	/** Create a list of the names of available language files. */
-	private List<String> geti18nNames(String i18nBaseDirPath) throws java.io.IOException {
-		List<String> i18nNames = Files.walk(Paths.get(i18nBaseDirPath))
-				.filter(Files::isRegularFile)
-				.map(Path::getFileName)
-				.map(p -> {return p.toString();})
-		    .collect(Collectors.toList());
-
-		return i18nNames;
+	private List<String> geti18nNames(String i18nBaseDirPath) {
+		try {
+			return Files.walk(Paths.get(i18nBaseDirPath))
+					.filter(Files::isRegularFile)
+					.map(Path::getFileName)
+					.map(p -> {return p.toString();})
+					.collect(Collectors.toList());
+		} catch (IOException e) {
+			throw new RuntimeException("Failed to find language files", e);
+		}
 	}
 
 	@Override
