@@ -391,7 +391,7 @@ public class UserAccountsDaoJenaTest extends AbstractTestClass {
 		ua.setFirstName(firstName);
 		ua.setLastName(lastName);
 		ua.setArgon2Password(argon2Password);
-		ua.setMd5Password("");
+		ua.setMd5Password(md5Password);
 		ua.setOldPassword(oldPassword);
 		ua.setPasswordLinkExpires(passwordLinkExpires);
 		ua.setPasswordChangeRequired(passwordChangeRequired);
