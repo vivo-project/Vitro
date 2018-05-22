@@ -29,6 +29,9 @@ public class ConfigurationPropertiesSmokeTests implements
 	private static final String PROPERTY_LANGUAGE_SELECTABLE = "languages.selectableLocales";
 	private static final String PROPERTY_LANGUAGE_FORCE = "languages.forceLocale";
 	private static final String PROPERTY_LANGUAGE_FILTER = "RDFService.languageFilter";
+	private static final String PROPERTY_ARGON2_TIME = "argon2.time";
+	private static final String PROPERTY_ARGON2_MEMORY = "argon2.memory";
+	private static final String PROPERTY_ARGON2_PARALLELISM = "argon2.parallelism";
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -38,6 +41,7 @@ public class ConfigurationPropertiesSmokeTests implements
 
 		checkDefaultNamespace(ctx, props, ss);
 		checkLanguages(props, ss);
+		checkEncryptionParameters(props, ss);
 	}
 
 	/**
@@ -119,6 +123,26 @@ public class ConfigurationPropertiesSmokeTests implements
 					+ "likely result in a mix of languages in the "
 					+ "application.", PROPERTY_LANGUAGE_BUILD, buildString,
 					PROPERTY_LANGUAGE_FILTER, filterString));
+		}
+	}
+
+	/**
+	 * Fail if there are no config properties for the Argon2 encryption.
+	 */
+	private void checkEncryptionParameters(ConfigurationProperties props,
+										   StartupStatus ss) {
+		failIfNotPresent(props, ss, PROPERTY_ARGON2_TIME);
+		failIfNotPresent(props, ss, PROPERTY_ARGON2_MEMORY);
+		failIfNotPresent(props, ss, PROPERTY_ARGON2_PARALLELISM);
+	}
+
+	private void failIfNotPresent(ConfigurationProperties props,
+								  StartupStatus ss, String name) {
+		String value = props.getProperty(name);
+		if (value == null || value.isEmpty()) {
+			ss.fatal(this, "runtime.properties does not contain a value for '"
+					+ name + "'");
+			return;
 		}
 	}
 
