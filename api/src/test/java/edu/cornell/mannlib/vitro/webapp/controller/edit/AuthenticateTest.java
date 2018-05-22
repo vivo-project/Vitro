@@ -191,7 +191,7 @@ public class AuthenticateTest extends AbstractTestClass {
 		user.setEmailAddress(userInfo.username);
 		user.setUri(userInfo.uri);
 		user.setPermissionSetUris(userInfo.permissionSetUris);
-		user.setArgon2Password(Authenticator.applyArgon2iEncodingStub(userInfo.password));
+		user.setArgon2Password(AuthenticatorStub.applyArgon2iEncodingStub(userInfo.password));
 		user.setMd5Password("");
 		user.setLoginCount(userInfo.loginCount);
 		user.setPasswordChangeRequired(userInfo.loginCount == 0);

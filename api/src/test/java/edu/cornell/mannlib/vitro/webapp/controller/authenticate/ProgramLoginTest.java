@@ -98,7 +98,7 @@ public class ProgramLoginTest extends AbstractTestClass {
 		user.setUri(uri);
 		user.setPermissionSetUris(Collections
 				.singleton(PermissionSets.URI_DBA));
-		user.setArgon2Password(Authenticator.applyArgon2iEncodingStub(password));
+		user.setArgon2Password(AuthenticatorStub.applyArgon2iEncodingStub(password));
 		user.setMd5Password("");
 		user.setLoginCount(loginCount);
 		user.setPasswordChangeRequired(loginCount == 0);

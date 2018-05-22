@@ -10,7 +10,7 @@ import edu.cornell.mannlib.vitro.webapp.auth.identifier.IdentifierBundle;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
 import edu.cornell.mannlib.vitro.webapp.config.ConfigurationProperties;
 import org.apache.commons.codec.binary.Hex;
-
+import edu.cornell.mannlib.vitro.webapp.application.ApplicationUtils;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.servlet.ServletContext;
@@ -57,7 +57,7 @@ public abstract class Authenticator {
 	 * 
 	 * If there is no factory, configure a Basic one.
 	 */
-	private static ConfigurationProperties cp;
+
 	public static Authenticator getInstance(HttpServletRequest request) {
 		ServletContext ctx = request.getSession().getServletContext();
 		Object attribute = ctx.getAttribute(FACTORY_ATTRIBUTE_NAME);
@@ -66,7 +66,6 @@ public abstract class Authenticator {
 			attribute = ctx.getAttribute(FACTORY_ATTRIBUTE_NAME);
 		}
 		AuthenticatorFactory factory = (AuthenticatorFactory) attribute;
-		cp = ConfigurationProperties.getBean(ctx);
 
 		return factory.getInstance(request);
 	}
@@ -200,79 +199,35 @@ public abstract class Authenticator {
 		}
 	}
 
-    /**
-     * Applies Argon2i hashing on a string.
-     * Used by tests only with pre-specified values because the configuration
-     * properties (runtime.properties) is not set at compile time.
-    **/
 
-	public static String applyArgon2iEncodingStub(String raw) {
-		Argon2 argon2 = Argon2Factory.create();
-		try {
-				return argon2.hash(200, 500, 1, raw);
-			} catch (Exception e) {
-			// This can't happen with a normal Java runtime.
-			throw new RuntimeException(e);
-		}
-	}
+	/**
+	 * Applies Argon2i hashing on a string. Obtains the argon2i parameters
+	 * from the configuration properties specified in the runtime.properties
+	 * through this class "Authenticator".
+	 **/
 
-    /**
-     * Applies Argon2i hashing on a string. Obtains the argon2i parameters
-     * from the configuration properties specified in the runtime.properties
-     * through this class "Authenticator".
-     **/
 
 	public static String applyArgon2iEncoding(String raw) {
+		ServletContext ctx = ApplicationUtils.instance().getServletContext();
+		ConfigurationProperties configProp = ConfigurationProperties.getBean(ctx);
+
 		Argon2 argon2 = Argon2Factory.create();
-		try {
-                if(cp.getProperty("argon2.time") != null && cp.getProperty("argon2.memory") !=null
-                        && cp.getProperty("argon2.parallelism")!=null) {
-                    return argon2.hash(Integer.parseInt(cp.getProperty("argon2.time")),
-                            Integer.parseInt(cp.getProperty("argon2.memory")),
-                            Integer.parseInt(cp.getProperty("argon2.parallelism")), raw);
-                }
-                else {
-                    throw new RuntimeException("Parameters \"argon2.time\", \"argon2.memory\" " +
-                            "and \"argon2.parallelism\" are either missing in the \"runtime.properties\"" +
-                            " file or are not defined correctly");
-                }
-		}
-		catch (Exception e) {
-			// This can't happen with a normal Java runtime.
-			throw new RuntimeException(e);
+		if (configProp.getProperty("argon2.time") != null
+				&& configProp.getProperty("argon2.memory") != null
+				&& configProp.getProperty("argon2.parallelism") != null) {
+			return argon2.hash(
+					Integer.parseInt(configProp.getProperty("argon2.time")),
+					Integer.parseInt(configProp.getProperty("argon2.memory")),
+					Integer.parseInt(configProp.getProperty("argon2.parallelism")), raw);
+		} else {
+			throw new RuntimeException(
+					"Parameters \"argon2.time\", \"argon2.memory\" and "
+							+ "\"argon2.parallelism\" are either missing in the "
+							+ "\"runtime.properties\" file or are not defined correctly");
 		}
 	}
 
 
-
-    /**
-     * Applies Argon2i hashing on a string.
-     * When Vivo/Vitro is run for the first time the application needs to set
-     * the "root" account before a call is made to this class (Authenticator).
-     * In that case the configuration properties are passed along with the
-     * password string to this method.
-     **/
-
-	public static String applyArgon2iEncoding(ConfigurationProperties configProp, String raw) {
-		Argon2 argon2 = Argon2Factory.create();
-		try {
-			if(configProp.getProperty("argon2.time") != null && configProp.getProperty("argon2.memory") !=null
-                    && configProp.getProperty("argon2.parallelism")!=null) {
-                return argon2.hash(Integer.parseInt(configProp.getProperty("argon2.time")),
-                        Integer.parseInt(configProp.getProperty("argon2.memory")),
-                        Integer.parseInt(configProp.getProperty("argon2.parallelism")), raw);
-            }
-			else {
-                throw new RuntimeException("Parameters \"argon2.time\", \"argon2.memory\" " +
-                        "and \"argon2.parallelism\" are either missing in the \"runtime.properties\"" +
-                        " file or are not defined correctly");
-            }
-		}
-		catch (Exception e) {
-			// This can't happen with a normal Java runtime.
-			throw new RuntimeException(e);
-		}
-	}
 
     /**
      Verifies the string against the Argon2i hash stored for a user account

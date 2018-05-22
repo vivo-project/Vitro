@@ -150,7 +150,7 @@ public class RootUserPolicy implements PolicyIface {
 			ua.setEmailAddress(configuredRootUser);
 			ua.setFirstName("root");
 			ua.setLastName("user");
-			ua.setArgon2Password(Authenticator.applyArgon2iEncoding(cp,
+			ua.setArgon2Password(Authenticator.applyArgon2iEncoding(
 					ROOT_USER_INITIAL_PASSWORD));
 			ua.setMd5Password("");
 			ua.setPasswordChangeRequired(true);

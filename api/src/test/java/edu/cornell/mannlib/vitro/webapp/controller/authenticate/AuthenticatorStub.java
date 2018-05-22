@@ -9,6 +9,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean;
 import edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource;
 import edu.cornell.mannlib.vitro.webapp.beans.UserAccount;
@@ -112,6 +114,22 @@ public class AuthenticatorStub extends Authenticator {
 				return false;
 		}
 		return false;
+	}
+
+	/**
+	 * Applies Argon2i hashing on a string.
+	 * Used by tests only with pre-specified values because the configuration
+	 * properties (runtime.properties) is not set at compile time.
+	 **/
+
+	public static String applyArgon2iEncodingStub(String raw) {
+		Argon2 argon2 = Argon2Factory.create();
+		try {
+			return argon2.hash(200, 500, 1, raw);
+		} catch (Exception e) {
+			// This can't happen with a normal Java runtime.
+			throw new RuntimeException(e);
+		}
 	}
 
 
