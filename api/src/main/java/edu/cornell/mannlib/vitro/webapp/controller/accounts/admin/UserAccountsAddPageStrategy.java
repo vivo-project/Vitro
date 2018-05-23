@@ -198,8 +198,8 @@ public abstract class UserAccountsAddPageStrategy extends UserAccountsPage {
 		@Override
 		protected void setAdditionalProperties(UserAccount u) {
 			if (!page.isExternalAuthOnly()) {
-				u.setMd5Password(Authenticator
-						.applyMd5Encoding(initialPassword));
+				u.setArgon2Password(Authenticator.applyArgon2iEncoding(initialPassword));
+				u.setMd5Password("");
 				u.setPasswordChangeRequired(true);
 			}
 			u.setStatus(Status.ACTIVE);

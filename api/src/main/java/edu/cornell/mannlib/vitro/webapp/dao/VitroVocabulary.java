@@ -149,6 +149,7 @@ public class VitroVocabulary {
     public static final String USERACCOUNT_EMAIL_ADDRESS = VITRO_AUTH + "emailAddress";
     public static final String USERACCOUNT_FIRST_NAME = VITRO_AUTH + "firstName";
     public static final String USERACCOUNT_LAST_NAME = VITRO_AUTH + "lastName";
+    public static final String USERACCOUNT_ARGON2_PASSWORD = VITRO_AUTH + "argon2password";
     public static final String USERACCOUNT_MD5_PASSWORD = VITRO_AUTH + "md5password";
     public static final String USERACCOUNT_OLD_PASSWORD = VITRO_AUTH + "oldpassword";
     public static final String USERACCOUNT_LOGIN_COUNT = VITRO_AUTH + "loginCount";

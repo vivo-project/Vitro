@@ -141,8 +141,12 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 		}
 
 		private boolean newPasswordRequired() {
-			return auth.isCurrentPassword(userAccount, password)
-					&& (userAccount.isPasswordChangeRequired());
+			if(auth.md5HashIsNull(userAccount)) {
+				return auth.isCurrentPasswordArgon2(userAccount, password)
+						&& userAccount.isPasswordChangeRequired();
+			}
+			else
+				return auth.isCurrentPassword(userAccount, password);  // MD5 password should be changed anyway
 		}
 
 		private boolean isPasswordValidLength(String pw) {
@@ -151,8 +155,18 @@ public class AdminLoginController extends FreemarkerHttpServlet {
 		}
 
 		private boolean tryToLogin() {
-			if (!auth.isCurrentPassword(userAccount, password)) {
-				return false;
+			if(auth.md5HashIsNull(userAccount)) {
+				if (!auth.isCurrentPasswordArgon2(userAccount, password))
+					return false;
+			}
+			else {
+				if (!auth.isCurrentPassword(userAccount, password))
+					return false;
+				else {
+					userAccount.setPasswordChangeRequired(true);
+					userAccount.setMd5Password("");
+
+				}
 			}
 
 			try {

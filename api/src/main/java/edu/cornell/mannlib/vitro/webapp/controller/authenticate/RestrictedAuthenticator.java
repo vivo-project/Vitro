@@ -77,6 +77,30 @@ public class RestrictedAuthenticator extends Authenticator {
 	}
 
 	@Override
+	public boolean md5HashIsNull(UserAccount userAccount){
+		if(userAccount.getMd5Password().compareTo("")==0 ||
+				userAccount.getMd5Password()==null)
+			return  true;
+		else
+			return false;
+	}
+
+
+	@Override
+	public boolean isCurrentPasswordArgon2(UserAccount userAccount,
+										   String clearTextPassword) {
+		if (userAccount == null) {
+			return false;
+		}
+		if (clearTextPassword == null) {
+			return false;
+		}
+		return verifyArgon2iHash(userAccount.getArgon2Password(),
+				clearTextPassword);
+	}
+
+
+	@Override
 	public boolean isCurrentPassword(UserAccount userAccount,
 			String clearTextPassword) {
 		return auth.isCurrentPassword(userAccount, clearTextPassword);

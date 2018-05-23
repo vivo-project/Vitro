@@ -99,13 +99,39 @@ public class BasicAuthenticator extends Authenticator {
 	}
 
 	@Override
+	public boolean md5HashIsNull(UserAccount userAccount){
+		if(userAccount.getMd5Password().compareTo("")==0 ||
+				userAccount.getMd5Password()==null)
+			return  true;
+		else
+			return false;
+	}
+
+
+	@Override
+	public boolean isCurrentPasswordArgon2(UserAccount userAccount,
+										   String clearTextPassword) {
+		if (userAccount == null) {
+			return false;
+		}
+		if (clearTextPassword == null) {
+			return false;
+		}
+		return verifyArgon2iHash(userAccount.getArgon2Password(),
+				clearTextPassword);
+	}
+
+
+	@Override
 	public void recordNewPassword(UserAccount userAccount,
 			String newClearTextPassword) {
 		if (userAccount == null) {
 			log.error("Trying to change password on null user.");
 			return;
 		}
-		userAccount.setMd5Password(applyMd5Encoding(newClearTextPassword));
+		userAccount.setArgon2Password((applyArgon2iEncoding(
+				newClearTextPassword)));
+		userAccount.setMd5Password("");
 		userAccount.setPasswordChangeRequired(false);
 		userAccount.setPasswordLinkExpires(0L);
 		getUserAccountsDao().updateUserAccount(userAccount);

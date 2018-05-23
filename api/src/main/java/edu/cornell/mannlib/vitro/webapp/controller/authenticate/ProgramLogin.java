@@ -5,6 +5,7 @@ package edu.cornell.mannlib.vitro.webapp.controller.authenticate;
 import static edu.cornell.mannlib.vedit.beans.LoginStatusBean.AuthenticationSource.INTERNAL;
 import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MAX_PASSWORD_LENGTH;
 import static edu.cornell.mannlib.vitro.webapp.beans.UserAccount.MIN_PASSWORD_LENGTH;
+import static edu.cornell.mannlib.vitro.webapp.controller.login.LoginProcessBean.MLevel.ERROR;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -158,7 +159,19 @@ public class ProgramLogin extends HttpServlet {
 		}
 
 		private boolean usernameAndPasswordAreValid() {
-			return auth.isCurrentPassword(userAccount, password);
+
+			if(auth.md5HashIsNull(userAccount)) {
+				if (!auth.isCurrentPasswordArgon2(userAccount, password))
+					return false;
+			}
+			else {
+				if (!auth.isCurrentPassword(userAccount, password))
+					return false;
+				else {
+					userAccount.setPasswordChangeRequired(true);
+				}
+			}
+			return true;
 		}
 
 		private boolean loginDisabled() {

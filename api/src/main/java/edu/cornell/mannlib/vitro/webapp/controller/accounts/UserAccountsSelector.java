@@ -37,7 +37,7 @@ public class UserAccountsSelector {
 			+ "PREFIX auth: <http://vitro.mannlib.cornell.edu/ns/vitro/authorization#> \n";
 
 	private static final String ALL_VARIABLES = "?uri ?email ?firstName "
-			+ "?lastName ?pwd ?expire ?count ?lastLogin ?status ?isRoot";
+			+ "?lastName ?md5pwd ?a2pwd ?expire ?count ?lastLogin ?status ?isRoot";
 
 	private static final String COUNT_VARIABLE = "?uri";
 
@@ -158,7 +158,8 @@ public class UserAccountsSelector {
 	private String optionalClauses() {
 		return "OPTIONAL { ?uri auth:firstName ?firstName } \n"
 				+ "    OPTIONAL { ?uri auth:lastName ?lastName } \n"
-				+ "    OPTIONAL { ?uri auth:md5password ?pwd } \n"
+				+ "    OPTIONAL { ?uri auth:md5password ?md5pwd } \n"
+				+ "    OPTIONAL { ?uri auth:argon2password ?a2pwd } \n"
 				+ "    OPTIONAL { ?uri auth:passwordChangeExpires ?expire } \n"
 				+ "    OPTIONAL { ?uri auth:loginCount ?count } \n"
 				+ "    OPTIONAL { ?uri auth:lastLoginTime ?lastLogin } \n"
@@ -245,7 +246,8 @@ public class UserAccountsSelector {
 			user.setEmailAddress(solution.getLiteral("email").getString());
 			user.setFirstName(ifLiteralPresent(solution, "firstName", ""));
 			user.setLastName(ifLiteralPresent(solution, "lastName", ""));
-			user.setMd5Password(ifLiteralPresent(solution, "pwd", ""));
+			user.setMd5Password(ifLiteralPresent(solution, "md5pwd", ""));
+			user.setArgon2Password(ifLiteralPresent(solution, "a2pwd", ""));
 			user.setPasswordLinkExpires(ifLongPresent(solution, "expire", 0L));
 			user.setLoginCount(ifIntPresent(solution, "count", 0));
 			user.setLastLoginTime(ifLongPresent(solution, "lastLogin", 0));
