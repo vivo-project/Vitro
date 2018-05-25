@@ -37,6 +37,9 @@ public class ConfigurationPropertiesSmokeTests implements
 	private static final String PROPERTY_LANGUAGE_FILTER = "RDFService.languageFilter";
 	private static final String VIVO_BUNDLE_PREFIX = "vivo_all_";
 	private static final String VITRO_BUNDLE_PREFIX = "all_";
+	private static final String PROPERTY_ARGON2_TIME = "argon2.time";
+	private static final String PROPERTY_ARGON2_MEMORY = "argon2.memory";
+	private static final String PROPERTY_ARGON2_PARALLELISM = "argon2.parallelism";
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -47,6 +50,8 @@ public class ConfigurationPropertiesSmokeTests implements
 		checkDefaultNamespace(ctx, props, ss);
 		checkMultipleRPFs(ctx, props, ss);
 		checkLanguages(ctx, props, ss);
+		checkEncryptionParameters(props, ss);
+
 	}
 
 	/**
@@ -191,6 +196,27 @@ public class ConfigurationPropertiesSmokeTests implements
 					.collect(Collectors.toList());
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to find language files", e);
+		}
+	}  
+
+	/**
+	 * Fail if there are no config properties for the Argon2 encryption.
+	 */
+	private void checkEncryptionParameters(ConfigurationProperties props,
+										   StartupStatus ss) {
+		failIfNotPresent(props, ss, PROPERTY_ARGON2_TIME);
+		failIfNotPresent(props, ss, PROPERTY_ARGON2_MEMORY);
+		failIfNotPresent(props, ss, PROPERTY_ARGON2_PARALLELISM);
+	}
+
+	private void failIfNotPresent(ConfigurationProperties props,
+								  StartupStatus ss, String name) {
+		String value = props.getProperty(name);
+		if (value == null || value.isEmpty()) {
+			ss.fatal(this, "runtime.properties does not contain a value for '"
+					+ name + "'");
+			return;
+
 		}
 	}
 

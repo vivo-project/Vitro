@@ -102,7 +102,7 @@ public class PolicyHelper {
 			String uri = user.getUri();
 			log.debug("userAccount is '" + uri + "'");
 
-			if (!auth.isCurrentPassword(user, password)) {
+			if (!auth.isCurrentPasswordArgon2(user, password)) {
 				log.debug(String.format("UNAUTHORIZED, password not accepted "
 						+ "for %s, account URI: %s", email, uri));
 				return false;
